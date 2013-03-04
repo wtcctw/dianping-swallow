@@ -235,9 +235,9 @@
 				<version>3.0.5.RELEASE</version>
 			</dependency>
 			<dependency>
-				<groupId>com.dianping</groupId>
+				<groupId>com.geekhua</groupId>
 				<artifactId>file-queue</artifactId>
-				<version>1.1.1</version>
+				<version>0.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.dianping.dpsf</groupId>
@@ -253,6 +253,11 @@
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
 				<version>1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>1.4</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

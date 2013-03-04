@@ -83,7 +83,7 @@
             <artifactId>dpsf-net</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.dianping</groupId>
+            <groupId>com.geekhua</groupId>
             <artifactId>file-queue</artifactId>
         </dependency>
     </dependencies>
