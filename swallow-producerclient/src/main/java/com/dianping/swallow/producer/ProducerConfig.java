@@ -120,7 +120,8 @@ public class ProducerConfig {
     }
 
     /**
-     * 设置异步模式（{@link ProducerMode}<code>.ASYNC_MODE</code> ）从FileQueue获取并发送消息的线程数量，默认为1
+     * 设置异步模式（{@link ProducerMode}<code>.ASYNC_MODE</code> ）从FileQueue获取并发送消息的线程数量，默认为1<br>
+     * <note>注意，如果设置成多线程，那么会有多线程同时从FileQueue获取消息并发送，这样的话发送的消息就无法保证其先后顺序) </note>
      * 
      * @param threadPoolSize 线程池大小
      */

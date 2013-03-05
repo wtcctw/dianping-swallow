@@ -82,11 +82,12 @@
             <groupId>com.dianping.dpsf</groupId>
             <artifactId>dpsf-net</artifactId>
             <version>1.6.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.geekhua</groupId>
-            <artifactId>file-queue</artifactId>
-            <version>0.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
