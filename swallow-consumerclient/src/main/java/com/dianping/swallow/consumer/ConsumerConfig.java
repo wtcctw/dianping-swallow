@@ -32,6 +32,7 @@ public class ConsumerConfig {
 
    /**
     * 设置consumer处理消息的线程池线程数，默认为1
+    * <note>注意，如果设置成多线程，那么会有多线程同时接收消息，这样的话接收的消息就无法保证其先后顺序) </note>
     * 
     * @param threadPoolSize
     */
