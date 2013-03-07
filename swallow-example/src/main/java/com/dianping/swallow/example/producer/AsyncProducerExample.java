@@ -14,7 +14,9 @@ public class AsyncProducerExample {
         config.setThreadPoolSize(10);
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
         for (int i = 0; i < 10; i++) {
-            p.sendMessage("消息-" + i);
+            String msg = "消息-" + i;
+            p.sendMessage(msg);
+            System.out.println("Sended msg:" + msg);
             Thread.sleep(500);
         }
     }
