@@ -8,14 +8,15 @@ import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 public class AsyncProducerExample {
 
-   public static void main(String[] args) throws Exception {
-      ProducerConfig config = new ProducerConfig();
-      config.setMode(ProducerMode.ASYNC_MODE);
-      config.setThreadPoolSize(10);
-      Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config );
-      for (int i = 0; i < 10; i++) {
-         p.sendMessage("" + i);
-      }
-   }
-   
+    public static void main(String[] args) throws Exception {
+        ProducerConfig config = new ProducerConfig();
+        config.setMode(ProducerMode.ASYNC_MODE);
+        config.setThreadPoolSize(10);
+        Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
+        for (int i = 0; i < 10; i++) {
+            p.sendMessage("消息-" + i);
+            Thread.sleep(500);
+        }
+    }
+
 }
