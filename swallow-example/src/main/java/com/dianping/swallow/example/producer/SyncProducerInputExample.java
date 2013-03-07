@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
+import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 /**
@@ -15,6 +16,7 @@ public class SyncProducerInputExample {
 
    public static void main(String[] args) throws Exception {
       ProducerConfig config = new ProducerConfig();
+      config.setMode(ProducerMode.SYNC_MODE);
       Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
       String CurLine = ""; // Line read from standard in
 
