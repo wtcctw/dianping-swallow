@@ -57,6 +57,7 @@ public class ProducerImpl implements Producer {
          this.producerConfig.setSyncRetryTimes(producerConfig.getSyncRetryTimes());
          this.producerConfig.setThreadPoolSize(producerConfig.getThreadPoolSize());
          this.producerConfig.setZipped(producerConfig.isZipped());
+         this.producerConfig.setFilequeueBaseDir(producerConfig.getFilequeueBaseDir());
       } else {
          LOGGER.warn("config is null, use default settings.");
       }
@@ -77,7 +78,7 @@ public class ProducerImpl implements Producer {
             producerHandler = new HandlerAsynchroMode(this);
             break;
          default:
-            producerHandler = new HandlerSynchroMode(this);
+            producerHandler = new HandlerAsynchroMode(this);
             break;
       }
 

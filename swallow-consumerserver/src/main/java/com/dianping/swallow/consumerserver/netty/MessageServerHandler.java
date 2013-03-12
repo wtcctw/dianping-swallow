@@ -151,8 +151,10 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
    private void removeChannel(ChannelEvent e) {
       channelGroup.remove(e.getChannel());
-      Channel channel = e.getChannel();
-      workerManager.handleChannelDisconnect(channel, consumerInfo);
+      if(consumerInfo != null){//consumerInfo可能为null(比如未收到消息前，messageReceived未被调用，则consumerInfo未被初始化)
+          Channel channel = e.getChannel();
+          workerManager.handleChannelDisconnect(channel, consumerInfo);
+      }
    }
 
    public static ChannelGroup getChannelGroup() {

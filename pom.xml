@@ -10,7 +10,7 @@
 	<groupId>com.dianping.swallow</groupId>
 	<artifactId>swallow-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.6.4</version>
+	<version>0.6.6</version>
 	<name>arch-swallow</name>
 	<organization>
 		<name>dianping</name>
@@ -24,12 +24,10 @@
 		<module>swallow-consumerserver</module>
 		<module>swallow-producerclient</module>
 		<module>swallow-producerserver</module>
-		<module>swallow-example</module>
-		<module>swallow-dashboard</module>
 	</modules>
 
 	<properties>
-		<swallow.version>0.6.4</swallow.version>
+		<swallow.version>0.6.6</swallow.version>
 	</properties>
 
 	<description>swallow is a message service!</description>
@@ -235,9 +233,9 @@
 				<version>3.0.5.RELEASE</version>
 			</dependency>
 			<dependency>
-				<groupId>com.dianping</groupId>
+				<groupId>com.geekhua</groupId>
 				<artifactId>file-queue</artifactId>
-				<version>1.1.1</version>
+				<version>0.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.dianping.dpsf</groupId>
@@ -254,6 +252,16 @@
 				<artifactId>commons-codec</artifactId>
 				<version>1.6</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>1.4</version>
+			</dependency>
+		        <dependency>
+		                <groupId>commons-lang</groupId>
+     		                <artifactId>commons-lang</artifactId>
+		                <version>2.4</version>
+		        </dependency>
 		</dependencies>
 	</dependencyManagement>
 
