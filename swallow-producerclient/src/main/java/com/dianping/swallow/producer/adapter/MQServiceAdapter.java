@@ -26,19 +26,31 @@ public class MQServiceAdapter implements MQService{
          throw new IllegalArgumentException("Illegal Argument!");
       }
       ProducerConfig config = new ProducerConfig();
-      config.setMode(ProducerMode.ASYNC_MODE);
+      config.setMode(ProducerMode.SYNC_MODE);//adapter模式升级，默认是同步模式。
 
-      if(options != null){
-         try{
-            int retryTimes = Integer.parseInt(options.get(ProducerOptionKey.MsgSendRetryCount).toString());
-            
-            if(retryTimes == -1){
-               config.setAsyncRetryTimes(Integer.MAX_VALUE);
-            } else {
-               config.setAsyncRetryTimes(retryTimes);
-            }
-         } catch (Exception nfe){
-         }
+      if (options != null) {
+          try {
+              String mode = (String) options.get("mode");
+              if (mode != null && mode.equalsIgnoreCase("ASYNC_MODE")) {
+                  config.setMode(ProducerMode.ASYNC_MODE);
+                  String filequeueBaseDir = (String) options.get("filequeueBaseDir");
+                  if (filequeueBaseDir != null) {
+                      config.setFilequeueBaseDir(filequeueBaseDir);
+                  }
+              }
+
+              //retryTimes
+              int retryTimes = Integer.parseInt(options.get(ProducerOptionKey.MsgSendRetryCount).toString());
+
+              if (retryTimes == -1) {
+                  config.setAsyncRetryTimes(Integer.MAX_VALUE);
+                  config.setSyncRetryTimes(Integer.MAX_VALUE);
+              } else {
+                  config.setAsyncRetryTimes(retryTimes);
+                  config.setSyncRetryTimes(retryTimes);
+              }
+          } catch (Exception nfe) {
+          }
       }
       
       return new MessageProducerAdapter(producerFactory.createProducer(com.dianping.swallow.common.message.Destination.topic(dest.getName()), config));

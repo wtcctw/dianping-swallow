@@ -52,7 +52,8 @@ public class HandlerAsynchroMode implements ProducerHandler {
      * @param sendMsgLeftLastSessions 是否重启续传
      * @return 指定参数的FileQueue
      */
-    private synchronized static FileQueue<Packet> getMessageQueue(String topicName, boolean sendMsgLeftLastSessions) {
+    private synchronized static FileQueue<Packet> getMessageQueue(String topicName, boolean sendMsgLeftLastSessions,
+                                                                  String filequeueBaseDir) {
         //如果Map里已经存在该filequeue，在要求“不续传”的情况下， 忽略该请求
         if (messageQueues.containsKey(topicName)) {
             return messageQueues.get(topicName);
@@ -62,6 +63,9 @@ public class HandlerAsynchroMode implements ProducerHandler {
         fileQueueConfig.setName(topicName);
         fileQueueConfig.setFileSiz(DEFAULT_FILEQUEUE_SIZE);
         fileQueueConfig.setMsgAvgLen(MSG_AVG_LEN);
+        if (filequeueBaseDir != null) {
+            fileQueueConfig.setBaseDir(filequeueBaseDir);
+        }
         //如果Map里不存在该filequeue，此handler又要求将之前的文件删除，则删除
         if (!sendMsgLeftLastSessions) {//如果不续传，则需要把/data/appdatas/filequeue/<topicName> 目录删除掉
             File file = new File(fileQueueConfig.getBaseDir(), topicName);
@@ -82,7 +86,8 @@ public class HandlerAsynchroMode implements ProducerHandler {
     public HandlerAsynchroMode(ProducerImpl producer) {
         this.producer = producer;
         delayBase = producer.getPunishTimeout();
-        messageQueue = getMessageQueue(producer.getDestination().getName(), producer.getProducerConfig().isSendMsgLeftLastSession());
+        messageQueue = getMessageQueue(producer.getDestination().getName(),
+                producer.getProducerConfig().isSendMsgLeftLastSession(), producer.getProducerConfig().getFilequeueBaseDir());
         this.start();
     }
 

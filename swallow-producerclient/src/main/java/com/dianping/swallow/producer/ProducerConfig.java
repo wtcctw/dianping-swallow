@@ -57,6 +57,15 @@ public class ProducerConfig {
     private boolean zipped = DEFAULT_ZIPPED; //是否对待发送消息进行压缩
     private int threadPoolSize = DEFAULT_THREADPOOL_SIZE; //异步模式时，线程池大小
     private boolean sendMsgLeftLastSession = DEFAULT_SEND_MSG_LEFT_LAST_SESSION; //异步模式时，是否重启续传
+    private String filequeueBaseDir;
+
+    public String getFilequeueBaseDir() {
+        return filequeueBaseDir;
+    }
+
+    public void setFilequeueBaseDir(String filequeueBaseDir) {
+        this.filequeueBaseDir = filequeueBaseDir;
+    }
 
     /**
      * @return Producer工作模式，类型为{@link ProducerMode}
@@ -158,8 +167,8 @@ public class ProducerConfig {
                 + "; Zipped="
                 + isZipped()
                 + (getMode() == ProducerMode.ASYNC_MODE ? "; ThreadPoolSize=" + getThreadPoolSize() + "; SendMsgLeftLastSession="
-                        + isSendMsgLeftLastSession() + "; AsyncRetryTimes=" + getAsyncRetryTimes() : "; SyncRetryTimes="
-                        + getSyncRetryTimes());
+                        + isSendMsgLeftLastSession() + "; AsyncRetryTimes=" + getAsyncRetryTimes() + "; FilequeueBaseDir="
+                        + getFilequeueBaseDir() : "; SyncRetryTimes=" + getSyncRetryTimes());
     }
 
     public int getSyncRetryTimes() {
