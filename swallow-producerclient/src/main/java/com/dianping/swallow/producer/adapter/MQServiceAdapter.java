@@ -13,15 +13,14 @@ import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 public class MQServiceAdapter implements MQService{
-   
+
    ProducerFactory producerFactory;
    
    public MQServiceAdapter(String mongoUri) throws RemoteServiceInitFailedException{
       producerFactory = ProducerFactoryImpl.getInstance();
    }
 
-   @Override
-   public MessageProducer createProducer(Destination dest, Map<ProducerOptionKey, Object> options) {
+   public MessageProducer createProducer(Destination dest, Map<ProducerOptionKey, Object> options, Map<String, Object> options0_6) {
       if(dest == null){
          throw new IllegalArgumentException("Illegal Argument!");
       }
@@ -30,16 +29,7 @@ public class MQServiceAdapter implements MQService{
 
       if (options != null) {
           try {
-              String mode = (String) options.get("mode");
-              if (mode != null && mode.equalsIgnoreCase("SYNC_MODE")) {
-                  config.setMode(ProducerMode.SYNC_MODE);
-              }
-              String filequeueBaseDir = (String) options.get("filequeueBaseDir");
-              if (filequeueBaseDir != null) {
-                  config.setFilequeueBaseDir(filequeueBaseDir);
-              }
-
-              //retryTimes
+              //0.5的参数：retryTimes
               int retryTimes = Integer.parseInt(options.get(ProducerOptionKey.MsgSendRetryCount).toString());
 
               if (retryTimes == -1) {
@@ -52,10 +42,29 @@ public class MQServiceAdapter implements MQService{
           } catch (Exception nfe) {
           }
       }
-      
+      if(options0_6 != null){
+          try {
+              //0.6的参数：mode，filequeueBaseDir
+              String mode = (String) options0_6.get("mode");
+              if (mode != null && mode.equalsIgnoreCase("SYNC_MODE")) {
+                  config.setMode(ProducerMode.SYNC_MODE);
+              }
+              String filequeueBaseDir = (String) options0_6.get("filequeueBaseDir");
+              if (filequeueBaseDir != null) {
+                  config.setFilequeueBaseDir(filequeueBaseDir);
+              }
+          } catch (Exception nfe) {
+          }
+      }
+
       return new MessageProducerAdapter(producerFactory.createProducer(com.dianping.swallow.common.message.Destination.topic(dest.getName()), config));
    }
 
+   @Override
+   public MessageProducer createProducer(Destination dest, Map<ProducerOptionKey, Object> options) {
+      return createProducer(dest, options, null);
+   }
+   
    @Override
    public MessageProducer createProducer(Destination dest) {
       return createProducer(dest, null);
