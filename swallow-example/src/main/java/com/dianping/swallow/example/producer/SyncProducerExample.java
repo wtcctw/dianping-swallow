@@ -16,7 +16,7 @@ public class SyncProducerExample {
         config.setMode(ProducerMode.SYNC_MODE);
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
         for (int i = 0; i < 10; i++) {
-            String msg = "消息-" + i;
+            String msg = SyncProducerExample.class.getSimpleName() + ": 消息-" + i;
             p.sendMessage(msg);
             System.out.println("Sended msg:" + msg);
             Thread.sleep(500);
