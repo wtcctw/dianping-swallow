@@ -49,12 +49,17 @@
         <dependency>
             <groupId>com.dianping.swallow</groupId>
             <artifactId>swallow-consumerclient</artifactId>
-            <version>0.6.5</version>
+            <version>0.6.6</version>
         </dependency>
         <dependency>
             <groupId>com.dianping.swallow</groupId>
             <artifactId>swallow-producerclient</artifactId>
-            <version>0.6.5</version>
+            <version>0.6.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dianping.swallow</groupId>
+            <artifactId>swallow-client</artifactId>
+            <version>0.5.4</version>
         </dependency>
         <!-- lion -->
         <dependency>
