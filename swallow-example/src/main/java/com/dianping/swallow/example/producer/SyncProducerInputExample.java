@@ -10,31 +10,31 @@ import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 /**
- * @rundemo_name 同步发送者例子(可输入)
+ * @rundemo_name 生产者例子(同步，可输入)
  */
 public class SyncProducerInputExample {
 
-   public static void main(String[] args) throws Exception {
-      ProducerConfig config = new ProducerConfig();
-      config.setMode(ProducerMode.SYNC_MODE);
-      Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
-      String CurLine = ""; // Line read from standard in
+    public static void main(String[] args) throws Exception {
+        ProducerConfig config = new ProducerConfig();
+        config.setMode(ProducerMode.SYNC_MODE);
+        Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
+        String CurLine = ""; // Line read from standard in
 
-      System.out.println("输入要发送的消息 (type 'quit' to exit): ");
-      InputStreamReader converter = new InputStreamReader(System.in);
+        System.out.println("输入要发送的消息 (type 'quit' to exit): ");
+        InputStreamReader converter = new InputStreamReader(System.in);
 
-      BufferedReader in = new BufferedReader(converter);
+        BufferedReader in = new BufferedReader(converter);
 
-      while (!(CurLine.equals("quit"))) {
-         CurLine = in.readLine();
+        while (!(CurLine.equals("quit"))) {
+            CurLine = in.readLine();
 
-         if (!(CurLine.equals("quit"))) {
-            System.out.println("您发送的是: " + CurLine);
-            p.sendMessage(CurLine);
-         } else {
-            System.exit(0);
-         }
-      }
-   }
+            if (!(CurLine.equals("quit"))) {
+                System.out.println("您发送的是: " + CurLine);
+                p.sendMessage(CurLine);
+            } else {
+                System.exit(0);
+            }
+        }
+    }
 
 }

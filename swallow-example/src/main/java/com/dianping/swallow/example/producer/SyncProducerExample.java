@@ -7,7 +7,7 @@ import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 /**
- * @rundemo_name 同步发送者例子
+ * @rundemo_name 生产者例子(同步)
  */
 public class SyncProducerExample {
 
