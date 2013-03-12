@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.cat.message.spi.MessageTree;
+import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.common.internal.packet.Packet;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.packet.PktSwallowPACK;
@@ -65,6 +67,17 @@ public class HandlerAsynchroMode implements ProducerHandler {
         fileQueueConfig.setMsgAvgLen(MSG_AVG_LEN);
         if (filequeueBaseDir != null) {
             fileQueueConfig.setBaseDir(filequeueBaseDir);
+        } else {
+            /*
+             * 为了避免测试环境filequeue目录公用导致出错的问题，当未自定义设置filequeue的目录，而且是alpha或qa环境时，则使用带有uuid的目录。但这样重启应用后filequeue目录变了故无法做到续传。
+             */
+            String env = EnvZooKeeperConfig.getEnv();
+            if ("qa".equals(env) || "alpha".equals(env)) {
+                String uuid = UUID.randomUUID().toString();
+                filequeueBaseDir = "/data/appdatas/filequeue/" + uuid;
+                fileQueueConfig.setBaseDir(filequeueBaseDir);
+                LOGGER.info("env is '" + env + "' and 'filequeueBaseDir' is not set, so randomize the filequeue dir: " + filequeueBaseDir);
+            }
         }
         //如果Map里不存在该filequeue，此handler又要求将之前的文件删除，则删除
         if (!sendMsgLeftLastSessions) {//如果不续传，则需要把/data/appdatas/filequeue/<topicName> 目录删除掉
