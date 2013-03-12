@@ -26,17 +26,17 @@ public class MQServiceAdapter implements MQService{
          throw new IllegalArgumentException("Illegal Argument!");
       }
       ProducerConfig config = new ProducerConfig();
-      config.setMode(ProducerMode.SYNC_MODE);//adapter模式升级，默认是同步模式。
+      config.setMode(ProducerMode.ASYNC_MODE);//adapter模式升级，默认是异步模式。
 
       if (options != null) {
           try {
               String mode = (String) options.get("mode");
-              if (mode != null && mode.equalsIgnoreCase("ASYNC_MODE")) {
-                  config.setMode(ProducerMode.ASYNC_MODE);
-                  String filequeueBaseDir = (String) options.get("filequeueBaseDir");
-                  if (filequeueBaseDir != null) {
-                      config.setFilequeueBaseDir(filequeueBaseDir);
-                  }
+              if (mode != null && mode.equalsIgnoreCase("SYNC_MODE")) {
+                  config.setMode(ProducerMode.SYNC_MODE);
+              }
+              String filequeueBaseDir = (String) options.get("filequeueBaseDir");
+              if (filequeueBaseDir != null) {
+                  config.setFilequeueBaseDir(filequeueBaseDir);
               }
 
               //retryTimes
