@@ -90,6 +90,13 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       pullStgy = new DefaultPullStrategy(configManager.getPullFailDelayBase(),
             configManager.getPullFailDelayUpperBound());
 
+      // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式
+      if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
+          this.consumerInfo = new ConsumerInfo(consumerInfo.getConsumerId(), ConsumerType.DURABLE_AT_LEAST_ONCE);
+          LOG.info("ConsumerClient[topicName=" + topicName + ", consumerid=" + consumerid
+                  + "] used ConsumerType.DURABLE_AT_MOST_ONCE. Now change it to ConsumerType.DURABLE_AT_LEAST_ONCE.");
+      }
+
       ackExecutor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.DAYS, new LinkedBlockingQueue<Runnable>(),
             new MQThreadFactory("swallow-ack-"));
 
@@ -307,7 +314,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                cachedMessages.add(preparedMessage);
             }
          }
-         //Cat begin TODO 应该放在messageMap.put(preparedMessage, Boolean.TRUE);之后
+         //Cat begin
          consumerServerTransaction.addData("mid", preparedMessage.getContent().getMessageId());
          consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
          //Cat end

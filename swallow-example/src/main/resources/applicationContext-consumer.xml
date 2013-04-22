@@ -62,7 +62,7 @@
 		</property>
 	</bean>
 	<bean id="nonDurableConsumerClient" factory-bean="consumerFactory"
-		factory-method="createConsumer">
+		factory-method="createConsumer" init-method="start">
 		<constructor-arg>
 			<ref bean="dest" />
 		</constructor-arg>
