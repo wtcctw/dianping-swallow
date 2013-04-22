@@ -310,15 +310,14 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                   waitAckMessages.put(channel, messageMap);
                }
                messageMap.put(preparedMessage, Boolean.TRUE);
-
-               //Cat begin (应该放在messageMap.put(preparedMessage, Boolean.TRUE);之后)
-               consumerServerTransaction.addData("mid", preparedMessage.getContent().getMessageId());
-               consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
-               //Cat end
             } else {
                cachedMessages.add(preparedMessage);
             }
          }
+         //Cat begin
+         consumerServerTransaction.addData("mid", preparedMessage.getContent().getMessageId());
+         consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
+         //Cat end
       } catch (RuntimeException e) {
          LOG.error(consumerInfo.toString() + "：channel write error.", e);
          cachedMessages.add(preparedMessage);
