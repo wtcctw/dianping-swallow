@@ -51,7 +51,7 @@ public class SlaveBootStrap {
 
          LOG.info("MessageServerHandler.getChannelGroup().clear()-started");
          MessageServerHandler.getChannelGroup().clear();
-         LOG.info("MessageServerHandler.getChannelGroup().unbind()-finished");
+         LOG.info("MessageServerHandler.getChannelGroup().clear()-finished");
 
          LOG.info("bootstrap.releaseExternalResources()-started");
          bootstrap.releaseExternalResources();
