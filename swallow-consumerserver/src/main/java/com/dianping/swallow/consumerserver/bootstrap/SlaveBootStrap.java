@@ -97,6 +97,9 @@ public class SlaveBootStrap {
 
       while (!closed) {
 
+         // start consumerWorkerManager
+         consumerWorkerManager.start();
+
          try {
             heartbeater.waitUntilMasterDown(configManager.getMasterIp(), configManager.getHeartbeatCheckInterval(),
                   configManager.getHeartbeatMaxStopTime());
