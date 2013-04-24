@@ -39,7 +39,8 @@ public class ConsumerWorkerManager {
    private Thread maxAckedMessageIdUpdaterThread;
 
    private volatile boolean closed = false;
-   
+   private volatile boolean readyForAcceptConn = true;
+
    public void setAckDAO(AckDAO ackDAO) {
       this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO, configManager.getRetryIntervalWhenMongoException());
       //this.ackDAO = ackDAO;
@@ -67,7 +68,12 @@ public class ConsumerWorkerManager {
    }
 
    public void handleGreet(Channel channel, ConsumerInfo consumerInfo, int clientThreadCount, MessageFilter messageFilter) {
-      findOrCreateConsumerWorker(consumerInfo, messageFilter).handleGreet(channel, clientThreadCount);
+      if( !readyForAcceptConn ){
+          //接收到连接，直接就关闭它
+          channel.close();
+      } else {
+         findOrCreateConsumerWorker(consumerInfo, messageFilter).handleGreet(channel, clientThreadCount);
+      }
    }
 
    public void handleAck(Channel channel, ConsumerInfo consumerInfo, Long ackedMsgId, ACKHandlerType type) {
@@ -88,6 +94,9 @@ public class ConsumerWorkerManager {
    }
 
    public void close() {
+       // 停止接收client的新连接
+       readyForAcceptConn = false;
+
       //遍历所有ConsumerWorker，停止发送消息给client端
       LOG.info("stoping ConsumerWorker's Send-Message thread.");
       for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
@@ -169,6 +178,9 @@ public class ConsumerWorkerManager {
     * 启动。在close()之后，可以再次调用此start()方法进行启动
     */
    public void start(){
+       closed = false;
+       readyForAcceptConn = true;
+
        consumerId2ConsumerWorker = new ConcurrentHashMap<ConsumerId, ConsumerWorker>();
        consumerId2MaxSavedAckedMessageId = new ConcurrentHashMap<ConsumerId, Long>();
 
