@@ -101,6 +101,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
 //      consumerWorkerManager.setAckDAO(ackDAO);
 //      consumerWorkerManager.setMessageDAO(messageDAO);
       consumerWorkerManager.setSwallowBuffer(swallowBuffer);
+      consumerWorkerManager.start();
    }
 
    @Before
