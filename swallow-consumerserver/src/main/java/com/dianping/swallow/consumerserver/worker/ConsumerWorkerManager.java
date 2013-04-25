@@ -38,7 +38,6 @@ public class ConsumerWorkerManager {
    private Thread idleWorkerManagerCheckerThread;
    private Thread maxAckedMessageIdUpdaterThread;
 
-   private volatile boolean closed = false;
    private volatile boolean readyForAcceptConn = true;
 
    public void setAckDAO(AckDAO ackDAO) {
@@ -124,8 +123,6 @@ public class ConsumerWorkerManager {
          entry.getValue().close();
       }
 
-      closed = true;
-
       //关闭“检测并关闭空闲ConsumerWorker”的后台线程
       if (idleWorkerManagerCheckerThread != null) {
          idleWorkerManagerCheckerThread.interrupt();
@@ -134,6 +131,7 @@ public class ConsumerWorkerManager {
       //等待“更新ack”的线程的关闭
       if (maxAckedMessageIdUpdaterThread != null) {
          try {
+            maxAckedMessageIdUpdaterThread.interrupt();
             maxAckedMessageIdUpdaterThread.join();
          } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -179,7 +177,6 @@ public class ConsumerWorkerManager {
     * 启动。在close()之后，可以再次调用此start()方法进行启动
     */
    public void start(){
-       closed = false;
        readyForAcceptConn = true;
 
        consumerId2ConsumerWorker = new ConcurrentHashMap<ConsumerId, ConsumerWorker>();
@@ -194,7 +191,7 @@ public class ConsumerWorkerManager {
 
          @Override
          public void run() {
-            while (!closed) {
+            while ( !Thread.currentThread().isInterrupted() ) {
                for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
                   ConsumerWorker worker = entry.getValue();
                   ConsumerId consumerId = entry.getKey();
@@ -202,12 +199,10 @@ public class ConsumerWorkerManager {
                }
 
                // 轮询时有一定的时间间隔
-               if(!closed){//如果未close，才进行sleep
-                  try {
-                     Thread.sleep(configManager.getMaxAckedMessageIdUpdateInterval());
-                  } catch (InterruptedException e) {
-                     break;
-                  }
+               try {
+                  Thread.sleep(configManager.getMaxAckedMessageIdUpdateInterval());
+               } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
                }
             }
             LOG.info("MaxAckedMessageIdUpdaterThread closed");
@@ -234,7 +229,7 @@ public class ConsumerWorkerManager {
 
          @Override
          public void run() {
-            while (!closed) {
+            while ( !Thread.currentThread().isInterrupted() ) {
                //轮询所有ConsumerWorker，如果其已经没有channel，则关闭ConsumerWorker,并移除
                for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
                   ConsumerWorker worker = entry.getValue();
@@ -249,12 +244,10 @@ public class ConsumerWorkerManager {
                   }
                }
                // 轮询时有一定的时间间隔
-               if(!closed){//如果未close，才进行sleep
-                  try {
-                     Thread.sleep(configManager.getCheckConnectedChannelInterval());
-                  } catch (InterruptedException e) {
-                     break;
-                  }
+               try {
+                  Thread.sleep(configManager.getCheckConnectedChannelInterval());
+               } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
                }
             }
             LOG.info("idle ConsumerWorker checker thread closed");
