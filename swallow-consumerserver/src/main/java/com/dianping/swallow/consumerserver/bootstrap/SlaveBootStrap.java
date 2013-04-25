@@ -97,9 +97,6 @@ public class SlaveBootStrap {
 
       while (!closed) {
 
-         // start consumerWorkerManager
-         consumerWorkerManager.start();
-
          try {
             heartbeater.waitUntilMasterDown(configManager.getMasterIp(), configManager.getHeartbeatCheckInterval(),
                   configManager.getHeartbeatMaxStopTime());
@@ -107,6 +104,11 @@ public class SlaveBootStrap {
             LOG.info("slave interruptted, will stop", e);
             break;
          }
+         // master down, now start slave ...
+
+         // start consumerWorkerManager
+         consumerWorkerManager.start();
+
          // Configure the server.
          bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),
                Executors.newCachedThreadPool()));
