@@ -69,8 +69,8 @@ public class ConsumerWorkerManager {
 
    public void handleGreet(Channel channel, ConsumerInfo consumerInfo, int clientThreadCount, MessageFilter messageFilter) {
       if( !readyForAcceptConn ){
-          //接收到连接，直接就关闭它
-          channel.close();
+         //接收到连接，直接就关闭它
+         channel.close();
       } else {
          findOrCreateConsumerWorker(consumerInfo, messageFilter).handleGreet(channel, clientThreadCount);
       }
@@ -157,7 +157,8 @@ public class ConsumerWorkerManager {
    private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo,MessageFilter messageFilter) {
       ConsumerWorker worker = findConsumerWorker(consumerInfo);
       if (worker == null) {
-         synchronized (consumerId2ConsumerWorker) {
+          // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
+         synchronized ( consumerInfo.getConsumerId().getConsumerId().intern() ) {
             if ( (worker = findConsumerWorker(consumerInfo)) == null) {
                worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter);
                ConsumerId consumerId = consumerInfo.getConsumerId();
