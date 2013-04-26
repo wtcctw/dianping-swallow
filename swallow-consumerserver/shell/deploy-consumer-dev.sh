@@ -35,14 +35,14 @@ echo "Backuped master dir."
 
 #重启master
 echo $
-echo "========== Continue to restart master =========="
+echo "========== To restart master =========="
 pause 'Press [Enter] key to continue...'
 cd $UserDir/$MasterDir
 sh swallow.sh restart master
 
 #重启slave
 echo $
-echo "========== Continue to restart slave =========="
+echo "========== To restart slave =========="
 pause 'Press [Enter] key to continue...'
 cd $UserDir/$SlaveDir
 sh swallow.sh restart slave 192.168.8.21
