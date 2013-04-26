@@ -98,8 +98,10 @@ public class ConsumerWorkerManager {
 
       //遍历所有ConsumerWorker，停止发送消息给client端
       LOG.info("stoping ConsumerWorker's Send-Message thread.");
-      for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
-         entry.getValue().closeMessageFetcherThread();
+      if ( consumerId2ConsumerWorker != null ){
+         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+            entry.getValue().closeMessageFetcherThread();
+         }
       }
       LOG.info("stoped.");
 
@@ -114,13 +116,17 @@ public class ConsumerWorkerManager {
       }
 
       //所有ConsumerWorker，不再处理接收到的ack(接收到，则丢弃)
-      for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
-         entry.getValue().closeAckExecutor();
+      if ( consumerId2ConsumerWorker != null ){
+         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+            entry.getValue().closeAckExecutor();
+         }
       }
 
       //关闭ConsumerWorker的资源（关闭内部的“用于获取消息的队列”）
-      for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
-         entry.getValue().close();
+      if ( consumerId2ConsumerWorker != null ){
+         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+            entry.getValue().close();
+         }
       }
 
       //关闭“检测并关闭空闲ConsumerWorker”的后台线程
@@ -139,8 +145,12 @@ public class ConsumerWorkerManager {
       }
       
       //清空 “用于保存状态的” 2个map
-      consumerId2ConsumerWorker.clear();
-      consumerId2MaxSavedAckedMessageId.clear();
+      if ( consumerId2ConsumerWorker != null ){
+         consumerId2ConsumerWorker.clear();
+      }
+      if ( consumerId2MaxSavedAckedMessageId != null ){
+         consumerId2MaxSavedAckedMessageId.clear();
+      }
    }
 
    private ConsumerWorker findConsumerWorker(ConsumerInfo consumerInfo) {
