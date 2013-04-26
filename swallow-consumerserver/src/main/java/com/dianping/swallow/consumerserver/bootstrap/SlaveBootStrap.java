@@ -19,8 +19,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.dianping.cat.Cat;
 import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
-import com.dianping.swallow.common.internal.monitor.CloseMonitor;
-import com.dianping.swallow.common.internal.monitor.CloseMonitor.CloseHook;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.consumerserver.Heartbeater;
@@ -77,20 +75,19 @@ public class SlaveBootStrap {
 
       Heartbeater heartbeater = ctx.getBean(Heartbeater.class);
 
-      CloseMonitor closeMonitor = new CloseMonitor();
-      int port = Integer.parseInt(System.getProperty("closeMonitorPort", "17556"));
-      closeMonitor.start(port, new CloseHook() {
-
-         @Override
-         public void onClose() {
-            closed = true;
-            LOG.info("consumerWorkerManager.close()-started");
-            consumerWorkerManager.close();
-            LOG.info("consumerWorkerManager.close()-finished");
-            closeNettyRelatedResource();
-         }
-
-      });
+      Thread hook = new Thread() {
+          @Override
+          public void run() {
+              closed = true;
+              LOG.info("consumerWorkerManager.close()-started");
+              consumerWorkerManager.close();
+              LOG.info("consumerWorkerManager.close()-finished");
+              closeNettyRelatedResource();
+          }
+      };
+      hook.setDaemon(true);
+      hook.setName("Swallow-ShutdownHook");
+      Runtime.getRuntime().addShutdownHook(hook);
 
       LOG.info("slave starting, master ip: " + configManager.getMasterIp());
       consumerWorkerManager.init(isSlave);
