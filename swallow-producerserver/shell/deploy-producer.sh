@@ -49,7 +49,6 @@ echo "Backuped producer dir."
 
 #重启
 echo ""
-echo "========== To restart =========="
-pause 'Press [Enter] key to continue...'
+pause 'Press [Enter] key to restart producer ...'
 cd $UserDir/$AppDir
 sh swallow.sh restart

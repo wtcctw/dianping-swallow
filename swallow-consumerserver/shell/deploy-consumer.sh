@@ -28,8 +28,13 @@ Mode=$1
 FileFtpAddress="$FtpServer/$Datedir/$Mode/$TarFile"
 if [ "$Mode" = "dev" ]; then
     UserDir="/home/wukezhu"
-elif [ "$Mode" = "alpha" -o "$Mode" = "qa" ]; then
+    MasterIp="192.168.8.21"
+elif [ "$Mode" = "alpha" ]; then
     UserDir="/data/swallow"
+    MasterIp="192.168.7.41"
+elif [ "$Mode" = "qa" ]; then
+    UserDir="/data/swallow"
+    MasterIp="10.1.77.13"
 else
     echo "Your input is not corrent!"
     usage
@@ -50,18 +55,16 @@ rm -rf $MasterDir && mkdir $MasterDir && tar xf $TarFile -C $MasterDir
 echo "Backuped master dir."
 rm -rf $SlaveDir-backup && cp -r $SlaveDir $SlaveDir-backup
 rm -rf $SlaveDir && mkdir $SlaveDir && tar xf $TarFile -C $SlaveDir
-echo "Backuped master dir."
+echo "Backuped slave dir."
 
 #重启master
 echo ""
-echo "========== To restart master =========="
-pause 'Press [Enter] key to continue...'
+pause 'Press [Enter] key to restart master ...'
 cd $UserDir/$MasterDir
 sh swallow.sh restart master
 
 #重启slave
 echo ""
-echo "========== To restart slave =========="
-pause 'Press [Enter] key to continue...'
+pause 'Press [Enter] key to restart slave ...'
 cd $UserDir/$SlaveDir
-sh swallow.sh restart slave 192.168.8.21
+sh swallow.sh restart slave $MasterIp
