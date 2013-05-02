@@ -4,7 +4,7 @@
 # 脚本说明：遍历swallow相关的ProcessName，然后对pid执行jvm相关的命令，将dump文件输出到/data/swallow下。
 ##########################################################################################################################################
 
-StatDir="/data/swallow"
+StatDir="/data/swallow-dump"
 
 if [ ! -d "$StatDir" ] ; then
   mkdir -p "$StatDir"
