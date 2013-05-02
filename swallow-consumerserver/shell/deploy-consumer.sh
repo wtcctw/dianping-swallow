@@ -1,8 +1,8 @@
 #!/bin/bash
 ##########################################################################################################################################
-#  dev的consumerserver部署方法：
+#  在dev/alpha/qa环境下的consumerserver部署方法(product环境使用群英的脚本，它会遍历多台swallow机器批量发布)：
 #  (1)打包tar之后，放到ftp，路径为ftp://10.1.1.189/arch/<当天日期>/<Mode>/swallow-consumerserver-withDependencies.tar
-#  (2)到相应机器(dev/alpha/beta)的 $AppRootDir 目录下，执行sh deploy-consumer.sh <Mode>即可。
+#  (2)到相应机器(dev/alpha/qa)的 $AppRootDir 目录下，执行sh deploy-consumer.sh <Mode>即可。
 #
 ##########################################################################################################################################
 
