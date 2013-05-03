@@ -32,13 +32,14 @@ public class ConsumerWorkerManager {
 
    private MQThreadFactory                 threadFactory             = new MQThreadFactory();
 
-   private Map<ConsumerId, ConsumerWorker> consumerId2ConsumerWorker = new ConcurrentHashMap<ConsumerId, ConsumerWorker>();
+   private Map<ConsumerId, ConsumerWorker> consumerId2ConsumerWorker;
+   private Map<ConsumerId, Long> consumerId2MaxSavedAckedMessageId;
 
    private Thread idleWorkerManagerCheckerThread;
    private Thread maxAckedMessageIdUpdaterThread;
-   private Map<ConsumerId, Long> consumerId2MaxSavedAckedMessageId = new ConcurrentHashMap<ConsumerId, Long>();
-   private volatile boolean closed = false;
-   
+
+   private volatile boolean readyForAcceptConn = true;
+
    public void setAckDAO(AckDAO ackDAO) {
       this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO, configManager.getRetryIntervalWhenMongoException());
       //this.ackDAO = ackDAO;
@@ -66,7 +67,12 @@ public class ConsumerWorkerManager {
    }
 
    public void handleGreet(Channel channel, ConsumerInfo consumerInfo, int clientThreadCount, MessageFilter messageFilter) {
-      findOrCreateConsumerWorker(consumerInfo, messageFilter).handleGreet(channel, clientThreadCount);
+      if( !readyForAcceptConn ){
+         //接收到连接，直接就关闭它
+         channel.close();
+      } else {
+         findOrCreateConsumerWorker(consumerInfo, messageFilter).handleGreet(channel, clientThreadCount);
+      }
    }
 
    public void handleAck(Channel channel, ConsumerInfo consumerInfo, Long ackedMsgId, ACKHandlerType type) {
@@ -87,36 +93,63 @@ public class ConsumerWorkerManager {
    }
 
    public void close() {
-      for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
-         entry.getValue().closeMessageFetcherThread();
+       // 停止接收client的新连接
+       readyForAcceptConn = false;
+
+      //遍历所有ConsumerWorker，停止发送消息给client端
+      LOG.info("stoping ConsumerWorker's Send-Message thread.");
+      if ( consumerId2ConsumerWorker != null ){
+         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+            entry.getValue().closeMessageFetcherThread();
+         }
       }
+      LOG.info("stoped.");
+
+      //等待一段时间，以便让所有ConsumerWorker，可以从client端接收 “已发送但未收到ack的消息” 的ack
       try {
+         long waitAckTimeWhenCloseSwc = configManager.getWaitAckTimeWhenCloseSwc();
+         LOG.info("sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
          Thread.sleep(configManager.getWaitAckTimeWhenCloseSwc());
+         LOG.info("sleep done.");
       } catch (InterruptedException e) {
          LOG.error("close Swc thread InterruptedException", e);
       }
-      for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
-         entry.getValue().closeAckExecutor();
-      }
-      for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
-         entry.getValue().close();
-      }
-      closed = true;
-      if (idleWorkerManagerCheckerThread != null) {
-         try {
-            idleWorkerManagerCheckerThread.join();
-            consumerId2ConsumerWorker = new ConcurrentHashMap<ConsumerId, ConsumerWorker>();
-         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+
+      //所有ConsumerWorker，不再处理接收到的ack(接收到，则丢弃)
+      if ( consumerId2ConsumerWorker != null ){
+         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+            entry.getValue().closeAckExecutor();
          }
       }
+
+      //关闭ConsumerWorker的资源（关闭内部的“用于获取消息的队列”）
+      if ( consumerId2ConsumerWorker != null ){
+         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+            entry.getValue().close();
+         }
+      }
+
+      //关闭“检测并关闭空闲ConsumerWorker”的后台线程
+      if (idleWorkerManagerCheckerThread != null) {
+         idleWorkerManagerCheckerThread.interrupt();
+      }
+
+      //等待“更新ack”的线程的关闭
       if (maxAckedMessageIdUpdaterThread != null) {
          try {
+            maxAckedMessageIdUpdaterThread.interrupt();
             maxAckedMessageIdUpdaterThread.join();
-            consumerId2MaxSavedAckedMessageId = new ConcurrentHashMap<ConsumerId, Long>();
          } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
          }
+      }
+      
+      //清空 “用于保存状态的” 2个map
+      if ( consumerId2ConsumerWorker != null ){
+         consumerId2ConsumerWorker.clear();
+      }
+      if ( consumerId2MaxSavedAckedMessageId != null ){
+         consumerId2MaxSavedAckedMessageId.clear();
       }
    }
 
@@ -129,10 +162,11 @@ public class ConsumerWorkerManager {
       return consumerId2ConsumerWorker;
    }
 
-   public ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo,MessageFilter messageFilter) {
+   private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo,MessageFilter messageFilter) {
       ConsumerWorker worker = findConsumerWorker(consumerInfo);
       if (worker == null) {
-         synchronized (consumerId2ConsumerWorker) {
+          // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
+         synchronized ( consumerInfo.getConsumerId().getConsumerId().intern() ) {
             if ( (worker = findConsumerWorker(consumerInfo)) == null) {
                worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter);
                ConsumerId consumerId = consumerInfo.getConsumerId();
@@ -144,31 +178,41 @@ public class ConsumerWorkerManager {
    }
 
    public void init(boolean isSlave) {
-	   
-      startIdleWorkerCheckerThread();
-      startMaxAckedMessageIdUpdaterThread();
-	   
       if (!isSlave) {
          startHeartbeater(configManager.getMasterIp());
       }
-
    }
-   
+
+   /**
+    * 启动。在close()之后，可以再次调用此start()方法进行启动
+    */
+   public void start(){
+       readyForAcceptConn = true;
+
+       consumerId2ConsumerWorker = new ConcurrentHashMap<ConsumerId, ConsumerWorker>();
+       consumerId2MaxSavedAckedMessageId = new ConcurrentHashMap<ConsumerId, Long>();
+
+       startIdleWorkerCheckerThread();
+       startMaxAckedMessageIdUpdaterThread();
+   }
+
    private void startMaxAckedMessageIdUpdaterThread() {
       maxAckedMessageIdUpdaterThread = threadFactory.newThread(new Runnable() {
-         
+
          @Override
          public void run() {
-            while (!closed) {
+            while ( !Thread.currentThread().isInterrupted() ) {
                for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
                   ConsumerWorker worker = entry.getValue();
                   ConsumerId consumerId = entry.getKey();
                   updateMaxAckedMessageId(worker, consumerId);
                }
+
+               // 轮询时有一定的时间间隔
                try {
                   Thread.sleep(configManager.getMaxAckedMessageIdUpdateInterval());
                } catch (InterruptedException e) {
-                  break;
+                  Thread.currentThread().interrupt();
                }
             }
             LOG.info("MaxAckedMessageIdUpdaterThread closed");
@@ -195,29 +239,32 @@ public class ConsumerWorkerManager {
 
          @Override
          public void run() {
-            while (!closed) {
+            while ( !Thread.currentThread().isInterrupted() ) {
+               //轮询所有ConsumerWorker，如果其已经没有channel，则关闭ConsumerWorker,并移除
                for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
                   ConsumerWorker worker = entry.getValue();
                   ConsumerId consumerId = entry.getKey();
                   if(worker.allChannelDisconnected()) {
                      updateMaxAckedMessageId(worker, consumerId);
-                     workerDone(consumerId);
+                     removeConsumerWorker(consumerId);
                      worker.closeMessageFetcherThread();
                      worker.closeAckExecutor();
                      worker.close();
                      LOG.info("ConsumerWorker for " + consumerId + " has no connected channel, close it");
                   }
                }
+               // 轮询时有一定的时间间隔
                try {
                   Thread.sleep(configManager.getCheckConnectedChannelInterval());
                } catch (InterruptedException e) {
-                  break;
+                  Thread.currentThread().interrupt();
                }
             }
             LOG.info("idle ConsumerWorker checker thread closed");
          }
 
       }, "idleConsumerWorkerChecker-");
+      idleWorkerManagerCheckerThread.setDaemon(true);
       idleWorkerManagerCheckerThread.start();
    }
 
@@ -245,7 +292,10 @@ public class ConsumerWorkerManager {
       heartbeatThread.start();
    }
 
-   public void workerDone(ConsumerId consumerId) {
+   /**
+    * consumerId对应的ConsumerWorker已经没有任何连接，所以移除ConsumerWorker
+    */
+   private void removeConsumerWorker(ConsumerId consumerId) {
       consumerId2MaxSavedAckedMessageId.remove(consumerId);
       consumerId2ConsumerWorker.remove(consumerId);
    }
