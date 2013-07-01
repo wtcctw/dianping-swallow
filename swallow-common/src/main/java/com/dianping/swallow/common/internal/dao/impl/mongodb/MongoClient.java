@@ -158,7 +158,7 @@ public class MongoClient implements ConfigChangeListener {
             this.heartbeatCappedCollectionMaxDocNum = Integer.parseInt(heartbeatCappedCollectionMaxDocNum.trim());
          }
          //添加Lion监听
-         dynamicConfig.setConfigChangeListener(this);
+         dynamicConfig.addConfigChangeListener(this);
       } catch (Exception e) {
          throw new IllegalArgumentException("Error Loading Config from Lion : " + e.getMessage(), e);
       }

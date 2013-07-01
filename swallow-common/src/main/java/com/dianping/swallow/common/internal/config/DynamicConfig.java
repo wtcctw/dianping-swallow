@@ -4,5 +4,5 @@ public interface DynamicConfig {
 
    String get(String key);
 
-   void setConfigChangeListener(ConfigChangeListener listener);
+   void addConfigChangeListener(ConfigChangeListener listener);
 }

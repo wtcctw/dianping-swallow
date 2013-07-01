@@ -61,7 +61,7 @@ public class LionDynamicConfig implements DynamicConfig {
    }
 
    @Override
-   public void setConfigChangeListener(final ConfigChangeListener listener) {
+   public void addConfigChangeListener(final ConfigChangeListener listener) {
       cc.addChange(new ConfigChange() {
 
          @Override
