@@ -22,6 +22,9 @@ public class BrokerController {
     public Object sendMsg(String topic, String oType) {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
+            //根据topic找到Producer，进行发送
+            
+            
             map.put("success", true);
         } catch (IllegalArgumentException e) {
             map.put("success", false);

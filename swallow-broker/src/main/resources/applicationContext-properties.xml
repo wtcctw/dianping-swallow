@@ -15,5 +15,12 @@
     <bean id="config" class="com.dianping.swallow.broker.conf.Config">
     </bean>
 
+    <bean id="lionDynamicConfig"
+        class="com.dianping.swallow.common.internal.config.impl.LionDynamicConfig">
+        <constructor-arg>
+            <value>topic.lion.properties</value>
+        </constructor-arg>
+    </bean>
+
 
 </beans>
