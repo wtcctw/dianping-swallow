@@ -19,9 +19,6 @@
 
     <import resource="applicationContext-properties.xml" />
 
-    <import resource="applicationContext-consumer.xml" />
-
-    <import resource="applicationContext-producer.xml" />
 
     <!-- 报警 -->
     <bean id="commonAlarmSerivce" class="com.dianping.dpsf.spring.ProxyBeanFactory"
@@ -33,10 +30,6 @@
         <property name="serialize" value="java" />
         <property name="callMethod" value="sync" />
         <property name="timeout" value="5000" />
-    </bean>
-    <bean id="notifyService" class="com.dianping.puma.core.monitor.DefaultNotifyService">
-        <property name="alarmService" ref="commonAlarmSerivce" />
-        <property name="devMode" value="${puma.syncserver.notify.devMode}" />
     </bean>
 
 </beans>
