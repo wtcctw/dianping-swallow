@@ -25,7 +25,7 @@ import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 @Service
 public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener {
-    private static final String   TOPIC       = "topic";
+    private static final String   TOPIC       = "swallow.broker.topic";
 
     private static final Logger   LOG         = LoggerFactory.getLogger(ProducerHolderImpl.class);
 
@@ -40,21 +40,14 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
     @PostConstruct
     public void init() throws RemoteServiceInitFailedException {
         //<topic>,<topic>
-        String topicStr = dynamicConfig.get(TOPIC);
-        String[] topics = StringUtils.split(topicStr, ';');
-        LOG.info("Initing producers with topics(" + Arrays.toString(topics) + ")");
+        String config = dynamicConfig.get(TOPIC);
 
-        //每个topic创建一个producer(生产者是可以并发使用的)
-        if (topics != null) {
-            for (String topic : topics) {
-                initializeProducer(topic);
-            }
-        }
+        //初始化
+        init(config);
 
         //监听lion
         dynamicConfig.addConfigChangeListener(this);
 
-        LOG.info("Producer map" + producerMap);
     }
 
     private void initializeProducer(String topic) throws RemoteServiceInitFailedException {
@@ -63,6 +56,7 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
         Producer producer = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
         if (!producerMap.containsKey(topic)) {//不存在该topic的producer时，才会添加改Producer
             producerMap.put(topic, producer);
+            LOG.info("Added producer:" + producer);
         }
     }
 
@@ -74,22 +68,26 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
     @Override
     public void onConfigChange(String key, String value) {
         if (StringUtils.equals(key, TOPIC)) {
-            String[] topics = StringUtils.split(value, ';');
-            LOG.info("Initing producers with topics(" + Arrays.toString(topics) + ")");
-
-            //每个topic创建一个producer(生产者是可以并发使用的)
-            if (topics != null) {
-                for (String topic : topics) {
-                    try {
-                        initializeProducer(topic);
-                    } catch (RemoteServiceInitFailedException e) {
-                        notifyService.alarm("Error initialize producer ", e, true);
-                    }
-                }
+            try {
+                init(value);
+            } catch (RemoteServiceInitFailedException e) {
+                notifyService.alarm("Error initialize producer ", e, true);
             }
-
-            LOG.info("Producer map" + producerMap);
         }
+    }
+
+    private void init(String config) throws RemoteServiceInitFailedException {
+        String[] topics = StringUtils.split(config, ';');
+        LOG.info("Initing producers with topics(" + Arrays.toString(topics) + ")");
+
+        //每个topic创建一个producer(生产者是可以并发使用的)
+        if (topics != null) {
+            for (String topic : topics) {
+                initializeProducer(topic);
+            }
+        }
+
+        LOG.info("Producer map" + producerMap);
     }
 
 }

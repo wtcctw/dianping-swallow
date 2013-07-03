@@ -9,16 +9,13 @@
 
     <bean name="placeholder" lazy-init="false"
         class="com.dianping.lion.client.InitializeConfig">
-        <property name="propertiesPath" value="swallow-broker.properties" />
-    </bean>
-
-    <bean id="config" class="com.dianping.swallow.broker.conf.Config">
+        <property name="propertiesPath" value="swallow-broker.lion.properties" />
     </bean>
 
     <bean id="lionDynamicConfig"
         class="com.dianping.swallow.common.internal.config.impl.LionDynamicConfig">
         <constructor-arg>
-            <value>topic.lion.properties</value>
+            <value>swallow-broker.lion.properties</value>
         </constructor-arg>
     </bean>
 

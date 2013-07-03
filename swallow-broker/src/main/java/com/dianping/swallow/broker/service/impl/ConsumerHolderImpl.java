@@ -1,8 +1,11 @@
 package com.dianping.swallow.broker.service.impl;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -10,56 +13,128 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.broker.service.ProducerHolder;
+import com.dianping.swallow.broker.monitor.NotifyService;
+import com.dianping.swallow.broker.service.ConsumerHolder;
+import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
-import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
-import com.dianping.swallow.consumer.Consumer;
-import com.dianping.swallow.consumer.ConsumerConfig;
-import com.dianping.swallow.consumer.MessageListener;
-import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
-import com.dianping.swallow.producer.Producer;
-import com.dianping.swallow.producer.ProducerConfig;
-import com.dianping.swallow.producer.ProducerMode;
-import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 @Service
-public class ConsumerHolderImpl {
-    private static final Logger   LOG         = LoggerFactory.getLogger(ConsumerHolderImpl.class);
+public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener {
+    private static final String         SWALLOW_BROKER_CONSUMER_RECEIVERS = "swallow.broker.consumerReceivers";
 
-    private Map<String, Consumer> producerMap = new ConcurrentHashMap<String, Consumer>();
+    private static final Logger         LOG                               = LoggerFactory
+                                                                                  .getLogger(ConsumerHolderImpl.class);
+
+    private static final int            LENGTH                            = 3;                                              //表示<topic>,<cid>,<url>是3个元素
+
+    private Map<String, ConsumerBroker> consumerBrokerMap                 = new ConcurrentHashMap<String, ConsumerBroker>();
 
     @Autowired
-    private DynamicConfig         dynamicConfig;
+    private DynamicConfig               dynamicConfig;
 
+    @Autowired
+    private NotifyService               notifyService;
+
+    @PostConstruct
     public void init() throws RemoteServiceInitFailedException {
-        //获取<url>,<cid>,<topic>;<url>,<cid>,<topic>;配置项
-        String consumerStr = dynamicConfig.get("swallow.broker.consumers");
-        String[] topics = StringUtils.split(consumerStr, ';');
-        LOG.info("initing producers with topics(" + Arrays.toString(topics) + ")");
+        //获取<topic>,<cid>,<url>;<topic>,<cid>,<url>;配置项
+        String config = dynamicConfig.get(SWALLOW_BROKER_CONSUMER_RECEIVERS);
 
-        //每个配置项创建一个ConsumerWrap,然后启动BrokerConsumer（BrokerConsumer负责启动所有consumer,接受消息，并发给url）
-        
-        
-        //每个topic创建一个consumer
-        if (topics != null) {
-            for (String topic : topics) {
-                ConsumerConfig config = new ConsumerConfig();
-                config.setThreadPoolSize(1);
-                Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic),
-                        "swallow-broker", config);
-                c.setListener(new MessageListener() {
-                    @Override
-                    public void onMessage(Message msg) {
-                        System.out.println(msg.getContent());
-                        //            System.out.println(msg.transferContentToBean(MsgClass.class));
-                    }
-                });
-                c.start();
+        //初始化
+        init(config);
+    }
+
+    @Override
+    public void start() {
+        for (ConsumerBroker consumerBroker : consumerBrokerMap.values()) {
+            if (!consumerBroker.isActive()) {
+                consumerBroker.start();
+                LOG.info("Started ConsumerBroker:" + consumerBroker);
             }
         }
+    }
 
+    @Override
+    public void close() {
+        for (ConsumerBroker consumerBroker : consumerBrokerMap.values()) {
+            if (consumerBroker.isActive()) {
+                consumerBroker.close();
+                LOG.info("Closed ConsumerBroker:" + consumerBroker);
+            }
+        }
+    }
+
+    static class ConsumerBrokerConfig {
+
+        String url;
+        String consumerId;
+        String topic;
+
+        public ConsumerBrokerConfig(String topic, String consumerId, String url) {
+            super();
+            this.url = url;
+            this.consumerId = consumerId;
+            this.topic = topic;
+        }
+    }
+
+    @Override
+    public void onConfigChange(String key, String value) {
+        if (StringUtils.equals(key, SWALLOW_BROKER_CONSUMER_RECEIVERS)) {
+            try {
+                init(value);
+                start();
+            } catch (RuntimeException e) {
+                notifyService.alarm("Error when initialize ConsumerBrokers ", e, true);
+            }
+        }
+    }
+
+    private void init(String configStr) {
+        //解析配置
+        List<ConsumerBrokerConfig> configs = parseConfig(configStr);
+        LOG.info("initing ConsumerBrokers with config:" + configs);
+
+        //每个配置项创建一个ConsumerWrap,然后启动BrokerConsumer（BrokerConsumer负责启动所有consumer,接受消息，并发给url）
+        if (configs != null) {
+            for (ConsumerBrokerConfig config : configs) {
+                initializeConsumerBroker(config);
+            }
+        }
+        LOG.info("ConsumerBrokers inited");
+    }
+
+    private void initializeConsumerBroker(ConsumerBrokerConfig config) {
+        ConsumerBroker consumerBroker = new ConsumerBroker(config.topic, config.consumerId, config.url);
+        consumerBroker.setNotifyService(notifyService);
+
+        String key = config.topic + config.consumerId + config.url;
+        if (!consumerBrokerMap.containsKey(key)) {
+            consumerBrokerMap.put(key, consumerBroker);
+            LOG.info("Added ConsumerBroker:" + consumerBroker);
+        }
+    }
+
+    private List<ConsumerBrokerConfig> parseConfig(String configStr) {
+        String[] configStrSplit = StringUtils.split(configStr, ';');
+        List<ConsumerBrokerConfig> configs = new ArrayList<ConsumerBrokerConfig>();
+        if (configStrSplit != null) {
+            for (String receiverStr : configStrSplit) {
+                String[] receiverStrSplit = StringUtils.split(receiverStr, ',');
+                if (receiverStrSplit != null && receiverStrSplit.length == LENGTH) {
+                    ConsumerBrokerConfig config = new ConsumerBrokerConfig(receiverStrSplit[0], receiverStrSplit[1],
+                            receiverStrSplit[2]);
+                    configs.add(config);
+                }
+            }
+        }
+        return configs;
+    }
+
+    @Override
+    public Map<String, ConsumerBroker> getConsumerBrokerMap() {
+        return consumerBrokerMap;
     }
 
 }
