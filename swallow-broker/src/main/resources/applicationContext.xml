@@ -31,5 +31,10 @@
         <property name="callMethod" value="sync" />
         <property name="timeout" value="5000" />
     </bean>
+    <bean id="notifyService"
+        class="com.dianping.swallow.broker.monitor.DefaultNotifyService">
+        <property name="alarmService" ref="commonAlarmSerivce" />
+        <property name="devMode" value="${swallow.broker.notify.devMode}" />
+    </bean>
 
 </beans>
