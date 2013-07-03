@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
+import com.google.gson.Gson;
 
 public class ConsumerBroker implements MessageListener {
     private static final Logger LOG    = LoggerFactory.getLogger(ConsumerBroker.class);
@@ -81,8 +83,10 @@ public class ConsumerBroker implements MessageListener {
         try {
             invoke(msg);
         } catch (IOException e) {
-            throw new BackoutMessageException("Error when send http message to " + url, e);
-        } catch (Exception e) {
+            //失败了(IO)，重试
+            throw new BackoutMessageException("Error(IO) when send http message to " + url, e);
+        } catch (RuntimeException e) {
+            LOG.error("This message is skiped:" + msg);
             LOG.error("Error when send http message to " + url, e);
             if (notifyService != null) {
                 notifyService.alarm("Error when send http message to " + url, e, true);
@@ -90,7 +94,8 @@ public class ConsumerBroker implements MessageListener {
         }
     }
 
-    private void invoke(Message msg) throws IOException {
+    @SuppressWarnings("rawtypes")
+    private void invoke(Message msg) throws IOException, BackoutMessageException {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair(Constant.CONTENT, msg.getContent()));
         nvps.add(new BasicNameValuePair(Constant.TOPIC, topic));
@@ -103,7 +108,14 @@ public class ConsumerBroker implements MessageListener {
             }
         }
         //http调用，发送消息
-        HttpClientUtil.post(url, nvps);
+        String result = HttpClientUtil.post(url, nvps);
+        Gson gson = new Gson();
+        Map resultMap = gson.fromJson(result, Map.class);
+        if (resultMap == null || StringUtils.equalsIgnoreCase(String.valueOf(resultMap.get("success")), "true")) {
+            //失败了(结果不对)，重试
+            throw new BackoutMessageException("Error(result is null or success not true) when send http message to "
+                    + url);
+        }
     }
 
     public String getUrl() {

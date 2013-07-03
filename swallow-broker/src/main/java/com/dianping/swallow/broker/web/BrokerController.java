@@ -62,7 +62,7 @@ public class BrokerController {
 
             //解析请球中的参数
             Map paramMap = request.getParameterMap();
-            LOG.info("request param is " + paramMap);
+            LOG.info("[sendMsg]request param is " + paramMap);
 
             if (paramMap != null && paramMap.size() > 0) {
                 Set<Map.Entry> set = paramMap.entrySet();
@@ -89,7 +89,7 @@ public class BrokerController {
             }
 
             //根据topic找到Producer
-            LOG.info("Sending message: topic=" + topic + ", content=" + content + ", properties=" + properties);
+            LOG.info("[sendMsg]Sending message: topic=" + topic + ", content=" + content + ", properties=" + properties);
             Producer producer = producerHolder.getProducer(topic);
             if (producer != null) {
                 //发送消息
@@ -126,7 +126,7 @@ public class BrokerController {
 
             //解析请球中的参数
             Map paramMap = request.getParameterMap();
-            LOG.info("request param is " + paramMap);
+            LOG.info("[testReceiver]request param is " + paramMap);
 
             if (paramMap != null && paramMap.size() > 0) {
                 Set<Map.Entry> set = paramMap.entrySet();
@@ -153,7 +153,8 @@ public class BrokerController {
             }
 
             //打印出来
-            LOG.info("Receive message: topic=" + topic + ", content=" + content + ", properties=" + properties);
+            LOG.info("[testReceiver]Receive message: topic=" + topic + ", content=" + content + ", properties="
+                    + properties);
 
         } catch (IllegalArgumentException e) {
             map.put("success", false);

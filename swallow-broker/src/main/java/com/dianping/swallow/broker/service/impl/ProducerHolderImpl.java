@@ -26,6 +26,8 @@ import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 @Service
 public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener {
     private static final String   TOPIC       = "swallow.broker.topic";
+    private static final String   RETRY_TIMES = "swallow.broker.producer.retryTimes";
+    private static final String   MODE        = "swallow.broker.producer.mode";
 
     private static final Logger   LOG         = LoggerFactory.getLogger(ProducerHolderImpl.class);
 
@@ -52,7 +54,18 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
 
     private void initializeProducer(String topic) throws RemoteServiceInitFailedException {
         ProducerConfig config = new ProducerConfig();
-        config.setMode(ProducerMode.SYNC_MODE);
+        String retryTimes = dynamicConfig.get(RETRY_TIMES);
+        if (retryTimes != null) {
+            int times = Integer.valueOf(retryTimes);
+            config.setSyncRetryTimes(times);
+            config.setAsyncRetryTimes(times);
+        }
+        //默认是异步模式
+        String mode = dynamicConfig.get(MODE);
+        if (StringUtils.equalsIgnoreCase(mode, "SYNC_MODE")) {
+            config.setMode(ProducerMode.SYNC_MODE);
+        }
+
         Producer producer = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
         if (!producerMap.containsKey(topic)) {//不存在该topic的producer时，才会添加改Producer
             producerMap.put(topic, producer);
