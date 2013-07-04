@@ -95,36 +95,56 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
     }
 
     private void initializeConsumerBroker(String topic) {
-        //根据topic，获取swallow.broker.consumer.<topic>.*配置
-        String consumerId = StringUtils.trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic
+        String consumerIdsStr = StringUtils.trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic
                 + ".consumerId"));
-        String url = StringUtils.trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + ".url"));
-        String key = topic + consumerId + url;
+        String[] splits = StringUtils.split(consumerIdsStr, ';');
+        if (splits != null) {
+            for (String split : splits) {
+                String[] consumerIdAndNum = StringUtils.split(split, ',');
+                String consumerId = consumerIdAndNum[0];
+                String num = consumerIdAndNum[1];
 
-        //该配置不存在，则可以创建ConsumerWrap; 已经存在则不创建
-        if (!consumerBrokerMap.containsKey(key)) {
-            Integer threadPoolSize = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
-                    .get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + ".config.threadPoolSize")));
-            Integer delayBaseOnBackoutMessageException = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
-                    .get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + ".config.delayBaseOnBackoutMessageException")));
-            Integer delayUpperboundOnBackoutMessageException = NumberUtils.createInteger(StringUtils
-                    .trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic
-                            + ".config.delayUpperboundOnBackoutMessageException")));
-            Integer retryCountOnBackoutMessageException = NumberUtils.createInteger(StringUtils
-                    .trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic
-                            + ".config.retryCountOnBackoutMessageException")));
+                String key = topic + consumerId + num;
 
-            ConsumerConfig consumerConfig = new ConsumerConfig();
-            consumerConfig.setDelayBaseOnBackoutMessageException(delayBaseOnBackoutMessageException);
-            consumerConfig.setDelayUpperboundOnBackoutMessageException(delayUpperboundOnBackoutMessageException);
-            consumerConfig.setRetryCountOnBackoutMessageException(retryCountOnBackoutMessageException);
-            consumerConfig.setThreadPoolSize(threadPoolSize);
+                //该配置不存在，则可以创建ConsumerWrap; 已经存在则不创建
+                if (!consumerBrokerMap.containsKey(key)) {
+                    String url = StringUtils.trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "."
+                            + consumerId + "." + num + ".url"));
+                    Integer threadPoolSize = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
+                            .get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "." + consumerId + "." + num
+                                    + ".threadPoolSize")));
+                    Integer delayBaseOnBackoutMessageException = NumberUtils.createInteger(StringUtils
+                            .trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "." + consumerId
+                                    + "." + num + ".delayBaseOnBackoutMessageException")));
+                    Integer delayUpperboundOnBackoutMessageException = NumberUtils.createInteger(StringUtils
+                            .trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "." + consumerId
+                                    + "." + num + ".delayUpperboundOnBackoutMessageException")));
+                    Integer retryCountOnBackoutMessageException = NumberUtils.createInteger(StringUtils
+                            .trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "." + consumerId
+                                    + "." + num + ".retryCountOnBackoutMessageException")));
 
-            ConsumerBroker consumerBroker = new ConsumerBroker(topic, consumerId, url, consumerConfig);
-            consumerBroker.setNotifyService(notifyService);
+                    ConsumerConfig consumerConfig = new ConsumerConfig();
+                    if (delayBaseOnBackoutMessageException != null) {
+                        consumerConfig.setDelayBaseOnBackoutMessageException(delayBaseOnBackoutMessageException);
+                    }
+                    if (delayUpperboundOnBackoutMessageException != null) {
+                        consumerConfig
+                                .setDelayUpperboundOnBackoutMessageException(delayUpperboundOnBackoutMessageException);
+                    }
+                    if (retryCountOnBackoutMessageException != null) {
+                        consumerConfig.setRetryCountOnBackoutMessageException(retryCountOnBackoutMessageException);
+                    }
+                    if (threadPoolSize != null) {
+                        consumerConfig.setThreadPoolSize(threadPoolSize);
+                    }
 
-            consumerBrokerMap.put(key, consumerBroker);
-            LOG.info("Added ConsumerBroker:" + consumerBroker);
+                    ConsumerBroker consumerBroker = new ConsumerBroker(topic, consumerId, url, consumerConfig);
+                    consumerBroker.setNotifyService(notifyService);
+
+                    consumerBrokerMap.put(key, consumerBroker);
+                    LOG.info("Added ConsumerBroker:" + consumerBroker);
+                }
+            }
         }
     }
 
