@@ -6,12 +6,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.broker.conf.Constant;
 import com.dianping.swallow.broker.monitor.NotifyService;
 import com.dianping.swallow.broker.service.ProducerHolder;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
@@ -25,13 +28,11 @@ import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 @Service
 public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener {
-    private static final String   TOPIC       = "swallow.broker.topic";
-    private static final String   RETRY_TIMES = "swallow.broker.producer.retryTimes";
-    private static final String   MODE        = "swallow.broker.producer.mode";
+    private static final Logger   LOG                            = LoggerFactory.getLogger(ProducerHolderImpl.class);
 
-    private static final Logger   LOG         = LoggerFactory.getLogger(ProducerHolderImpl.class);
+    private static final String   SWALLOW_BROKER_PRODUCER_PREFIX = "swallow.broker.consumer.";
 
-    private Map<String, Producer> producerMap = new ConcurrentHashMap<String, Producer>();
+    private Map<String, Producer> producerMap                    = new ConcurrentHashMap<String, Producer>();
 
     @Autowired
     private DynamicConfig         dynamicConfig;
@@ -42,10 +43,12 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
     @PostConstruct
     public void init() throws RemoteServiceInitFailedException {
         //<topic>,<topic>
-        String config = dynamicConfig.get(TOPIC);
+        String config = dynamicConfig.get(Constant.PROPERTY_TOPIC);
 
         //初始化
         init(config);
+
+        LOG.info("All producer's topic:" + producerMap.keySet());
 
         //监听lion
         dynamicConfig.addConfigChangeListener(this);
@@ -53,24 +56,40 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
     }
 
     private void initializeProducer(String topic) throws RemoteServiceInitFailedException {
-        ProducerConfig config = new ProducerConfig();
-        String retryTimes = dynamicConfig.get(RETRY_TIMES);
-        if (retryTimes != null) {
-            int times = Integer.valueOf(retryTimes);
-            config.setSyncRetryTimes(times);
-            config.setAsyncRetryTimes(times);
-        }
-        //默认是异步模式
-        String mode = dynamicConfig.get(MODE);
-        if (StringUtils.equalsIgnoreCase(mode, "SYNC_MODE")) {
-            config.setMode(ProducerMode.SYNC_MODE);
+        //该配置不存在，则可以创建ConsumerWrap; 已经存在则不创建
+        if (!producerMap.containsKey(topic)) {
+            //根据topic，获取swallow.broker.producer.<topic>.*配置
+            Integer retryTimes = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
+                    .get(SWALLOW_BROKER_PRODUCER_PREFIX + topic + ".config.retryTimes")));
+            String mode = StringUtils.trimToNull(dynamicConfig.get(SWALLOW_BROKER_PRODUCER_PREFIX + topic
+                    + ".config.mode"));
+            Boolean zipped = BooleanUtils.toBoolean(StringUtils.trimToNull(dynamicConfig
+                    .get(SWALLOW_BROKER_PRODUCER_PREFIX + topic + ".config.zipped")));
+            Integer threadPoolSize = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
+                    .get(SWALLOW_BROKER_PRODUCER_PREFIX + topic + ".config.threadPoolSize")));
+
+            ProducerConfig config = new ProducerConfig();
+            if (retryTimes != null) {
+                config.setSyncRetryTimes(retryTimes);
+                config.setAsyncRetryTimes(retryTimes);
+            }
+            if (StringUtils.equalsIgnoreCase(mode, "SYNC_MODE")) {
+                config.setMode(ProducerMode.SYNC_MODE);
+            }
+            if (zipped != null) {
+                config.setZipped(zipped);
+            }
+            if (threadPoolSize != null) {
+                config.setThreadPoolSize(threadPoolSize);
+            }
+
+            Producer producer = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
+
+            producerMap.put(topic, producer);
+
+            LOG.info("Added producer(topic=" + topic + ")");
         }
 
-        Producer producer = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
-        if (!producerMap.containsKey(topic)) {//不存在该topic的producer时，才会添加改Producer
-            producerMap.put(topic, producer);
-            LOG.info("Added producer:" + producer);
-        }
     }
 
     @Override
@@ -80,12 +99,15 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
 
     @Override
     public void onConfigChange(String key, String value) {
-        if (StringUtils.equals(key, TOPIC)) {
+        if (StringUtils.equals(key, Constant.PROPERTY_TOPIC)) {
             try {
                 init(value);
             } catch (RemoteServiceInitFailedException e) {
                 notifyService.alarm("Error initialize producer ", e, true);
+            } catch (RuntimeException e) {
+                notifyService.alarm("Error initialize producer ", e, true);
             }
+            LOG.info("All producer's topic:" + producerMap.keySet());
         }
     }
 
@@ -100,7 +122,6 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
             }
         }
 
-        LOG.info("Producer map" + producerMap);
     }
 
 }

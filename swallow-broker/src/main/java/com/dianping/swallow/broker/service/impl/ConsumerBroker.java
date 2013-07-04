@@ -39,14 +39,12 @@ public class ConsumerBroker implements MessageListener {
     private Consumer            consumer;
 
     //收到消息后，使用HttpClient将消息发给url (url，topic，consumer 组合不能重复)
-    public ConsumerBroker(String topic, String consumerId, String url) {
+    public ConsumerBroker(String topic, String consumerId, String url, ConsumerConfig config) {
         super();
         this.url = url;
         this.consumerId = consumerId;
         this.topic = topic;
 
-        ConsumerConfig config = new ConsumerConfig();
-        config.setThreadPoolSize(1);
         consumer = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), consumerId, config);
         consumer.setListener(this);
     }
@@ -136,6 +134,12 @@ public class ConsumerBroker implements MessageListener {
 
     public void setNotifyService(NotifyService notifyService) {
         this.notifyService = notifyService;
+    }
+
+    @Override
+    public String toString() {
+        return "ConsumerBroker [active=" + active + ", url=" + url + ", consumerId=" + consumerId + ", topic=" + topic
+                + "]";
     }
 
 }
