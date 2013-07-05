@@ -79,12 +79,14 @@ public class ConsumerBroker implements MessageListener {
     public void onMessage(Message msg) throws BackoutMessageException {
         //调用url
         try {
+            LOG.info("Sending to url(" + url + "): " + msg + ", content:" + msg.getContent());
             invoke(msg);
+            LOG.info("Sended to url(" + url + "): " + msg + ", content:" + msg.getContent());
         } catch (IOException e) {
             //失败了(IO)，重试
             throw new BackoutMessageException("Error(IO) when send http message to " + url, e);
         } catch (RuntimeException e) {
-            LOG.error("This message is skiped:" + msg);
+            LOG.error("This message is skiped:" + msg + ", content:" + msg.getContent());
             LOG.error("Error when send http message to " + url, e);
             if (notifyService != null) {
                 notifyService.alarm("Error when send http message to " + url, e, true);
@@ -114,6 +116,10 @@ public class ConsumerBroker implements MessageListener {
             throw new BackoutMessageException("Error(result is null or success not true) when send http message to "
                     + url);
         }
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getUrl() {

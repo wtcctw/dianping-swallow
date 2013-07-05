@@ -1,12 +1,13 @@
 package com.dianping.swallow.broker.service.impl;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +19,9 @@ import com.dianping.swallow.broker.monitor.NotifyService;
 import com.dianping.swallow.broker.service.ConsumerHolder;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
-import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.consumer.ConsumerConfig;
 
+//TODO:状态监控页面
 @Service
 public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener {
 
@@ -29,7 +30,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
     private static final Logger         LOG                            = LoggerFactory
                                                                                .getLogger(ConsumerHolderImpl.class);
 
-    private Map<String, ConsumerBroker> consumerBrokerMap              = new ConcurrentHashMap<String, ConsumerBroker>();
+    private Map<String, ConsumerBroker> consumerBrokerMap              = new HashMap<String, ConsumerBroker>();
 
     @Autowired
     private DynamicConfig               dynamicConfig;
@@ -38,27 +39,41 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
     private NotifyService               notifyService;
 
     @PostConstruct
-    public void init() throws RemoteServiceInitFailedException {
-        //获取<topic>配置项
-        String topicStr = dynamicConfig.get(Constant.PROPERTY_TOPIC);
-        //初始化所有topic对应的consumer
-        init(topicStr);
+    public void init() {
+        build();
 
-        LOG.info("consumerBrokerMap is " + consumerBrokerMap);
-
+        //监听lion
+        dynamicConfig.addConfigChangeListener(this);
     }
 
-    private void init(String topicStr) {
-        //获取<topic>配置项
-        String[] topics = StringUtils.split(topicStr.trim(), ';');
-        LOG.info("Initing consumers with topics(" + Arrays.toString(topics) + ")");
+    /**
+     * 读取配置项，初始化所有ConsumerBroker，此初始化方法可被多次调用(不能并发)，所以当配置项所生变化时，可以重新调用该方法即可。
+     */
+    private void build() {
+        LOG.info("Building consumerBrokers...");
 
-        //每个topic创建一个consumer
-        if (topics != null) {
-            for (String topic : topics) {
-                initializeConsumerBroker(topic);
-            }
+        Map<String, ConsumerBroker> map = new HashMap<String, ConsumerBroker>();
+
+        //获取<topic>配置项
+        String topicStr = dynamicConfig.get(Constant.PROPERTY_TOPIC);
+
+        //初始化所有topic对应的consumer
+        init(map, topicStr);
+
+        //新的map替换旧的map
+        Map<String, ConsumerBroker> oldMap = consumerBrokerMap;
+        consumerBrokerMap = map;
+
+        //对于被删除的consumerBroker(需要将它停掉)
+        for (String newKey : map.keySet()) {
+            oldMap.remove(newKey);//移除新的map中存在的key，剩下是则是被删除的key
         }
+        for (ConsumerBroker toBeStopConsumerBroker : oldMap.values()) {
+            toBeStopConsumerBroker.close();
+            LOG.info(toBeStopConsumerBroker + " is closed.");
+        }
+
+        LOG.info("Build done, consumerBrokerMap is " + consumerBrokerMap);
     }
 
     @Override
@@ -81,71 +96,162 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
         }
     }
 
+    /**
+     * 监听swallow.broker.topic和swallow.broker.consumer.<topic>.consumerId参数
+     */
     @Override
     public void onConfigChange(String key, String value) {
-        if (StringUtils.equals(key, Constant.PROPERTY_TOPIC)) {
+        key = StringUtils.trim(key);
+
+        boolean needReInit = false;
+
+        //看看是否是Topic配置项变化，或者是否是swallow.broker.consumer.<topic>.consumerId配置项变化。
+        //如果是，则需要重新初始化
+        if (StringUtils.equals(key, Constant.PROPERTY_TOPIC)) { //key是否是swallow.broker.topic
+            needReInit = true;
+        } else {
+            for (String consumerKey : consumerBrokerMap.keySet()) {
+                String topic = getTopicFromConsumerKey(consumerKey);
+                if (StringUtils.equals(key, getTopicConsumerPropertyName(topic))) {//key是否是swallow.broker.consumer.<topic>
+                    needReInit = true;
+                    break;
+                } else if (StringUtils.equals(key, getTopicConsumerNumPropertyName(consumerKey, "url"))) {//是否是swallow.broker.consumer.<topic>.<consumerId>.<url>
+                    //找到该ConsumerBroker，修改其url
+                    ConsumerBroker consumerBroker = consumerBrokerMap.get(consumerKey);
+                    consumerBroker.setUrl(value);
+                    LOG.info("ConsumerBroker(" + consumerKey + ")'s url changed to: " + value);
+                    needReInit = false;
+                    break;
+                }
+            }
+        }
+
+        if (needReInit) {
             try {
-                init(value);
+                build();
+                //lion的配置修改，可能会新增ConsumerBroker，所以需要触发启动
                 start();
             } catch (RuntimeException e) {
                 notifyService.alarm("Error when initialize ConsumerBrokers ", e, true);
             }
-            LOG.info("consumerBrokerMap is " + consumerBrokerMap);
         }
     }
 
-    private void initializeConsumerBroker(String topic) {
-        String consumerIdsStr = StringUtils.trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic
-                + ".consumerId"));
-        String[] splits = StringUtils.split(consumerIdsStr, ';');
-        if (splits != null) {
-            for (String split : splits) {
-                String[] consumerIdAndNum = StringUtils.split(split, ',');
-                String consumerId = consumerIdAndNum[0];
-                String num = consumerIdAndNum[1];
+    private void init(Map<String, ConsumerBroker> map, String topicStr) {
+        if (StringUtils.isNotBlank(topicStr)) {
+            String[] topics = StringUtils.split(topicStr.trim(), ';');
+            LOG.info("Initing consumers with topics(" + Arrays.toString(topics) + ")");
 
-                String key = topic + consumerId + num;
+            //每个topic创建一个consumer
+            if (topics != null) {
+                for (String topic : topics) {
+                    initConsumerBrokers(map, topic);
+                }
+            }
 
-                //该配置不存在，则可以创建ConsumerWrap; 已经存在则不创建
-                if (!consumerBrokerMap.containsKey(key)) {
-                    String url = StringUtils.trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "."
-                            + consumerId + "." + num + ".url"));
-                    Integer threadPoolSize = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
-                            .get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "." + consumerId + "." + num
-                                    + ".threadPoolSize")));
-                    Integer delayBaseOnBackoutMessageException = NumberUtils.createInteger(StringUtils
-                            .trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "." + consumerId
-                                    + "." + num + ".delayBaseOnBackoutMessageException")));
-                    Integer delayUpperboundOnBackoutMessageException = NumberUtils.createInteger(StringUtils
-                            .trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "." + consumerId
-                                    + "." + num + ".delayUpperboundOnBackoutMessageException")));
-                    Integer retryCountOnBackoutMessageException = NumberUtils.createInteger(StringUtils
-                            .trimToNull(dynamicConfig.get(SWALLOW_BROKER_CONSUMER_PREFIX + topic + "." + consumerId
-                                    + "." + num + ".retryCountOnBackoutMessageException")));
+        }
+    }
 
-                    ConsumerConfig consumerConfig = new ConsumerConfig();
-                    if (delayBaseOnBackoutMessageException != null) {
-                        consumerConfig.setDelayBaseOnBackoutMessageException(delayBaseOnBackoutMessageException);
-                    }
-                    if (delayUpperboundOnBackoutMessageException != null) {
-                        consumerConfig
-                                .setDelayUpperboundOnBackoutMessageException(delayUpperboundOnBackoutMessageException);
-                    }
-                    if (retryCountOnBackoutMessageException != null) {
-                        consumerConfig.setRetryCountOnBackoutMessageException(retryCountOnBackoutMessageException);
-                    }
-                    if (threadPoolSize != null) {
-                        consumerConfig.setThreadPoolSize(threadPoolSize);
-                    }
+    /**
+     * 初始化某个topic下的所有ConsumerBroker
+     * 
+     * @param map
+     */
+    private void initConsumerBrokers(Map<String, ConsumerBroker> map, String topic) {
+        String consumerIdsStr = dynamicConfig.get(getTopicConsumerPropertyName(topic));
 
-                    ConsumerBroker consumerBroker = new ConsumerBroker(topic, consumerId, url, consumerConfig);
-                    consumerBroker.setNotifyService(notifyService);
-
-                    consumerBrokerMap.put(key, consumerBroker);
-                    LOG.info("Added ConsumerBroker:" + consumerBroker);
+        if (StringUtils.isNotBlank(consumerIdsStr)) {
+            String[] splits = StringUtils.split(consumerIdsStr, ';');
+            if (splits != null) {
+                for (String split : splits) {
+                    initConsumerBroker(map, topic, split);
                 }
             }
         }
+    }
+
+    /**
+     * 初始化某个ConsumerBroker
+     * 
+     * @param map
+     */
+    private void initConsumerBroker(Map<String, ConsumerBroker> map, String topic, String config) {
+        String[] consumerIdAndNum = StringUtils.split(config, ',');
+        Validate.isTrue(consumerIdAndNum != null && consumerIdAndNum.length == 2, "Error config :" + config);
+
+        String consumerId = consumerIdAndNum[0];
+        String num = consumerIdAndNum[1];
+
+        String key = getConsumerKey(topic, consumerId, num);
+
+        //如果key对应的ConsumerBroker不存在，则可以创建ConsumerBroker; 已经存在复用，不创建
+        ConsumerBroker consumerBroker = consumerBrokerMap.get(key);
+        if (consumerBroker == null) {
+            LOG.info("ConsumerBroker with key '" + key + "' is not exsits, so create it!");
+
+            String url = StringUtils.trimToNull(dynamicConfig.get(getTopicConsumerNumPropertyName(topic, consumerId,
+                    num, "url")));
+            Integer threadPoolSize = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
+                    .get(getTopicConsumerNumPropertyName(topic, consumerId, num, "threadPoolSize"))));
+            Integer delayBaseOnBackoutMessageException = NumberUtils
+                    .createInteger(StringUtils.trimToNull(dynamicConfig.get(getTopicConsumerNumPropertyName(topic,
+                            consumerId, num, "delayBaseOnBackoutMessageException"))));
+            Integer delayUpperboundOnBackoutMessageException = NumberUtils.createInteger(StringUtils
+                    .trimToNull(dynamicConfig.get(getTopicConsumerNumPropertyName(topic, consumerId, num,
+                            "delayUpperboundOnBackoutMessageException"))));
+            Integer retryCountOnBackoutMessageException = NumberUtils.createInteger(StringUtils
+                    .trimToNull(dynamicConfig.get(getTopicConsumerNumPropertyName(topic, consumerId, num,
+                            "retryCountOnBackoutMessageException"))));
+
+            Validate.isTrue(StringUtils.isNotBlank(url), "Url(" + url + ") is blank!");
+
+            ConsumerConfig consumerConfig = new ConsumerConfig();
+            if (delayBaseOnBackoutMessageException != null) {
+                consumerConfig.setDelayBaseOnBackoutMessageException(delayBaseOnBackoutMessageException);
+            }
+            if (delayUpperboundOnBackoutMessageException != null) {
+                consumerConfig.setDelayUpperboundOnBackoutMessageException(delayUpperboundOnBackoutMessageException);
+            }
+            if (retryCountOnBackoutMessageException != null) {
+                consumerConfig.setRetryCountOnBackoutMessageException(retryCountOnBackoutMessageException);
+            }
+            if (threadPoolSize != null) {
+                consumerConfig.setThreadPoolSize(threadPoolSize);
+            }
+            consumerBroker = new ConsumerBroker(topic, consumerId, url, consumerConfig);
+            consumerBroker.setNotifyService(notifyService);
+            LOG.info("ConsumerBroker with key '" + key + "' is created!");
+        }
+
+        map.put(key, consumerBroker);
+        LOG.info("Added ConsumerBroker:" + consumerBroker);
+    }
+
+    //如swallow.broker.consumer.example
+    private String getTopicConsumerPropertyName(String topic) {
+        return StringUtils.trimToNull(SWALLOW_BROKER_CONSUMER_PREFIX + topic);
+    }
+
+    //如swallow.broker.consumer.example.swallow-broker.1.url
+    private String getTopicConsumerNumPropertyName(String topic, String consumerId, String num, String suffix) {
+        return getTopicConsumerNumPropertyName(getConsumerKey(topic, consumerId, num), suffix);
+    }
+
+    //如swallow.broker.consumer.example.swallow-broker.1.url
+    private String getTopicConsumerNumPropertyName(String comsunerKey, String suffix) {
+        return SWALLOW_BROKER_CONSUMER_PREFIX + comsunerKey + "." + suffix;
+    }
+
+    private String getConsumerKey(String topic, String consumerId, String num) {
+        return topic + "." + consumerId + "." + num;
+    }
+
+    private String getTopicFromConsumerKey(String consumerKey) {//topic不会含有点.
+        int index = consumerKey.indexOf('.');
+        if (index != -1) {
+            return consumerKey.substring(0, index);
+        }
+        return null;
     }
 
     @Override
