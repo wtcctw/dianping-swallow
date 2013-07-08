@@ -1,4 +1,4 @@
-package com.dianping.swallow.broker.service.impl;
+package com.dianping.swallow.broker.service.producer.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.broker.conf.Constant;
 import com.dianping.swallow.broker.monitor.NotifyService;
-import com.dianping.swallow.broker.service.ProducerHolder;
+import com.dianping.swallow.broker.service.producer.ProducerHolder;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.message.Destination;
@@ -73,6 +73,8 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
 
     @Override
     public void onConfigChange(String key, String value) {
+        LOG.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
+        key = StringUtils.trim(key);
         if (StringUtils.equals(key, Constant.PROPERTY_TOPIC)) {
             try {
                 build();

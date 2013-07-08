@@ -1,8 +1,8 @@
-package com.dianping.swallow.broker.service;
+package com.dianping.swallow.broker.service.consumer;
 
 import java.util.Map;
 
-import com.dianping.swallow.broker.service.impl.ConsumerBroker;
+import com.dianping.swallow.broker.service.consumer.impl.ConsumerBroker;
 
 public interface ConsumerHolder {
 

@@ -15,6 +15,10 @@ swallow.broker.consumer.example.swallow-broker.2.delayBaseOnBackoutMessageExcept
 swallow.broker.consumer.example.swallow-broker.2.delayUpperboundOnBackoutMessageException=3000
 swallow.broker.consumer.example.swallow-broker.2.retryCountOnBackoutMessageException=10
 
+swallow.broker.consumer.example2=swallow-broker,1;
+
+swallow.broker.consumer.example2.swallow-broker.1.url=http://localhost:8080/swallow-broker/testReceiver
+
 
 swallow.broker.producer.example.retryTimes=5
 swallow.broker.producer.example.mode=ASYNC_MODE

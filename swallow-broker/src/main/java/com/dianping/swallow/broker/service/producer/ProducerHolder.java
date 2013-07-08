@@ -1,4 +1,4 @@
-package com.dianping.swallow.broker.service;
+package com.dianping.swallow.broker.service.producer;
 
 import com.dianping.swallow.producer.Producer;
 

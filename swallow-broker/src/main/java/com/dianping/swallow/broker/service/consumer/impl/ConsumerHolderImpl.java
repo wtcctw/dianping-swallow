@@ -1,10 +1,13 @@
-package com.dianping.swallow.broker.service.impl;
+package com.dianping.swallow.broker.service.consumer.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -16,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.broker.conf.Constant;
 import com.dianping.swallow.broker.monitor.NotifyService;
-import com.dianping.swallow.broker.service.ConsumerHolder;
+import com.dianping.swallow.broker.service.consumer.ConsumerHolder;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.consumer.ConsumerConfig;
@@ -32,6 +35,8 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
 
     private Map<String, ConsumerBroker> consumerBrokerMap              = new HashMap<String, ConsumerBroker>();
 
+    private Set<String>                 topics                         = new HashSet<String>();
+
     @Autowired
     private DynamicConfig               dynamicConfig;
 
@@ -44,6 +49,8 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
 
         //监听lion
         dynamicConfig.addConfigChangeListener(this);
+
+        start();
     }
 
     /**
@@ -86,6 +93,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
         }
     }
 
+    @PreDestroy
     @Override
     public void close() {
         for (ConsumerBroker consumerBroker : consumerBrokerMap.values()) {
@@ -101,6 +109,8 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
      */
     @Override
     public void onConfigChange(String key, String value) {
+        LOG.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
+
         key = StringUtils.trim(key);
 
         boolean needReInit = false;
@@ -110,18 +120,22 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
         if (StringUtils.equals(key, Constant.PROPERTY_TOPIC)) { //key是否是swallow.broker.topic
             needReInit = true;
         } else {
-            for (String consumerKey : consumerBrokerMap.keySet()) {
-                String topic = getTopicFromConsumerKey(consumerKey);
-                if (StringUtils.equals(key, getTopicConsumerPropertyName(topic))) {//key是否是swallow.broker.consumer.<topic>
+            for (String topic : topics) {//key是否是swallow.broker.consumer.<topic>
+                if (StringUtils.equals(key, getTopicConsumerPropertyName(topic))) {
                     needReInit = true;
                     break;
-                } else if (StringUtils.equals(key, getTopicConsumerNumPropertyName(consumerKey, "url"))) {//是否是swallow.broker.consumer.<topic>.<consumerId>.<url>
-                    //找到该ConsumerBroker，修改其url
-                    ConsumerBroker consumerBroker = consumerBrokerMap.get(consumerKey);
-                    consumerBroker.setUrl(value);
-                    LOG.info("ConsumerBroker(" + consumerKey + ")'s url changed to: " + value);
-                    needReInit = false;
-                    break;
+                }
+            }
+            if (!needReInit) {
+                for (String consumerKey : consumerBrokerMap.keySet()) {//是否是swallow.broker.consumer.<topic>.<consumerId>.<url>
+                    if (StringUtils.equals(key, getTopicConsumerNumPropertyName(consumerKey, "url"))) {
+                        //找到该ConsumerBroker，修改其url
+                        ConsumerBroker consumerBroker = consumerBrokerMap.get(consumerKey);
+                        consumerBroker.setUrl(value);
+                        LOG.info("ConsumerBroker(" + consumerKey + ")'s url changed to: " + value);
+                        needReInit = false;
+                        break;
+                    }
                 }
             }
         }
@@ -145,6 +159,9 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
             //每个topic创建一个consumer
             if (topics != null) {
                 for (String topic : topics) {
+                    //将topic存起来
+                    this.topics.add(topic);
+                    //每个topic初始化其consumer
                     initConsumerBrokers(map, topic);
                 }
             }
@@ -244,14 +261,6 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
 
     private String getConsumerKey(String topic, String consumerId, String num) {
         return topic + "." + consumerId + "." + num;
-    }
-
-    private String getTopicFromConsumerKey(String consumerKey) {//topic不会含有点.
-        int index = consumerKey.indexOf('.');
-        if (index != -1) {
-            return consumerKey.substring(0, index);
-        }
-        return null;
     }
 
     @Override

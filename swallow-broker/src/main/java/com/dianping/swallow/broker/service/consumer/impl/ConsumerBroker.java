@@ -1,4 +1,4 @@
-package com.dianping.swallow.broker.service.impl;
+package com.dianping.swallow.broker.service.consumer.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
