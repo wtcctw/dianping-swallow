@@ -141,4 +141,9 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
 
     }
 
+    @Override
+    public Map<String, Producer> getProducerMap() {
+        return producerMap;
+    }
+
 }
