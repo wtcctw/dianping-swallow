@@ -24,7 +24,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
 
    private final String                           cid;
    private final String                           topicName;
-   private final transient MessageRetrieverThread messageRetrieverThread;
+   private transient MessageRetrieverThread messageRetrieverThread;
 
    /** 最小剩余数量,当queue的消息数量小于threshold时，会触发从数据库加载数据的操作 */
    private final int                              threshold;
@@ -39,8 +39,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
 
    private AtomicBoolean                          isClosed         = new AtomicBoolean(false);
 
-   private int                                    delayBase        = 100;
-   private int                                    delayUpperbound  = 500;
+   private int                                    delayBase        = 10;
+   private int                                    delayUpperbound  = 50;
 
    public MessageBlockingQueue(String cid, String topicName, int threshold, int capacity, Long messageIdOfTailMessage) {
       super(capacity);
@@ -55,8 +55,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
          throw new IllegalArgumentException("messageIdOfTailMessage is null.");
       }
       this.tailMessageId = messageIdOfTailMessage;
-      messageRetrieverThread = new MessageRetrieverThread();
-      messageRetrieverThread.start();
       //Hawk监控
       String hawkMBeanName = topicName + "-" + cid + "-MessageBlockingQueue";
       HawkJMXUtil.unregisterMBean(hawkMBeanName);
@@ -78,12 +76,15 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
       }
       this.tailMessageId = messageIdOfTailMessage;
       this.messageFilter = messageFilter;
-      messageRetrieverThread = new MessageRetrieverThread();
-      messageRetrieverThread.start();
       //Hawk监控
       String hawkMBeanName = topicName + "-" + cid + "-MessageBlockingQueue";
       HawkJMXUtil.unregisterMBean(hawkMBeanName);
       HawkJMXUtil.registerMBean(hawkMBeanName, new HawkMBean(this));
+   }
+
+   public void init(){
+       messageRetrieverThread = new MessageRetrieverThread();
+       messageRetrieverThread.start();
    }
 
    @Override

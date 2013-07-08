@@ -23,8 +23,8 @@ public class LionDynamicConfig implements DynamicConfig {
       String env = EnvZooKeeperConfig.getEnv();
       try {
          cc = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
-         if (!"dev".equals(env) && !"qa".equals(env)) {
-            LOG.warn("not dev or qa, ignore lion local config");
+         if (!"dev".equals(env)) {
+            LOG.warn("Env is not 'dev', ignore lion local config");
          } else {
             // 如果本地文件存在，则使用Lion本地文件
             InputStream in = LionDynamicConfig.class.getClassLoader().getResourceAsStream(localConfigFileName);
@@ -61,7 +61,7 @@ public class LionDynamicConfig implements DynamicConfig {
    }
 
    @Override
-   public void setConfigChangeListener(final ConfigChangeListener listener) {
+   public void addConfigChangeListener(final ConfigChangeListener listener) {
       cc.addChange(new ConfigChange() {
 
          @Override

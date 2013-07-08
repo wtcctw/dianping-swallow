@@ -185,6 +185,8 @@ public class SwallowBuffer {
             messageBlockingQueue.setDelayUpperbound(delayUpperbound);
          }
          messageBlockingQueue.setMessageRetriever(messageRetriever);
+         messageBlockingQueue.init();
+
          messageQueues.put(cid, new WeakReference<MessageBlockingQueue>(messageBlockingQueue));
          return messageBlockingQueue;
       }
