@@ -5,13 +5,15 @@ swallow.broker.consumer.example=swallow-broker,1;swallow-broker,2
 
 swallow.broker.consumer.example.swallow-broker.1.url=http://localhost:8080/swallow-broker/testReceiver
 swallow.broker.consumer.example.swallow-broker.1.retryCount=10000
+swallow.broker.consumer.example.swallow-broker.1.delayBase=10000
+swallow.broker.consumer.example.swallow-broker.1.delayUpperbound=10000
 swallow.broker.consumer.example.swallow-broker.1.threadPoolSize=2
 swallow.broker.consumer.example.swallow-broker.1.delayBaseOnBackoutMessageException=100
 swallow.broker.consumer.example.swallow-broker.1.delayUpperboundOnBackoutMessageException=3000
 swallow.broker.consumer.example.swallow-broker.1.retryCountOnBackoutMessageException=10
 
 swallow.broker.consumer.example.swallow-broker.2.url=http://localhost:8080/swallow-broker/testReceiver2
-swallow.broker.consumer.example.swallow-broker.1.retryCount=10000
+swallow.broker.consumer.example.swallow-broker.2.retryCount=10000
 swallow.broker.consumer.example.swallow-broker.2.threadPoolSize=2
 swallow.broker.consumer.example.swallow-broker.2.delayBaseOnBackoutMessageException=100
 swallow.broker.consumer.example.swallow-broker.2.delayUpperboundOnBackoutMessageException=3000

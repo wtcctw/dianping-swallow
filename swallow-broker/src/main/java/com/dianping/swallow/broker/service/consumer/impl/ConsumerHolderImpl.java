@@ -25,7 +25,6 @@ import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.consumer.ConsumerConfig;
 
-//TODO:状态监控页面
 @Service
 public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener {
 
@@ -226,6 +225,10 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
                     num, "url")));
             Integer retryCount = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
                     .get(getTopicConsumerNumPropertyName(topic, consumerId, num, "retryCount"))));
+            Integer delayBase = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
+                    .get(getTopicConsumerNumPropertyName(topic, consumerId, num, "delayBase"))));
+            Integer delayUpperbound = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
+                    .get(getTopicConsumerNumPropertyName(topic, consumerId, num, "delayUpperbound"))));
             Integer threadPoolSize = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
                     .get(getTopicConsumerNumPropertyName(topic, consumerId, num, "threadPoolSize"))));
             Integer delayBaseOnBackoutMessageException = NumberUtils
@@ -253,7 +256,11 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
             if (threadPoolSize != null) {
                 consumerConfig.setThreadPoolSize(threadPoolSize);
             }
-            consumerBroker = new ConsumerBroker(topic, consumerId, url, consumerConfig);
+            if (delayBase != null && delayUpperbound != null) {
+                consumerBroker = new ConsumerBroker(topic, consumerId, url, consumerConfig, delayBase, delayUpperbound);
+            } else {
+                consumerBroker = new ConsumerBroker(topic, consumerId, url, consumerConfig);
+            }
             if (retryCount != null) {
                 consumerBroker.setRetryCount(retryCount);
             }

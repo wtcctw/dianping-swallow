@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.broker.conf.Constant;
 import com.dianping.swallow.broker.monitor.NotifyService;
+import com.dianping.swallow.broker.util.AppUtils;
 import com.dianping.swallow.broker.util.HttpClientUtil;
+import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.BackoutMessageException;
@@ -24,31 +26,48 @@ import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.google.gson.Gson;
 
 public class ConsumerBroker implements MessageListener {
-    private static final Logger LOG        = LoggerFactory.getLogger(ConsumerBroker.class);
+    private static final Logger  LOG               = LoggerFactory.getLogger(ConsumerBroker.class);
 
-    private NotifyService       notifyService;
+    private NotifyService        notifyService;
 
-    private volatile boolean    active     = false;
+    private volatile boolean     active            = false;
 
-    private String              url;
+    private final ConsumerConfig config;
 
-    private String              consumerId;
+    private final String         consumerId;
 
-    private String              topic;
+    private final String         topic;
 
-    private Consumer            consumer;
+    private Consumer             consumer;
 
-    private int                 retryCount = Integer.MAX_VALUE;
+    private String               url;
+
+    private int                  retryCount        = Integer.MAX_VALUE;
+
+    private String               logPrefix;
+
+    private DefaultPullStrategy  pullStrategy;
+
+    private final static int     DELAY_BASE        = 10;                                           //ms
+
+    private final static int     DELAY_UPPER_BOUND = 500;                                          //ms
 
     //收到消息后，使用HttpClient将消息发给url (url，topic，consumer 组合不能重复)
-    public ConsumerBroker(String topic, String consumerId, String url, ConsumerConfig config) {
+    public ConsumerBroker(String topic, String consumerId, String url, ConsumerConfig config, int delayBase,
+                          int delayUpperbound) {
         super();
         this.url = url;
         this.consumerId = consumerId;
         this.topic = topic;
+        this.config = config;
+        this.logPrefix = AppUtils.highlight(topic + "," + consumerId);
 
-        consumer = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), consumerId, config);
-        consumer.setListener(this);
+        pullStrategy = new DefaultPullStrategy(delayBase, delayUpperbound);
+    }
+
+    //收到消息后，使用HttpClient将消息发给url (url，topic，consumer 组合不能重复)
+    public ConsumerBroker(String topic, String consumerId, String url, ConsumerConfig config) {
+        this(topic, consumerId, url, config, DELAY_BASE, DELAY_UPPER_BOUND);
     }
 
     public boolean isActive() {
@@ -57,8 +76,12 @@ public class ConsumerBroker implements MessageListener {
 
     public void start() {
         if (!active) {
-            synchronized (consumer) {
+            synchronized (this) {
                 if (!active) {
+                    LOG.info(logPrefix + "Starting");
+                    consumer = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), consumerId,
+                            config);
+                    consumer.setListener(this);
                     consumer.start();
                     active = true;
                 }
@@ -67,9 +90,10 @@ public class ConsumerBroker implements MessageListener {
     }
 
     public void close() {
-        if (!active) {
-            synchronized (consumer) {
-                if (!active) {
+        if (active) {
+            synchronized (this) {
+                if (active) {
+                    LOG.info(logPrefix + "Closing");
                     consumer.close();
                     active = false;
                 }
@@ -86,27 +110,34 @@ public class ConsumerBroker implements MessageListener {
             do {
                 try {
                     if (count > 0) {
-                        LOG.info("Retrying sending message to url(" + url + "), message is: " + msg + ", content is:"
-                                + msg.getContent() + ", retry " + count + "time.");
+                        pullStrategy.fail(true);
+
+                        if (count == 1) {//开始重试时，打印消息，重试过程不打印消息了，减少log
+                            LOG.info(logPrefix + "Retrying sending message to url(" + url + "), message is: " + msg
+                                    + ", content is:" + msg.getContent());
+                        }
+                        LOG.info(logPrefix + "Retrying " + count + " times...");
                     }
+
                     invoke(msg);
-                    LOG.info("Sended to url(" + url + "): " + msg + ", content:" + msg.getContent());
+
+                    LOG.info(logPrefix + "Sended to url(" + url + "): " + msg + ", content:" + msg.getContent());
                     success = true;
-
-                    //TODO 可停止（lion配置项，设置stop）
-
+                    pullStrategy.succeess();
                 } catch (IOException e) {//可恢复异常，自己重试，增加重试次数的配置项
                     //失败了(IO)，重试
-                    LOG.error("IO Error when send http message, will be retryed...", e);
+                    LOG.error(logPrefix + "IO Error when send http message, will be retryed: " + e.getMessage());
                 }
             } while (!success && count++ < retryCount);
         } catch (RuntimeException e) {//不可恢复异常，记录以及报警，跳过消息
-            LOG.error("[Topic=" + topic + "][ConsumerId=" + consumerId + "]Error when send http message to " + url
-                    + ". This message is skiped:" + msg + ", content:" + msg.getContent(), e);
+            LOG.error(logPrefix + "Error when send http message to " + url + ". This message is skiped:" + msg
+                    + ", content:" + msg.getContent(), e);
             if (notifyService != null) {
-                notifyService.alarm("[Topic=" + topic + "][ConsumerId=" + consumerId
-                        + "]Error when send http message to " + url + ", message is skiped.", e, true);
+                notifyService.alarm(logPrefix + "Error when send http message to " + url + ", message is skiped.", e,
+                        true);
             }
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -129,7 +160,7 @@ public class ConsumerBroker implements MessageListener {
         Map resultMap = gson.fromJson(result, Map.class);
         if (resultMap == null || StringUtils.equalsIgnoreCase(String.valueOf(resultMap.get("success")), "true")) {
             //http响应成功了，但结果不对，则记录
-            throw new RuntimeException("Error(result is null or success not true), result is " + result);
+            throw new RuntimeException(logPrefix + "Error(result is null or success not true), result is " + result);
         }
     }
 

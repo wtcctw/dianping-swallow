@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dianping.swallow.broker.service.producer.ProducerHolder;
+import com.dianping.swallow.broker.util.AppUtils;
 import com.dianping.swallow.broker.util.GsonUtil;
 import com.dianping.swallow.producer.Producer;
 
@@ -68,19 +69,20 @@ public class ProducerController {
             }
             //验证参数
             if (StringUtils.isBlank(topic)) {
-                throw new IllegalArgumentException("Topic (" + topic + ") can not be blank.");
+                throw new IllegalArgumentException("Topic " + AppUtils.highlight(topic) + " can not be blank.");
             } else if (StringUtils.isEmpty(content)) {
                 throw new IllegalArgumentException("Content (" + content + ") can not be empty.");
             }
 
             //根据topic找到Producer
-            LOG.info("[sendMsg]Sending message: topic=" + topic + ", content=" + content + ", properties=" + properties);
+            LOG.info("[sendMsg]Sending message: topic=" + AppUtils.highlight(topic) + " , content=" + content
+                    + ", properties=" + properties);
             Producer producer = producerHolder.getProducer(topic);
             if (producer != null) {
                 //发送消息
                 producer.sendMessage(content, properties);
             } else {
-                throw new IllegalArgumentException("Topic '" + topic + "' not allowed.");
+                throw new IllegalArgumentException("Topic " + AppUtils.highlight(topic) + " not allowed.");
             }
 
             map.put("success", true);
