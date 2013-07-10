@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.broker.conf.Constant;
 import com.dianping.swallow.broker.monitor.NotifyService;
 import com.dianping.swallow.broker.service.consumer.ConsumerHolder;
+import com.dianping.swallow.broker.util.UrlUtils;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.consumer.ConsumerConfig;
@@ -112,6 +113,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
         LOG.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
 
         key = StringUtils.trim(key);
+        value = StringUtils.trim(value);
 
         boolean needReInit = false;
 
@@ -129,11 +131,25 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
             if (!needReInit) {
                 for (String consumerKey : consumerBrokerMap.keySet()) {//是否是swallow.broker.consumer.<topic>.<consumerId>.<url>
                     if (StringUtils.equals(key, getTopicConsumerNumPropertyName(consumerKey, "url"))) {
+                        //判断合法
+                        String url = value;
+                        if (!UrlUtils.isValidUrl(url)) {
+                            LOG.error("Url(" + url + ") is inValid!");
+                        } else {
+                            //找到该ConsumerBroker，修改其url
+                            ConsumerBroker consumerBroker = consumerBrokerMap.get(consumerKey);
+                            consumerBroker.setUrl(value);
+                            LOG.info("ConsumerBroker(" + consumerKey + ")'s url changed to: " + url);
+                        }
+                        break;
+                    } else if (StringUtils.equals(key, getTopicConsumerNumPropertyName(consumerKey, "retryCount"))) {
                         //找到该ConsumerBroker，修改其url
                         ConsumerBroker consumerBroker = consumerBrokerMap.get(consumerKey);
-                        consumerBroker.setUrl(value);
-                        LOG.info("ConsumerBroker(" + consumerKey + ")'s url changed to: " + value);
-                        needReInit = false;
+                        Integer retryCount = NumberUtils.createInteger(value);
+                        if (retryCount != null) {
+                            consumerBroker.setRetryCount(retryCount);
+                            LOG.info("ConsumerBroker(" + consumerKey + ")'s retryCount changed to: " + retryCount);
+                        }
                         break;
                     }
                 }
@@ -208,6 +224,8 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
 
             String url = StringUtils.trimToNull(dynamicConfig.get(getTopicConsumerNumPropertyName(topic, consumerId,
                     num, "url")));
+            Integer retryCount = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
+                    .get(getTopicConsumerNumPropertyName(topic, consumerId, num, "retryCount"))));
             Integer threadPoolSize = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
                     .get(getTopicConsumerNumPropertyName(topic, consumerId, num, "threadPoolSize"))));
             Integer delayBaseOnBackoutMessageException = NumberUtils
@@ -220,7 +238,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
                     .trimToNull(dynamicConfig.get(getTopicConsumerNumPropertyName(topic, consumerId, num,
                             "retryCountOnBackoutMessageException"))));
 
-            Validate.isTrue(StringUtils.isNotBlank(url), "Url(" + url + ") is blank!");
+            Validate.isTrue(UrlUtils.isValidUrl(url), "Url(" + url + ") is inValid!");
 
             ConsumerConfig consumerConfig = new ConsumerConfig();
             if (delayBaseOnBackoutMessageException != null) {
@@ -236,6 +254,9 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
                 consumerConfig.setThreadPoolSize(threadPoolSize);
             }
             consumerBroker = new ConsumerBroker(topic, consumerId, url, consumerConfig);
+            if (retryCount != null) {
+                consumerBroker.setRetryCount(retryCount);
+            }
             consumerBroker.setNotifyService(notifyService);
             LOG.info("ConsumerBroker with key '" + key + "' is created!");
         }
@@ -246,7 +267,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
 
     //如swallow.broker.consumer.example
     private String getTopicConsumerPropertyName(String topic) {
-        return StringUtils.trimToNull(SWALLOW_BROKER_CONSUMER_PREFIX + topic);
+        return StringUtils.trim(SWALLOW_BROKER_CONSUMER_PREFIX + topic);
     }
 
     //如swallow.broker.consumer.example.swallow-broker.1.url
