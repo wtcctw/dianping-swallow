@@ -82,7 +82,7 @@ public class ProducerController {
                 //发送消息
                 producer.sendMessage(content, properties);
             } else {
-                throw new IllegalArgumentException("Topic " + AppUtils.highlight(topic) + " not allowed.");
+                throw new IllegalArgumentException("Topic (" + topic + ") not allowed.");
             }
 
             map.put("success", true);
