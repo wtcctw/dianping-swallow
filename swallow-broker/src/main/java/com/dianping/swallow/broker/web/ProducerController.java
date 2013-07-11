@@ -75,10 +75,10 @@ public class ProducerController {
             }
 
             //根据topic找到Producer
-            LOG.info("[sendMsg]Sending message: topic=" + AppUtils.highlight(topic) + " , content=" + content
-                    + ", properties=" + properties);
             Producer producer = producerHolder.getProducer(topic);
             if (producer != null) {
+                LOG.info("[sendMsg]Sending message: topic=" + AppUtils.highlight(topic) + " , content=" + content
+                        + ", properties=" + properties);
                 //发送消息
                 producer.sendMessage(content, properties);
             } else {
