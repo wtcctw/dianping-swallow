@@ -119,9 +119,9 @@ public class ConsumerBroker implements MessageListener {
                         LOG.info(logPrefix + "Retrying " + count + " times...");
                     }
 
+                    LOG.info(logPrefix + "Sending to url(" + url + "): " + msg + ", content:" + msg.getContent());
                     invoke(msg);
 
-                    LOG.info(logPrefix + "Sended to url(" + url + "): " + msg + ", content:" + msg.getContent());
                     success = true;
                     pullStrategy.succeess();
                 } catch (IOException e) {//可恢复异常，自己重试，增加重试次数的配置项
