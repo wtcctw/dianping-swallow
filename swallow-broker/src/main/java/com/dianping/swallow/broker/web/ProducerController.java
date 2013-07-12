@@ -32,6 +32,9 @@ public class ProducerController {
     @Autowired
     private ProducerHolder      producerHolder;
 
+    /**
+     * 如果是post方法，需要保证使用正确的“Content-Type=application/x-www-form-urlencoded”，否则Servlet不会自动解析参数
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @RequestMapping(value = "sendMsg", method = { RequestMethod.POST, RequestMethod.GET }, produces = "application/json; charset=utf-8")
     @ResponseBody
