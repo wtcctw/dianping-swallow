@@ -48,9 +48,9 @@ public class ConsumerBroker implements MessageListener {
 
     private DefaultPullStrategy  pullStrategy;
 
-    private final static int     DELAY_BASE        = 10;                                           //ms
+    private final static int     DELAY_BASE        = 50;                                           //ms
 
-    private final static int     DELAY_UPPER_BOUND = 500;                                          //ms
+    private final static int     DELAY_UPPER_BOUND = 10000;                                          //ms
 
     //收到消息后，使用HttpClient将消息发给url (url，topic，consumer 组合不能重复)
     public ConsumerBroker(String topic, String consumerId, String url, ConsumerConfig config, int delayBase,
