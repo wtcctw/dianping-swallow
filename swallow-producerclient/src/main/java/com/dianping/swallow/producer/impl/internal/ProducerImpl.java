@@ -80,6 +80,9 @@ public class ProducerImpl implements Producer {
          case ASYNC_MODE:
             producerHandler = new HandlerAsynchroMode(this);
             break;
+         case ASYNC_SEPARATELY_MODE:
+             producerHandler = new HandlerAsynchroSeparatelyMode(this);
+             break;
          default:
             producerHandler = new HandlerAsynchroMode(this);
             break;
