@@ -64,6 +64,7 @@ public final class SwallowPigeonConfiguration {
    public static final String  DEFAULT_HOSTS          = "127.0.0.1:4000";                                                  //默认Swallow server地址字符串
    public static final String  DEFAULT_WEIGHTS        = "1";                                                               //默认Swallow server权重
    public static final int     DEFAULT_RETRY_BASE_INTERVAL = 500;                                                               //默认失败重试延时基数
+   public static final int     DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL = 5000;                                                               //默认失败重试延时基数
 
    private String              serviceName            = DEFAULT_SERVICE_NAME;                                              //远程调用服务名称，需与Swallow server端配置的服务名称完全一致
    private String              serialize              = DEFAULT_SERIALIZE;                                                 //序列化方式，共有四种：hessian,java,protobuf以及thrift
@@ -72,6 +73,7 @@ public final class SwallowPigeonConfiguration {
    private String              hosts                  = DEFAULT_HOSTS;                                                     //Swallow server地址字符串，useLion为真时此项失效
    private String              weights                = DEFAULT_WEIGHTS;                                                   //Swallow server权重，范围从0-10，useLion为真时此项失效
    private int                 retryBaseInterval      = DEFAULT_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
+   private int                 fileQueueFailedBaseInterval      = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
 
    public SwallowPigeonConfiguration() {
       //默认配置
@@ -81,13 +83,13 @@ public final class SwallowPigeonConfiguration {
    public String toString() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
             + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
-            + retryBaseInterval;
+            + retryBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
    private String getConfigInfo() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
             + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
-            + retryBaseInterval;
+            + retryBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
    @SuppressWarnings("rawtypes")
@@ -153,6 +155,7 @@ public final class SwallowPigeonConfiguration {
       checkTimeout();
       checkUseLion();
       checkRetryBaseInterval();
+      checkFileQueueFailedBaseInterval();
       LOGGER.info("ProducerFactory configuration: [" + getConfigInfo() + "]");
    }
 
@@ -228,6 +231,13 @@ public final class SwallowPigeonConfiguration {
          LOGGER.warn("retryBaseInterval should be more than 0, use default value.");
       }
    }
+   
+   private void checkFileQueueFailedBaseInterval() {
+       if (fileQueueFailedBaseInterval <= 0) {
+           fileQueueFailedBaseInterval = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;
+          LOGGER.warn("fileQueueFailedBaseInterval should be more than 0, use default value.");
+       }
+    }
 
    public String getServiceName() {
       return serviceName;
@@ -289,6 +299,15 @@ public final class SwallowPigeonConfiguration {
 
    public void setRetryBaseInterval(int retryBaseInterval) {
       this.retryBaseInterval = retryBaseInterval;
+   }
+
+   public int getFileQueueFailedBaseInterval() {
+      return fileQueueFailedBaseInterval;
+   }
+
+   public void setFileQueueFailedBaseInterval(int fileQueueFailedBaseInterval) {
+      this.fileQueueFailedBaseInterval = fileQueueFailedBaseInterval;
+      checkFileQueueFailedBaseInterval();
    }
 
 }

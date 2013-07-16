@@ -46,6 +46,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
     private final ProducerImpl producer;
     private final FileQueue<Packet> messageQueue; //Filequeue
     private final int delayBase; //超时策略基数
+    private final int fileQueueFailedBaseInterval; //filequeue失败重试的策略基数
 
     /**
      * 获取指定topicName及选项的FileQueue，如果已经存在则返回引用，如果不存在就创建新的FileQueue
@@ -99,6 +100,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
     public HandlerAsynchroMode(ProducerImpl producer) {
         this.producer = producer;
         delayBase = producer.getRetryBaseInterval();
+        fileQueueFailedBaseInterval = producer.getFileQueueFailedBaseInterval();
         messageQueue = getMessageQueue(producer.getDestination().getName(),
                 producer.getProducerConfig().isSendMsgLeftLastSession(), producer.getProducerConfig().getFilequeueBaseDir());
         this.start();
@@ -142,6 +144,8 @@ public class HandlerAsynchroMode implements ProducerHandler {
         public void run() {
             //异步模式下，每个线程单独有一个延时策略，以保证不同的线程不会互相冲突
             DefaultPullStrategy defaultPullStrategy = new DefaultPullStrategy(delayBase, DELAY_BASE_MULTI * delayBase);
+            DefaultPullStrategy fileQueueStrategy = new DefaultPullStrategy(fileQueueFailedBaseInterval, DELAY_BASE_MULTI * fileQueueFailedBaseInterval);
+            
             Packet pktRet = null;
 
             while (true) {
@@ -159,6 +163,9 @@ public class HandlerAsynchroMode implements ProducerHandler {
                 try {
                     //从filequeue获取message，如果filequeue无元素则阻塞            
                     message = messageQueue.get();
+
+                    fileQueueStrategy.succeess();
+
                     producerHandlerTransaction = Cat.getProducer().newTransaction("MsgProduceTried",
                             producer.getDestination().getName() + ":" + producer.getProducerIP());
                 } catch (Exception e) {
@@ -174,6 +181,13 @@ public class HandlerAsynchroMode implements ProducerHandler {
                     Cat.getProducer().logError(e);
                     producerHandlerTransaction.complete();
                     LOGGER.error("Can not get msg from fileQueue.", e);
+
+                    try {
+                        fileQueueStrategy.fail(true);
+                    } catch (InterruptedException e1) {
+                        Thread.currentThread().interrupt();
+                    }
+
                     continue;
                 }
 

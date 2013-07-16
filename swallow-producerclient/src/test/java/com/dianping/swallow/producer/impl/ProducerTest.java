@@ -107,12 +107,12 @@ public class ProducerTest {
       config.setAsyncRetryTimes(1);
       config.setZipped(true);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000);
+      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 5000);
       String ret = producer.sendMessage(content);
       assertEquals(ack.getShaInfo(), ret);
 
       ProducerImpl expectionProducer = new ProducerImpl(dest, config, producerIP, producerVersion,
-            exceptionRemoteService, 500);
+            exceptionRemoteService, 500, 500);
       try {
          expectionProducer.sendMessage(content);
          fail();
@@ -131,7 +131,7 @@ public class ProducerTest {
       config.setSendMsgLeftLastSession(false);
       config.setThreadPoolSize(2);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, exceptionRemoteService, 5000);
+      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, exceptionRemoteService, 5000, 5000);
 
       for (int i = 0; i < 5; i++) {
          String ret = producer.sendMessage(content);
@@ -154,7 +154,7 @@ public class ProducerTest {
       config.setSendMsgLeftLastSession(false);
       config.setThreadPoolSize(2);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000);
+      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 5000);
 
       for (int i = 0; i < 5; i++) {
          String ret = producer.sendMessage(content);
@@ -177,7 +177,7 @@ public class ProducerTest {
       config.setSendMsgLeftLastSession(true);
       config.setThreadPoolSize(2);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000);
+      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 5000);
 
       Map<String, String> properties = new HashMap<String, String>();
       properties.put("Hello", "World");

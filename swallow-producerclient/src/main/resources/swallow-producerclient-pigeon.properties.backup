@@ -6,3 +6,4 @@ weights=1
 
 punishTimeout=500
 retryBaseInterval=500
+fileQueueFailedBaseInterval=5000
