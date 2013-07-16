@@ -59,12 +59,13 @@ public final class SwallowPigeonConfiguration {
 
    public static final String  DEFAULT_SERVICE_NAME   = "http://service.dianping.com/swallowService/producerService_1.0.0"; //默认远程服务名称
    public static final String  DEFAULT_SERIALIZE      = "hessian";                                                         //默认序列化方式
-   public static final int     DEFAULT_TIMEOUT        = 5000;                                                              //默认远程调用延时
+   public static final int     DEFAULT_TIMEOUT        = 1000;                                                              //默认远程调用延时
    public static final boolean DEFAULT_IS_USE_LION    = true;                                                              //默认是否使用Lion以配置Swallow server地址
    public static final String  DEFAULT_HOSTS          = "127.0.0.1:4000";                                                  //默认Swallow server地址字符串
    public static final String  DEFAULT_WEIGHTS        = "1";                                                               //默认Swallow server权重
    public static final int     DEFAULT_RETRY_BASE_INTERVAL = 500;                                                               //默认失败重试延时基数
    public static final int     DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL = 5000;                                                               //默认失败重试延时基数
+   public static final String  DEFAULT_LOAD_BALANCE   = "random";
 
    private String              serviceName            = DEFAULT_SERVICE_NAME;                                              //远程调用服务名称，需与Swallow server端配置的服务名称完全一致
    private String              serialize              = DEFAULT_SERIALIZE;                                                 //序列化方式，共有四种：hessian,java,protobuf以及thrift
@@ -74,6 +75,7 @@ public final class SwallowPigeonConfiguration {
    private String              weights                = DEFAULT_WEIGHTS;                                                   //Swallow server权重，范围从0-10，useLion为真时此项失效
    private int                 retryBaseInterval      = DEFAULT_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
    private int                 fileQueueFailedBaseInterval      = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
+   private String              loadBalance            = DEFAULT_LOAD_BALANCE;
 
    public SwallowPigeonConfiguration() {
       //默认配置
@@ -308,6 +310,14 @@ public final class SwallowPigeonConfiguration {
    public void setFileQueueFailedBaseInterval(int fileQueueFailedBaseInterval) {
       this.fileQueueFailedBaseInterval = fileQueueFailedBaseInterval;
       checkFileQueueFailedBaseInterval();
+   }
+
+   public String getLoadBalance() {
+      return loadBalance;
+   }
+
+   public void setLoadBalance(String loadBalance) {
+      this.loadBalance = loadBalance;
    }
 
 }

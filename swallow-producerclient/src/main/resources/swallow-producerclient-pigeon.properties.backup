@@ -1,5 +1,5 @@
 serviceName=http://service.dianping.com/swallowService/producerService_1.0.0
-timeout=5000
+timeout=1000
 useLion=false
 hosts=127.0.0.1:4000
 weights=1
@@ -7,3 +7,4 @@ weights=1
 punishTimeout=500
 retryBaseInterval=500
 fileQueueFailedBaseInterval=5000
+loadBalance=random

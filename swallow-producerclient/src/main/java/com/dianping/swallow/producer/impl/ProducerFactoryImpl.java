@@ -76,6 +76,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
       pigeon.setServiceName(pigeonConfigure.getServiceName());
       pigeon.setSerialize(pigeonConfigure.getSerialize());
       pigeon.setTimeout(pigeonConfigure.getTimeout());
+      pigeon.setLoadBalance(pigeonConfigure.getLoadBalance());
 
       if (!pigeonConfigure.isUseLion()) {
          pigeon.setUseLion(false);
