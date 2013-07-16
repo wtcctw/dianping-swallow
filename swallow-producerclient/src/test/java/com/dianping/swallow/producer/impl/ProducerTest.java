@@ -300,7 +300,7 @@ public class ProducerTest {
       assertEquals(SwallowPigeonConfiguration.DEFAULT_SERVICE_NAME, defaultConfig.getServiceName());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_TIMEOUT, defaultConfig.getTimeout());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_WEIGHTS, defaultConfig.getWeights());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_PUNISH_TIMEOUT, defaultConfig.getPunishTimeout());
+      assertEquals(SwallowPigeonConfiguration.DEFAULT_RETRY_BASE_INTERVAL, defaultConfig.getRetryBaseInterval());
       assertNotNull(defaultConfig.toString());
       
       //测试设置值
@@ -317,7 +317,7 @@ public class ProducerTest {
       assertEquals("hello", defaultConfig.getServiceName());
       assertEquals(2222, defaultConfig.getTimeout());
       assertEquals("9", defaultConfig.getWeights());
-      assertEquals(1000, defaultConfig.getPunishTimeout());
+      assertEquals(1000, defaultConfig.getRetryBaseInterval());
 
       //测试正常文件读取
       SwallowPigeonConfiguration normalConfig = new SwallowPigeonConfiguration("normalPigeon.properties");
@@ -327,7 +327,7 @@ public class ProducerTest {
       assertEquals("helloworld", normalConfig.getServiceName());
       assertEquals(200, normalConfig.getTimeout());
       assertEquals("2", normalConfig.getWeights());
-      assertEquals(600, normalConfig.getPunishTimeout());
+      assertEquals(600, normalConfig.getRetryBaseInterval());
 
       //测试格式错误文件读取
       SwallowPigeonConfiguration wrongConfig = new SwallowPigeonConfiguration("wrongPigeon.properties");
@@ -336,6 +336,6 @@ public class ProducerTest {
       assertEquals(SwallowPigeonConfiguration.DEFAULT_IS_USE_LION, wrongConfig.isUseLion());
       assertEquals("127.2.2.1:2000,125.36.321.123:1325", wrongConfig.getHosts());
       assertEquals("2,1", wrongConfig.getWeights());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_PUNISH_TIMEOUT, wrongConfig.getPunishTimeout());
+      assertEquals(SwallowPigeonConfiguration.DEFAULT_RETRY_BASE_INTERVAL, wrongConfig.getRetryBaseInterval());
    }
 }

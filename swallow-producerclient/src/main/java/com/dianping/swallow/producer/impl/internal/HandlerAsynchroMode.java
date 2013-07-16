@@ -98,7 +98,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
     //构造函数
     public HandlerAsynchroMode(ProducerImpl producer) {
         this.producer = producer;
-        delayBase = producer.getPunishTimeout();
+        delayBase = producer.getRetryBaseInterval();
         messageQueue = getMessageQueue(producer.getDestination().getName(),
                 producer.getProducerConfig().isSendMsgLeftLastSession(), producer.getProducerConfig().getFilequeueBaseDir());
         this.start();

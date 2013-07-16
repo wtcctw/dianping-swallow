@@ -63,7 +63,7 @@ public final class SwallowPigeonConfiguration {
    public static final boolean DEFAULT_IS_USE_LION    = true;                                                              //默认是否使用Lion以配置Swallow server地址
    public static final String  DEFAULT_HOSTS          = "127.0.0.1:4000";                                                  //默认Swallow server地址字符串
    public static final String  DEFAULT_WEIGHTS        = "1";                                                               //默认Swallow server权重
-   public static final int     DEFAULT_PUNISH_TIMEOUT = 500;                                                               //默认失败重试延时基数
+   public static final int     DEFAULT_RETRY_BASE_INTERVAL = 500;                                                               //默认失败重试延时基数
 
    private String              serviceName            = DEFAULT_SERVICE_NAME;                                              //远程调用服务名称，需与Swallow server端配置的服务名称完全一致
    private String              serialize              = DEFAULT_SERIALIZE;                                                 //序列化方式，共有四种：hessian,java,protobuf以及thrift
@@ -71,7 +71,7 @@ public final class SwallowPigeonConfiguration {
    private boolean             useLion                = DEFAULT_IS_USE_LION;                                               //是否使用Lion以配置Swallow server地址，非开发环境只能使用Lion
    private String              hosts                  = DEFAULT_HOSTS;                                                     //Swallow server地址字符串，useLion为真时此项失效
    private String              weights                = DEFAULT_WEIGHTS;                                                   //Swallow server权重，范围从0-10，useLion为真时此项失效
-   private int                 punishTimeout          = DEFAULT_PUNISH_TIMEOUT;                                            //失败重试延时基数
+   private int                 retryBaseInterval      = DEFAULT_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
 
    public SwallowPigeonConfiguration() {
       //默认配置
@@ -80,14 +80,14 @@ public final class SwallowPigeonConfiguration {
    @Override
    public String toString() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
-            + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; punishTimeout="
-            + punishTimeout;
+            + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
+            + retryBaseInterval;
    }
 
    private String getConfigInfo() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
-            + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; punishTimeout="
-            + punishTimeout;
+            + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
+            + retryBaseInterval;
    }
 
    @SuppressWarnings("rawtypes")
@@ -152,7 +152,7 @@ public final class SwallowPigeonConfiguration {
       checkSerialize();
       checkTimeout();
       checkUseLion();
-      checkPunishTimeout();
+      checkRetryBaseInterval();
       LOGGER.info("ProducerFactory configuration: [" + getConfigInfo() + "]");
    }
 
@@ -222,10 +222,10 @@ public final class SwallowPigeonConfiguration {
       }
    }
 
-   private void checkPunishTimeout() {
-      if (punishTimeout <= 0) {
-         punishTimeout = DEFAULT_PUNISH_TIMEOUT;
-         LOGGER.warn("PunishTimeout should be more than 0, use default value.");
+   private void checkRetryBaseInterval() {
+      if (retryBaseInterval <= 0) {
+          retryBaseInterval = DEFAULT_RETRY_BASE_INTERVAL;
+         LOGGER.warn("retryBaseInterval should be more than 0, use default value.");
       }
    }
 
@@ -278,12 +278,17 @@ public final class SwallowPigeonConfiguration {
       checkHostsAndWeights();
    }
 
-   public int getPunishTimeout() {
-      return punishTimeout;
+   public void setPunishTimeout(int retryBaseInterval) {
+      this.retryBaseInterval = retryBaseInterval;
+      checkRetryBaseInterval();
    }
 
-   public void setPunishTimeout(int punishTimeout) {
-      this.punishTimeout = punishTimeout;
-      checkPunishTimeout();
+   public int getRetryBaseInterval() {
+      return retryBaseInterval;
    }
+
+   public void setRetryBaseInterval(int retryBaseInterval) {
+      this.retryBaseInterval = retryBaseInterval;
+   }
+
 }

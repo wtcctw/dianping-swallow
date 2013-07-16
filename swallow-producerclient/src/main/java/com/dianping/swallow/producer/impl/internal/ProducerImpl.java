@@ -37,7 +37,7 @@ public class ProducerImpl implements Producer {
    private final String                 producerIP;                                   //Producer IP地址
    private final String                 producerVersion;                              //Producer版本号
    private final ProducerSwallowService remoteService;
-   private final int                    punishTimeout;
+   private final int                    retryBaseInterval;
    private final ProducerHandler        producerHandler;
 
    /**
@@ -46,10 +46,10 @@ public class ProducerImpl implements Producer {
     * @param producerIP 本机IP地址
     * @param producerVersion Producer版本号
     * @param remoteService 远程调用服务接口
-    * @param punishTimeout 远程调用超时
+    * @param retryBaseInterval 重试时的时间间隔起始值
     */
    public ProducerImpl(Destination destination, ProducerConfig producerConfig, String producerIP,
-                       String producerVersion, ProducerSwallowService remoteService, int punishTimeout) {
+                       String producerVersion, ProducerSwallowService remoteService, int retryBaseInterval) {
       if (producerConfig != null) {
          this.producerConfig.setAsyncRetryTimes(producerConfig.getAsyncRetryTimes());
          this.producerConfig.setMode(producerConfig.getMode());
@@ -67,7 +67,7 @@ public class ProducerImpl implements Producer {
       this.producerIP = producerIP;
       this.producerVersion = producerVersion;
       this.remoteService = remoteService;
-      this.punishTimeout = punishTimeout;
+      this.retryBaseInterval = retryBaseInterval;
 
       //设置Producer工作模式
       switch (this.producerConfig.getMode()) {
@@ -246,8 +246,8 @@ public class ProducerImpl implements Producer {
    /**
     * @return 远程调用超时
     */
-   public int getPunishTimeout() {
-      return punishTimeout;
+   public int getRetryBaseInterval() {
+      return retryBaseInterval;
    }
    
    public String getProducerIP() {
