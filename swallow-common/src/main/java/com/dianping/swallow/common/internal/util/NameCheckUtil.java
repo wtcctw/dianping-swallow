@@ -28,12 +28,13 @@ public class NameCheckUtil {
     * 判定topicName是否合法
     * 
     * <pre>
-    * topicName由字母,数字,减号“-”和下划线“_”构成，只能以字母开头，长度为2到30。
+    * topicName由字母,数字,减号“-”和下划线“_”构成，只能以字母开头，长度为2到50。(但topic名称和consumerId名称长度之和，不能超过58字节.)
     * </pre>
     * 
     * @param topicName
     * @return 合法返回true，非法返回false
     */
+   //数据库的db名长度限制为63字节，ack的数据库名是ack#<topic>#<consumerId>，故限制<topic><consumerId>总长度不超过58
    public static boolean isTopicNameValid(String topicName) {
       if (topicName == null || topicName.length() == 0) {
          return false;
@@ -48,7 +49,7 @@ public class NameCheckUtil {
     * 判定consumerId是否合法
     * 
     * <pre>
-    * consumerId由字母,数字,减号“-”和下划线“_”构成，只能以字母开头，长度为2到30。
+    * consumerId由字母,数字,减号“-”和下划线“_”构成，只能以字母开头，长度为2到30。 (但topic名称和consumerId名称长度之和，不能超过58字节.)
     * </pre>
     * 
     * @param consumerId
