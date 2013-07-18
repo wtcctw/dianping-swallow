@@ -309,7 +309,7 @@ public class ProducerTest {
       defaultConfig.setServiceName("hello");
       defaultConfig.setTimeout(2222);
       defaultConfig.setUseLion(true);
-      defaultConfig.setPunishTimeout(1000);
+      defaultConfig.setRetryBaseInterval(1000);
 
       assertEquals("127.0.0.1:4999", defaultConfig.getHosts());
       assertEquals(true, defaultConfig.isUseLion());

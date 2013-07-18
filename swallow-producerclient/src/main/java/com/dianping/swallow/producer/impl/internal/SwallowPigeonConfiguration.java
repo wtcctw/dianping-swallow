@@ -74,6 +74,7 @@ public final class SwallowPigeonConfiguration {
    private String              hosts                  = DEFAULT_HOSTS;                                                     //Swallow server地址字符串，useLion为真时此项失效
    private String              weights                = DEFAULT_WEIGHTS;                                                   //Swallow server权重，范围从0-10，useLion为真时此项失效
    private int                 retryBaseInterval      = DEFAULT_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
+   private int                 punishTimeout          = -1;                                            //失败重试延时基数(旧的，由于名称不合理，废弃使用)
    private int                 fileQueueFailedBaseInterval      = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
    private String              loadBalance            = DEFAULT_LOAD_BALANCE;
 
@@ -85,13 +86,13 @@ public final class SwallowPigeonConfiguration {
    public String toString() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
             + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
-            + retryBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
+            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
    private String getConfigInfo() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
             + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
-            + retryBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
+            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
    @SuppressWarnings("rawtypes")
@@ -290,17 +291,16 @@ public final class SwallowPigeonConfiguration {
       checkHostsAndWeights();
    }
 
-   public void setPunishTimeout(int retryBaseInterval) {
-      this.retryBaseInterval = retryBaseInterval;
-      checkRetryBaseInterval();
-   }
-
    public int getRetryBaseInterval() {
+       if (punishTimeout > 0) {//兼容老的punishTimeout参数，如果配置了punishTimeout，就使用punishTimeout
+           return punishTimeout;
+       }
       return retryBaseInterval;
    }
 
    public void setRetryBaseInterval(int retryBaseInterval) {
       this.retryBaseInterval = retryBaseInterval;
+      checkRetryBaseInterval();
    }
 
    public int getFileQueueFailedBaseInterval() {
