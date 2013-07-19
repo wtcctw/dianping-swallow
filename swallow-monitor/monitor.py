@@ -20,21 +20,21 @@ config = MonitorConfig.MonitorConfig()
 shouldNotify = False
 alarmSms = str()
 
-# CATÖ÷»úµØÖ·¼°¸½¼Ó×Ö´®
+# CATä¸»æœºåœ°å€åŠé™„åŠ å­—ä¸²
 CAT_HOST = '10.1.6.128:8080'
 CAT_URL = '/cat/r/dashboard?'
 
-# Ê¹ÓÃProducerClientµÄÏîÄ¿DomainÃû³Æ¼¯ºÏ
+# ä½¿ç”¨ProducerClientçš„é¡¹ç›®Domainåç§°é›†åˆ
 producerClientDomain = sets.Set()
 
-# Éú²ú¼°Ïû·Ñ£ºÖ÷ÌâÃû³ÆÓëÊıÁ¿Ó³Éä£¬´ÓServer¶Ë»ñÈ¡Êı¾İ
+# ç”Ÿäº§åŠæ¶ˆè´¹ï¼šä¸»é¢˜åç§°ä¸æ•°é‡æ˜ å°„ï¼Œä»Serverç«¯è·å–æ•°æ®
 producedMap = dict()
 consumedMap = dict()
 
 # Consumer servers stat
 consumerServerStat = dict()
 
-# ´¢´æ»ñÈ¡µ½µÄÊı¾İ
+# å‚¨å­˜è·å–åˆ°çš„æ•°æ®
 producerServerInfos = sets.Set()
 consumerServerInfos = sets.Set()
 cumulatedInfos = sets.Set()
@@ -47,7 +47,7 @@ mongoInfos = sets.Set()
 mongoStatInfos = sets.Set()
 mongoConsumeStatInfos = sets.Set()
 
-# ¼à¿ØÈÕÖ¾
+# ç›‘æ§æ—¥å¿—
 logger = logging.getLogger()
 loggerFileHandler = logging.FileHandler('/data/applogs/swallow/swallow-monitor.log')
 loggerFormatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -183,7 +183,7 @@ class SMS:
     def __repr__(self):
         return 'phoneNumber=' + self.phoneNum + '; message=' + self.message
 
-# »ñÈ¡ProducerServer¼°consumerServer¶ËµÄÊı¾İ
+# è·å–ProducerServeråŠconsumerServerç«¯çš„æ•°æ®
 def getServerInfo():
     conn = httplib.HTTPConnection(CAT_HOST)
     conn.request('GET', CAT_URL + 'domain=Swallow&report=transaction')
@@ -198,7 +198,7 @@ def getServerInfo():
 
     for data in datas:
         
-        # ProducerServerÊı¾İ»ñÈ¡
+        # ProducerServeræ•°æ®è·å–
         if data.startswith('In:'):
             if not checkType(data):
                 continue
@@ -234,7 +234,7 @@ def getServerInfo():
                     psInfo.avgSpeed = names[tmpStr + 'ResponseTime']
                     producerServerInfos.add(psInfo)
         
-        # ConsumerServerÊı¾İ»ñÈ¡
+        # ConsumerServeræ•°æ®è·å–
         elif(data.startswith('Out:')):
             if not checkType(data):
                 continue
@@ -289,7 +289,7 @@ def checkName(name):
     else:
         return True
 
-# ´ÓServer¶Ë»ñÈ¡¶Ñ»ı×ÜÊı
+# ä»Serverç«¯è·å–å †ç§¯æ€»æ•°
 def getCumulatedInfo():
     if len(producedMap) == 0 and len(consumedMap) == 0:
         logger.warning('[CumulateSummary] No message produced or consumed.')
@@ -302,7 +302,7 @@ def getCumulatedInfo():
         cInfo.consumed = str(consumedMap[topicName]) if consumedMap.has_key(topicName) else '0'
         cumulatedInfos.add(cInfo)
 
-# »ñÈ¡ProducerClient¶ËÍ³¼ÆÊı¾İ
+# è·å–ProducerClientç«¯ç»Ÿè®¡æ•°æ®
 def getProducerClientInfo():
     for domain in config.domainProducerReject:
         domainStr = str(domain).strip()
@@ -330,7 +330,7 @@ def getProducerClientInfo():
             conn.close()
             continue
 
-        # »ñÈ¡AsyncÄ£Ê½Producer·¢ËÍÊ§°ÜÊı¾İ
+        # è·å–Asyncæ¨¡å¼Producerå‘é€å¤±è´¥æ•°æ®
         if types.__contains__('MsgAsyncFailedCount'):
             conn.request('GET', CAT_URL + 'domain=' + domain + '&report=transaction&type=MsgAsyncFailed')
             try:
@@ -350,7 +350,7 @@ def getProducerClientInfo():
 #                print ('[ProducerClient] Get Names from domain=' + domain + ' type=MsgAsyncFailed failed.')
                 
         
-        # »ñÈ¡SyncÄ£Ê½Producer·¢ËÍÊ§°ÜÊı¾İ
+        # è·å–Syncæ¨¡å¼Producerå‘é€å¤±è´¥æ•°æ®
         if types.__contains__('MsgSyncFailedCount'):
             conn.request('GET', CAT_URL + 'domain=' + domain + '&report=transaction&type=MsgSyncFailed')
             try:
@@ -369,7 +369,7 @@ def getProducerClientInfo():
                 logger.error('[ProducerClient] Get Names from domain=' + domain + ' type=MsgSyncFailed failed.')
 #                print ('[ProducerClient] Get Names from domain=' + domain + ' type=MsgSyncFailed failed.')
                     
-        # »ñÈ¡Filequeue¶Ñ»ıÊı¾İ
+        # è·å–Filequeueå †ç§¯æ•°æ®
         if types.__contains__('SwallowHeartbeatCount'):
             conn.request('GET', CAT_URL + 'domain=' + domain + '&report=transaction&type=SwallowHeartbeat')
             try:
@@ -396,7 +396,7 @@ def getProducerClientInfo():
                 logger.error('[ProducerClient] Get Names from domain=' + domain + ' type=SwallowHeartbeat failed.')
 #                print ('[ProducerClient] Get Names from domain=' + domain + ' type=SwallowHeartbeat failed.')
 
-        # »ñÈ¡ProducerClientÉú²úÇé¿öÊı¾İ
+        # è·å–ProducerClientç”Ÿäº§æƒ…å†µæ•°æ®
         conn.request('GET', CAT_URL + 'domain=' + domain + '&report=transaction&type=MsgProduced')
         try:
             names = json.loads(conn.getresponse().read().strip())
@@ -417,7 +417,7 @@ def getProducerClientInfo():
 
         conn.close()
 
-# »ñÈ¡ConsumerClient¶ËÊı¾İ
+# è·å–ConsumerClientç«¯æ•°æ®
 def getConsumerClientInfo():
 
     for domain in config.domainConsumerAccept:
@@ -449,7 +449,7 @@ def getConsumerClientInfo():
                 consumerClientInfos.add(ccInfo)
         conn.close()
 
-# ´Ómongo»ñÈ¡ĞÅÏ¢
+# ä»mongoè·å–ä¿¡æ¯
 def getMongoInfos():
     for uri in config.mongoMongoUri:
         uristr = str(uri).strip()
@@ -458,8 +458,8 @@ def getMongoInfos():
         
         try:
             conn = pymongo.ReplicaSetConnection(uristr, replicaSet='SwallowCap')
-#            conn.read_preference = pymongo.read_preferences.ReadPreference.SECONDARY_PREFERRED
-            conn.read_preference = pymongo.ReadPreference.SECONDARY
+            #conn.read_preference = pymongo.read_preferences.ReadPreference.SECONDARY_PREFERRED
+            conn.read_preference= pymongo.ReadPreference.SECONDARY
         except:
             logger.error('[MongoInfo] Connect to ' + uristr + ' in replicaSet = SwallowCap failed. Try Normal connect.')
 #            print ('[MongoInfo] Connect to ' + uristr + ' in replicaSet = SwallowCap failed. Try Nomal connect.')
@@ -478,7 +478,7 @@ def getMongoInfos():
                 topic = domains[1]
                 info = next(conn[name]['c'].find().sort('_id', -1).limit(1), None)
                 
-                # ĞÂÔö´úÂë£¬Èç¹ûÒÑ¾­¼ÇÂ¼¹ı¸ÃtopicÉÏ´Î×îĞÂÏûÏ¢£¬Ôò¼ÆËã²úÉúÁË¶àÉÙĞÂÏûÏ¢£¬·ñÔò½«¸ÃtopicÊıÁ¿×÷Îª²úÉúÁË¶àÉÙĞÂÏûÏ¢
+                # æ–°å¢ä»£ç ï¼Œå¦‚æœå·²ç»è®°å½•è¿‡è¯¥topicä¸Šæ¬¡æœ€æ–°æ¶ˆæ¯ï¼Œåˆ™è®¡ç®—äº§ç”Ÿäº†å¤šå°‘æ–°æ¶ˆæ¯ï¼Œå¦åˆ™å°†è¯¥topicæ•°é‡ä½œä¸ºäº§ç”Ÿäº†å¤šå°‘æ–°æ¶ˆæ¯
                 if(config.logMongoTopic.__contains__(topic.lower())):
                     lastPeroidCount = conn[name]['c'].find({'_id' : {'$gt' : config.logMongoTopic[topic.lower()]}}).count()
                 else:
@@ -488,7 +488,7 @@ def getMongoInfos():
                 mongoStatInfo.topicName = topic
                 mongoStatInfo.lastPeriodAmount = lastPeroidCount
                 mongoStatInfos.add(mongoStatInfo)
-                # ĞÂÔö½áÊø
+                # æ–°å¢ç»“æŸ
                 
                 if info == None:
                     MPMap[topic] = None
@@ -530,7 +530,7 @@ def getMongoInfos():
                     
                     mongoInfos.add(mi)
                     
-                    # ĞÂÔö´úÂë£¬ÓÃÒÔÍ³¼ÆmongoÖĞconsumerÏû·Ñ¼ÇÂ¼
+                    # æ–°å¢ä»£ç ï¼Œç”¨ä»¥ç»Ÿè®¡mongoä¸­consumeræ¶ˆè´¹è®°å½•
                     lastPeroidAmount = 0
                     mongoConsumedStatInfo = MongoConsumedStatInfo()
                     
@@ -541,10 +541,10 @@ def getMongoInfos():
                                 lastPeroidAmount = conn['msg#' + topic]['c'].find({'_id' : {'$gt' : lastPeroidMsgId, '$lte' : info['_id']}}).count()
                         else:
                             if names.__contains__('msg#' + topic):
-                                lastPeroidAmount = conn['msg#' + topic]['c'].find({'_id' : {'$lte': Timestamp(int(info['_id'].time), info['_id'].inc)}}).count()
+                                lastPeroidAmount = conn['msg#' + topic]['c'].find({'_id' : {'$gt' : Timestamp(int(info['_id'].time) - 360, 0), '$lte': Timestamp(int(info['_id'].time), info['_id'].inc)}}).count()
                     else:
                         if names.__contains__('msg#' + topic):
-                            lastPeroidAmount = conn['msg#' + topic]['c'].find({'_id' : {'$lte': Timestamp(int(info['_id'].time), info['_id'].inc)}}).count()
+                            lastPeroidAmount = conn['msg#' + topic]['c'].find({'_id' : {'$gt' : Timestamp(int(info['_id'].time) - 360, 0), '$lte': Timestamp(int(info['_id'].time), info['_id'].inc)}}).count()
     
                     mongoConsumedStatInfo.consumerId = cid
                     mongoConsumedStatInfo.topicName = topic
@@ -553,7 +553,7 @@ def getMongoInfos():
                     if not dict(config.logMongoConsumeStatus).__contains__(topic.lower()):
                         config.logMongoConsumeStatus[topic.lower()] = dict()
                     config.logMongoConsumeStatus[topic.lower()][cid.lower()] = info['_id']
-                    # ĞÂÔö½áÊø
+                    # æ–°å¢ç»“æŸ
         
         for name in names:
             if str(name).startswith('heartbeat#'):
@@ -570,18 +570,18 @@ def getMongoInfos():
         MPMap.clear()
         conn.close()
 
-# ´ÓCat»ñÈ¡Í³¼ÆÊı¾İ
+# ä»Catè·å–ç»Ÿè®¡æ•°æ®
 def getInfosFromCat():
     getServerInfo()
     getProducerClientInfo()
     getConsumerClientInfo()
     getCumulatedInfo()
 
-# ´ÓMongo»ñÈ¡Í³¼ÆÊı¾İ
+# ä»Mongoè·å–ç»Ÿè®¡æ•°æ®
 def getInfosFromMongo():
     getMongoInfos()
 
-# ÇåÀíµ±Ç°Êı¾İ£¬³ıÁËProducerClientDomain¼¯ºÏ¡£
+# æ¸…ç†å½“å‰æ•°æ®ï¼Œé™¤äº†ProducerClientDomainé›†åˆã€‚
 def clearInfosFromCat():
     producerServerInfos.clear()
     consumerServerInfos.clear()
@@ -594,11 +594,11 @@ def clearInfosFromCat():
     producedMap.clear()
     consumedMap.clear()
 
-# ÇåÀí´ÓMongo»ñÈ¡µ½µÄÊı¾İ
+# æ¸…ç†ä»Mongoè·å–åˆ°çš„æ•°æ®
 def clearInfosFromMongo():
     mongoInfos.clear()
 
-# ´Óµ±Ç°Êı¾İ²úÉúÓÊ¼şÄÚÈİ
+# ä»å½“å‰æ•°æ®äº§ç”Ÿé‚®ä»¶å†…å®¹
 def generateCatMailContent():
     ret = str()
     
@@ -963,7 +963,7 @@ def generateMongoMail():
     html = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>' + head + body + '</html>'
     return html
 
-# ·¢ËÍCatMail
+# å‘é€CatMail
 def postCatMail():
     mail = generateCatMail()
     
@@ -990,7 +990,7 @@ def postCatMail():
             s.sendmail('Swallow<swallow@dianping.com>', addr, msg.as_string())
         s.quit()
 
-# ·¢ËÍMongoMail
+# å‘é€MongoMail
 def postMongoMail():
     mail = generateMongoMail()
     if not mail == None:
@@ -1016,7 +1016,7 @@ def postMongoMail():
             s.sendmail('Swallow<swallow@dianping.com>', addr, msg.as_string())
         s.quit()
 
-# ¼ì²éÓÊ¼şµØÖ·ÊÇ·ñ¸ºÔğ¹æ·¶
+# æ£€æŸ¥é‚®ä»¶åœ°å€æ˜¯å¦è´Ÿè´£è§„èŒƒ
 def checkMailAddr(addr):
     if str(addr).find('@') == -1:
         return False
@@ -1034,7 +1034,7 @@ def shouldIgnoreInSms(topicName, consumerID):
                 return True;
     return False;
 
-# ·ÖÎöÊÇ·ñÓ¦¸Ã±¨¾¯£¬Éú³É±¨¾¯¶ÌĞÅÄÚÈİ
+# åˆ†ææ˜¯å¦åº”è¯¥æŠ¥è­¦ï¼Œç”ŸæˆæŠ¥è­¦çŸ­ä¿¡å†…å®¹
 def analysis():
     global shouldNotify
     global alarmSms
@@ -1043,8 +1043,6 @@ def analysis():
     preSaveFailed = config.logPreSaveFailed
     preAsyncCumulated = config.logPreAsyncCumulated
     preSumCumulated = config.logPreSumCumulated
-    preSumDelay = config.logPreSumDelay
-    
     
     produceFailed = 0
     sfi = SyncFailedInfo()
@@ -1086,55 +1084,53 @@ def analysis():
         if not shouldIgnoreInSms(mi.topic, mi.consumerId):
             sumDelay += int(mi.delayTime)
 
-    alarmSms = '[Swallow]½×¶Î¾¯¸æ\n'
+    alarmSms = '[Swallow]é˜¶æ®µè­¦å‘Š\n'
     
     if produceFailed - preProduceFailed > config.alarmSmsProduceFailed:
-        alarmSms += 'Éú²úÊ§°Ü(Í¬²½+Òì²½)×ÜÊı: ' + str(produceFailed - preProduceFailed) + '\n'
+        alarmSms += 'ç”Ÿäº§å¤±è´¥(åŒæ­¥+å¼‚æ­¥)æ€»æ•°: ' + str(produceFailed - preProduceFailed) + '\n'
         shouldNotify = True
     preProduceFailed = produceFailed
     
     if saveFailed - preSaveFailed > config.alarmSmsMongoFailed:
-        alarmSms += '´æÈëMongoÊ§°Ü×ÜÊı: ' + str(saveFailed - preSaveFailed) + '\n'
+        alarmSms += 'å­˜å…¥Mongoå¤±è´¥æ€»æ•°: ' + str(saveFailed - preSaveFailed) + '\n'
         shouldNotify = True
     preSaveFailed = saveFailed
     
     if asyncCumulated - preAsyncCumulated > config.alarmSmsCumulateAsync:
-        alarmSms += 'FileQ¶Ñ»ı×ÜÊı: ' + str(asyncCumulated - preAsyncCumulated) + '\n'
-        alarmSms += '¶Ñ»ıTop1: ' + str(maxAsyncCumulatedIp) + ': ' + str(maxAsyncCumulated) + '\n'
+        alarmSms += 'FileQå †ç§¯æ€»æ•°: ' + str(asyncCumulated - preAsyncCumulated) + '\n'
+        alarmSms += 'å †ç§¯Top1: ' + str(maxAsyncCumulatedIp) + ': ' + str(maxAsyncCumulated) + '\n'
         shouldNotify = True
     preAsyncCumulated = asyncCumulated
     
     if sumCumulated - preSumCumulated > config.alarmSmsCumulateSum:
-        alarmSms += 'Éú²ú³¬Ç°ÊıÁ¿: ' + str(sumCumulated - preSumCumulated) + '\n'
+        alarmSms += 'ç”Ÿäº§è¶…å‰æ•°é‡: ' + str(sumCumulated - preSumCumulated) + '\n'
         shouldNotify = True
     preSumCumulated = sumCumulated
     
-    if sumDelay - preSumDelay > config.alarmSmsDelaySum:
-        alarmSms += 'Ïû·ÑÑÓÊ±×Ü¼Æ(Ãë): ' + getDateFromSeconds(sumDelay - preSumDelay) + '\n'
+    if sumDelay > config.alarmSmsDelaySum:
+        alarmSms += 'æ¶ˆè´¹å»¶æ—¶æ€»è®¡(ç§’): ' + getDateFromSeconds(sumDelay) + '\n'
         shouldNotify = True
-    preSumDelay = sumDelay
     
     for key, value in consumerServerStat.items():
         if value == False:
-            alarmSms += 'ConsumerServerĞÄÌø: ' + str(key) + '\n'
+            alarmSms += 'ConsumerServerå¿ƒè·³: ' + str(key) + '\n'
             shouldNotify = True
     
     config.logPreAsyncCumulated = preAsyncCumulated
     config.logPreProduceFailed = preProduceFailed
     config.logPreSaveFailed = preSaveFailed
     config.logPreSumCumulated = preSumCumulated
-    config.logPreSumDelay = preSumDelay
     
-# ½«alarmSms£¨¶ÌĞÅ±¨¾¯ÄÚÈİ£©·¢ËÍ¸øÖ¸¶¨µÄreceiver
+# å°†alarmSmsï¼ˆçŸ­ä¿¡æŠ¥è­¦å†…å®¹ï¼‰å‘é€ç»™æŒ‡å®šçš„receiver
 def postSms():
-    if alarmSms != '[Swallow]½×¶Î¾¯¸æ\n':
+    if alarmSms != '[Swallow]é˜¶æ®µè­¦å‘Š\n':
         for phoneNum in config.smsSmsReceiver:
             conn = httplib.HTTPConnection('211.136.163.68:8000');
             smsUrl = '/httpserver?enterpriseid=95102&accountid=000&pswd=z5PgZ4&mobs=' + str(phoneNum) + '&msg=' + urllib.quote(alarmSms);
             conn.request('POST', smsUrl)
             conn.close()
 
-# ´ÓCatºÍMongoÉÏ»ñÈ¡Êı¾İ
+# ä»Catå’ŒMongoä¸Šè·å–æ•°æ®
 def getLatestInfos():
     clearInfosFromCat()
     clearInfosFromMongo()
@@ -1149,9 +1145,11 @@ def notify():
     global shouldNotify
     postMongoMail()
     if shouldNotify:
-        shouldNotify = False
-        postCatMail()
-        postSms()
+        if int(time.time()) - config.logLastSmsTime > 3600:
+            config.logLastSmsTime = int(time.time())
+            shouldNotify = False
+            postCatMail()
+            postSms()
         
 def updateLog():
     args = sys.argv
@@ -1162,6 +1160,7 @@ def updateLog():
         config.logPreSaveFailed = 0
         config.logPreSumCumulated = 0
         config.logPreSumDelay = 0
+        config.logLastSmsTime = 0;
     config.updateLog()
 
 getLatestInfos()

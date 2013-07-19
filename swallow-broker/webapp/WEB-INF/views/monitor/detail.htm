@@ -1,10 +1,15 @@
 #set($layout = "monitorLayout.htm")
 <div style="padding: 30px">
+  <form id="monitor" style="display:none" action="" method="post">
+    <input name="action" value=""> <input name="key" value="">
+  </form>
   <table class="table table-hover table-striped">
     <thead>
       <tr>
         <th>Topic</th>
         <th>消费者</th>
+        <th>状态</th>
+        <th>操作</th>
       </tr>
     </thead>
     <tbody>
@@ -12,6 +17,11 @@
       <tr>
         <td>$entry.key</td>
         <td>$entry.value</td>
+        <td>#if($entry.value.isActive()) 运行中 #else 已停止 #end</td>
+        <th>#if($entry.value.isActive())
+          <button class="btn btn-mini btn-danger" onclick="closeConsumer('$entry.key');">关闭</button> #else
+          <button class="btn btn-mini btn-primary" onclick="startConsumer('$entry.key');">运行</button> #end
+        </th>
       </tr>
       #end
     </tbody>
@@ -33,3 +43,17 @@
     </tbody>
   </table>
 </div>
+<script>
+	function startConsumer(key) {
+		console.log(key);
+		$('input[name=action]').val('start');
+		$('input[name=key]').val(key);
+		$('form#monitor').submit();
+	}
+	function closeConsumer(key) {
+		console.log(key);
+		$('input[name=action]').val('close');
+		$('input[name=key]').val(key);
+		$('form#monitor').submit();
+	}
+</script>

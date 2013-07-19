@@ -115,12 +115,12 @@ public class ConsumerImpl implements Consumer {
             throw new IllegalArgumentException("ConsumerId is invalid, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-30 long：" + consumerId);
          }
       }
-      //ack#<topic>#<cid>长度不超过64字节(mongodb对数据库名的长度限制是64字节)
+      //ack#<topic>#<cid>长度不超过63字节(mongodb对数据库名的长度限制是63字节)
       int length = 0;
       length += dest.getName().length();
       length += consumerId != null ? consumerId.length() : 0;
-      if (length > 59) {
-          throw new IllegalArgumentException("TopicName and consumerId's summary length must less than 59 ：topicName is "
+      if (length > 58) {
+          throw new IllegalArgumentException("TopicName and consumerId's summary length must less or equals 58 ：topicName is "
                   + dest.getName() + ", consumerId is " + consumerId);
       }
 

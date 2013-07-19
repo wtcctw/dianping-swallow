@@ -37,7 +37,8 @@ public class ProducerImpl implements Producer {
    private final String                 producerIP;                                   //Producer IP地址
    private final String                 producerVersion;                              //Producer版本号
    private final ProducerSwallowService remoteService;
-   private final int                    punishTimeout;
+   private final int                    retryBaseInterval;
+   private final int                    fileQueueFailedBaseInterval;
    private final ProducerHandler        producerHandler;
 
    /**
@@ -46,10 +47,11 @@ public class ProducerImpl implements Producer {
     * @param producerIP 本机IP地址
     * @param producerVersion Producer版本号
     * @param remoteService 远程调用服务接口
-    * @param punishTimeout 远程调用超时
+    * @param retryBaseInterval 重试时的时间间隔起始值
+    * @param fileQueueFailedBaseInterval filequeue失败时重试的时间间隔起始值
     */
    public ProducerImpl(Destination destination, ProducerConfig producerConfig, String producerIP,
-                       String producerVersion, ProducerSwallowService remoteService, int punishTimeout) {
+                       String producerVersion, ProducerSwallowService remoteService, int retryBaseInterval, int fileQueueFailedBaseInterval) {
       if (producerConfig != null) {
          this.producerConfig.setAsyncRetryTimes(producerConfig.getAsyncRetryTimes());
          this.producerConfig.setMode(producerConfig.getMode());
@@ -67,7 +69,8 @@ public class ProducerImpl implements Producer {
       this.producerIP = producerIP;
       this.producerVersion = producerVersion;
       this.remoteService = remoteService;
-      this.punishTimeout = punishTimeout;
+      this.retryBaseInterval = retryBaseInterval;
+      this.fileQueueFailedBaseInterval = fileQueueFailedBaseInterval;
 
       //设置Producer工作模式
       switch (this.producerConfig.getMode()) {
@@ -77,6 +80,9 @@ public class ProducerImpl implements Producer {
          case ASYNC_MODE:
             producerHandler = new HandlerAsynchroMode(this);
             break;
+         case ASYNC_SEPARATELY_MODE:
+             producerHandler = new HandlerAsynchroSeparatelyMode(this);
+             break;
          default:
             producerHandler = new HandlerAsynchroMode(this);
             break;
@@ -244,12 +250,16 @@ public class ProducerImpl implements Producer {
    }
 
    /**
-    * @return 远程调用超时
+    * @return 重试的时间间隔起始值
     */
-   public int getPunishTimeout() {
-      return punishTimeout;
+   public int getRetryBaseInterval() {
+      return retryBaseInterval;
    }
-   
+
+   public int getFileQueueFailedBaseInterval() {
+    return fileQueueFailedBaseInterval;
+   }
+
    public String getProducerIP() {
       return producerIP;
    }

@@ -28,7 +28,7 @@ public class HandlerSynchroMode implements ProducerHandler {
     public HandlerSynchroMode(ProducerImpl producer) {
         this.sendTimes = producer.getProducerConfig().getSyncRetryTimes() == Integer.MAX_VALUE ? Integer.MAX_VALUE : producer
                 .getProducerConfig().getSyncRetryTimes() + 1;//初始值等于用户要求的retryTimes+1，这样可以保证至少执行一次
-        this.delayBase = producer.getPunishTimeout();
+        this.delayBase = producer.getRetryBaseInterval();
         this.remoteService = producer.getRemoteService();
         this.destination = producer.getDestination();
         this.producerIP = producer.getProducerIP();

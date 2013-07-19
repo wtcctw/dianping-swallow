@@ -68,10 +68,21 @@
         <appender-ref ref="producer" />
         <appender-ref ref="console"/>
     </logger>
+     <logger name="com.dianping.swallow.producer" additivity="false" level="INFO">
+        <appender-ref ref="producer" />
+        <appender-ref ref="console"/>
+    </logger>
      <logger name="com.dianping.swallow.broker.service.consumer" additivity="false" level="INFO">
         <appender-ref ref="consumer" />
         <appender-ref ref="console"/>
     </logger>
+    <logger name="com.dianping.swallow.consumer" additivity="false" level="INFO">
+        <appender-ref ref="consumer" />
+        <appender-ref ref="console"/>
+    </logger>
+    
+    
+    
     <logger name="com.dianping" level="INFO" />
 
     <root level="ERROR">

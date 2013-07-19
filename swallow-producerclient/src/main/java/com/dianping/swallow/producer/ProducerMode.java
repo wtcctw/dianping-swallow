@@ -13,5 +13,9 @@ public enum ProducerMode {
    /**
     * Producer工作模式：异步模式，APP等待SwallowMessage放入队列
     */
-   ASYNC_MODE
+   ASYNC_MODE,
+   /**
+    * Producer工作模式：异步模式，使用FileQueue存放待发消息，另起后台线程发送消息。（和ASYNC_MODE的区别在于，失败时使用独立FileQueue和线程重试）
+    */
+   ASYNC_SEPARATELY_MODE
 }

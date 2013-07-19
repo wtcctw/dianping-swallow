@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.broker.conf.Constant;
 import com.dianping.swallow.broker.monitor.NotifyService;
 import com.dianping.swallow.broker.service.producer.ProducerHolder;
+import com.dianping.swallow.broker.util.AppUtils;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.message.Destination;
@@ -63,7 +64,7 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
         //构造完成，可以替换
         producerMap = map;
 
-        LOG.info("Build producers done, All producer's topic:" + producerMap.keySet());
+        LOG.info("Build producers done, All producer's topic:" + AppUtils.highlight(producerMap.keySet().toString()));
     }
 
     @Override
@@ -89,7 +90,7 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
     private void init(Map<String, Producer> map, String config) throws RemoteServiceInitFailedException {
         if (StringUtils.isNotBlank(config)) {
             String[] topics = StringUtils.split(config, ';');
-            LOG.info("Initing producers with topics(" + Arrays.toString(topics) + ")");
+            LOG.info("Initing producers with topics " + AppUtils.highlight(Arrays.toString(topics)));
 
             //每个topic创建一个producer(生产者是可以并发使用的)
             if (topics != null) {
@@ -105,7 +106,7 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
         //如果key对应的Producer不存在，则可以创建Producer; 已经存在复用，不创建
         Producer producer = producerMap.get(topic);
         if (producer == null) {
-            LOG.info("Producer with topic '" + topic + "' is not exsits, so create it!");
+            LOG.info("Producer with topic " + AppUtils.highlight(topic) + " is not exsits, so create it!");
 
             //根据topic，获取swallow.broker.producer.<topic>.*配置
             Integer retryTimes = NumberUtils.createInteger(StringUtils.trimToNull(dynamicConfig
@@ -133,7 +134,7 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
 
             producer = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
 
-            LOG.info("Producer with topic '" + topic + "' is created!");
+            LOG.info("Producer with topic " + AppUtils.highlight(topic) + " is created!");
         }
 
         map.put(topic, producer);
