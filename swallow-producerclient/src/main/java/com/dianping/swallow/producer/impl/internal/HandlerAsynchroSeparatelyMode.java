@@ -69,6 +69,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
     private final FileQueue<Packet>               messageQueue;                                                                  //Filequeue
     private final FileQueue<Packet>               failedMessageQueue;                                                            //存放失败的消息的Filequeue
 
+    private final int                             failedBaseInterval;                                                            //发送抛出异常后，重新获取消息的间隔时间策略基数
     private final int                             retryBaseInterval;                                                             //超时策略基数
     private final int                             fileQueueFailedBaseInterval;                                                   //超时策略基数
 
@@ -131,6 +132,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
     public HandlerAsynchroSeparatelyMode(ProducerImpl producer) {
         this.producer = producer;
         this.retryBaseInterval = producer.getRetryBaseInterval();
+        this.failedBaseInterval = producer.getFailedBaseInterval();
         this.fileQueueFailedBaseInterval = producer.getFileQueueFailedBaseInterval();
         this.messageQueue = getMessageQueue(producer.getDestination().getName(), producer.getProducerConfig()
                 .isSendMsgLeftLastSession(), producer.getProducerConfig().getFilequeueBaseDir(), messageQueues, false);
@@ -162,8 +164,10 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
         for (int idx = 0; idx < threadPoolSize; idx++) {
             DefaultPullStrategy fileQueueStrategy = new DefaultPullStrategy(fileQueueFailedBaseInterval,
                     DELAY_BASE_MULTI * fileQueueFailedBaseInterval);
-            Thread t = THREAD_FACTORY.newThread(new MsgProduceTask(MSG_PRODUCE, messageQueue, fileQueueStrategy, null),
-                    "swallow-AsyncSeparatelyProducer-");
+            DefaultPullStrategy failIntervalStrategy = new DefaultPullStrategy(failedBaseInterval, DELAY_BASE_MULTI
+                    * failedBaseInterval);
+            Thread t = THREAD_FACTORY.newThread(new MsgProduceTask(MSG_PRODUCE, messageQueue, fileQueueStrategy,
+                    failIntervalStrategy), "swallow-AsyncSeparatelyProducer-");
             t.setDaemon(true);
             t.start();
         }
@@ -172,8 +176,8 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                 * fileQueueFailedBaseInterval);
         DefaultPullStrategy retryIntervalStrategy = new DefaultPullStrategy(retryBaseInterval, DELAY_BASE_MULTI
                 * retryBaseInterval);
-        Thread t = THREAD_FACTORY.newThread(new MsgProduceTask(MSG_PRODUCE_RETRY, failedMessageQueue, fileQueueStrategy,
-                retryIntervalStrategy), "swallow-AsyncSeparatelyProducer-Retry-");
+        Thread t = THREAD_FACTORY.newThread(new MsgProduceTask(MSG_PRODUCE_RETRY, failedMessageQueue,
+                fileQueueStrategy, retryIntervalStrategy), "swallow-AsyncSeparatelyProducer-Retry-");
         t.setDaemon(true);
         t.start();
     }
@@ -183,17 +187,17 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
 
         DefaultPullStrategy fileQueueStrategy;
 
-        DefaultPullStrategy retryIntervalStrategy;
+        DefaultPullStrategy intervalStrategy;
 
         FileQueue<Packet>   queue;
 
         String              msgProduceCatType;
 
         public MsgProduceTask(String msgProduceCatType, FileQueue<Packet> queue, DefaultPullStrategy fileQueueStrategy,
-                              DefaultPullStrategy retryIntervalStrategy) {
+                              DefaultPullStrategy intervalStrategy) {
             super();
             this.fileQueueStrategy = fileQueueStrategy;
-            this.retryIntervalStrategy = retryIntervalStrategy;
+            this.intervalStrategy = intervalStrategy;
             this.queue = queue;
             this.msgProduceCatType = msgProduceCatType;
         }
@@ -245,9 +249,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                 try {
                     ack = remoteService.sendMessage(message);
 
-                    if (retryIntervalStrategy != null) {
-                        retryIntervalStrategy.succeess();
-                    }
+                    intervalStrategy.succeess();
 
                     msgProduceTransaction.addData("sha1", ((PktSwallowPACK) ack).getShaInfo());
                     msgProduceTransaction.setStatus(Message.SUCCESS);
@@ -270,13 +272,12 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
 
                     LOGGER.error("Message sent failed: " + message.toString(), e);
 
-                    if (retryIntervalStrategy != null) {
-                        try {
-                            retryIntervalStrategy.fail(true);
-                        } catch (InterruptedException e1) {
-                            Thread.currentThread().interrupt();
-                        }
+                    try {
+                        intervalStrategy.fail(true);
+                    } catch (InterruptedException e1) {
+                        Thread.currentThread().interrupt();
                     }
+
                 } finally {
                     msgProduceTransaction.complete();
                 }

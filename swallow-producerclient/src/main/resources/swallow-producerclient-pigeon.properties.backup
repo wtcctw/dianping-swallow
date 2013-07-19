@@ -6,5 +6,6 @@ weights=1
 
 punishTimeout=500
 retryBaseInterval=500
+failedBaseInterval=1
 fileQueueFailedBaseInterval=5000
 loadBalance=random

@@ -132,7 +132,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
 
       ProducerImpl producerImpl = null;
       producerImpl = new ProducerImpl(dest, config, producerIP, producerVersion, remoteService,
-            pigeonConfigure.getRetryBaseInterval(), pigeonConfigure.getFileQueueFailedBaseInterval());
+            pigeonConfigure.getRetryBaseInterval(), pigeonConfigure.getFailedBaseInterval(), pigeonConfigure.getFileQueueFailedBaseInterval());
       LOGGER.info("New producer:[TopicName=" + dest.getName() + "; " + producerImpl.getProducerConfig().toString()
             + "]");
       //向swallow发送greet信息

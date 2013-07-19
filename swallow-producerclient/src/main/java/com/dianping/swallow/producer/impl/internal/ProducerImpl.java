@@ -38,6 +38,7 @@ public class ProducerImpl implements Producer {
    private final String                 producerVersion;                              //Producer版本号
    private final ProducerSwallowService remoteService;
    private final int                    retryBaseInterval;
+   private final int                    failedBaseInterval;
    private final int                    fileQueueFailedBaseInterval;
    private final ProducerHandler        producerHandler;
 
@@ -51,7 +52,7 @@ public class ProducerImpl implements Producer {
     * @param fileQueueFailedBaseInterval filequeue失败时重试的时间间隔起始值
     */
    public ProducerImpl(Destination destination, ProducerConfig producerConfig, String producerIP,
-                       String producerVersion, ProducerSwallowService remoteService, int retryBaseInterval, int fileQueueFailedBaseInterval) {
+                       String producerVersion, ProducerSwallowService remoteService, int retryBaseInterval,int failedBaseInterval, int fileQueueFailedBaseInterval) {
       if (producerConfig != null) {
          this.producerConfig.setAsyncRetryTimes(producerConfig.getAsyncRetryTimes());
          this.producerConfig.setMode(producerConfig.getMode());
@@ -70,6 +71,7 @@ public class ProducerImpl implements Producer {
       this.producerVersion = producerVersion;
       this.remoteService = remoteService;
       this.retryBaseInterval = retryBaseInterval;
+      this.failedBaseInterval = failedBaseInterval;
       this.fileQueueFailedBaseInterval = fileQueueFailedBaseInterval;
 
       //设置Producer工作模式
@@ -254,6 +256,13 @@ public class ProducerImpl implements Producer {
     */
    public int getRetryBaseInterval() {
       return retryBaseInterval;
+   }
+
+   /**
+    * @return 发送失败后，间隔多久进行重新获取的时间间隔起始值
+    */
+   public int getFailedBaseInterval() {
+      return failedBaseInterval;
    }
 
    public int getFileQueueFailedBaseInterval() {

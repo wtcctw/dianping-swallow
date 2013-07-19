@@ -63,7 +63,8 @@ public final class SwallowPigeonConfiguration {
    public static final boolean DEFAULT_IS_USE_LION    = true;                                                              //默认是否使用Lion以配置Swallow server地址
    public static final String  DEFAULT_HOSTS          = "127.0.0.1:4000";                                                  //默认Swallow server地址字符串
    public static final String  DEFAULT_WEIGHTS        = "1";                                                               //默认Swallow server权重
-   public static final int     DEFAULT_RETRY_BASE_INTERVAL = 500;                                                               //默认失败重试延时基数
+   public static final int     DEFAULT_RETRY_BASE_INTERVAL = 500;                                                             //默认失败重试延时基数
+   public static final int     DEFAULT_FAILED_BASE_INTERVAL = 1;                                                              //默认失败后重新获取前的间隔的延时基数
    public static final int     DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL = 5000;                                                               //默认失败重试延时基数
    public static final String  DEFAULT_LOAD_BALANCE   = "random";
 
@@ -73,7 +74,8 @@ public final class SwallowPigeonConfiguration {
    private boolean             useLion                = DEFAULT_IS_USE_LION;                                               //是否使用Lion以配置Swallow server地址，非开发环境只能使用Lion
    private String              hosts                  = DEFAULT_HOSTS;                                                     //Swallow server地址字符串，useLion为真时此项失效
    private String              weights                = DEFAULT_WEIGHTS;                                                   //Swallow server权重，范围从0-10，useLion为真时此项失效
-   private int                 retryBaseInterval      = DEFAULT_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
+   private int                 retryBaseInterval      = DEFAULT_RETRY_BASE_INTERVAL;                                       //失败重试延时基数
+   private int                 failedBaseInterval     = DEFAULT_FAILED_BASE_INTERVAL;                                     //失败后重新获取前的间隔的延时基数
    private int                 punishTimeout          = -1;                                            //失败重试延时基数(旧的，由于名称不合理，废弃使用)
    private int                 fileQueueFailedBaseInterval      = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
    private String              loadBalance            = DEFAULT_LOAD_BALANCE;
@@ -86,13 +88,13 @@ public final class SwallowPigeonConfiguration {
    public String toString() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
             + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
-            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
+            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
    private String getConfigInfo() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
             + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
-            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
+            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
    @SuppressWarnings("rawtypes")
@@ -301,6 +303,14 @@ public final class SwallowPigeonConfiguration {
    public void setRetryBaseInterval(int retryBaseInterval) {
       this.retryBaseInterval = retryBaseInterval;
       checkRetryBaseInterval();
+   }
+
+   public int getFailedBaseInterval() {
+      return failedBaseInterval;
+   }
+
+   public void setFailedBaseInterval(int failedBaseInterval) {
+      this.failedBaseInterval = failedBaseInterval;
    }
 
    public int getFileQueueFailedBaseInterval() {
