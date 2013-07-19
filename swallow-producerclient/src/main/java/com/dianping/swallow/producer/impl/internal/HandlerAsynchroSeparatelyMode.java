@@ -48,9 +48,9 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
      */
     //cat打点使用的几个名称
     private static final String                   MSG_PRODUCE            = "MsgProduce-Separately";                              //用于(1)(2)打点
+    private static final String                   MSG_PRODUCE_RETRY      = "MsgProduceRetry-Separately";                         //用于(5)(6)打点
     private static final String                   FILE_QUEUE_GET_FAILED  = "FileQueueGetFailed-Separately";                      //用于(3)打点
     private static final String                   FILE_QUEUE_ADD_FAILED  = "FileQueueAddFailed-Separately";                      //用于(4)打点
-    private static final String                   MSG_PRODUCE_RETRY      = "MsgProduceRetry-Separately";                         //用于(5)(6)打点
 
     //从FileQueue中获取消息，并且发送消息的线程的工厂类
     private static final MQThreadFactory          THREAD_FACTORY         = new MQThreadFactory();
@@ -172,7 +172,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                 * fileQueueFailedBaseInterval);
         DefaultPullStrategy retryIntervalStrategy = new DefaultPullStrategy(retryBaseInterval, DELAY_BASE_MULTI
                 * retryBaseInterval);
-        Thread t = THREAD_FACTORY.newThread(new MsgProduceTask(MSG_PRODUCE_RETRY, messageQueue, fileQueueStrategy,
+        Thread t = THREAD_FACTORY.newThread(new MsgProduceTask(MSG_PRODUCE_RETRY, failedMessageQueue, fileQueueStrategy,
                 retryIntervalStrategy), "swallow-AsyncSeparatelyProducer-Retry-");
         t.setDaemon(true);
         t.start();
