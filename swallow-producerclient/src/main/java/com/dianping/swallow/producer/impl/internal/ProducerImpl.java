@@ -209,6 +209,10 @@ public class ProducerImpl implements Producer {
                Cat.getProducer().logEvent(CatConstants.TYPE_REMOTE_CALL, "AsyncProducer", Message.SUCCESS, childMessageId);
                producerHandler.doSendMsg(pktMessage);
                break;
+            case ASYNC_SEPARATELY_MODE://异步模式
+               Cat.getProducer().logEvent(CatConstants.TYPE_REMOTE_CALL, "AsyncProducerSeparately", Message.SUCCESS, childMessageId);
+               producerHandler.doSendMsg(pktMessage);
+               break;
          }
 
          producerTransaction.setStatus(Message.SUCCESS);
