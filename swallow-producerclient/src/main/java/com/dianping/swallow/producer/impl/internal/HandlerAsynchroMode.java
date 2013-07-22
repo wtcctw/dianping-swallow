@@ -41,6 +41,11 @@ public class HandlerAsynchroMode implements ProducerHandler {
     private static final int DELAY_BASE_MULTI = 5; //超时策略倍数
     private static final int MSG_AVG_LEN = 512;
 
+    //用于 Cat 打点的type
+    private static final String FILE_QUEUE_FAILED = "FileQueueFailed";
+    private static final String MSG_ASYNC_FAILED = "MsgAsyncFailed";
+    private static final String MSG_PRODUCE_TRIED = "MsgProduceTried";
+
     private static Map<String, FileQueue<Packet>> messageQueues = new HashMap<String, FileQueue<Packet>>(); //当前TopicName与Filequeue对应关系的集合
 
     private final ProducerImpl producer;
@@ -166,16 +171,16 @@ public class HandlerAsynchroMode implements ProducerHandler {
 
                     fileQueueStrategy.succeess();
 
-                    producerHandlerTransaction = Cat.getProducer().newTransaction("MsgProduceTried",
+                    producerHandlerTransaction = Cat.getProducer().newTransaction(MSG_PRODUCE_TRIED,
                             producer.getDestination().getName() + ":" + producer.getProducerIP());
                 } catch (Exception e) {
-                    Transaction fileQueueTransaction = Cat.getProducer().newTransaction("FileQueueFailed",
+                    Transaction fileQueueTransaction = Cat.getProducer().newTransaction(FILE_QUEUE_FAILED,
                             producer.getDestination().getName() + ":" + producer.getProducerIP());
                     fileQueueTransaction.setStatus(e);
                     Cat.getProducer().logError(e);
                     fileQueueTransaction.complete();
 
-                    producerHandlerTransaction = Cat.getProducer().newTransaction("MsgProduceTried",
+                    producerHandlerTransaction = Cat.getProducer().newTransaction(MSG_PRODUCE_TRIED,
                             producer.getDestination().getName() + ":" + producer.getProducerIP());
                     producerHandlerTransaction.setStatus(e);
                     Cat.getProducer().logError(e);
@@ -201,7 +206,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                     } catch (Exception e) {
                         //如果剩余重试次数>0，超时重试
                         if (leftRetryTimes > 0) {
-                            Transaction retryTransaction = Cat.getProducer().newTransaction("MsgProduceTried",
+                            Transaction retryTransaction = Cat.getProducer().newTransaction(MSG_PRODUCE_TRIED,
                                     producer.getDestination().getName() + ":" + producer.getProducerIP());
                             try {
                                 defaultPullStrategy.fail(true);
@@ -215,7 +220,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                             //发送失败，重发
                             continue;
                         }
-                        Transaction failedTransaction = Cat.getProducer().newTransaction("MsgAsyncFailed",
+                        Transaction failedTransaction = Cat.getProducer().newTransaction(MSG_ASYNC_FAILED,
                                 producer.getDestination().getName() + ":" + producer.getProducerIP());
                         failedTransaction.addData("content", ((PktMessage) message).getContent().toKeyValuePairs());
                         failedTransaction.setStatus(Message.SUCCESS);
