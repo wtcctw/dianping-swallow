@@ -10,13 +10,13 @@ import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 /**
- * @rundemo_name 生产者例子(同步，可输入)
+ * @rundemo_name 生产者例子(异步，可输入)
  */
-public class SyncProducerInputExample {
+public class AsyncProducerInputExample {
 
     public static void main(String[] args) throws Exception {
         ProducerConfig config = new ProducerConfig();
-        config.setMode(ProducerMode.SYNC_MODE);
+        config.setMode(ProducerMode.ASYNC_MODE);
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
         String CurLine = ""; // Line read from standard in
 

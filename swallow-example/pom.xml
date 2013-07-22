@@ -106,7 +106,7 @@
         <dependency>
             <groupId>com.dianping.dpsf</groupId>
             <artifactId>dpsf-net</artifactId>
-            <version>1.6.3</version>
+            <version>1.6.3.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-lang</groupId>
@@ -141,13 +141,6 @@
                         <version>1.8.1</version>
                     </dependency>
                 </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
         </plugins>
     </build>
