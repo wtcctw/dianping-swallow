@@ -219,7 +219,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
 
                 //(1) 从filequeue获取message
                 try {
-                    //如果filequeue无元素则阻塞            
+                    //如果filequeue无元素则阻塞
                     message = queue.get();
 
                     fileQueueStrategy.succeess();
@@ -256,21 +256,28 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                 } catch (Exception e) {
                     try {
                         failedMessageQueue.add(message);
+
+                        msgProduceTransaction.setStatus(e);
+                        Cat.getProducer().logError(e);
+                        msgProduceTransaction.addData("content", ((PktMessage) message).getContent().toKeyValuePairs());
+
+                        LOGGER.error("Message sent failed, this message will be retryed in a separately FileQueue: "
+                                + message.toString(), e);
+
                     } catch (Exception e1) {
                         //file queue add 失败的打点
                         Transaction fileQueueAddFailedTransaction = Cat.getProducer().newTransaction(
                                 FILE_QUEUE_ADD_FAILED,
                                 producer.getDestination().getName() + ":" + producer.getProducerIP());
-                        fileQueueAddFailedTransaction.setStatus(e);
-                        Cat.getProducer().logError(e);
+                        fileQueueAddFailedTransaction.setStatus(e1);
+                        Cat.getProducer().logError(e1);
+                        fileQueueAddFailedTransaction.addData("content", ((PktMessage) message).getContent()
+                                .toKeyValuePairs());
                         fileQueueAddFailedTransaction.complete();
+
+                        LOGGER.error("Message add to FileQueue failed, this message is skiped: " + message.toString(),
+                                e1);
                     }
-
-                    msgProduceTransaction.setStatus(e);
-                    Cat.getProducer().logError(e);
-                    msgProduceTransaction.addData("content", ((PktMessage) message).getContent().toKeyValuePairs());
-
-                    LOGGER.error("Message sent failed: " + message.toString(), e);
 
                     try {
                         intervalStrategy.fail(true);

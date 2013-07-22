@@ -1,5 +1,5 @@
 serviceName=http://service.dianping.com/swallowService/producerService_1.0.0
-timeout=1000
+timeout=5000
 useLion=false
 hosts=127.0.0.1:4000
 weights=1

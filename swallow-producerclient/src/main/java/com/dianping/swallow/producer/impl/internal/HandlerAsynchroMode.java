@@ -211,6 +211,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                             retryTransaction.addData("Retry", sendTimes - leftRetryTimes);
                             retryTransaction.setStatus(e);
                             retryTransaction.complete();
+                            LOGGER.warn("Retry sending message, because: " + e.getMessage());
                             //发送失败，重发
                             continue;
                         }
