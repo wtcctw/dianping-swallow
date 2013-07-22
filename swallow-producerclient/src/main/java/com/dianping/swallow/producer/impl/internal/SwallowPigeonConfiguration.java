@@ -162,6 +162,9 @@ public final class SwallowPigeonConfiguration {
       checkRetryBaseInterval();
       checkFileQueueFailedBaseInterval();
       LOGGER.info("ProducerFactory configuration: [" + getConfigInfo() + "]");
+      if (punishTimeout > 0) {//兼容老的punishTimeout参数，如果配置了punishTimeout，就提示警告
+          LOGGER.warn("Property 'punishTimeout' is deprecated(but still work) after version 0.6.7, please use retryBaseInterval instead.");
+      }
    }
 
    /**
