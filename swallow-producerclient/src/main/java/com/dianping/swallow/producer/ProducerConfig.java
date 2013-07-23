@@ -96,6 +96,9 @@ public class ProducerConfig {
      * @param asyncRetryTimes
      */
     public void setAsyncRetryTimes(int asyncRetryTimes) {
+        if (asyncRetryTimes == -1) {
+            asyncRetryTimes = Integer.MAX_VALUE;
+        }
         if (asyncRetryTimes < 0) {
             this.asyncRetryTimes = DEFAULT_ASYNC_RETRY_TIMES;
             LOGGER.warn("invalid asyncRetryTimes, use default value: " + this.asyncRetryTimes + ".");
@@ -181,6 +184,9 @@ public class ProducerConfig {
      * @param syncRetryTimes 发送失败重试次数
      */
     public void setSyncRetryTimes(int syncRetryTimes) {
+        if (syncRetryTimes == -1) {
+            syncRetryTimes = Integer.MAX_VALUE;
+        }
         if (syncRetryTimes < 0) {
             this.syncRetryTimes = DEFAULT_SYNC_RETRY_TIMES;
             LOGGER.warn("invalid syncRetryTimes, use default value: " + this.syncRetryTimes + ".");
