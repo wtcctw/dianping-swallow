@@ -166,7 +166,7 @@ public class ProducerConfig {
                 + getMode()
                 + "; Zipped="
                 + isZipped()
-                + (getMode() == ProducerMode.ASYNC_MODE ? "; ThreadPoolSize=" + getThreadPoolSize() + "; SendMsgLeftLastSession="
+                + (getMode() == ProducerMode.ASYNC_MODE || getMode() == ProducerMode.ASYNC_SEPARATELY_MODE ? "; ThreadPoolSize=" + getThreadPoolSize() + "; SendMsgLeftLastSession="
                         + isSendMsgLeftLastSession() + "; AsyncRetryTimes=" + getAsyncRetryTimes() + "; FilequeueBaseDir="
                         + getFilequeueBaseDir() : "; SyncRetryTimes=" + getSyncRetryTimes());
     }

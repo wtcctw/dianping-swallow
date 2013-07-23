@@ -46,8 +46,12 @@ public class MQServiceAdapter implements MQService{
           try {
               //0.6的参数：mode，filequeueBaseDir
               String mode = (String) options0_6.get("mode");
-              if (mode != null && mode.equalsIgnoreCase("SYNC_MODE")) {
-                  config.setMode(ProducerMode.SYNC_MODE);
+              if (mode != null) {
+                  if (mode.equalsIgnoreCase("SYNC_MODE")) {
+                      config.setMode(ProducerMode.SYNC_MODE);
+                  }else if (mode.equalsIgnoreCase("ASYNC_SEPARATELY_MODE")) {
+                      config.setMode(ProducerMode.ASYNC_SEPARATELY_MODE);
+                  }
               }
               String filequeueBaseDir = (String) options0_6.get("filequeueBaseDir");
               if (filequeueBaseDir != null) {
