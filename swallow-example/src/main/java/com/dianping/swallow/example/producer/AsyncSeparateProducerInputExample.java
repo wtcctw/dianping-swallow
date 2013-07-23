@@ -17,6 +17,7 @@ public class AsyncSeparateProducerInputExample {
     public static void main(String[] args) throws Exception {
         ProducerConfig config = new ProducerConfig();
         config.setMode(ProducerMode.ASYNC_SEPARATELY_MODE);
+        config.setAsyncRetryTimes(-2);
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
         String CurLine = ""; // Line read from standard in
 
