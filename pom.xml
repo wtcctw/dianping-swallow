@@ -474,4 +474,14 @@ org.eclipse.jdt.core.compiler.compliance=1.6
             </plugins>
         </pluginManagement>
     </build>
+<distributionManagement>
+      <repository>
+         <id>dianping.repo</id>
+         <url>http://mvn.dianpingoa.com/dianping-releases</url>
+      </repository>
+      <snapshotRepository>
+         <id>dianping.repo.snapshots</id>
+         <url>http://mvn.dianpingoa.com/dianping-snapshots</url>
+      </snapshotRepository>
+	</distributionManagement>
 </project>
