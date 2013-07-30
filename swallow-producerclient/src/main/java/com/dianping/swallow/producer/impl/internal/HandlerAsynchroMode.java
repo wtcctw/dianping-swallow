@@ -40,6 +40,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
     private final FileQueue<Packet>      messageQueue;                                                          //Filequeue
     private final int                    delayBase;                                                             //超时策略基数
     private final int                    fileQueueFailedBaseInterval;                                           //filequeue失败重试的策略基数
+
     private Thread[]                     asyncThreads;
     private volatile boolean             closed            = false;
 
@@ -188,6 +189,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                     leftRetryTimes--;
                     try {
                         pktRet = remoteService.sendMessage(message);
+
                         produceTransaction.addData("sha1", ((PktSwallowPACK) pktRet).getShaInfo());
                         produceTransaction.setStatus(Message.SUCCESS);
                     } catch (Exception e) {

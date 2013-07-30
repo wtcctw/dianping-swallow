@@ -58,6 +58,10 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
     private final int                    retryBaseInterval;                                                            //超时策略基数
     private final int                    fileQueueFailedBaseInterval;                                                  //超时策略基数
 
+    private Thread[]                     asyncThreads;
+    private Thread                       retryThread;
+    private volatile boolean             closed                = false;
+
     public HandlerAsynchroSeparatelyMode(ProducerImpl producer) {
         this.producer = producer;
         this.retryBaseInterval = producer.getRetryBaseInterval();
@@ -89,7 +93,8 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
     private void start() {
         //启动针对messageQueue的线程
         int threadPoolSize = producer.getProducerConfig().getThreadPoolSize();
-        for (int idx = 0; idx < threadPoolSize; idx++) {
+        asyncThreads = new Thread[threadPoolSize];
+        for (int i = 0; i < threadPoolSize; i++) {
             DefaultPullStrategy fileQueueStrategy = new DefaultPullStrategy(fileQueueFailedBaseInterval,
                     DELAY_BASE_MULTI * fileQueueFailedBaseInterval);
             DefaultPullStrategy failIntervalStrategy = new DefaultPullStrategy(failedBaseInterval, DELAY_BASE_MULTI
@@ -98,16 +103,69 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                     failIntervalStrategy), "swallow-AsyncSeparatelyProducer-");
             t.setDaemon(true);
             t.start();
+            asyncThreads[i] = t;
         }
+
         //启动针对failedMessageQueue的一个线程
         DefaultPullStrategy fileQueueStrategy = new DefaultPullStrategy(fileQueueFailedBaseInterval, DELAY_BASE_MULTI
                 * fileQueueFailedBaseInterval);
         DefaultPullStrategy retryIntervalStrategy = new DefaultPullStrategy(retryBaseInterval, DELAY_BASE_MULTI
                 * retryBaseInterval);
-        Thread t = THREAD_FACTORY.newThread(new MsgProduceTask(MSG_PRODUCE_RETRY, failedMessageQueue,
+        retryThread = THREAD_FACTORY.newThread(new MsgProduceTask(MSG_PRODUCE_RETRY, failedMessageQueue,
                 fileQueueStrategy, retryIntervalStrategy), "swallow-AsyncSeparatelyProducer-Retry-");
-        t.setDaemon(true);
-        t.start();
+        retryThread.setDaemon(true);
+        retryThread.start();
+
+        //监听关闭事件
+        startShutdownook();
+    }
+
+    private void startShutdownook() {
+        //启动close Monitor
+        Thread hook = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    LOGGER.info("Swallow async(separately) producer stoping...");
+                    closed = true;
+                    //稍微等待线程执行
+                    if (asyncThreads != null) {
+                        for (Thread asyncThread : asyncThreads) {
+                            asyncThread.join(100);
+                        }
+                    }
+                    if (retryThread != null) {
+                        retryThread.join(100);
+                    }
+                    //中断线程
+                    if (asyncThreads != null) {
+                        for (Thread asyncThread : asyncThreads) {
+                            asyncThread.interrupt();
+                        }
+                    }
+                    if (retryThread != null) {
+                        retryThread.interrupt();
+                    }
+                    //确保线程执行完毕
+                    if (asyncThreads != null) {
+                        for (Thread asyncThread : asyncThreads) {
+                            asyncThread.join();
+                        }
+                    }
+                    if (retryThread != null) {
+                        retryThread.join();
+                    }
+
+                    LOGGER.info("Swallow async(separately) producer stoped.");
+
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
+        hook.setDaemon(true);
+        hook.setName("Swallow-ShutdownHook-" + this.producer.getDestination().getName());
+        Runtime.getRuntime().addShutdownHook(hook);
     }
 
     //从failedFilequeue队列获取并发送Message
@@ -135,9 +193,9 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
             ProducerSwallowService remoteService = producer.getRemoteService();
 
             Packet message = null;
-            Packet ack = null;
+            Packet pktRet = null;
 
-            while (!Thread.interrupted()) {
+            while (!closed) {
                 try {
                     //将自己设置为CatEventID的子节点
                     MessageTree tree = Cat.getManager().getThreadLocalMessageTree();
@@ -151,7 +209,9 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                     message = queue.get();
 
                     fileQueueStrategy.succeess();
-
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    continue;
                 } catch (Exception e) {
                     //file queue get 失败的打点
                     Transaction fileQueueGetFailedTransaction = Cat.getProducer().newTransaction(FILE_QUEUE_GET_FAILED,
@@ -171,11 +231,11 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                 Transaction msgProduceTransaction = Cat.getProducer().newTransaction(msgProduceCatType,
                         producer.getDestination().getName() + ":" + producer.getProducerIP());
                 try {
-                    ack = remoteService.sendMessage(message);
+                    pktRet = remoteService.sendMessage(message);
 
                     intervalStrategy.succeess();
 
-                    msgProduceTransaction.addData("sha1", ((PktSwallowPACK) ack).getShaInfo());
+                    msgProduceTransaction.addData("sha1", ((PktSwallowPACK) pktRet).getShaInfo());
                     msgProduceTransaction.setStatus(Message.SUCCESS);
                 } catch (Exception e) {
                     try {
