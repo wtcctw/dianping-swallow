@@ -17,6 +17,7 @@ public class AsyncProducerInputExample {
     public static void main(String[] args) throws Exception {
         ProducerConfig config = new ProducerConfig();
         config.setMode(ProducerMode.ASYNC_MODE);
+        config.setThreadPoolSize(5);
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
         String CurLine = ""; // Line read from standard in
 

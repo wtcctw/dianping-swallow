@@ -136,8 +136,6 @@ public class ConsumerBroker implements MessageListener {
                 notifyService.alarm(logPrefix + "Error when send http message to " + url + ", message is skiped.", e,
                         true);
             }
-        } catch (InterruptedException e) {
-            LOG.error(e.getMessage(), e);
         }
     }
 

@@ -193,8 +193,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
             }
          } catch (RuntimeException e1) {
             LOG.error(e1.getMessage(), e1);
-         } catch (InterruptedException e) {
-            this.interrupt();
          }
          if (LOG.isDebugEnabled()) {
             LOG.debug("retriveMessage() done:" + this.getName());

@@ -234,11 +234,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
 
                     LOGGER.error("Can not get msg from fileQueue, retry to get msg...", e);
 
-                    try {
-                        fileQueueStrategy.fail(true);
-                    } catch (InterruptedException e1) {
-                        Thread.currentThread().interrupt();
-                    }
+                    fileQueueStrategy.fail(true);
 
                     continue;
                 }
@@ -279,11 +275,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                                 e1);
                     }
 
-                    try {
-                        intervalStrategy.fail(true);
-                    } catch (InterruptedException e1) {
-                        Thread.currentThread().interrupt();
-                    }
+                    intervalStrategy.fail(true);
 
                 } finally {
                     msgProduceTransaction.complete();
