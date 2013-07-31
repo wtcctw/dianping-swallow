@@ -77,6 +77,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
     private MessageFilter messageFilter;
 
+    @SuppressWarnings("deprecation")
     public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager,
                               MessageFilter messageFilter) {
         this.consumerInfo = consumerInfo;
@@ -278,6 +279,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void sendMsgFromCachedMessages(Channel channel) throws InterruptedException {
         PktMessage preparedMessage = cachedMessages.poll();
         Long messageId = preparedMessage.getContent().getMessageId();
