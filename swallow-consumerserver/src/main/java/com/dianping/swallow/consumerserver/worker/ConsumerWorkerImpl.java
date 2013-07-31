@@ -92,7 +92,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
         pullStgy = new DefaultPullStrategy(configManager.getPullFailDelayBase(),
                 configManager.getPullFailDelayUpperBound());
 
-        // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式
+        // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
         if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
             this.consumerInfo = new ConsumerInfo(consumerInfo.getConsumerId(), ConsumerType.DURABLE_AT_LEAST_ONCE);
             LOG.info("ConsumerClient[topicName=" + topicName + ", consumerid=" + consumerid
