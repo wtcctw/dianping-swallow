@@ -37,45 +37,46 @@ import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 
+/***
+ * 一个ConsumerWorkerImpl负责处理一个(topic,consumerId)的消费者集群，使用单线程获取消息，并顺序推送给Consumer
+ * 
+ * @author kezhu.wu
+ */
 public final class ConsumerWorkerImpl implements ConsumerWorker {
-    private static final Logger    LOG               = LoggerFactory.getLogger(ConsumerWorkerImpl.class);
+    private static final Logger                    LOG               = LoggerFactory
+                                                                             .getLogger(ConsumerWorkerImpl.class);
 
-    private ConsumerInfo           consumerInfo;
-    private BlockingQueue<Channel> freeChannels      = new LinkedBlockingQueue<Channel>();
-    private Map<Channel, String>   connectedChannels = new ConcurrentHashMap<Channel, String>();
-
-    public Map<Channel, String> getConnectedChannels() {
-        return connectedChannels;
-    }
-
-    private CloseableBlockingQueue<Message> messageQueue   = null;
-
-    private AckDAO                          ackDao;
-    private SwallowBuffer                   swallowBuffer;
-    private MessageDAO                      messageDao;
-    private Queue<PktMessage>               cachedMessages = new ConcurrentLinkedQueue<PktMessage>();
-
-    public Queue<PktMessage> getCachedMessages() {
-        return cachedMessages;
-    }
-
+    private ConsumerInfo                           consumerInfo;
     private MQThreadFactory                        threadFactory;
     private String                                 consumerid;
     private String                                 topicName;
-    private volatile boolean                       getMessageisAlive = true;
-    private volatile boolean                       started           = false;
+    private MessageFilter                          messageFilter;
+
+    private AckDAO                                 ackDao;
+    private SwallowBuffer                          swallowBuffer;
+    private MessageDAO                             messageDao;
+
+    private CloseableBlockingQueue<Message>        messageQueue;
+    private ConfigManager                          configManager;
     private ExecutorService                        ackExecutor;
     private PullStrategy                           pullStgy;
 
-    private ConfigManager                          configManager;
-    private Map<Channel, Map<PktMessage, Boolean>> waitAckMessages   = new ConcurrentHashMap<Channel, Map<PktMessage, Boolean>>();
+    private volatile boolean                       getMessageisAlive = true;
+    private volatile boolean                       started           = false;
     private volatile long                          maxAckedMessageId = 0L;
 
-    public Map<Channel, Map<PktMessage, Boolean>> getWaitAckMessages() {
-        return waitAckMessages;
-    }
-
-    private MessageFilter messageFilter;
+    //TODO 如果channel断开，未通知我们，这里会一直留着。且close时，这块也不会被处理(即未ack的消息，也不管了。如果max id比较大，那么这部分消息会被认为是成功的。)
+    // 对于长期在waitAckMessages中的消息，认为没有ack，故将其放到backupQueue里，后续重新消费。
+    // 重启server时，等待一段时间，对于残留在waitAckMessages里的，也将其放到backupQueue里，后续重新消费。
+    /** 发送后等待ack的消息。以channel为key，每个channel可以发N条消息(N为其threadSize) */
+    private Map<Channel, Map<PktMessage, Boolean>> waitAckMessages   = new ConcurrentHashMap<Channel, Map<PktMessage, Boolean>>();
+    /** 待发送的消息 */
+    private Queue<PktMessage>                      messagesToBeSend  = new ConcurrentLinkedQueue<PktMessage>();
+    /** 可用来发送消息的channel */
+    private BlockingQueue<Channel>                 freeChannels      = new LinkedBlockingQueue<Channel>();
+    //TODO 是否能定时跳过channel check连接是否存活（只能设置系统的keepaliveInterval？）
+    /** 存放已连接的channel，key是channel，value是ip */
+    private Map<Channel, String>                   connectedChannels = new ConcurrentHashMap<Channel, String>();
 
     @SuppressWarnings("deprecation")
     public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager,
@@ -102,7 +103,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
         ackExecutor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.DAYS, new LinkedBlockingQueue<Runnable>(),
                 new MQThreadFactory("swallow-ack-"));
 
-        startMessageFetcherThread();
+        start();
 
         //Hawk监控
         String hawkMBeanName = topicName + '-' + consumerid + "-ConsumerWorkerImpl";
@@ -168,8 +169,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                 } catch (InterruptedException e) {
                     //netty自身的线程，不会有谁Interrupt。
                 }
+                //某个consumer断开了，那么它那些未应答的消息，就被重新放入待发送的队列里(这个时候消息顺序可能会乱序，因为序号小的被放到队列尾部了)
                 for (Map.Entry<PktMessage, Boolean> messageEntry : messageMap.entrySet()) {
-                    cachedMessages.add(messageEntry.getKey());
+                    messagesToBeSend.add(messageEntry.getKey());
                 }
                 waitAckMessages.remove(channel);
             }
@@ -177,14 +179,35 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
     }
 
-    private void startMessageFetcherThread() {
+    private void start() {
 
         threadFactory.newThread(new Runnable() {
 
             @Override
             public void run() {
                 while (getMessageisAlive) {
-                    sendMessageByPollFreeChannelQueue();
+                    try {
+                        Channel channel = freeChannels.take();
+                        //如果未连接，则不做处理
+                        if (channel.isConnected()) {
+
+                            // 确保有消息可发
+                            if (messagesToBeSend.isEmpty()) {
+                                ensureMessagesToBoSend(channel);
+                            }
+
+                            // 拿出消息并发送
+                            if (!messagesToBeSend.isEmpty()) {
+                                sendMessages(channel);
+                            } else {// 没有消息，channel继续放回去
+                                freeChannels.add(channel);
+                            }
+
+                        }
+
+                    } catch (InterruptedException e) {
+                        LOG.info("get message from messageQueue thread InterruptedException", e);
+                    }
                 }
                 LOG.info("message fetcher thread closed");
             }
@@ -226,62 +249,33 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
         HawkJMXUtil.unregisterMBean(hawkMBeanName);
     }
 
-    public long getMessageIdOfTailMessage(String topicName, String consumerId, Channel channel) {
+    private long getMessageIdOfTailMessage(String topicName, String consumerId, Channel channel) {
         Long maxMessageId = null;
-        if (!ConsumerType.NON_DURABLE.equals(consumerInfo.getConsumerType())) {
+
+        //持久类型，先尝试从数据库的ack表获取最大的id
+        if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
             maxMessageId = ackDao.getMaxMessageId(topicName, consumerId);
         }
+
+        //消息id不存在，则从消息队列里获取最大消息id
         if (maxMessageId == null) {
             maxMessageId = messageDao.getMaxMessageId(topicName);
 
-            if (maxMessageId == null) {
+            if (maxMessageId == null) {//不存在任何消息，则使用当前时间作为消息id即可
                 maxMessageId = MongoUtils.getLongByCurTime();
             }
-            if (!ConsumerType.NON_DURABLE.equals(consumerInfo.getConsumerType())) {
-                //consumer连接上后，以此时为时间基准，以后的消息都可以收到，因此需要插入ack。
+
+            if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
+                //持久型且ack尚未有记录，则插入ack，表示以此ack为基准。
                 ackDao.add(topicName, consumerId, maxMessageId, connectedChannels.get(channel));
             }
         }
         return maxMessageId;
     }
 
-    private void sendMessageByPollFreeChannelQueue() {
-        try {
-            while (getMessageisAlive) {
-                Channel channel = freeChannels.take();
-                //如果未连接，则不做处理
-                if (channel.isConnected()) {
-                    //创建消息缓冲QUEUE
-                    if (messageQueue == null) {
-                        try {
-                            long messageIdOfTailMessage = getMessageIdOfTailMessage(topicName, consumerid, channel);
-                            messageQueue = swallowBuffer.createMessageQueue(topicName, consumerid,
-                                    messageIdOfTailMessage, messageFilter);
-                        } catch (RuntimeException e) {
-                            LOG.error("Error create message queue from SwallowBuffer!", e);
-                            freeChannels.add(channel);
-                            Thread.sleep(configManager.getRetryIntervalWhenMongoException());
-                            continue;
-                        }
-                    }
-                    if (cachedMessages.isEmpty()) {
-                        putMsg2CachedMsgFromMsgQueue();
-                    }
-                    if (!cachedMessages.isEmpty()) {
-                        sendMsgFromCachedMessages(channel);
-                    }
-
-                }
-
-            }
-        } catch (InterruptedException e) {
-            LOG.info("get message from messageQueue thread InterruptedException", e);
-        }
-    }
-
     @SuppressWarnings("deprecation")
-    private void sendMsgFromCachedMessages(Channel channel) throws InterruptedException {
-        PktMessage preparedMessage = cachedMessages.poll();
+    private void sendMessages(Channel channel) throws InterruptedException {
+        PktMessage preparedMessage = messagesToBeSend.poll();
         Long messageId = preparedMessage.getContent().getMessageId();
 
         //Cat begin
@@ -314,7 +308,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                     }
                     messageMap.put(preparedMessage, Boolean.TRUE);
                 } else {
-                    cachedMessages.add(preparedMessage);
+                    messagesToBeSend.add(preparedMessage);
                 }
             }
             //Cat begin
@@ -323,7 +317,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
             //Cat end
         } catch (RuntimeException e) {
             LOG.error(consumerInfo.toString() + "：channel write error.", e);
-            cachedMessages.add(preparedMessage);
+            messagesToBeSend.add(preparedMessage);
 
             //Cat begin
             consumerServerTransaction.addData(preparedMessage.getContent().toKeyValuePairs());
@@ -335,7 +329,14 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
         //Cat end
     }
 
-    private void putMsg2CachedMsgFromMsgQueue() throws InterruptedException {
+    private void ensureMessagesToBoSend(Channel channel) throws InterruptedException {
+        //创建消息缓冲QUEUE
+        if (messageQueue == null) {
+            long messageIdOfTailMessage = getMessageIdOfTailMessage(topicName, consumerid, channel);
+            messageQueue = swallowBuffer.createMessageQueue(topicName, consumerid, messageIdOfTailMessage,
+                    messageFilter);
+        }
+
         SwallowMessage message = null;
         while (getMessageisAlive) {
             //从blockQueue中获取消息
@@ -345,9 +346,10 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                 break;
             }
         }
-        //收到close命令后,可能没有取得消息,此时,message仍然可能为null
+
+        //如果因为getMessageisAlive为false而退出（如收到close命令）,则消息可能依然是null
         if (message != null) {
-            cachedMessages.add(new PktMessage(consumerInfo.getConsumerId().getDest(), message));
+            messagesToBeSend.add(new PktMessage(consumerInfo.getConsumerId().getDest(), message));
         }
 
     }
@@ -428,8 +430,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
         public String getCachedMessages() {
             if (consumerWorkerImpl.get() != null) {
-                if (consumerWorkerImpl.get().cachedMessages != null) {
-                    return consumerWorkerImpl.get().cachedMessages.toString();
+                if (consumerWorkerImpl.get().messagesToBeSend != null) {
+                    return consumerWorkerImpl.get().messagesToBeSend.toString();
                 }
             }
             return null;

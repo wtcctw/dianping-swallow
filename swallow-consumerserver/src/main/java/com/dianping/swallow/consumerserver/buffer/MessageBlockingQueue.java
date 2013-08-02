@@ -16,6 +16,7 @@ import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
 import com.dianping.swallow.common.message.Message;
 
+//TODO 起一个线程定时从msg#<topic>#<cid>获取消息(该db存放backup消息)，放到queue里
 public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> implements CloseableBlockingQueue<Message> {
 
    private static final long                      serialVersionUID = -633276713494338593L;
