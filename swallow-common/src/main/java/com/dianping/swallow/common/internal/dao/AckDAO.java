@@ -2,14 +2,18 @@ package com.dianping.swallow.common.internal.dao;
 
 public interface AckDAO {
 
-   /**
-    * 获取topicName和consumerId对应的最大的messageId
-    */
-   Long getMaxMessageId(String topicName, String consumerId);
+    /**
+     * 获取topicName和consumerId对应的最大的messageId
+     */
+    Long getMaxMessageId(String topicName, String consumerId);
 
-   /**
-    * 添加一条topicName，consumerId，messageId记录
-    */
-   void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp);
+    /**
+     * 添加一条topicName，consumerId，messageId记录
+     */
+    void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp);
+
+    Long getBackupMaxMessageId(String topicName, String consumerId);
+
+    void addBackup(String topicName, String consumerId, Long messageId, String sourceConsumerIp);
 
 }

@@ -17,55 +17,73 @@ import com.mongodb.MongoException;
 
 public class AckDAOImpl implements AckDAO {
 
-   private static final Logger LOG             = LoggerFactory.getLogger(AckDAOImpl.class);
+    private static final Logger LOG             = LoggerFactory.getLogger(AckDAOImpl.class);
 
-   public static final String  MSG_ID          = "_id";
-   public static final String  SRC_CONSUMER_IP = "cip";
-   public static final String  TICK            = "t";
+    public static final String  MSG_ID          = "_id";
+    public static final String  SRC_CONSUMER_IP = "cip";
+    public static final String  TICK            = "t";
 
-   private MongoClient         mongoClient;
+    private MongoClient         mongoClient;
 
-   public void setMongoClient(MongoClient mongoClient) {
-      this.mongoClient = mongoClient;
-   }
+    public void setMongoClient(MongoClient mongoClient) {
+        this.mongoClient = mongoClient;
+    }
 
-   @Override
-   public Long getMaxMessageId(String topicName, String consumerId) {
-      DBCollection collection = this.mongoClient.getAckCollection(topicName, consumerId);
+    @Override
+    public Long getMaxMessageId(String topicName, String consumerId) {
+        DBCollection collection = this.mongoClient.getAckCollection(topicName, consumerId);
+        return getMaxMessageId(collection);
+    }
 
-      DBObject fields = BasicDBObjectBuilder.start().add(MSG_ID, Integer.valueOf(1)).get();
-      DBObject orderBy = BasicDBObjectBuilder.start().add(MSG_ID, Integer.valueOf(-1)).get();
-      DBCursor cursor = collection.find(new BasicDBObject(), fields).sort(orderBy).limit(1);
-      try {
-         if (cursor.hasNext()) {
-            DBObject result = cursor.next();
-            BSONTimestamp timestamp = (BSONTimestamp) result.get(MSG_ID);
-            return MongoUtils.BSONTimestampToLong(timestamp);
-         }
-      } finally {
-         cursor.close();
-      }
-      return null;
-   }
+    @Override
+    public Long getBackupMaxMessageId(String topicName, String consumerId) {
+        DBCollection collection = this.mongoClient.getBackupAckCollection(topicName, consumerId);
+        return getMaxMessageId(collection);
+    }
 
-   @Override
-   public void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp) {
-      DBCollection collection = this.mongoClient.getAckCollection(topicName, consumerId);
+    private Long getMaxMessageId(DBCollection collection) {
+        DBObject fields = BasicDBObjectBuilder.start().add(MSG_ID, Integer.valueOf(1)).get();
+        DBObject orderBy = BasicDBObjectBuilder.start().add(MSG_ID, Integer.valueOf(-1)).get();
+        DBCursor cursor = collection.find(new BasicDBObject(), fields).sort(orderBy).limit(1);
+        try {
+            if (cursor.hasNext()) {
+                DBObject result = cursor.next();
+                BSONTimestamp timestamp = (BSONTimestamp) result.get(MSG_ID);
+                return MongoUtils.BSONTimestampToLong(timestamp);
+            }
+        } finally {
+            cursor.close();
+        }
+        return null;
+    }
 
-      BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(messageId);
-      Date curTime = new Date();
-      try {
-         DBObject add = BasicDBObjectBuilder.start().add(MSG_ID, timestamp).add(SRC_CONSUMER_IP, sourceConsumerIp)
-               .add(TICK, curTime).get();
-         collection.insert(add);
-      } catch (MongoException e) {
-         if (e.getMessage() != null && e.getMessage().indexOf("duplicate key") >= 0 || e.getCode() == 11000) {
-            //_id already exists
-            LOG.warn(e.getMessage() + ": _id is " + timestamp);
-         } else {
-            throw e;
-         }
-      }
-   }
+    @Override
+    public void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp) {
+        DBCollection collection = this.mongoClient.getAckCollection(topicName, consumerId);
+        add(messageId, sourceConsumerIp, collection);
+    }
+
+    @Override
+    public void addBackup(String topicName, String consumerId, Long messageId, String sourceConsumerIp) {
+        DBCollection collection = this.mongoClient.getBackupAckCollection(topicName, consumerId);
+        add(messageId, sourceConsumerIp, collection);
+    }
+
+    private void add(Long messageId, String sourceConsumerIp, DBCollection collection) {
+        BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(messageId);
+        Date curTime = new Date();
+        try {
+            DBObject add = BasicDBObjectBuilder.start().add(MSG_ID, timestamp).add(SRC_CONSUMER_IP, sourceConsumerIp)
+                    .add(TICK, curTime).get();
+            collection.insert(add);
+        } catch (MongoException e) {
+            if (e.getMessage() != null && e.getMessage().indexOf("duplicate key") >= 0 || e.getCode() == 11000) {
+                //_id already exists
+                LOG.warn(e.getMessage() + ": _id is " + timestamp);
+            } else {
+                throw e;
+            }
+        }
+    }
 
 }
