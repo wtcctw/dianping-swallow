@@ -28,6 +28,9 @@
         <property name="delayUpperbound">
             <value>${retrieverDelayUpperbound}</value>
         </property>
+        <property name="retrieverFromBackupIntervalSecond">
+            <value>${retrieverFromBackupIntervalSecond}</value>
+        </property>
 	</bean>
 
 	<bean id="heartbeater"

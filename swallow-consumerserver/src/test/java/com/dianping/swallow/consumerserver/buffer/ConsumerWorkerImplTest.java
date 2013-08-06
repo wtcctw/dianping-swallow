@@ -26,7 +26,6 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumerserver.worker.ConsumerId;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
@@ -42,11 +41,11 @@ public class ConsumerWorkerImplTest extends AbstractTest {
 
     private Channel               channel;
 
-    private void makeMessages(BlockingQueue<Message> messageQueue) {
+    private void makeMessages(BlockingQueue<MessageWrapper> messageQueue) {
         for (long i = 0; i < 50; i++) {
             SwallowMessage message = new SwallowMessage();
             message.setMessageId(i);
-            messageQueue.add(message);
+            messageQueue.add(new MessageWrapper(message,false));
         }
 
     }
@@ -68,7 +67,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
     @Before
     public void mockDao() {
         SwallowBuffer swallowBuffer = mock(SwallowBuffer.class);
-        CloseableBlockingQueue<Message> messageQueue = new MockedCloseableBlockingQueue<Message>();
+        CloseableBlockingQueue<MessageWrapper> messageQueue = new MockedCloseableBlockingQueue<MessageWrapper>();
 
         makeMessages(messageQueue);
         when(

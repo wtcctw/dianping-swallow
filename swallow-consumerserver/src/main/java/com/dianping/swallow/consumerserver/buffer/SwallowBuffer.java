@@ -8,27 +8,27 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
-import com.dianping.swallow.common.message.Message;
 
 public class SwallowBuffer {
    /**
     * 锁是为了防止相同topicName的TopicBuffer被并发创建，所以相同的topicName对应相同的锁。
     * 锁的个数也决定了最多能有多少创建TopicBuffer的并发操作
     */
-   private final int                                LOCK_NUM_FOR_CREATE_TOPIC_BUFFER = 10;
-   private ReentrantLock[]                          locksForCreateTopicBuffer        = new ReentrantLock[LOCK_NUM_FOR_CREATE_TOPIC_BUFFER];
+   private final int                                LOCK_NUM_FOR_CREATE_TOPIC_BUFFER  = 10;
+   private ReentrantLock[]                          locksForCreateTopicBuffer         = new ReentrantLock[LOCK_NUM_FOR_CREATE_TOPIC_BUFFER];
    {
       for (int i = 0; i < locksForCreateTopicBuffer.length; i++) {
          locksForCreateTopicBuffer[i] = new ReentrantLock();
       }
    }
 
-   private final ConcurrentMap<String, TopicBuffer> topicBuffers                     = new ConcurrentHashMap<String, TopicBuffer>();
+   private final ConcurrentMap<String, TopicBuffer> topicBuffers                      = new ConcurrentHashMap<String, TopicBuffer>();
    private MessageRetriever                         messageRetriever;
-   private int                                      capacityOfQueue                  = Integer.MAX_VALUE;
-   private int                                      thresholdOfQueue                 = 60;
-   private int                                      delayBase                        = -1;
-   private int                                      delayUpperbound                  = -1;
+   private int                                      capacityOfQueue                   = Integer.MAX_VALUE;
+   private int                                      thresholdOfQueue                  = 60;
+   private int                                      delayBase                         = -1;
+   private int                                      delayUpperbound                   = -1;
+   private int                                      retrieverFromBackupIntervalSecond = -1;
 
    /**
     * 根据topicName，获取topicName对应的TopicBuffer。<br>
@@ -63,7 +63,7 @@ public class SwallowBuffer {
     * @param cid 消费者id
     * @return 返回消费者id对应的消息队列
     */
-   public BlockingQueue<Message> getMessageQueue(String topicName, String cid) {
+   public BlockingQueue<MessageWrapper> getMessageQueue(String topicName, String cid) {
       return this.getTopicBuffer(topicName).getMessageQueue(cid);
    }
 
@@ -74,8 +74,8 @@ public class SwallowBuffer {
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public CloseableBlockingQueue<Message> createMessageQueue(String topicName, String cid, Long tailMessageId,
-                                                             MessageFilter messageFilter) {
+   public CloseableBlockingQueue<MessageWrapper> createMessageQueue(String topicName, String cid, Long tailMessageId,
+                                                                    MessageFilter messageFilter) {
       return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId, messageFilter);
    }
 
@@ -86,7 +86,7 @@ public class SwallowBuffer {
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public BlockingQueue<Message> createMessageQueue(String topicName, String cid, Long tailMessageId) {
+   public BlockingQueue<MessageWrapper> createMessageQueue(String topicName, String cid, Long tailMessageId) {
       return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId);
    }
 
@@ -112,6 +112,10 @@ public class SwallowBuffer {
       this.delayUpperbound = delayUpperbound;
    }
 
+   public void setFetchFromBackupIntervalSecond(int fetchFromBackupIntervalSecond) {
+      this.retrieverFromBackupIntervalSecond = fetchFromBackupIntervalSecond;
+   }
+
    public void setMessageRetriever(MessageRetriever messageRetriever) {
       this.messageRetriever = messageRetriever;
    }
@@ -133,7 +137,7 @@ public class SwallowBuffer {
        * @param cid 消费者id
        * @return 返回消费者id对应的消息队列
        */
-      public BlockingQueue<Message> getMessageQueue(String cid) {
+      public BlockingQueue<MessageWrapper> getMessageQueue(String cid) {
          if (cid == null) {
             throw new IllegalArgumentException("cid is null.");
          }
@@ -151,7 +155,7 @@ public class SwallowBuffer {
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public BlockingQueue<Message> createMessageQueue(String cid, Long tailMessageId) {
+      public BlockingQueue<MessageWrapper> createMessageQueue(String cid, Long tailMessageId) {
          return this.createMessageQueue(cid, tailMessageId, null);
       }
 
@@ -162,8 +166,8 @@ public class SwallowBuffer {
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public CloseableBlockingQueue<Message> createMessageQueue(String cid, Long tailMessageId,
-                                                                MessageFilter messageFilter) {
+      public CloseableBlockingQueue<MessageWrapper> createMessageQueue(String cid, Long tailMessageId,
+                                                                       MessageFilter messageFilter) {
          if (cid == null) {
             throw new IllegalArgumentException("cid is null.");
          }
@@ -183,6 +187,9 @@ public class SwallowBuffer {
          }
          if (delayUpperbound != -1) {
             messageBlockingQueue.setDelayUpperbound(delayUpperbound);
+         }
+         if (retrieverFromBackupIntervalSecond != -1) {
+            messageBlockingQueue.setRetrieverFromBackupIntervalSecond(retrieverFromBackupIntervalSecond);
          }
          messageBlockingQueue.setMessageRetriever(messageRetriever);
          messageBlockingQueue.init();

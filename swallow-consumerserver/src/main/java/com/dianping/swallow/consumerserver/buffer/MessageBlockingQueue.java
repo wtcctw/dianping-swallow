@@ -13,35 +13,37 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.hawk.jmx.HawkJMXUtil;
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
-import com.dianping.swallow.common.message.Message;
 
 //TODO 起一个线程定时从msg#<topic>#<cid>获取消息(该db存放backup消息)，放到queue里
-public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> implements CloseableBlockingQueue<Message> {
+public final class MessageBlockingQueue extends LinkedBlockingQueue<MessageWrapper> implements
+      CloseableBlockingQueue<MessageWrapper> {
 
-   private static final long                      serialVersionUID = -633276713494338593L;
-   private static final Logger                    LOG              = LoggerFactory
-                                                                         .getLogger(MessageBlockingQueue.class);
+   private static final long            serialVersionUID                  = -633276713494338593L;
+   private static final Logger          LOG                               = LoggerFactory
+                                                                                .getLogger(MessageBlockingQueue.class);
 
-   private final String                           cid;
-   private final String                           topicName;
-   private transient MessageRetrieverThread messageRetrieverThread;
+   private final String                 cid;
+   private final String                 topicName;
 
+   protected transient MessageRetriever messageRetriever;
+
+   private AtomicBoolean                isClosed                          = new AtomicBoolean(false);
+
+   private transient Thread             messageRetrieverThread;
+   protected volatile Long              tailMessageId;
+   protected MessageFilter              messageFilter;
+   private int                          delayBase                         = 10;
+   private int                          delayUpperbound                   = 50;
    /** 最小剩余数量,当queue的消息数量小于threshold时，会触发从数据库加载数据的操作 */
-   private final int                              threshold;
+   private final int                    threshold;
+   private ReentrantLock                reentrantLock                     = new ReentrantLock(true);
+   private transient Condition          condition                         = reentrantLock.newCondition();
 
-   protected transient MessageRetriever           messageRetriever;
-
-   private ReentrantLock                          reentrantLock    = new ReentrantLock(true);
-   private transient Condition                    condition        = reentrantLock.newCondition();
-
-   protected volatile Long                        tailMessageId;
-   protected MessageFilter                        messageFilter;
-
-   private AtomicBoolean                          isClosed         = new AtomicBoolean(false);
-
-   private int                                    delayBase        = 10;
-   private int                                    delayUpperbound  = 50;
+   private transient Thread             backupMessageRetrieverThread;
+   protected volatile Long              tailBackupMessageId;
+   private int                          retrieverFromBackupIntervalSecond = 10;
 
    public MessageBlockingQueue(String cid, String topicName, int threshold, int capacity, Long messageIdOfTailMessage) {
       super(capacity);
@@ -83,13 +85,17 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
       HawkJMXUtil.registerMBean(hawkMBeanName, new HawkMBean(this));
    }
 
-   public void init(){
-       messageRetrieverThread = new MessageRetrieverThread();
-       messageRetrieverThread.start();
+   public void init() {
+      messageRetrieverThread = new MessageRetrieverThread();
+      messageRetrieverThread.start();
+
+      backupMessageRetrieverThread = new BackupMessageRetrieverThread();
+      backupMessageRetrieverThread.start();
+
    }
 
    @Override
-   public Message take() throws InterruptedException {
+   public MessageWrapper take() throws InterruptedException {
       //阻塞take()方法不让使用的原因是：防止当ensureLeftMessage()失败时，没法获取消息，而调用take()的代码将一直阻塞。
       //不过，可以在后台线程中获取消息失败时不断重试，直到保证ensureLeftMessage。
       //但是极端情况下，可能出现：
@@ -99,8 +105,9 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
             "Don't call this operation, call 'poll(long timeout, TimeUnit unit)' instead.");
    }
 
+   //TODO 返回MessageWrap
    @Override
-   public Message poll() {
+   public MessageWrapper poll() {
       //如果剩余元素数量小于最低限制值threshold，就启动一个“获取DB数据的后台线程”去DB获取数据，并添加到Queue的尾部
       if (super.size() < threshold) {
          ensureLeftMessage();
@@ -109,7 +116,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
    }
 
    @Override
-   public Message poll(long timeout, TimeUnit unit) throws InterruptedException {
+   public MessageWrapper poll(long timeout, TimeUnit unit) throws InterruptedException {
       //如果剩余元素数量小于最低限制值threshold，就启动一个“获取DB数据的后台线程”去DB获取数据，并添加到Queue的尾部
       if (super.size() < threshold) {
          ensureLeftMessage();
@@ -167,23 +174,10 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
             LOG.debug("retriveMessage() start:" + this.getName());
          }
          try {
-            List messages = messageRetriever.retriveMessage(MessageBlockingQueue.this.topicName,
-                  MessageBlockingQueue.this.tailMessageId, MessageBlockingQueue.this.messageFilter);
+            List messages = messageRetriever.retriveMessage(topicName, tailMessageId, messageFilter);
             if (messages != null && messages.size() > 0) {
                tailMessageId = (Long) messages.get(0);
-               for (int i = 1; i < messages.size(); i++) {
-                  Message message = (Message) messages.get(i);
-                  try {
-                     MessageBlockingQueue.this.put(message);
-                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("add message to (topic=" + topicName + ",cid=" + cid + ") queue:"
-                              + message.toString());
-                     }
-                  } catch (InterruptedException e) {
-                     this.interrupt();
-                     break;
-                  }
-               }
+               putMessage(messages, false);
                //如果本次获取完，queue的消息条数仍然比最低阀值小，那么消费者与生产者很有可能速度差不多，此时为了
                //避免retrieve线程不断被唤醒，适当地睡眠一段时间
                if (MessageBlockingQueue.this.size() < MessageBlockingQueue.this.threshold) {
@@ -191,6 +185,49 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
                } else {
                   pullStrategy.succeess();
                }
+            }
+         } catch (RuntimeException e1) {
+            LOG.error(e1.getMessage(), e1);
+         }
+         if (LOG.isDebugEnabled()) {
+            LOG.debug("retriveMessage() done:" + this.getName());
+         }
+      }
+   }
+
+   private class BackupMessageRetrieverThread extends Thread {
+
+      public BackupMessageRetrieverThread() {
+         this.setName("swallow-BackupMessageRetriever-(topic=" + topicName + ",cid=" + cid + ")");
+         this.setDaemon(true);
+      }
+
+      @Override
+      public void run() {
+         LOG.info("thread start:" + this.getName());
+         while (!this.isInterrupted()) {
+            try {
+               retrieveMessage();
+               TimeUnit.SECONDS.sleep(retrieverFromBackupIntervalSecond);
+            } catch (RuntimeException e) {
+               this.interrupt();
+            } catch (InterruptedException e) {
+               this.interrupt();
+            }
+         }
+         LOG.info("thread done:" + this.getName());
+      }
+
+      @SuppressWarnings("rawtypes")
+      private void retrieveMessage() {
+         if (LOG.isDebugEnabled()) {
+            LOG.debug("retriveMessage() start:" + this.getName());
+         }
+         try {
+            List messages = messageRetriever.retriveBackupMessage(topicName, cid, tailBackupMessageId);
+            if (messages != null && messages.size() > 0) {
+               tailBackupMessageId = (Long) messages.get(0);
+               putMessage(messages, true);
             }
          } catch (RuntimeException e1) {
             LOG.error(e1.getMessage(), e1);
@@ -270,6 +307,26 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<Message> imp
 
    public void setDelayUpperbound(int delayUpperbound) {
       this.delayUpperbound = delayUpperbound;
+   }
+
+   public void setRetrieverFromBackupIntervalSecond(int retrieverFromBackupIntervalSecond) {
+      this.retrieverFromBackupIntervalSecond = retrieverFromBackupIntervalSecond;
+   }
+
+   @SuppressWarnings("rawtypes")
+   private void putMessage(List messages, boolean isBackupMessage) {
+      for (int i = 1; i < messages.size(); i++) {
+         MessageWrapper message = new MessageWrapper((SwallowMessage) messages.get(i), isBackupMessage);
+         try {
+            MessageBlockingQueue.this.put(message);
+            if (LOG.isDebugEnabled()) {
+               LOG.debug("add message to (topic=" + topicName + ",cid=" + cid + ") queue:" + message.toString());
+            }
+         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            break;
+         }
+      }
    }
 
 }
