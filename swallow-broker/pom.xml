@@ -11,7 +11,7 @@
     <groupId>com.dianping.swallow</groupId>
     <artifactId>swallow-broker</artifactId>
     <name>arch-swallow-broker</name>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <version>1.0.0</version>
 
     <url>http://maven.apache.org</url>
