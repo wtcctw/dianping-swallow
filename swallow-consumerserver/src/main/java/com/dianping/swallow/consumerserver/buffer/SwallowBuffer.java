@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 public class SwallowBuffer {
    /**
@@ -63,7 +64,7 @@ public class SwallowBuffer {
     * @param cid 消费者id
     * @return 返回消费者id对应的消息队列
     */
-   public BlockingQueue<MessageWrapper> getMessageQueue(String topicName, String cid) {
+   public BlockingQueue<SwallowMessage> getMessageQueue(String topicName, String cid) {
       return this.getTopicBuffer(topicName).getMessageQueue(cid);
    }
 
@@ -74,7 +75,7 @@ public class SwallowBuffer {
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public CloseableBlockingQueue<MessageWrapper> createMessageQueue(String topicName, String cid, Long tailMessageId,
+   public CloseableBlockingQueue<SwallowMessage> createMessageQueue(String topicName, String cid, Long tailMessageId,
                                                                     MessageFilter messageFilter) {
       return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId, messageFilter);
    }
@@ -86,7 +87,7 @@ public class SwallowBuffer {
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public BlockingQueue<MessageWrapper> createMessageQueue(String topicName, String cid, Long tailMessageId) {
+   public BlockingQueue<SwallowMessage> createMessageQueue(String topicName, String cid, Long tailMessageId) {
       return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId);
    }
 
@@ -137,7 +138,7 @@ public class SwallowBuffer {
        * @param cid 消费者id
        * @return 返回消费者id对应的消息队列
        */
-      public BlockingQueue<MessageWrapper> getMessageQueue(String cid) {
+      public BlockingQueue<SwallowMessage> getMessageQueue(String cid) {
          if (cid == null) {
             throw new IllegalArgumentException("cid is null.");
          }
@@ -155,7 +156,7 @@ public class SwallowBuffer {
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public BlockingQueue<MessageWrapper> createMessageQueue(String cid, Long tailMessageId) {
+      public BlockingQueue<SwallowMessage> createMessageQueue(String cid, Long tailMessageId) {
          return this.createMessageQueue(cid, tailMessageId, null);
       }
 
@@ -166,7 +167,7 @@ public class SwallowBuffer {
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public CloseableBlockingQueue<MessageWrapper> createMessageQueue(String cid, Long tailMessageId,
+      public CloseableBlockingQueue<SwallowMessage> createMessageQueue(String cid, Long tailMessageId,
                                                                        MessageFilter messageFilter) {
          if (cid == null) {
             throw new IllegalArgumentException("cid is null.");

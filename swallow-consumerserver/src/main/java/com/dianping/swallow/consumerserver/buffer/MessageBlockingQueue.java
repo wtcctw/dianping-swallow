@@ -17,8 +17,8 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
 
 //TODO 起一个线程定时从msg#<topic>#<cid>获取消息(该db存放backup消息)，放到queue里
-public final class MessageBlockingQueue extends LinkedBlockingQueue<MessageWrapper> implements
-      CloseableBlockingQueue<MessageWrapper> {
+public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessage> implements
+      CloseableBlockingQueue<SwallowMessage> {
 
    private static final long            serialVersionUID                  = -633276713494338593L;
    private static final Logger          LOG                               = LoggerFactory
@@ -95,7 +95,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<MessageWrapp
    }
 
    @Override
-   public MessageWrapper take() throws InterruptedException {
+   public SwallowMessage take() throws InterruptedException {
       //阻塞take()方法不让使用的原因是：防止当ensureLeftMessage()失败时，没法获取消息，而调用take()的代码将一直阻塞。
       //不过，可以在后台线程中获取消息失败时不断重试，直到保证ensureLeftMessage。
       //但是极端情况下，可能出现：
@@ -105,9 +105,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<MessageWrapp
             "Don't call this operation, call 'poll(long timeout, TimeUnit unit)' instead.");
    }
 
-   //TODO 返回MessageWrap
    @Override
-   public MessageWrapper poll() {
+   public SwallowMessage poll() {
       //如果剩余元素数量小于最低限制值threshold，就启动一个“获取DB数据的后台线程”去DB获取数据，并添加到Queue的尾部
       if (super.size() < threshold) {
          ensureLeftMessage();
@@ -116,7 +115,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<MessageWrapp
    }
 
    @Override
-   public MessageWrapper poll(long timeout, TimeUnit unit) throws InterruptedException {
+   public SwallowMessage poll(long timeout, TimeUnit unit) throws InterruptedException {
       //如果剩余元素数量小于最低限制值threshold，就启动一个“获取DB数据的后台线程”去DB获取数据，并添加到Queue的尾部
       if (super.size() < threshold) {
          ensureLeftMessage();
@@ -177,7 +176,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<MessageWrapp
             List messages = messageRetriever.retriveMessage(topicName, tailMessageId, messageFilter);
             if (messages != null && messages.size() > 0) {
                tailMessageId = (Long) messages.get(0);
-               putMessage(messages, false);
+               putMessage(messages);
                //如果本次获取完，queue的消息条数仍然比最低阀值小，那么消费者与生产者很有可能速度差不多，此时为了
                //避免retrieve线程不断被唤醒，适当地睡眠一段时间
                if (MessageBlockingQueue.this.size() < MessageBlockingQueue.this.threshold) {
@@ -227,7 +226,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<MessageWrapp
             List messages = messageRetriever.retriveBackupMessage(topicName, cid, tailBackupMessageId);
             if (messages != null && messages.size() > 0) {
                tailBackupMessageId = (Long) messages.get(0);
-               putMessage(messages, true);
+               putMessage(messages);
             }
          } catch (RuntimeException e1) {
             LOG.error(e1.getMessage(), e1);
@@ -314,9 +313,9 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<MessageWrapp
    }
 
    @SuppressWarnings("rawtypes")
-   private void putMessage(List messages, boolean isBackupMessage) {
+   private void putMessage(List messages) {
       for (int i = 1; i < messages.size(); i++) {
-         MessageWrapper message = new MessageWrapper((SwallowMessage) messages.get(i), isBackupMessage);
+         SwallowMessage message = (SwallowMessage) messages.get(i);
          try {
             MessageBlockingQueue.this.put(message);
             if (LOG.isDebugEnabled()) {

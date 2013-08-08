@@ -29,6 +29,8 @@ public class SwallowMessage implements Serializable, Message {
 
    private String              sourceIp;
 
+   private Long                originalMessageId;
+
    @Override
    public Date getGeneratedTime() {
       return generatedTime;
@@ -124,11 +126,20 @@ public class SwallowMessage implements Serializable, Message {
       this.sourceIp = sourceIp;
    }
 
+   public Long getOriginalMessageId() {
+      return originalMessageId;
+   }
+
+   public void setOriginalMessageId(Long originalMessageId) {
+      this.originalMessageId = originalMessageId;
+   }
+
    @Override
    public String toString() {
-      return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", properties="
-            + properties + ", internalProperties=" + internalProperties + ", version=" + version + ", sha1=" + sha1
-            + ", type=" + type + ", sourceIp=" + sourceIp + "&content=" + content + "]";
+      return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", originalMessageId="
+            + originalMessageId + ", properties=" + properties + ", internalProperties=" + internalProperties
+            + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + "&content="
+            + content + "]";
    }
 
    public String toKeyValuePairs() {
@@ -136,9 +147,9 @@ public class SwallowMessage implements Serializable, Message {
    }
 
    public String toSuccessKeyValuePairs() {
-      return "generatedTime=" + generatedTime + "&messageId=" + messageId + "&properties=" + properties
-            + "&internalProperties=" + internalProperties + "&version=" + version + "&sha1=" + sha1 + "&type=" + type
-            + "&sourceIp=" + sourceIp;
+      return "generatedTime=" + generatedTime + "&messageId=" + messageId + ", originalMessageId=" + originalMessageId
+            + "&properties=" + properties + "&internalProperties=" + internalProperties + "&version=" + version
+            + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp;
    }
 
    @Override
@@ -185,6 +196,13 @@ public class SwallowMessage implements Serializable, Message {
          return false;
       }
       SwallowMessage other = (SwallowMessage) obj;
+      if (originalMessageId == null) {
+         if (other.originalMessageId != null) {
+            return false;
+         }
+      } else if (originalMessageId.compareTo(other.originalMessageId) != 0) {
+         return false;
+      }
       if (content == null) {
          if (other.content != null) {
             return false;

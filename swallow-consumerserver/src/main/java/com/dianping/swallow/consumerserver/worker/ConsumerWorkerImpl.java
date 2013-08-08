@@ -33,7 +33,6 @@ import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
-import com.dianping.swallow.consumerserver.buffer.MessageWrapper;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 
@@ -56,7 +55,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private SwallowBuffer                              swallowBuffer;
    private MessageDAO                                 messageDao;
 
-   private CloseableBlockingQueue<MessageWrapper>     messageQueue;
+   private CloseableBlockingQueue<SwallowMessage>     messageQueue;
    private ConfigManager                              configManager;
    private ExecutorService                            ackExecutor;
    private PullStrategy                               pullStgy;
@@ -69,9 +68,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    // 对于长期在waitAckMessages中的消息，认为没有ack，故将其放到backupQueue里，后续重新消费。
    // 重启server时，等待一段时间，对于残留在waitAckMessages里的，也将其放到backupQueue里，后续重新消费。
    /** 发送后等待ack的消息。以channel为key，每个channel可以发N条消息(N为其threadSize) */
-   private Map<Channel, Map<MessageWrapper, Boolean>> waitAckMessages   = new ConcurrentHashMap<Channel, Map<MessageWrapper, Boolean>>();
+   private Map<Channel, Map<SwallowMessage, Boolean>> waitAckMessages   = new ConcurrentHashMap<Channel, Map<SwallowMessage, Boolean>>();
    /** 待发送的消息 */
-   private Queue<MessageWrapper>                      messagesToBeSend  = new ConcurrentLinkedQueue<MessageWrapper>();
+   private Queue<SwallowMessage>                      messagesToBeSend  = new ConcurrentLinkedQueue<SwallowMessage>();
    /** 可用来发送消息的channel */
    private BlockingQueue<Channel>                     freeChannels      = new LinkedBlockingQueue<Channel>();
    //TODO 是否能定时跳过channel check连接是否存活（只能设置系统的keepaliveInterval？）
@@ -87,9 +86,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       this.swallowBuffer = workerManager.getSwallowBuffer();
       this.threadFactory = workerManager.getThreadFactory();
       this.messageFilter = messageFilter;
-      topicName = consumerInfo.getConsumerId().getDest().getName();
-      consumerid = consumerInfo.getConsumerId().getConsumerId();
-      pullStgy = new DefaultPullStrategy(configManager.getPullFailDelayBase(),
+      this.topicName = consumerInfo.getConsumerId().getDest().getName();
+      this.consumerid = consumerInfo.getConsumerId().getConsumerId();
+      this.pullStgy = new DefaultPullStrategy(configManager.getPullFailDelayBase(),
             configManager.getPullFailDelayUpperBound());
 
       // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
@@ -99,8 +98,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                + "] used ConsumerType.DURABLE_AT_MOST_ONCE. Now change it to ConsumerType.DURABLE_AT_LEAST_ONCE.");
       }
 
-      ackExecutor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.DAYS, new LinkedBlockingQueue<Runnable>(),
-            new MQThreadFactory("swallow-ack-"));
+      this.ackExecutor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.DAYS,
+            new LinkedBlockingQueue<Runnable>(), new MQThreadFactory("swallow-ack-"));
 
       start();
 
@@ -116,7 +115,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          @Override
          public void run() {
             try {
-               updateWaitAckMessages(channel, ackedMsgId);
+               removeWaitAckMessages(channel, ackedMsgId);
                updateMaxMessageId(ackedMsgId, channel);
                if (ACKHandlerType.CLOSE_CHANNEL.equals(type)) {
                   LOG.info("receive ack(type=" + type + ") from " + channel.getRemoteAddress());
@@ -133,44 +132,60 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    }
 
-   //只有AT_LEAST_ONCE模式的consumer需要更新等待ack的message列表，AT_MOST_ONCE没有等待ack的message列表
-   private void updateWaitAckMessages(Channel channel, Long ackedMsgId) {
+   /**
+    * 从WaitAckMessages中移除某个返回ack的消息
+    */
+   private void removeWaitAckMessages(Channel channel, Long ackedMsgId) {
       if (ConsumerType.DURABLE_AT_LEAST_ONCE.equals(consumerInfo.getConsumerType())) {
-         Map<MessageWrapper, Boolean> messages = waitAckMessages.get(channel);
+         Map<SwallowMessage, Boolean> messages = waitAckMessages.get(channel);
          if (messages != null) {
-            SwallowMessage swallowMsg = new SwallowMessage();
-            swallowMsg.setMessageId(ackedMsgId);
-            MessageWrapper mockMessage = new MessageWrapper(swallowMsg, false);
+            SwallowMessage mockMessage = new SwallowMessage();
+            mockMessage.setMessageId(ackedMsgId);
             messages.remove(mockMessage);
          }
-
       }
-
    }
 
    private void updateMaxMessageId(Long ackedMsgId, Channel channel) {
       if (ackedMsgId != null && ConsumerType.DURABLE_AT_LEAST_ONCE.equals(consumerInfo.getConsumerType())) {
-         //         ackDao.add(topicName, consumerid, ackedMsgId, connectedChannels.get(channel));
          LOG.info("Receive ACK(" + topicName + "," + consumerid + "," + ackedMsgId + ") from "
                + connectedChannels.get(channel));
          maxAckedMessageId = Math.max(maxAckedMessageId, ackedMsgId);
       }
    }
 
+   /**
+    * TODO 持久化ack的逻辑（该方法会被定时调用）
+    */
+   public void recordAck() {
+      //如果waitAckMessages
+
+      //定时记录waitAckMessages最小的那个的时间-1
+
+      //定时记录waitAckMessages
+
+      //对于waitAckBackupMessages也是一样这样处理，超时的空洞的ack消息放回backup里面
+
+      //      ackDao.add(consumerid, consumerId.getConsumerId(), currentMaxAckedMsgId, "batch");
+      //      ackDao.add(topicName, consumerId, maxMessageId, connectedChannels.get(channel));
+      //      consumerId2MaxSavedAckedMessageId.put(consumerId, currentMaxAckedMsgId);
+   }
+
    @Override
    public synchronized void handleChannelDisconnect(Channel channel) {
       connectedChannels.remove(channel);
       if (ConsumerType.DURABLE_AT_LEAST_ONCE.equals(consumerInfo.getConsumerType())) {
-         Map<MessageWrapper, Boolean> messageMap = waitAckMessages.get(channel);
+         Map<SwallowMessage, Boolean> messageMap = waitAckMessages.get(channel);
          if (messageMap != null) {
             try {
                Thread.sleep(100);
             } catch (InterruptedException e) {
                //netty自身的线程，不会有谁Interrupt。
             }
-            //某个consumer断开了，那么它那些未应答的消息，就被重新放入待发送的队列里(这个时候消息顺序可能会乱序，因为序号小的被放到队列尾部了)
-            for (Map.Entry<MessageWrapper, Boolean> messageEntry : messageMap.entrySet()) {
+            //某个consumer断开了，那么它对应的在waitAckMassage中的那些未返回ack的消息，就重新放回messageToSend里
+            for (Map.Entry<SwallowMessage, Boolean> messageEntry : messageMap.entrySet()) {
                messagesToBeSend.add(messageEntry.getKey());
+               // messageDao.saveBackupMessage(topicName, consumerid, messageEntry.getKey().getMessage());
             }
             waitAckMessages.remove(channel);
          }
@@ -210,7 +225,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
             }
             LOG.info("message fetcher thread closed");
          }
-      }, consumerInfo.toString() + "-messageFetcher-").start();
+      }, this.topicName + "#" + this.consumerid + "-messageFetcher-").start();
 
    }
 
@@ -272,12 +287,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       return maxMessageId;
    }
 
-   @SuppressWarnings("deprecation")
    private void sendMessages(Channel channel) throws InterruptedException {
-      MessageWrapper messageWrapper = messagesToBeSend.poll();
-      PktMessage preparedMessage = new PktMessage(consumerInfo.getConsumerId().getDest(), messageWrapper.getMessage());
-
-      Long messageId = preparedMessage.getContent().getMessageId();
+      SwallowMessage message = messagesToBeSend.poll();
+      PktMessage preparedMessage = new PktMessage(consumerInfo.getConsumerId().getDest(), message);
 
       //Cat begin
       Transaction consumerServerTransaction = Cat.getProducer().newTransaction("Out:" + topicName,
@@ -294,31 +306,33 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       //Cat end
 
       try {
-         channel.write(preparedMessage);
-         //如果是AT_MOST模式，收到ACK之前更新messageId的类型
-         if (ConsumerType.DURABLE_AT_MOST_ONCE.equals(consumerInfo.getConsumerType())) {
-            ackDao.add(topicName, consumerid, messageId, connectedChannels.get(channel));
-         }
-         //如果是AT_LEAST模式，发送完后，在server端记录已发送但未收到ACK的消息记录
+         //TODO 区分backup的waitAckMessages，和正常消息的waitAckMessages
+         //发送前，先记录已发送但未收到ACK的消息记录（在发送前就记录到waitAckMessages，这样发送成功或发送失败，都存在于waitAckMessages中）
          if (ConsumerType.DURABLE_AT_LEAST_ONCE.equals(consumerInfo.getConsumerType())) {
-            Map<MessageWrapper, Boolean> messageMap = waitAckMessages.get(channel);
-            if (channel.isConnected()) {
-               if (messageMap == null) {
-                  messageMap = new ConcurrentHashMap<MessageWrapper, Boolean>();
-                  waitAckMessages.put(channel, messageMap);
-               }
-               messageMap.put(messageWrapper, Boolean.TRUE);
-            } else {
-               messagesToBeSend.add(messageWrapper);
+            Map<SwallowMessage, Boolean> messageMap = waitAckMessages.get(channel);
+
+            if (messageMap == null) {
+               messageMap = new ConcurrentHashMap<SwallowMessage, Boolean>();
+               waitAckMessages.put(channel, messageMap);
             }
+
+            messageMap.put(message, Boolean.TRUE);
          }
+
+         //发送消息
+         channel.write(preparedMessage);
+
          //Cat begin
          consumerServerTransaction.addData("mid", preparedMessage.getContent().getMessageId());
          consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
          //Cat end
       } catch (RuntimeException e) {
          LOG.error(consumerInfo.toString() + "：channel write error.", e);
-         messagesToBeSend.add(messageWrapper);
+
+         //放到队尾
+         messagesToBeSend.add(message);
+         //发送失败，则放到backup队列里
+         //messageDao.saveBackupMessage(topicName, consumerid, messageWrapper.getMessage());
 
          //Cat begin
          consumerServerTransaction.addData(preparedMessage.getContent().toKeyValuePairs());
@@ -337,11 +351,11 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          messageQueue = swallowBuffer.createMessageQueue(topicName, consumerid, messageIdOfTailMessage, messageFilter);
       }
 
-      MessageWrapper message = null;
+      SwallowMessage message = null;
 
       while (getMessageisAlive) {
          //从blockQueue中获取消息
-         message = (MessageWrapper) messageQueue.poll(pullStgy.fail(false), TimeUnit.MILLISECONDS);
+         message = (SwallowMessage) messageQueue.poll(pullStgy.fail(false), TimeUnit.MILLISECONDS);
          if (message != null) {
             pullStgy.succeess();
             break;
@@ -429,7 +443,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          return null;
       }
 
-      public String getCachedMessages() {
+      public String getMessagesToSend() {
          if (consumerWorkerImpl.get() != null) {
             if (consumerWorkerImpl.get().messagesToBeSend != null) {
                return consumerWorkerImpl.get().messagesToBeSend.toString();
@@ -442,7 +456,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          if (consumerWorkerImpl.get() != null) {
             StringBuilder sb = new StringBuilder();
             if (consumerWorkerImpl.get().waitAckMessages != null) {
-               for (Entry<Channel, Map<MessageWrapper, Boolean>> waitAckMessage : consumerWorkerImpl.get().waitAckMessages
+               for (Entry<Channel, Map<SwallowMessage, Boolean>> waitAckMessage : consumerWorkerImpl.get().waitAckMessages
                      .entrySet()) {
                   if (waitAckMessage.getValue().size() != 0) {
                      sb.append(waitAckMessage.getKey().getRemoteAddress()).append(waitAckMessage.getValue().toString());
