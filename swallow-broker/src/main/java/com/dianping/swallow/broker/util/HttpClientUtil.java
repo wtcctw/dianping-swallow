@@ -73,10 +73,8 @@ public class HttpClientUtil {
         } finally {
             EntityUtils.consume(entity);
             httpPost.releaseConnection();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("****** http client invoke (Post method), url: " + url + ", nameValuePair: " + nvps + ", result: "
+            LOG.info("****** http client invoke (Post method), url: " + url + ", nameValuePair: " + nvps + ", result: "
                         + result + ", time: " + String.valueOf(System.currentTimeMillis() - start) + "ms.");
-            }
         }
     }
 
@@ -101,10 +99,8 @@ public class HttpClientUtil {
         } finally {
             EntityUtils.consume(entity);
             httpPost.releaseConnection();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("****** http client invoke (Post method), url: " + url + ", result: " + result + ", time: "
+            LOG.info("****** http client invoke (Post method), url: " + url + ", result: " + result + ", time: "
                         + String.valueOf(System.currentTimeMillis() - start) + "ms.");
-            }
         }
     }
 
@@ -129,10 +125,8 @@ public class HttpClientUtil {
         } finally {
             EntityUtils.consume(entity);
             httpGet.releaseConnection();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("****** http client invoke (Get method), url: " + url + ", nameValuePair: " + nvps + ", result: "
+            LOG.info("****** http client invoke (Get method), url: " + url + ", nameValuePair: " + nvps + ", result: "
                         + result + ", time: " + String.valueOf(System.currentTimeMillis() - start) + "ms.");
-            }
         }
     }
 }

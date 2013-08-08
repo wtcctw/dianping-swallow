@@ -156,7 +156,7 @@ public class ConsumerBroker implements MessageListener {
         String result = HttpClientUtil.post(url, nvps);
         Gson gson = new Gson();
         Map resultMap = gson.fromJson(result, Map.class);
-        if (resultMap == null || StringUtils.equalsIgnoreCase(String.valueOf(resultMap.get("success")), "true")) {
+        if (resultMap == null || StringUtils.equalsIgnoreCase(String.valueOf(resultMap.get("result")), "success")) {
             //http响应成功了，但结果不对，则记录
             throw new RuntimeException(logPrefix + "Error(result is null or success not true), result is " + result);
         }
