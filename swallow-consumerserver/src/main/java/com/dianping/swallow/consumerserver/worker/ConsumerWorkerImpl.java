@@ -1,16 +1,16 @@
 package com.dianping.swallow.consumerserver.worker;
 
-import java.lang.ref.WeakReference;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -42,43 +42,61 @@ import com.dianping.swallow.consumerserver.config.ConfigManager;
  * @author kezhu.wu
  */
 public final class ConsumerWorkerImpl implements ConsumerWorker {
-   private static final Logger                        LOG               = LoggerFactory
-                                                                              .getLogger(ConsumerWorkerImpl.class);
+   private static final Logger                          LOG                              = LoggerFactory
+                                                                                               .getLogger(ConsumerWorkerImpl.class);
 
-   private ConsumerInfo                               consumerInfo;
-   private MQThreadFactory                            threadFactory;
-   private String                                     consumerid;
-   private String                                     topicName;
-   private MessageFilter                              messageFilter;
+   private ConsumerInfo                                 consumerInfo;
+   private MQThreadFactory                              threadFactory;
+   private String                                       consumerId;
+   private String                                       topicName;
+   private MessageFilter                                messageFilter;
 
-   private AckDAO                                     ackDao;
-   private SwallowBuffer                              swallowBuffer;
-   private MessageDAO                                 messageDao;
+   private SwallowBuffer                                swallowBuffer;
+   private MessageDAO                                   messageDao;
+   private MessageDAO                                   backupMessageDao;
+   private AckDAO                                       ackDao;
+   private AckDAO                                       backupAckDao;
 
-   private CloseableBlockingQueue<SwallowMessage>     messageQueue;
-   private ConfigManager                              configManager;
-   private ExecutorService                            ackExecutor;
-   private PullStrategy                               pullStgy;
+   private CloseableBlockingQueue<SwallowMessage>       messageQueue;
+   private ConfigManager                                configManager;
+   private ExecutorService                              ackExecutor;
+   private PullStrategy                                 pullStgy;
 
-   private volatile boolean                           getMessageisAlive = true;
-   private volatile boolean                           started           = false;
-   private volatile long                              maxAckedMessageId = 0L;
+   private volatile boolean                             getMessageisAlive                = true;
+   private volatile boolean                             started                          = false;
 
+   /** 可用来发送消息的channel */
+   private BlockingQueue<Channel>                       freeChannels                     = new LinkedBlockingQueue<Channel>();
+   /** 存放已连接的channel，key是channel，value是ip */
+   private ConcurrentHashMap<Channel, String>           connectedChannels                = new ConcurrentHashMap<Channel, String>();
+
+   /** 记录当前最大的已经返回ack的消息id */
+   private volatile Long                                maxAckedMessageId                = 0L;
+   private volatile Long                                maxAckedBackupMessageId          = 0L;
+   /** 记录当前最大的已经返回ack的消息seq */
+   private volatile Long                                maxAckedMessageSeq               = 0L;
+   private volatile Long                                maxAckedBackupMessageSeq         = 0L;
+   /** 记录当前最大的已经持久化的ack的消息id */
+   private volatile Long                                lastRecordedAckedMessageId       = 0L;
+   private volatile Long                                lastRecordedAckedBackupMessageId = 0L;
    //TODO 如果channel断开，未通知我们，这里会一直留着。且close时，这块也不会被处理(即未ack的消息，也不管了。如果max id比较大，那么这部分消息会被认为是成功的。)
    // 对于长期在waitAckMessages中的消息，认为没有ack，故将其放到backupQueue里，后续重新消费。
    // 重启server时，等待一段时间，对于残留在waitAckMessages里的，也将其放到backupQueue里，后续重新消费。
-   /** 发送后等待ack的消息。以channel为key，每个channel可以发N条消息(N为其threadSize) */
-   private Map<Channel, Map<SwallowMessage, Boolean>> waitAckMessages   = new ConcurrentHashMap<Channel, Map<SwallowMessage, Boolean>>();
-   /** 待发送的消息 */
-   private Queue<SwallowMessage>                      messagesToBeSend  = new ConcurrentLinkedQueue<SwallowMessage>();
-   /** 可用来发送消息的channel */
-   private BlockingQueue<Channel>                     freeChannels      = new LinkedBlockingQueue<Channel>();
-   //TODO 是否能定时跳过channel check连接是否存活（只能设置系统的keepaliveInterval？）
-   /** 存放已连接的channel，key是channel，value是ip */
-   private Map<Channel, String>                       connectedChannels = new ConcurrentHashMap<Channel, String>();
+   /**
+    * 发送后等待ack的消息。以channel为key，每个channel可以发N条消息(N为其threadSize)，该变量会被多线程访问，
+    * 故需要保证线程安全。
+    */
+   private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages                  = new ConcurrentSkipListMap<Long, ConsumerMessage>();
+   private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckBackupMessages            = new ConcurrentSkipListMap<Long, ConsumerMessage>();
+
+   /** maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的阈值 */
+   private long                                         seqThreshold;
+   /** 允许"最小的空洞waitAckMessage"存活的时间的阈值 */
+   private long                                         waitAckTimeThreshold;
 
    @SuppressWarnings("deprecation")
-   public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter) {
+   public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager,
+                             MessageFilter messageFilter, long seqThreshold, long waitAckTimeThreshold) {
       this.consumerInfo = consumerInfo;
       this.configManager = workerManager.getConfigManager();
       this.ackDao = workerManager.getAckDAO();
@@ -87,26 +105,30 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       this.threadFactory = workerManager.getThreadFactory();
       this.messageFilter = messageFilter;
       this.topicName = consumerInfo.getConsumerId().getDest().getName();
-      this.consumerid = consumerInfo.getConsumerId().getConsumerId();
+      this.consumerId = consumerInfo.getConsumerId().getConsumerId();
       this.pullStgy = new DefaultPullStrategy(configManager.getPullFailDelayBase(),
             configManager.getPullFailDelayUpperBound());
+      this.seqThreshold = seqThreshold;
+      this.waitAckTimeThreshold = waitAckTimeThreshold;
 
       // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
          this.consumerInfo = new ConsumerInfo(consumerInfo.getConsumerId(), ConsumerType.DURABLE_AT_LEAST_ONCE);
-         LOG.info("ConsumerClient[topicName=" + topicName + ", consumerid=" + consumerid
+         LOG.info("ConsumerClient[topicName=" + topicName + ", consumerid=" + consumerId
                + "] used ConsumerType.DURABLE_AT_MOST_ONCE. Now change it to ConsumerType.DURABLE_AT_LEAST_ONCE.");
       }
 
       this.ackExecutor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.DAYS,
             new LinkedBlockingQueue<Runnable>(), new MQThreadFactory("swallow-ack-"));
 
+      //创建消息缓冲QUEUE
+      long messageIdOfTailMessage = getMessageIdOfTailMessage(topicName, consumerId);
+      long messageIdOfTailBackupMessage = getBackupMessageIdOfTailMessage(topicName, consumerId);
+      messageQueue = swallowBuffer.createMessageQueue(topicName, consumerId, messageIdOfTailMessage,
+            messageIdOfTailBackupMessage, this.messageFilter);
+
       start();
 
-      //Hawk监控
-      String hawkMBeanName = topicName + '-' + consumerid + "-ConsumerWorkerImpl";
-      HawkJMXUtil.unregisterMBean(hawkMBeanName);
-      HawkJMXUtil.registerMBean(hawkMBeanName, new HawkMBean(this));
    }
 
    @Override
@@ -115,12 +137,16 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          @Override
          public void run() {
             try {
-               removeWaitAckMessages(channel, ackedMsgId);
-               updateMaxMessageId(ackedMsgId, channel);
+
+               LOG.info("Receive ACK(" + topicName + "," + consumerId + "," + ackedMsgId + ") from "
+                     + connectedChannels.get(channel));
+
+               removeWaitAckMessages(ackedMsgId);
+
                if (ACKHandlerType.CLOSE_CHANNEL.equals(type)) {
                   LOG.info("receive ack(type=" + type + ") from " + channel.getRemoteAddress());
                   channel.close();
-                  //                  handleChannelDisconnect(channel); //channel.close()会触发netty调用handleChannelDisconnect(channel);
+                  // handleChannelDisconnect(channel); //channel.close()会触发netty调用handleChannelDisconnect(channel);
                } else if (ACKHandlerType.SEND_MESSAGE.equals(type)) {
                   freeChannels.add(channel);
                }
@@ -133,70 +159,122 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    /**
-    * 从WaitAckMessages中移除某个返回ack的消息
+    * 收到ack，则从WaitAckMessages中移除相应的消息，同时更新最大的ack message id <br>
+    * 按照实现逻辑，该方法只会被单线程调用
     */
-   private void removeWaitAckMessages(Channel channel, Long ackedMsgId) {
-      if (ConsumerType.DURABLE_AT_LEAST_ONCE.equals(consumerInfo.getConsumerType())) {
-         Map<SwallowMessage, Boolean> messages = waitAckMessages.get(channel);
-         if (messages != null) {
-            SwallowMessage mockMessage = new SwallowMessage();
-            mockMessage.setMessageId(ackedMsgId);
-            messages.remove(mockMessage);
+   private void removeWaitAckMessages(Long ackedMsgId) {
+      ConsumerMessage waitAckMessage = waitAckMessages.remove(ackedMsgId);
+      //更新最大ack message id，更新最大seq
+      if (waitAckMessage != null) {//ack属于正常消息的
+         maxAckedMessageSeq = Math.max(maxAckedMessageSeq, waitAckMessage.seq);
+         maxAckedMessageId = Math.max(maxAckedMessageId, ackedMsgId);
+      } else {
+         waitAckMessage = waitAckBackupMessages.remove(ackedMsgId);
+         if (waitAckMessage != null) {//ack属于备份消息的
+            maxAckedBackupMessageSeq = Math.max(maxAckedBackupMessageSeq, waitAckMessage.seq);
+            maxAckedBackupMessageId = Math.max(maxAckedBackupMessageId, ackedMsgId);
          }
       }
    }
 
-   private void updateMaxMessageId(Long ackedMsgId, Channel channel) {
-      if (ackedMsgId != null && ConsumerType.DURABLE_AT_LEAST_ONCE.equals(consumerInfo.getConsumerType())) {
-         LOG.info("Receive ACK(" + topicName + "," + consumerid + "," + ackedMsgId + ") from "
-               + connectedChannels.get(channel));
-         maxAckedMessageId = Math.max(maxAckedMessageId, ackedMsgId);
-      }
-   }
-
    /**
-    * TODO 持久化ack的逻辑（该方法会被定时调用）
+    * 持久化ack的逻辑（该方法会被定时调用） 2个，waitAckMessages和waitAckBackupMessages，处理方式一样
     */
    public void recordAck() {
-      //如果waitAckMessages
+      recordAck0(waitAckMessages, maxAckedMessageId, maxAckedMessageSeq, lastRecordedAckedMessageId, ackDao);
+      recordAck0(waitAckBackupMessages, maxAckedBackupMessageId, maxAckedBackupMessageSeq,
+            lastRecordedAckedBackupMessageId, backupAckDao);
+   }
 
-      //定时记录waitAckMessages最小的那个的时间-1
+   private void recordAck0(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages0, Long maxAckedMessageId0,
+                           long maxAckedMessageSeq0, Long lastRecordedAckedMessageId0, AckDAO ackDao0) {
+      //做超过阈值的判断，如果超过阈值，则移除并备份
+      Entry<Long, ConsumerMessage> entry = waitAckMessages0.firstEntry();
+      if (entry != null) {
+         ConsumerMessage consumerMessage = entry.getValue();
+         Long mid = consumerMessage.message.getMessageId();
+         boolean overdue = false;//是否超过阈值
+         if (mid < maxAckedMessageId0) {//大于最大ack id（maxAckedMessageId）的消息，不算是空洞
+            //如果最小等待ack的消息，与最大已记录ack的消息，相差超过seqThreshold，则移除该消息到备份队列里。
+            if (maxAckedMessageSeq0 - consumerMessage.seq > seqThreshold) {
+               overdue = true;
+            }
+            //如果最小等待ack的消息，与当前时间，相差超过waitAckTimeThreshold，则移除该消息到备份队列里。
+            if (!overdue && System.currentTimeMillis() - consumerMessage.gmt > waitAckTimeThreshold) {
+               overdue = true;
+            }
+         }
+         if (overdue) {
+            waitAckMessages0.remove(mid);
+            if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+               backupMessageDao.saveBackupMessage(topicName, consumerId, consumerMessage.message);
+            }
+         }
+      }
 
-      //定时记录waitAckMessages
+      //找到此时waitAckMessages0中最小的ack message id，减1后，即为应该持久化的消息id。如果waitAckMessages0为空，那就是maxAckedMessageId
+      Long ackMessageId = maxAckedMessageId0;
+      entry = waitAckMessages0.firstEntry();
+      if (entry != null) {
+         ackMessageId = entry.getValue().message.getMessageId() - 1;
+      }
 
-      //对于waitAckBackupMessages也是一样这样处理，超时的空洞的ack消息放回backup里面
-
-      //      ackDao.add(consumerid, consumerId.getConsumerId(), currentMaxAckedMsgId, "batch");
-      //      ackDao.add(topicName, consumerId, maxMessageId, connectedChannels.get(channel));
-      //      consumerId2MaxSavedAckedMessageId.put(consumerId, currentMaxAckedMsgId);
+      //如果新的可记录ack的消息id，大于上次记录的最大ack，则可以记录ack
+      if (ackMessageId > lastRecordedAckedMessageId0) {
+         if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+            ackDao0.add(topicName, consumerId, ackMessageId, "batch");
+         }
+         lastRecordedAckedMessageId0 = ackMessageId;
+      }
    }
 
    @Override
    public synchronized void handleChannelDisconnect(Channel channel) {
       connectedChannels.remove(channel);
-      if (ConsumerType.DURABLE_AT_LEAST_ONCE.equals(consumerInfo.getConsumerType())) {
-         Map<SwallowMessage, Boolean> messageMap = waitAckMessages.get(channel);
-         if (messageMap != null) {
-            try {
-               Thread.sleep(100);
-            } catch (InterruptedException e) {
-               //netty自身的线程，不会有谁Interrupt。
-            }
-            //某个consumer断开了，那么它对应的在waitAckMassage中的那些未返回ack的消息，就重新放回messageToSend里
-            for (Map.Entry<SwallowMessage, Boolean> messageEntry : messageMap.entrySet()) {
-               messagesToBeSend.add(messageEntry.getKey());
-               // messageDao.saveBackupMessage(topicName, consumerid, messageEntry.getKey().getMessage());
-            }
-            waitAckMessages.remove(channel);
-         }
+
+      //等待一下，如果对方已经返回ack回来，让其处理完
+      try {
+         Thread.sleep(100);
+      } catch (InterruptedException e) {
+         //netty自身的线程，不会有谁Interrupt。
       }
+
+      removeByChannel(channel, waitAckMessages);
+      removeByChannel(channel, waitAckBackupMessages);
+
+      //      Map<ConsumerMessage, Boolean> messageMap = waitAckMessages.get(channel);
+      //      if (messageMap != null) {
+      //         try {
+      //            Thread.sleep(100);
+      //         } catch (InterruptedException e) {
+      //            //netty自身的线程，不会有谁Interrupt。
+      //         }
+      //         //某个consumer断开了，那么它对应的在waitAckMassage中的那些未返回ack的消息，就重新放回messageToSend里
+      //         for (Map.Entry<ConsumerMessage, Boolean> messageEntry : messageMap.entrySet()) {
+      //            messageDao.saveBackupMessage(topicName, consumerid, messageEntry.getKey().message);
+      //         }
+      //         waitAckMessages.remove(channel);
+      //      }
 
    }
 
+   private void removeByChannel(Channel channel, Map<Long, ConsumerMessage> waitAckMessages0) {
+      Iterator<Entry<Long, ConsumerMessage>> it = waitAckMessages0.entrySet().iterator();
+      while (it.hasNext()) {
+         Entry<Long, ConsumerMessage> entry = (Entry<Long, ConsumerMessage>) it.next();
+         ConsumerMessage consumerMessage = entry.getValue();
+         if (consumerMessage.channel.equals(channel)) {
+            if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+               backupMessageDao.saveBackupMessage(topicName, consumerId, consumerMessage.message);
+               //TODO 非持久的如何考虑？没有backup？  如果代码简洁
+            }
+            it.remove();
+         }
+      }
+   }
+
    private void start() {
-
       threadFactory.newThread(new Runnable() {
-
          @Override
          public void run() {
             while (getMessageisAlive) {
@@ -206,27 +284,101 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                   if (channel.isConnected()) {
 
                      // 确保有消息可发
-                     if (messagesToBeSend.isEmpty()) {
-                        ensureMessagesToBoSend(channel);
-                     }
+                     ConsumerMessage consumerMessage = pollMessage(channel);
 
                      // 拿出消息并发送
-                     if (!messagesToBeSend.isEmpty()) {
-                        sendMessages(channel);
+                     if (consumerMessage != null) {
+                        sendMessage(channel, consumerMessage);
                      } else {// 没有消息，channel继续放回去
                         freeChannels.add(channel);
                      }
 
                   }
-
                } catch (InterruptedException e) {
                   LOG.info("get message from messageQueue thread InterruptedException", e);
                }
             }
             LOG.info("message fetcher thread closed");
          }
-      }, this.topicName + "#" + this.consumerid + "-messageFetcher-").start();
+      }, this.topicName + "#" + this.consumerId + "-messageFetcher-").start();
 
+   }
+
+   private ConsumerMessage pollMessage(Channel channel) throws InterruptedException {
+      ConsumerMessage consumerMessage = null;
+
+      while (getMessageisAlive) {
+         //从blockQueue中获取消息
+         SwallowMessage message = (SwallowMessage) messageQueue.poll(pullStgy.fail(false), TimeUnit.MILLISECONDS);
+         if (message != null) {
+            if (message.getOriginalMessageId() == null) {
+               maxAckedMessageSeq++;
+            } else {
+               maxAckedBackupMessageSeq++;
+            }
+            consumerMessage = new ConsumerMessage(message, channel);
+            pullStgy.succeess();
+            break;
+         }
+      }
+
+      //如果因为getMessageisAlive为false而退出（如收到close命令）,则消息可能依然是null
+      return consumerMessage;
+   }
+
+   private void sendMessage(Channel channel, ConsumerMessage consumerMessage) throws InterruptedException {
+      PktMessage pktMessage = new PktMessage(consumerInfo.getConsumerId().getDest(), consumerMessage.message);
+
+      //Cat begin
+      Transaction consumerServerTransaction = Cat.getProducer().newTransaction("Out:" + topicName,
+            consumerId + ":" + IPUtil.getIpFromChannel(channel));
+      String childEventId;
+      try {
+         childEventId = Cat.getProducer().createMessageId();
+         pktMessage.setCatEventID(childEventId);
+         Cat.getProducer().logEvent(CatConstants.TYPE_REMOTE_CALL, "ConsumedByWhom",
+               com.dianping.cat.message.Message.SUCCESS, childEventId);
+      } catch (Exception e) {
+         childEventId = "UnknownMessageId";
+      }
+      //Cat end
+
+      try {
+         //发送消息
+         channel.write(pktMessage);
+
+         //TODO 区分backup的waitAckMessages，和正常消息的waitAckMessages
+         //发送后，记录已发送但未收到ACK的消息记录
+         if (consumerMessage.message.getOriginalMessageId() == null) {
+            waitAckMessages.put(consumerMessage.message.getMessageId(), consumerMessage);
+         } else {
+            waitAckBackupMessages.put(consumerMessage.message.getMessageId(), consumerMessage);
+         }
+         //         Map<ConsumerMessage, Boolean> messageMap = waitAckMessages.get(channel);
+         //         if (messageMap == null) {
+         //            messageMap = new ConcurrentHashMap<ConsumerMessage, Boolean>();
+         //            waitAckMessages.put(channel, messageMap);
+         //         }
+         //         messageMap.put(consumerMessage, Boolean.TRUE);
+
+         //Cat begin
+         consumerServerTransaction.addData("mid", pktMessage.getContent().getMessageId());
+         consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
+         //Cat end
+      } catch (RuntimeException e) {
+         LOG.error(consumerInfo.toString() + "：channel write error.", e);
+
+         //发送失败，则放到backup队列里
+         backupMessageDao.saveBackupMessage(topicName, consumerId, consumerMessage.message);
+
+         //Cat begin
+         consumerServerTransaction.addData(pktMessage.getContent().toKeyValuePairs());
+         consumerServerTransaction.setStatus(e);
+         Cat.getProducer().logError(e);
+      } finally {
+         consumerServerTransaction.complete();
+      }
+      //Cat end
    }
 
    @Override
@@ -235,7 +387,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          @Override
          public void run() {
 
-            connectedChannels.put(channel, IPUtil.getIpFromChannel(channel));
+            connectedChannels.putIfAbsent(channel, IPUtil.getIpFromChannel(channel));
             started = true;
             for (int i = 0; i < clientThreadCount; i++) {
                freeChannels.add(channel);
@@ -258,12 +410,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    public void close() {
       getMessageisAlive = false;
       messageQueue.close();
-      //取消监控
-      String hawkMBeanName = topicName + '-' + consumerid + "-ConsumerWorkerImpl";
-      HawkJMXUtil.unregisterMBean(hawkMBeanName);
    }
 
-   private long getMessageIdOfTailMessage(String topicName, String consumerId, Channel channel) {
+   private long getMessageIdOfTailMessage(String topicName, String consumerId) {
       Long maxMessageId = null;
 
       //持久类型，先尝试从数据库的ack表获取最大的id
@@ -281,92 +430,35 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
          if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
             //持久型且ack尚未有记录，则插入ack，表示以此ack为基准。
-            ackDao.add(topicName, consumerId, maxMessageId, connectedChannels.get(channel));
+            ackDao.add(topicName, consumerId, maxMessageId, "inited");
          }
       }
       return maxMessageId;
    }
 
-   private void sendMessages(Channel channel) throws InterruptedException {
-      SwallowMessage message = messagesToBeSend.poll();
-      PktMessage preparedMessage = new PktMessage(consumerInfo.getConsumerId().getDest(), message);
+   //TODO 对于非持久类型，因为没有consumerid，所以没有backup队列，那么它丢消息怎么办，那就不管
+   private long getBackupMessageIdOfTailMessage(String topicName, String consumerId) {
+      Long maxMessageId = null;
 
-      //Cat begin
-      Transaction consumerServerTransaction = Cat.getProducer().newTransaction("Out:" + topicName,
-            consumerid + ":" + IPUtil.getIpFromChannel(channel));
-      String childEventId;
-      try {
-         childEventId = Cat.getProducer().createMessageId();
-         preparedMessage.setCatEventID(childEventId);
-         Cat.getProducer().logEvent(CatConstants.TYPE_REMOTE_CALL, "ConsumedByWhom",
-               com.dianping.cat.message.Message.SUCCESS, childEventId);
-      } catch (Exception e) {
-         childEventId = "UnknownMessageId";
+      //持久类型，先尝试从数据库的ack表获取最大的id
+      if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
+         maxMessageId = backupAckDao.getMaxMessageId(topicName, consumerId);
       }
-      //Cat end
 
-      try {
-         //TODO 区分backup的waitAckMessages，和正常消息的waitAckMessages
-         //发送前，先记录已发送但未收到ACK的消息记录（在发送前就记录到waitAckMessages，这样发送成功或发送失败，都存在于waitAckMessages中）
-         if (ConsumerType.DURABLE_AT_LEAST_ONCE.equals(consumerInfo.getConsumerType())) {
-            Map<SwallowMessage, Boolean> messageMap = waitAckMessages.get(channel);
+      //消息id不存在，则从消息队列里获取最大消息id
+      if (maxMessageId == null) {
+         maxMessageId = backupMessageDao.getMaxMessageId(topicName);
 
-            if (messageMap == null) {
-               messageMap = new ConcurrentHashMap<SwallowMessage, Boolean>();
-               waitAckMessages.put(channel, messageMap);
-            }
-
-            messageMap.put(message, Boolean.TRUE);
+         if (maxMessageId == null) {//不存在任何消息，则使用当前时间作为消息id即可
+            maxMessageId = MongoUtils.getLongByCurTime();
          }
 
-         //发送消息
-         channel.write(preparedMessage);
-
-         //Cat begin
-         consumerServerTransaction.addData("mid", preparedMessage.getContent().getMessageId());
-         consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
-         //Cat end
-      } catch (RuntimeException e) {
-         LOG.error(consumerInfo.toString() + "：channel write error.", e);
-
-         //放到队尾
-         messagesToBeSend.add(message);
-         //发送失败，则放到backup队列里
-         //messageDao.saveBackupMessage(topicName, consumerid, messageWrapper.getMessage());
-
-         //Cat begin
-         consumerServerTransaction.addData(preparedMessage.getContent().toKeyValuePairs());
-         consumerServerTransaction.setStatus(e);
-         Cat.getProducer().logError(e);
-      } finally {
-         consumerServerTransaction.complete();
-      }
-      //Cat end
-   }
-
-   private void ensureMessagesToBoSend(Channel channel) throws InterruptedException {
-      //创建消息缓冲QUEUE
-      if (messageQueue == null) {
-         long messageIdOfTailMessage = getMessageIdOfTailMessage(topicName, consumerid, channel);
-         messageQueue = swallowBuffer.createMessageQueue(topicName, consumerid, messageIdOfTailMessage, messageFilter);
-      }
-
-      SwallowMessage message = null;
-
-      while (getMessageisAlive) {
-         //从blockQueue中获取消息
-         message = (SwallowMessage) messageQueue.poll(pullStgy.fail(false), TimeUnit.MILLISECONDS);
-         if (message != null) {
-            pullStgy.succeess();
-            break;
+         if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
+            //持久型且ack尚未有记录，则插入ack，表示以此ack为基准。
+            backupAckDao.add(topicName, consumerId, maxMessageId, "inited");
          }
       }
-
-      //如果因为getMessageisAlive为false而退出（如收到close命令）,则消息可能依然是null
-      if (message != null) {
-         messagesToBeSend.add(message);
-      }
-
+      return maxMessageId;
    }
 
    @Override
@@ -375,129 +467,34 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    @Override
-   public long getMaxAckedMessageId() {
-      return maxAckedMessageId;
-   }
-
-   @Override
    public ConsumerType getConsumerType() {
       return consumerInfo.getConsumerType();
    }
 
    /**
-    * 用于Hawk监控
+    * 对消息的封装，含有其他辅助属性
     */
-   public static class HawkMBean {
+   private static class ConsumerMessage {
+      static AtomicLong      SEQ = new AtomicLong(1);
+      private SwallowMessage message;
+      /** 创建时间 */
+      private long           gmt;
+      /** 序号 */
+      private long           seq;
+      /** 连接 */
+      private Channel        channel;
 
-      private final WeakReference<ConsumerWorkerImpl> consumerWorkerImpl;
-
-      private HawkMBean(ConsumerWorkerImpl consumerWorkerImpl) {
-         this.consumerWorkerImpl = new WeakReference<ConsumerWorkerImpl>(consumerWorkerImpl);
+      public ConsumerMessage(SwallowMessage message, Channel channel) {
+         super();
+         this.message = message;
+         this.channel = channel;
+         this.gmt = System.currentTimeMillis();
+         this.seq = SEQ.getAndIncrement();
       }
 
-      public String getConnectedChannels() {
-         if (consumerWorkerImpl.get() != null) {
-            StringBuilder sb = new StringBuilder();
-            if (consumerWorkerImpl.get().connectedChannels != null) {
-               for (Channel channel : consumerWorkerImpl.get().connectedChannels.keySet()) {
-                  sb.append(channel.getRemoteAddress()).append("(isConnected:").append(channel.isConnected())
-                        .append(')');
-               }
-            }
-            return sb.toString();
-         }
-         return null;
-      }
-
-      public String getFreeChannels() {
-         if (consumerWorkerImpl.get() != null) {
-            StringBuilder sb = new StringBuilder();
-            if (consumerWorkerImpl.get().freeChannels != null) {
-               for (Channel channel : consumerWorkerImpl.get().freeChannels) {
-                  sb.append(channel.getRemoteAddress()).append("(isConnected:").append(channel.isConnected())
-                        .append(')');
-               }
-            }
-            return sb.toString();
-         }
-         return null;
-      }
-
-      public String getConsumerInfo() {
-         if (consumerWorkerImpl.get() != null) {
-            return "ConsumerId=" + consumerWorkerImpl.get().consumerInfo.getConsumerId() + ",ConsumerType="
-                  + consumerWorkerImpl.get().consumerInfo.getConsumerType();
-         }
-         return null;
-
-      }
-
-      //      public String getConsumerid() {
-      //         return consumerid;
-      //      }
-
-      public String getTopicName() {
-         if (consumerWorkerImpl.get() != null) {
-            return consumerWorkerImpl.get().topicName;
-         }
-         return null;
-      }
-
-      public String getMessagesToSend() {
-         if (consumerWorkerImpl.get() != null) {
-            if (consumerWorkerImpl.get().messagesToBeSend != null) {
-               return consumerWorkerImpl.get().messagesToBeSend.toString();
-            }
-         }
-         return null;
-      }
-
-      public String getWaitAckMessages() {
-         if (consumerWorkerImpl.get() != null) {
-            StringBuilder sb = new StringBuilder();
-            if (consumerWorkerImpl.get().waitAckMessages != null) {
-               for (Entry<Channel, Map<SwallowMessage, Boolean>> waitAckMessage : consumerWorkerImpl.get().waitAckMessages
-                     .entrySet()) {
-                  if (waitAckMessage.getValue().size() != 0) {
-                     sb.append(waitAckMessage.getKey().getRemoteAddress()).append(waitAckMessage.getValue().toString());
-                  }
-               }
-            }
-            return sb.toString();
-         }
-         return null;
-
-      }
-
-      public Boolean isGetMessageisAlive() {
-         if (consumerWorkerImpl.get() != null) {
-            return consumerWorkerImpl.get().getMessageisAlive;
-         }
-         return null;
-      }
-
-      public Boolean isStarted() {
-         if (consumerWorkerImpl.get() != null) {
-            return consumerWorkerImpl.get().started;
-         }
-         return null;
-      }
-
-      public String getMaxAckedMessageId() {
-         if (consumerWorkerImpl.get() != null) {
-            return Long.toString(consumerWorkerImpl.get().maxAckedMessageId);
-         }
-         return null;
-
-      }
-
-      public String getMessageFilter() {
-         if (consumerWorkerImpl.get() != null) {
-            if (consumerWorkerImpl.get().messageFilter != null) {
-               return consumerWorkerImpl.get().messageFilter.toString();
-            }
-         }
-         return null;
+      @Override
+      public String toString() {
+         return "ConsumerMessage [message=" + message + ", gmt=" + gmt + ", seq=" + seq + ", channel=" + channel + "]";
       }
 
    }

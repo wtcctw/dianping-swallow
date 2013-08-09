@@ -1,6 +1,5 @@
 package com.dianping.swallow.consumerserver.buffer;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -11,12 +10,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.hawk.jmx.HawkJMXUtil;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
 
-//TODO 起一个线程定时从msg#<topic>#<cid>获取消息(该db存放backup消息)，放到queue里
 public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessage> implements
       CloseableBlockingQueue<SwallowMessage> {
 
@@ -41,11 +38,13 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
    private ReentrantLock                reentrantLock                     = new ReentrantLock(true);
    private transient Condition          condition                         = reentrantLock.newCondition();
 
+   //起一个线程定时从msg#<topic>#<cid>获取消息(该db存放backup消息)，放到queue里
    private transient Thread             backupMessageRetrieverThread;
    protected volatile Long              tailBackupMessageId;
    private int                          retrieverFromBackupIntervalSecond = 10;
 
-   public MessageBlockingQueue(String cid, String topicName, int threshold, int capacity, Long messageIdOfTailMessage) {
+   public MessageBlockingQueue(String cid, String topicName, int threshold, int capacity, Long messageIdOfTailMessage,
+                               Long tailBackupMessageId) {
       super(capacity);
       //能运行到这里，说明capacity>0
       this.cid = cid;
@@ -58,14 +57,11 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
          throw new IllegalArgumentException("messageIdOfTailMessage is null.");
       }
       this.tailMessageId = messageIdOfTailMessage;
-      //Hawk监控
-      String hawkMBeanName = topicName + "-" + cid + "-MessageBlockingQueue";
-      HawkJMXUtil.unregisterMBean(hawkMBeanName);
-      HawkJMXUtil.registerMBean(hawkMBeanName, new HawkMBean(this));
+      this.tailBackupMessageId = tailBackupMessageId;
    }
 
    public MessageBlockingQueue(String cid, String topicName, int threshold, int capacity, Long messageIdOfTailMessage,
-                               MessageFilter messageFilter) {
+                               Long tailBackupMessageId, MessageFilter messageFilter) {
       super(capacity);
       //能运行到这里，说明capacity>0
       this.cid = cid;
@@ -78,11 +74,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
          throw new IllegalArgumentException("messageIdOfTailMessage is null.");
       }
       this.tailMessageId = messageIdOfTailMessage;
+      this.tailBackupMessageId = tailBackupMessageId;
       this.messageFilter = messageFilter;
-      //Hawk监控
-      String hawkMBeanName = topicName + "-" + cid + "-MessageBlockingQueue";
-      HawkJMXUtil.unregisterMBean(hawkMBeanName);
-      HawkJMXUtil.registerMBean(hawkMBeanName, new HawkMBean(this));
    }
 
    public void init() {
@@ -234,49 +227,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
          if (LOG.isDebugEnabled()) {
             LOG.debug("retriveMessage() done:" + this.getName());
          }
-      }
-   }
-
-   //以下是供Hawk监控使用的MBean
-   public static class HawkMBean {
-
-      private final WeakReference<MessageBlockingQueue> messageBlockingQueue;
-
-      private HawkMBean(MessageBlockingQueue messageBlockingQueue) {
-         this.messageBlockingQueue = new WeakReference<MessageBlockingQueue>(messageBlockingQueue);
-      }
-
-      public String getCid() {
-         return (messageBlockingQueue.get() != null) ? messageBlockingQueue.get().cid : null;
-      }
-
-      public String getTopicName() {
-         return (messageBlockingQueue.get() != null) ? messageBlockingQueue.get().topicName : null;
-      }
-
-      public int getThreshold() {
-         return (messageBlockingQueue.get() != null) ? messageBlockingQueue.get().threshold : null;
-      }
-
-      public Long getTailMessageId() {
-         return (messageBlockingQueue.get() != null) ? messageBlockingQueue.get().tailMessageId : null;
-      }
-
-      public MessageFilter getMessageFilter() {
-         return (messageBlockingQueue.get() != null) ? messageBlockingQueue.get().messageFilter : null;
-      }
-
-      public int getSize() {
-         return (messageBlockingQueue.get() != null) ? messageBlockingQueue.get().size() : null;
-      }
-
-      public int getRemainingCapacity() {
-         return (messageBlockingQueue.get() != null) ? messageBlockingQueue.get().remainingCapacity() : null;
-      }
-
-      public String getMessageRetriverThreadStatus() {
-         return (messageBlockingQueue.get() != null) ? messageBlockingQueue.get().messageRetrieverThread.getState()
-               .toString() : null;
       }
    }
 

@@ -76,8 +76,9 @@ public class SwallowBuffer {
     * @return
     */
    public CloseableBlockingQueue<SwallowMessage> createMessageQueue(String topicName, String cid, Long tailMessageId,
+                                                                    Long tailBackupMessageId,
                                                                     MessageFilter messageFilter) {
-      return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId, messageFilter);
+      return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId, tailBackupMessageId, messageFilter);
    }
 
    /**
@@ -87,8 +88,9 @@ public class SwallowBuffer {
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public BlockingQueue<SwallowMessage> createMessageQueue(String topicName, String cid, Long tailMessageId) {
-      return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId);
+   public BlockingQueue<SwallowMessage> createMessageQueue(String topicName, String cid, Long tailMessageId,
+                                                           Long tailBackupMessageId) {
+      return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId, tailBackupMessageId);
    }
 
    private int index(String topicName) {
@@ -156,8 +158,8 @@ public class SwallowBuffer {
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public BlockingQueue<SwallowMessage> createMessageQueue(String cid, Long tailMessageId) {
-         return this.createMessageQueue(cid, tailMessageId, null);
+      public BlockingQueue<SwallowMessage> createMessageQueue(String cid, Long tailMessageId, Long tailBackupMessageId) {
+         return this.createMessageQueue(cid, tailMessageId, tailBackupMessageId, null);
       }
 
       /**
@@ -168,6 +170,7 @@ public class SwallowBuffer {
        * @return
        */
       public CloseableBlockingQueue<SwallowMessage> createMessageQueue(String cid, Long tailMessageId,
+                                                                       Long tailBackupMessageId,
                                                                        MessageFilter messageFilter) {
          if (cid == null) {
             throw new IllegalArgumentException("cid is null.");
@@ -178,10 +181,10 @@ public class SwallowBuffer {
          MessageBlockingQueue messageBlockingQueue;
          if (messageFilter != null) {
             messageBlockingQueue = new MessageBlockingQueue(cid, this.topicName, thresholdOfQueue, capacityOfQueue,
-                  tailMessageId, messageFilter);
+                  tailMessageId, tailBackupMessageId, messageFilter);
          } else {
             messageBlockingQueue = new MessageBlockingQueue(cid, this.topicName, thresholdOfQueue, capacityOfQueue,
-                  tailMessageId);
+                  tailMessageId, tailBackupMessageId);
          }
          if (delayBase != -1) {
             messageBlockingQueue.setDelayBase(delayBase);

@@ -35,37 +35,46 @@ public class MessageDAOImpl implements MessageDAO {
 
    private MongoClient         mongoClient;
 
-   public void setMongoClient(MongoClient mongoClient) {
+   private boolean             isBackup;
+
+   public MessageDAOImpl(MongoClient mongoClient, boolean isBackup) {
+      super();
+      this.isBackup = isBackup;
       this.mongoClient = mongoClient;
    }
 
-   @Override
-   public SwallowMessage getMessage(String topicName, Long messageId) {
-      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
-
-      DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(messageId)).get();
-      DBObject result = collection.findOne(query);
-      if (result != null) {
-         SwallowMessage swallowMessage = new SwallowMessage();
-         try {
-            convert(result, swallowMessage);
-            return swallowMessage;
-         } catch (RuntimeException e) {
-            LOG.error("Error when convert resultset to SwallowMessage.", e);
-         }
-      }
-      return null;
-   }
+//   @Override
+//   public SwallowMessage getMessage(String topicName, Long messageId) {
+//      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
+//
+//      DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(messageId)).get();
+//      DBObject result = collection.findOne(query);
+//      if (result != null) {
+//         SwallowMessage swallowMessage = new SwallowMessage();
+//         try {
+//            convert(result, swallowMessage);
+//            return swallowMessage;
+//         } catch (RuntimeException e) {
+//            LOG.error("Error when convert resultset to SwallowMessage.", e);
+//         }
+//      }
+//      return null;
+//   }
 
    @Override
    public Long getMaxMessageId(String topicName) {
-      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
+      if(!isBackup){
+         DBCollection collection = this.mongoClient.getMessageCollection(topicName);
+         
+      }else{
+         DBCollection collection = this.mongoClient.getBackupMessageCollection(topicName, consumerId);
+         
+      }
       return getMaxMessageId(collection);
    }
 
    @Override
    public Long getMaxBackupMessageId(String topicName, String consumerId) {
-      DBCollection collection = this.mongoClient.getBackupMessageCollection(topicName, consumerId);
       return getMaxMessageId(collection);
    }
 
