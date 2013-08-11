@@ -31,6 +31,8 @@ public class SwallowMessage implements Serializable, Message {
 
    private Long                originalMessageId;
 
+   private boolean             isBackup;
+
    @Override
    public Date getGeneratedTime() {
       return generatedTime;
@@ -132,6 +134,14 @@ public class SwallowMessage implements Serializable, Message {
 
    public void setOriginalMessageId(Long originalMessageId) {
       this.originalMessageId = originalMessageId;
+   }
+
+   public boolean isBackup() {
+      return isBackup;
+   }
+
+   public void setBackup(boolean isBackup) {
+      this.isBackup = isBackup;
    }
 
    @Override

@@ -19,7 +19,8 @@ public class HeartbeatDAOImpl implements HeartbeatDAO {
 
    private MongoClient         mongoClient;
 
-   public void setMongoClient(MongoClient mongoClient) {
+   public HeartbeatDAOImpl(MongoClient mongoClient) {
+      super();
       this.mongoClient = mongoClient;
    }
 

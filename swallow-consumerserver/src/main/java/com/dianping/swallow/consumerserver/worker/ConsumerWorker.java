@@ -65,4 +65,6 @@ public interface ConsumerWorker {
     * @return
     */
    ConsumerType getConsumerType();
+
+   void recordAck();
 }

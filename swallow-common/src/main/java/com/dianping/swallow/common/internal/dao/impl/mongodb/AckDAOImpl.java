@@ -25,24 +25,30 @@ public class AckDAOImpl implements AckDAO {
 
    private MongoClient         mongoClient;
 
-   private boolean             isBackup;
-
-   public AckDAOImpl(MongoClient mongoClient, boolean isBackup) {
+   public AckDAOImpl(MongoClient mongoClient) {
       super();
-      this.isBackup = isBackup;
       this.mongoClient = mongoClient;
    }
 
    @Override
    public Long getMaxMessageId(String topicName, String consumerId) {
-      DBCollection collection = this.mongoClient.getAckCollection(topicName, consumerId);
-      return getMaxMessageId(collection);
+      return getMaxMessageId(topicName, consumerId, false);
    }
 
    @Override
-   public Long getBackupMaxMessageId(String topicName, String consumerId) {
-      DBCollection collection = this.mongoClient.getBackupAckCollection(topicName, consumerId);
+   public Long getMaxMessageId(String topicName, String consumerId, boolean isBackup) {
+      DBCollection collection = getCollection(topicName, consumerId, isBackup);
       return getMaxMessageId(collection);
+   }
+
+   private DBCollection getCollection(String topicName, String consumerId, boolean isBackup) {
+      DBCollection collection;
+      if (!isBackup) {
+         collection = this.mongoClient.getAckCollection(topicName, consumerId);
+      } else {
+         collection = this.mongoClient.getBackupAckCollection(topicName, consumerId);
+      }
+      return collection;
    }
 
    private Long getMaxMessageId(DBCollection collection) {
@@ -63,13 +69,12 @@ public class AckDAOImpl implements AckDAO {
 
    @Override
    public void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp) {
-      DBCollection collection = this.mongoClient.getAckCollection(topicName, consumerId);
-      add(messageId, sourceConsumerIp, collection);
+      add(topicName, consumerId, messageId, sourceConsumerIp, false);
    }
 
    @Override
-   public void addBackup(String topicName, String consumerId, Long messageId, String sourceConsumerIp) {
-      DBCollection collection = this.mongoClient.getBackupAckCollection(topicName, consumerId);
+   public void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp, boolean isBackup) {
+      DBCollection collection = getCollection(topicName, consumerId, isBackup);
       add(messageId, sourceConsumerIp, collection);
    }
 

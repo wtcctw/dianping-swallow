@@ -31,7 +31,6 @@ public class ConsumerWorkerManager {
    private MQThreadFactory                 threadFactory      = new MQThreadFactory();
 
    private Map<ConsumerId, ConsumerWorker> consumerId2ConsumerWorker;
-   private Map<ConsumerId, Long>           consumerId2MaxSavedAckedMessageId;
 
    private Thread                          idleWorkerManagerCheckerThread;
    private Thread                          maxAckedMessageIdUpdaterThread;
@@ -41,7 +40,6 @@ public class ConsumerWorkerManager {
    public void setAckDAO(AckDAO ackDAO) {
       this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO,
             configManager.getRetryIntervalWhenMongoException());
-      //this.ackDAO = ackDAO;
    }
 
    public MQThreadFactory getThreadFactory() {
@@ -59,7 +57,6 @@ public class ConsumerWorkerManager {
    public void setMessageDAO(MessageDAO messageDAO) {
       this.messageDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(messageDAO,
             configManager.getRetryIntervalWhenMongoException());
-      //this.messageDAO = messageDAO;
    }
 
    public ConfigManager getConfigManager() {
@@ -149,9 +146,6 @@ public class ConsumerWorkerManager {
       if (consumerId2ConsumerWorker != null) {
          consumerId2ConsumerWorker.clear();
       }
-      if (consumerId2MaxSavedAckedMessageId != null) {
-         consumerId2MaxSavedAckedMessageId.clear();
-      }
    }
 
    private ConsumerWorker findConsumerWorker(ConsumerInfo consumerInfo) {
@@ -169,7 +163,8 @@ public class ConsumerWorkerManager {
          // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
          synchronized (consumerInfo.getConsumerId().getConsumerId().intern()) {
             if ((worker = findConsumerWorker(consumerInfo)) == null) {
-               worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter);
+               worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, configManager.getSeqThreshold(),
+                     configManager.getWaitAckTimeThreshold());
                ConsumerId consumerId = consumerInfo.getConsumerId();
                consumerId2ConsumerWorker.put(consumerId, worker);
             }
@@ -191,7 +186,6 @@ public class ConsumerWorkerManager {
       readyForAcceptConn = true;
 
       consumerId2ConsumerWorker = new ConcurrentHashMap<ConsumerId, ConsumerWorker>();
-      consumerId2MaxSavedAckedMessageId = new ConcurrentHashMap<ConsumerId, Long>();
 
       startIdleWorkerCheckerThread();
       startMaxAckedMessageIdUpdaterThread();
@@ -205,13 +199,15 @@ public class ConsumerWorkerManager {
             while (!Thread.currentThread().isInterrupted()) {
                for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
                   ConsumerWorker worker = entry.getValue();
-                  ConsumerId consumerId = entry.getKey();
-                  updateMaxAckedMessageId(worker, consumerId);
+                  //                  ConsumerId consumerId = entry.getKey();
+                  //                  updateMaxAckedMessageId(worker, consumerId);
+                  worker.recordAck();
+
                }
 
                // 轮询时有一定的时间间隔
                try {
-                  Thread.sleep(configManager.getMaxAckedMessageIdUpdateInterval());
+                  Thread.sleep(configManager.getAckedMessageIdUpdateInterval());
                } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                }
@@ -223,15 +219,15 @@ public class ConsumerWorkerManager {
       maxAckedMessageIdUpdaterThread.start();
    }
 
-   private void updateMaxAckedMessageId(ConsumerWorker worker, ConsumerId consumerId) {
-      Long lastSavedAckedMsgId = consumerId2MaxSavedAckedMessageId.get(consumerId);
-      lastSavedAckedMsgId = lastSavedAckedMsgId == null ? 0 : lastSavedAckedMsgId;
-      Long currentMaxAckedMsgId = worker.getMaxAckedMessageId();
-      if (currentMaxAckedMsgId > 0 && currentMaxAckedMsgId > lastSavedAckedMsgId) {
-         ackDAO.add(consumerId.getDest().getName(), consumerId.getConsumerId(), currentMaxAckedMsgId, "batch");
-         consumerId2MaxSavedAckedMessageId.put(consumerId, currentMaxAckedMsgId);
-      }
-   }
+   //   private void updateMaxAckedMessageId(ConsumerWorker worker, ConsumerId consumerId) {
+   //      Long lastSavedAckedMsgId = consumerId2MaxSavedAckedMessageId.get(consumerId);
+   //      lastSavedAckedMsgId = lastSavedAckedMsgId == null ? 0 : lastSavedAckedMsgId;
+   //      Long currentMaxAckedMsgId = worker.getMaxAckedMessageId();
+   //      if (currentMaxAckedMsgId > 0 && currentMaxAckedMsgId > lastSavedAckedMsgId) {
+   //         ackDAO.add(consumerId.getDest().getName(), consumerId.getConsumerId(), currentMaxAckedMsgId, "batch");
+   //         consumerId2MaxSavedAckedMessageId.put(consumerId, currentMaxAckedMsgId);
+   //      }
+   //   }
 
    private void startIdleWorkerCheckerThread() {
       idleWorkerManagerCheckerThread = threadFactory.newThread(new Runnable() {
@@ -244,7 +240,8 @@ public class ConsumerWorkerManager {
                   ConsumerWorker worker = entry.getValue();
                   ConsumerId consumerId = entry.getKey();
                   if (worker.allChannelDisconnected()) {
-                     updateMaxAckedMessageId(worker, consumerId);
+                     //                     updateMaxAckedMessageId(worker, consumerId);
+                     worker.recordAck();
                      removeConsumerWorker(consumerId);
                      worker.closeMessageFetcherThread();
                      worker.closeAckExecutor();
@@ -295,7 +292,6 @@ public class ConsumerWorkerManager {
     * consumerId对应的ConsumerWorker已经没有任何连接，所以移除ConsumerWorker
     */
    private void removeConsumerWorker(ConsumerId consumerId) {
-      consumerId2MaxSavedAckedMessageId.remove(consumerId);
       consumerId2ConsumerWorker.remove(consumerId);
    }
 

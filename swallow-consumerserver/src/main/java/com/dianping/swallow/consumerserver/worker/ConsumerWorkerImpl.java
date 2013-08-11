@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import com.dianping.cat.Cat;
 import com.dianping.cat.CatConstants;
 import com.dianping.cat.message.Transaction;
-import com.dianping.hawk.jmx.HawkJMXUtil;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
@@ -45,6 +44,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private static final Logger                          LOG                              = LoggerFactory
                                                                                                .getLogger(ConsumerWorkerImpl.class);
 
+   private static final long                            SECOND                           = 1000;
+
    private ConsumerInfo                                 consumerInfo;
    private MQThreadFactory                              threadFactory;
    private String                                       consumerId;
@@ -53,9 +54,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    private SwallowBuffer                                swallowBuffer;
    private MessageDAO                                   messageDao;
-   private MessageDAO                                   backupMessageDao;
    private AckDAO                                       ackDao;
-   private AckDAO                                       backupAckDao;
 
    private CloseableBlockingQueue<SwallowMessage>       messageQueue;
    private ConfigManager                                configManager;
@@ -79,9 +78,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    /** 记录当前最大的已经持久化的ack的消息id */
    private volatile Long                                lastRecordedAckedMessageId       = 0L;
    private volatile Long                                lastRecordedAckedBackupMessageId = 0L;
-   //TODO 如果channel断开，未通知我们，这里会一直留着。且close时，这块也不会被处理(即未ack的消息，也不管了。如果max id比较大，那么这部分消息会被认为是成功的。)
-   // 对于长期在waitAckMessages中的消息，认为没有ack，故将其放到backupQueue里，后续重新消费。
-   // 重启server时，等待一段时间，对于残留在waitAckMessages里的，也将其放到backupQueue里，后续重新消费。
    /**
     * 发送后等待ack的消息。以channel为key，每个channel可以发N条消息(N为其threadSize)，该变量会被多线程访问，
     * 故需要保证线程安全。
@@ -109,7 +105,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       this.pullStgy = new DefaultPullStrategy(configManager.getPullFailDelayBase(),
             configManager.getPullFailDelayUpperBound());
       this.seqThreshold = seqThreshold;
-      this.waitAckTimeThreshold = waitAckTimeThreshold;
+      this.waitAckTimeThreshold = waitAckTimeThreshold * SECOND;
 
       // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
@@ -122,8 +118,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
             new LinkedBlockingQueue<Runnable>(), new MQThreadFactory("swallow-ack-"));
 
       //创建消息缓冲QUEUE
-      long messageIdOfTailMessage = getMessageIdOfTailMessage(topicName, consumerId);
-      long messageIdOfTailBackupMessage = getBackupMessageIdOfTailMessage(topicName, consumerId);
+      long messageIdOfTailMessage = getMaxMessageId(topicName, consumerId, false);
+      long messageIdOfTailBackupMessage = getMaxMessageId(topicName, consumerId, true);
       messageQueue = swallowBuffer.createMessageQueue(topicName, consumerId, messageIdOfTailMessage,
             messageIdOfTailBackupMessage, this.messageFilter);
 
@@ -180,14 +176,15 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    /**
     * 持久化ack的逻辑（该方法会被定时调用） 2个，waitAckMessages和waitAckBackupMessages，处理方式一样
     */
+   @Override
    public void recordAck() {
-      recordAck0(waitAckMessages, maxAckedMessageId, maxAckedMessageSeq, lastRecordedAckedMessageId, ackDao);
+      recordAck0(waitAckMessages, maxAckedMessageId, maxAckedMessageSeq, lastRecordedAckedMessageId, false);
       recordAck0(waitAckBackupMessages, maxAckedBackupMessageId, maxAckedBackupMessageSeq,
-            lastRecordedAckedBackupMessageId, backupAckDao);
+            lastRecordedAckedBackupMessageId, true);
    }
 
    private void recordAck0(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages0, Long maxAckedMessageId0,
-                           long maxAckedMessageSeq0, Long lastRecordedAckedMessageId0, AckDAO ackDao0) {
+                           long maxAckedMessageSeq0, Long lastRecordedAckedMessageId0, boolean isBackup) {
       //做超过阈值的判断，如果超过阈值，则移除并备份
       Entry<Long, ConsumerMessage> entry = waitAckMessages0.firstEntry();
       if (entry != null) {
@@ -207,7 +204,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          if (overdue) {
             waitAckMessages0.remove(mid);
             if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-               backupMessageDao.saveBackupMessage(topicName, consumerId, consumerMessage.message);
+               messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
             }
          }
       }
@@ -222,7 +219,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       //如果新的可记录ack的消息id，大于上次记录的最大ack，则可以记录ack
       if (ackMessageId > lastRecordedAckedMessageId0) {
          if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-            ackDao0.add(topicName, consumerId, ackMessageId, "batch");
+            ackDao.add(topicName, consumerId, ackMessageId, "batch", isBackup);
          }
          lastRecordedAckedMessageId0 = ackMessageId;
       }
@@ -265,8 +262,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          ConsumerMessage consumerMessage = entry.getValue();
          if (consumerMessage.channel.equals(channel)) {
             if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-               backupMessageDao.saveBackupMessage(topicName, consumerId, consumerMessage.message);
-               //TODO 非持久的如何考虑？没有backup？  如果代码简洁
+               messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
             }
             it.remove();
          }
@@ -311,7 +307,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          //从blockQueue中获取消息
          SwallowMessage message = (SwallowMessage) messageQueue.poll(pullStgy.fail(false), TimeUnit.MILLISECONDS);
          if (message != null) {
-            if (message.getOriginalMessageId() == null) {
+            if (!message.isBackup()) {
                maxAckedMessageSeq++;
             } else {
                maxAckedBackupMessageSeq++;
@@ -347,19 +343,12 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          //发送消息
          channel.write(pktMessage);
 
-         //TODO 区分backup的waitAckMessages，和正常消息的waitAckMessages
          //发送后，记录已发送但未收到ACK的消息记录
-         if (consumerMessage.message.getOriginalMessageId() == null) {
+         if (!consumerMessage.message.isBackup()) {
             waitAckMessages.put(consumerMessage.message.getMessageId(), consumerMessage);
          } else {
             waitAckBackupMessages.put(consumerMessage.message.getMessageId(), consumerMessage);
          }
-         //         Map<ConsumerMessage, Boolean> messageMap = waitAckMessages.get(channel);
-         //         if (messageMap == null) {
-         //            messageMap = new ConcurrentHashMap<ConsumerMessage, Boolean>();
-         //            waitAckMessages.put(channel, messageMap);
-         //         }
-         //         messageMap.put(consumerMessage, Boolean.TRUE);
 
          //Cat begin
          consumerServerTransaction.addData("mid", pktMessage.getContent().getMessageId());
@@ -369,7 +358,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          LOG.error(consumerInfo.toString() + "：channel write error.", e);
 
          //发送失败，则放到backup队列里
-         backupMessageDao.saveBackupMessage(topicName, consumerId, consumerMessage.message);
+         messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
 
          //Cat begin
          consumerServerTransaction.addData(pktMessage.getContent().toKeyValuePairs());
@@ -412,50 +401,30 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       messageQueue.close();
    }
 
-   private long getMessageIdOfTailMessage(String topicName, String consumerId) {
+   /**
+    * @param topicName
+    * @param consumerId consumerId为null时使用非backup队列
+    * @param isBakcup
+    * @return
+    */
+   private long getMaxMessageId(String topicName, String consumerId, boolean isBakcup) {
       Long maxMessageId = null;
 
       //持久类型，先尝试从数据库的ack表获取最大的id
-      if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
-         maxMessageId = ackDao.getMaxMessageId(topicName, consumerId);
+      if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+         maxMessageId = ackDao.getMaxMessageId(topicName, consumerId, isBakcup);
       }
 
       //消息id不存在，则从消息队列里获取最大消息id
       if (maxMessageId == null) {
-         maxMessageId = messageDao.getMaxMessageId(topicName);
-
+         maxMessageId = messageDao.getMaxMessageId(topicName, isBakcup ? consumerId : null);
          if (maxMessageId == null) {//不存在任何消息，则使用当前时间作为消息id即可
             maxMessageId = MongoUtils.getLongByCurTime();
          }
 
-         if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
+         if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
             //持久型且ack尚未有记录，则插入ack，表示以此ack为基准。
-            ackDao.add(topicName, consumerId, maxMessageId, "inited");
-         }
-      }
-      return maxMessageId;
-   }
-
-   //TODO 对于非持久类型，因为没有consumerid，所以没有backup队列，那么它丢消息怎么办，那就不管
-   private long getBackupMessageIdOfTailMessage(String topicName, String consumerId) {
-      Long maxMessageId = null;
-
-      //持久类型，先尝试从数据库的ack表获取最大的id
-      if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
-         maxMessageId = backupAckDao.getMaxMessageId(topicName, consumerId);
-      }
-
-      //消息id不存在，则从消息队列里获取最大消息id
-      if (maxMessageId == null) {
-         maxMessageId = backupMessageDao.getMaxMessageId(topicName);
-
-         if (maxMessageId == null) {//不存在任何消息，则使用当前时间作为消息id即可
-            maxMessageId = MongoUtils.getLongByCurTime();
-         }
-
-         if (consumerInfo.getConsumerType() != ConsumerType.NON_DURABLE) {
-            //持久型且ack尚未有记录，则插入ack，表示以此ack为基准。
-            backupAckDao.add(topicName, consumerId, maxMessageId, "inited");
+            ackDao.add(topicName, consumerId, maxMessageId, "inited", isBakcup);
          }
       }
       return maxMessageId;

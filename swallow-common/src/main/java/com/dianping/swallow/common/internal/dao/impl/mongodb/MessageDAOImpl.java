@@ -35,47 +35,48 @@ public class MessageDAOImpl implements MessageDAO {
 
    private MongoClient         mongoClient;
 
-   private boolean             isBackup;
-
-   public MessageDAOImpl(MongoClient mongoClient, boolean isBackup) {
+   public MessageDAOImpl(MongoClient mongoClient) {
       super();
-      this.isBackup = isBackup;
       this.mongoClient = mongoClient;
    }
 
-//   @Override
-//   public SwallowMessage getMessage(String topicName, Long messageId) {
-//      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
-//
-//      DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(messageId)).get();
-//      DBObject result = collection.findOne(query);
-//      if (result != null) {
-//         SwallowMessage swallowMessage = new SwallowMessage();
-//         try {
-//            convert(result, swallowMessage);
-//            return swallowMessage;
-//         } catch (RuntimeException e) {
-//            LOG.error("Error when convert resultset to SwallowMessage.", e);
-//         }
-//      }
-//      return null;
-//   }
+   @Override
+   public SwallowMessage getMessage(String topicName, Long messageId) {
+      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
+
+      DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(messageId)).get();
+      DBObject result = collection.findOne(query);
+      if (result != null) {
+         SwallowMessage swallowMessage = new SwallowMessage();
+         try {
+            convert(result, swallowMessage);
+            return swallowMessage;
+         } catch (RuntimeException e) {
+            LOG.error("Error when convert resultset to SwallowMessage.", e);
+         }
+      }
+      return null;
+   }
 
    @Override
-   public Long getMaxMessageId(String topicName) {
-      if(!isBackup){
-         DBCollection collection = this.mongoClient.getMessageCollection(topicName);
-         
-      }else{
-         DBCollection collection = this.mongoClient.getBackupMessageCollection(topicName, consumerId);
-         
-      }
+   public Long getMaxMessageId(String topicName, String consumerId) {
+      DBCollection collection = getCollection(topicName, consumerId);
       return getMaxMessageId(collection);
    }
 
    @Override
-   public Long getMaxBackupMessageId(String topicName, String consumerId) {
-      return getMaxMessageId(collection);
+   public Long getMaxMessageId(String topicName) {
+      return getMaxMessageId(topicName, null);
+   }
+
+   private DBCollection getCollection(String topicName, String consumerId) {
+      DBCollection collection;
+      if (consumerId == null) {
+         collection = this.mongoClient.getMessageCollection(topicName);
+      } else {
+         collection = this.mongoClient.getBackupMessageCollection(topicName, consumerId);
+      }
+      return collection;
    }
 
    private Long getMaxMessageId(DBCollection collection) {
@@ -95,7 +96,6 @@ public class MessageDAOImpl implements MessageDAO {
 
    @Override
    public SwallowMessage getMaxMessage(String topicName) {
-
       DBCollection collection = this.mongoClient.getMessageCollection(topicName);
 
       DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
@@ -119,17 +119,12 @@ public class MessageDAOImpl implements MessageDAO {
 
    @Override
    public List<SwallowMessage> getMessagesGreaterThan(String topicName, Long messageId, int size) {
-      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
-
-      List<SwallowMessage> list = getMessageGreaterThan(messageId, size, collection);
-      return list;
+      return getMessagesGreaterThan(topicName, null, messageId, size);
    }
 
    @Override
-   public List<SwallowMessage> getBackupMessagesGreaterThan(String topicName, String consumerId, Long messageId,
-                                                            int size) {
-      DBCollection collection = this.mongoClient.getBackupMessageCollection(topicName, consumerId);
-
+   public List<SwallowMessage> getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size) {
+      DBCollection collection = getCollection(topicName, consumerId);
       List<SwallowMessage> list = getMessageGreaterThan(messageId, size, collection);
       return list;
    }
@@ -166,6 +161,7 @@ public class MessageDAOImpl implements MessageDAO {
       BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(ORIGINAL_ID);
       if (originalTimestamp != null) {
          swallowMessage.setOriginalMessageId(MongoUtils.BSONTimestampToLong(originalTimestamp));
+         swallowMessage.setBackup(true);
       }
 
       swallowMessage.setContent(result.get(CONTENT));//content
@@ -188,18 +184,18 @@ public class MessageDAOImpl implements MessageDAO {
 
    @Override
    public void saveMessage(String topicName, SwallowMessage message) {
-      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
-
-      saveMessage(message, collection);
+      saveMessage(topicName, null, message);
    }
 
    @Override
-   public void saveBackupMessage(String topicName, String consumerId, SwallowMessage message) {
-      DBCollection collection = this.mongoClient.getBackupMessageCollection(topicName, consumerId);
+   public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
+      DBCollection collection = getCollection(topicName, consumerId);
 
-      //对于新消息，OriginalMessageId为其messageId
-      if (message.getOriginalMessageId() == null) {
-         message.setOriginalMessageId(message.getMessageId());
+      if (consumerId != null) {
+         //对于放入备份队列的新消息，OriginalMessageId为其messageId
+         if (message.getOriginalMessageId() == null) {
+            message.setOriginalMessageId(message.getMessageId());
+         }
       }
 
       saveMessage(message, collection);
@@ -255,4 +251,5 @@ public class MessageDAOImpl implements MessageDAO {
 
       collection.insert(builder.get());
    }
+
 }

@@ -166,7 +166,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
             LOG.debug("retriveMessage() start:" + this.getName());
          }
          try {
-            List messages = messageRetriever.retriveMessage(topicName, tailMessageId, messageFilter);
+            List messages = messageRetriever.retriveMessage(topicName, null, tailMessageId, messageFilter);
             if (messages != null && messages.size() > 0) {
                tailMessageId = (Long) messages.get(0);
                putMessage(messages);
@@ -216,7 +216,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
             LOG.debug("retriveMessage() start:" + this.getName());
          }
          try {
-            List messages = messageRetriever.retriveBackupMessage(topicName, cid, tailBackupMessageId);
+            List messages = messageRetriever.retriveMessage(topicName, cid, tailBackupMessageId, messageFilter);
             if (messages != null && messages.size() > 0) {
                tailBackupMessageId = (Long) messages.get(0);
                putMessage(messages);

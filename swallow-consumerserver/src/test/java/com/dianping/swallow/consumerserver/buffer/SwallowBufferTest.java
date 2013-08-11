@@ -57,7 +57,8 @@ public class SwallowBufferTest extends AbstractTest {
 
    @Test
    public void testCreateMessageQueue1() throws InterruptedException {
-      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId);
+      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
+            tailMessageId);
       SwallowMessage m;
       while ((m = queue.poll(1, TimeUnit.SECONDS)) == null) {
          ;
@@ -70,7 +71,7 @@ public class SwallowBufferTest extends AbstractTest {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(TYPE);
       BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            MessageFilter.createInSetMessageFilter(messageTypeSet));
+            tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
       SwallowMessage m;
       while ((m = queue.poll(1, TimeUnit.SECONDS)) == null) {
@@ -84,7 +85,7 @@ public class SwallowBufferTest extends AbstractTest {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(TYPE);
 
-      swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
+      swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId, tailMessageId,
             MessageFilter.createInSetMessageFilter(messageTypeSet));
       BlockingQueue<SwallowMessage> queue = swallowBuffer.getMessageQueue(TOPIC_NAME, cid);
       SwallowMessage m;
@@ -102,7 +103,7 @@ public class SwallowBufferTest extends AbstractTest {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(TYPE);
       BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            MessageFilter.createInSetMessageFilter(messageTypeSet));
+            tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
       SwallowMessage m = queue.poll();
       while (m == null) {
@@ -116,7 +117,7 @@ public class SwallowBufferTest extends AbstractTest {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(TYPE);
       BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            MessageFilter.createInSetMessageFilter(messageTypeSet));
+            tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
       SwallowMessage m = queue.poll(500, TimeUnit.MILLISECONDS);
       while (m == null) {
@@ -136,7 +137,7 @@ public class SwallowBufferTest extends AbstractTest {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(myType);
       BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            MessageFilter.createInSetMessageFilter(messageTypeSet));
+            tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
       SwallowMessage m = queue.poll(500, TimeUnit.MILLISECONDS);
       while (m == null) {
