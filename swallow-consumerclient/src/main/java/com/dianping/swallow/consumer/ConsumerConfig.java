@@ -148,7 +148,7 @@ public class ConsumerConfig {
        if (retryCountOnBackoutMessageException == -1) {
            retryCountOnBackoutMessageException = Integer.MAX_VALUE;
        }
-       if (retryCountOnBackoutMessageException < 0) {
+       if (retryCountOnBackoutMessageException < -1) {
            LOG.warn("invalid retryCountOnBackoutMessageException, use default value: " + this.retryCountOnBackoutMessageException + ".");
            return;
        }
