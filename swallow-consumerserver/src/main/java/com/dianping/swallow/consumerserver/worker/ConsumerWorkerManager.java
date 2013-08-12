@@ -76,7 +76,9 @@ public class ConsumerWorkerManager {
    public void handleAck(Channel channel, ConsumerInfo consumerInfo, Long ackedMsgId, ACKHandlerType type) {
       ConsumerWorker worker = findConsumerWorker(consumerInfo);
       if (worker != null) {
-         worker.handleAck(channel, ackedMsgId, type);
+         if (ackedMsgId != null) {
+            worker.handleAck(channel, ackedMsgId, type);
+         }
       } else {
          LOG.warn(consumerInfo + "ConsumerWorker is not exist!");
          channel.close();

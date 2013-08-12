@@ -70,14 +70,14 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private ConcurrentHashMap<Channel, String>           connectedChannels                = new ConcurrentHashMap<Channel, String>();
 
    /** 记录当前最大的已经返回ack的消息id */
-   private volatile Long                                maxAckedMessageId                = 0L;
-   private volatile Long                                maxAckedBackupMessageId          = 0L;
+   private volatile long                                maxAckedMessageId                = 0L;
+   private volatile long                                maxAckedBackupMessageId          = 0L;
    /** 记录当前最大的已经返回ack的消息seq */
-   private volatile Long                                maxAckedMessageSeq               = 0L;
-   private volatile Long                                maxAckedBackupMessageSeq         = 0L;
+   private volatile long                                maxAckedMessageSeq               = 0L;
+   private volatile long                                maxAckedBackupMessageSeq         = 0L;
    /** 记录当前最大的已经持久化的ack的消息id */
-   private volatile Long                                lastRecordedAckedMessageId       = 0L;
-   private volatile Long                                lastRecordedAckedBackupMessageId = 0L;
+   private volatile long                                lastRecordedAckedMessageId       = 0L;
+   private volatile long                                lastRecordedAckedBackupMessageId = 0L;
    /**
     * 发送后等待ack的消息。以channel为key，每个channel可以发N条消息(N为其threadSize)，该变量会被多线程访问，
     * 故需要保证线程安全。<br>
@@ -129,7 +129,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    @Override
-   public void handleAck(final Channel channel, final Long ackedMsgId, final ACKHandlerType type) {
+   public void handleAck(final Channel channel, final long ackedMsgId, final ACKHandlerType type) {
       ackExecutor.execute(new Runnable() {
          @Override
          public void run() {
@@ -159,7 +159,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
     * 收到ack，则从WaitAckMessages中移除相应的消息，同时更新最大的ack message id <br>
     * 按照实现逻辑，该方法只会被单线程调用
     */
-   private void removeWaitAckMessages(Long ackedMsgId) {
+   private void removeWaitAckMessages(long ackedMsgId) {
       ConsumerMessage waitAckMessage = waitAckMessages.remove(ackedMsgId);
       //更新最大ack message id，更新最大seq
       if (waitAckMessage != null) {//ack属于正常消息的
@@ -179,18 +179,19 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
     */
    @Override
    public void recordAck() {
-      recordAck0(waitAckMessages, maxAckedMessageId, maxAckedMessageSeq, lastRecordedAckedMessageId, false);
-      recordAck0(waitAckBackupMessages, maxAckedBackupMessageId, maxAckedBackupMessageSeq,
-            lastRecordedAckedBackupMessageId, true);
+      lastRecordedAckedMessageId = recordAck0(waitAckMessages, maxAckedMessageId, maxAckedMessageSeq,
+            lastRecordedAckedMessageId, false);
+      lastRecordedAckedBackupMessageId = recordAck0(waitAckBackupMessages, maxAckedBackupMessageId,
+            maxAckedBackupMessageSeq, lastRecordedAckedBackupMessageId, true);
    }
 
-   private void recordAck0(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages0, Long maxAckedMessageId0,
-                           long maxAckedMessageSeq0, Long lastRecordedAckedMessageId0, boolean isBackup) {
+   private long recordAck0(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages0, long maxAckedMessageId0,
+                           long maxAckedMessageSeq0, long lastRecordedAckedMessageId0, boolean isBackup) {
       //做超过阈值的判断，如果超过阈值，则移除并备份
-      Entry<Long, ConsumerMessage> entry = waitAckMessages0.firstEntry();
-      if (entry != null) {
+      Entry<Long, ConsumerMessage> entry;
+      while ((entry = waitAckMessages0.firstEntry()) != null) {//使用while，尽最大可能消除空洞ack id
          ConsumerMessage consumerMessage = entry.getValue();
-         Long mid = consumerMessage.message.getMessageId();
+         long mid = consumerMessage.message.getMessageId();
          boolean overdue = false;//是否超过阈值
          if (mid < maxAckedMessageId0) {//大于最大ack id（maxAckedMessageId）的消息，不算是空洞
             //如果最小等待ack的消息，与最大已记录ack的消息，相差超过seqThreshold，则移除该消息到备份队列里。
@@ -202,16 +203,18 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                overdue = true;
             }
          }
-         if (overdue) {
-            waitAckMessages0.remove(mid);
-            if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+         if (overdue && (consumerMessage = waitAckMessages0.remove(mid)) != null) {//超过阈值，则移除空洞
+            if (consumerMessage != null && this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
                messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
             }
+         } else {//没有移除任何空洞，则不再迭代；否则需要继续迭代以尽量多地移除空洞。
+            break;
          }
       }
 
-      //找到此时waitAckMessages0中最小的ack message id，减1后，即为应该持久化的消息id。如果waitAckMessages0为空，那就是maxAckedMessageId
-      Long ackMessageId = maxAckedMessageId0;
+      //找到此时waitAckMessages0中最小的ack message id，减1后，即为应该持久化的消息id。
+      //如果waitAckMessages0为空（没有任何空洞），那就是maxAckedMessageId(maxAckedMessageId是long型，故判断waitAckMessages0为空前后，maxAckedMessageId不会变)
+      long ackMessageId = maxAckedMessageId0;
       entry = waitAckMessages0.firstEntry();
       if (entry != null) {
          ackMessageId = entry.getValue().message.getMessageId() - 1;
@@ -224,6 +227,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          }
          lastRecordedAckedMessageId0 = ackMessageId;
       }
+
+      return lastRecordedAckedMessageId0;
    }
 
    @Override
