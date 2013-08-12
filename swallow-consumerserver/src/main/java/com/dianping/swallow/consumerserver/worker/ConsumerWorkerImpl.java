@@ -80,7 +80,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private volatile Long                                lastRecordedAckedBackupMessageId = 0L;
    /**
     * 发送后等待ack的消息。以channel为key，每个channel可以发N条消息(N为其threadSize)，该变量会被多线程访问，
-    * 故需要保证线程安全。
+    * 故需要保证线程安全。<br>
+    * log(n)的操作，如果性能有问题，则尝试使用googlecode上的ConcurrentLinkedHashMap代替。
     */
    private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages                  = new ConcurrentSkipListMap<Long, ConsumerMessage>();
    private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckBackupMessages            = new ConcurrentSkipListMap<Long, ConsumerMessage>();
