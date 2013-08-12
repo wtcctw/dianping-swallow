@@ -148,8 +148,8 @@ public class SwallowMessage implements Serializable, Message {
    public String toString() {
       return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", originalMessageId="
             + originalMessageId + ", properties=" + properties + ", internalProperties=" + internalProperties
-            + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + "&content="
-            + content + "]";
+            + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + ", content="
+            + content + ", isBackup=" + isBackup + "]";
    }
 
    public String toKeyValuePairs() {
@@ -157,9 +157,9 @@ public class SwallowMessage implements Serializable, Message {
    }
 
    public String toSuccessKeyValuePairs() {
-      return "generatedTime=" + generatedTime + "&messageId=" + messageId + ", originalMessageId=" + originalMessageId
+      return "generatedTime=" + generatedTime + "&messageId=" + messageId + "&originalMessageId=" + originalMessageId
             + "&properties=" + properties + "&internalProperties=" + internalProperties + "&version=" + version
-            + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp;
+            + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp + "&isBackup=" + isBackup;
    }
 
    @Override
@@ -267,6 +267,9 @@ public class SwallowMessage implements Serializable, Message {
             return false;
          }
       } else if (!version.equals(other.version)) {
+         return false;
+      }
+      if (isBackup != other.isBackup) {
          return false;
       }
       return true;

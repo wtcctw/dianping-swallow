@@ -70,13 +70,7 @@ public class MessageDAOImpl implements MessageDAO {
    }
 
    private DBCollection getCollection(String topicName, String consumerId) {
-      DBCollection collection;
-      if (consumerId == null) {
-         collection = this.mongoClient.getMessageCollection(topicName);
-      } else {
-         collection = this.mongoClient.getBackupMessageCollection(topicName, consumerId);
-      }
-      return collection;
+      return this.mongoClient.getMessageCollection(topicName, consumerId);
    }
 
    private Long getMaxMessageId(DBCollection collection) {

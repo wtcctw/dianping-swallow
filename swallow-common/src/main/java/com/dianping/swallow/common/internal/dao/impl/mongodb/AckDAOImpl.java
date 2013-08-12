@@ -42,13 +42,7 @@ public class AckDAOImpl implements AckDAO {
    }
 
    private DBCollection getCollection(String topicName, String consumerId, boolean isBackup) {
-      DBCollection collection;
-      if (!isBackup) {
-         collection = this.mongoClient.getAckCollection(topicName, consumerId);
-      } else {
-         collection = this.mongoClient.getBackupAckCollection(topicName, consumerId);
-      }
-      return collection;
+      return this.mongoClient.getAckCollection(topicName, consumerId, isBackup);
    }
 
    private Long getMaxMessageId(DBCollection collection) {
