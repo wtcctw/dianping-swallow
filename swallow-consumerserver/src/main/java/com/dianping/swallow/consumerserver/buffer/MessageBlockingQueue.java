@@ -201,8 +201,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
             try {
                retrieveMessage();
                TimeUnit.SECONDS.sleep(retrieverFromBackupIntervalSecond);
-            } catch (RuntimeException e) {
-               this.interrupt();
             } catch (InterruptedException e) {
                this.interrupt();
             }
@@ -221,8 +219,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
                tailBackupMessageId = (Long) messages.get(0);
                putMessage(messages);
             }
-         } catch (RuntimeException e1) {
-            LOG.error(e1.getMessage(), e1);
+         } catch (RuntimeException e) {
+            LOG.error(e.getMessage(), e);
          }
          if (LOG.isDebugEnabled()) {
             LOG.debug("retriveMessage() done:" + this.getName());
