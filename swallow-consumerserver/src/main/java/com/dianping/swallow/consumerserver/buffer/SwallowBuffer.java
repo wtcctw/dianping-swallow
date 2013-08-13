@@ -115,8 +115,8 @@ public class SwallowBuffer {
       this.delayUpperbound = delayUpperbound;
    }
 
-   public void setFetchFromBackupIntervalSecond(int fetchFromBackupIntervalSecond) {
-      this.retrieverFromBackupIntervalSecond = fetchFromBackupIntervalSecond;
+   public void setRetrieverFromBackupIntervalSecond(int retrieverFromBackupIntervalSecond) {
+      this.retrieverFromBackupIntervalSecond = retrieverFromBackupIntervalSecond;
    }
 
    public void setMessageRetriever(MessageRetriever messageRetriever) {

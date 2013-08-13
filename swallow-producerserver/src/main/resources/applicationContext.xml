@@ -9,17 +9,14 @@
 
     <bean id="ackDAO"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl">
-        <constructor-arg ref="mongoClient" />
     </bean>
 
     <bean id="messageDAO"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
-        <constructor-arg ref="mongoClient" />
     </bean>
 
     <bean id="heartbeatDAO"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl">
-        <constructor-arg ref="mongoClient" />
     </bean>
 
 

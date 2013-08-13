@@ -25,8 +25,7 @@ public class AckDAOImpl implements AckDAO {
 
    private MongoClient         mongoClient;
 
-   public AckDAOImpl(MongoClient mongoClient) {
-      super();
+   public void setMongoClient(MongoClient mongoClient) {
       this.mongoClient = mongoClient;
    }
 

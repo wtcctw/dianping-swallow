@@ -35,8 +35,7 @@ public class MessageDAOImpl implements MessageDAO {
 
    private MongoClient         mongoClient;
 
-   public MessageDAOImpl(MongoClient mongoClient) {
-      super();
+   public void setMongoClient(MongoClient mongoClient) {
       this.mongoClient = mongoClient;
    }
 
