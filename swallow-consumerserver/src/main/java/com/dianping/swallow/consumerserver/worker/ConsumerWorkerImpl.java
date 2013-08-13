@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.CatConstants;
+import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
@@ -170,6 +171,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          if (waitAckMessage != null) {//ack属于备份消息的
             maxAckedBackupMessageSeq = Math.max(maxAckedBackupMessageSeq, waitAckMessage.seq);
             maxAckedBackupMessageId = Math.max(maxAckedBackupMessageId, ackedMsgId);
+            //cat打点，记录一次备份消息的ack
+            catTraceForBackupAck(ackedMsgId);
          }
       }
    }
@@ -206,6 +209,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          if (overdue && (consumerMessage = waitAckMessages0.remove(mid)) != null) {//超过阈值，则移除空洞
             if (consumerMessage != null && this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
                messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
+               //cat打点，记录一次备份消息的record
+               catTraceForBackupRecord(consumerMessage.message);
+
             }
          } else {//没有移除任何空洞，则不再迭代；否则需要继续迭代以尽量多地移除空洞。
             break;
@@ -269,6 +275,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          if (consumerMessage.channel.equals(channel)) {
             if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
                messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
+               //cat打点，记录一次备份消息的record
+               catTraceForBackupRecord(consumerMessage.message);
             }
             it.remove();
          }
@@ -365,6 +373,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
          //发送失败，则放到backup队列里
          messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
+         //cat打点，记录一次备份消息的record
+         catTraceForBackupRecord(consumerMessage.message);
 
          //Cat begin
          consumerServerTransaction.addData(pktMessage.getContent().toKeyValuePairs());
@@ -374,6 +384,24 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          consumerServerTransaction.complete();
       }
       //Cat end
+   }
+
+   private void catTraceForBackupRecord(SwallowMessage message) {
+      Transaction transaction = Cat.getProducer().newTransaction("Backup:" + topicName, "In:" + consumerId);
+      if (message != null) {
+         transaction.addData("message", message.toString());
+      }
+      transaction.setStatus(Message.SUCCESS);
+      transaction.complete();
+   }
+
+   private void catTraceForBackupAck(Long messageId) {
+      Transaction transaction = Cat.getProducer().newTransaction("Backup:" + topicName, "Out:" + consumerId);
+      if (messageId != null) {
+         transaction.addData("messageId", messageId);
+      }
+      transaction.setStatus(Message.SUCCESS);
+      transaction.complete();
    }
 
    @Override

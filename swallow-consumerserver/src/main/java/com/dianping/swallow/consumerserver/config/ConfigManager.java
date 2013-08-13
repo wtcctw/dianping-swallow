@@ -141,7 +141,7 @@ public final class ConfigManager {
                try {
                   field = clazz.getDeclaredField(key.trim());
                } catch (Exception e) {
-                  LOG.error("unknow property found in " + configFileName + ": " + key);
+                  LOG.warn("unknow property found in " + configFileName + ": " + key);
                   continue;
                }
                field.setAccessible(true);
