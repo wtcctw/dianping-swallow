@@ -251,6 +251,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       removeByChannel(channel, waitAckMessages);
       removeByChannel(channel, waitAckBackupMessages);
 
+      LOG.info("Worker handle " + channel.getRemoteAddress() + " disconnect!");
+
       //      Map<ConsumerMessage, Boolean> messageMap = waitAckMessages.get(channel);
       //      if (messageMap != null) {
       //         try {
@@ -305,10 +307,13 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
                   }
                } catch (InterruptedException e) {
-                  LOG.info("get message from messageQueue thread InterruptedException", e);
+                  LOG.info("Get message from messageQueue thread InterruptedException", e);
+               } catch (RuntimeException e) {
+                  LOG.info("Get message from messageQueue thread Exception", e);
                }
+
             }
-            LOG.info("message fetcher thread closed");
+            LOG.info("Message fetcher thread closed");
          }
       }, this.topicName + "#" + this.consumerId + "-messageFetcher-").start();
 
