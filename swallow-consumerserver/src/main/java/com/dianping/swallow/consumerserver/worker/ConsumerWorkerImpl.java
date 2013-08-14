@@ -390,18 +390,20 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    private void catTraceForBackupRecord(SwallowMessage message) {
-      Transaction transaction = Cat.getProducer().newTransaction("Backup:" + topicName, "In:" + consumerId);
-      if (message != null) {
-         transaction.addData("message", message.toString());
+      if (!message.isBackup()) {//一条消息可能会多次放进backup队列，第一次放进backup队列的，才打点。
+         Transaction transaction = Cat.getProducer().newTransaction("Backup:" + topicName, "In:" + consumerId);
+         if (message != null) {
+            transaction.addData("message", message.toString());
+         }
+         transaction.setStatus(Message.SUCCESS);
+         transaction.complete();
       }
-      transaction.setStatus(Message.SUCCESS);
-      transaction.complete();
    }
 
    private void catTraceForBackupAck(Long messageId) {
       Transaction transaction = Cat.getProducer().newTransaction("Backup:" + topicName, "Out:" + consumerId);
       if (messageId != null) {
-         transaction.addData("messageId", messageId);
+         transaction.addData("mid", messageId);
       }
       transaction.setStatus(Message.SUCCESS);
       transaction.complete();
