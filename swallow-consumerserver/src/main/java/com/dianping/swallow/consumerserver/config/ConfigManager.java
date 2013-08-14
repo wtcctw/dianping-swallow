@@ -34,7 +34,7 @@ public final class ConfigManager {
    private int                  slavePort                       = 8082;
    private int                  ackedMessageIdUpdateInterval    = 1000;
    /** maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的阈值 */
-   private long                 seqThreshold                    = 100;
+   private long                 seqThreshold                    = 500;
    /** 允许"最小的空洞waitAckMessage"存活的时间的阈值,单位秒 */
    private long                 waitAckTimeThreshold            = 5 * 60;                                      //5分钟
 
