@@ -86,6 +86,9 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
             Transaction consumerClientTransaction = Cat.getProducer().newTransaction("MsgConsumed", catNameStr);
             consumerClientTransaction.addData("mid", swallowMessage.getMessageId());
             consumerClientTransaction.addData("sha1", swallowMessage.getSha1());
+            if(swallowMessage.getGeneratedTime() != null){//监控延迟时间
+               consumerClientTransaction.addData("delaytime", System.currentTimeMillis() - swallowMessage.getGeneratedTime().getTime());
+            }
 
             try {
                MessageTree tree = Cat.getManager().getThreadLocalMessageTree();
