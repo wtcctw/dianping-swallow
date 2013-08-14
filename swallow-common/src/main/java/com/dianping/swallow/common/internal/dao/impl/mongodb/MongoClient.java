@@ -461,9 +461,11 @@ public class MongoClient implements ConfigChangeListener {
                getIntSafely(msgTopicNameToMaxDocNums, topicName), MSG_PREFIX + topicName, new BasicDBObject(
                      MessageDAOImpl.ID, -1));
       } else {
+         BasicDBObject index = new BasicDBObject(MessageDAOImpl.ID, -1);
+         index.append(MessageDAOImpl.ORIGINAL_ID, -1);
          collection = this.getCollection(mongo, getIntSafely(backupMsgTopicNameToSizes, topicName),
                getIntSafely(backupMsgTopicNameToMaxDocNums, topicName), BACKUP_MSG_PREFIX + topicName + "#"
-                     + consumerId, new BasicDBObject(MessageDAOImpl.ID, -1));
+                     + consumerId, index);
       }
       return collection;
    }
