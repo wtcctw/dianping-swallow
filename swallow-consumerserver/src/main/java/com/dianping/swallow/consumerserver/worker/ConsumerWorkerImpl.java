@@ -251,8 +251,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       removeByChannel(channel, waitAckMessages);
       removeByChannel(channel, waitAckBackupMessages);
 
-      LOG.info("Worker handle " + channel.getRemoteAddress() + " disconnect!");
-
       //      Map<ConsumerMessage, Boolean> messageMap = waitAckMessages.get(channel);
       //      if (messageMap != null) {
       //         try {
