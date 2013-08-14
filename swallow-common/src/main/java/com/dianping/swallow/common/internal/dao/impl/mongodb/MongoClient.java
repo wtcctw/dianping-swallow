@@ -461,11 +461,11 @@ public class MongoClient implements ConfigChangeListener {
                getIntSafely(msgTopicNameToMaxDocNums, topicName), MSG_PREFIX + topicName, new BasicDBObject(
                      MessageDAOImpl.ID, -1));
       } else {
-         BasicDBObject index = new BasicDBObject(MessageDAOImpl.ID, -1);
-         index.append(MessageDAOImpl.ORIGINAL_ID, -1);
+         BasicDBObject index1 = new BasicDBObject(MessageDAOImpl.ID, -1);
+         BasicDBObject index2 = new BasicDBObject(MessageDAOImpl.ORIGINAL_ID, -1);
          collection = this.getCollection(mongo, getIntSafely(backupMsgTopicNameToSizes, topicName),
                getIntSafely(backupMsgTopicNameToMaxDocNums, topicName), BACKUP_MSG_PREFIX + topicName + "#"
-                     + consumerId, index);
+                     + consumerId, index1, index2);
       }
       return collection;
    }
@@ -519,7 +519,7 @@ public class MongoClient implements ConfigChangeListener {
    }
 
    private DBCollection getCollection(Mongo mongo, int size, int cappedCollectionMaxDocNum, String dbName,
-                                      DBObject indexDBObject) {
+                                      DBObject... indexDBObjects) {
       //根据topicname从Mongo实例从获取DB
       DB db = mongo.getDB(dbName);
       //从DB实例获取Collection(因为只有一个Collection，所以名字均叫做c),如果不存在，则创建)
@@ -528,7 +528,7 @@ public class MongoClient implements ConfigChangeListener {
          synchronized (db) {
             if (!collectionExists(db) && !db.collectionExists(DEFAULT_COLLECTION_NAME)) {
                collection = createColletcion(db, DEFAULT_COLLECTION_NAME, size, cappedCollectionMaxDocNum,
-                     indexDBObject);
+                     indexDBObjects);
             }
             markCollectionExists(db);//缓存default collection 存在的标识，避免db.collectionExists的调用
          }
@@ -558,7 +558,7 @@ public class MongoClient implements ConfigChangeListener {
    }
 
    private DBCollection createColletcion(DB db, String collectionName, int size, int cappedCollectionMaxDocNum,
-                                         DBObject indexDBObject) {
+                                         DBObject... indexDBObjects) {
       DBObject options = new BasicDBObject();
       options.put("capped", true);
       if (size > 0) {
@@ -569,10 +569,12 @@ public class MongoClient implements ConfigChangeListener {
       }
       try {
          DBCollection collection = db.createCollection(collectionName, options);
-         LOG.info("Create collection '" + collection + "' on db " + db + ", index is " + indexDBObject);
-         if (indexDBObject != null) {
-            collection.ensureIndex(indexDBObject);
-            LOG.info("Ensure index " + indexDBObject + " on colleciton " + collection);
+         LOG.info("Create collection '" + collection + "' on db " + db + ", index is " + indexDBObjects);
+         if (indexDBObjects != null) {
+            for (DBObject indexDBObject : indexDBObjects) {
+               collection.ensureIndex(indexDBObject);
+               LOG.info("Ensure index " + indexDBObject + " on colleciton " + collection);
+            }
          }
          return collection;
       } catch (MongoException e) {
