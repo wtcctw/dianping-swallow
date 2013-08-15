@@ -10,9 +10,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
+import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
 public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessage> implements
       CloseableBlockingQueue<SwallowMessage> {
@@ -21,8 +23,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
    private static final Logger          LOG                               = LoggerFactory
                                                                                 .getLogger(MessageBlockingQueue.class);
 
-   private final String                 cid;
-   private final String                 topicName;
+   private final ConsumerInfo           consumerInfo;
 
    protected transient MessageRetriever messageRetriever;
 
@@ -43,12 +44,11 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
    protected volatile Long              tailBackupMessageId;
    private int                          retrieverFromBackupIntervalSecond = 10;
 
-   public MessageBlockingQueue(String cid, String topicName, int threshold, int capacity, Long messageIdOfTailMessage,
+   public MessageBlockingQueue(ConsumerInfo consumerInfo, int threshold, int capacity, Long messageIdOfTailMessage,
                                Long tailBackupMessageId) {
       super(capacity);
       //能运行到这里，说明capacity>0
-      this.cid = cid;
-      this.topicName = topicName;
+      this.consumerInfo = consumerInfo;
       if (threshold < 0) {
          throw new IllegalArgumentException("threshold: " + threshold);
       }
@@ -60,12 +60,11 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
       this.tailBackupMessageId = tailBackupMessageId;
    }
 
-   public MessageBlockingQueue(String cid, String topicName, int threshold, int capacity, Long messageIdOfTailMessage,
+   public MessageBlockingQueue(ConsumerInfo consumerInfo, int threshold, int capacity, Long messageIdOfTailMessage,
                                Long tailBackupMessageId, MessageFilter messageFilter) {
       super(capacity);
       //能运行到这里，说明capacity>0
-      this.cid = cid;
-      this.topicName = topicName;
+      this.consumerInfo = consumerInfo;
       if (threshold < 0) {
          throw new IllegalArgumentException("threshold: " + threshold);
       }
@@ -82,8 +81,11 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
       messageRetrieverThread = new MessageRetrieverThread();
       messageRetrieverThread.start();
 
-      backupMessageRetrieverThread = new BackupMessageRetrieverThread();
-      backupMessageRetrieverThread.start();
+      //非持久的，不会有backup队列
+      if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+         backupMessageRetrieverThread = new BackupMessageRetrieverThread();
+         backupMessageRetrieverThread.start();
+      }
 
    }
 
@@ -139,7 +141,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
       private DefaultPullStrategy pullStrategy = new DefaultPullStrategy(delayBase, delayUpperbound);
 
       public MessageRetrieverThread() {
-         this.setName("swallow-MessageRetriever-(topic=" + topicName + ",cid=" + cid + ")");
+         this.setName("swallow-MessageRetriever-(topic=" + consumerInfo.getDest().getName() + ",cid="
+               + consumerInfo.getConsumerId() + ")");
          this.setDaemon(true);
       }
 
@@ -166,7 +169,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
             LOG.debug("retriveMessage() start:" + this.getName());
          }
          try {
-            List messages = messageRetriever.retriveMessage(topicName, null, tailMessageId, messageFilter);
+            List messages = messageRetriever.retriveMessage(consumerInfo.getDest().getName(), null, tailMessageId,
+                  messageFilter);
             if (messages != null && messages.size() > 0) {
                tailMessageId = (Long) messages.get(0);
                putMessage(messages);
@@ -190,7 +194,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
    private class BackupMessageRetrieverThread extends Thread {
 
       public BackupMessageRetrieverThread() {
-         this.setName("swallow-BackupMessageRetriever-(topic=" + topicName + ",cid=" + cid + ")");
+         this.setName("swallow-BackupMessageRetriever-(topic=" + consumerInfo.getDest().getName() + ",cid="
+               + consumerInfo.getConsumerId() + ")");
          this.setDaemon(true);
       }
 
@@ -214,7 +219,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
             LOG.debug("retriveMessage() start:" + this.getName());
          }
          try {
-            List messages = messageRetriever.retriveMessage(topicName, cid, tailBackupMessageId, messageFilter);
+            List messages = messageRetriever.retriveMessage(consumerInfo.getDest().getName(),
+                  consumerInfo.getConsumerId(), tailBackupMessageId, messageFilter);
             if (messages != null && messages.size() > 0) {
                tailBackupMessageId = (Long) messages.get(0);
                putMessage(messages);
@@ -237,7 +243,12 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
    @Override
    public void close() {
       if (isClosed.compareAndSet(false, true)) {
-         this.messageRetrieverThread.interrupt();
+         if (messageRetrieverThread != null) {
+            messageRetrieverThread.interrupt();
+         }
+         if (backupMessageRetrieverThread != null) {
+            backupMessageRetrieverThread.interrupt();
+         }
       }
    }
 
@@ -267,7 +278,8 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
          try {
             MessageBlockingQueue.this.put(message);
             if (LOG.isDebugEnabled()) {
-               LOG.debug("add message to (topic=" + topicName + ",cid=" + cid + ") queue:" + message.toString());
+               LOG.debug("Add message to (topic=" + consumerInfo.getDest().getName() + ",cid="
+                     + consumerInfo.getConsumerId() + ") queue:" + message.toString());
             }
          } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

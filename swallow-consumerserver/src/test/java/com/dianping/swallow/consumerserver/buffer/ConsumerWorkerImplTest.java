@@ -26,7 +26,6 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.consumerserver.worker.ConsumerId;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
@@ -70,9 +69,8 @@ public class ConsumerWorkerImplTest extends AbstractTest {
       CloseableBlockingQueue<SwallowMessage> messageQueue = new MockedCloseableBlockingQueue<SwallowMessage>();
 
       makeMessages(messageQueue);
-      when(
-            swallowBuffer.createMessageQueue(Matchers.anyString(), Matchers.anyString(), Matchers.anyLong(), null,
-                  (MessageFilter) Matchers.anyObject())).thenReturn(messageQueue);
+      when(swallowBuffer.createMessageQueue(null, Matchers.anyLong(), null, (MessageFilter) Matchers.anyObject()))
+            .thenReturn(messageQueue);
       //      AckDAO ackDAO = mock(AckDAO.class);
       //      //doReturn(print()).when(ackDAO).add(Matchers.anyString(), Matchers.anyString(), Matchers.anyLong(), Matchers.anyString());
       //      MessageDAO messageDAO = mock(MessageDAO.class);
@@ -133,8 +131,8 @@ public class ConsumerWorkerImplTest extends AbstractTest {
    public void testHandleGreet_NON_DURABLE() throws InterruptedException {
       //      mockChannel();
       //      mockDao();
-      ConsumerId consumerId2 = new ConsumerId(CONSUMER_ID2, Destination.topic(TOPIC_NAME));
-      ConsumerInfo consumerInfo2 = new ConsumerInfo(consumerId2, ConsumerType.NON_DURABLE);
+      ConsumerInfo consumerInfo2 = new ConsumerInfo(CONSUMER_ID2, Destination.topic(TOPIC_NAME),
+            ConsumerType.NON_DURABLE);
       consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null);
       Thread.sleep(3000);
       //      Assert.assertTrue(check(50));
@@ -150,8 +148,8 @@ public class ConsumerWorkerImplTest extends AbstractTest {
    public void testHandleGreet_topicFirst() throws InterruptedException {
       //      mockChannel();
       //      mockDao();
-      ConsumerId consumerId3 = new ConsumerId(CONSUMER_ID, Destination.topic(TOPIC_NAME2));
-      ConsumerInfo consumerInfo3 = new ConsumerInfo(consumerId3, ConsumerType.DURABLE_AT_MOST_ONCE);
+      ConsumerInfo consumerInfo3 = new ConsumerInfo(CONSUMER_ID, Destination.topic(TOPIC_NAME2),
+            ConsumerType.DURABLE_AT_MOST_ONCE);
       consumerWorkerManager.handleGreet(channel, consumerInfo3, 50, null);
       Thread.sleep(3000);
       //      Assert.assertTrue(check(50));
@@ -167,8 +165,8 @@ public class ConsumerWorkerImplTest extends AbstractTest {
    public void testHandleGreet_consumerFirst() throws InterruptedException {
       //      mockChannel();
       //      mockDao();
-      ConsumerId consumerId2 = new ConsumerId(CONSUMER_ID2, Destination.topic(TOPIC_NAME));
-      ConsumerInfo consumerInfo2 = new ConsumerInfo(consumerId2, ConsumerType.DURABLE_AT_MOST_ONCE);
+      ConsumerInfo consumerInfo2 = new ConsumerInfo(CONSUMER_ID2, Destination.topic(TOPIC_NAME),
+            ConsumerType.DURABLE_AT_MOST_ONCE);
       consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null);
       Thread.sleep(3000);
       //      Assert.assertTrue(check(50));
@@ -185,8 +183,8 @@ public class ConsumerWorkerImplTest extends AbstractTest {
       //      mockChannel();
       //      mockDao();
 
-      ConsumerId consumerId1 = new ConsumerId(CONSUMER_ID, Destination.topic(TOPIC_NAME));
-      ConsumerInfo consumerInfo1 = new ConsumerInfo(consumerId1, ConsumerType.DURABLE_AT_LEAST_ONCE);
+      ConsumerInfo consumerInfo1 = new ConsumerInfo(CONSUMER_ID, Destination.topic(TOPIC_NAME),
+            ConsumerType.DURABLE_AT_LEAST_ONCE);
       consumerWorkerManager.handleGreet(channel, consumerInfo1, 30, null);
       //        Thread.sleep(3000);
       //        Assert.assertTrue(check(30));

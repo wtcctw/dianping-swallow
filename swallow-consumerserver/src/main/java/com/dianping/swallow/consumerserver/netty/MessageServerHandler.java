@@ -1,7 +1,5 @@
 package com.dianping.swallow.consumerserver.netty;
 
-import java.util.UUID;
-
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -18,8 +16,8 @@ import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerMessageType;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
+import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
-import com.dianping.swallow.consumerserver.worker.ConsumerId;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
@@ -30,8 +28,6 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
    private static ChannelGroup   channelGroup = new DefaultChannelGroup();
 
    private ConsumerWorkerManager workerManager;
-
-   private ConsumerId            consumerId;
 
    private ConsumerInfo          consumerInfo;
 
@@ -65,22 +61,22 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
             clientThreadCount = consumerPacket.getThreadCount();
             if (clientThreadCount > workerManager.getConfigManager().getMaxClientThreadCount()) {
                LOG.warn(channel.getRemoteAddress() + " with " + consumerInfo
-                     + "clientThreadCount greater than MaxClientThreadCount("
+                     + " clientThreadCount greater than MaxClientThreadCount("
                      + workerManager.getConfigManager().getMaxClientThreadCount() + ")");
                clientThreadCount = workerManager.getConfigManager().getMaxClientThreadCount();
             }
             String strConsumerId = consumerPacket.getConsumerId();
             if (strConsumerId == null || strConsumerId.trim().length() == 0) {
-               consumerId = new ConsumerId(fakeCid(), consumerPacket.getDest());
-               consumerInfo = new ConsumerInfo(consumerId, ConsumerType.NON_DURABLE);
+               consumerInfo = new ConsumerInfo(ConsumerIdUtil.getRandomNonDurableConsumerId(),
+                     consumerPacket.getDest(), ConsumerType.NON_DURABLE);
             } else {
                if (!NameCheckUtil.isConsumerIdValid(consumerPacket.getConsumerId())) {
                   LOG.error("ConsumerId inValid from " + channel.getRemoteAddress());
                   channel.close();
                   return;
                }
-               consumerId = new ConsumerId(strConsumerId, consumerPacket.getDest());
-               consumerInfo = new ConsumerInfo(consumerId, consumerPacket.getConsumerType());
+               consumerInfo = new ConsumerInfo(strConsumerId, consumerPacket.getDest(),
+                     consumerPacket.getConsumerType());
             }
             LOG.info("received greet from " + e.getChannel().getRemoteAddress() + " with " + consumerInfo);
             workerManager.handleGreet(channel, consumerInfo, clientThreadCount, consumerPacket.getMessageFilter());
@@ -151,19 +147,14 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
    private void removeChannel(ChannelEvent e) {
       channelGroup.remove(e.getChannel());
-      if(consumerInfo != null){//consumerInfo可能为null(比如未收到消息前，messageReceived未被调用，则consumerInfo未被初始化)
-          Channel channel = e.getChannel();
-          workerManager.handleChannelDisconnect(channel, consumerInfo);
+      if (consumerInfo != null) {//consumerInfo可能为null(比如未收到消息前，messageReceived未被调用，则consumerInfo未被初始化)
+         Channel channel = e.getChannel();
+         workerManager.handleChannelDisconnect(channel, consumerInfo);
       }
    }
 
    public static ChannelGroup getChannelGroup() {
       return channelGroup;
-   }
-
-   //生成唯一consumerId
-   private String fakeCid() {
-      return UUID.randomUUID().toString();
    }
 
 }

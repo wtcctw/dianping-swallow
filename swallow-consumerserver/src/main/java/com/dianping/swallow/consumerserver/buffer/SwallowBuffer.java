@@ -1,6 +1,5 @@
 package com.dianping.swallow.consumerserver.buffer;
 
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,6 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
 public class SwallowBuffer {
    /**
@@ -48,7 +48,7 @@ public class SwallowBuffer {
          reentrantLock.lock();// 加锁，防止同时创建相同topicName的TopicCache
          topicBuffer = topicBuffers.get(topicName);// double check
          if (topicBuffer == null) {
-            topicBuffer = new TopicBuffer(topicName);
+            topicBuffer = new TopicBuffer();
             topicBuffers.put(topicName, topicBuffer);
          }
       } finally {// 释放锁
@@ -58,39 +58,28 @@ public class SwallowBuffer {
    }
 
    /**
-    * 根据消费者id，获取消息队列<br>
-    * 该方法是线程安全的。
-    * 
-    * @param cid 消费者id
-    * @return 返回消费者id对应的消息队列
-    */
-   public BlockingQueue<SwallowMessage> getMessageQueue(String topicName, String cid) {
-      return this.getTopicBuffer(topicName).getMessageQueue(cid);
-   }
-
-   /**
     * 创建一个BlockingQueue
     * 
-    * @param cid
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public CloseableBlockingQueue<SwallowMessage> createMessageQueue(String topicName, String cid, Long tailMessageId,
+   public CloseableBlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, Long tailMessageId,
                                                                     Long tailBackupMessageId,
                                                                     MessageFilter messageFilter) {
-      return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId, tailBackupMessageId, messageFilter);
+      return this.getTopicBuffer(consumerInfo.getDest().getName()).createMessageQueue(consumerInfo, tailMessageId,
+            tailBackupMessageId, messageFilter);
    }
 
    /**
     * 创建一个BlockingQueue
     * 
-    * @param cid
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public BlockingQueue<SwallowMessage> createMessageQueue(String topicName, String cid, Long tailMessageId,
+   public BlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, Long tailMessageId,
                                                            Long tailBackupMessageId) {
-      return this.getTopicBuffer(topicName).createMessageQueue(cid, tailMessageId, tailBackupMessageId);
+      return this.getTopicBuffer(consumerInfo.getDest().getName()).createMessageQueue(consumerInfo, tailMessageId,
+            tailBackupMessageId);
    }
 
    private int index(String topicName) {
@@ -125,32 +114,8 @@ public class SwallowBuffer {
 
    private class TopicBuffer {
 
-      private final String                                                   topicName;
-
       private ConcurrentHashMap<String, WeakReference<MessageBlockingQueue>> messageQueues = new ConcurrentHashMap<String, WeakReference<MessageBlockingQueue>>();
 
-      private TopicBuffer(String topicName) {
-         this.topicName = topicName;
-      }
-
-      /**
-       * 根据消费者id，获取消息队列<br>
-       * 该方法是线程安全的。
-       * 
-       * @param cid 消费者id
-       * @return 返回消费者id对应的消息队列
-       */
-      public BlockingQueue<SwallowMessage> getMessageQueue(String cid) {
-         if (cid == null) {
-            throw new IllegalArgumentException("cid is null.");
-         }
-         Reference<MessageBlockingQueue> ref = messageQueues.get(cid);
-         if (ref == null) {
-            return null;
-         }
-         return ref.get();
-      }
-
       /**
        * 创建一个BlockingQueue
        * 
@@ -158,32 +123,32 @@ public class SwallowBuffer {
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public BlockingQueue<SwallowMessage> createMessageQueue(String cid, Long tailMessageId, Long tailBackupMessageId) {
-         return this.createMessageQueue(cid, tailMessageId, tailBackupMessageId, null);
+      public BlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, Long tailMessageId,
+                                                              Long tailBackupMessageId) {
+         return this.createMessageQueue(consumerInfo, tailMessageId, tailBackupMessageId, null);
       }
 
       /**
        * 创建一个BlockingQueue
        * 
-       * @param cid
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public CloseableBlockingQueue<SwallowMessage> createMessageQueue(String cid, Long tailMessageId,
+      public CloseableBlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, Long tailMessageId,
                                                                        Long tailBackupMessageId,
                                                                        MessageFilter messageFilter) {
-         if (cid == null) {
-            throw new IllegalArgumentException("cid is null.");
+         if (consumerInfo == null) {
+            throw new IllegalArgumentException("consumerInfo is null.");
          }
          if (tailMessageId == null) {
             throw new IllegalArgumentException("messageIdOfTailMessage is null.");
          }
          MessageBlockingQueue messageBlockingQueue;
          if (messageFilter != null) {
-            messageBlockingQueue = new MessageBlockingQueue(cid, this.topicName, thresholdOfQueue, capacityOfQueue,
+            messageBlockingQueue = new MessageBlockingQueue(consumerInfo, thresholdOfQueue, capacityOfQueue,
                   tailMessageId, tailBackupMessageId, messageFilter);
          } else {
-            messageBlockingQueue = new MessageBlockingQueue(cid, this.topicName, thresholdOfQueue, capacityOfQueue,
+            messageBlockingQueue = new MessageBlockingQueue(consumerInfo, thresholdOfQueue, capacityOfQueue,
                   tailMessageId, tailBackupMessageId);
          }
          if (delayBase != -1) {
@@ -198,7 +163,7 @@ public class SwallowBuffer {
          messageBlockingQueue.setMessageRetriever(messageRetriever);
          messageBlockingQueue.init();
 
-         messageQueues.put(cid, new WeakReference<MessageBlockingQueue>(messageBlockingQueue));
+         messageQueues.put(consumerInfo.getConsumerId(), new WeakReference<MessageBlockingQueue>(messageBlockingQueue));
          return messageBlockingQueue;
       }
 

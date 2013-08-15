@@ -49,8 +49,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    private ConsumerInfo                                 consumerInfo;
    private MQThreadFactory                              threadFactory;
-   private String                                       consumerId;
-   private String                                       topicName;
    private MessageFilter                                messageFilter;
 
    private SwallowBuffer                                swallowBuffer;
@@ -102,8 +100,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       this.swallowBuffer = workerManager.getSwallowBuffer();
       this.threadFactory = workerManager.getThreadFactory();
       this.messageFilter = messageFilter;
-      this.topicName = consumerInfo.getConsumerId().getDest().getName();
-      this.consumerId = consumerInfo.getConsumerId().getConsumerId();
       this.pullStgy = new DefaultPullStrategy(configManager.getPullFailDelayBase(),
             configManager.getPullFailDelayUpperBound());
       this.seqThreshold = seqThreshold;
@@ -111,8 +107,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
       // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
-         this.consumerInfo = new ConsumerInfo(consumerInfo.getConsumerId(), ConsumerType.DURABLE_AT_LEAST_ONCE);
-         LOG.info("ConsumerClient[topicName=" + topicName + ", consumerid=" + consumerId
+         this.consumerInfo.setConsumerType(ConsumerType.DURABLE_AT_LEAST_ONCE);
+         LOG.warn("ConsumerClient[consumerInfo=" + consumerInfo
                + "] used ConsumerType.DURABLE_AT_MOST_ONCE. Now change it to ConsumerType.DURABLE_AT_LEAST_ONCE.");
       }
 
@@ -120,9 +116,12 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
             new LinkedBlockingQueue<Runnable>(), new MQThreadFactory("swallow-ack-"));
 
       //创建消息缓冲QUEUE
-      long messageIdOfTailMessage = getMaxMessageId(topicName, consumerId, false);
-      long messageIdOfTailBackupMessage = getMaxMessageId(topicName, consumerId, true);
-      messageQueue = swallowBuffer.createMessageQueue(topicName, consumerId, messageIdOfTailMessage,
+      long messageIdOfTailMessage = getMaxMessageId(false);
+      long messageIdOfTailBackupMessage = -1;
+      if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+         messageIdOfTailBackupMessage = getMaxMessageId(true);
+      }
+      messageQueue = swallowBuffer.createMessageQueue(this.consumerInfo, messageIdOfTailMessage,
             messageIdOfTailBackupMessage, this.messageFilter);
 
       start();
@@ -136,15 +135,14 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          public void run() {
             try {
 
-               LOG.info("Receive ACK(" + topicName + "," + consumerId + "," + ackedMsgId + ") from "
-                     + connectedChannels.get(channel));
+               LOG.info("Receive ACK(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
+                     + ackedMsgId + ") from " + connectedChannels.get(channel));
 
                removeWaitAckMessages(ackedMsgId);
 
                if (ACKHandlerType.CLOSE_CHANNEL.equals(type)) {
                   LOG.info("receive ack(type=" + type + ") from " + channel.getRemoteAddress());
-                  channel.close();
-                  // handleChannelDisconnect(channel); //channel.close()会触发netty调用handleChannelDisconnect(channel);
+                  channel.close();//channel.close()会触发netty调用handleChannelDisconnect(channel);
                } else if (ACKHandlerType.SEND_MESSAGE.equals(type)) {
                   freeChannels.add(channel);
                }
@@ -208,7 +206,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          }
          if (overdue && (consumerMessage = waitAckMessages0.remove(mid)) != null) {//超过阈值，则移除空洞
             if (consumerMessage != null && this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-               messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
+               messageDao.saveMessage(this.consumerInfo.getDest().getName(), this.consumerInfo.getConsumerId(),
+                     consumerMessage.message);
                //cat打点，记录一次备份消息的record
                catTraceForBackupRecord(consumerMessage.message);
 
@@ -229,7 +228,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       //如果新的可记录ack的消息id，大于上次记录的最大ack，则可以记录ack
       if (ackMessageId > lastRecordedAckedMessageId0) {
          if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-            ackDao.add(topicName, consumerId, ackMessageId, "batch", isBackup);
+            ackDao.add(this.consumerInfo.getDest().getName(), this.consumerInfo.getConsumerId(), ackMessageId, "batch",
+                  isBackup);
          }
          lastRecordedAckedMessageId0 = ackMessageId;
       }
@@ -250,21 +250,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
       removeByChannel(channel, waitAckMessages);
       removeByChannel(channel, waitAckBackupMessages);
-
-      //      Map<ConsumerMessage, Boolean> messageMap = waitAckMessages.get(channel);
-      //      if (messageMap != null) {
-      //         try {
-      //            Thread.sleep(100);
-      //         } catch (InterruptedException e) {
-      //            //netty自身的线程，不会有谁Interrupt。
-      //         }
-      //         //某个consumer断开了，那么它对应的在waitAckMassage中的那些未返回ack的消息，就重新放回messageToSend里
-      //         for (Map.Entry<ConsumerMessage, Boolean> messageEntry : messageMap.entrySet()) {
-      //            messageDao.saveBackupMessage(topicName, consumerid, messageEntry.getKey().message);
-      //         }
-      //         waitAckMessages.remove(channel);
-      //      }
-
    }
 
    private void removeByChannel(Channel channel, Map<Long, ConsumerMessage> waitAckMessages0) {
@@ -274,7 +259,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          ConsumerMessage consumerMessage = entry.getValue();
          if (consumerMessage.channel.equals(channel)) {
             if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-               messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
+               messageDao.saveMessage(this.consumerInfo.getDest().getName(), this.consumerInfo.getConsumerId(),
+                     consumerMessage.message);
                //cat打点，记录一次备份消息的record
                catTraceForBackupRecord(consumerMessage.message);
             }
@@ -313,7 +299,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
             }
             LOG.info("Message fetcher thread closed");
          }
-      }, this.topicName + "#" + this.consumerId + "-messageFetcher-").start();
+      }, this.consumerInfo.getDest().getName() + "#" + this.consumerInfo.getConsumerId() + "-messageFetcher-").start();
 
    }
 
@@ -325,11 +311,10 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          SwallowMessage message = (SwallowMessage) messageQueue.poll(pullStgy.fail(false), TimeUnit.MILLISECONDS);
          if (message != null) {
             if (!message.isBackup()) {
-               maxAckedMessageSeq++;
+               consumerMessage = new ConsumerMessage(message, channel, ConsumerMessage.SEQ.getAndIncrement());
             } else {
-               maxAckedBackupMessageSeq++;
+               consumerMessage = new ConsumerMessage(message, channel, ConsumerMessage.BACKUP_SEQ.getAndIncrement());
             }
-            consumerMessage = new ConsumerMessage(message, channel);
             pullStgy.succeess();
             break;
          }
@@ -340,11 +325,12 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    private void sendMessage(Channel channel, ConsumerMessage consumerMessage) throws InterruptedException {
-      PktMessage pktMessage = new PktMessage(consumerInfo.getConsumerId().getDest(), consumerMessage.message);
+      PktMessage pktMessage = new PktMessage(consumerInfo.getDest(), consumerMessage.message);
 
       //Cat begin
-      Transaction consumerServerTransaction = Cat.getProducer().newTransaction("Out:" + topicName,
-            consumerId + ":" + IPUtil.getIpFromChannel(channel));
+      Transaction consumerServerTransaction = Cat.getProducer().newTransaction(
+            "Out:" + this.consumerInfo.getDest().getName(),
+            consumerInfo.getConsumerId() + ":" + IPUtil.getIpFromChannel(channel));
       String childEventId;
       try {
          childEventId = Cat.getProducer().createMessageId();
@@ -374,10 +360,13 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       } catch (RuntimeException e) {
          LOG.error(consumerInfo.toString() + "：channel write error.", e);
 
-         //发送失败，则放到backup队列里
-         messageDao.saveMessage(topicName, consumerId, consumerMessage.message);
-         //cat打点，记录一次备份消息的record
-         catTraceForBackupRecord(consumerMessage.message);
+         if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+            //发送失败，则放到backup队列里
+            messageDao.saveMessage(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(),
+                  consumerMessage.message);
+            //cat打点，记录一次备份消息的record
+            catTraceForBackupRecord(consumerMessage.message);
+         }
 
          //Cat begin
          consumerServerTransaction.addData(pktMessage.getContent().toKeyValuePairs());
@@ -391,7 +380,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    private void catTraceForBackupRecord(SwallowMessage message) {
       if (!message.isBackup()) {//一条消息可能会多次放进backup队列，第一次放进backup队列的，才打点。
-         Transaction transaction = Cat.getProducer().newTransaction("Backup:" + topicName, "In:" + consumerId);
+         Transaction transaction = Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
+               "In:" + consumerInfo.getConsumerId());
          if (message != null) {
             transaction.addData("message", message.toString());
          }
@@ -401,7 +391,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    private void catTraceForBackupAck(Long messageId) {
-      Transaction transaction = Cat.getProducer().newTransaction("Backup:" + topicName, "Out:" + consumerId);
+      Transaction transaction = Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
+            "Out:" + consumerInfo.getConsumerId());
       if (messageId != null) {
          transaction.addData("mid", messageId);
       }
@@ -446,24 +437,25 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
     * @param isBakcup
     * @return
     */
-   private long getMaxMessageId(String topicName, String consumerId, boolean isBakcup) {
+   private long getMaxMessageId(boolean isBakcup) {
       Long maxMessageId = null;
+      String topicName = consumerInfo.getDest().getName();
 
       //持久类型，先尝试从数据库的ack表获取最大的id
       if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-         maxMessageId = ackDao.getMaxMessageId(topicName, consumerId, isBakcup);
+         maxMessageId = ackDao.getMaxMessageId(topicName, consumerInfo.getConsumerId(), isBakcup);
       }
 
       //消息id不存在，则从消息队列里获取最大消息id
       if (maxMessageId == null) {
-         maxMessageId = messageDao.getMaxMessageId(topicName, isBakcup ? consumerId : null);
+         maxMessageId = messageDao.getMaxMessageId(topicName, isBakcup ? consumerInfo.getConsumerId() : null);
          if (maxMessageId == null) {//不存在任何消息，则使用当前时间作为消息id即可
             maxMessageId = MongoUtils.getLongByCurTime();
          }
 
          if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
             //持久型且ack尚未有记录，则插入ack，表示以此ack为基准。
-            ackDao.add(topicName, consumerId, maxMessageId, "inited", isBakcup);
+            ackDao.add(topicName, consumerInfo.getConsumerId(), maxMessageId, "inited", isBakcup);
          }
       }
       return maxMessageId;
@@ -483,7 +475,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
     * 对消息的封装，含有其他辅助属性
     */
    private static class ConsumerMessage {
-      static AtomicLong      SEQ = new AtomicLong(1);
+      static AtomicLong      SEQ        = new AtomicLong(1);
+      static AtomicLong      BACKUP_SEQ = new AtomicLong(1);
+
       private SwallowMessage message;
       /** 创建时间 */
       private long           gmt;
@@ -492,12 +486,12 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       /** 连接 */
       private Channel        channel;
 
-      public ConsumerMessage(SwallowMessage message, Channel channel) {
+      public ConsumerMessage(SwallowMessage message, Channel channel, long seq) {
          super();
          this.message = message;
          this.channel = channel;
          this.gmt = System.currentTimeMillis();
-         this.seq = SEQ.getAndIncrement();
+         this.seq = seq;
       }
 
       @Override

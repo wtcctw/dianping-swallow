@@ -32,7 +32,7 @@ public class SwallowBufferTest extends AbstractTest {
    @Autowired
    private MongoClient           mongoClient;
 
-   private String                cid        = "cid-1";
+   //   private String                cid        = "cid-1";
 
    private Long                  tailMessageId;
 
@@ -57,8 +57,7 @@ public class SwallowBufferTest extends AbstractTest {
 
    @Test
    public void testCreateMessageQueue1() throws InterruptedException {
-      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            tailMessageId);
+      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(null, tailMessageId, tailMessageId);
       SwallowMessage m;
       while ((m = queue.poll(1, TimeUnit.SECONDS)) == null) {
          ;
@@ -70,8 +69,8 @@ public class SwallowBufferTest extends AbstractTest {
    public void testCreateMessageQueue2() throws InterruptedException {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(TYPE);
-      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
+      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(null, tailMessageId, tailMessageId,
+            MessageFilter.createInSetMessageFilter(messageTypeSet));
 
       SwallowMessage m;
       while ((m = queue.poll(1, TimeUnit.SECONDS)) == null) {
@@ -81,29 +80,11 @@ public class SwallowBufferTest extends AbstractTest {
    }
 
    @Test
-   public void testGetMessageQueue() throws InterruptedException {
-      Set<String> messageTypeSet = new HashSet<String>();
-      messageTypeSet.add(TYPE);
-
-      swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId, tailMessageId,
-            MessageFilter.createInSetMessageFilter(messageTypeSet));
-      BlockingQueue<SwallowMessage> queue = swallowBuffer.getMessageQueue(TOPIC_NAME, cid);
-      SwallowMessage m;
-      while ((m = queue.poll(1, TimeUnit.SECONDS)) == null) {
-         ;
-      }
-      while ((m = queue.poll(1, TimeUnit.SECONDS)) == null) {
-         ;
-      }
-      Assert.assertEquals("content3", m.getContent());
-   }
-
-   @Test
    public void testPoll1() throws InterruptedException {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(TYPE);
-      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
+      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(null, tailMessageId, tailMessageId,
+            MessageFilter.createInSetMessageFilter(messageTypeSet));
 
       SwallowMessage m = queue.poll();
       while (m == null) {
@@ -116,8 +97,8 @@ public class SwallowBufferTest extends AbstractTest {
    public void testPoll2() throws InterruptedException {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(TYPE);
-      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
+      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(null, tailMessageId, tailMessageId,
+            MessageFilter.createInSetMessageFilter(messageTypeSet));
 
       SwallowMessage m = queue.poll(500, TimeUnit.MILLISECONDS);
       while (m == null) {
@@ -136,8 +117,8 @@ public class SwallowBufferTest extends AbstractTest {
 
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(myType);
-      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(TOPIC_NAME, cid, tailMessageId,
-            tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
+      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(null, tailMessageId, tailMessageId,
+            MessageFilter.createInSetMessageFilter(messageTypeSet));
 
       SwallowMessage m = queue.poll(500, TimeUnit.MILLISECONDS);
       while (m == null) {

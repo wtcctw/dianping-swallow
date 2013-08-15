@@ -19,23 +19,23 @@ import com.dianping.swallow.consumerserver.config.ConfigManager;
 
 public class ConsumerWorkerManager {
 
-   private static final Logger             LOG                = LoggerFactory.getLogger(ConsumerWorkerManager.class);
+   private static final Logger               LOG                = LoggerFactory.getLogger(ConsumerWorkerManager.class);
 
-   private AckDAO                          ackDAO;
-   private Heartbeater                     heartbeater;
-   private SwallowBuffer                   swallowBuffer;
-   private MessageDAO                      messageDAO;
+   private AckDAO                            ackDAO;
+   private Heartbeater                       heartbeater;
+   private SwallowBuffer                     swallowBuffer;
+   private MessageDAO                        messageDAO;
 
-   private ConfigManager                   configManager      = ConfigManager.getInstance();
+   private ConfigManager                     configManager      = ConfigManager.getInstance();
 
-   private MQThreadFactory                 threadFactory      = new MQThreadFactory();
+   private MQThreadFactory                   threadFactory      = new MQThreadFactory();
 
-   private Map<ConsumerId, ConsumerWorker> consumerId2ConsumerWorker;
+   private Map<ConsumerInfo, ConsumerWorker> consumerInfo2ConsumerWorker;
 
-   private Thread                          idleWorkerManagerCheckerThread;
-   private Thread                          maxAckedMessageIdUpdaterThread;
+   private Thread                            idleWorkerManagerCheckerThread;
+   private Thread                            maxAckedMessageIdUpdaterThread;
 
-   private volatile boolean                readyForAcceptConn = true;
+   private volatile boolean                  readyForAcceptConn = true;
 
    public void setAckDAO(AckDAO ackDAO) {
       this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO,
@@ -97,34 +97,34 @@ public class ConsumerWorkerManager {
       readyForAcceptConn = false;
 
       //遍历所有ConsumerWorker，停止发送消息给client端
-      LOG.info("stoping ConsumerWorker's Send-Message thread.");
-      if (consumerId2ConsumerWorker != null) {
-         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+      LOG.info("Stoping ConsumerWorker's Send-Message thread.");
+      if (consumerInfo2ConsumerWorker != null) {
+         for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
             entry.getValue().closeMessageFetcherThread();
          }
       }
-      LOG.info("stoped.");
+      LOG.info("Stoped.");
 
       //等待一段时间，以便让所有ConsumerWorker，可以从client端接收 “已发送但未收到ack的消息” 的ack
       try {
          long waitAckTimeWhenCloseSwc = configManager.getWaitAckTimeWhenCloseSwc();
-         LOG.info("sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
+         LOG.info("Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
          Thread.sleep(configManager.getWaitAckTimeWhenCloseSwc());
-         LOG.info("sleep done.");
+         LOG.info("Sleep done.");
       } catch (InterruptedException e) {
-         LOG.error("close Swc thread InterruptedException", e);
+         LOG.error("Close Swc thread InterruptedException", e);
       }
 
       //所有ConsumerWorker，不再处理接收到的ack(接收到，则丢弃)
-      if (consumerId2ConsumerWorker != null) {
-         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+      if (consumerInfo2ConsumerWorker != null) {
+         for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
             entry.getValue().closeAckExecutor();
          }
       }
 
       //关闭ConsumerWorker的资源（关闭内部的“用于获取消息的队列”）
-      if (consumerId2ConsumerWorker != null) {
-         for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+      if (consumerInfo2ConsumerWorker != null) {
+         for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
             entry.getValue().close();
          }
       }
@@ -145,30 +145,28 @@ public class ConsumerWorkerManager {
       }
 
       //清空 “用于保存状态的” 2个map
-      if (consumerId2ConsumerWorker != null) {
-         consumerId2ConsumerWorker.clear();
+      if (consumerInfo2ConsumerWorker != null) {
+         consumerInfo2ConsumerWorker.clear();
       }
    }
 
    private ConsumerWorker findConsumerWorker(ConsumerInfo consumerInfo) {
-      ConsumerId consumerId = consumerInfo.getConsumerId();
-      return consumerId2ConsumerWorker.get(consumerId);
+      return consumerInfo2ConsumerWorker.get(consumerInfo);
    }
 
-   public Map<ConsumerId, ConsumerWorker> getConsumerId2ConsumerWorker() {
-      return consumerId2ConsumerWorker;
+   public Map<ConsumerInfo, ConsumerWorker> getConsumerId2ConsumerWorker() {
+      return consumerInfo2ConsumerWorker;
    }
 
    private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo, MessageFilter messageFilter) {
       ConsumerWorker worker = findConsumerWorker(consumerInfo);
       if (worker == null) {
          // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
-         synchronized (consumerInfo.getConsumerId().getConsumerId().intern()) {
+         synchronized (consumerInfo.getConsumerId().intern()) {
             if ((worker = findConsumerWorker(consumerInfo)) == null) {
                worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, configManager.getSeqThreshold(),
                      configManager.getWaitAckTimeThreshold());
-               ConsumerId consumerId = consumerInfo.getConsumerId();
-               consumerId2ConsumerWorker.put(consumerId, worker);
+               consumerInfo2ConsumerWorker.put(consumerInfo, worker);
             }
          }
       }
@@ -187,7 +185,7 @@ public class ConsumerWorkerManager {
    public void start() {
       readyForAcceptConn = true;
 
-      consumerId2ConsumerWorker = new ConcurrentHashMap<ConsumerId, ConsumerWorker>();
+      consumerInfo2ConsumerWorker = new ConcurrentHashMap<ConsumerInfo, ConsumerWorker>();
 
       startIdleWorkerCheckerThread();
       startMaxAckedMessageIdUpdaterThread();
@@ -199,10 +197,8 @@ public class ConsumerWorkerManager {
          @Override
          public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-               for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+               for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
                   ConsumerWorker worker = entry.getValue();
-                  //                  ConsumerId consumerId = entry.getKey();
-                  //                  updateMaxAckedMessageId(worker, consumerId);
                   worker.recordAck();
 
                }
@@ -221,16 +217,6 @@ public class ConsumerWorkerManager {
       maxAckedMessageIdUpdaterThread.start();
    }
 
-   //   private void updateMaxAckedMessageId(ConsumerWorker worker, ConsumerId consumerId) {
-   //      Long lastSavedAckedMsgId = consumerId2MaxSavedAckedMessageId.get(consumerId);
-   //      lastSavedAckedMsgId = lastSavedAckedMsgId == null ? 0 : lastSavedAckedMsgId;
-   //      Long currentMaxAckedMsgId = worker.getMaxAckedMessageId();
-   //      if (currentMaxAckedMsgId > 0 && currentMaxAckedMsgId > lastSavedAckedMsgId) {
-   //         ackDAO.add(consumerId.getDest().getName(), consumerId.getConsumerId(), currentMaxAckedMsgId, "batch");
-   //         consumerId2MaxSavedAckedMessageId.put(consumerId, currentMaxAckedMsgId);
-   //      }
-   //   }
-
    private void startIdleWorkerCheckerThread() {
       idleWorkerManagerCheckerThread = threadFactory.newThread(new Runnable() {
 
@@ -238,17 +224,16 @@ public class ConsumerWorkerManager {
          public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                //轮询所有ConsumerWorker，如果其已经没有channel，则关闭ConsumerWorker,并移除
-               for (Map.Entry<ConsumerId, ConsumerWorker> entry : consumerId2ConsumerWorker.entrySet()) {
+               for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
                   ConsumerWorker worker = entry.getValue();
-                  ConsumerId consumerId = entry.getKey();
+                  ConsumerInfo consumerInfo = entry.getKey();
                   if (worker.allChannelDisconnected()) {
-                     //                     updateMaxAckedMessageId(worker, consumerId);
                      worker.recordAck();
-                     removeConsumerWorker(consumerId);
+                     removeConsumerWorker(consumerInfo);
                      worker.closeMessageFetcherThread();
                      worker.closeAckExecutor();
                      worker.close();
-                     LOG.info("ConsumerWorker for " + consumerId + " has no connected channel, close it");
+                     LOG.info("ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
                   }
                }
                // 轮询时有一定的时间间隔
@@ -293,8 +278,8 @@ public class ConsumerWorkerManager {
    /**
     * consumerId对应的ConsumerWorker已经没有任何连接，所以移除ConsumerWorker
     */
-   private void removeConsumerWorker(ConsumerId consumerId) {
-      consumerId2ConsumerWorker.remove(consumerId);
+   private void removeConsumerWorker(ConsumerInfo consumerInfo) {
+      consumerInfo2ConsumerWorker.remove(consumerInfo);
    }
 
    public AckDAO getAckDAO() {
