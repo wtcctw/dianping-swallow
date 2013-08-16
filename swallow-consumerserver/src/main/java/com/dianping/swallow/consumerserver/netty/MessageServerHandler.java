@@ -18,6 +18,7 @@ import com.dianping.swallow.common.internal.consumer.ConsumerMessageType;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
+import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
@@ -59,11 +60,11 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
                return;
             }
             clientThreadCount = consumerPacket.getThreadCount();
-            if (clientThreadCount > workerManager.getConfigManager().getMaxClientThreadCount()) {
+            if (clientThreadCount > ConfigManager.getInstance().getMaxClientThreadCount()) {
                LOG.warn(channel.getRemoteAddress() + " with " + consumerInfo
                      + " clientThreadCount greater than MaxClientThreadCount("
-                     + workerManager.getConfigManager().getMaxClientThreadCount() + ")");
-               clientThreadCount = workerManager.getConfigManager().getMaxClientThreadCount();
+                     + ConfigManager.getInstance().getMaxClientThreadCount() + ")");
+               clientThreadCount = ConfigManager.getInstance().getMaxClientThreadCount();
             }
             String strConsumerId = consumerPacket.getConsumerId();
             if (strConsumerId == null || strConsumerId.trim().length() == 0) {
@@ -90,7 +91,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
                      @Override
                      public void run() {
                         try {
-                           Thread.sleep(workerManager.getConfigManager().getCloseChannelMaxWaitingTime());
+                           Thread.sleep(ConfigManager.getInstance().getCloseChannelMaxWaitingTime());
                         } catch (InterruptedException e) {
                            LOG.error("CloseChannelThread InterruptedException", e);
                         }

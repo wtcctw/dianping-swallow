@@ -63,8 +63,8 @@ public class SwallowBuffer {
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public CloseableBlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, Long tailMessageId,
-                                                                    Long tailBackupMessageId,
+   public CloseableBlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, long tailMessageId,
+                                                                    long tailBackupMessageId,
                                                                     MessageFilter messageFilter) {
       return this.getTopicBuffer(consumerInfo.getDest().getName()).createMessageQueue(consumerInfo, tailMessageId,
             tailBackupMessageId, messageFilter);
@@ -76,8 +76,8 @@ public class SwallowBuffer {
     * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
     * @return
     */
-   public BlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, Long tailMessageId,
-                                                           Long tailBackupMessageId) {
+   public BlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, long tailMessageId,
+                                                           long tailBackupMessageId) {
       return this.getTopicBuffer(consumerInfo.getDest().getName()).createMessageQueue(consumerInfo, tailMessageId,
             tailBackupMessageId);
    }
@@ -123,8 +123,8 @@ public class SwallowBuffer {
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public BlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, Long tailMessageId,
-                                                              Long tailBackupMessageId) {
+      public BlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, long tailMessageId,
+                                                              long tailBackupMessageId) {
          return this.createMessageQueue(consumerInfo, tailMessageId, tailBackupMessageId, null);
       }
 
@@ -134,14 +134,11 @@ public class SwallowBuffer {
        * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
        * @return
        */
-      public CloseableBlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, Long tailMessageId,
-                                                                       Long tailBackupMessageId,
+      public CloseableBlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, long tailMessageId,
+                                                                       long tailBackupMessageId,
                                                                        MessageFilter messageFilter) {
          if (consumerInfo == null) {
             throw new IllegalArgumentException("consumerInfo is null.");
-         }
-         if (tailMessageId == null) {
-            throw new IllegalArgumentException("messageIdOfTailMessage is null.");
          }
          MessageBlockingQueue messageBlockingQueue;
          if (messageFilter != null) {

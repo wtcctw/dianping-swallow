@@ -33,10 +33,10 @@ public final class ConfigManager {
    private int                  masterPort                      = 8081;
    private int                  slavePort                       = 8082;
    private int                  ackedMessageIdUpdateInterval    = 1000;
-   /** maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的阈值 */
-   private long                 seqThreshold                    = 500;
+//   /** maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的阈值 */
+//   private long                 seqThreshold                    = 500;
    /** 允许"最小的空洞waitAckMessage"存活的时间的阈值,单位秒 */
-   private long                 waitAckTimeThreshold            = 5 * 60;                                      //5分钟
+   private long                 waitAckExpiredSecond            = 30;                                          //30秒
 
    //Master Ip
    private String               masterIp                        = "127.0.0.1";
@@ -107,12 +107,12 @@ public final class ConfigManager {
       return ackedMessageIdUpdateInterval;
    }
 
-   public long getSeqThreshold() {
-      return seqThreshold;
-   }
+   //   public long getSeqThreshold() {
+   //      return seqThreshold;
+   //   }
 
-   public long getWaitAckTimeThreshold() {
-      return waitAckTimeThreshold;
+   public long getWaitAckExpiredSecond() {
+      return waitAckExpiredSecond;
    }
 
    public static void main(String[] args) {

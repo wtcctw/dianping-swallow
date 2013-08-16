@@ -69,7 +69,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
       CloseableBlockingQueue<SwallowMessage> messageQueue = new MockedCloseableBlockingQueue<SwallowMessage>();
 
       makeMessages(messageQueue);
-      when(swallowBuffer.createMessageQueue(null, Matchers.anyLong(), null, (MessageFilter) Matchers.anyObject()))
+      when(swallowBuffer.createMessageQueue(null, Matchers.anyLong(), -1, (MessageFilter) Matchers.anyObject()))
             .thenReturn(messageQueue);
       //      AckDAO ackDAO = mock(AckDAO.class);
       //      //doReturn(print()).when(ackDAO).add(Matchers.anyString(), Matchers.anyString(), Matchers.anyLong(), Matchers.anyString());

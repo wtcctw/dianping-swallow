@@ -26,8 +26,6 @@ public class ConsumerWorkerManager {
    private SwallowBuffer                     swallowBuffer;
    private MessageDAO                        messageDAO;
 
-   private ConfigManager                     configManager      = ConfigManager.getInstance();
-
    private MQThreadFactory                   threadFactory      = new MQThreadFactory();
 
    private Map<ConsumerInfo, ConsumerWorker> consumerInfo2ConsumerWorker;
@@ -38,8 +36,8 @@ public class ConsumerWorkerManager {
    private volatile boolean                  readyForAcceptConn = true;
 
    public void setAckDAO(AckDAO ackDAO) {
-      this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO,
-            configManager.getRetryIntervalWhenMongoException());
+      this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO, ConfigManager.getInstance()
+            .getRetryIntervalWhenMongoException());
    }
 
    public MQThreadFactory getThreadFactory() {
@@ -55,12 +53,8 @@ public class ConsumerWorkerManager {
    }
 
    public void setMessageDAO(MessageDAO messageDAO) {
-      this.messageDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(messageDAO,
-            configManager.getRetryIntervalWhenMongoException());
-   }
-
-   public ConfigManager getConfigManager() {
-      return configManager;
+      this.messageDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(messageDAO, ConfigManager.getInstance()
+            .getRetryIntervalWhenMongoException());
    }
 
    public void handleGreet(Channel channel, ConsumerInfo consumerInfo, int clientThreadCount,
@@ -107,9 +101,9 @@ public class ConsumerWorkerManager {
 
       //等待一段时间，以便让所有ConsumerWorker，可以从client端接收 “已发送但未收到ack的消息” 的ack
       try {
-         long waitAckTimeWhenCloseSwc = configManager.getWaitAckTimeWhenCloseSwc();
+         long waitAckTimeWhenCloseSwc = ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc();
          LOG.info("Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
-         Thread.sleep(configManager.getWaitAckTimeWhenCloseSwc());
+         Thread.sleep(ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc());
          LOG.info("Sleep done.");
       } catch (InterruptedException e) {
          LOG.error("Close Swc thread InterruptedException", e);
@@ -164,8 +158,7 @@ public class ConsumerWorkerManager {
          // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
          synchronized (consumerInfo.getConsumerId().intern()) {
             if ((worker = findConsumerWorker(consumerInfo)) == null) {
-               worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, configManager.getSeqThreshold(),
-                     configManager.getWaitAckTimeThreshold());
+               worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter);
                consumerInfo2ConsumerWorker.put(consumerInfo, worker);
             }
          }
@@ -175,7 +168,7 @@ public class ConsumerWorkerManager {
 
    public void init(boolean isSlave) {
       if (!isSlave) {
-         startHeartbeater(configManager.getMasterIp());
+         startHeartbeater(ConfigManager.getInstance().getMasterIp());
       }
    }
 
@@ -205,7 +198,7 @@ public class ConsumerWorkerManager {
 
                // 轮询时有一定的时间间隔
                try {
-                  Thread.sleep(configManager.getAckedMessageIdUpdateInterval());
+                  Thread.sleep(ConfigManager.getInstance().getAckedMessageIdUpdateInterval());
                } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                }
@@ -238,7 +231,7 @@ public class ConsumerWorkerManager {
                }
                // 轮询时有一定的时间间隔
                try {
-                  Thread.sleep(configManager.getCheckConnectedChannelInterval());
+                  Thread.sleep(ConfigManager.getInstance().getCheckConnectedChannelInterval());
                } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                }
@@ -261,7 +254,7 @@ public class ConsumerWorkerManager {
 
                try {
                   heartbeater.beat(ip);
-                  Thread.sleep(configManager.getHeartbeatUpdateInterval());
+                  Thread.sleep(ConfigManager.getInstance().getHeartbeatUpdateInterval());
                } catch (Exception e) {
                   LOG.error("Error update heart beat", e);
                }

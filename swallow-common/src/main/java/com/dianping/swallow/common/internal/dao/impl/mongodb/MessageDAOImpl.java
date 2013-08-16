@@ -149,12 +149,14 @@ public class MessageDAOImpl implements MessageDAO {
    @SuppressWarnings({ "unchecked" })
    private void convert(DBObject result, SwallowMessage swallowMessage) {
       BSONTimestamp timestamp = (BSONTimestamp) result.get(ID);
-      swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(timestamp));
-
       BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(ORIGINAL_ID);
+
       if (originalTimestamp != null) {
-         swallowMessage.setOriginalMessageId(MongoUtils.BSONTimestampToLong(originalTimestamp));
+         swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(originalTimestamp));
+         swallowMessage.setBackupMessageId(MongoUtils.BSONTimestampToLong(timestamp));
          swallowMessage.setBackup(true);
+      } else {
+         swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(timestamp));
       }
 
       swallowMessage.setContent(result.get(CONTENT));//content
@@ -184,22 +186,10 @@ public class MessageDAOImpl implements MessageDAO {
    public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
       DBCollection collection = getCollection(topicName, consumerId);
 
-      if (consumerId != null) {
-         //对于放入备份队列的新消息，OriginalMessageId为其messageId
-         if (message.getOriginalMessageId() == null) {
-            message.setOriginalMessageId(message.getMessageId());
-         }
-      }
-
-      saveMessage(message, collection);
-   }
-
-   private void saveMessage(SwallowMessage message, DBCollection collection) {
       BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
-      //如果有ORIGINAL_ID，则也存起来
-      Long originalMessageId = message.getOriginalMessageId();
-      if (originalMessageId != null && originalMessageId.compareTo(0L) > 0) {
-         builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(originalMessageId));
+      //如果有backupMessageId，则表示是备份消息，那么messageId则作为ORIGINAL_ID存起来
+      if (consumerId != null) {
+         builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getMessageId()));
       }
       //content
       String content = message.getContent();

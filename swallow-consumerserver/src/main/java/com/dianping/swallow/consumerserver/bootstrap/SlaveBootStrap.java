@@ -76,14 +76,14 @@ public class SlaveBootStrap {
       Heartbeater heartbeater = ctx.getBean(Heartbeater.class);
 
       Thread hook = new Thread() {
-          @Override
-          public void run() {
-              closed = true;
-              LOG.info("consumerWorkerManager.close()-started");
-              consumerWorkerManager.close();
-              LOG.info("consumerWorkerManager.close()-finished");
-              closeNettyRelatedResource();
-          }
+         @Override
+         public void run() {
+            closed = true;
+            LOG.info("consumerWorkerManager.close()-started");
+            consumerWorkerManager.close();
+            LOG.info("consumerWorkerManager.close()-finished");
+            closeNettyRelatedResource();
+         }
       };
       hook.setDaemon(true);
       hook.setName("Swallow-ShutdownHook");
@@ -125,8 +125,8 @@ public class SlaveBootStrap {
          });
 
          // Bind and start to accept incoming connections.
-         bootstrap.bind(new InetSocketAddress(consumerWorkerManager.getConfigManager().getSlavePort()));
-         LOG.info("Server started on port " + consumerWorkerManager.getConfigManager().getSlavePort());
+         bootstrap.bind(new InetSocketAddress(ConfigManager.getInstance().getSlavePort()));
+         LOG.info("Server started on port " + ConfigManager.getInstance().getSlavePort());
 
          try {
             heartbeater.waitUntilMasterUp(configManager.getMasterIp(), configManager.getHeartbeatCheckInterval(),
