@@ -19,21 +19,25 @@ import com.dianping.swallow.consumerserver.config.ConfigManager;
 
 public class ConsumerWorkerManager {
 
-   private static final Logger               LOG                = LoggerFactory.getLogger(ConsumerWorkerManager.class);
+   private static final Logger               LOG                   = LoggerFactory
+                                                                         .getLogger(ConsumerWorkerManager.class);
+
+   private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance()
+                                                                         .getAckIdUpdateIntervalSecond() * 1000;
 
    private AckDAO                            ackDAO;
    private Heartbeater                       heartbeater;
    private SwallowBuffer                     swallowBuffer;
    private MessageDAO                        messageDAO;
 
-   private MQThreadFactory                   threadFactory      = new MQThreadFactory();
+   private MQThreadFactory                   threadFactory         = new MQThreadFactory();
 
    private Map<ConsumerInfo, ConsumerWorker> consumerInfo2ConsumerWorker;
 
    private Thread                            idleWorkerManagerCheckerThread;
-   private Thread                            maxAckedMessageIdUpdaterThread;
+   private Thread                            ackIdUpdaterThread;
 
-   private volatile boolean                  readyForAcceptConn = true;
+   private volatile boolean                  readyForAcceptConn    = true;
 
    public void setAckDAO(AckDAO ackDAO) {
       this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO, ConfigManager.getInstance()
@@ -103,7 +107,7 @@ public class ConsumerWorkerManager {
       try {
          long waitAckTimeWhenCloseSwc = ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc();
          LOG.info("Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
-         Thread.sleep(ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc());
+         Thread.sleep(waitAckTimeWhenCloseSwc);
          LOG.info("Sleep done.");
       } catch (InterruptedException e) {
          LOG.error("Close Swc thread InterruptedException", e);
@@ -129,10 +133,10 @@ public class ConsumerWorkerManager {
       }
 
       //等待“更新ack”的线程的关闭
-      if (maxAckedMessageIdUpdaterThread != null) {
+      if (ackIdUpdaterThread != null) {
          try {
-            maxAckedMessageIdUpdaterThread.interrupt();
-            maxAckedMessageIdUpdaterThread.join();
+            ackIdUpdaterThread.interrupt();
+            ackIdUpdaterThread.join();
          } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
          }
@@ -181,11 +185,11 @@ public class ConsumerWorkerManager {
       consumerInfo2ConsumerWorker = new ConcurrentHashMap<ConsumerInfo, ConsumerWorker>();
 
       startIdleWorkerCheckerThread();
-      startMaxAckedMessageIdUpdaterThread();
+      startAckIdUpdaterThread();
    }
 
-   private void startMaxAckedMessageIdUpdaterThread() {
-      maxAckedMessageIdUpdaterThread = threadFactory.newThread(new Runnable() {
+   private void startAckIdUpdaterThread() {
+      ackIdUpdaterThread = threadFactory.newThread(new Runnable() {
 
          @Override
          public void run() {
@@ -193,21 +197,20 @@ public class ConsumerWorkerManager {
                for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
                   ConsumerWorker worker = entry.getValue();
                   worker.recordAck();
-
                }
 
                // 轮询时有一定的时间间隔
                try {
-                  Thread.sleep(ConfigManager.getInstance().getAckedMessageIdUpdateInterval());
+                  Thread.sleep(ACKID_UPDATE_INTERVAL);
                } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                }
             }
-            LOG.info("MaxAckedMessageIdUpdaterThread closed");
+            LOG.info("AckIdUpdaterThread closed");
          }
 
-      }, "maxAckedMessageIdUpdaterThread-");
-      maxAckedMessageIdUpdaterThread.start();
+      }, "AckIdUpdaterThread-");
+      ackIdUpdaterThread.start();
    }
 
    private void startIdleWorkerCheckerThread() {

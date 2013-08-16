@@ -1,6 +1,5 @@
 package com.dianping.swallow.consumerserver.worker;
 
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,10 +45,24 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private static final Logger                          LOG                     = LoggerFactory
                                                                                       .getLogger(ConsumerWorkerImpl.class);
 
-   private static final long                            SECOND                  = 1000;
-
    private final AtomicLong                             SEQ                     = new AtomicLong(1);
    private final AtomicLong                             BACKUP_SEQ              = new AtomicLong(1);
+   /**
+    * maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的值为seqThreshold，seqThreshold
+    * = max(实时qps * seqRatio, minSeqThreshold)
+    */
+   private final int                                    SEQ_RATIO               = ConfigManager.getInstance()
+                                                                                      .getSeqRatio();
+   private final long                                   MIN_SEQ_THRESHOLD       = ConfigManager.getInstance()
+                                                                                      .getMinSeqThreshold();
+   private long                                         INTERVAL_SECOND         = ConfigManager.getInstance()
+                                                                                      .getAckIdUpdateIntervalSecond();
+   private long                                         seqThreshold            = 0;
+   /** 允许"最小的空洞waitAckMessage"存活的时间的阈值,单位秒，默认5分钟 */
+   private final long                                   WAIT_ACK_EXPIRED        = ConfigManager.getInstance()
+                                                                                      .getWaitAckExpiredSecond() * 1000;
+   /** 记录上一次的qps */
+   private long                                         lastSeqForQPS           = 0;
 
    private ConsumerInfo                                 consumerInfo;
    private MQThreadFactory                              threadFactory;
@@ -71,12 +84,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    /** 存放已连接的channel，key是channel，value是ip */
    private ConcurrentHashMap<Channel, String>           connectedChannels       = new ConcurrentHashMap<Channel, String>();
 
-   /** 记录当前最大的已经返回ack的消息id */
-   //   private volatile long                                maxAckedMessageId                = 0L;
-   //   private volatile long                                maxAckedBackupMessageId          = 0L;
-   /** 记录当前最大的已经返回ack的消息seq */
-   //   private volatile long                                maxAckedMessageSeq               = 0L;
-   //   private volatile long                                maxAckedBackupMessageSeq         = 0L;
+   /** 记录当前最大的已经返回ack的消息 */
    private volatile ConsumerMessage                     maxAckedMessage;
    private volatile ConsumerMessage                     maxAckedBackupMessage;
 
@@ -91,13 +99,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages         = new ConcurrentSkipListMap<Long, ConsumerMessage>();
    private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckBackupMessages   = new ConcurrentSkipListMap<Long, ConsumerMessage>();
 
-   /** maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的阈值 */
-   private long                                         seqThreshold            = 100;
-   /** 允许"最小的空洞waitAckMessage"存活的时间的阈值 */
-   private long                                         waitAckExpiredSecond;
-
-   private long                                         lastSeqForQPS           = 0;
-
    @SuppressWarnings("deprecation")
    public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter) {
       this.consumerInfo = consumerInfo;
@@ -108,7 +109,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       this.messageFilter = messageFilter;
       this.pullStgy = new DefaultPullStrategy(ConfigManager.getInstance().getPullFailDelayBase(), ConfigManager
             .getInstance().getPullFailDelayUpperBound());
-      this.waitAckExpiredSecond = ConfigManager.getInstance().getWaitAckExpiredSecond() * SECOND;
 
       // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
@@ -140,8 +140,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          public void run() {
             try {
 
-               //               LOG.info("Receive ACK(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
-               //                     + ackedMsgId + ") from " + connectedChannels.get(channel));
+               LOG.info("Receive ACK(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
+                     + ackId + ") from " + connectedChannels.get(channel));
 
                removeWaitAckMessages(channel, ackId);
 
@@ -164,32 +164,19 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
     * 按照实现逻辑，该方法只会被单线程调用
     */
    private void removeWaitAckMessages(Channel channel, long ackId) {
-      //waitAckMessages和waitAckBackupMessages可以有一样的msgId!，
       ConsumerMessage waitAckMessage = waitAckMessages.remove(ackId);
-      //      System.out.println("waitAckMessage:" + waitAckMessage);
+
       //更新最大ack message id，更新最大seq
       if (waitAckMessage != null) {//ack属于正常消息的
-
-         //TODO 临时代码
-         //         ConsumerMessage waitAckMessage0 = waitAckBackupMessages.remove(ackId);
-         //         if (waitAckMessage0 != null) {//ack属于备份消息的
-         //            System.out.println("2个地方一个id：" + ackId);
-         //         }
-
          if (maxAckedMessage == null || waitAckMessage.seq > maxAckedMessage.seq) {
             maxAckedMessage = waitAckMessage;
          }
-         //         maxAckedMessageSeq = Math.max(maxAckedMessageSeq, waitAckMessage.seq);
-         //         maxAckedMessageId = Math.max(maxAckedMessageId, ackedMsgId);
       } else {
          waitAckMessage = waitAckBackupMessages.remove(ackId);
-         //         System.out.println("waitAckMessage-backup:" + waitAckMessage);
          if (waitAckMessage != null) {//ack属于备份消息的
             if (maxAckedBackupMessage == null || waitAckMessage.seq > maxAckedBackupMessage.seq) {
                maxAckedBackupMessage = waitAckMessage;
             }
-            //            maxAckedBackupMessageSeq = Math.max(maxAckedBackupMessageSeq, waitAckMessage.seq);
-            //            maxAckedBackupMessageId = Math.max(maxAckedBackupMessageId, waitAckMessage.message.getBackupMessageId());
             //cat打点，记录一次备份消息的ack
             catTraceForBackupAck(channel, ackId);
          }
@@ -203,11 +190,11 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    public void recordAck() {
       //根据SEQ计算QPS，调整seqThreshold；如qps=200，那么seqThreshold=2000(当然seqThreshold最少为100)
       long seqForQps = SEQ.get();
-      long qps = seqForQps - lastSeqForQPS;
-      seqThreshold = Math.max(qps * 30, 100);
+      long qps = (seqForQps - lastSeqForQPS) / INTERVAL_SECOND;
+      seqThreshold = Math.max(qps * SEQ_RATIO, MIN_SEQ_THRESHOLD);
       lastSeqForQPS = seqForQps;
-      //TODO 将qps和seqThreshold打cat
-      System.out.println("seqThreshold:" + seqThreshold);
+      //将qps和seqThreshold记录到cat
+      catTraceForQps(qps, seqThreshold);
 
       lastRecordedAckId = recordAck0(waitAckMessages, maxAckedMessage, lastRecordedAckId, false);
       lastRecordedBackupAckId = recordAck0(waitAckBackupMessages, maxAckedBackupMessage, lastRecordedBackupAckId, true);
@@ -226,13 +213,10 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          if (maxAckedMessage0 != null && minAckId < maxAckedMessage0.getAckId()) {//大于最大ack id（maxAckedMessageId）的消息，不算是空洞
             //如果最小等待ack的消息，与最大已记录ack的消息，相差超过seqThreshold，则移除该消息到备份队列里。
             if (maxAckedMessage0.seq - minWaitAckMessage.seq > seqThreshold) {
-               System.out.println("maxAckedMessage0.seq:" + maxAckedMessage0.seq + ",time:"
-                     + new Date(maxAckedMessage0.gmt) + ",minWaitAckMessage.seq " + minWaitAckMessage.seq + ",time:"
-                     + new Date(minWaitAckMessage.gmt) + ",isBackup:" + isBackup);
                overdue = true;
             }
             //如果最小等待ack的消息，与当前时间，相差超过waitAckTimeThreshold，则移除该消息到备份队列里。
-            if (!overdue && System.currentTimeMillis() - minWaitAckMessage.gmt > waitAckExpiredSecond) {
+            if (!overdue && System.currentTimeMillis() - minWaitAckMessage.gmt > WAIT_ACK_EXPIRED) {
                overdue = true;
             }
          }
@@ -242,11 +226,10 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                messageDao.saveMessage(this.consumerInfo.getDest().getName(), this.consumerInfo.getConsumerId(),
                      minWaitAckMessage.message);
                //cat打点，记录一次备份消息的record
-               System.out.println("overdue:" + new Date());//TODO 临时代码
                catTraceForBackupRecord(minWaitAckMessage.message);
             }
          } else {//没有移除任何空洞，则不再迭代；否则需要继续迭代以尽量多地移除空洞。
-            break;//TODO
+            break;
          }
       }
 
@@ -297,7 +280,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                messageDao.saveMessage(this.consumerInfo.getDest().getName(), this.consumerInfo.getConsumerId(),
                      consumerMessage.message);
                //cat打点，记录一次备份消息的record
-               System.out.println("2");//TODO 临时代码
                catTraceForBackupRecord(consumerMessage.message);
             }
             it.remove();
@@ -402,7 +384,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
             messageDao.saveMessage(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(),
                   consumerMessage.message);
             //cat打点，记录一次备份消息的record
-            System.out.println("3");//TODO 临时代码
             catTraceForBackupRecord(consumerMessage.message);
          }
 
@@ -417,23 +398,19 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    private void catTraceForBackupRecord(SwallowMessage message) {
+      Transaction transaction;
       if (!message.isBackup()) {//一条消息可能会多次放进backup队列，第一次放进backup队列的，才打点。
-         Transaction transaction = Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
+         transaction = Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
                "In:" + consumerInfo.getConsumerId());
-         if (message != null) {
-            transaction.addData("message", message.toString());
-         }
-         transaction.setStatus(Message.SUCCESS);
-         transaction.complete();
       } else {
-         Transaction transaction = Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
+         transaction = Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
                "In-Again:" + consumerInfo.getConsumerId());
-         if (message != null) {
-            transaction.addData("message", message.toString());
-         }
-         transaction.setStatus(Message.SUCCESS);
-         transaction.complete();
       }
+      if (message != null) {
+         transaction.addData("message", message.toString());
+      }
+      transaction.setStatus(Message.SUCCESS);
+      transaction.complete();
    }
 
    private void catTraceForBackupAck(Channel channel, Long messageId) {
@@ -442,6 +419,15 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       if (messageId != null) {
          transaction.addData("mid", messageId);
       }
+      transaction.setStatus(Message.SUCCESS);
+      transaction.complete();
+   }
+
+   private void catTraceForQps(long qps, long sqeThro) {
+      Transaction transaction = Cat.getProducer().newTransaction("Qps:" + consumerInfo.getDest().getName(),
+            consumerInfo.getConsumerId());
+      transaction.addData("qps", qps);
+      transaction.addData("seqThreshold", seqThreshold);
       transaction.setStatus(Message.SUCCESS);
       transaction.complete();
    }
@@ -478,10 +464,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    /**
-    * @param topicName
     * @param consumerId consumerId为null时使用非backup队列
-    * @param isBakcup
-    * @return
     */
    private long getMaxMessageId(boolean isBakcup) {
       Long maxMessageId = null;
