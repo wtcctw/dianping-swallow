@@ -56,16 +56,6 @@ public class SwallowBufferTest extends AbstractTest {
    }
 
    @Test
-   public void testCreateMessageQueue1() throws InterruptedException {
-      BlockingQueue<SwallowMessage> queue = swallowBuffer.createMessageQueue(null, tailMessageId, tailMessageId);
-      SwallowMessage m;
-      while ((m = queue.poll(1, TimeUnit.SECONDS)) == null) {
-         ;
-      }
-      Assert.assertEquals("content2", m.getContent());
-   }
-
-   @Test
    public void testCreateMessageQueue2() throws InterruptedException {
       Set<String> messageTypeSet = new HashSet<String>();
       messageTypeSet.add(TYPE);

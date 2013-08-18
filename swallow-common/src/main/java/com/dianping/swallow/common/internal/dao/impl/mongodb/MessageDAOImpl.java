@@ -111,11 +111,6 @@ public class MessageDAOImpl implements MessageDAO {
    }
 
    @Override
-   public List<SwallowMessage> getMessagesGreaterThan(String topicName, Long messageId, int size) {
-      return getMessagesGreaterThan(topicName, null, messageId, size);
-   }
-
-   @Override
    public List<SwallowMessage> getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size) {
       DBCollection collection = getCollection(topicName, consumerId);
       List<SwallowMessage> list = getMessageGreaterThan(messageId, size, collection);
@@ -157,6 +152,7 @@ public class MessageDAOImpl implements MessageDAO {
          swallowMessage.setBackup(true);
       } else {
          swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(timestamp));
+         swallowMessage.setBackup(false);
       }
 
       swallowMessage.setContent(result.get(CONTENT));//content

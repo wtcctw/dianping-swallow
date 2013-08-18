@@ -178,7 +178,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                maxAckedBackupMessage = waitAckMessage;
             }
             //cat打点，记录一次备份消息的ack
-            catTraceForBackupAck(channel, ackId);
+            catTraceForBackupAck(ackId);
          }
       }
    }
@@ -279,6 +279,15 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
             if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
                messageDao.saveMessage(this.consumerInfo.getDest().getName(), this.consumerInfo.getConsumerId(),
                      consumerMessage.message);
+               if (!consumerMessage.message.isBackup()) {
+                  if (maxAckedMessage == null || consumerMessage.seq > maxAckedMessage.seq) {
+                     maxAckedMessage = consumerMessage;
+                  }
+               } else {
+                  if (maxAckedBackupMessage == null || consumerMessage.seq > maxAckedBackupMessage.seq) {
+                     maxAckedBackupMessage = consumerMessage;
+                  }
+               }
                //cat打点，记录一次备份消息的record
                catTraceForBackupRecord(consumerMessage.message);
             }
@@ -362,15 +371,16 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       //Cat end
 
       try {
-         //发送消息
-         channel.write(pktMessage);
-
          //发送后，记录已发送但未收到ACK的消息记录
+         //由于channel.write(pktMessage)如果异常，是在handler抛出，之后会调用removeChannel方法，故此处提前放waitAckMessages
          if (!consumerMessage.message.isBackup()) {
             waitAckMessages.put(consumerMessage.message.getMessageId(), consumerMessage);
          } else {
             waitAckBackupMessages.put(consumerMessage.message.getMessageId(), consumerMessage);
          }
+
+         //发送消息
+         channel.write(pktMessage);
 
          //Cat begin
          consumerServerTransaction.addData("mid", pktMessage.getContent().getMessageId());
@@ -413,7 +423,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       transaction.complete();
    }
 
-   private void catTraceForBackupAck(Channel channel, Long messageId) {
+   private void catTraceForBackupAck(Long messageId) {
       Transaction transaction = Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
             "Out:" + consumerInfo.getConsumerId());
       if (messageId != null) {

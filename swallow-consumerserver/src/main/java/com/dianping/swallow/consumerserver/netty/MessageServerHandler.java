@@ -142,6 +142,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
    @Override
    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
       removeChannel(e);
+      e.getChannel().close();
       super.channelClosed(ctx, e);
       LOG.info(e.getChannel().getRemoteAddress() + " closed!");
    }

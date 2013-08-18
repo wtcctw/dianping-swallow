@@ -1,7 +1,6 @@
 package com.dianping.swallow.consumerserver.buffer;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -70,18 +69,6 @@ public class SwallowBuffer {
             tailBackupMessageId, messageFilter);
    }
 
-   /**
-    * 创建一个BlockingQueue
-    * 
-    * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
-    * @return
-    */
-   public BlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, long tailMessageId,
-                                                           long tailBackupMessageId) {
-      return this.getTopicBuffer(consumerInfo.getDest().getName()).createMessageQueue(consumerInfo, tailMessageId,
-            tailBackupMessageId);
-   }
-
    private int index(String topicName) {
       int hashcode = topicName.hashCode();
       hashcode = hashcode == Integer.MIN_VALUE ? 0 : Math.abs(hashcode);// 保证非负
@@ -115,18 +102,6 @@ public class SwallowBuffer {
    private class TopicBuffer {
 
       private ConcurrentHashMap<String, WeakReference<MessageBlockingQueue>> messageQueues = new ConcurrentHashMap<String, WeakReference<MessageBlockingQueue>>();
-
-      /**
-       * 创建一个BlockingQueue
-       * 
-       * @param cid
-       * @param tailMessageId 从messageId大于messageIdOfTailMessage的消息开始消费
-       * @return
-       */
-      public BlockingQueue<SwallowMessage> createMessageQueue(ConsumerInfo consumerInfo, long tailMessageId,
-                                                              long tailBackupMessageId) {
-         return this.createMessageQueue(consumerInfo, tailMessageId, tailBackupMessageId, null);
-      }
 
       /**
        * 创建一个BlockingQueue

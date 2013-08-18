@@ -28,8 +28,6 @@ public interface MessageDAO {
     */
    List<SwallowMessage> getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size);
 
-   List<SwallowMessage> getMessagesGreaterThan(String topicName, Long messageId, int size);
-
    /**
     * 获取topic数据库的topicName集合/表里，最大的messageId字段
     * 

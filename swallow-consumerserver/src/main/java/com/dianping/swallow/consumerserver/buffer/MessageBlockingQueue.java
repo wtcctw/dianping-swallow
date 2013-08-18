@@ -148,7 +148,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
 
       @Override
       public void run() {
-         LOG.info("thread start:" + this.getName());
+         LOG.info("thread start(tailMessageId=" + tailMessageId + "):" + this.getName());
          while (!this.isInterrupted()) {
             reentrantLock.lock();
             try {
@@ -201,7 +201,7 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
 
       @Override
       public void run() {
-         LOG.info("thread start:" + this.getName());
+         LOG.info("thread start(tailBackupMessageId=" + tailBackupMessageId + "):" + this.getName());
          while (!this.isInterrupted()) {
             try {
                retrieveMessage();

@@ -53,7 +53,7 @@ public class MessageDAOImplTest extends AbstractDAOImplTest {
       SwallowMessage expectedMessage2 = createMessage();
       messageDAO.saveMessage(TOPIC_NAME, expectedMessage2);
       //查询messageId比指定id大的按messageId升序排序的2条消息
-      List<SwallowMessage> messagesGreaterThan = messageDAO.getMessagesGreaterThan(TOPIC_NAME, maxMessageId, 5);
+      List<SwallowMessage> messagesGreaterThan = messageDAO.getMessagesGreaterThan(TOPIC_NAME, null, maxMessageId, 5);
       Assert.assertNotNull(messagesGreaterThan);
       Assert.assertEquals(2, messagesGreaterThan.size());
       Assert.assertTrue(expectedMessage1.equalsWithoutMessageId(messagesGreaterThan.get(0)));

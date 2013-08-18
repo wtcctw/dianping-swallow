@@ -39,11 +39,6 @@ public class MongoDBMessageRetriever implements MessageRetriever {
          //记录本次返回的最大那条消息的messageId
          SwallowMessage message = (SwallowMessage) messages.get(messages.size() - 1);
 
-         //TODO 临时代码
-         if (message.getBackupMessageId() == null && consumerId != null) {
-            System.out.println("有问题！！！：" + message);
-         }
-
          if (message.getBackupMessageId() == null) {//正常消息队列
             maxMessageId = message.getMessageId();
          } else {//备份消息队列
