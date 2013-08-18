@@ -1,5 +1,7 @@
 package com.dianping.swallow.common.internal.util;
 
+import java.util.Date;
+
 import org.bson.types.BSONTimestamp;
 
 public class MongoUtils {
@@ -28,5 +30,7 @@ public class MongoUtils {
 
    public static void main(String[] args) {
       System.out.println(MongoUtils.longToBSONTimestamp(5759378400351354888L));
+      BSONTimestamp ts = new BSONTimestamp(1376825482,573);
+      System.out.println(new Date(ts.getTime()*1000L));
    }
 }
