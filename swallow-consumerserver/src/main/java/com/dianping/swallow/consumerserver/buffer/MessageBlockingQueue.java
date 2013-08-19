@@ -204,7 +204,11 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
          LOG.info("thread start(tailBackupMessageId=" + tailBackupMessageId + "):" + this.getName());
          while (!this.isInterrupted()) {
             try {
-               retrieveMessage();
+               //为避免queue的元素太多，定时获取backup消息的线程，加上“size小于threshold * 5”的条件(目前即size<300时会尝试每隔10秒获取一次backup消息)
+               //目的是：backup消息需要经常获取，因为要保证backup消息尽早消费，但backup消息要防止使得queue爆满的情况。
+               if (size() < threshold * 5) {
+                  retrieveMessage();
+               }
                TimeUnit.SECONDS.sleep(retrieverFromBackupIntervalSecond);
             } catch (InterruptedException e) {
                this.interrupt();
