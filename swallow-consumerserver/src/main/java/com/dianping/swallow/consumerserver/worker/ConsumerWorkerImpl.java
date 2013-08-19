@@ -193,8 +193,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       long qps = (seqForQps - lastSeqForQPS) / INTERVAL_SECOND;
       seqThreshold = Math.max(qps * SEQ_RATIO, MIN_SEQ_THRESHOLD);
       lastSeqForQPS = seqForQps;
-      //将qps和seqThreshold记录到cat
-      catTraceForQps(qps, seqThreshold);
 
       lastRecordedAckId = recordAck0(waitAckMessages, maxAckedMessage, lastRecordedAckId, false);
       lastRecordedBackupAckId = recordAck0(waitAckBackupMessages, maxAckedBackupMessage, lastRecordedBackupAckId, true);
@@ -429,15 +427,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       if (messageId != null) {
          transaction.addData("mid", messageId);
       }
-      transaction.setStatus(Message.SUCCESS);
-      transaction.complete();
-   }
-
-   private void catTraceForQps(long qps, long sqeThro) {
-      Transaction transaction = Cat.getProducer().newTransaction("Qps:" + consumerInfo.getDest().getName(),
-            consumerInfo.getConsumerId());
-      transaction.addData("qps", qps);
-      transaction.addData("seqThreshold", seqThreshold);
       transaction.setStatus(Message.SUCCESS);
       transaction.complete();
    }
