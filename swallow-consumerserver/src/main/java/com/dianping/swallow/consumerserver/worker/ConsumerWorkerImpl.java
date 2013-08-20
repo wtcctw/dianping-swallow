@@ -174,6 +174,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          if (maxAckedMessage == null || waitAckMessage.seq > maxAckedMessage.seq) {
             maxAckedMessage = waitAckMessage;
          }
+         //cat打点，记录一次备份消息的ack
+         catTraceForAck(ackId, channel);
       } else {
          waitAckMessage = waitAckBackupMessages.remove(ackId);
          if (waitAckMessage != null) {//ack属于备份消息的
@@ -181,7 +183,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                maxAckedBackupMessage = waitAckMessage;
             }
             //cat打点，记录一次备份消息的ack
-            catTraceForBackupAck(ackId);
+            catTraceForBackupAck(ackId, channel);
          }
       }
    }
@@ -424,9 +426,19 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       transaction.complete();
    }
 
-   private void catTraceForBackupAck(Long messageId) {
+   private void catTraceForBackupAck(Long messageId, Channel channel) {
       Transaction transaction = Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
-            "Out:" + consumerInfo.getConsumerId());
+            "Ack:" + consumerInfo.getConsumerId() + ":" + IPUtil.getIpFromChannel(channel));
+      if (messageId != null) {
+         transaction.addData("mid", messageId);
+      }
+      transaction.setStatus(Message.SUCCESS);
+      transaction.complete();
+   }
+
+   private void catTraceForAck(Long messageId, Channel channel) {
+      Transaction transaction = Cat.getProducer().newTransaction("Ack:" + consumerInfo.getDest().getName(),
+            consumerInfo.getConsumerId() + ":" + IPUtil.getIpFromChannel(channel));
       if (messageId != null) {
          transaction.addData("mid", messageId);
       }
