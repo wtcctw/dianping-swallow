@@ -45,6 +45,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private static final Logger                          LOG                     = LoggerFactory
                                                                                       .getLogger(ConsumerWorkerImpl.class);
 
+   private static final MQThreadFactory                 ackThreadFactory        = new MQThreadFactory(
+                                                                                      "swallow-ack-handler-");
+
    private final AtomicLong                             SEQ                     = new AtomicLong(1);
    private final AtomicLong                             BACKUP_SEQ              = new AtomicLong(1);
    /**
@@ -118,7 +121,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       }
 
       this.ackExecutor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.DAYS,
-            new LinkedBlockingQueue<Runnable>(), new MQThreadFactory("swallow-ack-"));
+            new LinkedBlockingQueue<Runnable>(), ackThreadFactory);
 
       //创建消息缓冲QUEUE
       long messageIdOfTailMessage = getMaxMessageId(false);
