@@ -97,11 +97,11 @@ public class ReportMaker {
         //                String str = "08eddbde-d6b8-4edb-86e9-fda36109cb31";
         //                System.out.println(isLinshi(str));
 
-        int m1 = 5;
+        int m1 = 6;
         System.out.println("-----------------Month " + m1 + "-----------------");
         Result r1 = preMonth(m1);
 
-        int m2 = 6;
+        int m2 = 7;
         System.out.println("-----------------Month " + m2 + "-----------------");
         Result r2 = preMonth(m2);
 
