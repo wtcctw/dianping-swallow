@@ -29,7 +29,9 @@ import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 
 @Service
 public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener {
-    private static final Logger   LOG                            = LoggerFactory.getLogger(ProducerHolderImpl.class);
+    private static final int DEFAULT_RETRY_TIME = 50;
+
+   private static final Logger   LOG                            = LoggerFactory.getLogger(ProducerHolderImpl.class);
 
     private static final String   SWALLOW_BROKER_PRODUCER_PREFIX = "swallow.broker.producer.";
 
@@ -121,8 +123,13 @@ public class ProducerHolderImpl implements ProducerHolder, ConfigChangeListener 
             if (retryTimes != null) {
                 config.setSyncRetryTimes(retryTimes);
                 config.setAsyncRetryTimes(retryTimes);
+            }else{
+                config.setSyncRetryTimes(DEFAULT_RETRY_TIME);
+                config.setAsyncRetryTimes(DEFAULT_RETRY_TIME);
             }
-            if (StringUtils.equalsIgnoreCase(mode, "SYNC_MODE")) {
+            if (StringUtils.equalsIgnoreCase(mode, "ASYNC_MODE")) {
+                config.setMode(ProducerMode.ASYNC_MODE);
+            }else{
                 config.setMode(ProducerMode.SYNC_MODE);
             }
             if (zipped != null) {
