@@ -43,7 +43,7 @@ public class MonitorController {
       return new ModelAndView("monitor/detail", map);
    }
 
-   @RequestMapping(value = "monitor", method = { RequestMethod.POST })
+   @RequestMapping(value = { "/", "monitor" }, method = { RequestMethod.POST })
    public ModelAndView action(HttpSession session, String key, String action) {
       Map<String, Object> map = new HashMap<String, Object>();
 
