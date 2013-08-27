@@ -258,7 +258,7 @@
                     <webAppSourceDirectory>webapp
                     </webAppSourceDirectory>
                     <webApp>
-                        <contextPath>/swallow-broker</contextPath>
+                        <contextPath>/swallow-http</contextPath>
                     </webApp>
                     <systemProperties>
                         <systemProperty>
