@@ -17,9 +17,9 @@ import com.dianping.swallow.common.internal.config.DynamicConfig;
  */
 public class WhiteList implements ConfigChangeListener {
 
-    private static final String TOPIC_SPLIT      = ";";
-
     private static final Logger LOG              = LoggerFactory.getLogger(WhiteList.class);
+
+    private static final String TOPIC_SPLIT      = ";";
 
     private static final String TOPIC_WHITE_LIST = "swallow.topic.whitelist";
 
