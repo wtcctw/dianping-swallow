@@ -9,12 +9,15 @@ import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 
 public class ProducerServerTextPipelineFactory implements ChannelPipelineFactory {
-   private MessageDAO messageDAO;
+   private MessageDAO     messageDAO;
+   private TopicWhiteList topicWhiteList;
 
-   public ProducerServerTextPipelineFactory(MessageDAO messageDAO) {
+   public ProducerServerTextPipelineFactory(MessageDAO messageDAO, TopicWhiteList topicWhiteList) {
       this.messageDAO = messageDAO;
+      this.topicWhiteList = topicWhiteList;
    }
 
    @Override
@@ -27,7 +30,7 @@ public class ProducerServerTextPipelineFactory implements ChannelPipelineFactory
       pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
       pipeline.addLast("jsonEncoder", new JsonEncoder(TextACK.class));
 
-      pipeline.addLast("handler", new ProducerServerTextHandler(messageDAO));
+      pipeline.addLast("handler", new ProducerServerTextHandler(messageDAO, topicWhiteList));
 
       return pipeline;
    }

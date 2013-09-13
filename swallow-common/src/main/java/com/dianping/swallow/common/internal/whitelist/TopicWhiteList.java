@@ -24,13 +24,13 @@ public class TopicWhiteList implements ConfigChangeListener {
 
    private Set<String>         topics;
 
-   private DynamicConfig       dynamicConfig;
+   private DynamicConfig       lionDynamicConfig;
 
    public void init() {
       build();
 
       //监听lion
-      dynamicConfig.addConfigChangeListener(this);
+      lionDynamicConfig.addConfigChangeListener(this);
 
    }
 
@@ -52,7 +52,7 @@ public class TopicWhiteList implements ConfigChangeListener {
    }
 
    private void build() {
-      String value = dynamicConfig.get(TOPIC_WHITE_LIST);
+      String value = lionDynamicConfig.get(TOPIC_WHITE_LIST);
 
       Set<String> _topics = new HashSet<String>();
 
@@ -72,7 +72,7 @@ public class TopicWhiteList implements ConfigChangeListener {
    }
 
    public void setDynamicConfig(DynamicConfig dynamicConfig) {
-      this.dynamicConfig = dynamicConfig;
+      this.lionDynamicConfig = dynamicConfig;
    }
 
 }

@@ -17,9 +17,12 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.internal.util.SHAUtil;
+import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 
 public class ProducerServerTextHandler extends SimpleChannelUpstreamHandler {
    private final MessageDAO    messageDAO;
+
+   private TopicWhiteList      topicWhiteList;
 
    //TextHandler状态代码
    public static final int     OK                 = 250;
@@ -32,9 +35,11 @@ public class ProducerServerTextHandler extends SimpleChannelUpstreamHandler {
     * 构造函数
     * 
     * @param messageDAO
+    * @param topicWhiteList
     */
-   public ProducerServerTextHandler(MessageDAO messageDAO) {
+   public ProducerServerTextHandler(MessageDAO messageDAO, TopicWhiteList topicWhiteList) {
       this.messageDAO = messageDAO;
+      this.topicWhiteList = topicWhiteList;
    }
 
    @Override
@@ -64,16 +69,25 @@ public class ProducerServerTextHandler extends SimpleChannelUpstreamHandler {
       TextACK textAck = new TextACK();
       textAck.setStatus(OK);
       //TopicName非法，返回失败ACK，reason是"TopicName is not valid."
-      if (!NameCheckUtil.isTopicNameValid(textObject.getTopic())) {
+      String topicName = textObject.getTopic();
+      if (!NameCheckUtil.isTopicNameValid(topicName)) {
          LOGGER.error("[Incorrect topic name.][From=" + e.getRemoteAddress() + "][Content=" + textObject + "]");
          textAck.setStatus(INVALID_TOPIC_NAME);
          textAck.setInfo("TopicName is invalid.");
          //返回ACK
          e.getChannel().write(textAck);
       } else {
+         //验证topicName是否在白名单里
+         boolean isValid = topicWhiteList.isValid(topicName);
+         if (!isValid) {
+            textAck.setStatus(INVALID_TOPIC_NAME);
+            textAck.setInfo("Invalid topic(" + topicName
+                  + "), because it's not in whitelist, please contact swallow group for support.");
+         }
+
          //调用DAO层将SwallowMessage存入DB
          try {
-            messageDAO.saveMessage(textObject.getTopic(), swallowMessage);
+            messageDAO.saveMessage(topicName, swallowMessage);
          } catch (Exception e1) {
             //记录异常，返回失败ACK，reason是“Can not save message”
             LOGGER.error("[Save message to DB failed.]", e1);
