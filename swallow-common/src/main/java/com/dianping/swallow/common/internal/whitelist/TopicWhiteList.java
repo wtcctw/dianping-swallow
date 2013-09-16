@@ -71,8 +71,8 @@ public class TopicWhiteList implements ConfigChangeListener {
       LOG.info("White list topic is :" + topics);
    }
 
-   public void setDynamicConfig(DynamicConfig dynamicConfig) {
-      this.lionDynamicConfig = dynamicConfig;
+   public void setLionDynamicConfig(DynamicConfig lionDynamicConfig) {
+      this.lionDynamicConfig = lionDynamicConfig;
    }
 
 }
