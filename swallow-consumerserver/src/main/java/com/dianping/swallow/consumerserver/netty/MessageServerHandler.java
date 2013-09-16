@@ -18,6 +18,7 @@ import com.dianping.swallow.common.internal.consumer.ConsumerMessageType;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
+import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
@@ -32,12 +33,16 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
    private ConsumerInfo          consumerInfo;
 
+   private TopicWhiteList        topicWhiteList;
+
    private int                   clientThreadCount;
 
    private boolean               readyClose   = Boolean.FALSE;
 
-   public MessageServerHandler(ConsumerWorkerManager workerManager) {
+   public MessageServerHandler(ConsumerWorkerManager workerManager, TopicWhiteList topicWhiteList) {
       this.workerManager = workerManager;
+      this.topicWhiteList = topicWhiteList;
+      LOG.info("Inited MessageServerHandler.");
    }
 
    @Override
@@ -55,10 +60,19 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
          PktConsumerMessage consumerPacket = (PktConsumerMessage) e.getMessage();
          if (ConsumerMessageType.GREET.equals(consumerPacket.getType())) {
             if (!NameCheckUtil.isTopicNameValid(consumerPacket.getDest().getName())) {
-               LOG.error("TopicName inValid from " + channel.getRemoteAddress());
+               LOG.error("TopicName(" + consumerPacket.getDest().getName() + ") inValid from "
+                     + channel.getRemoteAddress());
                channel.close();
                return;
             }
+            //验证topicName是否在白名单里
+            boolean isValid = topicWhiteList.isValid(consumerPacket.getDest().getName());
+            if (!isValid) {
+               LOG.error("TopicName(" + consumerPacket.getDest().getName() + ") is not in whitelist, from "
+                     + channel.getRemoteAddress());
+               channel.close();
+            }
+
             clientThreadCount = consumerPacket.getThreadCount();
             if (clientThreadCount > ConfigManager.getInstance().getMaxClientThreadCount()) {
                LOG.warn(channel.getRemoteAddress() + " with " + consumerInfo

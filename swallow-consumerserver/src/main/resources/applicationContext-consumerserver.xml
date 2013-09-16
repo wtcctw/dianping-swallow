@@ -61,4 +61,17 @@
         </constructor-arg>
     </bean>
 
+    <bean id="topicWhiteList"
+        class="com.dianping.swallow.common.internal.whitelist.TopicWhiteList"
+        init-method="init">
+        <property name="lionDynamicConfig" ref="lionDynamicConfig"></property>
+    </bean>
+
+    <bean id="lionDynamicConfig"
+        class="com.dianping.swallow.common.internal.config.impl.LionDynamicConfig">
+        <constructor-arg>
+            <value>swallow-topic-whitelist-lion.properties</value>
+        </constructor-arg>
+    </bean>
+
 </beans>

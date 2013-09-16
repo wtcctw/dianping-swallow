@@ -21,6 +21,7 @@ import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
+import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.netty.MessageServerHandler;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
@@ -44,6 +45,7 @@ public class MasterBootStrap {
       ApplicationContext ctx = new ClassPathXmlApplicationContext(
             new String[] { "applicationContext-consumerserver.xml" });
       final ConsumerWorkerManager consumerWorkerManager = ctx.getBean(ConsumerWorkerManager.class);
+      final TopicWhiteList topicWhiteList = ctx.getBean(TopicWhiteList.class);
       consumerWorkerManager.init(isSlave);
       // start consumerWorkerManager
       consumerWorkerManager.start();
@@ -62,7 +64,7 @@ public class MasterBootStrap {
       bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
          @Override
          public ChannelPipeline getPipeline() {
-            MessageServerHandler handler = new MessageServerHandler(consumerWorkerManager);
+            MessageServerHandler handler = new MessageServerHandler(consumerWorkerManager, topicWhiteList);
             ChannelPipeline pipeline = Channels.pipeline();
             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
             pipeline.addLast("jsonDecoder", new JsonDecoder(PktConsumerMessage.class));
