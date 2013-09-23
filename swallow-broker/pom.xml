@@ -3,7 +3,7 @@
     <parent>
         <artifactId>swallow-parent</artifactId>
         <groupId>com.dianping.swallow</groupId>
-        <version>0.6.7</version>
+        <version>0.6.8</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -11,7 +11,7 @@
     <groupId>com.dianping.swallow</groupId>
     <artifactId>swallow-broker</artifactId>
     <name>arch-swallow-broker</name>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <version>1.0.0</version>
 
     <url>http://maven.apache.org</url>
@@ -193,8 +193,8 @@
             <artifactId>velocity</artifactId>
         </dependency>
         <dependency>
-            <groupId>velocity-tools</groupId>
-            <artifactId>velocity-tools-view</artifactId>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-tools</artifactId>
         </dependency>
         <dependency>
             <groupId>oro</groupId>
@@ -209,13 +209,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
-        <!-- 單元測試 -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
     <build>
         <finalName>swallow-broker</finalName>
@@ -240,6 +233,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.1</version>
                 <configuration>
+                    <warName>${artifactId}-${env}-${version}</warName>
                     <webappDirectory>webapp</webappDirectory>
                 </configuration>
             </plugin>
@@ -264,7 +258,7 @@
                     <webAppSourceDirectory>webapp
                     </webAppSourceDirectory>
                     <webApp>
-                        <contextPath>/swallow-broker</contextPath>
+                        <contextPath>/swallow-http</contextPath>
                     </webApp>
                     <systemProperties>
                         <systemProperty>

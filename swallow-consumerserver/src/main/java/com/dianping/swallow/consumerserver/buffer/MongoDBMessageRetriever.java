@@ -22,19 +22,32 @@ public class MongoDBMessageRetriever implements MessageRetriever {
       this.messageDAO = messageDAO;
    }
 
+   /**
+    * @param topicName
+    * @param consumerId consumerId为null时使用非backup队列
+    * @param messageId
+    * @param messageFilter
+    * @return
+    */
    @SuppressWarnings({ "rawtypes", "unchecked" })
    @Override
-   public List retriveMessage(String topicName, Long messageId, MessageFilter messageFilter) {
-      List maxIdAndMessages = messageDAO.getMessagesGreaterThan(topicName, messageId, fetchSize);
+   public List retriveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter) {
+      List messages = messageDAO.getMessagesGreaterThan(topicName, consumerId, messageId, fetchSize);
 
       Long maxMessageId = null;
-      if (maxIdAndMessages != null && maxIdAndMessages.size() > 0) {
+      if (messages != null && messages.size() > 0) {
          //记录本次返回的最大那条消息的messageId
-         maxMessageId = ((SwallowMessage) maxIdAndMessages.get(maxIdAndMessages.size() - 1)).getMessageId();
+         SwallowMessage message = (SwallowMessage) messages.get(messages.size() - 1);
+
+         if (message.getBackupMessageId() == null) {//正常消息队列
+            maxMessageId = message.getMessageId();
+         } else {//备份消息队列
+            maxMessageId = message.getBackupMessageId();
+         }
          //过滤type
          if (messageFilter != null && messageFilter.getType() == FilterType.InSet && messageFilter.getParam() != null
                && !messageFilter.getParam().isEmpty()) {
-            Iterator<SwallowMessage> iterator = maxIdAndMessages.iterator();
+            Iterator<SwallowMessage> iterator = messages.iterator();
             while (iterator.hasNext()) {
                SwallowMessage msg = iterator.next();
                if (!messageFilter.getParam().contains(msg.getType())) {
@@ -43,16 +56,16 @@ public class MongoDBMessageRetriever implements MessageRetriever {
             }
          }
          //无论最终过滤后messages.size是否大于0，都添加maxMessageId到返回集合
-         maxIdAndMessages.add(0, maxMessageId);
+         messages.add(0, maxMessageId);
       }
 
       if (LOG.isDebugEnabled()) {
-         LOG.debug("fetched messages from mongodb, size:" + maxIdAndMessages.size());
-         LOG.debug("messages:" + maxIdAndMessages);
+         LOG.debug("fetched messages from mongodb, size:" + messages.size());
+         LOG.debug("messages:" + messages);
       }
 
       //如果返回值messages.size大于0，则第一个元素一定是更新后的maxMessageId
-      return maxIdAndMessages;
+      return messages;
    }
 
    @Override

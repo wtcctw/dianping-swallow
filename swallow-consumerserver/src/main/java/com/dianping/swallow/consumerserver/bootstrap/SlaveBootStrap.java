@@ -21,6 +21,7 @@ import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
+import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.netty.MessageServerHandler;
@@ -72,18 +73,19 @@ public class SlaveBootStrap {
       ConfigManager configManager = ConfigManager.getInstance();
 
       final ConsumerWorkerManager consumerWorkerManager = ctx.getBean(ConsumerWorkerManager.class);
+      final TopicWhiteList topicWhiteList = ctx.getBean(TopicWhiteList.class);
 
       Heartbeater heartbeater = ctx.getBean(Heartbeater.class);
 
       Thread hook = new Thread() {
-          @Override
-          public void run() {
-              closed = true;
-              LOG.info("consumerWorkerManager.close()-started");
-              consumerWorkerManager.close();
-              LOG.info("consumerWorkerManager.close()-finished");
-              closeNettyRelatedResource();
-          }
+         @Override
+         public void run() {
+            closed = true;
+            LOG.info("consumerWorkerManager.close()-started");
+            consumerWorkerManager.close();
+            LOG.info("consumerWorkerManager.close()-finished");
+            closeNettyRelatedResource();
+         }
       };
       hook.setDaemon(true);
       hook.setName("Swallow-ShutdownHook");
@@ -113,7 +115,7 @@ public class SlaveBootStrap {
          bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() {
-               MessageServerHandler handler = new MessageServerHandler(consumerWorkerManager);
+               MessageServerHandler handler = new MessageServerHandler(consumerWorkerManager, topicWhiteList);
                ChannelPipeline pipeline = Channels.pipeline();
                pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
                pipeline.addLast("jsonDecoder", new JsonDecoder(PktConsumerMessage.class));
@@ -125,8 +127,8 @@ public class SlaveBootStrap {
          });
 
          // Bind and start to accept incoming connections.
-         bootstrap.bind(new InetSocketAddress(consumerWorkerManager.getConfigManager().getSlavePort()));
-         LOG.info("Server started on port " + consumerWorkerManager.getConfigManager().getSlavePort());
+         bootstrap.bind(new InetSocketAddress(ConfigManager.getInstance().getSlavePort()));
+         LOG.info("Server started on port " + ConfigManager.getInstance().getSlavePort());
 
          try {
             heartbeater.waitUntilMasterUp(configManager.getMasterIp(), configManager.getHeartbeatCheckInterval(),

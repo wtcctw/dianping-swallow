@@ -21,6 +21,8 @@ import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
+import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
+import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.netty.MessageServerHandler;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
@@ -43,13 +45,14 @@ public class MasterBootStrap {
       ApplicationContext ctx = new ClassPathXmlApplicationContext(
             new String[] { "applicationContext-consumerserver.xml" });
       final ConsumerWorkerManager consumerWorkerManager = ctx.getBean(ConsumerWorkerManager.class);
+      final TopicWhiteList topicWhiteList = ctx.getBean(TopicWhiteList.class);
       consumerWorkerManager.init(isSlave);
       // start consumerWorkerManager
       consumerWorkerManager.start();
 
-      LOG.info("wait " + consumerWorkerManager.getConfigManager().getWaitSlaveShutDown() + "ms for slave to stop working");
+      LOG.info("wait " + ConfigManager.getInstance().getWaitSlaveShutDown() + "ms for slave to stop working");
       try {
-         Thread.sleep(consumerWorkerManager.getConfigManager().getWaitSlaveShutDown());//主机启动的时候睡眠一会，给时间给slave关闭。
+         Thread.sleep(ConfigManager.getInstance().getWaitSlaveShutDown());//主机启动的时候睡眠一会，给时间给slave关闭。
       } catch (InterruptedException e) {
          LOG.error("thread InterruptedException", e);
       }
@@ -61,7 +64,7 @@ public class MasterBootStrap {
       bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
          @Override
          public ChannelPipeline getPipeline() {
-            MessageServerHandler handler = new MessageServerHandler(consumerWorkerManager);
+            MessageServerHandler handler = new MessageServerHandler(consumerWorkerManager, topicWhiteList);
             ChannelPipeline pipeline = Channels.pipeline();
             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
             pipeline.addLast("jsonDecoder", new JsonDecoder(PktConsumerMessage.class));
@@ -74,41 +77,41 @@ public class MasterBootStrap {
 
       //启动close Monitor
       Thread hook = new Thread() {
-          @Override
-          public void run() {
-              try {
-                  LOG.info("consumerWorkerManager.close()-started");
-                  consumerWorkerManager.close();
-                  LOG.info("consumerWorkerManager.close()-finished");
+         @Override
+         public void run() {
+            try {
+               LOG.info("consumerWorkerManager.close()-started");
+               consumerWorkerManager.close();
+               LOG.info("consumerWorkerManager.close()-finished");
 
-                  LOG.info("MessageServerHandler.getChannelGroup().unbind()-started");
-                  MessageServerHandler.getChannelGroup().unbind().await();
-                  LOG.info("MessageServerHandler.getChannelGroup().unbind()-finished");
+               LOG.info("MessageServerHandler.getChannelGroup().unbind()-started");
+               MessageServerHandler.getChannelGroup().unbind().await();
+               LOG.info("MessageServerHandler.getChannelGroup().unbind()-finished");
 
-                  LOG.info("MessageServerHandler.getChannelGroup().close()-started");
-                  MessageServerHandler.getChannelGroup().close().await();
-                  LOG.info("MessageServerHandler.getChannelGroup().close()-finished");
+               LOG.info("MessageServerHandler.getChannelGroup().close()-started");
+               MessageServerHandler.getChannelGroup().close().await();
+               LOG.info("MessageServerHandler.getChannelGroup().close()-finished");
 
-                  LOG.info("MessageServerHandler.getChannelGroup().clear()-started");
-                  MessageServerHandler.getChannelGroup().clear();
-                  LOG.info("MessageServerHandler.getChannelGroup().unbind()-finished");
+               LOG.info("MessageServerHandler.getChannelGroup().clear()-started");
+               MessageServerHandler.getChannelGroup().clear();
+               LOG.info("MessageServerHandler.getChannelGroup().unbind()-finished");
 
-                  LOG.info("bootstrap.releaseExternalResources()-started");
-                  bootstrap.releaseExternalResources();
-                  LOG.info("bootstrap.releaseExternalResources()-finished");
-               } catch (InterruptedException e) {
-                  LOG.error("Interrupted when onClose()", e);
-                  Thread.currentThread().interrupt();
-               }
-               LOG.info("MasterBootStrap-closed");
-          }
+               LOG.info("bootstrap.releaseExternalResources()-started");
+               bootstrap.releaseExternalResources();
+               LOG.info("bootstrap.releaseExternalResources()-finished");
+            } catch (InterruptedException e) {
+               LOG.error("Interrupted when onClose()", e);
+               Thread.currentThread().interrupt();
+            }
+            LOG.info("MasterBootStrap-closed");
+         }
       };
       hook.setDaemon(true);
       hook.setName("Swallow-ShutdownHook");
       Runtime.getRuntime().addShutdownHook(hook);
 
       //启动服务 (Bind and start to accept incoming connections.)
-      int masterPort = consumerWorkerManager.getConfigManager().getMasterPort();
+      int masterPort = ConfigManager.getInstance().getMasterPort();
       bootstrap.bind(new InetSocketAddress(masterPort));
       LOG.info("Server started at port " + masterPort);
    }

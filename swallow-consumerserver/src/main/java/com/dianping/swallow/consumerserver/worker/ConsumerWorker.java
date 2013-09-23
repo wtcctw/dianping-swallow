@@ -21,7 +21,7 @@ public interface ConsumerWorker {
     * @param ackedMsgId 客户端返回的messageId
     * @param type 接收到ack后的处理类型类型为{@link ACKHandlerType}
     */
-   void handleAck(Channel channel, Long ackedMsgId, ACKHandlerType type);
+   void handleAck(Channel channel, long ackedMsgId, ACKHandlerType type);
 
    /**
     * channel断开时所做的操作
@@ -51,16 +51,20 @@ public interface ConsumerWorker {
     * @return
     */
    boolean allChannelDisconnected();
-   
-   /**
-    * 返回DURABLE_AT_LEAST模式下最大已收到ack的MessageId
-    * @return
-    */
-   long getMaxAckedMessageId();
-   
+
+   //    /**
+   //     * 返回DURABLE_AT_LEAST模式下最大已收到ack的MessageId
+   //     * 
+   //     * @return
+   //     */
+   //    long getMaxAckedMessageId();
+
    /**
     * 获取ConsumerType
+    * 
     * @return
     */
    ConsumerType getConsumerType();
+
+   void recordAck();
 }

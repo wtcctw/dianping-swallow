@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>com.dianping</groupId>
-        <artifactId>dianping-parent</artifactId>
-        <version>1.0.0</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dianping.swallow</groupId>
     <artifactId>swallow-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.6.7</version>
+    <version>0.6.8</version>
     <name>arch-swallow</name>
     <organization>
         <name>dianping</name>
@@ -28,7 +23,7 @@
     </modules>
 
     <properties>
-        <swallow.version>0.6.7</swallow.version>
+        <swallow.version>0.6.8</swallow.version>
     </properties>
 
     <description>swallow is a message service!</description>
@@ -281,7 +276,7 @@
             <dependency>
                 <groupId>com.geekhua</groupId>
                 <artifactId>file-queue</artifactId>
-                <version>0.1.1</version>
+                <version>0.1.5</version>
             </dependency>
             <dependency>
                 <groupId>com.dianping.dpsf</groupId>
@@ -302,6 +297,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2</version>
             </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
@@ -339,10 +339,10 @@
                 <version>1.7</version>
             </dependency>
  <dependency>
-                <groupId>velocity-tools</groupId>
-                <artifactId>velocity-tools-view</artifactId>
-                <version>1.4</version>
-            </dependency>
+    <groupId>org.apache.velocity</groupId>
+    <artifactId>velocity-tools</artifactId>
+    <version>2.0</version>
+</dependency>
   <dependency>
                 <groupId>oro</groupId>
                 <artifactId>oro</artifactId>
@@ -357,6 +357,11 @@
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>1.9.4</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
             </dependency>
         </dependencies>
 
@@ -421,6 +426,20 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.4</version>
             </plugin>
+            <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                    <executions>
+                       <execution>
+                         <id>attach-sources</id>
+                         <phase>verify</phase>
+                         <goals>
+                           <goal>jar-no-fork</goal>
+                         </goals>
+                      </execution>
+                   </executions>
+                </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -455,4 +474,14 @@ org.eclipse.jdt.core.compiler.compliance=1.6
             </plugins>
         </pluginManagement>
     </build>
+<distributionManagement>
+      <repository>
+         <id>dianping.repo</id>
+         <url>http://mvn.dianpingoa.com/dianping-releases</url>
+      </repository>
+      <snapshotRepository>
+         <id>dianping.repo.snapshots</id>
+         <url>http://mvn.dianpingoa.com/dianping-snapshots</url>
+      </snapshotRepository>
+	</distributionManagement>
 </project>

@@ -27,8 +27,8 @@ import com.dianping.swallow.producer.adapter.MQServiceAdapter;
 
 public class AsyncProducer {
 
-    public static String MONGO_URI = "192.168.8.21:27017";
-    public static Destination dest = Destination.topic("example");
+    public static String      MONGO_URI = "192.168.8.21:27017";
+    public static Destination dest      = Destination.topic("example");
 
     /**
      * @param args
@@ -40,9 +40,9 @@ public class AsyncProducer {
         Map<ProducerOptionKey, Object> pOptions = new HashMap<ProducerOptionKey, Object>();
         pOptions.put(ProducerOptionKey.MsgSendRetryCount, MQService.PRODUCR_RETRY_COUNT_FOREVER);
         Map<String, Object> pOptions0_6 = new HashMap<String, Object>();
-//        pOptions0_6.put("filequeueBaseDir", "/data/appdatas/filequeue/abc");
+        pOptions0_6.put("mode", "ASYNC_SEPARATELY_MODE");
         MessageProducer p = sqs.createProducer(dest, pOptions, pOptions0_6);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 2; i++) {
             p.send(p.createStringMessage(new Date() + "  -" + i));
         }
         Thread.sleep(20000);

@@ -83,7 +83,7 @@ public class ProducerServerForClientTest {
       } catch (ServerDaoException e) {
       }
       Assert.assertNull(ACK);
-      
+
       System.out.println(producerServerForClient.getRemoteServiceName());
    }
 
@@ -102,9 +102,6 @@ public class ProducerServerForClientTest {
 
       PktSwallowPACK ACK = null;
 
-      //不抛异常的DAO
-      MessageDAOImpl messageDAOImpl = new MessageDAOImpl();
-
       //mock的lion配置
       DynamicConfig config = mock(LionDynamicConfig.class);
       when(config.get("swallow.mongo.producerServerURI")).thenReturn(
@@ -118,10 +115,13 @@ public class ProducerServerForClientTest {
       when(config.get("swallow.mongo.heartbeatServerURI")).thenReturn("mongodb://localhost:24521");
       when(config.get("swallow.mongo.heartbeatCappedCollectionSize")).thenReturn("1025");
       when(config.get("swallow.mongo.heartbeatCappedCollectionMaxDocNum")).thenReturn("1025");
-
       //真实的mongoClient
       MongoClient mongoClient = new MongoClient("swallow.mongo.producerServerURI", config);
+
+      //不抛异常的DAO
+      MessageDAOImpl messageDAOImpl = new MessageDAOImpl();
       messageDAOImpl.setMongoClient(mongoClient);
+
       producerServerForClient.setMessageDAO(messageDAOImpl);
 
       ACK = (PktSwallowPACK) producerServerForClient.sendMessage(pktMessage);

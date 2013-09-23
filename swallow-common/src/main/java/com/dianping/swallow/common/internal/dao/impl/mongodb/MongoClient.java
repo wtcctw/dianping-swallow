@@ -27,36 +27,52 @@ import com.mongodb.ServerAddress;
 
 public class MongoClient implements ConfigChangeListener {
 
-   private static final Logger           LOG                                              = LoggerFactory
-                                                                                                .getLogger(MongoClient.class);
+   private static final String           MSG_PREFIX                                        = "msg#";
+   private static final String           ACK_PREFIX                                        = "ack#";
+   private static final String           BACKUP_MSG_PREFIX                                 = "b_m#";
+   private static final String           BACKUP_ACK_PREFIX                                 = "b_a#";
 
-   private static final String           MONGO_CONFIG_FILENAME                            = "swallow-mongo.properties";
-   private static final String           LION_CONFIG_FILENAME                             = "swallow-mongo-lion.properties";
-   private static final String           DEFAULT_COLLECTION_NAME                          = "c";
-   private static final String           TOPICNAME_HEARTBEAT                              = "heartbeat";
-   private static final String           TOPICNAME_DEFAULT                                = "default";
+   private static final Logger           LOG                                               = LoggerFactory
+                                                                                                 .getLogger(MongoClient.class);
 
-   private static final String           LION_KEY_MSG_CAPPED_COLLECTION_SIZE              = "swallow.mongo.msgCappedCollectionSize";
-   private static final String           LION_KEY_MSG_CAPPED_COLLECTION_MAX_DOC_NUM       = "swallow.mongo.msgCappedCollectionMaxDocNum";
-   private static final String           LION_KEY_ACK_CAPPED_COLLECTION_SIZE              = "swallow.mongo.ackCappedCollectionSize";
-   private static final String           LION_KEY_ACK_CAPPED_COLLECTION_MAX_DOC_NUM       = "swallow.mongo.ackCappedCollectionMaxDocNum";
-   private static final String           LION_KEY_HEARTBEAT_SERVER_URI                    = "swallow.mongo.heartbeatServerURI";
-   private static final String           LION_KEY_HEARTBEAT_CAPPED_COLLECTION_SIZE        = "swallow.mongo.heartbeatCappedCollectionSize";
-   private static final String           LION_KEY_HEARTBEAT_CAPPED_COLLECTION_MAX_DOC_NUM = "swallow.mongo.heartbeatCappedCollectionMaxDocNum";
+   private static final String           MONGO_CONFIG_FILENAME                             = "swallow-mongo.properties";
+   private static final String           LION_CONFIG_FILENAME                              = "swallow-mongo-lion.properties";
+   private static final String           DEFAULT_COLLECTION_NAME                           = "c";
+   private static final String           TOPICNAME_HEARTBEAT                               = "heartbeat";
+   private static final String           TOPICNAME_DEFAULT                                 = "default";
 
-   private static final long              MILLION                                          = 1000000;
+   private static final String           LION_KEY_MSG_CAPPED_COLLECTION_SIZE               = "swallow.mongo.msgCappedCollectionSize";
+   private static final String           LION_KEY_MSG_CAPPED_COLLECTION_MAX_DOC_NUM        = "swallow.mongo.msgCappedCollectionMaxDocNum";
+   private static final String           LION_KEY_ACK_CAPPED_COLLECTION_SIZE               = "swallow.mongo.ackCappedCollectionSize";
+   private static final String           LION_KEY_ACK_CAPPED_COLLECTION_MAX_DOC_NUM        = "swallow.mongo.ackCappedCollectionMaxDocNum";
+   private static final String           LION_KEY_BACKUP_MSG_CAPPED_COLLECTION_SIZE        = "swallow.mongo.backupMsgCappedCollectionSize";
+   private static final String           LION_KEY_BACKUP_MSG_CAPPED_COLLECTION_MAX_DOC_NUM = "swallow.mongo.backupMsgCappedCollectionMaxDocNum";
+   private static final String           LION_KEY_BACKUP_ACK_CAPPED_COLLECTION_SIZE        = "swallow.mongo.backupAckCappedCollectionSize";
+   private static final String           LION_KEY_BACKUP_ACK_CAPPED_COLLECTION_MAX_DOC_NUM = "swallow.mongo.backupAckCappedCollectionMaxDocNum";
+
+   private static final String           LION_KEY_HEARTBEAT_SERVER_URI                     = "swallow.mongo.heartbeatServerURI";
+   private static final String           LION_KEY_HEARTBEAT_CAPPED_COLLECTION_SIZE         = "swallow.mongo.heartbeatCappedCollectionSize";
+   private static final String           LION_KEY_HEARTBEAT_CAPPED_COLLECTION_MAX_DOC_NUM  = "swallow.mongo.heartbeatCappedCollectionMaxDocNum";
+
+   private static final long             MILLION                                           = 1000000;
 
    //serverURI的名字可配置(consumer和producer在Lion上的名字是不同的)
    private final String                  severURILionKey;
 
    /** 缓存default collection 存在的标识，避免db.collectionExists的调用 */
-   private final Map<DB, Byte>           collectionExistsSign                             = new ConcurrentHashMap<DB, Byte>();
+   private final Map<DB, Byte>           collectionExistsSign                              = new ConcurrentHashMap<DB, Byte>();
 
    //lion config
    private volatile Map<String, Integer> msgTopicNameToSizes;
    private volatile Map<String, Integer> msgTopicNameToMaxDocNums;
    private volatile Map<String, Integer> ackTopicNameToSizes;
    private volatile Map<String, Integer> ackTopicNameToMaxDocNums;
+
+   private volatile Map<String, Integer> backupMsgTopicNameToSizes;
+   private volatile Map<String, Integer> backupMsgTopicNameToMaxDocNums;
+   private volatile Map<String, Integer> backupAckTopicNameToSizes;
+   private volatile Map<String, Integer> backupAckTopicNameToMaxDocNums;
+
    private volatile Mongo                heartbeatMongo;
    private volatile int                  heartbeatCappedCollectionSize;
    private volatile int                  heartbeatCappedCollectionMaxDocNum;
@@ -147,6 +163,24 @@ public class MongoClient implements ConfigChangeListener {
          String ackTopicNameToMaxDocNums = dynamicConfig.get(LION_KEY_ACK_CAPPED_COLLECTION_MAX_DOC_NUM);
          if (ackTopicNameToMaxDocNums != null) {
             this.ackTopicNameToMaxDocNums = parseSizeOrDocNum(ackTopicNameToMaxDocNums.trim());
+         }
+         //backupMsgTopicNameToSizes
+         String backupMsgTopicNameToSizes = dynamicConfig.get(LION_KEY_BACKUP_MSG_CAPPED_COLLECTION_SIZE);
+         if (backupMsgTopicNameToSizes != null) {
+            this.backupMsgTopicNameToSizes = parseSizeOrDocNum(backupMsgTopicNameToSizes.trim());
+         }
+         //backupMsgTopicNameToMaxDocNums(可选)
+         String backupMsgTopicNameToMaxDocNums = dynamicConfig.get(LION_KEY_BACKUP_MSG_CAPPED_COLLECTION_MAX_DOC_NUM);
+         if (backupMsgTopicNameToMaxDocNums != null) {
+            this.backupMsgTopicNameToMaxDocNums = parseSizeOrDocNum(backupMsgTopicNameToMaxDocNums.trim());
+         }
+         //backupAckTopicNameToSizes
+         String backupAckTopicNameToSizes = dynamicConfig.get(LION_KEY_BACKUP_ACK_CAPPED_COLLECTION_SIZE);
+         this.backupAckTopicNameToSizes = parseSizeOrDocNum(backupAckTopicNameToSizes.trim());
+         //backupAckTopicNameToMaxDocNums(可选)
+         String backupAckTopicNameToMaxDocNums = dynamicConfig.get(LION_KEY_BACKUP_ACK_CAPPED_COLLECTION_MAX_DOC_NUM);
+         if (backupAckTopicNameToMaxDocNums != null) {
+            this.backupAckTopicNameToMaxDocNums = parseSizeOrDocNum(backupAckTopicNameToMaxDocNums.trim());
          }
          //heartbeat
          this.heartbeatMongo = parseURIAndCreateHeartbeatMongo(dynamicConfig.get(LION_KEY_HEARTBEAT_SERVER_URI).trim());
@@ -328,6 +362,14 @@ public class MongoClient implements ConfigChangeListener {
             this.ackTopicNameToSizes = parseSizeOrDocNum(value);
          } else if (LION_KEY_ACK_CAPPED_COLLECTION_MAX_DOC_NUM.equals(key)) {
             this.ackTopicNameToMaxDocNums = parseSizeOrDocNum(value);
+         } else if (LION_KEY_BACKUP_MSG_CAPPED_COLLECTION_SIZE.equals(key)) {
+            this.backupMsgTopicNameToSizes = parseSizeOrDocNum(value);
+         } else if (LION_KEY_BACKUP_MSG_CAPPED_COLLECTION_MAX_DOC_NUM.equals(key)) {
+            this.backupMsgTopicNameToMaxDocNums = parseSizeOrDocNum(value);
+         } else if (LION_KEY_BACKUP_ACK_CAPPED_COLLECTION_SIZE.equals(key)) {
+            this.backupAckTopicNameToSizes = parseSizeOrDocNum(value);
+         } else if (LION_KEY_BACKUP_ACK_CAPPED_COLLECTION_MAX_DOC_NUM.equals(key)) {
+            this.backupAckTopicNameToMaxDocNums = parseSizeOrDocNum(value);
          } else if (LION_KEY_HEARTBEAT_SERVER_URI.equals(key)) {
             Mongo oldMongo = this.heartbeatMongo;
             this.heartbeatMongo = parseURIAndCreateHeartbeatMongo(value);
@@ -402,7 +444,33 @@ public class MongoClient implements ConfigChangeListener {
    }
 
    public DBCollection getMessageCollection(String topicName) {
+      return getMessageCollection(topicName, null);
+   }
+
+   /**
+    * @param topicName
+    * @param consumerId consumerId为null表示使用非backup消息队列
+    * @return
+    */
+   public DBCollection getMessageCollection(String topicName, String consumerId) {
       //根据topicName获取Mongo实例
+      Mongo mongo = getMongo(topicName);
+      DBCollection collection;
+      if (consumerId == null) {
+         collection = this.getCollection(mongo, getIntSafely(msgTopicNameToSizes, topicName),
+               getIntSafely(msgTopicNameToMaxDocNums, topicName), MSG_PREFIX + topicName, new BasicDBObject(
+                     MessageDAOImpl.ID, -1));
+      } else {
+         BasicDBObject index1 = new BasicDBObject(MessageDAOImpl.ID, -1);
+         BasicDBObject index2 = new BasicDBObject(MessageDAOImpl.ORIGINAL_ID, -1);
+         collection = this.getCollection(mongo, getIntSafely(backupMsgTopicNameToSizes, topicName),
+               getIntSafely(backupMsgTopicNameToMaxDocNums, topicName), BACKUP_MSG_PREFIX + topicName + "#"
+                     + consumerId, index1, index2);
+      }
+      return collection;
+   }
+
+   private Mongo getMongo(String topicName) {
       Mongo mongo = this.topicNameToMongoMap.get(topicName);
       if (mongo == null) {
          if (LOG.isDebugEnabled()) {
@@ -410,9 +478,7 @@ public class MongoClient implements ConfigChangeListener {
          }
          mongo = this.topicNameToMongoMap.get(TOPICNAME_DEFAULT);
       }
-      return this.getCollection(mongo, getIntSafely(msgTopicNameToSizes, topicName),
-            getIntSafely(msgTopicNameToMaxDocNums, topicName), "msg#", topicName, new BasicDBObject(MessageDAOImpl.ID,
-                  -1));
+      return mongo;
    }
 
    private int getIntSafely(Map<String, Integer> map, String key) {
@@ -427,36 +493,34 @@ public class MongoClient implements ConfigChangeListener {
    }
 
    public DBCollection getAckCollection(String topicName, String consumerId) {
-      //根据topicName获取Mongo实例
-      Mongo mongo = this.topicNameToMongoMap.get(topicName);
-      if (mongo == null) {
-         if (LOG.isDebugEnabled()) {
-            LOG.debug("topicname '" + topicName + "' do not match any Mongo Server, use default.");
-         }
-         mongo = this.topicNameToMongoMap.get(TOPICNAME_DEFAULT);
+      return getAckCollection(topicName, consumerId, false);
+   }
+
+   public DBCollection getAckCollection(String topicName, String consumerId, boolean isBackup) {
+      Mongo mongo = getMongo(topicName);
+      DBCollection collection;
+      if (!isBackup) {
+         collection = this.getCollection(mongo, getIntSafely(ackTopicNameToSizes, topicName),
+               getIntSafely(ackTopicNameToMaxDocNums, topicName), ACK_PREFIX + topicName + "#" + consumerId,
+               new BasicDBObject(AckDAOImpl.MSG_ID, -1));
+      } else {
+         collection = this.getCollection(mongo, getIntSafely(backupAckTopicNameToSizes, topicName),
+               getIntSafely(backupAckTopicNameToMaxDocNums, topicName), BACKUP_ACK_PREFIX + topicName + "#"
+                     + consumerId, new BasicDBObject(AckDAOImpl.MSG_ID, -1));
       }
-      return this.getCollection(mongo, getIntSafely(ackTopicNameToSizes, topicName),
-            getIntSafely(ackTopicNameToMaxDocNums, topicName), "ack#", topicName + "#" + consumerId, new BasicDBObject(
-                  AckDAOImpl.MSG_ID, -1));
+      return collection;
    }
 
    public DBCollection getHeartbeatCollection(String ip) {
       //根据topicName获取Mongo实例
-      Mongo mongo = this.topicNameToMongoMap.get(TOPICNAME_HEARTBEAT);
-      if (mongo == null) {
-         if (LOG.isDebugEnabled()) {
-            LOG.debug("topicname '" + TOPICNAME_HEARTBEAT + "' do not match any Mongo Server, use default.");
-         }
-         mongo = this.topicNameToMongoMap.get(TOPICNAME_DEFAULT);
-      }
+      Mongo mongo = getMongo(TOPICNAME_HEARTBEAT);
       return this.getCollection(mongo, this.heartbeatCappedCollectionSize, this.heartbeatCappedCollectionMaxDocNum,
-            "heartbeat#", ip, new BasicDBObject(HeartbeatDAOImpl.TICK, -1));
+            "heartbeat#" + ip, new BasicDBObject(HeartbeatDAOImpl.TICK, -1));
    }
 
-   private DBCollection getCollection(Mongo mongo, int size, int cappedCollectionMaxDocNum, String dbNamePrefix,
-                                      String topicName, DBObject indexDBObject) {
+   private DBCollection getCollection(Mongo mongo, int size, int cappedCollectionMaxDocNum, String dbName,
+                                      DBObject... indexDBObjects) {
       //根据topicname从Mongo实例从获取DB
-      String dbName = dbNamePrefix + topicName;
       DB db = mongo.getDB(dbName);
       //从DB实例获取Collection(因为只有一个Collection，所以名字均叫做c),如果不存在，则创建)
       DBCollection collection = null;
@@ -464,7 +528,7 @@ public class MongoClient implements ConfigChangeListener {
          synchronized (db) {
             if (!collectionExists(db) && !db.collectionExists(DEFAULT_COLLECTION_NAME)) {
                collection = createColletcion(db, DEFAULT_COLLECTION_NAME, size, cappedCollectionMaxDocNum,
-                     indexDBObject);
+                     indexDBObjects);
             }
             markCollectionExists(db);//缓存default collection 存在的标识，避免db.collectionExists的调用
          }
@@ -494,7 +558,7 @@ public class MongoClient implements ConfigChangeListener {
    }
 
    private DBCollection createColletcion(DB db, String collectionName, int size, int cappedCollectionMaxDocNum,
-                                         DBObject indexDBObject) {
+                                         DBObject... indexDBObjects) {
       DBObject options = new BasicDBObject();
       options.put("capped", true);
       if (size > 0) {
@@ -505,10 +569,12 @@ public class MongoClient implements ConfigChangeListener {
       }
       try {
          DBCollection collection = db.createCollection(collectionName, options);
-         LOG.info("Create collection '" + collection + "' on db " + db + ", index is " + indexDBObject);
-         if (indexDBObject != null) {
-            collection.ensureIndex(indexDBObject);
-            LOG.info("Ensure index " + indexDBObject + " on colleciton " + collection);
+         LOG.info("Create collection '" + collection + "' on db " + db + ", index is " + indexDBObjects);
+         if (indexDBObjects != null) {
+            for (DBObject indexDBObject : indexDBObjects) {
+               collection.ensureIndex(indexDBObject);
+               LOG.info("Ensure index " + indexDBObject + " on colleciton " + collection);
+            }
          }
          return collection;
       } catch (MongoException e) {
@@ -578,6 +644,22 @@ public class MongoClient implements ConfigChangeListener {
          return (mongoClient.get() != null) ? mongoClient.get().ackTopicNameToMaxDocNums : null;
       }
 
+      public Map<String, Integer> getBackupMsgTopicNameToSizes() {
+         return (mongoClient.get() != null) ? mongoClient.get().backupMsgTopicNameToSizes : null;
+      }
+
+      public Map<String, Integer> getBackupMsgTopicNameToMaxDocNums() {
+         return (mongoClient.get() != null) ? mongoClient.get().backupMsgTopicNameToMaxDocNums : null;
+      }
+
+      public Map<String, Integer> getBackupAckTopicNameToSizes() {
+         return (mongoClient.get() != null) ? mongoClient.get().backupAckTopicNameToSizes : null;
+      }
+
+      public Map<String, Integer> getBackupAckTopicNameToMaxDocNums() {
+         return (mongoClient.get() != null) ? mongoClient.get().backupAckTopicNameToMaxDocNums : null;
+      }
+
       public String getHeartbeatMongo() {
          return (mongoClient.get() != null) ? mongoClient.get().heartbeatMongo.toString() : null;
       }
@@ -603,10 +685,10 @@ public class MongoClient implements ConfigChangeListener {
       }
 
    }
-   
+
    public static void main(String[] args) {
-       int size = 10000;
-       System.out.println((long)MILLION*size);
-}
+      int size = 10000;
+      System.out.println((long) MILLION * size);
+   }
 
 }

@@ -22,6 +22,7 @@ import com.dianping.swallow.common.internal.packet.PktSwallowPACK;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.SHAUtil;
+import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.ServerDaoException;
 
@@ -34,6 +35,8 @@ public class ProducerServerForClient implements ProducerSwallowService {
    private int                 port             = DEFAULT_PORT;
    private MessageDAO          messageDAO;
    private String              remoteServiceName;
+   /** topic的白名单 */
+   private TopicWhiteList      topicWhiteList;
 
    public ProducerServerForClient() {
       //Hawk监控
@@ -85,8 +88,16 @@ public class ProducerServerForClient implements ProducerSwallowService {
             pktRet = new PktSwallowPACK(producerServerIP);
             break;
          case OBJECT_MSG:
-            swallowMessage = ((PktMessage) pkt).getContent();
             topicName = ((PktMessage) pkt).getDestination().getName();
+
+            //验证topicName是否在白名单里
+            boolean isValid = topicWhiteList.isValid(topicName);
+            if (!isValid) {
+               throw new IllegalArgumentException("Invalid topic(" + topicName
+                     + "), because it's not in whitelist, please contact swallow group for support.");
+            }
+
+            swallowMessage = ((PktMessage) pkt).getContent();
             sha1 = SHAUtil.generateSHA(swallowMessage.getContent());
             pktRet = new PktSwallowPACK(sha1);
             //设置swallowMessage的sha-1
@@ -135,6 +146,10 @@ public class ProducerServerForClient implements ProducerSwallowService {
 
    public void setMessageDAO(MessageDAO messageDAO) {
       this.messageDAO = messageDAO;
+   }
+
+   public void setTopicWhiteList(TopicWhiteList topicWhiteList) {
+      this.topicWhiteList = topicWhiteList;
    }
 
    public String getRemoteServiceName() {

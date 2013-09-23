@@ -45,7 +45,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
    private static final String              CONFIG_FILE_NAME = "swallow-producerclient-pigeon.properties";        //配置文件名称
 
    private final String                     producerIP       = IPUtil.getFirstNoLoopbackIP4Address();             //Producer IP地址
-   private final String                     producerVersion  = "0.6.6";                                           //Producer版本号
+   private final String                     producerVersion  = "0.6.8";                                           //Producer版本号
    private final SwallowPigeonConfiguration pigeonConfigure;                                                      //ProducerFactory配置类
    private ProducerSwallowService           remoteService;                                                        //远程调用对象
 
@@ -132,7 +132,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
 
       ProducerImpl producerImpl = null;
       producerImpl = new ProducerImpl(dest, config, producerIP, producerVersion, remoteService,
-            pigeonConfigure.getRetryBaseInterval(), pigeonConfigure.getFileQueueFailedBaseInterval());
+            pigeonConfigure.getRetryBaseInterval(), pigeonConfigure.getFailedBaseInterval(), pigeonConfigure.getFileQueueFailedBaseInterval());
       LOGGER.info("New producer:[TopicName=" + dest.getName() + "; " + producerImpl.getProducerConfig().toString()
             + "]");
       //向swallow发送greet信息

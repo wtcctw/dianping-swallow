@@ -21,52 +21,52 @@ import com.dianping.swallow.producer.Producer;
 
 @Controller
 public class MonitorController {
-    private static final Logger LOG = LoggerFactory.getLogger(MonitorController.class);
+   private static final Logger LOG = LoggerFactory.getLogger(MonitorController.class);
 
-    @Autowired
-    private ProducerHolder      producerHolder;
+   @Autowired
+   private ProducerHolder      producerHolder;
 
-    @Autowired
-    private ConsumerHolder      consumerHolder;
+   @Autowired
+   private ConsumerHolder      consumerHolder;
 
-    @RequestMapping(value = "monitor", method = { RequestMethod.GET })
-    public ModelAndView monitor(HttpSession session) {
-        Map<String, Object> map = new HashMap<String, Object>();
+   @RequestMapping(value = { "/", "monitor" }, method = { RequestMethod.GET })
+   public ModelAndView monitor(HttpSession session) {
+      Map<String, Object> map = new HashMap<String, Object>();
 
-        Map<String, ConsumerBroker> consumerBrokerMap = consumerHolder.getConsumerBrokerMap();
+      Map<String, ConsumerBroker> consumerBrokerMap = consumerHolder.getConsumerBrokerMap();
 
-        Map<String, Producer> producerMap = producerHolder.getProducerMap();
+      Map<String, Producer> producerMap = producerHolder.getProducerMap();
 
-        map.put("consumerBrokerMap", consumerBrokerMap);
-        map.put("producerMap", producerMap);
+      map.put("consumerBrokerMap", consumerBrokerMap);
+      map.put("producerMap", producerMap);
 
-        return new ModelAndView("monitor/detail", map);
-    }
+      return new ModelAndView("monitor/detail", map);
+   }
 
-    @RequestMapping(value = "monitor", method = { RequestMethod.POST })
-    public ModelAndView action(HttpSession session, String key, String action) {
-        Map<String, Object> map = new HashMap<String, Object>();
+   @RequestMapping(value = { "/", "monitor" }, method = { RequestMethod.POST })
+   public ModelAndView action(HttpSession session, String key, String action) {
+      Map<String, Object> map = new HashMap<String, Object>();
 
-        LOG.info("Control Action, key is " + key + ", action is " + action);
+      LOG.info("Control Action, key is " + key + ", action is " + action);
 
-        Map<String, ConsumerBroker> consumerBrokerMap = consumerHolder.getConsumerBrokerMap();
+      Map<String, ConsumerBroker> consumerBrokerMap = consumerHolder.getConsumerBrokerMap();
 
-        ConsumerBroker consumerBroker = consumerBrokerMap.get(key);
+      ConsumerBroker consumerBroker = consumerBrokerMap.get(key);
 
-        if (consumerBroker != null) {
-            if (StringUtils.equalsIgnoreCase(action, "close")) {
-                consumerBroker.close();
-            } else if (StringUtils.equalsIgnoreCase(action, "start")) {
-                consumerBroker.start();
-            }
-        }
+      if (consumerBroker != null) {
+         if (StringUtils.equalsIgnoreCase(action, "close")) {
+            consumerBroker.close();
+         } else if (StringUtils.equalsIgnoreCase(action, "start")) {
+            consumerBroker.start();
+         }
+      }
 
-        Map<String, Producer> producerMap = producerHolder.getProducerMap();
+      Map<String, Producer> producerMap = producerHolder.getProducerMap();
 
-        map.put("consumerBrokerMap", consumerBrokerMap);
-        map.put("producerMap", producerMap);
+      map.put("consumerBrokerMap", consumerBrokerMap);
+      map.put("producerMap", producerMap);
 
-        return new ModelAndView("monitor/detail", map);
-    }
+      return new ModelAndView("monitor/detail", map);
+   }
 
 }

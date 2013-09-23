@@ -35,7 +35,7 @@ public class ProducerServerForTextTest {
       textObj.setTopic("UnitTest");
 
       SocketAddress socketAddress = new InetSocketAddress("127.0.0.1", 8000);
-      
+
       //构造Channel
       Channel channel = mock(Channel.class);
       //Matchers.anyObject()
@@ -43,15 +43,17 @@ public class ProducerServerForTextTest {
          @Override
          public void describeTo(Description arg0) {
          }
+
          @Override
          public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
          }
+
          @Override
          public boolean matches(Object arg0) {
-            TextACK textAck = (TextACK)arg0;
+            TextACK textAck = (TextACK) arg0;
             System.out.println(textAck.toString());
             Assert.assertEquals(TextACK.class, arg0.getClass());
-            switch(textAck.getStatus()){
+            switch (textAck.getStatus()) {
                case ProducerServerTextHandler.OK:
                   Assert.assertEquals(SHAUtil.generateSHA(textObj.getContent()), textAck.getInfo());
                   break;
@@ -77,30 +79,31 @@ public class ProducerServerForTextTest {
       MessageDAO messageDAO = mock(MessageDAO.class);
 
       //利用以上变量，构造ProducerServerTextHandler对象
-      ProducerServerTextHandler producerServerTextHandler = new ProducerServerTextHandler(messageDAO);
+      ProducerServerTextHandler producerServerTextHandler = new ProducerServerTextHandler(messageDAO, null);
 
       //测试发送消息
       producerServerTextHandler.messageReceived(null, messageEvent);
 
       textObj.setTopic("H:ello");
       producerServerTextHandler.messageReceived(null, messageEvent);
-      
-      doThrow(new RuntimeException()).when(messageDAO).saveMessage(Matchers.anyString(), (SwallowMessage)Matchers.anyObject());
+
+      doThrow(new RuntimeException()).when(messageDAO).saveMessage(Matchers.anyString(),
+            (SwallowMessage) Matchers.anyObject());
       producerServerTextHandler.messageReceived(null, messageEvent);
-      
+
       ChannelEvent e = mock(ChannelStateEvent.class);
-      ExceptionEvent e2 = mock (ExceptionEvent.class);
+      ExceptionEvent e2 = mock(ExceptionEvent.class);
       ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
       producerServerTextHandler.handleUpstream(ctx, e);
       producerServerTextHandler.exceptionCaught(ctx, e2);
-      
+
       new ProducerServerForText().start();
    }
-   
+
    @Test
-   public void testProducerServerTextPipelineFactory(){
+   public void testProducerServerTextPipelineFactory() {
       MessageDAO messageDAO = mock(MessageDAO.class);
-      ProducerServerTextPipelineFactory pstp = new ProducerServerTextPipelineFactory(messageDAO);
+      ProducerServerTextPipelineFactory pstp = new ProducerServerTextPipelineFactory(messageDAO, null);
       System.out.println(pstp.getPipeline().toString());
    }
 }

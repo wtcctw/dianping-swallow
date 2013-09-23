@@ -31,8 +31,20 @@ public class AckDAOImpl implements AckDAO {
 
    @Override
    public Long getMaxMessageId(String topicName, String consumerId) {
-      DBCollection collection = this.mongoClient.getAckCollection(topicName, consumerId);
+      return getMaxMessageId(topicName, consumerId, false);
+   }
 
+   @Override
+   public Long getMaxMessageId(String topicName, String consumerId, boolean isBackup) {
+      DBCollection collection = getCollection(topicName, consumerId, isBackup);
+      return getMaxMessageId(collection);
+   }
+
+   private DBCollection getCollection(String topicName, String consumerId, boolean isBackup) {
+      return this.mongoClient.getAckCollection(topicName, consumerId, isBackup);
+   }
+
+   private Long getMaxMessageId(DBCollection collection) {
       DBObject fields = BasicDBObjectBuilder.start().add(MSG_ID, Integer.valueOf(1)).get();
       DBObject orderBy = BasicDBObjectBuilder.start().add(MSG_ID, Integer.valueOf(-1)).get();
       DBCursor cursor = collection.find(new BasicDBObject(), fields).sort(orderBy).limit(1);
@@ -50,8 +62,16 @@ public class AckDAOImpl implements AckDAO {
 
    @Override
    public void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp) {
-      DBCollection collection = this.mongoClient.getAckCollection(topicName, consumerId);
+      add(topicName, consumerId, messageId, sourceConsumerIp, false);
+   }
 
+   @Override
+   public void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp, boolean isBackup) {
+      DBCollection collection = getCollection(topicName, consumerId, isBackup);
+      add(messageId, sourceConsumerIp, collection);
+   }
+
+   private void add(Long messageId, String sourceConsumerIp, DBCollection collection) {
       BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(messageId);
       Date curTime = new Date();
       try {

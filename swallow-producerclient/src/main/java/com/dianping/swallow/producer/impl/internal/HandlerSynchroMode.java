@@ -18,16 +18,16 @@ import com.dianping.swallow.producer.ProducerHandler;
  * @author tong.song
  */
 public class HandlerSynchroMode implements ProducerHandler {
-    private final int sendTimes;
-    private final int delayBase;
-    private final Destination destination;
+    private final int              sendTimes;
+    private final int              delayBase;
+    private final Destination      destination;
     private ProducerSwallowService remoteService;
-    private final String producerIP;
-    private static final int DELAY_BASE_MULTI = 5; //超时策略倍数
+    private final String           producerIP;
+    private static final int       DELAY_BASE_MULTI = 5; //超时策略倍数
 
     public HandlerSynchroMode(ProducerImpl producer) {
-        this.sendTimes = producer.getProducerConfig().getSyncRetryTimes() == Integer.MAX_VALUE ? Integer.MAX_VALUE : producer
-                .getProducerConfig().getSyncRetryTimes() + 1;//初始值等于用户要求的retryTimes+1，这样可以保证至少执行一次
+        this.sendTimes = producer.getProducerConfig().getSyncRetryTimes() == Integer.MAX_VALUE ? Integer.MAX_VALUE
+                : producer.getProducerConfig().getSyncRetryTimes() + 1;//初始值等于用户要求的retryTimes+1，这样可以保证至少执行一次
         this.delayBase = producer.getRetryBaseInterval();
         this.remoteService = producer.getRemoteService();
         this.destination = producer.getDestination();
@@ -58,11 +58,9 @@ public class HandlerSynchroMode implements ProducerHandler {
                     if (defaultPullStrategy == null) {
                         defaultPullStrategy = new DefaultPullStrategy(delayBase, DELAY_BASE_MULTI * delayBase);
                     }
-                    try {
-                        defaultPullStrategy.fail(true);
-                    } catch (InterruptedException ie) {
-                        return null;
-                    }
+
+                    defaultPullStrategy.fail(true);
+
                     continue;
                 } else {
                     //重置超时

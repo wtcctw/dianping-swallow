@@ -29,6 +29,10 @@ public class SwallowMessage implements Serializable, Message {
 
    private String              sourceIp;
 
+   private Long                backupMessageId;
+
+   private boolean             isBackup;
+
    @Override
    public Date getGeneratedTime() {
       return generatedTime;
@@ -124,11 +128,28 @@ public class SwallowMessage implements Serializable, Message {
       this.sourceIp = sourceIp;
    }
 
+   public Long getBackupMessageId() {
+      return backupMessageId;
+   }
+
+   public void setBackupMessageId(Long backupMessageId) {
+      this.backupMessageId = backupMessageId;
+   }
+
+   public boolean isBackup() {
+      return isBackup;
+   }
+
+   public void setBackup(boolean isBackup) {
+      this.isBackup = isBackup;
+   }
+
    @Override
    public String toString() {
-      return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", properties="
-            + properties + ", internalProperties=" + internalProperties + ", version=" + version + ", sha1=" + sha1
-            + ", type=" + type + ", sourceIp=" + sourceIp + "&content=" + content + "]";
+      return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", backupMessageId="
+            + backupMessageId + ", properties=" + properties + ", internalProperties=" + internalProperties
+            + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + ", content="
+            + content + ", isBackup=" + isBackup + "]";
    }
 
    public String toKeyValuePairs() {
@@ -136,9 +157,9 @@ public class SwallowMessage implements Serializable, Message {
    }
 
    public String toSuccessKeyValuePairs() {
-      return "generatedTime=" + generatedTime + "&messageId=" + messageId + "&properties=" + properties
-            + "&internalProperties=" + internalProperties + "&version=" + version + "&sha1=" + sha1 + "&type=" + type
-            + "&sourceIp=" + sourceIp;
+      return "generatedTime=" + generatedTime + "&messageId=" + messageId + "&backupMessageId=" + backupMessageId
+            + "&properties=" + properties + "&internalProperties=" + internalProperties + "&version=" + version
+            + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp + "&isBackup=" + isBackup;
    }
 
    @Override
@@ -185,6 +206,13 @@ public class SwallowMessage implements Serializable, Message {
          return false;
       }
       SwallowMessage other = (SwallowMessage) obj;
+      if (backupMessageId == null) {
+         if (other.backupMessageId != null) {
+            return false;
+         }
+      } else if (backupMessageId.compareTo(other.backupMessageId) != 0) {
+         return false;
+      }
       if (content == null) {
          if (other.content != null) {
             return false;
@@ -239,6 +267,9 @@ public class SwallowMessage implements Serializable, Message {
             return false;
          }
       } else if (!version.equals(other.version)) {
+         return false;
+      }
+      if (isBackup != other.isBackup) {
          return false;
       }
       return true;

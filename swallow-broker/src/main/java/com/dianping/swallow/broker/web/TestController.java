@@ -31,10 +31,10 @@ public class TestController {
             LOG.info("[testReceiver]request param is " + paramMap);
 
         } catch (IllegalArgumentException e) {
-            map.put("success", false);
+            map.put("result", "fail");
             map.put("errorMsg", e.getMessage());
         } catch (Exception e) {
-            map.put("success", false);
+            map.put("result", "fail");
             map.put("errorMsg", e.getMessage());
             LOG.error(e.getMessage(), e);
         }

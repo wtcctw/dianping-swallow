@@ -24,9 +24,8 @@ public interface PullStrategy {
 
 	/***
 	 * 没有拉到消息
-	 * @throws InterruptedException
 	 */
-	long fail(boolean shouldSleep) throws InterruptedException;
+	long fail(boolean shouldSleep);
 	
 	/***
 	 * 拉到了消息

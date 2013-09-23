@@ -32,7 +32,15 @@ public final class ConfigManager {
    private int                  maxClientThreadCount            = 100;
    private int                  masterPort                      = 8081;
    private int                  slavePort                       = 8082;
-   private int                  maxAckedMessageIdUpdateInterval = 1000;
+   private int                  ackIdUpdateIntervalSecond       = 1;
+   /**
+    * maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的值为seq，seq = max(实时qps *
+    * seqRatio,minSeqThreshold)
+    */
+   private int                  seqRatio                        = 30;
+   private long                 minSeqThreshold                 = 100;
+   /** 允许"最小的空洞waitAckMessage"存活的时间的阈值,单位秒，默认5分钟 */
+   private long                 waitAckExpiredSecond            = 300;
 
    //Master Ip
    private String               masterIp                        = "127.0.0.1";
@@ -99,8 +107,20 @@ public final class ConfigManager {
       return heartbeatUpdateInterval;
    }
 
-   public int getMaxAckedMessageIdUpdateInterval() {
-      return maxAckedMessageIdUpdateInterval;
+   public int getAckIdUpdateIntervalSecond() {
+      return ackIdUpdateIntervalSecond;
+   }
+
+   public int getSeqRatio() {
+      return seqRatio;
+   }
+
+   public long getMinSeqThreshold() {
+      return minSeqThreshold;
+   }
+
+   public long getWaitAckExpiredSecond() {
+      return waitAckExpiredSecond;
    }
 
    public static void main(String[] args) {
@@ -129,7 +149,7 @@ public final class ConfigManager {
                try {
                   field = clazz.getDeclaredField(key.trim());
                } catch (Exception e) {
-                  LOG.error("unknow property found in " + configFileName + ": " + key);
+                  LOG.warn("unknow property found in " + configFileName + ": " + key);
                   continue;
                }
                field.setAccessible(true);

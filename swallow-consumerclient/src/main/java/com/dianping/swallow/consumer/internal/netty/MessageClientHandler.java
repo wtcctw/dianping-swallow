@@ -60,14 +60,14 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
    @Override
    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
       super.channelDisconnected(ctx, e);
-      LOG.info("channel(remoteAddress=" + e.getChannel().getRemoteAddress() + ") disconnected");
+      LOG.info("Channel(remoteAddress=" + e.getChannel().getRemoteAddress() + ") disconnected");
    }
 
    @Override
    public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e) {
       //记录收到消息，并且记录发来消息的server的地址
       if (LOG.isDebugEnabled()) {
-         LOG.debug("messageReceived from " + e.getChannel().getRemoteAddress());
+         LOG.debug("MessageReceived from " + e.getChannel().getRemoteAddress());
       }
 
       Runnable task = new Runnable() {
@@ -86,6 +86,9 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
             Transaction consumerClientTransaction = Cat.getProducer().newTransaction("MsgConsumed", catNameStr);
             consumerClientTransaction.addData("mid", swallowMessage.getMessageId());
             consumerClientTransaction.addData("sha1", swallowMessage.getSha1());
+            if(swallowMessage.getGeneratedTime() != null){//监控延迟时间
+               consumerClientTransaction.addData("delaytime", System.currentTimeMillis() - swallowMessage.getGeneratedTime().getTime());
+            }
 
             try {
                MessageTree tree = Cat.getManager().getThreadLocalMessageTree();
@@ -143,15 +146,12 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                         consumeTryTras.complete();
                      }
                   }
-               } catch (InterruptedException e) {
-                  LOG.warn("exception in MessageListener", e);//使用warn而不使用error是不希望其输出到cat，因为它是用户程序的异常；
-                  consumerClientTransaction.setStatus(e);
                } catch (RuntimeException e) {
-                  LOG.warn("exception in MessageListener", e);//使用warn而不使用error是不希望其输出到cat，因为它是用户程序的异常；
+                  LOG.error("Exception in MessageListener", e);
                   consumerClientTransaction.setStatus(e);
                }
             } catch (IOException e) {
-               LOG.error("can not uncompress message with messageId " + messageId, e);
+               LOG.error("Can not uncompress message with messageId " + messageId, e);
                consumerClientTransaction.setStatus(e);
                Cat.getProducer().logError(e);
             }
@@ -159,7 +159,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
             try {
                e.getChannel().write(consumermessage);
             } catch (RuntimeException e) {
-               LOG.warn("write to swallowC error.", e);
+               LOG.warn("Write to server error.", e);
             }
 
             consumerClientTransaction.complete();
@@ -173,7 +173,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
       // Close the connection when an exception is raised.
       Channel channel = e.getChannel();
-      LOG.error("error from channel(remoteAddress=" + channel.getRemoteAddress() + ")", e.getCause());
+      LOG.error("Error from channel(remoteAddress=" + channel.getRemoteAddress() + ")", e.getCause());
       channel.close();
    }
 }

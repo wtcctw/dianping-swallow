@@ -15,13 +15,14 @@ public interface MessageRetriever {
     * </p>
     * 
     * @param topicName
+    * @param consumerId consumerId为null时使用非backup队列
     * @param tailMessageId
     * @param messageFilter 可以为null，如果为null则忽略
     * @return
     * @throws Exception
     */
    @SuppressWarnings("rawtypes")
-   List retriveMessage(String topicName, Long tailMessageId, MessageFilter messageFilter);
+   List retriveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter);
 
    void setFetchSize(int fetchSize);
 

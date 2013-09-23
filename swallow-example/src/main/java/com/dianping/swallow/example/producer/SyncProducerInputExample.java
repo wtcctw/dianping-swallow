@@ -30,7 +30,11 @@ public class SyncProducerInputExample {
 
             if (!(CurLine.equals("quit"))) {
                 System.out.println("您发送的是: " + CurLine);
-                p.sendMessage(CurLine);
+                try {
+                    p.sendMessage(CurLine);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else {
                 System.exit(0);
             }

@@ -1,5 +1,8 @@
 package com.dianping.swallow.consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 
@@ -9,6 +12,9 @@ import com.dianping.swallow.common.consumer.MessageFilter;
  * @author kezhu.wu
  */
 public class ConsumerConfig {
+
+    private static final Logger    LOG           = LoggerFactory.getLogger(ConsumerConfig.class);
+
 
    private int           threadPoolSize                           = 1;
    private MessageFilter messageFilter                            = MessageFilter.AllMatchFilter;
@@ -139,6 +145,13 @@ public class ConsumerConfig {
     * </p>
     */
    public void setRetryCountOnBackoutMessageException(int retryCountOnBackoutMessageException) {
+       if (retryCountOnBackoutMessageException == -1) {
+           retryCountOnBackoutMessageException = Integer.MAX_VALUE;
+       }
+       if (retryCountOnBackoutMessageException < -1) {
+           LOG.warn("invalid retryCountOnBackoutMessageException, use default value: " + this.retryCountOnBackoutMessageException + ".");
+           return;
+       }
       this.retryCountOnBackoutMessageException = retryCountOnBackoutMessageException;
    }
 
