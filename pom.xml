@@ -156,7 +156,7 @@
             <dependency>
                 <groupId>com.dianping.lion</groupId>
                 <artifactId>lion-client</artifactId>
-                <version>0.2.2</version>
+                <version>0.3.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.dianping.swallow</groupId>
@@ -281,7 +281,7 @@
             <dependency>
                 <groupId>com.dianping.dpsf</groupId>
                 <artifactId>dpsf-net</artifactId>
-                <version>1.6.3</version>
+                <version>1.9.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cglib</groupId>
