@@ -11,6 +11,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.CatConstants;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
+import com.dianping.phoenix.environment.PhoenixContext;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.packet.PktSwallowPACK;
@@ -148,7 +149,6 @@ public class ProducerImpl implements Producer {
       //根据content生成SwallowMessage
       SwallowMessage swallowMsg = new SwallowMessage();
       String ret = null;
-      Map<String, String> zipProperties = null;
 
       Transaction producerTransaction = Cat.getProducer().newTransaction("MsgProduced", destination.getName() + ":" + producerIP);
       String childMessageId;
@@ -178,20 +178,8 @@ public class ProducerImpl implements Producer {
             }
             swallowMsg.setProperties(properties);
          }
-         //压缩选项为真：对通过SwallowMessage类转换过的json字符串进行压缩，压缩成功时将compress=gzip写入InternalProperties，
-         //               压缩失败时将compress=failed写入InternalProperties
-         //压缩选项为假：不做任何操作，InternalProperties中将不存在key为zip的项
-         if (producerConfig.isZipped()) {
-            zipProperties = new HashMap<String, String>();
-            try {
-               swallowMsg.setContent(ZipUtil.zip(swallowMsg.getContent()));
-               zipProperties.put("compress", "gzip");
-            } catch (Exception e) {
-               LOGGER.warn("Compress message failed.Content=" + swallowMsg.getContent(), e);
-               zipProperties.put("compress", "failed");
-            }
-            swallowMsg.setInternalProperties(zipProperties);
-         }
+
+         initInternalProperties(swallowMsg);
 
          //构造packet
          PktMessage pktMessage = new PktMessage(destination, swallowMsg);
@@ -232,6 +220,36 @@ public class ProducerImpl implements Producer {
       }
 
       return ret;
+   }
+
+   private void initInternalProperties(SwallowMessage swallowMsg) {
+        Map<String, String> internalProperties = new HashMap<String, String>();
+        //requestId和referRequestId
+        String requestId = PhoenixContext.getInstance().getRequestId();
+        String referRequestId = PhoenixContext.getInstance().getReferRequestId();
+        String guid = PhoenixContext.getInstance().getGuid();
+        if (requestId != null) {
+            internalProperties.put(PhoenixContext.REQUEST_ID, requestId);
+        }
+        if (referRequestId != null) {
+            internalProperties.put(PhoenixContext.REFER_REQUEST_ID, referRequestId);
+        }
+        if (requestId != null) {
+            internalProperties.put(PhoenixContext.GUID, guid);
+        }
+        //压缩选项为真：对通过SwallowMessage类转换过的json字符串进行压缩，压缩成功时将compress=gzip写入InternalProperties，
+        //               压缩失败时将compress=failed写入InternalProperties
+        //压缩选项为假：不做任何操作，InternalProperties中将不存在key为zip的项
+        if (producerConfig.isZipped()) {
+            try {
+                swallowMsg.setContent(ZipUtil.zip(swallowMsg.getContent()));
+                internalProperties.put("compress", "gzip");
+            } catch (Exception e) {
+                LOGGER.warn("Compress message failed.Content=" + swallowMsg.getContent(), e);
+                internalProperties.put("compress", "failed");
+            }
+        }
+        swallowMsg.setInternalProperties(internalProperties);
    }
 
    /**

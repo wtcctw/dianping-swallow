@@ -1,6 +1,7 @@
 package com.dianping.swallow.consumer.internal.netty;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,6 +18,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.cat.message.spi.MessageTree;
+import com.dianping.phoenix.environment.PhoenixContext;
 import com.dianping.swallow.common.internal.consumer.ConsumerMessageType;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
@@ -116,6 +118,23 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                               .getRetryCountOnBackoutMessageException()) {
                      Transaction consumeTryTras = Cat.getProducer().newTransaction("MsgConsumeTried", catNameStr);
                      try {
+                         //传递PhoenixContext环境变量(从swallow消息中取出，存储到当前线程环境变量中)
+                         Map<String, String> internalProperties = swallowMessage.getInternalProperties();
+                         if (internalProperties != null) {
+                             String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);
+                             String referRequestId = internalProperties.get(PhoenixContext.REFER_REQUEST_ID);
+                             String guid = internalProperties.get(PhoenixContext.GUID);
+                             if (requestId != null) {
+                                 PhoenixContext.getInstance().setRequestId(requestId);
+                             }
+                             if (referRequestId != null) {
+                                 PhoenixContext.getInstance().setReferRequestId(referRequestId);
+                             }
+                             if (guid != null) {
+                                 PhoenixContext.getInstance().setGuid(guid);
+                             }
+                         }
+
                         consumer.getListener().onMessage(swallowMessage);
                         consumeTryTras.setStatus(Message.SUCCESS);
                         consumerClientTransaction.setStatus(Message.SUCCESS);
