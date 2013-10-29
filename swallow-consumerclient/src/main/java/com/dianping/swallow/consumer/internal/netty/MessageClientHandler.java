@@ -102,10 +102,26 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
             //处理消息
             //如果是压缩后的消息，则进行解压缩
             try {
-               if (swallowMessage.getInternalProperties() != null) {
+               Map<String, String> internalProperties = swallowMessage.getInternalProperties();
+               if (internalProperties != null) {
                   if ("gzip".equals(swallowMessage.getInternalProperties().get("compress"))) {
                      swallowMessage.setContent(ZipUtil.unzip(swallowMessage.getContent()));
                   }
+               }
+               //传递PhoenixContext环境变量(从swallow消息中取出，存储到当前线程环境变量中)
+               if (internalProperties != null) {
+                   String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);
+                   String referRequestId = internalProperties.get(PhoenixContext.REFER_REQUEST_ID);
+                   String guid = internalProperties.get(PhoenixContext.GUID);
+                   if (requestId != null) {
+                       PhoenixContext.getInstance().setRequestId(requestId);
+                   }
+                   if (referRequestId != null) {
+                       PhoenixContext.getInstance().setReferRequestId(referRequestId);
+                   }
+                   if (guid != null) {
+                       PhoenixContext.getInstance().setGuid(guid);
+                   }
                }
                try {
                   DefaultPullStrategy pullStrategy = new DefaultPullStrategy(MessageClientHandler.this.consumer
@@ -118,23 +134,6 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                               .getRetryCountOnBackoutMessageException()) {
                      Transaction consumeTryTras = Cat.getProducer().newTransaction("MsgConsumeTried", catNameStr);
                      try {
-                         //传递PhoenixContext环境变量(从swallow消息中取出，存储到当前线程环境变量中)
-                         Map<String, String> internalProperties = swallowMessage.getInternalProperties();
-                         if (internalProperties != null) {
-                             String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);
-                             String referRequestId = internalProperties.get(PhoenixContext.REFER_REQUEST_ID);
-                             String guid = internalProperties.get(PhoenixContext.GUID);
-                             if (requestId != null) {
-                                 PhoenixContext.getInstance().setRequestId(requestId);
-                             }
-                             if (referRequestId != null) {
-                                 PhoenixContext.getInstance().setReferRequestId(referRequestId);
-                             }
-                             if (guid != null) {
-                                 PhoenixContext.getInstance().setGuid(guid);
-                             }
-                         }
-
                         consumer.getListener().onMessage(swallowMessage);
                         consumeTryTras.setStatus(Message.SUCCESS);
                         consumerClientTransaction.setStatus(Message.SUCCESS);
@@ -173,6 +172,8 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                LOG.error("Can not uncompress message with messageId " + messageId, e);
                consumerClientTransaction.setStatus(e);
                Cat.getProducer().logError(e);
+            } finally{
+               PhoenixContext.getInstance().clear();//清理phoenix环境
             }
 
             try {

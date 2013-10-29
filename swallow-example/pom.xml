@@ -69,12 +69,18 @@
         <dependency>
             <groupId>com.dianping.swallow</groupId>
             <artifactId>swallow-consumerclient</artifactId>
-            <version>0.6.8</version>
+            <version>0.6.9</version>
         </dependency>
         <dependency>
             <groupId>com.dianping.swallow</groupId>
             <artifactId>swallow-producerclient</artifactId>
-            <version>0.6.8</version>
+            <version>0.6.9</version>
+        </dependency>
+        <!-- requestId项目的通用容器(基于ThreadLocal) -->
+        <dependency>
+            <groupId>com.dianping.platform</groupId>
+            <artifactId>phoenix-environment</artifactId>
+            <version>0.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.dianping.swallow</groupId>
