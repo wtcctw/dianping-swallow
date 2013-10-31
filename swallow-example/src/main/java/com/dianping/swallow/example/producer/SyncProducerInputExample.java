@@ -3,6 +3,7 @@ package com.dianping.swallow.example.producer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+//import com.dianping.phoenix.environment.PhoenixContext;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
@@ -29,6 +30,11 @@ public class SyncProducerInputExample {
             CurLine = in.readLine();
 
             if (!(CurLine.equals("quit"))) {
+                //
+                //                PhoenixContext.getInstance().setRequestId("test-request-id:" + CurLine);
+                //                PhoenixContext.getInstance().setReferRequestId("test-refer-request-id:" + CurLine);
+                //                PhoenixContext.getInstance().setGuid("test-guid:" + CurLine);
+
                 System.out.println("您发送的是: " + CurLine);
                 try {
                     p.sendMessage(CurLine);

@@ -1,5 +1,6 @@
 package com.dianping.swallow.example.consumer;
 
+import com.dianping.phoenix.environment.PhoenixContext;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
@@ -16,7 +17,7 @@ public class NonDurableConsumerExample {
     public static void main(String[] args) {
         ConsumerConfig config = new ConsumerConfig();
         //以下两项根据自己情况而定，默认是不需要配的
-        config.setThreadPoolSize(10);
+        config.setThreadPoolSize(1);
         config.setConsumerType(ConsumerType.NON_DURABLE);
         Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), config);
         c.setListener(new MessageListener() {
@@ -25,6 +26,9 @@ public class NonDurableConsumerExample {
             public void onMessage(Message msg) {
                 System.out.println("延迟" + (System.currentTimeMillis() - msg.getGeneratedTime().getTime()) + "ms");
                 System.out.println(msg.getContent());
+                System.out.println(PhoenixContext.getInstance().getRequestId());
+                System.out.println(PhoenixContext.getInstance().getReferRequestId());
+                System.out.println(PhoenixContext.getInstance().getGuid());
                 //            System.out.println(msg.transferContentToBean(MsgClass.class));
             }
         });
