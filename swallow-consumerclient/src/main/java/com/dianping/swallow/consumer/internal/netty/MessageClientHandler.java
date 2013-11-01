@@ -2,8 +2,6 @@ package com.dianping.swallow.consumer.internal.netty;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -24,7 +22,6 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
-import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.consumer.BackoutMessageException;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
@@ -42,13 +39,9 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
    private final ConsumerImpl  consumer;
    private final String        catNameStr;
 
-   private ExecutorService     service;
-
    public MessageClientHandler(ConsumerImpl consumer) {
       this.consumer = consumer;
-      catNameStr = consumer.getDest().getName() + ":" + consumer.getConsumerId() + ":" + consumer.getConsumerIP();
-      service = Executors.newFixedThreadPool(consumer.getConfig().getThreadPoolSize(), new MQThreadFactory(
-            "swallow-consumer-client-"));
+      this.catNameStr = consumer.getDest().getName() + ":" + consumer.getConsumerId() + ":" + consumer.getConsumerIP();
    }
 
    @Override
@@ -72,6 +65,13 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
          LOG.debug("MessageReceived from " + e.getChannel().getRemoteAddress());
       }
 
+      //如果已经close，接收到消息时，不回复ack，而是关闭连接。
+      if(consumer.isClosed()){
+          LOG.info("Message receiced, but it was rejected because consumer was closed.");
+          ctx.getChannel().close();
+          return;
+      }
+
       Runnable task = new Runnable() {
 
          @Override
@@ -81,7 +81,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
             Long messageId = swallowMessage.getMessageId();
 
             PktConsumerMessage consumermessage = new PktConsumerMessage(ConsumerMessageType.ACK, messageId,
-                  consumer.isClosed());
+                    consumer.isClosed());
 
             //使用CAT监控处理消息的时间
 
@@ -186,7 +186,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
          }
       };
 
-      service.submit(task);
+      this.consumer.submit(task);
    }
 
    @Override

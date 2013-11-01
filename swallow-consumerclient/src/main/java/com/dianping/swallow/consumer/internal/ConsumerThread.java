@@ -44,19 +44,22 @@ public class ConsumerThread extends Thread {
 
    @Override
    public void run() {
+      ChannelFuture future = null;
       while (!Thread.currentThread().isInterrupted()) {
          synchronized (bootstrap) {
             if (!Thread.currentThread().isInterrupted()) {
                try {
                   LOG.info("ConsumerThread-try connecting to " + remoteAddress);
-                  ChannelFuture future = bootstrap.connect(remoteAddress);
-                  future.awaitUninterruptibly();
+                  future = bootstrap.connect(remoteAddress);
+                  future.await();
                   if (future.getChannel().isConnected()) {
                      SocketAddress localAddress = future.getChannel().getLocalAddress();
                      LOG.info("ConsumerThread(localAddress=" + localAddress + ")-connected to " + remoteAddress);
-                     future.getChannel().getCloseFuture().awaitUninterruptibly();//等待channel关闭，否则一直阻塞！
+                     future.getChannel().getCloseFuture().await();//等待channel关闭，否则一直阻塞！
                      LOG.info("ConsumerThread(localAddress=" + localAddress + ")-closed from " + remoteAddress);
                   }
+               } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
                } catch (RuntimeException e) {
                   LOG.error(e.getMessage(), e);
                }
@@ -67,6 +70,9 @@ public class ConsumerThread extends Thread {
          } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
          }
+      }
+      if(future!=null && future.getChannel()!=null){
+          future.getChannel().close();//线程被中断了，主动关闭连接
       }
       LOG.info("ConsumerThread(remoteAddress=" + remoteAddress + ") done.");
    }

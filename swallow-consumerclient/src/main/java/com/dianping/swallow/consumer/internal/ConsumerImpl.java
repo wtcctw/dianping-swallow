@@ -1,6 +1,7 @@
 package com.dianping.swallow.consumer.internal;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -19,6 +20,7 @@ import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
+import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.message.Destination;
@@ -42,6 +44,8 @@ public class ConsumerImpl implements Consumer {
 
    private ClientBootstrap        bootstrap;
 
+   private MessageClientHandler   handler;
+
    private MessageListener        listener;
 
    private InetSocketAddress      masterAddress;
@@ -50,16 +54,18 @@ public class ConsumerImpl implements Consumer {
 
    private ConfigManager          configManager = ConfigManager.getInstance();
 
-   private volatile boolean       closed        = false;
-
    private volatile AtomicBoolean started       = new AtomicBoolean(false);
+
+   private volatile AtomicBoolean inited        = new AtomicBoolean(false);
 
    private ConsumerConfig         config;
 
    private final String           consumerIP    = IPUtil.getFirstNoLoopbackIP4Address();
+   
+   private ExecutorService     service;
 
    public boolean isClosed() {
-      return closed;
+      return !started.get();
    }
 
    public ConfigManager getConfigManager() {
@@ -129,6 +135,7 @@ public class ConsumerImpl implements Consumer {
       this.config = config == null ? new ConsumerConfig() : config;
       this.masterAddress = masterAddress;
       this.slaveAddress = slaveAddress;
+
    }
 
    /**
@@ -136,13 +143,19 @@ public class ConsumerImpl implements Consumer {
     */
    @Override
    public void start() {
-      LOG.info("Starting " + this.toString());
       if (listener == null) {
          throw new IllegalArgumentException(
                "MessageListener is null, MessageListener should be set(use setListener()) before start.");
       }
+      if(inited.compareAndSet(false, true)){
+          LOG.info("Initing " + this.toString());
+          this.init();
+      }
+      LOG.info("Starting " + this.toString());
       if (started.compareAndSet(false, true)) {
-         init();
+         //启动handler的线程池
+         this.service = Executors.newFixedThreadPool(this.getConfig().getThreadPoolSize(), new MQThreadFactory(
+                 "swallow-consumer-client-"));
          //启动连接master的线程
          masterConsumerThread = new ConsumerThread();
          masterConsumerThread.setBootstrap(bootstrap);
@@ -162,13 +175,13 @@ public class ConsumerImpl implements Consumer {
 
    //连接swollowC，获得bootstrap
    private void init() {
+      handler = new MessageClientHandler(this);
+
       bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
             Executors.newCachedThreadPool()));
-      final ConsumerImpl consumer = this;
       bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
          @Override
          public ChannelPipeline getPipeline() throws Exception {
-            MessageClientHandler handler = new MessageClientHandler(consumer);
             ChannelPipeline pipeline = Channels.pipeline();
             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
             pipeline.addLast("jsonDecoder", new JsonDecoder(PktMessage.class));
@@ -186,13 +199,29 @@ public class ConsumerImpl implements Consumer {
     */
    @Override
    public void close() {
-      closed = true;
-      if (masterConsumerThread != null) {
-         masterConsumerThread.interrupt();
-      }
-      if (slaveConsumerThread != null) {
-         slaveConsumerThread.interrupt();
-      }
+      LOG.info("Closing " + this.toString());
+      if (started.compareAndSet(true, false)) {
+           if (masterConsumerThread != null) {
+               masterConsumerThread.interrupt();
+               masterConsumerThread = null;
+           }
+           if (slaveConsumerThread != null) {
+               slaveConsumerThread.interrupt();
+               slaveConsumerThread = null;
+           }
+           //关闭handler的线程池
+           this.service.shutdown();
+       }
+   }
+   
+   public void submit(Runnable task){
+       if(!this.isClosed() && this.service != null && !this.service.isShutdown()){
+           try{
+              this.service.submit(task);
+           }catch(RuntimeException e){
+               LOG.warn("Error when submiting task, task is ignored: "+ e.getMessage());
+           }
+       }
    }
 
    @Override
