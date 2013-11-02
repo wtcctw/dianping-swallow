@@ -110,7 +110,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                }
                //传递PhoenixContext环境变量(从swallow消息中取出，存储到当前线程环境变量中)
                if (internalProperties != null) {
-                   String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);
+                   String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);//TODO 如果没有依赖phoenix页不要报错！
                    String referRequestId = internalProperties.get(PhoenixContext.REFER_REQUEST_ID);
                    String guid = internalProperties.get(PhoenixContext.GUID);
                    if (requestId != null) {

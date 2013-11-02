@@ -151,8 +151,8 @@ public class ConsumerImpl implements Consumer {
           LOG.info("Initing " + this.toString());
           this.init();
       }
-      LOG.info("Starting " + this.toString());
       if (started.compareAndSet(false, true)) {
+         LOG.info("Starting " + this.toString());
          //启动handler的线程池
          this.service = Executors.newFixedThreadPool(this.getConfig().getThreadPoolSize(), new MQThreadFactory(
                  "swallow-consumer-client-"));
@@ -199,8 +199,8 @@ public class ConsumerImpl implements Consumer {
     */
    @Override
    public void close() {
-      LOG.info("Closing " + this.toString());
       if (started.compareAndSet(true, false)) {
+           LOG.info("Closing " + this.toString());
            if (masterConsumerThread != null) {
                masterConsumerThread.interrupt();
                masterConsumerThread = null;

@@ -12,7 +12,7 @@ import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
  */
 public class DurableConsumerExample {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ConsumerConfig config = new ConsumerConfig();
         //以下两项根据自己情况而定，默认是不需要配的
         config.setThreadPoolSize(1);
@@ -29,6 +29,12 @@ public class DurableConsumerExample {
             }
         });
         c.start();
+        
+        Thread.sleep(30000);
+        c.close();
+        Thread.sleep(10000);
+        c.start();
+        
     }
 
 }

@@ -20,6 +20,7 @@
         <module>swallow-producerclient</module>
         <module>swallow-producerserver</module>
         <module>swallow-broker</module>
+	<module>swallow-example</module>
     </modules>
 
     <properties>
