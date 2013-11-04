@@ -224,18 +224,24 @@ public class ProducerImpl implements Producer {
 
    private void initInternalProperties(SwallowMessage swallowMsg) {
         Map<String, String> internalProperties = new HashMap<String, String>();
-        //requestId和referRequestId
-        String requestId = PhoenixContext.getInstance().getRequestId();
-        String referRequestId = PhoenixContext.getInstance().getReferRequestId();
-        String guid = PhoenixContext.getInstance().getGuid();
-        if (requestId != null) {
-            internalProperties.put(PhoenixContext.REQUEST_ID, requestId);
-        }
-        if (referRequestId != null) {
-            internalProperties.put(PhoenixContext.REFER_REQUEST_ID, referRequestId);
-        }
-        if (requestId != null) {
-            internalProperties.put(PhoenixContext.GUID, guid);
+        try {
+            //如果没有依赖phoenix,不报错！
+            Class.forName("com.dianping.phoenix.environment.PhoenixContext");
+            //requestId和referRequestId
+            String requestId = PhoenixContext.getInstance().getRequestId();
+            String referRequestId = PhoenixContext.getInstance().getReferRequestId();
+            String guid = PhoenixContext.getInstance().getGuid();
+            if (requestId != null) {
+                internalProperties.put(PhoenixContext.REQUEST_ID, requestId);
+            }
+            if (referRequestId != null) {
+                internalProperties.put(PhoenixContext.REFER_REQUEST_ID, referRequestId);
+            }
+            if (requestId != null) {
+                internalProperties.put(PhoenixContext.GUID, guid);
+            }
+        } catch (ClassNotFoundException e1) {
+            LOGGER.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
         }
         //压缩选项为真：对通过SwallowMessage类转换过的json字符串进行压缩，压缩成功时将compress=gzip写入InternalProperties，
         //               压缩失败时将compress=failed写入InternalProperties

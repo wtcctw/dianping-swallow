@@ -110,17 +110,23 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                }
                //传递PhoenixContext环境变量(从swallow消息中取出，存储到当前线程环境变量中)
                if (internalProperties != null) {
-                   String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);//TODO 如果没有依赖phoenix页不要报错！
-                   String referRequestId = internalProperties.get(PhoenixContext.REFER_REQUEST_ID);
-                   String guid = internalProperties.get(PhoenixContext.GUID);
-                   if (requestId != null) {
-                       PhoenixContext.getInstance().setRequestId(requestId);
-                   }
-                   if (referRequestId != null) {
-                       PhoenixContext.getInstance().setReferRequestId(referRequestId);
-                   }
-                   if (guid != null) {
-                       PhoenixContext.getInstance().setGuid(guid);
+                   try {
+                       //如果没有依赖phoenix,不报错！
+                       Class.forName("com.dianping.phoenix.environment.PhoenixContext");
+                       String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);
+                       String referRequestId = internalProperties.get(PhoenixContext.REFER_REQUEST_ID);
+                       String guid = internalProperties.get(PhoenixContext.GUID);
+                       if (requestId != null) {
+                           PhoenixContext.getInstance().setRequestId(requestId);
+                       }
+                       if (referRequestId != null) {
+                           PhoenixContext.getInstance().setReferRequestId(referRequestId);
+                       }
+                       if (guid != null) {
+                           PhoenixContext.getInstance().setGuid(guid);
+                       }
+                   } catch (ClassNotFoundException e1) {
+                       LOG.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
                    }
                }
                try {
@@ -173,7 +179,12 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                consumerClientTransaction.setStatus(e);
                Cat.getProducer().logError(e);
             } finally{
-               PhoenixContext.getInstance().clear();//清理phoenix环境
+               try {
+                   Class.forName("com.dianping.phoenix.environment.PhoenixContext");
+                   PhoenixContext.getInstance().clear();//清理phoenix环境
+               } catch (ClassNotFoundException e1) {
+                   LOG.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env settiing is skiped.");
+               }
             }
 
             try {
