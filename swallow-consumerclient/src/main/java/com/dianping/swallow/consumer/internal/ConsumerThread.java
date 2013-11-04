@@ -26,10 +26,6 @@ public class ConsumerThread extends Thread {
 
    private long                interval;
 
-   public ClientBootstrap getBootstrap() {
-      return bootstrap;
-   }
-
    public void setBootstrap(ClientBootstrap bootstrap) {
       this.bootstrap = bootstrap;
    }

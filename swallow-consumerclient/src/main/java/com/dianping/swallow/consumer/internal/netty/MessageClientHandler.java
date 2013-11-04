@@ -193,7 +193,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
       // Close the connection when an exception is raised.
       Channel channel = e.getChannel();
-      LOG.error("Error from channel(remoteAddress=" + channel.getRemoteAddress() + ")", e.getCause());
+      LOG.error("Error from channel(remoteAddress=" + channel.getRemoteAddress() + ")", e);
       channel.close();
    }
 }
