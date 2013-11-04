@@ -31,7 +31,7 @@ public class ReportMaker {
         //        nvps.add(new BasicNameValuePair("date", "20130601"));
         //        nvps.add(new BasicNameValuePair("startDate", "20130601"));
         //        nvps.add(new BasicNameValuePair("endDate", "20130701"));
-        nvps.add(new BasicNameValuePair("date", "20130" + m + "01"));
+        nvps.add(new BasicNameValuePair("date", "2013" + (m > 9 ? m : ("0" + m)) + "01"));
         nvps.add(new BasicNameValuePair("startDate", "20130" + m + "01"));
         nvps.add(new BasicNameValuePair("endDate", "20130" + (m + 1) + "01"));
         nvps.add(new BasicNameValuePair("ip", "All"));
@@ -97,11 +97,11 @@ public class ReportMaker {
         //                String str = "08eddbde-d6b8-4edb-86e9-fda36109cb31";
         //                System.out.println(isLinshi(str));
 
-        int m1 = 8;
+        int m1 = 9;
         System.out.println("-----------------Month " + m1 + "-----------------");
         Result r1 = preMonth(m1);
 
-        int m2 = 9;
+        int m2 = 10;
         System.out.println("-----------------Month " + m2 + "-----------------");
         Result r2 = preMonth(m2);
 
