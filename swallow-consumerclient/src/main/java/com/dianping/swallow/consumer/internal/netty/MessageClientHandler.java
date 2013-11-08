@@ -170,30 +170,36 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                         consumeTryTras.complete();
                      }
                   }
-               } catch (RuntimeException e) {
-                  LOG.error("Exception in MessageListener", e);
+               } catch (Throwable e) {
+                  LOG.error("Exception in MessageListener，message would be skiped: " + swallowMessage, e);
                   consumerClientTransaction.setStatus(e);
                }
             } catch (IOException e) {
-               LOG.error("Can not uncompress message with messageId " + messageId, e);
+               LOG.error("Can not uncompress message，message would be skiped: " + swallowMessage, e);
                consumerClientTransaction.setStatus(e);
                Cat.getProducer().logError(e);
+            } catch (Throwable e) {
+                LOG.error("Can not uncompress message，message would be skiped: " + swallowMessage, e);
+                consumerClientTransaction.setStatus(e);
+                Cat.getProducer().logError(e);
             } finally{
                try {
                    Class.forName("com.dianping.phoenix.environment.PhoenixContext");
                    PhoenixContext.getInstance().clear();//清理phoenix环境
                } catch (ClassNotFoundException e1) {
-                   LOG.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env settiing is skiped.");
+                   LOG.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
                }
+
+               //接收到了消息，则保证ack一定会写回去（有异常打log，通知message被skiped）。
+               try {
+                   e.getChannel().write(consumermessage);
+                } catch (RuntimeException e) {
+                   LOG.warn("Write to server error.", e);//如果没能写ack，则server在一段时间内不会再继续发消息
+                }
+
+                consumerClientTransaction.complete();
             }
 
-            try {
-               e.getChannel().write(consumermessage);
-            } catch (RuntimeException e) {
-               LOG.warn("Write to server error.", e);
-            }
-
-            consumerClientTransaction.complete();
          }
       };
 
