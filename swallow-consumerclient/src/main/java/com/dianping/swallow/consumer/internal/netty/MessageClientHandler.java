@@ -1,8 +1,7 @@
 package com.dianping.swallow.consumer.internal.netty;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Map;
 
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -17,12 +16,12 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.cat.message.spi.MessageTree;
+import com.dianping.phoenix.environment.PhoenixContext;
 import com.dianping.swallow.common.internal.consumer.ConsumerMessageType;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
-import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.consumer.BackoutMessageException;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
@@ -40,13 +39,9 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
    private final ConsumerImpl  consumer;
    private final String        catNameStr;
 
-   private ExecutorService     service;
-
    public MessageClientHandler(ConsumerImpl consumer) {
       this.consumer = consumer;
-      catNameStr = consumer.getDest().getName() + ":" + consumer.getConsumerId() + ":" + consumer.getConsumerIP();
-      service = Executors.newFixedThreadPool(consumer.getConfig().getThreadPoolSize(), new MQThreadFactory(
-            "swallow-consumer-client-"));
+      this.catNameStr = consumer.getDest().getName() + ":" + consumer.getConsumerId() + ":" + consumer.getConsumerIP();
    }
 
    @Override
@@ -70,6 +65,13 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
          LOG.debug("MessageReceived from " + e.getChannel().getRemoteAddress());
       }
 
+      //如果已经close，接收到消息时，不回复ack，而是关闭连接。
+      if(consumer.isClosed()){
+          LOG.info("Message receiced, but it was rejected because consumer was closed.");
+          ctx.getChannel().close();
+          return;
+      }
+
       Runnable task = new Runnable() {
 
          @Override
@@ -79,7 +81,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
             Long messageId = swallowMessage.getMessageId();
 
             PktConsumerMessage consumermessage = new PktConsumerMessage(ConsumerMessageType.ACK, messageId,
-                  consumer.isClosed());
+                    consumer.isClosed());
 
             //使用CAT监控处理消息的时间
 
@@ -100,10 +102,32 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
             //处理消息
             //如果是压缩后的消息，则进行解压缩
             try {
-               if (swallowMessage.getInternalProperties() != null) {
+               Map<String, String> internalProperties = swallowMessage.getInternalProperties();
+               if (internalProperties != null) {
                   if ("gzip".equals(swallowMessage.getInternalProperties().get("compress"))) {
                      swallowMessage.setContent(ZipUtil.unzip(swallowMessage.getContent()));
                   }
+               }
+               //传递PhoenixContext环境变量(从swallow消息中取出，存储到当前线程环境变量中)
+               if (internalProperties != null) {
+                   try {
+                       //如果没有依赖phoenix,不报错！
+                       Class.forName("com.dianping.phoenix.environment.PhoenixContext");
+                       String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);
+                       String referRequestId = internalProperties.get(PhoenixContext.REFER_REQUEST_ID);
+                       String guid = internalProperties.get(PhoenixContext.GUID);
+                       if (requestId != null) {
+                           PhoenixContext.getInstance().setRequestId(requestId);
+                       }
+                       if (referRequestId != null) {
+                           PhoenixContext.getInstance().setReferRequestId(referRequestId);
+                       }
+                       if (guid != null) {
+                           PhoenixContext.getInstance().setGuid(guid);
+                       }
+                   } catch (ClassNotFoundException e1) {
+                       LOG.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
+                   }
                }
                try {
                   DefaultPullStrategy pullStrategy = new DefaultPullStrategy(MessageClientHandler.this.consumer
@@ -146,34 +170,47 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                         consumeTryTras.complete();
                      }
                   }
-               } catch (RuntimeException e) {
-                  LOG.error("Exception in MessageListener", e);
+               } catch (Throwable e) {
+                  LOG.error("Exception in MessageListener，message would be skiped: " + swallowMessage, e);
                   consumerClientTransaction.setStatus(e);
                }
             } catch (IOException e) {
-               LOG.error("Can not uncompress message with messageId " + messageId, e);
+               LOG.error("Can not uncompress message，message would be skiped: " + swallowMessage, e);
                consumerClientTransaction.setStatus(e);
                Cat.getProducer().logError(e);
+            } catch (Throwable e) {
+                LOG.error("Can not uncompress message，message would be skiped: " + swallowMessage, e);
+                consumerClientTransaction.setStatus(e);
+                Cat.getProducer().logError(e);
+            } finally{
+               try {
+                   Class.forName("com.dianping.phoenix.environment.PhoenixContext");
+                   PhoenixContext.getInstance().clear();//清理phoenix环境
+               } catch (ClassNotFoundException e1) {
+                   LOG.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
+               }
+
+               //接收到了消息，则保证ack一定会写回去（有异常打log，通知message被skiped）。
+               try {
+                   e.getChannel().write(consumermessage);
+                } catch (RuntimeException e) {
+                   LOG.warn("Write to server error.", e);//如果没能写ack，则server在一段时间内不会再继续发消息
+                }
+
+                consumerClientTransaction.complete();
             }
 
-            try {
-               e.getChannel().write(consumermessage);
-            } catch (RuntimeException e) {
-               LOG.warn("Write to server error.", e);
-            }
-
-            consumerClientTransaction.complete();
          }
       };
 
-      service.submit(task);
+      this.consumer.submit(task);
    }
 
    @Override
    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
       // Close the connection when an exception is raised.
       Channel channel = e.getChannel();
-      LOG.error("Error from channel(remoteAddress=" + channel.getRemoteAddress() + ")", e.getCause());
+      LOG.error("Error from channel(remoteAddress=" + channel.getRemoteAddress() + ")", e);
       channel.close();
    }
 }

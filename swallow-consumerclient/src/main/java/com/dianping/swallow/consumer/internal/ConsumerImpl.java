@@ -1,6 +1,7 @@
 package com.dianping.swallow.consumer.internal;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -19,6 +20,7 @@ import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
+import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.message.Destination;
@@ -32,15 +34,9 @@ public class ConsumerImpl implements Consumer {
 
    private static final Logger    LOG           = LoggerFactory.getLogger(ConsumerImpl.class);
 
-   private ConsumerThread         masterConsumerThread;
-
-   private ConsumerThread         slaveConsumerThread;
-
    private String                 consumerId;
 
    private Destination            dest;
-
-   private ClientBootstrap        bootstrap;
 
    private MessageListener        listener;
 
@@ -48,26 +44,24 @@ public class ConsumerImpl implements Consumer {
 
    private InetSocketAddress      slaveAddress;
 
-   private ConfigManager          configManager = ConfigManager.getInstance();
-
-   private volatile boolean       closed        = false;
-
    private volatile AtomicBoolean started       = new AtomicBoolean(false);
 
    private ConsumerConfig         config;
 
    private final String           consumerIP    = IPUtil.getFirstNoLoopbackIP4Address();
 
+   //以下字段，在start/close会构建和释放。
+
+   private ClientBootstrap        bootstrap;
+   
+   private ExecutorService        service;
+
+   private ConsumerThread         masterConsumerThread;
+
+   private ConsumerThread         slaveConsumerThread;
+
    public boolean isClosed() {
-      return closed;
-   }
-
-   public ConfigManager getConfigManager() {
-      return configManager;
-   }
-
-   public ClientBootstrap getBootstrap() {
-      return bootstrap;
+      return !started.get();
    }
 
    public String getConsumerId() {
@@ -129,6 +123,7 @@ public class ConsumerImpl implements Consumer {
       this.config = config == null ? new ConsumerConfig() : config;
       this.masterAddress = masterAddress;
       this.slaveAddress = slaveAddress;
+
    }
 
    /**
@@ -136,48 +131,46 @@ public class ConsumerImpl implements Consumer {
     */
    @Override
    public void start() {
-      LOG.info("Starting " + this.toString());
       if (listener == null) {
          throw new IllegalArgumentException(
                "MessageListener is null, MessageListener should be set(use setListener()) before start.");
       }
       if (started.compareAndSet(false, true)) {
-         init();
+         LOG.info("Starting " + this.toString());
+         //启动处理handler的线程池
+         service = Executors.newFixedThreadPool(this.getConfig().getThreadPoolSize(), new MQThreadFactory(
+                 "swallow-consumer-client-"));
+         //初始化netty bootstrap
+         final MessageClientHandler handler = new MessageClientHandler(this);
+         bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
+               Executors.newCachedThreadPool()));
+         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+            @Override
+            public ChannelPipeline getPipeline() throws Exception {
+               ChannelPipeline pipeline = Channels.pipeline();
+               pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+               pipeline.addLast("jsonDecoder", new JsonDecoder(PktMessage.class));
+               pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
+               pipeline.addLast("jsonEncoder", new JsonEncoder(PktConsumerMessage.class));
+               pipeline.addLast("handler", handler);
+               return pipeline;
+            }
+         });
          //启动连接master的线程
          masterConsumerThread = new ConsumerThread();
          masterConsumerThread.setBootstrap(bootstrap);
          masterConsumerThread.setRemoteAddress(masterAddress);
-         masterConsumerThread.setInterval(configManager.getConnectMasterInterval());
+         masterConsumerThread.setInterval(ConfigManager.getInstance().getConnectMasterInterval());
          masterConsumerThread.setName("masterConsumerThread");
          masterConsumerThread.start();
          //启动连接slave的线程
          slaveConsumerThread = new ConsumerThread();
          slaveConsumerThread.setBootstrap(bootstrap);
          slaveConsumerThread.setRemoteAddress(slaveAddress);
-         slaveConsumerThread.setInterval(configManager.getConnectSlaveInterval());
+         slaveConsumerThread.setInterval(ConfigManager.getInstance().getConnectSlaveInterval());
          slaveConsumerThread.setName("slaveConsumerThread");
          slaveConsumerThread.start();
       }
-   }
-
-   //连接swollowC，获得bootstrap
-   private void init() {
-      bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
-            Executors.newCachedThreadPool()));
-      final ConsumerImpl consumer = this;
-      bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-         @Override
-         public ChannelPipeline getPipeline() throws Exception {
-            MessageClientHandler handler = new MessageClientHandler(consumer);
-            ChannelPipeline pipeline = Channels.pipeline();
-            pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-            pipeline.addLast("jsonDecoder", new JsonDecoder(PktMessage.class));
-            pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
-            pipeline.addLast("jsonEncoder", new JsonEncoder(PktConsumerMessage.class));
-            pipeline.addLast("handler", handler);
-            return pipeline;
-         }
-      });
    }
 
    /**
@@ -186,20 +179,33 @@ public class ConsumerImpl implements Consumer {
     */
    @Override
    public void close() {
-      closed = true;
-      if (masterConsumerThread != null) {
-         masterConsumerThread.interrupt();
-      }
-      if (slaveConsumerThread != null) {
-         slaveConsumerThread.interrupt();
-      }
+      if (started.compareAndSet(true, false)) {
+           LOG.info("Closing " + this.toString());
+
+           masterConsumerThread.interrupt();
+           slaveConsumerThread.interrupt();
+           //关闭netty bootstrap
+           bootstrap.releaseExternalResources();
+           //关闭处理消息事件的线程池
+           service.shutdown();
+       }
+   }
+
+   public void submit(Runnable task){
+       if(!this.isClosed() && this.service != null && !this.service.isShutdown()){
+           try{
+              this.service.submit(task);
+           }catch(RuntimeException e){
+               LOG.warn("Error when submiting task, task is ignored（message will retry by server later）: "+ e.getMessage());
+           }
+       }
    }
 
    @Override
    public String toString() {
       return String.format(
-            "ConsumerImpl [consumerId=%s, dest=%s, masterAddress=%s, slaveAddress=%s, configManager=%s, config=%s]",
-            consumerId, dest, masterAddress, slaveAddress, configManager, config);
+            "ConsumerImpl [consumerId=%s, dest=%s, masterAddress=%s, slaveAddress=%s, config=%s]",
+            consumerId, dest, masterAddress, slaveAddress, config);
    }
 
    public String getConsumerIP() {

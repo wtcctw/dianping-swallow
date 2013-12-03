@@ -3,7 +3,7 @@
     <parent>
         <artifactId>swallow-parent</artifactId>
         <groupId>com.dianping.swallow</groupId>
-        <version>0.6.8</version>
+        <version>0.6.9</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -195,6 +195,20 @@
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-tools</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.struts</groupId>
+                    <artifactId>struts-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.struts</groupId>
+                    <artifactId>struts-taglib</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.struts</groupId>
+                    <artifactId>struts-tiles</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>oro</groupId>

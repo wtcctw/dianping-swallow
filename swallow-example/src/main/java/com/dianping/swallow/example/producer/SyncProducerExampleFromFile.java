@@ -16,7 +16,6 @@ import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
  */
 public class SyncProducerExampleFromFile {
 
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         ProducerConfig config = new ProducerConfig();
         config.setMode(ProducerMode.SYNC_MODE);

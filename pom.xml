@@ -5,7 +5,7 @@
     <groupId>com.dianping.swallow</groupId>
     <artifactId>swallow-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.6.8</version>
+    <version>0.6.9</version>
     <name>arch-swallow</name>
     <organization>
         <name>dianping</name>
@@ -20,10 +20,11 @@
         <module>swallow-producerclient</module>
         <module>swallow-producerserver</module>
         <module>swallow-broker</module>
+	<module>swallow-example</module>
     </modules>
 
     <properties>
-        <swallow.version>0.6.8</swallow.version>
+        <swallow.version>0.6.9</swallow.version>
     </properties>
 
     <description>swallow is a message service!</description>
@@ -362,6 +363,12 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
+            </dependency>
+            <!-- requestId项目的通用容器(基于ThreadLocal) -->
+            <dependency>
+                <groupId>com.dianping.platform</groupId>
+                <artifactId>phoenix-environment</artifactId>
+                <version>0.1.0</version>
             </dependency>
         </dependencies>
 

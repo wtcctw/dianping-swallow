@@ -4,7 +4,7 @@
   <parent>
     <artifactId>swallow-parent</artifactId>
     <groupId>com.dianping.swallow</groupId>
-    <version>0.6.8</version>
+    <version>0.6.9</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -59,6 +59,12 @@
     <dependency>
       <groupId>com.dianping.hawk</groupId>
       <artifactId>hawk-client</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- requestId项目的通用容器(基于ThreadLocal) -->
+    <dependency>
+      <groupId>com.dianping.platform</groupId>
+      <artifactId>phoenix-environment</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
