@@ -28,6 +28,12 @@
         <dependency>
             <groupId>com.geekhua</groupId>
             <artifactId>file-queue</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>kryo</artifactId>
+                    <groupId>com.esotericsoftware.kryo</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -77,9 +83,9 @@
         </dependency>
         <!-- requestId项目的通用容器(基于ThreadLocal) -->
         <dependency>
-           <groupId>com.dianping.platform</groupId>
-           <artifactId>phoenix-environment</artifactId>
-           <scope>provided</scope>
+            <groupId>com.dianping.platform</groupId>
+            <artifactId>phoenix-environment</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
