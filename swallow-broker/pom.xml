@@ -9,8 +9,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.dianping.swallow</groupId>
-    <artifactId>swallow-broker</artifactId>
-    <name>arch-swallow-broker</name>
+    <artifactId>swallow-http</artifactId>
+    <name>arch-swallow-http</name>
     <packaging>war</packaging>
     <version>1.0.0</version>
 
