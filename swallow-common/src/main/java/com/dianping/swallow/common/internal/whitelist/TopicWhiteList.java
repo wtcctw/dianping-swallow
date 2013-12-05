@@ -16,63 +16,67 @@ import com.dianping.swallow.common.internal.config.DynamicConfig;
  */
 public class TopicWhiteList implements ConfigChangeListener {
 
-   private static final Logger LOG              = LoggerFactory.getLogger(TopicWhiteList.class);
+    private static final Logger LOG              = LoggerFactory.getLogger(TopicWhiteList.class);
 
-   private static final String TOPIC_SPLIT      = ";";
+    private static final String TOPIC_SPLIT      = ";";
 
-   private static final String TOPIC_WHITE_LIST = "swallow.topic.whitelist";
+    private static final String TOPIC_WHITE_LIST = "swallow.topic.whitelist";
 
-   private Set<String>         topics;
+    private Set<String>         topics           = new HashSet<String>();
 
-   private DynamicConfig       lionDynamicConfig;
+    private DynamicConfig       lionDynamicConfig;
 
-   public void init() {
-      build();
+    public void init() {
+        build();
 
-      //监听lion
-      lionDynamicConfig.addConfigChangeListener(this);
+        //监听lion
+        lionDynamicConfig.addConfigChangeListener(this);
 
-   }
+    }
 
-   public boolean isValid(String topic) {
-      return topics != null && topics.contains(topic);
-   }
+    public boolean isValid(String topic) {
+        return topics != null && topics.contains(topic);
+    }
 
-   @Override
-   public void onConfigChange(String key, String value) {
-      LOG.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
-      key = key.trim();
-      if (key.equals(TOPIC_WHITE_LIST)) {
-         try {
-            build();
-         } catch (RuntimeException e) {
-            LOG.error("Error initialize 'topic white list' from lion ", e);
-         }
-      }
-   }
-
-   private void build() {
-      String value = lionDynamicConfig.get(TOPIC_WHITE_LIST);
-
-      Set<String> _topics = new HashSet<String>();
-
-      if (value != null && value.length() > 0) {
-         value = value.trim();
-         String[] topics = value.split(TOPIC_SPLIT);
-         for (String t : topics) {
-            if (!"".equals(t.trim())) {
-               _topics.add(t);
+    @Override
+    public void onConfigChange(String key, String value) {
+        LOG.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
+        key = key.trim();
+        if (key.equals(TOPIC_WHITE_LIST)) {
+            try {
+                build();
+            } catch (RuntimeException e) {
+                LOG.error("Error initialize 'topic white list' from lion ", e);
             }
-         }
-      }
+        }
+    }
 
-      this.topics = _topics;
+    private void build() {
+        String value = lionDynamicConfig.get(TOPIC_WHITE_LIST);
 
-      LOG.info("White list topic is :" + topics);
-   }
+        Set<String> _topics = new HashSet<String>();
 
-   public void setLionDynamicConfig(DynamicConfig lionDynamicConfig) {
-      this.lionDynamicConfig = lionDynamicConfig;
-   }
+        if (value != null && value.length() > 0) {
+            value = value.trim();
+            String[] topics = value.split(TOPIC_SPLIT);
+            for (String t : topics) {
+                if (!"".equals(t.trim())) {
+                    _topics.add(t);
+                }
+            }
+        }
+
+        this.topics = _topics;
+
+        LOG.info("White list topic is :" + topics);
+    }
+
+    public void setLionDynamicConfig(DynamicConfig lionDynamicConfig) {
+        this.lionDynamicConfig = lionDynamicConfig;
+    }
+
+    public void addTopic(String topic) {
+        this.topics.add(topic);
+    }
 
 }

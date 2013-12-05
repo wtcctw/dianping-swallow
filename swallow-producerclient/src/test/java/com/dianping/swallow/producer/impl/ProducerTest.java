@@ -276,10 +276,10 @@ public class ProducerTest {
 
       //测试非法值
       producerConfig.setAsyncRetryTimes(-1);
-      assertEquals(ProducerConfig.DEFAULT_ASYNC_RETRY_TIMES, producerConfig.getAsyncRetryTimes());
+      assertEquals(Integer.MAX_VALUE, producerConfig.getAsyncRetryTimes());
 
       producerConfig.setSyncRetryTimes(-1);
-      assertEquals(ProducerConfig.DEFAULT_SYNC_RETRY_TIMES, producerConfig.getSyncRetryTimes());
+      assertEquals(Integer.MAX_VALUE, producerConfig.getSyncRetryTimes());
 
       producerConfig.setThreadPoolSize(0);
       assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producerConfig.getThreadPoolSize());
