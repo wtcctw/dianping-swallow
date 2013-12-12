@@ -34,7 +34,7 @@ elif [ "$Mode" = "alpha" ]; then
     MasterIp="192.168.7.41"
 elif [ "$Mode" = "qa" ]; then
     UserDir="/data/swallow"
-    MasterIp="10.1.77.13"
+    MasterIp="192.168.213.143"
 else
     echo "Your input is not corrent!"
     usage
