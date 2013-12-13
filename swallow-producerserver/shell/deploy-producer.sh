@@ -27,8 +27,10 @@ Mode=$1
 FileFtpAddress="$FtpServer/$Datedir/$Mode/$TarFile"
 if [ "$Mode" = "dev" ]; then
     UserDir="/home/wukezhu"
-elif [ "$Mode" = "alpha" -o "$Mode" = "qa" ]; then
+elif [ "$Mode" = "alpha" ]; then
     UserDir="/data/swallow"
+elif [ "$Mode" = "qa" ]; then
+    UserDir="/data/webapps"
 else
     echo "Your input is not corrent!"
     usage
