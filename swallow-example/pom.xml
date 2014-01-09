@@ -4,7 +4,7 @@
     <parent>
         <artifactId>swallow-parent</artifactId>
         <groupId>com.dianping.swallow</groupId>
-        <version>0.6.9</version>
+        <version>0.6.10</version>
     </parent>
 
 
@@ -86,6 +86,12 @@
         <dependency>
             <groupId>com.dianping.swallow</groupId>
             <artifactId>swallow-producerclient</artifactId>
+             <exclusions>
+                <exclusion>
+                    <artifactId>kryo</artifactId>
+                    <groupId>com.esotericsoftware.kryo</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- requestId项目的通用容器(基于ThreadLocal) -->
         <dependency>
