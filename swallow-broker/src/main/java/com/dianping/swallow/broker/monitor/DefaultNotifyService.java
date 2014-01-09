@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.hawk.common.alarm.service.CommonAlarmService;
 import com.dianping.lion.EnvZooKeeperConfig;
@@ -36,7 +37,7 @@ import com.dianping.swallow.broker.util.IPUtils;
  */
 public class DefaultNotifyService implements NotifyService {
 
-    private static final Logger log                 = Logger.getLogger(DefaultNotifyService.class);
+    private static final Logger log                 = LoggerFactory.getLogger(DefaultNotifyService.class);
     private static final String MAIL_ALARM_TITLE    = "[swallow-broker] Alarm Notify";
     private static final String MAIL_RECOVERY_TITLE = "[swallow-broker] Recovery Notify";
     private static final String KEY_MAIL_TO         = "swallow.broker.notify.mailTo";
