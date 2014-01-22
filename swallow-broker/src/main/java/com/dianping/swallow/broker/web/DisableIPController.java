@@ -134,7 +134,9 @@ public class DisableIPController {
         nvps.add(new BasicNameValuePair("ef", "1"));
         nvps.add(new BasicNameValuePair("v", StringUtils.join(disableIPs, SEPARATOR)));
         String result = HttpClientUtil.get(setUrl, nvps);
-
+        if (StringUtils.startsWithIgnoreCase(result, "1|")) {
+            throw new RuntimeException("lionapi result error(" + result + ")");
+        }
         return result;
     }
 
@@ -145,6 +147,9 @@ public class DisableIPController {
         nvps.add(new BasicNameValuePair("e", env));
         nvps.add(new BasicNameValuePair("k", PROJECT + '.' + LION_KEY));
         String value = HttpClientUtil.get(getUrl, nvps);
+        if (StringUtils.startsWithIgnoreCase(value, "1|")) {
+            throw new RuntimeException("lionapi result error(" + value + ")");
+        }
         if (StringUtils.equalsIgnoreCase("<null>", value)) {
             disableIPs = new HashSet<String>();
         } else {
