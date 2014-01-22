@@ -1,5 +1,6 @@
 package com.dianping.swallow.consumerserver.worker;
 
+import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,9 +33,11 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
+import com.dianping.swallow.consumerserver.util.ConsumerUtil;
 
 /***
  * 一个ConsumerWorkerImpl负责处理一个(topic,consumerId)的消费者集群，使用单线程获取消息，并顺序推送给Consumer
@@ -78,6 +81,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private CloseableBlockingQueue<SwallowMessage>       messageQueue;
    private ExecutorService                              ackExecutor;
    private PullStrategy                                 pullStgy;
+   private ConsumerAuthController                       consumerAuthController;
 
    private volatile boolean                             getMessageisAlive       = true;
    private volatile boolean                             started                 = false;
@@ -103,13 +107,14 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckBackupMessages   = new ConcurrentSkipListMap<Long, ConsumerMessage>();
 
    @SuppressWarnings("deprecation")
-   public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter) {
+   public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter, ConsumerAuthController consumerAuthController) {
       this.consumerInfo = consumerInfo;
       this.ackDao = workerManager.getAckDAO();
       this.messageDao = workerManager.getMessageDAO();
       this.swallowBuffer = workerManager.getSwallowBuffer();
       this.threadFactory = workerManager.getThreadFactory();
       this.messageFilter = messageFilter;
+      this.consumerAuthController = consumerAuthController;
       this.pullStgy = new DefaultPullStrategy(ConfigManager.getInstance().getPullFailDelayBase(), ConfigManager
             .getInstance().getPullFailDelayUpperBound());
 
@@ -313,12 +318,20 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                      // 确保有消息可发
                      ConsumerMessage consumerMessage = pollMessage(channel);
 
-                     // 拿出消息并发送
-                     if (consumerMessage != null) {
-                        sendMessage(channel, consumerMessage);
-                     } else {// 没有消息，channel继续放回去
-                        freeChannels.add(channel);
+                     //发消息前，验证消费者是否合法
+                     boolean isAuth = consumerAuthController.isValid(consumerInfo, ((InetSocketAddress) channel.getRemoteAddress()).getAddress().getHostAddress());
+                     if (!isAuth) {
+                        LOG.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Consumer is disabled, channel will be close.");
+                        channel.close();
+                     } else {
+                         // 拿出消息并发送
+                         if (consumerMessage != null) {
+                             sendMessage(channel, consumerMessage);
+                         } else {// 没有消息，channel继续放回去
+                             freeChannels.add(channel);
+                         }
                      }
+
 
                   }
                } catch (InterruptedException e) {

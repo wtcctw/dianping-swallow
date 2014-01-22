@@ -23,7 +23,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
-@ContextConfiguration(loader = SpringockitoContextLoader.class, locations = "classpath:applicationContext-test.xml")
+@ContextConfiguration(loader = SpringockitoContextLoader.class, locations = "classpath:applicationContext-consumerserver.xml")
 public class SwallowBufferTest extends AbstractTest {
     protected static final String TOPIC_NAME = "topicForUnitTest";
     protected static final String TYPE       = "feed";

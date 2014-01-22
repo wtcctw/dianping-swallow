@@ -1,5 +1,7 @@
 package com.dianping.swallow.consumerserver.netty;
 
+import java.net.InetSocketAddress;
+
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -19,7 +21,9 @@ import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
+import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
+import com.dianping.swallow.consumerserver.util.ConsumerUtil;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
@@ -33,15 +37,18 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
    private ConsumerInfo          consumerInfo;
 
+   private ConsumerAuthController consumerAuthController;
+
    private TopicWhiteList        topicWhiteList;
 
    private int                   clientThreadCount;
 
    private boolean               readyClose   = Boolean.FALSE;
 
-   public MessageServerHandler(ConsumerWorkerManager workerManager, TopicWhiteList topicWhiteList) {
+   public MessageServerHandler(ConsumerWorkerManager workerManager, TopicWhiteList topicWhiteList, ConsumerAuthController consumerAuthController) {
       this.workerManager = workerManager;
       this.topicWhiteList = topicWhiteList;
+      this.consumerAuthController = consumerAuthController;
       LOG.info("Inited MessageServerHandler.");
    }
 
@@ -56,92 +63,100 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
       //收到PktConsumerACK，按照原流程解析
       final Channel channel = e.getChannel();
-      if (e.getMessage() instanceof PktConsumerMessage) {
-         PktConsumerMessage consumerPacket = (PktConsumerMessage) e.getMessage();
-         if (ConsumerMessageType.GREET.equals(consumerPacket.getType())) {
-            if (!NameCheckUtil.isTopicNameValid(consumerPacket.getDest().getName())) {
-               LOG.error("TopicName(" + consumerPacket.getDest().getName() + ") inValid from "
-                     + channel.getRemoteAddress());
-               channel.close();
-               return;
+
+      if (!(e.getMessage() instanceof PktConsumerMessage)) {
+          LOG.warn("the received message is not PktConsumerMessage");
+          return;
+      }
+
+      PktConsumerMessage consumerPacket = (PktConsumerMessage) e.getMessage();
+
+      // Greet信息，代表客户端第一次连接
+      if (ConsumerMessageType.GREET.equals(consumerPacket.getType())) {
+            // ConsumerInfo
+            String strConsumerId = consumerPacket.getConsumerId();
+            if (strConsumerId == null || strConsumerId.trim().length() == 0) {
+               consumerInfo = new ConsumerInfo(ConsumerIdUtil.getRandomNonDurableConsumerId(), consumerPacket.getDest(), ConsumerType.NON_DURABLE);
+            } else {
+               if (!NameCheckUtil.isConsumerIdValid(consumerPacket.getConsumerId())) {
+                   LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + "ConsumerId inValid.");
+                   channel.close();
+                   return;
+               }
+               consumerInfo = new ConsumerInfo(strConsumerId, consumerPacket.getDest(), consumerPacket.getConsumerType());
             }
-            //验证topicName是否在白名单里
-            boolean isValid = topicWhiteList.isValid(consumerPacket.getDest().getName());
+            // Topic
+            if (!NameCheckUtil.isTopicNameValid(consumerInfo.getDest().getName())) {
+                LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " TopicName inValid.");
+                channel.close();
+                return;
+            }
+            // 验证topicName是否在白名单里（白名单的控制，只在greet时检查，已经连接上的，不检查）
+            boolean isValid = topicWhiteList.isValid(consumerInfo.getDest().getName());
             if (!isValid) {
-               LOG.error("TopicName(" + consumerPacket.getDest().getName() + ") is not in whitelist, from "
-                     + channel.getRemoteAddress());
-               channel.close();
+                LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " TopicName is not in whitelist.");
+                channel.close();
+                return;
+            }
+            //验证该消费者是否被合法
+            boolean isAuth= consumerAuthController.isValid(consumerInfo, ((InetSocketAddress)channel.getRemoteAddress()).getAddress().getHostAddress());
+            if (!isAuth) {
+                  LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Consumer is disabled.");
+                  channel.close();
+                  return;
             }
 
             clientThreadCount = consumerPacket.getThreadCount();
             if (clientThreadCount > ConfigManager.getInstance().getMaxClientThreadCount()) {
-               LOG.warn(channel.getRemoteAddress() + " with " + consumerInfo
-                     + " clientThreadCount greater than MaxClientThreadCount("
-                     + ConfigManager.getInstance().getMaxClientThreadCount() + ")");
-               clientThreadCount = ConfigManager.getInstance().getMaxClientThreadCount();
+                LOG.warn(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " ClientThreadCount greater than MaxClientThreadCount(" + ConfigManager.getInstance().getMaxClientThreadCount() + ")");
+                clientThreadCount = ConfigManager.getInstance().getMaxClientThreadCount();
             }
-            String strConsumerId = consumerPacket.getConsumerId();
-            if (strConsumerId == null || strConsumerId.trim().length() == 0) {
-               consumerInfo = new ConsumerInfo(ConsumerIdUtil.getRandomNonDurableConsumerId(),
-                     consumerPacket.getDest(), ConsumerType.NON_DURABLE);
-            } else {
-               if (!NameCheckUtil.isConsumerIdValid(consumerPacket.getConsumerId())) {
-                  LOG.error("ConsumerId inValid from " + channel.getRemoteAddress());
-                  channel.close();
-                  return;
-               }
-               consumerInfo = new ConsumerInfo(strConsumerId, consumerPacket.getDest(),
-                     consumerPacket.getConsumerType());
-            }
-            LOG.info("received greet from " + e.getChannel().getRemoteAddress() + " with " + consumerInfo);
+            
+            LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Received greet.");
             workerManager.handleGreet(channel, consumerInfo, clientThreadCount, consumerPacket.getMessageFilter());
-         }
-         if (ConsumerMessageType.ACK.equals(consumerPacket.getType())) {
-            if (consumerPacket.getNeedClose() || readyClose) {
-               //第一次接到channel的close命令后,server启一个后台线程,当一定时间后channel仍未关闭,则强制关闭.
-               if (!readyClose) {
-                  Thread thread = workerManager.getThreadFactory().newThread(new Runnable() {
 
-                     @Override
-                     public void run() {
-                        try {
-                           Thread.sleep(ConfigManager.getInstance().getCloseChannelMaxWaitingTime());
-                        } catch (InterruptedException e) {
-                           LOG.error("CloseChannelThread InterruptedException", e);
+      } else if (ConsumerMessageType.ACK.equals(consumerPacket.getType())) { //ack信息，代表客户端收到消息
+            if (consumerPacket.getNeedClose() || readyClose) {
+                //第一次接到channel的close命令后,server启一个后台线程,当一定时间后channel仍未关闭,则强制关闭.
+                if (!readyClose) {
+                    Thread thread = workerManager.getThreadFactory().newThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(ConfigManager.getInstance().getCloseChannelMaxWaitingTime());
+                            } catch (InterruptedException e) {
+                                LOG.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " CloseChannelThread InterruptedException", e);
+                            }
+                            // channel.getRemoteAddress() 在channel断开后,不会抛异常
+                            LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " CloseChannelMaxWaitingTime reached, close channel.");
+                            channel.close();
+                            workerManager.handleChannelDisconnect(channel, consumerInfo);
                         }
-                        // channel.getRemoteAddress() 在channel断开后,不会抛异常
-                        LOG.info("CloseChannelMaxWaitingTime reached, close channel " + channel.getRemoteAddress()
-                              + " with " + consumerInfo);
-                        channel.close();
-                        workerManager.handleChannelDisconnect(channel, consumerInfo);
-                     }
-                  }, consumerInfo.toString() + "-CloseChannelThread-");
-                  thread.setDaemon(true);
-                  thread.start();
-               }
-               clientThreadCount--;
-               readyClose = Boolean.TRUE;
+                    }, consumerInfo.toString() + "-CloseChannelThread-");
+                    thread.setDaemon(true);
+                    thread.start();
+                }
+                clientThreadCount--;
+                readyClose = Boolean.TRUE;
             }
             ACKHandlerType handlerType = null;
             if (readyClose && clientThreadCount == 0) {
-               handlerType = ACKHandlerType.CLOSE_CHANNEL;
+                handlerType = ACKHandlerType.CLOSE_CHANNEL;
             } else if (readyClose && clientThreadCount > 0) {
-               handlerType = ACKHandlerType.NO_SEND;
+                handlerType = ACKHandlerType.NO_SEND;
             } else if (!readyClose) {
-               handlerType = ACKHandlerType.SEND_MESSAGE;
+                handlerType = ACKHandlerType.SEND_MESSAGE;
             }
             workerManager.handleAck(channel, consumerInfo, consumerPacket.getMessageId(), handlerType);
-         }
-      } else {
-         LOG.warn("the received message is not PktConsumerMessage");
-      }
+        }
 
    }
 
    @Override
    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
       removeChannel(e);
-      LOG.error("Exception from " + e.getChannel().getRemoteAddress(), e.getCause());
+      LOG.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " ExceptionCaught, channel will be close.", e.getCause());
       e.getChannel().close();
 
    }
@@ -150,7 +165,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
       removeChannel(e);
       super.channelDisconnected(ctx, e);
-      LOG.info(e.getChannel().getRemoteAddress() + " disconnected!");
+      LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " Disconnected!");
    }
 
    @Override
@@ -158,7 +173,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
       removeChannel(e);
       e.getChannel().close();
       super.channelClosed(ctx, e);
-      LOG.info(e.getChannel().getRemoteAddress() + " closed!");
+      LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " Channel closed.");
    }
 
    private void removeChannel(ChannelEvent e) {

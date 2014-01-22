@@ -67,6 +67,12 @@
         <property name="lionDynamicConfig" ref="lionDynamicConfig"></property>
     </bean>
 
+    <bean id="consumerAuthController"
+        class="com.dianping.swallow.consumerserver.auth.impl.ConsumerAuthControllerImpl"
+        init-method="init">
+        <property name="lionDynamicConfig" ref="lionDynamicConfig"></property>
+    </bean>
+
     <bean id="lionDynamicConfig"
         class="com.dianping.swallow.common.internal.config.impl.LionDynamicConfig">
         <constructor-arg>

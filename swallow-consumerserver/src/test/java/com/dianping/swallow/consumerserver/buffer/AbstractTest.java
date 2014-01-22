@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClient;
 
-@ContextConfiguration(loader = SpringockitoContextLoader.class, locations = "classpath:applicationContext-test.xml")
+@ContextConfiguration(loader = SpringockitoContextLoader.class, locations = "classpath:applicationContext-consumerserver.xml")
 public abstract class AbstractTest extends AbstractJUnit4SpringContextTests {
 
    protected static final String TOPIC_NAME   = "topicForUnitTest";
