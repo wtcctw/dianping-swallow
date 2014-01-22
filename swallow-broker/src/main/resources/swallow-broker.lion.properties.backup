@@ -36,4 +36,4 @@ swallow.broker.notify.smsTo=15921096896
 http://service.dianping.com/hawk/alarm/commonAlarmSerivce=192.168.7.87:9989
 
 
-lionapi.url=http://lionapi.dp:8080
+swallow.lionapi.url=http://lionapi.dp:8080
