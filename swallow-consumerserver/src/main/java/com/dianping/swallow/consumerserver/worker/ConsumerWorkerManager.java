@@ -14,6 +14,7 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.consumerserver.Heartbeater;
+import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 
@@ -29,6 +30,8 @@ public class ConsumerWorkerManager {
    private Heartbeater                       heartbeater;
    private SwallowBuffer                     swallowBuffer;
    private MessageDAO                        messageDAO;
+
+   private ConsumerAuthController            consumerAuthController;
 
    private MQThreadFactory                   threadFactory         = new MQThreadFactory();
 
@@ -162,7 +165,7 @@ public class ConsumerWorkerManager {
          // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
          synchronized (consumerInfo.getConsumerId().intern()) {
             if ((worker = findConsumerWorker(consumerInfo)) == null) {
-               worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter);
+               worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController);
                consumerInfo2ConsumerWorker.put(consumerInfo, worker);
             }
          }
@@ -288,6 +291,10 @@ public class ConsumerWorkerManager {
 
    public MessageDAO getMessageDAO() {
       return messageDAO;
+   }
+
+   public void setConsumerAuthController(ConsumerAuthController consumerAuthController) {
+      this.consumerAuthController = consumerAuthController;
    }
 
 }

@@ -50,8 +50,9 @@ public class JsonBinderTest {
    @Test
    public void fromJson() throws Exception {
       //Bean
-      String beanString = "{\"name\":\"A\"}";
+      String beanString = "{\"name\":\"A\",\"names\":\"A\"}";
       TestBean bean = binder.fromJson(beanString, TestBean.class);
+      System.out.println(bean);
       assertEquals(new TestBean("A"), bean);
 
    }

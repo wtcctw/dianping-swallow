@@ -34,3 +34,6 @@ swallow.broker.notify.devMode=false
 swallow.broker.notify.mailTo=kezhu.wu@dianping.com
 swallow.broker.notify.smsTo=15921096896
 http://service.dianping.com/hawk/alarm/commonAlarmSerivce=192.168.7.87:9989
+
+
+swallow.lionapi.url=http://lionapi.dp:8080
