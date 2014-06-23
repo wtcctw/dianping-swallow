@@ -974,8 +974,8 @@ def postCatMail():
         
         try:
             s = smtplib.SMTP()
-            s.connect('mail.51ping.com')
-            s.login('mysql_monitor@51ping.com', 'monitor123')
+            s.connect('${mail.server}')
+            s.login('${mail.sender}', '${mail.password}')
         except:
             logger.error('[PostMail] Mail service error.')
             return
@@ -1000,8 +1000,8 @@ def postMongoMail():
         
         try:
             s = smtplib.SMTP()
-            s.connect('mail.51ping.com')
-            s.login('mysql_monitor@51ping.com', 'monitor123')
+            s.connect('${mail.server}')
+            s.login('${mail.sender}', '${mail.password}')
         except:
             logger.error('[PostMail] Mail service error.')
             return
@@ -1125,8 +1125,8 @@ def analysis():
 def postSms():
     if alarmSms != '[Swallow]阶段警告\n':
         for phoneNum in config.smsSmsReceiver:
-            conn = httplib.HTTPConnection('211.136.163.68:8000');
-            smsUrl = '/httpserver?enterpriseid=95102&accountid=000&pswd=z5PgZ4&mobs=' + str(phoneNum) + '&msg=' + urllib.quote(alarmSms);
+            conn = httplib.HTTPConnection('${sms.server}');
+            smsUrl = '/httpserver?enterpriseid=${sms.enterprise}&accountid=${sms.account}&pswd=${sms.password}&mobs=' + str(phoneNum) + '&msg=' + urllib.quote(alarmSms);
             conn.request('POST', smsUrl)
             conn.close()
 
