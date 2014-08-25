@@ -20,15 +20,11 @@ import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ConsumerMessageType;
 import com.dianping.swallow.common.message.Destination;
 
-
-
 /**
  * 
  * @author yu.zhang
- *
  */
 public final class PktConsumerMessage extends Packet {
-	
 	/**
 	 * 
 	 */
@@ -40,7 +36,7 @@ public final class PktConsumerMessage extends Packet {
 	
 	private String consumerId;
 	
-	private Long messageId;
+	private Long messageId = -1L;
 	
 	private ConsumerType consumerType;
 	
@@ -48,7 +44,7 @@ public final class PktConsumerMessage extends Packet {
 	
 	private Integer threadCount;
 	
-   private MessageFilter messageFilter;
+    private MessageFilter messageFilter;
 	
 	public Boolean getNeedClose() {
 		return needClose;
@@ -93,27 +89,28 @@ public final class PktConsumerMessage extends Packet {
       return threadCount;
    }
 	
-   public MessageFilter getMessageFilter() {
+    public MessageFilter getMessageFilter() {
       return messageFilter;
    }
-   public PktConsumerMessage() {
+
+    public PktConsumerMessage() {
 		super();
-		
-	}
-	public PktConsumerMessage(ConsumerMessageType type, String consumerId, Destination dest, ConsumerType consumerType, int threadCount, MessageFilter messageFilter){
-		this.setPacketType(PacketType.CONSUMER_GREET);
-		this.type = type;
-		this.dest = dest;
-		this.consumerId = consumerId;
-		this.consumerType = consumerType;
-		this.threadCount = threadCount;
-		this.messageFilter = messageFilter;
-	}
-	public PktConsumerMessage(ConsumerMessageType type, Long messageId, boolean needClose){
-		this.setPacketType(PacketType.CONSUMER_ACK);
-		this.type = type;
-		this.messageId = messageId;
-		this.needClose = needClose;
-	}
-	
+    }
+
+    public PktConsumerMessage(ConsumerMessageType type, String consumerId, Destination dest, ConsumerType consumerType, int threadCount, MessageFilter messageFilter){
+        this.setPacketType(PacketType.CONSUMER_GREET);
+        this.type = type;
+        this.dest = dest;
+        this.consumerId = consumerId;
+        this.consumerType = consumerType;
+        this.threadCount = threadCount;
+        this.messageFilter = messageFilter;
+    }
+
+    public PktConsumerMessage(ConsumerMessageType type, Long messageId, boolean needClose){
+        this.setPacketType(PacketType.CONSUMER_ACK);
+        this.type = type;
+        this.messageId = messageId;
+        this.needClose = needClose;
+    }
 }

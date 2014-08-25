@@ -225,9 +225,8 @@ public final class MessageBlockingQueue extends
 			}
 			
 			synchronized (lock) {
-				List messages = messageRetriever.retriveMessage(consumerInfo
-						.getDest().getName(), null, tailMessageId,
-						messageFilter);
+				List messages = messageRetriever.retrieveMessage(consumerInfo
+						.getDest().getName(), null, tailMessageId, messageFilter);
 				updateRetrieveStrategy(messages);
 				if (messages != null && messages.size() > 0) {
 					tailMessageId = (Long) messages.get(0);
@@ -257,7 +256,7 @@ public final class MessageBlockingQueue extends
 			}
 
 			synchronized (backupLock) {
-				List messages = messageRetriever.retriveMessage(consumerInfo
+				List messages = messageRetriever.retrieveMessage(consumerInfo
 						.getDest().getName(), consumerInfo.getConsumerId(),
 						tailBackupMessageId, messageFilter);
 				updateRetrieveStrategy(messages);

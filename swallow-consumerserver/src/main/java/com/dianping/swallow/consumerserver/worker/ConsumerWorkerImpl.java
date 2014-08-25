@@ -105,8 +105,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private ConsumerThreadPoolManager  						consumerThreadPoolManager;
    
    @SuppressWarnings("deprecation")
-   public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, 
-		   MessageFilter messageFilter, ConsumerAuthController consumerAuthController, ConsumerThreadPoolManager consumerThreadPoolManager) {
+   public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter, 
+		   	ConsumerAuthController consumerAuthController, ConsumerThreadPoolManager consumerThreadPoolManager, long startMessageId) {
+	   
       this.consumerInfo = consumerInfo;
       this.ackDao = workerManager.getAckDAO();
       this.messageDao = workerManager.getMessageDAO();
@@ -128,7 +129,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       this.ackExecutor = this.consumerThreadPoolManager.getServiceHandlerThreadPool();
 
       //创建消息缓冲QUEUE
-      long messageIdOfTailMessage = getMaxMessageId(false);
+      long messageIdOfTailMessage = (startMessageId != -1 ? startMessageId : getMaxMessageId(false));
       long messageIdOfTailBackupMessage = -1;
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
          messageIdOfTailBackupMessage = getMaxMessageId(true);

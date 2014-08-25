@@ -131,7 +131,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         //      mockChannel();
         //      mockDao();
         ConsumerInfo consumerInfo2 = new ConsumerInfo(CONSUMER_ID2, Destination.topic(TOPIC_NAME), ConsumerType.NON_DURABLE);
-        consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null);
+        consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null, -1);
 //        Thread.sleep(3000);
         //      Assert.assertTrue(check(50));
     }
@@ -147,7 +147,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         //      mockChannel();
         //      mockDao();
         ConsumerInfo consumerInfo3 = new ConsumerInfo(CONSUMER_ID, Destination.topic(TOPIC_NAME2), ConsumerType.DURABLE_AT_MOST_ONCE);
-        consumerWorkerManager.handleGreet(channel, consumerInfo3, 50, null);
+        consumerWorkerManager.handleGreet(channel, consumerInfo3, 50, null, -1);
         Thread.sleep(3000);
         //      Assert.assertTrue(check(50));
     }
@@ -163,7 +163,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         //      mockChannel();
         //      mockDao();
         ConsumerInfo consumerInfo2 = new ConsumerInfo(CONSUMER_ID2, Destination.topic(TOPIC_NAME), ConsumerType.DURABLE_AT_MOST_ONCE);
-        consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null);
+        consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null, -1);
         Thread.sleep(3000);
         //      Assert.assertTrue(check(50));
     }
@@ -180,7 +180,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         //      mockDao();
 
         ConsumerInfo consumerInfo1 = new ConsumerInfo(CONSUMER_ID, Destination.topic(TOPIC_NAME), ConsumerType.DURABLE_AT_LEAST_ONCE);
-        consumerWorkerManager.handleGreet(channel, consumerInfo1, 30, null);
+        consumerWorkerManager.handleGreet(channel, consumerInfo1, 30, null, -1);
         //        Thread.sleep(3000);
         //        Assert.assertTrue(check(30));
         //        Assert.assertEquals(30,
@@ -219,7 +219,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         //            ((ConsumerWorkerImpl) consumerWorkerManager.getConsumerId2ConsumerWorker().get(consumerId1))
         //                  .getCachedMessages().size());
 
-        consumerWorkerManager.handleGreet(channel, consumerInfo1, 30, null);
+        consumerWorkerManager.handleGreet(channel, consumerInfo1, 30, null, -1);
         //        Thread.sleep(3000);
         //      Assert.assertTrue(check(51));
         //        Assert.assertEquals(48,

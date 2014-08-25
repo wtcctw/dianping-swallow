@@ -22,7 +22,7 @@ public interface MessageRetriever {
     * @throws Exception
     */
    @SuppressWarnings("rawtypes")
-   List retriveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter);
+   List retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter);
 
    void setFetchSize(int fetchSize);
 

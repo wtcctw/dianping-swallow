@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.message.Destination;
@@ -16,6 +18,8 @@ import com.dianping.swallow.consumer.internal.ConsumerImpl;
 
 public final class ConsumerFactoryImpl implements ConsumerFactory {
    
+   
+   private Logger logger = Logger.getLogger(getClass());
    
    private static final String LION_CONFIG_FILENAME         = "swallow-consumerclient-lion.properties";
 
@@ -81,10 +85,22 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
     * @return
     */
    private void lionValue2Map(String lionValue) {
+	   
+      if(logger.isInfoEnabled()){
+    	  logger.info("[lionValue2Map][config]" + lionValue);
+      }
       
-      for (String topicNameToAddress : lionValue.split(";")) {
+      for (String topicNameToAddress : lionValue.split(";\\s*")) {
          String[] splits = topicNameToAddress.split("=");
-         string2Map(splits[0].trim(), splits[1].trim());        
+         if(splits.length != 2){
+        	 throw new IllegalStateException("wrong swallow.consumer.consumerServerURI:" + topicNameToAddress);
+         }
+         String topicNames = splits[0].trim();
+         String swallowCAddress = splits[1].trim();
+         
+         for(String topicName : topicNames.split(",\\s*")){
+             string2Map(topicName.trim(), swallowCAddress);        
+         }
       }
   
    }
@@ -98,6 +114,9 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
       List<InetSocketAddress> tempAddress = new ArrayList<InetSocketAddress>();
       tempAddress.add(new InetSocketAddress(masterIp, masterPort));
       tempAddress.add(new InetSocketAddress(slaveIp, slavePort));
+      if(logger.isInfoEnabled()){
+    	  logger.info("[string2Map][topic, address]" + topicName + "," + tempAddress);
+      }
       topicName2Address.put(topicName, tempAddress);
    }
 }

@@ -31,7 +31,7 @@ public class MongoDBMessageRetriever implements MessageRetriever {
     */
    @SuppressWarnings({ "rawtypes", "unchecked" })
    @Override
-   public List retriveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter) {
+   public List retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter) {
       List messages = messageDAO.getMessagesGreaterThan(topicName, consumerId, messageId, fetchSize);
 
       Long maxMessageId = null;

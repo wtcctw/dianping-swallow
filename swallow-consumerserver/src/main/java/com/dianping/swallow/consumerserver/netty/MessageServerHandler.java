@@ -113,7 +113,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
             }
             
             LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Received greet.");
-            workerManager.handleGreet(channel, consumerInfo, clientThreadCount, consumerPacket.getMessageFilter());
+            workerManager.handleGreet(channel, consumerInfo, clientThreadCount, consumerPacket.getMessageFilter(), consumerPacket.getMessageId());
 
       } else if (ConsumerMessageType.ACK.equals(consumerPacket.getType())) { //ack信息，代表客户端收到消息
             if (consumerPacket.getNeedClose() || readyClose) {
