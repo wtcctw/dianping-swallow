@@ -17,6 +17,7 @@ import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
+import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 
 public class ConsumerWorkerManager {
 
@@ -41,6 +42,8 @@ public class ConsumerWorkerManager {
    private Thread                            ackIdUpdaterThread;
 
    private volatile boolean                  readyForAcceptConn    = true;
+   
+   private ConsumerThreadPoolManager  		 consumerThreadPoolManager; 
 
    public void setAckDAO(AckDAO ackDAO) {
       this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO, ConfigManager.getInstance()
@@ -106,6 +109,12 @@ public class ConsumerWorkerManager {
       }
       LOG.info("Stoped.");
 
+      try {
+    	  consumerThreadPoolManager.dispose();
+      } catch (Exception e) {
+    	  LOG.error("[close]", e);
+      }
+      
       //等待一段时间，以便让所有ConsumerWorker，可以从client端接收 “已发送但未收到ack的消息” 的ack
       try {
          long waitAckTimeWhenCloseSwc = ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc();
@@ -114,13 +123,6 @@ public class ConsumerWorkerManager {
          LOG.info("Sleep done.");
       } catch (InterruptedException e) {
          LOG.error("Close Swc thread InterruptedException", e);
-      }
-
-      //所有ConsumerWorker，不再处理接收到的ack(接收到，则丢弃)
-      if (consumerInfo2ConsumerWorker != null) {
-         for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
-            entry.getValue().closeAckExecutor();
-         }
       }
 
       //关闭ConsumerWorker的资源（关闭内部的“用于获取消息的队列”）
@@ -165,7 +167,7 @@ public class ConsumerWorkerManager {
          // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
          synchronized (consumerInfo.getConsumerId().intern()) {
             if ((worker = findConsumerWorker(consumerInfo)) == null) {
-               worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController);
+               worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController, consumerThreadPoolManager);
                consumerInfo2ConsumerWorker.put(consumerInfo, worker);
             }
          }
@@ -230,7 +232,6 @@ public class ConsumerWorkerManager {
                      worker.recordAck();
                      removeConsumerWorker(consumerInfo);
                      worker.closeMessageFetcherThread();
-                     worker.closeAckExecutor();
                      worker.close();
                      LOG.info("ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
                   }
@@ -296,5 +297,14 @@ public class ConsumerWorkerManager {
    public void setConsumerAuthController(ConsumerAuthController consumerAuthController) {
       this.consumerAuthController = consumerAuthController;
    }
+
+
+	public ConsumerThreadPoolManager getConsumerThreadPoolManager() {
+		return consumerThreadPoolManager;
+	}
+	
+	public void setConsumerThreadPoolManager(ConsumerThreadPoolManager consumerThreadPoolManager) {
+		this.consumerThreadPoolManager = consumerThreadPoolManager;
+	}
 
 }

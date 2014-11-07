@@ -10,11 +10,12 @@ import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 public class SimpleConsumerExample {
 
     public static void main(String[] args) {
+    	
         ConsumerConfig config = new ConsumerConfig();
         //以下两项根据自己情况而定，默认是不需要配的
         config.setThreadPoolSize(10);
 
-        Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);
+        Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId2", config);
         c.setListener(new MessageListener() {
 
             @Override

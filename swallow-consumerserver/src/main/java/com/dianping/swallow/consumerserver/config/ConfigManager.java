@@ -44,6 +44,9 @@ public final class ConfigManager {
 
    //Master Ip
    private String               masterIp                        = "127.0.0.1";
+   
+   private int 					zeroRetrieveInterval 			= 20;
+   private int					backupZeroRetrieveInterval		= 10000;
 
    public int getPullFailDelayBase() {
       return pullFailDelayBase;
@@ -208,4 +211,20 @@ public final class ConfigManager {
          }
       }
    }
+
+public int getZeroRetrieveInterval() {
+	return zeroRetrieveInterval;
+}
+
+public void setZeroRetrieveInterval(int zeroRetrieveInterval) {
+	this.zeroRetrieveInterval = zeroRetrieveInterval;
+}
+
+public int getBackupZeroRetrieveInterval() {
+	return backupZeroRetrieveInterval;
+}
+
+public void setBackupZeroRetrieveInterval(int backupZeroRetrieveInterval) {
+	this.backupZeroRetrieveInterval = backupZeroRetrieveInterval;
+}
 }

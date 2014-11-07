@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
 public class SwallowBuffer {
@@ -26,9 +27,7 @@ public class SwallowBuffer {
    private MessageRetriever                         messageRetriever;
    private int                                      capacityOfQueue                   = Integer.MAX_VALUE;
    private int                                      thresholdOfQueue                  = 60;
-   private int                                      delayBase                         = -1;
-   private int                                      delayUpperbound                   = -1;
-   private int                                      retrieverFromBackupIntervalSecond = -1;
+   private ConsumerThreadPoolManager  		 		consumerThreadPoolManager; 
 
    /**
     * 根据topicName，获取topicName对应的TopicBuffer。<br>
@@ -83,23 +82,19 @@ public class SwallowBuffer {
       this.thresholdOfQueue = threshold;
    }
 
-   public void setDelayBase(int delayBase) {
-      this.delayBase = delayBase;
-   }
-
-   public void setDelayUpperbound(int delayUpperbound) {
-      this.delayUpperbound = delayUpperbound;
-   }
-
-   public void setRetrieverFromBackupIntervalSecond(int retrieverFromBackupIntervalSecond) {
-      this.retrieverFromBackupIntervalSecond = retrieverFromBackupIntervalSecond;
-   }
-
    public void setMessageRetriever(MessageRetriever messageRetriever) {
       this.messageRetriever = messageRetriever;
    }
 
-   private class TopicBuffer {
+   public ConsumerThreadPoolManager getConsumerThreadPoolManager() {
+	return consumerThreadPoolManager;
+}
+
+public void setConsumerThreadPoolManager(ConsumerThreadPoolManager consumerThreadPoolManager) {
+	this.consumerThreadPoolManager = consumerThreadPoolManager;
+}
+
+private class TopicBuffer {
 
       private ConcurrentHashMap<String, WeakReference<MessageBlockingQueue>> messageQueues = new ConcurrentHashMap<String, WeakReference<MessageBlockingQueue>>();
 
@@ -116,22 +111,8 @@ public class SwallowBuffer {
             throw new IllegalArgumentException("consumerInfo is null.");
          }
          MessageBlockingQueue messageBlockingQueue;
-         if (messageFilter != null) {
-            messageBlockingQueue = new MessageBlockingQueue(consumerInfo, thresholdOfQueue, capacityOfQueue,
-                  tailMessageId, tailBackupMessageId, messageFilter);
-         } else {
-            messageBlockingQueue = new MessageBlockingQueue(consumerInfo, thresholdOfQueue, capacityOfQueue,
-                  tailMessageId, tailBackupMessageId);
-         }
-         if (delayBase != -1) {
-            messageBlockingQueue.setDelayBase(delayBase);
-         }
-         if (delayUpperbound != -1) {
-            messageBlockingQueue.setDelayUpperbound(delayUpperbound);
-         }
-         if (retrieverFromBackupIntervalSecond != -1) {
-            messageBlockingQueue.setRetrieverFromBackupIntervalSecond(retrieverFromBackupIntervalSecond);
-         }
+         messageBlockingQueue = new MessageBlockingQueue(consumerInfo, thresholdOfQueue, capacityOfQueue,
+                  tailMessageId, tailBackupMessageId, messageFilter, consumerThreadPoolManager.getRetrieverThreadPool());
          messageBlockingQueue.setMessageRetriever(messageRetriever);
          messageBlockingQueue.init();
 

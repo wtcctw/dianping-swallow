@@ -36,11 +36,6 @@ public interface ConsumerWorker {
    void closeMessageFetcherThread();
 
    /**
-    * 关闭处理ack的线程
-    */
-   void closeAckExecutor();
-
-   /**
     * 关闭资源
     */
    void close();

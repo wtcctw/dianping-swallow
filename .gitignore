@@ -75,3 +75,5 @@ Thumbs.db
 !*.gif
 !*.properties
 
+#
+*lion*properties*

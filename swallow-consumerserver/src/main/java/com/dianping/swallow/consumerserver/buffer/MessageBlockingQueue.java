@@ -1,11 +1,10 @@
 package com.dianping.swallow.consumerserver.buffer;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
-import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
+import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
 public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessage> implements
@@ -29,39 +28,20 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
 
    private AtomicBoolean                isClosed                          = new AtomicBoolean(false);
 
-   private transient Thread             messageRetrieverThread;
    protected volatile Long              tailMessageId;
    protected MessageFilter              messageFilter;
-   private int                          delayBase                         = 10;
-   private int                          delayUpperbound                   = 50;
    /** 最小剩余数量,当queue的消息数量小于threshold时，会触发从数据库加载数据的操作 */
    private final int                    threshold;
-   private ReentrantLock                reentrantLock                     = new ReentrantLock(true);
-   private transient Condition          condition                         = reentrantLock.newCondition();
 
    //起一个线程定时从msg#<topic>#<cid>获取消息(该db存放backup消息)，放到queue里
-   private transient Thread             backupMessageRetrieverThread;
    protected volatile Long              tailBackupMessageId;
-   private int                          retrieverFromBackupIntervalSecond = 10;
-
+   private ExecutorService 				retrieverThreadPool;
+   
+   private  Object  lock = new Object(), backupLock = new Object();
+   private RetriveStrategy retriveStrategy, backupRetriveStrategy;
+   
    public MessageBlockingQueue(ConsumerInfo consumerInfo, int threshold, int capacity, Long messageIdOfTailMessage,
-                               Long tailBackupMessageId) {
-      super(capacity);
-      //能运行到这里，说明capacity>0
-      this.consumerInfo = consumerInfo;
-      if (threshold < 0) {
-         throw new IllegalArgumentException("threshold: " + threshold);
-      }
-      this.threshold = threshold;
-      if (messageIdOfTailMessage == null) {
-         throw new IllegalArgumentException("messageIdOfTailMessage is null.");
-      }
-      this.tailMessageId = messageIdOfTailMessage;
-      this.tailBackupMessageId = tailBackupMessageId;
-   }
-
-   public MessageBlockingQueue(ConsumerInfo consumerInfo, int threshold, int capacity, Long messageIdOfTailMessage,
-                               Long tailBackupMessageId, MessageFilter messageFilter) {
+                               Long tailBackupMessageId, MessageFilter messageFilter, ExecutorService retrieverThreadPool) {
       super(capacity);
       //能运行到这里，说明capacity>0
       this.consumerInfo = consumerInfo;
@@ -75,18 +55,13 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
       this.tailMessageId = messageIdOfTailMessage;
       this.tailBackupMessageId = tailBackupMessageId;
       this.messageFilter = messageFilter;
+      this.retrieverThreadPool = retrieverThreadPool;
+      
+      this.retriveStrategy = new DefaultRetriveStrategy(ConfigManager.getInstance().getZeroRetrieveInterval());
+      this.backupRetriveStrategy = new DefaultRetriveStrategy(ConfigManager.getInstance().getBackupZeroRetrieveInterval());
    }
 
    public void init() {
-      messageRetrieverThread = new MessageRetrieverThread();
-      messageRetrieverThread.start();
-
-      //非持久的，不会有backup队列
-      if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-         backupMessageRetrieverThread = new BackupMessageRetrieverThread();
-         backupMessageRetrieverThread.start();
-      }
-
    }
 
    @Override
@@ -102,140 +77,35 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
 
    @Override
    public SwallowMessage poll() {
-      //如果剩余元素数量小于最低限制值threshold，就启动一个“获取DB数据的后台线程”去DB获取数据，并添加到Queue的尾部
-      if (super.size() < threshold) {
-         ensureLeftMessage();
-      }
+	   
+	  ensureLeftMessage();
       return super.poll();
    }
 
    @Override
    public SwallowMessage poll(long timeout, TimeUnit unit) throws InterruptedException {
-      //如果剩余元素数量小于最低限制值threshold，就启动一个“获取DB数据的后台线程”去DB获取数据，并添加到Queue的尾部
-      if (super.size() < threshold) {
-         ensureLeftMessage();
-      }
-      return super.poll(timeout, unit);
+	   
+	   ensureLeftMessage();
+	   LOG.info("[poll]" + timeout);
+	   return super.poll(timeout, unit);
    }
 
    /**
     * 唤醒“获取DB数据的后台线程”去DB获取数据，并添加到Queue的尾部
     */
    private void ensureLeftMessage() {
-      if (messageRetriever == null) {
-         return;
-      }
-      //只有一个线程能唤醒“获取DB数据的后台线程”
-      if (reentrantLock.tryLock()) {
-         condition.signal();
-         reentrantLock.unlock();
-      }
+	   
+	   if (super.size() < threshold) {
+		   retrieverThreadPool.execute(new MessageRetrieverTask(retriveStrategy));
+		   
+		   if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+			   retrieverThreadPool.execute(new BackupMessageRetrieverTask(backupRetriveStrategy));
+		   }
+	   }
    }
 
    public void setMessageRetriever(MessageRetriever messageRetriever) {
       this.messageRetriever = messageRetriever;
-   }
-
-   private class MessageRetrieverThread extends Thread {
-
-      private DefaultPullStrategy pullStrategy = new DefaultPullStrategy(delayBase, delayUpperbound);
-
-      public MessageRetrieverThread() {
-         this.setName("swallow-MessageRetriever-(topic=" + consumerInfo.getDest().getName() + ",cid="
-               + consumerInfo.getConsumerId() + ")");
-         this.setDaemon(true);
-      }
-
-      @Override
-      public void run() {
-         LOG.info("thread start(tailMessageId=" + tailMessageId + "):" + this.getName());
-         while (!this.isInterrupted()) {
-            reentrantLock.lock();
-            try {
-               condition.await();
-               retrieveMessage();
-            } catch (InterruptedException e) {
-               this.interrupt();
-            } finally {
-               reentrantLock.unlock();
-            }
-         }
-         LOG.info("thread done:" + this.getName());
-      }
-
-      @SuppressWarnings("rawtypes")
-      private void retrieveMessage() {
-         if (LOG.isDebugEnabled()) {
-            LOG.debug("retriveMessage() start:" + this.getName());
-         }
-         try {
-            List messages = messageRetriever.retriveMessage(consumerInfo.getDest().getName(), null, tailMessageId,
-                  messageFilter);
-            if (messages != null && messages.size() > 0) {
-               tailMessageId = (Long) messages.get(0);
-               putMessage(messages);
-               //如果本次获取完，queue的消息条数仍然比最低阀值小，那么消费者与生产者很有可能速度差不多，此时为了
-               //避免retrieve线程不断被唤醒，适当地睡眠一段时间
-               if (MessageBlockingQueue.this.size() < MessageBlockingQueue.this.threshold) {
-                  pullStrategy.fail(true);
-               } else {
-                  pullStrategy.succeess();
-               }
-            }
-         } catch (RuntimeException e1) {
-            LOG.error(e1.getMessage(), e1);
-         }
-         if (LOG.isDebugEnabled()) {
-            LOG.debug("retriveMessage() done:" + this.getName());
-         }
-      }
-   }
-
-   private class BackupMessageRetrieverThread extends Thread {
-
-      public BackupMessageRetrieverThread() {
-         this.setName("swallow-BackupMessageRetriever-(topic=" + consumerInfo.getDest().getName() + ",cid="
-               + consumerInfo.getConsumerId() + ")");
-         this.setDaemon(true);
-      }
-
-      @Override
-      public void run() {
-         LOG.info("thread start(tailBackupMessageId=" + tailBackupMessageId + "):" + this.getName());
-         while (!this.isInterrupted()) {
-            try {
-               //为避免queue的元素太多，定时获取backup消息的线程，加上“size小于threshold * 5”的条件(目前即size<300时会尝试每隔10秒获取一次backup消息)
-               //目的是：backup消息需要经常获取，因为要保证backup消息尽早消费，但backup消息要防止使得queue爆满的情况。
-               if (size() < threshold * 5) {
-                  retrieveMessage();
-               }
-               TimeUnit.SECONDS.sleep(retrieverFromBackupIntervalSecond);
-            } catch (InterruptedException e) {
-               this.interrupt();
-            }
-         }
-         LOG.info("thread done:" + this.getName());
-      }
-
-      @SuppressWarnings("rawtypes")
-      private void retrieveMessage() {
-         if (LOG.isDebugEnabled()) {
-            LOG.debug("retriveMessage() start:" + this.getName());
-         }
-         try {
-            List messages = messageRetriever.retriveMessage(consumerInfo.getDest().getName(),
-                  consumerInfo.getConsumerId(), tailBackupMessageId, messageFilter);
-            if (messages != null && messages.size() > 0) {
-               tailBackupMessageId = (Long) messages.get(0);
-               putMessage(messages);
-            }
-         } catch (RuntimeException e) {
-            LOG.error(e.getMessage(), e);
-         }
-         if (LOG.isDebugEnabled()) {
-            LOG.debug("retriveMessage() done:" + this.getName());
-         }
-      }
    }
 
    /**
@@ -247,12 +117,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
    @Override
    public void close() {
       if (isClosed.compareAndSet(false, true)) {
-         if (messageRetrieverThread != null) {
-            messageRetrieverThread.interrupt();
-         }
-         if (backupMessageRetrieverThread != null) {
-            backupMessageRetrieverThread.interrupt();
-         }
       }
    }
 
@@ -261,18 +125,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
       if (isClosed.get()) {
          throw new RuntimeException("MessageBlockingQueue- already closed! ");
       }
-   }
-
-   public void setDelayBase(int delayBase) {
-      this.delayBase = delayBase;
-   }
-
-   public void setDelayUpperbound(int delayUpperbound) {
-      this.delayUpperbound = delayUpperbound;
-   }
-
-   public void setRetrieverFromBackupIntervalSecond(int retrieverFromBackupIntervalSecond) {
-      this.retrieverFromBackupIntervalSecond = retrieverFromBackupIntervalSecond;
    }
 
    @SuppressWarnings("rawtypes")
@@ -292,4 +144,82 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
       }
    }
 
+
+   private abstract class AbstractRetrieveTask implements Runnable {
+
+	   protected final Logger  LOG  = LoggerFactory.getLogger(getClass());
+	   private RetriveStrategy retriveStrategy;
+	   
+	   public AbstractRetrieveTask(RetriveStrategy retriveStrategy){
+		   this.retriveStrategy = retriveStrategy;
+	   }
+	   
+		@Override
+		public void run() {
+			try{
+				if(retriveStrategy.isRetrieve()){
+					retrieveMessage();
+				}
+			}catch(Throwable th){
+				LOG.error("[run]", th);
+			}
+		}
+		protected abstract void retrieveMessage();
+		
+		@SuppressWarnings("rawtypes") 
+		protected void updateRetrieveStrategy(List messages) {
+			int messageSize = messages ==null ? 0 :messages.size();
+			if(LOG.isInfoEnabled()){
+				LOG.info("[updateRetrieveStrategy]" + messageSize);
+			}
+			retriveStrategy.retrieved(messageSize);
+		}
+
+   }
+
+   private class MessageRetrieverTask extends AbstractRetrieveTask implements Runnable {
+
+      public MessageRetrieverTask(RetriveStrategy retriveStrategy) {
+    	  super(retriveStrategy);
+      }
+
+      @SuppressWarnings("rawtypes")
+      @Override
+      protected void retrieveMessage() {
+    	 synchronized (lock) {
+             LOG.info("[run]thread start(tailMessageId=" + tailMessageId + ")");
+             List messages = messageRetriever.retriveMessage(consumerInfo.getDest().getName(), null, tailMessageId,
+                     messageFilter);
+             updateRetrieveStrategy(messages);
+             if (messages != null && messages.size() > 0) {
+            	 tailMessageId = (Long) messages.get(0);
+            	 putMessage(messages);
+             }
+		}
+         LOG.info("[run]thread done.(tailMessageId=" + tailMessageId + ")");
+      }
+   }
+
+   private class BackupMessageRetrieverTask extends AbstractRetrieveTask implements  Runnable {
+
+      public BackupMessageRetrieverTask(RetriveStrategy retriveStrategy) {
+		super(retriveStrategy);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	protected void retrieveMessage() {
+    	 synchronized (backupLock) {
+             LOG.info("[run]thread start(tailBackupMessageId=" + tailBackupMessageId + ")");
+             List messages = messageRetriever.retriveMessage(consumerInfo.getDest().getName(),
+                     consumerInfo.getConsumerId(), tailBackupMessageId, messageFilter);
+             updateRetrieveStrategy(messages);
+             if (messages != null && messages.size() > 0) {
+                  tailBackupMessageId = (Long) messages.get(0);
+                  putMessage(messages);
+             }
+             LOG.info("[run]thread done(tailBackupMessageId=" + tailBackupMessageId + ")");
+    	 }
+      }
+   }
 }

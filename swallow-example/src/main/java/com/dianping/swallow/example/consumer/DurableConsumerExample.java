@@ -18,7 +18,7 @@ public class DurableConsumerExample {
         config.setThreadPoolSize(1);
         config.setRetryCountOnBackoutMessageException(0);
 
-        Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);
+        Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId1", config);
         c.setListener(new MessageListener() {
 
             @Override

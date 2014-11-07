@@ -20,18 +20,18 @@
     <bean id="consumerWorkerManager"
         class="com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager">
     </bean>
+    
+    <bean id="consumerThreadPoolManager" class="com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManagerImpl">
+    	<property name="maxRetrieverThreadPoolSize"><value>${maxRetrieverThreadPoolSize}</value></property>
+    	<property name="coreServiceHandlerThreadPoolSize"><value>${coreServiceHandlerThreadPoolSize}</value></property>
+    	<property name="maxServiceHandlerThreadPoolSize"><value>${maxServiceHandlerThreadPoolSize}</value></property>
+    	<property name="coreSendMessageThreadPoolSize"><value>${coreSendMessageThreadPoolSize}</value></property>
+    	<property name="maxSendMessageThreadPoolSize"><value>${maxSendMessageThreadPoolSize}</value></property>
+    	<property name="coreRetrieverThreadPoolSize"><value>${coreRetrieverThreadPoolSize}</value></property>
+    </bean>
 
     <bean id="swallowBuffer"
         class="com.dianping.swallow.consumerserver.buffer.SwallowBuffer">
-        <property name="delayBase">
-            <value>${retrieverDelayBase}</value>
-        </property>
-        <property name="delayUpperbound">
-            <value>${retrieverDelayUpperbound}</value>
-        </property>
-        <property name="retrieverFromBackupIntervalSecond">
-            <value>${retrieverFromBackupIntervalSecond}</value>
-        </property>
     </bean>
 
     <bean id="heartbeater"
@@ -79,5 +79,7 @@
             <value>swallow-topic-whitelist-lion.properties</value>
         </constructor-arg>
     </bean>
-
+    
+	<bean id="defaultThreadException" class="com.dianping.swallow.common.internal.pool.DefaultThreadException">
+	</bean>
 </beans>

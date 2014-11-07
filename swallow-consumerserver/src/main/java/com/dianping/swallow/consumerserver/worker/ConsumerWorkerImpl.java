@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -37,6 +36,7 @@ import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
+import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 import com.dianping.swallow.consumerserver.util.ConsumerUtil;
 
 /***
@@ -47,10 +47,6 @@ import com.dianping.swallow.consumerserver.util.ConsumerUtil;
 public final class ConsumerWorkerImpl implements ConsumerWorker {
    private static final Logger                          LOG                     = LoggerFactory
                                                                                       .getLogger(ConsumerWorkerImpl.class);
-
-   private static final MQThreadFactory                 ackThreadFactory        = new MQThreadFactory(
-                                                                                      "swallow-ack-handler-");
-
    private final AtomicLong                             SEQ                     = new AtomicLong(1);
    private final AtomicLong                             BACKUP_SEQ              = new AtomicLong(1);
    /**
@@ -106,14 +102,18 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages         = new ConcurrentSkipListMap<Long, ConsumerMessage>();
    private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckBackupMessages   = new ConcurrentSkipListMap<Long, ConsumerMessage>();
 
+   private ConsumerThreadPoolManager  						consumerThreadPoolManager;
+   
    @SuppressWarnings("deprecation")
-   public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter, ConsumerAuthController consumerAuthController) {
+   public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, 
+		   MessageFilter messageFilter, ConsumerAuthController consumerAuthController, ConsumerThreadPoolManager consumerThreadPoolManager) {
       this.consumerInfo = consumerInfo;
       this.ackDao = workerManager.getAckDAO();
       this.messageDao = workerManager.getMessageDAO();
       this.swallowBuffer = workerManager.getSwallowBuffer();
       this.threadFactory = workerManager.getThreadFactory();
       this.messageFilter = messageFilter;
+      this.consumerThreadPoolManager = consumerThreadPoolManager;
       this.consumerAuthController = consumerAuthController;
       this.pullStgy = new DefaultPullStrategy(ConfigManager.getInstance().getPullFailDelayBase(), ConfigManager
             .getInstance().getPullFailDelayUpperBound());
@@ -125,8 +125,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
                + "] used ConsumerType.DURABLE_AT_MOST_ONCE. Now change it to ConsumerType.DURABLE_AT_LEAST_ONCE.");
       }
 
-      this.ackExecutor = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.DAYS,
-            new LinkedBlockingQueue<Runnable>(), ackThreadFactory);
+      this.ackExecutor = this.consumerThreadPoolManager.getServiceHandlerThreadPool();
 
       //创建消息缓冲QUEUE
       long messageIdOfTailMessage = getMaxMessageId(false);
@@ -148,7 +147,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          public void run() {
             try {
 
-               LOG.info("Receive ACK(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
+               LOG.info("Receive ACK(new)(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
                      + ackId + ") from " + connectedChannels.get(channel));
 
                removeWaitAckMessages(channel, ackId);
@@ -461,10 +460,16 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    @Override
    public void handleGreet(final Channel channel, final int clientThreadCount) {
+	   if(LOG.isInfoEnabled()){
+		   LOG.info("[handleGreet]");
+	   }
       ackExecutor.execute(new Runnable() {
          @Override
          public void run() {
 
+      	   if(LOG.isInfoEnabled()){
+    		   LOG.info("[handleGreet][run]");
+    	   }
             connectedChannels.putIfAbsent(channel, IPUtil.getIpFromChannel(channel));
             started = true;
             for (int i = 0; i < clientThreadCount; i++) {
@@ -477,11 +482,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    @Override
    public void closeMessageFetcherThread() {
       getMessageisAlive = false;
-   }
-
-   @Override
-   public void closeAckExecutor() {
-      ackExecutor.shutdownNow();
    }
 
    @Override
