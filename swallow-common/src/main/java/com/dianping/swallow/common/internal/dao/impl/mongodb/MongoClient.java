@@ -513,7 +513,7 @@ public class MongoClient implements ConfigChangeListener {
 
    public DBCollection getHeartbeatCollection(String ip) {
       //根据topicName获取Mongo实例
-      Mongo mongo = getMongo(TOPICNAME_HEARTBEAT);
+      Mongo mongo = this.heartbeatMongo;
       return this.getCollection(mongo, this.heartbeatCappedCollectionSize, this.heartbeatCappedCollectionMaxDocNum,
             "heartbeat#" + ip, new BasicDBObject(HeartbeatDAOImpl.TICK, -1));
    }
