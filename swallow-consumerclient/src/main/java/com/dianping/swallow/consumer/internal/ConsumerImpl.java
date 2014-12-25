@@ -144,6 +144,7 @@ public class ConsumerImpl implements Consumer {
          final MessageClientHandler handler = new MessageClientHandler(this);
          bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
                Executors.newCachedThreadPool()));
+         bootstrap.setOption("keepAlive", true);
          bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
