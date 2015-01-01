@@ -4,7 +4,6 @@ import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 import com.dianping.swallow.web.controller.utils.UserUtils;
-import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.TopicResourceService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,7 +49,7 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setSize(1);
 		topicApplyDto.setTopic("swallow-test");
 		topicApplyDto.setApprover("hongjun.zhong");
-		topicApplyDto.setType(MongoType.GENERAL.toString());
+		topicApplyDto.setType("一般消息队列");
 		topicApplyDto.setApplicant("mingdong.li");
 
 

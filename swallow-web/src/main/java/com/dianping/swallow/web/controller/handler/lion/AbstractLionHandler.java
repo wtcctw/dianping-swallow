@@ -33,7 +33,7 @@ public abstract class AbstractLionHandler extends AbstractHandler<LionEditorEnti
     public Object handle(LionEditorEntity lionEditorEntity, EmptyObject result) {
 
         ResponseStatus status = doHandlerHelper(lionEditorEntity, result);
-        if (status != ResponseStatus.SUCCESS) {
+        if (!ResponseStatus.SUCCESS.equals(status)) {
             String topic = lionEditorEntity.getTopic();
             topicResourceService.loadCachedTopicToAdministrator().remove(topic);
         }

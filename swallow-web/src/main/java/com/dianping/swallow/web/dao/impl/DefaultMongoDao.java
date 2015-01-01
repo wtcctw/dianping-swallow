@@ -27,7 +27,7 @@ public class DefaultMongoDao extends AbstractWriteDao implements MongoDao {
 
 	private static final String CATALOG = "catalog";
 
-	public static final String TYPE = "mongoType";
+	public static final String TYPE = "groupName";
 
 	public static final String IP = "ip";
 
@@ -78,7 +78,7 @@ public class DefaultMongoDao extends AbstractWriteDao implements MongoDao {
 	}
 
 	@Override
-	public List<MongoResource> findByType(MongoType mongoType) {
+	public List<MongoResource> findByType(String mongoType) {
 
 		Query query = new Query(Criteria.where(TYPE).is(mongoType));
 		List<MongoResource> mongoResource = mongoTemplate.find(query, MongoResource.class, MONGORESOURCE_COLLECTION);

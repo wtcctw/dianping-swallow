@@ -56,7 +56,7 @@ public class MongoResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public MongoResource findIdleMongoByType(MongoType mongoType) {
+	public MongoResource findIdleMongoByType(String mongoType) {
 
 		List<MongoResource> mongoResources = mongoDao.findByType(mongoType);
 		return loadIdleMongo(mongoResources);

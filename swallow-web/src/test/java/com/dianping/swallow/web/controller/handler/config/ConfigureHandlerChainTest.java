@@ -40,11 +40,11 @@ public class ConfigureHandlerChainTest extends MockTest {
         topicApplyDto.setSize(1);
         topicApplyDto.setTopic("swallow-test");
         topicApplyDto.setApprover("hongjun.zhong");
-        topicApplyDto.setType(MongoType.GENERAL.toString());
+        topicApplyDto.setType("一般消息队列");
 
         MongoResource mongoResource = new MongoResource();
         mongoResource.setIp("1.1.1.1");
-        mongoResource.setGroupName(MongoType.GENERAL.toString());
+        mongoResource.setGroupName(MongoType.findString("一般消息队列"));
 
         Pair<String, ResponseStatus> pair = new Pair<String, ResponseStatus>();
         pair.setFirst("2.2.2.2");
@@ -60,8 +60,8 @@ public class ConfigureHandlerChainTest extends MockTest {
 
         mongoServerHandler.setMongoResourceService(mongoResourceService);
         consumerServerHandler.setConsumerServerResourceService(consumerServerResourceService);
-        Mockito.doReturn(mongoResource).when(mongoResourceService).findIdleMongoByType(MongoType.findByType(topicApplyDto.getType()));
-        Mockito.doReturn(pair).when(consumerServerResourceService).loadIdleConsumerServer();
+        Mockito.doReturn(mongoResource).when(mongoResourceService).findIdleMongoByType(MongoType.findString(topicApplyDto.getType()));
+        Mockito.doReturn(pair).when(consumerServerResourceService).loadIdleConsumerServer(MongoType.findString(topicApplyDto.getType()));
 
     }
 

@@ -142,14 +142,14 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 
 		MongoResource mongoResource = new MongoResource();
 		String catalog = mongoReport.getCatalog();
-		MongoType mongoType;
+		String mongoType;
 		try {
-			mongoType = MongoType.findByType(catalog);
+			mongoType = MongoType.findString(catalog);
 		} catch (Exception e) {
-			mongoType = MongoType.GENERAL;
+			mongoType = MongoType.GENERAL.toString();
 		}
 
-		mongoResource.setGroupName(mongoType.toString());
+		mongoResource.setGroupName(mongoType);
 		mongoResource.setCatalog(catalog);
 		mongoResource.setDisk(mongoReport.getDisk());
 		mongoResource.setLoad(mongoReport.getLoad());

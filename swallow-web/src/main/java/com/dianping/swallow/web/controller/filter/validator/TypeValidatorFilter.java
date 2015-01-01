@@ -38,7 +38,7 @@ public class TypeValidatorFilter implements Filter<TopicApplyDto, ValidatorFilte
 		}
 
 		try {
-			MongoType.findByType(type.trim());
+			MongoType.findString(type.trim());
 			if (logger.isInfoEnabled()) {
 				logger.info("Pass TypeFilter");
 			}

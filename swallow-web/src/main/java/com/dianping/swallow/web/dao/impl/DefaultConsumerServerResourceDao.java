@@ -1,18 +1,17 @@
 package com.dianping.swallow.web.dao.impl;
 
-import java.util.List;
-
+import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
+import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.model.resource.ServerType;
+import com.mongodb.WriteResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
-import com.dianping.swallow.web.model.resource.ConsumerServerResource;
-import com.dianping.swallow.web.model.resource.ServerType;
-import com.mongodb.WriteResult;
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -25,6 +24,8 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 	private static final String CONSUMERSERVERRESOURCE_COLLECTION = "CONSUMER_SERVER_RESOURCE";
 
 	private static final String GROUPID = "groupId";
+
+	private static final String GROUPNAME = "groupName";
 
 	private static final String TYPE = "type";
 
@@ -113,10 +114,10 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 	}
 
 	@Override
-	public ConsumerServerResource loadIdleConsumerServer() {
+	public ConsumerServerResource loadIdleConsumerServer(String groupName) {
 
 		Query query = new Query(Criteria.where(TYPE).is(ServerType.MASTER)
-				.andOperator(Criteria.where(ACTIVE).is(Boolean.TRUE)));
+				.andOperator(Criteria.where(ACTIVE).is(Boolean.TRUE).and(GROUPNAME).is(groupName)));
 
 		query.with(new Sort(new Sort.Order(Direction.ASC, QPS)));
 		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,

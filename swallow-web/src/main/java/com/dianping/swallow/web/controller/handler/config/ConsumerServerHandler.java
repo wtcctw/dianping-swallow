@@ -5,6 +5,7 @@ import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.handler.AbstractHandler;
 import com.dianping.swallow.web.controller.handler.Handler;
 import com.dianping.swallow.web.controller.handler.result.LionConfigureResult;
+import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,9 @@ public class ConsumerServerHandler extends AbstractHandler<TopicApplyDto,LionCon
     @Override
     public Object handle(TopicApplyDto value, LionConfigureResult result) {
 
-        Pair<String, ResponseStatus> pair = consumerServerResourceService.loadIdleConsumerServer();
+        String type = value.getType();
+        String groupName = MongoType.findString(type.trim());
+        Pair<String, ResponseStatus> pair = consumerServerResourceService.loadIdleConsumerServer(groupName);
         if(result == null){
             result = new LionConfigureResult();
         }
