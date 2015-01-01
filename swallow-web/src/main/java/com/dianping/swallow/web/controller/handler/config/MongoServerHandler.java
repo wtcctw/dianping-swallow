@@ -27,8 +27,8 @@ public class MongoServerHandler extends AbstractHandler<TopicApplyDto,LionConfig
     public Object handle(TopicApplyDto value, LionConfigureResult result) {
 
         String type = value.getType();
-        MongoType mongoType = MongoType.findByType(type);
-        MongoResource mongoResource = mongoResourceService.findIdleMongoByType(mongoType);
+        String groupName = MongoType.findString(type);
+        MongoResource mongoResource = mongoResourceService.findIdleMongoByType(groupName);
         if(mongoResource != null){
             String mongoChosen = mongoResource.getIp();
             if(StringUtils.isNotBlank(mongoChosen)){

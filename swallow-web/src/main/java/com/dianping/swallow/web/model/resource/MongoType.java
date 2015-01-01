@@ -13,10 +13,7 @@ public enum MongoType {
 	
 	private String type;
 	
-	private MongoType(){
-	}
-	
-	private MongoType(String type){
+	MongoType(String type){
 		this.type = type;
 		
 	}
@@ -28,19 +25,38 @@ public enum MongoType {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
-	public static MongoType findByType(String type) {
+
+	public static String StringToType(String type) {
 		for (MongoType mongoType : values()) {
 			if (type.startsWith(mongoType.getType())) {
+				return mongoType.toString();
+			}
+		}
+		throw new RuntimeException("Error typy : " + type);
+	}
+	
+	public static String findString(String type) {
+		for (MongoType mongoType : values()) {
+			if (type.startsWith(mongoType.getType())) {
+				return type;
+			}
+		}
+		throw new RuntimeException("Error typy : " + type);
+	}
+
+	public static MongoType findType(String type) {
+		for (MongoType mongoType : values()) {
+			if (type.startsWith(mongoType.toString())) {
 				return mongoType;
 			}
 		}
 		throw new RuntimeException("Error typy : " + type);
 	}
 	
-	@Override
-	public String toString() {
-		return type;
+	public static void main(String[] args) {
+		System.out.println(findString("一般消息队列"));
+		System.out.println(findType(MongoType.GENERAL.toString()));
+		System.out.println(StringToType("一般消息队列"));
 	}
 	
 }

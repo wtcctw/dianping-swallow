@@ -1,10 +1,9 @@
 package com.dianping.swallow.web.service;
 
-import java.util.List;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
+
+import java.util.List;
 
 
 /**
@@ -22,7 +21,7 @@ public interface MongoResourceService {
 	
 	MongoResource findByIp(String ip);
 	
-	MongoResource findIdleMongoByType(MongoType mongoType);
+	MongoResource findIdleMongoByType(String mongoType);
 
 	List<MongoResource> findAll(String ... fields);
 
