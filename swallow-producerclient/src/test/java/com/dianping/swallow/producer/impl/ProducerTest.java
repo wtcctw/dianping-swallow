@@ -93,6 +93,13 @@ public class ProducerTest {
             }
             return true;
          }
+
+		@Override
+		public void describeMismatch(Object item,
+				Description mismatchDescription) {
+			// TODO Auto-generated method stub
+			
+		}
       }))).thenReturn(ack);
 
       when(exceptionRemoteService.sendMessage((Packet) anyObject())).thenThrow(new ServerDaoException(null));

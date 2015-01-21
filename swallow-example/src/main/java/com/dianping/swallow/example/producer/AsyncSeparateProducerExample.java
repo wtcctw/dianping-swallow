@@ -1,5 +1,7 @@
 package com.dianping.swallow.example.producer;
 
+import java.util.concurrent.TimeUnit;
+
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
@@ -21,6 +23,9 @@ public class AsyncSeparateProducerExample {
             System.out.println("Sended msg:" + msg);
             Thread.sleep(50);
         }
+        
+        
+        TimeUnit.SECONDS.sleep(1000);
     }
 
 }

@@ -67,6 +67,13 @@ public class ProducerServerForTextTest {
                 }
                 return true;
             }
+
+//			@Override
+			public void describeMismatch(Object item,
+					Description mismatchDescription) {
+				// TODO Auto-generated method stub
+				
+			}
         }))).thenReturn(null);
         when(channel.getRemoteAddress()).thenReturn(socketAddress);
 

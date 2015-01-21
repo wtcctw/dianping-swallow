@@ -460,16 +460,10 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    @Override
    public void handleGreet(final Channel channel, final int clientThreadCount) {
-	   if(LOG.isInfoEnabled()){
-		   LOG.info("[handleGreet]");
-	   }
       ackExecutor.execute(new Runnable() {
          @Override
          public void run() {
 
-      	   if(LOG.isInfoEnabled()){
-    		   LOG.info("[handleGreet][run]");
-    	   }
             connectedChannels.putIfAbsent(channel, IPUtil.getIpFromChannel(channel));
             started = true;
             for (int i = 0; i < clientThreadCount; i++) {
