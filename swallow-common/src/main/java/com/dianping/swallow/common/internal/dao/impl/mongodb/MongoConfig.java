@@ -23,8 +23,8 @@ class MongoConfig {
    private boolean             slaveOk                                      = true;
    private boolean             socketKeepAlive                              = true;
    private int                 socketTimeout                                = 2000;
-   private int                 connectionsPerHost                           = 30;
-   private int                 threadsAllowedToBlockForConnectionMultiplier = 50;
+   private int                 connectionsPerHost                           = 200;
+   private int                 threadsAllowedToBlockForConnectionMultiplier = 10;
    private int                 w                                            = 1;
    private int                 wtimeout                                     = 2000;
    private boolean             fsync                                        = false;

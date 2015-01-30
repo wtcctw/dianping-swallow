@@ -2,6 +2,12 @@ package com.dianping.swallow.consumerserver.buffer;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
 /**
  * 默认从mongodb取数据策略
@@ -12,20 +18,26 @@ import java.util.LinkedList;
  */
 public class DefaultRetriveStrategy implements RetriveStrategy{
 	
-	
+	private  final Logger          logger  = LoggerFactory.getLogger(getClass());
+
 	private Deque<RetrieveStatus> status = new LinkedList<DefaultRetriveStrategy.RetrieveStatus>();
+	
+	private ConsumerInfo consumerInfo;
 
 	private final int statusCount = 10;
 	
 	private int zeroRetrieveInterval = 20;//如果上次读取的数据为0，则在此时间内不读取数据
 	
+	/*队列最大消息数，大于此值，不取*/
+	private int maxThreshold;
 	
-	public DefaultRetriveStrategy(){
+	private AtomicInteger messageCount = new AtomicInteger();
+	
+	public DefaultRetriveStrategy(ConsumerInfo consumerInfo, int zeroRetrieveInterval, int maxThreshold){
 		
-	}
-
-	public DefaultRetriveStrategy(int zeroRetrieveInterval){
 		this.zeroRetrieveInterval = zeroRetrieveInterval;
+		this.maxThreshold = maxThreshold;
+		this.consumerInfo = consumerInfo;
 	}
 
 	@Override
@@ -40,6 +52,14 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 		if(rs.getCount() == 0 && (currentTime - rs.getRetrieveTime() < zeroRetrieveInterval)){
 			return false;
 		}
+		
+		if(messageCount.get() >= maxThreshold){
+			if(logger.isInfoEnabled()){
+				logger.info("[isRetrieve][message exceed maxthreshold]" + consumerInfo + "," + maxThreshold);
+			}
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -83,5 +103,25 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 			this.retrieveTime = retrieveTime;
 		}
 		
+	}
+
+	@Override
+	public void increaseMessageCount() {
+		messageCount.incrementAndGet();
+	}
+
+	@Override
+	public void increaseMessageCount(int count) {
+		messageCount.addAndGet(count);
+	}
+
+	@Override
+	public void decreaseMessageCount() {
+		messageCount.decrementAndGet();
+	}
+
+	@Override
+	public void decreaseMessageCount(int count) {
+		messageCount.addAndGet(-count);
 	}
 }

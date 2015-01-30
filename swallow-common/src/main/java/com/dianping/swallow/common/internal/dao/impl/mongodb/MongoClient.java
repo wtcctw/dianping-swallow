@@ -217,7 +217,7 @@ public class MongoClient implements ConfigChangeListener {
    /**
     * 解析URI，且创建topic(msg和ack)使用的Mongo实例
     */
-   private Map<String, Mongo> parseURIAndCreateTopicMongo(String serverURI) {
+   public Map<String, Mongo> parseURIAndCreateTopicMongo(String serverURI) {
       try {
          //解析uri
          Map<String, List<String>> serverURIToTopicNames = new HashMap<String, List<String>>();

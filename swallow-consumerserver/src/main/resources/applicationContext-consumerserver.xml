@@ -32,6 +32,8 @@
 
     <bean id="swallowBuffer"
         class="com.dianping.swallow.consumerserver.buffer.SwallowBuffer">
+        <property name="minThresholdOfQueue"><value>${minThresholdOfQueue}</value></property>
+        <property name="maxThresholdOfQueue"><value>${maxThresholdOfQueue}</value></property>
     </bean>
 
     <bean id="heartbeater"
@@ -52,6 +54,7 @@
 
     <bean id="messageRetriever"
         class="com.dianping.swallow.consumerserver.buffer.MongoDBMessageRetriever">
+        <property name="fetchSize"><value>${mongodb.messagefetchSize}</value></property>
     </bean>
 
     <bean id="mongoClient"

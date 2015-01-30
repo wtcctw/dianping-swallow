@@ -16,9 +16,9 @@ public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager,
 
 	private int cpuNum = Runtime.getRuntime().availableProcessors();
 
-	private int coreRetrieverThreadPoolSize = cpuNum*2;
+	private int coreRetrieverThreadPoolSize = cpuNum*10;
 	
-	private int maxRetrieverThreadPoolSize = cpuNum*4;
+	private int maxRetrieverThreadPoolSize = cpuNum*40;
 	
 	private int coreServiceHandlerThreadPoolSize = cpuNum;
 	

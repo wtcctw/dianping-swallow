@@ -21,4 +21,12 @@ public interface RetriveStrategy {
 	 */
 	void retrieved(int count);
 	
+	void increaseMessageCount();
+	
+	void increaseMessageCount(int count);
+
+	void decreaseMessageCount();
+
+	void decreaseMessageCount(int count);
+	
 }

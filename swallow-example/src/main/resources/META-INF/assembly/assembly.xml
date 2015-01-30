@@ -18,7 +18,6 @@
 			</includes>
 			<excludes>
 				<exclude>assembly.xml</exclude>
-				<exclude>*lion.properties</exclude>
 			</excludes>
 		</fileSet>
 	</fileSets>

@@ -79,6 +79,9 @@ public final class ProducerFactoryImpl implements ProducerFactory {
       pigeon.setLoadBalance(pigeonConfigure.getLoadBalance());
 
       if (!pigeonConfigure.isUseLion()) {
+    	  if(LOGGER.isInfoEnabled()){
+    		  LOGGER.info("[initPigeon][url]");
+    	  }
          pigeon.setUseLion(false);
          pigeon.setHosts(pigeonConfigure.getHosts());
          pigeon.setWeight(pigeonConfigure.getWeights());

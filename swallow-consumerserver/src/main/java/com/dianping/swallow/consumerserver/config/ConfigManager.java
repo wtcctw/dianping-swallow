@@ -19,7 +19,7 @@ public final class ConfigManager {
    private static ConfigManager ins                             = new ConfigManager();
 
    // time related
-   private int                  pullFailDelayBase               = 500;
+   private int pullFailDelayBase               = 500;
    private int                  pullFailDelayUpperBound         = 3000;
    private long                 checkConnectedChannelInterval   = 10000L;
    private long                 retryIntervalWhenMongoException = 2000L;
@@ -212,19 +212,19 @@ public final class ConfigManager {
       }
    }
 
-public int getZeroRetrieveInterval() {
-	return zeroRetrieveInterval;
-}
-
-public void setZeroRetrieveInterval(int zeroRetrieveInterval) {
-	this.zeroRetrieveInterval = zeroRetrieveInterval;
-}
-
-public int getBackupZeroRetrieveInterval() {
-	return backupZeroRetrieveInterval;
-}
-
-public void setBackupZeroRetrieveInterval(int backupZeroRetrieveInterval) {
-	this.backupZeroRetrieveInterval = backupZeroRetrieveInterval;
-}
+	public int getZeroRetrieveInterval() {
+		return zeroRetrieveInterval;
+	}
+	
+	public void setZeroRetrieveInterval(int zeroRetrieveInterval) {
+		this.zeroRetrieveInterval = zeroRetrieveInterval;
+	}
+	
+	public int getBackupZeroRetrieveInterval() {
+		return backupZeroRetrieveInterval;
+	}
+	
+	public void setBackupZeroRetrieveInterval(int backupZeroRetrieveInterval) {
+		this.backupZeroRetrieveInterval = backupZeroRetrieveInterval;
+	}
 }

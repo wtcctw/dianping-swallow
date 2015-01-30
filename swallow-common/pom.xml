@@ -17,7 +17,7 @@
   <url>http://maven.apache.org</url>
 
   <properties>
-    <env>dev</env>
+    <env>product</env>
   </properties>
 
   <dependencies>

@@ -26,7 +26,8 @@ public class SwallowBuffer {
    private final ConcurrentMap<String, TopicBuffer> topicBuffers                      = new ConcurrentHashMap<String, TopicBuffer>();
    private MessageRetriever                         messageRetriever;
    private int                                      capacityOfQueue                   = Integer.MAX_VALUE;
-   private int                                      thresholdOfQueue                  = 60;
+   private int                                      minThresholdOfQueue                  = 60;
+   private int                                      maxThresholdOfQueue                  = 10000;
    private ConsumerThreadPoolManager  		 		consumerThreadPoolManager; 
 
    /**
@@ -78,9 +79,6 @@ public class SwallowBuffer {
       this.capacityOfQueue = capacity;
    }
 
-   public void setThreshold(int threshold) {
-      this.thresholdOfQueue = threshold;
-   }
 
    public void setMessageRetriever(MessageRetriever messageRetriever) {
       this.messageRetriever = messageRetriever;
@@ -92,6 +90,22 @@ public class SwallowBuffer {
 
 public void setConsumerThreadPoolManager(ConsumerThreadPoolManager consumerThreadPoolManager) {
 	this.consumerThreadPoolManager = consumerThreadPoolManager;
+}
+
+public int getMinThresholdOfQueue() {
+	return minThresholdOfQueue;
+}
+
+public void setMinThresholdOfQueue(int minThresholdOfQueue) {
+	this.minThresholdOfQueue = minThresholdOfQueue;
+}
+
+public int getMaxThresholdOfQueue() {
+	return maxThresholdOfQueue;
+}
+
+public void setMaxThresholdOfQueue(int maxThresholdOfQueue) {
+	this.maxThresholdOfQueue = maxThresholdOfQueue;
 }
 
 private class TopicBuffer {
@@ -111,7 +125,7 @@ private class TopicBuffer {
             throw new IllegalArgumentException("consumerInfo is null.");
          }
          MessageBlockingQueue messageBlockingQueue;
-         messageBlockingQueue = new MessageBlockingQueue(consumerInfo, thresholdOfQueue, capacityOfQueue,
+         messageBlockingQueue = new MessageBlockingQueue(consumerInfo, minThresholdOfQueue, maxThresholdOfQueue, capacityOfQueue,
                   tailMessageId, tailBackupMessageId, messageFilter, consumerThreadPoolManager.getRetrieverThreadPool());
          messageBlockingQueue.setMessageRetriever(messageRetriever);
          messageBlockingQueue.init();

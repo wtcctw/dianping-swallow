@@ -14,7 +14,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 public class MongoDBMessageRetriever implements MessageRetriever {
    private static final Logger LOG       = LoggerFactory.getLogger(MongoDBMessageRetriever.class);
 
-   private int                 fetchSize = 100;                                                   //默认100条
+   private int                 fetchSize = 500;
 
    private MessageDAO          messageDAO;
 
