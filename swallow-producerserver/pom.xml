@@ -12,7 +12,7 @@
 	<artifactId>swallow-producerserver</artifactId>
 	<packaging>jar</packaging>
 
-	<name>arch-swallow-producerserver</name>
+	<name>swallow-producerserver</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -61,17 +61,13 @@
 			<artifactId>lion-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.dianping.lion</groupId>
-			<artifactId>lion-${env}</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 		</dependency>
 		<!-- 监控 -->
 		<dependency>
 			<groupId>com.dianping.cat</groupId>
-			<artifactId>cat-core</artifactId>
+			<artifactId>cat-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.dianping.hawk</groupId>
@@ -88,7 +84,6 @@
 					<excludes>
 						<exclude>**/*.properties</exclude>
 						<exclude>**/*.backup</exclude>
-						<exclude>applicationContext.xml</exclude>
 						<exclude>**/*.sh</exclude>
 					</excludes>
 				</configuration>

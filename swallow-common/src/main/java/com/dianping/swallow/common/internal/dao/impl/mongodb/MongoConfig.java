@@ -22,11 +22,11 @@ class MongoConfig {
    // local config(mongo server options)
    private boolean             slaveOk                                      = true;
    private boolean             socketKeepAlive                              = true;
-   private int                 socketTimeout                                = 2000;
-   private int                 connectionsPerHost                           = 200;
-   private int                 threadsAllowedToBlockForConnectionMultiplier = 10;
+   private int                 socketTimeout                                = 5000;
+   private int                 connectionsPerHost                           = 100;
+   private int                 threadsAllowedToBlockForConnectionMultiplier = 5;
    private int                 w                                            = 1;
-   private int                 wtimeout                                     = 2000;
+   private int                 wtimeout                                     = 5000;
    private boolean             fsync                                        = false;
    private int                 connectTimeout                               = 2000;
    private int                 maxWaitTime                                  = 2000;
@@ -52,6 +52,9 @@ class MongoConfig {
 
       Class clazz = this.getClass();
       for (String key : props.stringPropertyNames()) {
+    	  if(LOG.isInfoEnabled()){
+    		  LOG.info("[loadLocalConfig][key : value]" + key + ":" + props.getProperty(key));
+    	  }
          Field field = null;
          try {
             field = clazz.getDeclaredField(key.trim());

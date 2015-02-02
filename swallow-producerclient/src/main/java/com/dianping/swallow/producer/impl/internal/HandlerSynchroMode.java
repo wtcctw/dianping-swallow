@@ -1,5 +1,7 @@
 package com.dianping.swallow.producer.impl.internal;
 
+import org.apache.log4j.Logger;
+
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
@@ -24,6 +26,7 @@ public class HandlerSynchroMode implements ProducerHandler {
     private ProducerSwallowService remoteService;
     private final String           producerIP;
     private static final int       DELAY_BASE_MULTI = 5; //超时策略倍数
+    private Logger logger = 	   Logger.getLogger(getClass());
 
     public HandlerSynchroMode(ProducerImpl producer) {
         this.sendTimes = producer.getProducerConfig().getSyncRetryTimes() == Integer.MAX_VALUE ? Integer.MAX_VALUE
@@ -52,6 +55,7 @@ public class HandlerSynchroMode implements ProducerHandler {
                 producerHandlerTransaction.addData("sha1", ((PktSwallowPACK) pktRet).getShaInfo());
                 producerHandlerTransaction.setStatus(Message.SUCCESS);
             } catch (Exception e) {
+            	logger.error("[doSendMsg]", e);
                 //如果剩余重试次数>0，继续重试
                 if (leftRetryTimes > 0) {
                     producerHandlerTransaction.addData("Retry", sendTimes - leftRetryTimes);

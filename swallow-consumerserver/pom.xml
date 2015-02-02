@@ -12,7 +12,7 @@
 	<artifactId>swallow-consumerserver</artifactId>
 	<packaging>jar</packaging>
 
-	<name>arch-swallow-consumerserver</name>
+	<name>swallow-consumerserver</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -57,22 +57,19 @@
 			<artifactId>lion-client</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.dianping.lion</groupId>
-			<artifactId>lion-${env}</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
 		</dependency>
 		<!-- 监控 -->
 		<dependency>
 			<groupId>com.dianping.cat</groupId>
-			<artifactId>cat-core</artifactId>
+			<artifactId>cat-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.dianping.hawk</groupId>
 			<artifactId>hawk-client</artifactId>
 		</dependency>
+		
 	</dependencies>
 
 	<build>
@@ -85,7 +82,6 @@
 						<exclude>**/*.properties</exclude>
 						<exclude>**/*.backup</exclude>
 						<exclude>**/*.sh</exclude>
-						<exclude>applicationContext-consumerserver.xml</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

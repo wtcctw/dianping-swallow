@@ -11,7 +11,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>swallow-example</artifactId>
-	<name>arch-swallow-example</name>
+	<name>swallow-example</name>
 	<packaging>jar</packaging>
 
 	<url>http://maven.apache.org</url>
@@ -96,14 +96,10 @@
 			<groupId>com.dianping.lion</groupId>
 			<artifactId>lion-client</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.dianping.lion</groupId>
-			<artifactId>lion-${env}</artifactId>
-		</dependency>
 		<!-- 监控 -->
 		<dependency>
 			<groupId>com.dianping.cat</groupId>
-			<artifactId>cat-core</artifactId>
+			<artifactId>cat-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.dianping.hawk</groupId>

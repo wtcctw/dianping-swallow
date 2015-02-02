@@ -163,6 +163,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                     produceTransaction = Cat.getProducer().newTransaction(MSG_PRODUCE_TRIED,
                             producer.getDestination().getName() + ":" + producer.getProducerIP());
                 } catch (InterruptedException e) {
+                	LOGGER.error("[run]", e);
                     Thread.currentThread().interrupt();
                     continue;
                 } catch (Exception e) {
@@ -177,7 +178,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                     produceTransaction.setStatus(e);
                     Cat.getProducer().logError(e);
                     produceTransaction.complete();
-                    LOGGER.error("Can not get msg from fileQueue.", e);
+                    LOGGER.error("[run][Can not get msg from fileQueue].", e);
 
                     fileQueueStrategy.fail(true);
 

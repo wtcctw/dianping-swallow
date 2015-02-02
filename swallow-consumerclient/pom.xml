@@ -12,7 +12,7 @@
 	<artifactId>swallow-consumerclient</artifactId>
 	<packaging>jar</packaging>
 
-	<name>arch-swallow-consumerclient</name>
+	<name>swallow-consumerclient</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -43,15 +43,10 @@
 			<artifactId>lion-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.dianping.lion</groupId>
-			<artifactId>lion-${env}</artifactId>
-			<scope>provided</scope>
-		</dependency>
 		<!-- 监控 -->
 		<dependency>
 			<groupId>com.dianping.cat</groupId>
-			<artifactId>cat-core</artifactId>
+			<artifactId>cat-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

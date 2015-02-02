@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>swallow-http</artifactId>
-    <name>arch-swallow-http</name>
+    <name>swallow-http</name>
     <packaging>war</packaging>
 
     <url>http://maven.apache.org</url>
@@ -32,12 +32,8 @@
             <artifactId>lion-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.dianping.lion</groupId>
-            <artifactId>lion-${env}</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.dianping.cat</groupId>
-            <artifactId>cat-core</artifactId>
+            <artifactId>cat-client</artifactId>
         </dependency>
         <dependency>
             <groupId>com.dianping.hawk</groupId>
