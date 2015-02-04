@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.dianping.dpsf.api.ProxyFactory;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
+import com.dianping.pigeon.registry.RegistryManager;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
 import com.dianping.swallow.common.internal.util.IPUtil;
@@ -80,11 +81,9 @@ public final class ProducerFactoryImpl implements ProducerFactory {
 
       if (!pigeonConfigure.isUseLion()) {
     	  if(LOGGER.isInfoEnabled()){
-    		  LOGGER.info("[initPigeon][url]");
+    		  LOGGER.info("[initPigeon][url]" + pigeonConfigure.getHosts());
     	  }
-         pigeon.setUseLion(false);
-         pigeon.setHosts(pigeonConfigure.getHosts());
-         pigeon.setWeight(pigeonConfigure.getWeights());
+         RegistryManager.getInstance().setProperty(pigeonConfigure.getServiceName(), pigeonConfigure.getHosts());
       } else {
          pigeon.setUseLion(true);
       }

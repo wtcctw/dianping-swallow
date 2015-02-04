@@ -17,7 +17,7 @@ import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 public class SyncProducerRunner extends AbstractProducerLoadTest{
 
     private static int      topicCount    = 1;
-    private static int      producerCount = 10;
+    private static int      producerCount = 1;
     private static int  	totalCount = 100;
 
     public static void main(String[] args) throws Exception {

@@ -226,6 +226,10 @@ public final class SwallowPigeonConfiguration {
     * 检查是否使用Lion，如果非开发环境，强制useLion=true
     */
    private void checkUseLion() {
+	  boolean checkUseLion = Boolean.parseBoolean(System.getProperty("check.useLion"));
+	  if(!checkUseLion){
+		  return;
+	  }
       String env = EnvZooKeeperConfig.getEnv();
       if (!"dev".equals(env)) {
          LOGGER.warn("[Not dev, set useLion=" + DEFAULT_IS_USE_LION + ".]");

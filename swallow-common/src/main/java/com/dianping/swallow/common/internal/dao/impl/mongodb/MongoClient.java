@@ -220,30 +220,7 @@ public class MongoClient implements ConfigChangeListener {
    public Map<String, Mongo> parseURIAndCreateTopicMongo(String serverURI) {
       try {
          //解析uri
-         Map<String, List<String>> serverURIToTopicNames = new HashMap<String, List<String>>();
-         boolean defaultExists = false;
-         for (String topicNamesToURI : serverURI.split(";")) {
-            String[] splits = topicNamesToURI.split("=");
-            String mongoURI = splits[1];
-            String topicNameStr = splits[0];
-            List<String> topicNames = new ArrayList<String>();
-            for (String topicName : topicNameStr.split(",")) {
-               if (TOPICNAME_DEFAULT.equals(topicName)) {
-                  defaultExists = true;
-               }
-               topicNames.add(topicName);
-            }
-            List<String> topicNames0 = serverURIToTopicNames.get(mongoURI);
-            if (topicNames0 != null) {
-               topicNames.addAll(topicNames0);
-            }
-            serverURIToTopicNames.put(mongoURI, topicNames);
-         }
-         //验证uri(default是必须存在的topicName)
-         if (!defaultExists) {
-            throw new IllegalArgumentException("The '" + this.severURILionKey
-                  + "' property must contain 'default' topicName!");
-         }
+    	  Map<String, List<String>> serverURIToTopicNames = parseServerURIString(serverURI);
          //根据uri创建Mongo，放到Map
          HashMap<String, Mongo> topicNameToMongoMap = new HashMap<String, Mongo>();
          for (Map.Entry<String, List<String>> entry : serverURIToTopicNames.entrySet()) {
@@ -270,7 +247,37 @@ public class MongoClient implements ConfigChangeListener {
       }
    }
 
-   /**
+	protected Map<String, List<String>> parseServerURIString(String serverURI) {
+		
+	    Map<String, List<String>> serverURIToTopicNames = new HashMap<String, List<String>>();
+	    boolean defaultExists = false;
+	    for (String topicNamesToURI : serverURI.split(";\\s*")) {
+	       String[] splits = topicNamesToURI.split("=");
+	       String mongoURI = splits[1].trim();
+	       String topicNameStr = splits[0].trim();
+	       List<String> topicNames = new ArrayList<String>();
+	       for (String topicName : topicNameStr.split(",")) {
+	    	   topicName = topicName.trim();
+	          if (TOPICNAME_DEFAULT.equals(topicName)) {
+	             defaultExists = true;
+	          }
+	          topicNames.add(topicName);
+	       }
+	       List<String> topicNames0 = serverURIToTopicNames.get(mongoURI);
+	       if (topicNames0 != null) {
+	          topicNames.addAll(topicNames0);
+	       }
+	       serverURIToTopicNames.put(mongoURI, topicNames);
+	    }
+	    //验证uri(default是必须存在的topicName)
+	    if (!defaultExists) {
+	       throw new IllegalArgumentException("The '" + this.severURILionKey
+	             + "' property must contain 'default' topicName!");
+	    }
+	    return serverURIToTopicNames;
+	}
+	
+/**
     * 如果已有的map或heartbeatMongo中已经存在相同的地址的Mongo实例，则重复使用
     */
    private Mongo getExistsMongo(List<ServerAddress> replicaSetSeeds) {
