@@ -132,7 +132,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       long messageIdOfTailMessage = (startMessageId != -1 ? startMessageId : getMaxMessageId(false));
       long messageIdOfTailBackupMessage = -1;
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-         messageIdOfTailBackupMessage = getMaxMessageId(true);
+         messageIdOfTailBackupMessage = (startMessageId != -1 ? startMessageId : getMaxMessageId(true));
+         
       }
       messageQueue = swallowBuffer.createMessageQueue(this.consumerInfo, messageIdOfTailMessage,
             messageIdOfTailBackupMessage, this.messageFilter);

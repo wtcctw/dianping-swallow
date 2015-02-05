@@ -1,6 +1,7 @@
 package com.dianping.swallow.example.producer;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.producer.Producer;
@@ -17,11 +18,11 @@ public class SyncProducerExample {
         ProducerConfig config = new ProducerConfig();
         config.setMode(ProducerMode.SYNC_MODE);
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             String msg = SyncProducerExample.class.getSimpleName() + "(" + (new Date()) + "): 消息-" + i;
             p.sendMessage(msg);
             System.out.println("Sended msg:" + msg);
-            Thread.sleep(500);
+            TimeUnit.SECONDS.sleep(5);
         }
     }
 

@@ -20,7 +20,7 @@ import com.mongodb.DBObject;
 
 public class MessageDAOImpl implements MessageDAO {
 
-   private static final Logger LOG                 = LoggerFactory.getLogger(MessageDAOImpl.class);
+   private static final Logger logger                 = LoggerFactory.getLogger(MessageDAOImpl.class);
 
    public static final String  ID                  = "_id";
    public static final String  ORIGINAL_ID         = "o_id";
@@ -51,7 +51,7 @@ public class MessageDAOImpl implements MessageDAO {
             convert(result, swallowMessage);
             return swallowMessage;
          } catch (RuntimeException e) {
-            LOG.error("Error when convert resultset to SwallowMessage.", e);
+            logger.error("Error when convert resultset to SwallowMessage.", e);
          }
       }
       return null;
@@ -101,7 +101,7 @@ public class MessageDAOImpl implements MessageDAO {
                convert(result, swallowMessage);
                return swallowMessage;
             } catch (RuntimeException e) {
-               LOG.error("Error when convert resultset to SwallowMessage.", e);
+               logger.error("Error when convert resultset to SwallowMessage.", e);
             }
          }
       } finally {
@@ -115,6 +115,15 @@ public class MessageDAOImpl implements MessageDAO {
       DBCollection collection = getCollection(topicName, consumerId);
       List<SwallowMessage> list = getMessageGreaterThan(messageId, size, collection);
       return list;
+   }
+   
+   @Override
+   public void cleanMessage(String topicName, String consumerId){
+	   if(logger.isInfoEnabled()){
+		   logger.info("[cleanMessage][topic, consumerId]" + topicName + "," + consumerId);
+	   }
+		DBCollection collection = getCollection(topicName, consumerId);
+		collection.drop();
    }
 
    private List<SwallowMessage> getMessageGreaterThan(Long messageId, int size, DBCollection collection) {
@@ -132,7 +141,7 @@ public class MessageDAOImpl implements MessageDAO {
                convert(result, swallowMessage);
                list.add(swallowMessage);
             } catch (RuntimeException e) {
-               LOG.error("Error when convert resultset to SwallowMessage.", e);
+               logger.error("Error when convert resultset to SwallowMessage.", e);
             }
          }
       } finally {

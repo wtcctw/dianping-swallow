@@ -21,7 +21,7 @@ import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 
 public class ConsumerWorkerManager {
 
-    private static final Logger               LOG                   = LoggerFactory
+    private static final Logger               logger                   = LoggerFactory
             .getLogger(ConsumerWorkerManager.class);
 
     private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance()
@@ -84,7 +84,7 @@ public class ConsumerWorkerManager {
                 worker.handleAck(channel, ackedMsgId, type);
             }
         } else {
-            LOG.warn(consumerInfo + "ConsumerWorker is not exist!");
+            logger.warn(consumerInfo + "ConsumerWorker is not exist!");
             channel.close();
         }
     }
@@ -101,29 +101,29 @@ public class ConsumerWorkerManager {
         readyForAcceptConn = false;
 
         //遍历所有ConsumerWorker，停止发送消息给client端
-        LOG.info("Stoping ConsumerWorker's Send-Message thread.");
+        logger.info("Stoping ConsumerWorker's Send-Message thread.");
         if (consumerInfo2ConsumerWorker != null) {
             for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
                 entry.getValue().closeMessageFetcherThread();
             }
         }
-        LOG.info("Stoped.");
+        logger.info("Stoped.");
         
         try {
       	  consumerThreadPoolManager.dispose();
         } catch (Exception e) {
-      	  LOG.error("[close]", e);
+      	  logger.error("[close]", e);
         }
 
 
         //等待一段时间，以便让所有ConsumerWorker，可以从client端接收 “已发送但未收到ack的消息” 的ack
         try {
             long waitAckTimeWhenCloseSwc = ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc();
-            LOG.info("Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
+            logger.info("Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
             Thread.sleep(waitAckTimeWhenCloseSwc);
-            LOG.info("Sleep done.");
+            logger.info("Sleep done.");
         } catch (InterruptedException e) {
-            LOG.error("Close Swc thread InterruptedException", e);
+            logger.error("Close Swc thread InterruptedException", e);
         }
 
         //关闭ConsumerWorker的资源（关闭内部的“用于获取消息的队列”）
@@ -164,10 +164,9 @@ public class ConsumerWorkerManager {
 
     private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo, MessageFilter messageFilter, long startMessageId) {
         ConsumerWorker worker = findConsumerWorker(consumerInfo);
-        if (startMessageId != -1 && worker != null) {
-            worker.close();
-            worker = null;
-            consumerInfo2ConsumerWorker.remove(consumerInfo);
+        
+        if(startMessageId != -1){
+        	cleanConsumerInfo(consumerInfo, worker);
         }
         if (worker == null) {
             // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
@@ -181,7 +180,17 @@ public class ConsumerWorkerManager {
         return worker;
     }
 
-    public void init(boolean isSlave) {
+	private void cleanConsumerInfo(ConsumerInfo consumerInfo,
+			ConsumerWorker worker) {
+    	messageDAO.cleanMessage(consumerInfo.getDest().getName(), consumerInfo.getConsumerId());
+        if (worker != null) {
+            worker.close();
+            worker = null;
+            consumerInfo2ConsumerWorker.remove(consumerInfo);
+        }
+	}
+
+	public void init(boolean isSlave) {
         if (!isSlave) {
             startHeartbeater(ConfigManager.getInstance().getMasterIp());
         }
@@ -217,7 +226,7 @@ public class ConsumerWorkerManager {
                         Thread.currentThread().interrupt();
                     }
                 }
-                LOG.info("AckIdUpdaterThread closed");
+                logger.info("AckIdUpdaterThread closed");
             }
 
         }, "AckIdUpdaterThread-");
@@ -239,7 +248,7 @@ public class ConsumerWorkerManager {
                             removeConsumerWorker(consumerInfo);
                             worker.closeMessageFetcherThread();
                             worker.close();
-                            LOG.info("ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
+                            logger.info("ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
                         }
                     }
                     // 轮询时有一定的时间间隔
@@ -249,7 +258,7 @@ public class ConsumerWorkerManager {
                         Thread.currentThread().interrupt();
                     }
                 }
-                LOG.info("idle ConsumerWorker checker thread closed");
+                logger.info("idle ConsumerWorker checker thread closed");
             }
 
         }, "idleConsumerWorkerChecker-");
@@ -269,7 +278,7 @@ public class ConsumerWorkerManager {
                         heartbeater.beat(ip);
                         Thread.sleep(ConfigManager.getInstance().getHeartbeatUpdateInterval());
                     } catch (Exception e) {
-                        LOG.error("Error update heart beat", e);
+                        logger.error("Error update heart beat", e);
                     }
                 }
             }

@@ -47,4 +47,11 @@ public interface MessageDAO {
     */
    SwallowMessage getMaxMessage(String topicName);
 
+   /**
+    * 清理所有消息
+	 * @param topicName
+	 * @param consumerId
+	 */
+   void cleanMessage(String topicName, String consumerId);
+
 }

@@ -3,19 +3,33 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.bson.types.BSONTimestamp;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.dianping.cat.message.spi.MessageCodec;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.MongoUtils;
 
 public class MessageDAOImplTest extends AbstractDAOImplTest {
 
    @Autowired
    private MessageDAOImpl messageDAO;
 
+   private String consumerId = "consumer1";
+
+   @Before
+   public void beforeMessageDAOImplTest(){
+	   
+	   messageDAO.cleanMessage(TOPIC_NAME, null);
+	   messageDAO.cleanMessage(TOPIC_NAME, consumerId);
+   }
+   
    @Test
    public void testSaveMessage() {
       //插入消息
@@ -25,6 +39,40 @@ public class MessageDAOImplTest extends AbstractDAOImplTest {
       //查询消息是否正确
       SwallowMessage actualMessage = messageDAO.getMaxMessage(TOPIC_NAME);
       Assert.assertTrue(expectedMessage.equalsWithoutMessageId(actualMessage));
+   }
+   
+   @Test
+   public void testCleanMessage(){
+	   
+	   int messageCount = 100;
+	   
+	   Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(TOPIC_NAME, null, 0L, messageCount).size());
+	   Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(TOPIC_NAME, consumerId, 0L, messageCount).size());
+	   
+	   for(int i=0;i<messageCount;i++){
+		   if((i & 1) == 1){
+			   messageDAO.saveMessage(TOPIC_NAME, createMessage());
+		   }else{
+			   messageDAO.saveMessage(TOPIC_NAME, consumerId, createBackupMessage());
+		   }
+	   }
+
+	   Assert.assertEquals(messageCount/2, messageDAO.getMessagesGreaterThan(TOPIC_NAME, null, 0L, messageCount).size());
+	   Assert.assertEquals(messageCount/2, messageDAO.getMessagesGreaterThan(TOPIC_NAME, consumerId, 0L, messageCount).size());
+
+	   messageDAO.cleanMessage(TOPIC_NAME, null);
+
+	   Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(TOPIC_NAME, null, 0L, messageCount).size());
+	   Assert.assertEquals(messageCount/2, messageDAO.getMessagesGreaterThan(TOPIC_NAME, consumerId, 0L, messageCount).size());
+
+	   messageDAO.cleanMessage(TOPIC_NAME, consumerId);
+
+	   for(int i=0;i<messageCount/2;i++){
+		   messageDAO.saveMessage(TOPIC_NAME, createMessage());
+	   }
+
+	   Assert.assertEquals(messageCount/2, messageDAO.getMessagesGreaterThan(TOPIC_NAME, null, 0L, messageCount).size());
+	   Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(TOPIC_NAME, consumerId, 0L, messageCount).size());
 
    }
 
@@ -61,6 +109,7 @@ public class MessageDAOImplTest extends AbstractDAOImplTest {
    }
 
    private static SwallowMessage createMessage() {
+	   
       SwallowMessage message = new SwallowMessage();
       message.setContent("this is a SwallowMessage");
       message.setGeneratedTime(new Date());
@@ -74,5 +123,14 @@ public class MessageDAOImplTest extends AbstractDAOImplTest {
       return message;
 
    }
+
+   
+   private AtomicInteger inc = new AtomicInteger();
+   private SwallowMessage createBackupMessage() {
+	      SwallowMessage message = createMessage();
+	      message.setMessageId(MongoUtils.BSONTimestampToLong(new BSONTimestamp((int)(System.currentTimeMillis()/1000), inc.incrementAndGet())));
+	      return message;
+
+	   }
 
 }
