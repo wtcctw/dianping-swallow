@@ -8,6 +8,7 @@
 	</parent>
 	<artifactId>swallow-consumerslave</artifactId>
 	<packaging>pom</packaging>
+	
 	<properties>
 		<job-packaging>war</job-packaging>
 	</properties>
