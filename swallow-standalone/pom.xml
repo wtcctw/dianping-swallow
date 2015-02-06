@@ -11,6 +11,7 @@
 
 	<artifactId>swallow-standalone</artifactId>
 	<packaging>pom</packaging>
+	<job-packaging>war</job-packaging>
 
 	<name>swallow-standalone</name>
 
