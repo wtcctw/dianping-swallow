@@ -60,6 +60,7 @@ public class ProducerServerForClient implements ProducerSwallowService {
          remoteService.setServices(services);
          remoteService.init();
          LOGGER.info("[Initialize pigeon sucessfully, Producer service for client is ready.]");
+         System.out.println("[Initialize pigeon sucessfully, Producer service for client is ready.]");//用来检查系统启动成功
       } catch (Exception e) {
          LOGGER.error("[Initialize pigeon failed.]", e);
          throw new RemoteServiceInitFailedException(e);

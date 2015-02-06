@@ -1,5 +1,7 @@
 package com.dianping.swallow.example.consumer;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.Consumer;
@@ -12,6 +14,7 @@ public class SimpleConsumerExample {
     public static void main(String[] args) {
     	
         ConsumerConfig config = new ConsumerConfig();
+        final AtomicInteger count = new AtomicInteger();
         //以下两项根据自己情况而定，默认是不需要配的
         config.setThreadPoolSize(10);
 
@@ -22,9 +25,11 @@ public class SimpleConsumerExample {
             public void onMessage(Message msg) {
                 System.out.println("延迟" + (System.currentTimeMillis() - msg.getGeneratedTime().getTime()) + "ms");
                 System.out.println(msg.getContent());
+                System.out.println(count.incrementAndGet());
                 //            System.out.println(msg.transferContentToBean(MsgClass.class));
             }
         });
         c.start();
+        
     }
 }

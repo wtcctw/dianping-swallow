@@ -4,6 +4,8 @@ import java.util.Date;
 
 
 
+import java.util.concurrent.TimeUnit;
+
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.producer.Producer;
@@ -19,6 +21,7 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
     private static int      topicCount    = 1;
     private static int      producerCount = 1;
     private static int  	totalCount = 100;
+    private static int 		sendMessageInterval = 0;
 
     public static void main(String[] args) throws Exception {
     	
@@ -31,6 +34,10 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
     	if(args.length >= 3){
     		totalCount = Integer.parseInt(args[2]);
     	}
+    	
+    	if(args.length >= 4){
+    		totalCount = Integer.parseInt(args[3]);
+    	}
     	new SyncProducerRunner().start();
     	
     }
@@ -38,7 +45,7 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
     @Override
 	protected void doStart() throws InterruptedException {
 		    	
-    	logger.info("[doStart][args]" + topicCount + "," + producerCount + "," + totalCount);
+    	logger.info("[doStart][args]" + topicCount + "," + producerCount + "," + totalCount + "," + sendMessageInterval);
     	
         for (int i = 0; i < topicCount; i++) {
             String topic = getTopicName(topicName, i);
@@ -75,6 +82,7 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
                     } catch (Exception e) {
                     	logger.error(e.getMessage() + ", msg:" + currentCount, e);
                     }
+                    sleep();
                 }
             } catch (RemoteServiceInitFailedException e1) {
             	logger.error("[run]", e1);
@@ -82,7 +90,16 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
             	logger.info("[run][exit]");
             }
         }
+
 	}
 
-
+	private void sleep() {
+		if(sendMessageInterval > 0){
+			try {
+				TimeUnit.MILLISECONDS.sleep(sendMessageInterval);
+			} catch (InterruptedException e) {
+				logger.error("[sleep]", e);
+			}
+		}
+	}
 }

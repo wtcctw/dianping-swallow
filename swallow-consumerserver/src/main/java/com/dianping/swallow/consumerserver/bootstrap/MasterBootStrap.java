@@ -116,6 +116,7 @@ public class MasterBootStrap {
       int masterPort = ConfigManager.getInstance().getMasterPort();
       bootstrap.bind(new InetSocketAddress(masterPort));
       LOG.info("Server started at port " + masterPort);
+      System.out.println("Server started at port " + masterPort);//检查是否成功启动
    }
 
 }

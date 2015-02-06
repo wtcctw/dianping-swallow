@@ -30,6 +30,7 @@ public class MongoHeartbeater implements Heartbeater {
    public void waitUntilMasterDown(String ip, long checkInterval, long maxStopTime) throws InterruptedException {
       long startTime = System.currentTimeMillis();
       LOG.info("start to wait " + ip + " master stop beating");
+      System.out.println("start to wait " + ip + " master stop beating");//检查是否启动成功
       while (true) {
          Date beat = null;
          beat = heartbeatDAO.findLastHeartbeat(ip);

@@ -1,8 +1,5 @@
 package com.dianping.swallow.example.loadtest.consumer;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 import com.dianping.swallow.common.message.Destination;
@@ -22,9 +19,6 @@ public class ConsumerRunner extends AbstractLoadTest{
     private static int consumerCount = 10;
     private static int threadPoolSize = 2;
     private static int totalMessageCount = -1;
-    
-    private Map<Integer, AtomicInteger> statis = new ConcurrentHashMap<Integer, AtomicInteger>();
-
     
     public static void main(String[] args) throws Exception {
     	
