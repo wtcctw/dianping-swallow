@@ -15,7 +15,7 @@
 	<name>swallow-standalone</name>
 
 	<properties>
-			<job-packaging>zip</job-packaging>
+			<job-packaging>war</job-packaging>
 	</properties>	
 
 	<dependencies>
