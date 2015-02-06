@@ -21,7 +21,9 @@
 		<module>swallow-producerserver</module>
 		<module>swallow-broker</module>
 		<module>swallow-example</module>
-		<module>swallow-standalone</module>
+		<module>swallow-standalone-producer</module>
+		<module>swallow-standalone-consumermaster</module>
+		<module>swallow-standalone-consumerslave</module>
 	</modules>
 
 	<description>swallow is a message service!</description>
@@ -37,6 +39,9 @@
 	</developers>
 
 	<properties>
+		<!--  -->
+		<env>dev</env>
+	
 		<!-- dianping -->
 		<lion-client.version>0.4.6</lion-client.version>
 		<hawk-common.version>0.1.2</hawk-common.version>

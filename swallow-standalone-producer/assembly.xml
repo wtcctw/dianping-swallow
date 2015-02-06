@@ -8,7 +8,7 @@
 	</formats>
 	<fileSets>
 		<fileSet>
-			<directory>${project.basedir}/src/main/resources/bin</directory>
+			<directory>../swallow-standalone-producer/src/main/resources/bin</directory>
 			<outputDirectory>bin</outputDirectory>
             <fileMode>755</fileMode>
 			<includes>
@@ -16,21 +16,21 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/src/main/resources/conf</directory>
+			<directory>../swallow-standalone-producer/src/main/resources/conf</directory>
 			<outputDirectory>conf</outputDirectory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/src/main/resources/docs</directory>
+			<directory>../swallow-standalone-producer/src/main/resources/docs</directory>
 			<outputDirectory>docs</outputDirectory>
 			<includes>
 				<include>*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.basedir}/src/main/resources/logs</directory>
+			<directory>../swallow-standalone-producer/src/main/resources/logs</directory>
 			<outputDirectory>logs</outputDirectory>
 			<includes>
 				<include>*</include>
