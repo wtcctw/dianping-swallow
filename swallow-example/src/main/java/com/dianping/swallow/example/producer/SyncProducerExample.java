@@ -22,6 +22,7 @@ public class SyncProducerExample {
             String msg = SyncProducerExample.class.getSimpleName() + "(" + (new Date()) + "): 消息-" + i;
             p.sendMessage(msg);
             System.out.println("Sended msg:" + msg);
+            TimeUnit.SECONDS.sleep(5);
         }
     }
 

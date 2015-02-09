@@ -34,7 +34,7 @@ public class GetFromSpecificTimeConsumerExample {
         ConsumerConfig config = new ConsumerConfig();
         config.setThreadPoolSize(1);
         
-        final Date beginTime = getBeginTime(10000);
+        final Date beginTime = getBeginTime(100);
         final long beginMessageId =  getMessageId(beginTime);
 //        config.setStartMessageId(beginMessageId);
         

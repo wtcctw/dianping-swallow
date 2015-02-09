@@ -27,7 +27,7 @@ mysleep(){
       do
         sleep 1
         let TIMEOUT=$TIMEOUT-1
-        echo -en "\aTime left $TIMEOUT sec.\r"
+        echo -en "Time left $TIMEOUT sec.\r"
     done
     echo ""
 }
@@ -46,7 +46,7 @@ if [ "$ACTION" = "stop" -o "$ACTION" = "restart" ];  then
             kill $Pid 2>/dev/null
             sleep 1
             let TIMEOUT=$TIMEOUT-1
-            echo -en "\aStoping, please wait for $TIMEOUT sec ...\r"
+            echo -en "Stoping, please wait for $TIMEOUT sec ...\r"
           done
         [ $TIMEOUT -gt 0 ] || kill -9 $Pid 2>/dev/null
         echo ""
