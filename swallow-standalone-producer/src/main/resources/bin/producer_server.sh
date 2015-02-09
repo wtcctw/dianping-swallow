@@ -92,8 +92,8 @@ exec java $JAVA_OPTS $MAIN_CLASS > "$STD_OUT" 2>&1 &
 
 ###########  检查是否启动成功 ############
 SuccessLog="Producer service for client is ready"
-echo "Sleeping 5 sec for waiting process started ..."
-mysleep 5
+echo "Sleeping 8 sec for waiting process started ..."
+mysleep 8
 
 LogFile="/data/applogs/swallow/swallow-producerserver-std.out"
 CheckResult=$(grep "$SuccessLog" $LogFile |wc -l)
