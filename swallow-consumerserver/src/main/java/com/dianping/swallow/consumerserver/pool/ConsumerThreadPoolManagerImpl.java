@@ -74,7 +74,7 @@ public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager,
 		DefaultThreadProfile sender = new DefaultThreadProfile("CONSUMER_SENDER");
 		sender.setCorePoolSize(coreSendMessageThreadPoolSize);
 		sender.setMaxPoolSize(maxSendMessageThreadPoolSize);
-		sendMessageThreadPool = retriever.createPool();
+		sendMessageThreadPool = sender.createPool();
 	}
 
 

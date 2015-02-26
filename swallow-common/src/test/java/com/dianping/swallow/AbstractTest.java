@@ -1,5 +1,9 @@
 package com.dianping.swallow;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -10,5 +14,9 @@ import org.apache.log4j.Logger;
 public abstract class AbstractTest {
 	
 	protected Logger logger = Logger.getLogger(getClass());
+	
+	protected ExecutorService executors = Executors.newCachedThreadPool();
+
+	protected ScheduledExecutorService scheduledExecutors = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
 }

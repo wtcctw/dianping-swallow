@@ -2,6 +2,7 @@ package com.dianping.swallow.consumerserver.buffer;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -26,16 +27,24 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 
 	private final int statusCount = 10;
 	
-	private int zeroRetrieveInterval = 20;//如果上次读取的数据为0，则在此时间内不读取数据
+	/*上次读取消息数值小于此值，间隔一定时间再取*/
+	private int minRetrieveCount = 10;
+	
+	private int minRetrieveInterval = 100;//如果上次读取的数据小于minRetrieveCount，则在此时间内不读取数据
+	private long maxRetrieveInterval = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS);
+	/**
+	 * 如果读取消息一直为0，不停延时
+	 */
+	private int zeroCount = 0;
 	
 	/*队列最大消息数，大于此值，不取*/
 	private int maxThreshold;
 	
 	private AtomicInteger messageCount = new AtomicInteger();
 	
-	public DefaultRetriveStrategy(ConsumerInfo consumerInfo, int zeroRetrieveInterval, int maxThreshold){
+	public DefaultRetriveStrategy(ConsumerInfo consumerInfo, int minRetrieveInterval, int maxThreshold){
 		
-		this.zeroRetrieveInterval = zeroRetrieveInterval;
+		this.minRetrieveInterval = minRetrieveInterval;
 		this.maxThreshold = maxThreshold;
 		this.consumerInfo = consumerInfo;
 	}
@@ -49,7 +58,12 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 		}
 		
 		long currentTime = System.currentTimeMillis();
-		if(rs.getCount() == 0 && (currentTime - rs.getRetrieveTime() < zeroRetrieveInterval)){
+		
+		if(zeroCount > 0 && (currentTime - rs.getRetrieveTime() < getZeroDelayTime())){
+			return false;
+		}
+				
+		if(rs.getCount() <= minRetrieveCount && (currentTime - rs.getRetrieveTime() < minRetrieveInterval)){
 			return false;
 		}
 		
@@ -63,22 +77,29 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 		return true;
 	}
 
+	private long getZeroDelayTime() {
+		
+		long delay = minRetrieveInterval*zeroCount;
+		
+		if(delay > maxRetrieveInterval || delay <= 0){
+			delay = maxRetrieveInterval;
+		}
+		return delay;
+	}
+
 	@Override
 	public synchronized void retrieved(int count) {
+		
+		if(count == 0){
+			zeroCount++;
+		}else{
+			zeroCount = 0;
+		}
 		
 		status.offer(new RetrieveStatus(count, System.currentTimeMillis()));
 		if(status.size() > statusCount){
 			status.poll();
 		}
-	}
-
-	public int getZeroRetrieveInterval() {
-		return zeroRetrieveInterval;
-	}
-
-	public void setZeroRetrieveInterval(int zeroRetrieveInterval) {
-		
-		this.zeroRetrieveInterval = zeroRetrieveInterval;
 	}
 
 	static class RetrieveStatus{

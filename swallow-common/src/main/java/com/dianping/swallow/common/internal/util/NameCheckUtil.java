@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class NameCheckUtil {
    private static Pattern topicNamePattern = Pattern.compile("[a-z|A-Z][a-z|A-Z|_|\\-|0-9]{1,49}");
-   private static Pattern consumerIdPattern = Pattern.compile("[a-z|A-Z][a-z|A-Z|_|\\-|0-9]{1,29}");
+   private static Pattern consumerIdPattern = Pattern.compile("[a-z|A-Z][a-z|A-Z|_|\\-|0-9]{1,49}");
 
    private NameCheckUtil() {
    }

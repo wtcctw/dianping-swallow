@@ -6,6 +6,14 @@ import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 
 public interface ConsumerWorker {
+	
+	
+	/**
+	 * 发送消息，如果有消息可以发送，返回true，否则，返回false
+	 * @return
+	 */
+	boolean  sendMessage();
+
    /**
     * 处理greet信息
     * 
@@ -31,11 +39,6 @@ public interface ConsumerWorker {
    void handleChannelDisconnect(Channel channel);
 
    /**
-    * 关闭获取消息的线程
-    */
-   void closeMessageFetcherThread();
-
-   /**
     * 关闭资源
     */
    void close();
@@ -46,13 +49,6 @@ public interface ConsumerWorker {
     * @return
     */
    boolean allChannelDisconnected();
-
-   //    /**
-   //     * 返回DURABLE_AT_LEAST模式下最大已收到ack的MessageId
-   //     * 
-   //     * @return
-   //     */
-   //    long getMaxAckedMessageId();
 
    /**
     * 获取ConsumerType

@@ -66,10 +66,10 @@ public final class MessageBlockingQueue extends
 		this.retrieverThreadPool = retrieverThreadPool;
 
 		this.retriveStrategy = new DefaultRetriveStrategy(consumerInfo,
-				ConfigManager.getInstance().getZeroRetrieveInterval(),
+				ConfigManager.getInstance().getMinRetrieveInterval(),
 				this.maxThreshold);
 		this.backupRetriveStrategy = new DefaultRetriveStrategy(consumerInfo,
-				ConfigManager.getInstance().getBackupZeroRetrieveInterval(),
+				ConfigManager.getInstance().getBackupMinRetrieveInterval(),
 				this.maxThreshold);
 	}
 
@@ -188,7 +188,7 @@ public final class MessageBlockingQueue extends
 		@Override
 		public void run() {
 			try {
-				if (retriveStrategy.isRetrieve()) {
+				if (retriveStrategy.isRetrieve() && messageRetriever != null) {
 					retrieveMessage();
 				}
 			} catch (Throwable th) {
@@ -202,7 +202,7 @@ public final class MessageBlockingQueue extends
 		protected void updateRetrieveStrategy(List messages) {
 			int messageSize = messages == null ? 0 : messages.size();
 			if (logger.isInfoEnabled()) {
-				logger.info("[updateRetrieveStrategy][read message size]" + messageSize);
+				logger.info("[updateRetrieveStrategy][read message size]" + consumerInfo + "," + messageSize);
 			}
 			retriveStrategy.retrieved(messageSize);
 		}
@@ -220,7 +220,7 @@ public final class MessageBlockingQueue extends
 		@Override
 		protected void retrieveMessage() {
 			
-			if (logger.isInfoEnabled()) {
+			if (logger.isDebugEnabled()) {
 				logger.info("[retrieveMessage][tailMessageId]" + tailMessageId);
 			}
 			
@@ -234,8 +234,8 @@ public final class MessageBlockingQueue extends
 				}
 			}
 			
-			if (logger.isInfoEnabled()) {
-				logger.info("[retrieveMessage][tailMessageId]" + tailMessageId);
+			if (logger.isDebugEnabled()) {
+				logger.debug("[retrieveMessage][tailMessageId]" + tailMessageId);
 			}
 		}
 	}
@@ -251,8 +251,8 @@ public final class MessageBlockingQueue extends
 		@Override
 		protected void retrieveMessage() {
 
-			if(logger.isInfoEnabled()){
-				logger.info("[retrieveMessage][tailBackupMessageId]"+ tailBackupMessageId);
+			if(logger.isDebugEnabled()){
+				logger.debug("[retrieveMessage][tailBackupMessageId]"+ tailBackupMessageId);
 			}
 
 			synchronized (backupLock) {
@@ -265,8 +265,8 @@ public final class MessageBlockingQueue extends
 					putMessage(messages);
 				}
 			}
-			if(logger.isInfoEnabled()){
-				logger.info("[retrieveMessage][tailBackupMessageId]"+ tailBackupMessageId);
+			if(logger.isDebugEnabled()){
+				logger.debug("[retrieveMessage][tailBackupMessageId]"+ tailBackupMessageId);
 			}
 		}
 	}

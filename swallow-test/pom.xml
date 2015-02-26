@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.dianping.swallow</groupId>
+    <artifactId>swallow-parent</artifactId>
+    <version>0.7.0</version>
+  </parent>
+  <artifactId>swallow-test</artifactId>
+  <description>
+  	从外部自动化测试swallow的功能、性能
+  </description>
+  
+  <dependencies>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-consumerclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-producerclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.lion</groupId>
+			<artifactId>lion-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+  </dependencies>
+</project>

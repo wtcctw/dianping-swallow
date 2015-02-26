@@ -33,6 +33,7 @@ public final class ConfigManager {
    private int                  masterPort                      = 8081;
    private int                  slavePort                       = 8082;
    private int                  ackIdUpdateIntervalSecond       = 1;
+   private int                  messageSendNoneInterval       	= 20;
    /**
     * maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的值为seq，seq = max(实时qps *
     * seqRatio,minSeqThreshold)
@@ -45,8 +46,8 @@ public final class ConfigManager {
    //Master Ip
    private String               masterIp                        = "127.0.0.1";
    
-   private int 					zeroRetrieveInterval 			= 20;
-   private int					backupZeroRetrieveInterval		= 10000;
+   private int 					minRetrieveInterval 			= 100;
+   private int					backupMinRetrieveInterval		= 10000;
 
    public int getPullFailDelayBase() {
       return pullFailDelayBase;
@@ -211,20 +212,28 @@ public final class ConfigManager {
          }
       }
    }
+	
+	public int getMinRetrieveInterval() {
+		return minRetrieveInterval;
+	}
 
-	public int getZeroRetrieveInterval() {
-		return zeroRetrieveInterval;
+	public void setMinRetrieveInterval(int minRetrieveInterval) {
+		this.minRetrieveInterval = minRetrieveInterval;
 	}
-	
-	public void setZeroRetrieveInterval(int zeroRetrieveInterval) {
-		this.zeroRetrieveInterval = zeroRetrieveInterval;
+
+	public int getBackupMinRetrieveInterval() {
+		return backupMinRetrieveInterval;
 	}
-	
-	public int getBackupZeroRetrieveInterval() {
-		return backupZeroRetrieveInterval;
+
+	public void setBackupMinRetrieveInterval(int backupMinRetrieveInterval) {
+		this.backupMinRetrieveInterval = backupMinRetrieveInterval;
 	}
-	
-	public void setBackupZeroRetrieveInterval(int backupZeroRetrieveInterval) {
-		this.backupZeroRetrieveInterval = backupZeroRetrieveInterval;
+
+	public int getMessageSendNoneInterval() {
+		return messageSendNoneInterval;
+	}
+
+	public void setMessageSendNoneInterval(int messageSendNoneInterval) {
+		this.messageSendNoneInterval = messageSendNoneInterval;
 	}
 }

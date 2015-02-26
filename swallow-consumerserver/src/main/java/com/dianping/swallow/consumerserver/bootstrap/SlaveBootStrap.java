@@ -30,7 +30,7 @@ import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
 public class SlaveBootStrap {
 
-   private static final Logger     LOG       = LoggerFactory.getLogger(SlaveBootStrap.class);
+   private static final Logger     logger       = LoggerFactory.getLogger(SlaveBootStrap.class);
 
    private static boolean          isSlave   = true;
    private static ServerBootstrap  bootstrap = null;
@@ -41,23 +41,23 @@ public class SlaveBootStrap {
 
    private static void closeNettyRelatedResource() {
       try {
-         LOG.info("MessageServerHandler.getChannelGroup().unbind()-started");
+         logger.info("MessageServerHandler.getChannelGroup().unbind()-started");
          MessageServerHandler.getChannelGroup().unbind().await();
-         LOG.info("MessageServerHandler.getChannelGroup().unbind()-finished");
+         logger.info("MessageServerHandler.getChannelGroup().unbind()-finished");
 
-         LOG.info("MessageServerHandler.getChannelGroup().close()-started");
+         logger.info("MessageServerHandler.getChannelGroup().close()-started");
          MessageServerHandler.getChannelGroup().close().await();
-         LOG.info("MessageServerHandler.getChannelGroup().close()-finished");
+         logger.info("MessageServerHandler.getChannelGroup().close()-finished");
 
-         LOG.info("MessageServerHandler.getChannelGroup().clear()-started");
+         logger.info("MessageServerHandler.getChannelGroup().clear()-started");
          MessageServerHandler.getChannelGroup().clear();
-         LOG.info("MessageServerHandler.getChannelGroup().clear()-finished");
+         logger.info("MessageServerHandler.getChannelGroup().clear()-finished");
 
-         LOG.info("bootstrap.releaseExternalResources()-started");
+         logger.info("bootstrap.releaseExternalResources()-started");
          bootstrap.releaseExternalResources();
-         LOG.info("bootstrap.releaseExternalResources()-finished");
+         logger.info("bootstrap.releaseExternalResources()-finished");
       } catch (InterruptedException e) {
-         LOG.error("Interrupted when closeNettyRelatedResource()", e);
+         logger.error("Interrupted when closeNettyRelatedResource()", e);
          Thread.currentThread().interrupt();
       }
    }
@@ -83,9 +83,13 @@ public class SlaveBootStrap {
          @Override
          public void run() {
             closed = true;
-            LOG.info("consumerWorkerManager.close()-started");
-            consumerWorkerManager.close();
-            LOG.info("consumerWorkerManager.close()-finished");
+            logger.info("consumerWorkerManager.close()-started");
+            try {
+				consumerWorkerManager.stop();
+	            consumerWorkerManager.dispose();
+			} catch (Exception e) {
+			}
+            logger.info("consumerWorkerManager.close()-finished");
             closeNettyRelatedResource();
          }
       };
@@ -93,8 +97,8 @@ public class SlaveBootStrap {
       hook.setName("Swallow-ShutdownHook");
       Runtime.getRuntime().addShutdownHook(hook);
 
-      LOG.info("slave starting, master ip: " + configManager.getMasterIp());
-      consumerWorkerManager.init(isSlave);
+      logger.info("slave starting, master ip: " + configManager.getMasterIp());
+      consumerWorkerManager.isSlave(isSlave);
 
       while (!closed) {
 
@@ -102,13 +106,18 @@ public class SlaveBootStrap {
             heartbeater.waitUntilMasterDown(configManager.getMasterIp(), configManager.getHeartbeatCheckInterval(),
                   configManager.getHeartbeatMaxStopTime());
          } catch (InterruptedException e) {
-            LOG.info("slave interruptted, will stop", e);
+            logger.info("slave interruptted, will stop", e);
             break;
          }
          // master down, now start slave ...
 
          // start consumerWorkerManager
-         consumerWorkerManager.start();
+         try {
+			consumerWorkerManager.initialize();
+	         consumerWorkerManager.start();
+         } catch (Exception e) {
+        	 logger.error("[error start worker]", e);
+         }
 
          // Configure the server.
          bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(),
@@ -130,22 +139,27 @@ public class SlaveBootStrap {
 
          // Bind and start to accept incoming connections.
          bootstrap.bind(new InetSocketAddress(ConfigManager.getInstance().getSlavePort()));
-         LOG.info("Server started on port " + ConfigManager.getInstance().getSlavePort());
+         logger.info("Server started on port " + ConfigManager.getInstance().getSlavePort());
 
          try {
             heartbeater.waitUntilMasterUp(configManager.getMasterIp(), configManager.getHeartbeatCheckInterval(),
                   configManager.getHeartbeatMaxStopTime());
          } catch (InterruptedException e) {
-            LOG.info("slave interruptted, will stop", e);
+            logger.info("slave interruptted, will stop", e);
             break;
          }
-         LOG.info("consumerWorkerManager.close()-started");
-         consumerWorkerManager.close();
-         LOG.info("consumerWorkerManager.close()-finished");
+         logger.info("consumerWorkerManager.close()-started");
+         try {
+        	 consumerWorkerManager.stop();
+	         consumerWorkerManager.dispose();
+		} catch (Exception e) {
+			logger.error("[error close consumerWorkerManager]", e);
+		};
+         logger.info("consumerWorkerManager.close()-finished");
          closeNettyRelatedResource();
       }
 
-      LOG.info("slave stopped");
+      logger.info("slave stopped");
    }
 
 }

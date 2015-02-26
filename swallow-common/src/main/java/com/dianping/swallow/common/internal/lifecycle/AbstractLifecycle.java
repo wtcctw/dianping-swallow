@@ -11,35 +11,35 @@ import org.slf4j.LoggerFactory;
  */
 public class AbstractLifecycle implements Lifecycle{
 
-	private final Logger LOG     = LoggerFactory.getLogger(getClass());
+	private final Logger logger     = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public void initialize() throws Exception {
-		if(LOG.isInfoEnabled()){
-			LOG.info("[initialize]");
+		if(logger.isInfoEnabled()){
+			logger.info("[initialize]");
 		}
 		
 	}
 
 	@Override
 	public void start() throws Exception {
-		if(LOG.isInfoEnabled()){
-			LOG.info("[start]");
+		if(logger.isInfoEnabled()){
+			logger.info("[start]");
 		}
 		
 	}
 
 	@Override
 	public void stop() throws Exception {
-		if(LOG.isInfoEnabled()){
-			LOG.info("[stop]");
+		if(logger.isInfoEnabled()){
+			logger.info("[stop]");
 		}
 	}
 
 	@Override
 	public void dispose() throws Exception {
-		if(LOG.isInfoEnabled()){
-			LOG.info("[dispose]");
+		if(logger.isInfoEnabled()){
+			logger.info("[dispose]");
 		}
 	}
 

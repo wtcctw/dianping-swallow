@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jboss.netty.channel.Channel;
@@ -27,9 +26,6 @@ import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
-import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
-import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
-import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
@@ -45,7 +41,7 @@ import com.dianping.swallow.consumerserver.util.ConsumerUtil;
  * @author kezhu.wu
  */
 public final class ConsumerWorkerImpl implements ConsumerWorker {
-   private static final Logger                          LOG                     = LoggerFactory
+   private static final Logger                          logger                     = LoggerFactory
                                                                                       .getLogger(ConsumerWorkerImpl.class);
    private final AtomicLong                             SEQ                     = new AtomicLong(1);
    private final AtomicLong                             BACKUP_SEQ              = new AtomicLong(1);
@@ -67,7 +63,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private long                                         lastSeqForQPS           = 0;
 
    private ConsumerInfo                                 consumerInfo;
-   private MQThreadFactory                              threadFactory;
    private MessageFilter                                messageFilter;
 
    private SwallowBuffer                                swallowBuffer;
@@ -76,10 +71,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    private CloseableBlockingQueue<SwallowMessage>       messageQueue;
    private ExecutorService                              ackExecutor;
-   private PullStrategy                                 pullStgy;
+   private ExecutorService                              sendMessageExecutor;
    private ConsumerAuthController                       consumerAuthController;
 
-   private volatile boolean                             getMessageisAlive       = true;
    private volatile boolean                             started                 = false;
 
    /** 可用来发送消息的channel */
@@ -112,21 +106,19 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       this.ackDao = workerManager.getAckDAO();
       this.messageDao = workerManager.getMessageDAO();
       this.swallowBuffer = workerManager.getSwallowBuffer();
-      this.threadFactory = workerManager.getThreadFactory();
       this.messageFilter = messageFilter;
       this.consumerThreadPoolManager = consumerThreadPoolManager;
       this.consumerAuthController = consumerAuthController;
-      this.pullStgy = new DefaultPullStrategy(ConfigManager.getInstance().getPullFailDelayBase(), ConfigManager
-            .getInstance().getPullFailDelayUpperBound());
 
       // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
          this.consumerInfo.setConsumerType(ConsumerType.DURABLE_AT_LEAST_ONCE);
-         LOG.warn("ConsumerClient[consumerInfo=" + consumerInfo
+         logger.warn("ConsumerClient[consumerInfo=" + consumerInfo
                + "] used ConsumerType.DURABLE_AT_MOST_ONCE. Now change it to ConsumerType.DURABLE_AT_LEAST_ONCE.");
       }
 
       this.ackExecutor = this.consumerThreadPoolManager.getServiceHandlerThreadPool();
+      this.sendMessageExecutor = this.consumerThreadPoolManager.getSendMessageThreadPool();
 
       //创建消息缓冲QUEUE
       long messageIdOfTailMessage = (startMessageId != -1 ? startMessageId : getMaxMessageId(false));
@@ -138,8 +130,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       messageQueue = swallowBuffer.createMessageQueue(this.consumerInfo, messageIdOfTailMessage,
             messageIdOfTailBackupMessage, this.messageFilter);
 
-      start();
-
    }
 
    @Override
@@ -148,20 +138,20 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          @Override
          public void run() {
             try {
-
-               LOG.info("Receive ACK(new)(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
-                     + ackId + ") from " + connectedChannels.get(channel));
-
+            	if(logger.isInfoEnabled()){
+	               logger.info("Receive ACK(new)(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
+	                     + ackId + ") from " + connectedChannels.get(channel));
+            	}
                removeWaitAckMessages(channel, ackId);
 
                if (ACKHandlerType.CLOSE_CHANNEL.equals(type)) {
-                  LOG.info("receive ack(type=" + type + ") from " + IPUtil.getIpFromChannel(channel));
+                  logger.info("receive ack(type=" + type + ") from " + IPUtil.getIpFromChannel(channel));
                   channel.close();//channel.close()会触发netty调用handleChannelDisconnect(channel);
                } else if (ACKHandlerType.SEND_MESSAGE.equals(type)) {
                   freeChannels.add(channel);
                }
             } catch (Exception e) {
-               LOG.error("handleAck wrong!", e);
+               logger.error("handleAck wrong!", e);
             }
          }
       });
@@ -304,68 +294,63 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          }
       }
    }
+   
+   public  boolean  sendMessage() {
+	   
+       final Channel channel = freeChannels.poll();
+       if(channel == null || !channel.isConnected()){
+    	   //没有channel
+    	   return true;
+       }
+       
+       final SwallowMessage message = (SwallowMessage) messageQueue.poll();
+       if(message == null){
+    	   if(channel != null){
+    		   freeChannels.offer(channel);
+    	   }
+    	   return false;
+       }
+       sendMessageExecutor.execute(new Runnable(){
 
-   private void start() {
-      LOG.info("Worker(topic=" + consumerInfo.getDest().getName() + ",cid=" + consumerInfo.getConsumerId() + ") Start");
-      threadFactory.newThread(new Runnable() {
-         @Override
-         public void run() {
-            while (getMessageisAlive) {
-               try {
-                  Channel channel = freeChannels.take();
-                  //如果未连接，则不做处理
-                  if (channel.isConnected()) {
+		@Override
+		public void run() {
+	       try {
+              // 确保有消息可发
+	    	   ConsumerMessage consumerMessage = createConsumerMessage(channel, message);
 
-                     // 确保有消息可发
-                     ConsumerMessage consumerMessage = pollMessage(channel);
-
-                     //发消息前，验证消费者是否合法
-                     boolean isAuth = consumerAuthController.isValid(consumerInfo, ((InetSocketAddress) channel.getRemoteAddress()).getAddress().getHostAddress());
-                     if (!isAuth) {
-                        LOG.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Consumer is disabled, channel will be close.");
-                        channel.close();
-                     } else {
-                         // 拿出消息并发送
-                         if (consumerMessage != null) {
-                             sendMessage(channel, consumerMessage);
-                         } else {// 没有消息，channel继续放回去
-                             freeChannels.add(channel);
-                         }
-                     }
-
-
+              //发消息前，验证消费者是否合法
+              	boolean isAuth = consumerAuthController.isValid(consumerInfo, ((InetSocketAddress) channel.getRemoteAddress()).getAddress().getHostAddress());
+              	if (!isAuth) {
+              		logger.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Consumer is disabled, channel will close.");
+              		channel.close();
+              	} else {
+                  // 拿出消息并发送
+                  if (consumerMessage != null) {
+                      sendMessage(channel, consumerMessage);
+                  } else {// 没有消息，channel继续放回去
+                      freeChannels.add(channel);
                   }
-               } catch (InterruptedException e) {
-                  LOG.info("Get message from messageQueue thread InterruptedException", e);
-               } catch (RuntimeException e) {
-                  LOG.info("Get message from messageQueue thread Exception", e);
-               }
-
-            }
-            LOG.info("Message fetcher thread closed");
-         }
-      }, this.consumerInfo.getDest().getName() + "#" + this.consumerInfo.getConsumerId() + "-messageFetcher-").start();
-
+              }
+	        } catch (InterruptedException e) {
+	           logger.info("Get message from messageQueue thread InterruptedException", e);
+	        } catch (RuntimeException e) {
+	           logger.info("Get message from messageQueue thread Exception", e);
+	        }
+		}
+       });
+       return true;
    }
 
-   private ConsumerMessage pollMessage(Channel channel) throws InterruptedException {
+   private ConsumerMessage createConsumerMessage(Channel channel, SwallowMessage message) throws InterruptedException {
       ConsumerMessage consumerMessage = null;
 
-      while (getMessageisAlive) {
-         //从blockQueue中获取消息
-         SwallowMessage message = (SwallowMessage) messageQueue.poll(pullStgy.fail(false), TimeUnit.MILLISECONDS);
-         if (message != null) {
-            if (!message.isBackup()) {
-               consumerMessage = new ConsumerMessage(message, channel, SEQ.getAndIncrement());
-            } else {
-               consumerMessage = new ConsumerMessage(message, channel, BACKUP_SEQ.getAndIncrement());
-            }
-            pullStgy.succeess();
-            break;
-         }
-      }
-
-      //如果因为getMessageisAlive为false而退出（如收到close命令）,则消息可能依然是null
+     if (message != null) {
+        if (!message.isBackup()) {
+           consumerMessage = new ConsumerMessage(message, channel, SEQ.getAndIncrement());
+        } else {
+           consumerMessage = new ConsumerMessage(message, channel, BACKUP_SEQ.getAndIncrement());
+        }
+     }
       return consumerMessage;
    }
 
@@ -396,6 +381,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
             waitAckBackupMessages.put(consumerMessage.message.getMessageId(), consumerMessage);
          }
 
+         if(logger.isDebugEnabled()){
+        	 logger.debug("[sendMessage][channle write]");
+         }
          //发送消息
          channel.write(pktMessage);
 
@@ -404,7 +392,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
          //Cat end
       } catch (RuntimeException e) {
-         LOG.error(consumerInfo.toString() + "：channel write error.", e);
+         logger.error(consumerInfo.toString() + "：channel write error.", e);
 
          if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
             //发送失败，则放到backup队列里
@@ -476,13 +464,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    @Override
-   public void closeMessageFetcherThread() {
-      getMessageisAlive = false;
-   }
-
-   @Override
    public void close() {
-      getMessageisAlive = false;
       messageQueue.close();
    }
 

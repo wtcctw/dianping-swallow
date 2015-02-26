@@ -1,7 +1,8 @@
 package com.dianping.swallow.common.internal.pool;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -19,12 +20,13 @@ public class DefaultThreadProfile implements ThreadProfile{
 	
 	private int corePoolSize = cpuCount;
 	
-
 	private int maxPoolSize = cpuCount * 2;
 
 	private int keepAliveTime = 60;// seconds
 
 	private String threadPoolName = "default_thread_pool";
+	
+	private RejectedExecutionHandler handler;
 
 	public DefaultThreadProfile(String threadPoolName){
 		this.threadPoolName = threadPoolName;
@@ -48,9 +50,9 @@ public class DefaultThreadProfile implements ThreadProfile{
 		return new ThreadPoolExecutor(corePoolSize, 
 					maxPoolSize, 
 					keepAliveTime, TimeUnit.SECONDS, 
-					new LinkedBlockingDeque<Runnable>(),
+					new LinkedBlockingQueue<Runnable>(),
 					new MQThreadFactory(threadPoolName),
-					new ThreadPoolExecutor.CallerRunsPolicy()
+					handler == null ? new ThreadPoolExecutor.CallerRunsPolicy() : handler   
 				);
 	}
 

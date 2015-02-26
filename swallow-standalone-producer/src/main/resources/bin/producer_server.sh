@@ -31,7 +31,13 @@ mysleep(){
     done
     echo ""
 }
-
+getmem(){
+    MEM=2G
+    if hash free 2>/dev/null; then
+        MEM=`free -m | grep 'Mem' | awk '{print int($2*2/3/1000)"G";}'`
+    fi  
+    echo $MEM
+}
 ######### 关闭进程 #########
 if [ "$ACTION" = "stop" -o "$ACTION" = "restart" ];  then
     echo "========================= swallow stoping =========================="
@@ -81,10 +87,10 @@ if [ ! -d "/data/applogs/swallow" ] ; then
   mkdir -p "/data/applogs/swallow"
 fi
 
+MEM=`getmem`
 CLASSPATH=${PRGDIR}/../lib/swallow/*:${PRGDIR}/../lib/dianping/*:${PRGDIR}/../lib/others/*:${PRGDIR}/../conf/:${PRGDIR}/../conf/producer
-JAVA_OPTS="-cp ${CLASSPATH} -server -Xms512m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/data/applogs/swallow/swallow-producerserver-gc.log"
+JAVA_OPTS="-cp ${CLASSPATH} -server -Xms${MEM} -Xmx${MEM} -XX:+HeapDumpOnOutOfMemoryError -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/data/applogs/swallow/swallow-producerserver-gc.log"
 MAIN_CLASS="com.dianping.swallow.producerserver.bootstrap.ProducerServerBootstrap"
-
 STD_OUT="/data/applogs/swallow/swallow-producerserver-std.out"
 echo "starting..."
 echo "output: $STD_OUT"

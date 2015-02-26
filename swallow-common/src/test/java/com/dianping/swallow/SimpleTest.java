@@ -13,14 +13,7 @@ public class SimpleTest {
 	@Test
 	public void testLong(){
 		Long a = null;
-		func(a);
 		
 	}
 
-	/**
-	 * @param a
-	 */
-	private void func(long a) {
-		System.out.println(a);
-	}
 }

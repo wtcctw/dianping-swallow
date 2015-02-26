@@ -29,7 +29,7 @@ import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
 public class MasterBootStrap {
 
-   private static final Logger LOG     = LoggerFactory.getLogger(MasterBootStrap.class);
+   private static final Logger logger     = LoggerFactory.getLogger(MasterBootStrap.class);
 
    private static boolean      isSlave = false;
 
@@ -38,8 +38,9 @@ public class MasterBootStrap {
 
    /**
     * 启动Master
+ * @throws Exception 
     */
-   public static void main(String[] args) {
+   public static void main(String[] args) throws Exception {
       //启动Cat
       Cat.initialize(new File("/data/appdatas/cat/client.xml"));
 
@@ -48,17 +49,17 @@ public class MasterBootStrap {
       final ConsumerWorkerManager consumerWorkerManager = ctx.getBean(ConsumerWorkerManager.class);
       final TopicWhiteList topicWhiteList = ctx.getBean(TopicWhiteList.class);
       final ConsumerAuthController consumerAuthController = ctx.getBean(ConsumerAuthController.class);
-      consumerWorkerManager.init(isSlave);
-      // start consumerWorkerManager
+      consumerWorkerManager.isSlave(isSlave);
+      consumerWorkerManager.initialize();
       consumerWorkerManager.start();
 
-      LOG.info("wait " + ConfigManager.getInstance().getWaitSlaveShutDown() + "ms for slave to stop working");
+      logger.info("wait " + ConfigManager.getInstance().getWaitSlaveShutDown() + "ms for slave to stop working");
       try {
          Thread.sleep(ConfigManager.getInstance().getWaitSlaveShutDown());//主机启动的时候睡眠一会，给时间给slave关闭。
       } catch (InterruptedException e) {
-         LOG.error("thread InterruptedException", e);
+         logger.error("thread InterruptedException", e);
       }
-      LOG.info("start working");
+      logger.info("start working");
 
       // Configure the server.
       final ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
@@ -82,30 +83,35 @@ public class MasterBootStrap {
          @Override
          public void run() {
             try {
-               LOG.info("consumerWorkerManager.close()-started");
-               consumerWorkerManager.close();
-               LOG.info("consumerWorkerManager.close()-finished");
+               logger.info("consumerWorkerManager.close()-started");
+               try {
+					consumerWorkerManager.stop();
+		            consumerWorkerManager.dispose();
+				} catch (Exception e) {
+					logger.error("[run]", e);
+				}
+               logger.info("consumerWorkerManager.close()-finished");
 
-               LOG.info("MessageServerHandler.getChannelGroup().unbind()-started");
+               logger.info("MessageServerHandler.getChannelGroup().unbind()-started");
                MessageServerHandler.getChannelGroup().unbind().await();
-               LOG.info("MessageServerHandler.getChannelGroup().unbind()-finished");
+               logger.info("MessageServerHandler.getChannelGroup().unbind()-finished");
 
-               LOG.info("MessageServerHandler.getChannelGroup().close()-started");
+               logger.info("MessageServerHandler.getChannelGroup().close()-started");
                MessageServerHandler.getChannelGroup().close().await();
-               LOG.info("MessageServerHandler.getChannelGroup().close()-finished");
+               logger.info("MessageServerHandler.getChannelGroup().close()-finished");
 
-               LOG.info("MessageServerHandler.getChannelGroup().clear()-started");
+               logger.info("MessageServerHandler.getChannelGroup().clear()-started");
                MessageServerHandler.getChannelGroup().clear();
-               LOG.info("MessageServerHandler.getChannelGroup().unbind()-finished");
+               logger.info("MessageServerHandler.getChannelGroup().unbind()-finished");
 
-               LOG.info("bootstrap.releaseExternalResources()-started");
+               logger.info("bootstrap.releaseExternalResources()-started");
                bootstrap.releaseExternalResources();
-               LOG.info("bootstrap.releaseExternalResources()-finished");
+               logger.info("bootstrap.releaseExternalResources()-finished");
             } catch (InterruptedException e) {
-               LOG.error("Interrupted when onClose()", e);
+               logger.error("Interrupted when onClose()", e);
                Thread.currentThread().interrupt();
             }
-            LOG.info("MasterBootStrap-closed");
+            logger.info("MasterBootStrap-closed");
          }
       };
       hook.setDaemon(true);
@@ -115,7 +121,7 @@ public class MasterBootStrap {
       //启动服务 (Bind and start to accept incoming connections.)
       int masterPort = ConfigManager.getInstance().getMasterPort();
       bootstrap.bind(new InetSocketAddress(masterPort));
-      LOG.info("Server started at port " + masterPort);
+      logger.info("Server started at port " + masterPort);
       System.out.println("Server started at port " + masterPort);//检查是否成功启动
    }
 

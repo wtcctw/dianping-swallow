@@ -64,7 +64,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
     //    }
 
     @Before
-    public void mockDao() {
+    public void mockDao() throws Exception {
         SwallowBuffer swallowBuffer = mock(SwallowBuffer.class);
         CloseableBlockingQueue<SwallowMessage> messageQueue = new MockedCloseableBlockingQueue<SwallowMessage>();
 
@@ -94,6 +94,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         //      consumerWorkerManager.setAckDAO(ackDAO);
         //      consumerWorkerManager.setMessageDAO(messageDAO);
         consumerWorkerManager.setSwallowBuffer(swallowBuffer);
+        consumerWorkerManager.initialize();;
         consumerWorkerManager.start();
     }
 
