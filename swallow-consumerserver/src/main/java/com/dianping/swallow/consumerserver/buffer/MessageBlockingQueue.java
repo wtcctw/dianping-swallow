@@ -97,6 +97,15 @@ public final class MessageBlockingQueue extends
 		return message;
 	}
 
+	@Override
+	public SwallowMessage peek() {
+		ensureLeftMessage();
+		SwallowMessage message = super.peek();
+		return message;
+	}
+
+
+	
 	private void decreaseMessageCount() {
 		retriveStrategy.decreaseMessageCount();
 		backupRetriveStrategy.decreaseMessageCount();

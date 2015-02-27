@@ -268,7 +268,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       removeByChannel(channel, waitAckMessages);
       removeByChannel(channel, waitAckBackupMessages);
    }
-
+                                                                                                    
    private void removeByChannel(Channel channel, Map<Long, ConsumerMessage> waitAckMessages0) {
       Iterator<Entry<Long, ConsumerMessage>> it = waitAckMessages0.entrySet().iterator();
       while (it.hasNext()) {
@@ -295,12 +295,13 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       }
    }
    
+   @Override
    public  boolean  sendMessage() {
 	   
        final Channel channel = freeChannels.poll();
        if(channel == null || !channel.isConnected()){
-    	   //没有channel
-    	   return true;
+    	   messageQueue.peek();
+    	   return false;
        }
        
        final SwallowMessage message = (SwallowMessage) messageQueue.poll();

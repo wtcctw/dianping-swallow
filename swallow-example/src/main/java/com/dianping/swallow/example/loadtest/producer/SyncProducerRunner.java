@@ -36,7 +36,7 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
     	}
     	
     	if(args.length >= 4){
-    		totalCount = Integer.parseInt(args[3]);
+    		sendMessageInterval = Integer.parseInt(args[3]);
     	}
     	new SyncProducerRunner().start();
     	

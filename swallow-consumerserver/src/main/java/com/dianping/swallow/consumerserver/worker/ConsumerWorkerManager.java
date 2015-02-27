@@ -3,6 +3,9 @@ package com.dianping.swallow.consumerserver.worker;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.netty.channel.Channel;
@@ -234,37 +237,47 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 	
 	private void startSendMessageThread() {
 		
-		startTask(new AbstractEternalTask() {
-			
-			private volatile boolean shouldSleep = false;
-			
-			@Override
-			public void sleep(){
-				if(shouldSleep){
-					try {
-						TimeUnit.MILLISECONDS.sleep(MESSAGE_SEND_NONE_INTERVAL);
-					} catch (InterruptedException e) {
+		int coreSize = Runtime.getRuntime().availableProcessors();
+		ExecutorService executors = Executors.newFixedThreadPool(coreSize, new MQThreadFactory("MessageSenderTricker"));
+		
+		for(int i=0; i < coreSize; i++){
+			executors.execute(new AbstractEternalTask() {
+				
+				private volatile boolean shouldSleep = false;
+				
+				@Override
+				public void sleep(){
+					if(shouldSleep){
+						try {
+							if(logger.isDebugEnabled()){
+								logger.debug("[startSendMessageThread][sleep]" + MESSAGE_SEND_NONE_INTERVAL);
+							}
+							TimeUnit.MICROSECONDS.sleep(MESSAGE_SEND_NONE_INTERVAL);
+						} catch (InterruptedException e) {
+						}
 					}
 				}
+				@Override
+				protected boolean stop() {
+					return shoudStop();
+				}
+				
+				@Override
+				protected void doRun() {
+					shouldSleep = true;
+	                for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
+	                    ConsumerWorker worker = entry.getValue();
+	                    boolean messageExist = worker.sendMessage();
+	                    if(messageExist && shouldSleep){
+	                    	shouldSleep = false;
+	                    }
+	                }
+	                
+				}
 			}
-			@Override
-			protected boolean stop() {
-				return shoudStop();
-			}
-			
-			@Override
-			protected void doRun() {
-				shouldSleep = true;
-                for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
-                    ConsumerWorker worker = entry.getValue();
-                    boolean messageExist = worker.sendMessage();
-                    if(messageExist && shouldSleep){
-                    	shouldSleep = false;
-                    }
-                }
-                
-			}
-		}, "MessageSenderThread-");
+			);
+		}
+		
 	}
 
 	protected boolean shoudStop() {
