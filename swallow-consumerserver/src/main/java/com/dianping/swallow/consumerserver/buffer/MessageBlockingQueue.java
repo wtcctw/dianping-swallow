@@ -15,9 +15,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
-public final class MessageBlockingQueue extends
-		LinkedBlockingQueue<SwallowMessage> implements
-		CloseableBlockingQueue<SwallowMessage> {
+public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessage> implements CloseableBlockingQueue<SwallowMessage> {
 
 	private static final long serialVersionUID = -633276713494338593L;
 	
@@ -30,6 +28,7 @@ public final class MessageBlockingQueue extends
 	private AtomicBoolean isClosed = new AtomicBoolean(false);
 
 	protected volatile Long tailMessageId;
+
 	protected MessageFilter messageFilter;
 	
 	/** 最小剩余数量,当queue的消息数量小于threshold时，会触发从数据库加载数据的操作 */
@@ -40,7 +39,6 @@ public final class MessageBlockingQueue extends
 	protected volatile Long tailBackupMessageId;
 	private ExecutorService retrieverThreadPool;
 
-	private Object lock = new Object(), backupLock = new Object();
 	private RetriveStrategy retriveStrategy, backupRetriveStrategy;
 
 	public MessageBlockingQueue(ConsumerInfo consumerInfo, int minThreshold,
@@ -57,20 +55,15 @@ public final class MessageBlockingQueue extends
 		this.minThreshold = minThreshold;
 		this.maxThreshold = maxThreshold;
 		if (messageIdOfTailMessage == null) {
-			throw new IllegalArgumentException(
-					"messageIdOfTailMessage is null.");
+			throw new IllegalArgumentException("messageIdOfTailMessage is null.");
 		}
 		this.tailMessageId = messageIdOfTailMessage;
 		this.tailBackupMessageId = tailBackupMessageId;
 		this.messageFilter = messageFilter;
 		this.retrieverThreadPool = retrieverThreadPool;
 
-		this.retriveStrategy = new DefaultRetriveStrategy(consumerInfo,
-				ConfigManager.getInstance().getMinRetrieveInterval(),
-				this.maxThreshold);
-		this.backupRetriveStrategy = new DefaultRetriveStrategy(consumerInfo,
-				ConfigManager.getInstance().getBackupMinRetrieveInterval(),
-				this.maxThreshold);
+		this.retriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold);
+		this.backupRetriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getBackupMinRetrieveInterval(), this.maxThreshold);
 	}
 
 	public void init() {
@@ -91,9 +84,13 @@ public final class MessageBlockingQueue extends
 	public SwallowMessage poll() {
 
 		ensureLeftMessage();
+		
+		if(logger.isDebugEnabled() && size() >= maxThreshold){
+			logger.debug("[poll]" + size());
+		}
 
 		SwallowMessage message = super.poll();
-		decreaseMessageCount();
+		decreaseMessageCount(message);
 		return message;
 	}
 
@@ -106,9 +103,11 @@ public final class MessageBlockingQueue extends
 
 
 	
-	private void decreaseMessageCount() {
-		retriveStrategy.decreaseMessageCount();
-		backupRetriveStrategy.decreaseMessageCount();
+	private void decreaseMessageCount(SwallowMessage message) {
+		if(message != null){
+			retriveStrategy.decreaseMessageCount();
+			backupRetriveStrategy.decreaseMessageCount();
+		}
 	}
 
 	private void increaseMessageCount() {
@@ -125,7 +124,7 @@ public final class MessageBlockingQueue extends
 			logger.debug("[poll][timeout]" + timeout);
 		}
 		SwallowMessage message = super.poll(timeout, unit);
-		decreaseMessageCount();
+		decreaseMessageCount(message);
 		return message;
 	}
 
@@ -135,12 +134,17 @@ public final class MessageBlockingQueue extends
 	private void ensureLeftMessage() {
 
 		if (super.size() < minThreshold) {
-			retrieverThreadPool.execute(new MessageRetrieverTask(
-					retriveStrategy));
+
+			if(retriveStrategy.canPutNewTask()){
+				retrieverThreadPool.execute(new MessageRetrieverTask(retriveStrategy, consumerInfo, messageRetriever, this, messageFilter));
+				retriveStrategy.offerNewTask();
+			}
 
 			if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-				retrieverThreadPool.execute(new BackupMessageRetrieverTask(
-						backupRetriveStrategy));
+				if(backupRetriveStrategy.canPutNewTask()){
+					retrieverThreadPool.execute(new BackupMessageRetrieverTask(backupRetriveStrategy, consumerInfo, messageRetriever, this, messageFilter));
+					backupRetriveStrategy.offerNewTask();
+				}
 			}
 		}
 	}
@@ -169,7 +173,7 @@ public final class MessageBlockingQueue extends
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void putMessage(List messages) {
+	public void putMessage(List messages) {
 		for (int i = 1; i < messages.size(); i++) {
 			SwallowMessage message = (SwallowMessage) messages.get(i);
 			try {
@@ -185,98 +189,23 @@ public final class MessageBlockingQueue extends
 		}
 	}
 
-	private abstract class AbstractRetrieveTask implements Runnable {
 
-		protected final Logger logger = LoggerFactory.getLogger(getClass());
-		private RetriveStrategy retriveStrategy;
-
-		public AbstractRetrieveTask(RetriveStrategy retriveStrategy) {
-			this.retriveStrategy = retriveStrategy;
-		}
-
-		@Override
-		public void run() {
-			try {
-				if (retriveStrategy.isRetrieve() && messageRetriever != null) {
-					retrieveMessage();
-				}
-			} catch (Throwable th) {
-				logger.error("[run]", th);
-			}
-		}
-
-		protected abstract void retrieveMessage();
-
-		@SuppressWarnings("rawtypes")
-		protected void updateRetrieveStrategy(List messages) {
-			int messageSize = messages == null ? 0 : messages.size();
-			if (logger.isInfoEnabled()) {
-				logger.info("[updateRetrieveStrategy][read message size]" + consumerInfo + "," + messageSize);
-			}
-			retriveStrategy.retrieved(messageSize);
-		}
-
+	public Long getTailMessageId() {
+		return tailMessageId;
 	}
 
-	private class MessageRetrieverTask extends AbstractRetrieveTask implements
-			Runnable {
-
-		public MessageRetrieverTask(RetriveStrategy retriveStrategy) {
-			super(retriveStrategy);
-		}
-
-		@SuppressWarnings("rawtypes")
-		@Override
-		protected void retrieveMessage() {
-			
-			if (logger.isDebugEnabled()) {
-				logger.info("[retrieveMessage][tailMessageId]" + tailMessageId);
-			}
-			
-			synchronized (lock) {
-				List messages = messageRetriever.retrieveMessage(consumerInfo
-						.getDest().getName(), null, tailMessageId, messageFilter);
-				updateRetrieveStrategy(messages);
-				if (messages != null && messages.size() > 0) {
-					tailMessageId = (Long) messages.get(0);
-					putMessage(messages);
-				}
-			}
-			
-			if (logger.isDebugEnabled()) {
-				logger.debug("[retrieveMessage][tailMessageId]" + tailMessageId);
-			}
-		}
+	public void setTailMessageId(Long tailMessageId) {
+		this.tailMessageId = tailMessageId;
 	}
 
-	private class BackupMessageRetrieverTask extends AbstractRetrieveTask
-			implements Runnable {
-
-		public BackupMessageRetrieverTask(RetriveStrategy retriveStrategy) {
-			super(retriveStrategy);
-		}
-
-		@SuppressWarnings("rawtypes")
-		@Override
-		protected void retrieveMessage() {
-
-			if(logger.isDebugEnabled()){
-				logger.debug("[retrieveMessage][tailBackupMessageId]"+ tailBackupMessageId);
-			}
-
-			synchronized (backupLock) {
-				List messages = messageRetriever.retrieveMessage(consumerInfo
-						.getDest().getName(), consumerInfo.getConsumerId(),
-						tailBackupMessageId, messageFilter);
-				updateRetrieveStrategy(messages);
-				if (messages != null && messages.size() > 0) {
-					tailBackupMessageId = (Long) messages.get(0);
-					putMessage(messages);
-				}
-			}
-			if(logger.isDebugEnabled()){
-				logger.debug("[retrieveMessage][tailBackupMessageId]"+ tailBackupMessageId);
-			}
-		}
+	public Long getTailBackupMessageId() {
+		return tailBackupMessageId;
 	}
+
+	public void setTailBackupMessageId(Long tailBackupMessageId) {
+		this.tailBackupMessageId = tailBackupMessageId;
+	}
+
+
+	
 }

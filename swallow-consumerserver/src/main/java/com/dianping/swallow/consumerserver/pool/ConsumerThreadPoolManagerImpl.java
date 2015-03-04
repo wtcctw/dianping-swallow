@@ -15,7 +15,7 @@ import com.dianping.swallow.common.internal.pool.DefaultThreadProfile;
 public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager, InitializingBean{
 
 	private int cpuNum = Runtime.getRuntime().availableProcessors();
-
+	
 	private int coreRetrieverThreadPoolSize = cpuNum*10;
 	
 	private int maxRetrieverThreadPoolSize = cpuNum*40;

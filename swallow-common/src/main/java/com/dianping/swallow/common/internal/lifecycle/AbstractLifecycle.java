@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AbstractLifecycle implements Lifecycle{
 
-	private final Logger logger     = LoggerFactory.getLogger(getClass());
+	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public void initialize() throws Exception {

@@ -5,13 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.util.internal.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
@@ -30,9 +27,6 @@ import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 
 public class ConsumerWorkerManager extends AbstractLifecycle{
-
-    private static final Logger               logger                   = LoggerFactory
-            .getLogger(ConsumerWorkerManager.class);
 
     private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance()
             .getAckIdUpdateIntervalSecond() * 1000;
@@ -237,10 +231,10 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 	
 	private void startSendMessageThread() {
 		
-		int coreSize = Runtime.getRuntime().availableProcessors();
-		ExecutorService executors = Executors.newFixedThreadPool(coreSize, new MQThreadFactory("MessageSenderTricker"));
+		int senderThreadSize = ConfigManager.getInstance().getMessageSendThreadPoolSize();
+		ExecutorService executors = Executors.newFixedThreadPool(senderThreadSize, new MQThreadFactory("MessageSenderTricker"));
 		
-		for(int i=0; i < coreSize; i++){
+		for(int i=0; i < senderThreadSize; i++){
 			executors.execute(new AbstractEternalTask() {
 				
 				private volatile boolean shouldSleep = false;
@@ -352,6 +346,9 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
                         worker.close();
                         logger.info("[doRun][close ConsumerWorker]ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
                     }
+                }
+                if(logger.isInfoEnabled()){
+                	logger.info("[doRun][consumerWorker count]" + consumerInfo2ConsumerWorker.size());
                 }
 			}
         }, "idleConsumerWorkerChecker-");

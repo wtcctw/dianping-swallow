@@ -33,6 +33,8 @@ public final class ConfigManager {
    private int                  masterPort                      = 8081;
    private int                  slavePort                       = 8082;
    private int                  ackIdUpdateIntervalSecond       = 1;
+   
+   private int                  messageSendThreadPoolSize       = 1;
    private int                  messageSendNoneInterval       	= 20;
    /**
     * maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的值为seq，seq = max(实时qps *
@@ -235,5 +237,13 @@ public final class ConfigManager {
 
 	public void setMessageSendNoneInterval(int messageSendNoneInterval) {
 		this.messageSendNoneInterval = messageSendNoneInterval;
+	}
+
+	public int getMessageSendThreadPoolSize() {
+		return messageSendThreadPoolSize;
+	}
+
+	public void setMessageSendThreadPoolSize(int messageSendThreadPoolSize) {
+		this.messageSendThreadPoolSize = messageSendThreadPoolSize;
 	}
 }

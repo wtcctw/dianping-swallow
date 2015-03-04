@@ -29,4 +29,16 @@ public interface RetriveStrategy {
 
 	void decreaseMessageCount(int count);
 	
+	/**
+	 *任务开始 
+	 */
+	void beginRetrieve();
+	
+	/**
+	 * 任务结束
+	 */
+	void endRetrieve();
+	
+	void offerNewTask();
+	boolean canPutNewTask();
 }

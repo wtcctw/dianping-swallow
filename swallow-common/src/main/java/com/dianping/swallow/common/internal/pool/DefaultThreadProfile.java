@@ -6,6 +6,9 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 
 /**
@@ -16,6 +19,8 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
  */
 public class DefaultThreadProfile implements ThreadProfile{
 	
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+
 	private final int cpuCount = Runtime.getRuntime().availableProcessors();
 	
 	private int corePoolSize = cpuCount;
@@ -27,6 +32,9 @@ public class DefaultThreadProfile implements ThreadProfile{
 	private String threadPoolName = "default_thread_pool";
 	
 	private RejectedExecutionHandler handler;
+	
+	private QueueFactory queueFactory;
+	
 
 	public DefaultThreadProfile(String threadPoolName){
 		this.threadPoolName = threadPoolName;
@@ -47,13 +55,19 @@ public class DefaultThreadProfile implements ThreadProfile{
 	@Override
 	public ExecutorService createPool() {
 		
-		return new ThreadPoolExecutor(corePoolSize, 
-					maxPoolSize, 
-					keepAliveTime, TimeUnit.SECONDS, 
-					new LinkedBlockingQueue<Runnable>(),
-					new MQThreadFactory(threadPoolName),
-					handler == null ? new ThreadPoolExecutor.CallerRunsPolicy() : handler   
-				);
+		try {
+			return new ThreadPoolExecutor(corePoolSize, 
+						maxPoolSize, 
+						keepAliveTime, TimeUnit.SECONDS,
+						queueFactory!=null ? queueFactory.createQueue() : new LinkedBlockingQueue<Runnable>(),
+						new MQThreadFactory(threadPoolName),
+						handler == null ? new ThreadPoolExecutor.CallerRunsPolicy() : handler   
+					);
+		} catch (Exception e){
+			logger.error("[createPool]", e);
+		}
+		
+		return null;
 	}
 
 	@Override
@@ -78,6 +92,14 @@ public class DefaultThreadProfile implements ThreadProfile{
 
 	public void setKeepAliveTime(int keepAliveTime) {
 		this.keepAliveTime = keepAliveTime;
+	}
+
+	public QueueFactory getQueueFactory() {
+		return queueFactory;
+	}
+
+	public void setQueueFactory(QueueFactory queueFactory) {
+		this.queueFactory = queueFactory;
 	}
 
 }

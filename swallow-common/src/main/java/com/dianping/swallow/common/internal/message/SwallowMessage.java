@@ -96,6 +96,11 @@ public class SwallowMessage implements Serializable, Message {
       return jsonBinder.fromJson(content, clazz);
    }
 
+   public long size(){
+	   //估算，非严格
+	   return (long) (content.length()*2*1.2);
+   }
+   
    @Override
    public String getContent() {
       return content;

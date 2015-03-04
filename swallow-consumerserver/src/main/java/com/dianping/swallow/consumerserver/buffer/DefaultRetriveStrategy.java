@@ -39,7 +39,7 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 	
 	/*队列最大消息数，大于此值，不取*/
 	private int maxThreshold;
-	
+		
 	private AtomicInteger messageCount = new AtomicInteger();
 	
 	public DefaultRetriveStrategy(ConsumerInfo consumerInfo, int minRetrieveInterval, int maxThreshold){
@@ -69,7 +69,7 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 		
 		if(messageCount.get() >= maxThreshold){
 			if(logger.isInfoEnabled()){
-				logger.info("[isRetrieve][message exceed maxthreshold]" + consumerInfo + "," + maxThreshold);
+				logger.info("[isRetrieve][message exceed maxthreshold]" + consumerInfo + "," + maxThreshold + ", " + messageCount.get());
 			}
 			return false;
 		}
@@ -145,4 +145,31 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 	public void decreaseMessageCount(int count) {
 		messageCount.addAndGet(-count);
 	}
+
+	@Override
+	public void beginRetrieve() {
+	}
+
+	@Override
+	public void endRetrieve() {
+		taskCount.decrementAndGet();
+	}
+
+	
+	private AtomicInteger taskCount =  new AtomicInteger(); 
+	private final int maxTaskCount = 2;
+	@Override
+	public boolean canPutNewTask() {
+		
+		if(taskCount.get() >= maxTaskCount){
+			return false;
+		}
+		return true; 
+	}
+
+	@Override
+	public void offerNewTask() {
+		taskCount.incrementAndGet();
+	}
+
 }

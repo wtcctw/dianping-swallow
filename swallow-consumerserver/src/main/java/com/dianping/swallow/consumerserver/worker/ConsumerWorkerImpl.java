@@ -300,14 +300,16 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 	   
        final Channel channel = freeChannels.poll();
        if(channel == null || !channel.isConnected()){
-    	   messageQueue.peek();
     	   return false;
        }
        
        final SwallowMessage message = (SwallowMessage) messageQueue.poll();
        if(message == null){
     	   if(channel != null){
-    		   freeChannels.offer(channel);
+    		   boolean result = freeChannels.offer(channel);
+    		   if(!result){
+    			   logger.error("[sendMessage][channel put back error]" + consumerInfo);
+    		   }
     	   }
     	   return false;
        }

@@ -18,7 +18,7 @@ public class TopicWhiteList implements ConfigChangeListener {
 
     private static final Logger LOG              = LoggerFactory.getLogger(TopicWhiteList.class);
 
-    private static final String TOPIC_SPLIT      = ";";
+    private static final String TOPIC_SPLIT      = ";|,";
 
     private static final String TOPIC_WHITE_LIST = "swallow.topic.whitelist";
 

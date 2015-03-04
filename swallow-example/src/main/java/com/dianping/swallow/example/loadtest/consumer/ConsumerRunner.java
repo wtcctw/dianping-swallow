@@ -20,6 +20,8 @@ public class ConsumerRunner extends AbstractLoadTest{
     private static int threadPoolSize = 2;
     private static int totalMessageCount = -1;
     
+    private static boolean differentConsumerId = false;
+    
     public static void main(String[] args) throws Exception {
     	
     	if(args.length >= 1){
@@ -35,11 +37,16 @@ public class ConsumerRunner extends AbstractLoadTest{
     		totalMessageCount = Integer.parseInt(args[3]);
     	}
     	
+    	differentConsumerId = Boolean.parseBoolean(System.getProperty("differentConsumerId"));
     	new ConsumerRunner().start();
     }
 
     @Override
 	protected void doStart() {
+    	if(logger.isInfoEnabled()){
+    		logger.info("[doStart][topicCount, consumerCount, threadPoolSize, totalMessageCount, differentConsumerId]" + 
+    				topicCount + "," + consumerCount + "," + threadPoolSize + "," + totalMessageCount + "," + differentConsumerId);
+    	}
 		startReceiver();
 	}
     @Override
@@ -58,7 +65,12 @@ public class ConsumerRunner extends AbstractLoadTest{
                 //以下两项根据自己情况而定，默认是不需要配的
                 config.setThreadPoolSize(threadPoolSize);
                 config.setRetryCountOnBackoutMessageException(0);
-                Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), "myId-20130813", config);
+                
+                String consumerId = "myId-20130813";
+                if(differentConsumerId){
+                	consumerId += "-" + j;
+                }
+                Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), consumerId, config);
                 c.setListener(new MessageListener() {
                     @Override
                     public void onMessage(Message msg) {

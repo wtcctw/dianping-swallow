@@ -23,7 +23,14 @@ public interface MessageRetriever {
     */
    @SuppressWarnings("rawtypes")
    List retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter);
+   
+   @SuppressWarnings("rawtypes")
+   List retrieveMessage(String topicName, Long messageId, int fetchSize);
 
+   @SuppressWarnings("rawtypes")
+   List retrieveMessage(String topicName, Long messageId);
+
+   
    void setFetchSize(int fetchSize);
 
 }
