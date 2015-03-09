@@ -40,12 +40,8 @@ public class MessageBlockingQueueTest extends AbstractTest{
 			@Override
 			public void run() {
 				while(true){
-					try {
-						queue.put(new SwallowMessage());
-						putCount.incrementAndGet();
-					} catch (InterruptedException e) {
-						logger.error("[run]", e);
-					}
+					queue.offer(new SwallowMessage());
+					putCount.incrementAndGet();
 				}
 			}
 		});

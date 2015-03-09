@@ -1,14 +1,15 @@
 package com.dianping.swallow.consumerserver.worker;
 
 import java.net.InetSocketAddress;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jboss.netty.channel.Channel;
@@ -77,7 +78,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    private volatile boolean                             started                 = false;
 
    /** 可用来发送消息的channel */
-   private BlockingQueue<Channel>                       freeChannels            = new LinkedBlockingQueue<Channel>();
+   private Queue<Channel>                       freeChannels            = new ConcurrentLinkedQueue<Channel>();
    /** 存放已连接的channel，key是channel，value是ip */
    private ConcurrentHashMap<Channel, String>           connectedChannels       = new ConcurrentHashMap<Channel, String>();
 

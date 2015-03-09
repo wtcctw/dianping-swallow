@@ -1,5 +1,6 @@
 package com.dianping.swallow.consumerserver.worker;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
 import com.dianping.swallow.common.internal.lifecycle.DefaultLifecycleManager;
 import com.dianping.swallow.common.internal.lifecycle.LifecycleCallback;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.common.internal.util.task.AbstractEternalTask;
 import com.dianping.swallow.consumerserver.Heartbeater;
@@ -232,44 +234,13 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 	private void startSendMessageThread() {
 		
 		int senderThreadSize = ConfigManager.getInstance().getMessageSendThreadPoolSize();
+		if(senderThreadSize <= 0){
+			senderThreadSize = CommonUtils.getCpuCount();
+		}
 		ExecutorService executors = Executors.newFixedThreadPool(senderThreadSize, new MQThreadFactory("MessageSenderTricker"));
 		
 		for(int i=0; i < senderThreadSize; i++){
-			executors.execute(new AbstractEternalTask() {
-				
-				private volatile boolean shouldSleep = false;
-				
-				@Override
-				public void sleep(){
-					if(shouldSleep){
-						try {
-							if(logger.isDebugEnabled()){
-								logger.debug("[startSendMessageThread][sleep]" + MESSAGE_SEND_NONE_INTERVAL);
-							}
-							TimeUnit.MICROSECONDS.sleep(MESSAGE_SEND_NONE_INTERVAL);
-						} catch (InterruptedException e) {
-						}
-					}
-				}
-				@Override
-				protected boolean stop() {
-					return shoudStop();
-				}
-				
-				@Override
-				protected void doRun() {
-					shouldSleep = true;
-	                for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
-	                    ConsumerWorker worker = entry.getValue();
-	                    boolean messageExist = worker.sendMessage();
-	                    if(messageExist && shouldSleep){
-	                    	shouldSleep = false;
-	                    }
-	                }
-	                
-				}
-			}
-			);
+			executors.execute(new SendMessageThread(i, senderThreadSize));
 		}
 		
 	}
@@ -410,4 +381,51 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 		this.consumerThreadPoolManager = consumerThreadPoolManager;
 	}
 
+	
+	class SendMessageThread extends AbstractEternalTask{
+		
+		private volatile boolean shouldSleep = false;
+		private final int index, total;
+		
+		public SendMessageThread(int index, int total){
+			this.index = index;
+			this.total = total;
+		}
+		
+		@Override
+		public void sleep(){
+			if(shouldSleep){
+				try {
+					if(logger.isDebugEnabled()){
+						logger.debug("[startSendMessageThread][sleep]" + MESSAGE_SEND_NONE_INTERVAL);
+					}
+					TimeUnit.MICROSECONDS.sleep(MESSAGE_SEND_NONE_INTERVAL);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		@Override
+		protected boolean stop() {
+			return shoudStop();
+		}
+		
+		@Override
+		protected void doRun() {
+			shouldSleep = true;
+			Iterator<ConsumerWorker>   ite = consumerInfo2ConsumerWorker.values().iterator();
+			
+			int i = 0;
+			while(ite.hasNext()){
+				
+				ConsumerWorker worker = ite.next();
+				i++;
+				if((i % total) == index){
+					boolean messageExist = worker.sendMessage();
+	                if(messageExist && shouldSleep){
+	                	shouldSleep = false;
+	                }
+				}
+            }
+		}
+	}
 }

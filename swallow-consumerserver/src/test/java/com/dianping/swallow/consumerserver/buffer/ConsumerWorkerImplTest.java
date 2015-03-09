@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.hamcrest.Description;
@@ -40,7 +40,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
 
     private Channel               channel;
 
-    private void makeMessages(BlockingQueue<SwallowMessage> messageQueue) {
+    private void makeMessages(Queue<SwallowMessage> messageQueue) {
         for (long i = 0; i < 50; i++) {
             SwallowMessage message = new SwallowMessage();
             message.setMessageId(i);

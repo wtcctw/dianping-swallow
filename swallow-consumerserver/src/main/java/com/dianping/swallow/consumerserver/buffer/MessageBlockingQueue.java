@@ -1,9 +1,8 @@
 package com.dianping.swallow.consumerserver.buffer;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -15,7 +14,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
-public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessage> implements CloseableBlockingQueue<SwallowMessage> {
+public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMessage> implements CloseableBlockingQueue<SwallowMessage> {
 
 	private static final long serialVersionUID = -633276713494338593L;
 	
@@ -45,7 +44,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
 			int maxThreshold, int capacity, Long messageIdOfTailMessage,
 			Long tailBackupMessageId, MessageFilter messageFilter,
 			ExecutorService retrieverThreadPool) {
-		super(capacity);
 		// 能运行到这里，说明capacity>0
 		this.consumerInfo = consumerInfo;
 		if (minThreshold < 0 || maxThreshold < 0 || minThreshold > maxThreshold) {
@@ -67,17 +65,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
 	}
 
 	public void init() {
-	}
-
-	@Override
-	public SwallowMessage take() throws InterruptedException {
-		// 阻塞take()方法不让使用的原因是：防止当ensureLeftMessage()失败时，没法获取消息，而调用take()的代码将一直阻塞。
-		// 不过，可以在后台线程中获取消息失败时不断重试，直到保证ensureLeftMessage。
-		// 但是极端情况下，可能出现：
-		// 后台线程某时刻判断size()是足够的，所以wait；但在wait前，queue的元素又被取光了，外部调用者继续在take()上阻塞；而此时后台线程也wait，就‘死锁’了。
-		// 即，size()的判断和fetch消息的操作，比较作为同步块原子化。才能从根本上保证线程安全。
-		throw new UnsupportedOperationException(
-				"Don't call this operation, call 'poll(long timeout, TimeUnit unit)' instead.");
 	}
 
 	@Override
@@ -113,19 +100,6 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
 	private void increaseMessageCount() {
 		retriveStrategy.increaseMessageCount();
 		backupRetriveStrategy.increaseMessageCount();
-	}
-
-	@Override
-	public SwallowMessage poll(long timeout, TimeUnit unit)
-			throws InterruptedException {
-
-		ensureLeftMessage();
-		if (logger.isDebugEnabled()) {
-			logger.debug("[poll][timeout]" + timeout);
-		}
-		SwallowMessage message = super.poll(timeout, unit);
-		decreaseMessageCount(message);
-		return message;
 	}
 
 	/**
@@ -176,15 +150,10 @@ public final class MessageBlockingQueue extends LinkedBlockingQueue<SwallowMessa
 	public void putMessage(List messages) {
 		for (int i = 1; i < messages.size(); i++) {
 			SwallowMessage message = (SwallowMessage) messages.get(i);
-			try {
-				MessageBlockingQueue.this.put(message);
-				increaseMessageCount();
-				if (logger.isDebugEnabled()) {
-					logger.debug("Add message to (topic=" + consumerInfo.getDest().getName() + ",cid=" + consumerInfo.getConsumerId() + ") queue:" + message.toString());
-				}
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				break;
+			MessageBlockingQueue.this.offer(message);
+			increaseMessageCount();
+			if (logger.isDebugEnabled()) {
+				logger.debug("Add message to (topic=" + consumerInfo.getDest().getName() + ",cid=" + consumerInfo.getConsumerId() + ") queue:" + message.toString());
 			}
 		}
 	}

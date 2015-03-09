@@ -1,8 +1,8 @@
 package com.dianping.swallow.consumerserver.buffer;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 
-public interface CloseableBlockingQueue<E> extends BlockingQueue<E> {
+public interface CloseableBlockingQueue<E> extends Queue<E> {
 
    /**
     * 关闭BlockingQueue占用的资源

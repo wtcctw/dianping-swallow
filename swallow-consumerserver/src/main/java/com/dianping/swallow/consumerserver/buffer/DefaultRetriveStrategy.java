@@ -157,7 +157,7 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 
 	
 	private AtomicInteger taskCount =  new AtomicInteger(); 
-	private final int maxTaskCount = 2;
+	private final int maxTaskCount = 1;
 	@Override
 	public boolean canPutNewTask() {
 		
