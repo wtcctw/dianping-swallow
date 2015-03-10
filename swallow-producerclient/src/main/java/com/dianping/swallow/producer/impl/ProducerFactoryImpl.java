@@ -24,6 +24,7 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.pigeon.registry.RegistryManager;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
+import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
@@ -49,7 +50,10 @@ public final class ProducerFactoryImpl implements ProducerFactory {
    private final String                     producerVersion  = "0.7.0";                                           //Producer版本号
    private final SwallowPigeonConfiguration pigeonConfigure;                                                      //ProducerFactory配置类
    private ProducerSwallowService           remoteService;                                                        //远程调用对象
-
+   
+   static{
+	   SwallowHelper.initialize();
+   }
    /**
     * Producer工厂类构造函数
     * 

@@ -22,6 +22,7 @@ import com.dianping.swallow.common.internal.codec.JsonEncoder;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
+import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
@@ -44,8 +45,11 @@ public abstract class AbstractBootStrap {
     protected ConsumerAuthController consumerAuthController;
     protected Heartbeater heartbeater; 
     
-    
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+	static{
+		   SwallowHelper.initialize();
+	}
 
 	protected ServerBootstrap startNetty(int port) {
 

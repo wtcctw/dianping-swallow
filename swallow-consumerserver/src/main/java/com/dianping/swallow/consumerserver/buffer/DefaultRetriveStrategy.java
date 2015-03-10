@@ -42,11 +42,12 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 		
 	private AtomicInteger messageCount = new AtomicInteger();
 	
-	public DefaultRetriveStrategy(ConsumerInfo consumerInfo, int minRetrieveInterval, int maxThreshold){
+	public DefaultRetriveStrategy(ConsumerInfo consumerInfo, int minRetrieveInterval, int maxThreshold, int maxRetriverTaskCountPerConsumer){
 		
 		this.minRetrieveInterval = minRetrieveInterval;
 		this.maxThreshold = maxThreshold;
 		this.consumerInfo = consumerInfo;
+		this.maxRetriverTaskCountPerConsumer = maxRetriverTaskCountPerConsumer;
 	}
 
 	@Override
@@ -157,11 +158,12 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 
 	
 	private AtomicInteger taskCount =  new AtomicInteger(); 
-	private final int maxTaskCount = 1;
+	private int maxRetriverTaskCountPerConsumer = 3;
+	
 	@Override
 	public boolean canPutNewTask() {
 		
-		if(taskCount.get() >= maxTaskCount){
+		if(taskCount.get() >= maxRetriverTaskCountPerConsumer){
 			return false;
 		}
 		return true; 
@@ -170,6 +172,10 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 	@Override
 	public void offerNewTask() {
 		taskCount.incrementAndGet();
+	}
+
+	public int getMaxRetriverTaskCountPerConsumer() {
+		return maxRetriverTaskCountPerConsumer;
 	}
 
 }

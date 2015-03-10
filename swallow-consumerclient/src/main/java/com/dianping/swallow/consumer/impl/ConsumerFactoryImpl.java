@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
@@ -26,8 +27,13 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
    private static final String TOPICNAME_DEFAULT            = "default";
    private final static String LION_KEY_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
    private Map<String, List<InetSocketAddress>> topicName2Address = new HashMap<String, List<InetSocketAddress>>();
-   
    private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
+   
+   static{
+	   SwallowHelper.initialize();
+   }
+   
+
    
    private ConsumerFactoryImpl() {
       getSwallowCAddress();

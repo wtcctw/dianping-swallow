@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -22,6 +23,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
+import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.consumer.BackoutMessageException;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
@@ -34,14 +36,13 @@ import com.dianping.swallow.consumer.internal.ConsumerImpl;
  */
 public class MessageClientHandler extends SimpleChannelUpstreamHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MessageClientHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageClientHandler.class);
 
     private final ConsumerImpl  consumer;
-    private final String        catNameStr;
+    private String        		catNameStr;
 
     public MessageClientHandler(ConsumerImpl consumer) {
         this.consumer = consumer;
-        this.catNameStr = consumer.getDest().getName() + ":" + consumer.getConsumerId() + ":" + consumer.getConsumerIP();
     }
 
     @Override
@@ -50,25 +51,29 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                 consumer.getDest(), consumer.getConfig().getConsumerType(), consumer.getConfig().getThreadPoolSize(),
                 consumer.getConfig().getMessageFilter());
         consumerMessage.setMessageId(consumer.getConfig().getStartMessageId());
+        this.catNameStr = consumer.getDest().getName() + ":" + consumer.getConsumerId() +  ":" + IPUtil.getStrAddress(e.getChannel().getLocalAddress());
         e.getChannel().write(consumerMessage);
+        
     }
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         super.channelDisconnected(ctx, e);
-        LOG.info("Channel(remoteAddress=" + e.getChannel().getRemoteAddress() + ") disconnected");
+        if(logger.isInfoEnabled()){
+        	logger.info("Channel(remoteAddress=" + e.getChannel().getRemoteAddress() + ") disconnected");
+        }
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e) {
         //记录收到消息，并且记录发来消息的server的地址
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("MessageReceived from " + e.getChannel().getRemoteAddress());
+        if (logger.isDebugEnabled()) {
+            logger.debug("MessageReceived from " + getConnectionString(e));
         }
 
         //如果已经close，接收到消息时，不回复ack，而是关闭连接。
         if(consumer.isClosed()){
-            LOG.info("Message receiced, but it was rejected because consumer was closed.");
+            logger.info("Message receiced, but it was rejected because consumer was closed.");
             ctx.getChannel().close();
             return;
         }
@@ -77,9 +82,14 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
 
             @Override
             public void run() {
+            	
+                
                 SwallowMessage swallowMessage = ((PktMessage) e.getMessage()).getContent();
-
                 Long messageId = swallowMessage.getMessageId();
+                
+                if (logger.isDebugEnabled()) {
+                    logger.debug("[run][task begin]" + getConnectionString(e) + "," + messageId);
+                }
 
                 PktConsumerMessage consumermessage = new PktConsumerMessage(ConsumerMessageType.ACK, messageId,
                         consumer.isClosed());
@@ -98,6 +108,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                     String catParentID = ((PktMessage) e.getMessage()).getCatEventID();
                     tree.setMessageId(catParentID);
                 } catch (Exception e) {
+                	logger.error("[run]", e);
                 }
 
                 //处理消息
@@ -127,7 +138,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                                 PhoenixContext.getInstance().setGuid(guid);
                             }
                         } catch (ClassNotFoundException e1) {
-                            LOG.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
+                            logger.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
                         }
                     }
                     try {
@@ -152,7 +163,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                                 Cat.getProducer().logError(e);
                                 if (retryCount <= MessageClientHandler.this.consumer.getConfig()
                                         .getRetryCountOnBackoutMessageException()) {
-                                    LOG.error(
+                                    logger.error(
                                             "BackoutMessageException occur on onMessage(), onMessage() will be retryed soon [retryCount="
                                                     + retryCount + "]. ", e);
                                     pullStrategy.fail(true);
@@ -165,43 +176,47 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                                     consumeFailedTransaction.complete();
 
                                     consumerClientTransaction.setStatus(e);
-                                    LOG.error("BackoutMessageException occur on onMessage(), onMessage() failed.", e);
+                                    logger.error("BackoutMessageException occur on onMessage(), onMessage() failed.", e);
                                 }
                             } finally {
                                 consumeTryTras.complete();
                             }
                         }
                     } catch (Throwable e) {
-                        LOG.error("Exception in MessageListener，message would be skiped: " + swallowMessage, e);
+                        logger.error("Exception in MessageListener，message would be skiped: " + swallowMessage, e);
                         consumerClientTransaction.setStatus(e);
                     }
                 } catch (IOException e) {
-                    LOG.error("Can not uncompress message，message would be skiped: " + swallowMessage, e);
+                    logger.error("Can not uncompress message，message would be skiped: " + swallowMessage, e);
                     consumerClientTransaction.setStatus(e);
                     Cat.getProducer().logError(e);
                 } catch (Throwable e) {
-                    LOG.error("Can not uncompress message，message would be skiped: " + swallowMessage, e);
+                    logger.error("Can not uncompress message，message would be skiped: " + swallowMessage, e);
                     consumerClientTransaction.setStatus(e);
                     Cat.getProducer().logError(e);
                 } finally{
                     try {
                         Class.forName("com.dianping.phoenix.environment.PhoenixContext");
                         PhoenixContext.getInstance().clear();//清理phoenix环境
-                    } catch (ClassNotFoundException e1) {
-                        LOG.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
+                    } catch (Exception e1) {
+                        logger.error("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.", e1);
                     }
 
                     //接收到了消息，则保证ack一定会写回去（有异常打log，通知message被skiped）。
                     try {
+                    	if(logger.isDebugEnabled()){
+                    		logger.debug("[run][send ack]" + getConnectionString(e) + "," + messageId);
+                    	}
                         e.getChannel().write(consumermessage);
                     } catch (RuntimeException e) {
-                        LOG.warn("Write to server error.", e);//如果没能写ack，则server在一段时间内不会再继续发消息
+                        logger.warn("Write to server error.", e);//如果没能写ack，则server在一段时间内不会再继续发消息
                     }
 
                     consumerClientTransaction.complete();
                 }
 
             }
+
         };
 
         this.consumer.submit(task);
@@ -209,11 +224,21 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-        // Close the connection when an exception is raised.
         Channel channel = e.getChannel();
-        System.out.println(e.toString());
-//        LOG.error("hello" + e.toString());
-//        LOG.error("Error from channel(remoteAddress=" + channel.getRemoteAddress() + ")", e);
+        logger.error("Error from channel(" + getConnectionString(e) + ")", e);
         channel.close();
     }
+    
+    
+    private String connectionString;
+
+	private String getConnectionString(ChannelEvent e) {
+		if(connectionString == null){
+			Channel channel = e.getChannel();
+			connectionString = IPUtil.getStrAddress(channel.getLocalAddress()) + 
+					"->" + IPUtil.getStrAddress(channel.getRemoteAddress());
+		}
+		return connectionString;
+	}
+
 }

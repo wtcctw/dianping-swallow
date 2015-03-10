@@ -3,6 +3,7 @@ package com.dianping.swallow.common.internal.util;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,9 +76,13 @@ public class IPUtil {
          return "unknown";
       }
       try {
-         return channel.getRemoteAddress().toString().substring(1);
+         return getStrAddress(channel.getRemoteAddress());
       } catch (RuntimeException e) {
       }
       return "unknown";
+   }
+   
+   public static String getStrAddress(SocketAddress address){
+	   return address.toString().substring(1);
    }
 }

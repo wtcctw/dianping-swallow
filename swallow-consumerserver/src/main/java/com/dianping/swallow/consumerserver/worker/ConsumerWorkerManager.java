@@ -87,7 +87,9 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
             //接收到连接，直接就关闭它
             channel.close();
         } else {
-            findOrCreateConsumerWorker(consumerInfo, messageFilter, startMessageId).handleGreet(channel, clientThreadCount);
+        	synchronized (consumerInfo2ConsumerWorker) {
+                findOrCreateConsumerWorker(consumerInfo, messageFilter, startMessageId).handleGreet(channel, clientThreadCount);
+			}
         }
     }
 
@@ -159,8 +161,12 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
         if(startMessageId != -1){
         	cleanConsumerInfo(consumerInfo, worker);
         }
+        
         if (worker == null) {
             // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
+        	if(logger.isInfoEnabled()){
+        		logger.info("[findOrCreateConsumerWorker][create ConsumerWorkerImpl]" + consumerInfo);
+        	}
             synchronized (consumerInfo.getConsumerId().intern()) {
                 if ((worker = findConsumerWorker(consumerInfo)) == null) {
                     worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController, consumerThreadPoolManager, startMessageId);
@@ -308,19 +314,23 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 			@Override
 			protected void doRun() {
                 //轮询所有ConsumerWorker，如果其已经没有channel，则关闭ConsumerWorker,并移除
-                for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
-                    ConsumerWorker worker = entry.getValue();
-                    ConsumerInfo consumerInfo = entry.getKey();
-                    if (worker.allChannelDisconnected()) {
-                        worker.recordAck();
-                        removeConsumerWorker(consumerInfo);
-                        worker.close();
-                        logger.info("[doRun][close ConsumerWorker]ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
-                    }
-                }
-                if(logger.isInfoEnabled()){
-                	logger.info("[doRun][consumerWorker count]" + consumerInfo2ConsumerWorker.size());
-                }
+	        	synchronized (consumerInfo2ConsumerWorker) {
+
+	                for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
+	                    ConsumerWorker worker = entry.getValue();
+	                    ConsumerInfo consumerInfo = entry.getKey();
+	                    if (worker.allChannelDisconnected()) {
+	                        worker.recordAck();
+	                        removeConsumerWorker(consumerInfo);
+	                        worker.close();
+	                        logger.info("[doRun][close ConsumerWorker]ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
+	                    }
+	                }
+	                
+	                if(logger.isInfoEnabled()){
+	                	logger.info("[doRun][consumerWorker count]" + consumerInfo2ConsumerWorker.size());
+	                }
+	        	}
 			}
         }, "idleConsumerWorkerChecker-");
     }

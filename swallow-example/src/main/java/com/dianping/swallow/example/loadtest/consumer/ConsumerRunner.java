@@ -76,17 +76,6 @@ public class ConsumerRunner extends AbstractLoadTest{
                     public void onMessage(Message msg) {
                     	
                     	count.incrementAndGet();
-//                    	Integer key = Integer.parseInt(msg.getContent().split(";")[0]);
-//                    	synchronized (this) {
-//                        	if(statis.get(key) == null){
-//                        		statis.put(key, new AtomicInteger());
-//                        	}
-//						}
-//                    	AtomicInteger atomic = statis.get(key);
-//                    	int count  = atomic.incrementAndGet();
-//                    	if(count > 1){
-//                    		
-//                    	}
                     }
                 });
                 c.start();

@@ -32,7 +32,7 @@ import com.dianping.swallow.consumer.internal.netty.MessageClientHandler;
 
 public class ConsumerImpl implements Consumer {
 
-   private static final Logger    LOG           = LoggerFactory.getLogger(ConsumerImpl.class);
+   private static final Logger    logger           = LoggerFactory.getLogger(ConsumerImpl.class);
 
    private String                 consumerId;
 
@@ -136,10 +136,10 @@ public class ConsumerImpl implements Consumer {
                "MessageListener is null, MessageListener should be set(use setListener()) before start.");
       }
       if (started.compareAndSet(false, true)) {
-         LOG.info("Starting " + this.toString());
+         logger.info("Starting " + this.toString());
          //启动处理handler的线程池
          service = Executors.newFixedThreadPool(this.getConfig().getThreadPoolSize(), new MQThreadFactory(
-                 "swallow-consumer-client-"));
+                 "swallow-consumer-client-" + consumerId + "-"));
          //初始化netty bootstrap
          final MessageClientHandler handler = new MessageClientHandler(this);
          bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
@@ -181,7 +181,7 @@ public class ConsumerImpl implements Consumer {
    @Override
    public void close() {
       if (started.compareAndSet(true, false)) {
-           LOG.info("Closing " + this.toString());
+           logger.info("Closing " + this.toString());
 
            masterConsumerThread.interrupt();
            slaveConsumerThread.interrupt();
@@ -193,12 +193,19 @@ public class ConsumerImpl implements Consumer {
    }
 
    public void submit(Runnable task){
-       if(!this.isClosed() && this.service != null && !this.service.isShutdown()){
+       if(!isClosed() && this.service != null && !this.service.isShutdown()){
            try{
-              this.service.submit(task);
+        	   if(logger.isDebugEnabled()){
+        		   logger.debug("[submit][submit task]");
+        	   }
+              this.service.execute(task);
            }catch(RuntimeException e){
-               LOG.warn("Error when submiting task, task is ignored（message will retry by server later）: "+ e.getMessage());
+               logger.warn("Error when submiting task, task is ignored（message will retry by server later）: "+ e.getMessage());
            }
+       }else{
+    	   if(logger.isDebugEnabled()){
+    		   logger.debug("[submit]" + isClosed() + ", " + service + "," + ((service != null)? service.isShutdown():""));
+    	   }
        }
    }
 

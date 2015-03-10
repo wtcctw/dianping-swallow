@@ -74,7 +74,7 @@ public abstract class AbstractRetrieveTask implements Runnable {
 	@SuppressWarnings("rawtypes")
 	protected void updateRetrieveStrategy(List messages) {
 		int messageSize = messages == null ? 0 : messages.size();
-		if (logger.isInfoEnabled() && messageSize >= 0) {
+		if (logger.isInfoEnabled() && messageSize > 0) {
 			logger.info("[updateRetrieveStrategy][read message size]" + consumerInfo + "," + messageSize);
 		}
 		retriveStrategy.retrieved(messageSize);

@@ -60,8 +60,10 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		this.messageFilter = messageFilter;
 		this.retrieverThreadPool = retrieverThreadPool;
 
-		this.retriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold);
-		this.backupRetriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getBackupMinRetrieveInterval(), this.maxThreshold);
+		this.retriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold, 
+				ConfigManager.getInstance().getMaxRetriverTaskCountPerConsumer());
+		this.backupRetriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getBackupMinRetrieveInterval(), this.maxThreshold,
+				ConfigManager.getInstance().getMaxRetriverTaskCountPerConsumer());
 	}
 
 	public void init() {
