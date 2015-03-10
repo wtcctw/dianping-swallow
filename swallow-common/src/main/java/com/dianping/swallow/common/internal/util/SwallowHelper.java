@@ -1,5 +1,7 @@
 package com.dianping.swallow.common.internal.util;
 
+import java.io.File;
+
 import com.dianping.cat.Cat;
 
 /**
@@ -11,7 +13,7 @@ public class SwallowHelper {
 	
 	public static void initialize(){
 		
-		Cat.initialize(Cat.getCatHome(), "client.xml");
+		Cat.initialize(new File(Cat.getCatHome(), "client.xml"));
 		new DefaultThreadExceptionHandler().setExceptionCaughtHandler();
 	}
 
