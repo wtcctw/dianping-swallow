@@ -70,7 +70,7 @@ if [ "$ACTION" = "stop" -o "$ACTION" = "restart" ];  then
        echo "No process of name '$ProcessName' is running, so no need to stop. "
     fi
     if [ "$ACTION" == "stop" ] ; then
-       exit 1
+       exit 0
     fi
 fi
 
@@ -101,6 +101,9 @@ SuccessLog="Producer service for client is ready"
 echo "Sleeping 8 sec for waiting process started ..."
 mysleep 8
 
+Pid=$(jps |grep $ProcessName |cut -d\  -f1)
+echo "$ProcessName started as PID $Pid."
+
 LogFile="/data/applogs/swallow/swallow-producerserver-std.out"
 CheckResult=$(grep "$SuccessLog" $LogFile |wc -l)
 
@@ -112,7 +115,6 @@ if [ $CheckResult -ge 1 ]
 else
         echo "Started \033[31mError\033[0m."
         tail -n 10 $LogFile
+        exit 1
 fi
 
-Pid=$(jps |grep $ProcessName |cut -d\  -f1)
-echo "$ProcessName started as PID $Pid."
