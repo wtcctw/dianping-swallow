@@ -18,10 +18,10 @@ public class ProxyUtil {
     * @return 返回代理的targetClass
     */
    @SuppressWarnings("unchecked")
-   public static <T> T createMongoDaoProxyWithRetryMechanism(T targetClass, long retryIntervalWhenException) {
+   public static <T> T createMongoDaoProxyWithRetryMechanism(T targetClass, long retryIntervalWhenException, int retryTimesWhenMongoException) {
       Enhancer enhancer = new Enhancer();
       enhancer.setSuperclass(targetClass.getClass());
-      enhancer.setCallback(new RetryMethodInterceptor(targetClass, retryIntervalWhenException, MongoException.class));
+      enhancer.setCallback(new RetryMethodInterceptor(targetClass, retryIntervalWhenException, retryTimesWhenMongoException, MongoException.class));
       return (T) enhancer.create();
    }
 

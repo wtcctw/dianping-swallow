@@ -61,7 +61,8 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
     
     public void setAckDAO(AckDAO ackDAO) {
         this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO, ConfigManager.getInstance()
-                .getRetryIntervalWhenMongoException());
+                .getRetryIntervalWhenMongoException(), 
+                ConfigManager.getInstance().getRetryTimesWhenMongoException());
     }
 
     public MQThreadFactory getThreadFactory() {
@@ -77,8 +78,8 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
     }
 
     public void setMessageDAO(MessageDAO messageDAO) {
-        this.messageDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(messageDAO, ConfigManager.getInstance()
-                .getRetryIntervalWhenMongoException());
+        this.messageDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(messageDAO, 
+        		ConfigManager.getInstance().getRetryIntervalWhenMongoException(), ConfigManager.getInstance().getRetryTimesWhenMongoException());
     }
 
     public void handleGreet(Channel channel, ConsumerInfo consumerInfo, int clientThreadCount,

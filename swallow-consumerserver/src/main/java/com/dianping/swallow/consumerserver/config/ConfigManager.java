@@ -22,7 +22,8 @@ public final class ConfigManager {
    private int pullFailDelayBase               = 500;
    private int                  pullFailDelayUpperBound         = 3000;
    private long                 checkConnectedChannelInterval   = 10000L;
-   private long                 retryIntervalWhenMongoException = 2000L;
+   private long                 retryIntervalWhenMongoException = 20L;
+   private int                  retryTimesWhenMongoException 	= 50;
    private long                 waitAckTimeWhenCloseSwc         = 15000L;
    private long                 waitSlaveShutDown               = 15000L;
    private long                 closeChannelMaxWaitingTime      = 10000L;
@@ -254,6 +255,14 @@ public final class ConfigManager {
 
 	public void setMaxRetriverTaskCountPerConsumer(int maxRetriverTaskCountPerConsumer) {
 		this.maxRetriverTaskCountPerConsumer = maxRetriverTaskCountPerConsumer;
+	}
+
+	public int getRetryTimesWhenMongoException() {
+		return retryTimesWhenMongoException;
+	}
+
+	public void setRetryTimesWhenMongoException(int retryTimesWhenMongoException) {
+		this.retryTimesWhenMongoException = retryTimesWhenMongoException;
 	}
 
 }

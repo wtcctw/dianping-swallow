@@ -20,32 +20,36 @@ import com.mongodb.MongoException;
 class RetryMethodInterceptor implements MethodInterceptor {
    private static final Logger LOG = LoggerFactory.getLogger(RetryMethodInterceptor.class);
    private long                retryIntervalWhenException;
+   private int 				   retryTimesWhenMongoException;
    private Object              target;
    /** 指定异常的Class */
    private Class               clazz;
 
-   public RetryMethodInterceptor(Object target, long retryIntervalWhenException, Class clazz) {
+   public RetryMethodInterceptor(Object target, long retryIntervalWhenException, int retryTimesWhenMongoException, Class clazz) {
       this.target = target;
       this.retryIntervalWhenException = retryIntervalWhenException;
+      this.retryTimesWhenMongoException = retryTimesWhenMongoException;
       this.clazz = clazz;
    }
 
    @Override
    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-      while (true) {
-         try {
-            return proxy.invoke(this.target, args);
-         } catch (Exception e) {
-            //判断异常类型,如果是指定的异常或异常子类，则retry
-            if (clazz.isInstance(e)) {
-               LOG.error("Error in Proxy of " + this.target + ", wait " + retryIntervalWhenException
-                     + "ms before retry. ", e);
-               Thread.sleep(retryIntervalWhenException);
-            } else {
-               throw e;
-            }
-         }
-      }
+	   
+	   for(int i=0; i <= retryTimesWhenMongoException ; i++){
+		   try {
+			   return proxy.invoke(this.target, args);
+		   } catch (Exception e) {
+			   //判断异常类型,如果是指定的异常或异常子类，则retry
+				if (clazz.isInstance(e)) {
+				   LOG.error("Error in Proxy of " + this.target + ", wait " + retryIntervalWhenException
+				         + "ms before retry. ", e);
+				   Thread.sleep(retryIntervalWhenException);
+				} else {
+				   throw e;
+				}
+	         }
+	      }
+	   return null;
    }
 
    public static void main(String[] args) {

@@ -30,7 +30,7 @@ public class ProxyUtilTest {
    public void testCreateProxyWithRetryMechanism() {
       TempClassForTest target = new TempClassForTest();
       target.c = "test";
-      TempClassForTest proxyTarget = ProxyUtil.createMongoDaoProxyWithRetryMechanism(target, 1000);
+      TempClassForTest proxyTarget = ProxyUtil.createMongoDaoProxyWithRetryMechanism(target, 100, 10);
       Assert.assertEquals(target.c, proxyTarget.getA());
    }
 
@@ -38,7 +38,7 @@ public class ProxyUtilTest {
    public void testCreateProxyWithRetryMechanism2() {
       TempClassForTest target = new TempClassForTest();
       target.c = "test";
-      TempClassForTest proxyTarget = ProxyUtil.createMongoDaoProxyWithRetryMechanism(target, 1000);
+      TempClassForTest proxyTarget = ProxyUtil.createMongoDaoProxyWithRetryMechanism(target, 100, 10);
       try {
          proxyTarget.getB();
          Assert.fail();

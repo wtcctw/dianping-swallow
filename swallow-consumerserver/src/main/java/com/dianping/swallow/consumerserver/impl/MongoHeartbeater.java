@@ -18,7 +18,7 @@ public class MongoHeartbeater implements Heartbeater {
 
    public void setHeartbeatDAO(HeartbeatDAO heartbeatDAO) {
       this.heartbeatDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(heartbeatDAO,
-            configManager.getRetryIntervalWhenMongoException());
+    		  configManager.getRetryIntervalWhenMongoException(), configManager.getRetryTimesWhenMongoException());
    }
 
    @Override
