@@ -19,6 +19,7 @@ public class SimpleConsumerExample {
         config.setThreadPoolSize(10);
 
         Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId2", config);
+//      Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId2", config);
         c.setListener(new MessageListener() {
 
             @Override

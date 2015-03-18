@@ -21,7 +21,7 @@ public class MasterBootStrap extends AbstractBootStrap {
 		startConsumerWorkerManager();
 
 		if (logger.isInfoEnabled()) {
-			logger.info("wait " + ConfigManager.getInstance().getWaitSlaveShutDown() + "ms for slave to stop working");
+			logger.info("[run][wait " + ConfigManager.getInstance().getWaitSlaveShutDown() + "ms for slave to stop working]");
 		}
 
 		try {
@@ -30,7 +30,7 @@ public class MasterBootStrap extends AbstractBootStrap {
 			logger.error("thread InterruptedException", e);
 		}
 		if (logger.isInfoEnabled()) {
-			logger.info("start working");
+			logger.info("[run][start working]");
 		}
 
 		createShutdownHook();

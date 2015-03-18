@@ -102,19 +102,10 @@ echo "Sleeping 8 sec for waiting process started ..."
 mysleep 8
 
 Pid=$(jps |grep $ProcessName |cut -d\  -f1)
-echo "$ProcessName started as PID $Pid."
 
-LogFile="/data/applogs/swallow/swallow-producerserver-std.out"
-CheckResult=$(grep "$SuccessLog" $LogFile |wc -l)
-
-if [ $CheckResult -ge 1 ]
-        then
-        LogView=$(grep "$SuccessLog" $LogFile)
-        echo  "Started \033[32mSucessfully\033[0m."
-        echo "View of Log: $LogView"
+if [ -n "$Pid" ]; then
+	echo "$ProcessName started as PID $Pid."
 else
-        echo "Started \033[31mError\033[0m."
-        tail -n 10 $LogFile
-        exit 1
+	echo "start failed, none process exist."
+	exit 1
 fi
-
