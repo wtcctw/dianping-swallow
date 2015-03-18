@@ -15,6 +15,7 @@ import com.dianping.cat.message.spi.MessageCodec;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.mongodb.MongoException;
 
 public class MessageDAOImplTest extends AbstractDAOImplTest {
 
@@ -88,6 +89,17 @@ public class MessageDAOImplTest extends AbstractDAOImplTest {
       Assert.assertTrue(expectedMessage.equalsWithoutMessageId(actualMessage));
    }
 
+   @Test(expected = MongoException.class)
+   public void testSwallowDifferentDbName() {
+      //插入消息
+      SwallowMessage expectedMessage = createMessage();
+      expectedMessage.setContent("content in testGetMessage");
+      messageDAO.saveMessage("test", expectedMessage);
+      messageDAO.saveMessage("Test", expectedMessage);
+   }
+   
+   
+   
    @Test
    public void testGetMessagesGreaterThan() {
       //插入1条消息

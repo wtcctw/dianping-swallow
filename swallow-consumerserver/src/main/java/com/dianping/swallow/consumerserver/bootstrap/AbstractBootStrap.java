@@ -89,7 +89,8 @@ public abstract class AbstractBootStrap {
 		if(logger.isInfoEnabled()){
 	    	  logger.info("[startNetty][Server started at port]" + port);
 	    }
-		System.out.println("[startNetty][Server started at port]" + port);		
+		System.out.println("[startNetty][Server started at port " + port + "]");
+		
 		
 		return bootstrap;
 	}
