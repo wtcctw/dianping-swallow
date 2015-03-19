@@ -10,3 +10,8 @@ Swallow 是什么:
 Get Started
 -----------
 see： http://wiki.dianpingoa.com/bin/view/%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/swallow-%E7%94%A8%E6%88%B7%E6%96%87%E6%A1%A3
+
+[TOC]
+# swallow概念
+# swallow使用
+# swallow常见问题以及处理
