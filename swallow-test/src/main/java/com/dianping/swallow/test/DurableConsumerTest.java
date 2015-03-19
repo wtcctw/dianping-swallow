@@ -6,10 +6,9 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClient;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.SendFailedException;
+import com.dianping.swallow.consumer.Consumer;
 
 /**
  * 测试收发消息是否吻合
@@ -17,43 +16,53 @@ import com.dianping.swallow.common.producer.exceptions.SendFailedException;
  *
  * 2015年2月13日 下午1:34:34
  */
-public class SimpleTest extends AbstractTest{
+public class DurableConsumerTest extends AbstractConsumerTest{
 	
-	protected String topic = "swallow-test-integrated";
-	protected String consumerId = "swallow-test-integrated-consumer";
 	private   int  messageCount = 1000;
 	private	  int concurrentCount = 50;
 
 	@Before
 	public void beforeSimpleTest(){
-		
-		
-		MongoClient mc = new MongoClient("swallow.mongo.producerServerURI");
-		MessageDAOImpl mdao = new MessageDAOImpl();
-		mdao.setMongoClient(mc);
-		
-		mdao.cleanMessage(topic, consumerId);
+		mdao.cleanMessage(topic, getConsumerId());
 		mdao.cleanMessage(topic, null);
 	}
 	
 	@Test
 	public void testDurableMessage() throws SendFailedException, RemoteServiceInitFailedException{
 		
-		addListener(topic, consumerId, concurrentCount);
+		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
 		sendMessage(messageCount, topic);
 		sleep(3000);
-		Assert.assertEquals(messageCount, getConsumerMessageCount(topic, consumerId));
+		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		
 	}
 
 	@Test
+	public void testDurationClose() throws SendFailedException, RemoteServiceInitFailedException{
+		
+		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
+		closeConsumer(consumer);
+		sendMessage(messageCount, topic);
+		
+		startConsumer(consumer);
+		sleep(3000);
+		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
+		
+	}
+
+	@Test
+	/**
+	 * 测试consumer重启，能否收到消息 
+	 * @throws SendFailedException
+	 * @throws RemoteServiceInitFailedException
+	 */
 	public void testRestartMessage() throws SendFailedException, RemoteServiceInitFailedException{
 
-		addListener(topic, consumerId, concurrentCount);
+		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
 		sendMessage(messageCount, topic);
 		
 		sleep(5000);
-		int currentConsumerCount = getConsumerMessageCount(topic, consumerId); 
+		int currentConsumerCount = getConsumerMessageCount(consumer); 
 		Assert.assertEquals(messageCount, currentConsumerCount);
 		
 		
@@ -62,18 +71,18 @@ public class SimpleTest extends AbstractTest{
 			int concurrentSendMessageCount = getSendMessageCount(topic);
 			
 			//关闭consumer
-			closeConsumer(topic, consumerId);
+			closeConsumer(consumer);
 			sendMessage(messageCount, topic);
 	
 			//理论上应该不会收到消息
-			currentConsumerCount = getConsumerMessageCount(topic, consumerId); 
+			currentConsumerCount = getConsumerMessageCount(consumer); 
 			Assert.assertEquals(concurrentSendMessageCount, currentConsumerCount);
 			
-			startConsumer(topic, consumerId);
+			startConsumer(consumer);
 			sleep(5000);
 		
 			concurrentSendMessageCount = getSendMessageCount(topic);
-			currentConsumerCount = getConsumerMessageCount(topic, consumerId); 
+			currentConsumerCount = getConsumerMessageCount(consumer); 
 			Assert.assertEquals(concurrentSendMessageCount, currentConsumerCount);
 		}
 	}

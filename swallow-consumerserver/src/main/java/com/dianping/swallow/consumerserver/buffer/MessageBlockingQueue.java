@@ -152,7 +152,7 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 	public void putMessage(List messages) {
 		for (int i = 1; i < messages.size(); i++) {
 			SwallowMessage message = (SwallowMessage) messages.get(i);
-			MessageBlockingQueue.this.offer(message);
+			offer(message);
 			increaseMessageCount();
 			if (logger.isDebugEnabled()) {
 				logger.debug("Add message to (topic=" + consumerInfo.getDest().getName() + ",cid=" + consumerInfo.getConsumerId() + ") queue:" + message.toString());
@@ -174,6 +174,9 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 	}
 
 	public void setTailBackupMessageId(Long tailBackupMessageId) {
+		if(logger.isDebugEnabled()){
+			logger.debug("[setTailBackupMessageId]" + tailBackupMessageId);
+		}
 		this.tailBackupMessageId = tailBackupMessageId;
 	}
 

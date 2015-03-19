@@ -1,10 +1,14 @@
 package com.dianping.swallow.consumer;
 
+import java.util.Date;
+
+import org.bson.types.BSONTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.util.MongoUtils;
 
 /**
  * 该类用于设置Consumer的选项，每个Consumer对应一个ConsumerConfig
@@ -167,6 +171,11 @@ public class ConsumerConfig {
         this.startMessageId = startMessageId;
     }
 
+    
+    public static long fromDateToMessageId(Date beginDate){
+		return MongoUtils.BSONTimestampToLong(new BSONTimestamp((int)(beginDate.getTime()/1000), 0));
+    }
+    
     @Override
     public String toString() {
         return String

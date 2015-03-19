@@ -195,6 +195,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                         produceTransaction.setStatus(Message.SUCCESS);
                     } catch (Exception e) {
                         //如果剩余重试次数>0且未关闭，则重试
+                    	LOGGER.error("[run][send message exception]", e);
                         if (leftRetryTimes > 0 && !closed) {
                             Transaction retryTransaction = Cat.getProducer().newTransaction(MSG_PRODUCE_TRIED,
                                     producer.getDestination().getName() + ":" + producer.getProducerIP());

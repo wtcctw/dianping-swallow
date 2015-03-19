@@ -32,13 +32,12 @@ public class MongoClient implements ConfigChangeListener {
    private static final String           BACKUP_MSG_PREFIX                                 = "b_m#";
    private static final String           BACKUP_ACK_PREFIX                                 = "b_a#";
 
-   private static final Logger           LOG                                               = LoggerFactory
+   private static final Logger           logger                                               = LoggerFactory
                                                                                                  .getLogger(MongoClient.class);
 
    private static final String           MONGO_CONFIG_FILENAME                             = "swallow-mongo.properties";
    private static final String           LION_CONFIG_FILENAME                              = "swallow-mongo-lion.properties";
    private static final String           DEFAULT_COLLECTION_NAME                           = "c";
-   private static final String           TOPICNAME_HEARTBEAT                               = "heartbeat";
    private static final String           TOPICNAME_DEFAULT                                 = "default";
 
    private static final String           LION_KEY_MSG_CAPPED_COLLECTION_SIZE               = "swallow.mongo.msgCappedCollectionSize";
@@ -95,8 +94,8 @@ public class MongoClient implements ConfigChangeListener {
     */
    public MongoClient(String severURILionKey, DynamicConfig dynamicConfig) {
       this.severURILionKey = severURILionKey;
-      if (LOG.isDebugEnabled()) {
-         LOG.debug("Init MongoClient - start.");
+      if (logger.isDebugEnabled()) {
+         logger.debug("Init MongoClient - start.");
       }
       //读取properties配置(如果存在configFile，则使用configFile)
       InputStream in = MongoClient.class.getClassLoader().getResourceAsStream(MONGO_CONFIG_FILENAME);
@@ -107,15 +106,15 @@ public class MongoClient implements ConfigChangeListener {
          config = new MongoConfig();
       }
       mongoOptions = this.getMongoOptions(config);
-      LOG.info("MongoOptions=" + mongoOptions.toString());
+      logger.info("MongoOptions=" + mongoOptions.toString());
       if (dynamicConfig != null) {
          this.dynamicConfig = dynamicConfig;
       } else {
          this.dynamicConfig = new LionDynamicConfig(LION_CONFIG_FILENAME);
       }
       loadLionConfig();
-      if (LOG.isDebugEnabled()) {
-         LOG.debug("Init MongoClient - done.");
+      if (logger.isDebugEnabled()) {
+         logger.debug("Init MongoClient - done.");
       }
       //hawk监控
       HawkJMXUtil.unregisterMBean("MongoClient");
@@ -208,8 +207,8 @@ public class MongoClient implements ConfigChangeListener {
       if (mongo == null) {
          mongo = new Mongo(replicaSetSeeds, mongoOptions);
       }
-      if (LOG.isInfoEnabled()) {
-         LOG.info("parseURIAndCreateHeartbeatMongo() - parse " + serverURI + " to: " + mongo);
+      if (logger.isInfoEnabled()) {
+         logger.info("parseURIAndCreateHeartbeatMongo() - parse " + serverURI + " to: " + mongo);
       }
       return mongo;
    }
@@ -236,8 +235,8 @@ public class MongoClient implements ConfigChangeListener {
                topicNameToMongoMap.put(topicName, mongo);
             }
          }
-         if (LOG.isInfoEnabled()) {
-            LOG.info("parseURIAndCreateTopicMongo() - parse " + serverURI + " to: " + topicNameToMongoMap);
+         if (logger.isInfoEnabled()) {
+            logger.info("parseURIAndCreateTopicMongo() - parse " + serverURI + " to: " + topicNameToMongoMap);
          }
          return topicNameToMongoMap;
       } catch (RuntimeException e) {
@@ -296,8 +295,8 @@ public class MongoClient implements ConfigChangeListener {
          }
       }
       if (mongo != null) {
-         if (LOG.isInfoEnabled()) {
-            LOG.info("getExistsMongo() return a exists Mongo instance : " + mongo);
+         if (logger.isInfoEnabled()) {
+            logger.info("getExistsMongo() return a exists Mongo instance : " + mongo);
          }
       }
       return mongo;
@@ -327,8 +326,8 @@ public class MongoClient implements ConfigChangeListener {
             throw new IllegalArgumentException("The '" + this.severURILionKey
                   + "' property must contain 'default' topicName!");
          }
-         if (LOG.isInfoEnabled()) {
-            LOG.info("parseSizeOrDocNum() - parse " + sizeStr + " to: " + topicNameToSizes);
+         if (logger.isInfoEnabled()) {
+            logger.info("parseSizeOrDocNum() - parse " + sizeStr + " to: " + topicNameToSizes);
          }
          return topicNameToSizes;
       } catch (Exception e) {
@@ -350,8 +349,8 @@ public class MongoClient implements ConfigChangeListener {
     */
    @Override
    public synchronized void onConfigChange(String key, String value) {
-      if (LOG.isInfoEnabled()) {
-         LOG.info("onChange() called.");
+      if (logger.isInfoEnabled()) {
+         logger.info("onChange() called.");
       }
       value = value.trim();
       try {
@@ -385,17 +384,17 @@ public class MongoClient implements ConfigChangeListener {
             closeUnuseMongo(oldMongo, this.topicNameToMongoMap.values(), this.heartbeatMongo);
          } else if (LION_KEY_HEARTBEAT_CAPPED_COLLECTION_SIZE.equals(key)) {
             this.heartbeatCappedCollectionSize = Integer.parseInt(value);
-            if (LOG.isInfoEnabled()) {
-               LOG.info("parse " + value);
+            if (logger.isInfoEnabled()) {
+               logger.info("parse " + value);
             }
          } else if (LION_KEY_HEARTBEAT_CAPPED_COLLECTION_MAX_DOC_NUM.equals(key)) {
             this.heartbeatCappedCollectionMaxDocNum = Integer.parseInt(value);
-            if (LOG.isInfoEnabled()) {
-               LOG.info("parse " + value);
+            if (logger.isInfoEnabled()) {
+               logger.info("parse " + value);
             }
          }
       } catch (Exception e) {
-         LOG.error("Error occour when reset config from Lion, no config property would changed :" + e.getMessage(), e);
+         logger.error("Error occour when reset config from Lion, no config property would changed :" + e.getMessage(), e);
       }
    }
 
@@ -410,7 +409,7 @@ public class MongoClient implements ConfigChangeListener {
       for (Mongo unuseMongo : oldMongos) {
          if (unuseMongo != null) {
             unuseMongo.close();
-            LOG.info("Close unuse Mongo: " + unuseMongo);
+            logger.info("Close unuse Mongo: " + unuseMongo);
          }
       }
    }
@@ -421,7 +420,7 @@ public class MongoClient implements ConfigChangeListener {
    private void closeUnuseMongo(Mongo oldMongo, Collection<Mongo> curMongos, Mongo curMongo) {
       if (!curMongos.contains(oldMongo) && oldMongo != curMongo) {
          oldMongo.close();
-         LOG.info("Close unuse Mongo: " + oldMongo);
+         logger.info("Close unuse Mongo: " + oldMongo);
       }
    }
 
@@ -480,8 +479,8 @@ public class MongoClient implements ConfigChangeListener {
    private Mongo getMongo(String topicName) {
       Mongo mongo = this.topicNameToMongoMap.get(topicName);
       if (mongo == null) {
-         if (LOG.isDebugEnabled()) {
-            LOG.debug("topicname '" + topicName + "' do not match any Mongo Server, use default.");
+         if (logger.isDebugEnabled()) {
+            logger.debug("topicname '" + topicName + "' do not match any Mongo Server, use default.");
          }
          mongo = this.topicNameToMongoMap.get(TOPICNAME_DEFAULT);
       }
@@ -566,6 +565,10 @@ public class MongoClient implements ConfigChangeListener {
 
    private DBCollection createColletcion(DB db, String collectionName, int size, int cappedCollectionMaxDocNum,
                                          DBObject... indexDBObjects) {
+
+	   if(logger.isInfoEnabled()){
+		   logger.info("[createColletcion]" + "name:" + collectionName + ", size:" + size + ", cappedCollectionMaxDocNum:" + cappedCollectionMaxDocNum);
+	   }
       DBObject options = new BasicDBObject();
       options.put("capped", true);
       if (size > 0) {
@@ -576,18 +579,19 @@ public class MongoClient implements ConfigChangeListener {
       }
       try {
          DBCollection collection = db.createCollection(collectionName, options);
-         LOG.info("Create collection '" + collection + "' on db " + db + ", index is " + indexDBObjects);
          if (indexDBObjects != null) {
             for (DBObject indexDBObject : indexDBObjects) {
                collection.ensureIndex(indexDBObject);
-               LOG.info("Ensure index " + indexDBObject + " on colleciton " + collection);
+               if(logger.isInfoEnabled()){
+            	   logger.info("Ensure index " + indexDBObject + " on colleciton " + collection);
+               }
             }
          }
          return collection;
       } catch (MongoException e) {
          if (e.getMessage() != null && e.getMessage().indexOf("collection already exists") >= 0) {
             //collection already exists
-            LOG.warn(e.getMessage() + ":the collectionName is " + collectionName);
+            logger.warn(e.getMessage() + ":the collectionName is " + collectionName);
             return db.getCollection(collectionName);
          } else {
             //other exception, can not connect to mongo etc, should abort
