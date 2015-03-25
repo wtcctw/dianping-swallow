@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.BasicDBObjectBuilder;
@@ -33,15 +34,15 @@ public class MessageDAOImpl implements MessageDAO {
    public static final String  TYPE                = "t";
    public static final String  SOURCE_IP           = "si";
 
-   private MongoClient         mongoClient;
+   private MongoManager         mongoManager;
 
-   public void setMongoClient(MongoClient mongoClient) {
-      this.mongoClient = mongoClient;
+   public void setMongoManager(DefaultMongoManager mongoManager) {
+	      this.mongoManager = mongoManager;
    }
 
    @Override
    public SwallowMessage getMessage(String topicName, Long messageId) {
-      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
+      DBCollection collection = this.mongoManager.getMessageCollection(topicName);
 
       DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(messageId)).get();
       DBObject result = collection.findOne(query);
@@ -69,7 +70,7 @@ public class MessageDAOImpl implements MessageDAO {
    }
 
    private DBCollection getCollection(String topicName, String consumerId) {
-      return this.mongoClient.getMessageCollection(topicName, consumerId);
+      return this.mongoManager.getMessageCollection(topicName, consumerId);
    }
 
    private Long getMaxMessageId(DBCollection collection) {
@@ -89,7 +90,7 @@ public class MessageDAOImpl implements MessageDAO {
 
    @Override
    public SwallowMessage getMaxMessage(String topicName) {
-      DBCollection collection = this.mongoClient.getMessageCollection(topicName);
+      DBCollection collection = this.mongoManager.getMessageCollection(topicName);
 
       DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
       DBCursor cursor = collection.find().sort(orderBy).limit(1);
@@ -122,8 +123,7 @@ public class MessageDAOImpl implements MessageDAO {
 	   if(logger.isInfoEnabled()){
 		   logger.info("[cleanMessage][topic, consumerId]" + topicName + "," + consumerId);
 	   }
-		DBCollection collection = getCollection(topicName, consumerId);
-		collection.drop();
+	   mongoManager.cleanMessageCollection(topicName, consumerId);
    }
 
    private List<SwallowMessage> getMessageGreaterThan(Long messageId, int size, DBCollection collection) {

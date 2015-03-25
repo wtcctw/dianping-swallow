@@ -32,8 +32,8 @@
         </constructor-arg>
     </bean>
 
-    <bean id="mongoClient"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClient">
+    <bean id="mongoManager"
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
         <constructor-arg>
             <value>swallow.mongo.producerServerURI</value>
         </constructor-arg>

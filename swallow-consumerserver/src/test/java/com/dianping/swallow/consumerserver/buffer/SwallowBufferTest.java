@@ -18,7 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClient;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
@@ -33,7 +33,7 @@ public class SwallowBufferTest extends AbstractTest {
     @Autowired
     private MessageDAOImpl        messageDAO;
     @Autowired
-    private MongoClient           mongoClient;
+    private DefaultMongoManager           mongoClient;
 
     //   private String                cid        = "cid-1";
 

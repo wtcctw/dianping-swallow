@@ -16,16 +16,21 @@ import com.dianping.hawk.jmx.HawkJMXUtil;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientOptions.Builder;
 import com.mongodb.MongoException;
-import com.mongodb.MongoOptions;
+import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
 
-public class MongoClient implements ConfigChangeListener {
+public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
 
    private static final String           MSG_PREFIX                                        = "msg#";
    private static final String           ACK_PREFIX                                        = "ack#";
@@ -33,7 +38,7 @@ public class MongoClient implements ConfigChangeListener {
    private static final String           BACKUP_ACK_PREFIX                                 = "b_a#";
 
    private static final Logger           logger                                               = LoggerFactory
-                                                                                                 .getLogger(MongoClient.class);
+                                                                                                 .getLogger(DefaultMongoManager.class);
 
    private static final String           MONGO_CONFIG_FILENAME                             = "swallow-mongo.properties";
    private static final String           LION_CONFIG_FILENAME                              = "swallow-mongo-lion.properties";
@@ -78,7 +83,7 @@ public class MongoClient implements ConfigChangeListener {
    private volatile Map<String, Mongo>   topicNameToMongoMap;
 
    //local config
-   private MongoOptions                  mongoOptions;
+   private MongoClientOptions            mongoOptions;
 
    private DynamicConfig                 dynamicConfig;
 
@@ -92,13 +97,13 @@ public class MongoClient implements ConfigChangeListener {
     * @param uri
     * @param config
     */
-   public MongoClient(String severURILionKey, DynamicConfig dynamicConfig) {
+   public DefaultMongoManager(String severURILionKey, DynamicConfig dynamicConfig) {
       this.severURILionKey = severURILionKey;
       if (logger.isDebugEnabled()) {
          logger.debug("Init MongoClient - start.");
       }
       //读取properties配置(如果存在configFile，则使用configFile)
-      InputStream in = MongoClient.class.getClassLoader().getResourceAsStream(MONGO_CONFIG_FILENAME);
+      InputStream in = DefaultMongoManager.class.getClassLoader().getResourceAsStream(MONGO_CONFIG_FILENAME);
       MongoConfig config;
       if (in != null) {
          config = new MongoConfig(in);
@@ -121,7 +126,7 @@ public class MongoClient implements ConfigChangeListener {
       HawkJMXUtil.registerMBean("MongoClient", new HawkMBean(this));
    }
 
-   public MongoClient(String severURILionKey) {
+   public DefaultMongoManager(String severURILionKey) {
       this(severURILionKey, null);
    }
 
@@ -205,7 +210,7 @@ public class MongoClient implements ConfigChangeListener {
       List<ServerAddress> replicaSetSeeds = this.parseUriToAddressList(serverURI);
       mongo = getExistsMongo(replicaSetSeeds);
       if (mongo == null) {
-         mongo = new Mongo(replicaSetSeeds, mongoOptions);
+         mongo = new MongoClient(replicaSetSeeds, mongoOptions);
       }
       if (logger.isInfoEnabled()) {
          logger.info("parseURIAndCreateHeartbeatMongo() - parse " + serverURI + " to: " + mongo);
@@ -229,7 +234,7 @@ public class MongoClient implements ConfigChangeListener {
             List<String> topicNames = entry.getValue();
             mongo = getExistsMongo(replicaSetSeeds);
             if (mongo == null) {//创建mongo实例
-               mongo = new Mongo(replicaSetSeeds, mongoOptions);
+               mongo = new MongoClient(replicaSetSeeds, mongoOptions);
             }
             for (String topicName : topicNames) {
                topicNameToMongoMap.put(topicName, mongo);
@@ -432,21 +437,21 @@ public class MongoClient implements ConfigChangeListener {
       return list1.containsAll(list2) && list2.containsAll(list1);
    }
 
-   private MongoOptions getMongoOptions(MongoConfig config) {
-      MongoOptions options = new MongoOptions();
-      options.slaveOk = config.isSlaveOk();
-      options.socketKeepAlive = config.isSocketKeepAlive();
-      options.socketTimeout = config.getSocketTimeout();
-      options.connectionsPerHost = config.getConnectionsPerHost();
-      options.threadsAllowedToBlockForConnectionMultiplier = config.getThreadsAllowedToBlockForConnectionMultiplier();
-      options.w = config.getW();
-      options.wtimeout = config.getWtimeout();
-      options.fsync = config.isFsync();
-      options.connectTimeout = config.getConnectTimeout();
-      options.maxWaitTime = config.getMaxWaitTime();
-      options.autoConnectRetry = config.isAutoConnectRetry();
-      options.safe = config.isSafe();
-      return options;
+   private MongoClientOptions getMongoOptions(MongoConfig config) {
+	   
+      Builder builder = MongoClientOptions.builder();
+      
+      builder.socketKeepAlive(config.isSocketKeepAlive());
+      builder.socketTimeout(config.getSocketTimeout());
+      builder.connectionsPerHost(config.getConnectionsPerHost());
+      builder.threadsAllowedToBlockForConnectionMultiplier(config.getThreadsAllowedToBlockForConnectionMultiplier());
+      builder.connectTimeout(config.getConnectTimeout());
+      builder.maxWaitTime(config.getMaxWaitTime());
+
+      builder.writeConcern(new WriteConcern(config.getW(), config.getWtimeout(), config.isFsync()));
+      builder.readPreference(ReadPreference.secondaryPreferred());
+
+      return builder.build();
    }
 
    public DBCollection getMessageCollection(String topicName) {
@@ -464,17 +469,43 @@ public class MongoClient implements ConfigChangeListener {
       DBCollection collection;
       if (consumerId == null) {
          collection = this.getCollection(mongo, getIntSafely(msgTopicNameToSizes, topicName),
-               getIntSafely(msgTopicNameToMaxDocNums, topicName), MSG_PREFIX + topicName, new BasicDBObject(
+               getIntSafely(msgTopicNameToMaxDocNums, topicName), getMessageDbName(topicName, consumerId), new BasicDBObject(
                      MessageDAOImpl.ID, -1));
       } else {
          BasicDBObject index1 = new BasicDBObject(MessageDAOImpl.ID, -1);
          BasicDBObject index2 = new BasicDBObject(MessageDAOImpl.ORIGINAL_ID, -1);
          collection = this.getCollection(mongo, getIntSafely(backupMsgTopicNameToSizes, topicName),
-               getIntSafely(backupMsgTopicNameToMaxDocNums, topicName), BACKUP_MSG_PREFIX + topicName + "#"
-                     + consumerId, index1, index2);
+               getIntSafely(backupMsgTopicNameToMaxDocNums, topicName), getMessageDbName(topicName, consumerId), index1, index2);
       }
       return collection;
    }
+
+	private String getMessageDbName(String topicName, String consumerId) {
+
+		if(consumerId == null){
+			return MSG_PREFIX + topicName;
+		}
+		return BACKUP_MSG_PREFIX + topicName + "#" + consumerId;
+	}
+
+	@Override
+	public void cleanMessageCollection(String topicName, String consumerId) {
+
+		DBCollection collection = getMessageCollection(topicName, consumerId);
+		
+		boolean isCapped = collection.isCapped();
+		
+		collection.drop();
+		
+		markCollectionNotExists(getMongo(topicName).getDB(getMessageDbName(topicName, consumerId)));
+		
+		collection = getMessageCollection(topicName, consumerId);
+		
+		if(isCapped != collection.isCapped()){
+			logger.warn("[cleanMessageCollection][capped type change]" + isCapped + "," + collection.isCapped());
+		}
+				
+	}
 
    private Mongo getMongo(String topicName) {
       Mongo mongo = this.topicNameToMongoMap.get(topicName);
@@ -528,6 +559,7 @@ public class MongoClient implements ConfigChangeListener {
                                       DBObject... indexDBObjects) {
       //根据topicname从Mongo实例从获取DB
       DB db = mongo.getDB(dbName);
+      
       //从DB实例获取Collection(因为只有一个Collection，所以名字均叫做c),如果不存在，则创建)
       DBCollection collection = null;
       if (!collectionExists(db)) {//从缓存检查default collection 存在的标识，避免db.collectionExists的调用
@@ -547,21 +579,17 @@ public class MongoClient implements ConfigChangeListener {
       return collection;
    }
 
-   /**
-    * 由于collection创建后不会删除，故可以在内存缓存collection是否存在<br>
-    * 返回true，表示集合确实存在；<br>
-    * 返回false，表示集合可能不存在。<br>
-    */
    private boolean collectionExists(DB db) {
       return collectionExistsSign.containsKey(db);
    }
 
-   /**
-    * 在内存缓存db的default collection是否存在<br>
-    */
    private void markCollectionExists(DB db) {
       collectionExistsSign.put(db, Byte.MAX_VALUE);
    }
+
+   private void markCollectionNotExists(DB db) {
+	      collectionExistsSign.remove(db);
+	   }
 
    private DBCollection createColletcion(DB db, String collectionName, int size, int cappedCollectionMaxDocNum,
                                          DBObject... indexDBObjects) {
@@ -581,7 +609,7 @@ public class MongoClient implements ConfigChangeListener {
          DBCollection collection = db.createCollection(collectionName, options);
          if (indexDBObjects != null) {
             for (DBObject indexDBObject : indexDBObjects) {
-               collection.ensureIndex(indexDBObject);
+               collection.createIndex(indexDBObject);
                if(logger.isInfoEnabled()){
             	   logger.info("Ensure index " + indexDBObject + " on colleciton " + collection);
                }
@@ -629,10 +657,10 @@ public class MongoClient implements ConfigChangeListener {
     */
    public static class HawkMBean {
 
-      private final WeakReference<MongoClient> mongoClient;
+      private final WeakReference<DefaultMongoManager> mongoClient;
 
-      private HawkMBean(MongoClient mongoClient) {
-         this.mongoClient = new WeakReference<MongoClient>(mongoClient);
+      private HawkMBean(DefaultMongoManager mongoClient) {
+         this.mongoClient = new WeakReference<DefaultMongoManager>(mongoClient);
       }
 
       public String getSeverURILionKey() {
@@ -701,5 +729,6 @@ public class MongoClient implements ConfigChangeListener {
       int size = 10000;
       System.out.println((long) MILLION * size);
    }
+
 
 }

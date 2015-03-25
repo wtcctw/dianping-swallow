@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.AckDAO;
+import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -23,10 +24,10 @@ public class AckDAOImpl implements AckDAO {
    public static final String  SRC_CONSUMER_IP = "cip";
    public static final String  TICK            = "t";
 
-   private MongoClient         mongoClient;
+   private MongoManager         mongoManager;
 
-   public void setMongoClient(MongoClient mongoClient) {
-      this.mongoClient = mongoClient;
+   public void setMongoManager(DefaultMongoManager mongoManager) {
+      this.mongoManager = mongoManager;
    }
 
    @Override
@@ -41,7 +42,7 @@ public class AckDAOImpl implements AckDAO {
    }
 
    private DBCollection getCollection(String topicName, String consumerId, boolean isBackup) {
-      return this.mongoClient.getAckCollection(topicName, consumerId, isBackup);
+      return this.mongoManager.getAckCollection(topicName, consumerId, isBackup);
    }
 
    private Long getMaxMessageId(DBCollection collection) {

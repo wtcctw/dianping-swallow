@@ -5,7 +5,6 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
@@ -23,12 +22,12 @@ public class NonDurableConsumerTest extends AbstractConsumerTest{
 	private   int  messageCount = 1000;
 	private	  int concurrentCount = 50;
 
-	@Before
-	public void beforeSimpleTest(){
-		mdao.cleanMessage(topic, getConsumerId());
-		mdao.cleanMessage(topic, null);
-	}
 	
+	@Test
+	public void simpleSendMessage() throws SendFailedException, RemoteServiceInitFailedException{
+		sendMessage(10, topic);
+	}
+
 	@Test
 	public void testNoneDurableReceiveMessage() throws SendFailedException, RemoteServiceInitFailedException{
 		

@@ -386,7 +386,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
          }
 
          if(logger.isDebugEnabled()){
-        	 logger.debug("[sendMessage][channle write]");
+        	 logger.debug("[sendMessage][channel write]");
          }
          //发送消息
          channel.write(pktMessage);

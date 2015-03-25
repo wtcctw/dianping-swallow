@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClient;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 
 @ContextConfiguration(loader = SpringockitoContextLoader.class, locations = "classpath:applicationContext-consumerserver.xml")
 public abstract class AbstractDAOImplTest extends AbstractJUnit4SpringContextTests {
@@ -20,7 +20,7 @@ public abstract class AbstractDAOImplTest extends AbstractJUnit4SpringContextTes
    protected static final String IP          = "127.0.0.1";
 
    @Autowired
-   private MongoClient           mongoClient;
+   private DefaultMongoManager           mongoClient;
 
    private static MockMongo      mock;
 

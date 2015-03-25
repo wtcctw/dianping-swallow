@@ -16,7 +16,7 @@ import com.dianping.swallow.AbstractTest;
  */
 public class MongoClientTest extends AbstractTest{
 	
-	private MongoClient mongoClient = new MongoClient("swallow.mongo.producerServerURI");
+	private DefaultMongoManager mongoClient = new DefaultMongoManager("swallow.mongo.producerServerURI");
 	
 	@Test
 	public void testParse(){

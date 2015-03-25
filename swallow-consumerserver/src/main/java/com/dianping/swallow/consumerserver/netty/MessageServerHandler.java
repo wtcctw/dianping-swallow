@@ -29,7 +29,7 @@ import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
 public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
-   private static final Logger   LOG          = LoggerFactory.getLogger(MessageServerHandler.class);
+   private static final Logger   logger          = LoggerFactory.getLogger(MessageServerHandler.class);
 
    private static ChannelGroup   channelGroup = new DefaultChannelGroup();
 
@@ -49,12 +49,14 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
       this.workerManager = workerManager;
       this.topicWhiteList = topicWhiteList;
       this.consumerAuthController = consumerAuthController;
-      LOG.info("Inited MessageServerHandler.");
+      if(logger.isInfoEnabled()){
+    	  logger.info("Inited MessageServerHandler.");
+      }
    }
 
    @Override
    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
-      LOG.info(e.getChannel().getRemoteAddress() + " connected!");
+      logger.info(e.getChannel().getRemoteAddress() + " connected!");
       channelGroup.add(e.getChannel());
    }
 
@@ -65,7 +67,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
       final Channel channel = e.getChannel();
 
       if (!(e.getMessage() instanceof PktConsumerMessage)) {
-          LOG.warn("the received message is not PktConsumerMessage");
+          logger.warn("the received message is not PktConsumerMessage");
           return;
       }
 
@@ -79,7 +81,9 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
                consumerInfo = new ConsumerInfo(ConsumerIdUtil.getRandomNonDurableConsumerId(), consumerPacket.getDest(), ConsumerType.NON_DURABLE);
             } else {
                if (!NameCheckUtil.isConsumerIdValid(consumerPacket.getConsumerId())) {
-                   LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + "ConsumerId inValid.");
+            	   if(logger.isInfoEnabled()){
+            		   logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + "ConsumerId inValid.");
+            	   }
                    channel.close();
                    return;
                }
@@ -87,33 +91,43 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
             }
             // Topic
             if (!NameCheckUtil.isTopicNameValid(consumerInfo.getDest().getName())) {
-                LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " TopicName inValid.");
+         	   if(logger.isInfoEnabled()){
+         		   logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " TopicName inValid.");
+         	   }
                 channel.close();
                 return;
             }
             // 验证topicName是否在白名单里（白名单的控制，只在greet时检查，已经连接上的，不检查）
             boolean isValid = topicWhiteList.isValid(consumerInfo.getDest().getName());
             if (!isValid) {
-                LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " TopicName is not in whitelist.");
+         	   if(logger.isInfoEnabled()){
+         		   logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " TopicName is not in whitelist.");
+         	   	}
                 channel.close();
                 return;
             }
             //验证该消费者是否被合法
             boolean isAuth= consumerAuthController.isValid(consumerInfo, ((InetSocketAddress)channel.getRemoteAddress()).getAddress().getHostAddress());
             if (!isAuth) {
-                  LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Consumer is disabled.");
+         	   	 if(logger.isInfoEnabled()){
+         		   	logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Consumer is disabled.");
+         	   	  }
                   channel.close();
                   return;
             }
 
             clientThreadCount = consumerPacket.getThreadCount();
             if (clientThreadCount > ConfigManager.getInstance().getMaxClientThreadCount()) {
-                LOG.warn(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " ClientThreadCount greater than MaxClientThreadCount(" + ConfigManager.getInstance().getMaxClientThreadCount() + ")");
-                clientThreadCount = ConfigManager.getInstance().getMaxClientThreadCount();
+         	   if(logger.isInfoEnabled()){
+         		   logger.warn(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " ClientThreadCount greater than MaxClientThreadCount(" + ConfigManager.getInstance().getMaxClientThreadCount() + ")");
+         	   }
+               clientThreadCount = ConfigManager.getInstance().getMaxClientThreadCount();
             }
             
-            LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " Received greet.");
-            workerManager.handleGreet(channel, consumerInfo, clientThreadCount, consumerPacket.getMessageFilter(), 
+     	   if(logger.isInfoEnabled()){
+     		   logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + ", threadCount:" + clientThreadCount + " Received greet.");
+     	   }
+     	   workerManager.handleGreet(channel, consumerInfo, clientThreadCount, consumerPacket.getMessageFilter(), 
             		consumerPacket.getMessageId() == null ? -1 : consumerPacket.getMessageId());
 
       } else if (ConsumerMessageType.ACK.equals(consumerPacket.getType())) { //ack信息，代表客户端收到消息
@@ -127,10 +141,12 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
                             try {
                                 Thread.sleep(ConfigManager.getInstance().getCloseChannelMaxWaitingTime());
                             } catch (InterruptedException e) {
-                                LOG.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " CloseChannelThread InterruptedException", e);
+                                logger.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " CloseChannelThread InterruptedException", e);
                             }
                             // channel.getRemoteAddress() 在channel断开后,不会抛异常
-                            LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " CloseChannelMaxWaitingTime reached, close channel.");
+                     	   if(logger.isInfoEnabled()){
+                     		   logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " CloseChannelMaxWaitingTime reached, close channel.");
+                     	   }
                             channel.close();
                             workerManager.handleChannelDisconnect(channel, consumerInfo);
                         }
@@ -157,7 +173,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
    @Override
    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
       removeChannel(e);
-      LOG.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " ExceptionCaught, channel will be close.", e.getCause());
+      logger.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " ExceptionCaught, channel will be close.", e.getCause());
       e.getChannel().close();
 
    }
@@ -166,7 +182,9 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
       removeChannel(e);
       super.channelDisconnected(ctx, e);
-      LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " Disconnected!");
+	   if(logger.isInfoEnabled()){
+		   logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " Disconnected!");
+	   }
    }
 
    @Override
@@ -174,7 +192,9 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
       removeChannel(e);
       e.getChannel().close();
       super.channelClosed(ctx, e);
-      LOG.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " Channel closed.");
+	   if(logger.isInfoEnabled()){
+		   logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " Channel closed.");
+	   }
    }
 
    private void removeChannel(ChannelEvent e) {

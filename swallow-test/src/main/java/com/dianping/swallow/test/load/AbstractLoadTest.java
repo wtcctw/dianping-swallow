@@ -1,4 +1,4 @@
-package com.dianping.swallow.example.loadtest;
+package com.dianping.swallow.test.load;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -29,9 +29,20 @@ public abstract class AbstractLoadTest {
     protected int zeroCount = 0;
     protected int zeroExit = 10;
     
-
     protected ScheduledExecutorService	scheduled = Executors.newScheduledThreadPool(4);
     protected ExecutorService executors = Executors.newCachedThreadPool();
+
+    public static final int messageSize = 1000;
+    public static final String message;
+    
+
+	static {
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<messageSize;i++){
+			sb.append("c");
+		}
+		message = sb.toString();
+	}	
 
 	
     protected String getTopicName(String name, int count) {

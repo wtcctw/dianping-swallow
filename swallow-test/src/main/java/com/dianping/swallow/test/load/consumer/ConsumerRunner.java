@@ -1,4 +1,4 @@
-package com.dianping.swallow.example.loadtest.consumer;
+package com.dianping.swallow.test.load.consumer;
 
 
 
@@ -8,7 +8,7 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
-import com.dianping.swallow.example.loadtest.AbstractLoadTest;
+import com.dianping.swallow.test.load.AbstractLoadTest;
 
 /**
  * @rundemo_name 生产者例子(同步)

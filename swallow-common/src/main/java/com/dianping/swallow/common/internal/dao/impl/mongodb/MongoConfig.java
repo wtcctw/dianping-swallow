@@ -30,7 +30,6 @@ class MongoConfig {
    private boolean             fsync                                        = false;
    private int                 connectTimeout                               = 2000;
    private int                 maxWaitTime                                  = 2000;
-   private boolean             autoConnectRetry                             = true;
    private boolean             safe                                         = true;
 
    public MongoConfig() {
@@ -149,9 +148,6 @@ class MongoConfig {
       return maxWaitTime;
    }
 
-   public boolean isAutoConnectRetry() {
-      return autoConnectRetry;
-   }
 
    public boolean isSafe() {
       return safe;

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.HeartbeatDAO;
+import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -17,15 +18,15 @@ public class HeartbeatDAOImpl implements HeartbeatDAO {
 
    public static final String  TICK = "t";
 
-   private MongoClient         mongoClient;
+   private MongoManager         mongoManager;
 
-   public void setMongoClient(MongoClient mongoClient) {
-      this.mongoClient = mongoClient;
+   public void setMongoManager(DefaultMongoManager mongoManager) {
+      this.mongoManager = mongoManager;
    }
 
    @Override
    public Date updateLastHeartbeat(String ip) {
-      DBCollection collection = this.mongoClient.getHeartbeatCollection(ip.replace('.', '_'));
+      DBCollection collection = this.mongoManager.getHeartbeatCollection(ip.replace('.', '_'));
 
       Date curTime = new Date();
       DBObject insert = BasicDBObjectBuilder.start().add(TICK, curTime).get();
@@ -35,7 +36,7 @@ public class HeartbeatDAOImpl implements HeartbeatDAO {
 
    @Override
    public Date findLastHeartbeat(String ip) {
-      DBCollection collection = this.mongoClient.getHeartbeatCollection(ip.replace('.', '_'));
+      DBCollection collection = this.mongoManager.getHeartbeatCollection(ip.replace('.', '_'));
 
       DBObject fields = BasicDBObjectBuilder.start().add(TICK, Integer.valueOf(1)).get();
       DBObject orderBy = BasicDBObjectBuilder.start().add(TICK, Integer.valueOf(-1)).get();

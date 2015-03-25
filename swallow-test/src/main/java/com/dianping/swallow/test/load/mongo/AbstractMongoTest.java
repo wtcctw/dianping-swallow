@@ -1,4 +1,4 @@
-package com.dianping.swallow.example.loadtest.producer;
+package com.dianping.swallow.test.load.mongo;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,80 +12,30 @@ import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClient;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.test.load.AbstractLoadTest;
 
 /**
  * @author mengwenchao
- * 
- *         2015年1月26日 下午9:55:10
+ *
+ * 2015年3月24日 下午6:26:06
  */
-public class MongoTest extends AbstractProducerLoadTest {
-
-	private static int messageCount = 100000;
-	private static int concurrentCount = 100;
-	private static int topicCount = 2;
-	private MessageDAO dao;
-	/**
-	 * @param args
-	 * @throws InterruptedException
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws InterruptedException, IOException {
-		
-		if (args.length >= 1) {
-			topicCount  = Integer.parseInt(args[0]);
-		}
-		if (args.length >= 2) {
-			concurrentCount = Integer.parseInt(args[1]);
-		}
-		if (args.length >= 3) {
-			messageCount = Integer.parseInt(args[2]);
-		}
-
-		new MongoTest().start();
-	}
+public abstract class AbstractMongoTest extends AbstractLoadTest{
+	
+	protected MessageDAO dao;
 
 	@Override
-	protected void doStart() throws InterruptedException, IOException {
-
-		logger.info("[doStart][config]" + topicCount + "," + concurrentCount + "," + messageCount);
-		
+	protected void start() throws InterruptedException ,IOException {
+		super.start();
 		dao = createDao();
-
-		for(int i = 0 ;i< topicCount; i++){
-			
-			for(int j=0;j<concurrentCount;j++){
-				
-				final String realTopicName = getTopicName(topicName, i);
-				executors.execute(new Runnable(){
-					@Override
-					public void run() {
-	
-						while(true){
-							try{
-								if(count.get() > messageCount){
-									break;
-								}
-								dao.saveMessage(realTopicName, createMessage(message));
-								count.incrementAndGet();
-							}catch(Exception e){
-								logger.error("error save message", e);
-							}finally{
-							}
-						}
-						
-					}
-				});
-			}
-		}
-
-	}
-
-	private MessageDAO createDao() throws IOException {
 		
-		MongoClient mc = new MongoClient("swallow.mongo.producerServerURI", new DynamicConfig() {
+	};
+	
+	protected MessageDAO createDao() throws IOException {
+		
+		DefaultMongoManager mc = new DefaultMongoManager("swallow.mongo.producerServerURI", new DynamicConfig() {
 			
 			private DynamicConfig config = new LionDynamicConfig("swallow-mongo-lion.properties");
 			
@@ -108,7 +58,7 @@ public class MongoTest extends AbstractProducerLoadTest {
 		});
 		
 		MessageDAOImpl mdao = new MessageDAOImpl();
-		mdao.setMongoClient(mc);
+		mdao.setMongoManager(mc);
 		return mdao;
 	}
 
@@ -144,6 +94,40 @@ public class MongoTest extends AbstractProducerLoadTest {
 		message.setType("feed");
 		message.setSourceIp("localhost");
 		return message;
+	}
+
+	
+	protected void sendMessage(int topicCount, int concurrentCount, final int messageCount) {
+
+		logger.info("[doStart][config]" + topicCount + "," + concurrentCount + "," + messageCount);
+		
+
+		for(int i = 0 ;i< topicCount; i++){
+			
+			for(int j=0;j<concurrentCount;j++){
+				
+				final String realTopicName = getTopicName(topicName, i);
+				executors.execute(new Runnable(){
+					@Override
+					public void run() {
+	
+						while(true){
+							try{
+								if(count.get() > messageCount){
+									break;
+								}
+								dao.saveMessage(realTopicName, createMessage(message));
+								count.incrementAndGet();
+							}catch(Exception e){
+								logger.error("error save message", e);
+							}finally{
+							}
+						}
+						
+					}
+				});
+			}
+		}
 	}
 
 }

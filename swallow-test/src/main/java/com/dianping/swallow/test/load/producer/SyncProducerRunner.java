@@ -1,4 +1,4 @@
-package com.dianping.swallow.example.loadtest.producer;
+package com.dianping.swallow.test.load.producer;
 
 import java.util.Date;
 
