@@ -23,11 +23,16 @@ public class MongoUtils {
    }
 
    public static Long getLongByCurTime() {
-      int time = (int) (System.currentTimeMillis() / 1000);
-      BSONTimestamp bst = new BSONTimestamp(time, 1);
-      return BSONTimestampToLong(bst);
+      return getLongByDate(new Date());
    }
+   
+   public static Long getLongByDate(Date date) {
+	      int time = (int) (date.getTime() / 1000);
+	      BSONTimestamp bst = new BSONTimestamp(time, 1);
+	      return BSONTimestampToLong(bst);
+	   }
 
+   
    public static void main(String[] args) {
 	   
 	   System.out.println(-1 << 32);

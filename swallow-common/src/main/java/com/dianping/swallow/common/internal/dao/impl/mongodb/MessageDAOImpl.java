@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bson.types.BSONTimestamp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.MongoManager;
@@ -18,10 +16,9 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 
-public class MessageDAOImpl implements MessageDAO {
-
-   private static final Logger logger                 = LoggerFactory.getLogger(MessageDAOImpl.class);
+public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 
    public static final String  ID                  = "_id";
    public static final String  ORIGINAL_ID         = "o_id";
@@ -39,6 +36,7 @@ public class MessageDAOImpl implements MessageDAO {
    public void setMongoManager(DefaultMongoManager mongoManager) {
 	      this.mongoManager = mongoManager;
    }
+   
 
    @Override
    public SwallowMessage getMessage(String topicName, Long messageId) {
@@ -239,5 +237,38 @@ public class MessageDAOImpl implements MessageDAO {
 
       collection.insert(builder.get());
    }
+
+	@Override
+	public int deleteMessage(String topicName, Long messageId) {
+		return deleteMessage(topicName, null, messageId);
+	}
+
+	@Override
+	public int deleteMessage(String topicName, String consumerId, final Long messageId) {
+
+		final DBCollection collection = getCollection(topicName, consumerId);
+		if(collection.isCapped()){
+			logger.error("[deleteMessage][capped collection, can not delete]" + topicName + "," + consumerId);
+			return 0;
+		}
+		
+		WriteResult  result = doAndCheckResult(new MongoAction() {
+			@Override
+			public WriteResult doAction() {
+
+				DBObject query = new Query().lt(ID, MongoUtils.longToBSONTimestamp(messageId)).build();
+				return collection.remove(query);
+			}
+		});
+		
+		return result.getN();
+	}
+
+	@Override
+	public int count(String topicName, String consumerId) {
+		
+		DBCollection collection = getCollection(topicName, consumerId);
+		return collection.find().size();
+	}
 
 }

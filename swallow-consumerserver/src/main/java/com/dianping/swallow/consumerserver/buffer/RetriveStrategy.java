@@ -29,6 +29,8 @@ public interface RetriveStrategy {
 
 	void decreaseMessageCount(int count);
 	
+	int messageCount();
+	
 	/**
 	 *任务开始 
 	 */

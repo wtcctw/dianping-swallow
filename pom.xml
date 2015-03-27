@@ -58,7 +58,7 @@
 		<jackson-databind.version>2.0.2</jackson-databind.version>
 		<netty.version>3.2.7.Final</netty.version>
 		<hession.version>3.1.5</hession.version>
-		<mongo.java.driver.version>2.12.1</mongo.java.driver.version>
+		<mongo.java.driver.version>2.12.4</mongo.java.driver.version>
 		<swallow-client.version>0.5.4</swallow-client.version>
 		<lion-env.version>1.0.0</lion-env.version>
 		<log4j.version>1.2.17</log4j.version>

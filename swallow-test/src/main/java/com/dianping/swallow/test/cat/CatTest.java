@@ -17,6 +17,14 @@ public class CatTest extends AbstractTest{
 
 	
 	@Test
+	public void testArray(){
+		Long []data = new Long[5];
+		for(Long i : data){
+			System.out.println(i);
+		}
+	}
+	
+	@Test
 	public void testTransaction(){
 		
 		for(int i=0;i<100;i++){

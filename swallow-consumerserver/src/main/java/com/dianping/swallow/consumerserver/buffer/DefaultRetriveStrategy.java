@@ -178,4 +178,9 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 		return maxRetriverTaskCountPerConsumer;
 	}
 
+	@Override
+	public int messageCount() {
+		return messageCount.get();
+	}
+
 }

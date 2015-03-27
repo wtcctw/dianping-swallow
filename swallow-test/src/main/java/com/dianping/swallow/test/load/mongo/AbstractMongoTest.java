@@ -28,8 +28,8 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 
 	@Override
 	protected void start() throws InterruptedException ,IOException {
-		super.start();
 		dao = createDao();
+		super.start();
 		
 	};
 	

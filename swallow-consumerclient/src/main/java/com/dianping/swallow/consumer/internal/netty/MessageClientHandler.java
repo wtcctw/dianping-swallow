@@ -152,7 +152,13 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
                                 .getRetryCountOnBackoutMessageException()) {
                             Transaction consumeTryTras = Cat.getProducer().newTransaction("MsgConsumeTried", catNameStr);
                             try {
+                            	if(logger.isInfoEnabled()){
+                            		logger.info("[onMessage][before]" + swallowMessage.getMessageId());
+                            	}
                                 consumer.getListener().onMessage(swallowMessage);
+                            	if(logger.isInfoEnabled()){
+                            		logger.info("[onMessage][ end  ]" + swallowMessage.getMessageId());
+                            	}
                                 consumeTryTras.setStatus(Message.SUCCESS);
                                 consumerClientTransaction.setStatus(Message.SUCCESS);
                                 success = true;

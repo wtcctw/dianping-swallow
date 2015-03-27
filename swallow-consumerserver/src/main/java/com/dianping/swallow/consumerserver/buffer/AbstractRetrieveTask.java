@@ -42,7 +42,7 @@ public abstract class AbstractRetrieveTask implements Runnable {
 					retrieveMessage();
 				}
 			} catch (Throwable th) {
-				logger.error("[run]", th);
+				logger.error("[run]" + consumerInfo, th);
 			}finally{
 				retriveStrategy.endRetrieve();
 			}
