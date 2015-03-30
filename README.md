@@ -27,18 +27,18 @@
 * #### __<p id=“q1”>如何查看我的消费是否有延迟、延迟多少条消息？</p>__
 	* 从[CAT](http://cat.dp/)中查看`Swallow`项目的`Transaction`，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&domain=Swallow)）。
 	* 以dp\_action这个topic为例（__`仅作示例，具体到自己的topic，请做相应变通`__），先找到`In:dp_action`这个`type`：
-	![Swallow Transaction In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/1.png)
+	> ![Swallow Transaction In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/1.png)
 	* 上图右边对应的是当前__该topic的producer生产的`消息总量`__，点击`In:dp_action`链接，可以看到每个producer产生的消息数量：
-	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/2.png)
+	> ![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/2.png)
 	* 返回上一级，找到`Out:dp_action`这个type：
-	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/3.png)
+	> ![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/3.png)
 	* `Out:dp_action`对应的数量为__消费这个topic的`所有consumer`消费的消息总量__，点击进入，可以看到__每个消费者单台消费机__的消费数量：
-	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/4.png)
+	> ![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/4.png)
 	* 对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp\_action的数量），__如果消费的消息总量小于生产的消息总量，那么消费是有延迟的__。
 
 * #### __<p id=“q2”>如何查看我的Consumer消费一条消息的平均时间？</p>__
 	* 从[CAT](http://cat.dp/)中查看`Consumer ID对应项目`的Transaction，找到`MsgConsumed`和`MsgConsumeTried`这两个type：
-	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/5.png)
+	> ![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/5.png)
 	* `MsgConsumed`表示__consumer server给这个consumer推送的消息数量__，`MsgConsumeTried`表示__consumer尝试消费消息的次数__，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。
 	* 右边的三列可以看出__consumer调用onMessage回调函数耗费的最小、最大以及平均时间__，如果consumer消费状况一直良好，突然某个时刻开始有消费延时，可以观察一下这里的平均时间是不是比之前更高，如果平均消费时间比正常情况高出很多，可能会造成消费延时。
 
@@ -57,10 +57,10 @@
 	* 其次确认__是否该topic其他consumer都在消费，只有自己的consumer停止消费了__。可以参考[问题1](#q1)，查看topic其他consumer的消费情况。
 		* __如果该topic其他consumer也都停止消费，且生产者正常工作，`请及时联系swallow团队成员`__。
 		* 如果该topic其他consumer消费正常，只有你自己的consumer消费堵住了，请查看consumer对应项目在`CAT`中的`Problem`，找到`Heartbeat`这个type，查询最新的`线程堆栈`，以__确认Consumer的线程是否block在onMessage方法内__：
-		![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/6.png)
+		> ![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/6.png)
 		* 如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因`包括但不限于`__死循环__、__等待IO__、__死锁__、__数据库操作__、__依赖的服务超时__等情况，请仔细检查这些情况，__修复并重启consumer__即可。
 		* __如果consumer的线程不存在block现象，`请及时联系swallow团队成员`__。
 * #### __如何确认我的Producer正常工作？__
 	* 首先确认生产者是否正常启动，判别方法跟[问题4](#q4)中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。
 	* 在`CAT`上观察`Producer对应项目`的transaction，找到`MsgProduced`以及`MsgProduceTried`这两个Type，`MsgProduced`的数量表示__程序产生的消息数量__，`MsgProduceTried`表示Swallow的__producer client尝试发送给producer server的次数__。正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，`此时请联系swallow团队成员`。
-	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/7.png)
+	> ![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/7.png)
