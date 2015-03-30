@@ -56,7 +56,9 @@
 	* 其次确认`是否该topic其他consumer都在消费，只有自己的consumer停止消费了`。可以参考[问题1](#q1)，查看topic其他consumer的消费情况。
 		* __如果该topic其他consumer也都停止消费，且生产者正常工作，`请及时联系swallow团队成员`__。
 		* 如果该topic其他consumer消费正常，只有你自己的consumer消费堵住了，请查看consumer对应项目在`CAT`中的`Problem`，找到`Heartbeat`这个type，查询最新的`线程堆栈`，以确认Consumer的线程是否block在onMessage方法内：
+		
 		![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/6.png)
+		
 		* 如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因`包括但不限于``死循环`、`等待IO`、`死锁`、`数据库操作`、`依赖的服务超时`等情况，请仔细检查这些情况，`修复并重启consumer`即可。
 		* 如果consumer的线程不存在block现象，`请及时联系swallow团队成员`。
 * #### e. 如何确认我的Producer正常工作？
