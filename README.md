@@ -30,13 +30,19 @@
 
 	![Swallow Transaction In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/1.png)
 	
-	右边对应的是当前__该topic的producer生产的`消息总量`__，点击`In:dp_action`链接，可以看到每个producer产生的消息数量：
+	> 右边对应的是当前__该topic的producer生产的`消息总量`__，点击`In:dp_action`链接，可以看到每个producer产生的消息数量：
+
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/2.png)
+	
 	* 返回上一级，找到`Out:dp_action`这个type：
+	
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/3.png)
-	对应的数量为__消费这个topic的`所有consumer`消费的消息总量__，点击进入，可以看到__每个消费者单台消费机__的消费数量：
+	
+	> 对应的数量为__消费这个topic的`所有consumer`消费的消息总量__，点击进入，可以看到__每个消费者单台消费机__的消费数量：
+	
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/4.png)
-	对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp\_action的数量），__如果消费的消息总量小于生产的消息总量，那么消费是有延迟的__。
+	
+	> 对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp\_action的数量），__如果消费的消息总量小于生产的消息总量，那么消费是有延迟的__。
 
 * #### __<p id=“q2”>如何查看我的Consumer消费一条消息的平均时间？</p>__
 	* 从[CAT](http://cat.dp/)中查看`Consumer ID对应项目`的Transaction，找到`MsgConsumed`和`MsgConsumeTried`这两个type：
