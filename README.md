@@ -4,10 +4,10 @@
 
 ### 1. Swallow基础概念
 
-	* Swallow 是什么:
-		* Swallow是一个__基于Topic的异步消息传送系统__。Swallow使用__发布/订阅消息__的传送模型，__消息发布者__指定Topic并发送消息到Swallow消息服务器，__消息订阅者__则指定Topic并从Swallow消息服务器订阅消息。
-		* Swallow的发布/订阅模型。消息由Producer发布，ProducerServer负责接收并存储消息到DB。ConsumerServer负责从DB获取消息，并推送给Consumer。
-		* Swallow__支持集群订阅者__。在集群中，使用相同ConsumerId(例如Consumer A)的Consumer，将会视作同一个Consumer（同一个Consumer消费的Message将不会重复）。例如，假设一个有2台机器(主机1和主机2)的集群，ConsumerId都是“Consumer-A”，那么__同一则Message，将要么被“主机1”获取，要么被“主机2”获取，不会被两者均获取__。
+* Swallow 是什么:
+	* Swallow是一个__基于Topic的异步消息传送系统__。Swallow使用__发布/订阅消息__的传送模型，__消息发布者__指定Topic并发送消息到Swallow消息服务器,__消息订阅者__则指定Topic并从Swallow消息服务器订阅消息。
+	* Swallow的发布/订阅模型。消息由Producer发布，ProducerServer负责接收并存储消息到DB。ConsumerServer负责从DB获取消息，并推送给Consumer。
+	* Swallow__支持集群订阅者__。在集群中，使用相同ConsumerId(例如Consumer A)的Consumer，将会视作同一个Consumer（同一个Consumer消费的Message将不会重复）。例如，假设一个有2台机器(主机1和主机2)的集群，ConsumerId都是“Consumer-A”，那么__同一则Message，将要么被“主机1”获取，要么被“主机2”获取，不会被两者均获取__。
 
 ### 2. Swallow可用系统
 ### 3. Swallow系统接入流程
@@ -23,7 +23,7 @@
 
 ### 5. Swallow常见问题以及处理
 
-#### a. 如何查看我的消费是否有延迟、延迟多少条消息？
+* #### a. 如何查看我的消费是否有延迟、延迟多少条消息？
 	* 从[CAT](http://cat.dp/)中查看`Swallow`项目的`Transaction`，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&domain=Swallow)）。
 	* 以dp\_action这个topic为例（`仅作示例，具体到自己的topic，请做相应变通`），先找到`In:dp\\_action`这个type：
 	![Swallow Transaction In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/1.png)
@@ -35,7 +35,7 @@
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/4.png)
 	* 对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp\_action的数量），__如果消费的消息总量小于生产的消息总量，那么消费是有延迟的__。
 
-#### b. 如何查看我的Consumer消费一条消息的平均时间？
+* #### b. 如何查看我的Consumer消费一条消息的平均时间？
 	* 从[CAT](http://cat.dp/)中查看`Consumer ID对应项目`的Transaction，找到`MsgConsumed`和`MsgConsumeTried`这两个type：
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/5.png)
 	* `MsgConsumed`表示__consumer server给这个consumer推送的消息数量__，`MsgConsumeTried`表示__consumer尝试消费消息的次数__，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。
