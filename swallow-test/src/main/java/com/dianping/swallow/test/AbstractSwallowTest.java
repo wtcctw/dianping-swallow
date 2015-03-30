@@ -60,6 +60,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		for(Consumer c : consumers){
 			c.close();
 		}
+		sleep(100);
 	}
 
 	
@@ -91,6 +92,17 @@ public abstract class AbstractSwallowTest extends AbstractTest{
         return p;
 
 	}
+	protected Producer createProducer(String topic, boolean zipped) throws RemoteServiceInitFailedException{
+		
+        ProducerConfig config = new ProducerConfig();
+        config.setMode(ProducerMode.SYNC_MODE);
+        config.setZipped(zipped);
+        Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
+        
+        return p;
+
+	}
+
 	
 	protected int getSendMessageCount(String topic){
 		AtomicInteger count = sendMessageCount.get(topic);
@@ -123,14 +135,20 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected Consumer createConsumer(String topic, String consumerId){
 		
-		return createConsumer(topic, true, consumerId, 1, -1);
+		return createConsumer(topic, true, consumerId, 1, -1, 5);
 	}
 
-	protected Consumer createConsumer(String topic, boolean durable, String consumerId, int concurrentCount, long startMessageId){
+	protected Consumer createConsumer(String topic, String consumerId, int retryCount){
+		
+		return createConsumer(topic, true, consumerId, 1, -1, retryCount);
+	}
+
+	protected Consumer createConsumer(String topic, boolean durable, String consumerId, int concurrentCount, long startMessageId, int retryCount){
 
         ConsumerConfig config = new ConsumerConfig();
         config.setThreadPoolSize(concurrentCount);
         
+        config.setDelayBaseOnBackoutMessageException(1);
         if(!durable){
         	config.setConsumerType(ConsumerType.NON_DURABLE);
         	if(consumerId != null){
@@ -146,7 +164,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	
 	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, long startMessageId) {
 
-		final Consumer c = createConsumer(topic, durable, consumerId, concurrentCount, startMessageId);
+		final Consumer c = createConsumer(topic, durable, consumerId, concurrentCount, startMessageId, 5);
 
 		c.setListener(new MessageListener() {
         	

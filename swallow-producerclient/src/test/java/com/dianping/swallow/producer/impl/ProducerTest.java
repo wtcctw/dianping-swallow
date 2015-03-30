@@ -37,6 +37,8 @@ import com.dianping.swallow.common.internal.packet.Packet;
 import com.dianping.swallow.common.internal.packet.PacketType;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.packet.PktSwallowPACK;
+import com.dianping.swallow.common.internal.processor.DefaultMessageProcessorTemplate;
+import com.dianping.swallow.common.internal.processor.ProducerProcessor;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.common.message.Destination;
@@ -114,12 +116,13 @@ public class ProducerTest {
       config.setAsyncRetryTimes(1);
       config.setZipped(true);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000);
+      
+      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
       String ret = producer.sendMessage(content);
       assertEquals(ack.getShaInfo(), ret);
 
       ProducerImpl expectionProducer = new ProducerImpl(dest, config, producerIP, producerVersion,
-            exceptionRemoteService, 500,1, 500);
+            exceptionRemoteService, 500,1, 500, createProducerProcessor(config));
       try {
          expectionProducer.sendMessage(content);
          fail();
@@ -127,7 +130,12 @@ public class ProducerTest {
       }
    }
 
-   @Test
+	private ProducerProcessor createProducerProcessor(ProducerConfig config) {
+		
+		return new DefaultMessageProcessorTemplate(config.isZipped());
+	}
+
+@Test
    public void testExceptionAsyncProducerSendMessage() throws SendFailedException {
 
       ProducerConfig config = new ProducerConfig();
@@ -138,7 +146,7 @@ public class ProducerTest {
       config.setSendMsgLeftLastSession(false);
       config.setThreadPoolSize(2);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, exceptionRemoteService, 5000, 1, 5000);
+      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, exceptionRemoteService, 5000, 1, 5000, createProducerProcessor(config));
 
       for (int i = 0; i < 5; i++) {
          String ret = producer.sendMessage(content);
@@ -161,7 +169,7 @@ public class ProducerTest {
       config.setSendMsgLeftLastSession(false);
       config.setThreadPoolSize(2);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000);
+      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
 
       for (int i = 0; i < 5; i++) {
          String ret = producer.sendMessage(content);
@@ -184,7 +192,7 @@ public class ProducerTest {
       config.setSendMsgLeftLastSession(true);
       config.setThreadPoolSize(2);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000);
+      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
 
       Map<String, String> properties = new HashMap<String, String>();
       properties.put("Hello", "World");

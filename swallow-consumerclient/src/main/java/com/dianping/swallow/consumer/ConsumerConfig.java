@@ -33,10 +33,15 @@ public class ConsumerConfig {
     */
     private int           delayUpperboundOnBackoutMessageException = 3000;                              //ms
     /** 当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，最多重试的次数 */
-    private int           retryCountOnBackoutMessageException      = 5;                                 //重试次数
+    private int           retryCount      = 5;                                 //重试次数
 
     /** 当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定 */
     private long          startMessageId                           = -1;
+    
+    /**
+     * 任务运行时间过长，报警，此为运行时间报警阈值；设置为0，则不检查
+     */
+	private int 		  longTaskAlertTime						   = 5000;
 
     public int getThreadPoolSize() {
       return threadPoolSize;
@@ -133,32 +138,21 @@ public class ConsumerConfig {
     }
 
     /**
-    * retryCountOnBackoutMessageException表示“当MessageListener.onMessage(Message)
-    * 抛出BackoutMessageException异常时，最多重试的次数” *
-    * <p>
-    * 默认值为5
-    * </p>
-    */
+     * use getRetryCount instead
+     * @return
+     */
+    @Deprecated
     public int getRetryCountOnBackoutMessageException() {
-      return retryCountOnBackoutMessageException;
+      return retryCount;
     }
 
     /**
-    * retryCountOnBackoutMessageException表示“当MessageListener.onMessage(Message)
-    * 抛出BackoutMessageException异常时，最多重试的次数”<br>
-    * <p>
-    * 默认值为5
-    * </p>
-    */
+     * 	请使用方法：setRetryCount()
+     * @param retryCountOnBackoutMessageException
+     */
+    @Deprecated
     public void setRetryCountOnBackoutMessageException(int retryCountOnBackoutMessageException) {
-       if (retryCountOnBackoutMessageException == -1) {
-           retryCountOnBackoutMessageException = Integer.MAX_VALUE;
-       }
-       if (retryCountOnBackoutMessageException < -1) {
-           LOG.warn("invalid retryCountOnBackoutMessageException, use default value: " + this.retryCountOnBackoutMessageException + ".");
-           return;
-       }
-      this.retryCountOnBackoutMessageException = retryCountOnBackoutMessageException;
+    	setRetryCount(retryCountOnBackoutMessageException);
     }
 
     public long getStartMessageId()
@@ -180,9 +174,45 @@ public class ConsumerConfig {
     public String toString() {
         return String
             .format(
-                  "ConsumerConfig [threadPoolSize=%s, messageFilter=%s, consumerType=%s, delayBaseOnBackoutMessageException=%s, delayUpperboundOnBackoutMessageException=%s, retryCountOnBackoutMessageException=%s, startMessageId=%s]",
+                  "ConsumerConfig "
+                  + "[threadPoolSize=%s, messageFilter=%s, consumerType=%s, "
+                  + "delayBaseOnBackoutMessageException=%s, delayUpperboundOnBackoutMessageException=%s, "
+                  + "retryCountOnBackoutMessageException=%s, startMessageId=%s, longTaskAlertTime=%s]",
                   threadPoolSize, messageFilter, consumerType, delayBaseOnBackoutMessageException,
-                  delayUpperboundOnBackoutMessageException, retryCountOnBackoutMessageException, startMessageId);
+                  delayUpperboundOnBackoutMessageException, retryCount, startMessageId, longTaskAlertTime);
     }
+
+	public int getRetryCount() {
+		return retryCount;
+	}
+
+	public void setRetryCount(int retryCount) {
+		
+	       if (retryCount == -1) {
+	           retryCount = Integer.MAX_VALUE;
+	       }
+	       if (retryCount < -1) {
+	           LOG.warn("invalid retryCountOnBackoutMessageException, use default value: " + this.retryCount + ".");
+	           return;
+	       }
+	       this.retryCount = retryCount;
+	}
+
+	
+	/**
+	 * 任务运行时间过长，报警，此为运行时间报警阈值
+	 * @return 
+	 */
+	public int getLongTaskAlertTime() {
+		return longTaskAlertTime;
+	}
+
+	/**
+	 * 
+	 * @param longTaskAlertTime 任务运行时间过长，报警，此为运行时间报警阈值
+	 */
+	public void setLongTaskAlertTime(int longTaskAlertTime) {
+		this.longTaskAlertTime = longTaskAlertTime;
+	}
 
 }

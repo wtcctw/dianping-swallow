@@ -9,12 +9,20 @@ public class SwallowException extends Exception{
 
 	private static final long serialVersionUID = 1L;
 
+	public SwallowException(){
+		
+	}
+	
 	public SwallowException(String message){
 		super(message);
 	}
 
 	public SwallowException(String message, Throwable th){
 		super(message, th);
+	}
+	
+	public SwallowException(Throwable th){
+		super(th);
 	}
 
 }

@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
-import com.dianping.cat.CatConstants;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.consumer.ConsumerType;
@@ -365,16 +364,6 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       Transaction consumerServerTransaction = Cat.getProducer().newTransaction(
             "Out:" + this.consumerInfo.getDest().getName(),
             consumerInfo.getConsumerId() + ":" + IPUtil.getIpFromChannel(channel));
-      String childEventId;
-      try {
-         childEventId = Cat.getProducer().createMessageId();
-         pktMessage.setCatEventID(childEventId);
-         Cat.getProducer().logEvent(CatConstants.TYPE_REMOTE_CALL, "ConsumedByWhom",
-               com.dianping.cat.message.Message.SUCCESS, childEventId);
-      } catch (Exception e) {
-         childEventId = "UnknownMessageId";
-      }
-      //Cat end
 
       try {
          //发送后，记录已发送但未收到ACK的消息记录

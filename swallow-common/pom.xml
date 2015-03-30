@@ -82,5 +82,11 @@
 			<artifactId>hawk-client</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<!-- requestId项目的通用容器(基于ThreadLocal) -->
+		<dependency>
+			<groupId>com.dianping.platform</groupId>
+			<artifactId>phoenix-environment</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>

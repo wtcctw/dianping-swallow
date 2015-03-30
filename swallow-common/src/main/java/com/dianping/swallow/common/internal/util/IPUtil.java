@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelEvent;
 
 /**
  * @author Leo Liang
@@ -85,4 +86,13 @@ public class IPUtil {
    public static String getStrAddress(SocketAddress address){
 	   return address.toString().substring(1);
    }
+   
+   public static String getConnectionDesc(ChannelEvent e) {
+		
+		Channel channel = e.getChannel();
+		String 	connectionDesc = IPUtil.getStrAddress(channel.getLocalAddress()) + 
+				"->" + IPUtil.getStrAddress(channel.getRemoteAddress());
+		return connectionDesc;
+	}
+
 }

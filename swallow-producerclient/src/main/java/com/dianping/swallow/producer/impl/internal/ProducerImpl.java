@@ -1,22 +1,20 @@
 package com.dianping.swallow.producer.impl.internal;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
-import com.dianping.cat.CatConstants;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
-import com.dianping.phoenix.environment.PhoenixContext;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.packet.PktSwallowPACK;
+import com.dianping.swallow.common.internal.processor.ProducerProcessor;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
-import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.producer.exceptions.SendFailedException;
 import com.dianping.swallow.producer.Producer;
@@ -42,6 +40,7 @@ public class ProducerImpl implements Producer {
    private final int                    failedBaseInterval;
    private final int                    fileQueueFailedBaseInterval;
    private final ProducerHandler        producerHandler;
+   private ProducerProcessor			producerProcessor;
 
    /**
     * @param destination 此Producer发送消息的目的地
@@ -51,9 +50,10 @@ public class ProducerImpl implements Producer {
     * @param remoteService 远程调用服务接口
     * @param retryBaseInterval 重试时的时间间隔起始值
     * @param fileQueueFailedBaseInterval filequeue失败时重试的时间间隔起始值
+ * @param producerProcessor 
     */
    public ProducerImpl(Destination destination, ProducerConfig producerConfig, String producerIP,
-                       String producerVersion, ProducerSwallowService remoteService, int retryBaseInterval,int failedBaseInterval, int fileQueueFailedBaseInterval) {
+                       String producerVersion, ProducerSwallowService remoteService, int retryBaseInterval,int failedBaseInterval, int fileQueueFailedBaseInterval, ProducerProcessor producerProcessor) {
       if (producerConfig != null) {
          this.producerConfig.setAsyncRetryTimes(producerConfig.getAsyncRetryTimes());
          this.producerConfig.setMode(producerConfig.getMode());
@@ -74,7 +74,8 @@ public class ProducerImpl implements Producer {
       this.retryBaseInterval = retryBaseInterval;
       this.failedBaseInterval = failedBaseInterval;
       this.fileQueueFailedBaseInterval = fileQueueFailedBaseInterval;
-
+      this.producerProcessor = producerProcessor;
+      
       //设置Producer工作模式
       switch (this.producerConfig.getMode()) {
          case SYNC_MODE:
@@ -151,13 +152,6 @@ public class ProducerImpl implements Producer {
       String ret = null;
 
       Transaction producerTransaction = Cat.getProducer().newTransaction("MsgProduced", destination.getName() + ":" + producerIP);
-      String childMessageId;
-      try {
-         childMessageId = Cat.getProducer().createMessageId();
-         //Cat.getProducer().logEvent(CatConstants.TYPE_REMOTE_CALL, "SwallowPayload", Message.SUCCESS, childMessageId);
-      } catch (Exception e) {
-         childMessageId = "UnknownMessageId";
-      }
       try {
          //根据content生成SwallowMessage
          swallowMsg.setContent(content);
@@ -169,7 +163,6 @@ public class ProducerImpl implements Producer {
             swallowMsg.setType(messageType);
          }
          if (properties != null) {
-            //            Iterator propIter = properties.entrySet().iterator();
             for (Map.Entry<String, String> entry : properties.entrySet()) {
                if (!(entry.getKey() instanceof String)
                      || (entry.getValue() != null && !(entry.getValue() instanceof String))) {
@@ -179,13 +172,14 @@ public class ProducerImpl implements Producer {
             swallowMsg.setProperties(properties);
          }
 
-         initInternalProperties(swallowMsg);
+         try {
+			producerProcessor.beforeSend(swallowMsg);
+		} catch (SwallowException e) {
+			throw new SendFailedException("[fail]" + swallowMsg, e);
+		}
 
          //构造packet
          PktMessage pktMessage = new PktMessage(destination, swallowMsg);
-         //加入Cat的MessageID
-         pktMessage.setCatEventID(childMessageId);
-
          switch (producerConfig.getMode()) {
             case SYNC_MODE://同步模式
                PktSwallowPACK pktSwallowPACK = (PktSwallowPACK) producerHandler.doSendMsg(pktMessage);
@@ -194,11 +188,9 @@ public class ProducerImpl implements Producer {
                }
                break;
             case ASYNC_MODE://异步模式
-               Cat.getProducer().logEvent(CatConstants.TYPE_REMOTE_CALL, "AsyncProducer", Message.SUCCESS, childMessageId);
                producerHandler.doSendMsg(pktMessage);
                break;
             case ASYNC_SEPARATELY_MODE://异步模式
-               Cat.getProducer().logEvent(CatConstants.TYPE_REMOTE_CALL, "AsyncProducerSeparately", Message.SUCCESS, childMessageId);
                producerHandler.doSendMsg(pktMessage);
                break;
          }
@@ -220,42 +212,6 @@ public class ProducerImpl implements Producer {
       }
 
       return ret;
-   }
-
-   private void initInternalProperties(SwallowMessage swallowMsg) {
-        Map<String, String> internalProperties = new HashMap<String, String>();
-        try {
-            //如果没有依赖phoenix,不报错！
-            Class.forName("com.dianping.phoenix.environment.PhoenixContext");
-            //requestId和referRequestId
-            String requestId = PhoenixContext.getInstance().getRequestId();
-            String referRequestId = PhoenixContext.getInstance().getReferRequestId();
-            String guid = PhoenixContext.getInstance().getGuid();
-            if (requestId != null) {
-                internalProperties.put(PhoenixContext.REQUEST_ID, requestId);
-            }
-            if (referRequestId != null) {
-                internalProperties.put(PhoenixContext.REFER_REQUEST_ID, referRequestId);
-            }
-            if (requestId != null) {
-                internalProperties.put(PhoenixContext.GUID, guid);
-            }
-        } catch (ClassNotFoundException e1) {
-            LOGGER.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
-        }
-        //压缩选项为真：对通过SwallowMessage类转换过的json字符串进行压缩，压缩成功时将compress=gzip写入InternalProperties，
-        //               压缩失败时将compress=failed写入InternalProperties
-        //压缩选项为假：不做任何操作，InternalProperties中将不存在key为zip的项
-        if (producerConfig.isZipped()) {
-            try {
-                swallowMsg.setContent(ZipUtil.zip(swallowMsg.getContent()));
-                internalProperties.put("compress", "gzip");
-            } catch (Exception e) {
-                LOGGER.warn("Compress message failed.Content=" + swallowMsg.getContent(), e);
-                internalProperties.put("compress", "failed");
-            }
-        }
-        swallowMsg.setInternalProperties(internalProperties);
    }
 
    /**

@@ -23,6 +23,8 @@ import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.pigeon.registry.RegistryManager;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
+import com.dianping.swallow.common.internal.processor.DefaultMessageProcessorTemplate;
+import com.dianping.swallow.common.internal.processor.ProducerProcessor;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
 import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.util.IPUtil;
@@ -42,7 +44,7 @@ import com.dianping.swallow.producer.impl.internal.SwallowPigeonConfiguration;
 public final class ProducerFactoryImpl implements ProducerFactory {
 
    private static ProducerFactoryImpl       instance;                                                             //Producer工厂类单例
-   private static final Logger              LOGGER           = LoggerFactory.getLogger(ProducerFactoryImpl.class);
+   private static final Logger              logger           = LoggerFactory.getLogger(ProducerFactoryImpl.class);
 
    private static final String              CONFIG_FILE_NAME = "swallow-producerclient-pigeon.properties";        //配置文件名称
 
@@ -84,8 +86,8 @@ public final class ProducerFactoryImpl implements ProducerFactory {
       pigeon.setLoadBalance(pigeonConfigure.getLoadBalance());
 
       if (!pigeonConfigure.isUseLion()) {
-    	  if(LOGGER.isInfoEnabled()){
-    		  LOGGER.info("[initPigeon][url]" + pigeonConfigure.getHosts());
+    	  if(logger.isInfoEnabled()){
+    		  logger.info("[initPigeon][url]" + pigeonConfigure.getHosts());
     	  }
          RegistryManager.getInstance().setProperty(pigeonConfigure.getServiceName(), pigeonConfigure.getHosts());
       } else {
@@ -95,13 +97,13 @@ public final class ProducerFactoryImpl implements ProducerFactory {
          ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 
          pigeon.init();
-         LOGGER.info("[Initialize pigeon successfully.]");
+         logger.info("[Initialize pigeon successfully.]");
 
          remoteService = pigeon.getProxy();
-         LOGGER.info("[Get remoteService successfully.]:[" + "RemoteService's timeout is: "
+         logger.info("[Get remoteService successfully.]:[" + "RemoteService's timeout is: "
                + pigeonConfigure.getTimeout() + ".]");
       } catch (Exception e) {
-         LOGGER.error("[Initialize remote service failed.]", e);
+         logger.error("[Initialize remote service failed.]", e);
          throw new RemoteServiceInitFailedException(e);
       }
    }
@@ -137,10 +139,15 @@ public final class ProducerFactoryImpl implements ProducerFactory {
       }
 
       ProducerImpl producerImpl = null;
+      boolean isZipped = config != null ? config.isZipped() : false;
+      ProducerProcessor producerProcessor = new  DefaultMessageProcessorTemplate(isZipped);
       producerImpl = new ProducerImpl(dest, config, producerIP, producerVersion, remoteService,
-            pigeonConfigure.getRetryBaseInterval(), pigeonConfigure.getFailedBaseInterval(), pigeonConfigure.getFileQueueFailedBaseInterval());
-      LOGGER.info("New producer:[TopicName=" + dest.getName() + "; " + producerImpl.getProducerConfig().toString()
-            + "]");
+            pigeonConfigure.getRetryBaseInterval(), pigeonConfigure.getFailedBaseInterval(), pigeonConfigure.getFileQueueFailedBaseInterval(),
+            producerProcessor);
+      
+      if(logger.isInfoEnabled()){
+    	  logger.info("New producer:[TopicName=" + dest.getName() + "; " + producerImpl.getProducerConfig().toString()+ "]");
+      }
       //向swallow发送greet信息
       PktProducerGreet pktProducerGreet = new PktProducerGreet(producerVersion, producerIP);
 
@@ -148,7 +155,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
          remoteService.sendMessage(pktProducerGreet);
       } catch (Exception e) {
          //吃掉所有异常，以保证用户可以拿到Producer
-         LOGGER.warn("Couldn't send greet now.", e);
+         logger.warn("Couldn't send greet now.", e);
       }
 
       return producerImpl;

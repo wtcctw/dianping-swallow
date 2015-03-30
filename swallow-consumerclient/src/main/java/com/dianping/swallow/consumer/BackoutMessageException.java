@@ -1,5 +1,7 @@
 package com.dianping.swallow.consumer;
 
+import com.dianping.swallow.common.internal.exception.SwallowException;
+
 /**
  * 当consumer无法处理Message且希望重试该消息时，可以抛出该异常，Swallow接收到该异常会使用重试策略（见
  * {@link com.dianping.swallow.consumer.ConsumerConfig} 的
@@ -8,7 +10,7 @@ package com.dianping.swallow.consumer;
  * 
  * @author kezhu.wu
  */
-public class BackoutMessageException extends Exception {
+public class BackoutMessageException extends SwallowException {
 
    private static final long serialVersionUID = 3860244803030243875L;
 

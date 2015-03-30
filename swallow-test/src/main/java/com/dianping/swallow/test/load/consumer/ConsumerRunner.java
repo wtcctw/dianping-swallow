@@ -56,6 +56,7 @@ public class ConsumerRunner extends AbstractLoadTest{
 	}
 
 
+	@SuppressWarnings("deprecation")
 	private void startReceiver() {
 		
         for (int i = 0; i < topicCount; i++) {
