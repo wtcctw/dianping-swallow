@@ -26,9 +26,11 @@
 
 * #### __<p id=“q1”>如何查看我的消费是否有延迟、延迟多少条消息？</p>__
 	* 从[CAT](http://cat.dp/)中查看`Swallow`项目的`Transaction`，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&domain=Swallow)）。
-	* 以dp\_action这个topic为例（___`仅作示例，具体到自己的topic，请做相应变通`___），先找到`In:dp_action`这个`type`：
+	* 以dp\_action这个topic为例（__`仅作示例，具体到自己的topic，请做相应变通`__），先找到`In:dp_action`这个`type`：
+
 	![Swallow Transaction In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/1.png)
-	>右边对应的是当前__该topic的producer生产的`消息总量`__，点击`In:dp_action`链接，可以看到每个producer产生的消息数量：
+	
+	右边对应的是当前__该topic的producer生产的`消息总量`__，点击`In:dp_action`链接，可以看到每个producer产生的消息数量：
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/2.png)
 	* 返回上一级，找到`Out:dp_action`这个type：
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/3.png)
