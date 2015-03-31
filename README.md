@@ -27,6 +27,7 @@
 ### 4. Swallow使用说明
 
 * 使用swallow发送消息
+
     public class SyncProducerExample {
         public static void main(String[] args) throws Exception {
             ProducerConfig config = new ProducerConfig();  //(1)
@@ -40,6 +41,7 @@
             }
         }
     }
+
      1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了生产者的所有属性及其默认值。
 
      ![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/8.png "Producer属性")
@@ -66,6 +68,7 @@
 
 
 * 使用swallow接收消息
+
      public class DurableConsumerExample {
         public static void main(String[] args) {
             ConsumerConfig config = new ConsumerConfig();  //(1)
@@ -81,6 +84,7 @@
             c.start();  //(5)
         }
      }
+
      1.使用swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
      
      ![图片君匆匆加载中。。。](http://code.dianpingoa.com/arch/swallow/raw/master/readme/11.png "Consumer属性")
