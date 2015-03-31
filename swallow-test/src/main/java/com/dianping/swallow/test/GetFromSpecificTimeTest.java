@@ -26,7 +26,7 @@ public class GetFromSpecificTimeTest extends AbstractConsumerTest{
 		
 		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
 		sendMessage(messageCount, topic);
-		sleep(3000);
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		
 		

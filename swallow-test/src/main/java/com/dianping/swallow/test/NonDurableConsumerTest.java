@@ -22,11 +22,6 @@ public class NonDurableConsumerTest extends AbstractConsumerTest{
 	private   int  messageCount = 1000;
 	private	  int concurrentCount = 50;
 
-	
-	@Test
-	public void simpleSendMessage() throws SendFailedException, RemoteServiceInitFailedException{
-		sendMessage(10, topic);
-	}
 
 	@Test
 	public void testNoneDurableReceiveMessage() throws SendFailedException, RemoteServiceInitFailedException{
@@ -34,14 +29,14 @@ public class NonDurableConsumerTest extends AbstractConsumerTest{
 		Consumer consumer = addListener(topic, concurrentCount);
 		Date date = new Date();
 		sendMessage(messageCount, topic);
-		sleep(3000);
+		
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		
 		addListener(topic, getConsumerId(), date, concurrentCount);
-		sleep(3000);
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		
 	}
-
 
 }

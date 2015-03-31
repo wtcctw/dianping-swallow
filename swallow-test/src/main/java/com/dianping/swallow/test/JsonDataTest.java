@@ -46,7 +46,7 @@ public class JsonDataTest extends AbstractConsumerTest {
 		Producer p = createProducer(topic);
 		p.sendMessage(data);
 
-		sleep(3000);
+		waitForListernToComplete(1);
 		if(result.get() != null){
 			throw result.get();
 		}

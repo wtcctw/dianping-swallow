@@ -47,7 +47,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	protected MessageDAOImpl mdao = new MessageDAOImpl();
 
 	@Before
-	public void beforeAbstractTest(){
+	public void beforeSwallowAbstractTest(){
 		
 		DefaultMongoManager mc = new DefaultMongoManager("swallow.mongo.producerServerURI");
 		mdao = new MessageDAOImpl();
@@ -159,6 +159,8 @@ public abstract class AbstractSwallowTest extends AbstractTest{
        
         Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), consumerId, config);
         
+        consumers.add(c);
+        
         return c;
 	}
 	
@@ -183,14 +185,15 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             public void onMessage(Message msg) {
             	int result = count.incrementAndGet();
             	if(result % 100 == 0 ){
-            		System.out.println(result);
+            		if(logger.isInfoEnabled()){
+            			logger.info("[onMessage]" + result);
+            		}
             	}
             }
         });
         
-        consumers.add(c);
         c.start();
-        sleep(100);
+        sleep(1000);
         return c;
 	}
 
@@ -215,6 +218,16 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		}
 		return count.intValue();
 	}
+
+	protected void waitForListernToComplete(int messageCount) {
+		
+		if(messageCount <= 1000){
+			sleep(2000);
+			return;
+		}
+		sleep(5000);
+	}
+
 
 
 }
