@@ -28,9 +28,9 @@
 
 * 使用swallow发送消息
 
->	<pre>public class SyncProducerExample {
-	   public static void main(String[] args) throws Exception {
-	      ProducerConfig config = new ProducerConfig();  //(1)
+<pre>public class SyncProducerExample {
+         public static void main(String[] args) throws Exception {
+ 	      ProducerConfig config = new ProducerConfig();  //(1)
 	      config.setMode(ProducerMode.SYNC_MODE);  //(2)
 	      Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
 	      for (int i = 0; i < 10; i++) {
@@ -39,8 +39,8 @@
 		 System.out.println("Sended msg:" + msg);
 		 Thread.sleep(500);
 	      }
-	   }
->	}</pre>
+         }
+}</pre>
 
      1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了生产者的所有属性及其默认值。
 
