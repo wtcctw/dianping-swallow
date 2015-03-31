@@ -28,19 +28,19 @@
 
 * 使用swallow发送消息
 
-    public class SyncProducerExample {
-        public static void main(String[] args) throws Exception {
-            ProducerConfig config = new ProducerConfig();  //(1)
-            config.setMode(ProducerMode.SYNC_MODE);  //(2)
-            Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
-            for (int i = 0; i < 10; i++) {
-            String msg = "消息-" + i;
-                p.sendMessage(msg);  //(4)
-                System.out.println("Sended msg:" + msg);
-                Thread.sleep(500);
-            }
-        }
-    }
+	public class SyncProducerExample {
+	   public static void main(String[] args) throws Exception {
+	      ProducerConfig config = new ProducerConfig();  //(1)
+	      config.setMode(ProducerMode.SYNC_MODE);  //(2)
+	      Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);  //(3)
+	      for (int i = 0; i < 10; i++) {
+	         String msg = "消息-" + i;
+		 p.sendMessage(msg);  //(4)
+		 System.out.println("Sended msg:" + msg);
+		 Thread.sleep(500);
+	      }
+	   }
+	}
 
      1.使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了生产者的所有属性及其默认值。
 
@@ -69,21 +69,21 @@
 
 * 使用swallow接收消息
 
-     public class DurableConsumerExample {
-        public static void main(String[] args) {
-            ConsumerConfig config = new ConsumerConfig();  //(1)
-            //以下根据自己情况而定，默认是不需要配的
-            config.setThreadPoolSize(1);  //(2)
-            Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);  //(3)
-            c.setListener(new MessageListener() {  //(4)
-                @Override
-                public void onMessage(Message msg) {
-                    System.out.println(msg.getContent());
-                }
-            });
-            c.start();  //(5)
-        }
-     }
+	public class DurableConsumerExample {
+	   public static void main(String[] args) {
+	      ConsumerConfig config = new ConsumerConfig();  //(1)
+	      //以下根据自己情况而定，默认是不需要配的
+	      config.setThreadPoolSize(1);  //(2)
+	      Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);  //(3)
+	      c.setListener(new MessageListener() {  //(4)
+	         @Override
+	         public void onMessage(Message msg) {
+	            System.out.println(msg.getContent());
+	         }
+	      });
+	      c.start();  //(5)
+	   }
+	}
 
      1.使用swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
      
