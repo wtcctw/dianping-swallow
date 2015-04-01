@@ -75,9 +75,10 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
 		PktConsumerMessage consumerPacket = (PktConsumerMessage) e.getMessage();
 
-		if (ConsumerMessageType.GREET.equals(consumerPacket.getType()) || PacketType.CONSUMER_GREET.equals(consumerPacket.getPacketType())) {
+		
+		if (ConsumerMessageType.GREET.equals(consumerPacket.getType()) || PacketType.CONSUMER_GREET.equals(consumerPacket.getPacketType())) {//兼容老版本
 			handleGreet(channel, consumerPacket);
-		} else if (ConsumerMessageType.ACK.equals(consumerPacket.getType()) || PacketType.CONSUMER_ACK.equals(consumerPacket.getPacketType())) { // ack信息，代表客户端收到消息
+		} else if (ConsumerMessageType.ACK.equals(consumerPacket.getType()) || PacketType.CONSUMER_ACK.equals(consumerPacket.getPacketType())) {//兼容老版本
 			handleAck(channel, consumerPacket);
 		}else if(PacketType.HEART_BEAT.equals(consumerPacket.getPacketType())){
 			handleHeartBeat(channel, consumerPacket);

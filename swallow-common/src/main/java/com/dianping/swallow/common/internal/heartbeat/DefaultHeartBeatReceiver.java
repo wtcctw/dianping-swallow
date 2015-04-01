@@ -1,10 +1,10 @@
 package com.dianping.swallow.common.internal.heartbeat;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable {
 
-	private Map<Channel, Queue<HeartBeat>> heartBeats = new ConcurrentHashMap<Channel, Queue<HeartBeat>>();
+	private Map<Channel, Deque<HeartBeat>> heartBeats = new ConcurrentHashMap<Channel, Deque<HeartBeat>>();
 
 	private final Logger                          logger                     = LoggerFactory.getLogger(getClass());
 	
@@ -44,10 +44,10 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable {
 			logger.debug("[beat]" + channel);
 		}
 		
-		Queue<HeartBeat> beats = heartBeats.get(channel);
+		Deque<HeartBeat> beats = heartBeats.get(channel);
 		
 		if(beats == null){
-			beats = new ConcurrentLinkedQueue<HeartBeat>();
+			beats = new LinkedList<HeartBeat>();
 			heartBeats.put(channel, beats);
 		}
 		beats.offer(new HeartBeat(channel));
@@ -59,11 +59,11 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable {
 	@Override
 	public void run() {
 
-		for(Entry<Channel, Queue<HeartBeat>> channelBeats : heartBeats.entrySet()){
+		for(Entry<Channel, Deque<HeartBeat>> channelBeats : heartBeats.entrySet()){
 			Channel channel = channelBeats.getKey();
-			Queue<HeartBeat> beats = channelBeats.getValue();
+			Deque<HeartBeat> beats = channelBeats.getValue();
 
-			HeartBeat heartBeat = beats.peek();
+			HeartBeat heartBeat = beats.peekLast();
 			if(heartBeat == null){
 				logger.error("[run][no heartBeat]" + channel);
 				continue;
@@ -72,6 +72,9 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable {
 			Long current = System.currentTimeMillis();
 			if((current - heartBeat.getHeartBeatTime()) > (MAX_HEARTBEAT_INTERVAL_MULTI * HeartBeatSender.HEART_BEAT_INTERVAL * 1000)){
 				try{
+					if(logger.isDebugEnabled()){
+						logger.debug("[run][no heart beat]" + channel);
+					}
 					noHeartBeatListener.onNoHeartBeat(channel);
 				}catch(Throwable th){
 					logger.error("[run]", th);

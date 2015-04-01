@@ -88,7 +88,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
         Channel channel = e.getChannel();
-        logger.error("Error from channel(" + connectionDesc  + ")", e);
+        logger.error("Error from channel(" + connectionDesc  + ")", e.getCause());
         channel.close();
     }
 }

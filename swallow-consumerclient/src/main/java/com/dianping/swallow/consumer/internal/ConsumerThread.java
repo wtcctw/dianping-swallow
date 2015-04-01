@@ -45,14 +45,14 @@ public class ConsumerThread extends Thread {
          synchronized (bootstrap) {
             if (!Thread.currentThread().isInterrupted()) {
                try {
-                  logger.info("ConsumerThread-try connecting to " + remoteAddress);
+                  logger.info("[run][connecting]" + remoteAddress);
                   future = bootstrap.connect(remoteAddress);
                   future.await();
                   if (future.getChannel().isConnected()) {
                      SocketAddress localAddress = future.getChannel().getLocalAddress();
-                     logger.info("ConsumerThread(localAddress=" + localAddress + ")-connected to " + remoteAddress);
+                     logger.info("[run][connected]" + localAddress + "->" + remoteAddress);
                      future.getChannel().getCloseFuture().await();//等待channel关闭，否则一直阻塞！
-                     logger.info("ConsumerThread(localAddress=" + localAddress + ")-closed from " + remoteAddress);
+                     logger.info("[run][closed   ]" + localAddress + "->" + remoteAddress);
                   }
                } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
