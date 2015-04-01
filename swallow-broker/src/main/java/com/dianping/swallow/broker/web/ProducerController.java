@@ -23,7 +23,7 @@ import com.dianping.swallow.producer.Producer;
 @Controller
 public class ProducerController {
 
-    private static final Logger LOG     = LoggerFactory.getLogger(ProducerController.class);
+    private static final Logger logger     = LoggerFactory.getLogger(ProducerController.class);
 
     private static final String CONTENT = "content";
 
@@ -51,7 +51,7 @@ public class ProducerController {
 
             //解析请球中的参数
             Map paramMap = request.getParameterMap();
-            LOG.info("[sendMsg]request param is " + paramMap);
+            logger.info("[sendMsg]request param is " + paramMap);
 
             if (paramMap != null && paramMap.size() > 0) {
                 Set<Map.Entry> set = paramMap.entrySet();
@@ -80,7 +80,7 @@ public class ProducerController {
             //根据topic找到Producer
             Producer producer = producerHolder.getProducer(topic);
             if (producer != null) {
-                LOG.info("[sendMsg]Sending message: topic=" + AppUtils.highlight(topic) + " , content=" + content
+                logger.info("[sendMsg]Sending message: topic=" + AppUtils.highlight(topic) + " , content=" + content
                         + ", properties=" + properties);
                 //发送消息
                 producer.sendMessage(content, properties);
@@ -95,7 +95,7 @@ public class ProducerController {
         } catch (Exception e) {
             map.put("result", "fail"); 
             map.put("errorMsg", e.getMessage());
-            LOG.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return GsonUtil.toJson(map);
     }

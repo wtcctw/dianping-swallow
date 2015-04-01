@@ -28,7 +28,7 @@ import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.google.gson.Gson;
 
 public class ConsumerBroker implements MessageListener {
-   private static final Logger  LOG               = LoggerFactory.getLogger(ConsumerBroker.class);
+   private static final Logger  logger               = LoggerFactory.getLogger(ConsumerBroker.class);
 
    private NotifyService        notifyService;
 
@@ -80,7 +80,7 @@ public class ConsumerBroker implements MessageListener {
       if (!active) {
          synchronized (this) {
             if (!active) {
-               LOG.info(logPrefix + "Starting");
+               logger.info(logPrefix + "Starting");
                consumer = ConsumerFactoryImpl.getInstance()
                      .createConsumer(Destination.topic(topic), consumerId, config);
                consumer.setListener(this);
@@ -95,7 +95,7 @@ public class ConsumerBroker implements MessageListener {
       if (active) {
          synchronized (this) {
             if (active) {
-               LOG.info(logPrefix + "Closing");
+               logger.info(logPrefix + "Closing");
                consumer.close();
                active = false;
             }
@@ -115,13 +115,13 @@ public class ConsumerBroker implements MessageListener {
                   pullStrategy.fail(true);
 
                   if (count == 1) {//开始重试时，打印消息，重试过程不打印消息了，减少log
-                     LOG.info(logPrefix + "Retrying sending message to url(" + url + "), message is: " + msg
+                     logger.info(logPrefix + "Retrying sending message to url(" + url + "), message is: " + msg
                            + ", content is:" + msg.getContent());
                   }
-                  LOG.info(logPrefix + "Retrying " + count + " times...");
+                  logger.info(logPrefix + "Retrying " + count + " times...");
                }
 
-               LOG.info(logPrefix + "Sending to url(" + url + "): " + msg + ", content:" + msg.getContent());
+               logger.info(logPrefix + "Sending to url(" + url + "): " + msg + ", content:" + msg.getContent());
                invoke(msg);
 
                success = true;
@@ -138,7 +138,7 @@ public class ConsumerBroker implements MessageListener {
                }
 
                //失败了(IO)，重试
-               LOG.error(logPrefix + "IO Error when send http message, will be retryed: " + e.getMessage());
+               logger.error(logPrefix + "IO Error when send http message, will be retryed: " + e.getMessage());
             }
          } while (!success && count++ < retryCount);
       } catch (RuntimeException e) {//不可恢复异常，记录以及报警，跳过消息
@@ -148,7 +148,7 @@ public class ConsumerBroker implements MessageListener {
          Cat.getProducer().logError(e);
          transaction.complete();
 
-         LOG.error(logPrefix + "Error when send http message to " + url + ". This message is skiped:" + msg
+         logger.error(logPrefix + "Error when send http message to " + url + ". This message is skiped:" + msg
                + ", content:" + msg.getContent(), e);
          if (notifyService != null) {
             notifyService.alarm(logPrefix + "Error when send http message to " + url + ", message is skiped.", e, true);

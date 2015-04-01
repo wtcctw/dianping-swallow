@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("deprecation")
 public class HttpClientUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(HttpClientUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
     private static final DefaultHttpClient httpclient;
 
@@ -73,7 +73,7 @@ public class HttpClientUtil {
         } finally {
             EntityUtils.consume(entity);
             httpPost.releaseConnection();
-            LOG.info("****** http client invoke (Post method), url: " + url + ", nameValuePair: " + nvps + ", result: "
+            logger.info("****** http client invoke (Post method), url: " + url + ", nameValuePair: " + nvps + ", result: "
                         + result + ", time: " + String.valueOf(System.currentTimeMillis() - start) + "ms.");
         }
     }
@@ -99,7 +99,7 @@ public class HttpClientUtil {
         } finally {
             EntityUtils.consume(entity);
             httpPost.releaseConnection();
-            LOG.info("****** http client invoke (Post method), url: " + url + ", result: " + result + ", time: "
+            logger.info("****** http client invoke (Post method), url: " + url + ", result: " + result + ", time: "
                         + String.valueOf(System.currentTimeMillis() - start) + "ms.");
         }
     }
@@ -125,7 +125,7 @@ public class HttpClientUtil {
         } finally {
             EntityUtils.consume(entity);
             httpGet.releaseConnection();
-            LOG.info("****** http client invoke (Get method), url: " + url + ", nameValuePair: " + nvps + ", result: "
+            logger.info("****** http client invoke (Get method), url: " + url + ", nameValuePair: " + nvps + ", result: "
                         + result + ", time: " + String.valueOf(System.currentTimeMillis() - start) + "ms.");
         }
     }

@@ -41,4 +41,10 @@ public enum PacketType {
 	 * 承载SwallowMessage对象的消息报文
 	 */
 	OBJECT_MSG,
+
+	/**
+	 * 心跳
+	 */
+	HEART_BEAT
+
 }

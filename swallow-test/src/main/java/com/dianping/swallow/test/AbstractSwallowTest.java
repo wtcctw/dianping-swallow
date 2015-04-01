@@ -63,8 +63,12 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		sleep(100);
 	}
 
-	
+
 	protected void sendMessage(int messageCount, String topic) throws SendFailedException, RemoteServiceInitFailedException {
+		sendMessage(messageCount, topic, 0);
+	}
+
+	protected void sendMessage(int messageCount, String topic, int sleepInterval) throws SendFailedException, RemoteServiceInitFailedException {
 		
 		AtomicInteger count = sendMessageCount.get(topic);
 		if(count == null){
@@ -79,6 +83,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
         for (int i = 0; i < messageCount; i++) {
             String msg = i + "," + System.currentTimeMillis();
             p.sendMessage(msg);
+            sleep(sleepInterval);
             count.incrementAndGet();
         }
 	}

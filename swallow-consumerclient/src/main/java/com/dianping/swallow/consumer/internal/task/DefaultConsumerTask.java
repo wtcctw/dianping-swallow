@@ -9,7 +9,6 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
 import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.consumer.ConsumerMessageType;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
@@ -121,7 +120,7 @@ public class DefaultConsumerTask implements ConsumerTask{
         	if(logger.isDebugEnabled()){
         		logger.debug("[run][send ack]" + connectionDesc + "," + messageId);
         	}
-            PktConsumerMessage consumermessage = new PktConsumerMessage(ConsumerMessageType.ACK, messageId, consumer.isClosed());
+            PktConsumerMessage consumermessage = new PktConsumerMessage(messageId, consumer.isClosed());
             event.getChannel().write(consumermessage);
         } catch (RuntimeException e) {
             logger.warn("Write to server error.", e);

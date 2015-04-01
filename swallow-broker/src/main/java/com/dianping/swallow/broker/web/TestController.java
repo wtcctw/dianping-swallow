@@ -17,7 +17,7 @@ import com.dianping.swallow.broker.util.GsonUtil;
 @Controller
 public class TestController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
     @SuppressWarnings({ "rawtypes" })
     @RequestMapping(value = "testReceiver", method = { RequestMethod.POST, RequestMethod.GET }, produces = "application/json; charset=utf-8")
@@ -28,7 +28,7 @@ public class TestController {
 
             //解析请球中的参数
             Map paramMap = request.getParameterMap();
-            LOG.info("[testReceiver]request param is " + paramMap);
+            logger.info("[testReceiver]request param is " + paramMap);
 
         } catch (IllegalArgumentException e) {
             map.put("result", "fail");
@@ -36,7 +36,7 @@ public class TestController {
         } catch (Exception e) {
             map.put("result", "fail");
             map.put("errorMsg", e.getMessage());
-            LOG.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return GsonUtil.toJson(map);
     }

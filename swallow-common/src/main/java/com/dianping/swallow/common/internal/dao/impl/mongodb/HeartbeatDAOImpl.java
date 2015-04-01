@@ -14,7 +14,7 @@ import com.mongodb.DBObject;
 
 public class HeartbeatDAOImpl implements HeartbeatDAO {
    @SuppressWarnings("unused")
-   private static final Logger LOG  = LoggerFactory.getLogger(HeartbeatDAOImpl.class);
+   private static final Logger logger  = LoggerFactory.getLogger(HeartbeatDAOImpl.class);
 
    public static final String  TICK = "t";
 

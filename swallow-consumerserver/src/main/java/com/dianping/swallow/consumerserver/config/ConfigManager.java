@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class ConfigManager {
 
-   private static final Logger  LOG                             = LoggerFactory.getLogger(ConfigManager.class);
+   private static final Logger  logger                             = LoggerFactory.getLogger(ConfigManager.class);
 
    private static ConfigManager ins                             = new ConfigManager();
 
@@ -157,7 +157,7 @@ public final class ConfigManager {
                try {
                   field = clazz.getDeclaredField(key.trim());
                } catch (Exception e) {
-                  LOG.warn("unknow property found in " + configFileName + ": " + key);
+                  logger.warn("unknow property found in " + configFileName + ": " + key);
                   continue;
                }
                field.setAccessible(true);
@@ -165,38 +165,38 @@ public final class ConfigManager {
                   try {
                      field.set(this, Integer.parseInt(props.getProperty(key).trim()));
                   } catch (Exception e) {
-                     LOG.error("can not parse property " + key, e);
+                     logger.error("can not parse property " + key, e);
                      continue;
                   }
                } else if (field.getType().equals(Long.TYPE)) {
                   try {
                      field.set(this, Long.parseLong(props.getProperty(key).trim()));
                   } catch (Exception e) {
-                     LOG.error("can not set property " + key, e);
+                     logger.error("can not set property " + key, e);
                      continue;
                   }
                } else if (field.getType().equals(String.class)) {
                   try {
                      field.set(this, props.getProperty(key).trim());
                   } catch (Exception e) {
-                     LOG.error("can not set property " + key, e);
+                     logger.error("can not set property " + key, e);
                      continue;
                   }
                } else {
                   try {
                      field.set(this, Boolean.parseBoolean(props.getProperty(key).trim()));
                   } catch (Exception e) {
-                     LOG.error("can not set property " + key, e);
+                     logger.error("can not set property " + key, e);
                      continue;
                   }
                }
             }
 
          } catch (IOException e) {
-            LOG.error("Error reading " + configFileName, e);
+            logger.error("Error reading " + configFileName, e);
          }
       } else {
-         LOG.info(configFileName + " not found, use default");
+         logger.info(configFileName + " not found, use default");
       }
       //设置masterIP
       String masterIp = System.getProperty("masterIp");
@@ -210,7 +210,7 @@ public final class ConfigManager {
          f.setAccessible(true);
          if (!Modifier.isStatic(f.getModifiers())) {
             try {
-               LOG.info(f.getName() + "=" + f.get(this));
+               logger.info(f.getName() + "=" + f.get(this));
             } catch (Exception e) {
             }
          }

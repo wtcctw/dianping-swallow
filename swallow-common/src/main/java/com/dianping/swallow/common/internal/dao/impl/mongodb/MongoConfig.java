@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 class MongoConfig {
 
-   private static final Logger LOG                                          = LoggerFactory
+   private static final Logger logger                                          = LoggerFactory
                                                                                   .getLogger(MongoConfig.class);
 
    // local config(mongo server options)
@@ -51,14 +51,14 @@ class MongoConfig {
 
       Class clazz = this.getClass();
       for (String key : props.stringPropertyNames()) {
-    	  if(LOG.isInfoEnabled()){
-    		  LOG.info("[loadLocalConfig][key : value]" + key + ":" + props.getProperty(key));
+    	  if(logger.isInfoEnabled()){
+    		  logger.info("[loadLocalConfig][key : value]" + key + ":" + props.getProperty(key));
     	  }
          Field field = null;
          try {
             field = clazz.getDeclaredField(key.trim());
          } catch (Exception e) {
-            LOG.error("unknown property found: " + key);
+            logger.error("unknown property found: " + key);
             continue;
          }
          field.setAccessible(true);
@@ -66,41 +66,41 @@ class MongoConfig {
             try {
                field.set(this, Integer.parseInt(props.getProperty(key).trim()));
             } catch (Exception e) {
-               LOG.error("can not parse property " + key, e);
+               logger.error("can not parse property " + key, e);
                continue;
             }
          } else if (field.getType().equals(Long.TYPE)) {
             try {
                field.set(this, Long.parseLong(props.getProperty(key).trim()));
             } catch (Exception e) {
-               LOG.error("can not set property " + key, e);
+               logger.error("can not set property " + key, e);
                continue;
             }
          } else if (field.getType().equals(String.class)) {
             try {
                field.set(this, props.getProperty(key).trim());
             } catch (Exception e) {
-               LOG.error("can not set property " + key, e);
+               logger.error("can not set property " + key, e);
                continue;
             }
          } else {
             try {
                field.set(this, Boolean.parseBoolean(props.getProperty(key).trim()));
             } catch (Exception e) {
-               LOG.error("can not set property " + key, e);
+               logger.error("can not set property " + key, e);
                continue;
             }
          }
       }
 
-      if (LOG.isDebugEnabled()) {
+      if (logger.isDebugEnabled()) {
          Field[] fields = clazz.getDeclaredFields();
          for (int i = 0; i < fields.length; i++) {
             Field f = fields[i];
             f.setAccessible(true);
             if (!Modifier.isStatic(f.getModifiers())) {
                try {
-                  LOG.debug(f.getName() + "=" + f.get(this));
+                  logger.debug(f.getName() + "=" + f.get(this));
                } catch (Exception e) {
                }
             }

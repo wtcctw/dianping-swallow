@@ -30,7 +30,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
 
     private static final String         SWALLOW_BROKER_CONSUMER_PREFIX = "swallow.broker.consumer.";
 
-    private static final Logger         LOG                            = LoggerFactory
+    private static final Logger         logger                            = LoggerFactory
                                                                                .getLogger(ConsumerHolderImpl.class);
 
     private Map<String, ConsumerBroker> consumerBrokerMap              = new HashMap<String, ConsumerBroker>();
@@ -57,7 +57,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
      * 读取配置项，初始化所有ConsumerBroker，此初始化方法可被多次调用(不能并发)，所以当配置项所生变化时，可以重新调用该方法即可。
      */
     private void build() {
-        LOG.info("Building consumerBrokers...");
+        logger.info("Building consumerBrokers...");
 
         Map<String, ConsumerBroker> map = new HashMap<String, ConsumerBroker>();
 
@@ -77,10 +77,10 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
         }
         for (ConsumerBroker toBeStopConsumerBroker : oldMap.values()) {
             toBeStopConsumerBroker.close();
-            LOG.info(toBeStopConsumerBroker + " is closed.");
+            logger.info(toBeStopConsumerBroker + " is closed.");
         }
 
-        LOG.info("Build done, consumerBrokerMap is " + consumerBrokerMap);
+        logger.info("Build done, consumerBrokerMap is " + consumerBrokerMap);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
         for (ConsumerBroker consumerBroker : consumerBrokerMap.values()) {
             if (!consumerBroker.isActive()) {
                 consumerBroker.start();
-                LOG.info("Started ConsumerBroker:" + consumerBroker);
+                logger.info("Started ConsumerBroker:" + consumerBroker);
             }
         }
     }
@@ -99,7 +99,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
         for (ConsumerBroker consumerBroker : consumerBrokerMap.values()) {
             if (consumerBroker.isActive()) {
                 consumerBroker.close();
-                LOG.info("Closed ConsumerBroker:" + consumerBroker);
+                logger.info("Closed ConsumerBroker:" + consumerBroker);
             }
         }
     }
@@ -109,7 +109,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
      */
     @Override
     public void onConfigChange(String key, String value) {
-        LOG.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
+        logger.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
 
         key = StringUtils.trim(key);
         value = StringUtils.trim(value);
@@ -133,12 +133,12 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
                         //判断合法
                         String url = value;
                         if (!UrlUtils.isValidUrl(url)) {
-                            LOG.error("Url(" + url + ") is inValid!");
+                            logger.error("Url(" + url + ") is inValid!");
                         } else {
                             //找到该ConsumerBroker，修改其url
                             ConsumerBroker consumerBroker = consumerBrokerMap.get(consumerKey);
                             consumerBroker.setUrl(value);
-                            LOG.info("ConsumerBroker(" + consumerKey + ")'s url changed to: " + url);
+                            logger.info("ConsumerBroker(" + consumerKey + ")'s url changed to: " + url);
                         }
                         break;
                     } else if (StringUtils.equals(key, getTopicConsumerNumPropertyName(consumerKey, "retryCount"))) {
@@ -147,7 +147,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
                         Integer retryCount = NumberUtils.createInteger(value);
                         if (retryCount != null) {
                             consumerBroker.setRetryCount(retryCount);
-                            LOG.info("ConsumerBroker(" + consumerKey + ")'s retryCount changed to: " + retryCount);
+                            logger.info("ConsumerBroker(" + consumerKey + ")'s retryCount changed to: " + retryCount);
                         }
                         break;
                     }
@@ -169,7 +169,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
     private void init(Map<String, ConsumerBroker> map, String topicStr) {
         if (StringUtils.isNotBlank(topicStr)) {
             String[] topics = StringUtils.split(topicStr.trim(), ';');
-            LOG.info("Initing consumers with topics(" + Arrays.toString(topics) + ")");
+            logger.info("Initing consumers with topics(" + Arrays.toString(topics) + ")");
 
             //每个topic创建一个consumer
             if (topics != null) {
@@ -219,7 +219,7 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
         //如果key对应的ConsumerBroker不存在，则可以创建ConsumerBroker; 已经存在复用，不创建
         ConsumerBroker consumerBroker = consumerBrokerMap.get(key);
         if (consumerBroker == null) {
-            LOG.info("ConsumerBroker with key '" + key + "' is not exsits, so create it!");
+            logger.info("ConsumerBroker with key '" + key + "' is not exsits, so create it!");
 
             String url = StringUtils.trimToNull(dynamicConfig.get(getTopicConsumerNumPropertyName(topic, consumerId,
                     num, "url")));
@@ -265,11 +265,11 @@ public class ConsumerHolderImpl implements ConsumerHolder, ConfigChangeListener 
                 consumerBroker.setRetryCount(retryCount);
             }
             consumerBroker.setNotifyService(notifyService);
-            LOG.info("ConsumerBroker with key '" + key + "' is created!");
+            logger.info("ConsumerBroker with key '" + key + "' is created!");
         }
 
         map.put(key, consumerBroker);
-        LOG.info("Added ConsumerBroker:" + consumerBroker);
+        logger.info("Added ConsumerBroker:" + consumerBroker);
     }
 
     //如swallow.broker.consumer.example

@@ -18,7 +18,7 @@ import com.mongodb.MongoException;
  */
 @SuppressWarnings("rawtypes")
 class RetryMethodInterceptor implements MethodInterceptor {
-   private static final Logger LOG = LoggerFactory.getLogger(RetryMethodInterceptor.class);
+   private static final Logger logger = LoggerFactory.getLogger(RetryMethodInterceptor.class);
    private long                retryIntervalWhenException;
    private int 				   retryTimesWhenMongoException;
    private Object              target;
@@ -41,7 +41,7 @@ class RetryMethodInterceptor implements MethodInterceptor {
 		   } catch (Exception e) {
 			   //判断异常类型,如果是指定的异常或异常子类，则retry
 				if (clazz.isInstance(e)) {
-				   LOG.error("Error in Proxy of " + this.target + ", wait " + retryIntervalWhenException
+				   logger.error("Error in Proxy of " + this.target + ", wait " + retryIntervalWhenException
 				         + "ms before retry. ", e);
 				   Thread.sleep(retryIntervalWhenException);
 				} else {

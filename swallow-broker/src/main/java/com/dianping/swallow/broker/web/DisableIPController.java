@@ -30,7 +30,7 @@ import com.dianping.swallow.common.internal.config.DynamicConfig;
 @Controller
 @RequestMapping(value = "/api", method = RequestMethod.GET, produces = "application/javascript; charset=utf-8")
 public class DisableIPController {
-    private static final Logger LOG             = LoggerFactory.getLogger(DisableIPController.class);
+    private static final Logger logger             = LoggerFactory.getLogger(DisableIPController.class);
 
     private static final char   SEPARATOR       = ';';
     private static final String DELETE          = "delete";
@@ -59,7 +59,7 @@ public class DisableIPController {
         setUrl = lionApiUrl + "/setconfig";
         getUrl = lionApiUrl + "/getconfig";
 
-        LOG.info("lionApiUrl is " + lionApiUrl);
+        logger.info("lionApiUrl is " + lionApiUrl);
     }
 
     @ResponseBody
@@ -81,7 +81,7 @@ public class DisableIPController {
 
             Validate.notEmpty(ip, "param(ip) is required");
 
-            LOG.info("Receive disableIP request: action=" + action + ", env=" + env + ", ip=" + ip);
+            logger.info("Receive disableIP request: action=" + action + ", env=" + env + ", ip=" + ip);
 
             //解析ip为list
             List<String> paramIPs = Arrays.asList(StringUtils.split(ip, SEPARATOR));

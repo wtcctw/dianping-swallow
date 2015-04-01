@@ -1,10 +1,13 @@
 package com.dianping.swallow.consumerserver.pool;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.springframework.beans.factory.InitializingBean;
 
 import com.dianping.swallow.common.internal.pool.DefaultThreadProfile;
+import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 
 /**
  * 线程池实现
@@ -33,6 +36,8 @@ public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager,
 	private ExecutorService retrieverThreadPool;
 	
 	private ExecutorService sendMessageThreadPool;
+	
+	private ScheduledExecutorService scheduled;
 	
 	public ConsumerThreadPoolManagerImpl(){
 	
@@ -75,6 +80,9 @@ public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager,
 		sender.setCorePoolSize(coreSendMessageThreadPoolSize);
 		sender.setMaxPoolSize(maxSendMessageThreadPoolSize);
 		sendMessageThreadPool = sender.createPool();
+		
+		
+		scheduled = Executors.newScheduledThreadPool(cpuNum, new MQThreadFactory("SCHEDULE-"));		
 	}
 
 
@@ -148,6 +156,11 @@ public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager,
 		serviceHandlerThreadPool.shutdownNow();
 		sendMessageThreadPool.shutdownNow();
 		retrieverThreadPool.shutdownNow();
+	}
+
+	@Override
+	public ScheduledExecutorService getScheduledThreadPool() {
+		return scheduled;
 	}
 
 }

@@ -21,7 +21,7 @@ import com.dianping.swallow.producer.Producer;
 
 @Controller
 public class MonitorController {
-   private static final Logger LOG = LoggerFactory.getLogger(MonitorController.class);
+   private static final Logger logger = LoggerFactory.getLogger(MonitorController.class);
 
    @Autowired
    private ProducerHolder      producerHolder;
@@ -47,7 +47,7 @@ public class MonitorController {
    public ModelAndView action(HttpSession session, String key, String action) {
       Map<String, Object> map = new HashMap<String, Object>();
 
-      LOG.info("Control Action, key is " + key + ", action is " + action);
+      logger.info("Control Action, key is " + key + ", action is " + action);
 
       Map<String, ConsumerBroker> consumerBrokerMap = consumerHolder.getConsumerBrokerMap();
 

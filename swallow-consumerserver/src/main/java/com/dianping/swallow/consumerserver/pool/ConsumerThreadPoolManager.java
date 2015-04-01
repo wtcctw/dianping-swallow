@@ -1,6 +1,7 @@
 package com.dianping.swallow.consumerserver.pool;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import com.dianping.swallow.common.internal.lifecycle.Disposable;
 
@@ -29,4 +30,11 @@ public interface ConsumerThreadPoolManager extends Disposable{
 	 * @return
 	 */
 	ExecutorService getSendMessageThreadPool();
+	
+	
+	/**
+	 * 获取定时任务线程池
+	 * @return
+	 */
+	ScheduledExecutorService getScheduledThreadPool();
 }

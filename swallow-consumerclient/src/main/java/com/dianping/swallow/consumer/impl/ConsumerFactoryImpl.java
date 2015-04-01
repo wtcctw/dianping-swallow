@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
+import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
 import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumer.Consumer;
@@ -28,6 +30,7 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
    private final static String LION_KEY_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
    private Map<String, List<InetSocketAddress>> topicName2Address = new HashMap<String, List<InetSocketAddress>>();
    private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
+   private HeartBeatSender heartBeatSender = new DefaultHeartBeatSender();
    
    static{
 	   SwallowHelper.initialize();
@@ -46,38 +49,26 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
    @Override
    public Consumer createConsumer(Destination dest, String consumerId, ConsumerConfig config) {
      if(topicName2Address.get(dest.getName()) != null){
-        return new ConsumerImpl(dest, consumerId, config, topicName2Address.get(dest.getName()).get(0), topicName2Address.get(dest.getName()).get(1));
+        return new ConsumerImpl(dest, consumerId, config, topicName2Address.get(dest.getName()).get(0), topicName2Address.get(dest.getName()).get(1), heartBeatSender);
      } else{
-        return new ConsumerImpl(dest, consumerId, config, topicName2Address.get(TOPICNAME_DEFAULT).get(0), topicName2Address.get(TOPICNAME_DEFAULT).get(1));
+        return new ConsumerImpl(dest, consumerId, config, topicName2Address.get(TOPICNAME_DEFAULT).get(0), topicName2Address.get(TOPICNAME_DEFAULT).get(1), heartBeatSender);
      }
       
    }
 
    @Override
    public Consumer createConsumer(Destination dest, String consumerId) {
-      if(topicName2Address.get(dest.getName()) != null){
-         return new ConsumerImpl(dest, consumerId, new ConsumerConfig(), topicName2Address.get(dest.getName()).get(0), topicName2Address.get(dest.getName()).get(1));
-      } else{
-         return new ConsumerImpl(dest, consumerId, new ConsumerConfig(), topicName2Address.get(TOPICNAME_DEFAULT).get(0), topicName2Address.get(TOPICNAME_DEFAULT).get(1));
-      }
+         return createConsumer(dest, consumerId, new ConsumerConfig());
    }
 
    @Override
    public Consumer createConsumer(Destination dest, ConsumerConfig config) {
-      if(topicName2Address.get(dest.getName()) != null){
-         return new ConsumerImpl(dest, config, topicName2Address.get(dest.getName()).get(0), topicName2Address.get(dest.getName()).get(1));
-      } else{
-         return new ConsumerImpl(dest, config, topicName2Address.get(TOPICNAME_DEFAULT).get(0), topicName2Address.get(TOPICNAME_DEFAULT).get(1));
-      }
+	   return createConsumer(dest, null, config);
    }
 
    @Override
    public Consumer createConsumer(Destination dest) {
-      if(topicName2Address.get(dest.getName()) != null){
-         return new ConsumerImpl(dest, new ConsumerConfig(), topicName2Address.get(dest.getName()).get(0), topicName2Address.get(dest.getName()).get(1));
-      } else{
-         return new ConsumerImpl(dest, new ConsumerConfig(), topicName2Address.get(TOPICNAME_DEFAULT).get(0), topicName2Address.get(TOPICNAME_DEFAULT).get(1));
-      }
+	   return createConsumer(dest, new ConsumerConfig());
    }
 
    private void getSwallowCAddress() {
