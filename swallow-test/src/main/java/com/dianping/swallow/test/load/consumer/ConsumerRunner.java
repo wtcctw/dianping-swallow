@@ -2,6 +2,9 @@ package com.dianping.swallow.test.load.consumer;
 
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.Consumer;
@@ -58,7 +61,9 @@ public class ConsumerRunner extends AbstractLoadTest{
 
 	@SuppressWarnings("deprecation")
 	private void startReceiver() {
-		
+
+        String rawConsumerId = getConsumerId();
+
         for (int i = 0; i < topicCount; i++) {
             String topic = getTopicName(topicName, i);
             for (int j = 0; j < consumerCount; j++) {
@@ -67,7 +72,7 @@ public class ConsumerRunner extends AbstractLoadTest{
                 config.setThreadPoolSize(threadPoolSize);
                 config.setRetryCountOnBackoutMessageException(0);
                 
-                String consumerId = "myId-20130813";
+                String consumerId = rawConsumerId;
                 if(differentConsumerId){
                 	consumerId += "-" + j;
                 }
@@ -84,6 +89,13 @@ public class ConsumerRunner extends AbstractLoadTest{
         }
 	}
 
+
+	private String getConsumerId() {
+		
+		SimpleDateFormat format = new SimpleDateFormat("HH-mm-ss");
+		
+		return "myid-" + format.format(new Date());
+	}
 
 	@Override
 	protected boolean isExit() {

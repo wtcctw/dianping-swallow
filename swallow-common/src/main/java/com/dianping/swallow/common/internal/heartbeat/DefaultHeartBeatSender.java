@@ -30,7 +30,7 @@ public class DefaultHeartBeatSender implements HeartBeatSender{
 	@Override
 	public void addChannel(Channel channel) {
 		
-		 ScheduledFuture<?> future = scheduled.scheduleAtFixedRate(new HeartBeatTask(channel), 0, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
+		 ScheduledFuture<?> future = scheduled.scheduleAtFixedRate(new HeartBeatTask(channel), HEART_BEAT_INTERVAL, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
 		
 		channels.put(channel, future);
 		

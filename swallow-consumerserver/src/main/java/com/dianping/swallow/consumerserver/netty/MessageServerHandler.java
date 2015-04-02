@@ -87,6 +87,10 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 	}
 
 	private void handleHeartBeat(Channel channel, PktConsumerMessage consumerPacket) {
+		if(consumerInfo == null){
+			logger.warn("[handleHeartBeat][heart beat come before greet]" + channel);
+			return;
+		}
 		workerManager.handleHeartBeat(channel, consumerInfo);
 	}
 

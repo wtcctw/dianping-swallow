@@ -1,4 +1,4 @@
-package com.dianping.swallow.web;
+package com.dianping.swallow.controller;
 
 /**
  * @author mengwenchao
