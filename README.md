@@ -5,26 +5,25 @@
 ## Swallow基础概念
 
 * Swallow 是什么:
-	* Swallow是一个`基于Topic的异步消息传送系统`。Swallow使用`发布/订阅消息`的传送模型，`消息发布者`指定Topic并发送消息到Swallow消息服务器,`消息订阅者`则指定Topic并从Swallow消息服务器订阅消息。
+	* Swallow是一个*基于Topic的异步消息传送系统*。Swallow使用*发布/订阅消息*的传送模型，*消息发布者*指定Topic并发送消息到Swallow消息服务器,*消息订阅者*则指定Topic并从Swallow消息服务器订阅消息。
 	* Swallow的发布/订阅模型。消息由Producer发布，ProducerServer负责接收并存储消息到DB。ConsumerServer负责从DB获取消息，并推送给Consumer。
-	* Swallow`支持集群订阅者`。在集群中，使用相同ConsumerId(例如Consumer A)的Consumer，将会视作同一个Consumer（同一个Consumer消费的Message将不会重复）。例如，假设一个有2台机器(主机1和主机2)的集群，ConsumerId都是“Consumer-A”，那么`同一则Message，将要么被“主机1”获取，要么被“主机2”获取，不会被两者均获取`。
+	* Swallow*支持集群订阅者*。在集群中，使用相同ConsumerId(例如Consumer A)的Consumer，将会视作同一个Consumer（同一个Consumer消费的Message将不会重复）。例如，假设一个有2台机器(主机1和主机2)的集群，ConsumerId都是“Consumer-A”，那么*同一则Message，将要么被“主机1”获取，要么被“主机2”获取，不会被两者均获取*。
 
-## swallow名词解释
+## Swallow名词解释
 
-* Producer表示生产消息的主体，将消息发送到目的地Destination。
-* Consumer表示消费消息的主体，从Destination中获取消息。
-* Destination表示消息的目的地，也就是消息在swallow中驻留的地方。swallow中定义了两种目的地topic和queue，目前只实现了topic。
+* Producer表示生产消息的主体，将消息发送到目的地Topic。
+* Consumer表示消费消息的主体，从Topic中获取消息。
+* Topic表示消息的目的地，也就是消息在Swallow中驻留的地方。
 * 同步模式表示消息发送成功或者超时才返回。
-* 异步模式表示不管消息是否发送成功都立即返回。ASYNC_MODE的时候，生产者发送消息时，先把消费存储到本地文件，另外的线程将文件的消息读取出来发送到server，这种方式调用方的send方法返回的比Sync模式快，但是目前运行情况不是很稳定，有出现丢失消息的情况。所以推荐使用sync模式，sync模式是直接将消息发给server，保证消息能发送成功。
+* 异步模式表示不管消息是否发送成功都立即返回。ASYNC_MODE的时候，生产者发送消息时，先把消费存储到本地文件，另外的线程将文件的消息读取出来发送到server，这种方式调用的send方法返回的比Sync模式快。
 * 消息持久化表示消息会持久化到磁盘或者文件，server重启后消息不会丢失。非持久化与之相反，server重启后消息会丢失。
 
 ## Swallow生产者和消费者模拟平台
 
 ### 模拟生产者
 
-* 生产者可以向某个topic发送一条消息。
+* 生产者可以向某个Topic发送一条消息。
 
-	* [dev环境](http://192.168.8.21:7070/rundemo/swallow-dev-067#r=0&j=17)
 	* [alpha环境](http://192.168.8.21:7070/rundemo/swallow-alpha-067#r=0&j=17)
 	* [qa环境](http://192.168.8.21:7070/rundemo/swallow-qa-067#r=0&j=17)
 
@@ -36,73 +35,68 @@
 
 * 消费者接收消息  (在代码编辑框内，修改“Destination.topic("example")”为“Destination.topic("<你的topic名称>")”)，点击“run”，即可启动消费者。
 
-	* [dev环境](http://192.168.8.21:7070/rundemo/swallow-dev#r=0&j=10  )
 	* [qa环境](http://192.168.8.21:7070/rundemo/swallow-qa#r=0&j=10)
 	* [alpha环境](http://192.168.8.21:7070/rundemo/swallow-alpha#r=0&j=10 )
 
 ## Swallow系统接入流程
 
-### 申请topic
+### 申请Topic
 
-如果有新的topic，联系 孟文超/宋通(邮件： wenchao.meng@dianping.com, tong.song@dianping.com )，联系时，请邮件里告知：<br>
-申请人所在业务部门： （例如：支付中心业务部门 ）<br>
-使用swallow解决的业务场景是什么： （例如：订单支付成功后，使用swallow通知xxx付款成功的消息 ）<br>
-Topic名称：   (例如，dp_action)，不能包含点(.)，建议只使用字母和下划线。长度不超过25个字符。<br>
-生产者业务名，以及负责人姓名：  (例如，pay-order, 林俊杰)<br>
-消费者业务名，以及负责人姓名：  (例如，mobile-api, 陆经天)<br>
-计划上线时间<br>
-每天大概的消息量：  (例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成"100") <br>
-待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。<br>
+* 如果有新的Topic，联系 孟文超/宋通(邮件： wenchao.meng@dianping.com, tong.song@dianping.com )，联系时，请邮件里告知：<br>
+* 申请人所在业务部门： （例如：支付中心业务部门 ）<br>
+* 使用Swallow解决的业务场景是什么： （例如：订单支付成功后，使用Swallow通知xxx付款成功的消息 ）<br>
+* Topic名称：   (例如，dp_action)，不能包含点(.)，建议只使用字母和下划线。长度不超过25个字符。<br>
+* 生产者业务名，以及负责人姓名：  (例如，pay-order, 林俊杰)<br>
+* 消费者业务名，以及负责人姓名：  (例如，mobile-api, 陆经天)<br>
+* 计划上线时间<br>
+* 每天大概的消息量：  (例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成"100") <br>
+* 待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。<br>
 
 ## Swallow使用说明
 
-### 使用swallow发送消息
+### 使用Swallow发送消息
 
 #### Spring中配置实现
 
 ##### Maven pox.xml中添加依赖
 
 <pre><code>
-&lt;properties>
-	&lt;env>dev&lt;/env>
-&lt;/properties>		
-
 &lt;dependency>
 	&lt;groupId>org.springframework&lt;/groupId>
 	&lt;artifactId>spring-beans&lt;/artifactId>
-	&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;version>4.1.3.RELEASE&lt;/version>
 &lt;/dependency>
 &lt;dependency>
 	&lt;groupId>org.springframework&lt;/groupId>
 	&lt;artifactId>spring-context&lt;/artifactId>
-	&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;version>4.1.3.RELEASE&lt;/version>
 &lt;/dependency>
 &lt;dependency>
 	&lt;groupId>org.springframework&lt;/groupId>
 	&lt;artifactId>spring-core&lt;/artifactId>
-	&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;version>4.1.3.RELEASE&lt;/version>
 &lt;/dependency>
 &lt;dependency>
 	&lt;groupId>com.dianping.swallow&lt;/groupId>
 	&lt;artifactId>swallow-producerclient&lt;/artifactId>
-	&lt;version>0.6.5&lt;/version> 
+	&lt;version>0.6.10&lt;/version> 
 &lt;/dependency>
 &lt;!-- lion -->
 &lt;dependency>
 	 &lt;groupId>com.dianping.lion&lt;/groupId>
 	 &lt;artifactId>lion-client&lt;/artifactId>
-	 &lt;version>0.3.1-SNAPSHOT&lt;/version>
+	 &lt;version>0.4.6&lt;/version>
 &lt;/dependency>
 &lt;dependency>
-	 &lt;groupId>com.dianping.lion&lt;/groupId>
-	 &lt;artifactId>lion-${env}&lt;/artifactId>
-	 &lt;version>1.0.0&lt;/version>
+	&lt;groupId>javax.servlet&lt;/groupId>
+	&lt;artifactId>servlet-api&lt;/artifactId>
+	&lt;version>2.5&lt;/version>
 &lt;/dependency>
 &lt;!-- 监控 -->
 &lt;dependency>
 	 &lt;groupId>com.dianping.cat&lt;/groupId>
 	 &lt;artifactId>cat-core&lt;/artifactId>
-	 &lt;version>0.4.1&lt;/version>
+	 &lt;version>1.2.1&lt;/version>
 &lt;/dependency>
 &lt;dependency>
 	 &lt;groupId>com.dianping.hawk&lt;/groupId>
@@ -113,12 +107,11 @@ Topic名称：   (例如，dp_action)，不能包含点(.)，建议只使用字�
 &lt;dependency>
 	 &lt;groupId>com.dianping.dpsf&lt;/groupId>
 	 &lt;artifactId>dpsf-net&lt;/artifactId>
-	 &lt;version>1.9.1-SNAPSHOT&lt;/version>
+	 &lt;version>2.3.13&lt;/version>
 &lt;/dependency>
 </code></pre>
 
-* env可选的值包括dev（开发环境），alpha和beta（都是测试环境）。
-* swallow-producerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.6.5版本。
+* swallow-producerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.6.10版本。
 
 ##### Spring配置文件applicationContext-producer.xml配置相关bean
 
@@ -194,7 +187,7 @@ public class SyncProducerExample{
 }
 </code></pre>
  
-* (1). 使用swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下表列出了生产者的所有属性及其默认值。
+* (1) 使用Swallow发送消息时，首先需要对发送端进行配置，这由ProducerConfig完成。由于ProducerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下表列出了生产者的所有属性及其默认值。
 
  	* mode表示producer表示工作模式。
 	* asyncRetryTimes表示异步模式下发送失败重试次数。
@@ -234,8 +227,8 @@ public class SyncProducerExample{
    </tr>
 </table>
 
-* (2). 如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。ASYNC_MODE的时候，生产者发送消息时，先把消费存储到本地文件，另外的线程将文件的消息读取出来发送到server，这种方式调用方的send方法返回的比Sync模式快，但是目前运行情况不是很稳定，有出现丢失消息的情况。所以推荐使用sync模式，sync模式是直接将消息发给server，保证消息能发送成功。
-     
+* (2) 如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。生产者共有3中模式，即同步模式ProducerMode.SYNC_MODE,异步模式ProducerMode.ASYNC_MODE和ProducerMode.ASYNC_SEPARATELY_MODE。
+
 <table class= "table table-bordered table-striped table-condensed">
    <tr>
       <td>&#26041;&#27861; </td>
@@ -298,10 +291,10 @@ public class SyncProducerExample{
       <td>&#35774;&#32622;&#21516;&#27493;&#28040;&#24687;&#21457;&#36865;&#37325;&#35797;&#27425;&#25968;</td>
    </tr>
 </table>
+
+* (3) 设置好发送端属性后就可以对生产者对象进行构造。ProducerFactoryImpl实现了ProducerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createProducer会返回ProducerImpl实例，而ProducerImpl自身实现了接口Producer。作为生产者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地。
      
-* (3). 设置好发送端属性后就可以对生产者对象进行构造。ProducerFactoryImpl实现了ProducerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createProducer会返回ProducerImpl实例，而ProducerImpl自身实现了接口Producer。作为生产者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地。
-     
-* (4). Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：
+* (4) Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：
  
  	* 请确保content对象的类型具有默认构造方法。<br>
  	* 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
@@ -330,7 +323,7 @@ public class SyncProducerExample{
 </table>
 
 
-### 使用swallow接收消息
+### 使用Swallow接收消息
 
 #### Spring中配置实现
 
@@ -344,39 +337,34 @@ public class SyncProducerExample{
 &lt;dependency>
 	&lt;groupId>org.springframework&lt;/groupId>
 	&lt;artifactId>spring-beans&lt;/artifactId>
-	&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;version>4.1.3.RELEASE&lt;/version>
 &lt;/dependency>
 &lt;dependency>
 	&lt;groupId>org.springframework&lt;/groupId>
 	&lt;artifactId>spring-context&lt;/artifactId>
-	&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;version>4.1.3.RELEASE&lt;/version>
 &lt;/dependency>
 &lt;dependency>
 	&lt;groupId>org.springframework&lt;/groupId>
 	&lt;artifactId>spring-core&lt;/artifactId>
-	&lt;version>3.0.5.RELEASE&lt;/version>
+	&lt;version>4.1.3.RELEASE&lt;/version>
 &lt;/dependency>
 &lt;dependency>
 	&lt;groupId>com.dianping.swallow&lt;/groupId>
 	&lt;artifactId>swallow-consumerclient&lt;/artifactId>
-	&lt;version>0.6.5&lt;/version> 
+	&lt;version>0.6.10&lt;/version> 
 &lt;/dependency>
 &lt;!-- lion -->
 &lt;dependency>
 	 &lt;groupId>com.dianping.lion&lt;/groupId>
 	 &lt;artifactId>lion-client&lt;/artifactId>
-	 &lt;version>0.3.1-SNAPSHOT&lt;/version>
-&lt;/dependency>
-&lt;dependency>
-	 &lt;groupId>com.dianping.lion&lt;/groupId>
-	 &lt;artifactId>lion-${env}&lt;/artifactId>
-	 &lt;version>1.0.0&lt;/version>
+	 &lt;version>0.4.6&lt;/version>
 &lt;/dependency>
 &lt;!-- 监控 -->
 &lt;dependency>
 	 &lt;groupId>com.dianping.cat&lt;/groupId>
 	 &lt;artifactId>cat-core&lt;/artifactId>
-	 &lt;version>0.4.1&lt;/version>
+	 &lt;version>1.2.1&lt;/version>
 &lt;/dependency>
 &lt;dependency>
 	 &lt;groupId>com.dianping.hawk&lt;/groupId>
@@ -385,8 +373,7 @@ public class SyncProducerExample{
 &lt;/dependency>
 </code></pre>
 
-* env可选的值包括dev（开发环境），alpha和beta（都是测试环境）。
-* swallow-consumerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.6.5版本。
+* swallow-consumerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.6.10版本。
 
 ##### Spring配置文件applicationContext-consumer.xml配置相关bean
 
@@ -399,7 +386,7 @@ public class SyncProducerExample{
 &lt;!-- 消息的目的地(即Topic) -->
 &lt;bean id="dest" class="com.dianping.swallow.common.message.Destination" factory-method="topic">
 	&lt;constructor-arg>
-		&lt;value>example&lt;/value><!-- example为消息的Topic，需自定义 -->
+		&lt;value>example&lt;/value>  <!-- example为消息的Topic，需自定义 -->
 	&lt;/constructor-arg>
 &lt;/bean>
 &lt;!-- MessageListener为您实现的消息事件监听器，负责处理接收到的消息 -->
@@ -410,7 +397,7 @@ public class SyncProducerExample{
 		&lt;ref bean="dest" />
 	&lt;/constructor-arg>
 	&lt;constructor-arg>
-		&lt;value>xx&lt;/value> <!-- xx为消费者id，需自定义 -->
+		&lt;value>xx&lt;/value>   <!-- xx为消费者id，需自定义 -->
 	&lt;/constructor-arg>
 	&lt;constructor-arg>
 		&lt;ref bean="consumerConfig" />
@@ -421,7 +408,7 @@ public class SyncProducerExample{
 &lt;/bean>
 </code></pre>
 
-* 消息目的地的值example为消息种类，必须是在服务器白名单中的消息种类才能够连接服务器，否则会拒绝连接。
+* 消息目的地的值example为消息种类，必须是在服务器白名单中的消息种类才能够连接服务器，否则会拒绝连接。如何申请参加[申请Topic](#topic)
 * messageListener要自己实现，需继承com.dianping.swallow.consumer.MessageListener并实现onMessage方法。下面列出MessageListenerImpl的实现供参考。
 
 <pre><code>
@@ -486,7 +473,7 @@ public class DurableConsumerExample {
 </code></pre>
 
 
-* (1). 使用swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
+* (1) 使用Swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成。由于ConsumerConfig没有提供构造函数，所以只能调用默认构造函数，这样所有属性都会被设置为默认值。下图列出了消费者的所有属性及其默认值。
 
 	* threadPoolSize表示consumer处理消息的线程池线程数，默认为1。 Consumer接收到消息时，会调用用户 实现的MessageListener.onMessage。默认情况下，Consumer内部使用单线程来调用MessageListener.onMessage，即Consumer会单线程地调用onMessage，只有onMessage执行完并响应给服务器（即发送ack给服务器），服务器在收到ack后，才会推送下一个消息过来。如果希望并行地处理更多消息，可以通过设置threadPoolSize，实现多线程（本地有threadPoolSize个线程调用onMessage()，同时服务器也可以在未收到threadPoolSize个ack的情况下继续推送消息），能提高接收消息的速度，但是如此一来，消息的先后顺序则无法保证 。
 	* messageFilter表示consumer只消费“Message.type属性包含在指定集合中”的消息。
@@ -536,7 +523,7 @@ public class DurableConsumerExample {
 </table>
 
       
-* (2). 如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。
+* (2) 如果想更改默认设置，则可以调用相应的setter函数进行设置，下图列出了所有可配置属性及其getter和setter函数。
 
 <table class= "table table-bordered table-striped table-condensed">
    <tr>
@@ -601,11 +588,11 @@ public class DurableConsumerExample {
    </tr>
 </table>
      
-* (3). 设置好接收端属性后就可以对消费者对象进行构造。ConsumerFactoryImpl实现了ConsumerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createConsumer会返回ConsumerImpl实例，而ConsumerImpl自身实现了接口Consumer。作为消费者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地，该名字需要与所感兴趣的生产者指定的目的地名称一致。
+* (3) 设置好接收端属性后就可以对消费者对象进行构造。ConsumerFactoryImpl实现了ConsumerFactory，并且其自身为单例对象，调用静态方法getInstance()返回这个单例工厂对象，执行createConsumer会返回ConsumerImpl实例，而ConsumerImpl自身实现了接口Consumer。作为消费者，需要绑定消息发送的目的地，Destination实现了对目的地的抽象，其静态方法topic(String name)会返回主题是name的消息目的地，该名字需要与所感兴趣的生产者指定的目的地名称一致。
      
-* (4). Consumer唯一定义了异步接受消息的方法setListener,该方法需要一个实现MessageListener接口的实例作为参数。MessageListener接口唯一定义了onMessage(Message msg)方法，客户端只需要实现该方法，将消息处理逻辑写入其中即可。
+* (4) Consumer唯一定义了异步接受消息的方法setListener,该方法需要一个实现MessageListener接口的实例作为参数。MessageListener接口唯一定义了onMessage(Message msg)方法，客户端只需要实现该方法，将消息处理逻辑写入其中即可。
 
-* (5). 调用start()方法启动客户端程序。程序内部会使用Netty框架实现网络通信过程。
+* (5) 调用start()方法启动客户端程序。程序内部会使用Netty框架实现网络通信过程。
      
 
 ## Swallow常见问题以及处理
@@ -641,7 +628,7 @@ public class DurableConsumerExample {
 * 确认topic是否有生产者在持续生产消息，可以参考[问题1](#_5)，连续查看swallow中的transaction，看是否存在数量变化，如果In:&lt;topic名称>没有变化，说明没有新的消息产生，而不是consumer堵住了。
 * 确认consumer是否在持续消费消息，可以参考[问题2](#consumer)，连续查看consumer对应项目的transaction，看MsgConsumed这个type是否数量增加，如果这个数量在增加，说明consumer消费没有堵住。
 * 其次确认是否该topic其他consumer都在消费，只有自己的consumer停止消费了。可以参考[问题1](#_5)，查看topic其他consumer的消费情况。
-	* __如果该topic其他consumer也都停止消费，且生产者正常工作，请及时联系swallow团队成员__。
+	* _如果该topic其他consumer也都停止消费，且生产者正常工作，请及时联系swallow团队成员_。
 	* 如果该topic其他consumer消费正常，只有你自己的consumer消费堵住了，请查看consumer对应项目在CAT中的Problem，找到Heartbeat这个type，查询最新的线程堆栈，以确认Consumer的线程是否block在onMessage方法内，详细页面请参考下图：
 	![Producer Count In CAT](http://code.dianpingoa.com/arch/swallow/raw/master/readme/6.png)
 	* 如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因包括但不限于死循环、等待IO、死锁、数据库操作、依赖的服务超时等情况，请仔细检查这些情况，修复并重启consumer即可。
