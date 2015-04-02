@@ -105,7 +105,17 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
             channel.close();
         }
     }
-
+    
+	public void handleHeartBeat(Channel channel, ConsumerInfo consumerInfo) {
+        ConsumerWorker worker = findConsumerWorker(consumerInfo);
+        if (worker != null) {
+        	worker.handleHeartBeat(channel);
+        } else {
+            logger.warn(consumerInfo + "ConsumerWorker is not exist!");
+            channel.close();
+        }
+	}
+    
     public void handleChannelDisconnect(Channel channel, ConsumerInfo consumerInfo) {
         ConsumerWorker worker = findConsumerWorker(consumerInfo);
         if (worker != null) {
@@ -132,7 +142,11 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 		        //关闭ConsumerWorker的资源（关闭内部的“用于获取消息的队列”）
 		        if (consumerInfo2ConsumerWorker != null) {
 		            for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
-		                entry.getValue().close();
+		                try {
+							entry.getValue().dispose();
+						} catch (Exception e) {
+							logger.error("[onTransition]", e);
+						}
 		            }
 		        }
 
@@ -182,7 +196,11 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 			ConsumerWorker worker) {
     	messageDAO.cleanMessage(consumerInfo.getDest().getName(), consumerInfo.getConsumerId());
         if (worker != null) {
-            worker.close();
+            try {
+				worker.dispose();
+			} catch (Exception e) {
+				logger.error("[cleanConsumerInfo]", e);
+			}
             worker = null;
             consumerInfo2ConsumerWorker.remove(consumerInfo);
         }
@@ -323,7 +341,11 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 	                    if (worker.allChannelDisconnected()) {
 	                        worker.recordAck();
 	                        removeConsumerWorker(consumerInfo);
-	                        worker.close();
+	                        try {
+								worker.dispose();
+							} catch (Exception e) {
+								logger.error("[doRun]", e);
+							}
 	                        logger.info("[doRun][close ConsumerWorker]ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
 	                    }
 	                }

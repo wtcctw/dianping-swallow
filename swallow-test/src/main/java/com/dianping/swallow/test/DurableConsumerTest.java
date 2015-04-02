@@ -26,7 +26,7 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 		
 		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
 		sendMessage(messageCount, topic);
-		sleep(3000);
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		
 	}
@@ -39,7 +39,7 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 		sendMessage(messageCount, topic);
 		
 		startConsumer(consumer);
-		sleep(3000);
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		
 	}
@@ -55,7 +55,7 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
 		sendMessage(messageCount, topic);
 		
-		sleep(5000);
+		waitForListernToComplete(messageCount);
 		int currentConsumerCount = getConsumerMessageCount(consumer); 
 		Assert.assertEquals(messageCount, currentConsumerCount);
 		
@@ -73,7 +73,7 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 			Assert.assertEquals(concurrentSendMessageCount, currentConsumerCount);
 			
 			startConsumer(consumer);
-			sleep(5000);
+			waitForListernToComplete(messageCount);
 		
 			concurrentSendMessageCount = getSendMessageCount(topic);
 			currentConsumerCount = getConsumerMessageCount(consumer); 

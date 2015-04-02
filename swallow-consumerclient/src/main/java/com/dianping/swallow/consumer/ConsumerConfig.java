@@ -17,7 +17,7 @@ import com.dianping.swallow.common.internal.util.MongoUtils;
  */
 public class ConsumerConfig {
 
-    private static final Logger    LOG           = LoggerFactory.getLogger(ConsumerConfig.class);
+    private static final Logger    logger           = LoggerFactory.getLogger(ConsumerConfig.class);
 
     private int           threadPoolSize                           = 1;
     private MessageFilter messageFilter                            = MessageFilter.AllMatchFilter;
@@ -192,7 +192,7 @@ public class ConsumerConfig {
 	           retryCount = Integer.MAX_VALUE;
 	       }
 	       if (retryCount < -1) {
-	           LOG.warn("invalid retryCountOnBackoutMessageException, use default value: " + this.retryCount + ".");
+	           logger.warn("invalid retryCountOnBackoutMessageException, use default value: " + this.retryCount + ".");
 	           return;
 	       }
 	       this.retryCount = retryCount;

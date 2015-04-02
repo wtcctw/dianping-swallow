@@ -22,7 +22,7 @@ import com.dianping.swallow.common.internal.monitor.ThreadStatusBean;
  */
 public class MQThreadFactory implements ThreadFactory, Closeable {
 
-   private final static Logger                      LOG            = LoggerFactory.getLogger(MQThreadFactory.class);
+   private final static Logger                      logger            = LoggerFactory.getLogger(MQThreadFactory.class);
 
    private static ThreadGroup                       topThreadGroup = new ThreadGroup("swallow-top");
    private final static String                      PREFIX_DEFAULT = "swallow-";
@@ -72,7 +72,7 @@ public class MQThreadFactory implements ThreadFactory, Closeable {
                try {
                   ((Closeable) t).close();
                } catch (Exception e) {
-                  LOG.error("unexpected exception", e);
+                  logger.error("unexpected exception", e);
                }
             }
             t.interrupt();

@@ -4,8 +4,9 @@ import org.jboss.netty.channel.Channel;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
+import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 
-public interface ConsumerWorker {
+public interface ConsumerWorker extends Lifecycle{
 	
 	
 	/**
@@ -39,11 +40,6 @@ public interface ConsumerWorker {
    void handleChannelDisconnect(Channel channel);
 
    /**
-    * 关闭资源
-    */
-   void close();
-
-   /**
     * 判断同consumerId下的所有的连接是否都不存在
     * 
     * @return
@@ -58,4 +54,6 @@ public interface ConsumerWorker {
    ConsumerType getConsumerType();
 
    void recordAck();
+
+   void handleHeartBeat(Channel channel);
 }

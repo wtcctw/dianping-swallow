@@ -13,7 +13,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 @SuppressWarnings("rawtypes")
 public class MongoDBMessageRetriever implements MessageRetriever {
-   private static final Logger LOG       = LoggerFactory.getLogger(MongoDBMessageRetriever.class);
+   private static final Logger logger       = LoggerFactory.getLogger(MongoDBMessageRetriever.class);
 
    private int                 fetchSize = 500;
 
@@ -65,9 +65,9 @@ public class MongoDBMessageRetriever implements MessageRetriever {
 	         messages.add(0, maxMessageId);
 	      }
 
-	      if (LOG.isDebugEnabled()) {
-	         LOG.debug("fetched messages from mongodb, size:" + messages.size());
-	         LOG.debug("messages:" + messages);
+	      if (logger.isDebugEnabled()) {
+	         logger.debug("fetched messages from mongodb, size:" + messages.size());
+	         logger.debug("messages:" + messages);
 	      }
 
 	      //如果返回值messages.size大于0，则第一个元素一定是更新后的maxMessageId

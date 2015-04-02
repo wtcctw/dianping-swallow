@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CloseMonitor {
 
-   private static final Logger LOG                  = LoggerFactory.getLogger(CloseMonitor.class);
+   private static final Logger logger                  = LoggerFactory.getLogger(CloseMonitor.class);
 
    private final static String DEFAULT_SHUTDOWN_CMD = "shutdown";
 
@@ -34,19 +34,19 @@ public class CloseMonitor {
             try {
                ServerSocket ss = new ServerSocket(port);
 
-               LOG.info("MonitorTask started at port: " + port);
+               logger.info("MonitorTask started at port: " + port);
 
                Socket socket = null;
 
                while (true) {
                   try {
                      socket = ss.accept();
-                     LOG.info("Accepted one connection : " + socket.getRemoteSocketAddress());
+                     logger.info("Accepted one connection : " + socket.getRemoteSocketAddress());
                      BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                      String command = br.readLine();
-                     LOG.info("Command : " + command);
+                     logger.info("Command : " + command);
                      if (cmd.equals(command)) {
-                        LOG.info("Shutdown command received.");
+                        logger.info("Shutdown command received.");
                         break;
                      }
                   } catch (Exception e) {
@@ -60,7 +60,7 @@ public class CloseMonitor {
                hook.onClose();
                System.exit(0);
             } catch (Exception e) {
-               LOG.error("CloseMonitor start failed.", e);
+               logger.error("CloseMonitor start failed.", e);
             }
          }
       };

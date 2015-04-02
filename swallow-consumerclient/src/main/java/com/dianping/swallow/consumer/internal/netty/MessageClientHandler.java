@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
-import com.dianping.swallow.common.internal.consumer.ConsumerMessageType;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.processor.ConsumerProcessor;
 import com.dianping.swallow.common.internal.util.IPUtil;
@@ -34,18 +33,24 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     private SwallowCatActionWrapper 		actionWrapper;
     private String 							connectionDesc;
     private TaskChecker 					taskChecker;
+    private ConsumerConnectionListener 		consumerConnectionListener;
 
-    public MessageClientHandler(ConsumerImpl consumer, ConsumerProcessor processor, TaskChecker taskChecker, SwallowCatActionWrapper actionWrapper) {
+    public MessageClientHandler(ConsumerImpl consumer, ConsumerProcessor processor, TaskChecker taskChecker, SwallowCatActionWrapper actionWrapper, 
+    		ConsumerConnectionListener consumerConnectionListener) {
     	
         this.consumer = consumer;
         this.processor = processor;
         this.actionWrapper = actionWrapper;
         this.taskChecker = taskChecker;
+        this.consumerConnectionListener = consumerConnectionListener;
     }
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
-        PktConsumerMessage consumerMessage = new PktConsumerMessage(ConsumerMessageType.GREET, consumer.getConsumerId(),
+    	
+    	consumerConnectionListener.onChannelConnected(e.getChannel());
+    	
+        PktConsumerMessage consumerMessage = new PktConsumerMessage(consumer.getConsumerId(),
                 consumer.getDest(), consumer.getConfig().getConsumerType(), consumer.getConfig().getThreadPoolSize(),
                 consumer.getConfig().getMessageFilter());
         consumerMessage.setMessageId(consumer.getConfig().getStartMessageId());
@@ -55,7 +60,9 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelDisconnected(ctx, e);
+	    super.channelDisconnected(ctx, e);
+    	consumerConnectionListener.onChannelDisconnected(e.getChannel());
+
         if(logger.isInfoEnabled()){
         	logger.info("Channel(remoteAddress=" + e.getChannel().getRemoteAddress() + ") disconnected");
         }
@@ -81,7 +88,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
         Channel channel = e.getChannel();
-        logger.error("Error from channel(" + connectionDesc  + ")", e);
+        logger.error("Error from channel(" + connectionDesc  + ")", e.getCause());
         channel.close();
     }
 }

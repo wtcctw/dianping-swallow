@@ -426,8 +426,9 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
 		DBCollection collection = getMessageCollection(topicName, consumerId);
 		
 		boolean isCapped = collection.isCapped();
-		
-		collection.drop();
+
+		//此处不能只dropCollection，如果只dropCollection会导致db大小不停增加
+		dropDatabase(topicName, consumerId);
 		
 		markCollectionNotExists(getMongo(topicName).getDB(getMessageDbName(topicName, consumerId)));
 		
@@ -439,7 +440,14 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
 				
 	}
 
-   private Mongo getMongo(String topicName) {
+	private void dropDatabase(String topicName, String consumerId) {
+		
+		String dbName = getMessageDbName(topicName, consumerId);
+		Mongo mongo = getMongo(topicName);
+		mongo.dropDatabase(dbName);
+	}
+
+private Mongo getMongo(String topicName) {
       Mongo mongo = this.topicNameToMongoMap.get(topicName);
       if (mongo == null) {
          if (logger.isDebugEnabled()) {

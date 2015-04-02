@@ -16,7 +16,7 @@ import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
  */
 public class ConsumerAuthControllerImpl implements ConsumerAuthController, ConfigChangeListener {
 
-    private static final Logger LOG        = LoggerFactory.getLogger(ConsumerAuthControllerImpl.class);
+    private static final Logger logger        = LoggerFactory.getLogger(ConsumerAuthControllerImpl.class);
 
     private static final String IP_SPLIT   = ";";
 
@@ -36,13 +36,13 @@ public class ConsumerAuthControllerImpl implements ConsumerAuthController, Confi
 
     @Override
     public void onConfigChange(String key, String value) {
-        LOG.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
+        logger.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
         key = key.trim();
         if (key.equals(LION_KEY)) {
             try {
                 build();
             } catch (RuntimeException e) {
-                LOG.error("Error initialize 'topic white list' from lion ", e);
+                logger.error("Error initialize 'topic white list' from lion ", e);
             }
         }
     }
@@ -64,7 +64,7 @@ public class ConsumerAuthControllerImpl implements ConsumerAuthController, Confi
 
         this.disableIps = _ips;
 
-        LOG.info("Disable ip list is :" + disableIps);
+        logger.info("Disable ip list is :" + disableIps);
     }
 
     public void setLionDynamicConfig(DynamicConfig lionDynamicConfig) {

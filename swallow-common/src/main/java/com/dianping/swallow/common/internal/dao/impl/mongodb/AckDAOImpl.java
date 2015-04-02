@@ -18,7 +18,7 @@ import com.mongodb.MongoException;
 
 public class AckDAOImpl implements AckDAO {
 
-   private static final Logger LOG             = LoggerFactory.getLogger(AckDAOImpl.class);
+   private static final Logger logger             = LoggerFactory.getLogger(AckDAOImpl.class);
 
    public static final String  MSG_ID          = "_id";
    public static final String  SRC_CONSUMER_IP = "cip";
@@ -82,7 +82,7 @@ public class AckDAOImpl implements AckDAO {
       } catch (MongoException e) {
          if (e.getMessage() != null && e.getMessage().indexOf("duplicate key") >= 0 || e.getCode() == 11000) {
             //_id already exists
-            LOG.warn(e.getMessage() + ": _id is " + timestamp);
+            logger.warn(e.getMessage() + ": _id is " + timestamp);
          } else {
             throw e;
          }

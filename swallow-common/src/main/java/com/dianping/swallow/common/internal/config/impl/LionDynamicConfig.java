@@ -15,7 +15,7 @@ import com.dianping.swallow.common.internal.config.DynamicConfig;
 
 public class LionDynamicConfig implements DynamicConfig {
 
-   private static final Logger LOG = LoggerFactory.getLogger(LionDynamicConfig.class);
+   private static final Logger logger = LoggerFactory.getLogger(LionDynamicConfig.class);
 
    private ConfigCache         cc;
 
@@ -24,7 +24,7 @@ public class LionDynamicConfig implements DynamicConfig {
       try {
          cc = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
          if (!"dev".equals(env)) {
-            LOG.warn("Env is not 'dev', ignore lion local config");
+            logger.warn("Env is not 'dev', ignore lion local config");
          } else {
             // 如果本地文件存在，则使用Lion本地文件
             InputStream in = LionDynamicConfig.class.getClassLoader().getResourceAsStream(localConfigFileName);
@@ -38,8 +38,8 @@ public class LionDynamicConfig implements DynamicConfig {
                   } else {
                      cc.setPts(props);
                   }
-                  if (LOG.isInfoEnabled()) {
-                     LOG.info("Load Lion local config file :" + localConfigFileName);
+                  if (logger.isInfoEnabled()) {
+                     logger.info("Load Lion local config file :" + localConfigFileName);
                   }
                } finally {
                   in.close();

@@ -15,7 +15,7 @@ import com.dianping.swallow.impl.MongoMQService;
 
 public class MQServiceAdapter implements MQService {
 
-   private static final Logger LOG = LoggerFactory.getLogger(MQServiceAdapter.class);
+   private static final Logger logger = LoggerFactory.getLogger(MQServiceAdapter.class);
 
    private MongoMQService      oldMqService;
    private String              mongoUri;
@@ -41,10 +41,10 @@ public class MQServiceAdapter implements MQService {
             }
          }
       } catch (Exception e) {
-         LOG.error("Error parsing config from lion", e);
+         logger.error("Error parsing config from lion", e);
       }
 
-      LOG.info("start old swallow consumer " + shouldStartOldConsumer);
+      logger.info("start old swallow consumer " + shouldStartOldConsumer);
       return shouldStartOldConsumer;
    }
 

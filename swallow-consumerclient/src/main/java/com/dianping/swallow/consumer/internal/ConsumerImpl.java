@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -19,6 +20,7 @@ import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
 import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
+import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.processor.ConsumerProcessor;
@@ -36,11 +38,12 @@ import com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener;
 import com.dianping.swallow.consumer.internal.action.RetryOnAllExceptionActionWrapper;
 import com.dianping.swallow.consumer.internal.action.RetryOnBackoutMessageExceptionActionWrapper;
 import com.dianping.swallow.consumer.internal.config.ConfigManager;
+import com.dianping.swallow.consumer.internal.netty.ConsumerConnectionListener;
 import com.dianping.swallow.consumer.internal.netty.MessageClientHandler;
 import com.dianping.swallow.consumer.internal.task.LongTaskChecker;
 import com.dianping.swallow.consumer.internal.task.TaskChecker;
 
-public class ConsumerImpl implements Consumer {
+public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
 
@@ -60,8 +63,6 @@ public class ConsumerImpl implements Consumer {
 
 	private final String consumerIP = IPUtil.getFirstNoLoopbackIP4Address();
 
-	// 以下字段，在start/close会构建和释放。
-
 	private ClientBootstrap bootstrap;
 
 	private ExecutorService service;
@@ -77,16 +78,19 @@ public class ConsumerImpl implements Consumer {
 	private ExecutorService consumerHelperExecutors;
 
 	private TaskChecker taskChecker;
+	
+	private HeartBeatSender heartBeatSender;
 
 	public ConsumerImpl(Destination dest, ConsumerConfig config, InetSocketAddress masterAddress,
-			InetSocketAddress slaveAddress) {
-		this(dest, null, config, masterAddress, slaveAddress);
+			InetSocketAddress slaveAddress, HeartBeatSender heartBeatManager) {
+		this(dest, null, config, masterAddress, slaveAddress, heartBeatManager);
 	}
 
 	public ConsumerImpl(Destination dest, String consumerId, ConsumerConfig config, InetSocketAddress masterAddress,
-			InetSocketAddress slaveAddress) {
+			InetSocketAddress slaveAddress, HeartBeatSender heartBeatSender) {
 
 		checkArgument(config, consumerId);
+		
 		// ack#<topic>#<cid>长度不超过63字节(mongodb对数据库名的长度限制是63字节)
 		int length = 0;
 		length += dest.getName().length();
@@ -106,12 +110,10 @@ public class ConsumerImpl implements Consumer {
 		this.taskChecker = new LongTaskChecker(config.getLongTaskAlertTime());
 		this.pullStrategy = new DefaultPullStrategy(config.getDelayBaseOnBackoutMessageException(),
 				config.getDelayUpperboundOnBackoutMessageException());
+		this.heartBeatSender = heartBeatSender;
 
 	}
 
-	/**
-	 * 开始连接服务器，同时把连slave的线程启起来。
-	 */
 	@Override
 	public void start() {
 		if (listener == null) {
@@ -123,20 +125,15 @@ public class ConsumerImpl implements Consumer {
 			if (logger.isInfoEnabled()) {
 				logger.info("Starting " + this.toString());
 			}
-
-			// 启动处理handler的线程池
-			service = Executors.newFixedThreadPool(this.getConfig().getThreadPoolSize(), new MQThreadFactory(
-					"swallow-consumer-client-" + consumerId + "-"));
-
+			service = Executors.newFixedThreadPool(this.getConfig().getThreadPoolSize(), new MQThreadFactory("swallow-consumer-client-" + consumerId + "-"));
 			startListener();
-
 			startHelper();
 		}
 	}
 
 	private void startListener() {
 		final MessageClientHandler handler = new MessageClientHandler(this, processor, taskChecker,
-				createRetryWrapper());
+				createRetryWrapper(), this);
 		bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
 				Executors.newCachedThreadPool()));
 		bootstrap.setOption("keepAlive", true);
@@ -168,6 +165,16 @@ public class ConsumerImpl implements Consumer {
 		slaveConsumerThread.start();
 	}
 
+	@Override
+	public void onChannelConnected(Channel channel) {
+		heartBeatSender.addChannel(channel);
+	}
+
+	@Override
+	public void onChannelDisconnected(Channel channel) {
+		heartBeatSender.removeChannel(channel);
+	}
+	
 	private void startHelper() {
 		
 		consumerHelperExecutors = Executors.newCachedThreadPool(new MQThreadFactory("Swallow-Helper-"));
@@ -182,10 +189,6 @@ public class ConsumerImpl implements Consumer {
 		return new RetryOnBackoutMessageExceptionActionWrapper(pullStrategy, config.getRetryCount());
 	}
 
-	/**
-	 * 设置closed标记为true，这样Consumer会在接收到ConsumerServer的消息后通知对方需要关闭连接。<br>
-	 * 同时，Consumer内部的masterConsumerThread和slaveConsumerThread线程将在连接关闭后也结束。<br>
-	 */
 	@Override
 	public void close() {
 		if (started.compareAndSet(true, false)) {
@@ -193,27 +196,21 @@ public class ConsumerImpl implements Consumer {
 			if (logger.isInfoEnabled()) {
 				logger.info("Closing " + this.toString());
 			}
-
 			service.shutdown();
-			
 			closeListerner();
-
 			closeHelpers();
 
 		}
 	}
 
 	private void closeHelpers() {
-
 		consumerHelperExecutors.shutdown();
 		taskChecker.close();
-
 	}
 
 	private void closeListerner() {
 		masterConsumerThread.interrupt();
 		slaveConsumerThread.interrupt();
-		// 关闭netty bootstrap
 		bootstrap.releaseExternalResources();
 	}
 

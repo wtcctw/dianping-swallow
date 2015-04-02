@@ -16,7 +16,7 @@ public class DurableConsumerExample {
         ConsumerConfig config = new ConsumerConfig();
         //以下两项根据自己情况而定，默认是不需要配的
         config.setThreadPoolSize(1);
-        config.setRetryCountOnBackoutMessageException(0);
+        config.setRetryCount(0);
 
         Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId1", config);
         c.setListener(new MessageListener() {

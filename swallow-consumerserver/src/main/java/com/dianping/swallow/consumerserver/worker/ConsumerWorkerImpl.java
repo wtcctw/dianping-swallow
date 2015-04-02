@@ -1,7 +1,6 @@
 package com.dianping.swallow.consumerserver.worker;
 
 import java.net.InetSocketAddress;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +23,10 @@ import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatReceiver;
+import com.dianping.swallow.common.internal.heartbeat.HeartBeatReceiver;
+import com.dianping.swallow.common.internal.heartbeat.NoHeartBeatListener;
+import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
@@ -40,7 +43,7 @@ import com.dianping.swallow.consumerserver.util.ConsumerUtil;
  * 
  * @author kezhu.wu
  */
-public final class ConsumerWorkerImpl implements ConsumerWorker {
+public final class ConsumerWorkerImpl extends AbstractLifecycle implements ConsumerWorker, NoHeartBeatListener{
    private static final Logger                          logger                     = LoggerFactory
                                                                                       .getLogger(ConsumerWorkerImpl.class);
    private final AtomicLong                             SEQ                     = new AtomicLong(1);
@@ -98,6 +101,8 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    private ConsumerThreadPoolManager  						consumerThreadPoolManager;
    
+   private HeartBeatReceiver 								heartBeatReceiver;
+   
    @SuppressWarnings("deprecation")
    public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter, 
 		   	ConsumerAuthController consumerAuthController, ConsumerThreadPoolManager consumerThreadPoolManager, long startMessageId) {
@@ -129,6 +134,7 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
       }
       messageQueue = swallowBuffer.createMessageQueue(this.consumerInfo, messageIdOfTailMessage,
             messageIdOfTailBackupMessage, this.messageFilter);
+      heartBeatReceiver = new DefaultHeartBeatReceiver(consumerThreadPoolManager.getScheduledThreadPool(), this);
 
    }
 
@@ -158,6 +164,19 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
 
    }
 
+	@Override
+	public void handleHeartBeat(Channel channel) {
+		heartBeatReceiver.beat(channel);
+	}
+   
+	@Override
+	public void onNoHeartBeat(Channel channel) {
+		if(logger.isInfoEnabled()){
+			logger.info("[onNoHeartBeat][close channel]" + channel);
+		}
+		channel.close();
+	}
+	
    /**
     * 收到ack，则从WaitAckMessages中移除相应的消息，同时更新最大的ack message id <br>
     * 按照实现逻辑，该方法只会被单线程调用
@@ -457,8 +476,9 @@ public final class ConsumerWorkerImpl implements ConsumerWorker {
    }
 
    @Override
-   public void close() {
+   public void dispose() {
       messageQueue.close();
+      heartBeatReceiver.cancelCheck();
    }
 
    /**

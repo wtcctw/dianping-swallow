@@ -22,7 +22,7 @@ public class GzipDataTest extends AbstractConsumerTest {
 	
 
 	@Test
-	public void testSendData() throws Throwable{
+	public void testGzip() throws Throwable{
 		
 		String dataToSend = UUID.randomUUID().toString();
 		final AtomicReference<String> data = new AtomicReference<String>();
@@ -40,7 +40,7 @@ public class GzipDataTest extends AbstractConsumerTest {
 		Producer p = createProducer(topic, true);
 		p.sendMessage(dataToSend);
 
-		sleep(3000);
+		waitForListernToComplete(1);
 		
 		Assert.assertEquals(dataToSend, data.get());
 	}

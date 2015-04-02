@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("deprecation")
 public class HttpClientUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(HttpClientUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
     private static final DefaultHttpClient httpclient;
 
@@ -73,8 +73,8 @@ public class HttpClientUtil {
         } finally {
             EntityUtils.consume(entity);
             httpPost.releaseConnection();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("****** http client invoke (Post method), url: " + url + ", nameValuePair: " + nvps + ", result: "
+            if (logger.isDebugEnabled()) {
+                logger.debug("****** http client invoke (Post method), url: " + url + ", nameValuePair: " + nvps + ", result: "
                         + result + ", time: " + String.valueOf(System.currentTimeMillis() - start) + "ms.");
             }
         }
@@ -101,8 +101,8 @@ public class HttpClientUtil {
         } finally {
             EntityUtils.consume(entity);
             httpPost.releaseConnection();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("****** http client invoke (Post method), url: " + url + ", result: " + result + ", time: "
+            if (logger.isDebugEnabled()) {
+                logger.debug("****** http client invoke (Post method), url: " + url + ", result: " + result + ", time: "
                         + String.valueOf(System.currentTimeMillis() - start) + "ms.");
             }
         }

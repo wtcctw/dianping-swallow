@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ConsumerThread extends Thread {
 
-   private static final Logger LOG = LoggerFactory.getLogger(ConsumerThread.class);
+   private static final Logger logger = LoggerFactory.getLogger(ConsumerThread.class);
 
    private ClientBootstrap     bootstrap;
 
@@ -45,19 +45,19 @@ public class ConsumerThread extends Thread {
          synchronized (bootstrap) {
             if (!Thread.currentThread().isInterrupted()) {
                try {
-                  LOG.info("ConsumerThread-try connecting to " + remoteAddress);
+                  logger.info("[run][connecting]" + remoteAddress);
                   future = bootstrap.connect(remoteAddress);
                   future.await();
                   if (future.getChannel().isConnected()) {
                      SocketAddress localAddress = future.getChannel().getLocalAddress();
-                     LOG.info("ConsumerThread(localAddress=" + localAddress + ")-connected to " + remoteAddress);
+                     logger.info("[run][connected]" + localAddress + "->" + remoteAddress);
                      future.getChannel().getCloseFuture().await();//等待channel关闭，否则一直阻塞！
-                     LOG.info("ConsumerThread(localAddress=" + localAddress + ")-closed from " + remoteAddress);
+                     logger.info("[run][closed   ]" + localAddress + "->" + remoteAddress);
                   }
                } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
                } catch (RuntimeException e) {
-                  LOG.error(e.getMessage(), e);
+                  logger.error(e.getMessage(), e);
                }
             }
          }
@@ -70,6 +70,6 @@ public class ConsumerThread extends Thread {
       if(future!=null && future.getChannel()!=null){
           future.getChannel().close();//线程被中断了，主动关闭连接
       }
-      LOG.info("ConsumerThread(remoteAddress=" + remoteAddress + ") done.");
+      logger.info("ConsumerThread(remoteAddress=" + remoteAddress + ") done.");
    }
 }

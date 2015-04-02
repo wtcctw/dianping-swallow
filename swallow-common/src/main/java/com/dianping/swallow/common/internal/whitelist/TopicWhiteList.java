@@ -16,7 +16,7 @@ import com.dianping.swallow.common.internal.config.DynamicConfig;
  */
 public class TopicWhiteList implements ConfigChangeListener {
 
-    private static final Logger LOG              = LoggerFactory.getLogger(TopicWhiteList.class);
+    private static final Logger logger              = LoggerFactory.getLogger(TopicWhiteList.class);
 
     private static final String TOPIC_SPLIT      = ";|,";
 
@@ -40,13 +40,13 @@ public class TopicWhiteList implements ConfigChangeListener {
 
     @Override
     public void onConfigChange(String key, String value) {
-        LOG.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
+        logger.info("Invoke onConfigChange, key='" + key + "', value='" + value + "'");
         key = key.trim();
         if (key.equals(TOPIC_WHITE_LIST)) {
             try {
                 build();
             } catch (RuntimeException e) {
-                LOG.error("Error initialize 'topic white list' from lion ", e);
+                logger.error("Error initialize 'topic white list' from lion ", e);
             }
         }
     }
@@ -68,7 +68,7 @@ public class TopicWhiteList implements ConfigChangeListener {
 
         this.topics = _topics;
 
-        LOG.info("White list topic is :" + topics);
+        logger.info("White list topic is :" + topics);
     }
 
     public void setLionDynamicConfig(DynamicConfig lionDynamicConfig) {
