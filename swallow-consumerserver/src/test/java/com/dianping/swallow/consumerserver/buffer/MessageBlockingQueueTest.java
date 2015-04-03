@@ -88,7 +88,7 @@ public class MessageBlockingQueueTest extends AbstractTest{
 	@After
 	public void afterMessageBlockingQueueTest() throws InterruptedException{
 		
-		TimeUnit.SECONDS.sleep(100);
+		TimeUnit.SECONDS.sleep(1);
 		
 	}
 

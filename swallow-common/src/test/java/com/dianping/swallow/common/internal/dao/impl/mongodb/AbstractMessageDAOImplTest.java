@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bson.types.BSONTimestamp;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
@@ -32,7 +31,8 @@ public abstract class AbstractMessageDAOImplTest extends AbstractDAOImplTest {
 		messageDAO.cleanMessage(TOPIC_NAME, consumerId);
 	}
 
-	@Test
+//	@Test
+	//删除此测试，collection为capped
 	public void testDeleteMessage() {
 		
 		Assert.assertEquals(0, messageDAO.count(TOPIC_NAME, getConsumerId()));

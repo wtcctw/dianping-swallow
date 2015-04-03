@@ -7,7 +7,10 @@ import jmockmongo.MockMongo;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,6 +30,18 @@ public abstract class AbstractDAOImplTest extends AbstractJUnit4SpringContextTes
 
 	private static MockMongo mock;
 
+	@Rule
+	public TestName  testName = new TestName();
+
+	@Before
+	public void beforeAbstractTest(){
+		if(logger.isInfoEnabled()){
+			logger.info("[-----------------][begin test]" + testName.getMethodName());
+		}
+	}
+
+
+	
 	@BeforeClass
 	public synchronized static void setUpClass() throws Exception {
 		if (mock == null) {
@@ -36,12 +51,12 @@ public abstract class AbstractDAOImplTest extends AbstractJUnit4SpringContextTes
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void afterAbstractDAOImplTest() throws Exception {
 		// 删除测试过程创建的Collection
 		mongoClient.getMessageCollection(TOPIC_NAME).drop();
 		mongoClient.getAckCollection(TOPIC_NAME, CONSUMER_ID).drop();
 		mongoClient.getHeartbeatCollection(IP.replace('.', '_')).drop();
-
+		mock.stop();
 	}
 
 	@AfterClass
@@ -55,5 +70,12 @@ public abstract class AbstractDAOImplTest extends AbstractJUnit4SpringContextTes
 			e.printStackTrace();
 		}
 	}
-
+	
+	@After
+	public void afterAbstractTest(){
+		if(logger.isInfoEnabled()){
+			logger.info("[-----------------][end test]" + testName.getMethodName());
+		}
+	}
+	
 }
