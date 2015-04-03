@@ -4,7 +4,7 @@ ACTION=$1
 MODE=$2
 MASTER_IP=$3
 
-. ./common.sh
+. ${PRGDIR}/common.sh
 
 LOCAL_IP=`ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
 

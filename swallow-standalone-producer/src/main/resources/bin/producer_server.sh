@@ -3,7 +3,7 @@ PRGDIR=`dirname "$0"`
 ACTION=$1
 ProcessName="ProducerServerBootstrap"
 
-. ./common.sh
+. ${PRGDIR}/common.sh
 
 ##################################################
 # Some utility functions
