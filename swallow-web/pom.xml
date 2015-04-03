@@ -71,6 +71,12 @@
 	<build>
 		<finalName>swallow-broker</finalName>
 		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warName>${artifactId}-${env}-${version}</warName>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
