@@ -4,6 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.InitializingBean;
 
 import com.dianping.swallow.common.internal.pool.DefaultThreadProfile;
@@ -152,10 +154,12 @@ public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager,
 	}
 
 	@Override
+	@PreDestroy
 	public void dispose() throws Exception {
 		serviceHandlerThreadPool.shutdownNow();
 		sendMessageThreadPool.shutdownNow();
 		retrieverThreadPool.shutdownNow();
+		scheduled.shutdownNow();
 	}
 
 	@Override

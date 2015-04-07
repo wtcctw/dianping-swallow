@@ -70,6 +70,7 @@ public class DefaultConsumerTask implements ConsumerTask{
 					consumer.getListener().onMessage(swallowMessage);
 				}
 			});
+    		consumerClientTransaction.setStatus(Transaction.SUCCESS);
         } catch (SwallowException e) {
             logger.error("[run][can not process message]" + swallowMessage, e);
         	CatUtil.logException(e);

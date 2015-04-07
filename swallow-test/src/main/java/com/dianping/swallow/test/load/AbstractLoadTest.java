@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -90,33 +91,50 @@ public abstract class AbstractLoadTest {
         preTime = System.currentTimeMillis();
         preCount.set(0);
 		
-        scheduled.scheduleAtFixedRate(new Runnable(){
+        final ScheduledFuture<?> future = scheduled.scheduleAtFixedRate(new Runnable(){
 			@Override
 			public void run() {
 				
-				long currentTime = System.currentTimeMillis();
-				int currentCount = count.get();
-				
-				logger.info("[run]" + "current rate:" + (currentCount - preCount.get())/((currentTime - preTime)/1000));
-				logger.info("[run]" + "total rate:" + (currentCount)/((currentTime - startTime)/1000));
-				logger.info("[run]" + "message count:" + currentCount);
-
-				if(currentCount - preCount.get() == 0){
-					zeroCount++;
-				}else{
-					zeroCount = 0;
+				try{
+					
+					long currentTime = System.currentTimeMillis();
+					int currentCount = count.get();
+					
+					logger.info("[run]" + "current rate:" + (currentCount - preCount.get())/((currentTime - preTime)/1000));
+					logger.info("[run]" + "total rate:" + (currentCount)/((currentTime - startTime)/1000));
+					logger.info("[run]" + "message count:" + currentCount);
+	
+					if(currentCount - preCount.get() == 0){
+						zeroCount++;
+					}else{
+						zeroCount = 0;
+					}
+					if(zeroCount >= zeroExit || (isExit())){
+						logger.info("[run][zero size exceed maximum count, exit]" + zeroExit);
+						exit();
+					}
+					preTime = currentTime;
+					preCount.set(currentCount);
+				}catch(Throwable th){
+					logger.error("[run]", th);
 				}
-				if(zeroCount >= zeroExit || (isExit())){
-					logger.info("[run][zero size exceed maximum count, exit]" + zeroExit);
-					exit();
-				}
-				
-				preTime = currentTime;
-				preCount.set(currentCount);
-				
 			}
 
         }, 5, 5, TimeUnit.SECONDS);
+        
+        
+        executors.execute(new Runnable(){
+
+			@Override
+			public void run() {
+				try {
+					logger.info("[scheduled future]" + future.get());
+				} catch (Exception e) {
+					logger.error("[run]", e);
+				}
+			}
+        	
+        });
 		
 	}
 
