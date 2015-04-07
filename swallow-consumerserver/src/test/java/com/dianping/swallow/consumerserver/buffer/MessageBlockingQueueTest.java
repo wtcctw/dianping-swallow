@@ -41,6 +41,7 @@ public class MessageBlockingQueueTest extends AbstractTest{
 			public void run() {
 				while(true){
 					queue.offer(new SwallowMessage());
+					sleep(1);
 					putCount.incrementAndGet();
 				}
 			}

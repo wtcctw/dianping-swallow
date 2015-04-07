@@ -3,6 +3,7 @@ package com.dianping.swallow;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -34,19 +35,25 @@ public abstract class AbstractTest {
 	}
 
 	
+	protected void sleep(int miliSeconds){
+		
+		try {
+			TimeUnit.MILLISECONDS.sleep(miliSeconds);
+		} catch (InterruptedException e) {
+			logger.error("[sleep]", e);
+		}
+	}
+	
 	
 	@After
-	public void AfterAbstractTest(){
+	public void afterAbstractTest(){
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[-----------------][end test]" + testName.getMethodName());
+		}
+		
 		executors.shutdownNow();
 		scheduledExecutors.shutdownNow();
 	}
 
-
-	@After
-	public void afterAbstractTest(){
-		if(logger.isInfoEnabled()){
-			logger.info("[-----------------][end test]" + testName.getMethodName());
-		}
-	}
-	
 }

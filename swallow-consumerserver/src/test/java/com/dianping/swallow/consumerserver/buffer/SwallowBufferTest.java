@@ -80,20 +80,6 @@ public class SwallowBufferTest extends AbstractTest {
 	}
 
 	@Test
-    public void testPoll1() throws InterruptedException {
-        Set<String> messageTypeSet = new HashSet<String>();
-        messageTypeSet.add(TYPE);
-        ConsumerInfo consumerInfo = new ConsumerInfo("consumerId", Destination.topic(TOPIC_NAME), ConsumerType.DURABLE_AT_LEAST_ONCE);
-        Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
-
-        SwallowMessage m = queue.poll();
-        while (m == null) {
-            m = queue.poll();
-        }
-        Assert.assertEquals("content2", m.getContent());
-    }
-
-    @Test
     public void testPoll2() throws InterruptedException {
         Set<String> messageTypeSet = new HashSet<String>();
         messageTypeSet.add(TYPE);
