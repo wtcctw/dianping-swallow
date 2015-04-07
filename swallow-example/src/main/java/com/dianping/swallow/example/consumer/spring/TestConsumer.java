@@ -7,14 +7,15 @@ import com.dianping.swallow.consumer.Consumer;
 
 public class TestConsumer {
 
-   /**
-    * @param args
-    * @throws InterruptedException 
-    */
-   public static void main(String[] args) throws InterruptedException {
-      ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-consumer.xml" });
-      final Consumer consumerClient = (Consumer) ctx.getBean("consumerClient");  
-      consumerClient.start();
-   }
+	/**
+	 * @param args
+	 * @throws InterruptedException
+	 */
+	public static void main(String[] args) throws InterruptedException {
+		@SuppressWarnings("resource")
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-consumer.xml" });
+		final Consumer consumerClient = (Consumer) ctx.getBean("consumerClient");
+		consumerClient.start();
+	}
 
 }

@@ -17,11 +17,12 @@ import com.dianping.swallow.test.AbstractConsumerTest;
  */
 public class HeartBeatTest extends AbstractConsumerTest{
 	
-	private final int messageCount = 3000;
+//	private final int messageCount = 3000;
 	
 	@Test
 	public void testNormal() throws SendFailedException, RemoteServiceInitFailedException{
 		
+		@SuppressWarnings("unused")
 		Consumer consumer = addListener(topic, 10);
 		
 //		sendMessage(messageCount, topic, 100);

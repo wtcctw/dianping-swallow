@@ -13,11 +13,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.dianping.hawk</groupId>
-			<artifactId>hawk-client</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-consumerclient</artifactId>
 		</dependency>

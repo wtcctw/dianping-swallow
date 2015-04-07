@@ -12,7 +12,6 @@ public class SimpleTest {
 	
 	@Test
 	public void testLong(){
-		Long a = null;
 		
 	}
 

@@ -70,11 +70,6 @@
 			<artifactId>cat-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.dianping.hawk</groupId>
-			<artifactId>hawk-client</artifactId>
-			<scope>provided</scope>
-		</dependency>
 		<!-- requestId项目的通用容器(基于ThreadLocal) -->
 		<dependency>
 			<groupId>com.dianping.platform</groupId>

@@ -77,11 +77,6 @@
 			<artifactId>cat-client</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>com.dianping.hawk</groupId>
-			<artifactId>hawk-client</artifactId>
-			<optional>true</optional>
-		</dependency>
 		<!-- requestId项目的通用容器(基于ThreadLocal) -->
 		<dependency>
 			<groupId>com.dianping.platform</groupId>

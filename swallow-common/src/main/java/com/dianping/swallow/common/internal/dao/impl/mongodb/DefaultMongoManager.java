@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.hawk.jmx.HawkJMXUtil;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
@@ -123,9 +122,6 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
       if (logger.isDebugEnabled()) {
          logger.debug("Init MongoClient - done.");
       }
-      //hawk监控
-      HawkJMXUtil.unregisterMBean("MongoClient");
-      HawkJMXUtil.registerMBean("MongoClient", new HawkMBean(this));
    }
 
    public DefaultMongoManager(String severURILionKey) {

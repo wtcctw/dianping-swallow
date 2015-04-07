@@ -60,8 +60,6 @@
 			<includes>
 				<include>com.dianping.lion:lion-client</include>
 				<include>com.dianping.cat:cat-client</include>
-				<include>com.dianping.hawk:hawk-common</include>
-				<include>com.dianping.hawk:hawk-client</include>
 				<include>com.dianping.dpsf:dpsf-net</include>
 				<include>com.dianping.platform:phoenix-environment</include>
 			</includes>
@@ -73,8 +71,6 @@
 			<excludes>
 				<exclude>com.dianping.lion:lion-client</exclude>
 				<exclude>com.dianping.cat:cat-client</exclude>
-				<exclude>com.dianping.hawk:hawk-common</exclude>
-				<exclude>com.dianping.hawk:hawk-client</exclude>
 				<exclude>com.dianping.dpsf:dpsf-net</exclude>
 				<exclude>com.dianping.platform:phoenix-environment</exclude>
 				<exclude>com.dianping.swallow:swallow-common</exclude>

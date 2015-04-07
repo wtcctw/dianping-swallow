@@ -1,6 +1,5 @@
 package com.dianping.swallow.producerserver.impl;
 
-import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
@@ -9,7 +8,6 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.hawk.jmx.HawkJMXUtil;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 
@@ -22,9 +20,6 @@ public class ProducerServerForText {
    private TopicWhiteList      topicWhiteList;
 
    public ProducerServerForText() {
-      //Hawk监控
-      HawkJMXUtil.unregisterMBean("ProducerServerForText");
-      HawkJMXUtil.registerMBean("ProducerServerForText", new HawkMBean(this));
    }
 
    public void start() {
@@ -47,20 +42,5 @@ public class ProducerServerForText {
       this.messageDAO = messageDAO;
    }
 
-   /**
-    * 用于Hawk监控
-    */
-   public static class HawkMBean {
-
-      private final WeakReference<ProducerServerForText> producerServerForText;
-
-      private HawkMBean(ProducerServerForText producerServerForText) {
-         this.producerServerForText = new WeakReference<ProducerServerForText>(producerServerForText);
-      }
-
-      public int getPort() {
-         return (producerServerForText.get() != null) ? producerServerForText.get().port : null;
-      }
-   }
 
 }

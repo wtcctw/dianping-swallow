@@ -22,7 +22,8 @@ public class SyncProducerExampleFromFile {
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
 
         InputStream ins = Thread.currentThread().getContextClassLoader().getResourceAsStream("messages.txt");
-        List<String> lines = IOUtils.readLines(ins, "UTF-8");
+        @SuppressWarnings("unchecked")
+		List<String> lines = IOUtils.readLines(ins, "UTF-8");
         if (lines != null) {
             for (String line : lines) {
                 System.out.println("正在发送：" + line);

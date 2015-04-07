@@ -20,9 +20,13 @@
 		<module>swallow-producerclient</module>
 		<module>swallow-producerserver</module>
 		<module>swallow-example</module>
+
+		<!-- package -->
 		<module>swallow-standalone-producer</module>
 		<module>swallow-standalone-consumermaster</module>
 		<module>swallow-standalone-consumerslave</module>
+		<!-- package -->
+
 		<module>swallow-test</module>
 		<module>swallow-web</module>
 	</modules>
@@ -45,8 +49,6 @@
 	
 		<!-- dianping -->
 		<lion-client.version>0.4.6</lion-client.version>
-		<hawk-common.version>0.1.2</hawk-common.version>
-		<hawk-clinet.version>0.7.1</hawk-clinet.version>
 		<cat.version>1.2.7</cat.version>
 		<phoenix-environment.version>0.1.0</phoenix-environment.version>
 		<!-- dianping -->
@@ -133,16 +135,6 @@
 				<groupId>com.dianping.cat</groupId>
 				<artifactId>cat-client</artifactId>
 				<version>${cat.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.dianping.hawk</groupId>
-				<artifactId>hawk-common</artifactId>
-				<version>${hawk-common.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.dianping.hawk</groupId>
-				<artifactId>hawk-client</artifactId>
-				<version>${hawk-clinet.version}</version>
 			</dependency>
 			<!-- requestId项目的通用容器(基于ThreadLocal) -->
 			<dependency>

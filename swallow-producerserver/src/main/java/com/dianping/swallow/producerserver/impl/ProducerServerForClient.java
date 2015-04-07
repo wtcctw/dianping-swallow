@@ -12,7 +12,6 @@ import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.cat.message.internal.MessageId;
 import com.dianping.dpsf.api.ServiceRegistry;
-import com.dianping.hawk.jmx.HawkJMXUtil;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.Packet;
@@ -39,9 +38,6 @@ public class ProducerServerForClient implements ProducerSwallowService {
    private TopicWhiteList      topicWhiteList;
 
    public ProducerServerForClient() {
-      //Hawk监控
-      HawkJMXUtil.unregisterMBean("ProducerServerForClient");
-      HawkJMXUtil.registerMBean("ProducerServerForClient", new HawkMBean(this));
    }
 
    /**
