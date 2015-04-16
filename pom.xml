@@ -56,7 +56,7 @@
 		<file-queue.version>0.1.5</file-queue.version>
 		<guava.version>12.0</guava.version>
 		<slf4j.version>1.6.0</slf4j.version>
-		<spring.version>4.1.3.RELEASE</spring.version>
+		<spring.version>3.1.1.RELEASE</spring.version>
 		<jackson-databind.version>2.0.2</jackson-databind.version>
 		<netty.version>3.2.7.Final</netty.version>
 		<hession.version>3.1.5</hession.version>
