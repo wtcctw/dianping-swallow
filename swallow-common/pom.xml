@@ -67,10 +67,6 @@
 			<artifactId>cglib</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-		</dependency>
 		<!-- 监控 -->
 		<dependency>
 			<groupId>com.dianping.cat</groupId>
@@ -83,5 +79,11 @@
 			<artifactId>phoenix-environment</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
 	</dependencies>
 </project>
