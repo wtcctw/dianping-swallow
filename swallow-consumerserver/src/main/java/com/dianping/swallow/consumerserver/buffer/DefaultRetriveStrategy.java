@@ -31,7 +31,7 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 	private int minRetrieveCount = 10;
 	
 	private int minRetrieveInterval = 100;//如果上次读取的数据小于minRetrieveCount，则在此时间内不读取数据
-	private long maxRetrieveInterval = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS);
+	private long maxRetrieveInterval = TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS);
 	/**
 	 * 如果读取消息一直为0，不停延时
 	 */
