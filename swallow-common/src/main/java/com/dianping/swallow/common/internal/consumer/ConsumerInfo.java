@@ -1,4 +1,4 @@
-package com.dianping.swallow.consumerserver.worker;
+package com.dianping.swallow.common.internal.consumer;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.message.Destination;

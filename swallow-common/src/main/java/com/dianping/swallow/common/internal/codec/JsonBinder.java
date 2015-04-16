@@ -41,6 +41,7 @@ public final class JsonBinder {
       mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       //make all member fields serializable without further annotations, instead of just public fields (default setting).
       mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+            
    }
 
    /**

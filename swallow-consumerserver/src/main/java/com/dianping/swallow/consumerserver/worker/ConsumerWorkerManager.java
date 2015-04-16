@@ -13,6 +13,7 @@ import org.jboss.netty.util.internal.ConcurrentHashMap;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;

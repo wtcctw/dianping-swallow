@@ -2,7 +2,8 @@ package com.dianping.swallow.consumerserver.util;
 
 import org.jboss.netty.channel.Channel;
 
-import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
+
 
 public class ConsumerUtil {
 

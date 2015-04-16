@@ -26,6 +26,7 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
    public static final String  VERSION             = "v";
    public static final String  SHA1                = "s";
    public static final String  GENERATED_TIME      = "gt";
+   public static final String  SAVE_TIME      	   = "save_time";
    public static final String  PROPERTIES          = "p";
    public static final String  INTERNAL_PROPERTIES = "_p";
    public static final String  TYPE                = "t";
@@ -216,9 +217,11 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
       }
       //internalProperties
       Map<String, String> internalProperties = message.getInternalProperties();
-      if (internalProperties != null && internalProperties.size() > 0) {
-         builder.add(INTERNAL_PROPERTIES, internalProperties);
+      if(internalProperties == null){
+    	  internalProperties = new HashMap<String, String>();
       }
+ 	  addDefaultInternalProperties(internalProperties);
+      builder.add(INTERNAL_PROPERTIES, internalProperties);
       //sha1
       String sha1 = message.getSha1();
       if (sha1 != null && !"".equals(sha1.trim())) {
@@ -237,6 +240,11 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 
       collection.insert(builder.get());
    }
+
+   private void addDefaultInternalProperties(Map<String, String> internalProperties) {
+	   internalProperties.put(SAVE_TIME, String.valueOf(System.currentTimeMillis()));
+   }
+
 
 	@Override
 	public int deleteMessage(String topicName, Long messageId) {

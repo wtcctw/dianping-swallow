@@ -21,6 +21,7 @@ import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatReceiver;

@@ -1,6 +1,7 @@
 package com.dianping.swallow.consumerserver.auth;
 
-import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
+
 
 /**
  * 消费者权限控制
