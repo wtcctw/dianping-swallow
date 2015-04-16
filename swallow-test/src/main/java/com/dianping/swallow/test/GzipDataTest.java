@@ -24,7 +24,7 @@ public class GzipDataTest extends AbstractConsumerTest {
 	@Test
 	public void testGzip() throws Throwable{
 		
-		String dataToSend = UUID.randomUUID().toString();
+		String dataToSend = UUID.randomUUID().toString() + createMessage(1024*1024);
 		final AtomicReference<String> data = new AtomicReference<String>();
 		
 		Consumer c = createConsumer(topic, getConsumerId());

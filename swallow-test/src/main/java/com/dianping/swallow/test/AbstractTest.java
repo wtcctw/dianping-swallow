@@ -38,6 +38,16 @@ public class AbstractTest {
 		
 	}
 
+	
+	protected String createMessage(int size) {
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<size;i++){
+			sb.append("c");
+		}
+		return sb.toString();
+	}
+	
+	
 	@After
 	public void afterAbstractTest(){
 		if(logger.isInfoEnabled()){

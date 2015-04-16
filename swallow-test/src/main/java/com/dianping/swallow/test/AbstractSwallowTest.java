@@ -64,13 +64,19 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	}
 
 
+	protected void sendMessage(int messageCount, String topic, int size) throws SendFailedException, RemoteServiceInitFailedException {
+		sendMessage(messageCount, topic, 0, size);
+	}
+	
 	protected void sendMessage(int messageCount, String topic) throws SendFailedException, RemoteServiceInitFailedException {
-		sendMessage(messageCount, topic, 0);
+		
 	}
 	
 	private AtomicInteger totalSend = new AtomicInteger();
 
-	protected void sendMessage(int messageCount, String topic, int sleepInterval) throws SendFailedException, RemoteServiceInitFailedException {
+	protected void sendMessage(int messageCount, String topic, int sleepInterval, int size) throws SendFailedException, RemoteServiceInitFailedException {
+		
+		String message = createMessage(size);
 		
 		AtomicInteger count = sendMessageCount.get(topic);
 		if(count == null){
@@ -83,12 +89,13 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		
 		Producer p = createProducer(topic);
         for (int i = 0; i < messageCount; i++) {
-            String msg = System.currentTimeMillis() + "," + totalSend.incrementAndGet();
+            String msg = System.currentTimeMillis() + "," + totalSend.incrementAndGet() + "," + message;
             p.sendMessage(msg);
             sleep(sleepInterval);
             count.incrementAndGet();
         }
 	}
+
 
 	protected Producer createProducer(String topic) throws RemoteServiceInitFailedException{
 		
