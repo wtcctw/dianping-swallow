@@ -6,13 +6,17 @@
 	<parent>
 		<groupId>com.dianping.swallow</groupId>
 		<artifactId>swallow-parent</artifactId>
-		<version>0.7.0-SNAPSHOT</version>
+		<version>0.7.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>swallow-web</artifactId>
 	<packaging>war</packaging>
 	
 	<name>swallow-web</name>
 	<url>http://maven.apache.org</url>
+	
+	<properties>
+		<spring.data.mongo.version>1.5.4.RELEASE</spring.data.mongo.version>
+	</properties>
 	
 	<dependencies>
 		<dependency>
@@ -71,6 +75,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-mongodb</artifactId>
+			<version>${spring.data.mongo.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>swallow-broker</finalName>

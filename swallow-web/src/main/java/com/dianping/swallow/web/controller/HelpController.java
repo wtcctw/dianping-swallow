@@ -1,4 +1,4 @@
-package com.dianping.swallow.controller;
+package com.dianping.swallow.web.controller;
 
 import java.util.HashMap;
 import java.util.Map;

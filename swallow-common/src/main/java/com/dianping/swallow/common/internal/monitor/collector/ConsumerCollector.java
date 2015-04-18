@@ -10,7 +10,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  */
 public interface ConsumerCollector extends Collector{
 	
-	void sendMessage(ConsumerInfo consumerInfo, SwallowMessage message);
+	void sendMessage(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message);
 	
-	void ackMessage(ConsumerInfo consumerInfo, SwallowMessage message);
+	void ackMessage(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message);
 }

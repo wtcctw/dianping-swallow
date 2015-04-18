@@ -26,12 +26,14 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
    public static final String  VERSION             = "v";
    public static final String  SHA1                = "s";
    public static final String  GENERATED_TIME      = "gt";
-   public static final String  SAVE_TIME      	   = "save_time";
    public static final String  PROPERTIES          = "p";
    public static final String  INTERNAL_PROPERTIES = "_p";
    public static final String  TYPE                = "t";
    public static final String  SOURCE_IP           = "si";
 
+   //internal properties
+   public static final String  SAVE_TIME      	   = "save_time";
+   
    private MongoManager         mongoManager;
 
    public void setMongoManager(DefaultMongoManager mongoManager) {

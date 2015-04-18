@@ -19,6 +19,7 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
 import com.dianping.swallow.common.internal.lifecycle.DefaultLifecycleManager;
 import com.dianping.swallow.common.internal.lifecycle.LifecycleCallback;
+import com.dianping.swallow.common.internal.monitor.collector.ConsumerCollector;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
@@ -54,6 +55,8 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
     private ConsumerThreadPoolManager  		 consumerThreadPoolManager;
 
     private DefaultLifecycleManager 		lifecycleManager;
+    
+    private ConsumerCollector 				consumerCollector;
     
     public ConsumerWorkerManager(){
     	
@@ -185,7 +188,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
         	}
             synchronized (consumerInfo.getConsumerId().intern()) {
                 if ((worker = findConsumerWorker(consumerInfo)) == null) {
-                    worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController, consumerThreadPoolManager, startMessageId);
+                    worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController, consumerThreadPoolManager, startMessageId, consumerCollector);
                     consumerInfo2ConsumerWorker.put(consumerInfo, worker);
                 }
             }
@@ -415,7 +418,14 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 		this.consumerThreadPoolManager = consumerThreadPoolManager;
 	}
 
-	
+	public ConsumerCollector getConsumerCollector() {
+		return consumerCollector;
+	}
+
+	public void setConsumerCollector(ConsumerCollector consumerCollector) {
+		this.consumerCollector = consumerCollector;
+	}
+
 	class SendMessageThread extends AbstractEternalTask{
 		
 		private volatile boolean shouldSleep = false;

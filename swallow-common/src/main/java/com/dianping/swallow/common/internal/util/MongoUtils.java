@@ -1,13 +1,40 @@
 package com.dianping.swallow.common.internal.util;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.bson.types.BSONTimestamp;
+
+import com.mongodb.ServerAddress;
 
 public class MongoUtils {
    private MongoUtils() {
    }
 
+   public static List<ServerAddress> parseUriToAddressList(String uri) {
+	   
+	      uri = uri.trim();
+	      String schema = "mongodb://";
+	      if (uri.startsWith(schema)) { // 兼容老各式uri
+	         uri = uri.substring(schema.length());
+	      }
+	      String[] hostPortArr = uri.split(",");
+	      List<ServerAddress> result = new ArrayList<ServerAddress>();
+	      for (int i = 0; i < hostPortArr.length; i++) {
+	         String[] pair = hostPortArr[i].split(":");
+	         try {
+	            result.add(new ServerAddress(pair[0].trim(), Integer.parseInt(pair[1].trim())));
+	         } catch (Exception e) {
+	            throw new IllegalArgumentException(e.getMessage() + ". Bad format of mongo uri：" + uri
+	                  + ". The correct format is mongodb://<host>:<port>,<host>:<port>", e);
+	         }
+	      }
+	      return result;
+   }
+
+
+   
    public static BSONTimestamp longToBSONTimestamp(Long messageId) {
       int time = (int) (messageId >>> 32);
       int inc = (int) (messageId & 0xFFFFFFFF);

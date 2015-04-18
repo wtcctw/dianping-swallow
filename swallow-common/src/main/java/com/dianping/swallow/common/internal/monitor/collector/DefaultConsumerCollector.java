@@ -3,6 +3,7 @@ package com.dianping.swallow.common.internal.monitor.collector;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.monitor.data.ConsumerMonitorData;
+import com.dianping.swallow.common.internal.monitor.data.MonitorData;
 import com.dianping.swallow.common.internal.util.IPUtil;
 
 /**
@@ -16,15 +17,31 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 	private ConsumerMonitorData consumerMonitorData = new ConsumerMonitorData(IPUtil.getFirstNoLoopbackIP4Address());
 	
 	@Override
-	public void sendMessage(ConsumerInfo consumerInfo, SwallowMessage message) {
-		
-		consumerMonitorData.addSendData(consumerInfo, message);
+	public void sendMessage(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message) {
+		try{
+			consumerMonitorData.addSendData(consumerInfo, consumerIp, message);
+		}catch(Exception e){
+			logger.error("[sendMessage]" + consumerInfo + "," + consumerIp + "," + message, e);
+		}
 	}
 
 	@Override
-	public void ackMessage(ConsumerInfo consumerInfo, SwallowMessage message) {
-		
-		consumerMonitorData.addAckData(consumerInfo, message);
+	public void ackMessage(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message) {
+		try{
+			consumerMonitorData.addAckData(consumerInfo, consumerIp, message);
+		}catch(Exception e){
+			logger.error("[ackMessage]" + consumerInfo + "," + consumerIp + "," + message, e);
+		}
+	}
+
+	@Override
+	protected MonitorData getMonitorData() {
+		return consumerMonitorData;
+	}
+
+	@Override
+	protected String getServerType() {
+		return "consumer";
 	}
 	
 }

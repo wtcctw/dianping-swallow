@@ -44,6 +44,9 @@ public final class JsonBinder {
             
    }
 
+   public ObjectMapper getObjectMapper(){
+	   return mapper;
+   }
    /**
     * Object可以是POJO，也可以是Collection或数组。 如果对象为Null, 返回"null". 如果集合为空集合, 返回"[]".
     */

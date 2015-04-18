@@ -1,5 +1,7 @@
 package com.dianping.swallow;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +25,8 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 public abstract class AbstractTest {
 	
 	protected Logger logger = Logger.getLogger(getClass());
+	
+	private final int localWebPort = 8080;
 	
 	protected ExecutorService executors = Executors.newCachedThreadPool();
 
@@ -63,7 +67,28 @@ public abstract class AbstractTest {
 		message.setSourceIp("localhost");
 		return message;
 	}
-	
+
+	protected boolean testLocalWebServer() {
+		
+		Socket s = null;
+		
+		try {
+			s = new Socket("127.0.0.1", localWebPort);
+		} catch (Exception e) {
+			logger.error("[testLocalWebServer]", e);
+			return false;
+		}finally{
+			if(s != null){
+				try {
+					s.close();
+				} catch (IOException e) {
+					logger.error("[testLocalWebServer][close]", e);
+				}
+			}
+		}
+		return true;
+	}
+
 	
 	
 	@After

@@ -7,6 +7,6 @@ package com.dianping.swallow.common.internal.monitor.collector;
  */
 public interface ProducerCollector extends Collector{
 	
-	void addMessage(String topic, long messageId, long sendTime, long saveTime);
+	void addMessage(String topic, String producerIp, long messageId, long sendTime, long saveTime);
 
 }

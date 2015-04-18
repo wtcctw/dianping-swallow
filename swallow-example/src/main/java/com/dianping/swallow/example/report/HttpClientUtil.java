@@ -30,7 +30,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("deprecation")
 public class HttpClientUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
@@ -71,8 +70,7 @@ public class HttpClientUtil {
             result = IOUtils.toString(ins, "UTF-8");
             return result;
         } finally {
-            EntityUtils.consume(entity);
-            httpPost.releaseConnection();
+            EntityUtils.toByteArray(entity);
             if (logger.isDebugEnabled()) {
                 logger.debug("****** http client invoke (Post method), url: " + url + ", nameValuePair: " + nvps + ", result: "
                         + result + ", time: " + String.valueOf(System.currentTimeMillis() - start) + "ms.");
@@ -99,8 +97,7 @@ public class HttpClientUtil {
             result = IOUtils.toString(ins, "UTF-8");
             return result;
         } finally {
-            EntityUtils.consume(entity);
-            httpPost.releaseConnection();
+            EntityUtils.toByteArray(entity);
             if (logger.isDebugEnabled()) {
                 logger.debug("****** http client invoke (Post method), url: " + url + ", result: " + result + ", time: "
                         + String.valueOf(System.currentTimeMillis() - start) + "ms.");
@@ -125,8 +122,7 @@ public class HttpClientUtil {
             result = IOUtils.toString(ins, "UTF-8");
             return result;
         } finally {
-            EntityUtils.consume(entity);
-            httpGet.releaseConnection();
+            EntityUtils.toByteArray(entity);
             //            System.out.println("****** http client invoke (Get method), url: " + url + ", time: "
             //                    + String.valueOf(System.currentTimeMillis() - start) + "ms.");
         }

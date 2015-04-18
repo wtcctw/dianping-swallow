@@ -2,7 +2,7 @@ package com.dianping.swallow.common.internal.monitor.data;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+
 
 /**
  * @author mengwenchao
@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ProducerMonitorData extends MonitorData{
 
-	private Map<String, TopicInfo> all = new ConcurrentHashMap<String, TopicInfo>(); 
+	private Map<String, ProducerData> all = new ConcurrentHashMap<String, ProducerData>(); 
 	
 	
 	//for json deserialize
@@ -23,61 +23,70 @@ public class ProducerMonitorData extends MonitorData{
 		super(swallowServerIp);
 	}
 
-	public void addData(String topic, long messageId, long sendTime, long saveTime){
+	public void addData(String topic, String producerIp, long messageId, long sendTime, long saveTime){
 
-		TopicInfo topicInfo = getTopicInfo(topic);
+		if(topic == null){
+			logger.error("[addData][topic null]");
+			topic = "";
+		}
 		
-		topicInfo.increaseNum();
-		topicInfo.increaseDelay(saveTime - sendTime);
+		if(producerIp == null){
+			logger.error("[addData][producerIp null]");
+			producerIp = "";
+		}
+		
+		ProducerData ProducerData = getProducerInfo(topic);
+		ProducerData.sendMessage(producerIp, messageId, sendTime, saveTime);
 		
 	}
 
 	
-	private TopicInfo getTopicInfo(String topic) {
+	private ProducerData getProducerInfo(String topic) {
 		
-		TopicInfo topicInfo = null;
+		ProducerData topicInfo = null;
 		
 		synchronized (topic.intern()) {
 			
 			topicInfo = all.get(topic);
 			if(topicInfo == null){
-				topicInfo = new TopicInfo();
+				topicInfo = new ProducerData();
 				all.put(topic, topicInfo);
 			}
 		}
 		return topicInfo;
 	}
 
-	public static class TopicInfo{
-				
-		private AtomicLong totalDelay = new AtomicLong();
-
-		private AtomicLong total = new AtomicLong();
-
-		public void increaseNum(){
-			total.incrementAndGet();
-		}
+	
+	public static class ProducerData extends AbstractMonitorData{
 		
-		public void increaseDelay(long delay){
-			totalDelay.addAndGet(delay);
+		private Map<String, MessageInfo> producerMessages = new ConcurrentHashMap<String, ProducerMonitorData.MessageInfo>();
+		
+		public void sendMessage(String producerIp, long messageId, long sendTime, long saveTime){
+			
+			MessageInfo messageInfo = getMessageInfo(producerIp, producerMessages);
+			messageInfo.addMessage(messageId, sendTime, saveTime);
+			
 		}
 		
 		@Override
 		public boolean equals(Object obj) {
-			if(!(obj instanceof TopicInfo)){
+			
+			if(!(obj instanceof ProducerData)){
 				return false;
 			}
-			TopicInfo cmp = (TopicInfo) obj;
-			
-			return cmp.totalDelay.get() == totalDelay.get() 
-					&& cmp.total.get() == total.get();
+			ProducerData cmp = (ProducerData) obj;
+			return cmp.producerMessages.equals(producerMessages);
 		}
 		
 		@Override
 		public int hashCode() {
-			return (int) (totalDelay.get() ^ total.get());
+
+			return producerMessages.hashCode();
 		}
+		
+		
 	}
+	
 	
 	@Override
 	public boolean equals(Object obj) {

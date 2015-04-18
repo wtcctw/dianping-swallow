@@ -1,4 +1,4 @@
-package com.dianping.swallow.controller;
+package com.dianping.swallow.web.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import com.dianping.swallow.common.internal.codec.JsonBinder;
  */
 public abstract class AbstractController {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();	
 	

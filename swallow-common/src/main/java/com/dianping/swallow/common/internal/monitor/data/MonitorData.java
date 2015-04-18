@@ -1,6 +1,9 @@
 package com.dianping.swallow.common.internal.monitor.data;
 
 
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,5 +84,55 @@ public abstract class MonitorData {
 		hash = (int) (hash*31 + currentTime);
 		return hash;
 	}
+
 	
+	public static class MessageInfo{
+		
+		private AtomicLong totalDelay = new AtomicLong();
+
+		private AtomicLong total = new AtomicLong();
+		
+		@Override
+		public boolean equals(Object obj) {
+			if(!(obj instanceof MessageInfo)){
+				return false;
+			}
+			MessageInfo cmp = (MessageInfo) obj;
+			
+			return cmp.totalDelay.get() == totalDelay.get() 
+					&& cmp.total.get() == total.get();
+		}
+		
+		@Override
+		public int hashCode() {
+			return (int) (totalDelay.get() ^ total.get());
+		}
+
+		public void addMessage(long messageId, long startTime, long endTime) {
+			total.incrementAndGet();
+			totalDelay.addAndGet(endTime - startTime);
+		}
+	}
+	
+	public static abstract class AbstractMonitorData{
+		
+		protected MessageInfo getMessageInfo(String ip, Map<String, MessageInfo> messages) {
+			
+			MessageInfo messageInfo;
+			synchronized (ip.intern()) {
+				messageInfo = messages.get(ip);
+				if(messageInfo == null){
+					messageInfo = new MessageInfo();
+					messages.put(ip, messageInfo);
+				}
+			}
+			return messageInfo;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return jsonSerialize();
+	}
+
 }

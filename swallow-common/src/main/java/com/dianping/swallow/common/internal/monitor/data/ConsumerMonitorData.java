@@ -2,7 +2,6 @@ package com.dianping.swallow.common.internal.monitor.data;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessageUtil;
 public class ConsumerMonitorData extends MonitorData{
 	
 
-	private Map<String, ConsumerData>  all = new ConcurrentHashMap<String, ConsumerMonitorData.ConsumerData>();
+	private Map<String, ConsumerTopicData>  all = new ConcurrentHashMap<String, ConsumerMonitorData.ConsumerTopicData>();
 	
 	
 	public ConsumerMonitorData(){
@@ -31,71 +30,99 @@ public class ConsumerMonitorData extends MonitorData{
 	}
 	
 	
-	public void addSendData(ConsumerInfo consumerInfo, SwallowMessage message){
+	public void addSendData(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message){
 		
-		ConsumerData consumerData = getConsumerData(consumerInfo);
-		consumerData.sendMessage(message);
+		if(consumerIp == null){
+			logger.error("[addSendData][consumer ip null]" + consumerIp);
+			consumerIp = "";
+		}
+		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
+		consumerTopicData.sendMessage(consumerInfo.getConsumerId(), consumerIp, message);
 				
 	}
 
-	public void addAckData(ConsumerInfo consumerInfo, SwallowMessage message){
+	public void addAckData(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message){
 		
-		ConsumerData consumerData = getConsumerData(consumerInfo);
-		consumerData.ackMessage(message);;
+		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
+		consumerTopicData.ackMessage(consumerInfo.getConsumerId(), consumerIp, message);
 	}
 	
 	
 	
-	private ConsumerData getConsumerData(ConsumerInfo consumerInfo) {
+	private ConsumerTopicData getConsumerTopicData(String topicName) {
 		
-		ConsumerData consumerData;
+		ConsumerTopicData consumerTopicData;
 		
-		synchronized (consumerInfo) {
+		synchronized (topicName.intern()) {
 			
-			consumerData = all.get(consumerInfo);
-			if(consumerData == null){
-				consumerData = new ConsumerData();
-				all.put(getConsumerDesc(consumerInfo), consumerData);
+			consumerTopicData = all.get(topicName);
+			if(consumerTopicData == null){
+				consumerTopicData = new ConsumerTopicData();
+				all.put(topicName, consumerTopicData);
 			}
 		}
-		return consumerData;
+		return consumerTopicData;
 	}
 
-	private String getConsumerDesc(ConsumerInfo consumerInfo) {
-		return consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId();
+	public static class ConsumerTopicData extends ConcurrentHashMap<String, ConsumerIdData>{
+				
+		private static final long serialVersionUID = 1L;
+
+		public void sendMessage(String consumerId, String consumerIp, SwallowMessage message){
+			
+			ConsumerIdData consumerIdData = getConsumerIdData(consumerId);
+			consumerIdData.sendMessage(consumerIp, message);
+		}
+
+		public void ackMessage(String consumerId, String consumerIp, SwallowMessage message) {
+			ConsumerIdData consumerIdData = getConsumerIdData(consumerId);
+			consumerIdData.ackMessage(consumerIp, message);
+			
+		}
+
+		private ConsumerIdData getConsumerIdData(String consumerId) {
+			
+			ConsumerIdData consumerIdData = null;
+			synchronized (consumerId.intern()) {
+				
+				consumerIdData = get(consumerId);
+				if(consumerIdData == null){
+					consumerIdData = new ConsumerIdData();
+					put(consumerId, consumerIdData);
+				}
+			}
+			return consumerIdData;
+		}
 	}
+	
 
-
-	public static class ConsumerData{
+	public static class ConsumerIdData extends AbstractMonitorData{
 				
 		protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
-		private AtomicLong sendCount = new AtomicLong();
-		private AtomicLong sendTotalDelay = new AtomicLong();
-		
-		private AtomicLong ackCount = new AtomicLong();
-		private AtomicLong ackTotalDelay = new AtomicLong();
+		private Map<String, MessageInfo>  sendMessages = new ConcurrentHashMap<String, MonitorData.MessageInfo>();
+		private Map<String, MessageInfo>  ackMessages = new ConcurrentHashMap<String, MonitorData.MessageInfo>();
 		
 		
 		private Map<Long, Long>  messageSendTimes = new ConcurrentHashMap<Long, Long>();
 		
-		public void sendMessage(SwallowMessage message){
+		public void sendMessage(String consumerIp, SwallowMessage message){
 			
 			//记录消息发送时间
 			messageSendTimes.put(message.getMessageId(), System.currentTimeMillis());
 			
-			sendCount.incrementAndGet();
+			MessageInfo messageInfo = getMessageInfo(consumerIp, sendMessages);
+			
 			
 			long saveTime = SwallowMessageUtil.getSaveTime(message);
-			long delay = 0;
-			
-			if(saveTime > 0){
-				delay = System.currentTimeMillis() - saveTime;
+			if(saveTime <= 0){
+				saveTime = System.currentTimeMillis();
 			}
-			sendTotalDelay.addAndGet(delay);
+			
+			messageInfo.addMessage(message.getMessageId(), saveTime, System.currentTimeMillis());
 		}
 		
-		public void ackMessage(SwallowMessage message){
+		public void ackMessage(String consumerIp, SwallowMessage message){
 			
 			Long messageId = message.getMessageId();
 			Long sendTime = messageSendTimes.get(messageId);
@@ -104,9 +131,10 @@ public class ConsumerMonitorData extends MonitorData{
 				logger.warn("[ackMessage][unfound message]" + messageId);
 				sendTime = System.currentTimeMillis();
 			}
+			
 			try{
-				ackCount.incrementAndGet();
-				ackTotalDelay.addAndGet(System.currentTimeMillis() - sendTime);
+				MessageInfo messageInfo = getMessageInfo(consumerIp, ackMessages);
+				messageInfo.addMessage(messageId, sendTime, System.currentTimeMillis());
 			}finally{
 				messageSendTimes.remove(messageId);
 			}
@@ -114,20 +142,20 @@ public class ConsumerMonitorData extends MonitorData{
 	
 		@Override
 		public boolean equals(Object obj) {
-			if(!(obj instanceof ConsumerData)){
+			
+			if(!(obj instanceof ConsumerIdData)){
 				return false;
 			}
-			ConsumerData cmp = (ConsumerData) obj;
-			return cmp.ackCount.get() == ackCount.get()
-					&& cmp.ackTotalDelay.get() == ackTotalDelay.get()
-					&& cmp.sendCount.get() == sendCount.get()
-					&& cmp.sendTotalDelay.get() == sendTotalDelay.get();
+			
+			ConsumerIdData cmp = (ConsumerIdData) obj;
+			return cmp.sendMessages.equals(sendMessages) 
+					&& cmp.ackMessages.equals(ackMessages);
 		}
 		
 		@Override
 		public int hashCode() {
 			
-			return (int) (ackCount.get() ^ ackTotalDelay.get() ^ sendCount.get() ^ sendTotalDelay.get());
+			return (int) (sendMessages.hashCode() ^ ackMessages.hashCode());
 		}
 
 	}

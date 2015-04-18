@@ -29,8 +29,8 @@ public class ConsumerMonitorDataTest extends AbstractMonitorDataTest{
 		ConsumerInfo consumerInfo = createConsumerInfo();
 		
 		SwallowMessage message = createMessage();
-		consumerMonitorData.addSendData(consumerInfo, message);
-		consumerMonitorData.addAckData(consumerInfo, message);
+		consumerMonitorData.addSendData(consumerInfo, ip, message);
+		consumerMonitorData.addAckData(consumerInfo, ip, message);
 		
 		return consumerMonitorData;
 		
@@ -40,6 +40,12 @@ public class ConsumerMonitorDataTest extends AbstractMonitorDataTest{
 		
 		ConsumerInfo consumerInfo = new ConsumerInfo("consumerInfo", Destination.topic("mytopic"), ConsumerType.DURABLE_AT_LEAST_ONCE);
 		return consumerInfo;
+	}
+
+	@Override
+	protected String getUrl() {
+		
+		return "http://localhost:8080/api/stats/consumer";
 	}
 
 }
