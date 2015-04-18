@@ -41,8 +41,12 @@ public final class JsonBinder {
       mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       //make all member fields serializable without further annotations, instead of just public fields (default setting).
       mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+            
    }
 
+   public ObjectMapper getObjectMapper(){
+	   return mapper;
+   }
    /**
     * Object可以是POJO，也可以是Collection或数组。 如果对象为Null, 返回"null". 如果集合为空集合, 返回"[]".
     */

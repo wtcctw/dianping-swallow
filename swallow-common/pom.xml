@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>swallow-parent</artifactId>
 		<groupId>com.dianping.swallow</groupId>
-		<version>0.7.0-SNAPSHOT</version>
+		<version>0.7.1-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -14,6 +14,10 @@
 
 	<name>swallow-common</name>
 	<url>http://maven.apache.org</url>
+	
+	<description>
+		注意，依赖中不能引入spring，否则升级应用的过程当中可能会导致失败
+	</description>
 
 	<properties>
 		<env>product</env>
@@ -24,6 +28,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 		<!-- Base64 -->
 		<dependency>
@@ -82,6 +90,10 @@
 			<groupId>com.dianping.platform</groupId>
 			<artifactId>phoenix-environment</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
 		</dependency>
 	</dependencies>
 </project>

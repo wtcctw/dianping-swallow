@@ -67,6 +67,8 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	protected void sendMessage(int messageCount, String topic) throws SendFailedException, RemoteServiceInitFailedException {
 		sendMessage(messageCount, topic, 0);
 	}
+	
+	private AtomicInteger totalSend = new AtomicInteger();
 
 	protected void sendMessage(int messageCount, String topic, int sleepInterval) throws SendFailedException, RemoteServiceInitFailedException {
 		
@@ -81,7 +83,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		
 		Producer p = createProducer(topic);
         for (int i = 0; i < messageCount; i++) {
-            String msg = i + "," + System.currentTimeMillis();
+            String msg = System.currentTimeMillis() + "," + totalSend.incrementAndGet();
             p.sendMessage(msg);
             sleep(sleepInterval);
             count.incrementAndGet();
@@ -188,6 +190,11 @@ public abstract class AbstractSwallowTest extends AbstractTest{
         	}
             @Override
             public void onMessage(Message msg) {
+            	
+            	if(logger.isDebugEnabled()){
+            		logger.debug("[onMessage]" + msg);
+            	}
+            	
             	int result = count.incrementAndGet();
             	if(result % 100 == 0 ){
             		if(logger.isInfoEnabled()){
@@ -204,6 +211,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected void closeConsumer(Consumer consumer){
 		consumer.close();
+		sleep(100);
 	}
 
 	protected void startConsumer(Consumer consumer){
@@ -211,9 +219,8 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	}
 	
 	protected void restartConsumer(Consumer consumer){
-		
-		consumer.close();
-		consumer.start();
+		closeConsumer(consumer);
+		startConsumer(consumer);
 	}
 	
 	protected int getConsumerMessageCount(Consumer consumer){
@@ -227,10 +234,10 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	protected void waitForListernToComplete(int messageCount) {
 		
 		if(messageCount <= 1000){
-			sleep(2000);
+			sleep(4000);
 			return;
 		}
-		sleep(5000);
+		sleep(8000);
 	}
 
 

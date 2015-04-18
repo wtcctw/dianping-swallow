@@ -5,7 +5,7 @@
 	<groupId>com.dianping.swallow</groupId>
 	<artifactId>swallow-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.7.1-SNAPSHOT</version>
 	<name>swallow</name>
 	<organization>
 		<name>dianping</name>
@@ -44,9 +44,9 @@
 	</developers>
 
 	<properties>
-		<!--  -->
+		<!-- -->
 		<env>dev</env>
-	
+
 		<!-- dianping -->
 		<lion-client.version>0.4.6</lion-client.version>
 		<cat.version>1.2.7</cat.version>
@@ -57,7 +57,7 @@
 		<guava.version>12.0</guava.version>
 		<slf4j.version>1.6.0</slf4j.version>
 		<spring.version>4.1.3.RELEASE</spring.version>
-		<jackson-databind.version>2.0.2</jackson-databind.version>
+		<jackson-databind.version>2.4.4</jackson-databind.version>
 		<netty.version>3.2.7.Final</netty.version>
 		<hession.version>3.1.5</hession.version>
 		<mongo.java.driver.version>2.12.4</mongo.java.driver.version>
@@ -74,7 +74,7 @@
 		<commons-digester.version>2.1</commons-digester.version>
 		<gson.version>2.2.2</gson.version>
 		<guava.version>14.0.1</guava.version>
-		<httpclient.version>4.2.2</httpclient.version>
+		<httpclient.version>4.0.1</httpclient.version>
 		<httpmime.version>4.2.2</httpmime.version>
 		<velocity.version>1.7</velocity.version>
 		<velocity-tools.version>2.0</velocity-tools.version>
@@ -98,7 +98,7 @@
 			<dependency>
 				<groupId>com.dianping.swallow</groupId>
 				<artifactId>swallow-common</artifactId>
-            	<type>test-jar</type>
+				<type>test-jar</type>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -143,9 +143,9 @@
 				<version>${dpsf-net.version}</version>
 				<exclusions>
 					<exclusion>
-					      <groupId>org.ow2.asm</groupId>
-					      <artifactId>asm</artifactId>
-    				</exclusion>
+						<groupId>org.ow2.asm</groupId>
+						<artifactId>asm</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -349,24 +349,24 @@
 	</dependencyManagement>
 
 	<dependencies>
-	
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -382,7 +382,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-            <scope>test</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.kubek2k</groupId>
@@ -457,16 +457,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -475,14 +465,14 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>2.3</version>
-	                <executions>
-	                    <execution>
-	                        <id>attach-test-jar</id>
-	                        <goals>
-	                            <goal>test-jar</goal>
-	                        </goals>
-	                    </execution>
-	                </executions>					
+					<executions>
+						<execution>
+							<id>attach-test-jar</id>
+							<goals>
+								<goal>test-jar</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -518,11 +508,24 @@ org.eclipse.jdt.core.compiler.compliance=1.6
 						</additionalConfig>
 					</configuration>
 				</plugin>
-            	<plugin>
-	                <groupId>org.mortbay.jetty</groupId>
-	                <artifactId>jetty-maven-plugin</artifactId>
-                	<version>8.1.7.v20120910</version>
-             	</plugin>
+				<plugin>
+					<groupId>org.mortbay.jetty</groupId>
+					<artifactId>jetty-maven-plugin</artifactId>
+					<version>8.1.7.v20120910</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.2.1</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

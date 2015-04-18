@@ -6,9 +6,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
-import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
 public class SwallowBuffer {
    /**

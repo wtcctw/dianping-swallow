@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-4.1.xsd
+            http://www.springframework.org/schema/mvc
+            http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+            ">
+            
+	<mongo:mongo id="mongo" replica-set="${mongodb.url}" />
+
+	<mongo:db-factory id="dbConfig" dbname="${mongodb.dbname_config}" mongo-ref="mongo" />
+
+	<bean id="mongoTemplateConfig" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="dbConfig" />
+		<property name="writeResultChecking">
+			<value type="org.springframework.data.mongodb.core.WriteResultChecking">EXCEPTION</value>
+		</property>
+	</bean>
+            
+
+</beans>
