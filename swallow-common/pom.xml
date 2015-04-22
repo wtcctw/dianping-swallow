@@ -56,16 +56,11 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.caucho</groupId>
-			<artifactId>hessian</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>com.dianping.lion</groupId>
 			<artifactId>lion-client</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency><!-- lion need log4j -->
+		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<optional>true</optional>
@@ -78,6 +73,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<!-- 监控 -->
 		<dependency>
@@ -90,10 +86,6 @@
 			<groupId>com.dianping.platform</groupId>
 			<artifactId>phoenix-environment</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
 		</dependency>
 	</dependencies>
 </project>

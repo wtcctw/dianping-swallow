@@ -8,7 +8,7 @@
     default-autowire="byName">
     
     
-	<bean id="producerCollector" class="com.dianping.swallow.common.internal.monitor.collector.DefaultProducerCollector">
+	<bean id="producerCollector" class="com.dianping.swallow.common.server.monitor.collector.DefaultProducerCollector">
 		<property name="turnOff">
 			<value>${swallow.monitor.turnoff}</value>
 		</property>

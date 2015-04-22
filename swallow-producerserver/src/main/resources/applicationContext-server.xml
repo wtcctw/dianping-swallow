@@ -51,6 +51,8 @@
     <bean id="producerServerForText"
         class="com.dianping.swallow.producerserver.impl.ProducerServerForText"
         init-method="start">
-        <property name="port" value="8000" />
+        <property name="port">
+        	<value>${swallow.producerserverfortext.port}</value>
+        </property>
     </bean>
 </beans>

@@ -70,6 +70,7 @@ public class ProducerServerTextHandler extends AbstractProducerServer {
                 //调用DAO层将SwallowMessage存入DB
                 try {
                     messageDAO.saveMessage(topicName, swallowMessage);
+                    producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, swallowMessage.getGeneratedTime().getTime(), System.currentTimeMillis());                    
                     textAck.setInfo(swallowMessage.getSha1());
                 } catch (Exception e1) {
                     //记录异常，返回失败ACK，reason是“Can not save message”

@@ -7,7 +7,7 @@
            http://www.springframework.org/schema/context/spring-context-3.0.xsd"
     default-autowire="byName">
 
-	<bean id="lifecycleComponentManager" class="com.dianping.swallow.common.internal.lifecycle.LifecycleComponentManager"/>
+	<bean id="lifecycleComponentManager" class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager"/>
 	
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">

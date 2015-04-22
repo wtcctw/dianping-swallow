@@ -1,5 +1,8 @@
 package com.dianping.swallow.example.message;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
@@ -14,6 +17,13 @@ public class JsonToBean {
       SwallowMessage msg = jsonBinder.fromJson(json, SwallowMessage.class);
       System.out.println(msg);
       System.out.println(msg.transferContentToBean(DemoBean.class));
+      
+     json = "{\"1\" : {\"a\" : 1, \"b\" : \"nihao\"}}";
+     
+     Map<String, DemoBean> map = new HashMap<String, DemoBean>();
+     map = jsonBinder.fromJson(json, map.getClass());
+     System.out.println(map);
+
    }
 
 }

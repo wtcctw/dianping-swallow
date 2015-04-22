@@ -16,7 +16,7 @@
         </property>
     </bean>
     
-	<bean id="lifecycleComponentManager" class="com.dianping.swallow.common.internal.lifecycle.LifecycleComponentManager"/>
+	<bean id="lifecycleComponentManager" class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager"/>
 
 	<import resource="applicationContext-monitor.xml"/>
 	<import resource="applicationContext-consumerserver.xml"/>

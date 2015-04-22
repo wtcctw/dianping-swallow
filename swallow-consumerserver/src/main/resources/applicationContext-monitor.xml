@@ -8,7 +8,7 @@
 	default-autowire="byName">
 
 
-	<bean id="consumerCollector" class="com.dianping.swallow.common.internal.monitor.collector.DefaultConsumerCollector">
+	<bean id="consumerCollector" class="com.dianping.swallow.common.server.monitor.collector.DefaultConsumerCollector">
 		<property name="turnOff">
 			<value>${swallow.monitor.turnoff}</value>
 		</property>

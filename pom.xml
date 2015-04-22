@@ -29,6 +29,7 @@
 
 		<module>swallow-test</module>
 		<module>swallow-web</module>
+		<module>swallow-common-server</module>
 	</modules>
 
 	<description>swallow is a message service!</description>
@@ -57,7 +58,8 @@
 		<guava.version>12.0</guava.version>
 		<slf4j.version>1.6.0</slf4j.version>
 		<spring.version>4.1.3.RELEASE</spring.version>
-		<jackson-databind.version>2.4.4</jackson-databind.version>
+		<spring.data.mongo.version>1.5.4.RELEASE</spring.data.mongo.version>
+		<jackson-databind.version>2.0.2</jackson-databind.version>
 		<netty.version>3.2.7.Final</netty.version>
 		<hession.version>3.1.5</hession.version>
 		<mongo.java.driver.version>2.12.4</mongo.java.driver.version>
@@ -86,13 +88,24 @@
 		<springockito.version>1.0.4</springockito.version>
 		<springockito-annotations.version>1.0.2</springockito-annotations.version>
 		<jmockmongo-patched.version>0.0.3</jmockmongo-patched.version>
+		<guava.version>18.0</guava.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.dianping.swallow</groupId>
 				<artifactId>swallow-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dianping.swallow</groupId>
+				<artifactId>swallow-common-server</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -239,7 +252,11 @@
 				<artifactId>spring-test</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-mongodb</artifactId>
+				<version>${spring.data.mongo.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.geekhua</groupId>
 				<artifactId>file-queue</artifactId>

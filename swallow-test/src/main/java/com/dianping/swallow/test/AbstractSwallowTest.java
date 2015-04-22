@@ -87,6 +87,11 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             p.sendMessage(msg);
             sleep(sleepInterval);
             count.incrementAndGet();
+            if((i+1) % 100 == 0){
+            	if(logger.isInfoEnabled()){
+            		logger.info("[sendMessage]" + (i+1));
+            	}
+            }
         }
 	}
 

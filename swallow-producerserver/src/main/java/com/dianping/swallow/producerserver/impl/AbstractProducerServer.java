@@ -5,9 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
-import com.dianping.swallow.common.internal.monitor.collector.ProducerCollector;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
+import com.dianping.swallow.common.server.monitor.collector.ProducerCollector;
 
 /**
  * @author mengwenchao

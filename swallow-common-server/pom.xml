@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.dianping.swallow</groupId>
+    <artifactId>swallow-parent</artifactId>
+    <version>0.7.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>swallow-common-server</artifactId>
+  
+  <description>
+  	此工程专门为producerserver、consumerserver、web等swallow自己运行的server而建，作为共同依赖，避免在swallow-common中引入过多jar包，导致用户端异常
+  </description>
+  
+  
+  <dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-common</artifactId>
+            <type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-mongodb</artifactId>
+		</dependency>
+  </dependencies>
+</project>
