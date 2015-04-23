@@ -13,6 +13,8 @@ import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData;
 import com.dianping.swallow.web.dao.ConsumerMonitorDao;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 
 
 /**
@@ -29,11 +31,20 @@ public class DataCollectorController extends AbstractController{
 	@Autowired
 	private ConsumerMonitorDao  consumerMonitorDataDao; 
 
+	@Autowired
+	private ProducerDataRetriever producerDataRetriever;
+	
+	@Autowired
+	private ConsumerDataRetriever consumerDataRetriever;
 	
 	@RequestMapping(value = "/api/stats/producer", method = RequestMethod.POST)
 	@ResponseBody
 	public void addProducerMonitor(@RequestBody ProducerMonitorData  producerMonitorData) throws IOException{
 		
+		if(logger.isDebugEnabled()){
+			logger.debug("[addProducerMonitor]" + producerMonitorData);
+		}
+		producerDataRetriever.add(producerMonitorData);
 		producerMonitorDataDao.saveProducerMonotorData(producerMonitorData);
 		
 	}
@@ -41,7 +52,11 @@ public class DataCollectorController extends AbstractController{
 	@RequestMapping(value = "/api/stats/consumer", method = RequestMethod.POST)
 	@ResponseBody
 	public void addConsumerMonitor(@RequestBody ConsumerMonitorData consumerMonitorData) throws IOException{
-		
+
+		if(logger.isDebugEnabled()){
+			logger.debug("[addConsumerMonitor]" + consumerMonitorData);
+		}
+		consumerDataRetriever.add(consumerMonitorData);
 		consumerMonitorDataDao.saveConsumerMonotorData(consumerMonitorData);
 
 	}

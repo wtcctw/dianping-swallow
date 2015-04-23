@@ -25,6 +25,7 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
    private int                 port             = DEFAULT_PORT;
    private String              remoteServiceName;
    
+   private boolean 			   autoSelectPort;
 
    public ProducerServerForClient() {
    }
@@ -40,6 +41,7 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
       try {
          ServiceRegistry remoteService = null;
          remoteService = new ServiceRegistry(getPort());
+         remoteService.setAutoSelectPort(autoSelectPort);
          Map<String, Object> services = new HashMap<String, Object>();
          services.put(remoteServiceName, this);
          remoteService.setServices(services);
@@ -142,5 +144,19 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
    public void setRemoteServiceName(String remoteServiceName) {
       this.remoteServiceName = remoteServiceName;
    }
+
+/**
+ * @return the autoSelectPort
+ */
+public boolean isAutoSelectPort() {
+	return autoSelectPort;
+}
+
+/**
+ * @param autoSelectPort the autoSelectPort to set
+ */
+public void setAutoSelectPort(boolean autoSelectPort) {
+	this.autoSelectPort = autoSelectPort;
+}
 
 }

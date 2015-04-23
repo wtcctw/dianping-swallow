@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.monitor;
 
+import com.dianping.swallow.common.server.monitor.visitor.QPX;
+
 /**
  * @author mengwenchao
  *
@@ -14,7 +16,10 @@ public interface ProducerDataRetriever extends MonitorDataRetriever{
 	 * @param end
 	 * @return
 	 */
-	StatsData getSaveDelay(String topic, int interval, long start, long end);
+	StatsData getSaveDelay(String topic, int intervalTimeSeconds, long start, long end);
+	
+	
+	StatsData getQpx(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
 
 
 }

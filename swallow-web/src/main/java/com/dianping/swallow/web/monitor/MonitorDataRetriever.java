@@ -12,4 +12,8 @@ public interface MonitorDataRetriever {
 	
 	void add(MonitorData monitorData);
 	
+	
+	int getKeepInMemoryHour();
+
+	
 }

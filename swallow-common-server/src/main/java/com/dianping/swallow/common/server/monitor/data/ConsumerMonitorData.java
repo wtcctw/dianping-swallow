@@ -13,6 +13,9 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.message.SwallowMessageUtil;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MapUtil;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTotalMap;
+import com.dianping.swallow.common.server.monitor.data.structure.MessageInfoTotalMap;
+import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
 /**
  * @author mengwenchao
@@ -23,7 +26,7 @@ import com.dianping.swallow.common.internal.util.MapUtil;
 public class ConsumerMonitorData extends MonitorData{
 	
 
-	private TotalConcurrentHashMap<String, ConsumerTopicData>  all ;
+	private ConsumerTotalMap  all = new ConsumerTotalMap();
 	
 	
 	public ConsumerMonitorData(){
@@ -33,18 +36,6 @@ public class ConsumerMonitorData extends MonitorData{
 	
 	public ConsumerMonitorData(String swallowServerIp) {
 		super(swallowServerIp);
-		
-		all = new TotalConcurrentHashMap<String, ConsumerMonitorData.ConsumerTopicData>(){
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected ConsumerTopicData createValue() {
-				
-				return new ConsumerTopicData();
-			}
-			
-		};
-		
 	}
 	
 	@Override
@@ -56,7 +47,20 @@ public class ConsumerMonitorData extends MonitorData{
 		
 		ConsumerMonitorData consumerMergeData = (ConsumerMonitorData) mergeData;
 		all.merge(consumerMergeData.all);
+	}
+	
+	
+	@Override
+	protected Mergeable getTopic(KeyMergeable merge, String topic) {
 		
+		ConsumerMonitorData cmd = (ConsumerMonitorData) merge;
+		return cmd.getTopic(topic);
+	}
+
+	@Override
+	protected Mergeable getTopic(String topic) {
+		
+		return MapUtil.getOrCreate(all, topic, ConsumerTopicData.class);
 	}
 	
 	public void addSendData(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message){
@@ -68,7 +72,7 @@ public class ConsumerMonitorData extends MonitorData{
 		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
 		consumerTopicData.sendMessage(consumerInfo.getConsumerId(), consumerIp, message);
 		
-		all.getTotal().sendMessage(consumerInfo.getConsumerId(), consumerIp, message);
+		all.getTotal().sendMessage(TOTAL_KEY, TOTAL_KEY, message);
 				
 	}
 
@@ -77,7 +81,7 @@ public class ConsumerMonitorData extends MonitorData{
 		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
 		consumerTopicData.ackMessage(consumerInfo.getConsumerId(), consumerIp, message);
 		
-		all.getTotal().ackMessage(consumerInfo.getConsumerId(), consumerIp, message);
+		all.getTotal().ackMessage(TOTAL_KEY, TOTAL_KEY, message);
 	}
 	
 	
@@ -97,7 +101,7 @@ public class ConsumerMonitorData extends MonitorData{
 		return consumerTopicData;
 	}
 
-	public static class ConsumerTopicData extends TotalConcurrentHashMap<String, ConsumerIdData>{
+	public static class ConsumerTopicData extends TotalMap<ConsumerIdData>{
 				
 		private static final long serialVersionUID = 1L;
 
@@ -105,7 +109,8 @@ public class ConsumerMonitorData extends MonitorData{
 			
 			ConsumerIdData consumerIdData = getConsumerIdData(consumerId);
 			consumerIdData.sendMessage(consumerIp, message);
-			total.sendMessage(consumerIp, message);
+			
+			total.sendMessage(TOTAL_KEY, message);
 		}
 
 		public void merge(ConsumerTopicData consumerTopicData) {
@@ -149,46 +154,55 @@ public class ConsumerMonitorData extends MonitorData{
 	}
 	
 
-	public static class ConsumerIdData implements Mergeable{
+	public static class ConsumerIdData implements KeyMergeable{
 				
 		@Transient
 		protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
-		private TotalConcurrentHashMap<String, MessageInfo>  sendMessages;
-		private TotalConcurrentHashMap<String, MessageInfo>  ackMessages;
+		private MessageInfoTotalMap  sendMessages  = new MessageInfoTotalMap();
+		private MessageInfoTotalMap  ackMessages  = new MessageInfoTotalMap();
 		
 		@Transient
 		private Map<Long, Long>  messageSendTimes = new ConcurrentHashMap<Long, Long>();
 		
 		public ConsumerIdData(){
-			
-			sendMessages = new TotalConcurrentHashMap<String, MessageInfo>(){
-				private static final long serialVersionUID = 1L;
-				@Override
-				protected MessageInfo createValue() {
-					return new MessageInfo();
-				}
-			};
-			ackMessages = new TotalConcurrentHashMap<String, MonitorData.MessageInfo>(){
-				private static final long serialVersionUID = 1L;
-				@Override
-				protected MessageInfo createValue() {
-					return new MessageInfo();
-				}
-			};
-			
+						
 		}
 		
+		public MessageInfo getTotalSendMessages(){
+			return sendMessages.getTotal();
+		}
+
+		public MessageInfo getTotalAckMessages(){
+			return ackMessages.getTotal();
+				
+		}
+
 		public void merge(Mergeable merge) {
 			
-			if(!(merge instanceof ConsumerIdData)){
-				throw new IllegalArgumentException("wrong type " + merge.getClass());
-			}
+			checkType(merge);
 			
 			ConsumerIdData toMerge = (ConsumerIdData) merge;
 			sendMessages.merge(toMerge.sendMessages);
 			ackMessages.merge(toMerge.ackMessages);
 		}
+		
+		private void checkType(Mergeable merge) {
+			if(!(merge instanceof ConsumerIdData)){
+				throw new IllegalArgumentException("wrong type " + merge.getClass());
+			}
+		}
+
+		@Override
+		public void merge(String key, KeyMergeable merge) {
+			
+			checkType(merge);
+			
+			ConsumerIdData toMerge = (ConsumerIdData) merge;
+			sendMessages.merge(key, toMerge.sendMessages);
+			ackMessages.merge(key, toMerge.ackMessages);
+		}
+
 
 
 		public void sendMessage(String consumerIp, SwallowMessage message){
@@ -245,6 +259,7 @@ public class ConsumerMonitorData extends MonitorData{
 			return (int) (sendMessages.hashCode() ^ ackMessages.hashCode());
 		}
 
+
 	}
 	
 	@Override
@@ -268,5 +283,12 @@ public class ConsumerMonitorData extends MonitorData{
 		hash = hash*31 + all.hashCode();
 		return hash;
 	}
+
+	@Override
+	protected TotalMap<?> getTopicData(String topic) {
+		
+		return all.get(topic);
+	}
+
 
 }

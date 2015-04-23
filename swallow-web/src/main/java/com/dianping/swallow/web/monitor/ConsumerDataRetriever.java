@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.monitor;
 
+import java.util.List;
+
 /**
  * @author mengwenchao
  *
@@ -7,8 +9,8 @@ package com.dianping.swallow.web.monitor;
  */
 public interface ConsumerDataRetriever extends MonitorDataRetriever{
 	
-	StatsData getSendDelay(String topic, String consumerId, int interval, long start, long end);
+	List<StatsData> getSendDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end);
 	
-	StatsData ackSendDelay(String topic, String consumerId, int interval, long start, long end);
+	List<StatsData> getAckDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end);
 	
 }

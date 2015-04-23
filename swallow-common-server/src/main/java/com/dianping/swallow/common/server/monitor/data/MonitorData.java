@@ -9,13 +9,16 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.common.server.monitor.visitor.Acceptable;
+import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 
 /**
  * @author mengwenchao
  *
  * 2015年4月10日 上午11:44:46
  */
-public abstract class MonitorData implements Mergeable{
+public abstract class MonitorData implements KeyMergeable, Acceptable{
 	
 	
 	public static final String TOTAL_KEY = "total";
@@ -39,14 +42,39 @@ public abstract class MonitorData implements Mergeable{
 	
 	@Override
 	public void merge(Mergeable merge) {
-		if(!(merge instanceof MonitorData)){
-			throw new IllegalArgumentException("wrong type " + merge.getClass());
-		}
+		
+		checkTypeMatch(merge);
 		
 		doMerge((MonitorData) merge);
 	}
+	
+	private void checkTypeMatch(Mergeable merge) {
+		
+		if(merge == null || !(getClass().isAssignableFrom(merge.getClass()))){
+			throw new IllegalArgumentException("wrong type " + merge);
+		}
+		
+	}
 
+	public void merge(String topic, KeyMergeable merge){
+		
+		checkTypeMatch(merge);
+		
+		Mergeable toMergeData = getTopic(merge, topic);
+		
+		if(toMergeData == null){
+			logger.warn("[doTopMerge][no topic]" + toMergeData);
+			return;
+		}
+		
+		Mergeable self = getTopic(topic);
+		self.merge(toMergeData);
+	}
 
+	protected abstract Mergeable getTopic(KeyMergeable merge, String topic);
+
+	protected abstract Mergeable getTopic(String topic);
+	
 	protected abstract void doMerge(MonitorData mergeData);
 
 	public String jsonSerialize(){
@@ -130,6 +158,14 @@ public abstract class MonitorData implements Mergeable{
 			totalDelay.addAndGet(endTime - startTime);
 		}
 
+		public long getTotalDelay() {
+			return totalDelay.get();
+		}
+
+		public long getTotal() {
+			return total.get();
+		}
+		
 		@Override
 		public void merge(Mergeable merge) {
 			if(!(merge instanceof MessageInfo)){
@@ -142,7 +178,17 @@ public abstract class MonitorData implements Mergeable{
 		}
 	}
 	
+	
+	@Override
+	public void accept(MonitorVisitor visitor){
+		
+		String topic = visitor.getVisitTopic();
+		visitor.visitTopic(getTopicData(topic));
+	}
 
+
+	protected abstract TotalMap<?> getTopicData(String topic);
+	
 	@Override
 	public String toString() {
 		return jsonSerialize();

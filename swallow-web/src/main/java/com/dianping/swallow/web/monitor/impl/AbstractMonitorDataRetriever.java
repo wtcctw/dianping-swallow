@@ -4,7 +4,6 @@ package com.dianping.swallow.web.monitor.impl;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
-import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 import com.dianping.swallow.web.manager.impl.CacheManager;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 
@@ -32,7 +32,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	@Value("${swallow.web.monitor.keepinmemory}")
 	public int keepInMemoryHour = 2;//保存最后2小时
 	
-	public int keepInMemoryCount;
+	public static int keepInMemoryCount;
 
 	@Autowired
 	private CacheManager cacheManager;
@@ -46,20 +46,18 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		keepInMemoryCount = keepInMemoryHour * 3600 / AbstractCollector.SEND_INTERVAL;
 	}
 
-
-	
 	/**
 	 * 以发送消息的时间间隔为间隔，进行时间对齐
 	 * @param currentTime
 	 * @return
 	 */
-	protected Long getCeilingTime(long currentTime) {
+	protected static Long getCeilingTime(long currentTime) {
 		
 		return currentTime/1000/AbstractCollector.SEND_INTERVAL;
 	}
 
 
-	protected boolean dataExistInMemory(String topic, long start, long end) {
+	protected boolean dataExistInMemory(long start, long end) {
 		
 		long oldest = System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(keepInMemoryHour, TimeUnit.HOURS);
 		
@@ -69,28 +67,65 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		}
 		return false;
 	}
-
-	private Queue<MonitorData> getMemoryData(String topic, long start, long end) {
+	
+	
+	protected void visit(MonitorVisitor monitorVisitor,
+			NavigableMap<Long, MonitorData> data) {
 		
-		SwallowServerData ret = new SwallowServerData();
+		for(Entry<Long, MonitorData> entry : data.entrySet()){
+			
+			MonitorData value = entry.getValue();
+			
+			value.accept(monitorVisitor);
+		}
+		
+	}
+	
+	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end) {
+		
+		if(dataExistInMemory(start, end)){
+			return getMemoryData(topic, start, end);
+		}else{
+			return retrieveDbData(topic, start, end);
+			
+		}
+	}
+
+	protected NavigableMap<Long, MonitorData> retrieveDbData(String topic,
+			long start, long end) {
+		
+		//wait to be implemented
+		return getMemoryData(topic, start, end);
+	}
+
+
+	protected NavigableMap<Long, MonitorData> getMemoryData(String topic, long start, long end) {
+		
+		SwallowServerData ret = createSwallowServerData();
 		
 		for(SwallowServerData swallowServerData : serverMap.values()){
 			ret.merge(swallowServerData, topic, start, end);
 		}
 		
-		return null;
+		return ret.getMonitorData();
 	}
 
 	
+	protected abstract SwallowServerData createSwallowServerData();
+
 	@Override
 	public void add(MonitorData monitorData) {
 		
-		SwallowServerData serverData = MapUtil.getOrCreate(serverMap, monitorData.getSwallowServerIp(), SwallowServerData.class);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		SwallowServerData serverData = MapUtil.getOrCreate(serverMap, monitorData.getSwallowServerIp(), (Class)getServerDataClass());
 		serverData.add(monitorData);
 	}
 
 
-	public class SwallowServerData{
+	protected abstract Class<? extends SwallowServerData> getServerDataClass();
+
+
+	public abstract static class SwallowServerData{
 		
 		
 		private NavigableMap<Long, MonitorData> datas = new TreeMap<Long, MonitorData>();   
@@ -110,11 +145,14 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 				if(!shouldMerge(value.getCurrentTime(), start, end)){
 					continue;
 				}
-				MonitorData data = MapUtil.getOrCreate(datas, key, MonitorData.class);
-				data.merge(value);
+				@SuppressWarnings({ "unchecked", "rawtypes" })
+				MonitorData data = MapUtil.getOrCreate(datas, key, (Class)getMonitorDataClass());
+				data.merge(topic, value);
 			}
 			
 		}
+
+		protected abstract Class<? extends MonitorData> getMonitorDataClass();
 
 		private boolean shouldMerge(Long dataTime, long start, long end) {
 			
@@ -137,5 +175,14 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 			return datas;
 		}
 	}
-	
+
+	@Override
+	public int getKeepInMemoryHour() {
+		return keepInMemoryHour;
+	}
+
+	public void setKeepInMemoryHour(int keepInMemoryHour) {
+		this.keepInMemoryHour = keepInMemoryHour;
+	}
+
 }

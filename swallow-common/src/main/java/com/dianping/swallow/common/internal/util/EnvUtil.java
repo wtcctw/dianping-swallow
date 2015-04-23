@@ -10,6 +10,8 @@ import com.dianping.lion.EnvZooKeeperConfig;
 public class EnvUtil {
 	
 	private static final String basicWebAddress = "swallow.dp";
+
+	private static final String protocal = "http://";
 	
 	private static final String env;
 	
@@ -45,14 +47,19 @@ public class EnvUtil {
 	public static String getWebAddress(){
 		
 		if(!isProduct()){
-			if(!isQa()){
-				return "http://" + env + "." + basicWebAddress; 
+			
+			if(isQa()){
+				return protocal + "beta." + basicWebAddress;
 			}
-			return "http://beta." + basicWebAddress;
+			
+			if(isDev()){
+				return protocal + "localhost:8080";
+			}
+			
+			return protocal + env + "." + basicWebAddress; 
 		}
 		
 		return "http://" + basicWebAddress;
-		
 	}
 
 }

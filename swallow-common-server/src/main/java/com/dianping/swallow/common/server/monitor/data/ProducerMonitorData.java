@@ -4,6 +4,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MapUtil;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerTotalMap;
+import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
 
 /**
@@ -14,7 +16,7 @@ import com.dianping.swallow.common.internal.util.MapUtil;
 @Document( collection = "ProducerMonitorData")
 public class ProducerMonitorData extends MonitorData{
 
-	private TotalConcurrentHashMap<String, ProducerData> all; 
+	private ProducerTotalMap all; 
 	
 	//for json deserialize
 	public ProducerMonitorData(){
@@ -24,15 +26,7 @@ public class ProducerMonitorData extends MonitorData{
 	public ProducerMonitorData(String swallowServerIp) {
 		super(swallowServerIp);
 		
-		all = new TotalConcurrentHashMap<String, ProducerMonitorData.ProducerData>() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected ProducerData createValue() {
-				return new ProducerData();
-			}
-		};
+		all = new ProducerTotalMap();
 	}
 	
 	
@@ -47,6 +41,20 @@ public class ProducerMonitorData extends MonitorData{
 		all.merge(toMerge.all);
 		
 	}
+	
+	@Override
+	protected Mergeable getTopic(KeyMergeable merge, String topic) {
+		
+		ProducerMonitorData pmd = (ProducerMonitorData) merge;
+		return pmd.getTopic(topic);
+	}
+
+	@Override
+	protected Mergeable getTopic(String topic) {
+		
+		return MapUtil.getOrCreate(all, topic, ProducerData.class);
+	}
+	
 
 	public void addData(String topic, String producerIp, long messageId, long sendTime, long saveTime){
 
@@ -63,11 +71,11 @@ public class ProducerMonitorData extends MonitorData{
 		ProducerData ProducerData = MapUtil.getOrCreate(all, topic, ProducerData.class);
 		ProducerData.sendMessage(producerIp, messageId, sendTime, saveTime);
 		
-		all.getTotal().sendMessage(producerIp, messageId, sendTime, saveTime);
+		all.getTotal().sendMessage(TOTAL_KEY, messageId, sendTime, saveTime);
 		
 	}
 
-	public static class ProducerData extends TotalConcurrentHashMap<String, MessageInfo>{
+	public static class ProducerData extends TotalMap<MessageInfo>{
 		
 		private static final long serialVersionUID = 1L;
 				
@@ -85,8 +93,7 @@ public class ProducerMonitorData extends MonitorData{
 			if(!(obj instanceof ProducerData)){
 				return false;
 			}
-			ProducerData cmp = (ProducerData) obj;
-			return cmp.equals(this);
+			return super.equals(obj);
 		}
 
 		@Override
@@ -123,5 +130,11 @@ public class ProducerMonitorData extends MonitorData{
 		hash = hash*31 + all.hashCode();
 		return hash;
 	}
+
+	@Override
+	protected TotalMap<?> getTopicData(String topic) {
+		return all.get(topic);
+	}
+
 
 }

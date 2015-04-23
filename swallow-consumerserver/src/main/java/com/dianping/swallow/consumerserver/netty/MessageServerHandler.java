@@ -59,7 +59,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
 		if (logger.isInfoEnabled()) {
-			logger.info(e.getChannel().getRemoteAddress() + " connected!");
+			logger.info(e.getChannel() + " connected!");
 		}
 		channelGroup.add(e.getChannel());
 	}
