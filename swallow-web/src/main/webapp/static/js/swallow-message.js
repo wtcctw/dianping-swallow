@@ -19,16 +19,7 @@ module.factory('Paginator', function(){
 					}catch(e){  
 						alert("异常的错误信息："+e.message);  
 					}
-				    jQuery.browser = {};
-				    (function () {
-				        jQuery.browser.msie = false;
-				        jQuery.browser.version = 0;
-				        if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
-				            jQuery.browser.msie = true;
-				            jQuery.browser.version = RegExp.$1;
-				        }
-				    })();
-				    $.fn.jAlert("","消息内容", alert(str));
+				    alert(str);
 				},
 				_load: function(){
 					var self = this;  //must use  self
@@ -99,9 +90,6 @@ module.factory('Paginator', function(){
 		return paginator;
 	};
 });
-
-
-
 
 module.controller('MessageController', ['$scope', '$http', 'Paginator',
         function($scope, $http, Paginator){

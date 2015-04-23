@@ -70,7 +70,7 @@ module.factory('Paginator', function(){
 	};
 });
 
-module.controller('TopicController', ['$scope', '$http', 'Paginator', 'instance',
+module.controller('TopicController', ['$scope', '$http', 'Paginator',
         function($scope, $http, Paginator, instance){
 				var fetchFunction = function(offset, limit, name, prop, dept, callback){
 				var transFn = function(data){
