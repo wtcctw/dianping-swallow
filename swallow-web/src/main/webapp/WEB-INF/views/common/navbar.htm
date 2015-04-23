@@ -4,18 +4,51 @@
 			ace.settings.check('navbar', 'fixed')
 		} catch (e) {
 		}
+		
 	</script>
 
 	<div class="navbar-container" id="navbar-container">
 		<div class="navbar-header pull-left">
-			<a href="#" class="navbar-brand"> <small> <i
-					class="icon-leaf"></i> swallow管理中心
+			<a href="" class="navbar-brand"> <small> <i
+					class="icon-gift"></i> Swallow管理中心
 			</small>
+			</a>
+			
+			<a href="${rc.contextPath}/" class="navbar-brand">
+				<button
+					class="btn btn-info  btn-xs swallow-nav-btn">
+					<i class="icon-globe align-top bigger-125 icon-on-right"></i> Topic管理
+				</button>
+			</a> 
+			
+			<a href="${rc.contextPath}/message" class="navbar-brand">
+				<button
+					class="btn  btn-info btn-xs swallow-nav-btn">
+					<i class="icon-cloud  align-top bigger-125 icon-on-right"></i> Message管理
+				</button>
+			</a>
+						<a href="/monitor/index" class="navbar-brand">
+				<button
+					class="btn  btn-info btn-xs swallow-nav-btn">
+					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>发布者
+				</button>
+			</a>
+			<a href="/monitor/index" class="navbar-brand">
+				<button
+					class="btn  btn-info btn-xs swallow-nav-btn">
+					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>订阅者
+				</button>
+			</a>
+			<a href="/monitor/index" class="navbar-brand">
+				<button
+					class="btn  btn-info btn-xs nav-btn">
+					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>Swallow服务器
+				</button>
 			</a>
 		</div>
 
 		<div class="navbar-header pull-right" role="navigation">
-			<a href="${contextPath}/console/help" 
+			<a href="${rc.contextPath}/help/help.html" 
 				class="navbar-brand">
 				<button class="btn btn-info btn-xs">
 					<i class="icon-ambulance align-top bigger-125 icon-on-right"></i>
