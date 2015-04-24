@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.message.SwallowMessageUtil;
-import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTotalMap;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfoTotalMap;
@@ -31,7 +31,6 @@ public class ConsumerMonitorData extends MonitorData{
 	
 	public ConsumerMonitorData(){
 		
-		this(IPUtil.getFirstNoLoopbackIP4Address());
 	}
 	
 	public ConsumerMonitorData(String swallowServerIp) {
@@ -169,10 +168,12 @@ public class ConsumerMonitorData extends MonitorData{
 						
 		}
 		
+		@Transient
 		public MessageInfo getTotalSendMessages(){
 			return sendMessages.getTotal();
 		}
 
+		@Transient
 		public MessageInfo getTotalAckMessages(){
 			return ackMessages.getTotal();
 				
@@ -227,7 +228,7 @@ public class ConsumerMonitorData extends MonitorData{
 			Long sendTime = messageSendTimes.get(messageId);
 			
 			if(sendTime == null){
-				logger.warn("[ackMessage][unfound message]" + messageId);
+				logger.warn("[ackMessage][unfound message]" + messageId + "," + this);
 				sendTime = System.currentTimeMillis();
 			}
 			
@@ -253,6 +254,11 @@ public class ConsumerMonitorData extends MonitorData{
 					&& cmp.ackMessages.equals(ackMessages);
 		}
 		
+		@Override
+		public String toString() {
+			return JsonBinder.getNonEmptyBinder().toJson(this);
+		}
+
 		@Override
 		public int hashCode() {
 			

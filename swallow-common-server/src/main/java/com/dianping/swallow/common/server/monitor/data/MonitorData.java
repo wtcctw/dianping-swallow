@@ -174,7 +174,11 @@ public abstract class MonitorData implements KeyMergeable, Acceptable{
 			MessageInfo toMerge = (MessageInfo) merge;
 			total.addAndGet(toMerge.total.get());
 			totalDelay.addAndGet(toMerge.totalDelay.get());
-			
+		}
+		
+		@Override
+		public String toString() {
+			return JsonBinder.getNonEmptyBinder().toJson(this);
 		}
 	}
 	

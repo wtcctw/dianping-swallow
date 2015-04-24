@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.server.monitor.data.KeyMergeable;
 import com.dianping.swallow.common.server.monitor.data.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
@@ -87,4 +88,8 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 		}
 	}
 
+	@Override
+	public String toString() {
+		return JsonBinder.getNonEmptyBinder().toJson(this);
+	}
 }

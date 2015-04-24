@@ -74,6 +74,9 @@ public class AckDAOImpl implements AckDAO {
 
    private void add(Long messageId, String sourceConsumerIp, DBCollection collection) {
       BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(messageId);
+      if(logger.isDebugEnabled()){
+    	  logger.debug("[add][add ack id]" + timestamp);
+      }
       Date curTime = new Date();
       try {
          DBObject add = BasicDBObjectBuilder.start().add(MSG_ID, timestamp).add(SRC_CONSUMER_IP, sourceConsumerIp)

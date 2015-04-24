@@ -138,16 +138,18 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	
 		public void merge(SwallowServerData swallowServerData, String topic, long start, long end) {
 
-			for(Entry<Long, MonitorData> entry : swallowServerData.getMonitorData().entrySet()){
-				
-				Long key = entry.getKey();
-				MonitorData value = entry.getValue();
-				if(!shouldMerge(value.getCurrentTime(), start, end)){
-					continue;
+			synchronized (swallowServerData.getMonitorData()) {
+				for(Entry<Long, MonitorData> entry : swallowServerData.getMonitorData().entrySet()){
+					
+					Long key = entry.getKey();
+					MonitorData value = entry.getValue();
+					if(!shouldMerge(value.getCurrentTime(), start, end)){
+						continue;
+					}
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					MonitorData data = MapUtil.getOrCreate(datas, key, (Class)getMonitorDataClass());
+					data.merge(topic, value);
 				}
-				@SuppressWarnings({ "unchecked", "rawtypes" })
-				MonitorData data = MapUtil.getOrCreate(datas, key, (Class)getMonitorDataClass());
-				data.merge(topic, value);
 			}
 			
 		}
@@ -164,7 +166,9 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 
 		public void add(MonitorData monitorData){
 			
-			datas.put(getCeilingTime(monitorData.getCurrentTime()), monitorData);
+			synchronized (datas) {
+				datas.put(getCeilingTime(monitorData.getCurrentTime()), monitorData);
+			}
 			if(count.incrementAndGet() > keepInMemoryCount){
 				datas.pollFirstEntry();
 				count.decrementAndGet();

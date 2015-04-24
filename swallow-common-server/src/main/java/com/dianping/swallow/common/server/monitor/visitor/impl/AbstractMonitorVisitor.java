@@ -61,14 +61,14 @@ public abstract class AbstractMonitorVisitor implements MonitorVisitor{
 			
 			
 			if(step >= intervalCount){
-				step  = 0;
-				count = 0;
-				delay = 0;
 				if(count != 0){
 					result.add(delay/count);
 				}else{
 					result.add(0L);
 				}
+				step  = 0;
+				count = 0;
+				delay = 0;
 				continue;
 			}
 			step++;

@@ -2,7 +2,6 @@ package com.dianping.swallow.common.server.monitor.data;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTotalMap;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
@@ -16,17 +15,14 @@ import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 @Document( collection = "ProducerMonitorData")
 public class ProducerMonitorData extends MonitorData{
 
-	private ProducerTotalMap all; 
+	private ProducerTotalMap all = 	new ProducerTotalMap();
 	
 	//for json deserialize
 	public ProducerMonitorData(){
-		this(IPUtil.getFirstNoLoopbackIP4Address());
 	}
 	
 	public ProducerMonitorData(String swallowServerIp) {
 		super(swallowServerIp);
-		
-		all = new ProducerTotalMap();
 	}
 	
 	
