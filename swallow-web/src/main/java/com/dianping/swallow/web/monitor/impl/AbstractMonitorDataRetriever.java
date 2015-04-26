@@ -1,9 +1,14 @@
 package com.dianping.swallow.web.monitor.impl;
 
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.NavigableMap;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -11,13 +16,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
-import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
+import com.dianping.swallow.common.server.monitor.visitor.Visitor;
+import com.dianping.swallow.common.server.monitor.visitor.impl.TopicCollector;
 import com.dianping.swallow.web.manager.impl.CacheManager;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 
@@ -28,7 +37,11 @@ import com.dianping.swallow.web.monitor.MonitorDataRetriever;
  */
 public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriever{
 	
+	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+
 	
+	private final int DEFAULT_INTERVAL_IN_HOUR = 10;//一小时每个10秒采样
+
 	@Value("${swallow.web.monitor.keepinmemory}")
 	public int keepInMemoryHour = 2;//保存最后2小时
 	
@@ -45,6 +58,18 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		
 		keepInMemoryCount = keepInMemoryHour * 3600 / AbstractCollector.SEND_INTERVAL;
 	}
+
+	protected long getRealStartTime(NavigableMap<Long, MonitorData> data, long start, long end) {
+		try{
+			return data.firstKey().longValue()*AbstractCollector.SEND_INTERVAL*1000;
+		}catch(NoSuchElementException e){
+			if(logger.isInfoEnabled()){
+				logger.info("[getRealStartTime][no element, end instead]" + DateUtils.toPrettyFormat(end));
+			}
+			return end;
+		}
+	}
+
 
 	/**
 	 * 以发送消息的时间间隔为间隔，进行时间对齐
@@ -68,8 +93,51 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		return false;
 	}
 	
+	public Set<String> getTopics(){
+		
+		return getTopics(getDefaultStart(), getDefaultEnd());
+	}	
 	
-	protected void visit(MonitorVisitor monitorVisitor,
+	protected long getDefaultEnd() {
+		
+		return System.currentTimeMillis();
+	}
+
+	protected long getDefaultStart() {
+		return System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(keepInMemoryHour, TimeUnit.HOURS);
+	}
+
+	protected int getDefaultInterval(){
+		return keepInMemoryHour * DEFAULT_INTERVAL_IN_HOUR;
+	}
+	
+	@Override
+	public Set<String>  getTopics(long start, long end){
+		
+		if(dataExistInMemory(start, end)){
+			getTopicsInMemory(start, end);
+		}
+		
+		return getTopicsInDb(start, end);
+	}
+
+	private Set<String> getTopicsInMemory(long start, long end) {
+		
+		Set<String> topics = new HashSet<String>();
+		
+		for(SwallowServerData swallowServerData : serverMap.values()){
+			topics.addAll(swallowServerData.getTopics());
+		}
+		return topics;
+	}
+
+	private Set<String> getTopicsInDb(long start, long end) {
+		
+		//TODO
+		return getTopicsInMemory(start, end);
+	}
+
+	protected void visit(Visitor monitorVisitor,
 			NavigableMap<Long, MonitorData> data) {
 		
 		for(Entry<Long, MonitorData> entry : data.entrySet()){
@@ -83,13 +151,44 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	
 	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end) {
 		
+		NavigableMap<Long, MonitorData>  result;
+		
 		if(dataExistInMemory(start, end)){
-			return getMemoryData(topic, start, end);
+			result = getMemoryData(topic, start, end);
 		}else{
-			return retrieveDbData(topic, start, end);
-			
+			result = retrieveDbData(topic, start, end);
 		}
+		//插值补齐 
+		insertLackedData(result);
+		return result;
 	}
+
+	private void insertLackedData(NavigableMap<Long, MonitorData> result) {
+		
+		long before = 0;
+		
+		List<Long> toInsert = new LinkedList<Long>();
+		for(Entry<Long, MonitorData> entry : result.entrySet()){
+			
+			long current = entry.getKey();
+			if(before >0 && (current - before > 1)){
+				if(logger.isInfoEnabled()){
+					logger.info("[insertLackedData]" + before + "," + current);
+				}
+				for(long insert= before + 1; insert < current; insert++){
+					toInsert.add(insert);
+				}
+			}
+			before = current;
+		}
+		
+		for(Long insert : toInsert){
+			result.put(insert, createMonitorData());
+		}
+		
+	}
+
+	protected abstract MonitorData createMonitorData();
 
 	protected NavigableMap<Long, MonitorData> retrieveDbData(String topic,
 			long start, long end) {
@@ -125,7 +224,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	protected abstract Class<? extends SwallowServerData> getServerDataClass();
 
 
-	public abstract static class SwallowServerData{
+	public static abstract class SwallowServerData{
 		
 		
 		private NavigableMap<Long, MonitorData> datas = new TreeMap<Long, MonitorData>();   
@@ -151,10 +250,16 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 					data.merge(topic, value);
 				}
 			}
-			
 		}
-
-		protected abstract Class<? extends MonitorData> getMonitorDataClass();
+		
+		public Set<String> getTopics() {
+			
+			TopicCollector topicCollector = new TopicCollector();
+			for(MonitorData monitorData : datas.values()){
+				monitorData.accept(topicCollector);
+			}
+			return topicCollector.getTopics();
+		}
 
 		private boolean shouldMerge(Long dataTime, long start, long end) {
 			
@@ -174,11 +279,15 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 				count.decrementAndGet();
 			}
 		}
+
+		protected abstract Class<? extends MonitorData> getMonitorDataClass();
 		
 		public NavigableMap<Long, MonitorData> getMonitorData(){
 			return datas;
 		}
 	}
+	
+
 
 	@Override
 	public int getKeepInMemoryHour() {

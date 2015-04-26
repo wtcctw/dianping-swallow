@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,7 +31,6 @@ import com.dianping.swallow.web.monitor.impl.ConsumerStatsDataDesc;
 @Controller
 public class DataMonitorController extends AbstractMonitorController{
 	
-	private final int DEFAULT_INTERVAL_IN_HOUR = 10;//一小时每个10秒采样
 	
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -55,23 +55,23 @@ public class DataMonitorController extends AbstractMonitorController{
 
 	
 	
-	@RequestMapping(value = "/console/monitor/producer/{topic}/savedelay/get", method = RequestMethod.POST)
+	@RequestMapping(value = "/console/monitor/topiclist/get", method = RequestMethod.POST)
 	@ResponseBody
-	public HighChartsWrapper getProducerDelayMonitor(@PathVariable String topic) throws IOException{
+	public Set<String> getProducerDelayMonitor() throws IOException{
 		
-				
-		StatsData data = getCurrentProducerTopicDelay(topic);
-		
-		return ChartBuilder.getHighChart(topic, topic + "delay", data);
+		Set<String> producerTopics = producerDataRetriever.getTopics();
+		Set<String> consumerTopics = consumerDataRetriever.getTopics();
+		producerTopics.addAll(consumerTopics);
+		return  producerTopics;
 	}
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get", method = RequestMethod.POST)
 	@ResponseBody
 	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable String topic) throws IOException{
 
-		StatsData 		 producerData = getCurrentProducerTopicDelay(topic); 
-		List<StatsData>  consumerSendDelay = getCurrentConsumerTopicSendDelay(topic);
-		List<StatsData>  consumerAckDelay = getCurrentConsumerTopicAckDelay(topic);
+		StatsData 		 producerData = producerDataRetriever.getSaveDelay(topic); 
+		List<StatsData>  consumerSendDelay = consumerDataRetriever.getSendDelayForAllConsumerId(topic);
+		List<StatsData>  consumerAckDelay = consumerDataRetriever.getAckDelayForAllConsumerId(topic);
 		
 		return  buildConsumerChartWrapper(topic, producerData, consumerSendDelay, consumerAckDelay); 
 		
@@ -105,49 +105,6 @@ public class DataMonitorController extends AbstractMonitorController{
 		
 		return result;
 	}
-
-	private StatsData getCurrentProducerTopicDelay(String topic) {
-		
-		long end = System.currentTimeMillis();
-		int  keepInMemoryHour = producerDataRetriever.getKeepInMemoryHour();
-		long start = getStart(end, keepInMemoryHour);;
-		int intervalTimeSeconds = intervalTimeSeconds(keepInMemoryHour); 
-		
-		return producerDataRetriever.getSaveDelay(topic, intervalTimeSeconds, start, end);
-	}
-
-	
-	private List<StatsData> getCurrentConsumerTopicSendDelay(String topic) {
-		
-		long end = System.currentTimeMillis();
-		long start = getStart(end, consumerDataRetriever.getKeepInMemoryHour());
-		int intervalTimeSeconds = intervalTimeSeconds(consumerDataRetriever.getKeepInMemoryHour());
-
-		return consumerDataRetriever.getSendDelayForAllConsumerId(topic, intervalTimeSeconds, start, end);
-	}
-
-
-	private List<StatsData> getCurrentConsumerTopicAckDelay(String topic) {
-		
-		long end = System.currentTimeMillis();
-		long start = getStart(end, consumerDataRetriever.getKeepInMemoryHour());
-		int intervalTimeSeconds = intervalTimeSeconds(consumerDataRetriever.getKeepInMemoryHour());
-
-		return consumerDataRetriever.getAckDelayForAllConsumerId(topic, intervalTimeSeconds, start, end);
-	}
-
-
-
-	private int intervalTimeSeconds(int hour) {
-		
-		return hour*DEFAULT_INTERVAL_IN_HOUR;
-	}
-
-	private long getStart(long end, int hour) {
-		
-		return end - hour*3600*1000;
-	}
-
 
 	@Override
 	protected String getSide() {

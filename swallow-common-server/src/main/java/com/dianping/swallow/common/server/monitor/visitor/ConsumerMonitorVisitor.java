@@ -9,7 +9,7 @@ import java.util.List;
  *
  * 2015年4月22日 下午5:07:15
  */
-public interface ConsumerMonitorVisitor extends MonitorVisitor{
+public interface ConsumerMonitorVisitor extends MonitorTopicVisitor{
 	
 
 	List<Long> buildSendDelay(int intervalTimeSeconds);

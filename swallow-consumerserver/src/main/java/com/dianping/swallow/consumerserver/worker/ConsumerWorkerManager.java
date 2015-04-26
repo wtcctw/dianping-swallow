@@ -23,6 +23,7 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.common.internal.util.task.AbstractEternalTask;
+import com.dianping.swallow.common.server.lifecycle.SelfManagement;
 import com.dianping.swallow.common.server.monitor.collector.ConsumerCollector;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
@@ -30,7 +31,7 @@ import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 
-public class ConsumerWorkerManager extends AbstractLifecycle{
+public class ConsumerWorkerManager extends AbstractLifecycle implements SelfManagement{
 
     private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance()
             .getAckIdUpdateIntervalSecond() * 1000;

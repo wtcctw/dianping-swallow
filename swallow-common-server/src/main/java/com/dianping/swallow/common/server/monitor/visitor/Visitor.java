@@ -3,10 +3,8 @@ package com.dianping.swallow.common.server.monitor.visitor;
 /**
  * @author mengwenchao
  *
- * 2015年4月22日 下午10:36:05
+ * 2015年4月24日 下午11:37:27
  */
-public interface Acceptable {
-	
-	void accept(Visitor visitor);
+public interface Visitor {
 
 }

@@ -9,12 +9,11 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.common.server.monitor.visitor.ConsumerMonitorVisitor;
-import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
+import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitorFactory;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
@@ -49,7 +48,7 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 		
 		NavigableMap<Long, MonitorData> data = getData(topic, start, end);
 		
-		long realStartTime = data.firstKey().longValue()*AbstractCollector.SEND_INTERVAL*1000;
+		long realStartTime = getRealStartTime(data, start, end);
 		
 		Set<String> consumerIds = getAllConsumerIds(topic, data);
 		
@@ -57,7 +56,15 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 			result.add(getConsumerIdStats(topic, consumerId, data, intervalTimeSeconds, realStartTime, end, type));
 		}
 		
+		
 		return result;
+	}
+
+	private String getConsumerIdSubTitle(String consumerId) {
+		if(consumerId.equals(MonitorData.TOTAL_KEY)){
+			return "全局平均";
+		}
+		return "consumerID:" + consumerId;
 	}
 
 	private StatsData getConsumerIdStats(String topic, String consumerId,
@@ -73,7 +80,9 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 			stats = consumerMonitorVisitor.buildAckDelay(intervalTimeSeconds);
 		}
 		
-		return new StatsData(new ConsumerStatsDataDesc(topic, consumerId, type) , stats, start, intervalTimeSeconds);
+		String subTitle = getConsumerIdSubTitle(consumerId);
+
+		return new StatsData(new ConsumerStatsDataDesc(topic, subTitle, type) , stats, start, intervalTimeSeconds);
 	}
 
 
@@ -84,12 +93,14 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 		for(Entry<Long, MonitorData> entry : data.entrySet()){
 			
 			ConsumerMonitorData consumerMonitorData = (ConsumerMonitorData) entry.getValue();
-			consumerMonitorData.accept(new MonitorVisitor() {
+			consumerMonitorData.accept(new MonitorTopicVisitor() {
 				
 				@SuppressWarnings("unchecked")
 				@Override
 				public void visitTopic(@SuppressWarnings("rawtypes") TotalMap visitorData) {
-					consumerIds.addAll(visitorData.keySet());
+					if(visitorData != null){
+						consumerIds.addAll(visitorData.keySet());
+					}
 				}
 				
 				@Override
@@ -120,7 +131,25 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 		protected Class<? extends MonitorData> getMonitorDataClass() {
 			return ConsumerMonitorData.class;
 		}
+	}
+
+
+
+	@Override
+	public List<StatsData> getSendDelayForAllConsumerId(String topic) {
 		
+		return getSendDelayForAllConsumerId(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
+	public List<StatsData> getAckDelayForAllConsumerId(String topic) {
+		
+		return getAckDelayForAllConsumerId(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
+	protected MonitorData createMonitorData() {
+		return new ConsumerMonitorData();
 	}
 
 }

@@ -4,7 +4,7 @@ package com.dianping.swallow.common.server.monitor.visitor.impl;
 import java.util.Map.Entry;
 
 import com.dianping.swallow.common.server.monitor.data.MonitorData.MessageInfo;
-import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData.ProducerData;
+import com.dianping.swallow.common.server.monitor.data.ProducerData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
 /**

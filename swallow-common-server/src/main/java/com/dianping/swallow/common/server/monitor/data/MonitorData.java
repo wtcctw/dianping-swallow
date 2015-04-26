@@ -9,33 +9,39 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.monitor.KeyMergeable;
+import com.dianping.swallow.common.internal.monitor.Mergeable;
+import com.dianping.swallow.common.server.monitor.data.structure.AbstractTotalable;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.common.server.monitor.visitor.Acceptable;
+import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
+import com.dianping.swallow.common.server.monitor.visitor.Visitor;
 
 /**
  * @author mengwenchao
  *
  * 2015年4月10日 上午11:44:46
  */
-public abstract class MonitorData implements KeyMergeable, Acceptable{
+public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuilder{
 	
 	
 	public static final String TOTAL_KEY = "total";
 	
-	
+
 	@Transient
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Indexed
 	private String swallowServerIp;
 
+	@Indexed
 	private long currentTime;
 
 	public MonitorData(){
 		
 	}
-	
+
 	public MonitorData(String swallowServerIp){
 		this.swallowServerIp = swallowServerIp;
 	}
@@ -45,7 +51,7 @@ public abstract class MonitorData implements KeyMergeable, Acceptable{
 		
 		checkTypeMatch(merge);
 		
-		doMerge((MonitorData) merge);
+		doMerge(merge);
 	}
 	
 	private void checkTypeMatch(Mergeable merge) {
@@ -75,7 +81,7 @@ public abstract class MonitorData implements KeyMergeable, Acceptable{
 
 	protected abstract Mergeable getTopic(String topic);
 	
-	protected abstract void doMerge(MonitorData mergeData);
+	protected abstract void doMerge(Mergeable merge);
 
 	public String jsonSerialize(){
 		
@@ -131,7 +137,7 @@ public abstract class MonitorData implements KeyMergeable, Acceptable{
 	}
 
 	
-	public static class MessageInfo implements Mergeable{
+	public static class MessageInfo extends AbstractTotalable implements Mergeable{
 		
 		private AtomicLong totalDelay = new AtomicLong();
 
@@ -184,18 +190,31 @@ public abstract class MonitorData implements KeyMergeable, Acceptable{
 	
 	
 	@Override
-	public void accept(MonitorVisitor visitor){
+	public void accept(Visitor visitor){
 		
-		String topic = visitor.getVisitTopic();
-		visitor.visitTopic(getTopicData(topic));
+		if(visitor instanceof MonitorTopicVisitor){
+			MonitorTopicVisitor mtv = (MonitorTopicVisitor) visitor;
+			String topic = mtv.getVisitTopic();
+			mtv.visitTopic(getTopicData(topic));
+			return;
+		}
+		
+		if(visitor instanceof MonitorVisitor){
+			MonitorVisitor mv = (MonitorVisitor) visitor;
+			visitAllTopic(mv);
+			return;
+		}
+		
+		throw new IllegalStateException("unknown visitor " + visitor);
 	}
 
-
+	protected abstract void visitAllTopic(MonitorVisitor mv);
+	
 	protected abstract TotalMap<?> getTopicData(String topic);
 	
 	@Override
 	public String toString() {
 		return jsonSerialize();
 	}
-
+	
 }

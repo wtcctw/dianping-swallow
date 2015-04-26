@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.server.monitor.data;
+package com.dianping.swallow.common.internal.monitor;
 
 /**
  * @author mengwenchao

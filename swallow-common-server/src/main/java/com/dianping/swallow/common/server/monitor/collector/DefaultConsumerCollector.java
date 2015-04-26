@@ -18,25 +18,26 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 	private ConsumerMonitorData consumerMonitorData = new ConsumerMonitorData(IPUtil.getFirstNoLoopbackIP4Address());
 	
 	@Override
-	public void sendMessage(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message) {
+	public void sendMessage(ConsumerInfo consumerInfo, String consumerIpPort, SwallowMessage message) {
 		try{
-			consumerMonitorData.addSendData(consumerInfo, consumerIp, message);
+			consumerMonitorData.addSendData(consumerInfo, consumerIpPort, message);
 		}catch(Exception e){
-			logger.error("[sendMessage]" + consumerInfo + "," + consumerIp + "," + message, e);
+			logger.error("[sendMessage]" + consumerInfo + "," + consumerIpPort + "," + message, e);
 		}
 	}
 
 	@Override
-	public void ackMessage(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message) {
+	public void ackMessage(ConsumerInfo consumerInfo, String consumerIpPort, SwallowMessage message) {
 		try{
-			consumerMonitorData.addAckData(consumerInfo, consumerIp, message);
+			consumerMonitorData.addAckData(consumerInfo, consumerIpPort, message);
 		}catch(Exception e){
-			logger.error("[ackMessage]" + consumerInfo + "," + consumerIp + "," + message, e);
+			logger.error("[ackMessage]" + consumerInfo + "," + consumerIpPort + "," + message, e);
 		}
 	}
 
 	@Override
 	protected MonitorData getMonitorData() {
+		consumerMonitorData.buildTotal();
 		return consumerMonitorData;
 	}
 

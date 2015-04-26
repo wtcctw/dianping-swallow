@@ -31,6 +31,10 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		
 		for(Entry<String, Lifecycle> entry : beans.entrySet()){
 			
+			if(selfManagement(entry)){
+				continue;
+			}
+			
 			if(logger.isInfoEnabled()){
 				logger.info("[stop]" + entry.getKey());
 			}
@@ -38,7 +42,11 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		}
 
 		for(Entry<String, Lifecycle> entry : beans.entrySet()){
-			
+
+			if(selfManagement(entry)){
+				continue;
+			}
+
 			if(logger.isInfoEnabled()){
 				logger.info("[dispose]" + entry.getKey());
 			}
@@ -53,6 +61,10 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		
 		for(Entry<String, Lifecycle> entry : beans.entrySet()){
 			
+			if(selfManagement(entry)){
+				continue;
+			}
+			
 			if(logger.isInfoEnabled()){
 				logger.info("[init]" + entry.getKey());
 			}
@@ -60,7 +72,11 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		}
 
 		for(Entry<String, Lifecycle> entry : beans.entrySet()){
-			
+
+			if(selfManagement(entry)){
+				continue;
+			}
+
 			if(logger.isInfoEnabled()){
 				logger.info("[start]" + entry.getKey());
 			}
@@ -68,6 +84,18 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		}
 
 		
+	}
+
+	private boolean selfManagement(Entry<String, Lifecycle> entry) {
+		
+		if(entry.getValue() instanceof SelfManagement){
+			if(logger.isInfoEnabled()){
+				logger.info("[selfManagement]" + entry.getKey());
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	private Map<String, Lifecycle> getBeans() {

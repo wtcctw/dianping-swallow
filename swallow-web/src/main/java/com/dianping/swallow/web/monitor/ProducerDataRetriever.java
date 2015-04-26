@@ -17,9 +17,11 @@ public interface ProducerDataRetriever extends MonitorDataRetriever{
 	 * @return
 	 */
 	StatsData getSaveDelay(String topic, int intervalTimeSeconds, long start, long end);
-	
-	
+
+	StatsData getSaveDelay(String topic);
+
 	StatsData getQpx(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
+
 
 
 }

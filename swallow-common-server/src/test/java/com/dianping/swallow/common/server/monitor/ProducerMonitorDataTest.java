@@ -13,8 +13,6 @@ import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData;
 public class ProducerMonitorDataTest extends AbstractMonitorDataTest{
 
 	
-	
-	
 	protected Class<? extends MonitorData> getMonitorClass() {
 		
 		return ProducerMonitorData.class;

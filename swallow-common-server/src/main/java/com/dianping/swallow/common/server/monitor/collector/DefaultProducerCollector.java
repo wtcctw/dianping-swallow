@@ -26,7 +26,7 @@ public class DefaultProducerCollector extends AbstractCollector implements Produ
 
 	@Override
 	protected MonitorData getMonitorData() {
-		
+		producerMonitorData.buildTotal();
 		return producerMonitorData;
 	}
 

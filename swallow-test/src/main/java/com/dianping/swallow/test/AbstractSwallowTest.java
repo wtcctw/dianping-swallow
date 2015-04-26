@@ -124,24 +124,24 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		return count.intValue();
 	}
 
-	/**
-	 * NON_DURABLE模式
-	 * @param topic
-	 * @param concurrentCount
-	 * @return 
-	 */
+	
 	protected Consumer addListener(final String topic, int concurrentCount) {
 		
-		return addListener(topic, false, null, concurrentCount, -1);
+		return addListener(topic, false, null, concurrentCount, -1, 0);
 	}
 	
 	protected Consumer addListener(final String topic, final String consumerId, int concurrentCount) {
 		
-		return addListener(topic, true, consumerId, concurrentCount, -1);
+		return addListener(topic, true, consumerId, concurrentCount, -1, 0);
+	}
+
+	protected Consumer addListener(final String topic, final String consumerId, int concurrentCount, int sleepTime) {
+		
+		return addListener(topic, true, consumerId, concurrentCount, -1, sleepTime);
 	}
 
 	protected Consumer addListener(String topic, String consumerId, Date date, int concurrentCount) {
-		return addListener(topic, true, consumerId, concurrentCount, ConsumerConfig.fromDateToMessageId(date));
+		return addListener(topic, true, consumerId, concurrentCount, ConsumerConfig.fromDateToMessageId(date), 0);
 	}
 
 
@@ -176,7 +176,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
         return c;
 	}
 	
-	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, long startMessageId) {
+	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, long startMessageId, final int sleepTime) {
 
 		final Consumer c = createConsumer(topic, durable, consumerId, concurrentCount, startMessageId, 5);
 
@@ -206,6 +206,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             			logger.info("[onMessage]" + result);
             		}
             	}
+            	sleep(sleepTime);
             }
         });
         

@@ -5,13 +5,10 @@ import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 /**
  * @author mengwenchao
  *
- * 2015年4月22日 下午5:07:15
+ * 2015年4月24日 下午11:33:49
  */
-public interface MonitorVisitor {
+public interface MonitorVisitor extends Visitor{
 	
-
-	String getVisitTopic();
-		
-	void visitTopic(@SuppressWarnings("rawtypes") TotalMap visitorData);
+	void visit(String topic, TotalMap<?> monitorData);
 
 }

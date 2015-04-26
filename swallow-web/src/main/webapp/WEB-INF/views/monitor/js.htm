@@ -22,7 +22,7 @@
 			function() {
 
 				if ($('#ConsumerDelayController').length > 0) {
-					angular.element($('#ConsumerDelayController')).scope().getDelay('total');
+					angular.element($('#ConsumerDelayController')).scope().getDelay('${topic}');
 				}
 
 

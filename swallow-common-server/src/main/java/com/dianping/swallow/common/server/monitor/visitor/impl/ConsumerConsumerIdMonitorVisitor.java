@@ -1,10 +1,9 @@
 package com.dianping.swallow.common.server.monitor.visitor.impl;
 
 
-import java.util.Map.Entry;
 
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData.ConsumerIdData;
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData.ConsumerTopicData;
+import com.dianping.swallow.common.server.monitor.data.ConsumerIdData;
+import com.dianping.swallow.common.server.monitor.data.ConsumerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
 
@@ -29,10 +28,11 @@ public class ConsumerConsumerIdMonitorVisitor extends AbstractConsumerMonitorVis
 		ConsumerTopicData consumerTopicData = (ConsumerTopicData) visitorData;
 		
 		ConsumerIdData result = new ConsumerIdData();
+		result.setTotal();
 		
-		for(Entry<String, ConsumerIdData> entry : consumerTopicData.entrySet()){
-			ConsumerIdData consumerIdData = entry.getValue();
-			result.merge(consumerId, consumerIdData);
+		ConsumerIdData toMerge = consumerTopicData.get(consumerId);
+		if(toMerge != null){
+			result.merge(toMerge);
 		}
 		
 		sendRawData.add(result.getTotalSendMessages());

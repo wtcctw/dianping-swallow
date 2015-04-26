@@ -38,7 +38,7 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 		
 		List<Long> saveDelay = producerMonitorVisitor.buildSaveDelay(intervalTimeSeconds);
 		
-		return new StatsData(new ProducerStatsDataDesc(topic), saveDelay, start, intervalTimeSeconds) ;
+		return new StatsData(new ProducerStatsDataDesc(topic), saveDelay, getRealStartTime(data, start, end), intervalTimeSeconds) ;
 	}
 
 
@@ -58,8 +58,9 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 			
 			return ProducerMonitorData.class;
 		}
-		
 	}
+
+	
 
 	@Override
 	protected SwallowServerData createSwallowServerData() {
@@ -71,5 +72,17 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 	protected Class<? extends SwallowServerData> getServerDataClass() {
 		
 		return ProducerServerData.class;
+	}
+
+	@Override
+	public StatsData getSaveDelay(String topic) {
+		
+		return getSaveDelay(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+	}
+
+
+	@Override
+	protected MonitorData createMonitorData() {
+		return new ProducerMonitorData();
 	}
 }

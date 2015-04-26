@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.MonitorData.MessageInfo;
-import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
+import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.QPX;
 
 /**
@@ -13,7 +13,7 @@ import com.dianping.swallow.common.server.monitor.visitor.QPX;
  *
  * 2015年4月22日 下午5:17:58
  */
-public abstract class AbstractMonitorVisitor implements MonitorVisitor{
+public abstract class AbstractMonitorVisitor implements MonitorTopicVisitor{
 
 	protected String topic;
 	
@@ -61,6 +61,9 @@ public abstract class AbstractMonitorVisitor implements MonitorVisitor{
 			
 			
 			if(step >= intervalCount){
+				if(delay < 0){
+					delay = 0;
+				}
 				if(count != 0){
 					result.add(delay/count);
 				}else{

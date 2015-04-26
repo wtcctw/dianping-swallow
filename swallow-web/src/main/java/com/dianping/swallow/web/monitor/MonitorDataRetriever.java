@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.monitor;
 
+import java.util.Set;
+
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 
 /**
@@ -16,4 +18,8 @@ public interface MonitorDataRetriever {
 	int getKeepInMemoryHour();
 
 	
+	Set<String>  getTopics(long start, long end);
+
+	Set<String>  getTopics();
+
 }

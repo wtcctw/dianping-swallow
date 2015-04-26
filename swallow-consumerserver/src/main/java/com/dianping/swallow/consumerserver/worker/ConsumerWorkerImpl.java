@@ -392,10 +392,10 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
    private void sendMessage(Channel channel, ConsumerMessage consumerMessage) throws InterruptedException {
       PktMessage pktMessage = new PktMessage(consumerInfo.getDest(), consumerMessage.message);
 
-      String consumerIp = IPUtil.getIpFromChannel(channel);
+      String consumerIpPort = IPUtil.getIpFromChannel(channel);
       
       Transaction consumerServerTransaction = Cat.getProducer().newTransaction(
-            "Out:" + this.consumerInfo.getDest().getName(), consumerInfo.getConsumerId() + ":" + consumerIp);
+            "Out:" + this.consumerInfo.getDest().getName(), consumerInfo.getConsumerId() + ":" + consumerIpPort);
 
       try {
          //发送后，记录已发送但未收到ACK的消息记录
@@ -410,7 +410,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
         	 logger.debug("[sendMessage][channel write]");
          }
          
-         consumerCollector.sendMessage(consumerInfo, consumerIp, consumerMessage.message);
+         consumerCollector.sendMessage(consumerInfo, consumerIpPort, consumerMessage.message);
          
          //发送消息
          channel.write(pktMessage);

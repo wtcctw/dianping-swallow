@@ -8,7 +8,7 @@ import java.util.List;
  *
  * 2015年4月22日 下午5:07:15
  */
-public interface ProducerMonitorVisitor extends MonitorVisitor{
+public interface ProducerMonitorVisitor extends MonitorTopicVisitor{
 	
 
 	List<Long> buildSaveDelay(int intervalTimeSeconds);

@@ -4,6 +4,9 @@ package com.dianping.swallow.web.monitor.charts;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper.PlotOption;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper.PlotOptionSeries;
@@ -17,9 +20,9 @@ import com.dianping.swallow.web.monitor.charts.HighChartsWrapper.Series;
  *         2014年7月9日 上午10:32:51
  */
 public class ChartBuilder {
-
-
 	
+	protected static final Logger logger     = LoggerFactory.getLogger(ChartBuilder.class);
+
 	public static HighChartsWrapper getHighChart(String title, String subTitle, StatsData... data) {
 		
 		return getHighChart(title, subTitle, Arrays.asList(data));
@@ -28,6 +31,8 @@ public class ChartBuilder {
 	
 	public static HighChartsWrapper getHighChart(String title, String subTitle, Collection<StatsData> data) {
 
+		insertData(data);
+		
 		HighChartsWrapper hcw = new HighChartsWrapper();
 		hcw.setTitle(title);
 		hcw.setSubTitle(subTitle);
@@ -56,5 +61,22 @@ public class ChartBuilder {
 
 		hcw.setPlotOption(plotOption);
 		return hcw;
+	}
+
+	//数据插值，防止各个曲线数据不等
+	private static void insertData(Collection<StatsData> data) {
+		
+		long startMin = Long.MAX_VALUE;
+		for(StatsData ss : data){
+			if(ss.getStart() < startMin){
+				startMin = ss.getStart();
+				if(logger.isInfoEnabled()){
+					logger.info("[insertData][min]" + ss);
+				}
+			}
+		}
+		for(StatsData ss : data){
+			ss.minToTime(startMin);
+		}
 	}
 }

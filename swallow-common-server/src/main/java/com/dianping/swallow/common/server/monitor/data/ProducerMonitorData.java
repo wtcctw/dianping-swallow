@@ -2,9 +2,12 @@ package com.dianping.swallow.common.server.monitor.data;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.dianping.swallow.common.internal.monitor.KeyMergeable;
+import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTotalMap;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 
 
 /**
@@ -13,10 +16,10 @@ import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
  * 2015年4月14日 下午3:29:56
  */
 @Document( collection = "ProducerMonitorData")
-public class ProducerMonitorData extends MonitorData{
+public class ProducerMonitorData extends MonitorData {
 
-	private ProducerTotalMap all = 	new ProducerTotalMap();
-	
+	protected ProducerTotalMap all = new ProducerTotalMap();
+
 	//for json deserialize
 	public ProducerMonitorData(){
 	}
@@ -27,7 +30,7 @@ public class ProducerMonitorData extends MonitorData{
 	
 	
 	@Override
-	protected void doMerge(MonitorData mergeData) {
+	protected void doMerge(Mergeable mergeData) {
 		
 		if(!(mergeData instanceof ProducerMonitorData)){
 			throw new IllegalArgumentException("wrong type " + mergeData.getClass());
@@ -67,42 +70,8 @@ public class ProducerMonitorData extends MonitorData{
 		ProducerData ProducerData = MapUtil.getOrCreate(all, topic, ProducerData.class);
 		ProducerData.sendMessage(producerIp, messageId, sendTime, saveTime);
 		
-		all.getTotal().sendMessage(TOTAL_KEY, messageId, sendTime, saveTime);
-		
 	}
 
-	public static class ProducerData extends TotalMap<MessageInfo>{
-		
-		private static final long serialVersionUID = 1L;
-				
-		public void sendMessage(String producerIp, long messageId, long sendTime, long saveTime){
-			
-			MessageInfo messageInfo = MapUtil.getOrCreate(this, producerIp, MessageInfo.class);
-			messageInfo.addMessage(messageId, sendTime, saveTime);
-			
-			total.addMessage(messageId, sendTime, saveTime);
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			
-			if(!(obj instanceof ProducerData)){
-				return false;
-			}
-			return super.equals(obj);
-		}
-
-		@Override
-		public int hashCode() {
-			return hashCode();
-		}
-
-		@Override
-		protected MessageInfo createValue() {
-			return new MessageInfo();
-		}
-	}
-	
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -132,5 +101,22 @@ public class ProducerMonitorData extends MonitorData{
 		return all.get(topic);
 	}
 
+	@Override
+	protected void visitAllTopic(MonitorVisitor mv) {
+		
+		for(String topic : all.keySet()){
+			mv.visit(topic, all.get(topic));
+		}
+	}
+
+	@Override
+	public void buildTotal() {
+		all.buildTotal();
+	}
+
+	@Override
+	public Object getTotal() {
+		return all.getTotal();
+	}
 
 }

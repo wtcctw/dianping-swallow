@@ -1,10 +1,11 @@
 package com.dianping.swallow.common.server.monitor.visitor.impl;
 
+
 import java.util.Map.Entry;
 
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData.ConsumerIdData;
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData.ConsumerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.common.server.monitor.data.ConsumerIdData;
+import com.dianping.swallow.common.server.monitor.data.ConsumerTopicData;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 
 

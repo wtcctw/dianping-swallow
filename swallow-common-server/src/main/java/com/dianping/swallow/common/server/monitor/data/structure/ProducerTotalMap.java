@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data.structure;
 
-import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData.ProducerData;
+import com.dianping.swallow.common.server.monitor.data.ProducerData;
+
 
 
 

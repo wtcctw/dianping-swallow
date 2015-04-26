@@ -6,9 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.codec.JsonBinder;
-import com.dianping.swallow.common.server.monitor.data.KeyMergeable;
-import com.dianping.swallow.common.server.monitor.data.Mergeable;
+import com.dianping.swallow.common.internal.monitor.KeyMergeable;
+import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.TotalBuilder;
+import com.dianping.swallow.common.server.monitor.data.Totalable;
 
 
 
@@ -17,26 +19,50 @@ import com.dianping.swallow.common.server.monitor.data.MonitorData;
  *
  * 2015年4月21日 下午4:08:04
  */
-public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<String, V> implements KeyMergeable{
+public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<String, V> implements KeyMergeable, Totalable, TotalBuilder{
 
 	private static final long serialVersionUID = 1L;
 	
     private final Logger logger = LoggerFactory.getLogger(getClass());
-	
-	protected V total;
-	
+		
 	public TotalMap(){
 		super();
-		
-		total = createValue();
-		put(MonitorData.TOTAL_KEY, total);
+		createTotal();
 	}
 
 	protected abstract V createValue();
 
+	@Override
 	public V getTotal(){
 		
-		return total;
+		return get(MonitorData.TOTAL_KEY);
+	}
+
+	@Override
+	public void buildTotal(){
+		
+		//每次重建
+		createTotal();
+		
+		V total = getTotal();
+		for(Entry<String, V> entry : entrySet()){
+			V value = entry.getValue();
+			if(value instanceof TotalBuilder){
+				((TotalBuilder)value).buildTotal();
+			}
+
+			if(!total.equals(value)){
+				total.merge(value);
+			}
+		}
+	}
+	
+	private void createTotal() {
+		V total = createValue();
+		if(total instanceof Totalable){
+			((Totalable) total).setTotal();
+		}
+		put(MonitorData.TOTAL_KEY, total);
 	}
 
 	public void merge(Mergeable merge){
@@ -46,16 +72,22 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 		@SuppressWarnings("unchecked")
 		TotalMap<Mergeable> toMerge = (TotalMap<Mergeable>) merge;
 		
+		if(isTotal() && toMerge instanceof TotalBuilder){
+			
+			getTotal().merge((Mergeable)(((TotalBuilder)toMerge).getTotal()));
+			return;
+		}
+		
 		for(java.util.Map.Entry<String, Mergeable> entry : toMerge.entrySet()){
 
 			String key = entry.getKey();
 			Mergeable value = entry.getValue();
 		
-			V myValue = get(key);
-			if(myValue == null){
-				myValue = createValue();
-				put(key, myValue);
+			if(isTotal()){
+				getTotal().merge(value);
+				continue;
 			}
+			V myValue = getOrCreate(key);
 			myValue.merge(value);
 		}
 	}
@@ -71,7 +103,7 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 			return;
 		}
 		
-		V myValue = get(key);
+		V myValue = getOrCreate(key);
 		if(myValue instanceof KeyMergeable && value instanceof KeyMergeable){
 			
 			((KeyMergeable)myValue).merge(key, (KeyMergeable)value);
@@ -81,6 +113,15 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 		}
 	}
 	
+	private V getOrCreate(String key) {
+		V v = get(key);
+		if(v == null){
+			v= createValue();
+			put(key, v);
+		}
+		return v;
+	}
+
 	private void checkType(Mergeable merge) {
 		
 		if(!(merge instanceof TotalMap)){
@@ -92,4 +133,18 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 	public String toString() {
 		return JsonBinder.getNonEmptyBinder().toJson(this);
 	}
+
+	
+	private boolean isTotal = false;
+	
+	@Override
+	public void setTotal(){
+		isTotal = true;
+	}
+	
+	public boolean isTotal(){
+		return isTotal;
+	}
+
+
 }
