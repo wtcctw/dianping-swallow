@@ -119,6 +119,13 @@ public class ConsumerWorkerImplTest extends AbstractTest {
                 messageSetChecker.add(((PktMessage) arg0).getContent());
                 return true;
             }
+
+			@Override
+			public void describeMismatch(Object item,
+					Description mismatchDescription) {
+				// TODO Auto-generated method stub
+				
+			}
         }))).thenReturn(null);
     }
 
