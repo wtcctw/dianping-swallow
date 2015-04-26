@@ -51,6 +51,7 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 		long realStartTime = getRealStartTime(data, start, end);
 		
 		Set<String> consumerIds = getAllConsumerIds(topic, data);
+		consumerIds.remove(MonitorData.TOTAL_KEY);
 		
 		for(String consumerId : consumerIds){
 			result.add(getConsumerIdStats(topic, consumerId, data, intervalTimeSeconds, realStartTime, end, type));
