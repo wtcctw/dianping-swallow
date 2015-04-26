@@ -1,16 +1,46 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
-<head>#parse("common/header.htm")</head>
-<!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
-<!--[if IE 7 ]> <body class="ie ie7 "> <![endif]-->
-<!--[if IE 8 ]> <body class="ie ie8 "> <![endif]-->
-<!--[if IE 9 ]> <body class="ie ie9 "> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!-->
-<body class="navbar-fixed">
-  <!--<![endif]-->
-  #parse("common/navbar.htm") $screen_content   #parse("common/modals.htm") #parse("common/baseJs.htm")
+<html  lang="en">
+ <script>  
+	window.contextPath = "${rc.contextPath}";
+	window.offset = 0;
+	window.limit = 30;
+</script>
+<head>#parse("common/header.htm")
+</head>
 
-  #parse("${menu}/js.htm")
+<body class="navbar-fixed" ng-app='SwallowModule' >
+	#parse("common/navbar.htm")
+	<div class="main-container-inner" >
+		#parse("common/baseJs.htm")
+		#parse("common/sidebar.htm") $screen_content</div>
+	
+	<script type="text/javascript">
+      $('#datetimepicker').datetimepicker({
+        format: 'yyyy-mm-dd',
+        language: 'zh-CN',/*加载日历语言包，可自定义*/
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 2,
+        forceParse: 0,
+        autoclose:true
+      });
+      
+      $('.swallow-datetime').datetimepicker({
+          format: 'yyyy-mm-dd hh:ii',  //24 hours
+          language: 'en',/*加载日历语言包，可自定义*/
+          pickDate: true,
+          pickTime: true,
+          hourStep: 1,
+          minuteStep: 15,
+          secondStep: 30,
+          inputMask: true,
+          autoclose:true
+        });
 
-</body>
+
+    </script>
+</body>  
 </html>

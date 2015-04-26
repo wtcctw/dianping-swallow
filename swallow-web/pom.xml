@@ -93,6 +93,10 @@
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 		</dependency>
+		<dependency>
+   				<groupId>com.google.code.gson</groupId>
+   				<artifactId>gson</artifactId>
+  		</dependency>
 	</dependencies>
 	<build>
 		<finalName>swallow-broker</finalName>
@@ -108,6 +112,8 @@
 				<artifactId>jetty-maven-plugin</artifactId>
 				<configuration>
 					<webAppSourceDirectory>webapp</webAppSourceDirectory>
+					<webApp>
+					</webApp>
 					<systemProperties>
 						<systemProperty>
 							<name>org.mortbay.util.URI.charset</name>

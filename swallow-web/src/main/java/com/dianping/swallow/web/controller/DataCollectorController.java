@@ -2,6 +2,8 @@ package com.dianping.swallow.web.controller;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +38,8 @@ public class DataCollectorController extends AbstractController{
 	
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
+	
+	private static final Logger logger = LoggerFactory.getLogger(DataCollectorController.class);  
 	
 	@RequestMapping(value = "/api/stats/producer", method = RequestMethod.POST)
 	@ResponseBody
