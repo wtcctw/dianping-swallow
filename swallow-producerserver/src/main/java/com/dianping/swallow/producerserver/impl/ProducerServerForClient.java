@@ -1,41 +1,31 @@
 package com.dianping.swallow.producerserver.impl;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.cat.message.internal.MessageId;
 import com.dianping.dpsf.api.ServiceRegistry;
-import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.Packet;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.packet.PktSwallowPACK;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
-import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.SHAUtil;
-import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.ServerDaoException;
 
-public class ProducerServerForClient implements ProducerSwallowService {
+public class ProducerServerForClient extends AbstractProducerServer implements ProducerSwallowService {
 
-   private static final Logger LOGGER           = LoggerFactory.getLogger(ProducerServerForClient.class);
    private static final int    DEFAULT_PORT     = 4000;
-   public static final String  producerServerIP = IPUtil.getFirstNoLoopbackIP4Address();
 
    private int                 port             = DEFAULT_PORT;
-   private MessageDAO          messageDAO;
    private String              remoteServiceName;
-   /** topic的白名单 */
-   private TopicWhiteList      topicWhiteList;
+   
+   private boolean 			   autoSelectPort;
 
    public ProducerServerForClient() {
    }
@@ -51,14 +41,17 @@ public class ProducerServerForClient implements ProducerSwallowService {
       try {
          ServiceRegistry remoteService = null;
          remoteService = new ServiceRegistry(getPort());
+         remoteService.setAutoSelectPort(autoSelectPort);
          Map<String, Object> services = new HashMap<String, Object>();
          services.put(remoteServiceName, this);
          remoteService.setServices(services);
          remoteService.init();
-         LOGGER.info("[Initialize pigeon sucessfully, Producer service for client is ready.]");
+         if(logger.isInfoEnabled()){
+        	 logger.info("[Initialize pigeon sucessfully, Producer service for client is ready.]");
+         }
          System.out.println("[Initialize pigeon sucessfully, Producer service for client is ready.]");//用来检查系统启动成功
       } catch (Exception e) {
-         LOGGER.error("[Initialize pigeon failed.]", e);
+         logger.error("[Initialize pigeon failed.]", e);
          throw new RemoteServiceInitFailedException(e);
       }
    }
@@ -79,8 +72,10 @@ public class ProducerServerForClient implements ProducerSwallowService {
       String sha1;
       switch (pkt.getPacketType()) {
          case PRODUCER_GREET:
-            LOGGER.info("[Got Greet][From=" + ((PktProducerGreet) pkt).getProducerIP() + "][Version="
+             if(logger.isInfoEnabled()){
+            	 logger.info("[Got Greet][From=" + ((PktProducerGreet) pkt).getProducerIP() + "][Version="
                   + ((PktProducerGreet) pkt).getProducerVersion() + "]");
+             }
             //返回ProducerServer地址
             pktRet = new PktSwallowPACK(producerServerIP);
             break;
@@ -88,7 +83,7 @@ public class ProducerServerForClient implements ProducerSwallowService {
             topicName = ((PktMessage) pkt).getDestination().getName();
 
             //验证topicName是否在白名单里
-            boolean isValid = topicWhiteList.isValid(topicName);
+            boolean isValid = getTopicWhiteList().isValid(topicName);
             if (!isValid) {
                throw new IllegalArgumentException("Invalid topic(" + topicName
                      + "), because it's not in whitelist, please contact swallow group for support.");
@@ -106,28 +101,29 @@ public class ProducerServerForClient implements ProducerSwallowService {
             } catch (Exception e) {
                parentDomain = "UnknownDomain";
             }
-            //            MessageTree tree = Cat.getManager().getThreadLocalMessageTree();
-            //            tree.setMessageId(((PktMessage)pkt).getCatEventID());
 
             Transaction producerServerTransaction = Cat.getProducer().newTransaction("In:" + topicName,
                   parentDomain + ":" + swallowMessage.getSourceIp());
             //将swallowMessage保存到mongodb
             try {
-               messageDAO.saveMessage(topicName, swallowMessage);
+               getMessageDAO().saveMessage(topicName, swallowMessage);
+               
+               producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, swallowMessage.getGeneratedTime().getTime(), System.currentTimeMillis());
+               
                producerServerTransaction.addData("sha1", swallowMessage.getSha1());
                producerServerTransaction.setStatus(Message.SUCCESS);
             } catch (Exception e) {
                producerServerTransaction.addData(swallowMessage.toKeyValuePairs());
                producerServerTransaction.setStatus(e);
                Cat.getProducer().logError(e);
-               LOGGER.error("[Save message to DB failed.]", e);
+               logger.error("[Save message to DB failed.]", e);
                throw new ServerDaoException(e);
             } finally {
                producerServerTransaction.complete();
             }
             break;
          default:
-            LOGGER.warn("[Received unrecognized packet.]" + pkt);
+            logger.warn("[Received unrecognized packet.]" + pkt);
             break;
       }
       return pktRet;
@@ -141,14 +137,6 @@ public class ProducerServerForClient implements ProducerSwallowService {
       this.port = port;
    }
 
-   public void setMessageDAO(MessageDAO messageDAO) {
-      this.messageDAO = messageDAO;
-   }
-
-   public void setTopicWhiteList(TopicWhiteList topicWhiteList) {
-      this.topicWhiteList = topicWhiteList;
-   }
-
    public String getRemoteServiceName() {
       return remoteServiceName;
    }
@@ -157,24 +145,18 @@ public class ProducerServerForClient implements ProducerSwallowService {
       this.remoteServiceName = remoteServiceName;
    }
 
-   /**
-    * 用于Hawk监控
-    */
-   public static class HawkMBean {
+/**
+ * @return the autoSelectPort
+ */
+public boolean isAutoSelectPort() {
+	return autoSelectPort;
+}
 
-      private final WeakReference<ProducerServerForClient> producerServerForClient;
-
-      private HawkMBean(ProducerServerForClient producerServerForClient) {
-         this.producerServerForClient = new WeakReference<ProducerServerForClient>(producerServerForClient);
-      }
-
-      public String getProducerserverip() {
-         return producerServerIP;
-      }
-
-      public int getPort() {
-         return (producerServerForClient.get() != null) ? producerServerForClient.get().port : null;
-      }
-   }
+/**
+ * @param autoSelectPort the autoSelectPort to set
+ */
+public void setAutoSelectPort(boolean autoSelectPort) {
+	this.autoSelectPort = autoSelectPort;
+}
 
 }

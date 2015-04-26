@@ -1,14 +1,7 @@
 package com.dianping.swallow.producer.impl.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.swallow.common.internal.config.AbstractConfig;
 
 /**
  * ProducerFactory配置，默认构造函数生成的配置为：<br />
@@ -53,9 +46,7 @@ import com.dianping.lion.EnvZooKeeperConfig;
  * 
  * @author tong.song
  */
-public final class SwallowPigeonConfiguration {
-
-   private static final Logger LOGGER                 = LoggerFactory.getLogger(SwallowPigeonConfiguration.class);
+public final class SwallowPigeonConfiguration extends AbstractConfig{
 
    public static final String  DEFAULT_SERVICE_NAME   = "http://service.dianping.com/swallowService/producerService_1.0.0"; //默认远程服务名称
    public static final String  DEFAULT_SERIALIZE      = "hessian";                                                         //默认序列化方式
@@ -97,73 +88,23 @@ public final class SwallowPigeonConfiguration {
             + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
-   @SuppressWarnings("rawtypes")
    public SwallowPigeonConfiguration(String configFile) {
-      Properties props = new Properties();
-      Class clazz = this.getClass();
-      InputStream in = null;
-      in = SwallowPigeonConfiguration.class.getClassLoader().getResourceAsStream(configFile);
-      if (in == null) {
-         LOGGER.warn("No ProducerFactory config file, use default values: [" + getConfigInfo() + "]");
-         return;
-      }
-      try {
-         props.load(in);
-      } catch (IOException e) {
-         LOGGER.error("Load property file failed, use default values: [" + getConfigInfo() + "]", e);
-      } finally {
-         if (in != null) {
-            try {
-               in.close();
-            } catch (IOException e) {
-               LOGGER.error("[Close inputstream failed.]", e);
-            }
-         }
-      }
-      for (String key : props.stringPropertyNames()) {
-         Field field = null;
-         try {
-            field = clazz.getDeclaredField(key.trim());
-         } catch (Exception e) {
-            LOGGER.warn("[Unknow property found in " + configFile + ": " + key + ".]", e);
-            continue;
-         }
-         field.setAccessible(true);
-
-         if (field.getType().equals(Integer.TYPE)) {
-            try {
-               field.set(this, Integer.parseInt(props.getProperty(key).trim()));
-            } catch (Exception e) {
-               LOGGER.warn("[Can not parse property " + key + ".]", e);
-               continue;
-            }
-         } else if (field.getType().equals(Boolean.TYPE)) {
-            try {
-               String str = props.getProperty(key).trim();
-               field.set(this, ("false".equals(str) ? false : ("true".equals(str) ? true : DEFAULT_IS_USE_LION)));
-            } catch (Exception e) {
-               LOGGER.warn("[Can not parse property " + key + ".]", e);
-               continue;
-            }
-         } else if (field.getType().equals(String.class)) {
-            try {
-               field.set(this, props.getProperty(key).trim());
-            } catch (Exception e) {
-               LOGGER.warn("[Can not parse property " + key + ".]", e);
-               continue;
-            }
-         }
-      }
-
+	   
+	  loadLocalConfig(configFile);
+	  
       checkHostsAndWeights();
       checkSerialize();
       checkTimeout();
       checkUseLion();
       checkRetryBaseInterval();
       checkFileQueueFailedBaseInterval();
-      LOGGER.info("ProducerFactory configuration: [" + getConfigInfo() + "]");
+      
+      if(logger.isInfoEnabled()){
+    	  logger.info("ProducerFactory configuration: [" + getConfigInfo() + "]");
+      }
+      
       if (punishTimeout > 0) {//兼容老的punishTimeout参数，如果配置了punishTimeout，就提示警告
-          LOGGER.warn("Property 'punishTimeout' is deprecated(but still work) after version 0.6.7, please use retryBaseInterval instead.");
+          logger.warn("Property 'punishTimeout' is deprecated(but still work) after version 0.6.7, please use retryBaseInterval instead.");
       }
    }
 
@@ -173,7 +114,7 @@ public final class SwallowPigeonConfiguration {
    private void checkSerialize() {
       if (!"hessian".equals(serialize) && !"java".equals(serialize) && !"protobuf".equals(serialize)
             && !"thrift".equals(serialize)) {
-         LOGGER.warn("[Unrecognized serialize, use default value: " + DEFAULT_SERIALIZE + ".]");
+         logger.warn("[Unrecognized serialize, use default value: " + DEFAULT_SERIALIZE + ".]");
          serialize = DEFAULT_SERIALIZE;
       }
    }
@@ -197,7 +138,7 @@ public final class SwallowPigeonConfiguration {
             weight = weightSet[idx];
          }
          if (!host.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d{4,5}") || !weight.matches("[1-9]|10")) {
-            LOGGER.warn("[Unrecognized host address: " + host + ", or weight: " + weight + ", ignored it.]");
+            logger.warn("[Unrecognized host address: " + host + ", or weight: " + weight + ", ignored it.]");
             continue;
          }
          realHosts.append(host + ",");
@@ -218,7 +159,7 @@ public final class SwallowPigeonConfiguration {
    private void checkTimeout() {
       if (timeout <= 0) {
          timeout = DEFAULT_TIMEOUT;
-         LOGGER.warn("Timeout should be more than 0, use default value.");
+         logger.warn("Timeout should be more than 0, use default value.");
       }
    }
 
@@ -232,7 +173,7 @@ public final class SwallowPigeonConfiguration {
 	  }
       String env = EnvZooKeeperConfig.getEnv();
       if (!"dev".equals(env)) {
-         LOGGER.warn("[Not dev, set useLion=" + DEFAULT_IS_USE_LION + ".]");
+         logger.warn("[Not dev, set useLion=" + DEFAULT_IS_USE_LION + ".]");
          useLion = DEFAULT_IS_USE_LION;
       }
    }
@@ -240,14 +181,14 @@ public final class SwallowPigeonConfiguration {
    private void checkRetryBaseInterval() {
       if (retryBaseInterval <= 0) {
           retryBaseInterval = DEFAULT_RETRY_BASE_INTERVAL;
-         LOGGER.warn("retryBaseInterval should be more than 0, use default value.");
+         logger.warn("retryBaseInterval should be more than 0, use default value.");
       }
    }
    
    private void checkFileQueueFailedBaseInterval() {
        if (fileQueueFailedBaseInterval <= 0) {
            fileQueueFailedBaseInterval = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;
-          LOGGER.warn("fileQueueFailedBaseInterval should be more than 0, use default value.");
+          logger.warn("fileQueueFailedBaseInterval should be more than 0, use default value.");
        }
     }
 

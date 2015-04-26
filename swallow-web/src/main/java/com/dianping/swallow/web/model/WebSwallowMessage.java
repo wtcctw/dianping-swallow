@@ -4,8 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
+import org.springframework.data.annotation.Id;
 import org.bson.types.BSONTimestamp;
 
 import com.dianping.swallow.web.util.MongoUtils;
@@ -15,8 +14,7 @@ import com.dianping.swallow.web.util.MongoUtils;
  *
  * 2015年4月22日 上午12:06:15
  */
-@Entity 
-public class WebSwallowMessage  {
+public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 
 	// id will be used for storing MongoDB _id
 	@Id
@@ -116,7 +114,7 @@ public class WebSwallowMessage  {
 	}
 
 	public void setPin(Map<String, String> p) {
-		this.p = p;
+		this.ip = p;
 	}
 	
 	public Map<String, String>  getPin() {
@@ -124,7 +122,7 @@ public class WebSwallowMessage  {
 	}
 
 	public void setP(Map<String, String> _p) {
-		this.ip = _p;
+		this.p = _p;
 	}
 	
 	public String  getT() {
@@ -161,6 +159,19 @@ public class WebSwallowMessage  {
 	public void setGtstring(Date gt) {
 		this.gtstring = new SimpleDateFormat(TIMEFORMAT).format(gt);
 	}
+	
+    @Override
+    public int compareTo(WebSwallowMessage ts) {
+    	int bs= ts.getId().getTime();
+    	int thisbs = this.getId().getTime();
+        if(thisbs != bs) {
+            return thisbs - bs;
+        }
+        else{
+            return thisbs - bs;
+        }
+    }
+	
 	@Override
 	public String toString() {
 		return _id + "::" + o_id + "::" + c + "::" + v + "::" + s + "::" + gt + "::" + p + "::" + ip + "::" + t + "::" + si + "::" +  mid + "::" + gtstring + "::" +  ststring;

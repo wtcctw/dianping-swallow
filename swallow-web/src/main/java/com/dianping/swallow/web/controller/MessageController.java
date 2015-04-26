@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import com.dianping.swallow.web.dao.MongoManager;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
-import com.dianping.swallow.web.dao.WebSwallowMessageDAOImpl;
+import com.dianping.swallow.web.dao.impl.DefaultWebSwallowMessageDAO;
 import com.dianping.swallow.web.model.WebSwallowMessage;
 
 
@@ -38,7 +39,7 @@ public class MessageController extends AbstractController {
 	private static final String             SIZE                        = "size";
 	private static final String             MESSAGE                     = "message";
 	private static final String             TOPIC                       = "topic";
-	private WebSwallowMessageDAOImpl       	smdi;
+	private DefaultWebSwallowMessageDAO       	smdi;
 	private volatile List<String>           dbNames 					= new ArrayList<String>(); 
 	
 	private Map<String, MongoClient> 		topicNameToMongoMap 		= new HashMap<String, MongoClient>();
@@ -57,7 +58,6 @@ public class MessageController extends AbstractController {
 		
 		topicNameToMongoMap = MongoManager.getInstance().getTopicNameToMongoMap();  //name starts without msg#
 		allReadMongo = MongoManager.getInstance().getAllReadMongo();
-		MongoManager.getInstance().getWriteMongo();
 		
 		for(MongoClient mc: allReadMongo){ 
 			dbNames.addAll(mc.getDatabaseNames());
@@ -109,7 +109,7 @@ public class MessageController extends AbstractController {
 	private Map<String, Object> getByIp(String dbn, int start, int span,String ip){
 		String subStr = dbn.substring(PRE_MSG.length());
 		readMongoOps = new MongoTemplate(new SimMongoDbFactory(getMongoFromMap(subStr), dbn)); //write in writeMongo
-		smdi = new WebSwallowMessageDAOImpl(readMongoOps);
+		smdi = new DefaultWebSwallowMessageDAO(readMongoOps);
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 		List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
 		sizeAndMessage  = smdi.findByIp(start, span, ip);
@@ -128,7 +128,7 @@ public class MessageController extends AbstractController {
 	private Map<String, Object> getResults(String dbn,int start,  int span, long mid, String startdt, String stopdt){
 		String subStr = dbn.substring(PRE_MSG.length());
 		readMongoOps = new MongoTemplate(new SimMongoDbFactory(getMongoFromMap(subStr), dbn)); //write in writeMongo
-		smdi = new WebSwallowMessageDAOImpl(readMongoOps);
+		smdi = new DefaultWebSwallowMessageDAO(readMongoOps);
 		List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
 		if(startdt == null || startdt.isEmpty() ){
 			messageList = smdi.findSpecific(start, span, mid);

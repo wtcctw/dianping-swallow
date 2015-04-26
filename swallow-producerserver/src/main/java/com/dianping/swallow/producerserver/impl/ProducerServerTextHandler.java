@@ -8,9 +8,6 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -19,38 +16,25 @@ import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.internal.util.SHAUtil;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 
-public class ProducerServerTextHandler extends SimpleChannelUpstreamHandler {
-    private final MessageDAO    messageDAO;
-
-    private TopicWhiteList      topicWhiteList;
-
+public class ProducerServerTextHandler extends AbstractProducerServer {
     //TextHandler状态代码
     public static final int     OK                 = 250;
     public static final int     INVALID_TOPIC_NAME = 251;
     public static final int     SAVE_FAILED        = 252;
 
-    private static final Logger LOGGER             = LoggerFactory.getLogger(ProducerServerForText.class);
-
-    /**
-     * 构造函数
-     * 
-     * @param messageDAO
-     * @param topicWhiteList
-     */
     public ProducerServerTextHandler(MessageDAO messageDAO, TopicWhiteList topicWhiteList) {
-        this.messageDAO = messageDAO;
-        this.topicWhiteList = topicWhiteList;
+    	super(messageDAO, topicWhiteList);
     }
 
     @Override
     public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e) {
         if (e instanceof ChannelStateEvent) {
-            LOGGER.info(e.toString());
+            logger.info(e.toString());
         }
         try {
             super.handleUpstream(ctx, e);
         } catch (Exception e1) {
-            LOGGER.warn("Handle Upstrem Exceptions." + e1);
+            logger.warn("Handle Upstrem Exceptions." + e1);
         }
     }
 
@@ -71,7 +55,7 @@ public class ProducerServerTextHandler extends SimpleChannelUpstreamHandler {
         //TopicName非法，返回失败ACK，reason是"TopicName is not valid."
         String topicName = textObject.getTopic();
         if (!NameCheckUtil.isTopicNameValid(topicName)) {
-            LOGGER.error("[Incorrect topic name.][From=" + e.getRemoteAddress() + "][Content=" + textObject + "]");
+            logger.error("[Incorrect topic name.][From=" + e.getRemoteAddress() + "][Content=" + textObject + "]");
             textAck.setStatus(INVALID_TOPIC_NAME);
             textAck.setInfo("TopicName is invalid.");
             //返回ACK
@@ -86,10 +70,11 @@ public class ProducerServerTextHandler extends SimpleChannelUpstreamHandler {
                 //调用DAO层将SwallowMessage存入DB
                 try {
                     messageDAO.saveMessage(topicName, swallowMessage);
+                    producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, swallowMessage.getGeneratedTime().getTime(), System.currentTimeMillis());                    
                     textAck.setInfo(swallowMessage.getSha1());
                 } catch (Exception e1) {
                     //记录异常，返回失败ACK，reason是“Can not save message”
-                    LOGGER.error("[Save message to DB failed.]", e1);
+                    logger.error("[Save message to DB failed.]", e1);
                     textAck.setStatus(SAVE_FAILED);
                     textAck.setInfo("Can not save message.");
                 }
@@ -108,7 +93,7 @@ public class ProducerServerTextHandler extends SimpleChannelUpstreamHandler {
         if (e.getCause() instanceof IOException) {
             e.getChannel().close();
         } else {
-            LOGGER.error("Unexpected exception from downstream.", e.getCause());
+            logger.error("Unexpected exception from downstream.", e.getCause());
         }
     }
 }

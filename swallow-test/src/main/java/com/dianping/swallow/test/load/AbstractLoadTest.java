@@ -22,6 +22,9 @@ public abstract class AbstractLoadTest {
 
 	protected String topicName = "LoadTestTopic";
 	
+	
+	protected static int totalMessageCount = Integer.MAX_VALUE;
+
     protected  AtomicInteger count = new AtomicInteger();
     protected AtomicInteger preCount = new AtomicInteger();
     protected long preTime;
@@ -33,18 +36,20 @@ public abstract class AbstractLoadTest {
     protected ScheduledExecutorService	scheduled = Executors.newScheduledThreadPool(4);
     protected ExecutorService executors = Executors.newCachedThreadPool();
 
-    public static final int messageSize = 1000;
-    public static final String message;
+    public static int messageSize = 1000;
+    public static String message;
     
 
-	static {
+	private void createMessage() {
+		
 		StringBuilder sb = new StringBuilder();
 		for(int i=0;i<messageSize;i++){
 			sb.append("c");
 		}
 		message = sb.toString();
-	}	
-
+		
+	}
+	
 	
     protected String getTopicName(String name, int count) {
     	
@@ -54,6 +59,8 @@ public abstract class AbstractLoadTest {
     
     
 	protected void start() throws InterruptedException, IOException{
+
+		createMessage();
 		
 		startFrequencyCounter();
 		
@@ -69,7 +76,9 @@ public abstract class AbstractLoadTest {
 		}
 		
 	}
-	private void exit() {
+
+
+	protected void exit() {
 		
 		logger.info("[exit]" + "Total Message count:" + count.get());
 		logger.info("[exit]" + "Total Message Frequency:" + count.get()/((System.currentTimeMillis() - startTime)/1000));

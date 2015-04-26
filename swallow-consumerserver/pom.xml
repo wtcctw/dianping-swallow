@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>swallow-parent</artifactId>
 		<groupId>com.dianping.swallow</groupId>
-		<version>0.7.0-SNAPSHOT</version>
+		<version>0.7.1-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -20,6 +20,10 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
@@ -49,16 +53,20 @@
 			<artifactId>slf4j-log4j12</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.dianping.lion</groupId>
-			<artifactId>lion-client</artifactId>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-common-server</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
+			<groupId>com.dianping.lion</groupId>
+			<artifactId>lion-client</artifactId>
 		</dependency>
 		<!-- 监控 -->
 		<dependency>
@@ -68,7 +76,7 @@
 		<dependency>
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-common</artifactId>
-            <type>test-jar</type>
+			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

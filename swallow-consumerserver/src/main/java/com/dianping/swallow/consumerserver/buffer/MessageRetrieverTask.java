@@ -2,7 +2,7 @@ package com.dianping.swallow.consumerserver.buffer;
 
 
 import com.dianping.swallow.common.consumer.MessageFilter;
-import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 
 /**
  * @author mengwenchao

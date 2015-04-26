@@ -21,12 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
 public class ConsumerWorkerImplTest extends AbstractTest {

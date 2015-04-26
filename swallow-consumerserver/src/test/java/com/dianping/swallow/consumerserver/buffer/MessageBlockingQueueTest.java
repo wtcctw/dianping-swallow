@@ -10,9 +10,9 @@ import org.junit.Test;
 
 import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.consumer.ConsumerType;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
 /**
  * @author mengwenchao

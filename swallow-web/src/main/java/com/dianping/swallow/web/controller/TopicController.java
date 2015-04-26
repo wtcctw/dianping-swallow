@@ -28,11 +28,14 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.google.gson.Gson;
 import com.mongodb.MongoClient;
-import com.dianping.swallow.web.dao.SearchPropDAOImpl;
-import com.dianping.swallow.web.dao.WebSwallowMessageDAOImpl;
+import com.dianping.swallow.web.dao.SearchPropDAO;
+import com.dianping.swallow.web.dao.TopicDAO;
+import com.dianping.swallow.web.dao.WebSwallowMessageDAO;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.dianping.swallow.web.dao.MongoManager;
-import com.dianping.swallow.web.dao.TopicDAOImpl;
+import com.dianping.swallow.web.dao.impl.DefaultSearchPropDAO;
+import com.dianping.swallow.web.dao.impl.DefaultTopicDAO;
+import com.dianping.swallow.web.dao.impl.DefaultWebSwallowMessageDAO;
 import com.dianping.swallow.web.model.SearchProp;
 import com.dianping.swallow.web.model.Topic;
 
@@ -61,9 +64,9 @@ public class TopicController extends AbstractController {
 	private Map<String, MongoClient> 		topicNameToMongoMap 		= new HashMap<String, MongoClient>();
 	private List<MongoClient> 				allReadMongo 				= new ArrayList<MongoClient>();
 	private MongoClient 					writeMongo;
-	private WebSwallowMessageDAOImpl 		smdi;
-	private TopicDAOImpl 					tdi;
-	private SearchPropDAOImpl 				ddi;
+	private WebSwallowMessageDAO 			smdi;
+	private TopicDAO 						tdi;
+	private SearchPropDAO	 				ddi;
 	private MongoOperations 				readMongoOps;
 	private MongoOperations 				writeMongoOps;
 	private volatile boolean 				isTopicDbexist 				= false;
@@ -101,7 +104,7 @@ public class TopicController extends AbstractController {
 	public List<Topic> getAllTopicFromExisting(int start, int span)
 			throws UnknownHostException {
 		MongoOperations writeMongoOps = getWriteMongoOps();
-		tdi = new TopicDAOImpl(writeMongoOps);
+		tdi = new DefaultTopicDAO(writeMongoOps);
 		totalNumOfTopic = tdi.countTopic();
 		List<Topic> topicList = tdi.findFixedTopic(start, span);
 		return topicList;
@@ -128,7 +131,7 @@ public class TopicController extends AbstractController {
 		String subStr = dbn.substring(PRE_MSG.length());
 		readMongoOps = new MongoTemplate(new SimMongoDbFactory(
 				getMongoFromMap(subStr), dbn)); // write in writeMongo
-		smdi = new WebSwallowMessageDAOImpl(readMongoOps);
+		smdi = new DefaultWebSwallowMessageDAO(readMongoOps);
 		long num = smdi.count(); // 关联的message数目
 		return getTopic(subStr, num);
 	}
@@ -145,7 +148,7 @@ public class TopicController extends AbstractController {
 			String prop, String dept) throws UnknownHostException {
 
 		MongoOperations writeMongoOps = getWriteMongoOps();
-		tdi = new TopicDAOImpl(writeMongoOps);
+		tdi = new DefaultTopicDAO(writeMongoOps);
 		List<Topic> specificT = tdi.findSpecific(name, prop, dept);
 		return specificT;
 	}
@@ -174,7 +177,7 @@ public class TopicController extends AbstractController {
 	@ResponseBody
 	public Object deptName() throws UnknownHostException {
 		MongoOperations writeMongoOps = getWriteMongoOps();
-		ddi = new SearchPropDAOImpl(writeMongoOps, DEPT_COLLECTION, DEPT_NAME);
+		ddi = new DefaultSearchPropDAO(writeMongoOps, DEPT_COLLECTION, DEPT_NAME);
 		List<SearchProp> deptList = ddi.findAll();
 		List<String> depts = new ArrayList<String>();
 		for (SearchProp d : deptList)
@@ -190,7 +193,7 @@ public class TopicController extends AbstractController {
 	@ResponseBody
 	public Object propName() throws UnknownHostException {
 		MongoOperations writeMongoOps = getWriteMongoOps();
-		ddi = new SearchPropDAOImpl(writeMongoOps, PROP_COLLECTION, PROP_NAME);
+		ddi = new DefaultSearchPropDAO(writeMongoOps, PROP_COLLECTION, PROP_NAME);
 		List<SearchProp> propList = ddi.findAll();
 		List<String> props = new ArrayList<String>();
 		for (SearchProp p : propList)
@@ -204,7 +207,7 @@ public class TopicController extends AbstractController {
 	private void insertDept(String dept) {
 		if (!dept.isEmpty()) {
 			MongoOperations writeMongoOps = getWriteMongoOps();
-			ddi = new SearchPropDAOImpl(writeMongoOps, DEPT_COLLECTION,
+			ddi = new DefaultSearchPropDAO(writeMongoOps, DEPT_COLLECTION,
 					DEPT_NAME);
 			if (ddi.readByDept(dept) == null) {
 				SearchProp d = createSearchProp(dept);
@@ -217,7 +220,7 @@ public class TopicController extends AbstractController {
 	private void insertProp(String prop) {
 		if (!prop.isEmpty()) {
 			MongoOperations writeMongoOps = getWriteMongoOps();
-			ddi = new SearchPropDAOImpl(writeMongoOps, PROP_COLLECTION,
+			ddi = new DefaultSearchPropDAO(writeMongoOps, PROP_COLLECTION,
 					PROP_NAME);
 			if (ddi.readByDept(prop) == null) {
 				SearchProp p = createSearchProp(prop);
@@ -240,7 +243,7 @@ public class TopicController extends AbstractController {
 			IOException {
 
 		MongoOperations writeMongoOps = getWriteMongoOps();
-		tdi = new TopicDAOImpl(writeMongoOps);
+		tdi = new DefaultTopicDAO(writeMongoOps);
 		tdi.updateTopic(name, prop, dept, time);
 		// update DEPT_DB_NAME and PROP_DB_NAME
 		insertDept(dept);
@@ -272,7 +275,7 @@ public class TopicController extends AbstractController {
 		}
 		Collections.sort(dbs);
 		MongoOperations writeMongoOps = getWriteMongoOps();
-		tdi = new TopicDAOImpl(writeMongoOps);
+		tdi = new DefaultTopicDAO(writeMongoOps);
 		if (isTopicDbexist) { // update
 			for (String str : dbs) {
 				String subStr = str.substring(PRE_MSG.length());

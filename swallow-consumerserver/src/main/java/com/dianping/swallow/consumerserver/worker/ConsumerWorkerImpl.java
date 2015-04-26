@@ -21,6 +21,7 @@ import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatReceiver;
@@ -31,6 +32,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.common.server.monitor.collector.ConsumerCollector;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
@@ -103,9 +105,11 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
    
    private HeartBeatReceiver 								heartBeatReceiver;
    
+   private ConsumerCollector 								consumerCollector;
+   
    @SuppressWarnings("deprecation")
    public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter, 
-		   	ConsumerAuthController consumerAuthController, ConsumerThreadPoolManager consumerThreadPoolManager, long startMessageId) {
+		   	ConsumerAuthController consumerAuthController, ConsumerThreadPoolManager consumerThreadPoolManager, long startMessageId, ConsumerCollector consumerCollector) {
 	   
       this.consumerInfo = consumerInfo;
       this.ackDao = workerManager.getAckDAO();
@@ -114,6 +118,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
       this.messageFilter = messageFilter;
       this.consumerThreadPoolManager = consumerThreadPoolManager;
       this.consumerAuthController = consumerAuthController;
+      this.consumerCollector = consumerCollector;
 
       // consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
@@ -144,14 +149,19 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
          @Override
          public void run() {
             try {
+            	String consumerIp = IPUtil.getIpFromChannel(channel);
             	if(logger.isInfoEnabled()){
 	               logger.info("Receive ACK(new)(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
 	                     + ackId + ") from " + connectedChannels.get(channel));
             	}
-               removeWaitAckMessages(channel, ackId);
+            	
+               ConsumerMessage message = removeWaitAckMessages(channel, ackId);
+               if(message != null){
+            	   consumerCollector.ackMessage(consumerInfo, consumerIp, message.message);
+               }
 
                if (ACKHandlerType.CLOSE_CHANNEL.equals(type)) {
-                  logger.info("receive ack(type=" + type + ") from " + IPUtil.getIpFromChannel(channel));
+                  logger.info("receive ack(type=" + type + ") from " + consumerIp);
                   channel.close();//channel.close()会触发netty调用handleChannelDisconnect(channel);
                } else if (ACKHandlerType.SEND_MESSAGE.equals(type)) {
                   freeChannels.add(channel);
@@ -180,8 +190,9 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
    /**
     * 收到ack，则从WaitAckMessages中移除相应的消息，同时更新最大的ack message id <br>
     * 按照实现逻辑，该方法只会被单线程调用
+ * @return 
     */
-   private void removeWaitAckMessages(Channel channel, long ackId) {
+   private ConsumerMessage removeWaitAckMessages(Channel channel, long ackId) {
       ConsumerMessage waitAckMessage = waitAckMessages.remove(ackId);
 
       //更新最大ack message id，更新最大seq
@@ -201,6 +212,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
             catTraceForBackupAck(ackId, channel);
          }
       }
+      
+      return waitAckMessage;
    }
 
    /**
@@ -379,10 +392,10 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
    private void sendMessage(Channel channel, ConsumerMessage consumerMessage) throws InterruptedException {
       PktMessage pktMessage = new PktMessage(consumerInfo.getDest(), consumerMessage.message);
 
-      //Cat begin
+      String consumerIp = IPUtil.getIpFromChannel(channel);
+      
       Transaction consumerServerTransaction = Cat.getProducer().newTransaction(
-            "Out:" + this.consumerInfo.getDest().getName(),
-            consumerInfo.getConsumerId() + ":" + IPUtil.getIpFromChannel(channel));
+            "Out:" + this.consumerInfo.getDest().getName(), consumerInfo.getConsumerId() + ":" + consumerIp);
 
       try {
          //发送后，记录已发送但未收到ACK的消息记录
@@ -396,6 +409,9 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
          if(logger.isDebugEnabled()){
         	 logger.debug("[sendMessage][channel write]");
          }
+         
+         consumerCollector.sendMessage(consumerInfo, consumerIp, consumerMessage.message);
+         
          //发送消息
          channel.write(pktMessage);
 

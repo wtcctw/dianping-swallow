@@ -19,6 +19,12 @@ public class AbstractLifecycle implements Lifecycle{
 			logger.info("[initialize]");
 		}
 		
+		doInitialize();
+		
+	}
+
+	protected void doInitialize() throws Exception {
+		
 	}
 
 	@Override
@@ -27,6 +33,11 @@ public class AbstractLifecycle implements Lifecycle{
 			logger.info("[start]");
 		}
 		
+		doStart();
+	}
+
+	protected void doStart() throws Exception {
+		
 	}
 
 	@Override
@@ -34,6 +45,12 @@ public class AbstractLifecycle implements Lifecycle{
 		if(logger.isInfoEnabled()){
 			logger.info("[stop]");
 		}
+		
+		doStop();
+	}
+
+	protected void doStop() throws Exception {
+		
 	}
 
 	@Override
@@ -41,6 +58,12 @@ public class AbstractLifecycle implements Lifecycle{
 		if(logger.isInfoEnabled()){
 			logger.info("[dispose]");
 		}
+		
+		doDispose();
+	}
+
+	protected void doDispose() throws Exception {
+		
 	}
 
 }

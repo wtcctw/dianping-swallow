@@ -1,7 +1,10 @@
 package com.dianping.swallow.web.dao;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+
+import org.bson.types.BSONTimestamp;
 
 import com.dianping.swallow.web.model.WebSwallowMessage;
 
@@ -11,7 +14,7 @@ import com.dianping.swallow.web.model.WebSwallowMessage;
  *
  * 2015年4月22日 上午12:05:31
  */
-public interface WebSwallowMessageDAO {
+public interface WebSwallowMessageDAO extends Dao{
 	
 
 
@@ -32,7 +35,7 @@ public interface WebSwallowMessageDAO {
 	 * @param id
 	 * @return
 	 */
-	WebSwallowMessage readById(String id);
+	WebSwallowMessage readById(BSONTimestamp id);
 
 	/**
 	 * @param p
@@ -64,6 +67,7 @@ public interface WebSwallowMessageDAO {
 	 * @param startdt
 	 * @param stopdt
 	 * @return
+	 * @throws ParseException 
 	 */
 	Map<String, Object> findByTime(int offset, int limit, String startdt,
 			String stopdt);

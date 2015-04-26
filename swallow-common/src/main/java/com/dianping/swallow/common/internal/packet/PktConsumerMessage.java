@@ -99,6 +99,7 @@ public final class PktConsumerMessage extends Packet {
 
     public PktConsumerMessage(String consumerId, Destination dest, ConsumerType consumerType, int threadCount, MessageFilter messageFilter){
         this.setPacketType(PacketType.CONSUMER_GREET);
+        this.type = ConsumerMessageType.GREET;//兼容老版本
         this.dest = dest;
         this.consumerId = consumerId;
         this.consumerType = consumerType;
@@ -108,6 +109,7 @@ public final class PktConsumerMessage extends Packet {
 
     public PktConsumerMessage(Long messageId, boolean needClose){
         this.setPacketType(PacketType.CONSUMER_ACK);
+        this.type = ConsumerMessageType.ACK;//兼容老版本
         this.messageId = messageId;
         this.needClose = needClose;
     }

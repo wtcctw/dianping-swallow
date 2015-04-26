@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.LionException;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 
@@ -30,6 +34,8 @@ public class MongoManager {
 
 
 	private static MongoManager instance;
+	private static final Logger logger = LoggerFactory
+			.getLogger(MongoManager.class);
 
 	private static synchronized void synInit() {
 		if (instance == null)
@@ -48,12 +54,23 @@ public class MongoManager {
 	}
 
 	private void initMongoServer() {
-		String uri;
-		uri = ConfigCache.getInstance().getProperty(SWALLOW_W_MONGO);
+		String uri = null;
+		try {
+			uri = ConfigCache.getInstance().getProperty(SWALLOW_W_MONGO);
+		} catch (LionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		logger.info(uri);
 		writeMongo = new MongoClient(parseUriToWriteAddressList(uri));  //write mongo
-		
-		uri = ConfigCache.getInstance().getProperty(SWALLOW_MONGO);
+		try {
+			uri = ConfigCache.getInstance().getProperty(SWALLOW_MONGO);
+		} catch (LionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		topicNameToMongoMap = parseURIAndCreateTopicMongo(uri.trim());  //read mongo
+		logger.info(uri);
 	}
 
 	public Map<String, MongoClient> getTopicNameToMongoMap() {  //topic name without msg#

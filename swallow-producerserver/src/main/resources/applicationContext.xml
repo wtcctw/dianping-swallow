@@ -7,49 +7,18 @@
            http://www.springframework.org/schema/context/spring-context-3.0.xsd"
     default-autowire="byName">
 
-    <bean id="ackDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl">
+	<bean id="lifecycleComponentManager" class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager"/>
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:swallow-producerserver.properties</value>
+            </list>
+        </property>
     </bean>
+	
 
-    <bean id="messageDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
-    </bean>
+	<import resource="applicationContext-monitor.xml"/>
+	<import resource="applicationContext-server.xml"/>
 
-    <bean id="heartbeatDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl">
-    </bean>
-
-    <bean id="topicWhiteList"
-        class="com.dianping.swallow.common.internal.whitelist.TopicWhiteList"
-        init-method="init">
-        <property name="lionDynamicConfig" ref="lionDynamicConfig"></property>
-    </bean>
-
-    <bean id="lionDynamicConfig"
-        class="com.dianping.swallow.common.internal.config.impl.LionDynamicConfig">
-        <constructor-arg>
-            <value>swallow-topic-whitelist-lion.properties</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="mongoManager"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-        <constructor-arg>
-            <value>swallow.mongo.producerServerURI</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="producerServerForClient"
-        class="com.dianping.swallow.producerserver.impl.ProducerServerForClient"
-        init-method="start">
-        <property name="port" value="4000" />
-        <property name="remoteServiceName"
-            value="http://service.dianping.com/swallowService/producerService_1.0.0" />
-    </bean>
-
-    <bean id="producerServerForText"
-        class="com.dianping.swallow.producerserver.impl.ProducerServerForText"
-        init-method="start">
-        <property name="port" value="8000" />
-    </bean>
-</beans>
+    </beans>

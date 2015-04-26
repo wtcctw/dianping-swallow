@@ -14,8 +14,7 @@ public class DurableConsumerExample {
 
     public static void main(String[] args) throws InterruptedException {
         ConsumerConfig config = new ConsumerConfig();
-        //以下两项根据自己情况而定，默认是不需要配的
-        config.setThreadPoolSize(1);
+        config.setThreadPoolSize(50);
         config.setRetryCount(0);
 
         Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId1", config);
@@ -25,7 +24,6 @@ public class DurableConsumerExample {
             public void onMessage(Message msg) {
                 System.out.println("延迟" + (System.currentTimeMillis() - msg.getGeneratedTime().getTime()) + "ms");
                 System.out.println(msg.getContent());
-                //            System.out.println(msg.transferContentToBean(MsgClass.class));
             }
         });
         c.start();

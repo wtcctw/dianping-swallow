@@ -1,6 +1,5 @@
 package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,8 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
+import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.dao.MongoManager;
+import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -24,11 +25,8 @@ import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientOptions.Builder;
 import com.mongodb.MongoException;
-import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
-import com.mongodb.WriteConcern;
 
 public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
 
@@ -104,14 +102,8 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
          logger.debug("Init MongoClient - start.");
       }
       //读取properties配置(如果存在configFile，则使用configFile)
-      InputStream in = DefaultMongoManager.class.getClassLoader().getResourceAsStream(MONGO_CONFIG_FILENAME);
-      MongoConfig config;
-      if (in != null) {
-         config = new MongoConfig(in);
-      } else {
-         config = new MongoConfig();
-      }
-      mongoOptions = this.getMongoOptions(config);
+      MongoConfig config = new MongoConfig(MONGO_CONFIG_FILENAME);
+      mongoOptions = config.buildMongoOptions();
       logger.info("MongoOptions=" + mongoOptions.toString());
       if (dynamicConfig != null) {
          this.dynamicConfig = dynamicConfig;
@@ -156,7 +148,7 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
     */
    private Mongo parseURIAndCreateHeartbeatMongo(String serverURI) {
       Mongo mongo = null;
-      List<ServerAddress> replicaSetSeeds = this.parseUriToAddressList(serverURI);
+      List<ServerAddress> replicaSetSeeds = MongoUtils.parseUriToAddressList(serverURI);
       mongo = getExistsMongo(replicaSetSeeds);
       if (mongo == null) {
          mongo = new MongoClient(replicaSetSeeds, mongoOptions);
@@ -178,7 +170,7 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
          HashMap<String, Mongo> topicNameToMongoMap = new HashMap<String, Mongo>();
          for (Map.Entry<String, List<String>> entry : serverURIToTopicNames.entrySet()) {
             String uri = entry.getKey();
-            List<ServerAddress> replicaSetSeeds = parseUriToAddressList(uri);
+            List<ServerAddress> replicaSetSeeds = MongoUtils.parseUriToAddressList(uri);
             Mongo mongo = null;
             List<String> topicNames = entry.getValue();
             mongo = getExistsMongo(replicaSetSeeds);
@@ -356,23 +348,6 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
          return false;
       }
       return list1.containsAll(list2) && list2.containsAll(list1);
-   }
-
-   private MongoClientOptions getMongoOptions(MongoConfig config) {
-	   
-      Builder builder = MongoClientOptions.builder();
-      
-      builder.socketKeepAlive(config.isSocketKeepAlive());
-      builder.socketTimeout(config.getSocketTimeout());
-      builder.connectionsPerHost(config.getConnectionsPerHost());
-      builder.threadsAllowedToBlockForConnectionMultiplier(config.getThreadsAllowedToBlockForConnectionMultiplier());
-      builder.connectTimeout(config.getConnectTimeout());
-      builder.maxWaitTime(config.getMaxWaitTime());
-
-      builder.writeConcern(new WriteConcern(config.getW(), config.getWtimeout(), config.isFsync()));
-      builder.readPreference(ReadPreference.secondaryPreferred());
-
-      return builder.build();
    }
 
    public DBCollection getMessageCollection(String topicName) {
@@ -572,26 +547,6 @@ private Mongo getMongo(String topicName) {
             throw e;
          }
       }
-   }
-
-   private List<ServerAddress> parseUriToAddressList(String uri) {
-      uri = uri.trim();
-      String schema = "mongodb://";
-      if (uri.startsWith(schema)) { // 兼容老各式uri
-         uri = uri.substring(schema.length());
-      }
-      String[] hostPortArr = uri.split(",");
-      List<ServerAddress> result = new ArrayList<ServerAddress>();
-      for (int i = 0; i < hostPortArr.length; i++) {
-         String[] pair = hostPortArr[i].split(":");
-         try {
-            result.add(new ServerAddress(pair[0].trim(), Integer.parseInt(pair[1].trim())));
-         } catch (Exception e) {
-            throw new IllegalArgumentException(e.getMessage() + ". Bad format of mongo uri：" + uri
-                  + ". The correct format is mongodb://<host>:<port>,<host>:<port>", e);
-         }
-      }
-      return result;
    }
 
    public void setDynamicConfig(DynamicConfig dynamicConfig) {

@@ -1,4 +1,4 @@
-注：**本文针对Swallow0.6.10版本**
+注：**本文针对Swallow0.7.0版本**
 
 # 基础概念
 
@@ -46,7 +46,7 @@
 
 ## 申请Topic
 
-如果有新的Topic，请联系：孟文超/宋通(wenchao.meng@dianping.com, tong.song@dianping.com，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。
+如果有新的Topic，请联系：李明东/孟文超(mingdong.li@dianping.com, wenchao.meng@dianping.com)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。
 
 联系时，**请邮件里告知：**
 
