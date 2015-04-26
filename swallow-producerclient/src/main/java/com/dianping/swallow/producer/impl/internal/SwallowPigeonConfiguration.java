@@ -167,8 +167,8 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
     * 检查是否使用Lion，如果非开发环境，强制useLion=true
     */
    private void checkUseLion() {
-	  boolean checkUseLion = Boolean.parseBoolean(System.getProperty("check.useLion"));
-	  if(!checkUseLion){
+	  boolean noCheckLion = Boolean.parseBoolean(System.getProperty("noCheckLion"));
+	  if(noCheckLion){
 		  return;
 	  }
       String env = EnvZooKeeperConfig.getEnv();
