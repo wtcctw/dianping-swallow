@@ -15,6 +15,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.common.server.monitor.visitor.ConsumerMonitorVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitorFactory;
+import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataType;
@@ -37,12 +38,29 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 	@Override
 	public List<StatsData> getAckDelayForAllConsumerId(String topic,
 			int intervalTimeSeconds, long start, long end) {
-
 		
 		return createStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.ACK_DELAY);
 	}
+	
+	@Override
+	public List<StatsData> getSendQpxForAllConsumerId(String topic, QPX qpx,
+			int intervalTimeSeconds, long start, long end) {
+		
+		return createStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.SEND_QPX, qpx);
+	}
+	
+	@Override
+	public List<StatsData> getAckQpxForAllConsumerId(String topic, QPX qpx,
+			int intervalTimeSeconds, long start, long end) {
+		return createStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.ACK_QPX, qpx);
+	}
 
 	private List<StatsData> createStatsData(String topic, int intervalTimeSeconds, long start, long end, StatsDataType type) {
+		
+		return createStatsData(topic, intervalTimeSeconds, start, end, type, QPX.SECOND);
+	}
+
+	private List<StatsData> createStatsData(String topic, int intervalTimeSeconds, long start, long end, StatsDataType type, QPX qpx) {
 		
 		List<StatsData> result = new LinkedList<StatsData>();
 		
@@ -56,10 +74,8 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 		}
 		
 		for(String consumerId : consumerIds){
-			result.add(getConsumerIdStats(topic, consumerId, data, intervalTimeSeconds, realStartTime, end, type));
+			result.add(getConsumerIdStats(topic, consumerId, data, intervalTimeSeconds, realStartTime, end, type, qpx));
 		}
-		
-		
 		return result;
 	}
 
@@ -72,20 +88,30 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 
 	private StatsData getConsumerIdStats(String topic, String consumerId,
 			NavigableMap<Long, MonitorData> data, int intervalTimeSeconds,
-			long start, long end, StatsDataType type) {
+			long start, long end, StatsDataType type, QPX qpx) {
 		
 		ConsumerMonitorVisitor consumerMonitorVisitor = MonitorVisitorFactory.buildConsumerConsumerIdVisitor(topic, consumerId);
 		visit(consumerMonitorVisitor, data);
 		List<Long> stats = null;
-		if(type == StatsDataType.SEND_DELAY){
-			stats = consumerMonitorVisitor.buildSendDelay(intervalTimeSeconds);
-		}else{
-			stats = consumerMonitorVisitor.buildAckDelay(intervalTimeSeconds);
-		}
 		
+		switch(type){
+			case SEND_DELAY:
+				stats = consumerMonitorVisitor.buildSendDelay(intervalTimeSeconds);
+				break;
+			case ACK_DELAY:
+				stats = consumerMonitorVisitor.buildAckDelay(intervalTimeSeconds);
+				break;
+			case SEND_QPX:
+				stats = consumerMonitorVisitor.buildSendQpx(intervalTimeSeconds, qpx);
+				break;
+			case ACK_QPX:
+				stats = consumerMonitorVisitor.buildAckQpx(intervalTimeSeconds, qpx);
+				break;
+			default:
+				throw new IllegalArgumentException("unknown type:" + type);
+		}
 		String subTitle = getConsumerIdSubTitle(consumerId);
-
-		return new StatsData(new ConsumerStatsDataDesc(topic, subTitle, type) , stats, start, intervalTimeSeconds);
+		return new StatsData(new ConsumerStatsDataDesc(topic, subTitle, type) , stats, start, getRealIntervalSeconds(intervalTimeSeconds));
 	}
 
 
@@ -153,6 +179,19 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 	@Override
 	protected MonitorData createMonitorData() {
 		return new ConsumerMonitorData();
+	}
+
+	@Override
+	public List<StatsData> getSendQpxForAllConsumerId(String topic, QPX qpx) {
+		
+		return getSendQpxForAllConsumerId(topic, qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+	}
+
+
+	@Override
+	public List<StatsData> getAckdQpxForAllConsumerId(String topic, QPX qpx) {
+		
+		return getAckQpxForAllConsumerId(topic, qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
 	}
 
 }

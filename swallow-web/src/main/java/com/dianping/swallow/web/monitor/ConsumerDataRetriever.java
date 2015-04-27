@@ -2,6 +2,8 @@ package com.dianping.swallow.web.monitor;
 
 import java.util.List;
 
+import com.dianping.swallow.common.server.monitor.visitor.QPX;
+
 /**
  * @author mengwenchao
  *
@@ -17,4 +19,13 @@ public interface ConsumerDataRetriever extends MonitorDataRetriever{
 
 	List<StatsData> getAckDelayForAllConsumerId(String topic);
 
+	
+	List<StatsData> getSendQpxForAllConsumerId(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
+	
+	List<StatsData> getSendQpxForAllConsumerId(String topic, QPX qpx);
+
+	List<StatsData> getAckQpxForAllConsumerId(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
+	
+	List<StatsData> getAckdQpxForAllConsumerId(String topic, QPX qpx);
 }
+

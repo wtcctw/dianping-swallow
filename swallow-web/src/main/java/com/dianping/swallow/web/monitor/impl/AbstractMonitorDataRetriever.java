@@ -25,7 +25,9 @@ import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.common.server.monitor.visitor.Visitor;
+import com.dianping.swallow.common.server.monitor.visitor.impl.AbstractMonitorVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.impl.TopicCollector;
 import com.dianping.swallow.web.manager.impl.CacheManager;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
@@ -68,6 +70,16 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 			}
 			return end;
 		}
+	}
+
+	protected int getRealIntervalSeconds(int intervalTimeSeconds, QPX qpx) {
+		
+		return AbstractMonitorVisitor.getRealIntervalTimeSeconds(intervalTimeSeconds, qpx);
+	}
+
+	protected int getRealIntervalSeconds(int intervalTimeSeconds) {
+		
+		return AbstractMonitorVisitor.getRealIntervalTimeSeconds(intervalTimeSeconds);
 	}
 
 

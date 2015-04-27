@@ -1,36 +1,17 @@
-module.controller('ConsumerDelayController', function($scope, $http) {
 
-	// search
-	$http({
-		method : 'POST',
-		url : window.contextpath + '/console/monitor/topiclist/get'
-	}).success(function(topicList, status, headers, config) {
-		
-		$("#consumer-delay-div").typeahead({
-			source : topicList,
-			updater : function(c) {
-				window.location = window.contextpath + "/console/monitor/consumer/"+c+"/delay";
-				return c;
-			}
-		})
-	}).error(function(data, status, headers, config) {
-		 app.appError("响应错误", data);
-	});
-
-	$scope.getDelay = function(topicName) {
-		$http({
+function renderGraph(topic, url, divName,  http){
+		http({
 			method : 'POST',
-			url : window.contextpath + '/console/monitor/consumer/' + topicName + '/delay/get'
+			url : window.contextpath + url
 		}).success(function(data, status, headers, config) {
 			
-				var parent = $('#container');
+				var parent = $('#' + divName);
 				var count = 0;
 				data.forEach(function(item){
 					count++;
 					var childdiv=$('<div></div>'); 
 					childdiv.appendTo(parent);
 					$(function () {
-//				        $('#container').highcharts({
 						childdiv.highcharts({
 				            title: {
 				                text: item.title,
@@ -76,6 +57,52 @@ module.controller('ConsumerDelayController', function($scope, $http) {
 			
 			alert("响应错误", data);
 //			app.appError("响应错误", data);
-		});
-	}
+		});	
+}
+
+module.controller('ConsumerQpsController', function($scope, $http) {
+	$http({
+		method : 'POST',
+		url : window.contextpath + '/console/monitor/topiclist/get'
+	}).success(function(topicList, status, headers, config) {
+		
+		$("#consumer-div").typeahead({
+			source : topicList,
+			updater : function(c) {
+				window.location = window.contextpath + "/console/monitor/consumer/"+c+"/qps";
+				return c;
+			}
+		})
+	}).error(function(data, status, headers, config) {
+		 app.appError("响应错误", data);
+	});
+
+	
+	$scope.getQps = function(topicName){
+		renderGraph(topicName, "/console/monitor/consumer/"+topicName+"/qps/get", "container", $http);
+	};
+});
+
+module.controller('ConsumerDelayController', function($scope, $http) {
+
+	// search
+	$http({
+		method : 'POST',
+		url : window.contextpath + '/console/monitor/topiclist/get'
+	}).success(function(topicList, status, headers, config) {
+		
+		$("#consumer-div").typeahead({
+			source : topicList,
+			updater : function(c) {
+				window.location = window.contextpath + "/console/monitor/consumer/"+c+"/delay";
+				return c;
+			}
+		})
+	}).error(function(data, status, headers, config) {
+		 app.appError("响应错误", data);
+	});
+
+	$scope.getDelay = function(topicName) {
+		renderGraph(topicName, '/console/monitor/consumer/' + topicName + '/delay/get', "container", $http);
+	};
 });

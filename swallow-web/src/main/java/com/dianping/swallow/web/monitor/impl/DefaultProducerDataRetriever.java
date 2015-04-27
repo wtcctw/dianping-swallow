@@ -15,6 +15,7 @@ import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
+import com.dianping.swallow.web.monitor.StatsDataType;
 
 /**
  * @author mengwenchao
@@ -29,27 +30,56 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 	
 	@Override
 	public StatsData getSaveDelay(String topic, int intervalTimeSeconds, long start, long end) {
+		
+		return buildStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.SAVE_DELAY);
+	}
+	
+	@Override
+	public StatsData getQpx(String topic, QPX qpx, int intervalTimeSeconds, long start,
+			long end) {
+		
+		return buildStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.SAVE_QPX, qpx);
+	}
 
+	private StatsData buildStatsData(String topic, int intervalTimeSeconds,
+			long start, long end, StatsDataType type) {
+		return buildStatsData(topic, intervalTimeSeconds, start, end, type, QPX.SECOND);
+	}
+
+	private StatsData buildStatsData(String topic, int intervalTimeSeconds,
+			long start, long end, StatsDataType type, QPX qpx) {
+		
 		NavigableMap<Long, MonitorData> data = getData(topic, start, end);
 		
 		ProducerMonitorVisitor producerMonitorVisitor = MonitorVisitorFactory.buildProducerTopicVisitor(topic);
-
+		
 		visit(producerMonitorVisitor, data);
 		
-		List<Long> saveDelay = producerMonitorVisitor.buildSaveDelay(intervalTimeSeconds);
+		List<Long> result = null;
 		
-		return new StatsData(new ProducerStatsDataDesc(topic), saveDelay, getRealStartTime(data, start, end), intervalTimeSeconds) ;
+		switch(type){
+			case SAVE_DELAY:
+				result = producerMonitorVisitor.buildSaveDelay(intervalTimeSeconds);
+				break;
+			case SAVE_QPX:
+				result = producerMonitorVisitor.buildSaveQpx(intervalTimeSeconds, qpx);
+				break;
+			default:
+				throw new IllegalArgumentException("unknown type:" + type);
+		}
+		
+		return new StatsData(new ProducerStatsDataDesc(topic, type), result, 
+				getRealStartTime(data, start, end), 
+				getRealIntervalSeconds(intervalTimeSeconds, qpx)) ;
+		
 	}
-
-
 
 
 	@Override
-	public StatsData getQpx(String topic, QPX qpx, int interval, long start,
-			long end) {
-		return null;
+	public StatsData getQpx(String topic, QPX qpx) {
+		
+		return getQpx(topic, qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
 	}
-
 	
 	public static class ProducerServerData extends SwallowServerData{
 
@@ -85,4 +115,6 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 	protected MonitorData createMonitorData() {
 		return new ProducerMonitorData();
 	}
+
+
 }

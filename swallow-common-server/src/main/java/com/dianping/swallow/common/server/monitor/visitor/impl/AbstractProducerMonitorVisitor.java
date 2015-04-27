@@ -35,7 +35,7 @@ public abstract class AbstractProducerMonitorVisitor extends AbstractMonitorVisi
 
 	public List<Long> buildSaveQpx(int intervalTimeSeconds, QPX qpx){
 		
-		return null;
+		return buildQpx(allRawData, intervalTimeSeconds, qpx);
 	}
 
 }

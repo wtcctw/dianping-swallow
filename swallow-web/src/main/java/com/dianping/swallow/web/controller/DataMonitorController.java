@@ -3,6 +3,7 @@ package com.dianping.swallow.web.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
@@ -38,6 +40,13 @@ public class DataMonitorController extends AbstractMonitorController{
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 	
+	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
+	public ModelAndView viewTopicQps(@PathVariable String topic){
+		
+		subSide = "qps";
+		return new ModelAndView("monitor/consumerqps", createViewMap());
+	} 
+
 	@RequestMapping(value = "/console/monitor/producer/{topic}/savedelay", method = RequestMethod.GET)
 	public ModelAndView viewProducerDelayMonitor(@PathVariable String topic) throws IOException{
 
@@ -48,23 +57,44 @@ public class DataMonitorController extends AbstractMonitorController{
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay", method = RequestMethod.GET)
 	public ModelAndView viewConsumerDelayMonitor(@PathVariable String topic) throws IOException{
-		
+
+		subSide = "delay";
 		Map<String, Object> map = createViewMap();
 		return new ModelAndView("monitor/consumerdelay", map);
 	}
 
 	
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps/get", method = RequestMethod.POST)
+	@ResponseBody
+	public List<HighChartsWrapper> getTopicQps(@PathVariable String topic){
+		
+		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND);
+		List<StatsData> consumerSendData = consumerDataRetriever.getSendQpxForAllConsumerId(topic, QPX.SECOND);
+		List<StatsData> consumerAckData = consumerDataRetriever.getAckdQpxForAllConsumerId(topic, QPX.SECOND);
+		
+		return buildConsumerChartWrapper(topic, producerData, consumerSendData, consumerAckData);
+	} 
+
 	
+
 	@RequestMapping(value = "/console/monitor/topiclist/get", method = RequestMethod.POST)
 	@ResponseBody
 	public Set<String> getProducerDelayMonitor() throws IOException{
+		return  allTopics();
+	}
+
+	private Set<String> allTopics() {
 		
 		Set<String> producerTopics = producerDataRetriever.getTopics();
 		Set<String> consumerTopics = consumerDataRetriever.getTopics();
 		producerTopics.addAll(consumerTopics);
-		return  producerTopics;
+		return producerTopics;
 	}
 
+
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get", method = RequestMethod.POST)
 	@ResponseBody
 	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable String topic) throws IOException{
@@ -77,30 +107,44 @@ public class DataMonitorController extends AbstractMonitorController{
 		
 	}
 
-	private List<HighChartsWrapper> buildConsumerChartWrapper(String topic, StatsData producerData,
-			List<StatsData> consumerSendDelay, List<StatsData> consumerAckDelay) {
+	private List<HighChartsWrapper> buildConsumerChartWrapper(String topic, StatsData producerData, List<StatsData> ...consumerData) {
 		
-		
-		if(consumerSendDelay.size()  != consumerAckDelay.size()){
-			throw new IllegalArgumentException("[sendDelaySize != ackDelaySize] " + consumerSendDelay.size() + " VS " + consumerAckDelay.size());
-		}
-		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(consumerSendDelay.size());
-		
-		for(int i=0;i<consumerSendDelay.size();i++){
-			
-			StatsData send = consumerSendDelay.get(i);
-			StatsData ack  = consumerAckDelay.get(i);
-			
-			ConsumerStatsDataDesc sendInfo = (ConsumerStatsDataDesc) send.getInfo();
-			ConsumerStatsDataDesc ackInfo = (ConsumerStatsDataDesc) ack.getInfo();
-			
-			if(!sendInfo.getConsumerId().equals(ackInfo.getConsumerId())){
-				throw new IllegalStateException("consumerId not equal to each other!!");
+		int maxSize = -1;
+		List<StatsData> maxConsumerData = null;
+		for(List<StatsData> item : consumerData){
+			if(item.size() > maxSize){
+				maxSize = item.size();
+				maxConsumerData = item;
 			}
+		}
+		
+		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(maxSize);
+		
+		for(int i=0;i<maxConsumerData.size();i++){
 			
-			String consumerId = sendInfo.getConsumerId(); 
-					
-			result.add(ChartBuilder.getHighChart(topic, consumerId, producerData, send, ack));
+			StatsData statsData = maxConsumerData.get(i);
+			ConsumerStatsDataDesc currentDesc = (ConsumerStatsDataDesc) statsData.getInfo();
+			String currentConsumerId = currentDesc.getConsumerId();
+			
+			List<StatsData> allStats = new LinkedList<StatsData>();
+			allStats.add(producerData);
+			allStats .add(statsData);
+			
+			for(int j=0; j < consumerData.length; j++){
+				List<StatsData> cmp = consumerData[j];
+				if(maxConsumerData == cmp){
+					continue;
+				}
+				for(int k=0;k<cmp.size();k++){
+					StatsData cmpStatsData = cmp.get(k);
+					ConsumerStatsDataDesc cmpDesc = (ConsumerStatsDataDesc) cmpStatsData.getInfo();
+					if(cmpDesc.getConsumerId().equals(currentConsumerId)){
+						allStats .add(cmpStatsData);
+						break;
+					}
+				}
+			}
+			result.add(ChartBuilder.getHighChart(topic, currentConsumerId, allStats));
 		}
 		
 		return result;
@@ -111,9 +155,11 @@ public class DataMonitorController extends AbstractMonitorController{
 		return "delay";
 	}
 
+	private String subSide = "delay";
+	
 	@Override
 	public String getSubSide() {
-		return "all";
+		return subSide;
 	}
 
 }
