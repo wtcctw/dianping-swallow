@@ -2,6 +2,8 @@ package com.dianping.swallow.common.server.monitor.collector;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,10 +27,14 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.ConfigChange;
+import com.dianping.lion.client.LionException;
 import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.EnvUtil;
+import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 
 /**
@@ -36,7 +42,7 @@ import com.dianping.swallow.common.server.monitor.data.MonitorData;
  *
  * 2015年4月10日 下午2:08:18
  */
-public abstract class AbstractCollector extends AbstractLifecycle implements Collector, Runnable{
+public abstract class AbstractCollector extends AbstractLifecycle implements Collector, Runnable, ConfigChange{
 	
 	private ScheduledExecutorService scheduled;
 	
@@ -46,6 +52,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	
 	public static final int SEND_INTERVAL = 5;
 	
+	
 	private ScheduledFuture<?> future; 
 	
 	private HttpClient httpClient;
@@ -54,14 +61,44 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	protected static final int maxRetryTimesOnException = 3;
 	protected static final int maxRetryIntervalOnException = 1000;
 	
+	private Set<String> excludeTopics;
+	private ConfigCache configCache;
+	public static final String SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY = "swallow.monitor.exclude.topic"; 
+
 	
 	@Override
 	public void doInitialize() throws Exception {
 		
 		scheduled = Executors.newScheduledThreadPool(CommonUtils.getCpuCount(), new MQThreadFactory(THREAD_POOL_NAME));
 		createHttpClient();
+		
+		configCache = ConfigCache.getInstance();
+		configCache.addChange(this);
+		excludeTopics = getExculdeTopics(); 
 	}
 	
+	private Set<String> getExculdeTopics() {
+		
+		try {
+			String value = configCache.getProperty(SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY);
+			if(logger.isInfoEnabled()){
+				logger.info("[getExculdeTopics][exclude]" + value);
+			}
+			getExcludeTopics(value);
+		} catch (LionException e) {
+			logger.error("getExculdeTopics");
+		}
+		return null;
+	}
+
+	private void getExcludeTopics(String value) {
+		
+		excludeTopics = new HashSet<String>(StringUtils.splitByComma(value));
+		if(logger.isInfoEnabled()){
+			logger.info("[getExcludeTopics]" + excludeTopics);
+		}
+	}
+
 	private void createHttpClient() {
 		
         HttpParams params = new BasicHttpParams();
@@ -85,7 +122,11 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 		future = scheduled.scheduleAtFixedRate(this, SEND_INTERVAL, SEND_INTERVAL, TimeUnit.SECONDS);
 	}
 	
+	protected boolean isExclude(String topic) {
+		return false;
+	}
 
+	
 	@Override
 	protected void doStop() throws Exception {
 		if(turnOff){
@@ -205,6 +246,19 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 
 	public void setTurnOff(boolean turnOff) {
 		this.turnOff = turnOff;
+	}
+
+	
+	@Override
+	public void onChange(String key,String value){
+		
+		if(key != null && key.equals(SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY)){
+			if(logger.isInfoEnabled()){
+				logger.info("[onChange]["+ SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY +"]" + value);
+			}
+			getExcludeTopics(value);
+		}
+		
 	}
 
 	

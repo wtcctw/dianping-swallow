@@ -19,6 +19,13 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 	
 	@Override
 	public void sendMessage(ConsumerInfo consumerInfo, String consumerIpPort, SwallowMessage message) {
+		
+		String topic = consumerInfo.getDest().getName();
+		
+		if(isExclude(topic)){
+			return;
+		}
+		
 		try{
 			consumerMonitorData.addSendData(consumerInfo, consumerIpPort, message);
 		}catch(Exception e){
@@ -26,8 +33,15 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 		}
 	}
 
+
 	@Override
 	public void ackMessage(ConsumerInfo consumerInfo, String consumerIpPort, SwallowMessage message) {
+
+		String topic = consumerInfo.getDest().getName();
+		
+		if(isExclude(topic)){
+			return;
+		}
 		try{
 			consumerMonitorData.addAckData(consumerInfo, consumerIpPort, message);
 		}catch(Exception e){

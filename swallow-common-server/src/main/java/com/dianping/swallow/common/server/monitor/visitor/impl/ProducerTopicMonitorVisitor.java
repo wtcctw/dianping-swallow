@@ -1,8 +1,6 @@
 package com.dianping.swallow.common.server.monitor.visitor.impl;
 
 
-import java.util.Map.Entry;
-
 import com.dianping.swallow.common.server.monitor.data.MonitorData.MessageInfo;
 import com.dianping.swallow.common.server.monitor.data.ProducerData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
@@ -24,12 +22,9 @@ public class ProducerTopicMonitorVisitor extends AbstractProducerMonitorVisitor 
 		ProducerData producerData = (ProducerData)visitorData;
 
 		MessageInfo info = new MessageInfo();
-		for(Entry<String, MessageInfo> entry : producerData.entrySet()){
-			
-			MessageInfo value = entry.getValue();
-			info.merge(value);
+		if(producerData != null){
+			info = producerData.getTotal();
 		}
-		
 		allRawData.add(info);
 	}
 
