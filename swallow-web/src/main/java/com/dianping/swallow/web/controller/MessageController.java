@@ -42,7 +42,7 @@ public class MessageController extends AbstractController {
 	private static final String             SIZE                        = "size";
 	private static final String             MESSAGE                     = "message";
 	private static final String             TOPIC                       = "topic";
-	private DefaultWebSwallowMessageDAO       	smdi;
+	private DefaultWebSwallowMessageDAO     smdi;
 	private volatile List<String>           dbNames 					= new ArrayList<String>(); 
 	
 	private Map<String, MongoClient> 		topicNameToMongoMap 		= new HashMap<String, MongoClient>();
@@ -85,9 +85,7 @@ public class MessageController extends AbstractController {
 				map = getMessageFromSpecificTopic(start, span, tname, messageId ,startdt, stopdt);
 			}
 		}
-		Gson gson = new Gson(); // for last page to return
-		return gson.toJson(map);
-						
+		return map;
 	}
 	
 	private Map<String, Object> getMessageFromSpecificTopic(int start, int span,String  tname, String messageId
