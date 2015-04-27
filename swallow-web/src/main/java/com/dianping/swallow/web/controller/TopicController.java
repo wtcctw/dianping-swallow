@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import com.dianping.swallow.web.dao.SearchPropDAO;
 import com.dianping.swallow.web.dao.TopicDAO;
@@ -102,11 +101,9 @@ public class TopicController extends AbstractController {
 			topicList = getSpecificTopic(start, span, name, prop, dept); // name
 			searchSize = topicList.size();
 		}
-		//writeMongo.dropDatabase(TOPIC_DB_NAME);
 		map.put(SIZE, searchSize);
 		map.put(TOPIC, topicList);
-		Gson gson = new Gson(); // for last page to return
-		return gson.toJson(map);
+		return map;
 	}
 
 	// read records from writeMongoOps dut to it alread exists
@@ -174,11 +171,13 @@ public class TopicController extends AbstractController {
 
 		List<String> dbName = new ArrayList<String>();
 		for (String dbn : tmpDBName) {
-			if (dbn.startsWith(PRE_MSG))
-				dbName.add(dbn.substring(PRE_MSG.length()));
+			if (dbn.startsWith(PRE_MSG)){
+				String str = dbn.substring(PRE_MSG.length());
+				if(!dbName.contains(str))
+					dbName.add(str);
+			}
 		}
-		Gson gson = new Gson();
-		return gson.toJson(dbName);
+		return dbName;
 	}
 
 	// read from writeMongoOps, everytime read the the database to get the latest info
@@ -189,11 +188,13 @@ public class TopicController extends AbstractController {
 		ddi = new DefaultSearchPropDAO(writeMongoOps, DEPT_COLLECTION, DEPT_NAME);
 		List<SearchProp> deptList = ddi.findAll();
 		List<String> depts = new ArrayList<String>();
-		for (SearchProp d : deptList)
-			depts.add(d.getDept());
+		for (SearchProp d : deptList){
+			String dept = d.getDept();
+			if(!depts.contains(dept))
+				depts.add(dept);
+		}
 
-		Gson gson = new Gson();
-		return gson.toJson(depts);
+		return depts;
 	}
 
 	// read from writeMongoOps, everytime read the the database to get the
@@ -205,11 +206,13 @@ public class TopicController extends AbstractController {
 		ddi = new DefaultSearchPropDAO(writeMongoOps, PROP_COLLECTION, PROP_NAME);
 		List<SearchProp> propList = ddi.findAll();
 		List<String> props = new ArrayList<String>();
-		for (SearchProp p : propList)
-			props.add(p.getDept());
+		for (SearchProp p : propList){
+			String prop = p.getDept();
+			if(!props.contains(prop))
+				props.add(prop);
+		}
 
-		Gson gson = new Gson();
-		return gson.toJson(props);
+		return props;
 	}
 
 	// write use writeMongoOps
@@ -258,7 +261,7 @@ public class TopicController extends AbstractController {
 		insertDept(dept);
 		insertProp(prop);
 		// return current refreshed page
-		return new RedirectView(request.getContextPath());
+		return new RedirectView(request.getContextPath() + "/console/topic");
 	}
 
 	private boolean isTopicName(String str) {
@@ -293,12 +296,13 @@ public class TopicController extends AbstractController {
 				String subStr = str.substring(PRE_MSG.length());
 				if (isTopicName(str) && tdi.readByName(subStr) == null) {
 					tdi.create(TopicController.getTopic(subStr, 0L));
-					logger.info("create topic : "
+					if(logger.isInfoEnabled()){
+						logger.info("create topic : "
 							+ TopicController.getTopic(subStr, 0L));
+					}
 				}
 
 			}
-//			writeMongo.dropDatabase(TOPIC_DB_NAME);
 		} else { // create
 			for (String dbn : dbs) {
 				if (isTopicName(dbn)) {

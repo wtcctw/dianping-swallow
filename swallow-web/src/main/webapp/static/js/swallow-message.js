@@ -25,8 +25,8 @@ module.factory('Paginator', function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
 					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt,  function(data){
+						data = angular.fromJson(data);
 						items = data.topic;
-						items = angular.fromJson(items); //反序列化
 						length = data.size;
 						self.totalpieces = length;
 						self.totalPage = Math.ceil(length/pageSize);
@@ -200,6 +200,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 				method : 'GET',
 				url : window.contextPath + '/console/topic/namelist'
 			}).success(function(data, status, headers, config) {
+				data = angular.fromJson(data);
 				var topicNameList = data;
 				$("#topicname").typeahead({
 					source : topicNameList,
