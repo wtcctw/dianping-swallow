@@ -74,29 +74,29 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 		
 		configCache = ConfigCache.getInstance();
 		configCache.addChange(this);
-		excludeTopics = getExculdeTopics(); 
+		initExculdeTopics(); 
 	}
 	
-	private Set<String> getExculdeTopics() {
+	private void initExculdeTopics() {
 		
 		try {
 			String value = configCache.getProperty(SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY);
 			if(logger.isInfoEnabled()){
 				logger.info("[getExculdeTopics][exclude]" + value);
 			}
-			getExcludeTopics(value);
+			excludeTopics = splitExcludeTopics(value);
 		} catch (LionException e) {
-			logger.error("getExculdeTopics");
+			logger.error("[getExculdeTopics]", e);
 		}
-		return null;
 	}
 
-	private void getExcludeTopics(String value) {
+	private HashSet<String> splitExcludeTopics(String value) {
 		
-		excludeTopics = new HashSet<String>(StringUtils.splitByComma(value));
+		HashSet<String> excludeTopics = new HashSet<String>(StringUtils.splitByComma(value));
 		if(logger.isInfoEnabled()){
-			logger.info("[getExcludeTopics]" + excludeTopics);
+			logger.info("[splitExcludeTopics]" + excludeTopics);
 		}
+		return excludeTopics;
 	}
 
 	private void createHttpClient() {
@@ -123,7 +123,8 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	}
 	
 	protected boolean isExclude(String topic) {
-		return false;
+		
+		return excludeTopics.contains(topic);
 	}
 
 	
@@ -256,7 +257,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 			if(logger.isInfoEnabled()){
 				logger.info("[onChange]["+ SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY +"]" + value);
 			}
-			getExcludeTopics(value);
+			excludeTopics = splitExcludeTopics(value);
 		}
 		
 	}
