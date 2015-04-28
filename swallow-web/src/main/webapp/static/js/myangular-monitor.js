@@ -60,6 +60,21 @@ function renderGraph(topic, url, divName,  http){
 		});	
 }
 
+module.controller('ProducerServerQpsController', function($scope, $http) {
+
+	$scope.getProducerServerQps = function(){
+		renderGraph(topicName, "/console/monitor/producerserver/qps/get", "container", $http);
+	};
+
+});
+
+module.controller('ConsumerServerQpsController', function($scope, $http) {
+	
+	$scope.getProducerServerQps = function(){
+		renderGraph(topicName, "/console/monitor/consumerserver/qps/get", "container", $http);
+	};
+});
+
 module.controller('ConsumerQpsController', function($scope, $http) {
 	$http({
 		method : 'POST',
@@ -78,7 +93,7 @@ module.controller('ConsumerQpsController', function($scope, $http) {
 	});
 
 	
-	$scope.getQps = function(topicName){
+	$scope.getConsumerQps = function(topicName){
 		renderGraph(topicName, "/console/monitor/consumer/"+topicName+"/qps/get", "container", $http);
 	};
 });

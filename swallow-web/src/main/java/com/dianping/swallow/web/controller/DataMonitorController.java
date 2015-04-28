@@ -39,11 +39,27 @@ public class DataMonitorController extends AbstractMonitorController{
 	
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
+
+	@RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
+	public ModelAndView viewConsumerServerQps(@PathVariable String topic){
+		
+		subSide = "consumerserverqps";
+		return new ModelAndView("monitor/consumerserverqps", createViewMap());
+	} 
+
+	@RequestMapping(value = "/console/monitor/producerserver/qps", method = RequestMethod.GET)
+	public ModelAndView viewProducerServerQps(@PathVariable String topic){
+		
+		subSide = "producerserverqps";
+		return new ModelAndView("monitor/producerserverqps", createViewMap());
+	} 
+
 	
+
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
 	public ModelAndView viewTopicQps(@PathVariable String topic){
 		
-		subSide = "qps";
+		subSide = "consumerqps";
 		return new ModelAndView("monitor/consumerqps", createViewMap());
 	} 
 
@@ -63,6 +79,19 @@ public class DataMonitorController extends AbstractMonitorController{
 		return new ModelAndView("monitor/consumerdelay", map);
 	}
 
+	
+	@RequestMapping(value = "/console/monitor/consumerserver/qps/get", method = RequestMethod.POST)
+	public List<HighChartsWrapper> viewConsumerServerQps(){
+		
+		return null;
+	} 
+
+	@RequestMapping(value = "/console/monitor/producerserver/qps/get", method = RequestMethod.POST)
+	public List<HighChartsWrapper> viewProducerServerQps(@PathVariable String topic){
+		
+		subSide = "producerserverqps";
+		return new ModelAndView("monitor/producerserverqps", createViewMap());
+	} 
 	
 
 	@SuppressWarnings("unchecked")

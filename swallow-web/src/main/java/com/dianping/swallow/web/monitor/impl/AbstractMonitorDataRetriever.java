@@ -4,6 +4,7 @@ package com.dianping.swallow.web.monitor.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.NavigableMap;
@@ -31,6 +32,8 @@ import com.dianping.swallow.common.server.monitor.visitor.impl.AbstractMonitorVi
 import com.dianping.swallow.common.server.monitor.visitor.impl.TopicCollector;
 import com.dianping.swallow.web.manager.impl.CacheManager;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
+import com.dianping.swallow.web.monitor.StatsData;
+import com.mongodb.ServerAddress;
 
 /**
  * @author mengwenchao
@@ -54,6 +57,26 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 
 	private Map<String, SwallowServerData> serverMap = new ConcurrentHashMap<String, SwallowServerData>();
 	
+	
+	
+	public Map<String, StatsData> getServerQpx(QPX qpx, int intervalTimeSeconds, long start, long end){
+
+		Map<String, StatsData> result = new HashMap<String, StatsData>();
+		for(Entry<String, SwallowServerData> entry : serverMap.entrySet()){
+			String ip = entry.getKey();
+			SwallowServerData swallowServerData = entry.getValue();
+			
+			result.put(ip, value);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public Map<String, StatsData> getServerQpx(QPX qpx){
+		return getServerQpx(qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+	}
+
 	
 	@PostConstruct
 	public void postAbstractMonitorDataStats(){
@@ -160,19 +183,32 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		}
 		
 	}
-	
-	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end) {
-		
+
+
+	/**
+	 * @param topic
+	 * @param start
+	 * @param end
+	 * @param serverIp null 表示所有ip
+	 * @return
+	 */
+	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end, String serverIp) {
+
 		NavigableMap<Long, MonitorData>  result;
 		
 		if(dataExistInMemory(start, end)){
-			result = getMemoryData(topic, start, end);
+			result = getMemoryData(topic, start, end, serverIp);
 		}else{
-			result = retrieveDbData(topic, start, end);
+			result = retrieveDbData(topic, start, end, serverIp);
 		}
 		//插值补齐 
 		insertLackedData(result);
 		return result;
+
+	}
+
+	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end) {
+		return getData(topic, start, end, null);
 	}
 
 	private void insertLackedData(NavigableMap<Long, MonitorData> result) {
@@ -203,19 +239,25 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	protected abstract MonitorData createMonitorData();
 
 	protected NavigableMap<Long, MonitorData> retrieveDbData(String topic,
-			long start, long end) {
+			long start, long end, String serverIp) {
 		
 		//wait to be implemented
-		return getMemoryData(topic, start, end);
+		return getMemoryData(topic, start, end, serverIp);
 	}
 
 
-	protected NavigableMap<Long, MonitorData> getMemoryData(String topic, long start, long end) {
+	protected NavigableMap<Long, MonitorData> getMemoryData(String topic, long start, long end, String serverIp) {
 		
 		SwallowServerData ret = createSwallowServerData();
 		
-		for(SwallowServerData swallowServerData : serverMap.values()){
-			ret.merge(swallowServerData, topic, start, end);
+		for(Entry<String, SwallowServerData> entry : serverMap.entrySet()){
+			
+			String ip = entry.getKey();
+			SwallowServerData swallowServerData = entry.getValue();
+			
+			if(serverIp == null || serverIp.equals(ip)){
+				ret.merge(swallowServerData, topic, start, end);
+			}
 		}
 		
 		return ret.getMonitorData();

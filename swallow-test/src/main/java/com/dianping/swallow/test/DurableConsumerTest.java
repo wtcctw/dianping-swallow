@@ -24,9 +24,9 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 	@Test
 	public void testEternalSendAndReceive() throws SendFailedException, RemoteServiceInitFailedException{
 
-		addListener(topic, getConsumerId(), concurrentCount, 100);
-		addListener(topic, "id2", concurrentCount, 200);
-		sendMessage(Integer.MAX_VALUE, topic, 1000);
+		addListener(topic, getConsumerId(), concurrentCount, 10);
+		addListener(topic, "id2", concurrentCount, 20);
+		sendMessage(Integer.MAX_VALUE, topic, 50);
 		sleep(10000*1000);
 	}
 	

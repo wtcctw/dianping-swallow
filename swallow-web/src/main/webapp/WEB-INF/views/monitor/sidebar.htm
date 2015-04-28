@@ -9,7 +9,7 @@
 
 		<li class="#if($menu == 'delay') open #end"><a href="#"
 			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
-				class="menu-text">Monitor</span> <b
+				class="menu-text">监控</span> <b
 				class="arrow icon-angle-down"></b>
 		</a>
 			<ul class="submenu" style="display: block;">
@@ -19,7 +19,15 @@
 				</a></li>
 				<li class="#if($subside == 'qps') active #end"><a
 					href="${contextPath}/console/monitor/consumer/total/qps">
-					<i class="icon-globe"></i> qps(topic)
+					<i class="icon-globe"></i> 每秒消息(topic)
+				</a></li>
+				<li class="#if($subside == 'qps') active #end"><a
+					href="${contextPath}/console/monitor/server/total/qps">
+					<i class="icon-globe"></i> 每秒消息(producer server)
+				</a></li>
+				<li class="#if($subside == 'qps') active #end"><a
+					href="${contextPath}/console/monitor/server/total/qps">
+					<i class="icon-globe"></i> 每秒消息(consumer server)
 				</a></li>
 			</ul>
 			
