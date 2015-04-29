@@ -1,8 +1,11 @@
 package com.dianping.swallow.web.monitor.impl;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,9 +15,11 @@ import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitorFactory;
 import com.dianping.swallow.common.server.monitor.visitor.ProducerMonitorVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.QPX;
+import com.dianping.swallow.common.server.monitor.visitor.impl.ProducerTopicMonitorVisitor;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
+import com.dianping.swallow.web.monitor.StatsDataDesc;
 import com.dianping.swallow.web.monitor.StatsDataType;
 
 /**
@@ -34,6 +39,34 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 		return buildStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.SAVE_DELAY);
 	}
 	
+	
+	@Override
+	public Map<String, StatsData> getServerQpx(QPX qpx,
+			int intervalTimeSeconds, long start, long end) {
+
+		Set<String> ips = getServerIps(start, end);
+		
+		Map<String, StatsData> result = new HashMap<String, StatsData>();
+		ProducerMonitorVisitor visitor = new ProducerTopicMonitorVisitor(MonitorData.TOTAL_KEY);
+		
+		for(String serverIp : ips){
+			NavigableMap<Long, MonitorData> data = getData(MonitorData.TOTAL_KEY, start, end, serverIp);
+			visit(visitor, data);
+			List<Long> qpsData = visitor.buildSaveDelay(intervalTimeSeconds);
+			StatsDataDesc info = new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, StatsDataType.SAVE_DELAY);
+			result.put(serverIp, createStatsData(info, qpsData, start, end, data, intervalTimeSeconds, qpx));
+		}
+		return result;
+	}
+
+
+
+	@Override
+	public Map<String, StatsData> getServerQpx(QPX qpx){
+		return getServerQpx(qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+	}
+
+
 	@Override
 	public StatsData getQpx(String topic, QPX qpx, int intervalTimeSeconds, long start,
 			long end) {
@@ -68,10 +101,7 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 				throw new IllegalArgumentException("unknown type:" + type);
 		}
 		
-		return new StatsData(new ProducerStatsDataDesc(topic, type), result, 
-				getRealStartTime(data, start, end), 
-				getRealIntervalSeconds(intervalTimeSeconds, qpx)) ;
-		
+		return createStatsData(new ProducerStatsDataDesc(topic, type), result, start, end, data, intervalTimeSeconds, qpx);
 	}
 
 
@@ -115,6 +145,5 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 	protected MonitorData createMonitorData() {
 		return new ProducerMonitorData();
 	}
-
 
 }

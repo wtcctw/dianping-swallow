@@ -4,7 +4,6 @@ package com.dianping.swallow.web.monitor.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.NavigableMap;
@@ -33,7 +32,7 @@ import com.dianping.swallow.common.server.monitor.visitor.impl.TopicCollector;
 import com.dianping.swallow.web.manager.impl.CacheManager;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
-import com.mongodb.ServerAddress;
+import com.dianping.swallow.web.monitor.StatsDataDesc;
 
 /**
  * @author mengwenchao
@@ -48,7 +47,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	private final int DEFAULT_INTERVAL_IN_HOUR = 10;//一小时每个10秒采样
 
 	@Value("${swallow.web.monitor.keepinmemory}")
-	public int keepInMemoryHour = 2;//保存最后2小时
+	public int keepInMemoryHour = 1;//保存最后2小时
 	
 	public static int keepInMemoryCount;
 
@@ -57,26 +56,21 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 
 	private Map<String, SwallowServerData> serverMap = new ConcurrentHashMap<String, SwallowServerData>();
 	
-	
-	
-	public Map<String, StatsData> getServerQpx(QPX qpx, int intervalTimeSeconds, long start, long end){
-
-		Map<String, StatsData> result = new HashMap<String, StatsData>();
-		for(Entry<String, SwallowServerData> entry : serverMap.entrySet()){
-			String ip = entry.getKey();
-			SwallowServerData swallowServerData = entry.getValue();
-			
-			result.put(ip, value);
+	protected Set<String> getServerIps(long start, long end) {
+		if(dataExistInMemory(start, end)){
+			return getServerIpsInMemory(start, end);
 		}
+		return getServerIpsInDb(start, end);
+	}
+
+	private Set<String> getServerIpsInDb(long start, long end) {
 		
-		return result;
+		return getServerIpsInDb(start, end);
 	}
 
-	@Override
-	public Map<String, StatsData> getServerQpx(QPX qpx){
-		return getServerQpx(qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+	private Set<String> getServerIpsInMemory(long start, long end) {
+		return serverMap.keySet();
 	}
-
 	
 	@PostConstruct
 	public void postAbstractMonitorDataStats(){
@@ -104,6 +98,12 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		
 		return AbstractMonitorVisitor.getRealIntervalTimeSeconds(intervalTimeSeconds);
 	}
+
+	protected StatsData createStatsData(StatsDataDesc info, List<Long> qpsData, long start, long end, NavigableMap<Long, MonitorData> data, int intervalTimeSeconds, QPX qpx) {
+		
+		return new StatsData(info, qpsData, getRealStartTime(data, start, end), getRealIntervalSeconds(intervalTimeSeconds, qpx));
+	}
+
 
 
 	/**
