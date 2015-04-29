@@ -72,7 +72,12 @@ public class ConsumerMonitorData extends MonitorData{
 	}
 	
 	
-	
+	public void removeConsumer(ConsumerInfo consumerInfo){
+		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
+		consumerTopicData.removeConsumer(consumerInfo);
+		
+	}
+
 	private ConsumerTopicData getConsumerTopicData(String topicName) {
 		
 		ConsumerTopicData consumerTopicData;

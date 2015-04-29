@@ -107,9 +107,7 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 		if(saveTime <= 0){
 			saveTime = System.currentTimeMillis();
 		}
-		if(!isTotal()){
-			messageInfo.addMessage(message.getMessageId(), saveTime, System.currentTimeMillis());
-		}
+		messageInfo.addMessage(message.getMessageId(), saveTime, System.currentTimeMillis());
 		
 	}
 	
@@ -125,9 +123,7 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 		
 		try{
 			MessageInfo messageInfo = MapUtil.getOrCreate(ackMessages, consumerIp, MessageInfo.class);
-			if(!isTotal()){
-				messageInfo.addMessage(messageId, sendTime, System.currentTimeMillis());
-			}
+			messageInfo.addMessage(messageId, sendTime, System.currentTimeMillis());
 			
 		}finally{
 			messageSendTimes.remove(messageId);

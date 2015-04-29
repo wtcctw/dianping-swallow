@@ -1,5 +1,5 @@
 
-function renderGraph(topic, url, divName,  http){
+function renderGraph(url, divName,  http){
 		http({
 			method : 'POST',
 			url : window.contextpath + url
@@ -19,14 +19,14 @@ function renderGraph(topic, url, divName,  http){
 				            },
 				            subtitle: {
 				                text: item.subTitle,
-				                x: -20
+				                x: 0
 				            },
 				            xAxis: {
 				                type: 'datetime'
 				            },
 				            yAxis: {
 				                title: {
-				                    text: 'QPS'
+				                    text: item.yAxisTitle
 				                },
 				                plotLines: [{
 				                    value: 0,
@@ -55,7 +55,7 @@ function renderGraph(topic, url, divName,  http){
 				});
 		}).error(function(data, status, headers, config) {
 			
-			alert("响应错误", data);
+			alert("响应错误" + data);
 //			app.appError("响应错误", data);
 		});	
 }
@@ -63,15 +63,15 @@ function renderGraph(topic, url, divName,  http){
 module.controller('ProducerServerQpsController', function($scope, $http) {
 
 	$scope.getProducerServerQps = function(){
-		renderGraph(topicName, "/console/monitor/producerserver/qps/get", "container", $http);
+		renderGraph("/console/monitor/producerserver/qps/get", "container", $http);
 	};
 
 });
 
 module.controller('ConsumerServerQpsController', function($scope, $http) {
 	
-	$scope.getProducerServerQps = function(){
-		renderGraph(topicName, "/console/monitor/consumerserver/qps/get", "container", $http);
+	$scope.getConsumerServerQps = function(){
+		renderGraph("/console/monitor/consumerserver/qps/get", "container", $http);
 	};
 });
 
@@ -94,7 +94,7 @@ module.controller('ConsumerQpsController', function($scope, $http) {
 
 	
 	$scope.getConsumerQps = function(topicName){
-		renderGraph(topicName, "/console/monitor/consumer/"+topicName+"/qps/get", "container", $http);
+		renderGraph("/console/monitor/consumer/"+topicName+"/qps/get", "container", $http);
 	};
 });
 
@@ -118,6 +118,6 @@ module.controller('ConsumerDelayController', function($scope, $http) {
 	});
 
 	$scope.getDelay = function(topicName) {
-		renderGraph(topicName, '/console/monitor/consumer/' + topicName + '/delay/get', "container", $http);
+		renderGraph('/console/monitor/consumer/' + topicName + '/delay/get', "container", $http);
 	};
 });

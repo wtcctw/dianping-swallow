@@ -52,8 +52,8 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 		for(String serverIp : ips){
 			NavigableMap<Long, MonitorData> data = getData(MonitorData.TOTAL_KEY, start, end, serverIp);
 			visit(visitor, data);
-			List<Long> qpsData = visitor.buildSaveDelay(intervalTimeSeconds);
-			StatsDataDesc info = new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, StatsDataType.SAVE_DELAY);
+			List<Long> qpsData = visitor.buildSaveQpx(intervalTimeSeconds, qpx);
+			StatsDataDesc info = new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, StatsDataType.SAVE_QPX);
 			result.put(serverIp, createStatsData(info, qpsData, start, end, data, intervalTimeSeconds, qpx));
 		}
 		return result;

@@ -1,5 +1,6 @@
 package com.dianping.swallow.common.server.monitor.data;
 
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
@@ -14,10 +15,13 @@ public class ConsumerTopicData extends TotalMap<ConsumerIdData>{
 
 	public void sendMessage(String consumerId, String consumerIp, SwallowMessage message){
 		
-		if(!isTotal()){
-			ConsumerIdData consumerIdData = getConsumerIdData(consumerId);
-			consumerIdData.sendMessage(consumerIp, message);
-		}
+		ConsumerIdData consumerIdData = getConsumerIdData(consumerId);
+		consumerIdData.sendMessage(consumerIp, message);
+	}
+
+	public void removeConsumer(ConsumerInfo consumerInfo) {
+		
+		remove(consumerInfo.getConsumerId());
 	}
 
 	public void merge(ConsumerTopicData consumerTopicData) {
@@ -33,10 +37,8 @@ public class ConsumerTopicData extends TotalMap<ConsumerIdData>{
 
 	public void ackMessage(String consumerId, String consumerIp, SwallowMessage message) {
 		
-		if(!isTotal()){
-			ConsumerIdData consumerIdData = getConsumerIdData(consumerId);
-			consumerIdData.ackMessage(consumerIp, message);
-		}
+		ConsumerIdData consumerIdData = getConsumerIdData(consumerId);
+		consumerIdData.ackMessage(consumerIp, message);
 	}
 
 	private ConsumerIdData getConsumerIdData(String consumerId) {

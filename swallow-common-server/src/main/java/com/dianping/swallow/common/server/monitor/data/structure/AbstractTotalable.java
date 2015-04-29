@@ -1,6 +1,9 @@
 package com.dianping.swallow.common.server.monitor.data.structure;
 
+import org.springframework.data.annotation.Transient;
+
 import com.dianping.swallow.common.server.monitor.data.Totalable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mengwenchao
@@ -9,6 +12,8 @@ import com.dianping.swallow.common.server.monitor.data.Totalable;
  */
 public abstract class AbstractTotalable implements Totalable{
 	
+	@JsonIgnore
+	@Transient
 	private boolean isTotal = false;
 	
 	

@@ -15,10 +15,8 @@ public class ProducerData extends TotalMap<MessageInfo>{
 			
 	public void sendMessage(String producerIp, long messageId, long sendTime, long saveTime){
 		
-		if(!isTotal()){
-			MessageInfo messageInfo = MapUtil.getOrCreate(this, producerIp, MessageInfo.class);
-			messageInfo.addMessage(messageId, sendTime, saveTime);
-		}
+		MessageInfo messageInfo = MapUtil.getOrCreate(this, producerIp, MessageInfo.class);
+		messageInfo.addMessage(messageId, sendTime, saveTime);
 		
 	}
 	
