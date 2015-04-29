@@ -87,10 +87,10 @@ public class DataMonitorController extends AbstractMonitorController{
 	} 
 
 	@RequestMapping(value = "/console/monitor/producerserver/qps/get", method = RequestMethod.POST)
-	public List<HighChartsWrapper> viewProducerServerQps(@PathVariable String topic){
+	public List<HighChartsWrapper> getProducerServerQps(@PathVariable String topic){
 		
 		subSide = "producerserverqps";
-		return new ModelAndView("monitor/producerserverqps", createViewMap());
+		return null;
 	} 
 	
 
