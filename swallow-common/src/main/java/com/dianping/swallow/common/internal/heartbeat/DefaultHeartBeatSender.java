@@ -1,6 +1,5 @@
 package com.dianping.swallow.common.internal.heartbeat;
 
-import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,6 +30,10 @@ public class DefaultHeartBeatSender implements HeartBeatSender{
 	@Override
 	public void addChannel(Channel channel) {
 		
+		if(logger.isInfoEnabled()){
+			logger.info("[addChannel]" + channel);
+		}
+		
 		 ScheduledFuture<?> future = scheduled.scheduleAtFixedRate(new HeartBeatTask(channel), HEART_BEAT_INTERVAL, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
 		
 		channels.put(channel, future);
@@ -39,6 +42,10 @@ public class DefaultHeartBeatSender implements HeartBeatSender{
 
 	@Override
 	public void removeChannel(Channel channel) {
+
+		if(logger.isInfoEnabled()){
+			logger.info("[removeChannel]" + channel);
+		}
 
 		ScheduledFuture<?> future = channels.remove(channel);
 		if(future != null){
