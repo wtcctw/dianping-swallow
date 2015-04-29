@@ -19,7 +19,16 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 	
 	private   int  messageCount = 1000;
 	private	  int concurrentCount = 50;
-
+	
+	@Test
+	public void testMultiConsumer(){
+		
+		for(int i=0;i<100;i++){
+			Consumer consumer = addListener(topic, getConsumerId() + "-" + i, concurrentCount);
+		}
+		
+		sleep(1000*1000);
+	} 
 	
 	@Test
 	public void testBigMessage() throws SendFailedException, RemoteServiceInitFailedException{
@@ -27,8 +36,9 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
 		sendMessage(1, topic, 1024);
 		waitForListernToComplete(messageCount);
+
+		sleep(1000*1000);
 		Assert.assertEquals(1, getConsumerMessageCount(consumer));
-		
 	}
 	
 	

@@ -212,7 +212,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
         });
         
         c.start();
-        sleep(1000);
+        sleep(10);
         return c;
 	}
 

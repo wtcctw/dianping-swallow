@@ -1,5 +1,6 @@
 package com.dianping.swallow.common.internal.heartbeat;
 
+import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

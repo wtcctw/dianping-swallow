@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.processor.ConsumerProcessor;
-import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
 import com.dianping.swallow.consumer.internal.task.DefaultConsumerTask;
 import com.dianping.swallow.consumer.internal.task.TaskChecker;
@@ -31,7 +30,6 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     private final ConsumerImpl  			consumer;
     private ConsumerProcessor 				processor;
     private SwallowCatActionWrapper 		actionWrapper;
-    private String 							connectionDesc;
     private TaskChecker 					taskChecker;
     private ConsumerConnectionListener 		consumerConnectionListener;
 
@@ -49,12 +47,15 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
     	
     	consumerConnectionListener.onChannelConnected(e.getChannel());
-    	
+
+    	if(logger.isInfoEnabled()){
+    		logger.info("[channelConnected]" + e.getChannel());
+    	}
+
         PktConsumerMessage consumerMessage = new PktConsumerMessage(consumer.getConsumerId(),
                 consumer.getDest(), consumer.getConfig().getConsumerType(), consumer.getConfig().getThreadPoolSize(),
                 consumer.getConfig().getMessageFilter());
         consumerMessage.setMessageId(consumer.getConfig().getStartMessageId());
-        connectionDesc = IPUtil.getConnectionDesc(e);
         e.getChannel().write(consumerMessage);
     }
 
@@ -64,7 +65,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     	consumerConnectionListener.onChannelDisconnected(e.getChannel());
 
         if(logger.isInfoEnabled()){
-        	logger.info("Channel(remoteAddress=" + e.getChannel().getRemoteAddress() + ") disconnected");
+        	logger.info("[channelDisconnected]" + e.getChannel());
         }
     }
 
@@ -72,12 +73,12 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e) {
     	
         if (logger.isDebugEnabled()) {
-            logger.debug("MessageReceived from " + connectionDesc);
+            logger.debug("[messageReceived]" + e.getChannel());
         }
 
         //如果已经close，接收到消息时，不回复ack，而是关闭连接。
         if(consumer.isClosed()){
-            logger.info("Message receiced, but it was rejected because consumer was closed.");
+            logger.info("[messageReceived]Message receiced, but it was rejected because consumer was closed.");
             ctx.getChannel().close();
             return;
         }
@@ -88,7 +89,7 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
         Channel channel = e.getChannel();
-        logger.error("Error from channel(" + connectionDesc  + ")", e.getCause());
+        logger.error("[exceptionCaught]" + e.getChannel());
         channel.close();
     }
 }

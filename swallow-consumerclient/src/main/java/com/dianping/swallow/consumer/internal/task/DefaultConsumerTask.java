@@ -124,7 +124,7 @@ public class DefaultConsumerTask implements ConsumerTask{
             PktConsumerMessage consumermessage = new PktConsumerMessage(messageId, consumer.isClosed());
             event.getChannel().write(consumermessage);
         } catch (RuntimeException e) {
-            logger.warn("Write to server error.", e);
+            logger.warn("[sendAck][Write to server error]" + connectionDesc, e);
         }
 	}
 	
