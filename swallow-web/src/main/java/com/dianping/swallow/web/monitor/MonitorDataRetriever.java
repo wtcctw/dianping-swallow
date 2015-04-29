@@ -1,10 +1,8 @@
 package com.dianping.swallow.web.monitor;
 
-import java.util.Map;
 import java.util.Set;
 
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
 
 /**
  * @author mengwenchao
@@ -21,7 +19,4 @@ public interface MonitorDataRetriever {
 
 	Set<String>  getTopics();
 	
-	Map<String, StatsData> getServerQpx(QPX qpx, int intervalTimeSeconds, long start, long end);
-
-	Map<String, StatsData> getServerQpx(QPX qpx);
 }
