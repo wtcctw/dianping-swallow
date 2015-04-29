@@ -2,6 +2,7 @@ module.factory('Paginator', function(){
 	return function(fetchFunction, pageSize,  tname, messageId, startdt, stopdt){
 		var paginator = {
 				hasNextVar: false,
+				
 				fetch: function(page){
 					this.currentOffset = (page - 1) * pageSize;
 					this._load();
@@ -12,21 +13,12 @@ module.factory('Paginator', function(){
 						this._load();
 					}
 				},
-				formatres: function(items){
-					var str; 
-					try{  
-						str = JSON.stringify(JSON.parse(items), null, 2);
-					}catch(e){  
-						alert("异常的错误信息："+e.message);  
-					}
-				    alert(str);
-				},
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
 					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt,  function(data){
-						data = angular.fromJson(data);
 						items = data.topic;
+						//items = angular.fromJson(items); //反序列化
 						length = data.size;
 						self.totalpieces = length;
 						self.totalPage = Math.ceil(length/pageSize);
@@ -50,7 +42,9 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
-						for(var i=0;i<self.currentPageItems.length;i++){ 
+						self.currentPageItemsTicked = items.slice(0, pageSize);
+						for(var i=0;i<self.currentPageItems.length;i++){
+							self.currentPageItemsTicked[i].ticked = false;
 							self.currentPartialCon[i]= "点击展开";
 							} 
 						self.hasNextVar = items.length === pageSize + 1;
@@ -82,6 +76,7 @@ module.factory('Paginator', function(){
 				currentPageItems: [],
 				currentPartialCon: [],
 				currentParsedItems: [],
+				currentPageItemsTicked: [],
 				currentOffset: 0
 		};
 		
@@ -118,11 +113,32 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 				}).success(callback);
 			};
 			
+			$scope.isjsonstring = function(str) {
+			    try {
+			        JSON.parse(str);
+			    } catch (e) {
+			        return false;
+			    }
+			    return true;
+			};
+			$scope.formatres = function(items){
+				var str; 
+				if($scope.isjsonstring(items))
+					str = JSON.stringify(JSON.parse(items), null, 2);
+				else
+					str = items;
+			    //alert(str);
+				$scope.messagecontent = str;
+				$('#myModal2').modal('show');
+			},
+			
+			$scope.messagecontent = "";
+			
 			$scope.messageId = "";
 			$scope.tname         = "";
 			
 			$scope.suburl = "/console/message/messagedefault";
-			$scope.messagenum = 30;
+			
 			$scope.totalmessage = [];
 			$scope.lastpage = 0;
 			
@@ -154,10 +170,10 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 					$("#stoptime").attr("disabled","disabled");
 					$("#summittime").attr("disabled","disabled");
 					$("#searchmid").removeAttr("disabled");
-					
 				}
 			};
 			
+			//for show content when click on 
 			$scope.showornot = false;
 			$scope.showContent = function(index){
 				if(!$scope.showornot){
@@ -170,6 +186,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 				}
 			};
 			
+			//for query by time
 			$scope.queryByTime = function(){
 				$scope.startdt = $("#starttime").val();
 				$scope.stopdt = $("#stoptime").val();
@@ -185,28 +202,43 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 				}
 			};
 			
+			//for enter is pressed and search by ip or mid
 			$scope.myKeyup = function(e){
 	            var keycode = window.event?e.keyCode:e.which;
 	            if(keycode==13){
 	            	if($scope.tname.length == 0)
 	            		alert("请先输入Topic名称");  //query with mid but without topic name
-	            	$scope.searchPaginator = Paginator(fetchFunction, $scope.messagenum, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
+	            	$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
 	            }
 	        };
 	        
-
+	        //invoke when topic name is not empty and recordofperpage is changed
+	        $scope.makeChanged = function(){
+	        	if($scope.tname.length != 0){
+	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
+	        	}
+	        };
+	        
+	        //for change the number of per page
+	        $scope.numperpage = [
+	                        { id: 1, num: 30 },
+	                        { id: 2, num: 50 },
+	                        { id: 3, num: 70 },
+	                        { id: 4, num: 100 }
+	                      ];
+	        $scope.recordofperpage = $scope.numperpage[0].num;
+	        
 			// search topic name
 			$http({
 				method : 'GET',
 				url : window.contextPath + '/console/topic/namelist'
 			}).success(function(data, status, headers, config) {
-				data = angular.fromJson(data);
 				var topicNameList = data;
 				$("#topicname").typeahead({
 					source : topicNameList,
 					updater : function(c) {
 						$scope.tname = c;
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.messagenum, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);		
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);		
 						return c;
 					}
 				})
@@ -219,8 +251,52 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			if(tmpname != null){
 				$scope.tname = localStorage.getItem("name");
 				localStorage.clear();
-				$scope.searchPaginator = Paginator(fetchFunction, $scope.messagenum, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
 			}
+			
+	        //for deal with re transmit for selected messages
+	        $scope.retransmit = function(){
+	        	var needtotrans = [];
+	        	var tmp;
+	        	angular.forEach( $scope.searchPaginator.currentPageItemsTicked, function( value, key ) {
+	        		
+	        	    if ( value.ticked === true ) {
+	        	         value.ticked = false;
+	        	         tmp = value;
+	        	         delete tmp.ticked;
+	        	         needtotrans.push(tmp.mid);
+	        	    }
+	        	});
+	        	$scope.starttransmit(needtotrans);
+	        }
+	        
+	        
+	        $scope.starttransmit = function(data){
+	        		if(data.length == 0)
+	        			$scope.showselect = false;
+	        		else
+	        			$http.post(window.contextPath + '/console/message/sendmessage', {"param[]":JSON.stringify(data),"topic":$scope.tname}).success(function(response) {
+	        			  $scope.showselect = false;
+	        			  alert("消息发送成功")
+	        });
+	        
+	        }
+	        
+	        $scope.showselect = false;
+	        $scope.showmultiselect = function(){
+	        	if($scope.searchPaginator == null || $scope.searchPaginator.currentPageItemsTicked.length == 0)
+	        		alert("没有消息可供选择发送！");
+	        	else
+	        		$scope.showselect = true;
+	        }
+	        
+	        $scope.refreshpage = function(){
+	        	$( document ).ready(function() {
+	        		$scope.startdt = "";
+					$scope.stopdt = "";
+					$scope.messageId = "";
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+	        	});
+	        }
+	        
 }]);
-
-

@@ -60,9 +60,19 @@ public class DefaultWebSwallowMessageDAO  implements WebSwallowMessageDAO {
     }
  
     @Override
-    public WebSwallowMessage readById(BSONTimestamp id) {
-        Query query = new Query(Criteria.where(ID).is(id));
-        return this.mongoOps.findOne(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
+    public WebSwallowMessage readById(long mid) {
+    	DBCollection collection = this.mongoOps.getCollection(MESSAGE_COLLECTION);
+    	DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(mid)).get();
+        DBObject result = collection.findOne(query);
+        if (result != null) {
+            WebSwallowMessage swallowMessage = new WebSwallowMessage();
+            try {
+               convert(result, swallowMessage);
+               return swallowMessage;
+            } catch (RuntimeException e) {
+            }
+         }
+        return null;
     }
  
     @Override
