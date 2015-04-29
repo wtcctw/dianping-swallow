@@ -15,6 +15,10 @@
             http://www.springframework.org/schema/mvc
             http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
 	
+	<bean name="placeholder" lazy-init="false" class="com.dianping.lion.client.InitializeConfig">
+        <property name="propertiesPath" value="config/applicationContext.properties" />
+    </bean>
+	
 	<bean
         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
@@ -23,7 +27,24 @@
             </list>
         </property>
     </bean>
+    
+    
+    
+    <bean id="messageDAO"
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
+        <property name="mongoManager" >
+			<ref local="mongoManager"/>
+		</property>
+    </bean>
+
+    <bean id="mongoManager"
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
+        <constructor-arg>
+            <value>swallow.mongo.producerServerURI</value>
+        </constructor-arg>
+    </bean>
 	
+            
             
 	<import resource="applicationContext-utils.xml"/>
 	<import resource="applicationContext-mongo.xml"/>

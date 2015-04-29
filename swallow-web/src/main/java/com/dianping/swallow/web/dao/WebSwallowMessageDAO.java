@@ -4,8 +4,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.types.BSONTimestamp;
-
 import com.dianping.swallow.web.model.WebSwallowMessage;
 
 
@@ -35,7 +33,7 @@ public interface WebSwallowMessageDAO extends Dao{
 	 * @param id
 	 * @return
 	 */
-	WebSwallowMessage readById(BSONTimestamp id);
+	WebSwallowMessage readById(long id);
 
 	/**
 	 * @param p
