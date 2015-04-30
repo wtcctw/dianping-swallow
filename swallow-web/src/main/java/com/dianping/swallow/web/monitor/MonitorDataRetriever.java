@@ -11,15 +11,12 @@ import com.dianping.swallow.common.server.monitor.data.MonitorData;
  */
 public interface MonitorDataRetriever {
 
-	
 	void add(MonitorData monitorData);
 	
-	
 	int getKeepInMemoryHour();
-
 	
 	Set<String>  getTopics(long start, long end);
 
 	Set<String>  getTopics();
-
+	
 }

@@ -50,6 +50,19 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 	}
 
 	@Override
+	public void removeConsumer(ConsumerInfo consumerInfo) {
+		if(consumerInfo == null){
+			logger.warn("[remove][consumerInfo == null]");
+			return;
+		}
+		if(logger.isInfoEnabled()){
+			logger.info("[remove][remove consumerInfo]" );
+		}
+		consumerMonitorData.removeConsumer(consumerInfo);
+		
+	}
+
+	@Override
 	protected MonitorData getMonitorData() {
 		consumerMonitorData.buildTotal();
 		return consumerMonitorData;
@@ -59,5 +72,6 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 	protected String getServerType() {
 		return "consumer";
 	}
+
 	
 }

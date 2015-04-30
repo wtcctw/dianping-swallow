@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor;
 
 import java.util.List;
+import java.util.Map;
 
 import com.dianping.swallow.common.server.monitor.visitor.QPX;
 
@@ -11,21 +12,44 @@ import com.dianping.swallow.common.server.monitor.visitor.QPX;
  */
 public interface ConsumerDataRetriever extends MonitorDataRetriever{
 	
-	List<StatsData> getSendDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end);
+	List<ConsumerDataPair> getDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end);
 	
-	List<StatsData> getSendDelayForAllConsumerId(String topic);
+	List<ConsumerDataPair> getDelayForAllConsumerId(String topic);
 	
-	List<StatsData> getAckDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end);
+	
+	List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
+	
+	List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx);
+	
 
-	List<StatsData> getAckDelayForAllConsumerId(String topic);
+	Map<String, ConsumerDataPair> getServerQpx(QPX qpx, int intervalTimeSeconds, long start, long end);
+
+	Map<String, ConsumerDataPair> getServerQpx(QPX qpx);
+	
 
 	
-	List<StatsData> getSendQpxForAllConsumerId(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
 	
-	List<StatsData> getSendQpxForAllConsumerId(String topic, QPX qpx);
-
-	List<StatsData> getAckQpxForAllConsumerId(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
+	public static class ConsumerDataPair{
+		
+		private String consumerId;
+		private StatsData sendData;
+		private StatsData ackData;
+		
+		public ConsumerDataPair(String consumerId, StatsData sendData, StatsData ackData){
+			this.consumerId = consumerId;
+			this.sendData = sendData;
+			this.ackData = ackData;
+		}
+		public String getConsumerId() {
+			return consumerId;
+		}
+		public StatsData getSendData() {
+			return sendData;
+		}
+		public StatsData getAckData() {
+			return ackData;
+		}
+	}
 	
-	List<StatsData> getAckdQpxForAllConsumerId(String topic, QPX qpx);
 }
 

@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.monitor;
 
+import java.util.Map;
+
 import com.dianping.swallow.common.server.monitor.visitor.QPX;
 
 /**
@@ -23,5 +25,9 @@ public interface ProducerDataRetriever extends MonitorDataRetriever{
 	StatsData getQpx(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
 	
 	StatsData getQpx(String topic, QPX qpx);
+
+	Map<String, StatsData> getServerQpx(QPX qpx, int intervalTimeSeconds, long start, long end);
+
+	Map<String, StatsData> getServerQpx(QPX qpx);
 
 }

@@ -11,6 +11,7 @@ import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.TotalBuilder;
 import com.dianping.swallow.common.server.monitor.data.Totalable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 
@@ -135,13 +136,14 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 	}
 
 	
+	@JsonIgnore
 	private boolean isTotal = false;
 	
 	@Override
 	public void setTotal(){
 		isTotal = true;
 	}
-	
+
 	public boolean isTotal(){
 		return isTotal;
 	}

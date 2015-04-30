@@ -53,8 +53,7 @@ public abstract class AbstractMonitorVisitor implements MonitorTopicVisitor{
 			lastCount = info.getTotal();
 			
 			if(step >= intervalCount){
-				if(count != 0){
-					
+				if(count >= 0){
 					switch(qpx){
 						case SECOND:
 							result.add(count/realintervalTimeSeconds);

@@ -31,6 +31,8 @@ import com.dianping.swallow.common.server.monitor.visitor.impl.AbstractMonitorVi
 import com.dianping.swallow.common.server.monitor.visitor.impl.TopicCollector;
 import com.dianping.swallow.web.manager.impl.CacheManager;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
+import com.dianping.swallow.web.monitor.StatsData;
+import com.dianping.swallow.web.monitor.StatsDataDesc;
 
 /**
  * @author mengwenchao
@@ -45,7 +47,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	private final int DEFAULT_INTERVAL_IN_HOUR = 10;//一小时每个10秒采样
 
 	@Value("${swallow.web.monitor.keepinmemory}")
-	public int keepInMemoryHour = 2;//保存最后2小时
+	public int keepInMemoryHour = 1;//保存最后2小时
 	
 	public static int keepInMemoryCount;
 
@@ -54,6 +56,21 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 
 	private Map<String, SwallowServerData> serverMap = new ConcurrentHashMap<String, SwallowServerData>();
 	
+	protected Set<String> getServerIps(long start, long end) {
+		if(dataExistInMemory(start, end)){
+			return getServerIpsInMemory(start, end);
+		}
+		return getServerIpsInDb(start, end);
+	}
+
+	private Set<String> getServerIpsInDb(long start, long end) {
+		
+		return getServerIpsInDb(start, end);
+	}
+
+	private Set<String> getServerIpsInMemory(long start, long end) {
+		return serverMap.keySet();
+	}
 	
 	@PostConstruct
 	public void postAbstractMonitorDataStats(){
@@ -81,6 +98,12 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		
 		return AbstractMonitorVisitor.getRealIntervalTimeSeconds(intervalTimeSeconds);
 	}
+
+	protected StatsData createStatsData(StatsDataDesc info, List<Long> qpsData, long start, long end, NavigableMap<Long, MonitorData> data, int intervalTimeSeconds, QPX qpx) {
+		
+		return new StatsData(info, qpsData, getRealStartTime(data, start, end), getRealIntervalSeconds(intervalTimeSeconds, qpx));
+	}
+
 
 
 	/**
@@ -160,19 +183,32 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		}
 		
 	}
-	
-	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end) {
-		
+
+
+	/**
+	 * @param topic
+	 * @param start
+	 * @param end
+	 * @param serverIp null 表示所有ip
+	 * @return
+	 */
+	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end, String serverIp) {
+
 		NavigableMap<Long, MonitorData>  result;
 		
 		if(dataExistInMemory(start, end)){
-			result = getMemoryData(topic, start, end);
+			result = getMemoryData(topic, start, end, serverIp);
 		}else{
-			result = retrieveDbData(topic, start, end);
+			result = retrieveDbData(topic, start, end, serverIp);
 		}
 		//插值补齐 
 		insertLackedData(result);
 		return result;
+
+	}
+
+	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end) {
+		return getData(topic, start, end, null);
 	}
 
 	private void insertLackedData(NavigableMap<Long, MonitorData> result) {
@@ -203,19 +239,25 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	protected abstract MonitorData createMonitorData();
 
 	protected NavigableMap<Long, MonitorData> retrieveDbData(String topic,
-			long start, long end) {
+			long start, long end, String serverIp) {
 		
 		//wait to be implemented
-		return getMemoryData(topic, start, end);
+		return getMemoryData(topic, start, end, serverIp);
 	}
 
 
-	protected NavigableMap<Long, MonitorData> getMemoryData(String topic, long start, long end) {
+	protected NavigableMap<Long, MonitorData> getMemoryData(String topic, long start, long end, String serverIp) {
 		
 		SwallowServerData ret = createSwallowServerData();
 		
-		for(SwallowServerData swallowServerData : serverMap.values()){
-			ret.merge(swallowServerData, topic, start, end);
+		for(Entry<String, SwallowServerData> entry : serverMap.entrySet()){
+			
+			String ip = entry.getKey();
+			SwallowServerData swallowServerData = entry.getValue();
+			
+			if(serverIp == null || serverIp.equals(ip)){
+				ret.merge(swallowServerData, topic, start, end);
+			}
 		}
 		
 		return ret.getMonitorData();

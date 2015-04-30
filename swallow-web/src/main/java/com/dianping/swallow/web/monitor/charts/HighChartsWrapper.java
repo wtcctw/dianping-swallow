@@ -13,6 +13,10 @@ public class HighChartsWrapper {
 
 		private String subTitle;
 		
+		private String xAxisTitle = "时间";
+		
+		private String yAxisTitle = "QPS";
+		
 		private Series [] series;
 		
 		private PlotOption plotOption;
@@ -48,6 +52,28 @@ public class HighChartsWrapper {
 
 		public void setPlotOption(PlotOption plotOption) {
 			this.plotOption = plotOption;
+		}
+
+		public String getyAxisTitle() {
+			return yAxisTitle;
+		}
+
+		public void setyAxisTitle(String yAxisTitle) {
+			this.yAxisTitle = yAxisTitle;
+		}
+
+		/**
+		 * @return the xAxisTitle
+		 */
+		public String getxAxisTitle() {
+			return xAxisTitle;
+		}
+
+		/**
+		 * @param xAxisTitle the xAxisTitle to set
+		 */
+		public void setxAxisTitle(String xAxisTitle) {
+			this.xAxisTitle = xAxisTitle;
 		}
 
 		public static class Series{

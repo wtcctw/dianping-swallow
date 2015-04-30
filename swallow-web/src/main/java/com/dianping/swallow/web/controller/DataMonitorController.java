@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
-import com.dianping.swallow.web.monitor.impl.ConsumerStatsDataDesc;
 
 
 /**
@@ -34,16 +35,37 @@ import com.dianping.swallow.web.monitor.impl.ConsumerStatsDataDesc;
 public class DataMonitorController extends AbstractMonitorController{
 	
 	
+	public static final String Y_AXIS_TYPE_QPS = "QPS";
+	
+	public static final String Y_AXIS_TYPE_DELAY = "延时(毫秒)";
+
+	
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 	
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
+
+	@RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
+	public ModelAndView viewConsumerServerQps(){
+		
+		subSide = "consumerserverqps";
+		return new ModelAndView("monitor/consumerserverqps", createViewMap());
+	} 
+
+	@RequestMapping(value = "/console/monitor/producerserver/qps", method = RequestMethod.GET)
+	public ModelAndView viewProducerServerQps(){
+		
+		subSide = "producerserverqps";
+		return new ModelAndView("monitor/producerserverqps", createViewMap());
+	} 
+
 	
+
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
 	public ModelAndView viewTopicQps(@PathVariable String topic){
 		
-		subSide = "qps";
+		subSide = "consumerqps";
 		return new ModelAndView("monitor/consumerqps", createViewMap());
 	} 
 
@@ -64,17 +86,35 @@ public class DataMonitorController extends AbstractMonitorController{
 	}
 
 	
+	@RequestMapping(value = "/console/monitor/consumerserver/qps/get", method = RequestMethod.POST)
+	@ResponseBody
+	public List<HighChartsWrapper> getConsumerServerQps(){
+		
+		subSide = "consumerserverqps";
+		Map<String, ConsumerDataPair> serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND);
+		
+		return buildHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+	} 
 
-	@SuppressWarnings("unchecked")
+
+	@RequestMapping(value = "/console/monitor/producerserver/qps/get", method = RequestMethod.POST)
+	@ResponseBody
+	public List<HighChartsWrapper> getProducerServerQps(){
+		
+		subSide = "producerserverqps";
+		Map<String, StatsData> serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND);
+		
+		return buildConsumerChartWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+	} 
+	
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps/get", method = RequestMethod.POST)
 	@ResponseBody
 	public List<HighChartsWrapper> getTopicQps(@PathVariable String topic){
 		
 		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND);
-		List<StatsData> consumerSendData = consumerDataRetriever.getSendQpxForAllConsumerId(topic, QPX.SECOND);
-		List<StatsData> consumerAckData = consumerDataRetriever.getAckdQpxForAllConsumerId(topic, QPX.SECOND);
+		List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND);
 		
-		return buildConsumerChartWrapper(topic, producerData, consumerSendData, consumerAckData);
+		return buildConsumerChartWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData);
 	} 
 
 	
@@ -94,57 +134,65 @@ public class DataMonitorController extends AbstractMonitorController{
 	}
 
 
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get", method = RequestMethod.POST)
 	@ResponseBody
 	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable String topic) throws IOException{
 
 		StatsData 		 producerData = producerDataRetriever.getSaveDelay(topic); 
-		List<StatsData>  consumerSendDelay = consumerDataRetriever.getSendDelayForAllConsumerId(topic);
-		List<StatsData>  consumerAckDelay = consumerDataRetriever.getAckDelayForAllConsumerId(topic);
+		List<ConsumerDataPair>  consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic);
 		
-		return  buildConsumerChartWrapper(topic, producerData, consumerSendDelay, consumerAckDelay); 
+		return  buildConsumerChartWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay); 
 		
 	}
 
-	private List<HighChartsWrapper> buildConsumerChartWrapper(String topic, StatsData producerData, List<StatsData> ...consumerData) {
-		
-		int maxSize = -1;
-		List<StatsData> maxConsumerData = null;
-		for(List<StatsData> item : consumerData){
-			if(item.size() > maxSize){
-				maxSize = item.size();
-				maxConsumerData = item;
-			}
-		}
-		
-		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(maxSize);
-		
-		for(int i=0;i<maxConsumerData.size();i++){
+	private List<HighChartsWrapper> buildConsumerChartWrapper(String yAxis, Map<String, StatsData> serverQpx) {
+
+		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(serverQpx.size());
+		for(Entry<String, StatsData> entry : serverQpx.entrySet()){
 			
-			StatsData statsData = maxConsumerData.get(i);
-			ConsumerStatsDataDesc currentDesc = (ConsumerStatsDataDesc) statsData.getInfo();
-			String currentConsumerId = currentDesc.getConsumerId();
+			String ip = entry.getKey();
+			StatsData statsData = entry.getValue();
+			
+			result.add(ChartBuilder.getHighChart(ip, "", yAxis, statsData));
+
+		}
+
+		return result;
+	}
+	
+	private List<HighChartsWrapper> buildHighChartsWrapper(String yAxis, Map<String, ConsumerDataPair> serverQpx) {
+
+		int size = serverQpx.size();
+		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
+		
+		for(Entry<String, ConsumerDataPair> entry : serverQpx.entrySet()){
+			String ip = entry.getKey();
+			ConsumerDataPair dataPair = entry.getValue();
+			List<StatsData> allStats = new LinkedList<StatsData>();
+			allStats.add(dataPair.getSendData());
+			allStats.add(dataPair.getAckData());
+			result.add(ChartBuilder.getHighChart(ip, "", yAxis, allStats));
+		}
+			
+		return result;
+	}
+
+
+	private List<HighChartsWrapper> buildConsumerChartWrapper(String topic, String yAxis, StatsData producerData, List<ConsumerDataPair>consumerData) {
+		
+		int size = consumerData.size();
+		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
+		
+		for(int i=0; i<consumerData.size();i++){
+			
+			ConsumerDataPair dataPair = consumerData.get(i);
+			String currentConsumerId = dataPair.getConsumerId();
 			
 			List<StatsData> allStats = new LinkedList<StatsData>();
 			allStats.add(producerData);
-			allStats .add(statsData);
-			
-			for(int j=0; j < consumerData.length; j++){
-				List<StatsData> cmp = consumerData[j];
-				if(maxConsumerData == cmp){
-					continue;
-				}
-				for(int k=0;k<cmp.size();k++){
-					StatsData cmpStatsData = cmp.get(k);
-					ConsumerStatsDataDesc cmpDesc = (ConsumerStatsDataDesc) cmpStatsData.getInfo();
-					if(cmpDesc.getConsumerId().equals(currentConsumerId)){
-						allStats .add(cmpStatsData);
-						break;
-					}
-				}
-			}
-			result.add(ChartBuilder.getHighChart(topic, currentConsumerId, allStats));
+			allStats.add(dataPair.getSendData());
+			allStats.add(dataPair.getAckData());
+			result.add(ChartBuilder.getHighChart(topic, currentConsumerId, yAxis, allStats));
 		}
 		
 		return result;
