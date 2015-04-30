@@ -30,11 +30,13 @@ import org.apache.http.util.EntityUtils;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
+import com.dianping.swallow.common.server.monitor.MonitorActionWrapper;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 
 /**
@@ -52,6 +54,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	
 	public static final int SEND_INTERVAL = 5;
 	
+	protected SwallowActionWrapper actionWrapper = new MonitorActionWrapper();
 	
 	private ScheduledFuture<?> future; 
 	

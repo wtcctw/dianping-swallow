@@ -27,7 +27,6 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 	
 	
 	public static final String TOTAL_KEY = "total";
-	
 
 	@Transient
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
@@ -161,6 +160,9 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 
 		public void addMessage(long messageId, long startTime, long endTime) {
 			total.incrementAndGet();
+			if(endTime < startTime){
+				throw new TimeException("start > end", startTime, endTime);
+			}
 			totalDelay.addAndGet(endTime - startTime);
 		}
 

@@ -24,7 +24,7 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 
 	private static final long serialVersionUID = 1L;
 	
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 		
 	public TotalMap(){
 		super();

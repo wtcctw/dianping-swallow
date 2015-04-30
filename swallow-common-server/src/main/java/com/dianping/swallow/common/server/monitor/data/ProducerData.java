@@ -17,7 +17,6 @@ public class ProducerData extends TotalMap<MessageInfo>{
 		
 		MessageInfo messageInfo = MapUtil.getOrCreate(this, producerIp, MessageInfo.class);
 		messageInfo.addMessage(messageId, sendTime, saveTime);
-		
 	}
 	
 	@Override

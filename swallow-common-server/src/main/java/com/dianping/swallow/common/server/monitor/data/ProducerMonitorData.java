@@ -55,20 +55,21 @@ public class ProducerMonitorData extends MonitorData {
 	}
 	
 
-	public void addData(String topic, String producerIp, long messageId, long sendTime, long saveTime){
+	public void addData(final String topic, final String producerIp, final long messageId, final long sendTime, final long saveTime){
 
-		if(topic == null){
-			logger.error("[addData][topic null]");
-			topic = "";
-		}
-		
-		if(producerIp == null){
-			logger.error("[addData][producerIp null]");
-			producerIp = "";
-		}
-		
-		ProducerData ProducerData = MapUtil.getOrCreate(all, topic, ProducerData.class);
-		ProducerData.sendMessage(producerIp, messageId, sendTime, saveTime);
+			String realTopic = topic;
+			if(realTopic == null){
+				logger.error("[addData][topic null]");
+				realTopic = "";
+			}
+			
+			String realProducerIp = producerIp;
+			if(realProducerIp == null){
+				logger.error("[addData][producerIp null]");
+				realProducerIp = "";
+			}
+			ProducerData ProducerData = MapUtil.getOrCreate(all, realTopic, ProducerData.class);
+			ProducerData.sendMessage(realProducerIp, messageId, sendTime, saveTime);
 		
 	}
 
