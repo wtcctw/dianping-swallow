@@ -119,7 +119,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 			}
 			return;
 		}
-		future = scheduled.scheduleAtFixedRate(this, SEND_INTERVAL, SEND_INTERVAL, TimeUnit.SECONDS);
+		future = scheduled.scheduleWithFixedDelay(this, SEND_INTERVAL, SEND_INTERVAL, TimeUnit.SECONDS);
 	}
 	
 	protected boolean isExclude(String topic) {

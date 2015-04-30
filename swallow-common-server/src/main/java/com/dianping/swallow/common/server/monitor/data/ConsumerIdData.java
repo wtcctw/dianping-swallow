@@ -16,6 +16,7 @@ import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.MonitorData.MessageInfo;
 import com.dianping.swallow.common.server.monitor.data.structure.AbstractTotalable;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfoTotalMap;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mengwenchao
@@ -31,6 +32,7 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 	private MessageInfoTotalMap  ackMessages  = new MessageInfoTotalMap();
 	
 	@Transient
+	@JsonIgnore
 	private Map<Long, Long>  messageSendTimes = new ConcurrentHashMap<Long, Long>();
 	
 	public ConsumerIdData(){
@@ -38,11 +40,13 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 	}
 	
 	@Transient
+	@JsonIgnore
 	public MessageInfo getTotalSendMessages(){
 		return sendMessages.getTotal();
 	}
 
 	@Transient
+	@JsonIgnore
 	public MessageInfo getTotalAckMessages(){
 		return ackMessages.getTotal();
 			
