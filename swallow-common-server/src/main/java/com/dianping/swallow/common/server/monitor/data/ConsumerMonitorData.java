@@ -54,19 +54,15 @@ public class ConsumerMonitorData extends MonitorData{
 		return MapUtil.getOrCreate(all, topic, ConsumerTopicData.class);
 	}
 	
-	public void addSendData(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message){
+	public void addSendData(final ConsumerInfo consumerInfo, final String consumerIp, final SwallowMessage message){
 		
-		if(consumerIp == null){
-			logger.error("[addSendData][consumer ip null]" + consumerIp);
-			consumerIp = "";
-		}
 		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
 		consumerTopicData.sendMessage(consumerInfo.getConsumerId(), consumerIp, message);
 						
 	}
 
-	public void addAckData(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message){
-		
+	public void addAckData(final ConsumerInfo consumerInfo, final String consumerIp, final SwallowMessage message){
+
 		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
 		consumerTopicData.ackMessage(consumerInfo.getConsumerId(), consumerIp, message);
 	}

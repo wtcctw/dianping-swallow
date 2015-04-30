@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.server.monitor.collector;
 
 
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData;
@@ -15,13 +16,17 @@ public class DefaultProducerCollector extends AbstractCollector implements Produ
 	private ProducerMonitorData producerMonitorData = new ProducerMonitorData(IPUtil.getFirstNoLoopbackIP4Address());
 	
 	@Override
-	public void addMessage(String topic, String producerIp, long messageId, long sendTime,
-			long saveTime) {
-		try{
-			producerMonitorData.addData(topic, producerIp, messageId, sendTime, saveTime);
-		}catch(Exception e){
-			logger.error("[addMessage]" + topic + "," + messageId, e);
-		}
+	public void addMessage(final String topic, final String producerIp, final long messageId, final long sendTime,
+			final long saveTime) {
+		
+		actionWrapper.doAction(new AbstractMonitorDataAction(topic, producerIp, messageId) {
+			
+			@Override
+			public void doAction() throws SwallowException {
+				
+				producerMonitorData.addData(topic, producerIp, messageId, sendTime, saveTime);
+			}
+		});
 	}
 
 	@Override
@@ -35,7 +40,4 @@ public class DefaultProducerCollector extends AbstractCollector implements Produ
 		
 		return "producer";
 	}
-	
-	
-
 }
