@@ -158,8 +158,12 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 				continue;
 			}
 			SwallowMessage message = (SwallowMessage) o;
-			offer(message);
-			increaseMessageCount();
+			boolean result = offer(message);
+			if(result){
+				increaseMessageCount();
+			}else{
+				logger.warn("[putMessage][fail]");
+			}
 			if (logger.isDebugEnabled()) {
 				logger.debug("Add message to (topic=" + consumerInfo.getDest().getName() + ",cid=" + consumerInfo.getConsumerId() + ") queue:" + message.toString());
 			}
