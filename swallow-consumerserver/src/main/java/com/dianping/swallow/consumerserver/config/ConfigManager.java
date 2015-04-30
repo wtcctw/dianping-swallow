@@ -45,7 +45,7 @@ public final class ConfigManager extends AbstractConfig{
    
    private final long                 waitSlaveShutDown               = 4000L;
    private final int                  heartbeatCheckInterval          = 2000;
-   private final int                  heartbeatMaxStopTime            = 6000;
+   private final int                  heartbeatMaxStopTime            = 10000;
    private final int                  heartbeatUpdateInterval         = 2000;
 
 
