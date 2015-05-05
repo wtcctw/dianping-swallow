@@ -309,8 +309,10 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		public Set<String> getTopics() {
 			
 			TopicCollector topicCollector = new TopicCollector();
-			for(MonitorData monitorData : datas.values()){
-				monitorData.accept(topicCollector);
+			synchronized (datas) {
+				for(MonitorData monitorData : datas.values()){
+					monitorData.accept(topicCollector);
+				}
 			}
 			return topicCollector.getTopics();
 		}
