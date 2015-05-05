@@ -25,7 +25,7 @@ public class TimeException extends MonitorException{
 	public String getMessage() {
 		
 		return "["+ super.getMessage()+"]" + "startTime:" + DateUtils.toPrettyFormat(startTime) +  
-				"endTime:"  + DateUtils.toPrettyFormat(endTime);
+				",endTime:"  + DateUtils.toPrettyFormat(endTime);
 	}
 
 }
