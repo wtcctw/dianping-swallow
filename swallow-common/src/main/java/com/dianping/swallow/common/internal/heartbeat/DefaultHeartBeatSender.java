@@ -26,18 +26,22 @@ public class DefaultHeartBeatSender implements HeartBeatSender{
 	
 	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.getCpuCount());
 	
-	
 	@Override
 	public void addChannel(Channel channel) {
-		
+
 		if(logger.isInfoEnabled()){
 			logger.info("[addChannel]" + channel);
 		}
 		
-		 ScheduledFuture<?> future = scheduled.scheduleAtFixedRate(new HeartBeatTask(channel), HEART_BEAT_INTERVAL, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
+		ScheduledFuture<?> future = doSchedule(scheduled, new HeartBeatTask(channel));
 		
 		channels.put(channel, future);
 		
+	}
+
+	protected ScheduledFuture<?> doSchedule(ScheduledExecutorService scheduled, Runnable task) {
+		
+		 return scheduled.scheduleAtFixedRate(task , HEART_BEAT_INTERVAL, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
 	}
 
 	@Override

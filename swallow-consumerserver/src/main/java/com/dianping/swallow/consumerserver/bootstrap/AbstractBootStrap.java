@@ -164,7 +164,6 @@ public abstract class AbstractBootStrap {
 	}
 
 	protected void createContext() {
-	     @SuppressWarnings("resource")
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(
 		            new String[] { "applicationContext-consumerserver.xml" });
 	      consumerWorkerManager = ctx.getBean(ConsumerWorkerManager.class);

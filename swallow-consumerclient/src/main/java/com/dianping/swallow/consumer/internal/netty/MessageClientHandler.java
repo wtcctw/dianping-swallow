@@ -59,15 +59,6 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
         e.getChannel().write(consumerMessage);
     }
 
-    @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-	    super.channelDisconnected(ctx, e);
-    	consumerConnectionListener.onChannelDisconnected(e.getChannel());
-
-        if(logger.isInfoEnabled()){
-        	logger.info("[channelDisconnected]" + e.getChannel());
-        }
-    }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e) {
@@ -89,7 +80,25 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
         Channel channel = e.getChannel();
-        logger.error("[exceptionCaught]" + e.getChannel());
+        logger.error("[exceptionCaught]" + e.getChannel(), e.getCause());
         channel.close();
     }
+
+    @Override
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+	    super.channelDisconnected(ctx, e);
+        if(logger.isInfoEnabled()){
+        	logger.info("[channelDisconnected]" + e.getChannel());
+        }
+    }
+
+    public void channelClosed(
+            ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+    	super.channelClosed(ctx, e);
+        if(logger.isInfoEnabled()){
+        	logger.info("[channelClosed]" + e.getChannel());
+        }
+    	consumerConnectionListener.onChannelDisconnected(e.getChannel());
+    }
+    
 }

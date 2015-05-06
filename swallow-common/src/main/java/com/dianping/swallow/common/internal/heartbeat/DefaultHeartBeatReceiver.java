@@ -10,6 +10,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * 
  *         2015年3月31日 下午11:22:11
  */
-public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable {
+public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable, ChannelFutureListener {
 
 	private Map<Channel, Deque<HeartBeat>> heartBeats = new ConcurrentHashMap<Channel, Deque<HeartBeat>>();
 
@@ -43,6 +45,8 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable {
 		if(logger.isDebugEnabled()){
 			logger.debug("[beat]" + channel);
 		}
+		
+		channel.getCloseFuture().addListener(this);
 		
 		Deque<HeartBeat> beats = heartBeats.get(channel);
 		
@@ -92,5 +96,13 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable {
 	public void remove(Channel channel) {
 		
 		heartBeats.remove(channel);
+	}
+
+	@Override
+	public void operationComplete(ChannelFuture future) throws Exception {
+		if(logger.isInfoEnabled()){
+			logger.info("[operationComplete][channel close, remove channel]" + future.getChannel());
+		}
+		remove(future.getChannel());
 	}
 }

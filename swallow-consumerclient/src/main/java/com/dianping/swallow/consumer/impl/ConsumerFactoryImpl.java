@@ -32,7 +32,8 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
    private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
    private HeartBeatSender heartBeatSender = new DefaultHeartBeatSender();
    
-   static{
+	
+	static{
 	   SwallowHelper.initialize();
    }
    
@@ -116,4 +117,9 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
       }
       topicName2Address.put(topicName, tempAddress);
    }
+
+   public void setHeartBeatSender(HeartBeatSender heartBeatSender) {
+		this.heartBeatSender = heartBeatSender;
+   }
+
 }
