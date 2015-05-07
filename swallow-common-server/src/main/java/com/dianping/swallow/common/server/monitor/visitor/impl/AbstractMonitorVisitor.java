@@ -39,21 +39,24 @@ public abstract class AbstractMonitorVisitor implements MonitorTopicVisitor{
 		int intervalCount = getRealIntervalCount(intervalTimeSeconds, qpx);
 		int realintervalTimeSeconds = getRealIntervalTimeSeconds(intervalTimeSeconds, qpx);
 		double realIntervalTimeMinutes = (double)realintervalTimeSeconds/60;
-		
 		List<Long> result = new LinkedList<Long>();
-		
 		int step = 0;
 		long count = 0, lastCount = 0;
 		
 		for(MessageInfo info : rawData){
 			
 			if(step != 0){
-				count += info.getTotal() - lastCount;
+				if(info.getTotal() >0 && lastCount > 0){
+					
+					count += info.getTotal() - lastCount;
+				}
 			}
 			lastCount = info.getTotal();
 			
 			if(step >= intervalCount){
+				
 				if(count >= 0){
+					
 					switch(qpx){
 						case SECOND:
 							result.add(count/realintervalTimeSeconds);
@@ -91,8 +94,11 @@ public abstract class AbstractMonitorVisitor implements MonitorTopicVisitor{
 			
 			if(step != 0){
 				
-				count += info.getTotal() - lastCount;
-				delay += info.getTotalDelay() - lastDelay;
+				if(info.getTotal() >0 && lastCount > 0){//有效数据
+					
+					count += info.getTotal() - lastCount;
+					delay += info.getTotalDelay() - lastDelay;
+				}
 				
 			}
 			
