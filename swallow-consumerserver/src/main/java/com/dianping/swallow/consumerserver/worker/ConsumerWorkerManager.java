@@ -132,9 +132,9 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 			public void onTransition() {
 		        try {
 		            long waitAckTimeWhenCloseSwc = ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc();
-		            logger.info("Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
+		            logger.info("[onTransition]Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
 		            Thread.sleep(waitAckTimeWhenCloseSwc);
-		            logger.info("Sleep done.");
+		            logger.info("[onTransition]Sleep done.");
 		        } catch (InterruptedException e) {
 		            logger.error("Close Swc thread InterruptedException", e);
 		        }
@@ -298,10 +298,16 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 			
 			@Override
 			protected void doRun() {
+				if(logger.isInfoEnabled()){
+					logger.info("[doRun][start]");
+				}
                 for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
                     ConsumerWorker worker = entry.getValue();
                     worker.recordAck();
                 }
+				if(logger.isInfoEnabled()){
+					logger.info("[doRun][end]");
+				}
 			}
         }, "AckIdUpdaterThread-");
 	}

@@ -24,12 +24,7 @@ public final class ConfigManager {
    private long                 checkConnectedChannelInterval   = 10000L;
    private long                 retryIntervalWhenMongoException = 20L;
    private int                  retryTimesWhenMongoException 	= 50;
-   private long                 waitAckTimeWhenCloseSwc         = 15000L;
-   private long                 waitSlaveShutDown               = 15000L;
    private long                 closeChannelMaxWaitingTime      = 10000L;
-   private int                  heartbeatCheckInterval          = 2000;
-   private int                  heartbeatMaxStopTime            = 10000;
-   private int                  heartbeatUpdateInterval         = 2000;
    private int                  maxClientThreadCount            = 100;
    private int                  masterPort                      = 8081;
    private int                  slavePort                       = 8082;
@@ -53,6 +48,12 @@ public final class ConfigManager {
    private int 					minRetrieveInterval 			= 100;
    private int					backupMinRetrieveInterval		= 10000;
 
+   private final long                 waitAckTimeWhenCloseSwc         = 2000;
+   private final int                  heartbeatCheckInterval          = 2000;
+   private final int                  heartbeatMaxStopTime            = 10000;
+   private final int                  heartbeatUpdateInterval         = 2000;
+   private final long                 waitSlaveShutDown               = waitAckTimeWhenCloseSwc + 2*heartbeatCheckInterval;
+   
    public int getPullFailDelayBase() {
       return pullFailDelayBase;
    }
@@ -221,16 +222,8 @@ public final class ConfigManager {
 		return minRetrieveInterval;
 	}
 
-	public void setMinRetrieveInterval(int minRetrieveInterval) {
-		this.minRetrieveInterval = minRetrieveInterval;
-	}
-
 	public int getBackupMinRetrieveInterval() {
 		return backupMinRetrieveInterval;
-	}
-
-	public void setBackupMinRetrieveInterval(int backupMinRetrieveInterval) {
-		this.backupMinRetrieveInterval = backupMinRetrieveInterval;
 	}
 
 	public int getMessageSendNoneInterval() {

@@ -25,6 +25,8 @@ public class ConsumerRunner extends AbstractLoadTest{
     
     private static boolean differentConsumerId = false;
     
+    private String consumerIdPrefix = System.getProperty("consumerIdPrefix");
+    
     public static void main(String[] args) throws Exception {
     	
     	if(args.length >= 1){
@@ -92,8 +94,11 @@ public class ConsumerRunner extends AbstractLoadTest{
 
 	private String getConsumerId() {
 		
-		SimpleDateFormat format = new SimpleDateFormat("HH-mm-ss");
+		if(consumerIdPrefix != null){
+			return consumerIdPrefix;
+		}
 		
+		SimpleDateFormat format = new SimpleDateFormat("HH-mm-ss");
 		return "myid-" + format.format(new Date());
 	}
 

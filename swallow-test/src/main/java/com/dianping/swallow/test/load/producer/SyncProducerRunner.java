@@ -81,6 +81,7 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
                         producer.sendMessage(msg);
                     } catch (Exception e) {
                     	logger.error(e.getMessage() + ", msg:" + currentCount, e);
+                    	count.decrementAndGet();
                     }
                     sleep();
                 }

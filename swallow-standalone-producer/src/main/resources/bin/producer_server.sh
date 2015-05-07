@@ -88,9 +88,7 @@ echo "output: $STD_OUT"
 exec java $JAVA_OPTS $MAIN_CLASS > "$STD_OUT" 2>&1 &
 
 ###########  检查是否启动成功 ############
-SuccessLog="Producer service for client is ready"
-echo "Sleeping 8 sec for waiting process started ..."
-mysleep 8
+mysleep 5
 
 Pid=$(jps |grep $ProcessName |cut -d\  -f1)
 
