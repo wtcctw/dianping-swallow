@@ -28,7 +28,6 @@ import com.dianping.swallow.common.server.monitor.data.MonitorData;
 import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.common.server.monitor.visitor.Visitor;
 import com.dianping.swallow.common.server.monitor.visitor.impl.AbstractMonitorVisitor;
-import com.dianping.swallow.common.server.monitor.visitor.impl.TopicCollector;
 import com.dianping.swallow.web.manager.impl.CacheManager;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
@@ -289,6 +288,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 			
 		}
 	
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public void merge(SwallowServerData swallowServerData, String topic, long start, long end) {
 
 			synchronized (swallowServerData.getMonitorData()) {
@@ -299,8 +299,11 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 					if(!shouldMerge(value.getCurrentTime(), start, end)){
 						continue;
 					}
-					@SuppressWarnings({ "unchecked", "rawtypes" })
-					MonitorData data = MapUtil.getOrCreate(datas, key, (Class)getMonitorDataClass());
+					
+					MonitorData data = null;
+					synchronized(datas){
+						 data = MapUtil.getOrCreate(datas, key, (Class)getMonitorDataClass());
+					}
 					data.merge(topic, value);
 				}
 			}
@@ -308,13 +311,13 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		
 		public Set<String> getTopics() {
 			
-			TopicCollector topicCollector = new TopicCollector();
+			Set<String> topics = new HashSet<String>();
 			synchronized (datas) {
 				for(MonitorData monitorData : datas.values()){
-					monitorData.accept(topicCollector);
+					topics.addAll(monitorData.getTopics());
 				}
 			}
-			return topicCollector.getTopics();
+			return topics;
 		}
 
 		private boolean shouldMerge(Long dataTime, long start, long end) {
