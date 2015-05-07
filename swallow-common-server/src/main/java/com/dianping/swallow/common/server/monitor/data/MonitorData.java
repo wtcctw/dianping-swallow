@@ -18,6 +18,7 @@ import com.dianping.swallow.common.server.monitor.visitor.Acceptable;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.Visitor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mengwenchao
@@ -191,7 +192,8 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		}
 	}
 	
-	
+
+	@JsonIgnore
 	public abstract Set<String> getTopics();
 	
 	@Override
