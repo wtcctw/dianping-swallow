@@ -1,5 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data;
 
+import java.util.Set;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
@@ -135,6 +137,11 @@ public class ConsumerMonitorData extends MonitorData{
 	public Object getTotal() {
 
 		return all.getTotal();
+	}
+
+	@Override
+	public Set<String> getTopics() {
+		return all.keySet();
 	}
 
 }

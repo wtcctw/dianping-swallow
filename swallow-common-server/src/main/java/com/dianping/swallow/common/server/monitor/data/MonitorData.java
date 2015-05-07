@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data;
 
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -190,6 +191,8 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		}
 	}
 	
+	
+	public abstract Set<String> getTopics();
 	
 	@Override
 	public void accept(Visitor visitor){
