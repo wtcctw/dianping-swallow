@@ -11,6 +11,7 @@ import org.jboss.netty.channel.Channel;
 
 import com.dianping.swallow.common.internal.packet.PacketType;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
+import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 
 /**
@@ -24,7 +25,7 @@ public class DefaultHeartBeatSender implements HeartBeatSender{
 
 	private ConcurrentHashMap<Channel, ScheduledFuture<?>>  channels = new ConcurrentHashMap<Channel, ScheduledFuture<?>>();
 	
-	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.getCpuCount());
+	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.getCpuCount(), new MQThreadFactory("HEART-BEAT-SENDER"));
 	
 	@Override
 	public void addChannel(Channel channel) {
