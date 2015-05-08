@@ -46,11 +46,10 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable, Ch
 			logger.debug("[beat]" + channel);
 		}
 		
-		channel.getCloseFuture().addListener(this);
-		
 		Deque<HeartBeat> beats = heartBeats.get(channel);
 		
 		if(beats == null){
+			channel.getCloseFuture().addListener(this);
 			beats = new LinkedList<HeartBeat>();
 			heartBeats.put(channel, beats);
 		}
