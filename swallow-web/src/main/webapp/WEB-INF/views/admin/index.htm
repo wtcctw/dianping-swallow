@@ -1,0 +1,80 @@
+  <div class="main-content main-content-local" style="opacity: 1.0;" ng-controller="AdministratorController">
+	<div class="breadcrumbs" id="breadcrumbs">
+<!-- 		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/swallow-admin.js"></script> -->
+		<script type="text/javascript">
+                try {
+                    ace.settings.check('breadcrumbs', 'fixed')
+                } catch (e) {
+                }
+            </script>
+
+		<a class="pull-right" href="#myModal"
+			ng-click="editadmin();"
+		ng-show="adminornot" data-toggle="modal"><i
+    class="icon-plus"></i> 编辑管理员名单</a>
+	</div>
+
+	<!-- page-content -->
+	<div class="page-content">
+		<!--page-header  -->
+		<div class="page-header">
+
+			<!--row  -->
+			<div class="row">
+				<table 
+					class="table table-bordered table-striped  table-condensed table-hover">
+					<tr>
+						<td style="text-align: left;width: 10%;">管理员</td>
+						<td style="text-align: left" readonly ng-bind="namelist"></td>
+				<!-- 		<td style="text-align: left"><a href="#myModal"
+							ng-click="setModalInput(t.name, t.prop, t.dept, t.time);"
+							data-toggle="modal" class="edit-config-btn"><i
+								class="icon-edit" rel="tooltip" data-original-title="编辑配置值" ng-show="adminornot"></i></a></td> -->
+				</table>
+
+			</div> 
+			<!--end row  -->
+		</div>
+
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">编辑管理员名单</h4>
+					</div>
+					<div class="modal-body">
+						<form method="post" class="form-horizontal" name="myForm" ng-submit="refreshpage(myForm)">
+							<div class="control-group">
+								<label class="control-label">管理员</label>
+								<div class="controls">
+									<input type="text" name="name" class="input-xlarge"
+										ng-model="namelist" style="width:500px">
+								</div>
+							</div>
+
+							<div class="control-group" style="margin-top: 40px">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+									<button type="submit" class="btn btn-success">提交更改</button>
+								</div>
+							</div>
+
+						</form>
+					</div>
+
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+
+		<!--end page-header  -->
+	</div>
+	<!-- end page-content -->
+</div>

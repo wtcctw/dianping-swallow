@@ -31,10 +31,10 @@ import com.mongodb.WriteResult;
  */
 public class DefaultWebSwallowMessageDAO  implements WebSwallowMessageDAO {
  
-	private MongoOperations mongoOps;
+	private 			 MongoOperations 		mongoOps;
 	//集合名字
     private static final String 				MESSAGE_COLLECTION                 = "c";
-    private static final String 				TIMEFORMAT                         = "yyyy-MM-dd HH:mm";
+    private static final String 				TIMEFORMAT                         = "yyyy-MM-dd HH:mm:ss";
     private static final String 				ID                                 = "_id";
     private static final String 				OID                                = "o_id";
     private static final String 				GT                                 = "gt";
@@ -44,7 +44,7 @@ public class DefaultWebSwallowMessageDAO  implements WebSwallowMessageDAO {
     private static final String 				V                                  = "v";
     private static final String 				C                                  = "c";
     private static final String 				P                                  = "p"; 
-    private static final String 				IP                                 = "ip";
+    private static final String 				IP                                 = "i_p";
     private static final String 				T                                  = "t";
     private static final String 				S                                  = "s";
     
@@ -93,7 +93,21 @@ public class DefaultWebSwallowMessageDAO  implements WebSwallowMessageDAO {
     	return this.mongoOps.count(query, MESSAGE_COLLECTION);
     }
 	
-  
+    @Override
+    public Map<String, Object> findByTopicname(int offset, int limit){
+    	List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	Query query = new Query();
+    	query.with(new Sort(new Sort.Order(Direction.DESC, ID)));  //降序
+    	query.skip(offset).limit(limit);
+        messageList = this.mongoOps.find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
+
+       	long size = this.count();
+    	map.put(SIZE, size);
+    	map.put(MESSAGE, messageList);
+        return map;
+    }
+    
     @Override
     public List<WebSwallowMessage> findSpecific(int offset, int limit, long mid){
     	Query query = new Query();
@@ -143,7 +157,7 @@ public class DefaultWebSwallowMessageDAO  implements WebSwallowMessageDAO {
 					.add("$lt", MongoUtils.longToBSONTimestamp(stoplong))
 					.get())
 				.get();
-        DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(1)).get();
+        DBObject orderBy = BasicDBObjectBuilder.start().add(ID, -1).get();
         DBCursor cursor = collection.find(query).skip(offset).sort(orderBy).limit(limit);
         DBCursor cursorall = collection.find(query);
         Long size =(long) cursorall.count();
@@ -169,15 +183,49 @@ public class DefaultWebSwallowMessageDAO  implements WebSwallowMessageDAO {
         return map;
     }
     
+    @Override
+    public Map<String, Object> findByTimeAndId(int offset, int limit, long mid, String startdt, String stopdt){
+    	List<WebSwallowMessage> list = new ArrayList<WebSwallowMessage>();
+    	Query query = new Query();
+    	if(mid == 0){
+    		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));  //降序
+    		query.skip(offset).limit(limit);
+    		list = this.mongoOps.find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
+    	}
+    	else{
+    		list = findSpecificWithId(offset, limit, mid);
+    	}
+    	SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
+    	Date datestart = null;
+		Date datestop = null;
+		try {
+			datestart = addEightHours(sdf.parse(startdt));
+			datestop = addEightHours(sdf.parse(stopdt));
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		Long startlong = MongoUtils.getLongByDate(datestart);
+		Long stoplong  = MongoUtils.getLongByDate(datestop);
+		for(int i = 0; i < list.size(); ++i){
+			if(!(mid > startlong && mid < stoplong))
+				list.remove(i);
+		}
+		Map<String, Object> map = new HashMap<String, Object>();
+		Long size =(long) list.size();
+    	map.put(SIZE, size);
+    	map.put(MESSAGE, list);
+        return map;
+
+    }
+    
     @SuppressWarnings({ "unchecked" })
     private void convert(DBObject result, WebSwallowMessage swallowMessage) {
        BSONTimestamp timestamp = (BSONTimestamp) result.get(ID);
        BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(OID);
-       if (originalTimestamp != null) {
-           swallowMessage.setId(originalTimestamp);
-        } else {
-           swallowMessage.setId(timestamp);
-        }
+       if (originalTimestamp != null)
+           swallowMessage.setO_id(originalTimestamp);  //modify origin code
+       swallowMessage.setId(timestamp);
 
        swallowMessage.setC((String)result.get(C));//content
        swallowMessage.setV((String) result.get(V));//version
@@ -185,12 +233,12 @@ public class DefaultWebSwallowMessageDAO  implements WebSwallowMessageDAO {
        Map<String, String> propertiesBasicDBObject = (Map<String, String>) result.get(P);//mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
        if (propertiesBasicDBObject != null) {
           HashMap<String, String> properties = new HashMap<String, String>(propertiesBasicDBObject);
-          swallowMessage.setP(properties);//properties
+          swallowMessage.setP(properties.toString());//properties
        }
        Map<String, String> internalPropertiesBasicDBObject = (Map<String, String>) result.get(IP);//mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
        if (internalPropertiesBasicDBObject != null) {
           HashMap<String, String> properties = new HashMap<String, String>(internalPropertiesBasicDBObject);
-          swallowMessage.setPin(properties);//properties
+          swallowMessage.setI_p(properties.toString());//properties
        }
        swallowMessage.setS((String) result.get(S));//sha1
        swallowMessage.setT((String) result.get(T));//type

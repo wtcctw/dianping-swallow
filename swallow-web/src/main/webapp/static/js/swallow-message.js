@@ -20,6 +20,7 @@ module.factory('Paginator', function(){
 						items = data.topic;
 						//items = angular.fromJson(items); //反序列化
 						length = data.size;
+						self.show = data.show || localStorage.getItem("isadmin");
 						self.totalpieces = length;
 						self.totalPage = Math.ceil(length/pageSize);
 						self.endPage = self.totalPage;
@@ -42,11 +43,9 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
-						self.currentPageItemsTicked = items.slice(0, pageSize);
 						for(var i=0;i<self.currentPageItems.length;i++){
-							self.currentPageItemsTicked[i].ticked = false;
 							self.currentPartialCon[i]= "点击展开";
-							} 
+						} 
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -72,11 +71,11 @@ module.factory('Paginator', function(){
 				currentPage: 1,
 				endPage: 1,
 				totalpieces: 0,
+				show : false,
 				
 				currentPageItems: [],
 				currentPartialCon: [],
 				currentParsedItems: [],
-				currentPageItemsTicked: [],
 				currentOffset: 0
 		};
 		
@@ -113,6 +112,8 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 				}).success(callback);
 			};
 			
+			//－－－－－－－－－－for show content which click on 点击展开－－－－－－－－－－－		
+			$scope.messagecontent = "";
 			$scope.isjsonstring = function(str) {
 			    try {
 			        JSON.parse(str);
@@ -121,7 +122,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			    }
 			    return true;
 			};
-			$scope.formatres = function(items){
+			$scope.formatres2 = function(items){
 				var str; 
 				if($scope.isjsonstring(items))
 					str = JSON.stringify(JSON.parse(items), null, 2);
@@ -132,53 +133,72 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 				$('#myModal2').modal('show');
 			},
 			
-			$scope.messagecontent = "";
+			$scope.formatres = function(mid){
+				var topic = $scope.tname;
+				$http.get(window.contextPath + "/console/message/content", {
+					params : {
+						topic:topic,
+						mid:mid
+					}
+				}).success(function(data){
+					$scope.formatres2(data.c);
+				});
+			},
+			//－－－－－－－－－－for show more options－－－－－－－－－－－
+			$scope.fullmessage    = "";
+	        $scope.showfullmessage = function(mid){
+				var topic = $scope.tname;
+				$http.get(window.contextPath + "/console/message/content", {
+					params : {
+						topic:topic,
+						mid:mid
+					}
+				}).success(function(data){
+					delete data.id;
+					$scope.formatres3(data);
+				});
+	        },
+	        
+			$scope.formatres3 = function(items){
+				var str; 
+				//if($scope.isjsonstring(items))
+					str = JSON.stringify(items,null, 3);
+				//else
+				//	str = items;
+			    //alert(str);
+				$scope.fullmessage = str;
+				$('#myModal3').modal('show');
+			},
 			
-			$scope.messageId = "";
-			$scope.tname         = "";
+			$scope.messageId      = "";
+			$scope.tname          = "";
 			
-			$scope.suburl = "/console/message/messagedefault";
+			$scope.suburl         = "/console/message/messagedefault";
 			
-			$scope.totalmessage = [];
-			$scope.lastpage = 0;
+			$scope.totalmessage   = [];
+			$scope.lastpage       = 0;
 			
 			//for time controll
-			$scope.startdt = "";
-			$scope.stopdt = "";
+			$scope.startdt        = "";
+			$scope.stopdt         = "";
 			
-			
-			$scope.checked = true;
-			$scope.showTimeInput = function(){
-				if($scope.checked){
-					$scope.checked = false;
-					$("#starttime").removeAttr("disabled");
-					$("#stoptime").removeAttr("disabled");
-					$("#summittime").removeAttr("disabled");
-					
-					$("#searchmid").val("");  //clear in page
-					$scope.messageId = "";
-					$("#searchmid").attr("disabled","disabled");
-				}
-				else{		
-					$scope.checked = true;
-					$("#starttime").val("");
-					$("#stoptime").val("");  //clear in page
-					$scope.startdt = "";
-					$scope.stopdt = "";  //make them empty
-					
-					$("#starttime").attr("disabled","disabled");
-					$("#stoptime").attr("disabled","disabled");
-					$("#summittime").attr("disabled","disabled");
-					$("#searchmid").removeAttr("disabled");
-				}
-			};
 			
 			//for show content when click on 
 			$scope.showornot = false;
 			$scope.showContent = function(index){
+				var mid = $scope.searchPaginator.currentPageItems[index].mid;
+				var topic = $scope.tname;
 				if(!$scope.showornot){
-					$scope.searchPaginator.currentPartialCon[index] = $scope.searchPaginator.currentPageItems[index];
-					$scope.showornot = true;
+					$http.get(window.contextPath + "/console/message/content", {
+						params : {
+							topic:topic,
+							mid:mid
+						}
+					}).success(function(data){
+						$scope.searchPaginator.currentPartialCon[index] = data.c;
+						$scope.showornot = true;
+					});
+
 				}
 				else{
 					$scope.searchPaginator.currentPartialCon[index] = "点击展开";
@@ -190,14 +210,21 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			$scope.queryByTime = function(){
 				$scope.startdt = $("#starttime").val();
 				$scope.stopdt = $("#stoptime").val();
+				var d1 = new Date($scope.startdt);
+				var d2 = new Date($scope.stopdt);
+				if(d1 > d2){
+					alert("开始时间不能小于结束时间!");
+					return;
+				}
+					
 				if($scope.startdt.length==0  || $scope.stopdt.length == 0)
 					alert("时间不能为空!")
 				else{
 					if($scope.tname.length == 0){
-						alert("Topic不能为空!")
+						//alert("Topic不能为空!")
 					}
 					else{
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.messagenum, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
 					}
 				}
 			};
@@ -206,9 +233,10 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			$scope.myKeyup = function(e){
 	            var keycode = window.event?e.keyCode:e.which;
 	            if(keycode==13){
-	            	if($scope.tname.length == 0)
+	            	if($scope.tname == null || $scope.tname.length == 0)
 	            		alert("请先输入Topic名称");  //query with mid but without topic name
-	            	$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
+	            	else
+	            		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
 	            }
 	        };
 	        
@@ -243,7 +271,6 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 					}
 				})
 			}).error(function(data, status, headers, config) {
-				alert("响应错误", data);
 			});
 			
 			//judge if redirected from topic view
@@ -255,48 +282,56 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			}
 			
 	        //for deal with re transmit for selected messages
+			$scope.selectall = function(){
+				$(".swallowcheckbox").prop('checked', $("#selectall").prop('checked'));
+				$("#selectnone").prop('checked', false);
+			};
+			
+			$scope.selectnone = function(){
+				$(".swallowcheckbox").prop('checked', false);
+				$("#selectall").prop('checked', false);
+			};
+			
 	        $scope.retransmit = function(){
 	        	var needtotrans = [];
-	        	var tmp;
-	        	angular.forEach( $scope.searchPaginator.currentPageItemsTicked, function( value, key ) {
-	        		
-	        	    if ( value.ticked === true ) {
-	        	         value.ticked = false;
-	        	         tmp = value;
-	        	         delete tmp.ticked;
-	        	         needtotrans.push(tmp.mid);
-	        	    }
-	        	});
+	        	var scb = $(".swallowcheckbox");
+	        	for(var i=0;i < scb.length;i++){
+	        		if(scb[i].checked)
+	        			needtotrans.push($scope.searchPaginator.currentPageItems[i].mid);
+	        	}
+	        	
 	        	$scope.starttransmit(needtotrans);
 	        }
 	        
 	        
 	        $scope.starttransmit = function(data){
 	        		if(data.length == 0)
-	        			$scope.showselect = false;
+	        			alert("请先勾选需要发送的消息！");
 	        		else
 	        			$http.post(window.contextPath + '/console/message/sendmessage', {"param[]":JSON.stringify(data),"topic":$scope.tname}).success(function(response) {
-	        			  $scope.showselect = false;
-	        			  alert("消息发送成功")
+	        			  $("#selectnone").prop('checked', false);
+	        			  $("#selectall").prop('checked', false);
+	        			  $(".swallowcheckbox").prop('checked', false);
+	        			  $scope.messageId = "";
+	        			  $scope.startdt = "";
+	        			  $scope.stopdt = "";
+	        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
 	        });
 	        
 	        }
-	        
-	        $scope.showselect = false;
-	        $scope.showmultiselect = function(){
-	        	if($scope.searchPaginator == null || $scope.searchPaginator.currentPageItemsTicked.length == 0)
-	        		alert("没有消息可供选择发送！");
-	        	else
-	        		$scope.showselect = true;
-	        }
-	        
-	        $scope.refreshpage = function(){
-	        	$( document ).ready(function() {
+	        // for retransmit self defined messages
+	        $scope.textarea = "";
+	        $scope.refreshpage = function(myForm){
+	        	$('#myModal').modal('hide');
+	        	$http.post(window.contextPath + '/console/message/sendgroupmessage', {"textarea":$scope.textarea,"name":$scope.tname}).success(function(response) {
 	        		$scope.startdt = "";
 					$scope.stopdt = "";
 					$scope.messageId = "";
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
 	        	});
 	        }
+	        
+			$("a[href='/console/message'] button").removeClass("btn-info");
+			$("a[href='/console/message'] button").addClass("btn-purple");
 	        
 }]);

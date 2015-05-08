@@ -2,8 +2,6 @@ package com.dianping.swallow.web.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
-
 import org.springframework.data.annotation.Id;
 import org.bson.types.BSONTimestamp;
 
@@ -19,15 +17,16 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 	// id will be used for storing MongoDB _id
 	@Id
    private  BSONTimestamp        			_id;
-   private  String        					o_id;
+   private  BSONTimestamp        			o_id;
    private  String      				  	c;
    private  String        					v;
    private  String      			  		s;
    private  Date        					gt;
-   private  Map<String, String>        		ip;
-   private  Map<String, String>				p;
+   private  String        					p;
+   private  String							i_p;
    private  String        					t;
    public   String        					si;  //SOURCE_IP
+   public   String          				mo_id; //message ID
    public   String          				mid; //message ID
    public   String     						gtstring;
    public   String     						ststring;
@@ -38,7 +37,7 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 	public WebSwallowMessage() {
 	}
 
-	public WebSwallowMessage(BSONTimestamp id, String oid, String c, String v, String s, Date gt, Map<String,String> p , Map<String, String> _p,
+	public WebSwallowMessage(BSONTimestamp id, BSONTimestamp oid, String c, String v, String s, Date gt, String p , String i_p,
 									String t, String si) {
 		this._id = id;
 		this.o_id = oid;
@@ -47,7 +46,7 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 		this.s = s;
 		this.gt = gt;
 		this.p = p;
-		this.ip = _p;
+		this.i_p = i_p;
 		this.t = t;
 		this.si = si;
 	}
@@ -60,11 +59,11 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 		this._id = id;
 	}
 
-	public String getOid() {
+	public BSONTimestamp getO_id() {
 		return o_id;
 	}
 
-	public void setOid(String oid) {
+	public void setO_id(BSONTimestamp oid) {
 		this.o_id = oid;
 	}
 	
@@ -75,6 +74,15 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 	public void setMid(BSONTimestamp ts) {
 		long tmp = MongoUtils.BSONTimestampToLong(ts);
 		this.mid = Long.toString(tmp);
+	}
+	
+	public String getMo_id() {
+		return mo_id;
+	}
+
+	public void setMo_id(BSONTimestamp ts) {
+		long tmp = MongoUtils.BSONTimestampToLong(ts);
+		this.mo_id = Long.toString(tmp);
 	}
 
 	public String getC() {
@@ -109,22 +117,22 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 		this.gt = gt;
 	}
 
-	public Map<String, String>  getP() {
+	public String  getP() {
 		return p;
 	}
-
-	public void setPin(Map<String, String> p) {
-		this.ip = p;
-	}
 	
-	public Map<String, String>  getPin() {
-		return ip;
+	public void setP(String p) {
+		this.p = p;
 	}
 
-	public void setP(Map<String, String> _p) {
-		this.p = _p;
+	public void setI_p(String ip) {
+		this.i_p = ip;
 	}
 	
+	public String  getI_p() {
+		return i_p;
+	}
+
 	public String  getT() {
 		return t;
 	}
@@ -174,7 +182,7 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 	
 	@Override
 	public String toString() {
-		return _id + "::" + o_id + "::" + c + "::" + v + "::" + s + "::" + gt + "::" + p + "::" + ip + "::" + t + "::" + si + "::" +  mid + "::" + gtstring + "::" +  ststring;
+		return _id + "::" + o_id + "::" + c + "::" + v + "::" + s + "::" + gt + "::" + p + "::" + i_p + "::" + t + "::" + si + "::" +  mid + "::" + gtstring + "::" +  ststring;
 	}
 
 }

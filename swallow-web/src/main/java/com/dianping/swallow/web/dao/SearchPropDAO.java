@@ -2,7 +2,7 @@ package com.dianping.swallow.web.dao;
 
 import java.util.List;
 
-import com.dianping.swallow.web.model.SearchProp;
+import com.dianping.swallow.web.model.SearchString;
 
 
 /**
@@ -12,12 +12,12 @@ import com.dianping.swallow.web.model.SearchProp;
  */
 public interface SearchPropDAO  {
 
-	public void create(SearchProp p);
+	public void create(SearchString p);
 
-    public SearchProp readByDept(String dept) ;
+    public SearchString readByDept(String dept) ;
 
 	public void dropCol();
 	
-	public List<SearchProp> findAll();
+	public List<SearchString> findAll();
 	
  }

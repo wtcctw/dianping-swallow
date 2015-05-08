@@ -36,7 +36,7 @@ public class DefaultTopicDAO implements TopicDAO {
      
     @Override
     public void create(Topic p) {
-        this.mongoOps.insert(p, TOPIC_COLLECTION);
+    	this.mongoOps.save(p, TOPIC_COLLECTION);
     }
  
     @Override

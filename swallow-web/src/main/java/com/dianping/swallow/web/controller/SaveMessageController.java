@@ -1,6 +1,10 @@
 package com.dianping.swallow.web.controller;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,22 +25,22 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
+@SuppressWarnings("unused")
 @Controller
 @Component
 public class SaveMessageController {
 	
-	private static final String                V                  ="0.7.1";
-	private static final String                IP                 ="127.0.0.1";
+	private static final String                			V                  			="0.7.1";
+	private static final String                			RETRANSMIT                  ="retransmit";
+	private static 		 MessageDAO 					mdi;
 	
-	private static MessageDAO mdi;
 	static{
 		@SuppressWarnings("resource")
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 		mdi = (MessageDAOImpl) ctx.getBean("messageDAO");
 	}
 	
-	private static final Logger logger = LoggerFactory
-			.getLogger(TopicController.class);
+	private static final Logger logger = LoggerFactory.getLogger(TopicController.class);
 	
 	@RequestMapping(value = "/console/message/sendmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
@@ -56,18 +60,18 @@ public class SaveMessageController {
 		else{
 			for(int i = 0; i < length; ++i){
 				if(i != 0 && i != length - 1){
-					System.out.println(param[i]);
-					long tmplong = Long.parseLong(param[i].trim().replace("\"", ""));
+					String tmp = param[i].trim().replace("\"", "");
+					long tmplong = Long.parseLong(tmp);
 					doGetAndSaveMessage(topicName, tmplong);
 				}
 				else if(i == 0){
-					System.out.println(param[i].substring(1));
-					long tmplong = Long.parseLong(param[i].substring(1).trim().replace("\"", ""));
+					String tmp = param[i].trim().replace("\"", "");
+					long tmplong = Long.parseLong(tmp.substring(1));
 					doGetAndSaveMessage(topicName, tmplong);
 				} 
 				else{
-					System.out.println(param[i].substring(0, param[i].length()-1));
-					long tmplong = Long.parseLong(param[i].substring(0, param[i].trim().length()-1).trim().replace("\"", ""));
+					String tmp = param[i].trim().replace("\"", "");
+					long tmplong = Long.parseLong(tmp.substring(0, tmp.length()-1));
 					doGetAndSaveMessage(topicName, tmplong);
 				}
 			}
@@ -79,8 +83,8 @@ public class SaveMessageController {
 	private boolean doGetAndSaveMessage(String topic, long mid){
 		SwallowMessage sm = new SwallowMessage();
 		sm = mdi.getMessage(topic, mid);
-		if(sm != null){
-			mdi.saveMessage(topic, sm);
+		if(sm != null){  //already exists
+			mdi.retransmitMessage(topic, sm);
 			return true;
 		}
 		else{
@@ -93,29 +97,27 @@ public class SaveMessageController {
 	
 	@RequestMapping(value = "/console/message/sendgroupmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public RedirectView sendGroupMessages(@RequestParam(value = "name") String topic,
+	public void sendGroupMessages(@RequestParam(value = "name") String topic,
 							@RequestParam("textarea") String text,HttpServletRequest request,
 							HttpServletResponse response) {
-		System.out.println(topic);
-		System.out.println(text);
 		String topicName = topic.trim();
 		String textarea  = text.trim();
 		if(textarea.isEmpty()){
 			if(logger.isInfoEnabled())
 				logger.info(topicName + " is not in whitelist!");
-			return new RedirectView(request.getContextPath() + "/console/message");
+			return;
 		}
 		String[] contents = textarea.split("\\n");
 		int pieces = contents.length;
 		if(pieces == 0){
 			if(logger.isInfoEnabled())
 				logger.info(text + " parses failed because of wrong delimitor, please use '\n' to enter line!");
-			return new RedirectView(request.getContextPath() + "/console/message");
+			return;
 		}
 		for(int i = 0; i < pieces; ++i){
 			saveNewMessage(topicName, contents[i]);
 		}
-		return new RedirectView(request.getContextPath() + "/console/message");
+		return;
 	}
 	
 	private void saveNewMessage(String topicName, String content){
@@ -128,6 +130,24 @@ public class SaveMessageController {
 		sm.setContent(c);
 		sm.setVersion(V);
 		sm.setGeneratedTime(new Date());
-		//sm.setInternalProperties();
+		InetAddress addr = null;
+		String ip = null;
+		try {
+			addr = InetAddress.getLocalHost();
+			ip = addr.getHostAddress().toString();//获得本机IP
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			ip = "127.0.0.1";
+			e.printStackTrace();
+		}
+		
+		sm.setSourceIp(ip);
+		if(sm.getInternalProperties() != null)
+			sm.getInternalProperties().put(RETRANSMIT, "true");
+		else{
+			Map<String,String> map = new HashMap<String, String>();
+			map.put(RETRANSMIT, "true");
+			sm.setInternalProperties(map);
+		}
 	}
 }

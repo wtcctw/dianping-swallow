@@ -8,18 +8,18 @@ import org.springframework.data.annotation.Id;
  *
  * 2015年4月22日 上午12:05:51
  */
-public class SearchProp {
+public class SearchString {
 	@Id
 	private String id;
 
-	private String dept;
+	private String admin;
 
-	public SearchProp() {
+	public SearchString() {
 	}
 
-	public SearchProp(String id, String dept) {
+	public SearchString(String id, String admin) {
 		this.id = id;
-		this.dept = dept;
+		this.admin = admin;
 	}
 
 	public String getId() {
@@ -31,15 +31,15 @@ public class SearchProp {
 	}
 
 	public String getDept() {
-		return dept;
+		return admin;
 	}
 
-	public void setDept(String dept) {
-		this.dept = dept;
+	public void setDept(String admin) {
+		this.admin = admin;
 	}
 
 	@Override
 	public String toString() {
-		return id + "::" + dept;
+		return id + "::" + admin;
 	}
 }

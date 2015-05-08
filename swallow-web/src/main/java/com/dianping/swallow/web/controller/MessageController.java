@@ -25,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.mongodb.MongoClient;
 import com.dianping.swallow.web.dao.MongoManager;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
+import com.dianping.swallow.web.dao.WebSwallowMessageDAO;
 import com.dianping.swallow.web.dao.impl.DefaultWebSwallowMessageDAO;
 import com.dianping.swallow.web.model.WebSwallowMessage;
 import com.dianping.swallow.common.internal.util.ZipUtil;
@@ -37,27 +38,38 @@ import com.dianping.swallow.common.internal.util.ZipUtil;
 @Controller
 public class MessageController extends AbstractController {
 
-	private static final String PRE_MSG = "msg#";
-	private static final String DEFAULT = "default";
-	private static final String SIZE = "size";
-	private static final String MESSAGE = "message";
-	private static final String TOPIC = "topic";
-	private static final String GZIP = "H4sIAAAAAAAAA";
-	private DefaultWebSwallowMessageDAO smdi;
-	private volatile List<String> dbNames = new ArrayList<String>();
+	private static final String 				PRE_MSG 						= "msg#";
+	private static final String 				DEFAULT 						= "default";
+	private static final String 				SIZE 							= "size";
+	private static final String 				SHOW 							= "show";
+	private static final String 				MESSAGE 						= "message";
+	private static final String 				TOPIC 							= "topic";
+	private static final String 				GZIP 							= "H4sIAAAAAAAAA";
+	private static final String 			    LOGINDELIMITOR				    = "\\|";
+	private WebSwallowMessageDAO 				smdi;
+	private volatile List<String> 				dbNames 						= new ArrayList<String>();
 
-	private Map<String, MongoClient> topicNameToMongoMap = new HashMap<String, MongoClient>();
-	private List<MongoClient> allReadMongo = new ArrayList<MongoClient>();
-	private MongoOperations readMongoOps;
-	private Long totalNumOfTopic = new Long(0);
+	private Map<String, MongoClient> 			topicNameToMongoMap 			= new HashMap<String, MongoClient>();
+	private List<MongoClient> 					allReadMongo 					= new ArrayList<MongoClient>();
+	private MongoOperations 					readMongoOps;
+	private Long 								totalNumOfTopic 				= new Long(0);
+	
+	private String                              username;                     
 	@SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory
-			.getLogger(MessageController.class);
+	private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
 	@RequestMapping(value = "/console/message")
 	public ModelAndView message(HttpServletRequest request,
 			HttpServletResponse response) {
+		String tmpusername = request.getRemoteUser();
+	    if (tmpusername == null) 
+	      username = "";
+	    else{
+	    	String[] userinfo = tmpusername.split(LOGINDELIMITOR);
+	    	username = userinfo[userinfo.length - 1];
+	    }
 		Map<String, Object> map = new HashMap<String, Object>();
+		request.getRemoteUser();
 		return new ModelAndView("message/index", map);
 	}
 
@@ -79,13 +91,9 @@ public class MessageController extends AbstractController {
 		int start = Integer.parseInt(offset);
 		int span = Integer.parseInt(limit); // get span+1 topics so that it can
 		Map<String, Object> map = new HashMap<String, Object>();
-		if ((tname + messageId).isEmpty()) {
-			map = getMessageFromFirstTopic(start, span);
-		} else {
-			if (!tname.isEmpty()) {
-				map = getMessageFromSpecificTopic(start, span, tname,
-						messageId, startdt, stopdt);
-			}
+		if (!tname.isEmpty()) {
+			map = getMessageFromSpecificTopic(start, span, tname,
+					messageId, startdt, stopdt);
 		}
 		return map;
 	}
@@ -94,7 +102,7 @@ public class MessageController extends AbstractController {
 			int span, String tname, String messageId, String startdt,
 			String stopdt) {
 		String dbn = PRE_MSG + tname;
-		long mid = 0;
+		long mid = -1;
 		if (!messageId.isEmpty()) { // messageId is not empty
 			if (isIP(messageId)) { // query based on IP
 				return getByIp(dbn, start, span, messageId);
@@ -128,13 +136,17 @@ public class MessageController extends AbstractController {
 		totalNumOfTopic = (Long) sizeAndMessage.get(SIZE);
 		messageList = (List<WebSwallowMessage>) sizeAndMessage.get(MESSAGE);
 		for (WebSwallowMessage m : messageList)
-			setSMessageProperty(m);
+			setSMessageProperty(m, false);
 		Map<String, Object> map = new HashMap<String, Object>();
+		if(TopicController.getTopicToWhiteList().get(subStr).contains(username))
+			map.put(SHOW, true);
+		else
+			map.put(SHOW, false);
 		map.put(SIZE, totalNumOfTopic);
 		map.put(TOPIC, messageList);
 		return map;
 	}
-
+	
 	// read use readMongoOps
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> getResults(String dbn, int start, int span,
@@ -144,50 +156,61 @@ public class MessageController extends AbstractController {
 				getMongoFromMap(subStr), dbn)); // write in writeMongo
 		smdi = new DefaultWebSwallowMessageDAO(readMongoOps);
 		List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
-		if (startdt == null || startdt.isEmpty()) {
+		if( mid < 0 && (startdt + stopdt).isEmpty()){  //just query by topicname
+			Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
+			sizeAndMessage = smdi.findByTopicname(start, span);
+			totalNumOfTopic = (Long) sizeAndMessage.get(SIZE);
+			messageList = (List<WebSwallowMessage>) sizeAndMessage.get(MESSAGE);
+		} else if (startdt == null || startdt.isEmpty()) {  //time is empty, query by mid
 			messageList = smdi.findSpecific(start, span, mid);
-			if (mid == 0) {
+			if (mid == 0) {  //parse error
 				totalNumOfTopic = smdi.count(); // set size
 			} else
 				totalNumOfTopic = (long) messageList.size();
-		} else {
+		} else if(mid < 0){  // messageId is empty, query by time
 			Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 			sizeAndMessage = smdi.findByTime(start, span, startdt, stopdt);
 			totalNumOfTopic = (Long) sizeAndMessage.get(SIZE);
 			messageList = (List<WebSwallowMessage>) sizeAndMessage.get(MESSAGE);
 		}
+		else{  // both are not empty, query by time and messageId 
+			Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
+			sizeAndMessage = smdi.findByTimeAndId(start, span, mid, startdt, stopdt);
+			totalNumOfTopic = (Long) sizeAndMessage.get(SIZE);
+			messageList = (List<WebSwallowMessage>) sizeAndMessage.get(MESSAGE);
+
+		}
 
 		for (WebSwallowMessage m : messageList)
-			setSMessageProperty(m);
+			setSMessageProperty(m, false);
 		Map<String, Object> map = new HashMap<String, Object>();
+		//update all the time, so get the latest one
+		if(TopicController.getTopicToWhiteList().get(subStr).contains(username))
+			map.put(SHOW, true);
+		else
+			map.put(SHOW, false);
 		map.put(SIZE, totalNumOfTopic);
 		map.put(TOPIC, messageList);
 		return map;
 	}
 
-	public Map<String, Object> getMessageFromFirstTopic(int start, int span)
-			throws UnknownHostException {
 
-		Map<String, Object> map = new HashMap<String, Object>();
-		String KEY = SIZE;
-		for (String dbn : dbNames) {
-			if (dbn != null && dbn.startsWith(PRE_MSG)) {
-				map = getResults(dbn, start, span, 0, null, null);
-				int size = Integer.parseInt(String.valueOf(map.get(KEY)));
-				if (size == 0)
-					continue;
-				else
-					return map;
-			}
-		}
-		// no message
-		return map;
-	}
-
-	private void setSMessageProperty(WebSwallowMessage m) {
+	private void setSMessageProperty(WebSwallowMessage m, boolean showcontent) {
+		if(!showcontent)
+			m.setC("?");  //don't transmit content
 		m.setMid(m.getId());
+		if(m.getO_id() != null){
+			m.setMo_id(m.getO_id());
+			m.setO_id(null);
+		}
 		m.setGtstring(m.getGt());
 		m.setStstring(m.getId());
+		//no need to transmit
+		m.setId(null);
+		isZipped(m);
+	}
+	
+	private void isZipped(WebSwallowMessage m){
 		if(m.getC().startsWith(GZIP)){
 			try {
 				m.setC(ZipUtil.unzip( m.getC() ) );
@@ -205,6 +228,19 @@ public class MessageController extends AbstractController {
 		return m.find();
 	}
 
-
+	// doing all query, so use readMongoOps
+	@RequestMapping(value = "/console/message/content", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public WebSwallowMessage showMessageContent(String topic,String mid)
+			throws UnknownHostException {
+		readMongoOps = new MongoTemplate(new SimMongoDbFactory(
+				getMongoFromMap(topic), PRE_MSG + topic));
+		smdi = new DefaultWebSwallowMessageDAO(readMongoOps);
+		List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
+		long messageId = Long.parseLong(mid);
+		messageList = smdi.findSpecific(0, 1, messageId);
+		isZipped(messageList.get(0));
+		return messageList.get(0);
+	}
 	
 }

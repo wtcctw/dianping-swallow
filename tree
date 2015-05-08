@@ -1,0 +1,732 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.dianping.swallow:swallow-common:jar:0.7.1-SNAPSHOT
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.guava:guava:jar -> duplicate declaration of version ${guava.version} @ com.dianping.swallow:swallow-parent:0.7.1-SNAPSHOT, /Users/mingdongli/Documents/swallow2/swallow/pom.xml, line 300, column 16
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.dianping.swallow:swallow-consumerserver:jar:0.7.1-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-deploy-plugin is missing. @ line 97, column 12
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.dianping.swallow:swallow-producerserver:jar:0.7.1-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-deploy-plugin is missing. @ line 112, column 12
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.dianping.swallow:swallow-producer:pom:0.7.1-SNAPSHOT
+[WARNING] The expression ${artifactId} is deprecated. Please use ${project.artifactId} instead.
+[WARNING] The expression ${version} is deprecated. Please use ${project.version} instead.
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.dianping.swallow:swallow-consumermaster:pom:0.7.1-SNAPSHOT
+[WARNING] The expression ${artifactId} is deprecated. Please use ${project.artifactId} instead.
+[WARNING] The expression ${version} is deprecated. Please use ${project.version} instead.
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.dianping.swallow:swallow-consumerslave:pom:0.7.1-SNAPSHOT
+[WARNING] The expression ${artifactId} is deprecated. Please use ${project.artifactId} instead.
+[WARNING] The expression ${version} is deprecated. Please use ${project.version} instead.
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.dianping.swallow:swallow-web:war:0.7.1-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-war-plugin is missing. @ line 104, column 12
+[WARNING] The expression ${artifactId} is deprecated. Please use ${project.artifactId} instead.
+[WARNING] The expression ${version} is deprecated. Please use ${project.version} instead.
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.dianping.swallow:swallow-parent:pom:0.7.1-SNAPSHOT
+[WARNING] 'dependencyManagement.dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.google.guava:guava:jar -> duplicate declaration of version ${guava.version} @ line 300, column 16
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] swallow
+[INFO] swallow-common
+[INFO] swallow-consumerclient
+[INFO] swallow-common-server
+[INFO] swallow-consumerserver
+[INFO] swallow-producerclient
+[INFO] swallow-producerserver
+[INFO] swallow-example
+[INFO] swallow-standalone
+[INFO] swallow-consumermaster
+[INFO] swallow-consumerslave
+[INFO] swallow-test
+[INFO] swallow-web
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building swallow 0.7.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.4:tree (default-cli) @ swallow-parent ---
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom
+Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom
+2/2 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom (2 KB at 31.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia/1.0-alpha-10/doxia-1.0-alpha-10.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia/1.0-alpha-10/doxia-1.0-alpha-10.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia/1.0-alpha-10/doxia-1.0-alpha-10.pom
+4/9 KB   6/9 KB   9/9 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia/1.0-alpha-10/doxia-1.0-alpha-10.pom (9 KB at 197.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.pom
+3/3 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.pom (3 KB at 38.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-shared-components/15/maven-shared-components-15.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/15/maven-shared-components-15.pom
+4/10 KB   8/10 KB   10/10 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/15/maven-shared-components-15.pom
+           Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/15/maven-shared-components-15.pom (10 KB at 284.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.pom
+2/2 KB     [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.pom (2 KB at 50.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia/1.0/doxia-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia/1.0/doxia-1.0.pom
+4/10 KB   7/10 KB   10/10 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia/1.0/doxia-1.0.pom
+           Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia/1.0/doxia-1.0.pom (10 KB at 269.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-parent/10/maven-parent-10.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-parent/10/maven-parent-10.pom
+4/31 KB    8/31 KB   12/31 KB   16/31 KB   20/31 KB   24/31 KB   28/31 KB   31/31 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-parent/10/maven-parent-10.pom
+           Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-parent/10/maven-parent-10.pom (31 KB at 858.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.pom
+           Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.pom
+4/5 KB     5/5 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.pom (5 KB at 96.3 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.pom
+3/3 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.pom (3 KB at 62.6 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-utils/1.5.7/plexus-utils-1.5.7.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.5.7/plexus-utils-1.5.7.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-utils/1.5.7/plexus-utils-1.5.7.pom
+3/8 KB   7/8 KB   8/8 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-utils/1.5.7/plexus-utils-1.5.7.pom (8 KB at 437.3 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-container-default/1.0-alpha-30/plexus-container-default-1.0-alpha-30.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-container-default/1.0-alpha-30/plexus-container-default-1.0-alpha-30.pom
+4/4 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-container-default/1.0-alpha-30/plexus-container-default-1.0-alpha-30.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-container-default/1.0-alpha-30/plexus-container-default-1.0-alpha-30.pom (4 KB at 64.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-containers/1.0-alpha-30/plexus-containers-1.0-alpha-30.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-containers/1.0-alpha-30/plexus-containers-1.0-alpha-30.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-containers/1.0-alpha-30/plexus-containers-1.0-alpha-30.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-containers/1.0-alpha-30/plexus-containers-1.0-alpha-30.pom (2 KB at 84.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-utils/1.4.5/plexus-utils-1.4.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.4.5/plexus-utils-1.4.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.4.5/plexus-utils-1.4.5.pom (0 B at 0.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-classworlds/1.2-alpha-9/plexus-classworlds-1.2-alpha-9.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-classworlds/1.2-alpha-9/plexus-classworlds-1.2-alpha-9.pom
+4/4 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-classworlds/1.2-alpha-9/plexus-classworlds-1.2-alpha-9.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-classworlds/1.2-alpha-9/plexus-classworlds-1.2-alpha-9.pom (4 KB at 149.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.pom
+4/5 KB   5/5 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.pom (5 KB at 215.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-sitetools/1.0/doxia-sitetools-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-sitetools/1.0/doxia-sitetools-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-sitetools/1.0/doxia-sitetools-1.0.pom
+4/10 KB   8/10 KB   10/10 KB              Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-sitetools/1.0/doxia-sitetools-1.0.pom (10 KB at 322.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-parent/11/maven-parent-11.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-parent/11/maven-parent-11.pom
+4/32 KB    8/32 KB   12/32 KB   16/32 KB   20/32 KB   24/32 KB   28/32 KB   32/32 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-parent/11/maven-parent-11.pom
+           Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-parent/11/maven-parent-11.pom (32 KB at 659.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/apache/5/apache-5.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/apache/5/apache-5.pom
+4/5 KB     5/5 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/apache/5/apache-5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/apache/5/apache-5.pom (5 KB at 133.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.pom (2 KB at 35.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-components/1.1.12/plexus-components-1.1.12.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-components/1.1.12/plexus-components-1.1.12.pom
+3/3 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-components/1.1.12/plexus-components-1.1.12.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-components/1.1.12/plexus-components-1.1.12.pom (3 KB at 154.3 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.pom (2 KB at 59.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-container-default/1.0-alpha-20/plexus-container-default-1.0-alpha-20.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-container-default/1.0-alpha-20/plexus-container-default-1.0-alpha-20.pom
+3/3 KB   3/3 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-container-default/1.0-alpha-20/plexus-container-default-1.0-alpha-20.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-container-default/1.0-alpha-20/plexus-container-default-1.0-alpha-20.pom (3 KB at 88.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-containers/1.0-alpha-20/plexus-containers-1.0-alpha-20.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-containers/1.0-alpha-20/plexus-containers-1.0-alpha-20.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-containers/1.0-alpha-20/plexus-containers-1.0-alpha-20.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-containers/1.0-alpha-20/plexus-containers-1.0-alpha-20.pom (2 KB at 65.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/velocity/velocity/1.5/velocity-1.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/velocity/velocity/1.5/velocity-1.5.pom
+4/8 KB   8/8 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/velocity/velocity/1.5/velocity-1.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/velocity/velocity/1.5/velocity-1.5.pom (8 KB at 244.6 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-collections/commons-collections/3.1/commons-collections-3.1.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.1/commons-collections-3.1.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/commons-collections/commons-collections/3.1/commons-collections-3.1.pom
+4/7 KB   7/7 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/commons-collections/commons-collections/3.1/commons-collections-3.1.pom (7 KB at 242.3 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/oro/oro/2.0.8/oro-2.0.8.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/oro/oro/2.0.8/oro-2.0.8.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/oro/oro/2.0.8/oro-2.0.8.pom (0 B at 0.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.pom
+4/4 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.pom (4 KB at 92.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-collections/commons-collections/3.2/commons-collections-3.2.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.2/commons-collections-3.2.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.2/commons-collections-3.2.pom (0 B at 0.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.pom
+3/3 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.pom (3 KB at 87.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-modules/1.0/doxia-modules-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-modules/1.0/doxia-modules-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-modules/1.0/doxia-modules-1.0.pom
+3/3 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-modules/1.0/doxia-modules-1.0.pom (3 KB at 82.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.pom
+3/3 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.pom (3 KB at 108.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.pom
+3/3 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.pom (3 KB at 90.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.pom
+2/2 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.pom (2 KB at 48.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.pom
+4/6 KB   6/6 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.pom (6 KB at 121.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-shared-components/11/maven-shared-components-11.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/11/maven-shared-components-11.pom
+4/9 KB   8/9 KB   9/9 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/11/maven-shared-components-11.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/11/maven-shared-components-11.pom (9 KB at 280.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.pom
+4/10 KB   8/10 KB   10/10 KB              Downloaded: http://mvn.dianpingoa.com/dprepo/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.pom (10 KB at 325.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.pom
+           Downloading: http://mvn.dianpingoa.com/dprepo/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.pom
+411/411 B               Downloaded: http://mvn.dianpingoa.com/dprepo/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.pom (411 B at 22.3 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-logging/commons-logging/1.0.3/commons-logging-1.0.3.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/commons-logging/commons-logging/1.0.3/commons-logging-1.0.3.pom
+            Downloading: http://mvn.dianpingoa.com/dprepo/commons-logging/commons-logging/1.0.3/commons-logging-1.0.3.pom
+937/937 B               Downloaded: http://mvn.dianpingoa.com/dprepo/commons-logging/commons-logging/1.0.3/commons-logging-1.0.3.pom (937 B at 16.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-digester/commons-digester/1.6/commons-digester-1.6.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/commons-digester/commons-digester/1.6/commons-digester-1.6.pom
+            Downloading: http://mvn.dianpingoa.com/dprepo/commons-digester/commons-digester/1.6/commons-digester-1.6.pom
+2/2 KB               Downloaded: http://mvn.dianpingoa.com/dprepo/commons-digester/commons-digester/1.6/commons-digester-1.6.pom (2 KB at 20.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-beanutils/commons-beanutils/1.6/commons-beanutils-1.6.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/commons-beanutils/commons-beanutils/1.6/commons-beanutils-1.6.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/commons-beanutils/commons-beanutils/1.6/commons-beanutils-1.6.pom
+3/3 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/commons-beanutils/commons-beanutils/1.6/commons-beanutils-1.6.pom (3 KB at 131.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-logging/commons-logging/1.0/commons-logging-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/commons-logging/commons-logging/1.0/commons-logging-1.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/commons-logging/commons-logging/1.0/commons-logging-1.0.pom
+209/209 B               Downloaded: http://mvn.dianpingoa.com/dprepo/commons-logging/commons-logging/1.0/commons-logging-1.0.pom (209 B at 10.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-collections/commons-collections/2.0/commons-collections-2.0.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/2.0/commons-collections-2.0.pom
+            Downloading: http://mvn.dianpingoa.com/dprepo/commons-collections/commons-collections/2.0/commons-collections-2.0.pom
+217/217 B               Downloaded: http://mvn.dianpingoa.com/dprepo/commons-collections/commons-collections/2.0/commons-collections-2.0.pom (217 B at 12.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-collections/commons-collections/2.1/commons-collections-2.1.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/2.1/commons-collections-2.1.pom
+4/4 KB               Downloaded: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/2.1/commons-collections-2.1.pom (4 KB at 120.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
+400/400 B               Downloaded: http://mvn.dianpingoa.com/dprepo/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom (400 B at 21.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-archiver/2.0/plexus-archiver-2.0.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-archiver/2.0/plexus-archiver-2.0.pom
+            Downloading: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-archiver/2.0/plexus-archiver-2.0.pom
+3/3 KB               Downloaded: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-archiver/2.0/plexus-archiver-2.0.pom (3 KB at 27.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/sonatype/spice/spice-parent/17/spice-parent-17.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/sonatype/spice/spice-parent/17/spice-parent-17.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/sonatype/spice/spice-parent/17/spice-parent-17.pom (0 B at 0.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/sonatype/forge/forge-parent/10/forge-parent-10.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/sonatype/forge/forge-parent/10/forge-parent-10.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/sonatype/forge/forge-parent/10/forge-parent-10.pom (0 B at 0.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-io/2.0/plexus-io-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-io/2.0/plexus-io-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-io/2.0/plexus-io-2.0.pom
+2/2 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-io/2.0/plexus-io-2.0.pom (2 KB at 47.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus/2.0.7/plexus-2.0.7.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus/2.0.7/plexus-2.0.7.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus/2.0.7/plexus-2.0.7.pom (0 B at 0.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.pom
+4/4 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.pom (4 KB at 126.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.pom
+4/4 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.pom (4 KB at 74.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-artifact/2.0.2/maven-artifact-2.0.2.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact/2.0.2/maven-artifact-2.0.2.pom
+765/765 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact/2.0.2/maven-artifact-2.0.2.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact/2.0.2/maven-artifact-2.0.2.pom (765 B at 37.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven/2.0.2/maven-2.0.2.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven/2.0.2/maven-2.0.2.pom
+4/13 KB     8/13 KB   12/13 KB   13/13 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven/2.0.2/maven-2.0.2.pom
+           Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven/2.0.2/maven-2.0.2.pom (13 KB at 378.3 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.pom
+767/767 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.1/plexus-utils-1.1.pom (767 B at 24.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-artifact-manager/2.0.2/maven-artifact-manager-2.0.2.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact-manager/2.0.2/maven-artifact-manager-2.0.2.pom
+2/2 KB      [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact-manager/2.0.2/maven-artifact-manager-2.0.2.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact-manager/2.0.2/maven-artifact-manager-2.0.2.pom (2 KB at 37.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-repository-metadata/2.0.2/maven-repository-metadata-2.0.2.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-repository-metadata/2.0.2/maven-repository-metadata-2.0.2.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-repository-metadata/2.0.2/maven-repository-metadata-2.0.2.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-repository-metadata/2.0.2/maven-repository-metadata-2.0.2.pom (2 KB at 33.6 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.pom
+588/588 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/wagon/wagon-provider-api/1.0-alpha-6/wagon-provider-api-1.0-alpha-6.pom (588 B at 17.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/wagon/wagon/1.0-alpha-6/wagon-1.0-alpha-6.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/wagon/wagon/1.0-alpha-6/wagon-1.0-alpha-6.pom
+4/7 KB      7/7 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/wagon/wagon/1.0-alpha-6/wagon-1.0-alpha-6.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/wagon/wagon/1.0-alpha-6/wagon-1.0-alpha-6.pom (7 KB at 173.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.pom (2 KB at 53.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-dependency-analyzer/1.2/maven-dependency-analyzer-1.2.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-dependency-analyzer/1.2/maven-dependency-analyzer-1.2.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-dependency-analyzer/1.2/maven-dependency-analyzer-1.2.pom
+4/5 KB   5/5 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-dependency-analyzer/1.2/maven-dependency-analyzer-1.2.pom (5 KB at 190.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/asm/asm/3.0/asm-3.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/asm/asm/3.0/asm-3.0.pom
+360/360 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/asm/asm/3.0/asm-3.0.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/asm/asm/3.0/asm-3.0.pom (360 B at 18.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/asm/asm-parent/3.0/asm-parent-3.0.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/asm/asm-parent/3.0/asm-parent-3.0.pom
+3/3 KB      [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/asm/asm-parent/3.0/asm-parent-3.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/asm/asm-parent/3.0/asm-parent-3.0.pom (3 KB at 73.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-project/2.0.5/maven-project-2.0.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-project/2.0.5/maven-project-2.0.5.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-project/2.0.5/maven-project-2.0.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-project/2.0.5/maven-project-2.0.5.pom (2 KB at 66.6 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven/2.0.5/maven-2.0.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven/2.0.5/maven-2.0.5.pom
+4/6 KB   6/6 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven/2.0.5/maven-2.0.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven/2.0.5/maven-2.0.5.pom (6 KB at 214.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-settings/2.0.5/maven-settings-2.0.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-settings/2.0.5/maven-settings-2.0.5.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-settings/2.0.5/maven-settings-2.0.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-settings/2.0.5/maven-settings-2.0.5.pom (2 KB at 86.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-model/2.0.5/maven-model-2.0.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-model/2.0.5/maven-model-2.0.5.pom
+3/3 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-model/2.0.5/maven-model-2.0.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-model/2.0.5/maven-model-2.0.5.pom (3 KB at 98.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-profile/2.0.5/maven-profile-2.0.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-profile/2.0.5/maven-profile-2.0.5.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-profile/2.0.5/maven-profile-2.0.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-profile/2.0.5/maven-profile-2.0.5.pom (2 KB at 62.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-artifact-manager/2.0.5/maven-artifact-manager-2.0.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact-manager/2.0.5/maven-artifact-manager-2.0.5.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact-manager/2.0.5/maven-artifact-manager-2.0.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact-manager/2.0.5/maven-artifact-manager-2.0.5.pom (2 KB at 99.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-repository-metadata/2.0.5/maven-repository-metadata-2.0.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-repository-metadata/2.0.5/maven-repository-metadata-2.0.5.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-repository-metadata/2.0.5/maven-repository-metadata-2.0.5.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-repository-metadata/2.0.5/maven-repository-metadata-2.0.5.pom (2 KB at 46.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-artifact/2.0.5/maven-artifact-2.0.5.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact/2.0.5/maven-artifact-2.0.5.pom
+727/727 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact/2.0.5/maven-artifact-2.0.5.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-artifact/2.0.5/maven-artifact-2.0.5.pom (727 B at 41.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.pom
+            Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.pom
+3/4 KB      4/4 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.pom (4 KB at 80.6 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-shared-components/9/maven-shared-components-9.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/9/maven-shared-components-9.pom
+4/4 KB            Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/9/maven-shared-components-9.pom (4 KB at 189.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.pom
+4/5 KB   5/5 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.pom (5 KB at 76.6 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.pom
+4/7 KB   7/7 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.pom (7 KB at 206.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-shared-components/7/maven-shared-components-7.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/7/maven-shared-components-7.pom
+3/3 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/7/maven-shared-components-7.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-components/7/maven-shared-components-7.pom (3 KB at 81.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-core/2.0/maven-core-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-core/2.0/maven-core-2.0.pom
+4/6 KB   6/6 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-core/2.0/maven-core-2.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-core/2.0/maven-core-2.0.pom (6 KB at 176.3 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-settings/2.0/maven-settings-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-settings/2.0/maven-settings-2.0.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-settings/2.0/maven-settings-2.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-settings/2.0/maven-settings-2.0.pom (2 KB at 43.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-plugin-parameter-documenter/2.0/maven-plugin-parameter-documenter-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-parameter-documenter/2.0/maven-plugin-parameter-documenter-2.0.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-parameter-documenter/2.0/maven-plugin-parameter-documenter-2.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-parameter-documenter/2.0/maven-plugin-parameter-documenter-2.0.pom (2 KB at 14.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/reporting/maven-reporting-api/2.0/maven-reporting-api-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/2.0/maven-reporting-api-2.0.pom
+2/2 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/2.0/maven-reporting-api-2.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/2.0/maven-reporting-api-2.0.pom (2 KB at 24.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/reporting/maven-reporting/2.0/maven-reporting-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting/2.0/maven-reporting-2.0.pom
+504/504 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting/2.0/maven-reporting-2.0.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting/2.0/maven-reporting-2.0.pom (504 B at 30.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/doxia/doxia-sink-api/1.0-alpha-4/doxia-sink-api-1.0-alpha-4.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/doxia/doxia-sink-api/1.0-alpha-4/doxia-sink-api-1.0-alpha-4.pom
+            Downloading: http://mvn.dianpingoa.com/dprepo/doxia/doxia-sink-api/1.0-alpha-4/doxia-sink-api-1.0-alpha-4.pom
+2/2 KB               Downloaded: http://mvn.dianpingoa.com/dprepo/doxia/doxia-sink-api/1.0-alpha-4/doxia-sink-api-1.0-alpha-4.pom (2 KB at 40.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-error-diagnostics/2.0/maven-error-diagnostics-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-error-diagnostics/2.0/maven-error-diagnostics-2.0.pom
+812/812 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-error-diagnostics/2.0/maven-error-diagnostics-2.0.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-error-diagnostics/2.0/maven-error-diagnostics-2.0.pom (812 B at 18.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-plugin-registry/2.0/maven-plugin-registry-2.0.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-registry/2.0/maven-plugin-registry-2.0.pom
+2/2 KB      [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-registry/2.0/maven-plugin-registry-2.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-registry/2.0/maven-plugin-registry-2.0.pom (2 KB at 52.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-plugin-api/2.0/maven-plugin-api-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-api/2.0/maven-plugin-api-2.0.pom
+601/601 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-api/2.0/maven-plugin-api-2.0.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-api/2.0/maven-plugin-api-2.0.pom (601 B at 12.8 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-plugin-descriptor/2.0/maven-plugin-descriptor-2.0.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-descriptor/2.0/maven-plugin-descriptor-2.0.pom
+2/2 KB      [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-descriptor/2.0/maven-plugin-descriptor-2.0.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-plugin-descriptor/2.0/maven-plugin-descriptor-2.0.pom (2 KB at 46.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/maven-monitor/2.0/maven-monitor-2.0.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-monitor/2.0/maven-monitor-2.0.pom
+400/400 B   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-monitor/2.0/maven-monitor-2.0.pom
+            Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/maven-monitor/2.0/maven-monitor-2.0.pom (400 B at 20.6 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-utils/1.4.2/plexus-utils-1.4.2.pom
+            Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.4.2/plexus-utils-1.4.2.pom
+2/2 KB      [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.4.2/plexus-utils-1.4.2.pom
+         Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-utils/1.4.2/plexus-utils-1.4.2.pom (2 KB at 53.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.pom
+3/5 KB   5/5 KB            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.pom (5 KB at 126.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-lang/commons-lang/2.6/commons-lang-2.6.pom
+         Downloading: http://mvn.dianpingoa.com/third-party/commons-lang/commons-lang/2.6/commons-lang-2.6.pom
+         Downloading: http://mvn.dianpingoa.com/dprepo/commons-lang/commons-lang/2.6/commons-lang-2.6.pom
+4/18 KB   8/18 KB   12/18 KB   16/18 KB   18/18 KB              Downloaded: http://mvn.dianpingoa.com/dprepo/commons-lang/commons-lang/2.6/commons-lang-2.6.pom (18 KB at 289.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.pom
+4/12 KB    8/12 KB   12/12 KB   12/12 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.pom
+           Downloaded: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.pom (12 KB at 255.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/commons/commons-parent/9/commons-parent-9.pom
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/commons/commons-parent/9/commons-parent-9.pom
+           Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/commons/commons-parent/9/commons-parent-9.pom (0 B at 0.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.jar
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.jar
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.jar
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.jar
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-digester/commons-digester/1.6/commons-digester-1.6.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/velocity/velocity/1.5/velocity-1.5.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.jar
+                      Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.jar
+Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-archiver/2.0/plexus-archiver-2.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-dependency-analyzer/1.2/maven-dependency-analyzer-1.2.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/asm/asm/3.0/asm-3.0.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.jar
+                      Downloading: http://mvn.dianpingoa.com/dianping-releases/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.jar
+Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-lang/commons-lang/2.6/commons-lang-2.6.jar
+           Downloading: http://mvn.dianpingoa.com/dianping-releases/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar
+                                                       Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.jar
+Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.jar
+Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.jar
+Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.jar
+Downloading: http://mvn.dianpingoa.com/third-party/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/commons-digester/commons-digester/1.6/commons-digester-1.6.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.jar
+3/11 KB    7/11 KB   11/11 KB   11/11 KB              Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/velocity/velocity/1.5/velocity-1.5.jar
+[WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.jar
+           Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.jar (11 KB at 464.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-archiver/2.0/plexus-archiver-2.0.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.jar
+           Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.jar
+3/11 KB    7/11 KB   11/11 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.jar
+           Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.jar (11 KB at 201.2 KB/sec)
+Downloading: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.jar
+4/38 KB    8/38 KB   12/38 KB   14/38 KB   18/38 KB   21/38 KB   21/38 KB   2/37 KB   21/38 KB   6/37 KB   25/38 KB   6/37 KB   29/38 KB   6/37 KB   29/38 KB   10/37 KB   30/38 KB   10/37 KB   30/38 KB   14/37 KB   30/38 KB   14/37 KB   34/38 KB   14/37 KB   38/38 KB   14/37 KB   38/38 KB   17/37 KB   38/38 KB   21/37 KB   38/38 KB   25/37 KB   38/38 KB   29/37 KB   38/38 KB   31/37 KB   38/38 KB   35/37 KB   38/38 KB   37/37 KB                         Downloaded: http://mvn.dianpingoa.com/third-party/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar (38 KB at 452.7 KB/sec)
+Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-dependency-analyzer/1.2/maven-dependency-analyzer-1.2.jar
+                      Downloading: http://mvn.dianpingoa.com/third-party/asm/asm/3.0/asm-3.0.jar
+[WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.jar
+                      Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/file-management/1.2.1/file-management-1.2.1.jar (37 KB at 655.3 KB/sec)
+Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.jar
+                      Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.jar
+                      Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.jar
+                      Downloading: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.jar
+                      Downloading: http://mvn.dianpingoa.com/third-party/commons-lang/commons-lang/2.6/commons-lang-2.6.jar
+4/39 KB               8/39 KB   12/39 KB   14/39 KB   18/39 KB   22/39 KB   26/39 KB   30/39 KB   33/39 KB              Downloading: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar
+37/39 KB   39/39 KB   4/383 KB   39/39 KB   8/383 KB   39/39 KB   12/383 KB   39/39 KB   14/383 KB   39/39 KB   18/383 KB   39/39 KB   22/383 KB   39/39 KB   26/383 KB   39/39 KB   30/383 KB   39/39 KB   33/383 KB   39/39 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.jar
+                       37/383 KB              Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-shared-io/1.1/maven-shared-io-1.1.jar (39 KB at 448.3 KB/sec)
+41/383 KB   45/383 KB   49/383 KB   53/383 KB   57/383 KB   61/383 KB   65/383 KB   67/383 KB   71/383 KB   75/383 KB   79/383 KB   83/383 KB   87/383 KB   91/383 KB   92/383 KB   95/383 KB   98/383 KB   102/383 KB   105/383 KB   109/383 KB   113/383 KB   117/383 KB   118/383 KB   122/383 KB   126/383 KB   130/383 KB   132/383 KB   136/383 KB   140/383 KB   144/383 KB   148/383 KB   152/383 KB   156/383 KB   156/383 KB   159/383 KB   163/383 KB   163/383 KB   166/383 KB   170/383 KB   174/383 KB   178/383 KB   182/383 KB   182/383 KB   4/57 KB   186/383 KB   4/57 KB   186/383 KB   8/57 KB   190/383 KB   8/57 KB   190/383 KB   12/57 KB   194/383 KB   12/57 KB   194/383 KB   14/57 KB   198/383 KB   14/57 KB   201/383 KB   14/57 KB   205/383 KB   14/57 KB   205/383 KB   14/57 KB   208/383 KB   14/57 KB   212/383 KB   14/57 KB   212/383 KB   16/57 KB   212/383 KB   20/57 KB   216/383 KB   20/57 KB   216/383 KB   24/57 KB   220/383 KB   24/57 KB   220/383 KB   28/57 KB   224/383 KB   28/57 KB   224/383 KB   30/57 KB   225/383 KB   30/57 KB   228/383 KB   30/57 KB   232/383 KB   30/57 KB   235/383 KB   30/57 KB   238/383 KB   30/57 KB   242/383 KB   30/57 KB   246/383 KB   30/57 KB   250/383 KB   30/57 KB   251/383 KB   30/57 KB   251/383 KB   33/57 KB   251/383 KB   37/57 KB   251/383 KB   41/57 KB   252/383 KB   41/57 KB   255/383 KB   41/57 KB   255/383 KB   45/57 KB   259/383 KB   45/57 KB   263/383 KB   45/57 KB   263/383 KB   49/57 KB   263/383 KB   49/57 KB   263/383 KB   53/57 KB   267/383 KB   53/57 KB   269/383 KB   53/57 KB   269/383 KB   53/57 KB   4/32 KB   273/383 KB   53/57 KB   4/32 KB   277/383 KB   53/57 KB   4/32 KB   277/383 KB   53/57 KB   7/32 KB   277/383 KB   53/57 KB   11/32 KB   281/383 KB   53/57 KB   11/32 KB   284/383 KB   53/57 KB   14/32 KB   284/383 KB   53/57 KB   14/32 KB   284/383 KB   57/57 KB   14/32 KB   284/383 KB   57/57 KB   14/32 KB   288/383 KB   57/57 KB   14/32 KB   292/383 KB   57/57 KB   14/32 KB   296/383 KB   57/57 KB   14/32 KB   299/383 KB   57/57 KB   14/32 KB   301/383 KB   57/57 KB   14/32 KB   305/383 KB   57/57 KB   14/32 KB   307/383 KB   57/57 KB   14/32 KB   308/383 KB   57/57 KB   14/32 KB   308/383 KB   57/57 KB   18/32 KB   308/383 KB   57/57 KB   21/32 KB   308/383 KB   57/57 KB   24/32 KB   308/383 KB   57/57 KB   27/32 KB   308/383 KB   57/57 KB   30/32 KB   311/383 KB   57/57 KB   30/32 KB   314/383 KB   57/57 KB   30/32 KB   317/383 KB   57/57 KB   30/32 KB   320/383 KB   57/57 KB   30/32 KB   323/383 KB   57/57 KB   30/32 KB   324/383 KB   57/57 KB   30/32 KB   325/383 KB   57/57 KB   30/32 KB   329/383 KB   57/57 KB   30/32 KB   331/383 KB   57/57 KB   30/32 KB   333/383 KB   57/57 KB   30/32 KB   337/383 KB   57/57 KB   30/32 KB   340/383 KB   57/57 KB   30/32 KB   342/383 KB   57/57 KB   30/32 KB   345/383 KB   57/57 KB   30/32 KB   348/383 KB   57/57 KB   30/32 KB   349/383 KB   57/57 KB   30/32 KB   351/383 KB   57/57 KB   32/32 KB   351/383 KB   57/57 KB   32/32 KB   354/383 KB   57/57 KB   32/32 KB   357/383 KB   57/57 KB   32/32 KB   359/383 KB   57/57 KB   32/32 KB   363/383 KB   57/57 KB   32/32 KB   367/383 KB   57/57 KB   32/32 KB   371/383 KB   57/57 KB   32/32 KB   375/383 KB   57/57 KB   32/32 KB   375/383 KB   57/57 KB   32/32 KB   376/383 KB   57/57 KB   32/32 KB   380/383 KB   57/57 KB   32/32 KB   382/383 KB   57/57 KB   32/32 KB   383/383 KB   57/57 KB   32/32 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.jar
+                                   Downloaded: http://mvn.dianpingoa.com/third-party/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.jar (57 KB at 497.7 KB/sec)
+4/562 KB   383/383 KB   32/32 KB   8/562 KB   383/383 KB   32/32 KB   12/562 KB   383/383 KB   32/32 KB   14/562 KB   383/383 KB   32/32 KB   17/562 KB   383/383 KB   32/32 KB   21/562 KB   383/383 KB   32/32 KB   25/562 KB   383/383 KB   32/32 KB   29/562 KB   383/383 KB   32/32 KB   30/562 KB   383/383 KB   32/32 KB   34/562 KB   383/383 KB   32/32 KB   37/562 KB   383/383 KB   32/32 KB   40/562 KB   383/383 KB   32/32 KB   41/562 KB   383/383 KB   32/32 KB   45/562 KB   383/383 KB   32/32 KB   48/562 KB   383/383 KB   32/32 KB   51/562 KB   383/383 KB   32/32 KB   53/562 KB   383/383 KB   32/32 KB   57/562 KB   383/383 KB   32/32 KB   60/562 KB   383/383 KB   32/32 KB   62/562 KB   383/383 KB   32/32 KB   64/562 KB   383/383 KB   32/32 KB   67/562 KB   383/383 KB   32/32 KB   71/562 KB   383/383 KB   32/32 KB   74/562 KB   383/383 KB   32/32 KB   75/562 KB   383/383 KB   32/32 KB   78/562 KB   383/383 KB   32/32 KB   82/562 KB   383/383 KB   32/32 KB   86/562 KB   383/383 KB   32/32 KB   90/562 KB   383/383 KB   32/32 KB   94/562 KB   383/383 KB   32/32 KB   98/562 KB   383/383 KB   32/32 KB   102/562 KB   383/383 KB   32/32 KB   105/562 KB   383/383 KB   32/32 KB   108/562 KB   383/383 KB   32/32 KB   111/562 KB   383/383 KB   32/32 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.jar
+                                     Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.jar (32 KB at 327.2 KB/sec)
+[WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/org/apache/velocity/velocity/1.5/velocity-1.5.jar
+                                     Downloaded: http://mvn.dianpingoa.com/third-party/org/apache/velocity/velocity/1.5/velocity-1.5.jar (383 KB at 2163.5 KB/sec)
+115/562 KB                           119/562 KB   123/562 KB   126/562 KB   129/562 KB   130/562 KB   132/562 KB   136/562 KB   140/562 KB   144/562 KB   144/562 KB   148/562 KB   152/562 KB   154/562 KB   157/562 KB   159/562 KB   161/562 KB   165/562 KB   168/562 KB   171/562 KB   173/562 KB   177/562 KB   181/562 KB   183/562 KB   184/562 KB   187/562 KB   191/562 KB   195/562 KB   199/562 KB   202/562 KB   205/562 KB   207/562 KB   208/562 KB   211/562 KB   214/562 KB   215/562 KB   218/562 KB   222/562 KB   226/562 KB   229/562 KB   232/562 KB   235/562 KB   238/562 KB   241/562 KB   242/562 KB   246/562 KB   249/562 KB   251/562 KB   255/562 KB   258/562 KB   262/562 KB   266/562 KB   266/562 KB   267/562 KB   269/562 KB   273/562 KB   277/562 KB   277/562 KB   280/562 KB   282/562 KB   283/562 KB   287/562 KB   291/562 KB   293/562 KB   297/562 KB   301/562 KB   305/562 KB   308/562 KB   311/562 KB   314/562 KB   317/562 KB   318/562 KB   320/562 KB   323/562 KB   327/562 KB   328/562 KB   330/562 KB   333/562 KB   335/562 KB   339/562 KB   342/562 KB   345/562 KB   348/562 KB   351/562 KB   354/562 KB   357/562 KB   359/562 KB   362/562 KB   364/562 KB   365/562 KB   368/562 KB   372/562 KB   376/562 KB   379/562 KB   381/562 KB   385/562 KB   388/562 KB   391/562 KB   393/562 KB   396/562 KB   399/562 KB   402/562 KB   405/562 KB   407/562 KB   410/562 KB   412/562 KB   415/562 KB   417/562 KB   421/562 KB   425/562 KB   429/562 KB   433/562 KB   437/562 KB   441/562 KB   445/562 KB   448/562 KB   450/562 KB   451/562 KB   455/562 KB   459/562 KB   463/562 KB   465/562 KB   467/562 KB   470/562 KB   474/562 KB   477/562 KB   480/562 KB   482/562 KB   485/562 KB   488/562 KB   491/562 KB   494/562 KB   497/562 KB   498/562 KB   499/562 KB   501/562 KB   505/562 KB   508/562 KB   511/562 KB   515/562 KB   518/562 KB   521/562 KB   523/562 KB   526/562 KB   529/562 KB   532/562 KB   535/562 KB   538/562 KB   540/562 KB   542/562 KB   543/562 KB   545/562 KB   547/562 KB   551/562 KB   555/562 KB   557/562 KB   559/562 KB   560/562 KB   562/562 KB   [WARNING] Checksum validation failed, no checksums available from the repository for http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar
+             Downloaded: http://mvn.dianpingoa.com/third-party/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar (562 KB at 3902.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.jar
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.jar
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.jar
+Downloading: http://mvn.dianpingoa.com/dprepo/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.jar
+Downloading: http://mvn.dianpingoa.com/dprepo/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar
+2/41 KB      4/41 KB   6/41 KB   7/41 KB   9/41 KB   10/41 KB   12/41 KB   13/41 KB   14/41 KB   2/89 KB   14/41 KB   3/89 KB   14/41 KB   4/89 KB   14/41 KB   6/89 KB   14/41 KB   7/89 KB   14/41 KB   10/89 KB   14/41 KB   13/89 KB   14/41 KB   14/89 KB   14/41 KB   14/89 KB   18/41 KB   14/89 KB   22/41 KB   14/89 KB   26/41 KB   14/89 KB   29/41 KB   17/89 KB   29/41 KB   20/89 KB   29/41 KB   21/89 KB   29/41 KB   23/89 KB   29/41 KB   27/89 KB   29/41 KB   29/89 KB   29/41 KB   30/89 KB   29/41 KB   30/89 KB   33/41 KB   30/89 KB   36/41 KB   30/89 KB   38/41 KB   30/89 KB   41/41 KB   34/89 KB   41/41 KB   38/89 KB   41/41 KB   38/89 KB   41/41 KB   42/89 KB   41/41 KB   45/89 KB   41/41 KB   48/89 KB   41/41 KB   50/89 KB   41/41 KB   51/89 KB   41/41 KB   55/89 KB   41/41 KB   59/89 KB   41/41 KB   61/89 KB   41/41 KB   62/89 KB   41/41 KB   65/89 KB   41/41 KB   69/89 KB   41/41 KB   73/89 KB   41/41 KB   75/89 KB   41/41 KB   78/89 KB   41/41 KB   81/89 KB   41/41 KB   84/89 KB   41/41 KB   85/89 KB   41/41 KB   86/89 KB   41/41 KB   89/89 KB   41/41 KB   3/54 KB   89/89 KB   41/41 KB   7/54 KB   89/89 KB   41/41 KB   11/54 KB   89/89 KB   41/41 KB   14/54 KB   89/89 KB   41/41 KB   18/54 KB   89/89 KB   41/41 KB                                                                     22/54 KB                         Downloaded: http://mvn.dianpingoa.com/dprepo/commons-validator/commons-validator/1.2.0/commons-validator-1.2.0.jar (89 KB at 1711.1 KB/sec)
+Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-doxia-tools/1.0.2/maven-doxia-tools-1.0.2.jar (41 KB at 757.0 KB/sec)
+23/54 KB   Downloading: http://mvn.dianpingoa.com/dprepo/commons-digester/commons-digester/1.6/commons-digester-1.6.jar
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.jar
+27/54 KB   30/54 KB   31/54 KB   35/54 KB   38/54 KB   40/54 KB   41/54 KB   45/54 KB   49/54 KB   53/54 KB   54/54 KB   3/21 KB   54/54 KB   7/21 KB   54/54 KB   11/21 KB   54/54 KB   14/21 KB   54/54 KB   18/21 KB   54/54 KB   21/21 KB   54/54 KB                         Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.jar (54 KB at 838.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.jar
+                      Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/reporting/maven-reporting-impl/2.0.5/maven-reporting-impl-2.0.5.jar (21 KB at 296.0 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.jar
+3/185 KB              7/185 KB   11/185 KB   14/185 KB   18/185 KB   22/185 KB   23/185 KB   26/185 KB   30/185 KB   31/185 KB   35/185 KB   38/185 KB   40/185 KB   44/185 KB   47/185 KB   50/185 KB   53/185 KB   55/185 KB   57/185 KB   58/185 KB   58/185 KB   4/10 KB   58/185 KB   8/10 KB   58/185 KB   10/10 KB   61/185 KB   10/10 KB   65/185 KB   10/10 KB   67/185 KB   10/10 KB   68/185 KB   10/10 KB   72/185 KB   10/10 KB   75/185 KB   10/10 KB   78/185 KB   10/10 KB   81/185 KB   10/10 KB   84/185 KB   10/10 KB   86/185 KB   10/10 KB   89/185 KB   10/10 KB   91/185 KB   10/10 KB   95/185 KB   10/10 KB   99/185 KB   10/10 KB   101/185 KB   10/10 KB   102/185 KB   10/10 KB   106/185 KB   10/10 KB   109/185 KB   10/10 KB   111/185 KB   10/10 KB   113/185 KB   10/10 KB   115/185 KB   10/10 KB   119/185 KB   10/10 KB   122/185 KB   10/10 KB   125/185 KB   10/10 KB   127/185 KB   10/10 KB   130/185 KB   10/10 KB   133/185 KB   10/10 KB                           Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.jar (10 KB at 298.1 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.jar
+136/185 KB              140/185 KB   143/185 KB   146/185 KB   149/185 KB   152/185 KB   153/185 KB   154/185 KB   157/185 KB   161/185 KB   164/185 KB   166/185 KB   167/185 KB   170/185 KB   174/185 KB   178/185 KB   182/185 KB   185/185 KB   3/165 KB   185/185 KB   3/165 KB   185/185 KB   3/46 KB   7/165 KB   185/185 KB   3/46 KB   7/165 KB   185/185 KB   7/46 KB   11/165 KB   185/185 KB   7/46 KB   11/165 KB   185/185 KB   11/46 KB   15/165 KB   185/185 KB   11/46 KB   19/165 KB   185/185 KB   15/46 KB   19/165 KB   185/185 KB   15/46 KB   23/165 KB   185/185 KB   15/46 KB   23/165 KB   185/185 KB   19/46 KB   27/165 KB   185/185 KB   19/46 KB   27/165 KB   185/185 KB   23/46 KB   29/165 KB   185/185 KB   23/46 KB   29/165 KB   185/185 KB   27/46 KB   29/165 KB   185/185 KB   31/46 KB   29/165 KB   185/185 KB   33/46 KB                                       Downloaded: http://mvn.dianpingoa.com/dprepo/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar (185 KB at 740.0 KB/sec)
+33/165 KB   33/46 KB                Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.jar
+37/165 KB   33/46 KB   41/165 KB   33/46 KB   45/165 KB   33/46 KB   45/165 KB   36/46 KB   49/165 KB   40/46 KB   49/165 KB   40/46 KB   49/165 KB   44/46 KB   50/165 KB   44/46 KB   50/165 KB   46/46 KB   53/165 KB   46/46 KB   57/165 KB   46/46 KB   61/165 KB   46/46 KB   64/165 KB   46/46 KB   65/165 KB   46/46 KB   69/165 KB   46/46 KB   73/165 KB   46/46 KB   77/165 KB   46/46 KB   81/165 KB   46/46 KB   85/165 KB   46/46 KB   89/165 KB   46/46 KB   93/165 KB   46/46 KB   96/165 KB   46/46 KB   99/165 KB   46/46 KB   103/165 KB   46/46 KB   106/165 KB   46/46 KB   108/165 KB   46/46 KB   109/165 KB   46/46 KB   112/165 KB   46/46 KB   116/165 KB   46/46 KB   120/165 KB   46/46 KB   124/165 KB   46/46 KB   128/165 KB   46/46 KB   132/165 KB   46/46 KB   136/165 KB   46/46 KB   139/165 KB   46/46 KB   140/165 KB   46/46 KB   144/165 KB   46/46 KB   147/165 KB   46/46 KB   149/165 KB   46/46 KB   150/165 KB   46/46 KB   154/165 KB   46/46 KB   157/165 KB   46/46 KB   160/165 KB   46/46 KB   163/165 KB   46/46 KB   164/165 KB   46/46 KB   165/165 KB   46/46 KB                           Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.jar (46 KB at 224.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.jar
+165/165 KB   4/8 KB     165/165 KB   6/8 KB   165/165 KB   8/8 KB                         Downloaded: http://mvn.dianpingoa.com/dprepo/commons-digester/commons-digester/1.6/commons-digester-1.6.jar (165 KB at 727.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.jar
+3/48 KB   8/8 KB                         Downloaded: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.jar (8 KB at 34.3 KB/sec)
+7/48 KB            Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.jar
+11/48 KB   15/48 KB   19/48 KB   23/48 KB   27/48 KB   31/48 KB   34/48 KB   34/48 KB   4/46 KB   34/48 KB   8/46 KB   34/48 KB   12/46 KB   34/48 KB   16/46 KB   34/48 KB   20/46 KB   34/48 KB   24/46 KB   34/48 KB   28/46 KB   34/48 KB   32/46 KB   34/48 KB   36/46 KB   34/48 KB   38/46 KB   34/48 KB   3/19 KB   38/46 KB   34/48 KB   7/19 KB   38/46 KB   34/48 KB   11/19 KB   38/46 KB   34/48 KB   15/19 KB   38/46 KB   34/48 KB   19/19 KB   38/46 KB   38/48 KB   19/19 KB   38/46 KB   41/48 KB   19/19 KB   38/46 KB   45/48 KB   19/19 KB   38/46 KB   45/48 KB   19/19 KB   38/46 KB   47/48 KB   19/19 KB   38/46 KB   48/48 KB   19/19 KB   38/46 KB   48/48 KB   19/19 KB   42/46 KB   48/48 KB   19/19 KB   45/46 KB   48/48 KB   19/19 KB   46/46 KB   48/48 KB   4/22 KB   19/19 KB   46/46 KB   48/48 KB   7/22 KB   19/19 KB   46/46 KB   48/48 KB   11/22 KB   19/19 KB   46/46 KB   48/48 KB   14/22 KB   19/19 KB   46/46 KB   48/48 KB   18/22 KB   19/19 KB   46/46 KB   48/48 KB   21/22 KB   19/19 KB   46/46 KB   48/48 KB   22/22 KB   19/19 KB   46/46 KB                                               Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.jar (46 KB at 919.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-archiver/2.0/plexus-archiver-2.0.jar
+                                            Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.jar (19 KB at 517.4 KB/sec)
+                                            Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-dependency-analyzer/1.2/maven-dependency-analyzer-1.2.jar
+Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.jar (48 KB at 221.5 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/asm/asm/3.0/asm-3.0.jar
+22/22 KB   4/28 KB                          22/22 KB   8/28 KB   22/22 KB   12/28 KB   22/22 KB   16/28 KB   22/22 KB   20/28 KB   22/22 KB   24/28 KB   22/22 KB   28/28 KB                         Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.jar (22 KB at 967.9 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.jar
+                      Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.jar (28 KB at 798.4 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.jar
+4/31 KB               6/31 KB   10/31 KB   14/31 KB   18/31 KB   22/31 KB   26/31 KB   30/31 KB   31/31 KB   31/31 KB   3/28 KB   31/31 KB   7/28 KB   2/176 KB   31/31 KB   11/28 KB   2/176 KB   31/31 KB   11/28 KB   2/176 KB   31/31 KB   15/28 KB   6/176 KB   31/31 KB   15/28 KB   6/176 KB   31/31 KB   19/28 KB   10/176 KB   31/31 KB   23/28 KB   10/176 KB   31/31 KB   23/28 KB   14/176 KB   31/31 KB   23/28 KB   14/176 KB   31/31 KB   27/28 KB   14/176 KB   31/31 KB   28/28 KB   18/176 KB   31/31 KB   28/28 KB   22/176 KB   31/31 KB   28/28 KB   26/176 KB   31/31 KB   28/28 KB   30/176 KB   31/31 KB   28/28 KB   31/176 KB   31/31 KB   28/28 KB   34/176 KB   31/31 KB   28/28 KB   36/176 KB   31/31 KB   28/28 KB   3/42 KB   36/176 KB   31/31 KB   28/28 KB   7/42 KB   36/176 KB   31/31 KB   28/28 KB   11/42 KB   36/176 KB   31/31 KB   28/28 KB   15/42 KB   36/176 KB   31/31 KB   28/28 KB   19/42 KB   36/176 KB   31/31 KB   28/28 KB   23/42 KB   36/176 KB   31/31 KB   28/28 KB   27/42 KB   36/176 KB   31/31 KB   28/28 KB   31/42 KB   36/176 KB   31/31 KB   28/28 KB   35/42 KB   36/176 KB   31/31 KB   28/28 KB   35/42 KB   37/176 KB   31/31 KB   28/28 KB   39/42 KB   37/176 KB   31/31 KB   28/28 KB   39/42 KB   41/176 KB   31/31 KB   28/28 KB   40/42 KB   41/176 KB   31/31 KB   28/28 KB   40/42 KB   45/176 KB   31/31 KB   28/28 KB   40/42 KB   48/176 KB   31/31 KB   28/28 KB   40/42 KB   51/176 KB   31/31 KB   28/28 KB   40/42 KB   54/176 KB   31/31 KB   28/28 KB   40/42 KB   57/176 KB   31/31 KB   28/28 KB   40/42 KB   60/176 KB   31/31 KB   28/28 KB   40/42 KB   62/176 KB   31/31 KB   28/28 KB   40/42 KB   65/176 KB   31/31 KB   28/28 KB   40/42 KB   68/176 KB   31/31 KB   28/28 KB   42/42 KB   68/176 KB   31/31 KB   28/28 KB   42/42 KB   71/176 KB   31/31 KB   28/28 KB   42/42 KB   75/176 KB   31/31 KB   28/28 KB   42/42 KB   79/176 KB   31/31 KB   28/28 KB   42/42 KB   83/176 KB   31/31 KB   28/28 KB   42/42 KB   87/176 KB   31/31 KB   28/28 KB   42/42 KB   91/176 KB   31/31 KB   28/28 KB   42/42 KB   95/176 KB   31/31 KB   28/28 KB   42/42 KB   99/176 KB   31/31 KB   28/28 KB   42/42 KB   101/176 KB   31/31 KB   28/28 KB   42/42 KB   105/176 KB   31/31 KB   28/28 KB   42/42 KB   109/176 KB   31/31 KB   28/28 KB   42/42 KB   109/176 KB   31/31 KB   28/28 KB   42/42 KB   113/176 KB   31/31 KB   28/28 KB   42/42 KB   116/176 KB   31/31 KB   28/28 KB   42/42 KB   120/176 KB   31/31 KB   28/28 KB   42/42 KB   120/176 KB   31/31 KB   28/28 KB   42/42 KB   123/176 KB   31/31 KB   28/28 KB   42/42 KB   126/176 KB   31/31 KB   28/28 KB   42/42 KB   130/176 KB   31/31 KB   28/28 KB   42/42 KB   132/176 KB   31/31 KB   28/28 KB   42/42 KB   135/176 KB   31/31 KB   28/28 KB   42/42 KB   139/176 KB   31/31 KB   28/28 KB   42/42 KB   142/176 KB   31/31 KB   28/28 KB   42/42 KB   144/176 KB   31/31 KB   28/28 KB   42/42 KB   146/176 KB   31/31 KB   28/28 KB   42/42 KB   147/176 KB   31/31 KB   28/28 KB   42/42 KB   151/176 KB   31/31 KB   28/28 KB   42/42 KB   154/176 KB   31/31 KB   28/28 KB   42/42 KB   158/176 KB   31/31 KB   28/28 KB   42/42 KB   161/176 KB   31/31 KB   28/28 KB   42/42 KB   165/176 KB   31/31 KB   28/28 KB   42/42 KB   169/176 KB   31/31 KB   28/28 KB   42/42 KB   173/176 KB   31/31 KB   28/28 KB   42/42 KB   176/176 KB   31/31 KB   28/28 KB   42/42 KB   176/176 KB   31/31 KB   28/28 KB   42/42 KB   4/34 KB   176/176 KB   31/31 KB   28/28 KB                                                                                                                                                              Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.jar (31 KB at 482.2 KB/sec)
+                                           Downloading: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.jar
+42/42 KB   8/34 KB   31/31 KB   28/28 KB                Downloaded: http://mvn.dianpingoa.com/dprepo/asm/asm/3.0/asm-3.0.jar (42 KB at 563.6 KB/sec)
+Downloading: http://mvn.dianpingoa.com/dprepo/commons-lang/commons-lang/2.6/commons-lang-2.6.jar
+Downloaded: http://mvn.dianpingoa.com/dprepo/org/codehaus/plexus/plexus-archiver/2.0/plexus-archiver-2.0.jar (176 KB at 2342.3 KB/sec)
+Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-dependency-analyzer/1.2/maven-dependency-analyzer-1.2.jar (28 KB at 362.2 KB/sec)
+12/34 KB                                   16/34 KB   20/34 KB   24/34 KB   28/34 KB   32/34 KB   34/34 KB              Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.jar (34 KB at 427.2 KB/sec)
+4/278 KB   8/278 KB   12/278 KB   16/278 KB   20/278 KB   24/278 KB   28/278 KB   4/29 KB   28/278 KB   4/29 KB   32/278 KB   4/29 KB   36/278 KB   8/29 KB   40/278 KB   8/29 KB   40/278 KB   8/29 KB   43/278 KB   12/29 KB   43/278 KB   16/29 KB   43/278 KB   20/29 KB   43/278 KB   24/29 KB   43/278 KB   28/29 KB   43/278 KB   29/29 KB   43/278 KB   29/29 KB   45/278 KB   29/29 KB   49/278 KB   29/29 KB   53/278 KB   29/29 KB   57/278 KB   29/29 KB   61/278 KB   29/29 KB   65/278 KB   29/29 KB   69/278 KB   29/29 KB   72/278 KB   29/29 KB   76/278 KB   29/29 KB   80/278 KB   29/29 KB   84/278 KB   29/29 KB   85/278 KB   29/29 KB   89/278 KB   29/29 KB   89/278 KB   29/29 KB   93/278 KB   29/29 KB   97/278 KB   29/29 KB   101/278 KB   29/29 KB   105/278 KB   29/29 KB   106/278 KB   29/29 KB   110/278 KB   29/29 KB   114/278 KB   29/29 KB   118/278 KB   29/29 KB   122/278 KB   29/29 KB   126/278 KB   29/29 KB   130/278 KB   29/29 KB   132/278 KB   29/29 KB   135/278 KB   29/29 KB   137/278 KB   29/29 KB   139/278 KB                           143/278 KB              Downloaded: http://mvn.dianpingoa.com/dprepo/org/apache/maven/shared/maven-invoker/2.0.11/maven-invoker-2.0.11.jar (29 KB at 564.6 KB/sec)
+146/278 KB   149/278 KB   153/278 KB   157/278 KB   160/278 KB   163/278 KB   166/278 KB   170/278 KB   171/278 KB   174/278 KB   176/278 KB   180/278 KB   184/278 KB   188/278 KB   190/278 KB   193/278 KB   197/278 KB   201/278 KB   205/278 KB   207/278 KB   210/278 KB   212/278 KB   214/278 KB   218/278 KB   222/278 KB   226/278 KB   230/278 KB   231/278 KB   235/278 KB   239/278 KB   243/278 KB   247/278 KB   251/278 KB   255/278 KB   258/278 KB   260/278 KB   264/278 KB   265/278 KB   266/278 KB   270/278 KB   274/278 KB   276/278 KB   278/278 KB                Downloaded: http://mvn.dianpingoa.com/dprepo/commons-lang/commons-lang/2.6/commons-lang-2.6.jar (278 KB at 4081.7 KB/sec)
+[INFO] com.dianping.swallow:swallow-parent:pom:0.7.1-SNAPSHOT
+[INFO] +- org.springframework:spring-core:jar:3.2.9.RELEASE:compile
+[INFO] |  \- commons-logging:commons-logging:jar:1.1.3:compile
+[INFO] +- org.springframework:spring-beans:jar:3.2.9.RELEASE:compile
+[INFO] +- org.springframework:spring-context:jar:3.2.9.RELEASE:compile
+[INFO] |  +- org.springframework:spring-aop:jar:3.2.9.RELEASE:compile
+[INFO] |  |  \- aopalliance:aopalliance:jar:1.0:compile
+[INFO] |  \- org.springframework:spring-expression:jar:3.2.9.RELEASE:compile
+[INFO] +- org.springframework:spring-test:jar:3.2.9.RELEASE:test
+[INFO] +- log4j:log4j:jar:1.2.17:compile
+[INFO] +- org.slf4j:slf4j-log4j12:jar:1.6.0:compile
+[INFO] +- org.slf4j:slf4j-api:jar:1.6.0:compile
+[INFO] +- junit:junit:jar:4.9:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- org.kubek2k:springockito-annotations:jar:1.0.2:test
+[INFO] |  \- org.mockito:mockito-all:jar:1.9.0:test
+[INFO] \- com.dianping:jmockmongo-patched:jar:0.0.3:test
+[INFO]    +- org.mongodb:mongo-java-driver:jar:2.12.4:test (version managed from 2.7.3)
+[INFO]    \- io.netty:netty:jar:3.3.1.Final:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building swallow-common 0.7.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.4:tree (default-cli) @ swallow-common ---
+[INFO] com.dianping.swallow:swallow-common:jar:0.7.1-SNAPSHOT
+[INFO] +- com.fasterxml.jackson.core:jackson-databind:jar:2.1.4:compile
+[INFO] |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.1.4:compile
+[INFO] |  \- com.fasterxml.jackson.core:jackson-core:jar:2.1.4:compile
+[INFO] +- commons-io:commons-io:jar:1.4:compile
+[INFO] +- commons-codec:commons-codec:jar:1.6:compile
+[INFO] +- org.jboss.netty:netty:jar:3.2.7.Final:compile
+[INFO] +- com.caucho:hessian:jar:3.1.5:compile
+[INFO] +- org.mongodb:mongo-java-driver:jar:2.12.4:compile
+[INFO] +- com.dianping.lion:lion-client:jar:0.4.6:compile
+[INFO] |  +- org.apache.zookeeper:zookeeper:jar:3.4.5:compile
+[INFO] |  |  \- jline:jline:jar:0.9.94:compile
+[INFO] |  \- org.jodd:jodd-bean:jar:3.4.9:compile
+[INFO] |     \- org.jodd:jodd-core:jar:3.4.9:compile
+[INFO] +- log4j:log4j:jar:1.2.17:compile
+[INFO] +- cglib:cglib:jar:2.1_3:compile
+[INFO] |  \- asm:asm:jar:1.5.3:compile
+[INFO] +- org.springframework:spring-beans:jar:3.2.9.RELEASE:test (scope not updated to compile)
+[INFO] +- com.dianping.cat:cat-client:jar:1.2.7:compile
+[INFO] |  +- org.unidal.framework:foundation-service:jar:2.1.0:compile
+[INFO] |  |  +- org.codehaus.plexus:plexus-container-default:jar:1.5.5:compile
+[INFO] |  |  |  +- org.codehaus.plexus:plexus-classworlds:jar:2.2.2:compile
+[INFO] |  |  |  \- org.apache.xbean:xbean-reflect:jar:3.4:compile
+[INFO] |  |  |     \- commons-logging:commons-logging-api:jar:1.1:compile
+[INFO] |  |  +- com.google.guava:guava:jar:18.0:compile (version managed from 15.0)
+[INFO] |  |  +- org.codehaus.plexus:plexus-utils:jar:3.0.8:compile
+[INFO] |  |  \- org.aspectj:aspectjrt:jar:1.5.4:compile
+[INFO] |  \- io.netty:netty-all:jar:4.0.24.Final:compile
+[INFO] +- com.dianping.platform:phoenix-environment:jar:0.1.0:provided
+[INFO] +- org.springframework:spring-core:jar:3.2.9.RELEASE:compile
+[INFO] |  \- commons-logging:commons-logging:jar:1.1.3:compile
+[INFO] +- org.springframework:spring-context:jar:3.2.9.RELEASE:compile
+[INFO] |  +- org.springframework:spring-aop:jar:3.2.9.RELEASE:compile
+[INFO] |  |  \- aopalliance:aopalliance:jar:1.0:compile
+[INFO] |  \- org.springframework:spring-expression:jar:3.2.9.RELEASE:compile
+[INFO] +- org.springframework:spring-test:jar:3.2.9.RELEASE:test
+[INFO] +- org.slf4j:slf4j-log4j12:jar:1.6.0:compile
+[INFO] +- org.slf4j:slf4j-api:jar:1.6.0:compile
+[INFO] +- junit:junit:jar:4.9:test (scope not updated to compile)
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- org.kubek2k:springockito-annotations:jar:1.0.2:test
+[INFO] |  \- org.mockito:mockito-all:jar:1.9.0:test
+[INFO] \- com.dianping:jmockmongo-patched:jar:0.0.3:test
+[INFO]    \- io.netty:netty:jar:3.3.1.Final:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building swallow-consumerclient 0.7.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.4:tree (default-cli) @ swallow-consumerclient ---
+[INFO] com.dianping.swallow:swallow-consumerclient:jar:0.7.1-SNAPSHOT
+[INFO] +- org.jboss.netty:netty:jar:3.2.7.Final:compile
+[INFO] +- commons-codec:commons-codec:jar:1.6:compile
+[INFO] +- com.dianping.swallow:swallow-common:jar:0.7.1-SNAPSHOT:compile
+[INFO] |  +- com.fasterxml.jackson.core:jackson-databind:jar:2.1.4:compile
+[INFO] |  |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.1.4:compile
+[INFO] |  |  \- com.fasterxml.jackson.core:jackson-core:jar:2.1.4:compile
+[INFO] |  \- commons-io:commons-io:jar:1.4:compile
+[INFO] +- com.dianping.swallow:swallow-client:jar:0.5.4:provided
+[INFO] |  +- dom4j:dom4j:jar:1.6.1:provided
+[INFO] |  |  \- xml-apis:xml-apis:jar:1.0.b2:provided
+[INFO] |  +- org.mongodb:mongo-java-driver:jar:2.12.4:provided (version managed from 2.6.3)
+[INFO] |  +- commons-lang:commons-lang:jar:2.4:provided (version managed from 2.6)
+[INFO] |  +- org.springframework:spring:jar:2.5.6:provided
+[INFO] |  \- org.quartz-scheduler:quartz:jar:1.8.5:provided
+[INFO] |     \- javax.transaction:jta:jar:1.1:provided
+[INFO] +- com.dianping.lion:lion-client:jar:0.4.6:provided
+[INFO] |  +- org.apache.zookeeper:zookeeper:jar:3.4.5:provided
+[INFO] |  |  \- jline:jline:jar:0.9.94:provided
+[INFO] |  \- org.jodd:jodd-bean:jar:3.4.9:provided
+[INFO] |     \- org.jodd:jodd-core:jar:3.4.9:provided
+[INFO] +- com.dianping.cat:cat-client:jar:1.2.7:provided
+[INFO] |  +- org.unidal.framework:foundation-service:jar:2.1.0:provided
+[INFO] |  |  +- org.codehaus.plexus:plexus-container-default:jar:1.5.5:provided
+[INFO] |  |  |  +- org.codehaus.plexus:plexus-classworlds:jar:2.2.2:provided
+[INFO] |  |  |  \- org.apache.xbean:xbean-reflect:jar:3.4:provided
+[INFO] |  |  |     \- commons-logging:commons-logging-api:jar:1.1:provided
+[INFO] |  |  +- com.google.guava:guava:jar:18.0:provided (version managed from 15.0)
+[INFO] |  |  +- org.codehaus.plexus:plexus-utils:jar:3.0.8:provided
+[INFO] |  |  \- org.aspectj:aspectjrt:jar:1.5.4:provided
+[INFO] |  \- io.netty:netty-all:jar:4.0.24.Final:provided
+[INFO] +- com.dianping.platform:phoenix-environment:jar:0.1.0:provided
+[INFO] +- org.springframework:spring-core:jar:3.2.9.RELEASE:compile
+[INFO] |  \- commons-logging:commons-logging:jar:1.1.3:compile
+[INFO] +- org.springframework:spring-beans:jar:3.2.9.RELEASE:compile
+[INFO] +- org.springframework:spring-context:jar:3.2.9.RELEASE:compile
+[INFO] |  +- org.springframework:spring-aop:jar:3.2.9.RELEASE:compile
+[INFO] |  |  \- aopalliance:aopalliance:jar:1.0:compile
+[INFO] |  \- org.springframework:spring-expression:jar:3.2.9.RELEASE:compile
+[INFO] +- org.springframework:spring-test:jar:3.2.9.RELEASE:test
+[INFO] +- log4j:log4j:jar:1.2.17:compile
+[INFO] +- org.slf4j:slf4j-log4j12:jar:1.6.0:compile
+[INFO] +- org.slf4j:slf4j-api:jar:1.6.0:compile
+[INFO] +- junit:junit:jar:4.9:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- org.kubek2k:springockito-annotations:jar:1.0.2:test
+[INFO] |  \- org.mockito:mockito-all:jar:1.9.0:test
+[INFO] \- com.dianping:jmockmongo-patched:jar:0.0.3:test
+[INFO]    \- io.netty:netty:jar:3.3.1.Final:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building swallow-common-server 0.7.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.4:tree (default-cli) @ swallow-common-server ---
+[INFO] com.dianping.swallow:swallow-common-server:jar:0.7.1-SNAPSHOT
+[INFO] +- log4j:log4j:jar:1.2.17:compile
+[INFO] +- com.fasterxml.jackson.core:jackson-databind:jar:2.1.4:compile
+[INFO] |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.1.4:compile
+[INFO] |  \- com.fasterxml.jackson.core:jackson-core:jar:2.1.4:compile
+[INFO] +- org.slf4j:slf4j-log4j12:jar:1.6.0:compile
+[INFO] +- com.dianping.swallow:swallow-common:jar:0.7.1-SNAPSHOT:compile
+[INFO] |  \- commons-io:commons-io:jar:1.4:compile
+[INFO] +- org.apache.httpcomponents:httpclient:jar:4.0.1:compile
+[INFO] |  +- org.apache.httpcomponents:httpcore:jar:4.0.1:compile
+[INFO] |  +- commons-logging:commons-logging:jar:1.1.1:compile
+[INFO] |  \- commons-codec:commons-codec:jar:1.6:compile (version managed from 1.3)
+[INFO] +- com.dianping.swallow:swallow-common:test-jar:tests:0.7.1-SNAPSHOT:test
+[INFO] +- org.springframework.data:spring-data-mongodb:jar:1.5.4.RELEASE:compile
+[INFO] |  +- org.springframework:spring-tx:jar:3.2.10.RELEASE:compile
+[INFO] |  +- org.springframework:spring-expression:jar:3.2.10.RELEASE:compile
+[INFO] |  +- org.springframework.data:spring-data-commons:jar:1.8.4.RELEASE:compile
+[INFO] |  +- org.mongodb:mongo-java-driver:jar:2.12.4:compile (version managed from 2.12.1)
+[INFO] |  \- org.slf4j:jcl-over-slf4j:jar:1.6.0:runtime
+[INFO] +- org.springframework:spring-core:jar:3.2.9.RELEASE:compile
+[INFO] +- org.springframework:spring-beans:jar:3.2.9.RELEASE:compile
+[INFO] +- org.springframework:spring-context:jar:3.2.9.RELEASE:compile
+[INFO] |  \- org.springframework:spring-aop:jar:3.2.9.RELEASE:compile
+[INFO] |     \- aopalliance:aopalliance:jar:1.0:compile
+[INFO] +- org.springframework:spring-test:jar:3.2.9.RELEASE:test
+[INFO] +- org.slf4j:slf4j-api:jar:1.6.0:compile
+[INFO] +- junit:junit:jar:4.9:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- org.kubek2k:springockito-annotations:jar:1.0.2:test
+[INFO] |  \- org.mockito:mockito-all:jar:1.9.0:test
+[INFO] \- com.dianping:jmockmongo-patched:jar:0.0.3:test
+[INFO]    \- io.netty:netty:jar:3.3.1.Final:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building swallow-consumerserver 0.7.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://mvn.dianpingoa.com/dianping-snapshots/com/dianping/swallow/swallow-common-server/0.7.1-SNAPSHOT/maven-metadata.xml
+             Downloading: http://mvn.dianpingoa.com/dianping-snapshots/com/dianping/swallow/swallow-common-server/0.7.1-SNAPSHOT/swallow-common-server-0.7.1-SNAPSHOT.jar
+             [INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] swallow ........................................... SUCCESS [6.332s]
+[INFO] swallow-common .................................... SUCCESS [0.369s]
+[INFO] swallow-consumerclient ............................ SUCCESS [0.207s]
+[INFO] swallow-common-server ............................. SUCCESS [0.112s]
+[INFO] swallow-consumerserver ............................ FAILURE [0.042s]
+[INFO] swallow-producerclient ............................ SKIPPED
+[INFO] swallow-producerserver ............................ SKIPPED
+[INFO] swallow-example ................................... SKIPPED
+[INFO] swallow-standalone ................................ SKIPPED
+[INFO] swallow-consumermaster ............................ SKIPPED
+[INFO] swallow-consumerslave ............................. SKIPPED
+[INFO] swallow-test ...................................... SKIPPED
+[INFO] swallow-web ....................................... SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 7.577s
+[INFO] Finished at: Sat Apr 25 12:07:32 CST 2015
+[INFO] Final Memory: 13M/210M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal on project swallow-consumerserver: Could not resolve dependencies for project com.dianping.swallow:swallow-consumerserver:jar:0.7.1-SNAPSHOT: Could not find artifact com.dianping.swallow:swallow-common-server:jar:0.7.1-SNAPSHOT in dianping-internal-snapshots (http://mvn.dianpingoa.com/dianping-snapshots) -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <goals> -rf :swallow-consumerserver

@@ -1,6 +1,6 @@
 //var module = angular.module('SwallowModule', ['ngResource','isteven-multi-select']);
 //Your app's root module...
-var module = angular.module('SwallowModule', ['ngResource','isteven-multi-select'], function($httpProvider) {
+var module = angular.module('SwallowModule', ['ngResource'], function($httpProvider) {
   // Use x-www-form-urlencoded Content-Type
   $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 
@@ -75,6 +75,19 @@ module.directive('onFinishRenderFilters', function ($timeout) {
     };
 });
 
+//module.directive('onFinishLoadFilters', function ($timeout) {
+//    return {
+//        restrict: 'A',
+//        link: function(scope, element, attr) {
+//            if (scope.$last === true) {
+//                $timeout(function() {
+//                    scope.$broadcast('ngLoadFinished');
+//                });
+//            }
+//        }
+//    };
+//});
+
 module.directive('ngConfirmClick', [
     function(){
         return {
@@ -89,3 +102,5 @@ module.directive('ngConfirmClick', [
             }
         };
 }])
+
+

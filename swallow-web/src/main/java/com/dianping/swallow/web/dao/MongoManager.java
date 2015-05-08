@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.MongoClient;
@@ -28,12 +28,10 @@ public class MongoManager {
 	private static final String 				SWALLOW_MONGO 					= "swallow.mongo.producerServerURI";
 	private static final String 				TOPICNAME_DEFAULT 				= "default";
 	private static final String 				SWALLOW_W_MONGO 				= "swallow.mongourl";
-	
 	private volatile Map<String, MongoClient>   topicNameToMongoMap 			= new HashMap<String, MongoClient>();
 	private List<MongoClient>                   allReadMongo 					= new ArrayList<MongoClient>();
 	private MongoClient              			writeMongo;
-
-
+	
 	private static MongoManager instance;
 	private static final Logger logger = LoggerFactory
 			.getLogger(MongoManager.class);
@@ -73,9 +71,24 @@ public class MongoManager {
 			e.printStackTrace();
 		}
 		topicNameToMongoMap = parseURIAndCreateTopicMongo(uri.trim());  //read mongo
-		logger.info(uri);
-	}
+		if(logger.isInfoEnabled()){
+			logger.info(uri);
+		}
+		
+		try {
+			ConfigCache.getInstance().addChange(new ConfigChange() {
 
+			     @Override
+			     public void onChange(String key, String value) {
+			        onConfigChange(key, value);
+			     }
+			  });
+		} catch (LionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public Map<String, MongoClient> getTopicNameToMongoMap() {  //topic name without msg#
 		return topicNameToMongoMap;
 	}
@@ -194,4 +207,35 @@ public class MongoManager {
 		}
 		return result;
 	}
+	
+//	private Set<String> parseWebAdmin() throws LionException{
+//		Set<String> adminSet = new HashSet<String>();
+//		String admins = ConfigCache.getInstance().getProperty(SWALLOW_W_ADMIN);
+//		String[] admin = admins.split(",");
+//		for(int i = 0; i < admin.length; ++i)
+//			adminSet.add(admin[i]);
+//		return adminSet;
+//	}
+	
+	public synchronized void onConfigChange(String key, String value) {
+		if (logger.isInfoEnabled()) {
+	         logger.info("onChange() called.");
+	      }
+	      value = value.trim();
+	      try {
+	         if (SWALLOW_MONGO.equals(key)) {
+	            this.topicNameToMongoMap = parseURIAndCreateTopicMongo(value);
+	            Thread.sleep(5000);//DAO可能正在使用旧的Mongo，故等候5秒，才执行关闭操作
+	         }
+//	         } else if (SWALLOW_W_ADMIN.equals(key)) {
+//	        	 this.webAdmin = parseWebAdmin();
+//	 			if(logger.isInfoEnabled()){
+//					logger.info("webAdmin contains: " + webAdmin.toString());
+//				}
+//	         }
+	      } catch (Exception e) {
+	         logger.error("Error occour when reset config from Lion, no config property would changed :" + e.getMessage(), e);
+	      }
+	}
+	
 }

@@ -1,15 +1,16 @@
 package com.dianping.swallow.web.controller;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,20 +24,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
-
 import com.mongodb.MongoClient;
-import com.dianping.swallow.web.dao.SearchPropDAO;
 import com.dianping.swallow.web.dao.TopicDAO;
 import com.dianping.swallow.web.dao.WebSwallowMessageDAO;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.dianping.swallow.web.dao.MongoManager;
-import com.dianping.swallow.web.dao.impl.DefaultSearchPropDAO;
 import com.dianping.swallow.web.dao.impl.DefaultTopicDAO;
 import com.dianping.swallow.web.dao.impl.DefaultWebSwallowMessageDAO;
-import com.dianping.swallow.web.model.SearchProp;
 import com.dianping.swallow.web.model.Topic;
 
 /**
@@ -45,34 +42,29 @@ import com.dianping.swallow.web.model.Topic;
  *         2015年4月22日 下午1:50:20
  */
 @Controller
-@Component
 public class TopicController extends AbstractController {
 
 	private static final String 			TOPIC_DB_NAME 				= "swallowwebapplication";
-	private static final String 			DEPT_COLLECTION 			= "cdept";
-	private static final String 			DEPT_NAME 					= "dept";
 	private static final String             DEFAULT                     = "default";
 	private static final String             SIZE                        = "size";
 	private static final String             TOPIC                       = "topic";
-
-	private static final String 			PROP_COLLECTION 			= "cprop";
-	private static final String 			PROP_NAME 					= "prop";
-	public  static final String 			TIMEFORMAT 					= "yyyy-MM-dd";
+	public  static final String 			TIMEFORMAT 					= "yyyy-MM-dd HH:mm";
 
 	private static final String 			PRE_MSG 					= "msg#";
+	private static final String 			DELIMITOR					= ";";
 
 	private Map<String, MongoClient> 		topicNameToMongoMap 		= new HashMap<String, MongoClient>();
 	private List<MongoClient> 				allReadMongo 				= new ArrayList<MongoClient>();
 	private MongoClient 					writeMongo;
 	private WebSwallowMessageDAO 			smdi;
 	private TopicDAO 						tdi;
-	private SearchPropDAO	 				ddi;
 	private MongoOperations 				readMongoOps;
 	private MongoOperations 				writeMongoOps;
 	private volatile boolean 				isTopicDbexist 				= false;
 	private long 							totalNumOfTopic 			= 0;
 	private long 							searchSize 					= 0;
-
+	
+	private static Map<String,Set<String>>  topicToWhiteList            = new HashMap<String,Set<String>>();
 	private static final Logger logger = LoggerFactory
 			.getLogger(TopicController.class);
 
@@ -87,7 +79,8 @@ public class TopicController extends AbstractController {
 	@RequestMapping(value = "/console/topic/topicdefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object topicDefault(String offset, String limit, String name,
-			String prop, String dept) throws UnknownHostException {
+			String prop, String dept, HttpServletRequest request,
+			HttpServletResponse response) throws UnknownHostException {
 
 		int start = Integer.parseInt(offset);
 		int span = Integer.parseInt(limit); // get span+1 topics so that it can
@@ -101,6 +94,7 @@ public class TopicController extends AbstractController {
 			topicList = getSpecificTopic(start, span, name, prop, dept); // name
 			searchSize = topicList.size();
 		}
+		
 		map.put(SIZE, searchSize);
 		map.put(TOPIC, topicList);
 		return map;
@@ -185,15 +179,12 @@ public class TopicController extends AbstractController {
 	@ResponseBody
 	public Object deptName() throws UnknownHostException {
 		MongoOperations writeMongoOps = getWriteMongoOps();
-		ddi = new DefaultSearchPropDAO(writeMongoOps, DEPT_COLLECTION, DEPT_NAME);
-		List<SearchProp> deptList = ddi.findAll();
+		tdi = new DefaultTopicDAO(writeMongoOps);
 		List<String> depts = new ArrayList<String>();
-		for (SearchProp d : deptList){
-			String dept = d.getDept();
-			if(!depts.contains(dept))
-				depts.add(dept);
+		List<Topic> topics = tdi.findAll();
+		for(int i = 0; i < topics.size(); ++i){
+			depts.add(topics.get(i).getDept());
 		}
-
 		return depts;
 	}
 
@@ -203,75 +194,55 @@ public class TopicController extends AbstractController {
 	@ResponseBody
 	public Object propName() throws UnknownHostException {
 		MongoOperations writeMongoOps = getWriteMongoOps();
-		ddi = new DefaultSearchPropDAO(writeMongoOps, PROP_COLLECTION, PROP_NAME);
-		List<SearchProp> propList = ddi.findAll();
+		tdi = new DefaultTopicDAO(writeMongoOps);
 		List<String> props = new ArrayList<String>();
-		for (SearchProp p : propList){
-			String prop = p.getDept();
-			if(!props.contains(prop))
-				props.add(prop);
+		List<Topic> topics = tdi.findAll();
+		for(int i = 0; i < topics.size(); ++i){
+			String[] tmpprops = topics.get(i).getProp().split(DELIMITOR);
+			for(int j = 0; j < tmpprops.length; ++j){
+				if(!props.contains(tmpprops[j]))
+					props.add(tmpprops[j]);
+			}
 		}
-
 		return props;
 	}
-
-	// write use writeMongoOps
-	private void insertDept(String dept) {
-		if (!dept.isEmpty()) {
-			MongoOperations writeMongoOps = getWriteMongoOps();
-			ddi = new DefaultSearchPropDAO(writeMongoOps, DEPT_COLLECTION,
-					DEPT_NAME);
-			if (ddi.readByDept(dept) == null) {
-				SearchProp d = createSearchProp(dept);
-				ddi.create(d);
-			}
-		}
+	
+	public static Map<String, Set<String>> getTopicToWhiteList(){
+		return topicToWhiteList;
 	}
 
-	// write use writeMongoOps
-	private void insertProp(String prop) {
-		if (!prop.isEmpty()) {
-			MongoOperations writeMongoOps = getWriteMongoOps();
-			ddi = new DefaultSearchPropDAO(writeMongoOps, PROP_COLLECTION,
-					PROP_NAME);
-			if (ddi.readByDept(prop) == null) {
-				SearchProp p = createSearchProp(prop);
-				ddi.create(p);
-			}
-		}
-	}
-
-	private SearchProp createSearchProp(String search) {
-		Long id = System.currentTimeMillis();
-		SearchProp sp = new SearchProp(id.toString(), search);
-		return sp;
-	}
-
-	// write use writeMongoOps
-	@RequestMapping(value = "/console/edittopic")
-	public RedirectView edit(String name, String prop, String dept,
-			String time, HttpServletRequest request,
-			HttpServletResponse response) throws FileNotFoundException,
-			IOException {
-
+	@RequestMapping(value = "/console/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public void sendGroupMessages(@RequestParam(value = "name") String name, @RequestParam("prop") String prop, 
+							@RequestParam("dept") String dept,@RequestParam("time") String time,
+							HttpServletRequest request, HttpServletResponse response) {
 		MongoOperations writeMongoOps = getWriteMongoOps();
 		tdi = new DefaultTopicDAO(writeMongoOps);
+		prop = prop.trim().replace("；", ";"); //in case chinese ；
+		topicToWhiteList.put(name, splitProps(prop));
+		if(logger.isInfoEnabled()){
+			logger.info("Update prop to " + splitProps(prop) + " of " + name);
+		}
 		tdi.updateTopic(name, prop, dept, time);
-		// update DEPT_DB_NAME and PROP_DB_NAME
-		insertDept(dept);
-		insertProp(prop);
-		// return current refreshed page
-		return new RedirectView(request.getContextPath() + "/console/topic");
-	}
 
+		// return current refreshed page
+		return;
+	}
+	
 	private boolean isTopicName(String str) {
 		if (str != null && str.startsWith(PRE_MSG))
 			return true;
 		else
 			return false;
 	}
+	
+	private Set<String> splitProps(String props){
+		String[] prop = props.split(DELIMITOR);
+		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
+		return lists;
+	}
 
-	@Scheduled(cron = "0/10 * * * * *")
+	@Scheduled(fixedDelay=10000)
 	public void scanTopicDatabase() {
 		if(logger.isInfoEnabled()){
 			logger.info("[scanTopicDatabase]");
@@ -280,35 +251,58 @@ public class TopicController extends AbstractController {
 				.getTopicNameToMongoMap(); // name starts without msg#
 		allReadMongo = MongoManager.getInstance().getAllReadMongo();
 		writeMongo = MongoManager.getInstance().getWriteMongo();
+		
 		List<String> writeDbNames = writeMongo.getDatabaseNames();
 		if (writeDbNames.contains(TOPIC_DB_NAME)) {
 			isTopicDbexist = true;
+			//writeMongo.dropDatabase(TOPIC_DB_NAME);
 		}
 		List<String> dbs = new ArrayList<String>();
 		for (MongoClient mc : allReadMongo) {
 			dbs.addAll(mc.getDatabaseNames());
 		}
 		Collections.sort(dbs);
+
 		MongoOperations writeMongoOps = getWriteMongoOps();
 		tdi = new DefaultTopicDAO(writeMongoOps);
 		if (isTopicDbexist) { // update
 			for (String str : dbs) {
-				String subStr = str.substring(PRE_MSG.length());
-				if (isTopicName(str) && tdi.readByName(subStr) == null) {
-					tdi.create(TopicController.getTopic(subStr, 0L));
-					if(logger.isInfoEnabled()){
-						logger.info("create topic : "
-							+ TopicController.getTopic(subStr, 0L));
+				if(isTopicName(str)){
+					String subStr = str.substring(PRE_MSG.length());
+					Topic t = tdi.readByName(subStr);
+					if(t != null){  //exists
+						if(topicToWhiteList.get(subStr) == null){ //first scan
+							Set<String> lists = splitProps(t.getProp());
+							topicToWhiteList.put(subStr, lists);
+							if(logger.isInfoEnabled()){
+								logger.info("add " + subStr + " 's whitelist " + lists);
+							}
+						}
+					}
+					else {
+						tdi.create(TopicController.getTopic(subStr, 0L));
+						if(logger.isInfoEnabled()){
+							logger.info("isTopicDbexist is " + isTopicDbexist + ". create topic : "
+								+ TopicController.getTopic(subStr, 0L));
+						}
 					}
 				}
 
 			}
 		} else { // create
 			for (String dbn : dbs) {
+				Set<String> names = new HashSet<String>();
 				if (isTopicName(dbn)) {
-					String subStr = dbn.substring(PRE_MSG.length());
-					Topic t = TopicController.getTopic(subStr, 0L);
-					tdi.create(t);
+					String subStr = dbn.substring(PRE_MSG.length()).trim();
+					if(!names.contains(subStr)){ //in case add twice
+						names.add(subStr);
+						Topic t = TopicController.getTopic(subStr, 0L);
+						tdi.create(t);
+						if(logger.isInfoEnabled()){
+							logger.info("isTopicDbexist is " + isTopicDbexist + ". create topic : "
+								+ TopicController.getTopic(subStr, 0L));
+						}
+					}
 				}
 			}
 		}

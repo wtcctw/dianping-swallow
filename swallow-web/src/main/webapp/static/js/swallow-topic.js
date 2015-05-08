@@ -113,6 +113,15 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 				$scope.topicdept = dept;
 				$scope.topictime = time;
 			}
+			
+			$scope.refreshpage = function(myForm){
+	        	$('#myModal').modal('hide');
+	        	$scope.topictime = $("#datetimepicker").val();
+	        	$http.post(window.contextPath + '/console/topic/edittopic', {"name":$scope.topicname,"prop":$scope.topicprop,
+	        		"dept":$scope.topicdept,"time":$scope.topictime}).success(function(response) {
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" , "");
+	        	});
+	        }
 						
 			$scope.setTopicName = function(name){
 				localStorage.setItem("name", name);
@@ -120,7 +129,12 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 			
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
 			
+			$scope.loaddone = false;
+			if($scope.loaddone){}
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
+				$("a[href='/console/topic'] button").removeClass("btn-info");
+				$("a[href='/console/topic'] button").addClass("btn-purple");
+				$scope.adminornot = localStorage.getItem("isadmin");
 		          //下面是在table render完成后执行的js
 				 $http({
 						method : 'GET',
@@ -136,7 +150,6 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 							}
 						})
 					}).error(function(data, status, headers, config) {
-						alert("响应错误", data);
 					});
 					
 					// search topic name with specific prop
@@ -154,7 +167,6 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 							}
 						})
 					}).error(function(data, status, headers, config) {
-						alert("响应错误", data);
 					});
 					
 					// search topic name with specific dept
@@ -172,8 +184,10 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 							}
 						})
 					}).error(function(data, status, headers, config) {
-						alert("响应错误", data);
 					});
+					
+					$scope.loaddone = true;
 			 });
+			
 }]);
 

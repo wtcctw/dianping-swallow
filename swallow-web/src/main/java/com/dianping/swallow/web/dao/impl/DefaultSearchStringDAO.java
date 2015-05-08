@@ -7,35 +7,36 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.dianping.swallow.web.dao.SearchPropDAO;
-import com.dianping.swallow.web.model.SearchProp;
+import com.dianping.swallow.web.model.SearchString;
 
 /**
  * @author mingdongli
  *
  * 2015年4月22日 上午12:04:41
  */
-public class DefaultSearchPropDAO  implements SearchPropDAO{
+public class DefaultSearchStringDAO  implements SearchPropDAO{
 	
 	private  String DEPARTMENT_COLLECTION;
 	private  String NAME;                                                                      
 	
 	private MongoOperations mongoOps;
 	 
-	public DefaultSearchPropDAO(MongoOperations mongoOps, String col, String name){
+	public DefaultSearchStringDAO(MongoOperations mongoOps, String col, String name){
 	    this.mongoOps=mongoOps;
 	    this.DEPARTMENT_COLLECTION = col;
 	    this.NAME = name;
 }
 	
 	@Override
-	public void create(SearchProp p){
-		this.mongoOps.insert(p, DEPARTMENT_COLLECTION);
+	public void create(SearchString p){
+		//save and update
+		this.mongoOps.save(p, DEPARTMENT_COLLECTION);
 	}
 
     @Override
-	public SearchProp readByDept(String dept) {
+	public SearchString readByDept(String dept) {
         Query query = new Query(Criteria.where(NAME).is(dept));
-        return this.mongoOps.findOne(query, SearchProp.class, DEPARTMENT_COLLECTION);
+        return this.mongoOps.findOne(query, SearchString.class, DEPARTMENT_COLLECTION);
     }
 
     @Override
@@ -44,8 +45,8 @@ public class DefaultSearchPropDAO  implements SearchPropDAO{
     }
 	
     @Override
-	public List<SearchProp> findAll(){
-    	return this.mongoOps.findAll(SearchProp.class, DEPARTMENT_COLLECTION);
+	public List<SearchString> findAll(){
+    	return this.mongoOps.findAll(SearchString.class, DEPARTMENT_COLLECTION);
     }
 
 }

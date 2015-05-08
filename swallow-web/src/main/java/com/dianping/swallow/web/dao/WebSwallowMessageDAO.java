@@ -70,4 +70,8 @@ public interface WebSwallowMessageDAO extends Dao{
 	Map<String, Object> findByTime(int offset, int limit, String startdt,
 			String stopdt);
 	
+	Map<String, Object> findByTimeAndId(int offset, int limit, long mid, String startdt, String stopdt);
+	
+	Map<String, Object> findByTopicname(int offset, int limit);
+	
 }

@@ -14,7 +14,7 @@
 
 	<import resource="applicationContext.xml"/>
 
-    <task:annotation-driven /> 
+<!--     <task:annotation-driven />  -->
     <context:annotation-config />  
 
 	
