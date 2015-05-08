@@ -70,6 +70,8 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	
 	protected void sendMessage(int messageCount, String topic) throws SendFailedException, RemoteServiceInitFailedException {
 		
+		sendMessage(messageCount, topic, 0, 10);
+		
 	}
 	
 	private AtomicInteger totalSend = new AtomicInteger();

@@ -298,16 +298,10 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 			
 			@Override
 			protected void doRun() {
-				if(logger.isInfoEnabled()){
-					logger.info("[doRun][start]");
-				}
                 for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
                     ConsumerWorker worker = entry.getValue();
                     worker.recordAck();
                 }
-				if(logger.isInfoEnabled()){
-					logger.info("[doRun][end]");
-				}
 			}
         }, "AckIdUpdaterThread-");
 	}
