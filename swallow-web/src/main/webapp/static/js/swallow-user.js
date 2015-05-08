@@ -52,7 +52,7 @@ module.controller('UserController', ['$scope', '$http',
 				
 				$http({
 					method : 'GET',
-					url : "https://sso.a.alpha.dp:8443/logout?service=http%3A%2F%2Falpha.swallow.dp"
+					url : "https://sso.a.alpha.dp:8443/logout?service=http%3A%2F%2Flocalhost:8080"
 				}).success(function(data, status, headers, config) {
 					
 				}).error(function(data, status, headers, config) {
