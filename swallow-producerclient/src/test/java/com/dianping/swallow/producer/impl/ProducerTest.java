@@ -309,48 +309,33 @@ public class ProducerTest {
       SwallowPigeonConfiguration defaultConfig = new SwallowPigeonConfiguration();
 
       //测试默认值
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_HOSTS, defaultConfig.getHosts());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_IS_USE_LION, defaultConfig.isUseLion());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, defaultConfig.getSerialize());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_SERVICE_NAME, defaultConfig.getServiceName());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_TIMEOUT, defaultConfig.getTimeout());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_WEIGHTS, defaultConfig.getWeights());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_RETRY_BASE_INTERVAL, defaultConfig.getRetryBaseInterval());
       assertNotNull(defaultConfig.toString());
       
-      //测试设置值
-      defaultConfig.setHostsAndWeights("127.0.0.1:4999", "9");
       defaultConfig.setSerialize("what");
       defaultConfig.setServiceName("hello");
       defaultConfig.setTimeout(2222);
-      defaultConfig.setUseLion(true);
       defaultConfig.setRetryBaseInterval(1000);
 
-      assertEquals("127.0.0.1:4999", defaultConfig.getHosts());
-      assertEquals(true, defaultConfig.isUseLion());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, defaultConfig.getSerialize());
       assertEquals("hello", defaultConfig.getServiceName());
       assertEquals(2222, defaultConfig.getTimeout());
-      assertEquals("9", defaultConfig.getWeights());
       assertEquals(1000, defaultConfig.getRetryBaseInterval());
 
       //测试正常文件读取
       SwallowPigeonConfiguration normalConfig = new SwallowPigeonConfiguration("normalPigeon.properties");
-      assertEquals("127.2.2.1:2000", normalConfig.getHosts());
-      assertEquals(true, normalConfig.isUseLion());
       assertEquals("java", normalConfig.getSerialize());
       assertEquals("helloworld", normalConfig.getServiceName());
       assertEquals(200, normalConfig.getTimeout());
-      assertEquals("2", normalConfig.getWeights());
       assertEquals(600, normalConfig.getRetryBaseInterval());
 
       //测试格式错误文件读取
       SwallowPigeonConfiguration wrongConfig = new SwallowPigeonConfiguration("wrongPigeon.properties");
       assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, wrongConfig.getSerialize());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_TIMEOUT, wrongConfig.getTimeout());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_IS_USE_LION, wrongConfig.isUseLion());
-      assertEquals("127.2.2.1:2000,125.36.321.123:1325", wrongConfig.getHosts());
-      assertEquals("2,1", wrongConfig.getWeights());
       assertEquals(SwallowPigeonConfiguration.DEFAULT_RETRY_BASE_INTERVAL, wrongConfig.getRetryBaseInterval());
    }
 }

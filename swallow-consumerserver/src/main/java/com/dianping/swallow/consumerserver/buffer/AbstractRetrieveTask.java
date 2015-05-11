@@ -72,10 +72,10 @@ public abstract class AbstractRetrieveTask implements Runnable {
 	}
 
 	@SuppressWarnings("rawtypes")
-	protected void updateRetrieveStrategy(List messages) {
+	protected void updateRetrieveStrategy(List messages, Long tailId) {
 		int messageSize = messages == null ? 0 : messages.size();
 		if (logger.isInfoEnabled() && messageSize > 0) {
-			logger.info("[updateRetrieveStrategy][read message size]" + consumerInfo + "," + messageSize);
+			logger.info("[updateRetrieveStrategy][read message]" + consumerInfo + "," + tailId + "," + messageSize);
 		}
 		retriveStrategy.retrieved(messageSize);
 	}
@@ -89,7 +89,7 @@ public abstract class AbstractRetrieveTask implements Runnable {
 
 		List messages = messageRetriever.retrieveMessage(consumerInfo.getDest().getName(),
 				getConsumerId(), getTailId(), messageFilter);
-		updateRetrieveStrategy(messages);
+		updateRetrieveStrategy(messages, getTailId());
 		if (messages != null && messages.size() > 0) {
 			setTailId((Long) messages.get(0));
 			putMessage(messages);

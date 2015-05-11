@@ -102,6 +102,9 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		}
 		
 		Producer p = createProducer(topic, zipped);
+		if(logger.isInfoEnabled()){
+			logger.info("[sendMessage][begin]" + count.get());
+		}
         for (int i = 0; i < messageCount; i++) {
         	
     		if(message == null){
@@ -111,6 +114,14 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             sleep(sleepInterval);
             count.incrementAndGet();
         }
+		if(logger.isInfoEnabled()){
+			logger.info("[sendMessage][end]" + count.get());
+		}
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[sendMessage][db data count]" + mdao.count(topic, null));
+			logger.info("[sendMessage][min message]" + mdao.getMessagesGreaterThan(topic, null, 0L, 1));
+		}
 	}
 
 
@@ -238,7 +249,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
         });
         
         c.start();
-        sleep(10);
+        sleep(500);
         return c;
 	}
 
@@ -267,7 +278,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	protected void waitForListernToComplete(int messageCount) {
 		
 		if(messageCount <= 1000){
-			sleep(4000);
+			sleep(5000);
 			return;
 		}
 		sleep(8000);

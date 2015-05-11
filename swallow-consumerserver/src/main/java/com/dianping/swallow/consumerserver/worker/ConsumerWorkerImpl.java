@@ -111,8 +111,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
       long messageIdOfTailBackupMessage = -1;
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
          messageIdOfTailBackupMessage = (startMessageId != -1 ? startMessageId : getMaxMessageId(true));
-         
       }
+      
       messageQueue = swallowBuffer.createMessageQueue(this.consumerInfo, messageIdOfTailMessage,
             messageIdOfTailBackupMessage, this.messageFilter);
       heartBeatReceiver = new DefaultHeartBeatReceiver(consumerThreadPoolManager.getScheduledThreadPool(), this);
@@ -459,7 +459,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
          if (maxMessageId == null) {//不存在任何消息，则使用当前时间作为消息id即可
             maxMessageId = MongoUtils.getLongByCurTime();
          }
-
+         
+         
          if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
             //持久型且ack尚未有记录，则插入ack，表示以此ack为基准。
             ackDao.add(topicName, consumerInfo.getConsumerId(), maxMessageId, "inited", isBakcup);
