@@ -12,7 +12,7 @@ import com.dianping.swallow.web.model.WebSwallowMessage;
  *
  * 2015年4月22日 上午12:05:31
  */
-public interface WebSwallowMessageDao extends Dao, WebMongoManager{
+public interface WebSwallowMessageDaoB extends Dao, WebMongoManager{
 	
 
 	Map<String, Object> findByIp(int offset, int limit, String ip, String topicName);

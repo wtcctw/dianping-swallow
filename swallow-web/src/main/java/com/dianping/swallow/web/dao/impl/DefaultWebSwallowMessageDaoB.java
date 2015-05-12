@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-import com.dianping.swallow.web.dao.WebSwallowMessageDao;
+import com.dianping.swallow.web.dao.WebSwallowMessageDaoB;
 import com.dianping.swallow.web.model.WebSwallowMessage;
 import com.dianping.swallow.web.util.MongoUtils;
 import com.mongodb.BasicDBObjectBuilder;
@@ -31,7 +31,7 @@ import com.mongodb.WriteResult;
  *
  * 2015年4月20日 下午9:31:41 
  */
-public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
+public class DefaultWebSwallowMessageDaoB  implements WebSwallowMessageDaoB {
  
 	private 			 WebMongoManager        webMongoManager;
     private static final String 				MESSAGE_COLLECTION                 = "c";

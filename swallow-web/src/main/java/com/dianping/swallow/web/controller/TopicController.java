@@ -27,8 +27,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.mongodb.MongoClient;
 import com.dianping.swallow.web.dao.AdministratorDao;
-import com.dianping.swallow.web.dao.TopicDao;
-import com.dianping.swallow.web.dao.WebSwallowMessageDao;
+import com.dianping.swallow.web.dao.TopicDaoB;
+import com.dianping.swallow.web.dao.WebSwallowMessageDaoB;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AccessControlService;
@@ -53,9 +53,9 @@ public class TopicController extends AbstractWriteDao {
 	private long 							searchSize 					= 0;
 	
 	@Autowired
-	private WebSwallowMessageDao 			smdi;
+	private WebSwallowMessageDaoB 			smdi;
 	@Autowired
-	private TopicDao 						tdi;
+	private TopicDaoB 						tdi;
 	@Autowired
 	private AdministratorDao 				admind;
 	@Resource(name="accessControlService")

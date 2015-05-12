@@ -23,7 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.controller.utils.WebSwallowUtils;
 import com.dianping.swallow.web.dao.AdministratorDao;
-import com.dianping.swallow.web.dao.WebSwallowMessageDao;
+import com.dianping.swallow.web.dao.WebSwallowMessageDaoB;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.WebSwallowMessage;
 import com.dianping.swallow.web.service.AccessControlService;
@@ -49,7 +49,7 @@ public class MessageController extends AbstractWriteDao {
 	private String 								username;
 
 	@Autowired
-	private WebSwallowMessageDao 				smdi;
+	private WebSwallowMessageDaoB 				smdi;
 	@Autowired
 	private AdministratorDao 					admind;
 	@Resource(name = "accessControlService")
