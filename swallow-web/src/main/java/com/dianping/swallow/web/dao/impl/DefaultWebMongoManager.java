@@ -44,7 +44,6 @@ public class DefaultWebMongoManager implements WebMongoManager {
 		try {
 			uri = ConfigCache.getInstance().getProperty(SWALLOW_W_MONGO);
 		} catch (LionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (logger.isInfoEnabled()) {
@@ -53,7 +52,6 @@ public class DefaultWebMongoManager implements WebMongoManager {
 		try {
 			uri = ConfigCache.getInstance().getProperty(SWALLOW_MONGO);
 		} catch (LionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		topicNameToMongoMap = parseURIAndCreateTopicMongo(uri.trim()); 
@@ -70,7 +68,6 @@ public class DefaultWebMongoManager implements WebMongoManager {
 				}
 			});
 		} catch (LionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
