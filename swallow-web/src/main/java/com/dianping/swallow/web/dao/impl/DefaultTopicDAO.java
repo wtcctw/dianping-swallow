@@ -80,7 +80,7 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
     @Override
     public List<Topic> findFixedTopic(int offset, int limit){
         Query query = new Query();  
-        query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, "name"))); //根据name字段排序
+        query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, "name")));
         return mongoTemplate.find(query, Topic.class, TOPIC_COLLECTION);
     }
     

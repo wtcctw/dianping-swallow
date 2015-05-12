@@ -30,7 +30,6 @@ public interface TopicDao extends Dao {
 	
 	List<Topic> findFixedTopic(int offset, int limit);
 	
-	//each topic have one record in database
 	List<Topic> findSpecific(String name, String prop, String dept);
 	
  }

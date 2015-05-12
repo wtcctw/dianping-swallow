@@ -114,7 +114,7 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
     public List<WebSwallowMessage> findSpecific(int offset, int limit, long mid, String topicName){
     	Query query = new Query();
     	if(mid == 0){
-    		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));  //降序
+    		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
     	}
     	else{
     		return findSpecificWithId(offset, limit, mid, topicName);
