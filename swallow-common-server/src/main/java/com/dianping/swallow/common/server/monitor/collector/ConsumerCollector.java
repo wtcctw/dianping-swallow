@@ -14,4 +14,6 @@ public interface ConsumerCollector extends Collector{
 	void sendMessage(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message);
 	
 	void ackMessage(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message);
+	
+	void removeConsumer(ConsumerInfo consumerInfo);
 }

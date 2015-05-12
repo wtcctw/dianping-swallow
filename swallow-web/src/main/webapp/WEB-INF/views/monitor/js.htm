@@ -24,8 +24,15 @@
 				if ($('#ConsumerDelayController').length > 0) {
 					angular.element($('#ConsumerDelayController')).scope().getDelay('${topic}');
 				}
-
-
+				if ($('#ConsumerQpsController').length > 0) {
+					angular.element($('#ConsumerQpsController')).scope().getConsumerQps('${topic}');
+				}
+				if ($('#ConsumerServerQpsController').length > 0) {
+					angular.element($('#ConsumerServerQpsController')).scope().getConsumerServerQps();
+				}
+				if ($('#ProducerServerQpsController').length > 0) {
+					angular.element($('#ProducerServerQpsController')).scope().getProducerServerQps();
+				}
 			});
 </script>
 

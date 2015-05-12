@@ -3,8 +3,7 @@ package com.dianping.swallow.test;
 
 import java.util.Date;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;

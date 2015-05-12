@@ -374,7 +374,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements SelfMana
                     try {
                         heartbeater.beat(ip);
                         Thread.sleep(ConfigManager.getInstance().getHeartbeatUpdateInterval());
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         logger.error("Error update heart beat", e);
                     }
                 }

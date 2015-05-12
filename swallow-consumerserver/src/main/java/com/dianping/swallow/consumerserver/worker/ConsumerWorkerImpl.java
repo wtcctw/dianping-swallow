@@ -493,6 +493,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 
    @Override
    public void dispose() {
+	  consumerCollector.removeConsumer(consumerInfo);
       messageQueue.close();
       heartBeatReceiver.cancelCheck();
    }

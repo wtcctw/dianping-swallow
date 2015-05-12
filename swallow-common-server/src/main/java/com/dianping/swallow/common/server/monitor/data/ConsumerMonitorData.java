@@ -1,5 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data;
 
+import java.util.Set;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
@@ -54,25 +56,26 @@ public class ConsumerMonitorData extends MonitorData{
 		return MapUtil.getOrCreate(all, topic, ConsumerTopicData.class);
 	}
 	
-	public void addSendData(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message){
+	public void addSendData(final ConsumerInfo consumerInfo, final String consumerIp, final SwallowMessage message){
 		
-		if(consumerIp == null){
-			logger.error("[addSendData][consumer ip null]" + consumerIp);
-			consumerIp = "";
-		}
 		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
 		consumerTopicData.sendMessage(consumerInfo.getConsumerId(), consumerIp, message);
 						
 	}
 
-	public void addAckData(ConsumerInfo consumerInfo, String consumerIp, SwallowMessage message){
-		
+	public void addAckData(final ConsumerInfo consumerInfo, final String consumerIp, final SwallowMessage message){
+
 		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
 		consumerTopicData.ackMessage(consumerInfo.getConsumerId(), consumerIp, message);
 	}
 	
 	
-	
+	public void removeConsumer(ConsumerInfo consumerInfo){
+		ConsumerTopicData consumerTopicData = getConsumerTopicData(consumerInfo.getDest().getName());
+		consumerTopicData.removeConsumer(consumerInfo);
+		
+	}
+
 	private ConsumerTopicData getConsumerTopicData(String topicName) {
 		
 		ConsumerTopicData consumerTopicData;
@@ -134,6 +137,11 @@ public class ConsumerMonitorData extends MonitorData{
 	public Object getTotal() {
 
 		return all.getTotal();
+	}
+
+	@Override
+	public Set<String> getTopics() {
+		return all.keySet();
 	}
 
 }

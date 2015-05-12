@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data;
 
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import com.dianping.swallow.common.server.monitor.visitor.Acceptable;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.Visitor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mengwenchao
@@ -27,7 +29,6 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 	
 	
 	public static final String TOTAL_KEY = "total";
-	
 
 	@Transient
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
@@ -161,6 +162,9 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 
 		public void addMessage(long messageId, long startTime, long endTime) {
 			total.incrementAndGet();
+			if(endTime < startTime){
+				throw new TimeException("start > end", startTime, endTime);
+			}
 			totalDelay.addAndGet(endTime - startTime);
 		}
 
@@ -188,6 +192,9 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		}
 	}
 	
+
+	@JsonIgnore
+	public abstract Set<String> getTopics();
 	
 	@Override
 	public void accept(Visitor visitor){

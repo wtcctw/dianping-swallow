@@ -3,8 +3,7 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.AbstractTest;

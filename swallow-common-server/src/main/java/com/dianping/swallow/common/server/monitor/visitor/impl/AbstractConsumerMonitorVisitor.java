@@ -37,11 +37,15 @@ public abstract class AbstractConsumerMonitorVisitor extends AbstractMonitorVisi
 	}
 	
 	public List<Long> buildSendQpx(int intervalTimeSeconds, QPX qpx){
-		return null;
+		
+		return buildQpx(sendRawData, intervalTimeSeconds, qpx);
 	}
 
+
+
 	public List<Long> buildAckQpx(int intervalTimeSeconds, QPX qpx){
-		return null;
+		
+		return buildQpx(ackRawData, intervalTimeSeconds, qpx);
 	}
 
 

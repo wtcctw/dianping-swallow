@@ -168,6 +168,9 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
     */
    private void checkUseLion() {
 	  boolean noCheckLion = Boolean.parseBoolean(System.getProperty("noCheckLion"));
+	  if(logger.isInfoEnabled()){
+		  logger.info("[checkUseLion][noCheckLion]" + noCheckLion);
+	  }
 	  if(noCheckLion){
 		  return;
 	  }

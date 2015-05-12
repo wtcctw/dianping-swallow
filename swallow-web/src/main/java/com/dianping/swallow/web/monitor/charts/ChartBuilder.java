@@ -23,19 +23,27 @@ public class ChartBuilder {
 	
 	protected static final Logger logger     = LoggerFactory.getLogger(ChartBuilder.class);
 
-	public static HighChartsWrapper getHighChart(String title, String subTitle, StatsData... data) {
+	public static HighChartsWrapper getHighChart(String title, String subTitle, String yAxisTitle, StatsData... data) {
 		
-		return getHighChart(title, subTitle, Arrays.asList(data));
+		return getHighChart(title, subTitle, yAxisTitle, Arrays.asList(data));
+	}
+
+	public static HighChartsWrapper getHighChart(String title, String subTitle, String yAxisTitle, Collection<StatsData> data) {
+		
+		return getHighChart(title, subTitle, "时间", yAxisTitle, data);
 	}
 	
 	
-	public static HighChartsWrapper getHighChart(String title, String subTitle, Collection<StatsData> data) {
+	public static HighChartsWrapper getHighChart(String title, String subTitle,String xAxisTitle, String yAxisTitle, Collection<StatsData> data) {
 
 		insertData(data);
 		
 		HighChartsWrapper hcw = new HighChartsWrapper();
 		hcw.setTitle(title);
 		hcw.setSubTitle(subTitle);
+		
+		hcw.setxAxisTitle(xAxisTitle);
+		hcw.setyAxisTitle(yAxisTitle);
 
 		Series[] series = new Series[data.size()];
 		int i = 0;

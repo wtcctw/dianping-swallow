@@ -30,9 +30,11 @@ public class ConsumerConsumerIdMonitorVisitor extends AbstractConsumerMonitorVis
 		ConsumerIdData result = new ConsumerIdData();
 		result.setTotal();
 		
-		ConsumerIdData toMerge = consumerTopicData.get(consumerId);
-		if(toMerge != null){
-			result.merge(toMerge);
+		if(consumerTopicData != null){
+			ConsumerIdData toMerge = consumerTopicData.get(consumerId);
+			if(toMerge != null){
+				result.merge(toMerge);
+			}
 		}
 		
 		sendRawData.add(result.getTotalSendMessages());

@@ -2,8 +2,6 @@ package com.dianping.swallow.common.internal.util;
 
 import java.util.Map;
 
-import com.dianping.swallow.common.internal.monitor.Mergeable;
-
 /**
  * @author mengwenchao
  *

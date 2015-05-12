@@ -4,8 +4,6 @@ package com.dianping.swallow.web.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 
@@ -15,8 +13,6 @@ import com.dianping.swallow.common.internal.codec.JsonBinder;
  * 2015年4月2日 下午6:24:25
  */
 public abstract class AbstractMenuController extends AbstractController{
-
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();	
 	

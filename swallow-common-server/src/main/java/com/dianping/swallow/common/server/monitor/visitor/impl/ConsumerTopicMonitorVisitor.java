@@ -1,13 +1,10 @@
 package com.dianping.swallow.common.server.monitor.visitor.impl;
 
 
-import java.util.Map.Entry;
 
-import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.common.server.monitor.data.ConsumerIdData;
 import com.dianping.swallow.common.server.monitor.data.ConsumerTopicData;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
-
+import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
 /**
  * @author mengwenchao
@@ -15,26 +12,24 @@ import com.dianping.swallow.common.server.monitor.data.MonitorData;
  * 2015年4月22日 下午5:18:40
  */
 public class ConsumerTopicMonitorVisitor extends AbstractConsumerMonitorVisitor {
-	
+
 	public ConsumerTopicMonitorVisitor(String topic) {
 		super(topic);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void visitTopic(TotalMap visitorData) {
+	public void visitTopic(@SuppressWarnings("rawtypes") TotalMap visitorData) {
 		
-		ConsumerTopicData consumerTopicData = (ConsumerTopicData) visitorData;
+		ConsumerTopicData consumerTopicData = (ConsumerTopicData)visitorData;
+
 		
-		ConsumerIdData result = new ConsumerIdData();
-		
-		for(Entry<String, ConsumerIdData> entry : consumerTopicData.entrySet()){
-			ConsumerIdData consumerIdData = entry.getValue();
-			result.merge(MonitorData.TOTAL_KEY, consumerIdData);
+		ConsumerIdData consumerIdData = new ConsumerIdData();
+		if(consumerTopicData != null){
+			consumerIdData = consumerTopicData.getTotal();
 		}
 		
-		sendRawData.add(result.getTotalSendMessages());
-		ackRawData.add(result.getTotalAckMessages());
+		sendRawData.add(consumerIdData.getTotalSendMessages());
+		ackRawData.add(consumerIdData.getTotalAckMessages());
 	}
 
 }
