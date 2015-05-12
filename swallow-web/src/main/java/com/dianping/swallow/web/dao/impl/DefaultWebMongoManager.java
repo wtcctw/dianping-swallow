@@ -1,16 +1,18 @@
-package com.dianping.swallow.web.dao;
+package com.dianping.swallow.web.dao.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
-import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 
@@ -20,7 +22,7 @@ import com.mongodb.ServerAddress;
  *
  * 2015年4月22日 上午12:04:18
  */
-public class MongoManager {
+public class DefaultWebMongoManager implements WebMongoManager{
 
 	public  static final String 				TOPIC_COLLECTION 				= "c";
 	public  static final String 				PRE_MSG 						= "msg#";
@@ -30,25 +32,12 @@ public class MongoManager {
 	private static final String 				SWALLOW_W_MONGO 				= "swallow.mongourl";
 	private volatile Map<String, MongoClient>   topicNameToMongoMap 			= new HashMap<String, MongoClient>();
 	private List<MongoClient>                   allReadMongo 					= new ArrayList<MongoClient>();
-	private MongoClient              			writeMongo;
 	
-	private static MongoManager instance;
 	private static final Logger logger = LoggerFactory
-			.getLogger(MongoManager.class);
+			.getLogger(DefaultWebMongoManager.class);
 
-	private static synchronized void synInit() {
-		if (instance == null)
-			instance = new MongoManager();
-	}
 
-	public static MongoManager getInstance() {
-		if (instance == null) {
-			synInit();
-		}
-		return instance;
-	}
-
-	private MongoManager() {
+	public DefaultWebMongoManager() {
 		initMongoServer();
 	}
 
@@ -63,7 +52,6 @@ public class MongoManager {
 		if(logger.isInfoEnabled()){
 			logger.info(uri);
 		}
-		writeMongo = new MongoClient(MongoUtils.parseUriToAddressList(uri));  //write mongo
 		try {
 			uri = ConfigCache.getInstance().getProperty(SWALLOW_MONGO);
 		} catch (LionException e) {
@@ -89,18 +77,34 @@ public class MongoManager {
 		}
 	}
 	
+	@Override
 	public Map<String, MongoClient> getTopicNameToMongoMap() {  //topic name without msg#
 		return topicNameToMongoMap;
 	}
 	
+	@Override
+	public MongoTemplate getMessageMongoTemplate(String topicName){
+		MongoClient mongo = this.getMongoClient(topicName);
+		return new MongoTemplate(new SimMongoDbFactory(
+				mongo, PRE_MSG + topicName));
+	}
+	
+	private MongoClient getMongoClient(String topicName) {
+	      MongoClient mongo = this.topicNameToMongoMap.get(topicName);
+	      if (mongo == null) {
+	         if (logger.isDebugEnabled()) {
+	            logger.debug("topicname '" + topicName + "' do not match any Mongo Server, use default.");
+	         }
+	         mongo = this.topicNameToMongoMap.get(TOPICNAME_DEFAULT);
+	      }
+	      return mongo;
+	}
+	
+	@Override
 	public List< MongoClient> getAllReadMongo() {  //topic name without msg#
 		return allReadMongo;
 	}
 	
-	public MongoClient getWriteMongo() {  //topic name without msg#
-		return writeMongo;
-	}
-
 	/**
 	 * 解析URI，且创建topic使用的Mongo实例
 	 */
@@ -208,15 +212,6 @@ public class MongoManager {
 		return result;
 	}
 	
-//	private Set<String> parseWebAdmin() throws LionException{
-//		Set<String> adminSet = new HashSet<String>();
-//		String admins = ConfigCache.getInstance().getProperty(SWALLOW_W_ADMIN);
-//		String[] admin = admins.split(",");
-//		for(int i = 0; i < admin.length; ++i)
-//			adminSet.add(admin[i]);
-//		return adminSet;
-//	}
-	
 	public synchronized void onConfigChange(String key, String value) {
 		if (logger.isInfoEnabled()) {
 	         logger.info("onChange() called.");
@@ -227,15 +222,11 @@ public class MongoManager {
 	            this.topicNameToMongoMap = parseURIAndCreateTopicMongo(value);
 	            Thread.sleep(5000);//DAO可能正在使用旧的Mongo，故等候5秒，才执行关闭操作
 	         }
-//	         } else if (SWALLOW_W_ADMIN.equals(key)) {
-//	        	 this.webAdmin = parseWebAdmin();
-//	 			if(logger.isInfoEnabled()){
-//					logger.info("webAdmin contains: " + webAdmin.toString());
-//				}
-//	         }
 	      } catch (Exception e) {
 	         logger.error("Error occour when reset config from Lion, no config property would changed :" + e.getMessage(), e);
 	      }
 	}
+	
+	
 	
 }

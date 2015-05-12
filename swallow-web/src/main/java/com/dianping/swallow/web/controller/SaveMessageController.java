@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
@@ -24,21 +25,19 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 
 @SuppressWarnings("unused")
 @Controller
-@Component
-public class SaveMessageController {
+public class SaveMessageController extends AbstractWriteDao{
 	
 	private static final String                			V                  			="0.7.1";
+	private static final String                			LOCALHOST                   ="127.0.0.1";
 	private static final String                			RETRANSMIT                  ="retransmit";
-	private static 		 MessageDAO 					mdi;
 	
-	static{
-		@SuppressWarnings("resource")
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-		mdi = (MessageDAOImpl) ctx.getBean("messageDAO");
-	}
+	@Autowired
+	private  MessageDAO 								mdi;
+	
 	
 	private static final Logger logger = LoggerFactory.getLogger(TopicController.class);
 	
@@ -46,6 +45,7 @@ public class SaveMessageController {
 	@ResponseBody
 	public void retransmit(@RequestParam(value = "param[]") String[] param,
 							@RequestParam("topic") String topic) {
+		boolean successornot = false;
 		String topicName = topic.trim();
 		int length = param.length;
 		
@@ -54,30 +54,33 @@ public class SaveMessageController {
 		if(length == 1){
 			String tmpString = param[0].trim();
 			String subString = tmpString.substring(1,tmpString.length()-1);
-			long tmplong = Long.parseLong(subString.replace("\"", ""));
-			doGetAndSaveMessage(topicName, tmplong);
+			successornot = doRetransmit(topicName, Long.parseLong(subString.replace("\"", "")));
 		}
 		else{
 			for(int i = 0; i < length; ++i){
-				if(i != 0 && i != length - 1){
-					String tmp = param[i].trim().replace("\"", "");
-					long tmplong = Long.parseLong(tmp);
-					doGetAndSaveMessage(topicName, tmplong);
-				}
-				else if(i == 0){
-					String tmp = param[i].trim().replace("\"", "");
-					long tmplong = Long.parseLong(tmp.substring(1));
-					doGetAndSaveMessage(topicName, tmplong);
-				} 
-				else{
-					String tmp = param[i].trim().replace("\"", "");
-					long tmplong = Long.parseLong(tmp.substring(0, tmp.length()-1));
-					doGetAndSaveMessage(topicName, tmplong);
-				}
+				String tmp = param[i].trim().replace("\"", "");
+				if(i != 0 && i != length - 1)
+					successornot = doRetransmit(topicName, Long.parseLong(tmp));
+				else if(i == 0)
+					successornot = doRetransmit(topicName, Long.parseLong(tmp.substring(1)));
+				else
+					successornot = doRetransmit(topicName, Long.parseLong(tmp.substring(0, tmp.length()-1)));
 			}
 		}
 		
+		if(successornot){
+			if(logger.isInfoEnabled())
+				logger.info("retransmit messages with mid: " + param + " successfully.");
+		}
+		else{
+			if(logger.isInfoEnabled())
+				logger.info("retransmit messages with mid: " + param + " failed.");
+		}
 		return;
+	}
+	
+	private boolean doRetransmit(String topicName, long mid){
+		return doGetAndSaveMessage(topicName, mid);
 	}
 	
 	private boolean doGetAndSaveMessage(String topic, long mid){
@@ -131,17 +134,8 @@ public class SaveMessageController {
 		sm.setVersion(V);
 		sm.setGeneratedTime(new Date());
 		InetAddress addr = null;
-		String ip = null;
-		try {
-			addr = InetAddress.getLocalHost();
-			ip = addr.getHostAddress().toString();//获得本机IP
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			ip = "127.0.0.1";
-			e.printStackTrace();
-		}
 		
-		sm.setSourceIp(ip);
+		sm.setSourceIp(getHostIp(addr));
 		if(sm.getInternalProperties() != null)
 			sm.getInternalProperties().put(RETRANSMIT, "true");
 		else{
@@ -150,4 +144,19 @@ public class SaveMessageController {
 			sm.setInternalProperties(map);
 		}
 	}
+	
+	private String getHostIp(InetAddress addr){
+		String ip = null;
+		try {
+			addr = InetAddress.getLocalHost();
+			ip = addr.getHostAddress().toString();//获得本机IP
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			ip = LOCALHOST;
+			e.printStackTrace();
+		}
+		
+		return ip;
+	}
+
 }

@@ -9,6 +9,8 @@
         http://www.springframework.org/schema/task  
     	http://www.springframework.org/schema/task/spring-task-3.2.xsd">
     	
-    	<task:annotation-driven/> 
+    	<task:annotation-driven scheduler="dd"/> 
+    	
+    	<task:scheduler id="dd" pool-size="5"/>
 
 </beans>

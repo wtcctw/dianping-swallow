@@ -16,6 +16,7 @@ import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
@@ -34,6 +35,9 @@ public class MongoTemplateFactory {
 
 	@Value("${swallow.web.mongodbname.stats}")
 	private String statsMongoDbName;
+	
+	@Value("${swallow.web.mongodbname.topic}")
+	private String topicMongoDbName;
 
 	public static final String SWALLOW_STATS_MONGO_URL_KEY = "swallow.mongourl";
 
@@ -61,6 +65,14 @@ public class MongoTemplateFactory {
 	public MongoTemplate getStatisMongoTemplate(){
 		
 		return createMongoTemplate(statsMongoDbName);
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Bean( name = "topicMongoTemplate" )
+	public MongoTemplate getTopicMongoTemplate(){
+		
+		return new MongoTemplate(new SimMongoDbFactory(
+				mongo, topicMongoDbName));
 	}
 
 	private MongoTemplate createMongoTemplate(String mongoDbName) {

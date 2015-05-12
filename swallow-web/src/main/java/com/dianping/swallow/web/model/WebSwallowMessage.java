@@ -23,7 +23,7 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
    private  String      			  		s;
    private  Date        					gt;
    private  String        					p;
-   private  String							i_p;
+   private  String							_p;
    private  String        					t;
    public   String        					si;  //SOURCE_IP
    public   String          				mo_id; //message ID
@@ -46,27 +46,28 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 		this.s = s;
 		this.gt = gt;
 		this.p = p;
-		this.i_p = i_p;
+		this._p = i_p;
 		this.t = t;
 		this.si = si;
 	}
 
-	public BSONTimestamp getId() {
+	public BSONTimestamp get_id() {
 		return _id;
 	}
 
-	public void setId(BSONTimestamp id) {
-		this._id = id;
+	public void set_id(BSONTimestamp _id) {
+		this._id = _id;
 	}
 
+	
 	public BSONTimestamp getO_id() {
 		return o_id;
 	}
 
-	public void setO_id(BSONTimestamp oid) {
-		this.o_id = oid;
+	public void setO_id(BSONTimestamp o_id) {
+		this.o_id = o_id;
 	}
-	
+
 	public String getMid() {
 		return mid;
 	}
@@ -124,13 +125,14 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 	public void setP(String p) {
 		this.p = p;
 	}
-
-	public void setI_p(String ip) {
-		this.i_p = ip;
-	}
 	
-	public String  getI_p() {
-		return i_p;
+
+	public String get_p() {
+		return _p;
+	}
+
+	public void set_p(String _p) {
+		this._p = _p;
 	}
 
 	public String  getT() {
@@ -170,8 +172,8 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 	
     @Override
     public int compareTo(WebSwallowMessage ts) {
-    	int bs= ts.getId().getTime();
-    	int thisbs = this.getId().getTime();
+    	int bs= ts.get_id().getTime();
+    	int thisbs = this.get_id().getTime();
         if(thisbs != bs) {
             return thisbs - bs;
         }
@@ -182,7 +184,7 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 	
 	@Override
 	public String toString() {
-		return _id + "::" + o_id + "::" + c + "::" + v + "::" + s + "::" + gt + "::" + p + "::" + i_p + "::" + t + "::" + si + "::" +  mid + "::" + gtstring + "::" +  ststring;
+		return _id + "::" + o_id + "::" + c + "::" + v + "::" + s + "::" + gt + "::" + p + "::" + _p + "::" + t + "::" + si + "::" +  mid + "::" + gtstring + "::" +  ststring;
 	}
 
 }

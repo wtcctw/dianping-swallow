@@ -8,9 +8,9 @@
                     ace.settings.check('breadcrumbs', 'fixed')
                 } catch (e) {
                 }
+
             </script>
 		
-
 		<form class="bs-example bs-example-form-local" role="form">
 			<div class="input-group input-group-local">
 				<span class="input-group-addon">申请人</span> <input type="text"
@@ -116,11 +116,11 @@
 							<div class="control-group">
 								<label class="control-label">申请人</label>
 								<div class="controls">
-									<input name="prop" class="input-xlarge" type="text" required
-										placeholder="多人请用;分割..." ng-model="topicprop">
+									<input name="prop" class="input-xlarge" type="text" required data-provide="typeahead"
+									 ng-model="topicprop" id="topicprops" autocomplete = "off" style="width: 270px">
 								</div>
 							</div>
-
+							
 							<div class="control-group">
 								<label class="control-label">申请人部门</label>
 								<div class="controls">

@@ -71,7 +71,7 @@ module.factory('Paginator', function(){
 });
 
 module.controller('TopicController', ['$scope', '$http', 'Paginator',
-        function($scope, $http, Paginator, instance){
+        function($scope, $http, Paginator){
 				var fetchFunction = function(offset, limit, name, prop, dept, callback){
 				var transFn = function(data){
 					return $.param(data);
@@ -109,6 +109,13 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 			$scope.topictime = "";
 			$scope.setModalInput = function(name,prop,dept,time){
 				$scope.topicname = name;
+				//clear all first
+				$('#topicprops').tagsinput('removeAll');
+				if(prop != null && prop.length > 0){
+					var props = prop.split(",");
+					for(var i = 0; i < props.length; ++i)
+						$('#topicprops').tagsinput('add', props[i]);
+				}
 				$scope.topicprop  = prop;
 				$scope.topicdept = dept;
 				$scope.topictime = time;
@@ -117,6 +124,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 			$scope.refreshpage = function(myForm){
 	        	$('#myModal').modal('hide');
 	        	$scope.topictime = $("#datetimepicker").val();
+	        	$scope.topicprop = $("#topicprops").val();
 	        	$http.post(window.contextPath + '/console/topic/edittopic', {"name":$scope.topicname,"prop":$scope.topicprop,
 	        		"dept":$scope.topicdept,"time":$scope.topictime}).success(function(response) {
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" , "");
@@ -127,7 +135,20 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 				localStorage.setItem("name", name);
 			}
 			
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
+			//display different view for different login user
+			$scope.firstaccess = false;
+			$scope.$on('ngLoadFinished',  function (ngLoadFinishedEvent, admin, user){
+				if(!$scope.firstaccess){
+					if(!admin)
+						$scope.prop = user;  //if not admin, show all topic, so that it can edit
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
+					$scope.prop = "";
+					$scope.firstaccess = true;
+				}
+				else
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
+			});
+			
 			
 			$scope.loaddone = false;
 			if($scope.loaddone){}
@@ -135,6 +156,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 				$("a[href='/console/topic'] button").removeClass("btn-info");
 				$("a[href='/console/topic'] button").addClass("btn-purple");
 				$scope.adminornot = localStorage.getItem("isadmin");
+				
 		          //下面是在table render完成后执行的js
 				 $http({
 						method : 'GET',
@@ -166,6 +188,13 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 								return c;
 							}
 						})
+						//work
+						$('#topicprops').tagsinput({
+							  typeahead: {      
+								  source: topicPropList,
+								  displayText: function(item){ return item;}  //necessary
+							  }
+						});
 					}).error(function(data, status, headers, config) {
 					});
 					

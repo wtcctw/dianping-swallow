@@ -10,29 +10,27 @@ import com.dianping.swallow.web.model.Topic;
  *
  * 2015年4月22日 上午12:05:13
  */
-public interface TopicDAO extends Dao {
+public interface TopicDao extends Dao {
 
-	public void create(Topic p);
+	Topic readById(String id);
+	
+    Topic readByName(String name) ;
 
-	public Topic readById(String id);
+	void saveTopic(Topic p);
 	
-    public Topic readByName(String name) ;
+	void updateTopic(String name, String person, String dept, String time);
 
-	public void saveTopic(Topic p);
+	int deleteById(String id);
 	
-	public void updateTopic(String name, String person, String dept, String time);
-
-	public int deleteById(String id);
+	void dropCol();
 	
-	public void dropCol();
+	List<Topic> findAll();
 	
-	public List<Topic> findAll();
+	long countTopic();
 	
-	public long countTopic();
-	
-	public List<Topic> findFixedTopic(int offset, int limit);
+	List<Topic> findFixedTopic(int offset, int limit);
 	
 	//each topic have one record in database
-	public List<Topic> findSpecific(String name, String prop, String dept);
+	List<Topic> findSpecific(String name, String prop, String dept);
 	
  }

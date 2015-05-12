@@ -10,8 +10,7 @@
 		<param-value>
 				classpath*:config/spring/common/appcontext-*.xml
 				classpath*:config/spring/local/appcontext-*.xml
-				classpath*:servlet-context.xml
-				classpath*:applicationContext-springtask.xml
+				classpath*:applicationContext.xml
 		</param-value>
 	</context-param>
 	 	<!-- for cas-server -->
