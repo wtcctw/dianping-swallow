@@ -10,7 +10,7 @@ import com.dianping.swallow.web.model.Topic;
  *
  * 2015年4月22日 上午12:05:13
  */
-public interface TopicDaoB extends Dao {
+public interface TopicDao extends Dao {
 
 	Topic readById(String id);
 	

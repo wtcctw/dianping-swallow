@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import com.dianping.swallow.web.controller.TopicController;
 import com.dianping.swallow.web.dao.AdministratorDao;
-import com.dianping.swallow.web.dao.TopicDaoB;
-import com.dianping.swallow.web.dao.WebSwallowMessageDaoB;
+import com.dianping.swallow.web.dao.TopicDao;
+import com.dianping.swallow.web.dao.WebSwallowMessageDao;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
@@ -38,9 +38,9 @@ public class ScanWriteDaoScheduler extends AbstractWriteDao{
 	private static final String 				DELIMITOR 					= ",";
 
 	@Autowired
-	private WebSwallowMessageDaoB 				smdi;
+	private WebSwallowMessageDao 				smdi;
 	@Autowired
-	private TopicDaoB 							tdi;
+	private TopicDao 							tdi;
 	@Autowired
 	private AdministratorDao 					admind;
 	@Resource(name = "accessControlService")
