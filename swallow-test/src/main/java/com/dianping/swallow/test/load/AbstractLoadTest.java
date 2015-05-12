@@ -62,9 +62,12 @@ public abstract class AbstractLoadTest {
 		doStart();
 		
 		executors.shutdown();
-		executors.awaitTermination(1, TimeUnit.DAYS);
+		executors.awaitTermination(7, TimeUnit.DAYS);
 		
 		if(isExitOnExecutorsReturn()){
+			if(logger.isInfoEnabled()){
+				logger.info("[start][time exceed return]");
+			}
 			exit();
 		}
 		
