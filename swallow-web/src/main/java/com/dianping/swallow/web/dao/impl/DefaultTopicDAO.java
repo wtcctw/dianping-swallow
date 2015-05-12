@@ -20,7 +20,6 @@ import com.mongodb.WriteResult;
  */
 public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
  
-    //集合名字
     private static final String 			TOPIC_COLLECTION =					"swallowwebtopicc";
     
     private static final String 			NAME =								"name";

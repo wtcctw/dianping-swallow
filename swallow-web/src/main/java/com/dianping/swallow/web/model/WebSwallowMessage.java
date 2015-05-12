@@ -155,7 +155,6 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 		return ststring;
 	}
 
-	//数据库里面用的是秒为单位，而JAVA里面则是毫秒为单位，差了1000倍
 	public void setStstring(BSONTimestamp ts) {
 		int seconds = ts.getTime();
 		long millions = new Long(seconds)*1000;

@@ -7,8 +7,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.mongodb.MongoClient;
 
-
-
 /**
  * @author mingdongli
  * 2015年4月8日 下午6:31:13

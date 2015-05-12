@@ -34,7 +34,6 @@ import com.mongodb.WriteResult;
 public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
  
 	private 			 WebMongoManager        webMongoManager;
-	//集合名字
     private static final String 				MESSAGE_COLLECTION                 = "c";
     private static final String 				TIMEFORMAT                         = "yyyy-MM-dd HH:mm:ss";
     private static final String 				ID                                 = "_id";
@@ -290,5 +289,5 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
 	public WebMongoManager getWebwebMongoManager() {
 		return this.webMongoManager;
 	}
- 
+
 }
