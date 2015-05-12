@@ -100,7 +100,7 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
     	List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
     	Map<String, Object> map = new HashMap<String, Object>();
     	Query query = new Query();
-    	query.with(new Sort(new Sort.Order(Direction.DESC, ID)));  //降序
+    	query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
     	query.skip(offset).limit(limit);
         messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
 
@@ -190,7 +190,7 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
     	List<WebSwallowMessage> list = new ArrayList<WebSwallowMessage>();
     	Query query = new Query();
     	if(mid == 0){
-    		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));  //降序
+    		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
     		query.skip(offset).limit(limit);
     		list = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
     	}
@@ -226,25 +226,25 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
        BSONTimestamp timestamp = (BSONTimestamp) result.get(ID);
        BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(OID);
        if (originalTimestamp != null)
-           swallowMessage.setO_id(originalTimestamp);  //modify origin code
+           swallowMessage.setO_id(originalTimestamp); 
        swallowMessage.set_id(timestamp);
 
-       swallowMessage.setC((String)result.get(C));//content
-       swallowMessage.setV((String) result.get(V));//version
-       swallowMessage.setGt((Date) result.get(GT));//generatedTime
-       Map<String, String> propertiesBasicDBObject = (Map<String, String>) result.get(P);//mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
+       swallowMessage.setC((String)result.get(C));
+       swallowMessage.setV((String) result.get(V));
+       swallowMessage.setGt((Date) result.get(GT));
+       Map<String, String> propertiesBasicDBObject = (Map<String, String>) result.get(P);
        if (propertiesBasicDBObject != null) {
           HashMap<String, String> properties = new HashMap<String, String>(propertiesBasicDBObject);
-          swallowMessage.setP(properties.toString());//properties
+          swallowMessage.setP(properties.toString());
        }
-       Map<String, String> internalPropertiesBasicDBObject = (Map<String, String>) result.get(IP);//mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
+       Map<String, String> internalPropertiesBasicDBObject = (Map<String, String>) result.get(IP);
        if (internalPropertiesBasicDBObject != null) {
           HashMap<String, String> properties = new HashMap<String, String>(internalPropertiesBasicDBObject);
-          swallowMessage.set_p(properties.toString());//properties
+          swallowMessage.set_p(properties.toString());
        }
-       swallowMessage.setS((String) result.get(S));//sha1
-       swallowMessage.setT((String) result.get(T));//type
-       swallowMessage.setSi((String) result.get(SI));//sourceIp
+       swallowMessage.setS((String) result.get(S));
+       swallowMessage.setT((String) result.get(T));
+       swallowMessage.setSi((String) result.get(SI));
     }
     
 
