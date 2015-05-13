@@ -37,14 +37,21 @@ module.controller('UserController', ['$scope', '$http',
 				$scope.login    = true;
 				$scope.logout   = false;
 				
-				$http({
-					method : 'GET',
-					url : "https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080",
-					dataType: 'jsonp'
-				}).success(function(data, status, headers, config) {
-					
-				}).error(function(data, status, headers, config) {
-				});
+				$.ajax({
+			        url: "https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080",
+			        type: 'GET',
+			        dataType: 'JSONP',//here
+			        success: function (data) {
+			        }
+			    });
+//				$http({
+//					method : 'GET',
+//					url : "https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080",
+//					dataType: 'jsonp'
+//				}).success(function(data, status, headers, config) {
+//					
+//				}).error(function(data, status, headers, config) {
+//				});
 			};
 			
 }]);
