@@ -40,7 +40,7 @@ module.controller('UserController', ['$scope', '$http',
 				$.ajax({
 			        url: "https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080",
 			        type: 'GET',
-			        dataType: 'JSONP',//here
+			        dataType: 'jsonp',//here
 			        success: function (data) {
 			        }
 			    });
