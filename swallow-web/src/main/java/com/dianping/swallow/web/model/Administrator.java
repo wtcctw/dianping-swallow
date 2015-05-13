@@ -20,6 +20,18 @@ public class Administrator {
 	private int    role;
 	
 	private String date;
+	
+	public Administrator(){
+		
+	}
+	
+	public Administrator(String name, String email,int role, String date) {
+		this.name = name;
+		this.email = email;
+		this.role = role;
+		this.date = date;
+	}
+
 
 	public String getDate() {
 		return date;
@@ -27,13 +39,6 @@ public class Administrator {
 
 
 	public void setDate(String date) {
-		this.date = date;
-	}
-
-	public Administrator(String name, String email,int role, String date) {
-		this.name = name;
-		this.email = email;
-		this.role = role;
 		this.date = date;
 	}
 
