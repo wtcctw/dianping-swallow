@@ -40,8 +40,7 @@ module.controller('UserController', ['$scope', '$http',
 				$http({
 					method : 'GET',
 					url : "https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080",
-					dataType: 'jsonp',
-			        crossDomain: true
+					dataType: 'jsonp'
 				}).success(function(data, status, headers, config) {
 					
 				}).error(function(data, status, headers, config) {
