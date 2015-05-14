@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
@@ -39,6 +42,8 @@ public class DataMonitorController extends AbstractMonitorController{
 	
 	public static final String Y_AXIS_TYPE_DELAY = "延时(毫秒)";
 
+	public static final String CAT_TYPE = "MONITOR";
+	
 	
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -136,12 +141,22 @@ public class DataMonitorController extends AbstractMonitorController{
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get", method = RequestMethod.POST)
 	@ResponseBody
-	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable String topic) throws IOException{
-
-		StatsData 		 producerData = producerDataRetriever.getSaveDelay(topic); 
-		List<ConsumerDataPair>  consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic);
+	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic) throws IOException{
 		
-		return  buildConsumerChartWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay); 
+		SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(CAT_TYPE, "getConsumerDelayMonitor");
+		
+		return wrapper.doCallable(new Callable<List<HighChartsWrapper>>() {
+			
+			@Override
+			public List<HighChartsWrapper> call() throws Exception {
+				
+				StatsData 		 producerData = producerDataRetriever.getSaveDelay(topic); 
+				List<ConsumerDataPair>  consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic);
+				
+				return  buildConsumerChartWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay); 
+			}
+		});		
+		
 		
 	}
 

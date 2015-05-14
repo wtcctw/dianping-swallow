@@ -9,8 +9,8 @@ import java.util.LinkedList;
 import java.util.NavigableMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -193,6 +193,10 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	 */
 	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end, String serverIp) {
 
+		if(logger.isDebugEnabled()){
+			logger.debug("[getData][begin]" + topic + "," + serverIp);
+		}
+		
 		NavigableMap<Long, MonitorData>  result;
 		
 		if(dataExistInMemory(start, end)){
@@ -202,8 +206,12 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		}
 		//插值补齐 
 		insertLackedData(result);
-		return result;
 
+		if(logger.isDebugEnabled()){
+			logger.debug("[getData][end]" + topic + "," + serverIp);
+		}
+		
+		return result;
 	}
 
 	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end) {
@@ -280,7 +288,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	public static abstract class SwallowServerData{
 		
 		
-		private NavigableMap<Long, MonitorData> datas = new TreeMap<Long, MonitorData>();   
+		private NavigableMap<Long, MonitorData> datas = new ConcurrentSkipListMap<Long, MonitorData>();   
 
 		private AtomicInteger count = new AtomicInteger();
 		
@@ -301,9 +309,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 					}
 					
 					MonitorData data = null;
-					synchronized(datas){
-						 data = MapUtil.getOrCreate(datas, key, (Class)getMonitorDataClass());
-					}
+					data = MapUtil.getOrCreate(datas, key, (Class)getMonitorDataClass());
 					data.merge(topic, value);
 				}
 			}
@@ -312,10 +318,8 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		public Set<String> getTopics() {
 			
 			Set<String> topics = new HashSet<String>();
-			synchronized (datas) {
-				for(MonitorData monitorData : datas.values()){
-					topics.addAll(monitorData.getTopics());
-				}
+			for(MonitorData monitorData : datas.values()){
+				topics.addAll(monitorData.getTopics());
 			}
 			return topics;
 		}
@@ -330,9 +334,8 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 
 		public void add(MonitorData monitorData){
 			
-			synchronized (datas) {
-				datas.put(getCeilingTime(monitorData.getCurrentTime()), monitorData);
-			}
+			datas.put(getCeilingTime(monitorData.getCurrentTime()), monitorData);
+				
 			if(count.incrementAndGet() > keepInMemoryCount){
 				datas.pollFirstEntry();
 				count.decrementAndGet();

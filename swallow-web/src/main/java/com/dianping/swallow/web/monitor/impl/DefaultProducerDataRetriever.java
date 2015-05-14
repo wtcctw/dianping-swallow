@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitorFactory;
@@ -29,6 +32,8 @@ import com.dianping.swallow.web.monitor.StatsDataType;
  */
 @Component
 public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever implements ProducerDataRetriever{
+	
+	public static final String CAT_TYPE = "DefaultProducerDataRetriever";
 	
 	@Autowired
 	private ProducerMonitorDao producerMonitorDao;
@@ -135,9 +140,18 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 	}
 
 	@Override
-	public StatsData getSaveDelay(String topic) {
+	public StatsData getSaveDelay(final String topic) {
 		
-		return getSaveDelay(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+		SwallowCallableWrapper<StatsData> wrapper = new CatCallableWrapper<StatsData>(CAT_TYPE, "getSaveDelay");
+		
+		return wrapper.doCallable(new Callable<StatsData>() {
+			
+			@Override
+			public StatsData call() throws Exception {
+				
+				return getSaveDelay(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+			}
+		});
 	}
 
 

@@ -6,11 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 import java.util.NavigableMap;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
@@ -30,6 +33,9 @@ import com.dianping.swallow.web.monitor.StatsDataType;
 @Component
 public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever implements ConsumerDataRetriever{
 
+	
+	public static final String CAT_TYPE = "ConsumerDataRetriever";
+	
 	@Override
 	public List<ConsumerDataPair> getDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end) {
 		
@@ -76,6 +82,10 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 
 	private List<ConsumerDataPair> getStatsData(String topic, String serverIp, int intervalTimeSeconds, long start, long end, int type, QPX qpx) {
 		
+		if(logger.isDebugEnabled()){
+			logger.debug("[getStatsData][begin]" + topic + "," + serverIp);
+		}
+		
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataPair>();
 		
 		NavigableMap<Long, MonitorData> data = getData(topic, start, end, serverIp);
@@ -90,6 +100,10 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 		for(String consumerId : consumerIds){
 			result.add(getConsumerIdDataPair(topic, consumerId, data, intervalTimeSeconds, realStartTime, end, type, qpx));
 		}
+
+		if(logger.isDebugEnabled()){
+			logger.debug("[getStatsData][end]" + topic + "," + serverIp);
+		}
 		return result;
 	}
 
@@ -103,6 +117,10 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 	private ConsumerDataPair getConsumerIdDataPair(String topic, String consumerId,
 			NavigableMap<Long, MonitorData> data, int intervalTimeSeconds,
 			long start, long end, int type, QPX qpx) {
+		
+		if(logger.isDebugEnabled()){
+			logger.debug("[getConsumerIdDataPair][begin]" + topic + "," + consumerId);
+		}
 		
 		ConsumerMonitorVisitor consumerMonitorVisitor = MonitorVisitorFactory.buildConsumerConsumerIdVisitor(topic, consumerId);
 		visit(consumerMonitorVisitor, data);
@@ -123,6 +141,10 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 			ackStatsData  = createStatsData(new ConsumerStatsDataDesc(topic, subTitle, StatsDataType.ACK_QPX),  ackStats, start, end, data, intervalTimeSeconds, qpx);
 		}else{
 			throw new IllegalArgumentException("unknown type:" + type);
+		}
+
+		if(logger.isDebugEnabled()){
+			logger.debug("[getConsumerIdDataPair][end]" + topic + "," + consumerId);
 		}
 
 		return new ConsumerDataPair(consumerId, sendStatsData, ackStatsData);
@@ -178,9 +200,18 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 
 
 	@Override
-	public List<ConsumerDataPair> getDelayForAllConsumerId(String topic) {
+	public List<ConsumerDataPair> getDelayForAllConsumerId(final String topic) {
 		
-		return getDelayForAllConsumerId(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+		SwallowCallableWrapper<List<ConsumerDataPair>> wrapper = new CatCallableWrapper<List<ConsumerDataPair>>(CAT_TYPE, "getDelayForAllConsumerId");
+		
+		return wrapper.doCallable(new Callable<List<ConsumerDataPair>>() {
+			
+			@Override
+			public List<ConsumerDataPair> call() throws Exception {
+				
+				return getDelayForAllConsumerId(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+			}
+		});
 	}
 
 
