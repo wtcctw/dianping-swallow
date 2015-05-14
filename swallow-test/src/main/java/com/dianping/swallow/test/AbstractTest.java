@@ -33,7 +33,7 @@ public class AbstractTest {
 	@Before
 	public void beforeAbstractTest(){
 		if(logger.isInfoEnabled()){
-			logger.info("[beforeAbstractTest]" + testName.getMethodName());
+			logger.info("[beforeAbstractTest]----------------------------------" + testName.getMethodName());
 		}
 		
 	}
@@ -51,11 +51,15 @@ public class AbstractTest {
 	@After
 	public void afterAbstractTest(){
 		if(logger.isInfoEnabled()){
-			logger.info("[afterAbstractTest]" + testName.getMethodName());
+			logger.info("[afterAbstractTest]----------------------------------" + testName.getMethodName());
 		}
 	}
 
 	protected void sleep(int miliSeconds) {
+		
+		if(logger.isInfoEnabled() && miliSeconds > 0){
+			logger.info("[sleep]" + miliSeconds);
+		}
 		
 		try {
 			TimeUnit.MILLISECONDS.sleep(miliSeconds);

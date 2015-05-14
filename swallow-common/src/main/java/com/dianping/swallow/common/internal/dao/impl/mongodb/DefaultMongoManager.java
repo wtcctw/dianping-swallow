@@ -416,26 +416,6 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
 		return BACKUP_MSG_PREFIX + topicName + "#" + consumerId;
 	}
 
-	@Override
-	public void cleanMessageCollection(String topicName, String consumerId) {
-
-		DBCollection collection = getMessageCollection(topicName, consumerId);
-		
-		boolean isCapped = collection.isCapped();
-
-		//此处不能只dropCollection，如果只dropCollection会导致db大小不停增加
-		dropDatabase(topicName, consumerId);
-		
-		markCollectionNotExists(getMongo(topicName).getDB(getMessageDbName(topicName, consumerId)));
-		
-		collection = getMessageCollection(topicName, consumerId);
-		
-		if(isCapped != collection.isCapped()){
-			logger.warn("[cleanMessageCollection][capped type change]" + isCapped + "," + collection.isCapped());
-		}
-				
-	}
-
 	private void dropDatabase(String topicName, String consumerId) {
 		
 		String dbName = getMessageDbName(topicName, consumerId);
@@ -465,21 +445,69 @@ private Mongo getMongo(String topicName) {
       return i == null ? -1 : i.intValue();
    }
 
-   public DBCollection getAckCollection(String topicName, String consumerId) {
+	@Override
+	public void cleanMessageCollection(String topicName, String consumerId) {
+
+		if(logger.isInfoEnabled()){
+			logger.info("[cleanMessageCollection]" + topicName + "," + consumerId);
+		}
+		
+		DBCollection collection = getMessageCollection(topicName, consumerId);
+		
+		boolean isCapped = collection.isCapped();
+
+		//此处不能只dropCollection，如果只dropCollection会导致db大小不停增加
+		dropDatabase(topicName, consumerId);
+		
+		markCollectionNotExists(getMongo(topicName).getDB(getMessageDbName(topicName, consumerId)));
+		
+		collection = getMessageCollection(topicName, consumerId);
+		
+		if(isCapped != collection.isCapped()){
+			logger.warn("[cleanMessageCollection][capped type change]" + isCapped + "," + collection.isCapped());
+		}
+	}
+
+	@Override
+	public void cleanAckCollection(String topicName, String consumerId, boolean isBackup){
+		
+		  if(logger.isInfoEnabled()){
+			  logger.info("[cleanAckCollection]" + topicName + "," + consumerId + "," + isBackup);
+		  }
+		  
+	      Mongo mongo = getMongo(topicName);
+	      
+	      String dbName = getAckDbName(topicName, consumerId, isBackup);
+	      mongo.dropDatabase(dbName);
+	      
+	      markCollectionNotExists(mongo.getDB(dbName));
+	      getAckCollection(topicName, consumerId, isBackup);
+	}
+
+	private String getAckDbName(String topicName, String consumerId,
+			boolean isBackup) {
+		
+		String dbName = null;
+		
+		if (!isBackup) {
+			dbName = ACK_PREFIX + topicName + "#" + consumerId;
+		} else {
+			dbName = BACKUP_ACK_PREFIX + topicName + "#" + consumerId;
+		}
+		return dbName;
+	}
+
+	public DBCollection getAckCollection(String topicName, String consumerId) {
+		
       return getAckCollection(topicName, consumerId, false);
    }
 
    public DBCollection getAckCollection(String topicName, String consumerId, boolean isBackup) {
 	   
       Mongo mongo = getMongo(topicName);
-      String dbName = null;
-      DBObject index = new BasicDBObject(AckDAOImpl.MSG_ID, -1);
+      String dbName = getAckDbName(topicName, consumerId, isBackup);
       
-      if (!isBackup) {
-    	  dbName = ACK_PREFIX + topicName + "#" + consumerId;
-      } else {
-    	  dbName = BACKUP_ACK_PREFIX + topicName + "#" + consumerId;
-      }
+      DBObject index = new BasicDBObject(AckDAOImpl.MSG_ID, -1);
       return getCollection(mongo, DEFAULT_CAPPED_COLLECTION_SIZE, DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM
     		  , dbName, index);
    }
@@ -534,7 +562,7 @@ private Mongo getMongo(String topicName) {
 
    private void markCollectionNotExists(DB db) {
 	      collectionExistsSign.remove(db);
-	   }
+   }
 
    private DBCollection createColletcion(DB db, String collectionName, int size, int cappedCollectionMaxDocNum,
                                          List<DBObject> indexDBObjects) {

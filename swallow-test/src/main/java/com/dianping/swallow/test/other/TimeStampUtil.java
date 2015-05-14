@@ -18,8 +18,8 @@ public class TimeStampUtil {
 	public void testTimeStamp(){
 //		BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(6146147335001870685L);
 		
-		print(6147539260888055859L);
-		print(6147534841366708225L);
+		print(6148565019337424909L);
+//		print(6148547951137390594L);
 		
 	}
 	

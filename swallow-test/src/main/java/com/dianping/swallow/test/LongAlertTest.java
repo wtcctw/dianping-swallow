@@ -48,7 +48,6 @@ public class LongAlertTest extends AbstractConsumerTest {
 				}
 			}
 		});
-		
 		c.start();
 		
 		sendMessage(1, topic);

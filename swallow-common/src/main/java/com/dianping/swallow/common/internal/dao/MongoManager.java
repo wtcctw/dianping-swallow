@@ -21,4 +21,6 @@ public interface MongoManager {
 	DBCollection getHeartbeatCollection(String ip);
 
 	void cleanMessageCollection(String topicName, String consumerId);
+
+	void cleanAckCollection(String topicName, String consumerId, boolean isBackup);
 }
