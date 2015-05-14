@@ -64,6 +64,9 @@ public class DefaultConsumerTask implements ConsumerTask{
         	
         	beginTask();
         	consumerProcessor.beforeOnMessage(swallowMessage);
+        	if(logger.isInfoEnabled()){
+        		logger.info("[run][begin]" + messageId);
+        	}
     		actionWrapper.doAction(consumerClientTransaction, new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {
@@ -85,6 +88,10 @@ public class DefaultConsumerTask implements ConsumerTask{
 			}
         	sendAck(e, swallowMessage.getMessageId());
             consumerClientTransaction.complete();
+            
+        	if(logger.isInfoEnabled()){
+        		logger.info("[run][end]" + messageId);
+        	}
         }
 	}
 	private void beginTask() {
