@@ -45,7 +45,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	protected List<Consumer> consumers = new LinkedList<Consumer>();
 
 	protected MessageDAOImpl mdao = new MessageDAOImpl();
-
+	
 	@Before
 	public void beforeSwallowAbstractTest(){
 		
@@ -63,22 +63,33 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		sleep(100);
 	}
 
+	protected void sendMessage(String topic, Object message, boolean zipped) throws SendFailedException, RemoteServiceInitFailedException{
+		
+		sendMessage(1, topic, zipped,  0, -1, message);
+		
+	}
 
+	protected void sendMessage(String topic, Object message) throws SendFailedException, RemoteServiceInitFailedException{
+		
+		sendMessage(1, topic, false, 0, -1, message);
+		
+	}
+	
 	protected void sendMessage(int messageCount, String topic, int size) throws SendFailedException, RemoteServiceInitFailedException {
-		sendMessage(messageCount, topic, 0, size);
+		
+		sendMessage(messageCount, topic, false, 0, size, null);
 	}
 	
 	protected void sendMessage(int messageCount, String topic) throws SendFailedException, RemoteServiceInitFailedException {
 		
-		sendMessage(messageCount, topic, 0, 10);
+		sendMessage(messageCount, topic, false,  0, 10, null);
 		
 	}
 	
 	private AtomicInteger totalSend = new AtomicInteger();
 
-	protected void sendMessage(int messageCount, String topic, int sleepInterval, int size) throws SendFailedException, RemoteServiceInitFailedException {
+	protected void sendMessage(int messageCount, String topic, boolean zipped, int sleepInterval, int size, Object message) throws SendFailedException, RemoteServiceInitFailedException {
 		
-		String message = createMessage(size);
 		
 		AtomicInteger count = sendMessageCount.get(topic);
 		if(count == null){
@@ -89,15 +100,26 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 			}
 		}
 		
-		Producer p = createProducer(topic);
+		Producer p = createProducer(topic, zipped);
         for (int i = 0; i < messageCount; i++) {
-            String msg = System.currentTimeMillis() + "," + totalSend.incrementAndGet() + "," + message;
-            p.sendMessage(msg);
+        	
+    		if(message == null){
+    			message = getMessage(size);
+    		}
+            p.sendMessage(message);
             sleep(sleepInterval);
             count.incrementAndGet();
         }
 	}
 
+
+	protected Object getMessage(int size) {
+		
+        String msg = System.currentTimeMillis() + "," + totalSend.incrementAndGet() + ",";
+        msg += createMessage(size);
+
+        return msg;
+	}
 
 	protected Producer createProducer(String topic) throws RemoteServiceInitFailedException{
 		

@@ -11,7 +11,6 @@ import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.BackoutMessageException;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.MessageListener;
-import com.dianping.swallow.producer.Producer;
 
 /**
  * @author mengwenchao
@@ -37,8 +36,7 @@ public class GzipDataTest extends AbstractConsumerTest {
 		});
 		c.start();
 
-		Producer p = createProducer(topic, true);
-		p.sendMessage(dataToSend);
+		sendMessage(topic, dataToSend, true);
 
 		waitForListernToComplete(1);
 		
