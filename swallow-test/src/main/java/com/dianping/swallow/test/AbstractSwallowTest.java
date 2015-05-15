@@ -47,14 +47,9 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	
 	protected List<Consumer> consumers = new LinkedList<Consumer>();
 
-<<<<<<< HEAD
-	protected MessageDAOImpl mdao = new MessageDAOImpl();
-	
-=======
 	protected MessageDAOImpl mdao;
 	protected AckDAOImpl 	 ackdao;
 
->>>>>>> filter类型的消息，根据消息总量延时
 	@Before
 	public void beforeSwallowAbstractTest(){
 		
@@ -74,65 +69,50 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		sleep(100);
 	}
 
-<<<<<<< HEAD
 	
 	protected void sendMessage(String topic, Object message, boolean zipped) throws SendFailedException, RemoteServiceInitFailedException{
 		
-		sendMessage(1, topic, zipped,  0, -1, message);
+		sendMessage(1, topic, zipped,  0, -1, null, message);
+	}
 		
-=======
 	protected void cleanSendMessageCount() {
 		sendMessageCount.clear();
 	}
 	
 	protected void cleanGetMessageCount(){
 		getMessageCount.clear();
->>>>>>> filter类型的消息，根据消息总量延时
 	}
 
 	protected void sendMessage(String topic, Object message) throws SendFailedException, RemoteServiceInitFailedException{
 		
-		sendMessage(1, topic, false, 0, -1, message);
+		sendMessage(1, topic, false, 0, -1, null, message);
 		
 	}
 	
 	protected void sendMessage(int messageCount, String topic, int size) throws SendFailedException, RemoteServiceInitFailedException {
-<<<<<<< HEAD
 		
-		sendMessage(messageCount, topic, false, 0, size, null);
-=======
-		sendMessage(messageCount, topic, 0, size, null);
->>>>>>> filter类型的消息，根据消息总量延时
+		sendMessage(messageCount, topic, false, 0, size, null, null);
 	}
 	
 	protected void sendMessage(int messageCount, String topic, String type) throws SendFailedException, RemoteServiceInitFailedException {
-		sendMessage(messageCount, topic, 0, 10, type);
+		
+		sendMessage(messageCount, topic, false, 0, 10, type, null);
 	}
 
 
 	protected void sendMessage(int messageCount, String topic) throws SendFailedException, RemoteServiceInitFailedException {
 		
-<<<<<<< HEAD
-		sendMessage(messageCount, topic, false,  0, 10, null);
-=======
-		sendMessage(messageCount, topic, 0, 10, null);
->>>>>>> filter类型的消息，根据消息总量延时
+		sendMessage(messageCount, topic, false,  0, 10, null, null);
 		
 	}
 	
 	private AtomicInteger totalSend = new AtomicInteger();
 
-<<<<<<< HEAD
-	protected void sendMessage(int messageCount, String topic, boolean zipped, int sleepInterval, int size, Object message) throws SendFailedException, RemoteServiceInitFailedException {
-		
-=======
-	protected void sendMessage(int messageCount, String topic, int sleepInterval, int size, String type) throws SendFailedException, RemoteServiceInitFailedException {
+	protected void sendMessage(int messageCount, String topic, boolean zipped, int sleepInterval, int size, String type, Object message) throws SendFailedException, RemoteServiceInitFailedException {
 
 		//等待consumer建立成功
 		sleep(100);
 
-		String message = createMessage(size);
->>>>>>> filter类型的消息，根据消息总量延时
 		
 		AtomicInteger count = sendMessageCount.get(topic);
 		if(count == null){
@@ -148,16 +128,13 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 			logger.info("[sendMessage][begin]" + count.get());
 		}
         for (int i = 0; i < messageCount; i++) {
-<<<<<<< HEAD
         	
     		if(message == null){
     			message = getMessage(size);
     		}
             p.sendMessage(message);
-=======
             String msg = System.currentTimeMillis() + "," + totalSend.incrementAndGet() + "," + message;
             p.sendMessage(msg, type);
->>>>>>> filter类型的消息，根据消息总量延时
             sleep(sleepInterval);
             count.incrementAndGet();
         }
@@ -211,13 +188,10 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		return count.intValue();
 	}
 
-<<<<<<< HEAD
 	protected Consumer addListener(final String topic) {
 		
-		return addListener(topic, false, null, 1, -1);
+		return addListener(topic, false, null, 1, -1, null);
 	}
-
-=======
 	
 	protected Consumer addListener(String topic, String consumerId, Set<String> filters) {
 	
@@ -225,7 +199,6 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	}
 
 
->>>>>>> filter类型的消息，根据消息总量延时
 	protected Consumer addListener(final String topic, int concurrentCount) {
 		
 		return addListener(topic, false, null, concurrentCount, -1, null);
