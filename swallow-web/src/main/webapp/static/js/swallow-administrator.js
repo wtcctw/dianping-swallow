@@ -42,8 +42,10 @@ module.factory('Paginator', function(){
 						for(var i = 0; i < self.currentPageItems.length; ++i){
 							if(self.currentPageItems[i].role == 0)
 								self.currentPageItems[i].role = "Administrator";
-							else
+							else if(self.currentPageItems[i].role == 3)
 								self.currentPageItems[i].role = "User";
+							else
+								self.currentPageItems[i].role = "Visitor";
 						}
 						self.hasNextVar = items.length === pageSize + 1;
 					});
@@ -89,14 +91,12 @@ module.controller('AdministratorController', ['$scope', '$http','Paginator',
 		var data = {'offset' : offset,
 								'limit': limit,
 								'name': name,
-								'email': email,
 								'role': role};
 			$http.get(window.contextPath + $scope.suburl, {
 				params : {
 					offset : offset,
 					limit : limit,
 					name: name,
-					email: email,
 					role: role
 				}
 			}).success(callback);
@@ -113,36 +113,36 @@ module.controller('AdministratorController', ['$scope', '$http','Paginator',
 		
 		//edit admin and save it in database
 		$scope.adminrole = "";
-		$scope.adminemail = "";
 		$scope.adminname = "";
 		$scope.refreshpage = function(myForm){
         	$('#myModal').modal('hide');
         	//for selected item, use jquery to get value
         	$scope.adminrole = $("#roleselect").val();
         	$http.post(window.contextPath + '/console/admin/createadmin', {"name":$scope.adminname, 
-        		"email": $scope.adminemail,"role":$scope.adminrole})
+        		"role":$scope.adminrole})
         		.success(function(response) {
-        			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.email , $scope.role);
+        			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
         	});
         }
 		
 		//delete admin
-		$scope.removerecord = function(name, email){
-			$http.post(window.contextPath + '/console/admin/removeadmin', {"name":name, "email": email})
+		$scope.removerecord = function(name){
+			$http.post(window.contextPath + '/console/admin/removeadmin', {"name":name})
         		.success(function(response) {
-        			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.email , $scope.role);
+        			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
         	});
 		}
 		
-		$scope.setModalInput = function(name,email,date,role){
+		$scope.setModalInput = function(name,role){
 			$scope.adminname   = name;
-			$scope.adminemail  = email;
-			$("#roleselect").val(role);
+			if($("#roleselect").val() == "VISITOR")
+				$("#roleselect").val("");
+			else
+				$("#roleselect").val(role);
 		}
 		
 		$scope.clearModal = function(){
 			$scope.adminname   = "";
-			$scope.adminemail  = "";
 			$("#roleselect").val("Administrator");
 		}
 		
@@ -150,7 +150,7 @@ module.controller('AdministratorController', ['$scope', '$http','Paginator',
 		$scope.adminornot = false;
 		$scope.$on('ngLoadFinished',  function (ngLoadFinishedEvent, admin, user){
 			$scope.adminornot = admin;
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.email , $scope.role);
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
 			
 			$http({
 				method : 'GET',

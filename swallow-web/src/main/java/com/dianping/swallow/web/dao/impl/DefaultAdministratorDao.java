@@ -20,12 +20,12 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements Adminis
 	
     //collection name
     private static final String 			ADMINISTRATOR_COLLECTION 						= "swallowwebadminc";
-    private static final String 			VISIT_COLLECTION 								= "swallowwebvisitc";
-    private static final String 			EMAIL 											= "email";
+    private static final String 			NAME 											= "name";
+    private static final String 			ROLE 											= "role";
 	
     @Override
-    public Administrator readByEmail(String email){
-        Query query = new Query(Criteria.where(EMAIL).is(email));
+    public Administrator readByName(String name){
+        Query query = new Query(Criteria.where(NAME).is(name));
         return mongoTemplate.findOne(query, Administrator.class, ADMINISTRATOR_COLLECTION);
     }
 
@@ -40,8 +40,8 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements Adminis
 	}
 	
 	@Override
-	public int deleteByEmail(String email){
-        Query query = new Query(Criteria.where(EMAIL).is(email));
+	public int deleteByName(String name){
+        Query query = new Query(Criteria.where(NAME).is(name));
         WriteResult result = mongoTemplate.remove(query, Administrator.class, ADMINISTRATOR_COLLECTION);
         return result.getN();
 	}
@@ -65,25 +65,8 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements Adminis
 	@Override
 	public List<Administrator> findFixedAdministrator(int offset, int limit){
         Query query = new Query();  
-        query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, EMAIL))); //根据email字段排序
+        query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, ROLE))); //根据email字段排序
         return mongoTemplate.find(query, Administrator.class, ADMINISTRATOR_COLLECTION);
-	}
-
-	@Override
-	public void saveVisit(Administrator v) {
-		mongoTemplate.save(v, VISIT_COLLECTION);
-		
-	}
-
-	@Override
-	public Administrator readByVisitEmail(String email) {
-        Query query = new Query(Criteria.where(EMAIL).is(email));
-        return mongoTemplate.findOne(query, Administrator.class, VISIT_COLLECTION);
-	}
-	
-	@Override
-	public List<Administrator> findAllVisit(){
-		return mongoTemplate.findAll(Administrator.class, VISIT_COLLECTION);
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.dao;
 
-import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.web.dao.impl.WebMongoManager;
@@ -27,7 +26,7 @@ public interface WebSwallowMessageDao extends Dao, WebMongoManager{
 
 	long count(String topicName);
 
-	List<WebSwallowMessage> findSpecific(int offset, int limit, long mid, String topicName);
+	Map<String, Object> findSpecific(int offset, int limit, long mid, String topicName);
 
 	Map<String, Object> findByTime(int offset, int limit, String startdt,
 			String stopdt, String topicName);

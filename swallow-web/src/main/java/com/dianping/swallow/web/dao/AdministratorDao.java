@@ -10,9 +10,9 @@ import com.dianping.swallow.web.model.Administrator;
  *
  * 2015年5月11日 上午11:14:30
  */
-public interface AdministratorDao  extends VisitDao{
+public interface AdministratorDao{
 
-    Administrator readByEmail(String email);
+    Administrator readByName(String name);
     
     //use insert to create
     void createAdministrator(Administrator p);
@@ -20,7 +20,7 @@ public interface AdministratorDao  extends VisitDao{
     //use save to implement insert and update
 	void saveAdministrator(Administrator p);
 	
-	int deleteByEmail(String email);  //txz is uniq
+	int deleteByName(String name);  //txz is uniq
 	
 	void dropCol();
 	

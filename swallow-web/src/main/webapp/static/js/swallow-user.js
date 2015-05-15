@@ -42,6 +42,7 @@ module.controller('UserController', ['$scope', '$http',
 			        type: 'GET',
 			        dataType: 'jsonp',//here
 			        success: function (data) {
+			        	
 			        }
 			    });
 //				$http({

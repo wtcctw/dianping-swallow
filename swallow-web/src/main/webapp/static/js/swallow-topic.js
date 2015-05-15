@@ -144,15 +144,20 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
 					$scope.prop = "";
 					$scope.firstaccess = true;
+					if($scope.searchPaginator.currentPageItems.length == 0)
+						$scope.$emit('ngRepeatFinished');
 				}
 				else
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
+
 			});
 			
 			
-			$scope.loaddone = false;
-			if($scope.loaddone){}
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
+				$scope.initpage();
+			});
+			
+			$scope.initpage = function(){
 				$("a[href='/console/topic'] button").removeClass("btn-info");
 				$("a[href='/console/topic'] button").addClass("btn-purple");
 				$scope.adminornot = localStorage.getItem("isadmin");
@@ -177,13 +182,21 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 					// search topic name with specific prop
 					$http({
 						method : 'GET',
-						url : window.contextPath + '/console/topic/proplist'
+						url : window.contextPath + '/console/topic/propdept'
 					}).success(function(data, status, headers, config) {
-						var topicPropList = data;
+						var propDeptList = data;
 						$("#searchprop").typeahead({
-							source : topicPropList,
+							source : propDeptList,
 							updater : function(c) {
 								$scope.prop = c
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
+								return c;
+							}
+						})
+						$("#searchdept").typeahead({
+							source : propDeptList,
+							updater : function(c) {
+								$scope.dept = c
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
 								return c;
 							}
@@ -191,32 +204,13 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						//work
 						$('#topicprops').tagsinput({
 							  typeahead: {      
-								  source: topicPropList,
+								  source: propDeptList,
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
 					}).error(function(data, status, headers, config) {
 					});
-					
-					// search topic name with specific dept
-					$http({
-						method : 'GET',
-						url : window.contextPath + '/console/topic/deptlist'
-					}).success(function(data, status, headers, config) {
-						var topicDeptList = data;
-						$("#searchdept").typeahead({
-							source : topicDeptList,
-							updater : function(c) {
-								$scope.dept = c
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
-								return c;
-							}
-						})
-					}).error(function(data, status, headers, config) {
-					});
-					
-					$scope.loaddone = true;
-			 });
+			}
 			
 }]);
 

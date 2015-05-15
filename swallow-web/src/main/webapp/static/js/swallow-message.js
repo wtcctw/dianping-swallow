@@ -17,7 +17,7 @@ module.factory('Paginator', function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
 					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt,  function(data){
-						items = data.topic;
+						items = data.message;
 						//items = angular.fromJson(items); //反序列化
 						length = data.size;
 						self.show = data.show || localStorage.getItem("isadmin");

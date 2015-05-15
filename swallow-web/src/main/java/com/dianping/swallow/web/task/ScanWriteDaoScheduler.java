@@ -9,12 +9,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+
 import com.dianping.swallow.web.controller.TopicController;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.TopicDao;
@@ -22,7 +21,7 @@ import com.dianping.swallow.web.dao.WebSwallowMessageDao;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
-import com.dianping.swallow.web.service.AccessControlService;
+import com.dianping.swallow.web.service.AccessControlServiceConstants;
 import com.mongodb.MongoClient;
 
 /**
@@ -43,8 +42,6 @@ public class ScanWriteDaoScheduler extends AbstractWriteDao{
 	private TopicDao 							tdi;
 	@Autowired
 	private AdministratorDao 					admind;
-	@Resource(name = "accessControlService")
-	private AccessControlService 				accessControlService;
 	
 
 	private static final Logger 				logger = 					
@@ -136,14 +133,23 @@ public class ScanWriteDaoScheduler extends AbstractWriteDao{
 	
 	private void scanAdminCollection(){
 		List<Administrator> aList = admind.findAll();
-		for (int i = 0; i < aList.size(); ++i) {
-			if (aList.get(i).getRole() == 0)
+		for (Administrator list : aList) {
+			if (list.getRole() == 0)
 				if (accessControlService.getAdminSet().add(
-						aList.get(i).getName()))
+						list.getName()))
 					if (logger.isInfoEnabled()) {
-						logger.info("admiSet add " + aList.get(i).getName());
+						logger.info("admiSet add " + list.getName());
 					}
 		}
+		if(accessControlService.getAdminSet().isEmpty()){
+			String defaultAdmin = accessControlService.getDefaultAdmin();
+			administratorService.createAdmin(defaultAdmin, AccessControlServiceConstants.ADMINI);
+			accessControlService.getAdminSet().add(accessControlService.getDefaultAdmin()); //add default admin
+			if (logger.isInfoEnabled()) {
+				logger.info("admiSet add default admin.");
+			}
+		}
+
 	}
 	
 	private boolean isTopicName(String str) {

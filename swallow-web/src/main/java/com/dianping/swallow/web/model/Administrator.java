@@ -12,10 +12,8 @@ public class Administrator {
 	@Id
 	private String id;
 
-	private String name; //chinese
+	private String name;
 	
-	private String email;  //email
-
 	//0:admin, 3:common
 	private int    role;
 	
@@ -25,9 +23,8 @@ public class Administrator {
 		
 	}
 	
-	public Administrator(String name, String email,int role, String date) {
+	public Administrator(String name,int role, String date) {
 		this.name = name;
-		this.email = email;
 		this.role = role;
 		this.date = date;
 	}
@@ -52,16 +49,6 @@ public class Administrator {
 		this.name = name;
 	}
 
-
-	public String getEmail() {
-		return email;
-	}
-
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public int getRole() {
 		return role;
 	}
@@ -82,8 +69,7 @@ public class Administrator {
 
 	@Override
 	public String toString() {
-		return "Administrator [id=" + id + ", name=" + name + ", email="
-				+ email + ", role=" + role + ", date=" + date + "]";
+		return "Administrator [id=" + id + ", name=" + name + ", role=" + role + ", date=" + date + "]";
 	}
 
 }

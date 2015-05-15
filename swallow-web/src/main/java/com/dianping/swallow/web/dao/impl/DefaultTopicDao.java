@@ -1,7 +1,9 @@
 package com.dianping.swallow.web.dao.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -20,12 +22,15 @@ import com.mongodb.WriteResult;
  */
 public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
  
-    private static final String 			TOPIC_COLLECTION =					"swallowwebtopicc";
+    private static final String 			TOPIC_COLLECTION 						= "swallowwebtopicc";
     
-    private static final String 			NAME =								"name";
-    private static final String 			PROP =								"prop";
-    private static final String 			DEPT =								"dept";
-    private static final String 			ID =								"_id";
+    private static final String 			NAME 									= "name";
+    private static final String 			PROP 									="prop";
+    private static final String 			DEPT 									="dept";
+    private static final String 			ID 										="_id";
+    
+	private static final String             SIZE                       			 	= "size";
+	private static final String             TOPIC                       		 	= "topic";
      
     @Override
     public Topic readById(String id) {
@@ -78,21 +83,34 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
     }
     
     @Override
-    public List<Topic> findFixedTopic(int offset, int limit){
+    public Map<String, Object> findFixedTopic(int offset, int limit){
         Query query = new Query();  
         query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, "name")));
-        return mongoTemplate.find(query, Topic.class, TOPIC_COLLECTION);
+        List<Topic> topicList =  mongoTemplate.find(query, Topic.class, TOPIC_COLLECTION);
+        Long topicSize = this.countTopic();
+        return getResponse(topicSize, topicList);
     }
-    
+    ;
     @Override
-	public List<Topic> findSpecific(String name, String prop, String dept){
-		List<Topic> records = new ArrayList<Topic>();
+	public Map<String, Object> findSpecific(int offset, int limit, String name, String prop, String dept){
+		List<Topic> topicList = new ArrayList<Topic>();
+		
 	    String namer = name.isEmpty() ? ".*" : name;
 	    String propr = prop.isEmpty() ? ".*" : prop;
 	    String deptr = dept.isEmpty() ? ".*" : dept;
-		Query query = new Query(Criteria.where(NAME).regex("^" + namer).and(PROP).regex(propr).and(DEPT).regex(deptr));
-    	records = mongoTemplate.find(query, Topic.class, TOPIC_COLLECTION);
-    	return records;
+		Query query1 = new Query(Criteria.where(NAME).regex("^" + namer).and(PROP).regex(propr).and(DEPT).regex(deptr));
+		Query query2 = query1;
+		query1.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, "name")));
+		topicList = mongoTemplate.find(query1, Topic.class, TOPIC_COLLECTION);
+    	Long topicSize = mongoTemplate.count(query2, TOPIC_COLLECTION);
+    	return getResponse(topicSize, topicList);
     }
+    
+	private Map<String, Object> getResponse(Long topicSize, List<Topic> topicList){
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(SIZE, topicSize);
+		map.put(TOPIC, topicList);
+		return map;
+	}
  
 }

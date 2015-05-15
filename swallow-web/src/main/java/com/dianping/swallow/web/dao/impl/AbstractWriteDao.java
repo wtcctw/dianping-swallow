@@ -1,7 +1,11 @@
 package com.dianping.swallow.web.dao.impl;
 
 import javax.annotation.Resource;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
+
+import com.dianping.swallow.web.service.AccessControlServiceImpl;
+import com.dianping.swallow.web.service.AdministratorService;
 
 
 /**
@@ -12,7 +16,13 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 public abstract class AbstractWriteDao extends AbstractDao{
 	
 	@Resource( name = "topicMongoTemplate")
-	protected MongoTemplate mongoTemplate;
+	protected MongoTemplate 						mongoTemplate;
+	
+	@Resource(name = "accessControlService")
+	protected AccessControlServiceImpl 				accessControlService;
+	
+    @Resource(name = "administratorService")
+    protected AdministratorService 					administratorService;
 	
 }
 

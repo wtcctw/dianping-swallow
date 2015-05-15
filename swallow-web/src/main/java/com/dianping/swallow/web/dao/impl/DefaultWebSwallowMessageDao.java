@@ -3,7 +3,6 @@ package com.dianping.swallow.web.dao.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -74,7 +73,7 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
             } catch (RuntimeException e) {
             }
          }
-        return null;
+        return (WebSwallowMessage) result;
     }
  
     @Override
@@ -98,61 +97,56 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
     @Override
     public Map<String, Object> findByTopicname(int offset, int limit, String topicName){
     	List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
-    	Map<String, Object> map = new HashMap<String, Object>();
     	Query query = new Query();
     	query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
     	query.skip(offset).limit(limit);
         messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
 
-       	long size = this.count(topicName);
-    	map.put(SIZE, size);
-    	map.put(MESSAGE, messageList);
-        return map;
+       	return getResponse(messageList,this.count(topicName));
     }
     
     @Override
-    public List<WebSwallowMessage> findSpecific(int offset, int limit, long mid, String topicName){
-    	Query query = new Query();
-    	if(mid == 0){
-    		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
-    	}
-    	else{
+    public Map<String, Object> findSpecific(int offset, int limit, long mid, String topicName){
+    	
+    	if(mid == 0)
+    		return findSpecificWithoutId(offset, limit, topicName);
+    	else
     		return findSpecificWithId(offset, limit, mid, topicName);
-    	}
-        query.skip(offset).limit(limit);
-        return this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
+        
+    }
+    
+    private Map<String, Object> findSpecificWithoutId(int offset, int limit,String topicName){
+		Query query = new Query();
+		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
+		query.skip(offset).limit(limit);
+        List<WebSwallowMessage> messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
+		
+        return getResponse(messageList, this.count(topicName));
     }
     
     @Override
     public Map<String, Object>  findByIp(int offset, int limit, String ip, String topicName){
     	List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
-    	Map<String, Object> map = new HashMap<String, Object>();
     	Query query1 = new Query(Criteria.where(SI).is(ip));
     	query1.skip(offset).limit(limit);
     	messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query1, WebSwallowMessage.class, MESSAGE_COLLECTION);
     	Query query2 = new Query(Criteria.where(SI).is(ip));
        	long size = this.webMongoManager.getMessageMongoTemplate(topicName).count(query2, MESSAGE_COLLECTION);
-    	map.put(SIZE, size);
-    	map.put(MESSAGE, messageList);
-        return map;
+        return getResponse(messageList,size);
     }
     
     @Override
     public Map<String, Object> findByTime(int offset, int limit, String startdt, String stopdt, String topicName){
-    	Map<String, Object> map = new HashMap<String, Object>();
     	DBCollection collection = this.webMongoManager.getMessageMongoTemplate(topicName).getCollection(MESSAGE_COLLECTION);
     	SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
-    	Date datestart = null;
-		Date datestop = null;
+		Long startlong = null;
+		Long stoplong = null;
 		try {
-			datestart = addEightHours(sdf.parse(startdt));
-			datestop = addEightHours(sdf.parse(stopdt));
+			startlong = MongoUtils.getLongByDate(sdf.parse(startdt));
+			stoplong = MongoUtils.getLongByDate(sdf.parse(stopdt));
 		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		Long startlong = MongoUtils.getLongByDate(datestart);
-		Long stoplong  = MongoUtils.getLongByDate(datestop);
 		DBObject query = BasicDBObjectBuilder.start()
 				.add(ID, BasicDBObjectBuilder.start()
 					.add("$gt", MongoUtils.longToBSONTimestamp(startlong))
@@ -180,12 +174,11 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
         } finally {
            cursor.close();
         }
-    	map.put(SIZE, size);
-    	map.put(MESSAGE, list);
-        return map;
+        return getResponse(list, size);
     }
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Map<String, Object> findByTimeAndId(int offset, int limit, long mid, String startdt, String stopdt, String topicName){
     	List<WebSwallowMessage> list = new ArrayList<WebSwallowMessage>();
     	Query query = new Query();
@@ -195,29 +188,24 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
     		list = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
     	}
     	else{
-    		list = findSpecificWithId(offset, limit, mid, topicName);
+    		list = (List<WebSwallowMessage>) findSpecificWithId(offset, limit, mid, topicName).get(MESSAGE);
     	}
     	SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
-    	Date datestart = null;
-		Date datestop = null;
+
+		Long startlong = null;
+		Long stoplong = null;
 		try {
-			datestart = addEightHours(sdf.parse(startdt));
-			datestop = addEightHours(sdf.parse(stopdt));
-		} catch (ParseException e1) {
+			startlong = MongoUtils.getLongByDate(sdf.parse(startdt));
+			stoplong  = MongoUtils.getLongByDate(sdf.parse(stopdt));
+		} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
-		Long startlong = MongoUtils.getLongByDate(datestart);
-		Long stoplong  = MongoUtils.getLongByDate(datestop);
 		for(int i = 0; i < list.size(); ++i){
 			if(!(mid > startlong && mid < stoplong))
 				list.remove(i);
 		}
-		Map<String, Object> map = new HashMap<String, Object>();
-		Long size =(long) list.size();
-    	map.put(SIZE, size);
-    	map.put(MESSAGE, list);
-        return map;
+		return getResponse(list, (long) list.size());
 
     }
     
@@ -246,16 +234,8 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
        swallowMessage.setT((String) result.get(T));
        swallowMessage.setSi((String) result.get(SI));
     }
-    
 
-    private Date addEightHours(Date date){
-    	Calendar c = Calendar.getInstance();
-    	c.setTime(date);
-    	c.add(Calendar.MINUTE, 0 * 60);
-    	return c.getTime();
-    }
-    
-    private List<WebSwallowMessage> findSpecificWithId(int offset, int limit, long mid, String topicName){
+    private Map<String, Object> findSpecificWithId(int offset, int limit, long mid, String topicName){
     	DBCollection collection = this.webMongoManager.getMessageMongoTemplate(topicName).getCollection(MESSAGE_COLLECTION);
     	DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(mid)).get();
         DBObject result = collection.findOne(query);
@@ -268,7 +248,7 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
             } catch (RuntimeException e) {
             }
          }
-        return messageList;
+        return getResponse(messageList, (long) messageList.size());
     }
 
 	@Override
@@ -288,6 +268,13 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
 
 	public WebMongoManager getWebwebMongoManager() {
 		return this.webMongoManager;
+	}
+	
+	private Map<String, Object> getResponse(List<WebSwallowMessage> list, Long size){
+		Map<String, Object> map = new HashMap<String, Object>();
+    	map.put(SIZE, size);
+    	map.put(MESSAGE, list);
+        return map;
 	}
 
 }

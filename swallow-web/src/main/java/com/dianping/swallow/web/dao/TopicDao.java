@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.dianping.swallow.web.model.Topic;
 
@@ -28,8 +29,8 @@ public interface TopicDao extends Dao {
 	
 	long countTopic();
 	
-	List<Topic> findFixedTopic(int offset, int limit);
+	Map<String, Object> findFixedTopic(int offset, int limit);
 	
-	List<Topic> findSpecific(String name, String prop, String dept);
+	Map<String, Object> findSpecific(int offset, int limit, String name, String prop, String dept);
 	
  }

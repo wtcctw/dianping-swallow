@@ -26,7 +26,6 @@
 					<tr>
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">姓名</th>
-						<th style="text-align: left">邮箱</th>
 						<th style="text-align: left">修改时间</th>
 						<th style="text-align: left">权限</th>
 						<th style="text-align: left">操作</th>
@@ -35,16 +34,15 @@
 						on-finish-render-filters>
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="a.name"></td>
-						<td style="text-align: left" ng-bind="a.email"></td>
 						<td style="text-align: left" ng-bind="a.date"></td>
 						<td style="text-align: left" ng-bind="a.role"></td>
 						<td style="text-align: left">
 							<a href="#myModal"
-								ng-click="setModalInput(a.name, a.email, a.date, a.role);"
+								ng-click="setModalInput(a.name, a.role);"
 								data-toggle="modal" class="edit-config-btn"><i
-								class="icon-edit" rel="tooltip" data-original-title="编辑配置值" ng-show="adminornot"></i></a>
+								class="icon-edit " rel="tooltip" data-original-title="编辑配置值" ng-show="adminornot"></i></a>
 							<a href=""
-								ng-click="removerecord(a.name, a.email);"
+								ng-click="removerecord(a.name);"
 								class="edit-config-btn"><i
 								class="icon-remove" rel="tooltip" data-original-title="删除配置项" ng-show="adminornot"></i></a>
 							</td>
@@ -82,20 +80,20 @@
 					<div class="modal-body">
 						<form method="post" class="form-horizontal" name="myForm" ng-submit="refreshpage(myForm)">
 							<div class="control-group">
-								<label class="control-label">姓名</label>
+								<label class="control-label">点评通行证</label>
 								<div class="controls">
 									<input type="text" name="name" class="input-xlarge" autocomplete = "off" data-provide="typeahead"
 										ng-model="adminname" id="modalname" style="width:500px" required>
 								</div>
 							</div>
 							
-							<div class="control-group">
+<!-- 							<div class="control-group">
 								<label class="control-label">邮箱</label>
 								<div class="controls">
 									<input type="email" name="email" class="input-xlarge"
 										ng-model="adminemail" style="width:500px" required>
 								</div>
-							</div>
+							</div> -->
 							
 							<div class="control-group">
 								<label class="control-label">角色</label>
