@@ -113,7 +113,6 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		//等待consumer建立成功
 		sleep(100);
 
-		
 		AtomicInteger count = sendMessageCount.get(topic);
 		if(count == null){
 			count = new AtomicInteger();
@@ -132,9 +131,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
     		if(message == null){
     			message = getMessage(size);
     		}
-            p.sendMessage(message);
-            String msg = System.currentTimeMillis() + "," + totalSend.incrementAndGet() + "," + message;
-            p.sendMessage(msg, type);
+            p.sendMessage(message, type);
             sleep(sleepInterval);
             count.incrementAndGet();
         }
@@ -308,7 +305,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected void waitForListernToComplete(int messageCount) {
 		
-		sleep((int) (Math.ceil((double)messageCount/1000) * 5000));
+		sleep((int) (Math.ceil((double)messageCount/200) * 2000));
 	}
 
 
