@@ -30,6 +30,7 @@ public abstract class AbstractConsumerTest extends AbstractSwallowTest{
 		cleanSendMessageCount();
 	}
 
+	
 
 	protected String getConsumerId() {
 		

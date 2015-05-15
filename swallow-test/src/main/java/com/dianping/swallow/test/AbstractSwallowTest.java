@@ -1,7 +1,6 @@
 package com.dianping.swallow.test;
 
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -69,6 +68,10 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		sleep(100);
 	}
 
+	
+	protected Long getMaxMessageId(String topicName){
+		return mdao.getMaxMessageId(topicName);
+	} 
 	
 	protected void sendMessage(String topic, Object message, boolean zipped) throws SendFailedException, RemoteServiceInitFailedException{
 		
@@ -187,55 +190,50 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected Consumer addListener(final String topic) {
 		
-		return addListener(topic, false, null, 1, -1, null);
+		return addListener(topic, false, null, 1, null);
 	}
 	
 	protected Consumer addListener(String topic, String consumerId, Set<String> filters) {
 	
-		return addListener(topic, true, consumerId, 10, -1, filters);
+		return addListener(topic, true, consumerId, 10, filters);
 	}
 
 
 	protected Consumer addListener(final String topic, int concurrentCount) {
 		
-		return addListener(topic, false, null, concurrentCount, -1, null);
+		return addListener(topic, false, null, concurrentCount, null);
 	}
 	
 	protected Consumer addListener(final String topic, final String consumerId, int concurrentCount) {
 		
-		return addListener(topic, true, consumerId, concurrentCount, -1, null);
+		return addListener(topic, true, consumerId, concurrentCount, null);
 	}
-
-	protected Consumer addListener(String topic, String consumerId, Date date, int concurrentCount, Set<String> filters) {
-		
-		return addListener(topic, true, consumerId, concurrentCount, ConsumerConfig.fromDateToMessageId(date), filters);
-	}
-
 
 	protected Consumer createConsumer(String topic, String consumerId){
 		
-		return createConsumer(topic, true, consumerId, 1, -1, 5, null);
+		return createConsumer(topic, true, consumerId, 1, 5, null);
 	}
 
 	protected Consumer createConsumer(String topic, String consumerId, int retryCount){
-		
-		return createConsumer(topic, true, consumerId, 1, -1, retryCount, null);
+
+		return createConsumer(topic, true, consumerId, 1, retryCount, null);
 	}
 
-	protected Consumer createConsumer(String topic, boolean durable, String consumerId, int concurrentCount, long startMessageId, int retryCount, Set<String> filters){
+	protected Consumer createConsumer(String topic, boolean durable, String consumerId, int concurrentCount, int retryCount, Set<String> filters){
 
         ConsumerConfig config = new ConsumerConfig();
         config.setThreadPoolSize(concurrentCount);
         config.setMessageFilter(MessageFilter.createInSetMessageFilter(filters));
-        
         config.setDelayBaseOnBackoutMessageException(1);
+        
+        setConsumerConfig(config);
+        
         if(!durable){
         	config.setConsumerType(ConsumerType.NON_DURABLE);
         	if(consumerId != null){
         		throw new IllegalArgumentException("consumerId should be null, but " + consumerId);
         	}
         }
-        config.setStartMessageId(startMessageId);
        
         Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), consumerId, config);
         
@@ -243,9 +241,14 @@ public abstract class AbstractSwallowTest extends AbstractTest{
         return c;
 	}
 	
-	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, long startMessageId, Set<String> filters) {
+	protected void setConsumerConfig(ConsumerConfig config) {
+		
+		
+	}
 
-		final Consumer c = createConsumer(topic, durable, consumerId, concurrentCount, startMessageId, 5, filters);
+	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, Set<String> filters) {
+
+		final Consumer c = createConsumer(topic, durable, consumerId, concurrentCount, 5, filters);
 
 		c.setListener(new MessageListener() {
         	
@@ -305,7 +308,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected void waitForListernToComplete(int messageCount) {
 		
-		sleep((int) (Math.ceil((double)messageCount/200) * 2000));
+		sleep((int) (Math.ceil((double)messageCount/200) * 1000));
 	}
 
 

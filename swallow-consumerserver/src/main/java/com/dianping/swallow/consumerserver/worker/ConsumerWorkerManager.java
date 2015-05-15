@@ -175,6 +175,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
         
         if(startMessageId != -1){
         	cleanConsumerInfo(consumerInfo, worker);
+        	worker = null;
         }
         
         if (worker == null) {
@@ -339,6 +340,9 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 	                    ConsumerWorker worker = entry.getValue();
 	                    ConsumerInfo consumerInfo = entry.getKey();
 	                    if (worker.allChannelDisconnected()) {
+	                    	if(logger.isInfoEnabled()){
+	                    		logger.info("[doRun][clean]" + consumerInfo);
+	                    	}
 	                        worker.recordAck();
 	                        removeConsumerWorker(consumerInfo);
 	                        try {
