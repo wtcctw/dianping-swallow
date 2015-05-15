@@ -63,6 +63,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		sleep(100);
 	}
 
+	
 	protected void sendMessage(String topic, Object message, boolean zipped) throws SendFailedException, RemoteServiceInitFailedException{
 		
 		sendMessage(1, topic, zipped,  0, -1, message);
@@ -123,25 +124,27 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected Producer createProducer(String topic) throws RemoteServiceInitFailedException{
 		
-        ProducerConfig config = new ProducerConfig();
-        config.setMode(ProducerMode.SYNC_MODE);
-        Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
-        
-        return p;
-
+		return createProducer(topic, false);
 	}
+	
 	protected Producer createProducer(String topic, boolean zipped) throws RemoteServiceInitFailedException{
 		
         ProducerConfig config = new ProducerConfig();
         config.setMode(ProducerMode.SYNC_MODE);
         config.setZipped(zipped);
+        
+        setProducerConfig(config);
+        
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
         
         return p;
 
 	}
 
-	
+	protected void setProducerConfig(ProducerConfig config) {
+		
+	}
+
 	protected int getSendMessageCount(String topic){
 		AtomicInteger count = sendMessageCount.get(topic);
 		if(count == null){
@@ -150,12 +153,11 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		return count.intValue();
 	}
 
-	/**
-	 * NON_DURABLE模式
-	 * @param topic
-	 * @param concurrentCount
-	 * @return 
-	 */
+	protected Consumer addListener(final String topic) {
+		
+		return addListener(topic, false, null, 1, -1);
+	}
+
 	protected Consumer addListener(final String topic, int concurrentCount) {
 		
 		return addListener(topic, false, null, concurrentCount, -1);
