@@ -22,6 +22,7 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements Adminis
     private static final String 			ADMINISTRATOR_COLLECTION 						= "swallowwebadminc";
     private static final String 			NAME 											= "name";
     private static final String 			ROLE 											= "role";
+    private static final String 			DATE 											= "date";
 	
     @Override
     public Administrator readByName(String name){
@@ -65,7 +66,7 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements Adminis
 	@Override
 	public List<Administrator> findFixedAdministrator(int offset, int limit){
         Query query = new Query();  
-        query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, ROLE))); //根据email字段排序
+        query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, ROLE), new Sort.Order(Direction.DESC, DATE))); //根据role and date字段排序
         return mongoTemplate.find(query, Administrator.class, ADMINISTRATOR_COLLECTION);
 	}
 
