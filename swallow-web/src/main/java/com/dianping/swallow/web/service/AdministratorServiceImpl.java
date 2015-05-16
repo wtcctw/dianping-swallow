@@ -88,9 +88,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements 
 	@Override
 	public Object queryAdmin(HttpServletRequest request) {
 		
-		List<String> info = WebSwallowUtils.getVisitInfo(request);
-		
-		return setResult(info.get(1), info.get(0));
+		return setResult(WebSwallowUtils.getVisitInfo(request));
 	}
 	
 	@Override
@@ -104,7 +102,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements 
 		return adminLists;
 	}
 	
-	private Map<String, Object> setResult(String txz, String username){
+	private Map<String, Object> setResult(String txz){
 		boolean notproduct = isShowContentToAll();  //getEnv();
 		if(logger.isInfoEnabled()){
 			logger.info("notproduct is " + notproduct);
@@ -124,7 +122,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements 
 			}
 		}
 			
-		map.put(LOGINNAME, username);
+		map.put(LOGINNAME, txz);
 		return map;
 	}
 	

@@ -68,7 +68,6 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	@Override
 	public void editTopic(String name, String prop, String dept, String time) {
 
-			
 			tdi.updateTopic(name, prop, dept, time);
 			if (logger.isInfoEnabled()) {
 				logger.info("Update prop to " + splitProps(prop) + " of "

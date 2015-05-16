@@ -22,7 +22,7 @@ public class AccessControlServiceImpl extends AbstractAccessControlService imple
 	@Override
 	public boolean checkVisitIsValid(HttpServletRequest request, String topic){
 		
-		return checkVisit(WebSwallowUtils.getTxz(request), topic);  //based on tongxingzheng
+		return checkVisit(WebSwallowUtils.getVisitInfo(request), topic);  //based on tongxingzheng
 	}
 	
 	private boolean checkVisit(String name, String topic){

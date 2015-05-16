@@ -2,7 +2,6 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -42,8 +41,7 @@ public class MessageController extends AbstractWriteDao {
 	
 	private String setUserName(HttpServletRequest request){
 		
-		List<String> info = WebSwallowUtils.getVisitInfo(request);
-		return info.get(0);
+		return WebSwallowUtils.getVisitInfo(request);
 	}
 
 	// doing all query, so use readMongoOps
@@ -52,7 +50,7 @@ public class MessageController extends AbstractWriteDao {
 	public Object messageDefault(String offset, String limit, String tname, String messageId, 
 			String startdt, String stopdt, HttpServletRequest request, HttpServletResponse response){
 		//save visit info
-		administratorService.saveVisitAdmin(WebSwallowUtils.getTxz(request));
+		administratorService.saveVisitAdmin(WebSwallowUtils.getVisitInfo(request));
 		Map<String, Object> map = new HashMap<String,Object>();
 		String username = setUserName(request);
 		int start = Integer.parseInt(offset);

@@ -49,11 +49,11 @@ public class TopicController extends AbstractWriteDao {
 			String prop, String dept, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
 		//save visit info
-		administratorService.saveVisitAdmin(WebSwallowUtils.getTxz(request));
+		administratorService.saveVisitAdmin(WebSwallowUtils.getVisitInfo(request));
 		int start = Integer.parseInt(offset);
 		int span = Integer.parseInt(limit); // get span+1 topics so that it can
 		boolean findAll = (name + prop + dept).isEmpty();
-		WebSwallowUtils.getTxz(request);
+		WebSwallowUtils.getVisitInfo(request);
 		if (findAll)
 			return topicService.getAllTopicFromExisting(start, span);
 		else

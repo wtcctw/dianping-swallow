@@ -55,7 +55,7 @@ public class AdministratorController extends AbstractWriteDao {
 			return map;
 		}
 		else{  //be not able to access, but store visit
-			administratorService.saveVisitAdmin(WebSwallowUtils.getTxz(request));
+			administratorService.saveVisitAdmin(WebSwallowUtils.getVisitInfo(request));
 		}
 		
 		map = getZeroResult();
