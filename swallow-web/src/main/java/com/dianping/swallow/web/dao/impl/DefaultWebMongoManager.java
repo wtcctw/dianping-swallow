@@ -23,8 +23,8 @@ import com.mongodb.ServerAddress;
  */
 public class DefaultWebMongoManager implements WebMongoManager {
 
-	public static final String TOPIC_COLLECTION = "c";
-	public static final String PRE_MSG = "msg#";
+	public 	static final String TOPIC_COLLECTION = "c";
+	public 	static final String PRE_MSG = "msg#";
 	private static final String PRE_MONGO = "mongodb://";
 	private static final String SWALLOW_MONGO = "swallow.mongo.producerServerURI";
 	private static final String TOPICNAME_DEFAULT = "default";

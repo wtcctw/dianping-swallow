@@ -118,14 +118,14 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 		this.gt = gt;
 	}
 
-	public String  getP() {
+
+	public String getP() {
 		return p;
 	}
-	
+
 	public void setP(String p) {
 		this.p = p;
 	}
-	
 
 	public String get_p() {
 		return _p;
@@ -180,10 +180,15 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
             return thisbs - bs;
         }
     }
-	
+
 	@Override
 	public String toString() {
-		return _id + "::" + o_id + "::" + c + "::" + v + "::" + s + "::" + gt + "::" + p + "::" + _p + "::" + t + "::" + si + "::" +  mid + "::" + gtstring + "::" +  ststring;
+		return "WebSwallowMessage [_id=" + _id + ", o_id=" + o_id + ", c=" + c
+				+ ", v=" + v + ", s=" + s + ", gt=" + gt + ", p=" + p + ", _p="
+				+ _p + ", t=" + t + ", si=" + si + ", mo_id=" + mo_id
+				+ ", mid=" + mid + ", gtstring=" + gtstring + ", ststring="
+				+ ststring + "]";
 	}
+
 
 }

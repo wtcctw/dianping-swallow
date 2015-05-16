@@ -101,7 +101,8 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
     	query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
     	query.skip(offset).limit(limit);
         messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
-
+		for(WebSwallowMessage m : messageList)
+			System.out.println(m);
        	return getResponse(messageList,this.count(topicName));
     }
     
@@ -120,7 +121,7 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
 		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
 		query.skip(offset).limit(limit);
         List<WebSwallowMessage> messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
-		
+
         return getResponse(messageList, this.count(topicName));
     }
     

@@ -42,7 +42,13 @@ module.controller('UserController', ['$scope', '$http',
 			        type: 'GET',
 			        dataType: 'jsonp',//here
 			        success: function (data) {
-			        	
+						$.ajax({
+					        url: "http%3A%2F%2F192.168.78.29%3A8080",
+					        type: 'GET',
+					        success: function (data) {
+					        	
+					        }
+					    });
 			        }
 			    });
 //				$http({
