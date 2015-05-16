@@ -19,7 +19,7 @@ module.controller('UserController', ['$scope', '$http',
 						$scope.name = data.loginname.replace(/"/g, "");
 					$scope.username = "欢迎 " + $scope.name;
 					//set lmd to default admin
-					if(data.admin == true || $scope.name == "李明冬")
+					if(data.admin == true || $scope.name == "mingdong.li")
 						$scope.isadmin = true;
 					else
 						$scope.isadmin = false;
@@ -30,36 +30,6 @@ module.controller('UserController', ['$scope', '$http',
 					
 				});
 			}
-			
-			//for sso logout
-			$scope.logoutservice = function(){
-				$scope.username = "";
-				$scope.login    = true;
-				$scope.logout   = false;
-				
-				$.ajax({
-			        url: "https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080",
-			        type: 'GET',
-			        dataType: 'jsonp',//here
-			        success: function (data) {
-						$.ajax({
-					        url: "http%3A%2F%2F192.168.78.29%3A8080",
-					        type: 'GET',
-					        success: function (data) {
-					        	
-					        }
-					    });
-			        }
-			    });
-//				$http({
-//					method : 'GET',
-//					url : "https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080",
-//					dataType: 'jsonp'
-//				}).success(function(data, status, headers, config) {
-//					
-//				}).error(function(data, status, headers, config) {
-//				});
-			};
 			
 }]);
 
