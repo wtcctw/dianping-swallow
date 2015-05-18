@@ -1,6 +1,8 @@
 package com.dianping.swallow.consumer.internal.netty;
 
 
+import java.nio.channels.ClosedChannelException;
+
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
@@ -79,8 +81,13 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+    	
         Channel channel = e.getChannel();
         logger.error("[exceptionCaught]" + e.getChannel(), e.getCause());
+        
+        if(e.getCause() instanceof ClosedChannelException){
+        	consumerConnectionListener.onChannelDisconnected(e.getChannel());
+        }
         channel.close();
     }
 
