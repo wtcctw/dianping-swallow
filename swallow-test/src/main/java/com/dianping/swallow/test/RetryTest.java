@@ -34,7 +34,7 @@ public class RetryTest extends AbstractConsumerTest {
 		createRetryConsumerListener(true, retryCount);
 		sendMessage(messageCount, topic);
 
-		sleep(5000);
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals((retryCount + 1) * messageCount, count.get());
 	}
 	
@@ -45,7 +45,7 @@ public class RetryTest extends AbstractConsumerTest {
 
 		sendMessage(messageCount, topic);
 
-		sleep(3000);
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, count.get());
 	}
 
@@ -56,7 +56,7 @@ public class RetryTest extends AbstractConsumerTest {
 		
 		sendMessage(messageCount, topic);
 
-		sleep(5000);
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals((retryCount + 1) * messageCount, count.get());
 
 	}
@@ -68,7 +68,7 @@ public class RetryTest extends AbstractConsumerTest {
 		
 		sendMessage(messageCount, topic);
 
-		sleep(5000);
+		waitForListernToComplete(messageCount);
 		Assert.assertEquals((retryCount + 1) * messageCount, count.get());
 
 	}
@@ -105,6 +105,7 @@ public class RetryTest extends AbstractConsumerTest {
 			});
 		}
 		c.start();
+		sleep(100);
 	}
 
 

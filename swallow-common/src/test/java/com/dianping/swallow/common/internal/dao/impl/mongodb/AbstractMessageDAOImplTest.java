@@ -1,13 +1,10 @@
 package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bson.types.BSONTimestamp;
 import org.junit.Assert;
 import org.junit.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -20,13 +17,15 @@ import com.dianping.swallow.common.internal.util.MongoUtils;
  */
 public abstract class AbstractMessageDAOImplTest extends AbstractDAOImplTest {
 
-	@Autowired
 	protected MessageDAO messageDAO;
 
 	protected String consumerId = "consumer1";
 
 	@Before
 	public void beforeMessageDAOImplTest() {
+		
+		messageDAO = getBean(MessageDAO.class);
+				
 		messageDAO.cleanMessage(TOPIC_NAME, null);
 		messageDAO.cleanMessage(TOPIC_NAME, consumerId);
 	}
@@ -70,22 +69,6 @@ public abstract class AbstractMessageDAOImplTest extends AbstractDAOImplTest {
 
 			messageDAO.saveMessage(topicName, consumerId, createBackupMessage());
 		}
-	}
-
-	public static SwallowMessage createMessage() {
-
-		SwallowMessage message = new SwallowMessage();
-		message.setContent("this is a SwallowMessage");
-		message.setGeneratedTime(new Date());
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("property-key", "property-value");
-		message.setProperties(map);
-		message.setSha1("sha-1 string");
-		message.setVersion("0.6.0");
-		message.setType("feed");
-		message.setSourceIp("localhost");
-		return message;
-
 	}
 
 	private AtomicInteger inc = new AtomicInteger();

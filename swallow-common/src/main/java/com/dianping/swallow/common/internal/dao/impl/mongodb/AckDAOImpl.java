@@ -62,6 +62,19 @@ public class AckDAOImpl implements AckDAO {
    }
 
    @Override
+	public void clean(String topicName, String consumerId){
+	   
+	   mongoManager.cleanAckCollection(topicName, consumerId, false);
+	}
+
+	@Override
+	public void clean(String topicName, String consumerId, boolean isBackup) {
+		
+		mongoManager.cleanAckCollection(topicName, consumerId, isBackup);;
+	}
+
+
+   @Override
    public void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp) {
       add(topicName, consumerId, messageId, sourceConsumerIp, false);
    }

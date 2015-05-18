@@ -90,16 +90,22 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 
 	@Test
 	public void testGetMessagesGreaterThan() {
+		
 		// 插入1条消息
 		SwallowMessage message = createMessage();
 		messageDAO.saveMessage(TOPIC_NAME, message);
+		sleep(100);
+		
 		// 获取消息id
 		Long maxMessageId = messageDAO.getMaxMessageId(TOPIC_NAME);
+		Assert.assertNotNull(maxMessageId);
 		// 再插入2条消息
 		SwallowMessage expectedMessage1 = createMessage();
 		messageDAO.saveMessage(TOPIC_NAME, expectedMessage1);
 		SwallowMessage expectedMessage2 = createMessage();
 		messageDAO.saveMessage(TOPIC_NAME, expectedMessage2);
+		
+		sleep(100);
 		// 查询messageId比指定id大的按messageId升序排序的2条消息
 		List<SwallowMessage> messagesGreaterThan = messageDAO.getMessagesGreaterThan(TOPIC_NAME, null, maxMessageId, 5);
 		Assert.assertNotNull(messagesGreaterThan);

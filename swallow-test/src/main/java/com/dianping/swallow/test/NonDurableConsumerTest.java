@@ -1,8 +1,6 @@
 package com.dianping.swallow.test;
 
 
-import java.util.Date;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -23,20 +21,26 @@ public class NonDurableConsumerTest extends AbstractConsumerTest{
 	private	  int concurrentCount = 50;
 
 
+	/**
+	 * 此测试用例不可删除，准备dpsf可能耗费时间比较长，引发行为不一致
+	 * @throws SendFailedException
+	 * @throws RemoteServiceInitFailedException
+	 */
+	@Test
+	public void testPrepareDpsf() throws SendFailedException, RemoteServiceInitFailedException {
+		
+		sendMessage(1, topic);
+	}
+
 	@Test
 	public void testNoneDurableReceiveMessage() throws SendFailedException, RemoteServiceInitFailedException{
 		
 		Consumer consumer = addListener(topic, concurrentCount);
-		Date date = new Date();
 		sendMessage(messageCount, topic);
 		
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
-		
-		addListener(topic, getConsumerId(), date, concurrentCount);
-		waitForListernToComplete(messageCount);
-		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
-		
+				
 	}
 
 }

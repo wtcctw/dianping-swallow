@@ -3,16 +3,20 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 import junit.framework.Assert;
 
 import org.bson.types.BSONTimestamp;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 
 public class AckDAOImplTest extends AbstractDAOImplTest {
 
-   @Autowired
    private AckDAOImpl ackDAO;
+   
+   @Before
+   public void beforeAckDAOImplTest(){
+	   ackDAO = getBean(AckDAOImpl.class);
+   }
 
    @Test
    public void testAdd() {

@@ -4,24 +4,24 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.common.internal.packet.Packet;
 import com.geekhua.filequeue.Config;
 import com.geekhua.filequeue.FileQueue;
 import com.geekhua.filequeue.FileQueueImpl;
 
 public class FileQueueHolder {
-    private static final Logger                   LOGGER                 = LoggerFactory
+	
+    private static final Logger                   logger                 = LoggerFactory
                                                                                  .getLogger(FileQueueHolder.class);
 
-    private static final long                     DEFAULT_FILEQUEUE_SIZE = 100 * 1024 * 1024;
-    private static final int                      MSG_AVG_LEN            = 512;                                      //默认的filequeue切片大小，512MB
+    private static  long                     	  DEFAULT_FILEQUEUE_SIZE = 100 * 1024 * 1024;
+    
+    private static final int                      MSG_AVG_LEN            = 512;                                      //默认的filequeue切片大小，100MB
 
     private static Map<String, FileQueue<Packet>> queues                 = new HashMap<String, FileQueue<Packet>>(); //当前TopicName与Filequeue对应关系的集合
 
@@ -45,25 +45,16 @@ public class FileQueueHolder {
         fileQueueConfig.setMsgAvgLen(MSG_AVG_LEN);
         if (filequeueBaseDir != null) {
             fileQueueConfig.setBaseDir(filequeueBaseDir);
-        } else {
-            /*
-             * 为了避免测试环境filequeue目录公用导致出错的问题，当未自定义设置filequeue的目录，而且是alpha或qa环境时，
-             * 则使用带有uuid的目录。但这样重启应用后filequeue目录变了故无法做到续传。
-             */
-            String env = EnvZooKeeperConfig.getEnv();
-            if ("qa".equals(env) || "alpha".equals(env)) {
-                String uuid = UUID.randomUUID().toString();
-                filequeueBaseDir = "/data/appdatas/filequeue/" + uuid;
-                fileQueueConfig.setBaseDir(filequeueBaseDir);
-                LOGGER.info("env is '" + env + "' and 'filequeueBaseDir' is not set, so randomize the filequeue dir: "
-                        + filequeueBaseDir);
-            }
         }
+        
         //如果Map里不存在该filequeue，此handler又要求将之前的文件删除，则删除
         if (!sendMsgLeftLastSessions) {//如果不续传，则需要把/data/appdatas/filequeue/<topicName> 目录删除掉
             File file = new File(fileQueueConfig.getBaseDir(), fileName);
             if (file.exists()) {
                 try {
+                	if(logger.isInfoEnabled()){
+                		logger.info("[getQueue][delete file]" + file);
+                	}
                     FileUtils.deleteDirectory(file);
                 } catch (IOException e) {
                     throw new RuntimeException(e.getMessage(), e);
@@ -76,5 +67,11 @@ public class FileQueueHolder {
         queues.put(fileName, newQueue);
 
         return queues.get(fileName);
+    }
+    
+    
+    public synchronized static void removeQueue(String fileName){
+    	
+    	queues.remove(fileName);
     }
 }

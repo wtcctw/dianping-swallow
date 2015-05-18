@@ -13,6 +13,7 @@ public class Counter {
 		
 		String file = "/data/applogs/swallow/all";
 		File f = new File(file);
+		@SuppressWarnings("resource")
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 		String line = null;
 		int count[] = new int[10000];

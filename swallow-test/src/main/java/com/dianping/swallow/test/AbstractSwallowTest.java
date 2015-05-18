@@ -1,9 +1,9 @@
 package com.dianping.swallow.test;
 
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jboss.netty.util.internal.ConcurrentHashMap;
@@ -11,6 +11,8 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
+import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.message.Destination;
@@ -44,15 +46,18 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	
 	protected List<Consumer> consumers = new LinkedList<Consumer>();
 
-	protected MessageDAOImpl mdao = new MessageDAOImpl();
-	
+	protected MessageDAOImpl mdao;
+	protected AckDAOImpl 	 ackdao;
+
 	@Before
 	public void beforeSwallowAbstractTest(){
 		
-		DefaultMongoManager mc = new DefaultMongoManager("swallow.mongo.producerServerURI");
+		DefaultMongoManager mongoManager = new DefaultMongoManager("swallow.mongo.producerServerURI");
 		mdao = new MessageDAOImpl();
-		mdao.setMongoManager(mc);
-
+		mdao.setMongoManager(mongoManager);
+		
+		ackdao = new AckDAOImpl();
+		ackdao.setMongoManager(mongoManager);
 	}
 
 	@After
@@ -64,34 +69,53 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	}
 
 	
+	protected Long getMaxMessageId(String topicName){
+		return mdao.getMaxMessageId(topicName);
+	} 
+	
 	protected void sendMessage(String topic, Object message, boolean zipped) throws SendFailedException, RemoteServiceInitFailedException{
 		
-		sendMessage(1, topic, zipped,  0, -1, message);
+		sendMessage(1, topic, zipped,  0, -1, null, message);
+	}
 		
+	protected void cleanSendMessageCount() {
+		sendMessageCount.clear();
+	}
+	
+	protected void cleanGetMessageCount(){
+		getMessageCount.clear();
 	}
 
 	protected void sendMessage(String topic, Object message) throws SendFailedException, RemoteServiceInitFailedException{
 		
-		sendMessage(1, topic, false, 0, -1, message);
+		sendMessage(1, topic, false, 0, -1, null, message);
 		
 	}
 	
 	protected void sendMessage(int messageCount, String topic, int size) throws SendFailedException, RemoteServiceInitFailedException {
 		
-		sendMessage(messageCount, topic, false, 0, size, null);
+		sendMessage(messageCount, topic, false, 0, size, null, null);
 	}
 	
+	protected void sendMessage(int messageCount, String topic, String type) throws SendFailedException, RemoteServiceInitFailedException {
+		
+		sendMessage(messageCount, topic, false, 0, 10, type, null);
+	}
+
+
 	protected void sendMessage(int messageCount, String topic) throws SendFailedException, RemoteServiceInitFailedException {
 		
-		sendMessage(messageCount, topic, false,  0, 10, null);
+		sendMessage(messageCount, topic, false,  0, 10, null, null);
 		
 	}
 	
 	private AtomicInteger totalSend = new AtomicInteger();
 
-	protected void sendMessage(int messageCount, String topic, boolean zipped, int sleepInterval, int size, Object message) throws SendFailedException, RemoteServiceInitFailedException {
-		
-		
+	protected void sendMessage(int messageCount, String topic, boolean zipped, int sleepInterval, int size, String type, Object message) throws SendFailedException, RemoteServiceInitFailedException {
+
+		//等待consumer建立成功
+		sleep(100);
+
 		AtomicInteger count = sendMessageCount.get(topic);
 		if(count == null){
 			count = new AtomicInteger();
@@ -102,15 +126,26 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		}
 		
 		Producer p = createProducer(topic, zipped);
+		if(logger.isInfoEnabled()){
+			logger.info("[sendMessage][begin]" + count.get());
+		}
         for (int i = 0; i < messageCount; i++) {
         	
     		if(message == null){
     			message = getMessage(size);
     		}
-            p.sendMessage(message);
+            p.sendMessage(message, type);
             sleep(sleepInterval);
             count.incrementAndGet();
         }
+		if(logger.isInfoEnabled()){
+			logger.info("[sendMessage][end]" + count.get());
+		}
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[sendMessage][db data count]" + mdao.count(topic, null));
+			logger.info("[sendMessage][min message]" + mdao.getMessagesGreaterThan(topic, null, 0L, 1));
+		}
 	}
 
 
@@ -155,58 +190,65 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected Consumer addListener(final String topic) {
 		
-		return addListener(topic, false, null, 1, -1);
+		return addListener(topic, false, null, 1, null);
 	}
+	
+	protected Consumer addListener(String topic, String consumerId, Set<String> filters) {
+	
+		return addListener(topic, true, consumerId, 10, filters);
+	}
+
 
 	protected Consumer addListener(final String topic, int concurrentCount) {
 		
-		return addListener(topic, false, null, concurrentCount, -1);
+		return addListener(topic, false, null, concurrentCount, null);
 	}
 	
 	protected Consumer addListener(final String topic, final String consumerId, int concurrentCount) {
 		
-		return addListener(topic, true, consumerId, concurrentCount, -1);
+		return addListener(topic, true, consumerId, concurrentCount, null);
 	}
-
-	protected Consumer addListener(String topic, String consumerId, Date date, int concurrentCount) {
-		return addListener(topic, true, consumerId, concurrentCount, ConsumerConfig.fromDateToMessageId(date));
-	}
-
 
 	protected Consumer createConsumer(String topic, String consumerId){
 		
-		return createConsumer(topic, true, consumerId, 1, -1, 5);
+		return createConsumer(topic, true, consumerId, 1, 5, null);
 	}
 
 	protected Consumer createConsumer(String topic, String consumerId, int retryCount){
-		
-		return createConsumer(topic, true, consumerId, 1, -1, retryCount);
+
+		return createConsumer(topic, true, consumerId, 1, retryCount, null);
 	}
 
-	protected Consumer createConsumer(String topic, boolean durable, String consumerId, int concurrentCount, long startMessageId, int retryCount){
+	protected Consumer createConsumer(String topic, boolean durable, String consumerId, int concurrentCount, int retryCount, Set<String> filters){
 
         ConsumerConfig config = new ConsumerConfig();
         config.setThreadPoolSize(concurrentCount);
-        
+        config.setMessageFilter(MessageFilter.createInSetMessageFilter(filters));
         config.setDelayBaseOnBackoutMessageException(1);
+        
+        setConsumerConfig(config);
+        
         if(!durable){
         	config.setConsumerType(ConsumerType.NON_DURABLE);
         	if(consumerId != null){
         		throw new IllegalArgumentException("consumerId should be null, but " + consumerId);
         	}
         }
-        config.setStartMessageId(startMessageId);
        
         Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), consumerId, config);
         
         consumers.add(c);
-        
         return c;
 	}
 	
-	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, long startMessageId) {
+	protected void setConsumerConfig(ConsumerConfig config) {
+		
+		
+	}
 
-		final Consumer c = createConsumer(topic, durable, consumerId, concurrentCount, startMessageId, 5);
+	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, Set<String> filters) {
+
+		final Consumer c = createConsumer(topic, durable, consumerId, concurrentCount, 5, filters);
 
 		c.setListener(new MessageListener() {
         	
@@ -238,7 +280,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
         });
         
         c.start();
-        sleep(10);
+        sleep(200);
         return c;
 	}
 
@@ -266,11 +308,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected void waitForListernToComplete(int messageCount) {
 		
-		if(messageCount <= 1000){
-			sleep(4000);
-			return;
-		}
-		sleep(8000);
+		sleep((int) (Math.ceil((double)messageCount/200) * 1000));
 	}
 
 

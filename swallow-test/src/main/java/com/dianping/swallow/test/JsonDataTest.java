@@ -33,6 +33,9 @@ public class JsonDataTest extends AbstractConsumerTest {
 			@Override
 			public void onMessage(Message msg) throws BackoutMessageException {
 				try{
+					if(logger.isInfoEnabled()){
+						logger.info(msg.toString());
+					}
 					realData.set(msg.transferContentToBean(Data.class));
 				}catch(Throwable th){
 					logger.error("[error transform data]", th);

@@ -2,6 +2,10 @@ package com.dianping.swallow.common.internal.dao;
 
 public interface AckDAO {
 
+	void clean(String topicName, String consumerId, boolean isBackup);
+	
+	void clean(String topicName, String consumerId);
+
    /**
     * 获取topicName和consumerId对应的最大的messageId
     */

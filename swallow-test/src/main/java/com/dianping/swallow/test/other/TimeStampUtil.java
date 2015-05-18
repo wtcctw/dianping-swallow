@@ -1,5 +1,7 @@
 package com.dianping.swallow.test.other;
 
+import java.util.Date;
+
 import org.bson.types.BSONTimestamp;
 import org.junit.Test;
 
@@ -15,8 +17,25 @@ public class TimeStampUtil {
 	@Test
 	public void testTimeStamp(){
 //		BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(6146147335001870685L);
-		BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(6146147335001870739L);
 		
+		print(6148565019337424909L);
+//		print(6148547951137390594L);
+		
+	}
+	
+	
+	@Test
+	public void testMongo(){
+		
+		Long cur = MongoUtils.getLongByCurTime();
+		print(cur);
+	}
+
+	private void print(Long id) {
+		
+		BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(id);
 		System.out.println(timestamp.getTime() + "," + timestamp.getInc());
+		System.out.println(new Date(timestamp.getTime()*1000L));
+		
 	}
 }

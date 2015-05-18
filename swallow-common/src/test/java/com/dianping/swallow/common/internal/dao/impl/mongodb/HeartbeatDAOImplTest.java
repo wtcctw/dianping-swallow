@@ -1,17 +1,23 @@
 package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
+
 import java.util.Date;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl;
 
 public class HeartbeatDAOImplTest extends AbstractDAOImplTest {
 
-   @Autowired
    private HeartbeatDAOImpl heartbeatDAO;
+   
+   @Before
+   public void beforeHeartbeatDAOImplTest(){
+
+	   heartbeatDAO = getBean(HeartbeatDAOImpl.class);
+   }
 
    @Test
    public void testUpdateLastHeartbeat() {
