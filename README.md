@@ -412,6 +412,11 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 # Swallow常见问题以及处理
 
+## 如何查找某个topic对应的consumer
+* 从[CAT](http://cat.dp)中，找到swallow项目[Swallow](http://cat.dp/cat/r/t?op=view&domain=Swallow)
+* 找到`Out:topic`(topic即你关心的topic名字)，点开，即可看到consumer信息
+
+
 ## 如何查看我的消费是否有延迟、延迟多少条消息？
 * 从[CAT](http://cat.dp/)中查看Swallow项目的Transaction，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&ampdomain=Swallow)）。
 * 以dp\_action这个topic为例（仅作示例，具体到自己的topic，请做相应变通），先找到In:dp_action这个type：
