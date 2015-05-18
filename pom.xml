@@ -5,7 +5,7 @@
 	<groupId>com.dianping.swallow</groupId>
 	<artifactId>swallow-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.7.1-SNAPSHOT</version>
+	<version>0.7.1</version>
 	<name>swallow</name>
 	<organization>
 		<name>dianping</name>
