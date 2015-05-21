@@ -1,56 +1,71 @@
-package com.dianping.swallow.web.service;
+package com.dianping.swallow.web.service.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.StringUtils;
+import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.dao.WebSwallowMessageDao;
+import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
-import com.mongodb.MongoClient;
+import com.dianping.swallow.web.service.AbstractSwallowService;
+import com.dianping.swallow.web.service.AccessControlServiceConstants;
+import com.dianping.swallow.web.service.AdministratorListService;
+import com.dianping.swallow.web.service.TopicService;
+import com.mongodb.Mongo;
 
 /**
  * @author mingdongli
  *
- *         2015年5月14日下午1:16:09
+ * 2015年5月14日下午1:16:09
  */
 @Service("topicService")
 public class TopicServiceImpl extends AbstractSwallowService implements TopicService {
 
 	private static final String PRE_MSG = "msg#";
 	private static final String DELIMITOR = ",";
-
 	@Autowired
-	private TopicDao tdi;
+	private AdministratorDao administratorDao;
+	@Resource(name = "administratorListService")
+	private AdministratorListService administratorListService;
 	@Autowired
-	private WebSwallowMessageDao smdi;
+	private TopicDao topicDao;
+	@Autowired
+	private WebSwallowMessageDao webSwallowMessageDao;
 
-	// read records from writeMongoOps dut to it alread exists
+	/* 
+	 * read records from writeMongo due to it already exists
+	 */
 	@Override
 	public Map<String, Object> getAllTopicFromExisting(int start, int span) {
-		return tdi.findFixedTopic(start, span);
+		return topicDao.findFixedTopic(start, span);
 	}
 
-	// just read, so use writeMongoOps
+	
+	/* 
+	 * just read, so use writeMongo
+	 */
 	@Override
 	public Map<String, Object> getSpecificTopic(int start, int span,
 			String name, String prop, String dept) {
-
-		return tdi.findSpecific(start, span, name, prop, dept);
+	
+		return topicDao.findSpecific(start, span, name, prop, dept);
 	}
 
 	@Override
-	public List<String> getTopicNames() {
+	public List<String> getTopicNames(String tongXingZheng, boolean isAdmin) {
 		List<String> tmpDBName = new ArrayList<String>();
-		List<MongoClient> allReadMongo = smdi.getAllReadMongo();
-		for (MongoClient mc : allReadMongo) {
+		List<Mongo> allReadMongo = webSwallowMessageDao.getAllReadMongo();
+		for (Mongo mc : allReadMongo) {
 			tmpDBName.addAll(mc.getDatabaseNames());
 		}
 
@@ -58,8 +73,12 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 		for (String dbn : tmpDBName) {
 			if (dbn.startsWith(PRE_MSG)) {
 				String str = dbn.substring(PRE_MSG.length());
-				if (!dbName.contains(str))
-					dbName.add(str);
+				if (!dbName.contains(str)){
+					if(isAdmin)
+						dbName.add(str); 
+					else if(topicDao.readByName(str).getProp().contains(tongXingZheng))
+						dbName.add(str);  //add if correlative
+				}
 			}
 		}
 		return dbName;
@@ -68,27 +87,18 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	@Override
 	public void editTopic(String name, String prop, String dept, String time) {
 
-			tdi.updateTopic(name, prop, dept, time);
-			if (logger.isInfoEnabled()) {
-				logger.info("Update prop to " + splitProps(prop) + " of "
-						+ name);
-			}
+			topicDao.updateTopic(name, prop, dept, time);
 
 		return;
 	}
 
-	private Set<String> splitProps(String props) {
-		String[] prop = props.split(DELIMITOR);
-		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
-		return lists;
-	}
-
-	// read from writeMongoOps, everytime read the the database to get the
-	// latest info
+	/* 
+	 * read from writeMongo, every time read the the database to get the latest info
+	 */
 	@Override
 	public Set<String> getPropAndDept() {
 		Set<String> propdept = new HashSet<String>();
-		List<Topic> topics = tdi.findAll();
+		List<Topic> topics = topicDao.findAll();
 
 		for (Topic topic : topics) {
 			propdept.addAll(getPropList(topic));
@@ -96,7 +106,24 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 		}
 		return propdept;
 	}
+	
 
+	@Override
+	public void saveVisitInAdminList(String name) {
+		Administrator admin = administratorDao.readByName(name);
+		if(admin != null){
+			administratorListService.updateAdmin(admin, name, admin.getRole());
+		}
+		else {
+			if(topicDao.readByProp(name) != null)
+				administratorListService.doneCreateAdmin(name, AccessControlServiceConstants.USER);
+			else
+				administratorListService.doneCreateAdmin(name, AccessControlServiceConstants.VISITOR);
+		}
+		
+		return;
+	}
+	
 	private Set<String> getPropList(Topic topic) {
 		Set<String> props = new HashSet<String>();
 		String[] tmpprops = topic.getProp().split(DELIMITOR);

@@ -15,14 +15,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.web.dao.WebSwallowMessageDao;
 import com.dianping.swallow.web.model.WebSwallowMessage;
-import com.dianping.swallow.web.util.MongoUtils;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.Mongo;
 import com.mongodb.WriteResult;
 
 /**
@@ -30,7 +30,7 @@ import com.mongodb.WriteResult;
  *
  * 2015年4月20日 下午9:31:41 
  */
-public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
+public class DefaultWebSwallowMessageDao extends AbstractDao implements WebSwallowMessageDao {
  
 	private 			 WebMongoManager        webMongoManager;
     private static final String 				MESSAGE_COLLECTION                 = "c";
@@ -71,6 +71,9 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
                convert(result, swallowMessage);
                return swallowMessage;
             } catch (RuntimeException e) {
+            	if(logger.isErrorEnabled()){
+            		logger.error("Error when convert resultset to SwallowMessage.", e);
+            	}
             }
          }
         return (WebSwallowMessage) result;
@@ -100,9 +103,8 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
     	Query query = new Query();
     	query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
     	query.skip(offset).limit(limit);
+    	query.fields().exclude(C);
         messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
-		for(WebSwallowMessage m : messageList)
-			System.out.println(m);
        	return getResponse(messageList,this.count(topicName));
     }
     
@@ -120,6 +122,9 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
 		Query query = new Query();
 		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
 		query.skip(offset).limit(limit);
+		if(limit - offset != 1){  //return C until it is necessary
+			query.fields().exclude(C);
+		}
         List<WebSwallowMessage> messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, WebSwallowMessage.class, MESSAGE_COLLECTION);
 
         return getResponse(messageList, this.count(topicName));
@@ -130,6 +135,8 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
     	List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
     	Query query1 = new Query(Criteria.where(SI).is(ip));
     	query1.skip(offset).limit(limit);
+    	query1.fields().exclude(C);
+    	query1.with(new Sort(new Sort.Order(Direction.DESC, ID)));
     	messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query1, WebSwallowMessage.class, MESSAGE_COLLECTION);
     	Query query2 = new Query(Criteria.where(SI).is(ip));
        	long size = this.webMongoManager.getMessageMongoTemplate(topicName).count(query2, MESSAGE_COLLECTION);
@@ -145,8 +152,10 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
 		try {
 			startlong = MongoUtils.getLongByDate(sdf.parse(startdt));
 			stoplong = MongoUtils.getLongByDate(sdf.parse(stopdt));
-		} catch (ParseException e1) {
-			e1.printStackTrace();
+		} catch (ParseException e) {
+			if (logger.isErrorEnabled()){
+				logger.error("Error when parse date to Long.", e);
+			}
 		}
 		DBObject query = BasicDBObjectBuilder.start()
 				.add(ID, BasicDBObjectBuilder.start()
@@ -169,7 +178,9 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
                  convert(result, swallowMessage);
                  list.add(swallowMessage);
               } catch (RuntimeException e) {
-            	  e.printStackTrace();
+          		if (logger.isErrorEnabled()){
+          			logger.error("Error when convert resultset to WebSwallowMessage.", e);
+				}
               }
            }
         } finally {
@@ -199,8 +210,9 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
 			startlong = MongoUtils.getLongByDate(sdf.parse(startdt));
 			stoplong  = MongoUtils.getLongByDate(sdf.parse(stopdt));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if (logger.isErrorEnabled()){
+				logger.error("Error when parse date to Long.", e);
+			}
 		}
 		for(int i = 0; i < list.size(); ++i){
 			if(!(mid > startlong && mid < stoplong))
@@ -247,6 +259,9 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
                convert(result, swallowMessage);
                messageList.add(swallowMessage);
             } catch (RuntimeException e) {
+        		if (logger.isErrorEnabled()){
+          			logger.error("Error when convert resultset to WebSwallowMessage.", e);
+				}
             }
          }
         return getResponse(messageList, (long) messageList.size());
@@ -258,12 +273,12 @@ public class DefaultWebSwallowMessageDao  implements WebSwallowMessageDao {
 	}
 
 	@Override
-	public List<MongoClient> getAllReadMongo() {
+	public List<Mongo> getAllReadMongo() {
 		return this.webMongoManager.getAllReadMongo();
 	}
 
 	@Override
-	public Map<String, MongoClient> getTopicNameToMongoMap() {
+	public Map<String, Mongo> getTopicNameToMongoMap() {
 		return this.webMongoManager.getTopicNameToMongoMap();
 	}
 

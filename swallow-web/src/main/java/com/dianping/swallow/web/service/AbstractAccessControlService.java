@@ -6,6 +6,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+/**
+ * @author mingdongli
+ *
+ * 2015年5月20日下午2:05:02
+ */
 public abstract class AbstractAccessControlService extends AbstractSwallowService{
 
 	protected volatile Map<String,Set<String>>  		topicToWhiteList 					= new ConcurrentHashMap<String,Set<String>>();

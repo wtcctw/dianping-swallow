@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.utils.WebSwallowUtils;
-import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.WebSwallowMessage;
 import com.dianping.swallow.web.service.MessageService;
+import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
 
 /**
  * @author mingdongli
@@ -25,12 +26,18 @@ import com.dianping.swallow.web.service.MessageService;
  *         2015年4月22日 上午12:04:03
  */
 @Controller
-public class MessageController extends AbstractWriteDao {
+public class MessageController extends AbstractController{
 
 	private static final String 				SHOW 						= "show";
 	
+	@Resource(name = "accessControlService")
+	private AccessControlServiceImpl 				accessControlService;
+	
+    @Resource(name = "topicService")
+    private TopicService 							topicService;
+    
 	@Resource(name = "messageService")
-	private MessageService 						messageService;
+	private MessageService 							messageService;
 
 	@RequestMapping(value = "/console/message")
 	public ModelAndView message(HttpServletRequest request,
@@ -44,13 +51,11 @@ public class MessageController extends AbstractWriteDao {
 		return WebSwallowUtils.getVisitInfo(request);
 	}
 
-	// doing all query, so use readMongoOps
 	@RequestMapping(value = "/console/message/messagedefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object messageDefault(String offset, String limit, String tname, String messageId, 
 			String startdt, String stopdt, HttpServletRequest request, HttpServletResponse response){
-		//save visit info
-		administratorService.saveVisitAdmin(WebSwallowUtils.getVisitInfo(request));
+		topicService.saveVisitInAdminList(WebSwallowUtils.getVisitInfo(request));
 		Map<String, Object> map = new HashMap<String,Object>();
 		String username = setUserName(request);
 		int start = Integer.parseInt(offset);
@@ -60,14 +65,13 @@ public class MessageController extends AbstractWriteDao {
 		return getResponse(map, tname, username);
 	}
 
-	// doing all query, so use readMongoOps
 	@RequestMapping(value = "/console/message/content", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public WebSwallowMessage showMessageContent(String topic, String mid,
 			HttpServletRequest request, HttpServletResponse response)
 			throws UnknownHostException {
 		if (accessControlService.checkVisitIsValid(request, topic)) {
-			return messageService.getMessageContent(topic, mid, request, response);
+			return messageService.getMessageContent(topic, mid);
 		} else{
 			return new WebSwallowMessage();
 		}

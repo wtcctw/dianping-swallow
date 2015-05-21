@@ -9,39 +9,49 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.dianping.swallow.web.controller.TopicController;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.dao.WebSwallowMessageDao;
-import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AccessControlServiceConstants;
-import com.mongodb.MongoClient;
+import com.dianping.swallow.web.service.AdministratorService;
+import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
+import com.mongodb.Mongo;
 
 /**
  * @author mingdongli
- *		2015年5月12日 下午2:52:05
+ * 2015年5月12日 下午2:52:05
  */
-public class ScanWriteDaoScheduler extends AbstractWriteDao{
+public class ScanWriteDaoScheduler {
 	
 	private static final String 				TOPIC_DB_NAME 				= "swallowwebapplication";
 	private static final String 				TIMEFORMAT 					= "yyyy-MM-dd HH:mm";
 
 	private static final String 				PRE_MSG 					= "msg#";
 	private static final String 				DELIMITOR 					= ",";
-
+	
+	@Resource(name = "accessControlService")
+	private AccessControlServiceImpl 			accessControlService;
+    @Resource(name = "administratorService")
+    private AdministratorService 				administratorService;
+	@Resource(name = "topicMongoTemplate")
+	private MongoTemplate 						mongoTemplate;
 	@Autowired
-	private WebSwallowMessageDao 				smdi;
+	private WebSwallowMessageDao 				webSwallowMessageDao;
 	@Autowired
-	private TopicDao 							tdi;
+	private TopicDao 							topicDao;
 	@Autowired
-	private AdministratorDao 					admind;
+	private AdministratorDao 					administratorDao;
 	
 
 	private static final Logger 				logger = 					
@@ -81,7 +91,7 @@ public class ScanWriteDaoScheduler extends AbstractWriteDao{
 		for (String str : dbs) {
 			if (isTopicName(str)) {
 				String subStr = str.substring(PRE_MSG.length());
-				Topic t = tdi.readByName(subStr);
+				Topic t = topicDao.readByName(subStr);
 				if (t != null) { // exists
 					updateTopicToWhiteList(subStr, t);
 				} else {
@@ -92,7 +102,7 @@ public class ScanWriteDaoScheduler extends AbstractWriteDao{
 	}
 	
 	private void saveTopic(String subStr){
-		tdi.saveTopic(getTopic(subStr, 0L));
+		topicDao.saveTopic(getTopic(subStr, 0L));
 		if (logger.isInfoEnabled()) {
 			logger.info("create topic : " + getTopic(subStr, 0L));
 		}
@@ -123,8 +133,8 @@ public class ScanWriteDaoScheduler extends AbstractWriteDao{
 
 	private List<String> getDatabaseName(){
 		List<String> dbs = new ArrayList<String>();
-		List<MongoClient> allReadMongo = smdi.getAllReadMongo();
-		for (MongoClient mc : allReadMongo) {
+		List<Mongo> allReadMongo = webSwallowMessageDao.getAllReadMongo();
+		for (Mongo mc : allReadMongo) {
 			dbs.addAll(mc.getDatabaseNames());
 		}
 		Collections.sort(dbs);
@@ -132,18 +142,21 @@ public class ScanWriteDaoScheduler extends AbstractWriteDao{
 	}
 	
 	private void scanAdminCollection(){
-		List<Administrator> aList = admind.findAll();
+		List<Administrator> aList = administratorDao.findAll();
+		int role = -1;
 		for (Administrator list : aList) {
-			if (list.getRole() == 0)
+			role = list.getRole();
+			if ( role == AccessControlServiceConstants.ADMINI){
 				if (accessControlService.getAdminSet().add(
 						list.getName()))
 					if (logger.isInfoEnabled()) {
 						logger.info("admiSet add " + list.getName());
 					}
+			}
 		}
 		if(accessControlService.getAdminSet().isEmpty()){
 			String defaultAdmin = accessControlService.getDefaultAdmin();
-			administratorService.createAdmin(defaultAdmin, AccessControlServiceConstants.ADMINI);
+			administratorService.createInAdminList(defaultAdmin, AccessControlServiceConstants.ADMINI);
 			accessControlService.getAdminSet().add(accessControlService.getDefaultAdmin()); //add default admin
 			if (logger.isInfoEnabled()) {
 				logger.info("admiSet add default admin.");

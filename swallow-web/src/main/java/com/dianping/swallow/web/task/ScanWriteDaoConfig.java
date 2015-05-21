@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author mingdongli
- *		2015年5月12日 下午2:42:37
+ * 2015年5月12日 下午2:42:37
  */
 
 @Configuration

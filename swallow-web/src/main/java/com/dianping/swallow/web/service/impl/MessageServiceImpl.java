@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.service;
+package com.dianping.swallow.web.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,9 +8,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +15,8 @@ import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.WebSwallowMessageDao;
 import com.dianping.swallow.web.model.WebSwallowMessage;
+import com.dianping.swallow.web.service.AbstractSwallowService;
+import com.dianping.swallow.web.service.MessageService;
 
 
 /**
@@ -33,9 +32,9 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	private static final String 				GZIP 						= "H4sIAAAAAAAAA";
 	
 	@Autowired
-	private WebSwallowMessageDao 				smdi;
+	private WebSwallowMessageDao 				webSwallowMessageDao;
 	@Autowired
-	private AdministratorDao 					admind;
+	private AdministratorDao 					administratorDao;
 	
 	public Map<String, Object> getMessageFromSpecificTopic(int start,
 			int span, String tname, String messageId, String startdt,
@@ -49,6 +48,9 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 				try {
 					mid = Long.parseLong(messageId.trim());
 				} catch (NumberFormatException e) {
+					if (logger.isErrorEnabled()){
+						logger.error("Error when parse " + messageId.trim() + " to Long.", e);
+					}
 					mid = 0;
 				}
 			}
@@ -61,12 +63,11 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 			String ip, String username) {
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
-		sizeAndMessage = smdi.findByIp(start, span, ip, subStr);
+		sizeAndMessage = webSwallowMessageDao.findByIp(start, span, ip, subStr);
 		beforeResponse(  (List<WebSwallowMessage>) sizeAndMessage.get(MESSAGE) );
 		return sizeAndMessage;
 	}
 
-	// read use readMongoOps
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> getResults(String dbn, int start, int span,
 			long mid, String startdt, String stopdt, String username) {
@@ -74,19 +75,19 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 		if (mid < 0 && (startdt + stopdt).isEmpty()) // just query by topicname
 			
-			sizeAndMessage = smdi.findByTopicname(start, span, subStr);
+			sizeAndMessage = webSwallowMessageDao.findByTopicname(start, span, subStr);
 		
 		else if (startdt == null || startdt.isEmpty()) // time is empty,
 			
-			sizeAndMessage = smdi.findSpecific(start, span, mid, subStr);
+			sizeAndMessage = webSwallowMessageDao.findSpecific(start, span, mid, subStr);
 		
 		else if (mid < 0) // messageId is empty, query by time
 			
-			sizeAndMessage = smdi.findByTime(start, span, startdt, stopdt, subStr);
+			sizeAndMessage = webSwallowMessageDao.findByTime(start, span, startdt, stopdt, subStr);
 		
 		else  // both are not empty, query by time and messageId
 			
-			sizeAndMessage = smdi.findByTimeAndId(start, span, mid, startdt, stopdt, subStr);
+			sizeAndMessage = webSwallowMessageDao.findByTimeAndId(start, span, mid, startdt, stopdt, subStr);
 
 		beforeResponse(  (List<WebSwallowMessage>) sizeAndMessage.get(MESSAGE) );
 		return sizeAndMessage;
@@ -94,14 +95,12 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	
 	private void beforeResponse(List<WebSwallowMessage> messageList){
 		for (WebSwallowMessage m : messageList)
-			setSMessageProperty(m, false);
+			setSMessageProperty(m);
 	}
 	
 
 
-	private void setSMessageProperty(WebSwallowMessage m, boolean showcontent) {
-		if (!showcontent)
-			m.setC("?"); // don't transmit content
+	private void setSMessageProperty(WebSwallowMessage m) {
 		m.setMid(m.get_id());
 		if (m.getO_id() != null) {
 			m.setMo_id(m.getO_id());
@@ -109,9 +108,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		}
 		m.setGtstring(m.getGt());
 		m.setStstring(m.get_id());
-		// no need to transmit
-		m.set_id(null);
-		isZipped(m);
+		m.set_id(null); // no need to transmit
 	}
 
 	private void isZipped(WebSwallowMessage m) {
@@ -119,7 +116,9 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 			try {
 				m.setC(ZipUtil.unzip(m.getC()));
 			} catch (IOException e) {
-				e.printStackTrace();
+				if (logger.isErrorEnabled()){
+					logger.error("Error when unzip " + m.getC(), e);
+				}
 			}
 		}
 	}
@@ -132,13 +131,12 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	}
 
 	@SuppressWarnings("unchecked")
-	public WebSwallowMessage getMessageContent(String topic, String mid,
-			HttpServletRequest request, HttpServletResponse response) {
+	public WebSwallowMessage getMessageContent(String topic, String mid) {
 		
 		List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
 
 			long messageId = Long.parseLong(mid);
-			messageList = (List<WebSwallowMessage>) smdi.findSpecific(0, 1, messageId, topic).get(MESSAGE);
+			messageList = (List<WebSwallowMessage>) webSwallowMessageDao.findSpecific(0, 1, messageId, topic).get(MESSAGE);
 			isZipped(messageList.get(0));
 			return messageList.get(0);
 

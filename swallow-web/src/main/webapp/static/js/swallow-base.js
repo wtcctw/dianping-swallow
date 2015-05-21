@@ -1,6 +1,6 @@
 //var module = angular.module('SwallowModule', ['ngResource','isteven-multi-select']);
 //Your app's root module...
-var module = angular.module('SwallowModule', ['ngResource'], function($httpProvider) {
+var module = angular.module('SwallowModule', ['ngResource', 'ngDialog'], function($httpProvider) {
   // Use x-www-form-urlencoded Content-Type
   $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 

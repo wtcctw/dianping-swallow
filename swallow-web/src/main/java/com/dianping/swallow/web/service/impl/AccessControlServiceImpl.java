@@ -1,10 +1,12 @@
-package com.dianping.swallow.web.service;
+package com.dianping.swallow.web.service.impl;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.controller.utils.WebSwallowUtils;
+import com.dianping.swallow.web.service.AbstractAccessControlService;
+import com.dianping.swallow.web.service.AccessControlService;
 
 
 /**
@@ -36,6 +38,5 @@ public class AccessControlServiceImpl extends AbstractAccessControlService imple
 			return  env || admin; 
 		}
 	}
-	
 
 }

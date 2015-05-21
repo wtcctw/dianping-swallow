@@ -13,7 +13,7 @@
 				classpath*:applicationContext.xml
 		</param-value>
 	</context-param>
-	 	<!-- for cas-server -->
+	
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>

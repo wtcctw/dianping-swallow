@@ -12,22 +12,50 @@ import com.dianping.swallow.web.model.Administrator;
  */
 public interface AdministratorDao{
 
+	/**
+	 *  根据通行证查询Administrator列表
+	 * @param name	通行证
+	 */
     Administrator readByName(String name);
     
-    //use insert to create
-    void createAdministrator(Administrator p);
+    /**
+     * 新建Administrator纪录
+     * @param admin  Administrator纪录
+     */
+    void createAdministrator(Administrator admin);
 
-    //use save to implement insert and update
-	void saveAdministrator(Administrator p);
+    /**
+     * 保存Administrator纪录
+     * @param admin  Administrator纪录
+     */
+	void saveAdministrator(Administrator admin);
 	
-	int deleteByName(String name);  //txz is uniq
+	/**
+	 * 根据通行证删除纪录
+	 * @param name   通行证
+	 */
+	int deleteByName(String name);
 	
+	/**
+	 * 删除集合
+	 */
 	void dropCol();
 	
+	/**
+	 * 查询所有Administrator纪录
+	 */
 	List<Administrator> findAll();
 	
+	/**
+	 * 查询Administrator列表中纪录条数
+	 */
 	long countAdministrator();
 	
+	/**
+	 * 查询指定数目的Administrator纪录
+	 * @param offset	起始位置
+	 * @param limit		偏移量
+	 */
 	List<Administrator> findFixedAdministrator(int offset, int limit);
 	
  }

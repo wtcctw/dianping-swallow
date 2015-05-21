@@ -2,9 +2,6 @@ package com.dianping.swallow.web.service;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.dianping.swallow.web.model.WebSwallowMessage;
 
 
@@ -15,10 +12,24 @@ import com.dianping.swallow.web.model.WebSwallowMessage;
  */
 public interface MessageService extends SwallowService{
 
+	/**
+	 * 在限定条件下查询topic指定数量的messages
+	 * @param start  	开始位置
+	 * @param span	 	偏移量
+	 * @param tname     topic名称
+	 * @param messageId 消息ID
+	 * @param startdt   开始时间
+	 * @param stopdt	结束时间	
+	 * @param username  用户名
+	 */
 	Map<String, Object> getMessageFromSpecificTopic(int start, int span, String tname, 
 			String messageId, String startdt, String stopdt, String username);
 	
-	WebSwallowMessage getMessageContent(String topic, String mid,
-			HttpServletRequest request, HttpServletResponse response);
+	/**
+	 * 查询指定消息ID的消息内容
+	 * @param topic 消息名称
+	 * @param mid	消息ID
+	 */
+	WebSwallowMessage getMessageContent(String topic, String mid);
 	
 }

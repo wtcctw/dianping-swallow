@@ -3,15 +3,21 @@ package com.dianping.swallow.web.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+
+/**
+ * @author mingdongli
+ *
+ * 2015年5月20日下午2:05:16
+ */
+@Component
 public abstract class AbstractSwallowService {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Value("${swallow.web.env.notproduct}")
-	protected volatile boolean							showContentToAll;
+	protected boolean									showContentToAll;
 	
 	@Value("${swallow.web.admin.defaultadmin}")
 	protected String 									defaultAdmin;

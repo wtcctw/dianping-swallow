@@ -2,10 +2,12 @@ package com.dianping.swallow.web.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.bson.types.BSONTimestamp;
 
-import com.dianping.swallow.web.util.MongoUtils;
+import com.dianping.swallow.common.internal.util.MongoUtils;
+
 
 /**
  * @author mingdongli

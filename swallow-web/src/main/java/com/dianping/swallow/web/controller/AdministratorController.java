@@ -1,10 +1,10 @@
 package com.dianping.swallow.web.controller;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.utils.WebSwallowUtils;
-import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.service.AccessControlServiceConstants;
+import com.dianping.swallow.web.service.AdministratorService;
+import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
 
 
 /**
@@ -28,13 +28,18 @@ import com.dianping.swallow.web.service.AccessControlServiceConstants;
  *		2015年5月5日 下午2:42:57
  */
 @Controller
-public class AdministratorController extends AbstractWriteDao {
+public class AdministratorController extends AbstractController{
 	
     private static final String 					ADMIN           			= "admin";
 	private static final String             		SIZE                        = "size";
 	private static final String 					ADMINISTRATOR 				= "Administrator";
 	private static final String 					USER 						= "User";
 	
+	@Resource(name = "accessControlService")
+	private AccessControlServiceImpl 				accessControlService;
+	
+    @Resource(name = "administratorService")
+    private AdministratorService 					administratorService;
 	
 	@RequestMapping(value = "/console/administrator")
 	public ModelAndView allApps(HttpServletRequest request,
@@ -46,18 +51,14 @@ public class AdministratorController extends AbstractWriteDao {
 	@RequestMapping(value = "/console/admin/admindefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object adminDefault(String offset, String limit, String name, String role, 
-			HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
+			HttpServletRequest request, HttpServletResponse response) {
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		if(accessControlService.checkVisitIsValid(request, null)){  //be able to access
-			map = administratorService.adminQuery(offset, limit, name, role);
+			map = administratorService.queryAllFromAdminList(offset, limit);
 			return map;
 		}
-		else{  //be not able to access, but store visit
-			administratorService.saveVisitAdmin(WebSwallowUtils.getVisitInfo(request));
-		}
-		
 		map = getZeroResult();
 		return map;
 	}
@@ -70,7 +71,7 @@ public class AdministratorController extends AbstractWriteDao {
 		
 		if(accessControlService.checkVisitIsValid(request, null)){
 			int auth = convertRole(role);
-			administratorService.createAdmin(name, auth);
+			administratorService.createInAdminList(name, auth);
 		}
 		return;
 	}
@@ -81,7 +82,7 @@ public class AdministratorController extends AbstractWriteDao {
 					HttpServletRequest request, HttpServletResponse response) {
 
 		if(accessControlService.checkVisitIsValid(request, null)){
-			administratorService.removeAdmin(name);
+			administratorService.removeFromAdminList(name);
 		}
 		
 		return;
@@ -91,14 +92,14 @@ public class AdministratorController extends AbstractWriteDao {
 	@ResponseBody
 	public Object queryAdmin(HttpServletRequest request, HttpServletResponse response) {
 		
-		return administratorService.queryAdmin(request); 
+		return administratorService.queryIfAdmin(request); 
 	}
 	
 	@RequestMapping(value = "/console/admin/queryvisits", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object queryAllVisits(HttpServletRequest request, HttpServletResponse response) {
 		
-		return administratorService.queryAllVisits();
+		return administratorService.queryAllNameFromAdminList();
 	}
 	
 	private Map<String, Object> getZeroResult(){

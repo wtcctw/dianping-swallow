@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,8 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.utils.WebSwallowUtils;
-import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
 
 /**
  * @author mingdongli
@@ -29,12 +30,15 @@ import com.dianping.swallow.web.service.TopicService;
  *         2015年4月22日 下午1:50:20
  */
 @Controller
-public class TopicController extends AbstractWriteDao {
+public class TopicController extends AbstractController{
 	
 	private static final String DELIMITOR = ",";
 
+	@Resource(name = "accessControlService")
+	private AccessControlServiceImpl 				accessControlService;
+    
 	@Resource(name = "topicService")
-	private TopicService topicService;
+	private TopicService 							topicService;
 
 	@RequestMapping(value = "/console/topic")
 	public ModelAndView allApps(HttpServletRequest request,
@@ -48,8 +52,8 @@ public class TopicController extends AbstractWriteDao {
 	public Object topicDefault(String offset, String limit, String name,
 			String prop, String dept, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-		//save visit info
-		administratorService.saveVisitAdmin(WebSwallowUtils.getVisitInfo(request));
+		
+		topicService.saveVisitInAdminList(WebSwallowUtils.getVisitInfo(request));
 		int start = Integer.parseInt(offset);
 		int span = Integer.parseInt(limit); // get span+1 topics so that it can
 		boolean findAll = (name + prop + dept).isEmpty();
@@ -62,16 +66,15 @@ public class TopicController extends AbstractWriteDao {
 	}
 	
 
-	// read from readMongoOps
 	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public List<String> topicName() throws UnknownHostException {
+	public List<String> topicName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
-		return topicService.getTopicNames();
+		String tongXingZheng = WebSwallowUtils.getVisitInfo(request);
+		boolean isAdmin = accessControlService.getAdminSet().contains(tongXingZheng);
+		return topicService.getTopicNames(tongXingZheng, isAdmin);
 	}
 
-	// read from writeMongoOps, everytime read the the database to get the
-	// latest info
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object propName() throws UnknownHostException {
@@ -92,6 +95,10 @@ public class TopicController extends AbstractWriteDao {
 			
 			accessControlService.getTopicToWhiteList().put(name, splitProps(prop.trim()));
 			topicService.editTopic(name, prop, dept, time);
+			if (logger.isInfoEnabled()) {
+				logger.info(WebSwallowUtils.getVisitInfo(request) + " update topic " + name + " to [prop: " + prop
+						+ " ], [dept: " + splitProps(prop.trim()) + " ], [time: " + time + " ].");
+			}
 			
 		}
 		return;

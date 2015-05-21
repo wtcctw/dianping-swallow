@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 
 /**
@@ -12,6 +13,7 @@ public class Administrator {
 	@Id
 	private String id;
 
+	@Indexed
 	private String name;
 	
 	//0:admin, 3:common

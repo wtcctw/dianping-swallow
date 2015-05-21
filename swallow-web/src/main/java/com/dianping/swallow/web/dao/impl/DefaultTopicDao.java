@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.model.Topic;
-import com.mongodb.WriteResult;
  
 
 /**
@@ -25,18 +24,12 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
     private static final String 			TOPIC_COLLECTION 						= "swallowwebtopicc";
     
     private static final String 			NAME 									= "name";
-    private static final String 			PROP 									="prop";
-    private static final String 			DEPT 									="dept";
-    private static final String 			ID 										="_id";
+    private static final String 			PROP 									= "prop";
+    private static final String 			DEPT 									= "dept";
     
 	private static final String             SIZE                       			 	= "size";
 	private static final String             TOPIC                       		 	= "topic";
      
-    @Override
-    public Topic readById(String id) {
-        Query query = new Query(Criteria.where(ID).is(id));
-        return mongoTemplate.findOne(query, Topic.class, TOPIC_COLLECTION);
-    }
     
     @Override
     public Topic readByName(String name) {
@@ -57,13 +50,6 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
     	topic.setTime(time);
     	saveTopic(topic);
     	return;
-    }
- 
-    @Override
-    public int deleteById(String id) {
-        Query query = new Query(Criteria.where(ID).is(id));
-        WriteResult result = mongoTemplate.remove(query, Topic.class, TOPIC_COLLECTION);
-        return result.getN();
     }
   
     @Override
@@ -105,6 +91,15 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
     	Long topicSize = mongoTemplate.count(query2, TOPIC_COLLECTION);
     	return getResponse(topicSize, topicList);
     }
+    
+	
+	@Override
+	public Topic readByProp(String prop){
+		Query query = new Query(Criteria.where(PROP).regex(".*" + prop + ".*"));
+		Topic topic = mongoTemplate.findOne(query, Topic.class, TOPIC_COLLECTION);
+		return topic;
+		
+	}
     
 	private Map<String, Object> getResponse(Long topicSize, List<Topic> topicList){
 		Map<String, Object> map = new HashMap<String, Object>();

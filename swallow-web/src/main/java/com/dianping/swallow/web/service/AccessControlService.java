@@ -9,7 +9,16 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface AccessControlService extends SwallowService{
 
+	/**
+	 * 检查用户是否有权限访问
+	 * @param request
+	 */
 	boolean checkVisitIsValid(HttpServletRequest request);
 	
+	/**
+	 * 检查用户是否有权限访问
+	 * @param request
+	 * @param topic  topic名称
+	 */
 	boolean checkVisitIsValid(HttpServletRequest request, String topic);
 }

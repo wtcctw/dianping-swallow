@@ -32,6 +32,14 @@
 		</property>
     </bean>
     
+    <bean id="webMongoManager"
+        class="com.dianping.swallow.web.dao.impl.DefaultWebMongoManager"
+        init-method="initMongoServer">
+        <property name="mongoManager" >
+			<ref local="mongoManager"/>
+		</property>
+    </bean>
+    
     <bean id="mongoManager"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
         <constructor-arg>
@@ -50,15 +58,12 @@
 		</property>
     </bean>
     
-    <bean id="webMongoManager"
-        class="com.dianping.swallow.web.dao.impl.DefaultWebMongoManager">
-    </bean>
-            
 	<context:component-scan base-package="com.dianping.swallow.web" />
 	<context:annotation-config />  
 
 	<import resource="applicationContext-utils.xml"/>
 	<import resource="applicationContext-mongo.xml"/>
 	<import resource="applicationContext-springtask.xml"/>
+	
 
 </beans>

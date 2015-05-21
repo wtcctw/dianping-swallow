@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.MongoClient;
+import com.mongodb.Mongo;
 
 /**
  * @author mingdongli
@@ -15,8 +15,8 @@ public interface WebMongoManager {
 	
 	MongoTemplate getMessageMongoTemplate(String topicName);
 	
-	List< MongoClient> getAllReadMongo();
+	List< Mongo> getAllReadMongo();
 	
-	Map<String, MongoClient> getTopicNameToMongoMap();
+	Map<String, Mongo> getTopicNameToMongoMap();
 	
 }

@@ -78,8 +78,8 @@ module.factory('Paginator', function(){
 	};
 });
 
-module.controller('AdministratorController', ['$scope', '$http','Paginator',
-        function($scope, $http, Paginator){
+module.controller('AdministratorController', ['$rootScope','$scope', '$http','Paginator', 'ngDialog',
+        function($rootScope, $scope, $http, Paginator, ngDialog){
 	
 	var fetchFunction = function(offset, limit, name, email, role, callback){
 		var transFn = function(data){
@@ -126,11 +126,12 @@ module.controller('AdministratorController', ['$scope', '$http','Paginator',
         }
 		
 		//delete admin
-		$scope.removerecord = function(name){
+		$rootScope.removerecord = function(name){
 			$http.post(window.contextPath + '/console/admin/removeadmin', {"name":name})
         		.success(function(response) {
         			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
         	});
+			return true;
 		}
 		
 		$scope.setModalInput = function(name,role){
@@ -167,6 +168,31 @@ module.controller('AdministratorController', ['$scope', '$http','Paginator',
 			}).error(function(data, status, headers, config) {
 			});
 		});
+		
+		$scope.dialog = function(name) {
+			$rootScope.removeName = name;
+			ngDialog.open({
+							template : '\
+							<div class="widget-box">\
+							<div class="widget-header">\
+								<h4 class="widget-title">警告</h4>\
+							</div>\
+							<div class="widget-body">\
+								<div class="widget-main">\
+									<p class="alert alert-info">\
+										您确认要删除吗？\
+									</p>\
+								</div>\
+								<div class="modal-footer">\
+									<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
+									<button type="button" class="btn btn-primary" ng-click="removerecord(removeName)&&closeThisDialog()">确定</button>\
+								</div>\
+							</div>\
+						</div>',
+						plain : true,
+						className : 'ngdialog-theme-default'
+				});
+		};
 		
 }]);
 
