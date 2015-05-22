@@ -5,8 +5,8 @@ import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao

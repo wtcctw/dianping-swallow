@@ -37,7 +37,7 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.server.monitor.MonitorActionWrapper;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao

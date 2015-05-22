@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitorFactory;
 import com.dianping.swallow.common.server.monitor.visitor.ProducerMonitorVisitor;
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.common.server.monitor.visitor.impl.ProducerTopicMonitorVisitor;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
@@ -140,7 +140,7 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 	}
 
 	@Override
-	public StatsData getSaveDelay(final String topic) {
+	public StatsData getSaveDelay(final String topic) throws Exception {
 		
 		SwallowCallableWrapper<StatsData> wrapper = new CatCallableWrapper<StatsData>(CAT_TYPE, "getSaveDelay");
 		

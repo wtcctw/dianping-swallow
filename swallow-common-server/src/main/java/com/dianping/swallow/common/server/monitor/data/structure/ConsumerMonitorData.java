@@ -1,4 +1,5 @@
-package com.dianping.swallow.common.server.monitor.data;
+package com.dianping.swallow.common.server.monitor.data.structure;
+
 
 import java.util.Set;
 
@@ -9,8 +10,6 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
-import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTotalMap;
-import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 
 /**
@@ -21,7 +20,9 @@ import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 @Document( collection = "ConsumerMonitorData")
 public class ConsumerMonitorData extends MonitorData{
 	
-	private ConsumerTotalMap all = new ConsumerTotalMap();
+	private static final long serialVersionUID = 1L;
+	
+	private ConsumerServerData all = new ConsumerServerData();
 
 	public ConsumerMonitorData(){
 		
@@ -144,4 +145,11 @@ public class ConsumerMonitorData extends MonitorData{
 		return all.keySet();
 	}
 
+	@Override
+	public TotalMap<?> getServerData() {
+
+		return all;
+	}
+
+	
 }

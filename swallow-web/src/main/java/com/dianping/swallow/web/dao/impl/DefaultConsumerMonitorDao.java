@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.web.dao.ConsumerMonitorDao;
 
 /**

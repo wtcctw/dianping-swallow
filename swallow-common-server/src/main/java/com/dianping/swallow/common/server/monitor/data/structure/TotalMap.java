@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.TotalBuilder;
 import com.dianping.swallow.common.server.monitor.data.Totalable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -123,7 +122,7 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 		return v;
 	}
 
-	private void checkType(Mergeable merge) {
+	private void checkType(Object merge) {
 		
 		if(!(merge instanceof TotalMap)){
 			throw new IllegalArgumentException("wrong type : " + merge.getClass());
@@ -147,6 +146,4 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 	public boolean isTotal(){
 		return isTotal;
 	}
-
-
 }

@@ -3,7 +3,7 @@ package com.dianping.swallow.web.monitor;
 import java.util.List;
 import java.util.Map;
 
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
+import com.dianping.swallow.common.server.monitor.data.QPX;
 
 /**
  * @author mengwenchao
@@ -14,7 +14,7 @@ public interface ConsumerDataRetriever extends MonitorDataRetriever{
 	
 	List<ConsumerDataPair> getDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end);
 	
-	List<ConsumerDataPair> getDelayForAllConsumerId(String topic);
+	List<ConsumerDataPair> getDelayForAllConsumerId(String topic) throws Exception;
 	
 	
 	List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);

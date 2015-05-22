@@ -1,15 +1,13 @@
-package com.dianping.swallow.common.server.monitor.data;
+package com.dianping.swallow.common.server.monitor.data.structure;
 
 import com.dianping.swallow.common.internal.util.MapUtil;
-import com.dianping.swallow.common.server.monitor.data.MonitorData.MessageInfo;
-import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
 /**
  * @author mengwenchao
  *
  * 2015年4月26日 上午9:42:55
  */
-public class ProducerData extends TotalMap<MessageInfo>{
+public class ProducerTopicData extends TotalMap<MessageInfo>{
 	
 	private static final long serialVersionUID = 1L;
 			
@@ -22,7 +20,7 @@ public class ProducerData extends TotalMap<MessageInfo>{
 	@Override
 	public boolean equals(Object obj) {
 		
-		if(!(obj instanceof ProducerData)){
+		if(!(obj instanceof ProducerTopicData)){
 			return false;
 		}
 		return super.equals(obj);

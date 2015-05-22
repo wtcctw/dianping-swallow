@@ -2,8 +2,8 @@ package com.dianping.swallow.common.server.monitor;
 
 
 import com.dianping.swallow.common.internal.util.IPUtil;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 
 /**
  * @author mengwenchao

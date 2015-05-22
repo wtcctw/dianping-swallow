@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.common.server.monitor.visitor.ConsumerMonitorVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitorFactory;
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataType;
@@ -200,7 +200,7 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 
 
 	@Override
-	public List<ConsumerDataPair> getDelayForAllConsumerId(final String topic) {
+	public List<ConsumerDataPair> getDelayForAllConsumerId(final String topic) throws Exception {
 		
 		SwallowCallableWrapper<List<ConsumerDataPair>> wrapper = new CatCallableWrapper<List<ConsumerDataPair>>(CAT_TYPE, "getDelayForAllConsumerId");
 		

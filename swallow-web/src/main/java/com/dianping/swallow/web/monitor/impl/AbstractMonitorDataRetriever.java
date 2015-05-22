@@ -24,8 +24,9 @@ import org.springframework.beans.factory.annotation.Value;
 import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
+import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.Statisable;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.visitor.Visitor;
 import com.dianping.swallow.common.server.monitor.visitor.impl.AbstractMonitorVisitor;
 import com.dianping.swallow.web.manager.impl.CacheManager;
@@ -43,18 +44,25 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 
 	
-	private final int DEFAULT_INTERVAL_IN_HOUR = 10;//一小时每个10秒采样
+	private final int DEFAULT_INTERVAL = 30;//一小时每个10秒采样
 
 	@Value("${swallow.web.monitor.keepinmemory}")
-	public int keepInMemoryHour = 1;//保存最后2小时
+	public int keepInMemoryHour = 1;//保存最新小时
+	
+	private Statisable<? extends MonitorData>  statis; 
 	
 	public static int keepInMemoryCount;
 
-	@Autowired
-	private CacheManager cacheManager;
+	@PostConstruct
+	public void postAbstractMonitorDataStats(){
+		
+		keepInMemoryCount = keepInMemoryHour * 3600 / AbstractCollector.SEND_INTERVAL;
+		statis = createServerStatis();
+	}
 
-	private Map<String, SwallowServerData> serverMap = new ConcurrentHashMap<String, SwallowServerData>();
-	
+	protected abstract Statisable<? extends MonitorData> createServerStatis();
+
+
 	protected Set<String> getServerIps(long start, long end) {
 		if(dataExistInMemory(start, end)){
 			return getServerIpsInMemory(start, end);
@@ -71,12 +79,6 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		return serverMap.keySet();
 	}
 	
-	@PostConstruct
-	public void postAbstractMonitorDataStats(){
-		
-		keepInMemoryCount = keepInMemoryHour * 3600 / AbstractCollector.SEND_INTERVAL;
-	}
-
 	protected long getRealStartTime(NavigableMap<Long, MonitorData> data, long start, long end) {
 		try{
 			return data.firstKey().longValue()*AbstractCollector.SEND_INTERVAL*1000;

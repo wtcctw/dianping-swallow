@@ -2,7 +2,7 @@ package com.dianping.swallow.web.monitor;
 
 import java.util.Map;
 
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
+import com.dianping.swallow.common.server.monitor.data.QPX;
 
 /**
  * @author mengwenchao
@@ -20,7 +20,7 @@ public interface ProducerDataRetriever extends MonitorDataRetriever{
 	 */
 	StatsData getSaveDelay(String topic, int intervalTimeSeconds, long start, long end);
 
-	StatsData getSaveDelay(String topic);
+	StatsData getSaveDelay(String topic) throws Exception;
 
 	StatsData getQpx(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
 	

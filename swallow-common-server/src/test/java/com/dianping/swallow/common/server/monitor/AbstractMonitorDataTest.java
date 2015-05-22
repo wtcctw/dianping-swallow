@@ -27,7 +27,7 @@ import org.junit.Test;
 import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.collector.ContentType;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao

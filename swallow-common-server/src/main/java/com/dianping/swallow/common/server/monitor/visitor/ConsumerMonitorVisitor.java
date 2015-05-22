@@ -3,6 +3,8 @@ package com.dianping.swallow.common.server.monitor.visitor;
 
 import java.util.List;
 
+import com.dianping.swallow.common.server.monitor.data.QPX;
+
 
 /**
  * @author mengwenchao

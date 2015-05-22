@@ -1,8 +1,8 @@
-package com.dianping.swallow.common.server.monitor.data;
+package com.dianping.swallow.common.server.monitor.data.structure;
 
 
+import java.io.Serializable;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +12,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
-import com.dianping.swallow.common.server.monitor.data.structure.AbstractTotalable;
-import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
+import com.dianping.swallow.common.server.monitor.data.TotalBuilder;
 import com.dianping.swallow.common.server.monitor.visitor.Acceptable;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
@@ -25,8 +25,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年4月10日 上午11:44:46
  */
-public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuilder{
+public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuilder, Serializable{
 	
+	private static final long serialVersionUID = 1L;
+
 	
 	public static final String TOTAL_KEY = "total";
 
@@ -47,6 +49,16 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		this.swallowServerIp = swallowServerIp;
 	}
 	
+	protected void checkTypeMatch(Object merge) {
+		
+		if(merge == null || !(getClass().isAssignableFrom(merge.getClass()))){
+			throw new IllegalArgumentException("wrong type " + merge);
+		}
+		
+	}
+	
+	public abstract TotalMap<? extends Mergeable> getServerData();
+	
 	@Override
 	public void merge(Mergeable merge) {
 		
@@ -55,14 +67,6 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		doMerge(merge);
 	}
 	
-	private void checkTypeMatch(Mergeable merge) {
-		
-		if(merge == null || !(getClass().isAssignableFrom(merge.getClass()))){
-			throw new IllegalArgumentException("wrong type " + merge);
-		}
-		
-	}
-
 	public void merge(String topic, KeyMergeable merge){
 		
 		checkTypeMatch(merge);
@@ -77,7 +81,7 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		Mergeable self = getTopic(topic);
 		self.merge(toMergeData);
 	}
-
+	
 	protected abstract Mergeable getTopic(KeyMergeable merge, String topic);
 
 	protected abstract Mergeable getTopic(String topic);
@@ -103,6 +107,15 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		return currentTime;
 	}
 
+	/**
+	 * 以发送间隔为单位，进行数据归并
+	 * @return
+	 */
+	public long getKey(){
+		
+		return currentTime/AbstractCollector.SEND_INTERVAL/1000;
+	}
+	
 	public void setCurrentTime(long currentTime) {
 		this.currentTime = currentTime;
 	}
@@ -137,62 +150,6 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		return hash;
 	}
 
-	
-	public static class MessageInfo extends AbstractTotalable implements Mergeable{
-		
-		private AtomicLong totalDelay = new AtomicLong();
-
-		private AtomicLong total = new AtomicLong();
-		
-		@Override
-		public boolean equals(Object obj) {
-			if(!(obj instanceof MessageInfo)){
-				return false;
-			}
-			MessageInfo cmp = (MessageInfo) obj;
-			
-			return cmp.totalDelay.get() == totalDelay.get() 
-					&& cmp.total.get() == total.get();
-		}
-		
-		@Override
-		public int hashCode() {
-			return (int) (totalDelay.get() ^ total.get());
-		}
-
-		public void addMessage(long messageId, long startTime, long endTime) {
-			total.incrementAndGet();
-			if(endTime < startTime){
-				throw new TimeException("start > end", startTime, endTime);
-			}
-			totalDelay.addAndGet(endTime - startTime);
-		}
-
-		public long getTotalDelay() {
-			return totalDelay.get();
-		}
-
-		public long getTotal() {
-			return total.get();
-		}
-		
-		@Override
-		public void merge(Mergeable merge) {
-			if(!(merge instanceof MessageInfo)){
-				throw new IllegalArgumentException("wrong type " + merge.getClass());
-			}
-			MessageInfo toMerge = (MessageInfo) merge;
-			total.addAndGet(toMerge.total.get());
-			totalDelay.addAndGet(toMerge.totalDelay.get());
-		}
-		
-		@Override
-		public String toString() {
-			return JsonBinder.getNonEmptyBinder().toJson(this);
-		}
-	}
-	
-
 	@JsonIgnore
 	public abstract Set<String> getTopics();
 	
@@ -223,5 +180,4 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 	public String toString() {
 		return jsonSerialize();
 	}
-	
 }
