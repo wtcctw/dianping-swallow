@@ -24,8 +24,12 @@ public interface FilterMetaDataService {
 
 	void setShowContentToAll(boolean showContentToAll);
 
-	String getDefaultAdmin();
+	String loadDefaultAdmin();
 	
 	void setDefaultAdmin(String defaultAdmin);
+	
+	String loadEnv();
+	
+	void setEnv(String env);
 
 }

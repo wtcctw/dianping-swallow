@@ -142,11 +142,11 @@ public class ScanWriteDaoScheduler {
 			}
 		}
 		else if (filterMetaDataService.loadAdminSet().isEmpty()) {
-			String defaultAdmin = filterMetaDataService.getDefaultAdmin();
+			String defaultAdmin = filterMetaDataService.loadDefaultAdmin();
 			administratorService.createInAdminList(defaultAdmin,
 					AccessControlServiceConstants.ADMINI);
 			filterMetaDataService.loadAdminSet().add(
-					filterMetaDataService.getDefaultAdmin());
+					filterMetaDataService.loadDefaultAdmin());
 			logger.info("admiSet add default admin.");
 		}
 		else{
