@@ -1,16 +1,40 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
-<head>#parse("common/header.htm")</head>
-<!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
-<!--[if IE 7 ]> <body class="ie ie7 "> <![endif]-->
-<!--[if IE 8 ]> <body class="ie ie8 "> <![endif]-->
-<!--[if IE 9 ]> <body class="ie ie9 "> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!-->
-<body class="navbar-fixed">
-  <!--<![endif]-->
-  #parse("common/navbar.htm") $screen_content   #parse("common/modals.htm") #parse("common/baseJs.htm")
+<html lang="en">
+<script>
+	window.contextPath = "${rc.contextPath}";
+</script>
+<head>#parse("common/header.htm")
+</head>
 
-  #parse("${menu}/js.htm")
+<body class="navbar-fixed" ng-app='SwallowModule'
+	ng-controller="UserController">
+	#parse("common/navbar.htm")
+	<div class="main-container-inner">#parse("common/baseJs.htm")
+		$screen_content</div>
+	#parse("common/simplefooter.htm")
 
+	<script type="text/javascript">
+		$('#datetimepicker').datetimepicker({
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+
+		$('#starttime').datetimepicker({
+			showSecond : true,
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$('#stoptime').datetimepicker({
+			showSecond : true,
+			//showMillisec: true, 
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$("#datetimepicker").datepicker('setDate', new Date());
+		$("#starttime").datepicker('setDate', new Date());
+		$("#stoptime").datepicker('setDate', new Date());
+	</script>
 </body>
 </html>

@@ -2,6 +2,7 @@ package com.dianping.swallow.test.load.mongo;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
@@ -16,6 +17,8 @@ import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.test.load.AbstractLoadTest;
+import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
 
 /**
  * @author mengwenchao
@@ -25,6 +28,7 @@ import com.dianping.swallow.test.load.AbstractLoadTest;
 public abstract class AbstractMongoTest extends AbstractLoadTest{
 	
 	protected MessageDAO dao;
+	
 
 	@Override
 	protected void start() throws InterruptedException ,IOException {
@@ -81,6 +85,45 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 		return result;
 	}
 
+	
+	protected MongoClient getMongo() throws IOException{
+		
+		String topicToMongo = getTopicToMongo();
+		ServerAddress address = getAddress(topicToMongo);
+		return new MongoClient(address);
+	}
+	
+	
+	
+	/**
+	 * 获取默认地址
+	 * @param topicToMongo
+	 * @return
+	 * @throws UnknownHostException 
+	 * @throws NumberFormatException 
+	 */
+	private ServerAddress getAddress(String topicToMongo) throws NumberFormatException, UnknownHostException {
+		
+		for(String topicMongo : topicToMongo.split(";")){
+			
+			if(StringUtils.isBlank(topicMongo)){
+				continue;
+			}
+			String []sp = topicMongo.split("=");
+			if(sp.length !=2){
+				continue;
+			}
+			if(sp[0].equalsIgnoreCase("default")){
+				String address = sp[1].substring("mongodb://".length());
+				String []ipPort = address.split(":");
+				return new ServerAddress(ipPort[0], Integer.parseInt(ipPort[1]));
+				
+			}
+		}
+		
+		return null;
+	}
+
 	protected SwallowMessage createMessage(String content) {
 		
 		SwallowMessage message = new SwallowMessage();
@@ -114,7 +157,7 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 						while(true){
 							try{
 								if(count.get() > messageCount){
-									break;
+									exit();
 								}
 								dao.saveMessage(realTopicName, createMessage(message));
 								count.incrementAndGet();

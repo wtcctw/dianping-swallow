@@ -14,6 +14,10 @@
 
 	<name>swallow-common</name>
 	<url>http://maven.apache.org</url>
+	
+	<description>
+		注意，依赖中不能引入spring，否则升级应用的过程当中可能会导致失败
+	</description>
 
 	<properties>
 		<env>product</env>
@@ -24,6 +28,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 		<!-- Base64 -->
 		<dependency>
@@ -48,16 +56,11 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.caucho</groupId>
-			<artifactId>hessian</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>com.dianping.lion</groupId>
 			<artifactId>lion-client</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency><!-- lion need log4j -->
+		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<optional>true</optional>

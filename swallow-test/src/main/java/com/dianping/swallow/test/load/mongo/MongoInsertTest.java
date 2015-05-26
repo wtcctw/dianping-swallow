@@ -9,9 +9,9 @@ import java.io.IOException;
  */
 public class MongoInsertTest extends AbstractMongoTest {
 
-	private static int messageCount = Integer.MAX_VALUE;
 	private static int concurrentCount = 100;
 	private static int topicCount = 2;
+	
 	/**
 	 * @param args
 	 * @throws InterruptedException
@@ -26,16 +26,20 @@ public class MongoInsertTest extends AbstractMongoTest {
 			concurrentCount = Integer.parseInt(args[1]);
 		}
 		if (args.length >= 3) {
-			messageCount = Integer.parseInt(args[2]);
+			totalMessageCount = Integer.parseInt(args[2]);
+		}
+		if (args.length >= 4) {
+			messageSize = Integer.parseInt(args[3]);
 		}
 
+		
 		new MongoInsertTest().start();
 	}
 
 	@Override
 	protected void doStart() throws InterruptedException, IOException {
 
-		sendMessage(topicCount, concurrentCount, messageCount);
+		sendMessage(topicCount, concurrentCount, totalMessageCount);
 	}
 
 }

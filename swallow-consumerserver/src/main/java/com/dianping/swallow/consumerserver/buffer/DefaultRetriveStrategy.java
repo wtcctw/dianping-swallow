@@ -8,7 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
+
 
 /**
  * 默认从mongodb取数据策略

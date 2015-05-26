@@ -239,12 +239,9 @@ public class SwallowMessage implements Serializable, Message {
       } else if (!properties.equals(other.properties)) {
          return false;
       }
-      if (internalProperties == null) {
-         if (other.internalProperties != null) {
-            return false;
-         }
-      } else if (!internalProperties.equals(other.internalProperties)) {
-         return false;
+      
+      if(!compareInternalPropeties(other)){
+    	  return false;
       }
       if (sha1 == null) {
          if (other.sha1 != null) {
@@ -279,5 +276,11 @@ public class SwallowMessage implements Serializable, Message {
       }
       return true;
    }
+
+	private boolean compareInternalPropeties(SwallowMessage other) {
+		//内部信息认为相等
+		//因为可能会在服务端自动写入信息比如save_time
+		return true;
+	}
 
 }

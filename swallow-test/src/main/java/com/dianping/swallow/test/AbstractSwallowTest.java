@@ -137,6 +137,11 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             p.sendMessage(message, type);
             sleep(sleepInterval);
             count.incrementAndGet();
+            if((i+1) % 100 == 0){
+            	if(logger.isInfoEnabled()){
+            		logger.info("[sendMessage]" + (i+1));
+            	}
+            }
         }
 		if(logger.isInfoEnabled()){
 			logger.info("[sendMessage][end]" + count.get());
@@ -190,24 +195,30 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected Consumer addListener(final String topic) {
 		
-		return addListener(topic, false, null, 1, null);
+		return addListener(topic, false, null, 1, null, 0);
 	}
 	
 	protected Consumer addListener(String topic, String consumerId, Set<String> filters) {
 	
-		return addListener(topic, true, consumerId, 10, filters);
+		return addListener(topic, true, consumerId, 10, filters, 0);
 	}
 
 
 	protected Consumer addListener(final String topic, int concurrentCount) {
 		
-		return addListener(topic, false, null, concurrentCount, null);
+		return addListener(topic, false, null, concurrentCount, null, 0);
 	}
 	
 	protected Consumer addListener(final String topic, final String consumerId, int concurrentCount) {
 		
-		return addListener(topic, true, consumerId, concurrentCount, null);
+		return addListener(topic, true, consumerId, concurrentCount, null, 0);
 	}
+
+	protected Consumer addListener(final String topic, final String consumerId, int concurrentCount, int sleepTime) {
+		
+		return addListener(topic, true, consumerId, concurrentCount, null, sleepTime);
+	}
+
 
 	protected Consumer createConsumer(String topic, String consumerId){
 		
@@ -245,8 +256,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		
 		
 	}
-
-	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, Set<String> filters) {
+	protected Consumer addListener(final String topic, boolean durable, final String consumerId, int concurrentCount, Set<String> filters, final int sleepTime) {
 
 		final Consumer c = createConsumer(topic, durable, consumerId, concurrentCount, 5, filters);
 
@@ -276,6 +286,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             			logger.info("[onMessage]" + result);
             		}
             	}
+            	sleep(sleepTime);
             }
         });
         
@@ -308,7 +319,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected void waitForListernToComplete(int messageCount) {
 		
-		sleep((int) (Math.ceil((double)messageCount/200) * 1000));
+		sleep((int) (Math.ceil((double)messageCount/1000) * 5000));
 	}
 
 

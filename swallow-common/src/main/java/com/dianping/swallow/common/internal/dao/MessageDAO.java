@@ -15,6 +15,8 @@ public interface MessageDAO {
 	void saveMessage(String topicName, String consumerId, SwallowMessage message);
 
 	void saveMessage(String topicName, SwallowMessage message);
+	
+	void retransmitMessage(String topicName, SwallowMessage message);
 
 	/**
 	 * 获取topic数据库的topicName集合/表里，对应messageId字段的记录

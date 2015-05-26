@@ -1,20 +1,12 @@
 package com.dianping.swallow.consumerserver.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.dianping.swallow.common.internal.config.AbstractConfig;
 
 /**
  * @author zhang.yu
  */
-public final class ConfigManager {
-
-   private static final Logger  logger                             = LoggerFactory.getLogger(ConfigManager.class);
+public final class ConfigManager extends AbstractConfig{
 
    private static ConfigManager ins                             = new ConfigManager();
 
@@ -47,7 +39,8 @@ public final class ConfigManager {
    
    private int 					minRetrieveInterval 			= 100;
    private int					backupMinRetrieveInterval		= 10000;
-
+   
+   
    private final long                 waitAckTimeWhenCloseSwc         = 2000;
    private final int                  heartbeatCheckInterval          = 2000;
    private final int                  heartbeatMaxStopTime            = 10000;
@@ -144,77 +137,12 @@ public final class ConfigManager {
       this("swallow-consumerserver.properties");
    }
 
-   @SuppressWarnings("rawtypes")
    private ConfigManager(String configFileName) {
-      InputStream in = ConfigManager.class.getClassLoader().getResourceAsStream(configFileName);
-      Properties props = new Properties();
-      Class clazz = this.getClass();
-      if (in != null) {
-         try {
-            props.load(in);
-            in.close();
-            for (String key : props.stringPropertyNames()) {
-               Field field = null;
-               try {
-                  field = clazz.getDeclaredField(key.trim());
-               } catch (Exception e) {
-                  logger.warn("unknow property found in " + configFileName + ": " + key);
-                  continue;
-               }
-               field.setAccessible(true);
-               if (field.getType().equals(Integer.TYPE)) {
-                  try {
-                     field.set(this, Integer.parseInt(props.getProperty(key).trim()));
-                  } catch (Exception e) {
-                     logger.error("can not parse property " + key, e);
-                     continue;
-                  }
-               } else if (field.getType().equals(Long.TYPE)) {
-                  try {
-                     field.set(this, Long.parseLong(props.getProperty(key).trim()));
-                  } catch (Exception e) {
-                     logger.error("can not set property " + key, e);
-                     continue;
-                  }
-               } else if (field.getType().equals(String.class)) {
-                  try {
-                     field.set(this, props.getProperty(key).trim());
-                  } catch (Exception e) {
-                     logger.error("can not set property " + key, e);
-                     continue;
-                  }
-               } else {
-                  try {
-                     field.set(this, Boolean.parseBoolean(props.getProperty(key).trim()));
-                  } catch (Exception e) {
-                     logger.error("can not set property " + key, e);
-                     continue;
-                  }
-               }
-            }
-
-         } catch (IOException e) {
-            logger.error("Error reading " + configFileName, e);
-         }
-      } else {
-         logger.info(configFileName + " not found, use default");
-      }
-      //设置masterIP
-      String masterIp = System.getProperty("masterIp");
+	   
+	  loadLocalConfig(configFileName);
+	  String masterIp = System.getProperty("masterIp");
       if (masterIp != null && masterIp.length() > 0) {
          this.masterIp = masterIp;
-      }
-      //打印参数
-      Field[] fields = clazz.getDeclaredFields();
-      for (int i = 0; i < fields.length; i++) {
-         Field f = fields[i];
-         f.setAccessible(true);
-         if (!Modifier.isStatic(f.getModifiers())) {
-            try {
-               logger.info(f.getName() + "=" + f.get(this));
-            } catch (Exception e) {
-            }
-         }
       }
    }
 	

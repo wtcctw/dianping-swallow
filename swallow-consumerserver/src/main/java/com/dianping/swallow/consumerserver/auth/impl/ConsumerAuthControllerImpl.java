@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
-import com.dianping.swallow.consumerserver.worker.ConsumerInfo;
 
 /**
  * 控制消费者是否允许消费

@@ -61,7 +61,6 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
         e.getChannel().write(consumerMessage);
     }
 
-
     @Override
     public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e) {
     	

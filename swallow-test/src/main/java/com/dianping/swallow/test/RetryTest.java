@@ -2,9 +2,8 @@ package com.dianping.swallow.test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.common.message.Message;

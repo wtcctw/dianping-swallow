@@ -164,8 +164,9 @@ public abstract class AbstractBootStrap {
 	}
 
 	protected void createContext() {
+		
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-		            new String[] { "applicationContext-consumerserver.xml" });
+		            new String[] { "c-applicationContext.xml" });
 	      consumerWorkerManager = ctx.getBean(ConsumerWorkerManager.class);
 	      topicWhiteList = ctx.getBean(TopicWhiteList.class);
 	      consumerAuthController = ctx.getBean(ConsumerAuthController.class);

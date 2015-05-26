@@ -3,8 +3,7 @@ package com.dianping.swallow.test;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.common.message.Message;

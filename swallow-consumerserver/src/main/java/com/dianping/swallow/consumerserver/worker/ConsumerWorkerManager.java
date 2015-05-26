@@ -13,6 +13,7 @@ import org.jboss.netty.util.internal.ConcurrentHashMap;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
@@ -22,13 +23,15 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.common.internal.util.task.AbstractEternalTask;
+import com.dianping.swallow.common.server.lifecycle.SelfManagement;
+import com.dianping.swallow.common.server.monitor.collector.ConsumerCollector;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 
-public class ConsumerWorkerManager extends AbstractLifecycle{
+public class ConsumerWorkerManager extends AbstractLifecycle implements SelfManagement{
 
     private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance()
             .getAckIdUpdateIntervalSecond() * 1000;
@@ -53,6 +56,8 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
     private ConsumerThreadPoolManager  		 consumerThreadPoolManager;
 
     private DefaultLifecycleManager 		lifecycleManager;
+    
+    private ConsumerCollector 				consumerCollector;
     
     public ConsumerWorkerManager(){
     	
@@ -185,7 +190,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
         	}
             synchronized (consumerInfo.getConsumerId().intern()) {
                 if ((worker = findConsumerWorker(consumerInfo)) == null) {
-                    worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController, consumerThreadPoolManager, startMessageId);
+                    worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController, consumerThreadPoolManager, startMessageId, consumerCollector);
                     consumerInfo2ConsumerWorker.put(consumerInfo, worker);
                 }
             }
@@ -418,7 +423,14 @@ public class ConsumerWorkerManager extends AbstractLifecycle{
 		this.consumerThreadPoolManager = consumerThreadPoolManager;
 	}
 
-	
+	public ConsumerCollector getConsumerCollector() {
+		return consumerCollector;
+	}
+
+	public void setConsumerCollector(ConsumerCollector consumerCollector) {
+		this.consumerCollector = consumerCollector;
+	}
+
 	class SendMessageThread extends AbstractEternalTask{
 		
 		private volatile boolean shouldSleep = false;

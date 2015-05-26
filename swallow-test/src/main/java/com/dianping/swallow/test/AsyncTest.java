@@ -6,9 +6,8 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Collection;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,84 +1,123 @@
-module.controller('MonitorController', function($scope, $http) {
 
-	$scope.getQps = function(poolName) {
-		$http({
-			method : 'GET',
-			url : window.contextpath + '/monitor/qps/pool/' + poolName + '/get'
+function renderGraph(url, divName,  http){
+		http({
+			method : 'POST',
+			url : window.contextpath + url
 		}).success(function(data, status, headers, config) {
-			qps = data.qps;
-			if(data.errorCode == 0 ){
-				$(function () {
-			        $('#container').highcharts({
-			            title: {
-			                text: qps.title,
-			                x: 0 //center
-			            },
-			            subtitle: {
-			                text: qps.subTitle,
-			                x: -20
-			            },
-			            xAxis: {
-			                type: 'datetime'
-			            },
-			            yAxis: {
-			                title: {
-			                    text: 'QPS'
-			                },
-			                plotLines: [{
-			                    value: 0,
-			                    width: 10,
-			                    color: '#808080'
-			                }]
-			            },
-			            tooltip: {
-			                valueSuffix: ''
-			            },
-			            legend: {
-			                layout: 'vertical',
-			                align: 'right',
-			                verticalAlign: 'middle',
-			                borderWidth: 0
-			            },
-			            plotOptions: {
-			                series: {
-			                    pointStart: qps.plotOption.series.pointStart + 8*3600*1000,
-			                    pointInterval: qps.plotOption.series.pointInterval // one day
-			                }
-			            },
-			            series: qps.series
-			        });
-			    });
-			} else {
-				alert("获取失败: " + data.errorMessage);
-//				app.alertError("获取失败: " + data.errorMessage);
-			}
+			
+				var parent = $('#' + divName);
+				var count = 0;
+				data.forEach(function(item){
+					count++;
+					var childdiv=$('<div></div>'); 
+					childdiv.appendTo(parent);
+					$(function () {
+						childdiv.highcharts({
+				            title: {
+				                text: item.title,
+				                x: 0 //center
+				            },
+				            subtitle: {
+				                text: item.subTitle,
+				                x: 0
+				            },
+				            xAxis: {
+				                type: 'datetime'
+				            },
+				            yAxis: {
+				                title: {
+				                    text: item.yAxisTitle
+				                },
+				                plotLines: [{
+				                    value: 0,
+				                    width: 10,
+				                    color: '#808080'
+				                }]
+				            },
+				            tooltip: {
+				                valueSuffix: ''
+				            },
+				            legend: {
+				                layout: 'vertical',
+				                align: 'right',
+				                verticalAlign: 'middle',
+				                borderWidth: 0
+				            },
+				            plotOptions: {
+				                series: {
+				                    pointStart: item.plotOption.series.pointStart + 8*3600*1000,
+				                    pointInterval: item.plotOption.series.pointInterval // one day
+				                }
+				            },
+				            series: item.series
+				        });
+				    });
+				});
 		}).error(function(data, status, headers, config) {
 			
-			alert("响应错误", data);
+			alert("响应错误" + data);
 //			app.appError("响应错误", data);
-		});
-	}
+		});	
+}
+
+module.controller('ProducerServerQpsController', function($scope, $http) {
+
+	$scope.getProducerServerQps = function(){
+		renderGraph("/console/monitor/producerserver/qps/get", "container", $http);
+	};
+
 });
 
-module.controller('singleApp', function($scope, $http) {
+module.controller('ConsumerServerQpsController', function($scope, $http) {
 	
-	$scope.getSinleAppStatus = function(app) {
-		$http({
-			method : 'GET',
-			url : window.contextpath + '/monitor/singleapp/' + app + '/status/get'
-		}).success(function(data, status, headers, config) {
-			
-			for (var i=0;i<data.length;i++){
-				data[i].id = i+1;
-			}
-			
-			$scope.tengines = data;
-			$scope.options = ['up', 'down', 'warning'];
-			
-		}).error(function(data, status, headers, config) {
-			
-			alert("响应错误", data);
-		});
-	}
+	$scope.getConsumerServerQps = function(){
+		renderGraph("/console/monitor/consumerserver/qps/get", "container", $http);
+	};
+});
 
+module.controller('ConsumerQpsController', function($scope, $http) {
+	$http({
+		method : 'POST',
+		url : window.contextpath + '/console/monitor/topiclist/get'
+	}).success(function(topicList, status, headers, config) {
+		
+		$("#consumer-div").typeahead({
+			source : topicList,
+			updater : function(c) {
+				window.location = window.contextpath + "/console/monitor/consumer/"+c+"/qps";
+				return c;
+			}
+		})
+	}).error(function(data, status, headers, config) {
+		 app.appError("响应错误", data);
+	});
+
+	
+	$scope.getConsumerQps = function(topicName){
+		renderGraph("/console/monitor/consumer/"+topicName+"/qps/get", "container", $http);
+	};
+});
+
+module.controller('ConsumerDelayController', function($scope, $http) {
+
+	// search
+	$http({
+		method : 'POST',
+		url : window.contextpath + '/console/monitor/topiclist/get'
+	}).success(function(topicList, status, headers, config) {
+		
+		$("#consumer-div").typeahead({
+			source : topicList,
+			updater : function(c) {
+				window.location = window.contextpath + "/console/monitor/consumer/"+c+"/delay";
+				return c;
+			}
+		})
+	}).error(function(data, status, headers, config) {
+		 app.appError("响应错误", data);
+	});
+
+	$scope.getDelay = function(topicName) {
+		renderGraph('/console/monitor/consumer/' + topicName + '/delay/get', "container", $http);
+	};
 });

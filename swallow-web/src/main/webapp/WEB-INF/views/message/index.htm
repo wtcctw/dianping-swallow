@@ -1,0 +1,265 @@
+<div class="main-content main-content-local" style="opacity: 1.0;"
+	ng-controller="MessageController">
+	<div class="breadcrumbs" id="breadcrumbs">
+		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/swallow-message.js"></script>
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
+
+		<form class="bs-example bs-example-form" role="form">
+			<div class="input-group">
+				<span class="input-group-addon">Topic名称</span> <input type="text"
+					class="form-control" placeholder="请先输入Topic 名称"
+					style="width: 200px" id="topicname" ng-model='tname' required>
+				<ul class="typeahead dropdown-menu"
+					style="top: 28px; left: 0px; display: none;">
+				</ul>
+
+				<span class="input-group-addon" style="opacity: 0;"></span> 保存时间查询 <input
+					type="text" placeholder="开始时间..." ng-model="startdt" id="starttime">
+				<input type="text" placeholder="结束时间..." ng-model="stopdt"
+					id="stoptime">
+				<button type="button" class="btn btn-success btn-swallow-ok"
+					id="summittime" ng-click="queryByTime()">提交</button>
+			</div>
+		</form>
+
+		<!-- #nav-search -->
+		<div class="nav-search" id="nav-search">
+			<form class="form-search">
+				<span class="input-icon"> <input type="text"
+					placeholder="根据MessageId查找 ..." style="width: 205px"
+					class="nav-search-input" name="a" id="searchmid" autocomplete="off"
+					ng-model="messageId" ng-keyup="myKeyup($event)">
+					<ul class="typeahead dropdown-menu"
+						style="top: 28px; left: 0px; display: none;">
+					</ul> <i class="icon-search nav-search-icon"></i>
+				</span>
+			</form>
+		</div>
+		<!-- end  breadcrumbs-->
+	</div>
+
+	<div class="breadcrumbs" id="message-retransmit" style="display: none;">
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
+
+		<div class="btn-group" role="group" aria-label="">
+			<button type="submit" class="btn btn-success btn-swallow-ok"
+				data-toggle="modal" data-target="#myModal">发送自定义消息</button>
+			<button type="button" class="btn btn-success btn-swallow-ok"
+				ng-click="retransmit()">发送下表消息</button>
+			<input type="checkbox" id="selectall" ng-click="selectall()">
+			全选 <input type="checkbox" id="selectnone" ng-click="selectnone()">
+			全不选
+		</div>
+
+	</div>
+
+
+	<!-- page-content -->
+	<div class="page-content">
+		<!--page-header  -->
+		<div class="page-header">
+
+			<!--row  -->
+			<div class="row">
+				<table
+					class="table table-bordered table-striped table-condensed  table-hover">
+					<tr>
+						<th style="text-align: left">操作</th>
+						<th style="text-align: left">序号</th>
+						<th style="text-align: left">消息ID</th>
+						<th style="text-align: left">消息内容</th>
+						<th style="text-align: left">保存时间</th>
+						<th style="text-align: left">产生时间</th>
+						<th style="text-align: left">原始ID</th>
+						<th style="text-align: left">属性</th>
+						<th style="text-align: left">更多选项</th>
+					</tr>
+					<tr ng-repeat="m in searchPaginator.currentPageItems">
+						<td style="text-align: left"><input type="checkbox"
+							class="swallowcheckbox"></td>
+						<td style="text-align: left" ng-bind="$index+1"></td>
+						<td style="text-align: left" ng-bind="m.mid"></td>
+						<td style="text-align: left"><a
+							ng-click="formatres(m.mid)" class="edit-config-btn"
+							style="cursor: pointer;" ng-bind="searchPaginator.currentPartialCon[$index]"></a></td>
+						<td style="text-align: left" ng-bind="m.ststring"></td>
+						<td style="text-align: left" ng-bind="m.gtstring"></td>
+						<td style="text-align: left" ng-bind="m.mo_id"></td>
+						<td style="text-align: left" ng-bind="m.p"></td>
+						<td style="text-align: left"><a
+							ng-click="showfullmessage(m.mid)" class="edit-config-btn"
+							style="cursor: pointer;"><i class="icon-folder-open"></i></a></td>
+				</table>
+
+				<ul style="margin-top: 20px;" class="pagination">
+					<li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+					<li><a href="" ng-click="searchPaginator.previous()"
+						ng-show="searchPaginator.hasPrevious()">&lt;&lt; 上一页</a></li>
+					<li ng-repeat="p in searchPaginator.pages"><a href=""
+						ng-click="searchPaginator.fetch(p)">{{p}}</a></li>
+					<li class="disabled"><a href="javascript:;">...</a></li>
+					<li><a href="" ng-click="searchPaginator.next()"
+						ng-show="searchPaginator.hasNext()">下一页</a></li>
+					<li><a href=""
+						ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+					<li><a href=""
+						ng-click="searchPaginator.fetch(searchPaginator.endPage)"
+						ng-show="searchPaginator.pages.length">{{searchPaginator.totalpieces}}条</a></li>
+					<select class="selectpicker" ng-model="recordofperpage"
+						ng-change="makeChanged()"
+						ng-options="item.num as item.num for item in numperpage"></select>
+
+				</ul>
+			</div>
+		</div>
+
+		<!-- 模态框（Modal） for transmit self defined message-->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">编辑Topic</h4>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal" name="myForm"
+							ng-submit="refreshpage(myForm)">
+							<div class="control-group">
+								<label class="control-label">Topic名称 :</label>
+								<div class="controls">
+									<input type="text" name="name" class="input-xlarge"
+										ng-model="tname" required>
+								</div>
+							</div>
+
+							<div class="control-group">
+								<label class="control-label">输入需要发送的消息(每行代表一条消息)</label>
+								<div class="controls">
+									<textarea class="form-control" name="textarea"
+										id="message-text" rows="10" ng-model="textarea" required></textarea>
+								</div>
+							</div>
+
+							<div class="control-group" style="margin-top: 40px">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+									<button type="submit" class="btn btn-success">发送消息</button>
+								</div>
+							</div>
+
+						</form>
+					</div>
+
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+
+		<!-- 模态框（Modal）for show content -->
+		<div class="modal fade" id="myModal2" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">消息内容</h4>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label">Topic名称 :</label>
+								<div class="controls">
+									<input type="text" name="name" class="input-xlarge"
+										ng-model="tname" readonly>
+								</div>
+							</div>
+
+							<div class="control-group">
+								<label class="control-label">消息体</label>
+								<div class="controls">
+									<textarea class="form-control" id="message-text" rows="10"
+										ng-model="messagecontent" readonly></textarea>
+								</div>
+							</div>
+
+							<div class="control-group" style="margin-top: 40px">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+								</div>
+							</div>
+
+						</form>
+					</div>
+
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+
+		<!-- 模态框（Modal）for show more options -->
+		<div class="modal fade" id="myModal3" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">消息内容</h4>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label">Topic名称 :</label>
+								<div class="controls">
+									<input type="text" name="name" class="input-xlarge"
+										ng-model="tname" readonly>
+								</div>
+							</div>
+
+							<div class="control-group">
+								<label class="control-label">消息体</label>
+								<div class="controls">
+									<textarea class="form-control" id="message-text" rows="10"
+										ng-model="fullmessage" readonly></textarea>
+								</div>
+							</div>
+
+							<div class="control-group" style="margin-top: 40px">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+								</div>
+							</div>
+
+						</form>
+					</div>
+
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+
+		<!-- /.modal -->
+		<!--end page-header  -->
+	</div>
+	<!-- end page-content -->
+</div>

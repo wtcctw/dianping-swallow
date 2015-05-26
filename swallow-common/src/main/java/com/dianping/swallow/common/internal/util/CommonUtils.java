@@ -7,10 +7,14 @@ package com.dianping.swallow.common.internal.util;
  */
 public class CommonUtils {
 	
+	public static final int DEFAULT_CPU_COUNT = 4;
 	
 	public static int getCpuCount(){
-		
-		return Runtime.getRuntime().availableProcessors();
+		int cpuCount = Runtime.getRuntime().availableProcessors();
+		if(cpuCount <= 0 ){
+			cpuCount = 4;
+		}
+		return cpuCount;
 	}
 
 }

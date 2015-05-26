@@ -1,8 +1,8 @@
 package com.dianping.swallow.test;
 
 
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
@@ -27,7 +27,6 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
 		sendMessage(1, topic, 1024*1024);
 		waitForListernToComplete(messageCount);
-
 		Assert.assertEquals(1, getConsumerMessageCount(consumer));
 	}
 	
