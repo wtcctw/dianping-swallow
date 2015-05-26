@@ -11,6 +11,7 @@ import org.jboss.netty.channel.Channel;
 
 import com.dianping.swallow.common.internal.packet.PacketType;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
+import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 
 /**
@@ -24,20 +25,32 @@ public class DefaultHeartBeatSender implements HeartBeatSender{
 
 	private ConcurrentHashMap<Channel, ScheduledFuture<?>>  channels = new ConcurrentHashMap<Channel, ScheduledFuture<?>>();
 	
-	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.getCpuCount());
-	
+	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.getCpuCount(), new MQThreadFactory("HEART-BEAT-SENDER"));
 	
 	@Override
 	public void addChannel(Channel channel) {
+
+		if(logger.isInfoEnabled()){
+			logger.info("[addChannel]" + channel);
+		}
 		
-		 ScheduledFuture<?> future = scheduled.scheduleAtFixedRate(new HeartBeatTask(channel), HEART_BEAT_INTERVAL, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
+		ScheduledFuture<?> future = doSchedule(scheduled, new HeartBeatTask(channel));
 		
 		channels.put(channel, future);
 		
 	}
 
+	protected ScheduledFuture<?> doSchedule(ScheduledExecutorService scheduled, Runnable task) {
+		
+		 return scheduled.scheduleAtFixedRate(task , HEART_BEAT_INTERVAL, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
+	}
+
 	@Override
 	public void removeChannel(Channel channel) {
+
+		if(logger.isInfoEnabled()){
+			logger.info("[removeChannel]" + channel);
+		}
 
 		ScheduledFuture<?> future = channels.remove(channel);
 		if(future != null){

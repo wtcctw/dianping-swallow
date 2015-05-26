@@ -10,7 +10,6 @@ import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.BackoutMessageException;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.MessageListener;
-import com.dianping.swallow.producer.Producer;
 
 /**
  * @author mengwenchao
@@ -33,6 +32,9 @@ public class JsonDataTest extends AbstractConsumerTest {
 			@Override
 			public void onMessage(Message msg) throws BackoutMessageException {
 				try{
+					if(logger.isInfoEnabled()){
+						logger.info(msg.toString());
+					}
 					realData.set(msg.transferContentToBean(Data.class));
 				}catch(Throwable th){
 					logger.error("[error transform data]", th);
@@ -42,8 +44,7 @@ public class JsonDataTest extends AbstractConsumerTest {
 		});
 		c.start();
 
-		Producer p = createProducer(topic);
-		p.sendMessage(data);
+		sendMessage(topic, data);
 
 		waitForListernToComplete(1);
 		if(result.get() != null){
@@ -54,8 +55,6 @@ public class JsonDataTest extends AbstractConsumerTest {
 		
 		
 	}
-	
-	
 	
 	private Data createData() {
 		Data data = new Data();

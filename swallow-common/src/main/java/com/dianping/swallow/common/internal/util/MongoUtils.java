@@ -5,10 +5,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.types.BSONTimestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.ServerAddress;
 
 public class MongoUtils {
+	
+   protected  static final Logger logger     = LoggerFactory.getLogger(MongoUtils.class);
+	
    private MongoUtils() {
    }
 
@@ -55,8 +60,15 @@ public class MongoUtils {
    
    public static Long getLongByDate(Date date) {
 	      int time = (int) (date.getTime() / 1000);
-	      BSONTimestamp bst = new BSONTimestamp(time, 1);
-	      return BSONTimestampToLong(bst);
+	      BSONTimestamp bst = new BSONTimestamp(time, 0);
+	      if(logger.isDebugEnabled()){
+	    	  logger.debug("[getLongByDate][BSONTimestamp]" + bst);
+	      }
+	      Long result = BSONTimestampToLong(bst);
+	      if(logger.isDebugEnabled()){
+	    	  logger.debug("[getLongByDate][messageId]" + result);
+	      }
+	      return result;
 	   }
 
    

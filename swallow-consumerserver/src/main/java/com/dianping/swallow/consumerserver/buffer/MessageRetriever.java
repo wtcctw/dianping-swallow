@@ -3,6 +3,7 @@ package com.dianping.swallow.consumerserver.buffer;
 import java.util.List;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 public interface MessageRetriever {
 
@@ -21,16 +22,44 @@ public interface MessageRetriever {
     * @return
     * @throws Exception
     */
-   @SuppressWarnings("rawtypes")
-   List retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter);
+	ReturnMessageWrapper retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter);
    
-   @SuppressWarnings("rawtypes")
-   List retrieveMessage(String topicName, Long messageId, int fetchSize);
+	ReturnMessageWrapper retrieveMessage(String topicName, Long messageId, int fetchSize);
 
-   @SuppressWarnings("rawtypes")
-   List retrieveMessage(String topicName, Long messageId);
-
+	ReturnMessageWrapper retrieveMessage(String topicName, Long messageId);
    
    void setFetchSize(int fetchSize);
+
+   
+	public static class ReturnMessageWrapper{
+		
+		private List<SwallowMessage> messages;
+		
+		/**
+		 * 消息大小，如果是包含有filter，则返回原生的获取消息大小
+		 */
+		private int rawMessageSize;
+		
+		private Long maxMessageId;
+
+		public ReturnMessageWrapper(List<SwallowMessage> messages, int rawMessageSize, Long maxMessageId){
+			this.messages = messages;
+			this.rawMessageSize = rawMessageSize;
+			this.maxMessageId = maxMessageId;
+		}
+
+		public List<SwallowMessage> getMessages() {
+			return messages;
+		}
+
+		public int getRawMessageSize() {
+			return rawMessageSize;
+		}
+
+		public Long getMaxMessageId() {
+			return maxMessageId;
+		}
+
+	}
 
 }

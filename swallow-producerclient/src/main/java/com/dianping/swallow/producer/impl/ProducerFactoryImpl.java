@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.dianping.dpsf.api.ProxyFactory;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
-import com.dianping.pigeon.registry.RegistryManager;
+import com.dianping.pigeon.remoting.common.util.Constants;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.processor.DefaultMessageProcessorTemplate;
 import com.dianping.swallow.common.internal.processor.ProducerProcessor;
@@ -49,7 +49,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
    private static final String              CONFIG_FILE_NAME = "swallow-producerclient-pigeon.properties";        //配置文件名称
 
    private final String                     producerIP       = IPUtil.getFirstNoLoopbackIP4Address();             //Producer IP地址
-   private final String                     producerVersion  = "0.7.0";                                           //Producer版本号
+   private final String                     producerVersion  = "0.7.1";                                           //Producer版本号
    private final SwallowPigeonConfiguration pigeonConfigure;                                                      //ProducerFactory配置类
    private ProducerSwallowService           remoteService;                                                        //远程调用对象
    
@@ -78,21 +78,13 @@ public final class ProducerFactoryImpl implements ProducerFactory {
 
       ProxyFactory<ProducerSwallowService> pigeon = new ProxyFactory<ProducerSwallowService>(); //pigeon代理对象
       pigeon.setIface(ProducerSwallowService.class);
-      pigeon.setCallMethod("sync");
+      pigeon.setCallMethod(Constants.CALL_SYNC);
 
       pigeon.setServiceName(pigeonConfigure.getServiceName());
       pigeon.setSerialize(pigeonConfigure.getSerialize());
       pigeon.setTimeout(pigeonConfigure.getTimeout());
       pigeon.setLoadBalance(pigeonConfigure.getLoadBalance());
 
-      if (!pigeonConfigure.isUseLion()) {
-    	  if(logger.isInfoEnabled()){
-    		  logger.info("[initPigeon][url]" + pigeonConfigure.getHosts());
-    	  }
-         RegistryManager.getInstance().setProperty(pigeonConfigure.getServiceName(), pigeonConfigure.getHosts());
-      } else {
-         pigeon.setUseLion(true);
-      }
       try {
          ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 

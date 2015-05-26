@@ -13,7 +13,6 @@ public class Counter {
 		
 		String file = "/data/applogs/swallow/all";
 		File f = new File(file);
-	
 		BufferedReader br = null;
 		
 		
@@ -30,7 +29,6 @@ public class Counter {
 				if(data > max){
 					max = data;
 				}
-				
 			}
 	
 			for(int i=0;i<=max;i++){

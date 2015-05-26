@@ -135,16 +135,9 @@ else
     exit 1
 fi
 ###########  检查是否启动成功 ############
-if [ "$MODE" == "master" ]; then
-    SuccessLog="Server started at port 8081"
-    SleepTime=20
-else
-    SuccessLog="start to wait $MASTER_IP master stop beating"
-    SleepTime=5
-fi
 
 echo "Sleeping $SleepTime sec for waiting process started ..."
-mysleep $SleepTime
+mysleep 5
 
 Pid=$(jps |grep $ProcessName |cut -d\  -f1)
 

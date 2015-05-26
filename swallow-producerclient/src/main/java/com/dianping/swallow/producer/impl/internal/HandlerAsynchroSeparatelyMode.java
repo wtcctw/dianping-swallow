@@ -61,6 +61,8 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
     private Thread[]                     asyncThreads;
     private Thread                       retryThread;
     private volatile boolean             closed                = false;
+    
+    public static String RETRY_QUEUE_SUFFIX =  "#retry";
 
     public HandlerAsynchroSeparatelyMode(ProducerImpl producer) {
         this.producer = producer;
@@ -69,7 +71,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
         this.fileQueueFailedBaseInterval = producer.getFileQueueFailedBaseInterval();
         this.messageQueue = FileQueueHolder.getQueue(producer.getDestination().getName(), producer.getProducerConfig()
                 .isSendMsgLeftLastSession(), producer.getProducerConfig().getFilequeueBaseDir());
-        this.failedMessageQueue = FileQueueHolder.getQueue(producer.getDestination().getName() + "#retry", producer
+        this.failedMessageQueue = FileQueueHolder.getQueue(producer.getDestination().getName() + RETRY_QUEUE_SUFFIX, producer
                 .getProducerConfig().isSendMsgLeftLastSession(), producer.getProducerConfig().getFilequeueBaseDir());
         this.start();
     }

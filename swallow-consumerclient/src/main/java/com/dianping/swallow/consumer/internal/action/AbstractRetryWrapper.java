@@ -38,6 +38,7 @@ public abstract class AbstractRetryWrapper implements SwallowCatActionWrapper{
             try {
             	action.doAction();
                 success = true;
+    			transaction.setStatus(Transaction.SUCCESS);
             } catch (Throwable e) {
             	
                 CatUtil.logException(e);

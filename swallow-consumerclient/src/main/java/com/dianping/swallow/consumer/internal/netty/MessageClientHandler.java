@@ -1,6 +1,8 @@
 package com.dianping.swallow.consumer.internal.netty;
 
 
+import java.nio.channels.ClosedChannelException;
+
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
@@ -60,16 +62,6 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-	    super.channelDisconnected(ctx, e);
-    	consumerConnectionListener.onChannelDisconnected(e.getChannel());
-
-        if(logger.isInfoEnabled()){
-        	logger.info("[channelDisconnected]" + e.getChannel());
-        }
-    }
-
-    @Override
     public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e) {
     	
         if (logger.isDebugEnabled()) {
@@ -88,9 +80,31 @@ public class MessageClientHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+    	
         Channel channel = e.getChannel();
-        logger.error("[exceptionCaught]" + e.getChannel());
+        logger.error("[exceptionCaught]" + e.getChannel(), e.getCause());
         
+        if(e.getCause() instanceof ClosedChannelException){
+        	consumerConnectionListener.onChannelDisconnected(e.getChannel());
+        }
         channel.close();
     }
+
+    @Override
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+	    super.channelDisconnected(ctx, e);
+        if(logger.isInfoEnabled()){
+        	logger.info("[channelDisconnected]" + e.getChannel());
+        }
+    }
+
+    public void channelClosed(
+            ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+    	super.channelClosed(ctx, e);
+        if(logger.isInfoEnabled()){
+        	logger.info("[channelClosed]" + e.getChannel());
+        }
+    	consumerConnectionListener.onChannelDisconnected(e.getChannel());
+    }
+    
 }

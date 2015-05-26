@@ -16,9 +16,7 @@ public final class ConfigManager extends AbstractConfig{
    private long                 checkConnectedChannelInterval   = 10000L;
    private long                 retryIntervalWhenMongoException = 20L;
    private int                  retryTimesWhenMongoException 	= 50;
-   private long                 waitAckTimeWhenCloseSwc         = 15000L;
    private long                 closeChannelMaxWaitingTime      = 10000L;
-   
    private int                  maxClientThreadCount            = 100;
    private int                  masterPort                      = 8081;
    private int                  slavePort                       = 8082;
@@ -43,12 +41,12 @@ public final class ConfigManager extends AbstractConfig{
    private int					backupMinRetrieveInterval		= 10000;
    
    
-   private final long                 waitSlaveShutDown               = 4000L;
+   private final long                 waitAckTimeWhenCloseSwc         = 2000;
    private final int                  heartbeatCheckInterval          = 2000;
    private final int                  heartbeatMaxStopTime            = 10000;
    private final int                  heartbeatUpdateInterval         = 2000;
-
-
+   private final long                 waitSlaveShutDown               = waitAckTimeWhenCloseSwc + 2*heartbeatCheckInterval;
+   
    public int getPullFailDelayBase() {
       return pullFailDelayBase;
    }
@@ -152,16 +150,8 @@ public final class ConfigManager extends AbstractConfig{
 		return minRetrieveInterval;
 	}
 
-	public void setMinRetrieveInterval(int minRetrieveInterval) {
-		this.minRetrieveInterval = minRetrieveInterval;
-	}
-
 	public int getBackupMinRetrieveInterval() {
 		return backupMinRetrieveInterval;
-	}
-
-	public void setBackupMinRetrieveInterval(int backupMinRetrieveInterval) {
-		this.backupMinRetrieveInterval = backupMinRetrieveInterval;
 	}
 
 	public int getMessageSendNoneInterval() {

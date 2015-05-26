@@ -9,11 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.jboss.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
@@ -46,26 +43,10 @@ import com.dianping.swallow.consumerserver.util.ConsumerUtil;
  * @author kezhu.wu
  */
 public final class ConsumerWorkerImpl extends AbstractLifecycle implements ConsumerWorker, NoHeartBeatListener{
-   private static final Logger                          logger                     = LoggerFactory
-                                                                                      .getLogger(ConsumerWorkerImpl.class);
-   private final AtomicLong                             SEQ                     = new AtomicLong(1);
-   private final AtomicLong                             BACKUP_SEQ              = new AtomicLong(1);
-   /**
-    * maxAckedMessageSeq最多允许领先"最小的空洞waitAckMessage"的值为seqThreshold，seqThreshold
-    * = max(实时qps * seqRatio, minSeqThreshold)
-    */
-   private final int                                    SEQ_RATIO               = ConfigManager.getInstance()
-                                                                                      .getSeqRatio();
-   private final long                                   MIN_SEQ_THRESHOLD       = ConfigManager.getInstance()
-                                                                                      .getMinSeqThreshold();
-   private long                                         INTERVAL_SECOND         = ConfigManager.getInstance()
-                                                                                      .getAckIdUpdateIntervalSecond();
-   private long                                         seqThreshold            = 0;
+	
    /** 允许"最小的空洞waitAckMessage"存活的时间的阈值,单位秒，默认5分钟 */
    private final long                                   WAIT_ACK_EXPIRED        = ConfigManager.getInstance()
                                                                                       .getWaitAckExpiredSecond() * 1000;
-   /** 记录上一次的qps */
-   private long                                         lastSeqForQPS           = 0;
 
    private ConsumerInfo                                 consumerInfo;
    private MessageFilter                                messageFilter;
@@ -135,8 +116,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
       long messageIdOfTailBackupMessage = -1;
       if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
          messageIdOfTailBackupMessage = (startMessageId != -1 ? startMessageId : getMaxMessageId(true));
-         
       }
+      
       messageQueue = swallowBuffer.createMessageQueue(this.consumerInfo, messageIdOfTailMessage,
             messageIdOfTailBackupMessage, this.messageFilter);
       heartBeatReceiver = new DefaultHeartBeatReceiver(consumerThreadPoolManager.getScheduledThreadPool(), this);
@@ -197,7 +178,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 
       //更新最大ack message id，更新最大seq
       if (waitAckMessage != null) {//ack属于正常消息的
-         if (maxAckedMessage == null || waitAckMessage.seq > maxAckedMessage.seq) {
+         if (maxAckedMessage == null || waitAckMessage.getAckId() > maxAckedMessage.getAckId()) {
             maxAckedMessage = waitAckMessage;
          }
          //cat打点，记录一次备份消息的ack
@@ -205,7 +186,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
       } else {
          waitAckMessage = waitAckBackupMessages.remove(ackId);
          if (waitAckMessage != null) {//ack属于备份消息的
-            if (maxAckedBackupMessage == null || waitAckMessage.seq > maxAckedBackupMessage.seq) {
+            if (maxAckedBackupMessage == null || waitAckMessage.getAckId() > maxAckedBackupMessage.getAckId()) {
                maxAckedBackupMessage = waitAckMessage;
             }
             //cat打点，记录一次备份消息的ack
@@ -216,17 +197,9 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
       return waitAckMessage;
    }
 
-   /**
-    * 持久化ack的逻辑（该方法会被定时调用） 2个，waitAckMessages和waitAckBackupMessages，处理方式一样
-    */
    @Override
    public void recordAck() {
-      //根据SEQ计算QPS，调整seqThreshold；如qps=200，那么seqThreshold=2000(当然seqThreshold最少为100)
-      long seqForQps = SEQ.get();
-      long qps = (seqForQps - lastSeqForQPS) / INTERVAL_SECOND;
-      seqThreshold = Math.max(qps * SEQ_RATIO, MIN_SEQ_THRESHOLD);
-      lastSeqForQPS = seqForQps;
-
+	   
       lastRecordedAckId = recordAck0(waitAckMessages, maxAckedMessage, lastRecordedAckId, false);
       lastRecordedBackupAckId = recordAck0(waitAckBackupMessages, maxAckedBackupMessage, lastRecordedBackupAckId, true);
 
@@ -242,12 +215,9 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
          ConsumerMessage minWaitAckMessage = entry.getValue();
          long minAckId = minWaitAckMessage.getAckId();
          if (maxAckedMessage0 != null && minAckId < maxAckedMessage0.getAckId()) {//大于最大ack id（maxAckedMessageId）的消息，不算是空洞
-            //如果最小等待ack的消息，与最大已记录ack的消息，相差超过seqThreshold，则移除该消息到备份队列里。
-            if (maxAckedMessage0.seq - minWaitAckMessage.seq > seqThreshold) {
-               overdue = true;
-            }
+        	 
             //如果最小等待ack的消息，与当前时间，相差超过waitAckTimeThreshold，则移除该消息到备份队列里。
-            if (!overdue && System.currentTimeMillis() - minWaitAckMessage.gmt > WAIT_ACK_EXPIRED) {
+            if (System.currentTimeMillis() - minWaitAckMessage.gmt > WAIT_ACK_EXPIRED) {
                overdue = true;
             }
          }
@@ -310,16 +280,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
             if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
                messageDao.saveMessage(this.consumerInfo.getDest().getName(), this.consumerInfo.getConsumerId(),
                      consumerMessage.message);
-               if (!consumerMessage.message.isBackup()) {
-                  if (maxAckedMessage == null || consumerMessage.seq > maxAckedMessage.seq) {
-                     maxAckedMessage = consumerMessage;
-                  }
-               } else {
-                  if (maxAckedBackupMessage == null || consumerMessage.seq > maxAckedBackupMessage.seq) {
-                     maxAckedBackupMessage = consumerMessage;
-                  }
-               }
-               //cat打点，记录一次备份消息的record
+               
                catTraceForBackupRecord(consumerMessage.message);
             }
             it.remove();
@@ -381,9 +342,9 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 
      if (message != null) {
         if (!message.isBackup()) {
-           consumerMessage = new ConsumerMessage(message, channel, SEQ.getAndIncrement());
+           consumerMessage = new ConsumerMessage(message, channel);
         } else {
-           consumerMessage = new ConsumerMessage(message, channel, BACKUP_SEQ.getAndIncrement());
+           consumerMessage = new ConsumerMessage(message, channel);
         }
      }
       return consumerMessage;
@@ -516,7 +477,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
          if (maxMessageId == null) {//不存在任何消息，则使用当前时间作为消息id即可
             maxMessageId = MongoUtils.getLongByCurTime();
          }
-
+         
+         
          if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
             //持久型且ack尚未有记录，则插入ack，表示以此ack为基准。
             ackDao.add(topicName, consumerInfo.getConsumerId(), maxMessageId, "inited", isBakcup);
@@ -542,22 +504,20 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
       private SwallowMessage message;
       /** 创建时间 */
       private long           gmt;
-      /** 序号 */
-      private long           seq;
+
       /** 连接 */
       private Channel        channel;
 
-      public ConsumerMessage(SwallowMessage message, Channel channel, long seq) {
+      public ConsumerMessage(SwallowMessage message, Channel channel) {
          super();
          this.message = message;
          this.channel = channel;
          this.gmt = System.currentTimeMillis();
-         this.seq = seq;
       }
 
       @Override
       public String toString() {
-         return "ConsumerMessage [message=" + message + ", gmt=" + gmt + ", seq=" + seq + ", channel=" + channel + "]";
+         return "ConsumerMessage [message=" + message + ", gmt=" + gmt + ", channel=" + channel + "]";
       }
 
       public Long getAckId() {

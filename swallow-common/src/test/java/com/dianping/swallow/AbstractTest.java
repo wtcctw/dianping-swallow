@@ -32,6 +32,11 @@ public abstract class AbstractTest {
 	protected ExecutorService executors = Executors.newCachedThreadPool();
 
 	protected ScheduledExecutorService scheduledExecutors = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+	
+	
+	protected String topicName = "SwallowUnitTest";
+	
+	protected String baseConsumerId = "ut";
 
 	@Rule
 	public TestName  testName = new TestName();
@@ -95,7 +100,12 @@ public abstract class AbstractTest {
 	}
 
 	
-	
+	protected String getConsumerId() {
+		
+		return baseConsumerId + "-" + testName.getMethodName();
+	}
+
+
 	@After
 	public void afterAbstractTest(){
 		

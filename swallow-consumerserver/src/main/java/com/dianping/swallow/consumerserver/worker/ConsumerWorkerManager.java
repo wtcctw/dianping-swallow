@@ -137,9 +137,9 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements SelfMana
 			public void onTransition() {
 		        try {
 		            long waitAckTimeWhenCloseSwc = ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc();
-		            logger.info("Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
+		            logger.info("[onTransition]Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
 		            Thread.sleep(waitAckTimeWhenCloseSwc);
-		            logger.info("Sleep done.");
+		            logger.info("[onTransition]Sleep done.");
 		        } catch (InterruptedException e) {
 		            logger.error("Close Swc thread InterruptedException", e);
 		        }
@@ -180,6 +180,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements SelfMana
         
         if(startMessageId != -1){
         	cleanConsumerInfo(consumerInfo, worker);
+        	worker = null;
         }
         
         if (worker == null) {
@@ -344,6 +345,9 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements SelfMana
 	                    ConsumerWorker worker = entry.getValue();
 	                    ConsumerInfo consumerInfo = entry.getKey();
 	                    if (worker.allChannelDisconnected()) {
+	                    	if(logger.isInfoEnabled()){
+	                    		logger.info("[doRun][clean]" + consumerInfo);
+	                    	}
 	                        worker.recordAck();
 	                        removeConsumerWorker(consumerInfo);
 	                        try {

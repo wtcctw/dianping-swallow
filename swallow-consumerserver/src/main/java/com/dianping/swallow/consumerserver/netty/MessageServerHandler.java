@@ -162,8 +162,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 		boolean isValid = topicWhiteList.isValid(consumerInfo.getDest().getName());
 		if (!isValid) {
 			if (logger.isInfoEnabled()) {
-				logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel)
-						+ " TopicName is not in whitelist.");
+				logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " TopicName is not in whitelist.");
 			}
 			channel.close();
 			return;

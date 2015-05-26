@@ -64,13 +64,15 @@ public class DefaultConsumerTask implements ConsumerTask{
         	
         	beginTask();
         	consumerProcessor.beforeOnMessage(swallowMessage);
+        	if(logger.isInfoEnabled()){
+        		logger.info("[run][begin]" + messageId);
+        	}
     		actionWrapper.doAction(consumerClientTransaction, new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {
 					consumer.getListener().onMessage(swallowMessage);
 				}
 			});
-    		consumerClientTransaction.setStatus(Transaction.SUCCESS);
         } catch (SwallowException e) {
             logger.error("[run][can not process message]" + swallowMessage, e);
         	CatUtil.logException(e);
@@ -85,6 +87,10 @@ public class DefaultConsumerTask implements ConsumerTask{
 			}
         	sendAck(e, swallowMessage.getMessageId());
             consumerClientTransaction.complete();
+            
+        	if(logger.isInfoEnabled()){
+        		logger.info("[run][end]" + messageId);
+        	}
         }
 	}
 	private void beginTask() {
@@ -124,7 +130,7 @@ public class DefaultConsumerTask implements ConsumerTask{
             PktConsumerMessage consumermessage = new PktConsumerMessage(messageId, consumer.isClosed());
             event.getChannel().write(consumermessage);
         } catch (RuntimeException e) {
-            logger.warn("Write to server error.", e);
+            logger.warn("[sendAck][Write to server error]" + connectionDesc, e);
         }
 	}
 	

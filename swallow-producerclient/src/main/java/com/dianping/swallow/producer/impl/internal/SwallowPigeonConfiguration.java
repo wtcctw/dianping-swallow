@@ -1,6 +1,6 @@
 package com.dianping.swallow.producer.impl.internal;
 
-import com.dianping.lion.EnvZooKeeperConfig;
+
 import com.dianping.swallow.common.internal.config.AbstractConfig;
 
 /**
@@ -50,9 +50,8 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
 
    public static final String  DEFAULT_SERVICE_NAME   = "http://service.dianping.com/swallowService/producerService_1.0.0"; //默认远程服务名称
    public static final String  DEFAULT_SERIALIZE      = "hessian";                                                         //默认序列化方式
-   public static final int     DEFAULT_TIMEOUT        = 60000;                                                              //默认远程调用延时
+   public static final int     DEFAULT_TIMEOUT        = 10000;                                                              //默认远程调用延时
    public static final boolean DEFAULT_IS_USE_LION    = true;                                                              //默认是否使用Lion以配置Swallow server地址
-   public static final String  DEFAULT_HOSTS          = "127.0.0.1:4000";                                                  //默认Swallow server地址字符串
    public static final String  DEFAULT_WEIGHTS        = "1";                                                               //默认Swallow server权重
    public static final int     DEFAULT_RETRY_BASE_INTERVAL = 500;                                                             //默认失败重试延时基数
    public static final int     DEFAULT_FAILED_BASE_INTERVAL = 1;                                                              //默认失败后重新获取前的间隔的延时基数
@@ -62,9 +61,6 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
    private String              serviceName            = DEFAULT_SERVICE_NAME;                                              //远程调用服务名称，需与Swallow server端配置的服务名称完全一致
    private String              serialize              = DEFAULT_SERIALIZE;                                                 //序列化方式，共有四种：hessian,java,protobuf以及thrift
    private int                 timeout                = DEFAULT_TIMEOUT;                                                   //远程调用延时
-   private boolean             useLion                = DEFAULT_IS_USE_LION;                                               //是否使用Lion以配置Swallow server地址，非开发环境只能使用Lion
-   private String              hosts                  = DEFAULT_HOSTS;                                                     //Swallow server地址字符串，useLion为真时此项失效
-   private String              weights                = DEFAULT_WEIGHTS;                                                   //Swallow server权重，范围从0-10，useLion为真时此项失效
    private int                 retryBaseInterval      = DEFAULT_RETRY_BASE_INTERVAL;                                       //失败重试延时基数
    private int                 failedBaseInterval     = DEFAULT_FAILED_BASE_INTERVAL;                                     //失败后重新获取前的间隔的延时基数
    private int                 punishTimeout          = -1;                                            //失败重试延时基数(旧的，由于名称不合理，废弃使用)
@@ -77,25 +73,20 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
 
    @Override
    public String toString() {
-      return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
-            + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
+      return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "retryBaseInterval="
             + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
    private String getConfigInfo() {
-      return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; useLion="
-            + useLion + (!useLion ? "; hosts=" + hosts + "; weights=" + weights : "") + "; retryBaseInterval="
+      return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; retryBaseInterval="
             + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
    }
 
    public SwallowPigeonConfiguration(String configFile) {
 	   
 	  loadLocalConfig(configFile);
-	  
-      checkHostsAndWeights();
       checkSerialize();
       checkTimeout();
-      checkUseLion();
       checkRetryBaseInterval();
       checkFileQueueFailedBaseInterval();
       
@@ -120,64 +111,12 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
    }
 
    /**
-    * 检查hosts和weights，host个数与weight需一一对应，示例：hosts=
-    * "127.0.0.1:4000,192.168.6.123:8000"; weights="1,2"
-    */
-   private void checkHostsAndWeights() {
-      String[] hostSet = getHosts().trim().split(",");
-      String[] weightSet = getWeights().trim().split(",");
-      StringBuilder realHosts = new StringBuilder();
-      StringBuilder realWeights = new StringBuilder();
-      String host;
-      String weight;
-      for (int idx = 0; idx < hostSet.length; idx++) {
-         host = hostSet[idx];
-         if (idx >= weightSet.length) {
-            weight = "-1";
-         } else {
-            weight = weightSet[idx];
-         }
-         if (!host.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d{4,5}") || !weight.matches("[1-9]|10")) {
-            logger.warn("[Unrecognized host address: " + host + ", or weight: " + weight + ", ignored it.]");
-            continue;
-         }
-         realHosts.append(host + ",");
-         realWeights.append(weight + ",");
-      }
-      if (realHosts.length() == 0) {
-         this.hosts = DEFAULT_HOSTS;
-         this.weights = DEFAULT_WEIGHTS;
-      } else {
-         this.hosts = realHosts.substring(0, realHosts.length() - 1);
-         this.weights = realWeights.substring(0, realWeights.length() - 1);
-      }
-   }
-
-   /**
     * 检查Timeout是否合法，Timeout>0
     */
    private void checkTimeout() {
       if (timeout <= 0) {
          timeout = DEFAULT_TIMEOUT;
          logger.warn("Timeout should be more than 0, use default value.");
-      }
-   }
-
-   /**
-    * 检查是否使用Lion，如果非开发环境，强制useLion=true
-    */
-   private void checkUseLion() {
-	  boolean noCheckLion = Boolean.parseBoolean(System.getProperty("noCheckLion"));
-	  if(logger.isInfoEnabled()){
-		  logger.info("[checkUseLion][noCheckLion]" + noCheckLion);
-	  }
-	  if(noCheckLion){
-		  return;
-	  }
-      String env = EnvZooKeeperConfig.getEnv();
-      if (!"dev".equals(env)) {
-         logger.warn("[Not dev, set useLion=" + DEFAULT_IS_USE_LION + ".]");
-         useLion = DEFAULT_IS_USE_LION;
       }
    }
 
@@ -219,29 +158,6 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
    public void setTimeout(int timeout) {
       this.timeout = timeout;
       checkTimeout();
-   }
-
-   public boolean isUseLion() {
-      return useLion;
-   }
-
-   public void setUseLion(boolean useLion) {
-      this.useLion = useLion;
-      checkUseLion();
-   }
-
-   public String getHosts() {
-      return hosts;
-   }
-
-   public String getWeights() {
-      return weights;
-   }
-
-   public void setHostsAndWeights(String hosts, String weights) {
-      this.hosts = hosts;
-      this.weights = weights;
-      checkHostsAndWeights();
    }
 
    public int getRetryBaseInterval() {

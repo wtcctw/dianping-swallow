@@ -32,7 +32,7 @@ public class CatTest extends AbstractTest{
 			Transaction t = Cat.newTransaction("test", "test");
 			try{
 				if((i&1) == 0){
-					t.setStatus("success");
+					t.setStatus(Transaction.SUCCESS);
 				}else{
 					t.setStatus(new Exception("man made exception!!"));
 				}

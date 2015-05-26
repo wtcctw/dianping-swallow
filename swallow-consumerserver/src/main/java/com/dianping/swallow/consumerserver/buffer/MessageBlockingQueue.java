@@ -148,16 +148,10 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	public void putMessage(List messages) {
+	public void putMessage(List<SwallowMessage> messages) {
 		
-		boolean first = true;
-		for (Object o : messages) {
-			if(first){
-				first = false;
-				continue;
-			}
-			SwallowMessage message = (SwallowMessage) o;
+		for (SwallowMessage message : messages) {
+			
 			boolean result = offer(message);
 			if(result){
 				increaseMessageCount();

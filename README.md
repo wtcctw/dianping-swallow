@@ -1,4 +1,6 @@
-注：**本文针对Swallow0.7.0版本**
+注：**本文针对Swallow0.7.1版本**
+
+[TOC]
 
 # 基础概念
 
@@ -59,130 +61,9 @@
 * 每天大概的消息量	(例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成"100")
 
 # Swallow使用说明
-
-
-## 使用Swallow发送消息
-### 添加maven依赖
-	<dependency>
-	    <groupId>org.springframework</groupId>
-	    <artifactId>spring-beans</artifactId>
-	    <version>4.1.3.RELEASE</version>
-	</dependency>
-	<dependency>
-	    <groupId>org.springframework</groupId>
-	    <artifactId>spring-context</artifactId>
-	    <version>4.1.3.RELEASE</version>
-	</dependency>
-	<dependency>
-	    <groupId>org.springframework</groupId>
-	    <artifactId>spring-core</artifactId>
-	    <version>4.1.3.RELEASE</version>
-	</dependency>
-	<dependency>
-	    <groupId>com.dianping.swallow</groupId>
-	    <artifactId>swallow-producerclient</artifactId>
-	    <version>0.6.10</version> 
-	</dependency>
-	<!-- lion -->
-	<dependency>
-	     <groupId>com.dianping.lion</groupId>
-	     <artifactId>lion-client</artifactId>
-	     <version>0.4.6</version>
-	</dependency>
-	<dependency>
-	    <groupId>javax.servlet</groupId>
-	    <artifactId>servlet-api</artifactId>
-	    <version>2.5</version>
-	</dependency>
-	<!-- 监控 -->
-	<dependency>
-	     <groupId>com.dianping.cat</groupId>
-	     <artifactId>cat-core</artifactId>
-	     <version>1.2.1</version>
-	</dependency>
-	<dependency>
-	     <groupId>com.dianping.hawk</groupId>
-	     <artifactId>hawk-client</artifactId>
-	     <version>0.7.1</version>
-	</dependency>
-	<!-- 远程调用Pigeon -->
-	<dependency>
-	     <groupId>com.dianping.dpsf</groupId>
-	     <artifactId>dpsf-net</artifactId>
-	     <version>2.3.13</version>
-	</dependency>
-
-### 在Spring中配置使用
-* swallow-producerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.6.10版本。
-
-##### Spring配置文件applicationContext-producer.xml配置相关bean
-
-	<bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
-
-	<bean id="producerClient" factory-bean="producerFactory" factory-method="createProducer">
-	    <constructor-arg>
-	        <ref bean="destination" />
-	    </constructor-arg>
-	    <constructor-arg>
-	        <ref bean="producerConfig" />
-	    </constructor-arg>
-	</bean>
-
-	<bean id="destination" class="com.dianping.swallow.common.message.Destination" factory-method="topic">
-	    <constructor-arg value="example" />
-	</bean>
-
-	<bean id="producerConfig" class="com.dianping.swallow.producer.ProducerConfig">
-	    <property name="mode" value="SYNC_MODE" />
-	    <property name="syncRetryTimes" value="0" />
-	    <property name="zipped" value="false" />
-	    <property name="threadPoolSize" value="5" />
-	    <property name="sendMsgLeftLastSession" value="false" />
-	</bean>
-
-##### 使用Spring中配置的bean发送消息
-
-	import org.springframework.context.ApplicationContext;
-	import org.springframework.context.support.ClassPathXmlApplicationContext;
-	import com.dianping.swallow.common.producer.exceptions.SendFailedException;
-	import com.dianping.swallow.producer.Producer;
-
-	public class ProducerSpring {
-	    public static void main(String[] args) {
-	    ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-producer.xml" });
-	    Producer producer = (Producer) ctx.getBean("producerClient");
-	        try {
-	            System.out.println(producer.sendMessage("Hello world.") + "hello");
-	        } catch (SendFailedException e) {
-	            e.printStackTrace();
-	        }
-	    }   
-	}
-
-### 生产者端纯代码实现
-
-纯代码实现与使用Spring配置bean有一样的效果。
-
-	public class SyncProducerExample {
-		public static void main(String[] args) throws Exception {
-			producerConfig config = new ProducerConfig(); 
-			// 以下设置的值与默认配置一致，可以省略
-			config.setMode(ProducerMode.SYNC_MODE); 
-			config.setSyncRetryTimes(0);
-			config.setZipped(false);
-			config.setThreadPoolSize(5);
-			config.setSendMsgLeftLastSession(false);
-			Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config); 
-			for (int i = 0; i < 10; i++) {
-				String msg = "消息-" + i;
-				p.sendMessage(msg); 
-				System.out.println("Sended msg:" + msg);
-				Thread.sleep(500);
-			}
-		}
-	}
-
-### Producer配置信息详解
+## 使用swallow发送消息
+### 基本概念说明
+#### Producer配置信息详解
 
 * mode表示producer表示工作模式。
 * asyncRetryTimes表示异步模式下发送失败重试次数。
@@ -250,10 +131,159 @@
    </tr>
 </table>
 
+### 代码示例
+#### 添加maven依赖
+	<dependency>
+	    <groupId>org.springframework</groupId>
+	    <artifactId>spring-beans</artifactId>
+	    <version>4.1.3.RELEASE</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.springframework</groupId>
+	    <artifactId>spring-context</artifactId>
+	    <version>4.1.3.RELEASE</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.springframework</groupId>
+	    <artifactId>spring-core</artifactId>
+	    <version>4.1.3.RELEASE</version>
+	</dependency>
+	<dependency>
+	    <groupId>com.dianping.swallow</groupId>
+	    <artifactId>swallow-producerclient</artifactId>
+	    <version>0.7.0</version> 
+	</dependency>
+	<!-- lion -->
+	<dependency>
+	     <groupId>com.dianping.lion</groupId>
+	     <artifactId>lion-client</artifactId>
+	     <version>0.4.6</version>
+	</dependency>
+	<dependency>
+	    <groupId>javax.servlet</groupId>
+	    <artifactId>servlet-api</artifactId>
+	    <version>2.5</version>
+	</dependency>
+	<!-- 监控 -->
+	<dependency>
+	     <groupId>com.dianping.cat</groupId>
+	     <artifactId>cat-core</artifactId>
+	     <version>1.2.1</version>
+	</dependency>
+	<!-- 远程调用Pigeon -->
+	<dependency>
+	     <groupId>com.dianping.dpsf</groupId>
+	     <artifactId>dpsf-net</artifactId>
+	     <version>2.3.13</version>
+	</dependency>
+
+#### 在Spring中配置使用
+* swallow-producerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.7.0版本。
+
+##### Spring配置文件applicationContext-producer.xml配置相关bean
+
+	<bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
+
+	<bean id="producerClient" factory-bean="producerFactory" factory-method="createProducer">
+	    <constructor-arg>
+	        <ref bean="destination" />
+	    </constructor-arg>
+	    <constructor-arg>
+	        <ref bean="producerConfig" />
+	    </constructor-arg>
+	</bean>
+
+	<bean id="destination" class="com.dianping.swallow.common.message.Destination" factory-method="topic">
+	    <constructor-arg value="example" />
+	</bean>
+
+	<bean id="producerConfig" class="com.dianping.swallow.producer.ProducerConfig">
+	    <property name="mode" value="SYNC_MODE" />
+	    <property name="syncRetryTimes" value="0" />
+	    <property name="zipped" value="false" />
+	    <property name="threadPoolSize" value="5" />
+	    <property name="sendMsgLeftLastSession" value="false" />
+	</bean>
+
+##### 使用Spring中配置的bean发送消息
+
+	import org.springframework.context.ApplicationContext;
+	import org.springframework.context.support.ClassPathXmlApplicationContext;
+	import com.dianping.swallow.common.producer.exceptions.SendFailedException;
+	import com.dianping.swallow.producer.Producer;
+
+	public class ProducerSpring {
+	    public static void main(String[] args) {
+	    ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-producer.xml" });
+	    Producer producer = (Producer) ctx.getBean("producerClient");
+	        try {
+	            System.out.println(producer.sendMessage("Hello world.") + "hello");
+	        } catch (SendFailedException e) {
+	            e.printStackTrace();
+	        }
+	    }   
+	}
+
+#### 生产者端纯代码实现
+
+纯代码实现与使用Spring配置bean有一样的效果。
+
+	public class SyncProducerExample {
+		public static void main(String[] args) throws Exception {
+			producerConfig config = new ProducerConfig(); 
+			// 以下设置的值与默认配置一致，可以省略
+			config.setMode(ProducerMode.SYNC_MODE); 
+			config.setSyncRetryTimes(0);
+			config.setZipped(false);
+			config.setThreadPoolSize(5);
+			config.setSendMsgLeftLastSession(false);
+			Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config); 
+			for (int i = 0; i < 10; i++) {
+				String msg = "消息-" + i;
+				p.sendMessage(msg); 
+				System.out.println("Sended msg:" + msg);
+				Thread.sleep(500);
+			}
+		}
+	}
 
 ## 使用Swallow接收消息
+### 基本概念
+#### ConsumerConfig配置详解
+使用Swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成:
 
-### Maven pox.xml中添加依赖
+* threadPoolSize：consumer处理消息的线程池线程数，默认为1。Consumer接收到消息时，会调用用户实现的onMessage方法。默认情况下，Consumer内部使用单线程来调用，只有onMessage执行完并响应给服务器（即发送ack给服务器），服务器在收到ack后，才会推送下一个消息过来。**如果希望并行地处理更多消息，可以通过设置threadPoolSize，实现多线程接收消息，但是如此一来，消息的时序则无法保证**
+* messageFilter：consumer只消费“Message.type属性包含在指定集合中”的消息
+* consumerType：consumer的类型，目前支持2种类型：
+	* DURABLE_AT_LEAST_ONCE：保证消息最少消费一次，不出现消息丢失的情况。
+	* NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始
+* delayBaseOnBackoutMessageException：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
+* delayUpperboundOnBackoutMessageException：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
+* retryCount：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，最多重试的次数。 *0.7.0版本新增*
+* startMessageId 表示当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定。
+* longTaskAlertTime 当用户的onMessage业务逻辑过长时的报警时间间隔，单位毫秒  *0.7.0版本新增* 
+在业务处理时间过长时，会在cat上面生成长时间Transaction提示，如下图所示：
+![业务逻辑时间过长cat](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=QievF1rwJYLpSM0T8fSa1fjdx24Qovv3PoxV%2ftOxcg0%3d&docid=07b20fc54a95f4ca8a9f8a42f5a096b86)
+
+属性|默认值
+-|-
+threadPoolSize | 1 
+messageFilter  | MessageFilter.AllMatchFilter
+consumerType   | ConsumerType.DURABLE_AT_LEAST_ONCE
+delayBaseOnBackoutMessageException | 100ms
+delayUpperboundOnBackoutMessageException |  3000ms
+retryCount | 5
+startMessageId | 1
+longTaskAlertTime | 5000
+
+#### 接收消息接口
+* `com.dianping.swallow.consumer.MessageListener` 
+用户实现此接口，只有在抛出``BackoutMessageException``异常时才会消息重发
+* `com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener` *0.7.0版本增加*
+用户实现此接口，只要onMessage抛出异常，即进行消息重发
+
+### 代码示例
+#### Maven pox.xml中添加依赖
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-beans</artifactId>
@@ -272,7 +302,7 @@
 	<dependency>
 	    <groupId>com.dianping.swallow</groupId>
 	    <artifactId>swallow-consumerclient</artifactId>
-	    <version>0.6.10</version> 
+	    <version>0.7.0</version> 
 	</dependency>
 	<!-- lion -->
 	<dependency>
@@ -286,15 +316,10 @@
 	     <artifactId>cat-core</artifactId>
 	     <version>1.2.1</version>
 	</dependency>
-	<dependency>
-	     <groupId>com.dianping.hawk</groupId>
-	     <artifactId>hawk-client</artifactId>
-	     <version>0.7.1</version>
-	</dependency>
-* swallow-consumerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.6.10版本。
+* swallow-consumerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.7.0版本。
 
-### Spring中配置实现
-#### Spring配置文件applicationContext-consumer.xml配置相关bean
+#### Spring中配置实现
+##### Spring配置文件applicationContext-consumer.xml配置相关bean
 
 	<!-- 消费者工厂类 -->
 	<bean id="consumerFactory" class="com.dianping.swallow.consumer.impl.ConsumerFactoryImpl" factory-method="getInstance" />
@@ -347,7 +372,7 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 		}
 	}
 
-#### Spring代码
+##### Spring代码
 
 
 	package com.dianping.swallow.example.consumer.spring;
@@ -366,7 +391,7 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 		}
 	}
 
-### 消费者端纯代码实现
+#### 消费者端纯代码实现
 
 	public class DurableConsumerExample {
 	    public static void main(String[] args) {
@@ -384,58 +409,13 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 	    }
 	}
 
-### ConsumerConfig配置详解
-
-使用Swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成:
-
-* threadPoolSize：consumer处理消息的线程池线程数，默认为1。Consumer接收到消息时，会调用用户实现的onMessage方法。默认情况下，Consumer内部使用单线程来调用，只有onMessage执行完并响应给服务器（即发送ack给服务器），服务器在收到ack后，才会推送下一个消息过来。**如果希望并行地处理更多消息，可以通过设置threadPoolSize，实现多线程接收消息，但是如此一来，消息的时序则无法保证**
-* messageFilter：consumer只消费“Message.type属性包含在指定集合中”的消息
-* consumerType：consumer的类型，目前支持2种类型：
-	* DURABLE_AT_LEAST_ONCE：保证消息最少消费一次，不出现消息丢失的情况。
-	* NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始
-* delayBaseOnBackoutMessageException：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。
-* delayUpperboundOnBackoutMessageException：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。
-* retryCountOnBackoutMessageException：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，最多重试的次数。
-* startMessageId表示当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定。
-     
-<table  class= "table table-bordered table-striped table-condensed">
-   <tr>
-      <td>&#23646;&#24615;</td>
-      <td>&#40664;&#35748;&#20540;</td>
-   </tr>
-   <tr>
-      <td>threadPoolSize </td>
-      <td>1</td>
-   </tr>
-   <tr>
-      <td>messageFilter</td>
-      <td>MessageFilter.AllMatchFilter</td>
-   </tr>
-   <tr>
-      <td>consumerType</td>
-      <td>ConsumerType.DURABLE_AT_LEAST_ONCE</td>
-   </tr>
-   <tr>
-      <td>delayBaseOnBackoutMessageException</td>
-      <td>100ms</td>
-   </tr>
-   <tr>
-      <td>delayUpperboundOnBackoutMessageException</td>
-      <td>3000ms</td>
-   </tr>
-   <tr>
-      <td>retryCountOnBackoutMessageException</td>
-      <td>5</td>
-   </tr>
-   <tr>
-      <td>startMessageId</td>
-      <td>-1</td>
-   </tr>
-</table>
-
-     
 
 # Swallow常见问题以及处理
+
+## 如何查找某个topic对应的consumer
+* 从[CAT](http://cat.dp)中，找到swallow项目[Swallow](http://cat.dp/cat/r/t?op=view&domain=Swallow)
+* 找到`Out:topic`(topic即你关心的topic名字)，点开，即可看到consumer信息
+
 
 ## 如何查看我的消费是否有延迟、延迟多少条消息？
 * 从[CAT](http://cat.dp/)中查看Swallow项目的Transaction，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&ampdomain=Swallow)）。

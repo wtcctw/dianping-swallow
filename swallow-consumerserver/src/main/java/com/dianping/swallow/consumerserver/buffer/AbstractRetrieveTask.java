@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.consumerserver.buffer.MessageRetriever.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 
 /**
@@ -71,35 +73,46 @@ public abstract class AbstractRetrieveTask implements Runnable {
 		return consumerInfo.hashCode();
 	}
 
-	@SuppressWarnings("rawtypes")
-	protected void updateRetrieveStrategy(List messages) {
-		int messageSize = messages == null ? 0 : messages.size();
-		if (logger.isInfoEnabled() && messageSize > 0) {
-			logger.info("[updateRetrieveStrategy][read message size]" + consumerInfo + "," + messageSize);
+	protected void updateRetrieveStrategy(int rawMessageSize, List<SwallowMessage> messages, Long tailId) {
+		
+		if (logger.isInfoEnabled() && rawMessageSize > 0) {
+			
+			logger.info(String.format("[updateRetrieveStrategy][read message]%s,%d,%d", consumerInfo, tailId, rawMessageSize));
+			
+			int messageSize = messages == null ? 0 : messages.size();
+			if(messageSize != rawMessageSize){
+				logger.info("[updateRetrieveStrategy][real message size]" + messageSize);
+			}
 		}
-		retriveStrategy.retrieved(messageSize);
+		
+		retriveStrategy.retrieved(rawMessageSize);
 	}
 
-	@SuppressWarnings("rawtypes")
 	protected void retrieveMessage() {
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("[retrieveMessage][tailBackupMessageId]" + getTailId());
 		}
 
-		List messages = messageRetriever.retrieveMessage(consumerInfo.getDest().getName(),
+		ReturnMessageWrapper messageWrapper = messageRetriever.retrieveMessage(consumerInfo.getDest().getName(),
 				getConsumerId(), getTailId(), messageFilter);
-		updateRetrieveStrategy(messages);
-		if (messages != null && messages.size() > 0) {
-			setTailId((Long) messages.get(0));
-			putMessage(messages);
+		
+		List<SwallowMessage> messages = messageWrapper.getMessages();
+		
+		updateRetrieveStrategy(messageWrapper.getRawMessageSize(), messageWrapper.getMessages(), getTailId());
+		
+		putMessage(messages);
+
+		if(messageWrapper.getRawMessageSize() > 0){
+			setTailId(messageWrapper.getMaxMessageId());
 		}
+		
 		if (logger.isDebugEnabled()) {
 			logger.debug("[retrieveMessage][tailBackupMessageId]" + getTailId());
 		}
 	}
 
-	protected void putMessage(@SuppressWarnings("rawtypes") List messages) {
+	protected void putMessage(List<SwallowMessage> messages) {
 		blockingQueue.putMessage(messages);;
 	}
 

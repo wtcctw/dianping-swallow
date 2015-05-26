@@ -199,9 +199,9 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 
    @Override
    public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
-      DBCollection collection = getCollection(topicName, consumerId);
+      final DBCollection collection = getCollection(topicName, consumerId);
 
-      BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
+      final BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
       //如果有backupMessageId，则表示是备份消息，那么messageId则作为ORIGINAL_ID存起来
       if (consumerId != null) {
          builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getMessageId()));
@@ -248,8 +248,13 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
       if (sourceIp != null && !"".equals(sourceIp.trim())) {
          builder.add(SOURCE_IP, sourceIp);
       }
-
-      collection.insert(builder.get());
+      
+      doAndCheckResult(new MongoAction() {
+		@Override
+		public WriteResult doAction() {
+		     return collection.insert(builder.get());
+		}
+      });
    }
    
    @Override

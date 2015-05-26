@@ -11,7 +11,6 @@ import com.dianping.swallow.common.consumer.MessageFilter.FilterType;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
-@SuppressWarnings("rawtypes")
 public class MongoDBMessageRetriever implements MessageRetriever {
    private static final Logger logger       = LoggerFactory.getLogger(MongoDBMessageRetriever.class);
 
@@ -25,22 +24,24 @@ public class MongoDBMessageRetriever implements MessageRetriever {
 
    
    @Override
-	public List retrieveMessage(String topicName, Long messageId, int fetchSize) {
+	public ReturnMessageWrapper retrieveMessage(String topicName, Long messageId, int fetchSize) {
 		return retrieveMessage(topicName, null, messageId, null, fetchSize);
 	}
 
    @Override
-   public List retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter) {
+   public ReturnMessageWrapper retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter) {
  
       return retrieveMessage(topicName, consumerId, messageId, messageFilter, fetchSize);
    }
 
    
-   @SuppressWarnings("unchecked")
-   private List retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter, int fetchSize) {
-	      List messages = messageDAO.getMessagesGreaterThan(topicName, consumerId, messageId, fetchSize);
-
+   private ReturnMessageWrapper retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter, int fetchSize) {
+	   
+	      List<SwallowMessage> messages = messageDAO.getMessagesGreaterThan(topicName, consumerId, messageId, fetchSize);
+	      
+	      int rawMessageSize = messages.size();
 	      Long maxMessageId = null;
+	      
 	      if (messages != null && messages.size() > 0) {
 	         //记录本次返回的最大那条消息的messageId
 	         SwallowMessage message = (SwallowMessage) messages.get(messages.size() - 1);
@@ -61,8 +62,6 @@ public class MongoDBMessageRetriever implements MessageRetriever {
 	               }
 	            }
 	         }
-	         //无论最终过滤后messages.size是否大于0，都添加maxMessageId到返回集合
-	         messages.add(0, maxMessageId);
 	      }
 
 	      if (logger.isDebugEnabled()) {
@@ -70,8 +69,7 @@ public class MongoDBMessageRetriever implements MessageRetriever {
 	         logger.debug("messages:" + messages);
 	      }
 
-	      //如果返回值messages.size大于0，则第一个元素一定是更新后的maxMessageId
-	      return messages;
+	      return new ReturnMessageWrapper(messages, rawMessageSize, maxMessageId);
 	   }
 
    
@@ -82,7 +80,7 @@ public class MongoDBMessageRetriever implements MessageRetriever {
 
 
 	@Override
-	public List retrieveMessage(String topicName, Long messageId) {
+	public ReturnMessageWrapper retrieveMessage(String topicName, Long messageId) {
 		return retrieveMessage(topicName, messageId, fetchSize);
 	}
 
