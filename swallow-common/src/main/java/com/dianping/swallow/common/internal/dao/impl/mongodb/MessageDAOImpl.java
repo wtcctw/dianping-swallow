@@ -251,6 +251,63 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 
       collection.insert(builder.get());
    }
+   
+   @Override
+   public void retransmitMessage(String topicName, SwallowMessage message) {
+	      DBCollection collection = getCollection(topicName, null);
+
+	      BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
+	      //如果有backupMessageId，则表示是备份消息，那么messageId则作为ORIGINAL_ID存起来
+	      
+	      if(message.isBackup())
+	    	  builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getBackupMessageId()));
+	      else
+	    	  builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getMessageId()));
+	      //content
+	      String content = message.getContent();
+	      if (content != null && !"".equals(content.trim())) {
+	         builder.add(CONTENT, content);
+	      }
+	      //generatedTime
+	      Date generatedTime = message.getGeneratedTime();
+	      if (generatedTime != null) {
+	         builder.add(GENERATED_TIME, generatedTime);
+	      }
+	      //version
+	      String version = message.getVersion();
+	      if (version != null && !"".equals(version.trim())) {
+	         builder.add(VERSION, version);
+	      }
+	      //properties
+	      Map<String, String> properties = message.getProperties();
+	      if (properties != null && properties.size() > 0) {
+	         builder.add(PROPERTIES, properties);
+	      }
+	      //internalProperties
+	      Map<String, String> internalProperties = message.getInternalProperties();
+	      if(internalProperties == null){
+	    	  internalProperties = new HashMap<String, String>();
+	      }
+	 	  addDefaultInternalProperties(internalProperties);
+	      builder.add(INTERNAL_PROPERTIES, internalProperties);
+	      //sha1
+	      String sha1 = message.getSha1();
+	      if (sha1 != null && !"".equals(sha1.trim())) {
+	         builder.add(SHA1, sha1);
+	      }
+	      //type
+	      String type = message.getType();
+	      if (type != null && !"".equals(type.trim())) {
+	         builder.add(TYPE, type);
+	      }
+	      //sourceIp
+	      String sourceIp = message.getSourceIp();
+	      if (sourceIp != null && !"".equals(sourceIp.trim())) {
+	         builder.add(SOURCE_IP, sourceIp);
+	      }
+
+	      collection.insert(builder.get());
+	   }
 
    private void addDefaultInternalProperties(Map<String, String> internalProperties) {
 	   internalProperties.put(SAVE_TIME, String.valueOf(System.currentTimeMillis()));

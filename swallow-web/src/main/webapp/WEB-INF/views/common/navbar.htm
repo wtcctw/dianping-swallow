@@ -4,7 +4,6 @@
 			ace.settings.check('navbar', 'fixed')
 		} catch (e) {
 		}
-		
 	</script>
 
 	<div class="navbar-container" id="navbar-container">
@@ -12,39 +11,60 @@
 			<a href="" class="navbar-brand"> <small> <i
 					class="icon-gift"></i> Swallow管理中心
 			</small>
-			</a>
-			
-			<a href="${rc.contextPath}/console/topic" class="navbar-brand">
-				<button
-					class="btn btn-info  btn-xs swallow-nav-btn">
-					<i class="icon-globe align-top bigger-125 icon-on-right"></i> Topic管理
+			</a> <a href="${rc.contextPath}/console/topic" class="navbar-brand">
+				<button class="btn btn-info  btn-xs swallow-nav-btn">
+					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
+					Topic管理
 				</button>
-			</a> 
-			
-			<a href="${rc.contextPath}/console/message" class="navbar-brand">
-				<button
-					class="btn  btn-info btn-xs swallow-nav-btn">
-					<i class="icon-cloud  align-top bigger-125 icon-on-right"></i> Message管理
+			</a> <a href="${rc.contextPath}/console/message" class="navbar-brand">
+				<button class="btn  btn-info btn-xs swallow-nav-btn">
+					<i class="icon-cloud  align-top bigger-125 icon-on-right"></i>
+					Message管理
 				</button>
-			<a href="${rc.contextPath}/console/monitor/consumer/total/delay" 
+			</a> <a href="${rc.contextPath}/console/monitor/consumer/total/delay"
 				class="navbar-brand">
-				
-				<button class="btn  #if(${menu}=='monitor')btn-purple #else btn-info#end btn-xs">
+				<button
+					class="btn  #if(${menu}=='monitor')btn-purple #else btn-info#end btn-xs">
 					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>
 					监控
+				</button>
+			</a> <a href="${rc.contextPath}/console/administrator"
+				class="navbar-brand">
+				<button class="btn  btn-info btn-xs swallow-nav-btn"
+					id="navbar-admin" style="display: none;">
+					<i class="icon-lock align-top bigger-125 icon-on-right"></i> 管理员
 				</button>
 			</a>
 		</div>
 
-		<div class="navbar-header pull-right" role="navigation">
-			<a href="${rc.contextPath}/help/help.html" 
+		<div class="navbar-header pull-right" role="navigation"
+			style="opacity: 1.0;">
+			<!-- 			<a href="${rc.contextPath}/help/help.html" 
 				class="navbar-brand">
-				<button class="btn btn-info btn-xs">
-					<i class="icon-ambulance align-top bigger-125 icon-on-right"></i>
+				<button class="btn btn-info btn-xs" id="user">
+					 <i class="icon-ambulance align-top bigger-125 icon-on-right"></i>
 					帮助
 				</button>
-			</a> 
+			</a>  -->
+			<ul class="nav nav-pills" style="margin-top: 4px">
+				<li><a href="${rc.contextPath}/help/help.html"
+					style="background: white">帮助</a>
+				<li><a
+					href="https://sso.51ping.com/login?TARGET=http%3A%2F%2F192.168.78.29%3A8080%2F"
+					style="background: white" ng-show="login">登录</a>
+				<li class="dropdown all-camera-dropdown"><a ng-show="logout"
+					class="dropdown-toggle" data-toggle="dropdown" href="#"
+					style="background: white" ng-bind="username"><b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+						<li><a
+							href="https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080">登出</a></li>
+					</ul></li>
+			</ul>
+
 		</div>
+
+
 		<!-- /.navbar-header -->
 	</div>
 	<!-- /.container -->

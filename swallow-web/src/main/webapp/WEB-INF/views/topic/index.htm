@@ -1,17 +1,17 @@
-<div class="main-content" style="opacity: 1.0;"
+<div class="main-content main-content-local" style="opacity: 1.0;"
 	ng-controller="TopicController">
 	<div class="breadcrumbs" id="breadcrumbs">
 		<script type="text/javascript"
 			src="${rc.contextPath}/static/js/swallow-topic.js"></script>
 		<script type="text/javascript">
-                try {
-                    ace.settings.check('breadcrumbs', 'fixed')
-                } catch (e) {
-                }
-            </script>
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
 
-		<form class="bs-example bs-example-form" role="form">
-			<div class="input-group">
+		<form class="bs-example bs-example-form-local" role="form">
+			<div class="input-group input-group-local">
 				<span class="input-group-addon">申请人</span> <input type="text"
 					class="form-control" placeholder="申请人姓名..." style="width: 150px"
 					id="searchprop" ng-model='prop'>
@@ -28,7 +28,7 @@
 		</form>
 
 		<!-- #nav-search -->
-		<div class="nav-search" id="nav-search">
+		<div class="nav-search nav-search-local" id="nav-search">
 			<form class="form-search">
 				<span class="input-icon"> <input type="text"
 					placeholder="查找topic ..." style="width: 220px"
@@ -58,17 +58,17 @@
 						<th style="text-align: left">申请者</th>
 						<th style="text-align: left">申请人部门</th>
 						<th style="text-align: left">申请时间</th>
-						<!--<th style="text-align:left">消息数目</th>-->
 						<th style="text-align: left">操作</th>
 					</tr>
 					<tr ng-repeat="t in searchPaginator.currentPageItems"
 						on-finish-render-filters>
-						<td style="text-align: left">{{$index+1}}</td>
-						<td style="text-align: left"><a ng-href="${rc.contextPath}/console/message/"
-							ng-click="setTopicName(t.name)">{{t.name}}</a></td>
-						<td style="text-align: left">{{t.prop}}</td>
-						<td style="text-align: left">{{t.dept}}</td>
-						<td style="text-align: left">{{t.time}}</td>
+						<td style="text-align: left" ng-bind="$index+1"></td>
+						<td style="text-align: left"><a
+							ng-href="${rc.contextPath}/console/message/"
+							ng-click="setTopicName(t.name)" ng-bind="t.name"></a></td>
+						<td style="text-align: left" ng-bind="t.prop"></td>
+						<td style="text-align: left" ng-bind="t.dept"></td>
+						<td style="text-align: left" ng-bind="t.time"></td>
 						<td style="text-align: left"><a href="#myModal"
 							ng-click="setModalInput(t.name, t.prop, t.dept, t.time);"
 							data-toggle="modal" class="edit-config-btn"><i
@@ -91,7 +91,6 @@
 				</ul>
 			</div>
 			<!--end row  -->
-			<!-- 			<div class="tabbable tabs-left"></div> -->
 		</div>
 
 		<!-- 模态框（Modal） -->
@@ -105,8 +104,8 @@
 						<h4 class="modal-title" id="myModalLabel">编辑Topic</h4>
 					</div>
 					<div class="modal-body">
-						<form method="post" class="form-horizontal"
-							action="${rc.contextPath}/console/edittopic">
+						<form method="post" class="form-horizontal" name="myForm"
+							ng-submit="refreshpage(myForm)">
 							<div class="control-group">
 								<label class="control-label">Topic名称</label>
 								<div class="controls">
@@ -119,7 +118,8 @@
 								<label class="control-label">申请人</label>
 								<div class="controls">
 									<input name="prop" class="input-xlarge" type="text" required
-										ng-model="topicprop">
+										data-provide="typeahead" ng-model="topicprop" id="topicprops"
+										autocomplete="off" style="width: 270px">
 								</div>
 							</div>
 
@@ -135,7 +135,7 @@
 								<label class="control-label">申请时间</label>
 								<div class="controls">
 									<input name="time" class="input-xlarge" type="text"
-										value="2014-05-15" id="datetimepicker" required
+										placeholder="2015-05-05 00:00" id="datetimepicker" required
 										ng-model="topictime">
 								</div>
 							</div>

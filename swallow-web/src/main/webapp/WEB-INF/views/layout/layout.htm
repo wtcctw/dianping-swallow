@@ -1,47 +1,40 @@
 <!DOCTYPE html>
-<html  lang="en">
- <script>  
+<html lang="en">
+<script>
 	window.contextPath = "${rc.contextPath}";
-	window.offset = 0;
-	window.limit = 30;
-	
 </script>
 <head>#parse("common/header.htm")
 </head>
 
-<body class="navbar-fixed" ng-app='SwallowModule' >
+<body class="navbar-fixed" ng-app='SwallowModule'
+	ng-controller="UserController">
 	#parse("common/navbar.htm")
-	<div class="main-container-inner" >
-		#parse("common/baseJs.htm")
-		#parse("common/sidebar.htm") $screen_content</div>
-	
+	<div class="main-container-inner">#parse("common/baseJs.htm")
+		$screen_content</div>
+	#parse("common/simplefooter.htm")
+
 	<script type="text/javascript">
-      $('#datetimepicker').datetimepicker({
-        format: 'yyyy-mm-dd',
-        language: 'zh-CN',/*加载日历语言包，可自定义*/
-        weekStart: 1,
-        todayBtn: 1,
-        autoclose: 1,
-        todayHighlight: 1,
-        startView: 2,
-        minView: 2,
-        forceParse: 0,
-        autoclose:true
-      });
-      
-      $('.swallow-datetime').datetimepicker({
-          format: 'yyyy-mm-dd hh:ii:ss',  //24 hours
-          language: 'en',/*加载日历语言包，可自定义*/
-          pickDate: true,
-          pickTime: true,
-          hourStep: 1,
-          minuteStep: 15,
-          secondStep: 30,
-          inputMask: true,
-          autoclose:true
-        });
+		$('#datetimepicker').datetimepicker({
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
 
-
-    </script>
-</body>  
+		$('#starttime').datetimepicker({
+			showSecond : true,
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$('#stoptime').datetimepicker({
+			showSecond : true,
+			//showMillisec: true, 
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$("#datetimepicker").datepicker('setDate', new Date());
+		$("#starttime").datepicker('setDate', new Date());
+		$("#stoptime").datepicker('setDate', new Date());
+	</script>
+</body>
 </html>

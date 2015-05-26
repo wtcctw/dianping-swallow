@@ -2,7 +2,6 @@ package com.dianping.swallow.web.model;
 
 import org.springframework.data.annotation.Id;
 
-
 /**
  * @author mingdongli
  *
@@ -12,76 +11,73 @@ public class Topic {
 
 	// id will be used for storing MongoDB _id
 	@Id
-	private String 				id;
-
-	private String 				name;
-	private String 				prop;
-	private String 				dept;
-	private String 				time;
-	private long 				messageNum;
+	private String id;
+	private String name;
+	private String prop;
+	private String dept;
+	private String time;
+	private long messageNum;
 
 	public Topic() {
-	}
-
-	public Topic(String id, String name, String prop, String dept, String time,  long messageNum) {
-		this.id = id;
-		this.name = name;
-		this.prop = prop;
-		this.dept = dept;
-		this.time = time;
-		this.messageNum = messageNum;
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public Topic setId(String id) {
 		this.id = id;
+		return this;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public Topic setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public String getProp() {
 		return prop;
 	}
 
-	public void setProp(String prop) {
+	public Topic setProp(String prop) {
 		this.prop = prop;
+		return this;
 	}
-	
+
 	public String getDept() {
 		return dept;
 	}
 
-	public void setDept(String dept) {
+	public Topic setDept(String dept) {
 		this.dept = dept;
+		return this;
 	}
-	
+
 	public String getTime() {
 		return time;
 	}
 
-	public void setTime(String time) {
+	public Topic setTime(String time) {
 		this.time = time;
+		return this;
 	}
-	
+
 	public long getMessageNum() {
 		return messageNum;
 	}
 
-	public void setMessageNum(long messageNum) {
+	public Topic setMessageNum(long messageNum) {
 		this.messageNum = messageNum;
+		return this;
 	}
-	
+
 	@Override
 	public String toString() {
-		return id + "::" + name + "::" + prop + "::" + dept + "::" + time +  "::" + messageNum;
+		return id + "::" + name + "::" + prop + "::" + dept + "::" + time
+				+ "::" + messageNum;
 	}
 }

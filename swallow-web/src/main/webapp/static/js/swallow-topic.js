@@ -71,7 +71,7 @@ module.factory('Paginator', function(){
 });
 
 module.controller('TopicController', ['$scope', '$http', 'Paginator',
-        function($scope, $http, Paginator, instance){
+        function($scope, $http, Paginator){
 				var fetchFunction = function(offset, limit, name, prop, dept, callback){
 				var transFn = function(data){
 					return $.param(data);
@@ -81,14 +81,14 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 				};
 				var data = {'offset' : offset,
 										'limit': limit,
-										'name': name,
+										'topic': name,
 										'prop': prop,
 										'dept': dept};
 				$http.get(window.contextPath + $scope.suburl, {
 					params : {
 						offset : offset,
 						limit : limit,
-						name: name,
+						topic: name,
 						prop: prop,
 						dept: dept
 					}
@@ -109,18 +109,57 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 			$scope.topictime = "";
 			$scope.setModalInput = function(name,prop,dept,time){
 				$scope.topicname = name;
+				//clear all first
+				$('#topicprops').tagsinput('removeAll');
+				if(prop != null && prop.length > 0){
+					var props = prop.split(",");
+					for(var i = 0; i < props.length; ++i)
+						$('#topicprops').tagsinput('add', props[i]);
+				}
 				$scope.topicprop  = prop;
 				$scope.topicdept = dept;
 				$scope.topictime = time;
 			}
+			
+			$scope.refreshpage = function(myForm){
+	        	$('#myModal').modal('hide');
+	        	$scope.topictime = $("#datetimepicker").val();
+	        	$scope.topicprop = $("#topicprops").val();
+	        	$http.post(window.contextPath + '/console/topic/auth/edittopic', {"topic":$scope.topicname,"prop":$scope.topicprop,
+	        		"dept":$scope.topicdept,"time":$scope.topictime}).success(function(response) {
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" , "");
+	        	});
+	        }
 						
 			$scope.setTopicName = function(name){
 				localStorage.setItem("name", name);
 			}
 			
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
+			//display different view for different login user
+			$scope.firstaccess = false;
+			$scope.$on('ngLoadFinished',  function (ngLoadFinishedEvent, admin, user){
+				if(!$scope.firstaccess){
+					if(!admin)
+						$scope.prop = user;  //if not admin, show all topic, so that it can edit
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
+					$scope.prop = "";
+					$scope.firstaccess = true;
+				}
+				else
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
+
+			});
+			
 			
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
+				$scope.initpage();
+			});
+			
+			$scope.initpage = function(){
+				$("a[href='/console/topic'] button").removeClass("btn-info");
+				$("a[href='/console/topic'] button").addClass("btn-purple");
+				$scope.adminornot = localStorage.getItem("isadmin");
+				
 		          //下面是在table render完成后执行的js
 				 $http({
 						method : 'GET',
@@ -136,44 +175,41 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 							}
 						})
 					}).error(function(data, status, headers, config) {
-						alert("响应错误", data);
 					});
 					
 					// search topic name with specific prop
 					$http({
 						method : 'GET',
-						url : window.contextPath + '/console/topic/proplist'
+						url : window.contextPath + '/console/topic/propdept'
 					}).success(function(data, status, headers, config) {
-						var topicPropList = data;
+						var props = data.prop;
+						var depts = data.dept;
 						$("#searchprop").typeahead({
-							source : topicPropList,
+							source : props,
 							updater : function(c) {
 								$scope.prop = c
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
 								return c;
 							}
 						})
-					}).error(function(data, status, headers, config) {
-						alert("响应错误", data);
-					});
-					
-					// search topic name with specific dept
-					$http({
-						method : 'GET',
-						url : window.contextPath + '/console/topic/deptlist'
-					}).success(function(data, status, headers, config) {
-						var topicDeptList = data;
 						$("#searchdept").typeahead({
-							source : topicDeptList,
+							source : depts,
 							updater : function(c) {
 								$scope.dept = c
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
 								return c;
 							}
 						})
+						//work
+						$('#topicprops').tagsinput({
+							  typeahead: {      
+								  source: props,
+								  displayText: function(item){ return item;}  //necessary
+							  }
+						});
 					}).error(function(data, status, headers, config) {
-						alert("响应错误", data);
 					});
-			 });
+			}
+			
 }]);
 

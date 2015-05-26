@@ -47,7 +47,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class IndexController extends AbstractController {
 
-	@SuppressWarnings("unused")
+ 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory
 			.getLogger(IndexController.class);
 	
@@ -56,6 +56,8 @@ public class IndexController extends AbstractController {
 	public ModelAndView allApps(HttpServletRequest request,
 			HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<String, Object>();
+	    
 		return new ModelAndView("topic/index", map);
 	}
+	
 }
