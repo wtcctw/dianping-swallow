@@ -45,7 +45,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludeURLs</param-name>
-			<param-value>/exclude</param-value>
+			<param-value>/exclude,/api/*,/console/monitor/*,/static/*,/assets/*,/help/*</param-value>
 		</init-param>
 	</filter>
 
