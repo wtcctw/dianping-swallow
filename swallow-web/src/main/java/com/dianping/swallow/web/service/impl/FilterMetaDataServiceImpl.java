@@ -7,9 +7,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.service.FilterMetaDataService;
 
 /**
@@ -25,10 +28,17 @@ public class FilterMetaDataServiceImpl implements FilterMetaDataService {
 
 	@Value("${swallow.web.admin.defaultadmin}")
 	private String defaultAdmin;
+	
+	private String env;
 
 	private Map<String, Set<String>> topicToWhiteList = new ConcurrentHashMap<String, Set<String>>();
 
 	private Set<String> adminSet = new HashSet<String>();
+	
+	@PostConstruct
+	private void environment(){
+		env = EnvZooKeeperConfig.getEnv();
+	}
 
 	public Map<String, Set<String>> loadTopicToWhiteList() {
 		return topicToWhiteList;
@@ -56,12 +66,23 @@ public class FilterMetaDataServiceImpl implements FilterMetaDataService {
 		this.showContentToAll = showContentToAll;
 	}
 
-	public String getDefaultAdmin() {
+	public String loadDefaultAdmin() {
 		return defaultAdmin;
 	}
 
 	public void setDefaultAdmin(String defaultAdmin) {
 		this.defaultAdmin = defaultAdmin;
+	}
+
+	@Override
+	public String loadEnv() {
+		return env;
+	}
+
+	@Override
+	public void setEnv(String env) {
+		this.env = env;
+		
 	}
 
 }
