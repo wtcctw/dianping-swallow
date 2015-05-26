@@ -34,10 +34,10 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData>{
 	}
 
 	@Override
-	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount, int step) {
+	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
 		
-		sendMessages.build(qpx, startKey, endKey, intervalCount, step);
-		ackMessages.build(qpx, startKey, endKey, intervalCount, step);
+		sendMessages.build(qpx, startKey, endKey, intervalCount);
+		ackMessages.build(qpx, startKey, endKey, intervalCount);
 	}
 
 	@Override

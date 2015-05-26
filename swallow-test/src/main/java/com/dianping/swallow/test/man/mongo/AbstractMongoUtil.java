@@ -1,7 +1,6 @@
 package com.dianping.swallow.test.man.mongo;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.bson.types.BSONTimestamp;
@@ -12,7 +11,6 @@ import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.util.DateUtils;
-import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;

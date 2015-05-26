@@ -224,7 +224,10 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	private HttpPost createPost() throws UnsupportedEncodingException {
 		
 		HttpPost post = new HttpPost(getUrl());
-		String json = getMonitorData().jsonSerialize();
+		
+		MonitorData monitorData = getMonitorData();
+		monitorData.setCurrentTime(System.currentTimeMillis());
+		String json = monitorData.jsonSerialize();
 		if(logger.isDebugEnabled()){
 			logger.debug("[createPost]" + json);
 		}

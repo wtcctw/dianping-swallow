@@ -8,7 +8,9 @@ import java.util.NavigableMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.MapStatisable;
@@ -17,6 +19,7 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mengwenchao
@@ -27,11 +30,13 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 
 	
 	protected Map<String, Statisable<M>> map = new ConcurrentHashMap<String, Statisable<M>>();
+	
+	@JsonIgnore
+	private ThreadLocal<AtomicInteger> step = new ThreadLocal<AtomicInteger>();
 
 	public Set<String> keySet(){
 		
 		Set<String> result = new HashSet<String>(map.keySet());
-		result.remove(MonitorData.TOTAL_KEY);
 		return result;
 	}
 	
@@ -54,33 +59,53 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 
 
 	@Override
-	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount, int step) {
+	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
 		
 		for(Entry<String, Statisable<M>> entry : map.entrySet()){
 			
 			String key = entry.getKey();
 			Statisable<M> value = entry.getValue();
 			
-			if(logger.isDebugEnabled()){
-				logger.debug("[build]"+ getStepDebug(step) + key);
+			
+			try{
+				increateStep();
+				if(logger.isDebugEnabled()){
+					logger.debug("[build]"+ getStepDebug() + key);
+				}
+				
+				if(logger.isDebugEnabled()){
+					logger.debug("[build]" + value);
+				}
+				value.build(qpx, startKey, endKey, intervalCount);
+			}finally{
+				decreateStep();
 			}
-			if(logger.isDebugEnabled()){
-				logger.debug("[build]" + value);
-			}
-			value.build(qpx, startKey, endKey, intervalCount, step+1);
+			
 			if(logger.isDebugEnabled()){
 				if(value instanceof MessageInfoStatis){
-					logger.debug("[build]" + getStepDebug(step) + value);
+					logger.debug("[build]" + getStepDebug() + value);
 				}
 			}
 		}
 		
 	}
 
-	protected String getStepDebug(int step) {
+	private void increateStep() {
+		if(step.get() == null){
+			step.set(new AtomicInteger());
+		}
 		
+		step.get().incrementAndGet();
+	}
+	
+	private void decreateStep() {
+		step.get().decrementAndGet();
+	}
+
+	protected String getStepDebug() {
+				
 		StringBuilder sb = new StringBuilder();
-		for(int i=0;i<=step;i++){
+		for(int i=0;i<=step.get().get();i++){
 			sb.append("-----:");
 		}
 		return sb.toString();
@@ -154,11 +179,6 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 			
 			
 			String key = entry.getKey();
-			
-			if(isTotalKey(key)){
-				continue;
-			}
-			
 			Statisable<M> value = entry.getValue();
 			
 			result.put(key, value.getDelay(type));
@@ -177,9 +197,6 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 		for(Entry<String, Statisable<M>> entry : map.entrySet()){
 			
 			String key = entry.getKey();
-			if(isTotalKey(key)){
-				continue;
-			}
 			Statisable<M> value = entry.getValue();
 			
 			result.put(key, value.getQpx(type));
@@ -201,4 +218,9 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 	}
 
 
+	@Override
+	public String toString() {
+		
+		return JsonBinder.getNonEmptyBinder().toJson(map);
+	}
 }

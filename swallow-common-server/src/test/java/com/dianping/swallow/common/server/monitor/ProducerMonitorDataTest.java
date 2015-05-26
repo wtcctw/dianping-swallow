@@ -41,4 +41,16 @@ public class ProducerMonitorDataTest extends AbstractMonitorDataTest{
 		return "http://127.0.0.1:8080/api/stats/producer";
 	}
 
+	@Override
+	protected void checkTotal(MonitorData monitorData) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void addMessages(MonitorData monitorData) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

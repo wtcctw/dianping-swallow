@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
 
+import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 
 /**
@@ -29,5 +30,11 @@ public abstract class AbstractStatisable<V> implements Statisable<V>{
 
 
 	protected abstract Statisable<?> getValue(Object key);;
+
+	
+	@Override
+	public String toString() {
+		return JsonBinder.getNonEmptyBinder().toJson(this);
+	}
 
 }

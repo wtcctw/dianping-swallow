@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年4月10日 上午11:44:46
  */
-public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuilder, Serializable{
+public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuilder, Serializable, Cloneable{
 	
 	private static final long serialVersionUID = 1L;
 
@@ -57,6 +57,7 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 		
 	}
 	
+	@JsonIgnore
 	public abstract TotalMap<? extends Mergeable> getServerData();
 	
 	@Override
@@ -91,7 +92,6 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 	public String jsonSerialize(){
 		
 		JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
-		setCurrentTime(System.currentTimeMillis());
 		return jsonBinder.toJson(this);
 		
 	}
@@ -111,6 +111,7 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 	 * 以发送间隔为单位，进行数据归并
 	 * @return
 	 */
+	@JsonIgnore
 	public long getKey(){
 		
 		return currentTime/AbstractCollector.SEND_INTERVAL/1000;
@@ -180,4 +181,14 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 	public String toString() {
 		return jsonSerialize();
 	}
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		
+		MonitorData monitorData = (MonitorData) super.clone(); 
+		doClone(monitorData);
+		return monitorData;
+	}
+
+	protected abstract void doClone(MonitorData monitorData) throws CloneNotSupportedException;
 }

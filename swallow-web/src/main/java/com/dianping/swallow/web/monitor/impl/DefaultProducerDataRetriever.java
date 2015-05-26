@@ -1,11 +1,7 @@
 package com.dianping.swallow.web.monitor.impl;
 
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +10,18 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.ProducerAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
-import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitorFactory;
-import com.dianping.swallow.common.server.monitor.visitor.ProducerMonitorVisitor;
-import com.dianping.swallow.common.server.monitor.visitor.impl.ProducerTopicMonitorVisitor;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
-import com.dianping.swallow.web.monitor.StatsDataType;
 
 /**
  * @author mengwenchao
@@ -31,7 +29,7 @@ import com.dianping.swallow.web.monitor.StatsDataType;
  * 2015年4月21日 上午11:04:09
  */
 @Component
-public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever implements ProducerDataRetriever{
+public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever<ProducerTopicData, ProducerServerData, ProducerServerStatisData, ProducerMonitorData> implements ProducerDataRetriever{
 	
 	public static final String CAT_TYPE = "DefaultProducerDataRetriever";
 	
@@ -39,106 +37,40 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 	private ProducerMonitorDao producerMonitorDao;
 	
 	@Override
-	public StatsData getSaveDelay(String topic, int intervalTimeSeconds, long start, long end) {
+	public StatsData getSaveDelay(String topic, long start, long end) {
 		
-		return buildStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.SAVE_DELAY);
-	}
-	
-	
-	@Override
-	public Map<String, StatsData> getServerQpx(QPX qpx,
-			int intervalTimeSeconds, long start, long end) {
-
-		Set<String> ips = getServerIps(start, end);
-		
-		Map<String, StatsData> result = new HashMap<String, StatsData>();
-		ProducerMonitorVisitor visitor = new ProducerTopicMonitorVisitor(MonitorData.TOTAL_KEY);
-		
-		for(String serverIp : ips){
-			NavigableMap<Long, MonitorData> data = getData(MonitorData.TOTAL_KEY, start, end, serverIp);
-			visit(visitor, data);
-			List<Long> qpsData = visitor.buildSaveQpx(intervalTimeSeconds, qpx);
-			StatsDataDesc info = new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, StatsDataType.SAVE_QPX);
-			result.put(serverIp, createStatsData(info, qpsData, start, end, data, intervalTimeSeconds, qpx));
-		}
-		return result;
-	}
-
-
-
-	@Override
-	public Map<String, StatsData> getServerQpx(QPX qpx){
-		return getServerQpx(qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
-	}
-
-
-	@Override
-	public StatsData getQpx(String topic, QPX qpx, int intervalTimeSeconds, long start,
-			long end) {
-		
-		return buildStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.SAVE_QPX, qpx);
-	}
-
-	private StatsData buildStatsData(String topic, int intervalTimeSeconds,
-			long start, long end, StatsDataType type) {
-		return buildStatsData(topic, intervalTimeSeconds, start, end, type, QPX.SECOND);
-	}
-
-	private StatsData buildStatsData(String topic, int intervalTimeSeconds,
-			long start, long end, StatsDataType type, QPX qpx) {
-		
-		NavigableMap<Long, MonitorData> data = getData(topic, start, end);
-		
-		ProducerMonitorVisitor producerMonitorVisitor = MonitorVisitorFactory.buildProducerTopicVisitor(topic);
-		
-		visit(producerMonitorVisitor, data);
-		
-		List<Long> result = null;
-		
-		switch(type){
-			case SAVE_DELAY:
-				result = producerMonitorVisitor.buildSaveDelay(intervalTimeSeconds);
-				break;
-			case SAVE_QPX:
-				result = producerMonitorVisitor.buildSaveQpx(intervalTimeSeconds, qpx);
-				break;
-			default:
-				throw new IllegalArgumentException("unknown type:" + type);
+		if(dataExistInMemory(start, end)){
+			return getDelayInMemory(topic, StatisType.SAVE, start, end);
 		}
 		
-		return createStatsData(new ProducerStatsDataDesc(topic, type), result, start, end, data, intervalTimeSeconds, qpx);
+		return getDelayInDb(topic, StatisType.SAVE, start, end);
 	}
 
+	@Override
+	public StatsData getQpx(String topic, QPX qpx, long start, long end) {
+		
+		if(dataExistInMemory(start, end)){
+			return getQpxInMemory(topic, StatisType.SAVE, start, end);
+		}
+		return getQpxInDb(topic, StatisType.SAVE, start, end);
+	}
+
+	@Override
+	public Map<String, StatsData> getServerQpx(QPX qpx, long start, long end) {
+		
+		if(dataExistInMemory(start, end)){
+			return getServerQpxInMemory(qpx, StatisType.SAVE, start, end);
+		}
+		
+		return getServerQpxInDb(qpx, StatisType.SAVE, start, end);
+	}
 
 	@Override
 	public StatsData getQpx(String topic, QPX qpx) {
 		
-		return getQpx(topic, qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+		return getQpx(topic, qpx, getDefaultStart(), getDefaultEnd());
 	}
 	
-	public static class ProducerServerData extends SwallowServerData{
-
-		@Override
-		protected Class<? extends MonitorData> getMonitorDataClass() {
-			
-			return ProducerMonitorData.class;
-		}
-	}
-
-	
-
-	@Override
-	protected SwallowServerData createSwallowServerData() {
-		
-		return new ProducerServerData();
-	}
-
-	@Override
-	protected Class<? extends SwallowServerData> getServerDataClass() {
-		
-		return ProducerServerData.class;
-	}
-
 	@Override
 	public StatsData getSaveDelay(final String topic) throws Exception {
 		
@@ -149,15 +81,46 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever i
 			@Override
 			public StatsData call() throws Exception {
 				
-				return getSaveDelay(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+				return getSaveDelay(topic, getDefaultStart(), getDefaultEnd());
 			}
 		});
 	}
 
+	@Override
+	protected AbstractAllData<ProducerTopicData, ProducerServerData, ProducerServerStatisData, ProducerMonitorData> createServerStatis() {
+		
+		return new ProducerAllData();
+	}
 
 	@Override
-	protected MonitorData createMonitorData() {
-		return new ProducerMonitorData();
+	public Map<String, StatsData> getServerQpx(QPX qpx){
+		return getServerQpx(qpx, getDefaultStart(), getDefaultEnd());
+	}
+
+	
+	@Override
+	protected StatsDataDesc createDelayDesc(String topic, StatisType type) {
+		
+		return new ProducerStatsDataDesc(topic, type.getDelayDetailType());
+	}
+
+	@Override
+	protected StatsDataDesc createQpxDesc(String topic, StatisType type) {
+		
+		return new ProducerStatsDataDesc(topic, type.getQpxDetailType());
+	}
+
+	@Override
+	protected StatsDataDesc createServerQpxDesc(String serverIp, StatisType type) {
+		
+		return new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getQpxDetailType());
+	}
+
+	@Override
+	protected StatsDataDesc createServerDelayDesc(String serverIp,
+			StatisType type) {
+		
+		return new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getDelayDetailType());
 	}
 
 }

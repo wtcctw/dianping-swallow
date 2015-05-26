@@ -1,6 +1,8 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
@@ -33,8 +35,13 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	protected Map<String, S> servers = new ConcurrentHashMap<String, S>();
 	protected   S 			 total = null;
 	
-	protected AbstractAllData(){
+	protected final Set<StatisType> 	supportedTypes = new HashSet<StatisType>();
+	
+	public AbstractAllData(StatisType ... types){
 		
+		for(StatisType type : types){
+			supportedTypes.add(type);
+		}
 		total = MapUtil.getOrCreate(servers, MonitorData.TOTAL_KEY, getStatisClass());
 	}
 
@@ -74,16 +81,16 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	}
 	
 	@Override
-	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount, int step) {
+	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
 		
 		for(Entry<String, S> entry : servers.entrySet()){
 			
 			String key = entry.getKey();
 			S 	   value =  entry.getValue();
 			if(logger.isDebugEnabled()){
-				logger.debug("[build]" + key);
+				logger.debug("[build]" + key + ","+ value);
 			}
-			value.build(qpx, startKey, endKey, intervalCount, step);
+			value.build(qpx, startKey, endKey, intervalCount);
 		}
 		
 	}
@@ -119,17 +126,22 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	@Override
 	public NavigableMap<Long, Long> getDelay(StatisType type) {
 		
-		return getTopicDelay(type, MonitorData.TOTAL_KEY);
+		checkSupported(type);
+		return getDelayForTopic(MonitorData.TOTAL_KEY, type);
 	}
 
 	@Override
 	public NavigableMap<Long, Long> getQpx(StatisType type) {
 		
-		return getTopicQpx(type, MonitorData.TOTAL_KEY);
+		checkSupported(type);
+		return getQpxForTopic(MonitorData.TOTAL_KEY, type);
 	}
 
 	
-	protected NavigableMap<Long, Long> getTopicQpx(StatisType type, String topic) {
+	@Override
+	public NavigableMap<Long, Long> getQpxForTopic(String topic, StatisType type) {
+		
+		checkSupported(type);
 		
 		Statisable<?> statis = total.getValue(topic);
 		if(statis != null){
@@ -138,7 +150,17 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 		return null;
 	}
 
-	protected NavigableMap<Long, Long> getTopicDelay(StatisType type, String topic) {
+	private void checkSupported(StatisType type) {
+		if(!supportedTypes.contains(type)){
+			throw new IllegalArgumentException("unsupported type:" + type + ", class:" + getClass());
+		}
+	}
+
+
+	@Override
+	public NavigableMap<Long, Long> getDelayForTopic(String topic, StatisType type) {
+		
+		checkSupported(type);
 		
 		Statisable<?> statis = total.getValue(topic);
 		if(statis != null){
@@ -147,5 +169,45 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 		return null;
 	}
 
+	@Override
+	public Map<String, NavigableMap<Long, Long>> getQpxForServers(StatisType type) {
+		
+		checkSupported(type);
+		HashMap<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long, Long>>();
+		for(Entry<String, S> entry : servers.entrySet()){
+			
+			String serverIp = entry.getKey();
+			S pssd = entry.getValue();
+			if(pssd == total){
+				continue;
+			}
+			result.put(serverIp, pssd.getQpx(type));
+		}
+		
+		return result;
+	}
 
+	
+	protected Map<String, NavigableMap<Long, Long>> getAllQpx(StatisType type, String topic) {
+		
+		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
+		
+		if(ctss == null){
+			return null;
+		}
+		
+		return ctss.allQpx(type);
+	}
+
+	protected Map<String, NavigableMap<Long, Long>> getAllDelay(StatisType type, String topic) {
+		
+		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
+		
+		if(ctss == null){
+			return null;
+		}
+		
+		return ctss.allDelay(type);
+	}
+	
 }

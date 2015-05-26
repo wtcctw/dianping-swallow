@@ -55,7 +55,7 @@ public class MessageInfoCollectionTest extends AbstractTest{
 	@Test
 	public void testQpx(){
 		
-		messageInfoCollection.build(QPX.SECOND, startKey, endKey, intervalCount, 0);
+		messageInfoCollection.build(QPX.SECOND, startKey, endKey, intervalCount);
 		
 		NavigableMap<Long, Long>  qpx = messageInfoCollection.getQpx(StatisType.SAVE);
 		
@@ -73,7 +73,7 @@ public class MessageInfoCollectionTest extends AbstractTest{
 		
 		int insertCount = 100;
 		
-		messageInfoCollection.build(QPX.SECOND, startKey, endKey + insertCount, intervalCount, 0);
+		messageInfoCollection.build(QPX.SECOND, startKey, endKey + insertCount, intervalCount);
 		
 		NavigableMap<Long, Long> qpxs = messageInfoCollection.getQpx(StatisType.SAVE);
 		NavigableMap<Long, Long> delays = messageInfoCollection.getDelay(StatisType.SAVE);
@@ -110,7 +110,7 @@ public class MessageInfoCollectionTest extends AbstractTest{
 	@Test
 	public void testDelay(){
 		
-		messageInfoCollection.build(QPX.SECOND, startKey, endKey, intervalCount, 0);
+		messageInfoCollection.build(QPX.SECOND, startKey, endKey, intervalCount);
 		
 		NavigableMap<Long, Long>  delays = messageInfoCollection.getDelay(StatisType.SAVE);
 		

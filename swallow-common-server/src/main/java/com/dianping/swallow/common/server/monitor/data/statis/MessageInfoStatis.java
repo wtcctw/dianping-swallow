@@ -5,6 +5,7 @@ import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,13 +32,15 @@ public class MessageInfoStatis implements Statisable<MessageInfo>{
 	private NavigableMap<Long, Long>  delayMap = new ConcurrentSkipListMap<Long, Long>();
 
 	@Override
-	public synchronized void add(Long key, MessageInfo added) {
+	public synchronized void add(Long key, MessageInfo rawAdded) {
 		
-		if(!(added instanceof MessageInfo)){
-			throw new IllegalArgumentException("not MessageInfo, but " + added.getClass());
+		if(!(rawAdded instanceof MessageInfo)){
+			throw new IllegalArgumentException("not MessageInfo, but " + rawAdded.getClass());
 		}
 		
+		MessageInfo added = (MessageInfo) SerializationUtils.clone(rawAdded); 
 		MessageInfo messageInfo = col.get(key);
+	
 		if(messageInfo == null){
 			col.put(key, added);
 		}else{
@@ -47,7 +50,7 @@ public class MessageInfoStatis implements Statisable<MessageInfo>{
 	}
 
 	@Override
-	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount, int step) {
+	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
 		
 		SortedMap<Long, MessageInfo> sub = col.subMap(startKey, true, endKey, true);
 		insertLackedData(sub, startKey, endKey);

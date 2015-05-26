@@ -63,7 +63,6 @@ public abstract class AbstractMonitorDataTest extends AbstractTest{
 	}
 
 
-	
 	@Test
 	public void testSerialize(){
 	
@@ -76,6 +75,20 @@ public abstract class AbstractMonitorDataTest extends AbstractTest{
 		
 		Assert.assertEquals(monitorData, monitorData2);
 	}
+	
+	
+	@Test
+	public void testBuildTotal(){
+		
+		MonitorData monitorData = createMonitorData();
+		addMessages(monitorData);
+		monitorData.buildTotal();
+		checkTotal(monitorData);
+	}
+
+	protected abstract void checkTotal(MonitorData monitorData);
+
+	protected abstract void addMessages(MonitorData monitorData);
 
 	@Test
 	public void sendData() throws ClientProtocolException, IOException{

@@ -1,5 +1,6 @@
 package com.dianping.swallow.common.server.monitor.data.structure;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,8 +22,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年4月26日 上午9:48:42
  */
-public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, TotalBuilder{
+public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, TotalBuilder, Serializable{
 	
+	private static final long serialVersionUID = 1L;
+	
+	public static final String ACK_DELAY_FOR_UNIT_KEY = "ACK_DELAY_FOR_UNIT_KEY"; 
+
 	@Transient
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -37,12 +42,10 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 					
 	}
 	
-	@JsonIgnore
 	public MessageInfoTotalMap getSendMessages(){
 		return sendMessages;
 	}
 	
-	@JsonIgnore
 	public MessageInfoTotalMap getAckMessages(){
 		return ackMessages;
 	}
@@ -135,7 +138,13 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 		
 		try{
 			MessageInfo messageInfo = MapUtil.getOrCreate(ackMessages, consumerIp, MessageInfo.class);
-			messageInfo.addMessage(messageId, sendTime, System.currentTimeMillis());
+			long current = System.currentTimeMillis();
+			
+			if(System.getProperty(ACK_DELAY_FOR_UNIT_KEY) != null){//for unit test
+				sendTime = current - Long.parseLong(System.getProperty(ACK_DELAY_FOR_UNIT_KEY));
+			}
+					
+			messageInfo.addMessage(messageId, sendTime, current);
 			
 		}finally{
 			messageSendTimes.remove(messageId);
@@ -165,6 +174,12 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 		return (int) (sendMessages.hashCode() ^ ackMessages.hashCode());
 	}
 
-
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		ConsumerIdData clone = (ConsumerIdData) super.clone();
+		clone.sendMessages = (MessageInfoTotalMap) sendMessages.clone();
+		clone.ackMessages = (MessageInfoTotalMap) ackMessages.clone();
+		return clone;
+	}
 }
 

@@ -12,17 +12,17 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
  */
 public interface ConsumerDataRetriever extends MonitorDataRetriever{
 	
-	List<ConsumerDataPair> getDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end);
+	List<ConsumerDataPair> getDelayForAllConsumerId(String topic, long start, long end);
 	
 	List<ConsumerDataPair> getDelayForAllConsumerId(String topic) throws Exception;
 	
 	
-	List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, int intervalTimeSeconds, long start, long end);
+	List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, long start, long end);
 	
 	List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx);
 	
 
-	Map<String, ConsumerDataPair> getServerQpx(QPX qpx, int intervalTimeSeconds, long start, long end);
+	Map<String, ConsumerDataPair> getServerQpx(QPX qpx, long start, long end);
 
 	Map<String, ConsumerDataPair> getServerQpx(QPX qpx);
 	

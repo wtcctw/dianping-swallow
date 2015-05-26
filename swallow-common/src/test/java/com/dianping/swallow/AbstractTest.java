@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 /**
@@ -65,6 +66,10 @@ public abstract class AbstractTest {
 		message.setVersion("0.6.0");
 		message.setType("feed");
 		message.setSourceIp("localhost");
+		
+		HashMap<String, String> internal = new HashMap<String, String>();
+		internal.put(MessageDAOImpl.SAVE_TIME, String.valueOf(System.currentTimeMillis() - 50));
+		message.setInternalProperties(internal);
 		return message;
 	}
 

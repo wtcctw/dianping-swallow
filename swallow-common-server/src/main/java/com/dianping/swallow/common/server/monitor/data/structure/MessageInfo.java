@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.TimeException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mengwenchao
@@ -19,6 +20,10 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 	private AtomicLong totalDelay = new AtomicLong();
 
 	private AtomicLong total = new AtomicLong();
+	
+	public MessageInfo(){
+		
+	}
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -68,10 +73,21 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 		return JsonBinder.getNonEmptyBinder().toJson(this);
 	}
 
+	@JsonIgnore
 	public boolean isEmpty() {
 		if(total.get() > 0 || totalDelay.get() > 0){
 			return false;
 		}
 		return true;
 	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		
+		MessageInfo info = (MessageInfo) super.clone();
+		info.total = new AtomicLong(total.get());
+		info.totalDelay = new AtomicLong(totalDelay.get());
+		return info;
+	}
+
 }

@@ -133,4 +133,12 @@ public class ProducerMonitorData extends MonitorData {
 		return all;
 	}
 
+	@Override
+	protected void doClone(MonitorData monitorData)
+			throws CloneNotSupportedException {
+		
+		ProducerMonitorData producerMonitorData = (ProducerMonitorData) monitorData;
+		producerMonitorData.all = (ProducerServerData) all.clone();
+	}
+
 }

@@ -3,13 +3,13 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 
 /**
@@ -21,15 +21,6 @@ public class ProducerServerDataTest extends AbstractServerDataTest{
 	
 	private ProducerAllData  producerAllData; 
 	
-	private Long startKey = 100L, endKey = 400L;
-	
-	protected String []topics = new String[]{"topic1", "topic2"};
-	
-	protected String []ips = new String[]{"127.0.0.1", "127.0.0.2"};
-	
-	protected final long avergeDelay = 50;
-	protected final long qpsPerUnit = 10;
-	protected final int intervalCount = 6;
 	
 	
 	@Before
@@ -37,7 +28,7 @@ public class ProducerServerDataTest extends AbstractServerDataTest{
 		
 		producerAllData = new ProducerAllData();
 		prepareData(producerAllData);
-		producerAllData.build(QPX.SECOND, startKey, endKey, intervalCount, 0);
+		producerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
 	}
 	
 	@Test
@@ -46,14 +37,14 @@ public class ProducerServerDataTest extends AbstractServerDataTest{
 		int totalCount = (int) ((endKey - startKey)/intervalCount); 
 		for(String topic : topics){
 			
-			NavigableMap<Long, Long> saveDelay = producerAllData.getSaveDelayForTopic(topic);
-			NavigableMap<Long, Long> saveQpx = producerAllData.getSaveQpxForTopic(topic);
+			NavigableMap<Long, Long> saveDelay = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
+			NavigableMap<Long, Long> saveQpx = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
 			
 			expected(saveDelay, totalCount, avergeDelay);
 			expected(saveQpx, totalCount, qpsPerUnit * ips.length);
 		}
 		
-		for(Entry<String, NavigableMap<Long, Long>>  entry : producerAllData.getSaveQpxForServers().entrySet()){
+		for(Entry<String, NavigableMap<Long, Long>>  entry : producerAllData.getQpxForServers(StatisType.SAVE).entrySet()){
 			
 			String ip = entry.getKey();
 			NavigableMap<Long, Long> value = entry.getValue();
@@ -96,9 +87,13 @@ public class ProducerServerDataTest extends AbstractServerDataTest{
 				sendData(producerMonitorData, i, ip);
 				producerMonitorData.buildTotal();
 				
-				producerAllData.add(producerMonitorData.getKey(), (ProducerMonitorData)SerializationUtils.clone(producerMonitorData));
-				
+				try {
+					producerAllData.add(producerMonitorData.getKey(), (ProducerMonitorData)producerMonitorData.clone());
+				} catch (CloneNotSupportedException e) {
+					logger.error("[prepareData]", e);
+				}
 			}
+			
 		}
 		
 	}

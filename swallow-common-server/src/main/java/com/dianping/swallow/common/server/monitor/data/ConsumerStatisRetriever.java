@@ -13,13 +13,9 @@ import java.util.Set;
 public interface ConsumerStatisRetriever extends StatisRetriever{
 
 
-	Map<String, NavigableMap<Long, Long>> getSendQpxForAllConsumerId(String topic);
+	Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(String topic, StatisType type);
 	
-	Map<String, NavigableMap<Long, Long>> getSendDelayForAllConsumerId(String topic);
-
-	Map<String, NavigableMap<Long, Long>> getAckQpxForAllConsumerId(String topic);
-	
-	Map<String, NavigableMap<Long, Long>> getAckDelayForAllConsumerId(String topic);
+	Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(String topic, StatisType type);
 
 	Set<String>  getConsumerIds(String topic);
 }

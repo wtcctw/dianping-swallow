@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.monitor.impl;
 
+import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 
-import com.dianping.swallow.web.monitor.StatsDataType;
 
 /**
  * @author mengwenchao
@@ -12,7 +12,7 @@ public abstract class AbstractServerDataDesc extends AbstractStatsDataDesc{
 	
 	private String serverIp;
 
-	public AbstractServerDataDesc(String serverIp, String topic, StatsDataType dt) {
+	public AbstractServerDataDesc(String serverIp, String topic, StatisDetailType dt) {
 		super(topic, dt);
 		this.setServerIp(serverIp);
 	}

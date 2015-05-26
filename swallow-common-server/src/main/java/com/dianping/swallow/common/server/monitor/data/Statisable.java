@@ -28,7 +28,7 @@ public interface Statisable<V> {
 	 * @param intervalCount
 	 * @param step for debug log
 	 */
-	void build(QPX qpx, Long startKey, Long endKey, int intervalCount, int step);
+	void build(QPX qpx, Long startKey, Long endKey, int intervalCount);
 	
 	
 	/**

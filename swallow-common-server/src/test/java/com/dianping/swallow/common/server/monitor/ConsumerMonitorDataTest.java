@@ -48,4 +48,14 @@ public class ConsumerMonitorDataTest extends AbstractMonitorDataTest{
 		return "http://localhost:8080/api/stats/consumer";
 	}
 
+	@Override
+	protected void checkTotal(MonitorData monitorData) {
+		
+	}
+
+	@Override
+	protected void addMessages(MonitorData monitorData) {
+		
+	}
+
 }
