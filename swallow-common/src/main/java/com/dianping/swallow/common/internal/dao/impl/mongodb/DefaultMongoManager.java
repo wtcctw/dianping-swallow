@@ -55,7 +55,7 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
    private static final int				DEFAULT_BACKUP_CAPPED_COLLECTION_MAX_DOC_NUM = 1;
 
 
-   private static final long             MILLION                                           = 1000000;
+   private static final long             MILLION                                           = 1024*1024;
 
    //serverURI的名字可配置(consumer和producer在Lion上的名字是不同的)
    private final String                  severURILionKey;

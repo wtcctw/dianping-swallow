@@ -20,7 +20,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
+import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
@@ -141,7 +142,7 @@ public class DataMonitorController extends AbstractMonitorController{
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get", method = RequestMethod.POST)
 	@ResponseBody
-	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic) throws IOException{
+	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic) throws Exception{
 		
 		SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(CAT_TYPE, "getConsumerDelayMonitor");
 		
@@ -207,10 +208,26 @@ public class DataMonitorController extends AbstractMonitorController{
 			allStats.add(producerData);
 			allStats.add(dataPair.getSendData());
 			allStats.add(dataPair.getAckData());
-			result.add(ChartBuilder.getHighChart(topic, currentConsumerId, yAxis, allStats));
+			result.add(ChartBuilder.getHighChart(getTopicDesc(topic), getConsumerIdDesc(currentConsumerId), yAxis, allStats));
 		}
 		
 		return result;
+	}
+
+	private String getConsumerIdDesc(String consumerId) {
+		
+		if(consumerId.equals(MonitorData.TOTAL_KEY)){
+			return "所有consumerId";
+		}
+		return consumerId;
+	}
+
+	private String getTopicDesc(String topic) {
+		
+		if(topic.equals(MonitorData.TOTAL_KEY)){
+			return "所有topic";
+		}
+		return topic;
 	}
 
 	@Override

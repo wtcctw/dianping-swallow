@@ -7,8 +7,8 @@ import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao
@@ -46,6 +46,16 @@ public class ConsumerMonitorDataTest extends AbstractMonitorDataTest{
 	protected String getUrl() {
 		
 		return "http://localhost:8080/api/stats/consumer";
+	}
+
+	@Override
+	protected void checkTotal(MonitorData monitorData) {
+		
+	}
+
+	@Override
+	protected void addMessages(MonitorData monitorData) {
+		
 	}
 
 }

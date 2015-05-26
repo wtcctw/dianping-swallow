@@ -1,5 +1,6 @@
-package com.dianping.swallow.common.server.monitor.data;
+package com.dianping.swallow.common.server.monitor.data.structure;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,9 +14,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessageUtil;
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
-import com.dianping.swallow.common.server.monitor.data.MonitorData.MessageInfo;
-import com.dianping.swallow.common.server.monitor.data.structure.AbstractTotalable;
-import com.dianping.swallow.common.server.monitor.data.structure.MessageInfoTotalMap;
+import com.dianping.swallow.common.server.monitor.data.TotalBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -23,8 +22,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年4月26日 上午9:48:42
  */
-public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, TotalBuilder{
+public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, TotalBuilder, Serializable{
 	
+	private static final long serialVersionUID = 1L;
+	
+	public static final String ACK_DELAY_FOR_UNIT_KEY = "ACK_DELAY_FOR_UNIT_KEY"; 
+
 	@Transient
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -37,6 +40,14 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 	
 	public ConsumerIdData(){
 					
+	}
+	
+	public MessageInfoTotalMap getSendMessages(){
+		return sendMessages;
+	}
+	
+	public MessageInfoTotalMap getAckMessages(){
+		return ackMessages;
 	}
 	
 	@Transient
@@ -127,7 +138,13 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 		
 		try{
 			MessageInfo messageInfo = MapUtil.getOrCreate(ackMessages, consumerIp, MessageInfo.class);
-			messageInfo.addMessage(messageId, sendTime, System.currentTimeMillis());
+			long current = System.currentTimeMillis();
+			
+			if(System.getProperty(ACK_DELAY_FOR_UNIT_KEY) != null){//for unit test
+				sendTime = current - Long.parseLong(System.getProperty(ACK_DELAY_FOR_UNIT_KEY));
+			}
+					
+			messageInfo.addMessage(messageId, sendTime, current);
 			
 		}finally{
 			messageSendTimes.remove(messageId);
@@ -157,6 +174,12 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 		return (int) (sendMessages.hashCode() ^ ackMessages.hashCode());
 	}
 
-
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		ConsumerIdData clone = (ConsumerIdData) super.clone();
+		clone.sendMessages = (MessageInfoTotalMap) sendMessages.clone();
+		clone.ackMessages = (MessageInfoTotalMap) ackMessages.clone();
+		return clone;
+	}
 }
 

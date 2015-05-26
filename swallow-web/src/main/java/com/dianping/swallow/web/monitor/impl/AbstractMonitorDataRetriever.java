@@ -2,33 +2,35 @@ package com.dianping.swallow.web.monitor.impl;
 
 
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import com.dianping.swallow.common.internal.monitor.Mergeable;
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.DateUtils;
-import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
+import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.AbstractTotalMapStatisable;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.common.server.monitor.utils.MonitorUtils;
 import com.dianping.swallow.common.server.monitor.visitor.Visitor;
-import com.dianping.swallow.common.server.monitor.visitor.impl.AbstractMonitorVisitor;
-import com.dianping.swallow.web.manager.impl.CacheManager;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
@@ -38,48 +40,127 @@ import com.dianping.swallow.web.monitor.StatsDataDesc;
  *
  * 2015年4月21日 上午11:04:30
  */
-public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriever{
+public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extends TotalMap<M>, S extends AbstractTotalMapStatisable<M, T>, V extends MonitorData> implements MonitorDataRetriever{
 	
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 
-	
-	private final int DEFAULT_INTERVAL_IN_HOUR = 10;//一小时每个10秒采样
+	private final int DEFAULT_INTERVAL = 30;//每隔多少秒采样
 
 	@Value("${swallow.web.monitor.keepinmemory}")
-	public int keepInMemoryHour = 1;//保存最后2小时
+	public int keepInMemoryHour = 1;//保存最新小时
+	
+	protected AbstractAllData<M, T, S, V> statis; 
 	
 	public static int keepInMemoryCount;
-
-	@Autowired
-	private CacheManager cacheManager;
-
-	private Map<String, SwallowServerData> serverMap = new ConcurrentHashMap<String, SwallowServerData>();
 	
-	protected Set<String> getServerIps(long start, long end) {
-		if(dataExistInMemory(start, end)){
-			return getServerIpsInMemory(start, end);
-		}
-		return getServerIpsInDb(start, end);
-	}
-
-	private Set<String> getServerIpsInDb(long start, long end) {
-		
-		return getServerIpsInDb(start, end);
-	}
-
-	private Set<String> getServerIpsInMemory(long start, long end) {
-		return serverMap.keySet();
-	}
+	protected ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT);
 	
+	private  long lastBuildTime = System.currentTimeMillis();
+	private  int intervalCount;
+
 	@PostConstruct
 	public void postAbstractMonitorDataStats(){
 		
 		keepInMemoryCount = keepInMemoryHour * 3600 / AbstractCollector.SEND_INTERVAL;
+		intervalCount = DEFAULT_INTERVAL/AbstractCollector.SEND_INTERVAL;
+		
+		statis = createServerStatis();
+		startStatisBuilder();
 	}
 
-	protected long getRealStartTime(NavigableMap<Long, MonitorData> data, long start, long end) {
+	private void startStatisBuilder() {
+		
+		scheduled.scheduleWithFixedDelay(new Runnable(){
+
+			@Override
+			public void run() {
+				
+				long current = System.currentTimeMillis();
+				try{
+					statis.build(QPX.SECOND, getKey(lastBuildTime), getKey(current), intervalCount);
+				}catch(Throwable th){
+					logger.error("[startStatisBuilder]", th);
+				}finally{
+					lastBuildTime = current;
+				}
+			}
+
+		}, DEFAULT_INTERVAL, DEFAULT_INTERVAL, TimeUnit.SECONDS);
+	}
+
+	private Long getKey(long timeMili) {
+		
+		return timeMili/AbstractCollector.SEND_INTERVAL/1000;
+	}
+	
+	protected abstract AbstractAllData<M, T, S, V> createServerStatis();
+
+	protected StatsData getQpxInDb(String topic, StatisType type,
+			long start, long end) {
+		
+		return getQpxInMemory(topic, type, start, end);
+	}
+
+	protected Map<String, StatsData> getServerQpxInDb(QPX qpx, StatisType save, long start, long end) {
+		
+		return getServerQpxInMemory(qpx, save, start, end);
+	}
+
+	protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
+		
+		return getDelayInMemory(topic, type, start, end);
+	}
+
+
+	protected StatsData getDelayInMemory(String topic, StatisType type, long start, long end) {
+		
+		NavigableMap<Long, Long> rawData = statis.getDelayForTopic(topic, type);
+		
+		StatsData result = new StatsData(createDelayDesc(topic, type), getValue(rawData), getStartTime(rawData, start, end), getDefaultInterval());
+		return result;
+	}
+
+
+	protected StatsData getQpxInMemory(String topic, StatisType type, long start, long end) {
+		
+		NavigableMap<Long, Long> rawData = statis.getQpxForTopic(topic, type);
+		StatsData result = new StatsData(createQpxDesc(topic, type), getValue(rawData), getStartTime(rawData, start, end), getDefaultInterval());
+		return result;
+	}
+	
+	protected Map<String, StatsData> getServerQpxInMemory(QPX qpx, StatisType type, long start, long end) {
+		
+		Map<String, StatsData> result = new HashMap<String, StatsData>();
+		
+		Map<String, NavigableMap<Long, Long>>  serversQpx = statis.getQpxForServers(type);
+		
+		for(Entry<String, NavigableMap<Long, Long>> entry : serversQpx.entrySet()){
+			
+			String serverIp = entry.getKey();
+			NavigableMap<Long, Long> serverQpx = entry.getValue();
+			result.put(serverIp, new StatsData(createServerQpxDesc(serverIp, type), getValue(serverQpx), getStartTime(serverQpx, start, end), getDefaultInterval()));
+			
+		}
+		
+		return result;
+	}
+
+	protected abstract StatsDataDesc createServerQpxDesc(String serverIp, StatisType type);
+
+	protected abstract StatsDataDesc createServerDelayDesc(String serverIp, StatisType type);
+
+	protected abstract StatsDataDesc createDelayDesc(String topic, StatisType type);
+	
+	protected abstract StatsDataDesc createQpxDesc(String topic, StatisType type);
+
+	
+	protected long getStartTime(NavigableMap<Long, Long> rawData, long start, long end) {
+
+		if(rawData == null){
+			return end;
+		}
 		try{
-			return data.firstKey().longValue()*AbstractCollector.SEND_INTERVAL*1000;
+			return rawData.firstKey().longValue()*AbstractCollector.SEND_INTERVAL*1000;
 		}catch(NoSuchElementException e){
 			if(logger.isInfoEnabled()){
 				logger.info("[getRealStartTime][no element, end instead]" + DateUtils.toPrettyFormat(end));
@@ -88,21 +169,27 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		}
 	}
 
+	protected List<Long> getValue(NavigableMap<Long, Long> rawData) {
+		
+		List<Long> result = new LinkedList<Long>();
+		
+		if(rawData != null){
+			for(Long value : rawData.values()){
+				result.add(value);
+			}
+		}
+		return result;
+	}
+
 	protected int getRealIntervalSeconds(int intervalTimeSeconds, QPX qpx) {
 		
-		return AbstractMonitorVisitor.getRealIntervalTimeSeconds(intervalTimeSeconds, qpx);
+		return MonitorUtils.getRealIntervalTimeSeconds(intervalTimeSeconds, qpx);
 	}
 
 	protected int getRealIntervalSeconds(int intervalTimeSeconds) {
 		
-		return AbstractMonitorVisitor.getRealIntervalTimeSeconds(intervalTimeSeconds);
+		return MonitorUtils.getRealIntervalTimeSeconds(intervalTimeSeconds);
 	}
-
-	protected StatsData createStatsData(StatsDataDesc info, List<Long> qpsData, long start, long end, NavigableMap<Long, MonitorData> data, int intervalTimeSeconds, QPX qpx) {
-		
-		return new StatsData(info, qpsData, getRealStartTime(data, start, end), getRealIntervalSeconds(intervalTimeSeconds, qpx));
-	}
-
 
 
 	/**
@@ -142,7 +229,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 	}
 
 	protected int getDefaultInterval(){
-		return keepInMemoryHour * DEFAULT_INTERVAL_IN_HOUR;
+		return DEFAULT_INTERVAL;
 	}
 	
 	@Override
@@ -157,12 +244,7 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 
 	private Set<String> getTopicsInMemory(long start, long end) {
 		
-		Set<String> topics = new HashSet<String>();
-		
-		for(SwallowServerData swallowServerData : serverMap.values()){
-			topics.addAll(swallowServerData.getTopics());
-		}
-		return topics;
+		return statis.getTopics();
 	}
 
 	private Set<String> getTopicsInDb(long start, long end) {
@@ -183,172 +265,12 @@ public abstract class AbstractMonitorDataRetriever implements MonitorDataRetriev
 		
 	}
 
-
-	/**
-	 * @param topic
-	 * @param start
-	 * @param end
-	 * @param serverIp null 表示所有ip
-	 * @return
-	 */
-	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end, String serverIp) {
-
-		if(logger.isDebugEnabled()){
-			logger.debug("[getData][begin]" + topic + "," + serverIp);
-		}
-		
-		NavigableMap<Long, MonitorData>  result;
-		
-		if(dataExistInMemory(start, end)){
-			result = getMemoryData(topic, start, end, serverIp);
-		}else{
-			result = retrieveDbData(topic, start, end, serverIp);
-		}
-		//插值补齐 
-		insertLackedData(result);
-
-		if(logger.isDebugEnabled()){
-			logger.debug("[getData][end]" + topic + "," + serverIp);
-		}
-		
-		return result;
-	}
-
-	protected NavigableMap<Long, MonitorData> getData(String topic, long start, long end) {
-		return getData(topic, start, end, null);
-	}
-
-	private void insertLackedData(NavigableMap<Long, MonitorData> result) {
-		
-		long before = 0;
-		
-		List<Long> toInsert = new LinkedList<Long>();
-		for(Entry<Long, MonitorData> entry : result.entrySet()){
-			
-			long current = entry.getKey();
-			if(before >0 && (current - before > 1)){
-				if(logger.isInfoEnabled()){
-					logger.info("[insertLackedData]" + before + "," + current);
-				}
-				for(long insert= before + 1; insert < current; insert++){
-					toInsert.add(insert);
-				}
-			}
-			before = current;
-		}
-		
-		for(Long insert : toInsert){
-			result.put(insert, createMonitorData());
-		}
-		
-	}
-
-	protected abstract MonitorData createMonitorData();
-
-	protected NavigableMap<Long, MonitorData> retrieveDbData(String topic,
-			long start, long end, String serverIp) {
-		
-		//wait to be implemented
-		return getMemoryData(topic, start, end, serverIp);
-	}
-
-
-	protected NavigableMap<Long, MonitorData> getMemoryData(String topic, long start, long end, String serverIp) {
-		
-		SwallowServerData ret = createSwallowServerData();
-		
-		for(Entry<String, SwallowServerData> entry : serverMap.entrySet()){
-			
-			String ip = entry.getKey();
-			SwallowServerData swallowServerData = entry.getValue();
-			
-			if(serverIp == null || serverIp.equals(ip)){
-				ret.merge(swallowServerData, topic, start, end);
-			}
-		}
-		
-		return ret.getMonitorData();
-	}
-
-	
-	protected abstract SwallowServerData createSwallowServerData();
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public void add(MonitorData monitorData) {
 		
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		SwallowServerData serverData = MapUtil.getOrCreate(serverMap, monitorData.getSwallowServerIp(), (Class)getServerDataClass());
-		serverData.add(monitorData);
+		statis.add(monitorData.getKey(), (V) monitorData);
 	}
-
-
-	protected abstract Class<? extends SwallowServerData> getServerDataClass();
-
-
-	public static abstract class SwallowServerData{
-		
-		
-		private NavigableMap<Long, MonitorData> datas = new ConcurrentSkipListMap<Long, MonitorData>();   
-
-		private AtomicInteger count = new AtomicInteger();
-		
-		public SwallowServerData(){
-			
-		}
-	
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		public void merge(SwallowServerData swallowServerData, String topic, long start, long end) {
-
-			synchronized (swallowServerData.getMonitorData()) {
-				for(Entry<Long, MonitorData> entry : swallowServerData.getMonitorData().entrySet()){
-					
-					Long key = entry.getKey();
-					MonitorData value = entry.getValue();
-					if(!shouldMerge(value.getCurrentTime(), start, end)){
-						continue;
-					}
-					
-					MonitorData data = null;
-					data = MapUtil.getOrCreate(datas, key, (Class)getMonitorDataClass());
-					data.merge(topic, value);
-				}
-			}
-		}
-		
-		public Set<String> getTopics() {
-			
-			Set<String> topics = new HashSet<String>();
-			for(MonitorData monitorData : datas.values()){
-				topics.addAll(monitorData.getTopics());
-			}
-			return topics;
-		}
-
-		private boolean shouldMerge(Long dataTime, long start, long end) {
-			
-			if(dataTime >= start && dataTime <= end){
-				return true;
-			}
-			return false;
-		}
-
-		public void add(MonitorData monitorData){
-			
-			datas.put(getCeilingTime(monitorData.getCurrentTime()), monitorData);
-				
-			if(count.incrementAndGet() > keepInMemoryCount){
-				datas.pollFirstEntry();
-				count.decrementAndGet();
-			}
-		}
-
-		protected abstract Class<? extends MonitorData> getMonitorDataClass();
-		
-		public NavigableMap<Long, MonitorData> getMonitorData(){
-			return datas;
-		}
-	}
-	
 
 
 	@Override

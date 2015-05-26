@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class MapUtil {
 	
-	public static <K, V> V getOrCreate(Map<K, V> map, K key, Class<V> clazz){
+	public static <K, V> V getOrCreate(Map<K, V> map, K key, Class<? extends V> clazz){
 		
 		V ret  = null;
 		

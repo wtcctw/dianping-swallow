@@ -1,5 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author mengwenchao
  *
@@ -9,5 +11,6 @@ public interface TotalBuilder{
 
 	void buildTotal();
 	
+	@JsonIgnore
 	Object getTotal();
 }

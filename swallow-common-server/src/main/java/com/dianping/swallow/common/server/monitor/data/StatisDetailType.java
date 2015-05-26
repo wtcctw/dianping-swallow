@@ -1,11 +1,11 @@
-package com.dianping.swallow.web.monitor;
+package com.dianping.swallow.common.server.monitor.data;
 
 /**
  * @author mengwenchao
  *
  * 2015年4月23日 上午11:05:42
  */
-public enum StatsDataType {
+public enum StatisDetailType {
 		
 	SAVE_DELAY("用户发送-存储延时", 1),
 	SEND_DELAY("存储-发送延时", 1),
@@ -20,7 +20,7 @@ public enum StatsDataType {
 	public static final int TYPE_DELAY = 1;
 	public static final int TYPE_QPX = 2;
 	
-	StatsDataType(String desc, int type){
+	StatisDetailType(String desc, int type){
 		this.desc = desc;
 		this.type = type;
 	}

@@ -36,6 +36,15 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
    
    private MongoManager         mongoManager;
 
+   public MessageDAOImpl(){
+	   
+   }
+   
+   public MessageDAOImpl(MongoManager mongoManager){
+	   
+	   this.mongoManager = mongoManager;
+   }
+   
    public void setMongoManager(DefaultMongoManager mongoManager) {
 	      this.mongoManager = mongoManager;
    }

@@ -2,8 +2,8 @@ package com.dianping.swallow.common.server.monitor;
 
 
 import com.dianping.swallow.common.internal.util.IPUtil;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.ProducerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 
 /**
  * @author mengwenchao
@@ -39,6 +39,18 @@ public class ProducerMonitorDataTest extends AbstractMonitorDataTest{
 	protected String getUrl() {
 		
 		return "http://127.0.0.1:8080/api/stats/producer";
+	}
+
+	@Override
+	protected void checkTotal(MonitorData monitorData) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void addMessages(MonitorData monitorData) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

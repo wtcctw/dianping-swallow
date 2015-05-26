@@ -1,29 +1,27 @@
 package com.dianping.swallow.web.monitor.impl;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 import java.util.NavigableMap;
-import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
-import com.dianping.swallow.common.server.monitor.data.ConsumerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
-import com.dianping.swallow.common.server.monitor.visitor.ConsumerMonitorVisitor;
-import com.dianping.swallow.common.server.monitor.visitor.MonitorTopicVisitor;
-import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitorFactory;
-import com.dianping.swallow.common.server.monitor.visitor.QPX;
+import com.dianping.swallow.common.server.monitor.data.ConsumerStatisRetriever;
+import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.ConsumerAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerData;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
-import com.dianping.swallow.web.monitor.StatsDataType;
+import com.dianping.swallow.web.monitor.StatsDataDesc;
 
 /**
  * @author mengwenchao
@@ -31,81 +29,105 @@ import com.dianping.swallow.web.monitor.StatsDataType;
  * 2015年4月21日 上午11:04:09
  */
 @Component
-public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever implements ConsumerDataRetriever{
+public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<ConsumerTopicData, ConsumerServerData, ConsumerServerStatisData, ConsumerMonitorData> 
+			implements ConsumerDataRetriever{
 
 	
 	public static final String CAT_TYPE = "ConsumerDataRetriever";
 	
 	@Override
-	public List<ConsumerDataPair> getDelayForAllConsumerId(String topic, int intervalTimeSeconds, long start, long end) {
+	public List<ConsumerDataPair> getDelayForAllConsumerId(String topic,  long start, long end) {
 		
-		return getStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.TYPE_DELAY);
+		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
+		
+		Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND);
+		Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK);
+
+		removeTotal(sendDelays);
+		removeTotal(ackDelays);
+		
+		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
+		
+		if(sendDelays != null){
+			for(Entry<String, NavigableMap<Long, Long>> entry : sendDelays.entrySet()){
+				
+				String consumerId =  entry.getKey();
+				NavigableMap<Long, Long> send = entry.getValue();
+				NavigableMap<Long, Long> ack = ackDelays.get(consumerId);
+				
+				StatsData sendStatis = new StatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), getValue(send), getStartTime(send, start, end), getDefaultInterval());
+				StatsData ackStatis = new StatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK), getValue(ack), getStartTime(ack, start, end), getDefaultInterval());
+				
+				result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
+			} 
+		}
+		
+		return result;
 	}
 	
-	@Override
-	public List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, int intervalTimeSeconds, long start, long end) {
+	private void removeTotal(Map<String, NavigableMap<Long, Long>> data) {
 		
-		return getStatsData(topic, intervalTimeSeconds, start, end, StatsDataType.TYPE_QPX);
+		if(data.size() > 1){
+			data.remove(MonitorData.TOTAL_KEY);
+		}
 	}
 
 	@Override
-	public Map<String, ConsumerDataPair> getServerQpx(QPX qpx, int intervalTimeSeconds, long start, long end) {
+	public List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx,  long start, long end) {
 		
-		Map<String, ConsumerDataPair> result = new HashMap<String, ConsumerDataPair>();
-		Set<String> ips = getServerIps(start, end);
+		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		
-		for(String serverIp : ips){
-			List<ConsumerDataPair> statsData = getStatsData(MonitorData.TOTAL_KEY, serverIp, intervalTimeSeconds, start, end, StatsDataType.TYPE_QPX, qpx);
-			if(statsData.size() != 1){
-				throw new IllegalStateException("total stats data type should be 1, but "  + statsData.size());
-			}
-			result.put(serverIp, statsData.get(0));
+		Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND);
+		Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK);
+		
+		removeTotal(sendQpxs);
+		removeTotal(ackQpxs);
+		
+		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
+		
+		if(sendQpxs != null){
+			for(Entry<String, NavigableMap<Long, Long>> entry : sendQpxs.entrySet()){
+				
+				String consumerId =  entry.getKey();
+				NavigableMap<Long, Long> send = entry.getValue();
+				NavigableMap<Long, Long> ack = ackQpxs.get(consumerId);
+				
+				StatsData sendStatis = new StatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND), getValue(send), getStartTime(send, start, end), getDefaultInterval());
+				StatsData ackStatis = new StatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK), getValue(send), getStartTime(ack, start, end), getDefaultInterval());
+				
+				result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
+			} 
+		}		
+		return result;
+	}
+
+	@Override
+	public Map<String, ConsumerDataPair> getServerQpx(QPX qpx,  long start, long end) {
+		
+		Map<String, StatsData> sendQpxs = null;
+		
+		Map<String, StatsData> ackQpxs = null;
+		
+		if(dataExistInMemory(start, end)){
+			sendQpxs = getServerQpxInMemory(qpx, StatisType.SEND, start, end);
+			ackQpxs = getServerQpxInMemory(qpx, StatisType.ACK, start, end);
+		}else{
+			sendQpxs = getServerQpxInDb(qpx, StatisType.SEND, start, end);
+			ackQpxs = getServerQpxInDb(qpx, StatisType.ACK, start, end);
+		}
+		
+		Map<String, ConsumerDataPair> result = new HashMap<String, ConsumerDataRetriever.ConsumerDataPair>();
+		for(Entry<String, StatsData> entry : sendQpxs.entrySet()){
+			
+			String serverIp = entry.getKey();
+			StatsData sendQpx = entry.getValue();
+			StatsData ackQpx = ackQpxs.get(serverIp);
+			result.put(serverIp, new ConsumerDataPair(getConsumerIdSubTitle(MonitorData.TOTAL_KEY), sendQpx, ackQpx));
 		}
 		
 		return result;
 	}
 
-	
-	protected MonitorData createMonitorData() {
-		return new ConsumerMonitorData();
-	}
-	
-	private List<ConsumerDataPair> getStatsData(String topic, int intervalTimeSeconds, long start, long end, int type) {
-		
-		return getStatsData(topic, intervalTimeSeconds, start, end, type, QPX.SECOND);
-	}
-
-	private List<ConsumerDataPair> getStatsData(String topic, int intervalTimeSeconds, long start, long end, int type, QPX qpx) {
-		
-		return getStatsData(topic, null, intervalTimeSeconds, start, end, type, qpx);
-	}
-
-	private List<ConsumerDataPair> getStatsData(String topic, String serverIp, int intervalTimeSeconds, long start, long end, int type, QPX qpx) {
-		
-		if(logger.isDebugEnabled()){
-			logger.debug("[getStatsData][begin]" + topic + "," + serverIp);
-		}
-		
-		List<ConsumerDataPair> result = new LinkedList<ConsumerDataPair>();
-		
-		NavigableMap<Long, MonitorData> data = getData(topic, start, end, serverIp);
-		
-		long realStartTime = getRealStartTime(data, start, end);
-		
-		Set<String> consumerIds = getAllConsumerIds(topic, data);
-		if(consumerIds.size() > 1){
-			consumerIds.remove(MonitorData.TOTAL_KEY);
-		}
-		
-		for(String consumerId : consumerIds){
-			result.add(getConsumerIdDataPair(topic, consumerId, data, intervalTimeSeconds, realStartTime, end, type, qpx));
-		}
-
-		if(logger.isDebugEnabled()){
-			logger.debug("[getStatsData][end]" + topic + "," + serverIp);
-		}
-		return result;
-	}
 
 	private String getConsumerIdSubTitle(String consumerId) {
 		if(consumerId.equals(MonitorData.TOTAL_KEY)){
@@ -114,120 +136,69 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever i
 		return "consumerID:" + consumerId;
 	}
 
-	private ConsumerDataPair getConsumerIdDataPair(String topic, String consumerId,
-			NavigableMap<Long, MonitorData> data, int intervalTimeSeconds,
-			long start, long end, int type, QPX qpx) {
-		
-		if(logger.isDebugEnabled()){
-			logger.debug("[getConsumerIdDataPair][begin]" + topic + "," + consumerId);
-		}
-		
-		ConsumerMonitorVisitor consumerMonitorVisitor = MonitorVisitorFactory.buildConsumerConsumerIdVisitor(topic, consumerId);
-		visit(consumerMonitorVisitor, data);
-		
-		List<Long> sendStats = null, ackStats = null;
-		StatsData sendStatsData = null, ackStatsData = null;
-		String subTitle = getConsumerIdSubTitle(consumerId);
-		
-		if(type == StatsDataType.TYPE_DELAY){
-			sendStats = consumerMonitorVisitor.buildSendDelay(intervalTimeSeconds);
-			ackStats = consumerMonitorVisitor.buildAckDelay(intervalTimeSeconds);
-			sendStatsData = createStatsData(new ConsumerStatsDataDesc(topic, subTitle, StatsDataType.SEND_DELAY),  sendStats, start, end, data, intervalTimeSeconds, qpx);
-			ackStatsData  = createStatsData(new ConsumerStatsDataDesc(topic, subTitle, StatsDataType.ACK_DELAY),  ackStats, start, end, data, intervalTimeSeconds, qpx);
-		}else if(type == StatsDataType.TYPE_QPX){
-			sendStats = consumerMonitorVisitor.buildSendQpx(intervalTimeSeconds, qpx);
-			ackStats = consumerMonitorVisitor.buildAckQpx(intervalTimeSeconds, qpx);
-			sendStatsData = createStatsData(new ConsumerStatsDataDesc(topic, subTitle, StatsDataType.SEND_QPX),  sendStats, start, end, data, intervalTimeSeconds, qpx);
-			ackStatsData  = createStatsData(new ConsumerStatsDataDesc(topic, subTitle, StatsDataType.ACK_QPX),  ackStats, start, end, data, intervalTimeSeconds, qpx);
-		}else{
-			throw new IllegalArgumentException("unknown type:" + type);
-		}
-
-		if(logger.isDebugEnabled()){
-			logger.debug("[getConsumerIdDataPair][end]" + topic + "," + consumerId);
-		}
-
-		return new ConsumerDataPair(consumerId, sendStatsData, ackStatsData);
-	}
-
-
-	private Set<String> getAllConsumerIds(final String topic, NavigableMap<Long, MonitorData> data) {
-		
-		final Set<String> consumerIds = new HashSet<String>();
-		
-		for(Entry<Long, MonitorData> entry : data.entrySet()){
-			
-			ConsumerMonitorData consumerMonitorData = (ConsumerMonitorData) entry.getValue();
-			consumerMonitorData.accept(new MonitorTopicVisitor() {
-				
-				@SuppressWarnings("unchecked")
-				@Override
-				public void visitTopic(@SuppressWarnings("rawtypes") TotalMap visitorData) {
-					if(visitorData != null){
-						consumerIds.addAll(visitorData.keySet());
-					}
-				}
-				
-				@Override
-				public String getVisitTopic() {
-					return topic;
-				}
-			});
-		}
-		
-		return consumerIds;
-	}
-
-	@Override
-	protected SwallowServerData createSwallowServerData() {
-		return new ConsumerSwallowServerData();
-	}
-
-	@Override
-	protected Class<? extends SwallowServerData> getServerDataClass() {
-		
-		return ConsumerSwallowServerData.class;
-	}
-	
-	
-	public static class ConsumerSwallowServerData extends SwallowServerData{
-
-		@Override
-		protected Class<? extends MonitorData> getMonitorDataClass() {
-			return ConsumerMonitorData.class;
-		}
-	}
-
-
-	@Override
-	public List<ConsumerDataPair> getDelayForAllConsumerId(final String topic) {
-		
-		SwallowCallableWrapper<List<ConsumerDataPair>> wrapper = new CatCallableWrapper<List<ConsumerDataPair>>(CAT_TYPE, "getDelayForAllConsumerId");
-		
-		return wrapper.doCallable(new Callable<List<ConsumerDataPair>>() {
-			
-			@Override
-			public List<ConsumerDataPair> call() throws Exception {
-				
-				return getDelayForAllConsumerId(topic, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
-			}
-		});
-	}
-
 
 	@Override
 	public List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx) {
 		
-		return getQpxForAllConsumerId(topic, qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+		return getQpxForAllConsumerId(topic, qpx, getDefaultStart(), getDefaultEnd());
 	}
 
 
 	@Override
 	public Map<String, ConsumerDataPair> getServerQpx(QPX qpx) {
 		
-		return getServerQpx(qpx, getDefaultInterval(), getDefaultStart(), getDefaultEnd());
+		return getServerQpx(qpx, getDefaultStart(), getDefaultEnd());
 	}
 
+	@Override
+	public List<ConsumerDataPair> getDelayForAllConsumerId(String topic)
+			throws Exception {
+		
+		return getDelayForAllConsumerId(topic, getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
+	protected AbstractAllData<ConsumerTopicData, ConsumerServerData, ConsumerServerStatisData, ConsumerMonitorData> createServerStatis() {
+		
+		return new ConsumerAllData();
+	}
+
+	@Override
+	protected StatsDataDesc createDelayDesc(String topic, StatisType type) {
+		
+		return new ConsumerStatsDataDesc(topic, type.getDelayDetailType());
+	}
+
+	@Override
+	protected StatsDataDesc createQpxDesc(String topic, StatisType type) {
+		
+		return new ConsumerStatsDataDesc(topic, type.getQpxDetailType());
+	}
+
+	@Override
+	protected StatsDataDesc createServerQpxDesc(String serverIp, StatisType type) {
+
+		return new ConsumerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getQpxDetailType());
+	}
+
+	@Override
+	protected StatsDataDesc createServerDelayDesc(String serverIp,
+			StatisType type) {
+
+		return new ConsumerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getDelayDetailType());
+	}
+
+	protected StatsDataDesc createConsumerIdDelayDesc(String topic, String consumerId,
+			StatisType type) {
+
+		return new ConsumerStatsDataDesc(topic, consumerId, type.getDelayDetailType());
+	}
+
+	protected StatsDataDesc createConsumerIdQpxDesc(String topic, String consumerId,
+			StatisType type) {
+
+		return new ConsumerStatsDataDesc(topic, consumerId, type.getQpxDetailType());
+	}
 
 
 }

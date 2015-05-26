@@ -1,7 +1,8 @@
 package com.dianping.swallow.web.monitor.impl;
 
+
+import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
-import com.dianping.swallow.web.monitor.StatsDataType;
 
 /**
  * @author mengwenchao
@@ -11,10 +12,11 @@ import com.dianping.swallow.web.monitor.StatsDataType;
 public class ProducerStatsDataDesc extends AbstractStatsDataDesc implements StatsDataDesc{
 
 	public ProducerStatsDataDesc(String topic) {
-		super(topic, StatsDataType.SAVE_DELAY);
+		
+		super(topic, StatisDetailType.SAVE_DELAY);
 	}
 
-	public ProducerStatsDataDesc(String topic, StatsDataType dt) {
+	public ProducerStatsDataDesc(String topic, StatisDetailType dt) {
 		super(topic, dt);
 	}
 

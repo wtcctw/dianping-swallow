@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.TotalBuilder;
 import com.dianping.swallow.common.server.monitor.data.Totalable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年4月21日 下午4:08:04
  */
-public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<String, V> implements KeyMergeable, Totalable, TotalBuilder{
+public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<String, V> implements KeyMergeable, Totalable, TotalBuilder, Cloneable{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -43,27 +42,30 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 	public void buildTotal(){
 		
 		//每次重建
-		createTotal();
+		V total = createTotal();
 		
-		V total = getTotal();
 		for(Entry<String, V> entry : entrySet()){
+			
 			V value = entry.getValue();
-			if(value instanceof TotalBuilder){
+			
+			if((value instanceof TotalBuilder) && value != total){
 				((TotalBuilder)value).buildTotal();
 			}
 
-			if(!total.equals(value)){
+			if(total != value){
 				total.merge(value);
 			}
 		}
 	}
 	
-	private void createTotal() {
+	private V createTotal() {
+		
 		V total = createValue();
 		if(total instanceof Totalable){
 			((Totalable) total).setTotal();
 		}
 		put(MonitorData.TOTAL_KEY, total);
+		return total;
 	}
 
 	public void merge(Mergeable merge){
@@ -123,7 +125,7 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 		return v;
 	}
 
-	private void checkType(Mergeable merge) {
+	private void checkType(Object merge) {
 		
 		if(!(merge instanceof TotalMap)){
 			throw new IllegalArgumentException("wrong type : " + merge.getClass());
@@ -135,7 +137,7 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 		return JsonBinder.getNonEmptyBinder().toJson(this);
 	}
 
-	
+
 	@JsonIgnore
 	private boolean isTotal = false;
 	
@@ -147,6 +149,30 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 	public boolean isTotal(){
 		return isTotal;
 	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public Object clone() throws CloneNotSupportedException {
+		
+		TotalMap<? extends Mergeable> map = (TotalMap<? extends Mergeable>) super.clone();
+		
+		for(java.util.Map.Entry<String, ? extends Mergeable>  entry : map.entrySet()){
+			
+			String key = entry.getKey(); 
+			Mergeable value = entry.getValue();
+			map.put(key, value.clone());
+		}
+		
+		return map;
+	}
 
-
+	/**
+	 * @param key
+	 * @param clone
+	 */
+	private void put(String key, Object clone) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

@@ -2,17 +2,21 @@ package com.dianping.swallow.common.internal.action.impl;
 
 import java.util.concurrent.Callable;
 
+import org.apache.log4j.Logger;
+
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-import com.dianping.swallow.common.internal.action.AbstractSwallowCallableWrapper;
+import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 
 /**
  * @author mengwenchao
  *
  * 2015年5月14日 下午7:41:31
  */
-public class CatCallableWrapper<V> extends AbstractSwallowCallableWrapper<V>{
-	
+public class CatCallableWrapper<V> implements SwallowCallableWrapper<V>{
+
+	protected Logger logger = Logger.getLogger(getClass());
+
 	private String type;
 	
 	private String name;

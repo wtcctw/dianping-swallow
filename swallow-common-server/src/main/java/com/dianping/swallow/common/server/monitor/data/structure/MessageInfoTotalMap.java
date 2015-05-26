@@ -1,6 +1,5 @@
 package com.dianping.swallow.common.server.monitor.data.structure;
 
-import com.dianping.swallow.common.server.monitor.data.MonitorData.MessageInfo;
 
 
 

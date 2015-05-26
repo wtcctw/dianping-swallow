@@ -1,7 +1,8 @@
 package com.dianping.swallow.web.monitor.impl;
 
+
+import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
-import com.dianping.swallow.web.monitor.StatsDataType;
 
 /**
  * @author mengwenchao
@@ -12,16 +13,17 @@ public class ConsumerStatsDataDesc extends AbstractStatsDataDesc implements Stat
 	
 	private String consumerId;
 	
-	public ConsumerStatsDataDesc(String topic, StatsDataType dt){
+	public ConsumerStatsDataDesc(String topic, StatisDetailType dt){
 		super(topic, dt);
 	}
 
-	public ConsumerStatsDataDesc(String topic, String consumerId, StatsDataType dt){
+	public ConsumerStatsDataDesc(String topic, String consumerId, StatisDetailType dt){
 		super(topic, dt);
 		this.setConsumerId(consumerId);
 	}
 
 	public String getConsumerId() {
+		
 		return consumerId;
 	}
 

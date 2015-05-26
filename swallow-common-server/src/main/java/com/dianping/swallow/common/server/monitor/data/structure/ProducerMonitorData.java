@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.server.monitor.data;
+package com.dianping.swallow.common.server.monitor.data.structure;
 
 import java.util.Set;
 
@@ -7,8 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerTotalMap;
-import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 
 
@@ -20,7 +18,9 @@ import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 @Document( collection = "ProducerMonitorData")
 public class ProducerMonitorData extends MonitorData {
 
-	protected ProducerTotalMap all = new ProducerTotalMap();
+	private static final long serialVersionUID = 1L;
+	
+	protected ProducerServerData all = new ProducerServerData();
 
 	//for json deserialize
 	public ProducerMonitorData(){
@@ -53,7 +53,7 @@ public class ProducerMonitorData extends MonitorData {
 	@Override
 	protected Mergeable getTopic(String topic) {
 		
-		return MapUtil.getOrCreate(all, topic, ProducerData.class);
+		return MapUtil.getOrCreate(all, topic, ProducerTopicData.class);
 	}
 	
 
@@ -70,7 +70,7 @@ public class ProducerMonitorData extends MonitorData {
 				logger.error("[addData][producerIp null]");
 				realProducerIp = "";
 			}
-			ProducerData ProducerData = MapUtil.getOrCreate(all, realTopic, ProducerData.class);
+			ProducerTopicData ProducerData = MapUtil.getOrCreate(all, realTopic, ProducerTopicData.class);
 			ProducerData.sendMessage(realProducerIp, messageId, sendTime, saveTime);
 		
 	}
@@ -125,6 +125,20 @@ public class ProducerMonitorData extends MonitorData {
 	@Override
 	public Set<String> getTopics() {
 		return all.keySet();
+	}
+
+	@Override
+	public TotalMap<?> getServerData() {
+		
+		return all;
+	}
+
+	@Override
+	protected void doClone(MonitorData monitorData)
+			throws CloneNotSupportedException {
+		
+		ProducerMonitorData producerMonitorData = (ProducerMonitorData) monitorData;
+		producerMonitorData.all = (ProducerServerData) all.clone();
 	}
 
 }

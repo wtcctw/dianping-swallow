@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.monitor.impl;
 
+import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
-import com.dianping.swallow.web.monitor.StatsDataType;
 
 /**
  * @author mengwenchao
@@ -12,9 +12,9 @@ public abstract class AbstractStatsDataDesc implements StatsDataDesc{
 
 	private String topic;
 	
-	private StatsDataType dt = StatsDataType.SEND_DELAY;
+	private StatisDetailType dt = StatisDetailType.SEND_DELAY;
 	
-	public AbstractStatsDataDesc(String topic, StatsDataType dt){
+	public AbstractStatsDataDesc(String topic, StatisDetailType dt){
 		this.setTopic(topic);
 		this.dt = dt;
 	}
@@ -26,6 +26,7 @@ public abstract class AbstractStatsDataDesc implements StatsDataDesc{
 	}
 
 	public String getTopic() {
+		
 		return topic;
 	}
 

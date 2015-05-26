@@ -27,7 +27,7 @@ import org.junit.Test;
 import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.collector.ContentType;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao
@@ -63,7 +63,6 @@ public abstract class AbstractMonitorDataTest extends AbstractTest{
 	}
 
 
-	
 	@Test
 	public void testSerialize(){
 	
@@ -76,6 +75,20 @@ public abstract class AbstractMonitorDataTest extends AbstractTest{
 		
 		Assert.assertEquals(monitorData, monitorData2);
 	}
+	
+	
+	@Test
+	public void testBuildTotal(){
+		
+		MonitorData monitorData = createMonitorData();
+		addMessages(monitorData);
+		monitorData.buildTotal();
+		checkTotal(monitorData);
+	}
+
+	protected abstract void checkTotal(MonitorData monitorData);
+
+	protected abstract void addMessages(MonitorData monitorData);
 
 	@Test
 	public void sendData() throws ClientProtocolException, IOException{

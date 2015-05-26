@@ -37,7 +37,7 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.server.monitor.MonitorActionWrapper;
-import com.dianping.swallow.common.server.monitor.data.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao
@@ -224,7 +224,10 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	private HttpPost createPost() throws UnsupportedEncodingException {
 		
 		HttpPost post = new HttpPost(getUrl());
-		String json = getMonitorData().jsonSerialize();
+		
+		MonitorData monitorData = getMonitorData();
+		monitorData.setCurrentTime(System.currentTimeMillis());
+		String json = monitorData.jsonSerialize();
 		if(logger.isDebugEnabled()){
 			logger.debug("[createPost]" + json);
 		}
