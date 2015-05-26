@@ -1,24 +1,25 @@
 package com.dianping.swallow.web.service;
 
-import javax.servlet.http.HttpServletRequest;
-
-
 /**
- * @author mingdongli
- *		2015年5月13日 下午4:32:29
+ * @author mingdongli 2015年5月13日 下午4:32:29
  */
-public interface AccessControlService extends SwallowService{
+public interface AccessControlService {
 
 	/**
 	 * 检查用户是否有权限访问
-	 * @param request
+	 * 
+	 * @param username
+	 *            通行证
 	 */
-	boolean checkVisitIsValid(HttpServletRequest request);
-	
+	boolean checkVisitIsValid(String username);
+
 	/**
 	 * 检查用户是否有权限访问
-	 * @param request
-	 * @param topic  topic名称
+	 * 
+	 * @param username
+	 *            通行证
+	 * @param topic
+	 *            topic名称
 	 */
-	boolean checkVisitIsValid(HttpServletRequest request, String topic);
+	boolean checkVisitIsValid(String username, String topic);
 }

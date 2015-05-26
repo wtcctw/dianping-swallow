@@ -1,42 +1,40 @@
 <!DOCTYPE html>
-<html  lang="en">
- <script>  
+<html lang="en">
+<script>
 	window.contextPath = "${rc.contextPath}";
 </script>
 <head>#parse("common/header.htm")
 </head>
 
-<body class="navbar-fixed" ng-app='SwallowModule' ng-controller="UserController">
+<body class="navbar-fixed" ng-app='SwallowModule'
+	ng-controller="UserController">
 	#parse("common/navbar.htm")
-	<div class="main-container-inner" >
-		#parse("common/baseJs.htm")
+	<div class="main-container-inner">#parse("common/baseJs.htm")
 		$screen_content</div>
-		#parse("common/simplefooter.htm")
-	
-	<script type="text/javascript">
-      $('#datetimepicker').datetimepicker({ 
- 	     dateFormat: 'yy-mm-dd',
- 	     autoclose:true
- 	});
-      
-       $('#starttime').datetimepicker({ 
-    	     showSecond: true, 
-    	     timeFormat: 'HH:mm:ss',
-    	     dateFormat: 'yy-mm-dd',
-    	     autoclose:true
-    });
-      $('#stoptime').datetimepicker({ 
- 	     showSecond: true, 
- 	     //showMillisec: true, 
- 	     timeFormat: 'HH:mm:ss' ,
- 	     dateFormat: 'yy-mm-dd',
- 	     autoclose:true
- 	}); 
-      $("#datetimepicker").datepicker( 'setDate' , new Date());
-      $("#starttime").datepicker( 'setDate' , new Date());
-      $("#stoptime").datepicker( 'setDate' , new Date());
- 
+	#parse("common/simplefooter.htm")
 
-    </script>
-</body>  
+	<script type="text/javascript">
+		$('#datetimepicker').datetimepicker({
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+
+		$('#starttime').datetimepicker({
+			showSecond : true,
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$('#stoptime').datetimepicker({
+			showSecond : true,
+			//showMillisec: true, 
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$("#datetimepicker").datepicker('setDate', new Date());
+		$("#starttime").datepicker('setDate', new Date());
+		$("#stoptime").datepicker('setDate', new Date());
+	</script>
+</body>
 </html>

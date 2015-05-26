@@ -2,9 +2,6 @@ package com.dianping.swallow.web.service;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
-
 /**
  * @author mingdongli
  *
@@ -17,26 +14,26 @@ public interface AdministratorService extends SwallowService{
 	 * @param offset  起始位置
 	 * @param limit	  偏移量
 	 */
-	Map<String, Object> queryAllFromAdminList(String offset, String limit);
+	Map<String, Object> queryAllRecordFromAdminList(int offset, int limit);
 
 	/**
 	 * 返回用户是否为管理员
 	 * @param request
 	 */
-	Object queryIfAdmin(HttpServletRequest request);
+	Object queryIfAdmin(String userName);
 	
 	/**
 	 * 创建用户
 	 * @param name  用户通行证  
 	 * @param auth  用户级别， 0 － 管理员，3 － 用户， 10 － 访问者
 	 */
-	void createInAdminList(String name, int auth);
+	boolean createInAdminList(String name, int auth);
 	
 	/**
 	 * 根据通行证删除用户
 	 * @param name 通行证
 	 */
-	void removeFromAdminList(String name);
+	boolean removeFromAdminList(String name);
 	
 	/**
 	 * 查询所有访问者

@@ -22,13 +22,13 @@ public interface AdministratorDao{
      * 新建Administrator纪录
      * @param admin  Administrator纪录
      */
-    void createAdministrator(Administrator admin);
+    boolean createAdministrator(Administrator admin);
 
     /**
      * 保存Administrator纪录
      * @param admin  Administrator纪录
      */
-	void saveAdministrator(Administrator admin);
+	boolean saveAdministrator(Administrator admin);
 	
 	/**
 	 * 根据通行证删除纪录

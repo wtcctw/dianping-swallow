@@ -106,7 +106,7 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 		$scope.role = "";
 		$scope.adminnum = 30;
 		
-		$scope.suburl = "/console/admin/admindefault";
+		$scope.suburl = "/console/admin/auth/admindefault";
 	
 		$("a[href='/console/administrator'] button").removeClass("btn-info");
 		$("a[href='/console/administrator'] button").addClass("btn-purple");
@@ -118,7 +118,7 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
         	$('#myModal').modal('hide');
         	//for selected item, use jquery to get value
         	$scope.adminrole = $("#roleselect").val();
-        	$http.post(window.contextPath + '/console/admin/createadmin', {"name":$scope.adminname, 
+        	$http.post(window.contextPath + '/console/admin/auth/createadmin', {"name":$scope.adminname, 
         		"role":$scope.adminrole})
         		.success(function(response) {
         			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
@@ -127,7 +127,7 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 		
 		//delete admin
 		$rootScope.removerecord = function(name){
-			$http.post(window.contextPath + '/console/admin/removeadmin', {"name":name})
+			$http.post(window.contextPath + '/console/admin/auth/removeadmin', {"name":name})
         		.success(function(response) {
         			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
         	});

@@ -19,8 +19,10 @@ module.controller('UserController', ['$scope', '$http',
 						$scope.name = data.loginname.replace(/"/g, "");
 					$scope.username = "欢迎 " + $scope.name;
 					//set lmd to default admin
-					if(data.admin == true || $scope.name == "mingdong.li")
+					if(data.admin == true || $scope.name == "mingdong.li"){
 						$scope.isadmin = true;
+						$("#navbar-admin").css('display','block');
+					}
 					else
 						$scope.isadmin = false;
 					

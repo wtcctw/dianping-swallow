@@ -13,32 +13,32 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.dao.AdministratorDao;
-import com.dianping.swallow.web.dao.WebSwallowMessageDao;
-import com.dianping.swallow.web.model.WebSwallowMessage;
+import com.dianping.swallow.web.dao.MessageDao;
+import com.dianping.swallow.web.model.Message;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MessageService;
-
 
 /**
  * @author mingdongli
  *
- * 2015年5月14日下午1:20:29
+ *         2015年5月14日下午1:20:29
  */
 @Service("messageService")
-public class MessageServiceImpl extends AbstractSwallowService implements MessageService {
+public class MessageServiceImpl extends AbstractSwallowService implements
+		MessageService {
 
-	private static final String 				PRE_MSG 					= "msg#";
-	private static final String 				MESSAGE 					= "message";
-	private static final String 				GZIP 						= "H4sIAAAAAAAAA";
-	
+	private static final String PRE_MSG = "msg#";
+	private static final String MESSAGE = "message";
+	private static final String GZIP = "H4sIAAAAAAAAA";
+
 	@Autowired
-	private WebSwallowMessageDao 				webSwallowMessageDao;
+	private MessageDao webSwallowMessageDao;
 	@Autowired
-	private AdministratorDao 					administratorDao;
-	
-	public Map<String, Object> getMessageFromSpecificTopic(int start,
-			int span, String tname, String messageId, String startdt,
-			String stopdt, String username) {
+	private AdministratorDao administratorDao;
+
+	public Map<String, Object> getMessageFromSpecificTopic(int start, int span,
+			String tname, String messageId, String startdt, String stopdt,
+			String username) {
 		String dbn = PRE_MSG + tname;
 		long mid = -1;
 		if (!messageId.isEmpty()) { // messageId is not empty
@@ -48,8 +48,9 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 				try {
 					mid = Long.parseLong(messageId.trim());
 				} catch (NumberFormatException e) {
-					if (logger.isErrorEnabled()){
-						logger.error("Error when parse " + messageId.trim() + " to Long.", e);
+					if (logger.isErrorEnabled()) {
+						logger.error("Error when parse " + messageId.trim()
+								+ " to Long.", e);
 					}
 					mid = 0;
 				}
@@ -64,7 +65,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 		sizeAndMessage = webSwallowMessageDao.findByIp(start, span, ip, subStr);
-		beforeResponse(  (List<WebSwallowMessage>) sizeAndMessage.get(MESSAGE) );
+		beforeResponse((List<Message>) sizeAndMessage.get(MESSAGE));
 		return sizeAndMessage;
 	}
 
@@ -74,33 +75,36 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 		if (mid < 0 && (startdt + stopdt).isEmpty()) // just query by topicname
-			
-			sizeAndMessage = webSwallowMessageDao.findByTopicname(start, span, subStr);
-		
-		else if (startdt == null || startdt.isEmpty()) // time is empty,
-			
-			sizeAndMessage = webSwallowMessageDao.findSpecific(start, span, mid, subStr);
-		
-		else if (mid < 0) // messageId is empty, query by time
-			
-			sizeAndMessage = webSwallowMessageDao.findByTime(start, span, startdt, stopdt, subStr);
-		
-		else  // both are not empty, query by time and messageId
-			
-			sizeAndMessage = webSwallowMessageDao.findByTimeAndId(start, span, mid, startdt, stopdt, subStr);
 
-		beforeResponse(  (List<WebSwallowMessage>) sizeAndMessage.get(MESSAGE) );
+			sizeAndMessage = webSwallowMessageDao.findByTopicname(start, span,
+					subStr);
+
+		else if (startdt == null || startdt.isEmpty()) // time is empty,
+
+			sizeAndMessage = webSwallowMessageDao.findSpecific(start, span,
+					mid, subStr);
+
+		else if (mid < 0) // messageId is empty, query by time
+
+			sizeAndMessage = webSwallowMessageDao.findByTime(start, span,
+					startdt, stopdt, subStr);
+
+		else
+			// both are not empty, query by time and messageId
+
+			sizeAndMessage = webSwallowMessageDao.findByTimeAndId(start, span,
+					mid, startdt, stopdt, subStr);
+
+		beforeResponse((List<Message>) sizeAndMessage.get(MESSAGE));
 		return sizeAndMessage;
 	}
-	
-	private void beforeResponse(List<WebSwallowMessage> messageList){
-		for (WebSwallowMessage m : messageList)
+
+	private void beforeResponse(List<Message> messageList) {
+		for (Message m : messageList)
 			setSMessageProperty(m);
 	}
-	
 
-
-	private void setSMessageProperty(WebSwallowMessage m) {
+	private void setSMessageProperty(Message m) {
 		m.setMid(m.get_id());
 		if (m.getO_id() != null) {
 			m.setMo_id(m.getO_id());
@@ -111,12 +115,12 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		m.set_id(null); // no need to transmit
 	}
 
-	private void isZipped(WebSwallowMessage m) {
+	private void isZipped(Message m) {
 		if (m.getC().startsWith(GZIP)) {
 			try {
 				m.setC(ZipUtil.unzip(m.getC()));
 			} catch (IOException e) {
-				if (logger.isErrorEnabled()){
+				if (logger.isErrorEnabled()) {
 					logger.error("Error when unzip " + m.getC(), e);
 				}
 			}
@@ -131,14 +135,15 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	}
 
 	@SuppressWarnings("unchecked")
-	public WebSwallowMessage getMessageContent(String topic, String mid) {
-		
-		List<WebSwallowMessage> messageList = new ArrayList<WebSwallowMessage>();
+	public Message getMessageContent(String topic, String mid) {
 
-			long messageId = Long.parseLong(mid);
-			messageList = (List<WebSwallowMessage>) webSwallowMessageDao.findSpecific(0, 1, messageId, topic).get(MESSAGE);
-			isZipped(messageList.get(0));
-			return messageList.get(0);
+		List<Message> messageList = new ArrayList<Message>();
+
+		long messageId = Long.parseLong(mid);
+		messageList = (List<Message>) webSwallowMessageDao
+				.findSpecific(0, 1, messageId, topic).get(MESSAGE);
+		isZipped(messageList.get(0));
+		return messageList.get(0);
 
 	}
 

@@ -20,7 +20,7 @@ module.factory('Paginator', function(){
 						items = data.message;
 						//items = angular.fromJson(items); //反序列化
 						length = data.size;
-						self.show = data.show || localStorage.getItem("isadmin");
+						self.show = localStorage.getItem("isadmin");
 						self.totalpieces = length;
 						self.totalPage = Math.ceil(length/pageSize);
 						self.endPage = self.totalPage;
@@ -43,6 +43,13 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
+						if (self.currentPageItems.length > 0) {
+							$("#message-retransmit").css(
+									'display', 'block');
+						} else {
+							$("#message-retransmit").css(
+									'display', 'none');
+						}
 						for(var i=0;i<self.currentPageItems.length;i++){
 							self.currentPartialCon[i]= "点击展开";
 						} 
@@ -128,14 +135,13 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 					str = JSON.stringify(JSON.parse(items), null, 2);
 				else
 					str = items;
-			    //alert(str);
 				$scope.messagecontent = str;
 				$('#myModal2').modal('show');
 			},
 			
 			$scope.formatres = function(mid){
 				var topic = $scope.tname;
-				$http.get(window.contextPath + "/console/message/content", {
+				$http.get(window.contextPath + "/console/message/auth/content", {
 					params : {
 						topic:topic,
 						mid:mid
@@ -148,7 +154,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			$scope.fullmessage    = "";
 	        $scope.showfullmessage = function(mid){
 				var topic = $scope.tname;
-				$http.get(window.contextPath + "/console/message/content", {
+				$http.get(window.contextPath + "/console/message/auth/content", {
 					params : {
 						topic:topic,
 						mid:mid
@@ -189,7 +195,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 				var mid = $scope.searchPaginator.currentPageItems[index].mid;
 				var topic = $scope.tname;
 				if(!$scope.showornot){
-					$http.get(window.contextPath + "/console/message/content", {
+					$http.get(window.contextPath + "/console/message/auth/content", {
 						params : {
 							topic:topic,
 							mid:mid
@@ -266,7 +272,8 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 					source : topicNameList,
 					updater : function(c) {
 						$scope.tname = c;
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);		
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+
 						return c;
 					}
 				})
@@ -293,11 +300,16 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			};
 			
 	        $scope.retransmit = function(){
-	        	var needtotrans = [];
+	        	var needtotrans = "";
 	        	var scb = $(".swallowcheckbox");
 	        	for(var i=0;i < scb.length;i++){
-	        		if(scb[i].checked)
-	        			needtotrans.push($scope.searchPaginator.currentPageItems[i].mid);
+	        		if(scb[i].checked){
+	        			if(needtotrans.length == 0)
+	        				needtotrans += $scope.searchPaginator.currentPageItems[i].mid;
+	        			else{
+		        			needtotrans = needtotrans + "," + $scope.searchPaginator.currentPageItems[i].mid;
+	        			}
+	        		}
 	        	}
 	        	
 	        	$scope.starttransmit(needtotrans);
@@ -308,7 +320,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 	        		if(data.length == 0)
 	        			alert("请先勾选需要发送的消息！");
 	        		else
-	        			$http.post(window.contextPath + '/console/message/sendmessage', {"param[]":JSON.stringify(data),"topic":$scope.tname}).success(function(response) {
+	        			$http.post(window.contextPath + '/console/message/auth/sendmessage', {"param": data,"topic":$scope.tname}).success(function(response) {
 	        			  $("#selectnone").prop('checked', false);
 	        			  $("#selectall").prop('checked', false);
 	        			  $(".swallowcheckbox").prop('checked', false);
@@ -323,7 +335,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 	        $scope.textarea = "";
 	        $scope.refreshpage = function(myForm){
 	        	$('#myModal').modal('hide');
-	        	$http.post(window.contextPath + '/console/message/sendgroupmessage', {"textarea":$scope.textarea,"name":$scope.tname}).success(function(response) {
+	        	$http.post(window.contextPath + '/console/message/auth/sendgroupmessage', {"textarea":$scope.textarea,"name":$scope.tname}).success(function(response) {
 	        		$scope.startdt = "";
 					$scope.stopdt = "";
 					$scope.messageId = "";

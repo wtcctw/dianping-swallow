@@ -3,11 +3,10 @@ package com.dianping.swallow.web.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
-
 /**
  * @author mingdongli
  *
- * 2015年4月22日 上午12:05:51
+ *         2015年4月22日 上午12:05:51
  */
 public class Administrator {
 	@Id
@@ -15,63 +14,51 @@ public class Administrator {
 
 	@Indexed
 	private String name;
-	
-	//0:admin, 3:common
-	private int    role;
-	
-	private String date;
-	
-	public Administrator(){
-		
-	}
-	
-	public Administrator(String name,int role, String date) {
-		this.name = name;
-		this.role = role;
-		this.date = date;
-	}
 
+	private int role;
+
+	private String date;
 
 	public String getDate() {
 		return date;
 	}
 
-
-	public void setDate(String date) {
+	public Administrator setDate(String date) {
 		this.date = date;
+		return this;
 	}
-
 
 	public String getName() {
 		return name;
 	}
 
-
-	public void setName(String name) {
+	public Administrator setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public int getRole() {
 		return role;
 	}
 
-
-	public void setRole(int role) {
+	public Administrator setRole(int role) {
 		this.role = role;
+		return this;
 	}
-
 
 	public String getId() {
 		return id;
 	}
-	
-	public void setId(String id) {
+
+	public Administrator setId(String id) {
 		this.id = id;
+		return this;
 	}
 
 	@Override
 	public String toString() {
-		return "Administrator [id=" + id + ", name=" + name + ", role=" + role + ", date=" + date + "]";
+		return "Administrator [id=" + id + ", name=" + name + ", role=" + role
+				+ ", date=" + date + "]";
 	}
 
 }

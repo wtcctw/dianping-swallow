@@ -23,7 +23,7 @@ public interface TopicDao extends Dao {
      * 保存topic
      * @param topic 
      */
-	void saveTopic(Topic topic);
+	boolean saveTopic(Topic topic);
 	
 	/**
 	 * 更新topic
@@ -32,7 +32,7 @@ public interface TopicDao extends Dao {
 	 * @param dept  申请人部门
 	 * @param time  申请时间
 	 */
-	void updateTopic(String name, String prop, String dept, String time);
+	boolean updateTopic(String name, String prop, String dept, String time);
 
 	/**
 	 *  删除集合

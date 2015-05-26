@@ -1,9 +1,9 @@
 package com.dianping.swallow.web.dao.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,48 +23,37 @@ import com.mongodb.Mongo;
  */
 public class DefaultWebMongoManager implements WebMongoManager {
 
-	public 	static final String TOPIC_COLLECTION = "c";
-	public 	static final String PRE_MSG = "msg#";
+	public static final String TOPIC_COLLECTION = "c";
+	public static final String PRE_MSG = "msg#";
 	private static final String SWALLOW_MONGO = "swallow.mongo.producerServerURI";
 	private static final String TOPICNAME_DEFAULT = "default";
 	private static final String SWALLOW_W_MONGO = "swallow.mongourl";
-	private volatile Map<String, Mongo> topicNameToMongoMap = new HashMap<String, Mongo>();
-	
-	DefaultMongoManager			mongoManager;
-	
-	
+	private volatile Map<String, Mongo> topicNameToMongoMap = new ConcurrentHashMap<String, Mongo>();
+
+	DefaultMongoManager mongoManager;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(DefaultWebMongoManager.class);
-	
-    public void setMongoManager(DefaultMongoManager mongoManager) {
-	    this.mongoManager = mongoManager;
-    }
+
+	public void setMongoManager(DefaultMongoManager mongoManager) {
+		this.mongoManager = mongoManager;
+	}
 
 	public void initMongoServer() {
 		String uri = null;
 		try {
 			uri = ConfigCache.getInstance().getProperty(SWALLOW_W_MONGO);
 		} catch (LionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Error when read " + SWALLOW_W_MONGO + " from lion.", e);
-			}
-		}
-		if (logger.isInfoEnabled()) {
-			logger.info(uri);
+			logger.error("Error when read " + SWALLOW_W_MONGO + " from lion.",
+					e);
 		}
 		try {
 			uri = ConfigCache.getInstance().getProperty(SWALLOW_MONGO);
 		} catch (LionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Error when read " + SWALLOW_MONGO + " from lion.", e);;
-			}
+			logger.error("Error when read " + SWALLOW_MONGO + " from lion.", e);
 		}
-		topicNameToMongoMap = mongoManager.parseURIAndCreateTopicMongo(uri.trim()); 
-		if (logger.isInfoEnabled()) {
-			logger.info(uri);
-		}
-
+		topicNameToMongoMap = mongoManager.parseURIAndCreateTopicMongo(uri
+				.trim());
 		try {
 			ConfigCache.getInstance().addChange(new ConfigChange() {
 
@@ -74,15 +63,13 @@ public class DefaultWebMongoManager implements WebMongoManager {
 				}
 			});
 		} catch (LionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Error when addChange of lion.", e);;
-			}
+			logger.error("Error when addChange of lion.", e);
 		}
 	}
 
 	@Override
-	public Map<String, Mongo> getTopicNameToMongoMap() { 
-																
+	public Map<String, Mongo> getTopicNameToMongoMap() {
+
 		return topicNameToMongoMap;
 	}
 
@@ -97,10 +84,8 @@ public class DefaultWebMongoManager implements WebMongoManager {
 	private Mongo getMongoClient(String topicName) {
 		Mongo mongo = this.topicNameToMongoMap.get(topicName);
 		if (mongo == null) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("topicname '" + topicName
-						+ "' do not match any Mongo Server, use default.");
-			}
+			logger.debug("topicname '" + topicName
+					+ "' do not match any Mongo Server, use default.");
 			mongo = this.topicNameToMongoMap.get(TOPICNAME_DEFAULT);
 		}
 		return mongo;
@@ -112,13 +97,11 @@ public class DefaultWebMongoManager implements WebMongoManager {
 	}
 
 	public synchronized void onConfigChange(String key, String value) {
-		if (logger.isInfoEnabled()) {
-			logger.info("onChange() called.");
-		}
 		value = value.trim();
 		try {
 			if (SWALLOW_MONGO.equals(key)) {
-				this.topicNameToMongoMap = mongoManager.parseURIAndCreateTopicMongo(value);
+				this.topicNameToMongoMap = mongoManager
+						.parseURIAndCreateTopicMongo(value);
 				Thread.sleep(5000);
 			}
 		} catch (Exception e) {

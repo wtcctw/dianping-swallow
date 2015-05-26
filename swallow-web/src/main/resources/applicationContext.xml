@@ -51,8 +51,8 @@
         class="com.dianping.swallow.web.dao.impl.DefaultTopicDao">
     </bean>
     
-    <bean id="webSwallowMessageDAO"
-        class="com.dianping.swallow.web.dao.impl.DefaultWebSwallowMessageDao">
+    <bean id="webMessageDAO"
+        class="com.dianping.swallow.web.dao.impl.DefaultMessageDao">
         <property name="webMongoManager" >
 			<ref local="webMongoManager"/>
 		</property>

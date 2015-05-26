@@ -6,7 +6,7 @@ package com.dianping.swallow.web.service;
  *
  * 2015年5月20日下午6:17:30
  */
-public interface SaveMessageService {
+public interface SaveMessageService extends SwallowService{
 
 	/**
 	 * 重发已经保存的消息

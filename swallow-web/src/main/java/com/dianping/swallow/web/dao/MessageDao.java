@@ -3,7 +3,7 @@ package com.dianping.swallow.web.dao;
 import java.util.Map;
 
 import com.dianping.swallow.web.dao.impl.WebMongoManager;
-import com.dianping.swallow.web.model.WebSwallowMessage;
+import com.dianping.swallow.web.model.Message;
 
 
 /**
@@ -11,7 +11,7 @@ import com.dianping.swallow.web.model.WebSwallowMessage;
  *
  * 2015年4月22日 上午12:05:31
  */
-public interface WebSwallowMessageDao extends Dao, WebMongoManager{
+public interface MessageDao extends Dao, WebMongoManager{
 	
 	/**
 	 * 根据IP查找消息
@@ -27,21 +27,21 @@ public interface WebSwallowMessageDao extends Dao, WebMongoManager{
 	 * @param wsm         WebSwallowMessage
 	 * @param topicName	  topic名称
 	 */
-	void create(WebSwallowMessage wsm, String topicName);
+	boolean create(Message wsm, String topicName);
 
 	/**
 	 * 根据消息ID查询
 	 * @param mid	  	消息ID
 	 * @param topicName	topic名称
 	 */
-	WebSwallowMessage readById(long mid, String topicName);
+	Message readById(long mid, String topicName);
 	
 	/**
 	 * 
 	 * @param wsm		WebSwallowMessage
 	 * @param topicName topic名称
 	 */
-	void update(WebSwallowMessage wsm, String topicName);
+	boolean update(Message wsm, String topicName);
 
 	/**
 	 * 根据消息ID删除message

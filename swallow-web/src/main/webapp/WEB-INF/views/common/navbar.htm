@@ -4,7 +4,6 @@
 			ace.settings.check('navbar', 'fixed')
 		} catch (e) {
 		}
-		
 	</script>
 
 	<div class="navbar-container" id="navbar-container">
@@ -24,20 +23,22 @@
 				</button>
 			</a> <a href="${rc.contextPath}/console/monitor/consumer/total/delay"
 				class="navbar-brand">
-				<button class="btn  #if(${menu}=='monitor')btn-purple #else btn-info#end btn-xs">
+				<button
+					class="btn  #if(${menu}=='monitor')btn-purple #else btn-info#end btn-xs">
 					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>
 					监控
 				</button>
-			</a> <a href="${rc.contextPath}/console/administrator" class="navbar-brand">
-				<button class="btn  btn-info btn-xs swallow-nav-btn">
-					<i class="icon-lock align-top bigger-125 icon-on-right"></i>
-					管理员
+			</a> <a href="${rc.contextPath}/console/administrator"
+				class="navbar-brand">
+				<button class="btn  btn-info btn-xs swallow-nav-btn"
+					id="navbar-admin" style="display: none;">
+					<i class="icon-lock align-top bigger-125 icon-on-right"></i> 管理员
 				</button>
 			</a>
 		</div>
 
 		<div class="navbar-header pull-right" role="navigation"
-			 style="opacity: 1.0;">
+			style="opacity: 1.0;">
 			<!-- 			<a href="${rc.contextPath}/help/help.html" 
 				class="navbar-brand">
 				<button class="btn btn-info btn-xs" id="user">
@@ -51,12 +52,13 @@
 				<li><a
 					href="https://sso.51ping.com/login?TARGET=http%3A%2F%2F192.168.78.29%3A8080%2F"
 					style="background: white" ng-show="login">登录</a>
-				<li class="dropdown all-camera-dropdown" ><a ng-show="logout"
+				<li class="dropdown all-camera-dropdown"><a ng-show="logout"
 					class="dropdown-toggle" data-toggle="dropdown" href="#"
 					style="background: white" ng-bind="username"><b class="caret"></b>
 				</a>
 					<ul class="dropdown-menu">
-						<li><a href="https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080" >登出</a></li>
+						<li><a
+							href="https://sso.51ping.com/logout?service=http%3A%2F%2F192.168.78.29%3A8080">登出</a></li>
 					</ul></li>
 			</ul>
 

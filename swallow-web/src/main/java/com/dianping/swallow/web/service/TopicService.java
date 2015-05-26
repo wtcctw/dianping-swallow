@@ -2,8 +2,6 @@ package com.dianping.swallow.web.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 
 
 /**
@@ -18,7 +16,7 @@ public interface TopicService extends SwallowService {
 	 * @param start 起始位置
 	 * @param span	偏移量
 	 */
-	Map<String, Object> getAllTopicFromExisting(int start, int span);
+	Map<String, Object> loadAllTopic(int start, int span);
 
 	/**
 	 * 根据消息名称，部门，申请人查询消息
@@ -28,7 +26,7 @@ public interface TopicService extends SwallowService {
 	 * @param prop  申请人
 	 * @param dept  申请人部门
 	 */
-	Map<String, Object> getSpecificTopic(int start, int span, String name,
+	Map<String, Object> loadSpecificTopic(int start, int span, String name,
 			String prop, String dept);
 
 	/**
@@ -36,7 +34,7 @@ public interface TopicService extends SwallowService {
 	 * @param tongXingZheng  用户名
 	 * @param isAdmin  		 是否是管理员
 	 */
-	List<String> getTopicNames(String tongXingZheng, boolean isAdmin);
+	List<String> loadAllTopicNames(String tongXingZheng, boolean isAdmin);
 
 	/**
 	 * 编辑topic信息
@@ -50,12 +48,7 @@ public interface TopicService extends SwallowService {
 	/**
 	 *  查询所有申请人和部门
 	 */
-	Set<String> getPropAndDept();
+	Map<String, Object[]> getPropAndDept();
 	
-	/**
-	 * 保存访问者信息，如果已经存在，则更新访问时间，否则创建之
-	 * @param name  通行证
-	 */
-	void saveVisitInAdminList(String name);
 
 }

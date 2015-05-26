@@ -2,7 +2,7 @@ package com.dianping.swallow.web.service;
 
 import java.util.Map;
 
-import com.dianping.swallow.web.model.WebSwallowMessage;
+import com.dianping.swallow.web.model.Message;
 
 
 /**
@@ -30,6 +30,6 @@ public interface MessageService extends SwallowService{
 	 * @param topic 消息名称
 	 * @param mid	消息ID
 	 */
-	WebSwallowMessage getMessageContent(String topic, String mid);
+	Message getMessageContent(String topic, String mid);
 	
 }

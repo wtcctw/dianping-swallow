@@ -14,7 +14,7 @@ import com.dianping.swallow.common.internal.util.MongoUtils;
  *
  * 2015年4月22日 上午12:06:15
  */
-public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
+public class Message implements Comparable<Message> {
 
 	// id will be used for storing MongoDB _id
 	@Id
@@ -36,29 +36,16 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
    public static final String  				TIMEFORMAT      = "yyyy-MM-dd HH:mm:ss";  //H means 24 hours
   
    
-	public WebSwallowMessage() {
-	}
-
-	public WebSwallowMessage(BSONTimestamp id, BSONTimestamp oid, String c, String v, String s, Date gt, String p , String i_p,
-									String t, String si) {
-		this._id = id;
-		this.o_id = oid;
-		this.c = c;
-		this.v = v;
-		this.s = s;
-		this.gt = gt;
-		this.p = p;
-		this._p = i_p;
-		this.t = t;
-		this.si = si;
+	public Message() {
 	}
 
 	public BSONTimestamp get_id() {
 		return _id;
 	}
 
-	public void set_id(BSONTimestamp _id) {
+	public Message set_id(BSONTimestamp _id) {
 		this._id = _id;
+		return this;
 	}
 
 	
@@ -66,58 +53,65 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 		return o_id;
 	}
 
-	public void setO_id(BSONTimestamp o_id) {
+	public Message setO_id(BSONTimestamp o_id) {
 		this.o_id = o_id;
+		return this;
 	}
 
 	public String getMid() {
 		return mid;
 	}
 
-	public void setMid(BSONTimestamp ts) {
+	public Message setMid(BSONTimestamp ts) {
 		long tmp = MongoUtils.BSONTimestampToLong(ts);
 		this.mid = Long.toString(tmp);
+		return this;
 	}
 	
 	public String getMo_id() {
 		return mo_id;
 	}
 
-	public void setMo_id(BSONTimestamp ts) {
+	public Message setMo_id(BSONTimestamp ts) {
 		long tmp = MongoUtils.BSONTimestampToLong(ts);
 		this.mo_id = Long.toString(tmp);
+		return this;
 	}
 
 	public String getC() {
 		return c;
 	}
 
-	public void setC(String c) {
+	public Message setC(String c) {
 		this.c = c;
+		return this;
 	}
 	
 	public String getV() {
 		return v;
 	}
 
-	public void setV(String v) {
+	public Message setV(String v) {
 		this.v = v;
+		return this;
 	}
 	
 	public String getS() {
 		return s;
 	}
 
-	public void setS(String s) {
+	public Message setS(String s) {
 		this.s = s;
+		return this;
 	}
 	
 	public Date getGt() {
 		return gt;
 	}
 
-	public void setGt(Date gt) {
+	public Message setGt(Date gt) {
 		this.gt = gt;
+		return this;
 	}
 
 
@@ -125,54 +119,60 @@ public class WebSwallowMessage implements Comparable<WebSwallowMessage> {
 		return p;
 	}
 
-	public void setP(String p) {
+	public Message setP(String p) {
 		this.p = p;
+		return this;
 	}
 
 	public String get_p() {
 		return _p;
 	}
 
-	public void set_p(String _p) {
+	public Message set_p(String _p) {
 		this._p = _p;
+		return this;
 	}
 
 	public String  getT() {
 		return t;
 	}
 
-	public void setT(String t) {
+	public Message setT(String t) {
 		this.t = t;
+		return this;
 	}
 	
 	public String getSi() {
 		return si;
 	}
 
-	public void setSi(String si) {
+	public Message setSi(String si) {
 		this.si = si;
+		return this;
 	}
 	
 	public String  getStstring() {
 		return ststring;
 	}
 
-	public void setStstring(BSONTimestamp ts) {
+	public Message setStstring(BSONTimestamp ts) {
 		int seconds = ts.getTime();
 		long millions = new Long(seconds)*1000;
 		this.ststring = new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
+		return this;
 	}
 	
 	public String  getGtstring() {
 		return gtstring;
 	}
 
-	public void setGtstring(Date gt) {
+	public Message setGtstring(Date gt) {
 		this.gtstring = new SimpleDateFormat(TIMEFORMAT).format(gt);
+		return this;
 	}
 	
     @Override
-    public int compareTo(WebSwallowMessage ts) {
+    public int compareTo(Message ts) {
     	int bs= ts.get_id().getTime();
     	int thisbs = this.get_id().getTime();
         if(thisbs != bs) {

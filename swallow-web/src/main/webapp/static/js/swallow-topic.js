@@ -81,14 +81,14 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 				};
 				var data = {'offset' : offset,
 										'limit': limit,
-										'name': name,
+										'topic': name,
 										'prop': prop,
 										'dept': dept};
 				$http.get(window.contextPath + $scope.suburl, {
 					params : {
 						offset : offset,
 						limit : limit,
-						name: name,
+						topic: name,
 						prop: prop,
 						dept: dept
 					}
@@ -125,7 +125,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 	        	$('#myModal').modal('hide');
 	        	$scope.topictime = $("#datetimepicker").val();
 	        	$scope.topicprop = $("#topicprops").val();
-	        	$http.post(window.contextPath + '/console/topic/edittopic', {"name":$scope.topicname,"prop":$scope.topicprop,
+	        	$http.post(window.contextPath + '/console/topic/auth/edittopic', {"topic":$scope.topicname,"prop":$scope.topicprop,
 	        		"dept":$scope.topicdept,"time":$scope.topictime}).success(function(response) {
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" , "");
 	        	});
@@ -144,8 +144,6 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
 					$scope.prop = "";
 					$scope.firstaccess = true;
-					if($scope.searchPaginator.currentPageItems.length == 0)
-						$scope.$emit('ngRepeatFinished');
 				}
 				else
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
@@ -184,9 +182,10 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						method : 'GET',
 						url : window.contextPath + '/console/topic/propdept'
 					}).success(function(data, status, headers, config) {
-						var propDeptList = data;
+						var props = data.prop;
+						var depts = data.dept;
 						$("#searchprop").typeahead({
-							source : propDeptList,
+							source : props,
 							updater : function(c) {
 								$scope.prop = c
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
@@ -194,7 +193,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 							}
 						})
 						$("#searchdept").typeahead({
-							source : propDeptList,
+							source : depts,
 							updater : function(c) {
 								$scope.dept = c
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
@@ -204,7 +203,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						//work
 						$('#topicprops').tagsinput({
 							  typeahead: {      
-								  source: propDeptList,
+								  source: props,
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});

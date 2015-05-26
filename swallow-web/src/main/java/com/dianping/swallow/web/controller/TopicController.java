@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +12,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,9 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.utils.WebSwallowUtils;
+import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.service.FilterMetaDataService;
 import com.dianping.swallow.web.service.TopicService;
-import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
 
 /**
  * @author mingdongli
@@ -30,15 +31,18 @@ import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
  *         2015年4月22日 下午1:50:20
  */
 @Controller
-public class TopicController extends AbstractController{
-	
+public class TopicController extends AbstractController {
+
 	private static final String DELIMITOR = ",";
 
-	@Resource(name = "accessControlService")
-	private AccessControlServiceImpl 				accessControlService;
-    
+	@Resource(name = "filterMetaDataService")
+	private FilterMetaDataService filterMetaDataService;
+
 	@Resource(name = "topicService")
-	private TopicService 							topicService;
+	private TopicService topicService;
+
+	@Autowired
+	ExtractUsernameUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/topic")
 	public ModelAndView allApps(HttpServletRequest request,
@@ -49,64 +53,57 @@ public class TopicController extends AbstractController{
 
 	@RequestMapping(value = "/console/topic/topicdefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object topicDefault(String offset, String limit, String name,
+	public Object topicDefault(int offset, int limit, String topic,
 			String prop, String dept, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-		
-		topicService.saveVisitInAdminList(WebSwallowUtils.getVisitInfo(request));
-		int start = Integer.parseInt(offset);
-		int span = Integer.parseInt(limit); // get span+1 topics so that it can
-		boolean findAll = (name + prop + dept).isEmpty();
-		WebSwallowUtils.getVisitInfo(request);
-		if (findAll)
-			return topicService.getAllTopicFromExisting(start, span);
-		else
-			return topicService.getSpecificTopic(start, span, name, prop, dept);
+
+		boolean findAll = StringUtils.isEmpty(topic + prop + dept);
+		if (findAll) {
+			return topicService.loadAllTopic(offset, limit);
+		} else {
+			return topicService.loadSpecificTopic(offset, limit, topic, prop,
+					dept);
+		}
 
 	}
-	
 
 	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public List<String> topicName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
+	public List<String> topicName(HttpServletRequest request,
+			HttpServletResponse response) throws UnknownHostException {
 
-		String tongXingZheng = WebSwallowUtils.getVisitInfo(request);
-		boolean isAdmin = accessControlService.getAdminSet().contains(tongXingZheng);
-		return topicService.getTopicNames(tongXingZheng, isAdmin);
+		String userName = extractUsernameUtils.getUsername(request);
+		boolean isAdmin = filterMetaDataService.loadAdminSet()
+				.contains(userName);
+		return topicService.loadAllTopicNames(userName, isAdmin);
 	}
 
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object propName() throws UnknownHostException {
-
-		return topicService.getPropAndDept().toArray();
-
+		return topicService.getPropAndDept();
 	}
 
-	@RequestMapping(value = "/console/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/topic/auth/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void editTopic(@RequestParam(value = "name") String name,
+	public void editTopic(@RequestParam(value = "topic") String topic,
 			@RequestParam("prop") String prop,
 			@RequestParam("dept") String dept,
 			@RequestParam("time") String time, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		if (accessControlService.checkVisitIsValid(request)) {
-			
-			accessControlService.getTopicToWhiteList().put(name, splitProps(prop.trim()));
-			topicService.editTopic(name, prop, dept, time);
-			if (logger.isInfoEnabled()) {
-				logger.info(WebSwallowUtils.getVisitInfo(request) + " update topic " + name + " to [prop: " + prop
-						+ " ], [dept: " + splitProps(prop.trim()) + " ], [time: " + time + " ].");
-			}
-			
-		}
-		return;
+		topicService.editTopic(topic, prop, dept, time);
+		logger.info(String.format(
+				"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ].",
+				extractUsernameUtils.getUsername(request), topic, prop,
+				splitProps(prop.trim()).toString(), time.toString()));
+
 	}
-	
+
 	private Set<String> splitProps(String props) {
 		String[] prop = props.split(DELIMITOR);
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
+
 		return lists;
 	}
 
