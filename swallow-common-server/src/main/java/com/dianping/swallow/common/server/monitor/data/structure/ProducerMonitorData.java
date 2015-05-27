@@ -140,5 +140,4 @@ public class ProducerMonitorData extends MonitorData {
 		ProducerMonitorData producerMonitorData = (ProducerMonitorData) monitorData;
 		producerMonitorData.all = (ProducerServerData) all.clone();
 	}
-
 }

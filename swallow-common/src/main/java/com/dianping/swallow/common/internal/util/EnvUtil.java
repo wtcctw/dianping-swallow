@@ -56,6 +56,10 @@ public class EnvUtil {
 				return protocal + "localhost:8080";
 			}
 			
+			if(isPpe()){
+				return protocal + "ppe."+basicWebAddress;
+			}
+			
 			return protocal + env + "." + basicWebAddress; 
 		}
 		

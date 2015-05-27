@@ -150,6 +150,8 @@ public class ConsumerMonitorData extends MonitorData{
 
 		return all;
 	}
+	
+	
 
 	@Override
 	protected void doClone(MonitorData monitorData) throws CloneNotSupportedException {
@@ -159,5 +161,4 @@ public class ConsumerMonitorData extends MonitorData{
 		
 	}
 
-	
 }

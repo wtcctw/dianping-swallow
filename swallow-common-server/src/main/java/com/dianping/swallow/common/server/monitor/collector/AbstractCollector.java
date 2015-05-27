@@ -95,7 +95,14 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 
 	private HashSet<String> splitExcludeTopics(String value) {
 		
-		HashSet<String> excludeTopics = new HashSet<String>(StringUtils.splitByComma(value));
+		HashSet<String> excludeTopics = new HashSet<String>();
+		
+		if(value != null){
+			excludeTopics.addAll(StringUtils.splitByComma(value));
+		}else{
+			logger.warn("[splitExcludeTopics][lion value null]");
+		}
+		
 		if(logger.isInfoEnabled()){
 			logger.info("[splitExcludeTopics]" + excludeTopics);
 		}

@@ -31,27 +31,47 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 
 	@Override
 	public Set<String> getConsumerIds(String topic) {
-		
-		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
-		if(ctss == null){
-			return null;
-		}
-		
-		return ctss.keySet();
+		return getConsumerIds(topic, true);
 	}
 
 	@Override
 	public Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(
 			String topic, StatisType type) {
 		
-		return getAllQpx(type, topic);
+		return getQpxForAllConsumerId(topic, type, true);
 	}
 
 	@Override
 	public Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(
 			String topic, StatisType type) {
 		
-		return getAllDelay(type, topic);
+		return getDelayForAllConsumerId(topic, type, true);
 	}
+
+	@Override
+	public Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(
+			String topic, StatisType type, boolean includeTotal) {
+		
+		return getAllQpx(type, topic, includeTotal);
+	}
+
+	@Override
+	public Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(
+			String topic, StatisType type, boolean includeTotal) {
+		
+		return getAllDelay(type, topic, includeTotal);
+	}
+
+	@Override
+	public Set<String> getConsumerIds(String topic, boolean includeTotal) {
+		
+		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
+		if(ctss == null){
+			return null;
+		}
+		
+		return ctss.keySet(includeTotal);
+	}
+
 
 }

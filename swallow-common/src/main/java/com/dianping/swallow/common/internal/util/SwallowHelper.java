@@ -14,8 +14,8 @@ public class SwallowHelper {
 	
 	public static void initialize(){
 		
-		Cat.initialize(new File(Cat.getCatHome(), "client.xml"));
 		new DefaultThreadExceptionHandler();
+		Cat.initialize(new File(Cat.getCatHome(), "client.xml"));
 	}
 
 }

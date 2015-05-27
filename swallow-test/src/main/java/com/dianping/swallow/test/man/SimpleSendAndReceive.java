@@ -21,7 +21,7 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 		
 		addListener(topic, "id1", 10, 10);
 		addListener(topic, "id2", 10, 50);
-		sendMessage(1000000, topic, 100);
+		sendMessage(topic, 100000000, 100);
 
 		TimeUnit.SECONDS.sleep(10000);
 	}

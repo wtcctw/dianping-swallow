@@ -40,15 +40,14 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 		
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		
-		Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND);
-		Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK);
+		Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, false);
+		Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, false);
 
-		removeTotal(sendDelays);
-		removeTotal(ackDelays);
 		
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
 		
 		if(sendDelays != null){
+			
 			for(Entry<String, NavigableMap<Long, Long>> entry : sendDelays.entrySet()){
 				
 				String consumerId =  entry.getKey();
@@ -65,23 +64,14 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 		return result;
 	}
 	
-	private void removeTotal(Map<String, NavigableMap<Long, Long>> data) {
-		
-		if(data.size() > 1){
-			data.remove(MonitorData.TOTAL_KEY);
-		}
-	}
-
 	@Override
 	public List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx,  long start, long end) {
 		
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		
-		Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND);
-		Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK);
+		Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
+		Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
 		
-		removeTotal(sendQpxs);
-		removeTotal(ackQpxs);
 		
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
 		

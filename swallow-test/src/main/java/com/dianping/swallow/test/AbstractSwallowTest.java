@@ -92,6 +92,12 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		
 	}
 	
+	protected void sendMessage(String topic, int messageCount, int sleepTime) throws SendFailedException, RemoteServiceInitFailedException {
+		
+		sendMessage(messageCount, topic, false, sleepTime, 10, null, null);
+
+	}
+	
 	protected void sendMessage(int messageCount, String topic, int size) throws SendFailedException, RemoteServiceInitFailedException {
 		
 		sendMessage(messageCount, topic, false, 0, size, null, null);

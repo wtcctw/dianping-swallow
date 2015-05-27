@@ -27,7 +27,7 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData>{
 	}
 
 	@Override
-	public void removeBefore(Long time) {
+	public void doRemoveBefore(Long time) {
 		
 		sendMessages.removeBefore(time);
 		ackMessages.removeBefore(time);
@@ -41,9 +41,9 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData>{
 	}
 
 	@Override
-	public void clean() {
-		sendMessages.clean();
-		ackMessages.clean();
+	public void cleanEmpty() {
+		sendMessages.cleanEmpty();
+		ackMessages.cleanEmpty();
 	}
 
 	@Override

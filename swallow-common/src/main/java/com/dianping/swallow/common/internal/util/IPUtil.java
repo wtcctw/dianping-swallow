@@ -95,4 +95,18 @@ public class IPUtil {
 		return connectionDesc;
 	}
 
+   
+   public static String getIp(String ipPort){
+
+	   if(ipPort == null){
+		   return ipPort;
+	   }
+	   
+	   int index = ipPort.indexOf(":");
+	   String result = ipPort;
+	   if(index >= 0){
+		   result = ipPort.substring(0, index);
+	   }
+	   return result;
+   }
 }

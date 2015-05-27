@@ -31,12 +31,6 @@ public interface Statisable<V> {
 	void build(QPX qpx, Long startKey, Long endKey, int intervalCount);
 	
 	
-	/**
-	 * 判断内部存储的数据是否无效，如果无效，清除信息
-	 * @return
-	 */
-	void clean();
-
 	boolean isEmpty();
 
 

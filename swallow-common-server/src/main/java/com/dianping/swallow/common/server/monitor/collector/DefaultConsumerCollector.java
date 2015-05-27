@@ -31,7 +31,7 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 				if(isExclude(topic)){
 					return;
 				}
-				consumerMonitorData.addSendData(consumerInfo, consumerIpPort, message);
+				consumerMonitorData.addSendData(consumerInfo, IPUtil.getIp(consumerIpPort), message);
 			}
 		});
 	}
@@ -50,7 +50,7 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 				if(isExclude(topic)){
 					return;
 				}
-				consumerMonitorData.addAckData(consumerInfo, consumerIpPort, message);
+				consumerMonitorData.addAckData(consumerInfo, IPUtil.getIp(consumerIpPort), message);
 			}
 		});
 		
@@ -87,5 +87,4 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 		return "consumer";
 	}
 
-	
 }

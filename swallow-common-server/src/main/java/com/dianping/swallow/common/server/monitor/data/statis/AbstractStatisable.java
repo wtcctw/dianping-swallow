@@ -28,10 +28,18 @@ public abstract class AbstractStatisable<V> implements Statisable<V>{
 		
 	}
 
+	@Override
+	public void removeBefore(Long time) {
+		doRemoveBefore(time);
+		cleanEmpty();
+	}
+
+	protected abstract void doRemoveBefore(Long time);
 
 	protected abstract Statisable<?> getValue(Object key);;
 
-	
+	public abstract void cleanEmpty();
+
 	@Override
 	public String toString() {
 		return JsonBinder.getNonEmptyBinder().toJson(this);

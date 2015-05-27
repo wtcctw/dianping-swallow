@@ -47,7 +47,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	private final int DEFAULT_INTERVAL = 30;//每隔多少秒采样
 
 	@Value("${swallow.web.monitor.keepinmemory}")
-	public int keepInMemoryHour = 1;//保存最新小时
+	public int keepInMemoryHour = 3;//保存最新小时
 	
 	protected AbstractAllData<M, T, S, V> statis; 
 	
@@ -78,11 +78,19 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 				long current = System.currentTimeMillis();
 				try{
 					statis.build(QPX.SECOND, getKey(lastBuildTime), getKey(current), intervalCount);
+					
+					long key = getKey(current - keepInMemoryHour*3600000L);
+					if(logger.isInfoEnabled()){
+						logger.info("[run][remove]" + key + "," + getKey(current) + "," + keepInMemoryHour);
+					}
+					statis.removeBefore(key);
 				}catch(Throwable th){
 					logger.error("[startStatisBuilder]", th);
 				}finally{
 					lastBuildTime = current;
 				}
+				
+				
 			}
 
 		}, DEFAULT_INTERVAL, DEFAULT_INTERVAL, TimeUnit.SECONDS);
@@ -244,7 +252,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 	private Set<String> getTopicsInMemory(long start, long end) {
 		
-		return statis.getTopics();
+		return statis.getTopics(true);
 	}
 
 	private Set<String> getTopicsInDb(long start, long end) {
