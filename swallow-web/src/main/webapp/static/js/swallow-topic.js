@@ -165,7 +165,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						method : 'GET',
 						url : window.contextPath + '/console/topic/namelist'
 					}).success(function(data, status, headers, config) {
-						var topicNameList = jQuery.unique(data);
+						var topicNameList = data;
 						$("#searchname").typeahead({
 							source : topicNameList,
 							updater : function(c) {

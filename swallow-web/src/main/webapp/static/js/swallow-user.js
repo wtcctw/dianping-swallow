@@ -15,15 +15,15 @@ module.controller('UserController', ['$scope', '$http',
 					url : window.contextPath + '/console/admin/queryadminandlogin'
 				}).success(function(data, status, headers, config) {
 					if(data.env == "alpha"){
-						$scope.logouturl = "https://sso.51ping.com/logout?service=http%3A%2F%2Falpha.swallow.dp%3A8080";
+						$scope.logouturl = "logout?service=http%3A%2F%2Falpha.swallow.dp%3A8080";
 					}
-					else if(data.env == "beta"){
-						$scope.logouturl = "https://sso.51ping.com/logout?service=http%3A%2F%2Fbeta.swallow.dp%3A8080";
+					else if(data.env == "qa"){
+						$scope.logouturl = "logout?service=http%3A%2F%2Fbeta.swallow.dp%3A8080";
 					}
 					else if(data.env == "ppe"){
-						$scope.logouturl = "https://sso.51ping.com/logout?service=http%3A%2F%2Fppe.swallow.dp%3A8080";
+						$scope.logouturl = "logout?service=http%3A%2F%2Fppe.swallow.dp%3A8080";
 					}else {
-						$scope.logouturl = "https://sso.51ping.com/logout?service=http%3A%2F%2Fswallow.dp%3A8080";
+						$scope.logouturl = "logout?service=http%3A%2F%2Fswallow.dp%3A8080";
 					}
 					if(data.loginname == null)
 						$scope.name = "";
