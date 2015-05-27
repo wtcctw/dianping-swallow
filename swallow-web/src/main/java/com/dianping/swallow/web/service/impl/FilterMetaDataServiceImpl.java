@@ -37,7 +37,7 @@ public class FilterMetaDataServiceImpl implements FilterMetaDataService {
 	
 	@PostConstruct
 	private void environment(){
-		env = EnvZooKeeperConfig.getEnv();
+		env = EnvZooKeeperConfig.getEnv().trim();
 	}
 
 	public Map<String, Set<String>> loadTopicToWhiteList() {
