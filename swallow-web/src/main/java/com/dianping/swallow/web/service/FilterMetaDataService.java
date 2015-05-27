@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * 2015年5月24日下午3:19:24
  */
-public interface FilterMetaDataService {
+public interface FilterMetaDataService extends SwallowService{
 	
 	Map<String, Set<String>> loadTopicToWhiteList();
 
@@ -28,8 +28,8 @@ public interface FilterMetaDataService {
 	
 	void setDefaultAdmin(String defaultAdmin);
 	
-	String loadEnv();
+	String loadLogoutUrl();
 	
-	void setEnv(String env);
+	void setLogoutUrl(String env);
 
 }

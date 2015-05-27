@@ -89,7 +89,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 	@Override
 	public Object queryIfAdmin(String tongXingZheng) {
 		boolean notproduct = filterMetaDataService.isShowContentToAll();
-		String env = filterMetaDataService.loadEnv();
+		String env = filterMetaDataService.loadLogoutUrl();
 		logger.info("notproduct is " + notproduct);
 		Map<String, Object> map = new HashMap<String, Object>();
 		Administrator a = administratorDao.readByName(tongXingZheng);

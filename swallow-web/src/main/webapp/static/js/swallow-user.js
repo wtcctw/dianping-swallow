@@ -14,24 +14,14 @@ module.controller('UserController', ['$scope', '$http',
 					method : 'GET',
 					url : window.contextPath + '/console/admin/queryadminandlogin'
 				}).success(function(data, status, headers, config) {
-					if(data.env == "alpha"){
-						$scope.logouturl = "logout?service=http%3A%2F%2Falpha.swallow.dp%3A8080";
-					}
-					else if(data.env == "qa"){
-						$scope.logouturl = "logout?service=http%3A%2F%2Fbeta.swallow.dp%3A8080";
-					}
-					else if(data.env == "ppe"){
-						$scope.logouturl = "logout?service=http%3A%2F%2Fppe.swallow.dp%3A8080";
-					}else {
-						$scope.logouturl = "logout?service=http%3A%2F%2Fswallow.dp%3A8080";
-					}
+					$scope.logouturl = "logout?service=" + data.env + "%3A8080";
 					if(data.loginname == null)
 						$scope.name = "";
 					else
 						$scope.name = data.loginname.replace(/"/g, "");
 					$scope.username = "欢迎 " + $scope.name;
 					//set lmd to default admin
-					if(data.admin == true || $scope.name == "mingdong.li"){
+					if(data.admin == true){
 						$scope.isadmin = true;
 						$("#navbar-admin").css('display','block');
 					}
