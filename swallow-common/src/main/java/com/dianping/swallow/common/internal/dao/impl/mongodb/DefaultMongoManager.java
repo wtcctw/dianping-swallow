@@ -398,7 +398,9 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
 		mongo.dropDatabase(dbName);
 	}
 
-private Mongo getMongo(String topicName) {
+	@Override
+	public Mongo getMongo(String topicName) {
+		
       Mongo mongo = this.topicNameToMongoMap.get(topicName);
       if (mongo == null) {
          if (logger.isDebugEnabled()) {

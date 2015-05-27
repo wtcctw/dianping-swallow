@@ -182,9 +182,13 @@ public class DataMonitorController extends AbstractMonitorController{
 		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
 		
 		for(Entry<String, ConsumerDataPair> entry : serverQpx.entrySet()){
+			
 			String ip = entry.getKey();
 			ConsumerDataPair dataPair = entry.getValue();
 			List<StatsData> allStats = new LinkedList<StatsData>();
+			if(isEmpty(dataPair.getSendData()) && isEmpty(dataPair.getAckData())){
+				continue;
+			}
 			allStats.add(dataPair.getSendData());
 			allStats.add(dataPair.getAckData());
 			result.add(ChartBuilder.getHighChart(ip, "", yAxis, allStats));
@@ -193,6 +197,10 @@ public class DataMonitorController extends AbstractMonitorController{
 		return result;
 	}
 
+	private boolean isEmpty(StatsData sendData) {
+		
+		return sendData == null || sendData.getArrayData() == null || sendData.getArrayData().length == 0;
+	}
 
 	private List<HighChartsWrapper> buildConsumerChartWrapper(String topic, String yAxis, StatsData producerData, List<ConsumerDataPair>consumerData) {
 		
