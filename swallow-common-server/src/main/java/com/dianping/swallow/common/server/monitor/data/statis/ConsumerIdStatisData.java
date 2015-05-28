@@ -42,6 +42,7 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData>{
 
 	@Override
 	public void cleanEmpty() {
+		
 		sendMessages.cleanEmpty();
 		ackMessages.cleanEmpty();
 	}

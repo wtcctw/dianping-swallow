@@ -42,9 +42,8 @@
     
     <bean id="mongoManager"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-        <constructor-arg>
-            <value>swallow.mongo.producerServerURI</value>
-        </constructor-arg>
+        <constructor-arg value="swallow.mongo.producerServerURI" index="0"/>
+        <constructor-arg value="web" index="1"/>
     </bean>
     
     <bean id="topicDAO"

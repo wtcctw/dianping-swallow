@@ -19,6 +19,10 @@
 					href="${contextPath}/console/monitor/consumer/total/qps"> <i
 						class="icon-globe"></i> 每秒消息(topic)
 				</a></li>
+				<li class="#if($subside == 'consumeraccu') active #end"><a
+					href="${contextPath}/console/monitor/consumer/total/accu"> <i
+						class="icon-globe"></i> 消息堆积(topic)
+				</a></li>
 			</ul>
 			</li>
 	</ul>
@@ -28,11 +32,11 @@
                 class="menu-text">swallow server监控</span> <b
                 class="arrow icon-angle-down"></b></a>
             <ul class="submenu" style="display: block;">
-	            <li class="#if($subside == 'qps') active #end"><a
+	            <li class="#if($subside == 'producerserverqps') active #end"><a
 	                href="${contextPath}/console/monitor/producerserver/qps"> <i
 	                    class="icon-globe"></i> 每秒消息(producer server)
 	            </a></li>
-	            <li class="#if($subside == 'qps') active #end"><a
+	            <li class="#if($subside == 'consumerserverqps') active #end"><a
 	                href="${contextPath}/console/monitor/consumerserver/qps"> <i
 	                    class="icon-globe"></i> 每秒消息(consumer server)
 	            </a></li>

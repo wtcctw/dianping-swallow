@@ -16,8 +16,10 @@ import com.mongodb.MongoClientOptions.Builder;
  * 
  * @author wukezhu
  */
-public class MongoConfig extends AbstractConfig {
+public class MongoConfig extends AbstractLionConfig {
 
+	private static final String MONGO_CONIFG_BASIC_SUFFIX = "mongoconfig";
+	
 	private boolean slaveOk = true;
 	private boolean socketKeepAlive = true;
 	private int socketTimeout = 5000;
@@ -30,15 +32,25 @@ public class MongoConfig extends AbstractConfig {
 	private int maxWaitTime = 2000;
 	private boolean safe = true;
 	private boolean readFromMaster = false;
+	
 	/**
 	 * 例如 use:product,use:another;use:third
 	 */
 	private String tags;
 
-	public MongoConfig(String fileName) {
-		loadLocalConfig(fileName);
+	public MongoConfig(String fileName, String suffix, boolean isUseLion) {
+		super(fileName, StringUtils.join(SPLIT, MONGO_CONIFG_BASIC_SUFFIX, suffix), isUseLion);
+		loadConfig();
 	}
 
+	public MongoConfig(String fileName, String suffix) {
+		this(fileName, suffix, true);
+	}
+
+	public MongoConfig(String fileName) {
+		this(fileName, null, true);
+	}
+	
 	public MongoClientOptions buildMongoOptions() {
 
 		Builder builder = MongoClientOptions.builder();
@@ -58,7 +70,7 @@ public class MongoConfig extends AbstractConfig {
 
 	public ReadPreference buildReadPreference() {
 		
-		if(tags == null){
+		if(StringUtils.isEmpty(tags)){
 			return readPreference(readFromMaster, null);
 		}
 		
@@ -101,7 +113,6 @@ public class MongoConfig extends AbstractConfig {
 	}
 
 	private ReadPreference readPreference(boolean readFromMaster, List<DBObject> tagSets) {
-		
 		
 		if(readFromMaster){
 			if(tagSets != null && tagSets.size() != 0){

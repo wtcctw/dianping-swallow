@@ -12,6 +12,7 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -350,6 +351,22 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 		
 		DBCollection collection = getCollection(topicName, consumerId);
 		return collection.find().size();
+	}
+
+	@Override
+	public long getAccumulation(String topicName, String consumerId) {
+		
+		DBCollection collection = mongoManager.getAckCollection(topicName, consumerId);
+		DBCursor cursor = collection.find().sort(new BasicDBObject(ID, -1)).limit(1);
+				
+		BSONTimestamp currentIndex = MongoUtils.getTimestampByCurTime();
+
+		while(cursor.hasNext()){
+			currentIndex = (BSONTimestamp) cursor.next().get(ID);
+		}
+		
+		DBCollection msgCollection = getCollection(topicName, null);
+		return msgCollection.count(new Query().gt(ID, currentIndex).build());
 	}
 
 }

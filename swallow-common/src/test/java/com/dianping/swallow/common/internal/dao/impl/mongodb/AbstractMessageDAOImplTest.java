@@ -26,33 +26,33 @@ public abstract class AbstractMessageDAOImplTest extends AbstractDAOImplTest {
 		
 		messageDAO = getBean(MessageDAO.class);
 				
-		messageDAO.cleanMessage(TOPIC_NAME, null);
-		messageDAO.cleanMessage(TOPIC_NAME, consumerId);
+		messageDAO.cleanMessage(topicName, null);
+		messageDAO.cleanMessage(topicName, consumerId);
 	}
 
 //	@Test
 	//删除此测试，collection为capped
 	public void testDeleteMessage() {
 		
-		Assert.assertEquals(0, messageDAO.count(TOPIC_NAME, getConsumerId()));
+		Assert.assertEquals(0, messageDAO.count(topicName, getConsumerId()));
 		
 		int count1 = 100, count2 = 150;
 		
-		insertMessage(count1, TOPIC_NAME, getConsumerId());
+		insertMessage(count1, topicName, getConsumerId());
 		
-		Assert.assertEquals(count1, messageDAO.count(TOPIC_NAME, getConsumerId()));
+		Assert.assertEquals(count1, messageDAO.count(topicName, getConsumerId()));
 		
-		Long currentMaxId = messageDAO.getMaxMessageId(TOPIC_NAME, getConsumerId());
+		Long currentMaxId = messageDAO.getMaxMessageId(topicName, getConsumerId());
 		
-		insertMessage(count2, TOPIC_NAME, getConsumerId());
+		insertMessage(count2, topicName, getConsumerId());
 		
-		Assert.assertEquals(count2 + count1, messageDAO.count(TOPIC_NAME, getConsumerId()));
+		Assert.assertEquals(count2 + count1, messageDAO.count(topicName, getConsumerId()));
 		
-		int del = messageDAO.deleteMessage(TOPIC_NAME, getConsumerId(), currentMaxId + 1);
+		int del = messageDAO.deleteMessage(topicName, getConsumerId(), currentMaxId + 1);
 		
 		Assert.assertEquals(count1, del);
 		
-		Assert.assertEquals(count2, messageDAO.count(TOPIC_NAME, getConsumerId()));
+		Assert.assertEquals(count2, messageDAO.count(topicName, getConsumerId()));
 		
 	}
 

@@ -25,7 +25,7 @@ public class MongoConfigTest extends AbstractTest{
 		
 		
 		//use:product
-		MongoConfig config = new MongoConfig("swallow-mongo-1.properties");
+		MongoConfig config = new MongoConfig("swallow-mongo-1.properties", null, false);
 		MongoClientOptions options = config.buildMongoOptions();
 		TaggableReadPreference read = (TaggableReadPreference) options.getReadPreference();
 
@@ -55,7 +55,7 @@ public class MongoConfigTest extends AbstractTest{
 	public void testTag2(){
 		
 		//use:product,tag:first;use:product:tag:second
-		MongoConfig config = new MongoConfig("swallow-mongo-2.properties");
+		MongoConfig config = new MongoConfig("swallow-mongo-2.properties", null, false);
 		MongoClientOptions options = config.buildMongoOptions();
 		TaggableReadPreference read = (TaggableReadPreference) options.getReadPreference();
 

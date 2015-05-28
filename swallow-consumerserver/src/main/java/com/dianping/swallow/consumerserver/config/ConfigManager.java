@@ -138,8 +138,8 @@ public final class ConfigManager extends AbstractConfig{
    }
 
    private ConfigManager(String configFileName) {
-	   
-	  loadLocalConfig(configFileName);
+	   super(configFileName);
+	  loadConfig();
 	  String masterIp = System.getProperty("masterIp");
       if (masterIp != null && masterIp.length() > 0) {
          this.masterIp = masterIp;

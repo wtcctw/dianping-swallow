@@ -20,7 +20,7 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 	public void eternalSend() throws SendFailedException, RemoteServiceInitFailedException, InterruptedException{
 		
 		addListener(topic, "id1", 10, 10);
-		addListener(topic, "id2", 10, 50);
+		addListener(topic, "id2", 10, 100);
 		sendMessage(topic, 100000000, 40);
 
 		TimeUnit.SECONDS.sleep(10000);

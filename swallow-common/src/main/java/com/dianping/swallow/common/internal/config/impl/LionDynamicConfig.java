@@ -13,6 +13,12 @@ import com.dianping.lion.client.LionException;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 
+/**
+ * 在dev环境，优先使用本地配置
+ * @author mengwenchao
+ *
+ * 2015年5月28日 上午10:30:15
+ */
 public class LionDynamicConfig implements DynamicConfig {
 
    private static final Logger logger = LoggerFactory.getLogger(LionDynamicConfig.class);

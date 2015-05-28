@@ -98,6 +98,31 @@ module.controller('ConsumerQpsController', function($scope, $http) {
 	};
 });
 
+module.controller('ConsumerAccuController', function($scope, $http) {
+	
+	$http({
+		method : 'POST',
+		url : window.contextpath + '/console/monitor/topiclist/get'
+	}).success(function(topicList, status, headers, config) {
+		
+		$("#consumer-div").typeahead({
+			source : topicList,
+			updater : function(c) {
+				window.location = window.contextpath + "/console/monitor/consumer/"+c+"/accu";
+				return c;
+			}
+		})
+	}).error(function(data, status, headers, config) {
+		 app.appError("响应错误", data);
+	});
+
+	
+	$scope.getAccu = function(topicName){
+		renderGraph("/console/monitor/consumer/"+topicName+"/accu/get", "container", $http);
+	};
+});
+
+
 module.controller('ConsumerDelayController', function($scope, $http) {
 
 	// search

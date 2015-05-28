@@ -54,9 +54,8 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 				NavigableMap<Long, Long> send = entry.getValue();
 				NavigableMap<Long, Long> ack = ackDelays.get(consumerId);
 				
-				StatsData sendStatis = new StatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), getValue(send), getStartTime(send, start, end), getDefaultInterval());
-				StatsData ackStatis = new StatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK), getValue(ack), getStartTime(ack, start, end), getDefaultInterval());
-				
+				StatsData sendStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), send, start, end);
+				StatsData ackStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK), ack, start, end);
 				result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
 			} 
 		}
@@ -82,8 +81,8 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 				NavigableMap<Long, Long> send = entry.getValue();
 				NavigableMap<Long, Long> ack = ackQpxs.get(consumerId);
 				
-				StatsData sendStatis = new StatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND), getValue(send), getStartTime(send, start, end), getDefaultInterval());
-				StatsData ackStatis = new StatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK), getValue(send), getStartTime(ack, start, end), getDefaultInterval());
+				StatsData sendStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND), send, start, end);
+				StatsData ackStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK), ack, start, end);
 				
 				result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
 			} 
