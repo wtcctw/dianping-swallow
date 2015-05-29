@@ -18,7 +18,7 @@ public class MasterBootStrap extends AbstractBootStrap {
 
 		createContext();
 
-		startConsumerWorkerManager();
+		startConsumerServer();
 
 		if (logger.isInfoEnabled()) {
 			logger.info("[run][wait " + ConfigManager.getInstance().getWaitSlaveShutDown() + "ms for slave to stop working]");

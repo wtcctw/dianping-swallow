@@ -16,7 +16,7 @@ public class EnvUtil {
 	private static final String env;
 	
 	static{
-		env = EnvZooKeeperConfig.getEnv();
+		env = EnvZooKeeperConfig.getEnv().trim();
 	}
 	
 	public static boolean isDev(){

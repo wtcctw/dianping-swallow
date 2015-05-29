@@ -85,7 +85,10 @@ public class DataMonitorController extends AbstractMonitorController{
 		subSide = "consumeraccu";
 		
 		if(topic.equals(MonitorData.TOTAL_KEY)){
-			return new ModelAndView("redirect:/console/monitor/consumer/" +getFirstTopic(accumulationRetriever.getTopics())+ "/accu", createViewMap());
+			String firstTopic = getFirstTopic(accumulationRetriever.getTopics());
+			if(!firstTopic.equals(MonitorData.TOTAL_KEY)){
+				return new ModelAndView("redirect:/console/monitor/consumer/" + firstTopic + "/accu", createViewMap());
+			}
 		}
 		return new ModelAndView("monitor/consumeraccu", createViewMap());
 	} 
