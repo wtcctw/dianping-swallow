@@ -132,8 +132,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
             try {
             	String consumerIp = IPUtil.getIpFromChannel(channel);
             	if(logger.isInfoEnabled()){
-	               logger.info("Receive ACK(new)(" + consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
-	                     + ackId + ") from " + connectedChannels.get(channel));
+	               logger.info(consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
+	                     + ackId + "," + connectedChannels.get(channel));
             	}
             	
                ConsumerMessage message = removeWaitAckMessages(channel, ackId);
