@@ -13,7 +13,7 @@
 	<appender name="fileAppender" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="/data/applogs/swallow/swallow-web.log" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %-5p [%c] %m [%t]%n" />
+			<param name="ConversionPattern" value="%d[%-5p][%t][%c]%m%n" />
 		</layout>
 	</appender>
 	
