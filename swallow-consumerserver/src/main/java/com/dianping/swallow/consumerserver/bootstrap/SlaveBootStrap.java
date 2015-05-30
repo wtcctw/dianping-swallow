@@ -36,7 +36,7 @@ public class SlaveBootStrap extends AbstractBootStrap{
 	          break;
 	       }
 	       
-	       startConsumerWorkerManager();
+	       startConsumerServer();
 	       bootstrap = startNetty(ConfigManager.getInstance().getSlavePort());
 	
 	       try {
@@ -46,7 +46,7 @@ public class SlaveBootStrap extends AbstractBootStrap{
 	          logger.warn("slave interruptted, will stop", e);
 	          break;
 	       }
-	       stopConsumerManager();
+	       stopConsumerServer();
 	       closeNettyRelatedResource();
 	    }
 	    

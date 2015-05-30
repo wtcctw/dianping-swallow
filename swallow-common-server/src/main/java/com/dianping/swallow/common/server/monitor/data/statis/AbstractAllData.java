@@ -47,8 +47,8 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
 	
 	@Override
-	public Set<String> getTopics(){
-		return total.keySet();
+	public Set<String> getTopics(boolean includeTotal){
+		return total.keySet(includeTotal);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -67,7 +67,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	protected abstract Class<? extends S> getStatisClass();
 
 	@Override
-	public void removeBefore(Long time) {
+	public void doRemoveBefore(Long time) {
 		
 		for(S s : servers.values()){
 			s.removeBefore(time);
@@ -96,18 +96,18 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	}
 
 	@Override
-	public void clean() {
+	public void cleanEmpty() {
 		for(Entry<String, S> entry : servers.entrySet()){
 			
 			String key = entry.getKey();
 			S 	   value = entry.getValue();
 			
-			value.clean();
+			value.cleanEmpty();
 			if(value.isEmpty()){
 				if(logger.isInfoEnabled()){
 					logger.info("[clean]" + key);
-					servers.remove(key);
 				}
+				servers.remove(key);
 			}
 		}
 	}
@@ -188,7 +188,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	}
 
 	
-	protected Map<String, NavigableMap<Long, Long>> getAllQpx(StatisType type, String topic) {
+	protected Map<String, NavigableMap<Long, Long>> getAllQpx(StatisType type, String topic, boolean includeTotal) {
 		
 		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
 		
@@ -196,10 +196,10 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 			return null;
 		}
 		
-		return ctss.allQpx(type);
+		return ctss.allQpx(type, includeTotal);
 	}
 
-	protected Map<String, NavigableMap<Long, Long>> getAllDelay(StatisType type, String topic) {
+	protected Map<String, NavigableMap<Long, Long>> getAllDelay(StatisType type, String topic, boolean includeTotal) {
 		
 		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
 		
@@ -207,7 +207,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 			return null;
 		}
 		
-		return ctss.allDelay(type);
+		return ctss.allDelay(type, includeTotal);
 	}
 	
 }

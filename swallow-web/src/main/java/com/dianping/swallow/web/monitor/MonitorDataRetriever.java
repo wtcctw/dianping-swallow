@@ -1,6 +1,6 @@
 package com.dianping.swallow.web.monitor;
 
-import java.util.Set;
+
 
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
@@ -9,14 +9,8 @@ import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
  *
  * 2015年4月21日 上午10:38:07
  */
-public interface MonitorDataRetriever{
+public interface MonitorDataRetriever extends Retriever{
 
 	void add(MonitorData monitorData);
-	
-	int getKeepInMemoryHour();
-
-	Set<String>  getTopics();
-
-	Set<String>  getTopics(long start, long end);
 	
 }

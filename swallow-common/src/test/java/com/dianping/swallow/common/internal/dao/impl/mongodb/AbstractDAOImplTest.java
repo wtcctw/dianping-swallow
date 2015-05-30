@@ -13,15 +13,11 @@ import com.dianping.swallow.common.internal.dao.MongoManager;
 
 public abstract class AbstractDAOImplTest extends AbstractSpringTest {
 
-	protected static final String TOPIC_NAME = "topicForUnitTest";
-	protected static final String CONSUMER_ID = "consumer1";
-	protected static final String IP = "127.0.0.1";
-
-
 	protected MongoManager mongoManager;
 
 	private static MockMongo mock;
 
+	protected static final String IP = "127.0.0.1";
 
 	@Before
 	public void beforeAbstractDAOImplTest(){
@@ -50,8 +46,8 @@ public abstract class AbstractDAOImplTest extends AbstractSpringTest {
 	@After
 	public void afterAbstractDAOImplTest() throws Exception {
 		// 删除测试过程创建的Collection
-		mongoManager.getMessageCollection(TOPIC_NAME).drop();
-		mongoManager.getAckCollection(TOPIC_NAME, CONSUMER_ID).drop();
+		mongoManager.getMessageCollection(topicName).drop();
+		mongoManager.getAckCollection(topicName, getConsumerId()).drop();
 		mongoManager.getHeartbeatCollection(IP.replace('.', '_')).drop();
 		mock.stop();
 	}

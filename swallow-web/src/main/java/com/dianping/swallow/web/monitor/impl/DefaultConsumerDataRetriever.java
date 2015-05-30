@@ -40,24 +40,22 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 		
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		
-		Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND);
-		Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK);
+		Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, false);
+		Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, false);
 
-		removeTotal(sendDelays);
-		removeTotal(ackDelays);
 		
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
 		
 		if(sendDelays != null){
+			
 			for(Entry<String, NavigableMap<Long, Long>> entry : sendDelays.entrySet()){
 				
 				String consumerId =  entry.getKey();
 				NavigableMap<Long, Long> send = entry.getValue();
 				NavigableMap<Long, Long> ack = ackDelays.get(consumerId);
 				
-				StatsData sendStatis = new StatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), getValue(send), getStartTime(send, start, end), getDefaultInterval());
-				StatsData ackStatis = new StatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK), getValue(ack), getStartTime(ack, start, end), getDefaultInterval());
-				
+				StatsData sendStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), send, start, end);
+				StatsData ackStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK), ack, start, end);
 				result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
 			} 
 		}
@@ -65,23 +63,14 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 		return result;
 	}
 	
-	private void removeTotal(Map<String, NavigableMap<Long, Long>> data) {
-		
-		if(data.size() > 1){
-			data.remove(MonitorData.TOTAL_KEY);
-		}
-	}
-
 	@Override
 	public List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx,  long start, long end) {
 		
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		
-		Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND);
-		Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK);
+		Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
+		Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
 		
-		removeTotal(sendQpxs);
-		removeTotal(ackQpxs);
 		
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
 		
@@ -92,8 +81,8 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 				NavigableMap<Long, Long> send = entry.getValue();
 				NavigableMap<Long, Long> ack = ackQpxs.get(consumerId);
 				
-				StatsData sendStatis = new StatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND), getValue(send), getStartTime(send, start, end), getDefaultInterval());
-				StatsData ackStatis = new StatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK), getValue(send), getStartTime(ack, start, end), getDefaultInterval());
+				StatsData sendStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND), send, start, end);
+				StatsData ackStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK), ack, start, end);
 				
 				result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
 			} 

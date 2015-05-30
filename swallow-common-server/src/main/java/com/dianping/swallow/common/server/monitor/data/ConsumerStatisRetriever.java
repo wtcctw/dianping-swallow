@@ -18,4 +18,11 @@ public interface ConsumerStatisRetriever extends StatisRetriever{
 	Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(String topic, StatisType type);
 
 	Set<String>  getConsumerIds(String topic);
+
+	Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(String topic, StatisType type, boolean includeTotal);
+	
+	Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(String topic, StatisType type, boolean includeTotal);
+
+	Set<String>  getConsumerIds(String topic, boolean includeTotal);
+
 }

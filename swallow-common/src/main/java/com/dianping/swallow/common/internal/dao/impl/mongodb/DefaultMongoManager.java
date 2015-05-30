@@ -30,10 +30,10 @@ import com.mongodb.ServerAddress;
 
 public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
 
-   private static final String           MSG_PREFIX                                        = "msg#";
-   private static final String           ACK_PREFIX                                        = "ack#";
-   private static final String           BACKUP_MSG_PREFIX                                 = "b_m#";
-   private static final String           BACKUP_ACK_PREFIX                                 = "b_a#";
+   public static final String           MSG_PREFIX                                        = "msg#";
+   public static final String           ACK_PREFIX                                        = "ack#";
+   public static final String           BACKUP_MSG_PREFIX                                 = "b_m#";
+   public static final String           BACKUP_ACK_PREFIX                                 = "b_a#";
 
    private static final Logger           logger                                               = LoggerFactory
                                                                                                  .getLogger(DefaultMongoManager.class);
@@ -85,41 +85,40 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
    private DynamicConfig                 dynamicConfig;
 
    private boolean messageCollectionCapped = true;
+
+   public DefaultMongoManager(String severURILionKey, DynamicConfig dynamicConfig, String mongoConfigLionSuffix) {
+
+	      this.severURILionKey = severURILionKey;
+	      MongoConfig config = new MongoConfig(MONGO_CONFIG_FILENAME, mongoConfigLionSuffix);
+	      mongoOptions = config.buildMongoOptions();
+	      if(logger.isInfoEnabled()){
+	    	  logger.info("MongoOptions=" + mongoOptions.toString());
+	      }
+	      if (dynamicConfig != null) {
+	         this.dynamicConfig = dynamicConfig;
+	      } else {
+	         this.dynamicConfig = new LionDynamicConfig(LION_CONFIG_FILENAME);
+	      }
+	      loadLionConfig();
+   }
+
    
-   /**
-    * 从 Lion(配置topicName,serverUrl的列表) 和 MongoConfigManager(配置Mongo参数) 获取配置，创建
-    * “topicName -&gt; Mongo实例” 的Map映射。<br>
-    * <br>
-    * 当 Lion 配置发现变化时，“topicName -&gt; Mongo实例” 的Map映射;<br>
-    * 将 MongoClient 实例注入到DAO：dao通过调用MongoClient.getXXCollectiond得到Collection。
-    * 
-    * @param uri
-    * @param config
-    */
    public DefaultMongoManager(String severURILionKey, DynamicConfig dynamicConfig) {
-      this.severURILionKey = severURILionKey;
-      if (logger.isDebugEnabled()) {
-         logger.debug("Init MongoClient - start.");
-      }
-      //读取properties配置(如果存在configFile，则使用configFile)
-      MongoConfig config = new MongoConfig(MONGO_CONFIG_FILENAME);
-      mongoOptions = config.buildMongoOptions();
-      logger.info("MongoOptions=" + mongoOptions.toString());
-      if (dynamicConfig != null) {
-         this.dynamicConfig = dynamicConfig;
-      } else {
-         this.dynamicConfig = new LionDynamicConfig(LION_CONFIG_FILENAME);
-      }
-      loadLionConfig();
-      if (logger.isDebugEnabled()) {
-         logger.debug("Init MongoClient - done.");
-      }
+	   
+	   this(severURILionKey, dynamicConfig, null);
    }
 
    public DefaultMongoManager(String severURILionKey) {
-      this(severURILionKey, null);
+	   
+      this(severURILionKey, new LionDynamicConfig(LION_CONFIG_FILENAME));
    }
 
+   public DefaultMongoManager(String severURILionKey, String mongoConfigLionSuffix) {
+	   
+	      this(severURILionKey, null, mongoConfigLionSuffix);
+	   }
+
+   
    private void loadLionConfig() {
       try {
          //serverURI
@@ -398,7 +397,9 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
 		mongo.dropDatabase(dbName);
 	}
 
-private Mongo getMongo(String topicName) {
+	@Override
+	public Mongo getMongo(String topicName) {
+		
       Mongo mongo = this.topicNameToMongoMap.get(topicName);
       if (mongo == null) {
          if (logger.isDebugEnabled()) {

@@ -77,8 +77,9 @@ public class DefaultWebMongoManager implements WebMongoManager {
 	@Override
 	public MongoTemplate getMessageMongoTemplate(String topicName) {
 		Mongo mongo = this.getMongoClient(topicName);
-		return new MongoTemplate(new SimMongoDbFactory(mongo, PRE_MSG
-				+ topicName));
+		MongoTemplate template = new MongoTemplate(new SimMongoDbFactory(mongo, PRE_MSG+ topicName));
+		template.setReadPreference(mongo.getReadPreference());
+		return template;
 	}
 
 	private Mongo getMongoClient(String topicName) {

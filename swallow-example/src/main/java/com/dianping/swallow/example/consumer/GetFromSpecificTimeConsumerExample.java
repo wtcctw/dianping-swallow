@@ -36,23 +36,13 @@ public class GetFromSpecificTimeConsumerExample {
         
         final Date beginTime = getBeginTime(100);
         final long beginMessageId =  getMessageId(beginTime);
-//        config.setStartMessageId(beginMessageId);
+        config.setStartMessageId(beginMessageId);
         
-        System.err.println("begin Time:" + beginTime);
-        
-        		
         Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId2", config);
         c.setListener(new MessageListener() {
 
             @Override
             public void onMessage(Message msg) {
-            	
-                System.out.println("延迟" + (System.currentTimeMillis() - msg.getGeneratedTime().getTime()) + "ms");
-                if(logger.isInfoEnabled()){
-                	logger.info(msg.getMessageId());
-                	logger.info(msg.getContent());
-                }
-
             	long currentMessageId = msg.getMessageId();
             	if(currentMessageId < lastMessageId){
             		logger.error("[Current messageId < lastMessageId]" + currentMessageId + "," + lastMessageId);

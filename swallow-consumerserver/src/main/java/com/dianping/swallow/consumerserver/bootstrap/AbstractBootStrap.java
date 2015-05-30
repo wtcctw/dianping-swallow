@@ -1,6 +1,8 @@
 package com.dianping.swallow.consumerserver.bootstrap;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -24,6 +26,7 @@ import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
+import com.dianping.swallow.common.server.lifecycle.SelfManagement;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.netty.MessageServerHandler;
@@ -40,6 +43,7 @@ public abstract class AbstractBootStrap {
 
 	protected ServerBootstrap bootstrap;
 	
+	protected Map<String, SelfManagement> selfManageMentComponents;
 	protected ConsumerWorkerManager consumerWorkerManager;
 	protected TopicWhiteList topicWhiteList; 
     protected ConsumerAuthController consumerAuthController;
@@ -95,34 +99,38 @@ public abstract class AbstractBootStrap {
 		return bootstrap;
 	}
 
-	protected void stopConsumerManager() {
+	protected void stopConsumerServer() {
 
-		if(logger.isInfoEnabled()){
-			logger.info("[stopConsumerManager][begin]");
-		}
 		try {
-			consumerWorkerManager.stop();
-			consumerWorkerManager.dispose();
-		} catch (Exception e) {
-			logger.error("[error close consumerWorkerManager]", e);
-		}
-		if(logger.isInfoEnabled()){
-			logger.info("[stopConsumerManager][end]");
-		}
-	}
-
-	protected void startConsumerWorkerManager() {
-		if (logger.isInfoEnabled()) {
-			logger.info("[startConsumerWorkerManager][begin]");
-		}
-		try {
-			consumerWorkerManager.initialize();
-			consumerWorkerManager.start();
+			for(Entry<String, SelfManagement> entry : selfManageMentComponents.entrySet()){
+				
+				String name = entry.getKey();
+				SelfManagement component = entry.getValue();
+				if(logger.isInfoEnabled()){
+					logger.info("[stopConsumerServer][stop and dispose]" + name);
+				}
+				component.stop();
+				component.dispose();
+			}
 		} catch (Exception e) {
 			logger.error("[error start worker]", e);
 		}
-		if (logger.isInfoEnabled()) {
-			logger.info("[startConsumerWorkerManager][end]");
+	}
+
+	protected void startConsumerServer() {
+		try {
+			for(Entry<String, SelfManagement> entry : selfManageMentComponents.entrySet()){
+				
+				String name = entry.getKey();
+				SelfManagement component = entry.getValue();
+				if(logger.isInfoEnabled()){
+					logger.info("[startConsumerServer][init and start]" + name);
+				}
+				component.initialize();
+				component.start();
+			}
+		} catch (Exception e) {
+			logger.error("[error start worker]", e);
 		}
 	}
 
@@ -154,7 +162,7 @@ public abstract class AbstractBootStrap {
 		         @Override
 		         public void run() {
 		        	 closed = true;
-	        		 stopConsumerManager();
+	        		 stopConsumerServer();
 	        		 closeNettyRelatedResource();
 		         }
 		      };
@@ -165,6 +173,7 @@ public abstract class AbstractBootStrap {
 
 	protected void createContext() {
 		
+		@SuppressWarnings("resource")
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(
 		            new String[] { "c-applicationContext.xml" });
 	      consumerWorkerManager = ctx.getBean(ConsumerWorkerManager.class);
@@ -172,7 +181,8 @@ public abstract class AbstractBootStrap {
 	      consumerAuthController = ctx.getBean(ConsumerAuthController.class);
 		  heartbeater = ctx.getBean(Heartbeater.class);
 	      consumerWorkerManager.isSlave(isSlave());
-
+	      
+	      selfManageMentComponents = ctx.getBeansOfType(SelfManagement.class);
 	}
 
 	protected abstract boolean isSlave();

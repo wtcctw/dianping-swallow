@@ -43,10 +43,11 @@ public class MongoTemplateFactory {
 
 	public static final String SWALLOW_MONGO_ADDRESS_FILE = "swallow-mongo-lion.properties";
 
-	public static final String SWALLOW_MONGO_CONFIG_FILE = "swallow-mongo.properties";
+	public static final String SWALLOW_MONGO_CONFIG_FILE = "swallow-web-mongo.properties";
 
 	private Mongo mongo;
 
+	private MongoConfig config;
 	private DynamicConfig dynamicConfig;
 
 	@PostConstruct
@@ -54,9 +55,9 @@ public class MongoTemplateFactory {
 
 		dynamicConfig = new LionDynamicConfig(SWALLOW_MONGO_ADDRESS_FILE);
 		String mongoUrl = dynamicConfig.get(SWALLOW_STATS_MONGO_URL_KEY);
-		MongoConfig config = new MongoConfig(SWALLOW_MONGO_CONFIG_FILE);
-		mongo = new MongoClient(MongoUtils.parseUriToAddressList(mongoUrl),
-				config.buildMongoOptions());
+		config = new MongoConfig(SWALLOW_MONGO_CONFIG_FILE);
+		
+		mongo = new MongoClient(MongoUtils.parseUriToAddressList(mongoUrl), config.buildMongoOptions());
 		if (logger.isInfoEnabled()) {
 			logger.info("[getMongo]" + mongo);
 		}

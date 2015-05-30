@@ -20,11 +20,29 @@ public class AbstractConfig {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-	protected void loadLocalConfig(String fileName) {
+	private String localFileName; 
+	
+	public AbstractConfig(){
 		
-		InputStream ins = DefaultMongoManager.class.getClassLoader().getResourceAsStream(fileName);
+	}
+	
+	public AbstractConfig(String localFileName) {
+		
+		this.localFileName = localFileName;
+	}
+
+	protected void loadConfig() {
+		
+		if(localFileName == null){
+			if(logger.isInfoEnabled()){
+				logger.info("[loadConfig][localFileName null]");
+			}
+			return ;
+		}
+		
+		InputStream ins = DefaultMongoManager.class.getClassLoader().getResourceAsStream(localFileName);
 		if(ins == null){
-			logger.warn("[loadLocalConfig][file not found]" + fileName);
+			logger.warn("[loadLocalConfig][file not found]" + localFileName);
 			return;
 		}
 		loadLocalConfig(ins);
@@ -45,6 +63,7 @@ public class AbstractConfig {
 			if (logger.isInfoEnabled()) {
 				logger.info("[loadLocalConfig][key:value]" + key + ":" + props.getProperty(key));
 			}
+			String value = getValue(key, props).trim();
 			Field field = null;
 			try {
 				field = clazz.getDeclaredField(key.trim());
@@ -56,7 +75,7 @@ public class AbstractConfig {
 			if (field.getType().equals(Integer.TYPE)) {
 				try {
 					field.set(this,
-							Integer.parseInt(props.getProperty(key).trim()));
+							Integer.parseInt(value));
 				} catch (Exception e) {
 					logger.error("can not parse property " + key, e);
 					continue;
@@ -64,14 +83,14 @@ public class AbstractConfig {
 			} else if (field.getType().equals(Long.TYPE)) {
 				try {
 					field.set(this,
-							Long.parseLong(props.getProperty(key).trim()));
+							Long.parseLong(value));
 				} catch (Exception e) {
 					logger.error("can not set property " + key, e);
 					continue;
 				}
 			} else if (field.getType().equals(String.class)) {
 				try {
-					field.set(this, props.getProperty(key).trim());
+					field.set(this, value);
 				} catch (Exception e) {
 					logger.error("can not set property " + key, e);
 					continue;
@@ -79,7 +98,7 @@ public class AbstractConfig {
 			} else {
 				try {
 					field.set(this,
-							Boolean.parseBoolean(props.getProperty(key).trim()));
+							Boolean.parseBoolean(value));
 				} catch (Exception e) {
 					logger.error("can not set property " + key, e);
 					continue;
@@ -100,6 +119,11 @@ public class AbstractConfig {
 				}
 			}
 		}
+	}
+
+	protected String getValue(String key, Properties props) {
+		
+		return props.getProperty(key);
 	}
 
 }

@@ -32,4 +32,27 @@ public class StringUtils {
 		}
 		return false;
 	}
+	
+	
+	public static String join(String split, String ...str){
+		
+		StringBuilder sb = new StringBuilder();
+		
+		int index = 0;
+		
+		for(int i=0;i<str.length;i++){
+			
+			if(isEmpty(str[i])){
+				continue;
+			}
+			
+			if(index > 0){
+				sb.append(split);
+			}
+			sb.append(str[i]);
+			index++;
+		}
+		
+		return sb.toString(); 
+	}
 }

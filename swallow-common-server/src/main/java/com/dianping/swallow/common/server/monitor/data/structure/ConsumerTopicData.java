@@ -39,6 +39,7 @@ public class ConsumerTopicData extends TotalMap<ConsumerIdData>{
 		ConsumerIdData consumerIdData = getConsumerIdData(consumerId);
 		consumerIdData.ackMessage(consumerIp, message);
 	}
+	
 
 	private ConsumerIdData getConsumerIdData(String consumerId) {
 		
@@ -59,5 +60,6 @@ public class ConsumerTopicData extends TotalMap<ConsumerIdData>{
 		
 		return new ConsumerIdData();
 	}
+
 }
 

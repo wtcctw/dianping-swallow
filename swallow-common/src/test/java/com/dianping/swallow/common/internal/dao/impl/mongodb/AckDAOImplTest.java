@@ -25,9 +25,10 @@ public class AckDAOImplTest extends AbstractDAOImplTest {
       int inc = 1;
       BSONTimestamp timestamp = new BSONTimestamp(time, inc);
       Long expectedMessageId = MongoUtils.BSONTimestampToLong(timestamp);
-      ackDAO.add(TOPIC_NAME, CONSUMER_ID, MongoUtils.BSONTimestampToLong(timestamp), IP);
+      ackDAO.add(topicName, getConsumerId(), MongoUtils.BSONTimestampToLong(timestamp), IP);
+      
       //测试
-      Long maxMessageId = ackDAO.getMaxMessageId(TOPIC_NAME, CONSUMER_ID);
+      Long maxMessageId = ackDAO.getMaxMessageId(topicName, getConsumerId());
       Assert.assertEquals(expectedMessageId, maxMessageId);
    }
 
@@ -38,9 +39,9 @@ public class AckDAOImplTest extends AbstractDAOImplTest {
       int inc = 1;
       BSONTimestamp timestamp = new BSONTimestamp(time, inc);
       Long expectedMessageId = MongoUtils.BSONTimestampToLong(timestamp);
-      ackDAO.add(TOPIC_NAME, CONSUMER_ID, MongoUtils.BSONTimestampToLong(timestamp), IP);
+      ackDAO.add(topicName, getConsumerId(), MongoUtils.BSONTimestampToLong(timestamp), IP);
       //测试
-      Long maxMessageId = ackDAO.getMaxMessageId(TOPIC_NAME, CONSUMER_ID);
+      Long maxMessageId = ackDAO.getMaxMessageId(topicName, getConsumerId());
       Assert.assertEquals(expectedMessageId, maxMessageId);
    }
 

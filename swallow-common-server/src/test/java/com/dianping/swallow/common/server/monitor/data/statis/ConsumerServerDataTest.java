@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,6 +48,32 @@ public class ConsumerServerDataTest extends AbstractServerDataTest{
 		consumerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
 	}
 	
+	
+	@Test
+	public void testClean(){
+		
+		int consumerIdLength = consumerIds.length + 1;
+		
+		Set<String> ids = consumerAllData.getConsumerIds(topics[0]);
+		
+		Assert.assertEquals(consumerIdLength, ids.size());
+		
+		
+
+		consumerAllData.removeBefore(endKey);
+		
+		ids = consumerAllData.getConsumerIds(topics[0]);
+		
+		Assert.assertEquals(consumerIdLength, ids.size());
+
+
+		consumerAllData.removeBefore(endKey + 1);
+		ids = consumerAllData.getConsumerIds(topics[0]);
+		Assert.assertNull(ids);
+
+		
+	}
+	
 	@Test
 	public void testConsumerServerData(){
 		
@@ -65,8 +92,8 @@ public class ConsumerServerDataTest extends AbstractServerDataTest{
 				expectedDelay(delays, totalCount, avergeDelay);
 				expected(qpxs, totalCount, qpsPerUnit * ips.length * consumerIds.length);
 
-				Map<String, NavigableMap<Long, Long>> allDelay = consumerAllData.getAllDelay(type, topic);
-				Map<String, NavigableMap<Long, Long>> allQpx = consumerAllData.getAllQpx(type, topic);
+				Map<String, NavigableMap<Long, Long>> allDelay = consumerAllData.getDelayForAllConsumerId(topic, type, false);
+				Map<String, NavigableMap<Long, Long>> allQpx = consumerAllData.getQpxForAllConsumerId(topic, type, false);
 				
 				Assert.assertEquals(consumerIds.length, allDelay.size());
 				Assert.assertEquals(consumerIds.length, allQpx.size());

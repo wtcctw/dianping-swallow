@@ -11,7 +11,8 @@ import org.junit.Test;
  *
  * 2015年4月27日 上午11:55:07
  */
-public class StringUtilsTEst {
+public class StringUtilsTest {
+
 	
 	@Test
 	public void testSplitByComma(){
@@ -28,7 +29,14 @@ public class StringUtilsTEst {
 			List<String> result = StringUtils.splitByComma(data);
 			judge(result);
 		}
+	}
+	
+	@Test
+	public void testJoin(){
 		
+		Assert.assertEquals("a.b", StringUtils.join(".", "a","b"));
+		Assert.assertEquals("a.b", StringUtils.join(".", "a",null,"b"));
+		Assert.assertEquals("a.b", StringUtils.join(".", null, "a",null,"b"));
 		
 	}
 

@@ -43,7 +43,7 @@ public class FilterMetaDataServiceImpl extends AbstractSwallowService implements
 		try {
 			ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 			logoutUrl = configCache.getProperty("swallow.web.sso.url").trim();
-			logoutUrl = logoutUrl.replaceAll(":", "%3A").replaceAll("/", "%2F");
+			logoutUrl = "https://sso.51ping.com/logout?service=" + logoutUrl.replaceAll(":", "%3A").replaceAll("/", "%2F");
 		} catch (LionException e) {
 			logger.error("Use lion to get swallow.web.sso.url error.", e);
 		}

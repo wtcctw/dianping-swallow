@@ -5,6 +5,7 @@ import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
+import com.dianping.swallow.common.server.lifecycle.SelfManagement;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
@@ -13,7 +14,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
  *
  * 2015年4月10日 上午11:51:05
  */
-public class DefaultConsumerCollector extends AbstractCollector implements ConsumerCollector{
+public class DefaultConsumerCollector extends AbstractCollector implements ConsumerCollector, SelfManagement{
 	
 	
 	private ConsumerMonitorData consumerMonitorData = new ConsumerMonitorData(IPUtil.getFirstNoLoopbackIP4Address());
@@ -31,7 +32,7 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 				if(isExclude(topic)){
 					return;
 				}
-				consumerMonitorData.addSendData(consumerInfo, consumerIpPort, message);
+				consumerMonitorData.addSendData(consumerInfo, IPUtil.getIp(consumerIpPort), message);
 			}
 		});
 	}
@@ -50,7 +51,7 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 				if(isExclude(topic)){
 					return;
 				}
-				consumerMonitorData.addAckData(consumerInfo, consumerIpPort, message);
+				consumerMonitorData.addAckData(consumerInfo, IPUtil.getIp(consumerIpPort), message);
 			}
 		});
 		
@@ -87,5 +88,4 @@ public class DefaultConsumerCollector extends AbstractCollector implements Consu
 		return "consumer";
 	}
 
-	
 }

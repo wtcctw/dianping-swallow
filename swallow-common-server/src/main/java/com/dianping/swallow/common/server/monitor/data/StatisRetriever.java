@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public interface StatisRetriever {
 	
-	Set<String> getTopics();
+	Set<String> getTopics(boolean includeTotal);
 
 	NavigableMap<Long, Long> getQpxForTopic(String topic, StatisType type);
 	

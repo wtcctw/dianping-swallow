@@ -84,7 +84,8 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
 
    public SwallowPigeonConfiguration(String configFile) {
 	   
-	  loadLocalConfig(configFile);
+	  super(configFile);
+	  loadConfig();
       checkSerialize();
       checkTimeout();
       checkRetryBaseInterval();

@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.dao;
 
 import com.mongodb.DBCollection;
+import com.mongodb.Mongo;
 
 /**
  * @author mengwenchao
@@ -23,4 +24,6 @@ public interface MongoManager {
 	void cleanMessageCollection(String topicName, String consumerId);
 
 	void cleanAckCollection(String topicName, String consumerId, boolean isBackup);
+	
+	Mongo getMongo(String topicName);
 }

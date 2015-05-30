@@ -34,9 +34,12 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 	@JsonIgnore
 	private ThreadLocal<AtomicInteger> step = new ThreadLocal<AtomicInteger>();
 
-	public Set<String> keySet(){
+	public Set<String> keySet(boolean includeTotal){
 		
 		Set<String> result = new HashSet<String>(map.keySet());
+		if(!includeTotal && !isOnlyTotal()){
+			result.remove(MonitorData.TOTAL_KEY);
+		}
 		return result;
 	}
 	
@@ -112,12 +115,12 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 	}
 
 	@Override
-	public void clean() {
+	public void cleanEmpty() {
 		
 		for(String key : map.keySet()){
 			
-			Statisable<M> value = map.get(key);
-			value.clean();
+			AbstractStatisable<M> value = (AbstractStatisable<M>) map.get(key);
+			value.cleanEmpty();
 			
 			if(value.isEmpty()){
 				if(logger.isInfoEnabled()){
@@ -141,7 +144,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 	}
 
 	@Override
-	public void removeBefore(Long time) {
+	public void doRemoveBefore(Long time) {
 		
 		for(Statisable<M> value : map.values()){
 			value.removeBefore(time);
@@ -172,33 +175,44 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> allDelay(StatisType type){
+	public Map<String, NavigableMap<Long, Long>> allDelay(StatisType type, boolean includeTotal){
 		
 		Map<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long,Long>>();
+					
 		for(Entry<String, Statisable<M>> entry : map.entrySet()){
 			
 			
 			String key = entry.getKey();
 			Statisable<M> value = entry.getValue();
-			
+			if(!isOnlyTotal()  && !includeTotal && isTotalKey(key)){
+				continue;
+			}
 			result.put(key, value.getDelay(type));
 		}
 		return result;
 	}
 	
+	private boolean isOnlyTotal() {
+		return map.size() == 1;
+	}
+
 	protected boolean isTotalKey(String key) {
 		return key.equals(MonitorData.TOTAL_KEY);
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> allQpx(StatisType type){
+	public Map<String, NavigableMap<Long, Long>> allQpx(StatisType type, boolean includeTotal){
 
 		Map<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long,Long>>();
+		
 		for(Entry<String, Statisable<M>> entry : map.entrySet()){
 			
 			String key = entry.getKey();
 			Statisable<M> value = entry.getValue();
-			
+			if(!isOnlyTotal() && !includeTotal && isTotalKey(key)){
+				continue;
+			}
+
 			result.put(key, value.getQpx(type));
 		}
 		return result;

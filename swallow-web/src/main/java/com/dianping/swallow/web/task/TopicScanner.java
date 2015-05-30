@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -16,8 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.controller.TopicController;
+import com.dianping.cat.Cat;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
+import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.dao.MessageDao;
@@ -31,34 +36,45 @@ import com.mongodb.Mongo;
 /**
  * @author mingdongli 2015年5月12日 下午2:52:05
  */
-public class ScanWriteDaoScheduler {
+@Component
+public class TopicScanner {
 
 	private static final String TOPIC_DB_NAME = "swallowwebapplication";
 	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm";
 
-	private static final String PRE_MSG = "msg#";
 	private static final String DELIMITOR = ",";
 
 	@Resource(name = "administratorService")
 	private AdministratorService administratorService;
+	
 	@Resource(name = "topicMongoTemplate")
 	private MongoTemplate mongoTemplate;
+	
 	@Resource(name = "filterMetaDataService")
 	private FilterMetaDataService filterMetaDataService;
+	
 	@Autowired
 	private MessageDao webSwallowMessageDao;
+	
 	@Autowired
 	private TopicDao topicDao;
+	
 	@Autowired
 	private AdministratorDao administratorDao;
+	
+	private Map<String, Set<String>> topics = new ConcurrentHashMap<String, Set<String>>(); 
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(TopicController.class);
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Scheduled(fixedDelay = 10000)
+	@Scheduled(fixedDelay = 60000)
 	public void scanTopicDatabase() {
-		logger.info("[scanTopicDatabase]");
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[scanTopicDatabase]");
+		}
+		
 		List<String> dbs = getDatabaseName();
+		getTopicAndConsumerIds(dbs);
 		boolean isTopicDbexist = isDatabaseExist();
 
 		if (isTopicDbexist)
@@ -70,11 +86,55 @@ public class ScanWriteDaoScheduler {
 		scanAdminCollection();
 	}
 
+	public Map<String, Set<String>> getTopics(){
+		
+		return topics;
+	}
+	
+	private void getTopicAndConsumerIds(List<String> dbs) {
+		
+		
+		for(String dbName :dbs){
+			
+			if(StringUtils.isEmpty(dbName)){
+				continue;
+			}
+			
+			dbName = dbName.trim();
+			if(isConsumerId(dbName)){
+				
+				String []split = dbName.split("#");
+				if(split.length != 3){
+					logger.warn("[getTopicAndConsumerIds][wrong ackdbname]" + dbName);
+					Cat.logError("wrong db name", new IllegalArgumentException(dbName));
+					continue;
+				}
+				String topic = split[1];
+				String consumerId = split[2];
+				Set<String> consumerIds = topics.get(topic);
+				if(consumerIds == null){
+					consumerIds = new HashSet<String>();
+					topics.put(topic, consumerIds);
+				}
+				consumerIds.add(consumerId);
+			}
+		}
+		
+	}
+
+	private boolean isConsumerId(String dbName) {
+		
+		if(dbName.startsWith(DefaultMongoManager.ACK_PREFIX)){
+			return true; 
+		}
+		return false;
+	}
+
 	private void createTopicDb(List<String> dbs) {
 		for (String dbn : dbs) {
 			Set<String> names = new HashSet<String>();
 			if (isTopicName(dbn)) {
-				String subStr = dbn.substring(PRE_MSG.length()).trim();
+				String subStr = dbn.substring(DefaultMongoManager.MSG_PREFIX.length()).trim();
 				if (!names.contains(subStr)) { // in case add twice
 					names.add(subStr);
 					saveTopic(subStr);
@@ -86,7 +146,7 @@ public class ScanWriteDaoScheduler {
 	private void updateTopicDb(List<String> dbs) {
 		for (String str : dbs) {
 			if (isTopicName(str)) {
-				String subStr = str.substring(PRE_MSG.length());
+				String subStr = str.substring(DefaultMongoManager.MSG_PREFIX.length());
 				Topic t = topicDao.readByName(subStr);
 				if (t != null) { // exists
 					updateTopicToWhiteList(subStr, t);
@@ -119,13 +179,15 @@ public class ScanWriteDaoScheduler {
 	}
 
 	private List<String> getDatabaseName() {
-		List<String> dbs = new ArrayList<String>();
+		Set<String> dbs = new HashSet<String>();
 		List<Mongo> allReadMongo = webSwallowMessageDao.getAllReadMongo();
 		for (Mongo mc : allReadMongo) {
 			dbs.addAll(mc.getDatabaseNames());
 		}
-		Collections.sort(dbs);
-		return dbs;
+		List<String> result = new ArrayList<String>(dbs);
+		Collections.sort(result);
+		
+		return result;
 	}
 
 	private void scanAdminCollection() {
@@ -156,10 +218,12 @@ public class ScanWriteDaoScheduler {
 	}
 
 	private boolean isTopicName(String str) {
-		if (str != null && str.startsWith(PRE_MSG))
+		
+		if (str.startsWith(DefaultMongoManager.MSG_PREFIX)){
 			return true;
-		else
-			return false;
+		}
+		
+		return false;
 	}
 
 	private Set<String> splitProps(String props) {

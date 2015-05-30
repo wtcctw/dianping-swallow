@@ -191,4 +191,5 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 	}
 
 	protected abstract void doClone(MonitorData monitorData) throws CloneNotSupportedException;
+
 }

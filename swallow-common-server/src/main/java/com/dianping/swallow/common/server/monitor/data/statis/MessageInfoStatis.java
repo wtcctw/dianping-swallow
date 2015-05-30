@@ -21,7 +21,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.MessageInfo;
  *
  * 2015年5月19日 下午5:46:28
  */
-public class MessageInfoStatis implements Statisable<MessageInfo>{
+public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implements Statisable<MessageInfo>{
 	
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -59,7 +59,7 @@ public class MessageInfoStatis implements Statisable<MessageInfo>{
 		buildQpx(sub, intervalCount, qpx);
 		
 		
-		removeBefore(sub.lastKey(), col);
+		removeBefore(sub.lastKey(), col, "col,build");
 		
 	}
 	
@@ -77,19 +77,19 @@ public class MessageInfoStatis implements Statisable<MessageInfo>{
 	}
 
 	@Override
-	public void removeBefore(Long key) {
+	public void doRemoveBefore(Long key) {
 		
-		removeBefore(key, col);
-		removeBefore(key, qpxMap);
-		removeBefore(key, delayMap);
+		removeBefore(key, col, "col");
+		removeBefore(key, qpxMap, "qpxMap");
+		removeBefore(key, delayMap, "delayMap");
 	}
 
-	private void removeBefore(Long key, NavigableMap<Long, ?> map) {
+	private void removeBefore(Long key, NavigableMap<Long, ?> map, String desc) {
 		
 		SortedMap<Long, ?>  toDelete = map.headMap(key);
 		for(Long id : toDelete.keySet()){
 			if(logger.isDebugEnabled()){
-				logger.debug("[removeBefore]" + id);
+				logger.debug("[removeBefore]" + id + "," + key + "," + desc);
 			}
 			map.remove(id);
 		}
@@ -132,20 +132,19 @@ public class MessageInfoStatis implements Statisable<MessageInfo>{
 			
 			if(step >= intervalCount){
 				
-				if(count >= 0){
-					
-					switch(qpx){
-						case SECOND:
-							qpxMap.put(startKey, count/realintervalTimeSeconds);
-						break;
-						case MINUTE:
-							qpxMap.put(startKey, (long)(count/realIntervalTimeMinutes));
-						break;
-					}
-					
-				}else{
-					qpxMap.put(startKey, 0L);
+				if(count < 0){
+					count = 0;
 				}
+				
+				switch(qpx){
+					case SECOND:
+						qpxMap.put(startKey, count/realintervalTimeSeconds);
+					break;
+					case MINUTE:
+						qpxMap.put(startKey, (long)(count/realIntervalTimeMinutes));
+					break;
+				}
+					
 				step  = 1;
 				count = 0;
 				startKey = key;
@@ -221,11 +220,8 @@ public class MessageInfoStatis implements Statisable<MessageInfo>{
 	}
 
 	@Override
-	public void clean() {
-		
-		col.clear();
-		qpxMap.clear();
-		delayMap.clear();
+	public void cleanEmpty() {
+		//nothing need to be done
 	}
 
 	@Override
@@ -236,4 +232,9 @@ public class MessageInfoStatis implements Statisable<MessageInfo>{
 		
 	}
 
+	@Override
+	protected Statisable<?> getValue(Object key) {
+		
+		throw  new UnsupportedOperationException("unsupported operation getValue()");
+	}
 }

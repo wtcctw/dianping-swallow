@@ -82,4 +82,11 @@ public interface MessageDAO {
 	 * @return
 	 */
 	int count(String topicName, String consumerId);
+	
+	
+	/**
+	 * 获取当前consumerId还有多少堆积消息
+	 * @return
+	 */
+	long getAccumulation(String topicName, String consumerId);
 }

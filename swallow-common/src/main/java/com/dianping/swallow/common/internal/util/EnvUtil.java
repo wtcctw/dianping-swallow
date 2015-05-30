@@ -16,7 +16,7 @@ public class EnvUtil {
 	private static final String env;
 	
 	static{
-		env = EnvZooKeeperConfig.getEnv();
+		env = EnvZooKeeperConfig.getEnv().trim();
 	}
 	
 	public static boolean isDev(){
@@ -54,6 +54,10 @@ public class EnvUtil {
 			
 			if(isDev()){
 				return protocal + "localhost:8080";
+			}
+			
+			if(isPpe()){
+				return protocal + "ppe."+basicWebAddress;
 			}
 			
 			return protocal + env + "." + basicWebAddress; 

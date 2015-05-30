@@ -109,8 +109,6 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 		ackMessages.merge(key, toMerge.ackMessages);
 	}
 
-
-
 	public void sendMessage(String consumerIp, SwallowMessage message){
 		
 		//记录消息发送时间
@@ -181,5 +179,6 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 		clone.ackMessages = (MessageInfoTotalMap) ackMessages.clone();
 		return clone;
 	}
+
 }
 
