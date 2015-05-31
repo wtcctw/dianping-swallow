@@ -20,6 +20,9 @@ public class SwallowMessageUtil {
 		}
 		
 		String time = internalProperties.get(MessageDAOImpl.SAVE_TIME);
+		if(time == null){
+			return 0;
+		}
 		return Long.parseLong(time);
 	}
 
