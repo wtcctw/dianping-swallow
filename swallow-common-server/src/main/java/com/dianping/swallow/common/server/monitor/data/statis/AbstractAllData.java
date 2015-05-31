@@ -9,9 +9,6 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.QPX;
@@ -31,8 +28,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>, S extends AbstractTotalMapStatisable<M, T>, V extends MonitorData> 
 														extends AbstractStatisable<V> implements StatisRetriever{
 
-	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
-	
 	protected Map<String, S> servers = new ConcurrentHashMap<String, S>();
 	
 	@JsonIgnore

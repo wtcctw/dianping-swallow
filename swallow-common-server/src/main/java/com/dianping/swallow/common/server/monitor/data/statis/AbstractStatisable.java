@@ -43,7 +43,7 @@ public abstract class AbstractStatisable<V> implements Statisable<V>{
 
 	@Override
 	public String toString() {
-		return JsonBinder.getNonEmptyBinder().toJson(this);
+		return JsonBinder.getNonEmptyBinder().toPrettyJson(this);
 	}
 
 	protected boolean isTotalKey(String key) {

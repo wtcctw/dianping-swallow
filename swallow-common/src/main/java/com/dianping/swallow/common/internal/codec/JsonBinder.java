@@ -58,6 +58,14 @@ public final class JsonBinder {
       }
    }
 
+   public String toPrettyJson(Object object) {
+      try {
+          return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+       } catch (IOException e) {
+          throw new JsonSerializedException("Serialized Object to json string error : " + object, e);
+       }
+   }
+
    /**
     * 反序列化POJO或简单Collection如List<String>. 如果JSON字符串为Null或"null"字符串, 返回Null.
     * 如果JSON字符串为"[]", 返回空集合. 如需反序列化复杂Collection如List<MyBean>,

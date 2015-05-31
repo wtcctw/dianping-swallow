@@ -6,12 +6,12 @@
 	<appender name="console" class="com.dianping.combiz.misc.ExtendedConsoleAppender">
 		<param name="Target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %-5p [%c] %m%n" />
+			<param name="ConversionPattern" value="%d[%-5p][%t][%c]%m%n" />
 		</layout>
 	</appender>
 
 	<appender name="fileAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="/data/applogs/swallow/swallow-web.log" />
+		<param name="File" value="/data/applogs/swallow-web/logs/swallow-web.log" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d[%-5p][%t][%c]%m%n" />
 		</layout>
@@ -19,16 +19,6 @@
 	
 	<appender name="catAppender" class="com.dianping.cat.log4j.CatAppender"/>
 	
-
-<!--  	
-	<logger name="com.dianping.swallow.web.monitor.impl.DefaultAccumulationRetriever" additivity="true">
-		<priority value ="DEBUG"/>
-	</logger>
--->
-	<logger name="com.dianping.swallow.common.server.monitor.data.statis.ProducerAllData" additivity="true">
-		<priority value ="DEBUG"/>
-	</logger>
-
 
 	<logger name="org.jasig.cas" additivity="true">
 		<priority value ="ERROR"/>

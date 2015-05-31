@@ -18,8 +18,11 @@ public class SimpleTest {
 	@Test
 	public void testLong() throws ParseException{
 		
-		print("20150530153030");
-		print("20150530093430");
+		System.out.println(new Date(286610301L*5*1000));
+		print("20150531135100");
+		print("20150531135200");
+		
+		print("20150531144500");
 		
 		
 	}
@@ -29,9 +32,10 @@ public class SimpleTest {
 	 * @throws ParseException 
 	 */
 	private void print(String timeStr) throws ParseException {
-		
+		System.out.println();
 		long time = DateUtils.fromSimpleFormat(timeStr).getTime();
 		System.out.println(time);
+		System.out.println(time/5/1000);
 		System.out.println(new Date(time));
 	}
 
