@@ -31,7 +31,7 @@ import com.dianping.swallow.web.service.TopicService;
  *         2015年4月22日 下午1:50:20
  */
 @Controller
-public class TopicController extends AbstractController {
+public class TopicController extends AbstractMenuController {
 
 	private static final String DELIMITOR = ",";
 
@@ -105,6 +105,11 @@ public class TopicController extends AbstractController {
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
 
 		return lists;
+	}
+
+	@Override
+	protected String getMenu() {
+		return "topic";
 	}
 
 }

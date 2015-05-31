@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.LionException;
+import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.FilterMetaDataService;
 
 /**
@@ -21,7 +24,7 @@ import com.dianping.swallow.web.service.FilterMetaDataService;
  *         2015年5月24日下午3:20:46
  */
 @Service("filterMetaDataService")
-public class FilterMetaDataServiceImpl implements FilterMetaDataService {
+public class FilterMetaDataServiceImpl extends AbstractSwallowService implements FilterMetaDataService {
 
 	@Value("${swallow.web.env.notproduct}")
 	private boolean showContentToAll;
@@ -29,7 +32,7 @@ public class FilterMetaDataServiceImpl implements FilterMetaDataService {
 	@Value("${swallow.web.admin.defaultadmin}")
 	private String defaultAdmin;
 	
-	private String env;
+	private String logoutUrl;
 
 	private Map<String, Set<String>> topicToWhiteList = new ConcurrentHashMap<String, Set<String>>();
 
@@ -37,7 +40,13 @@ public class FilterMetaDataServiceImpl implements FilterMetaDataService {
 	
 	@PostConstruct
 	private void environment(){
-		env = EnvZooKeeperConfig.getEnv().trim();
+		try {
+			ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
+			logoutUrl = configCache.getProperty("swallow.web.sso.url").trim();
+			logoutUrl = logoutUrl.replaceAll(":", "%3A").replaceAll("/", "%2F");
+		} catch (LionException e) {
+			logger.error("Use lion to get swallow.web.sso.url error.", e);
+		}
 	}
 
 	public Map<String, Set<String>> loadTopicToWhiteList() {
@@ -75,13 +84,13 @@ public class FilterMetaDataServiceImpl implements FilterMetaDataService {
 	}
 
 	@Override
-	public String loadEnv() {
-		return env;
+	public String loadLogoutUrl() {
+		return logoutUrl;
 	}
 
 	@Override
-	public void setEnv(String env) {
-		this.env = env;
+	public void setLogoutUrl(String logoutUrl) {
+		this.logoutUrl = logoutUrl;
 		
 	}
 
