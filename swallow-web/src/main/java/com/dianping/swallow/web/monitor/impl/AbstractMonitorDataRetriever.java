@@ -9,7 +9,10 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
@@ -44,17 +47,37 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		statis = createServerStatis();
 	}
 	
+	public String getDebugInfo(){
+		return statis.toString();
+	}
+	
 	@Override
 	protected void doBuild() {
 
-		statis.build(QPX.SECOND, getKey(lastBuildTime), getKey(current), intervalCount);
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doBuild");
+		catWrapper.doAction(new SwallowAction() {
+			
+			@Override
+			public void doAction() throws SwallowException {
+				
+				statis.build(QPX.SECOND, getKey(lastBuildTime), getKey(current), intervalCount);
+			}
+		});
+		
 	}
 
 	
 	@Override
-	protected void doRemove(long toKey) {
+	protected void doRemove(final long toKey) {
 
-		statis.removeBefore(toKey);
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doRemove");
+		catWrapper.doAction(new SwallowAction() {
+			
+			@Override
+			public void doAction() throws SwallowException {
+				statis.removeBefore(toKey);;
+			}
+		});
 	}
 
 	protected abstract AbstractAllData<M, T, S, V> createServerStatis();
@@ -132,8 +155,16 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void add(MonitorData monitorData) {
+	public void add(final MonitorData monitorData) {
 		
-		statis.add(monitorData.getKey(), (V) monitorData);
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "add");
+		catWrapper.doAction(new SwallowAction() {
+			
+			@Override
+			public void doAction() throws SwallowException {
+				
+				statis.add(monitorData.getKey(), (V) monitorData);
+			}
+		});
 	}
 }

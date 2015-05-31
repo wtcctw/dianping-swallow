@@ -59,7 +59,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 		buildQpx(sub, intervalCount, qpx);
 		
 		
-		removeBefore(sub.lastKey(), col, "col,build");
+//		removeBefore(sub.lastKey(), col, "col,build");
 		
 	}
 	
@@ -123,7 +123,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 			MessageInfo info = entry.getValue(); 
 			
 			if(step != 0){
-				if(info.getTotal() >0 && lastCount > 0){
+				if(info.getTotal() >0 && lastCount > 0 && info.getTotal() > lastCount){
 					
 					count += info.getTotal() - lastCount;
 				}
@@ -186,7 +186,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 				if(delay < 0){
 					delay = 0;
 				}
-				if(count != 0){
+				if(count > 0){
 					delayMap.put(startKey, delay/count);
 				}else{
 					delayMap.put(startKey, 0L);

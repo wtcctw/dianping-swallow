@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 import com.dianping.swallow.web.dao.ConsumerMonitorDao;
@@ -43,25 +47,40 @@ public class DataCollectorController extends AbstractController{
 	
 	@RequestMapping(value = "/api/stats/producer", method = RequestMethod.POST)
 	@ResponseBody
-	public void addProducerMonitor(@RequestBody ProducerMonitorData  producerMonitorData) throws IOException{
+	public void addProducerMonitor(@RequestBody final ProducerMonitorData  producerMonitorData) throws IOException{
 		
 		if(logger.isDebugEnabled()){
 			logger.debug("[addProducerMonitor]" + producerMonitorData);
 		}
-		producerDataRetriever.add(producerMonitorData);
-		producerMonitorDataDao.saveProducerMonotorData(producerMonitorData);
+		SwallowActionWrapper action = new CatActionWrapper("DataCollectorController", "addProducerMonitor");
+		action.doAction(new SwallowAction() {
+			
+			@Override
+			public void doAction() throws SwallowException {
+				producerDataRetriever.add(producerMonitorData);
+				producerMonitorDataDao.saveProducerMonotorData(producerMonitorData);
+			}
+		});
 		
 	}
 
 	@RequestMapping(value = "/api/stats/consumer", method = RequestMethod.POST)
 	@ResponseBody
-	public void addConsumerMonitor(@RequestBody ConsumerMonitorData consumerMonitorData) throws IOException{
+	public void addConsumerMonitor(@RequestBody final ConsumerMonitorData consumerMonitorData) throws IOException{
 
 		if(logger.isDebugEnabled()){
 			logger.debug("[addConsumerMonitor]" + consumerMonitorData);
 		}
-		consumerDataRetriever.add(consumerMonitorData);
-		consumerMonitorDataDao.saveConsumerMonotorData(consumerMonitorData);
+		SwallowActionWrapper action = new CatActionWrapper("DataCollectorController", "addProducerMonitor");
+		action.doAction(new SwallowAction() {
+
+			@Override
+			public void doAction() throws SwallowException {
+				
+				consumerDataRetriever.add(consumerMonitorData);
+				consumerMonitorDataDao.saveConsumerMonotorData(consumerMonitorData);
+			}
+		});
 
 	}
 

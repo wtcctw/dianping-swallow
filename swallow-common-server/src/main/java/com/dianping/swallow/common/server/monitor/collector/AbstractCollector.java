@@ -163,14 +163,10 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 			if(logger.isDebugEnabled()){
 				logger.debug("[run][begin]");
 			}
+
 			doSendTask();
 		}catch(Throwable th){
-			
-			if(th instanceof SocketException){
-				logger.error(th.toString());
-			}else{
-				logger.error("[run]", th);
-			}
+			logger.error("[run]", th);
 		}finally{
 			if(logger.isDebugEnabled()){
 				logger.debug("[run][end]");
@@ -191,7 +187,11 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 				success = checkResponse(response);
 			}catch(Exception e){
 				post.abort();
-				logger.error("[doSendTask]", e);
+				if(e instanceof SocketException){
+					logger.error(e.toString());
+				}else{
+					logger.error("[doSendTask]", e);
+				}
 			}finally{
 				
 			}

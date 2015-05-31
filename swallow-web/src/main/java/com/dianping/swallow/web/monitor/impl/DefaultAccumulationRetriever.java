@@ -49,7 +49,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	@Autowired
 	private MessageDAO messageDao;
 	
-	private ExecutorService executors = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT*2, new MQThreadFactory("ACCUMULATION_RETRIEVER-"));
+	private ExecutorService executors = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT*5, new MQThreadFactory("ACCUMULATION_RETRIEVER-"));
 
 	@Override
 	protected void doBuild() {

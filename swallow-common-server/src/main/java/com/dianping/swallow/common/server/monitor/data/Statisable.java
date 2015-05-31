@@ -30,7 +30,7 @@ public interface Statisable<V> {
 	 */
 	void build(QPX qpx, Long startKey, Long endKey, int intervalCount);
 	
-	
+	@JsonIgnore
 	boolean isEmpty();
 
 

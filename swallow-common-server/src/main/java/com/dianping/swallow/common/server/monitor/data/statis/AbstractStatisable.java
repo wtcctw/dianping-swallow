@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Transient;
 
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao
@@ -44,5 +45,10 @@ public abstract class AbstractStatisable<V> implements Statisable<V>{
 	public String toString() {
 		return JsonBinder.getNonEmptyBinder().toJson(this);
 	}
+
+	protected boolean isTotalKey(String key) {
+		return key.equals(MonitorData.TOTAL_KEY);
+	}
+
 
 }
