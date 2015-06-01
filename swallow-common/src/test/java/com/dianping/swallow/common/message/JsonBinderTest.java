@@ -19,6 +19,14 @@ import com.google.common.collect.Maps;
 public class JsonBinderTest {
 
    private static JsonBinder binder = JsonBinder.getNonEmptyBinder();
+   
+   
+   @Test
+   public void toNullJson(){
+	   
+	   System.out.println(binder.toJson(null));
+	   
+   }
 
    /**
     * 序列化对象/集合到Json字符串.

@@ -47,8 +47,9 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		statis = createServerStatis();
 	}
 	
-	public String getDebugInfo(){
-		return statis.toString();
+	public String getDebugInfo(String server){
+
+		return statis.toString(server);
 	}
 	
 	@Override

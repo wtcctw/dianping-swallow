@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data.structure;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.dianping.swallow.common.internal.codec.JsonBinder;
@@ -22,6 +23,7 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 	private AtomicLong total = new AtomicLong();
 	
 	private volatile boolean isDirty = false;
+	private AtomicInteger noneZeroMergeCount = new AtomicInteger();
 	
 	public MessageInfo(){
 		
@@ -65,7 +67,11 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 		if(!(merge instanceof MessageInfo)){
 			throw new IllegalArgumentException("wrong type " + merge.getClass());
 		}
+		
 		MessageInfo toMerge = (MessageInfo) merge;
+		if(toMerge.getTotal() > 0 || toMerge.getTotalDelay() > 0){
+			noneZeroMergeCount.incrementAndGet();
+		}
 		total.addAndGet(toMerge.total.get());
 		totalDelay.addAndGet(toMerge.totalDelay.get());
 	}
@@ -89,6 +95,7 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 		MessageInfo info = (MessageInfo) super.clone();
 		info.total = new AtomicLong(total.get());
 		info.totalDelay = new AtomicLong(totalDelay.get());
+		info.noneZeroMergeCount = new AtomicInteger(noneZeroMergeCount.get());
 		return info;
 	}
 
@@ -103,5 +110,10 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 	@JsonIgnore
 	public boolean isDirty(){
 		return isDirty;
+	}
+
+	@JsonIgnore
+	public int getNonZeroMergeCount(){
+		return noneZeroMergeCount.get();
 	}
 }

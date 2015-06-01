@@ -31,7 +31,10 @@ import org.apache.http.util.EntityUtils;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
+import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
@@ -130,7 +133,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 			}
 			return;
 		}
-		future = scheduled.scheduleWithFixedDelay(this, SEND_INTERVAL, SEND_INTERVAL, TimeUnit.SECONDS);
+		future = scheduled.scheduleAtFixedRate(this, SEND_INTERVAL, SEND_INTERVAL, TimeUnit.SECONDS);
 	}
 	
 	protected boolean isExclude(String topic) {
@@ -159,19 +162,18 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	@Override
 	public void run() {
 		
-		try{
-			if(logger.isDebugEnabled()){
-				logger.debug("[run][begin]");
+		SwallowActionWrapper cat = new CatActionWrapper(getClass().getSimpleName(), "sendMessage");
+		cat.doAction(new SwallowAction() {
+			
+			@Override
+			public void doAction() throws SwallowException {
+				try {
+					doSendTask();
+				} catch (UnsupportedEncodingException e) {
+					logger.error("run", e);
+				}
 			}
-
-			doSendTask();
-		}catch(Throwable th){
-			logger.error("[run]", th);
-		}finally{
-			if(logger.isDebugEnabled()){
-				logger.debug("[run][end]");
-			}
-		}
+		});
 	}
 
 	private void doSendTask() throws UnsupportedEncodingException {

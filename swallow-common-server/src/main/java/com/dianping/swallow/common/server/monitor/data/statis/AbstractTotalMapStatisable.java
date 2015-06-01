@@ -233,4 +233,10 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 		
 		return JsonBinder.getNonEmptyBinder().toPrettyJson(map);
 	}
+	
+	public String toString(String key){
+		
+		return JsonBinder.getNonEmptyBinder().toPrettyJson(map.get(key));
+	}
+
 }
