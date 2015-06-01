@@ -46,33 +46,33 @@ public class TopicScanner {
 
 	@Resource(name = "administratorService")
 	private AdministratorService administratorService;
-	
+
 	@Resource(name = "topicMongoTemplate")
 	private MongoTemplate mongoTemplate;
-	
+
 	@Resource(name = "filterMetaDataService")
 	private FilterMetaDataService filterMetaDataService;
-	
+
 	@Autowired
 	private MessageDao webSwallowMessageDao;
-	
+
 	@Autowired
 	private TopicDao topicDao;
-	
+
 	@Autowired
 	private AdministratorDao administratorDao;
-	
-	private Map<String, Set<String>> topics = new ConcurrentHashMap<String, Set<String>>(); 
+
+	private Map<String, Set<String>> topics = new ConcurrentHashMap<String, Set<String>>();
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Scheduled(fixedDelay = 60000)
 	public void scanTopicDatabase() {
-		
-		if(logger.isInfoEnabled()){
+
+		if (logger.isInfoEnabled()) {
 			logger.info("[scanTopicDatabase]");
 		}
-		
+
 		List<String> dbs = getDatabaseName();
 		getTopicAndConsumerIds(dbs);
 		boolean isTopicDbexist = isDatabaseExist();
@@ -86,46 +86,47 @@ public class TopicScanner {
 		scanAdminCollection();
 	}
 
-	public Map<String, Set<String>> getTopics(){
-		
+	public Map<String, Set<String>> getTopics() {
+
 		return topics;
 	}
-	
+
 	private void getTopicAndConsumerIds(List<String> dbs) {
-		
-		
-		for(String dbName :dbs){
-			
-			if(StringUtils.isEmpty(dbName)){
+
+		for (String dbName : dbs) {
+
+			if (StringUtils.isEmpty(dbName)) {
 				continue;
 			}
-			
+
 			dbName = dbName.trim();
-			if(isConsumerId(dbName)){
-				
-				String []split = dbName.split("#");
-				if(split.length != 3){
-					logger.warn("[getTopicAndConsumerIds][wrong ackdbname]" + dbName);
-					Cat.logError("wrong db name", new IllegalArgumentException(dbName));
+			if (isConsumerId(dbName)) {
+
+				String[] split = dbName.split("#");
+				if (split.length != 3) {
+					logger.warn("[getTopicAndConsumerIds][wrong ackdbname]"
+							+ dbName);
+					Cat.logError("wrong db name", new IllegalArgumentException(
+							dbName));
 					continue;
 				}
 				String topic = split[1];
 				String consumerId = split[2];
 				Set<String> consumerIds = topics.get(topic);
-				if(consumerIds == null){
+				if (consumerIds == null) {
 					consumerIds = new HashSet<String>();
 					topics.put(topic, consumerIds);
 				}
 				consumerIds.add(consumerId);
 			}
 		}
-		
+
 	}
 
 	private boolean isConsumerId(String dbName) {
-		
-		if(dbName.startsWith(DefaultMongoManager.ACK_PREFIX)){
-			return true; 
+
+		if (dbName.startsWith(DefaultMongoManager.ACK_PREFIX)) {
+			return true;
 		}
 		return false;
 	}
@@ -134,7 +135,8 @@ public class TopicScanner {
 		for (String dbn : dbs) {
 			Set<String> names = new HashSet<String>();
 			if (isTopicName(dbn)) {
-				String subStr = dbn.substring(DefaultMongoManager.MSG_PREFIX.length()).trim();
+				String subStr = dbn.substring(
+						DefaultMongoManager.MSG_PREFIX.length()).trim();
 				if (!names.contains(subStr)) { // in case add twice
 					names.add(subStr);
 					saveTopic(subStr);
@@ -146,7 +148,8 @@ public class TopicScanner {
 	private void updateTopicDb(List<String> dbs) {
 		for (String str : dbs) {
 			if (isTopicName(str)) {
-				String subStr = str.substring(DefaultMongoManager.MSG_PREFIX.length());
+				String subStr = str.substring(DefaultMongoManager.MSG_PREFIX
+						.length());
 				Topic t = topicDao.readByName(subStr);
 				if (t != null) { // exists
 					updateTopicToWhiteList(subStr, t);
@@ -186,43 +189,45 @@ public class TopicScanner {
 		}
 		List<String> result = new ArrayList<String>(dbs);
 		Collections.sort(result);
-		
+
 		return result;
 	}
 
 	private void scanAdminCollection() {
 		List<Administrator> aList = administratorDao.findAll();
 		int role = -1;
-		if(!aList.isEmpty()){
+		if (!aList.isEmpty()) {
 			for (Administrator list : aList) {
 				role = list.getRole();
 				if (role == AccessControlServiceConstants.ADMINI) {
-					if (filterMetaDataService.loadAdminSet().add(list.getName())) {
+					if (filterMetaDataService.loadAdminSet()
+							.add(list.getName())) {
 						logger.info("admiSet add " + list.getName());
 					}
 				}
 			}
-		}
-		else if (filterMetaDataService.loadAdminSet().isEmpty()) {
+		} else if (filterMetaDataService.loadAdminSet().isEmpty()) {
 			String defaultAdmin = filterMetaDataService.loadDefaultAdmin();
-			administratorService.createInAdminList(defaultAdmin,
-					AccessControlServiceConstants.ADMINI);
-			filterMetaDataService.loadAdminSet().add(
-					filterMetaDataService.loadDefaultAdmin());
-			logger.info("admiSet add default admin.");
-		}
-		else{
-			//ignore
+			String[] admins = defaultAdmin.split(DELIMITOR);
+			for (String admin : admins) {
+				administratorService.createInAdminList(admin,
+						AccessControlServiceConstants.ADMINI);
+				filterMetaDataService.loadAdminSet().add(
+						filterMetaDataService.loadDefaultAdmin());
+				logger.info("admiSet add default admin.");
+			}
+		} else {
+			// ignore
 		}
 
 	}
 
 	private boolean isTopicName(String str) {
-		
-		if (str.startsWith(DefaultMongoManager.MSG_PREFIX)){
+
+		if (str.startsWith(DefaultMongoManager.MSG_PREFIX)) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -236,7 +241,8 @@ public class TopicScanner {
 		Long id = System.currentTimeMillis();
 		String date = new SimpleDateFormat(TIMEFORMAT).format(new Date());
 		Topic p = new Topic();
-		p.setId(id.toString()).setName(subStr).setProp("").setDept("").setTime(date).setMessageNum(num);
+		p.setId(id.toString()).setName(subStr).setProp("").setDept("")
+				.setTime(date).setMessageNum(num);
 		return p;
 	}
 }
