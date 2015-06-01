@@ -40,4 +40,6 @@ public interface Statisable<V> {
 	@JsonIgnore
 	NavigableMap<Long, Long> getQpx(StatisType type);
 
+	String toString(String key);
+
 }

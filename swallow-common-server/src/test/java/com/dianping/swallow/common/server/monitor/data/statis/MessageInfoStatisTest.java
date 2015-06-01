@@ -56,6 +56,51 @@ public class MessageInfoStatisTest extends AbstractTest{
 		}
 	}
 
+	@Test
+	public void testMergeDirty() throws CloneNotSupportedException{
+		
+		int addCount = 100;
+		int wrong = 2;
+		
+		MessageInfo info1 = new MessageInfo();
+		MessageInfo info2 = new MessageInfo();
+		
+		for(Long i = endKey + 1;  i <= endKey + addCount; i++){
+			
+			add(info1);
+			add(info2);
+			
+			if(i <= endKey + wrong){
+				messageInfoStatis.add(i , (MessageInfo)info1.clone());
+			}else{
+				messageInfoStatis.add(i , (MessageInfo)info1.clone());
+				messageInfoStatis.add(i , (MessageInfo)info2.clone());
+			}
+		}
+		
+		messageInfoStatis.build(QPX.SECOND, endKey + 1, endKey + addCount, 1);
+		
+		NavigableMap<Long, Long> qpx = messageInfoStatis.getQpx(StatisType.SAVE);
+		NavigableMap<Long, Long> delay = messageInfoStatis.getDelay(StatisType.SAVE);
+		
+		expect(qpx.headMap(endKey + wrong, true), wrong , 0L);
+		expect(qpx.tailMap(endKey + wrong + 1, true), addCount - wrong - 1, expectedQpx * 2);
+		
+		expect(delay.headMap(endKey + wrong, true), wrong , 0L);
+		expect(delay.tailMap(endKey + wrong + 1, true), addCount - wrong -1, expectedDelay);
+		
+		
+	}
+
+	
+	private void add(MessageInfo info) {
+		
+		for(int j=0; j<AbstractCollector.SEND_INTERVAL*expectedQpx ; j++){
+			Long current = System.currentTimeMillis();
+			info.addMessage(1, current - expectedDelay, current);
+		}
+	}
+
 
 	@Test
 	public void testAjustBigInterval() throws CloneNotSupportedException{
@@ -99,10 +144,7 @@ public class MessageInfoStatisTest extends AbstractTest{
 		
 		for(int i=0 ; i < addCount; i++){
 			
-			for(int j=0;j<AbstractCollector.SEND_INTERVAL*expectedQpx;j++){
-				Long current = System.currentTimeMillis();
-				wrongInfo.addMessage(i, current - expectedDelay, current);
-			}
+			add(wrongInfo);
 			
 			messageInfoStatis.add(endKey + i + 1, (MessageInfo) wrongInfo.clone());
 		}

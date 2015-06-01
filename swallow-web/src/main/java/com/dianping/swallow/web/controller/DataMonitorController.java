@@ -120,22 +120,24 @@ public class DataMonitorController extends AbstractMonitorController{
 	}
 
 
-	@RequestMapping(value = "/console/monitor/consumer/debug", method = RequestMethod.GET)
+	@RequestMapping(value = "/console/monitor/consumer/debug/{server}", method = RequestMethod.GET)
 	@ResponseBody
-	public String getConsumerDebug(){
+	public String getConsumerDebug(@PathVariable String server){
 		
 		if(logger.isInfoEnabled()){
-			logger.info(consumerDataRetriever.getDebugInfo());
+			logger.info("[getConsumerDebug]" + server);
+			logger.info(consumerDataRetriever.getDebugInfo(server));
 		}
 		return "ok";
 	} 
 
-	@RequestMapping(value = "/console/monitor/producer/debug", method = RequestMethod.GET)
+	@RequestMapping(value = "/console/monitor/producer/debug/{server}", method = RequestMethod.GET)
 	@ResponseBody
-	public String getProducerDebug(){
+	public String getProducerDebug(@PathVariable String server){
 		
 		if(logger.isInfoEnabled()){
-			logger.info(producerDataRetriever.getDebugInfo());
+			logger.info("[getConsumerDebug]" + server);
+			logger.info(producerDataRetriever.getDebugInfo(server));
 		}
 		return "ok";
 	} 

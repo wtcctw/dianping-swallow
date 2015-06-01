@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.QPX;
@@ -207,5 +208,10 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 		
 		return ctss.allDelay(type, includeTotal);
 	}
-	
+
+	public String toString(String key){
+		
+		return JsonBinder.getNonEmptyBinder().toJson(servers.get(key));
+	}
+
 }

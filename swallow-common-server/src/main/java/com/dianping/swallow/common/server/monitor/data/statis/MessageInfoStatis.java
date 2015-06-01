@@ -72,6 +72,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 			Long startKey, Long endKey) {
 
 		Long lastDelay = 0L, lastTotal = 0L;
+		int  noneZeroMergeCount = 0;
 		for(Long i =startKey ; i <= endKey; i++){
 			
 			MessageInfo currentMessageInfo = sub.get(i);
@@ -92,6 +93,17 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 			
 			lastDelay = currentMessageInfo.getTotalDelay();
 			lastTotal = currentMessageInfo.getTotal();
+			
+			if( currentMessageInfo.getNonZeroMergeCount() > noneZeroMergeCount ){
+				noneZeroMergeCount = currentMessageInfo.getNonZeroMergeCount();
+			}
+		}
+		
+		
+		for(MessageInfo messageInfo : sub.values()){
+			if(messageInfo.getNonZeroMergeCount() < noneZeroMergeCount){
+				messageInfo.markDirty();
+			}
 		}
 	}
 

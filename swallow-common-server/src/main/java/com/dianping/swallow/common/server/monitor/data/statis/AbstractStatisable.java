@@ -45,6 +45,11 @@ public abstract class AbstractStatisable<V> implements Statisable<V>{
 	public String toString() {
 		return JsonBinder.getNonEmptyBinder().toPrettyJson(this);
 	}
+	
+	public String toString(String key){
+		
+		return toString();
+	}
 
 	protected boolean isTotalKey(String key) {
 		return key.equals(MonitorData.TOTAL_KEY);
