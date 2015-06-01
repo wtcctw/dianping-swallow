@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
 
+
 /**
  * @author Leo Liang
  */
@@ -109,4 +110,24 @@ public class IPUtil {
 	   }
 	   return result;
    }
+
+   
+   
+   public static String simpleLogIp(String ipPort) {
+	   
+	   if(ipPort == null){
+		   return null;
+	   }
+	   ipPort = ipPort.trim();
+	   int index = ipPort.indexOf(".");
+	   if(index < 0){
+		   return ipPort;
+	   }
+	   index = ipPort.indexOf(".", index + 1);
+	   if(index < 0){
+		   return ipPort;
+	   }
+	   return ipPort.substring(index + 1);
+   }
+   
 }

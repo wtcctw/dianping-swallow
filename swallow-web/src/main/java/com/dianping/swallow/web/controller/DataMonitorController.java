@@ -119,6 +119,27 @@ public class DataMonitorController extends AbstractMonitorController{
 		return new ModelAndView("monitor/consumerdelay", map);
 	}
 
+
+	@RequestMapping(value = "/console/monitor/consumer/debug", method = RequestMethod.GET)
+	@ResponseBody
+	public String getConsumerDebug(){
+		
+		if(logger.isInfoEnabled()){
+			logger.info(consumerDataRetriever.getDebugInfo());
+		}
+		return "ok";
+	} 
+
+	@RequestMapping(value = "/console/monitor/producer/debug", method = RequestMethod.GET)
+	@ResponseBody
+	public String getProducerDebug(){
+		
+		if(logger.isInfoEnabled()){
+			logger.info(producerDataRetriever.getDebugInfo());
+		}
+		return "ok";
+	} 
+
 	
 	@RequestMapping(value = "/console/monitor/consumerserver/qps/get", method = RequestMethod.POST)
 	@ResponseBody
@@ -130,7 +151,7 @@ public class DataMonitorController extends AbstractMonitorController{
 		return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
 	} 
 
-
+	
 	@RequestMapping(value = "/console/monitor/producerserver/qps/get", method = RequestMethod.POST)
 	@ResponseBody
 	public List<HighChartsWrapper> getProducerServerQps(){

@@ -5,7 +5,6 @@ import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,13 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 			throw new IllegalArgumentException("not MessageInfo, but " + rawAdded.getClass());
 		}
 		
-		MessageInfo added = (MessageInfo) SerializationUtils.clone(rawAdded); 
+		MessageInfo added = null;
+		try {
+			added = (MessageInfo) rawAdded.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException("[add]", e);
+		} 
+		
 		MessageInfo messageInfo = col.get(key);
 	
 		if(messageInfo == null){
@@ -53,26 +58,40 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
 		
 		SortedMap<Long, MessageInfo> sub = col.subMap(startKey, true, endKey, true);
-		insertLackedData(sub, startKey, endKey);
+		ajustData(sub, startKey, endKey);
 		
 		buildDelay(sub, intervalCount, qpx);
 		buildQpx(sub, intervalCount, qpx);
 		
-		
-		removeBefore(sub.lastKey(), col, "col,build");
+		//统计完，删除原始数据，为了方便debug，保留120条数据
+		removeBefore(sub.lastKey() - 120, col, "col,build");
 		
 	}
 	
-	private void insertLackedData(SortedMap<Long, MessageInfo> sub,
+	protected void ajustData(SortedMap<Long, MessageInfo> sub,
 			Long startKey, Long endKey) {
-		
+
+		Long lastDelay = 0L, lastTotal = 0L;
 		for(Long i =startKey ; i <= endKey; i++){
-			if(!sub.containsKey(i)){
+			
+			MessageInfo currentMessageInfo = sub.get(i);
+			
+			if(currentMessageInfo == null){
 				if(logger.isDebugEnabled()){
 					logger.debug("[insertLackedData]" + i);
 				}
-				sub.put(i, new MessageInfo());
+				currentMessageInfo = new MessageInfo();
+				sub.put(i, currentMessageInfo);
 			}
+			
+			if(i > startKey){
+				if(currentMessageInfo.getTotal() < lastTotal || currentMessageInfo.getTotalDelay() < lastDelay){
+					currentMessageInfo.markDirty();
+				}
+			}
+			
+			lastDelay = currentMessageInfo.getTotalDelay();
+			lastTotal = currentMessageInfo.getTotal();
 		}
 	}
 
@@ -107,15 +126,14 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 		return qpxMap;
 	}
 
-	protected void buildQpx(SortedMap<Long, MessageInfo> rawData, int intervalCount, QPX qpx) {
+	private void buildQpx(SortedMap<Long, MessageInfo> rawData, int intervalCount, QPX qpx) {
 
 		
-		int realintervalTimeSeconds = intervalCount * AbstractCollector.SEND_INTERVAL;
-		double realIntervalTimeMinutes = (double)realintervalTimeSeconds/60;
-		
 		int step = 0;
-		long count = 0, lastCount = 0;
+		long count = 0;
 		Long startKey = rawData.firstKey();
+		MessageInfo lastMessageInfo = null;
+		int realIntervalCount = 0;
 		
 		for(Entry<Long, MessageInfo> entry: rawData.entrySet()){
 			
@@ -123,12 +141,14 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 			MessageInfo info = entry.getValue(); 
 			
 			if(step != 0){
-				if(info.getTotal() >0 && lastCount > 0){
+				if(isDataLegal(info, lastMessageInfo)){
 					
-					count += info.getTotal() - lastCount;
+					count += info.getTotal() - lastMessageInfo.getTotal();
+					realIntervalCount++;
 				}
 			}
-			lastCount = info.getTotal();
+			
+			lastMessageInfo = info;
 			
 			if(step >= intervalCount){
 				
@@ -136,18 +156,25 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 					count = 0;
 				}
 				
-				switch(qpx){
-					case SECOND:
-						qpxMap.put(startKey, count/realintervalTimeSeconds);
-					break;
-					case MINUTE:
-						qpxMap.put(startKey, (long)(count/realIntervalTimeMinutes));
-					break;
+				int realintervalTimeSeconds = realIntervalCount * AbstractCollector.SEND_INTERVAL;
+				double realIntervalTimeMinutes = (double)realintervalTimeSeconds/60;
+				
+				if(realintervalTimeSeconds == 0){
+					qpxMap.put(startKey, 0L);
+				}else{
+					switch(qpx){
+						case SECOND:
+							qpxMap.put(startKey, (long) (count/realintervalTimeSeconds));
+						break;
+						case MINUTE:
+							qpxMap.put(startKey, (long)(count/realIntervalTimeMinutes));
+						break;
+					}
 				}
-					
 				step  = 1;
 				count = 0;
 				startKey = key;
+				realIntervalCount = 0;
 				continue;
 			}
 			step++;
@@ -156,12 +183,18 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 		
 	}
 
-	public void buildDelay(SortedMap<Long, MessageInfo> rawData, int intervalCount, QPX qpx){
+	private boolean isDataLegal(MessageInfo info, MessageInfo lastMessageInfo) {
+		
+		return !info.isDirty() && !lastMessageInfo.isDirty() && info.getTotal() >0 && lastMessageInfo.getTotal() > 0;
+	}
+
+	private void buildDelay(SortedMap<Long, MessageInfo> rawData, int intervalCount, QPX qpx){
 		
 		int step = 0;
-		long delay = 0, lastDelay = 0;
-		long count = 0, lastCount = 0;
+		long delay = 0;
+		long count = 0;
 		Long startKey = rawData.firstKey();
+		MessageInfo lastMessageInfo = null;
 		
 		for(Entry<Long, MessageInfo> entry: rawData.entrySet()){
 			
@@ -170,23 +203,21 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
 			if(step != 0){
 				
-				if(info.getTotal() >0 && lastCount > 0){//有效数据
+				if(isDataLegal(info, lastMessageInfo)){//有效数据
 					
-					count += info.getTotal() - lastCount;
-					delay += info.getTotalDelay() - lastDelay;
+					count += info.getTotal() - lastMessageInfo.getTotal();
+					delay += info.getTotalDelay() - lastMessageInfo.getTotalDelay();
 				}
-				
 			}
 			
-			lastCount = info.getTotal();
-			lastDelay = info.getTotalDelay();
+			lastMessageInfo = info;
 			
 			
 			if(step >= intervalCount){
 				if(delay < 0){
 					delay = 0;
 				}
-				if(count != 0){
+				if(count > 0){
 					delayMap.put(startKey, delay/count);
 				}else{
 					delayMap.put(startKey, 0L);

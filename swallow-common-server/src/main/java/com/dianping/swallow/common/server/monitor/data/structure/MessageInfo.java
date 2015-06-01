@@ -21,6 +21,8 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 
 	private AtomicLong total = new AtomicLong();
 	
+	private volatile boolean isDirty = false;
+	
 	public MessageInfo(){
 		
 	}
@@ -33,7 +35,7 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 		MessageInfo cmp = (MessageInfo) obj;
 		
 		return cmp.totalDelay.get() == totalDelay.get() 
-				&& cmp.total.get() == total.get();
+				&& cmp.total.get() == total.get() && cmp.isDirty == isDirty;
 	}
 	
 	@Override
@@ -90,4 +92,16 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 		return info;
 	}
 
+	
+	/**
+	 * 标记此数据为脏数据
+	 */
+	public void markDirty(){
+		isDirty = true;
+	}
+	
+	@JsonIgnore
+	public boolean isDirty(){
+		return isDirty;
+	}
 }

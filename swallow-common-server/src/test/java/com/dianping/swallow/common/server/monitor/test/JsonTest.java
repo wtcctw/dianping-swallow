@@ -6,6 +6,8 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
+import com.dianping.swallow.common.internal.codec.JsonBinder;
+
 
 /**
  * @author mengwenchao
@@ -19,12 +21,16 @@ public class JsonTest {
 	public void testSerialize(){
 		
 		HashMap<String, String> test = new HashMap<String, String>();
-		test.put("1", "1");
-		test.put("2", "2");
 		
-		System.out.println(test);
+		for(int i=0;i<100;i++){
+			test.put(String.valueOf(i), "value" + i);
+		}
+		
 		new HashSet<String>(test.keySet()).remove("1");
-		System.out.println(test);
+		
+		System.out.println(JsonBinder.getNonEmptyBinder().toJson(test));
+		System.out.println(JsonBinder.getNonEmptyBinder().toPrettyJson(test));
+		
 	}
 	
 	@Test

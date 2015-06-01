@@ -28,7 +28,9 @@ public class ProducerServerDataTest extends AbstractServerDataTest{
 		
 		producerAllData = new ProducerAllData();
 		prepareData(producerAllData);
+		System.out.println(producerAllData.toString());
 		producerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
+		System.out.println(producerAllData.toString());
 	}
 	
 	@Test

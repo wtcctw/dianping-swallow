@@ -2,6 +2,7 @@ package com.dianping.swallow.common.server.monitor.collector;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -162,6 +163,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 			if(logger.isDebugEnabled()){
 				logger.debug("[run][begin]");
 			}
+
 			doSendTask();
 		}catch(Throwable th){
 			logger.error("[run]", th);
@@ -185,7 +187,11 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 				success = checkResponse(response);
 			}catch(Exception e){
 				post.abort();
-				logger.error("[doSendTask]", e);
+				if(e instanceof SocketException){
+					logger.error(e.toString());
+				}else{
+					logger.error("[doSendTask]", e);
+				}
 			}finally{
 				
 			}

@@ -9,9 +9,6 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.QPX;
@@ -20,6 +17,7 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * 服务器相关，存储server对应的监控数据
@@ -30,9 +28,9 @@ import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>, S extends AbstractTotalMapStatisable<M, T>, V extends MonitorData> 
 														extends AbstractStatisable<V> implements StatisRetriever{
 
-	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
-	
 	protected Map<String, S> servers = new ConcurrentHashMap<String, S>();
+	
+	@JsonIgnore
 	protected   S 			 total = null;
 	
 	protected final Set<StatisType> 	supportedTypes = new HashSet<StatisType>();
@@ -88,7 +86,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 			String key = entry.getKey();
 			S 	   value =  entry.getValue();
 			if(logger.isDebugEnabled()){
-				logger.debug("[build]" + key + ","+ value);
+				logger.debug("[build][" +startKey + "," + endKey + "," + intervalCount + "]" + key + ","+ value);
 			}
 			value.build(qpx, startKey, endKey, intervalCount);
 		}
@@ -103,7 +101,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 			S 	   value = entry.getValue();
 			
 			value.cleanEmpty();
-			if(value.isEmpty()){
+			if(!isTotalKey(key) && value.isEmpty()){
 				if(logger.isInfoEnabled()){
 					logger.info("[clean]" + key);
 				}

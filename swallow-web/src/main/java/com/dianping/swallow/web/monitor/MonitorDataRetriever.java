@@ -13,4 +13,5 @@ public interface MonitorDataRetriever extends Retriever{
 
 	void add(MonitorData monitorData);
 	
+	String getDebugInfo();
 }

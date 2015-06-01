@@ -196,10 +196,6 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 		return map.size() == 1;
 	}
 
-	protected boolean isTotalKey(String key) {
-		return key.equals(MonitorData.TOTAL_KEY);
-	}
-
 	@Override
 	public Map<String, NavigableMap<Long, Long>> allQpx(StatisType type, boolean includeTotal){
 
@@ -235,6 +231,6 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 	@Override
 	public String toString() {
 		
-		return JsonBinder.getNonEmptyBinder().toJson(map);
+		return JsonBinder.getNonEmptyBinder().toPrettyJson(map);
 	}
 }
