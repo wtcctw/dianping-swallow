@@ -206,20 +206,16 @@ public class TopicScanner {
 					}
 				}
 			}
-		} else if (filterMetaDataService.loadAdminSet().isEmpty()) {
+		} else {
 			String defaultAdmin = filterMetaDataService.loadDefaultAdmin();
 			String[] admins = defaultAdmin.split(DELIMITOR);
 			for (String admin : admins) {
 				administratorService.createInAdminList(admin,
 						AccessControlServiceConstants.ADMINI);
-				filterMetaDataService.loadAdminSet().add(
-						filterMetaDataService.loadDefaultAdmin());
-				logger.info("admiSet add default admin.");
+				filterMetaDataService.loadAdminSet().add(admin);
+				logger.info("admiSet add admin " + admin);
 			}
-		} else {
-			// ignore
 		}
-
 	}
 
 	private boolean isTopicName(String str) {

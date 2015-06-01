@@ -75,7 +75,8 @@ public class TopicController extends AbstractMenuController {
 		String userName = extractUsernameUtils.getUsername(request);
 		boolean isAdmin = filterMetaDataService.loadAdminSet()
 				.contains(userName);
-		return topicService.loadAllTopicNames(userName, isAdmin);
+		boolean isproduct = filterMetaDataService.isShowContentToAll();
+		return topicService.loadAllTopicNames(userName, isAdmin || isproduct);
 	}
 
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
