@@ -71,7 +71,7 @@ public class DataCollectorController extends AbstractController{
 		if(logger.isDebugEnabled()){
 			logger.debug("[addConsumerMonitor]" + consumerMonitorData);
 		}
-		SwallowActionWrapper action = new CatActionWrapper("DataCollectorController", "addProducerMonitor");
+		SwallowActionWrapper action = new CatActionWrapper("DataCollectorController", "addConsumerMonitor");
 		action.doAction(new SwallowAction() {
 
 			@Override
