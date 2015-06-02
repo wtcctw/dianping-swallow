@@ -17,6 +17,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.dao.AdministratorDao;
+import com.dianping.swallow.web.dao.impl.DefaultAdministratorDao;
+import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.service.AccessControlServiceConstants;
 import com.dianping.swallow.web.service.AdministratorListService;
 import com.dianping.swallow.web.service.FilterMetaDataService;
@@ -38,6 +41,8 @@ public class RequestLogFilter implements Filter {
 	private AdministratorListService administratorListService;
 	
 	private FilterMetaDataService filterMetaDataService;
+	
+	private AdministratorDao administratorDao;
 
 	public void init(FilterConfig fConfig) throws ServletException {
 		this.context = fConfig.getServletContext();
@@ -46,6 +51,7 @@ public class RequestLogFilter implements Filter {
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
 		this.administratorListService = ctx.getBean(AdministratorListServiceImpl.class);
 		this.filterMetaDataService = ctx.getBean(FilterMetaDataServiceImpl.class);
+		this.administratorDao = ctx.getBean(DefaultAdministratorDao.class);
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -81,23 +87,25 @@ public class RequestLogFilter implements Filter {
 	}
 	
 	private boolean recordVisitInAdminList(String username){
-		boolean admin = filterMetaDataService.loadAdminSet().contains(username);
-		if(admin){
-			return administratorListService.updateAdmin(username, AccessControlServiceConstants.ADMINI);
-		}
-		boolean user = false;
-		Collection<Set<String>> topicUsers = filterMetaDataService.loadTopicToWhiteList().values();
-		for(Set<String> set : topicUsers){
-			if(set.contains(username)){
-				user = true;
-				break;
-			}
-		}
-		if(user){
-			return administratorListService.updateAdmin(username, AccessControlServiceConstants.USER);
+		Administrator admin = administratorDao.readByName(username);
+		if(admin != null){
+			return administratorListService.updateAdmin(username, admin.getRole());
 		}
 		else{
-			return administratorListService.updateAdmin(username, AccessControlServiceConstants.VISITOR);
+			boolean user = false;
+			Collection<Set<String>> topicUsers = filterMetaDataService.loadTopicToWhiteList().values();
+			for(Set<String> set : topicUsers){
+				if(set.contains(username)){
+					user = true;
+					break;
+				}
+			}
+			if(user){
+				return administratorListService.updateAdmin(username, AccessControlServiceConstants.USER);
+			}
+			else{
+				return administratorListService.updateAdmin(username, AccessControlServiceConstants.VISITOR);
+			}
 		}
 	}
 
