@@ -116,6 +116,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		}
 		map.put("prop", proposal.toArray());
 		map.put("dept", department.toArray());
+		
 		return map;
 	}
 

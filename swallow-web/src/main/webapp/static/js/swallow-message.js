@@ -335,7 +335,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 	        $scope.textarea = "";
 	        $scope.refreshpage = function(myForm){
 	        	$('#myModal').modal('hide');
-	        	$http.post(window.contextPath + '/console/message/auth/sendgroupmessage', {"textarea":$scope.textarea,"name":$scope.tname}).success(function(response) {
+	        	$http.post(window.contextPath + '/console/message/auth/sendgroupmessage', {"textarea":$scope.textarea,"topic":$scope.tname}).success(function(response) {
 	        		$scope.startdt = "";
 					$scope.stopdt = "";
 					$scope.messageId = "";

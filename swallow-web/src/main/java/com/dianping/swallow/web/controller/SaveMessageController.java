@@ -48,7 +48,7 @@ public class SaveMessageController extends AbstractController {
 
 	@RequestMapping(value = "/console/message/auth/sendgroupmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void sendGroupMessages(@RequestParam(value = "name") String topic,
+	public void sendGroupMessages(@RequestParam(value = "topic") String topic,
 			@RequestParam("textarea") String text, HttpServletRequest request,
 			HttpServletResponse response) {
 		String topicName = topic.trim();
