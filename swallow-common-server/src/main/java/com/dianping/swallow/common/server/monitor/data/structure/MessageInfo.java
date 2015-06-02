@@ -26,7 +26,17 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 	private AtomicInteger noneZeroMergeCount = new AtomicInteger();
 	
 	public MessageInfo(){
-		
+		this(true);
+	}
+
+	/**
+	 * 是否只真实的数据，或者是插值插入的数据
+	 * @param isReal
+	 */
+	public MessageInfo(boolean isReal){
+		if(!isReal){
+			noneZeroMergeCount.set(-1);
+		}
 	}
 	
 	@Override

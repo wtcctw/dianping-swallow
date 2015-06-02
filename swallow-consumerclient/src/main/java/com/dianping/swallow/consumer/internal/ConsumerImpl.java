@@ -150,14 +150,14 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 			}
 		});
 		// 启动连接master的线程
-		masterConsumerThread = new ConsumerThread();
+		masterConsumerThread = new ConsumerThread(this);
 		masterConsumerThread.setBootstrap(bootstrap);
 		masterConsumerThread.setRemoteAddress(masterAddress);
 		masterConsumerThread.setInterval(ConfigManager.getInstance().getConnectMasterInterval());
 		masterConsumerThread.setName("masterConsumerThread");
 		masterConsumerThread.start();
 		// 启动连接slave的线程
-		slaveConsumerThread = new ConsumerThread();
+		slaveConsumerThread = new ConsumerThread(this);
 		slaveConsumerThread.setBootstrap(bootstrap);
 		slaveConsumerThread.setRemoteAddress(slaveAddress);
 		slaveConsumerThread.setInterval(ConfigManager.getInstance().getConnectSlaveInterval());

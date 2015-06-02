@@ -26,9 +26,16 @@ public class ConsumerThread extends Thread {
 
    private long                interval;
 
-   public void setBootstrap(ClientBootstrap bootstrap) {
-      this.bootstrap = bootstrap;
+   private ConsumerImpl consumerImpl;
+   
+   public ConsumerThread(ConsumerImpl consumerImpl) {
+	   
+	   this.consumerImpl = consumerImpl;
    }
+
+	public void setBootstrap(ClientBootstrap bootstrap) {
+      this.bootstrap = bootstrap;
+	}
 
    public void setRemoteAddress(InetSocketAddress remoteAddress) {
       this.remoteAddress = remoteAddress;
@@ -45,14 +52,20 @@ public class ConsumerThread extends Thread {
          synchronized (bootstrap) {
             if (!Thread.currentThread().isInterrupted()) {
                try {
-                  logger.info("[run][connecting]" + remoteAddress);
+            	   if(logger.isInfoEnabled()){
+            		   logger.info("[run][connecting][" + getDesc() + "]" + remoteAddress);
+            	   }
                   future = bootstrap.connect(remoteAddress);
                   future.await();
                   if (future.getChannel().isConnected()) {
                      SocketAddress localAddress = future.getChannel().getLocalAddress();
-                     logger.info("[run][connected]" + localAddress + "->" + remoteAddress);
+                     if(logger.isInfoEnabled()){
+                    	 logger.info("[run][connected][" + getDesc() + "]" + localAddress + "->" + remoteAddress);
+                     }
                      future.getChannel().getCloseFuture().await();//等待channel关闭，否则一直阻塞！
-                     logger.info("[run][closed   ]" + localAddress + "->" + remoteAddress);
+                     if(logger.isInfoEnabled()){
+                    	 logger.info("[run][closed   ][" + getDesc() + "]" + localAddress + "->" + remoteAddress);
+                     }
                   }
                } catch (InterruptedException e) {
                   Thread.currentThread().interrupt();
@@ -67,9 +80,17 @@ public class ConsumerThread extends Thread {
             Thread.currentThread().interrupt();
          }
       }
+      
       if(future!=null && future.getChannel()!=null){
           future.getChannel().close();//线程被中断了，主动关闭连接
       }
-      logger.info("ConsumerThread(remoteAddress=" + remoteAddress + ") done.");
+      
+      if(logger.isInfoEnabled()){
+    	  logger.info("ConsumerThread(remoteAddress=" + remoteAddress + ") done.");
+      }
    }
+
+	private String getDesc() {
+		return consumerImpl.toString();
+	}
 }

@@ -32,6 +32,8 @@ public abstract class AbstractRetriever implements Retriever{
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 
 	protected final int DEFAULT_INTERVAL = 30;//每隔多少秒采样
+	
+	protected final int BUILD_TIMES_AGEO = 60000;//每次构建时，构建此时间(ms)以前的数据 
 
 	@Value("${swallow.web.monitor.keepinmemory}")
 	public int keepInMemoryHour = 3;//保存最新小时
@@ -55,7 +57,7 @@ public abstract class AbstractRetriever implements Retriever{
 			@Override
 			public void run() {
 				
-				current = System.currentTimeMillis();
+				current = System.currentTimeMillis() - BUILD_TIMES_AGEO;
 				try{
 					doBuild();
 					

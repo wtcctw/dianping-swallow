@@ -13,6 +13,7 @@ public class AsyncProducerExample {
     public static void main(String[] args) throws Exception {
         ProducerConfig config = new ProducerConfig();
         //        config.setMode(ProducerMode.ASYNC_MODE);//默认就是异步(ASYNC_MODE)模式
+        config.setAsyncRetryTimes(20);
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example1"), config);
         for (int i = 0; i < 10; i++) {
             String msg = AsyncProducerExample.class.getSimpleName() + ": 消息-" + i;
