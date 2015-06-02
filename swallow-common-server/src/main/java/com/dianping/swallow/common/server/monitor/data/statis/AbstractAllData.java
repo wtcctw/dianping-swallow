@@ -211,7 +211,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
 	public String toString(String key){
 		
-		return JsonBinder.getNonEmptyBinder().toJson(servers.get(key));
+		return JsonBinder.getNonEmptyBinder().toPrettyJson(servers.get(key));
 	}
 
 }

@@ -19,8 +19,8 @@ import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.AdministratorListService;
+import com.dianping.swallow.web.service.FilterMetaDataService;
 import com.dianping.swallow.web.service.TopicService;
-import com.mongodb.Mongo;
 
 /**
  * @author mingdongli
@@ -31,7 +31,6 @@ import com.mongodb.Mongo;
 public class TopicServiceImpl extends AbstractSwallowService implements
 		TopicService {
 
-	private static final String PRE_MSG = "msg#";
 	private static final String DELIMITOR = ",";
 
 	@Autowired
@@ -45,6 +44,9 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 
 	@Resource(name = "administratorListService")
 	private AdministratorListService administratorListService;
+	
+	@Resource(name = "filterMetaDataService")
+	private FilterMetaDataService filterMetaDataService;
 
 	/*
 	 * read records from writeMongo due to it already exists
@@ -66,28 +68,23 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 
 	@Override
 	public List<String> loadAllTopicNames(String tongXingZheng, boolean isAdmin) {
-		List<String> tmpDBName = new ArrayList<String>();
-		List<Mongo> allReadMongo = webSwallowMessageDao.getAllReadMongo();
-		for (Mongo mc : allReadMongo) {
-			tmpDBName.addAll(mc.getDatabaseNames());
+		
+		Map<String, Set<String>> topicToWhiteList = filterMetaDataService.loadTopicToWhiteList();
+		if(isAdmin){
+			return new ArrayList<String>(topicToWhiteList.keySet());
 		}
-
-		List<String> dbName = new ArrayList<String>();
-		for (String dbn : tmpDBName) {
-			if (dbn.startsWith(PRE_MSG)) {
-				String str = dbn.substring(PRE_MSG.length());
-				if (!dbName.contains(str)) {
-					if (isAdmin)
-						dbName.add(str);
-					else if (topicDao.readByName(str).getProp()
-							.contains(tongXingZheng))
-						dbName.add(str); // add if correlative
+		else{
+			List<String> topics = new ArrayList<String>();
+			for(Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()){
+				if(entry.getValue().contains(tongXingZheng)){
+					String topic = entry.getKey();
+					if(!topics.contains(topic)){
+						topics.add(topic);
+					}
 				}
-			} else {
-				// ignore
-			}
+			} 
+			return topics;
 		}
-		return dbName;
 	}
 
 	@Override

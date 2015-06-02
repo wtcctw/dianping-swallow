@@ -136,7 +136,7 @@ public class DataMonitorController extends AbstractMonitorController{
 	public String getProducerDebug(@PathVariable String server){
 		
 		if(logger.isInfoEnabled()){
-			logger.info("[getConsumerDebug]" + server);
+			logger.info("[getProducerDebug]" + server);
 			logger.info(producerDataRetriever.getDebugInfo(server));
 		}
 		return "ok";
