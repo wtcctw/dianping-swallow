@@ -14,7 +14,7 @@ module.controller('UserController', ['$scope', '$http',
 					method : 'GET',
 					url : window.contextPath + '/console/admin/queryadminandlogin'
 				}).success(function(data, status, headers, config) {
-					$scope.logouturl = "logout?service=" + data.env + "%3A8080";
+					$scope.logouturl = data.env;
 					if(data.loginname == null)
 						$scope.name = "";
 					else

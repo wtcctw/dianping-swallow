@@ -48,9 +48,10 @@ public class TopicController extends AbstractMenuController {
 	public ModelAndView allApps(HttpServletRequest request,
 			HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<String, Object>();
+		createViewMap();
 		return new ModelAndView("topic/index", map);
 	}
-
+	
 	@RequestMapping(value = "/console/topic/topicdefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object topicDefault(int offset, int limit, String topic,
@@ -75,7 +76,8 @@ public class TopicController extends AbstractMenuController {
 		String userName = extractUsernameUtils.getUsername(request);
 		boolean isAdmin = filterMetaDataService.loadAdminSet()
 				.contains(userName);
-		return topicService.loadAllTopicNames(userName, isAdmin);
+		boolean isproduct = filterMetaDataService.isShowContentToAll();
+		return topicService.loadAllTopicNames(userName, isAdmin || isproduct);
 	}
 
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")

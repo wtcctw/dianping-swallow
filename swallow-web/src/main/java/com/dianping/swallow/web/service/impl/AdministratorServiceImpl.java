@@ -71,11 +71,13 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 	@Override
 	public boolean createInAdminList(String name, int auth) {
 
+		filterMetaDataService.loadAdminSet().add(name);  //need add in adminSet in memory
 		return administratorListService.updateAdmin(name, auth);
 	}
 
 	@Override
 	public boolean removeFromAdminList(String name) {
+		filterMetaDataService.loadAdminSet().remove(name);
 		int n = administratorDao.deleteByName(name);
 		if (n != 1) {
 				logger.info("deleteByEmail is wrong with email: " + name);
@@ -90,7 +92,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 	public Object queryIfAdmin(String tongXingZheng) {
 		boolean notproduct = filterMetaDataService.isShowContentToAll();
 		String env = filterMetaDataService.loadLogoutUrl();
-		logger.info("notproduct is " + notproduct);
+		logger.info(String.format("logout url is %s", env));
 		Map<String, Object> map = new HashMap<String, Object>();
 		Administrator a = administratorDao.readByName(tongXingZheng);
 		if (a != null && a.getRole() == 0) {
