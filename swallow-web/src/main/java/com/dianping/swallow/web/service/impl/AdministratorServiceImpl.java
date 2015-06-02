@@ -98,7 +98,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 		if (a != null && a.getRole() == 0) {
 			map.put(ADMIN, true);
 		} else {
-			map.put(ADMIN, false | notproduct);
+			map.put(ADMIN, false || notproduct);
 		}
 
 		map.put(LOGINNAME, tongXingZheng);

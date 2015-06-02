@@ -69,8 +69,7 @@ public class FilterMetaDataServiceImpl extends AbstractSwallowService implements
 	}
 
 	public boolean isShowContentToAll() {
-		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
-		return showContentToAll || !env;
+		return showContentToAll;
 	}
 
 	public void setShowContentToAll(boolean showContentToAll) {

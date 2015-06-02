@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,6 +90,8 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 
 	@Override
 	public void editTopic(String name, String prop, String dept, String time) {
+		
+		filterMetaDataService.loadTopicToWhiteList().put(name, splitProps(prop));
 		if (topicDao.updateTopic(name, prop, dept, time)) {
 			logger.info(String.format(
 					"Edit s% to [prop: s%, dept: s%, time: s%] successfully",
@@ -134,6 +137,12 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		if (!StringUtils.isEmpty(dept))
 			depts.add(dept);
 		return depts;
+	}
+	
+	private Set<String> splitProps(String props) {
+		String[] prop = props.split(DELIMITOR);
+		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
+		return lists;
 	}
 
 }

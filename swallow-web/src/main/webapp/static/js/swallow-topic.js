@@ -148,6 +148,8 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 				else
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
 
+				$("a[href='/console/topic'] button").removeClass("btn-info");
+				$("a[href='/console/topic'] button").addClass("btn-purple");
 			});
 			
 			
@@ -156,8 +158,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 			});
 			
 			$scope.initpage = function(){
-				$("a[href='/console/topic'] button").removeClass("btn-info");
-				$("a[href='/console/topic'] button").addClass("btn-purple");
+
 				$scope.adminornot = localStorage.getItem("isadmin");
 				
 		          //下面是在table render完成后执行的js
