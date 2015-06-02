@@ -58,22 +58,25 @@ public class MongoUtils {
 		return messageId;
 	}
 
+	public static BSONTimestamp getTimestampByCurTime() {
+		
+		return getTimestamp(new Date());
+	}
+
+	private static BSONTimestamp getTimestamp(Date date) {
+		
+		int time = (int) (date.getTime() / 1000);
+		BSONTimestamp bst = new BSONTimestamp(time, 0);
+		return bst;
+	}
+
 	public static Long getLongByCurTime() {
 		return getLongByDate(new Date());
 	}
 
-	public static BSONTimestamp getTimestampByCurTime() {
-
-		Date date = new Date();
-		int time = (int) (date.getTime() / 1000);
-		BSONTimestamp bst = new BSONTimestamp(time, 0);
-
-		return bst;
-	}
-
 	public static Long getLongByDate(Date date) {
 
-		BSONTimestamp bst = getTimestampByCurTime();
+		BSONTimestamp bst = getTimestamp(date);
 		
 		if (logger.isDebugEnabled()) {
 			logger.debug("[getLongByDate][BSONTimestamp]" + bst);
