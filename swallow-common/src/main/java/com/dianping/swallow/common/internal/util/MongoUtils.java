@@ -71,6 +71,7 @@ public class MongoUtils {
 	}
 
 	public static Long getLongByCurTime() {
+		
 		return getLongByDate(new Date());
 	}
 
