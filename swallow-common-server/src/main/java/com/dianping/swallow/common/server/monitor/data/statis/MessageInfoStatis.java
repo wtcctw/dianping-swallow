@@ -40,6 +40,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 		MessageInfo added = null;
 		try {
 			added = (MessageInfo) rawAdded.clone();
+			added.setNoneZeroMergeCount(0);
 		} catch (CloneNotSupportedException e) {
 			throw new IllegalStateException("[add]", e);
 		} 
@@ -56,6 +57,10 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
 	@Override
 	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
+		if(startKey >= endKey){
+			logger.warn("[build][startKey >= endKey]" + startKey + "," + endKey);
+			return;
+		}
 		
 		SortedMap<Long, MessageInfo> sub = col.subMap(startKey, true, endKey, true);
 		ajustData(sub, startKey, endKey);
