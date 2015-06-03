@@ -48,7 +48,7 @@ public interface TopicService extends SwallowService {
 	/**
 	 *  查询所有申请人和部门
 	 */
-	Map<String, Object[]> getPropAndDept();
+	Map<String, Object[]> getPropAndDept(String username);
 	
 
 }

@@ -89,8 +89,11 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object propName() throws UnknownHostException {
-		return topicService.getPropAndDept();
+	public Object propName(HttpServletRequest request,
+			HttpServletResponse response) throws UnknownHostException {
+		
+		String userName = extractUsernameUtils.getUsername(request);
+		return topicService.getPropAndDept(userName);
 	}
 
 	@RequestMapping(value = "/console/topic/auth/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")

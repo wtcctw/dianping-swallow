@@ -104,15 +104,28 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	}
 
 	@Override
-	public Map<String, Object[]> getPropAndDept() {
+	public Map<String, Object[]> getPropAndDept(String username) {
 		Map<String, Object[]> map = new HashMap<String, Object[]>();
 		Set<String> proposal = new HashSet<String>();
 		Set<String> department = new HashSet<String>();
 		List<Topic> topics = topicDao.findAll();
 
-		for (Topic topic : topics) {
-			proposal.addAll(getPropList(topic));
-			department.addAll(getDeptList(topic));
+		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(username);
+		if(isAdmin){
+			for (Topic topic : topics) {
+				proposal.addAll(getPropList(topic));
+				department.addAll(getDeptList(topic));
+			}
+		}
+		else{
+			for (Topic topic : topics) {
+				Set<String> tmpprop = getPropList(topic);
+				if(tmpprop.contains(username)){
+					proposal.addAll(tmpprop);
+					department.addAll(getDeptList(topic));
+				}
+			}
+
 		}
 		map.put("prop", proposal.toArray());
 		map.put("dept", department.toArray());

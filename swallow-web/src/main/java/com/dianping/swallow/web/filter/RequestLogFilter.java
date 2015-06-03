@@ -32,6 +32,12 @@ import com.dianping.swallow.web.service.impl.FilterMetaDataServiceImpl;
  *         2015年5月25日下午5:51:54
  */
 public class RequestLogFilter implements Filter {
+	
+	private static final String TOPICURL = "/console/topic";
+	private static final String MESSAGEURL = "/console/message";
+	private static final String MONITORURL = "/console/monitor/consumer/total/delay";
+	private static final String ADMINURL = "/console/administrator";
+	private static final String MAINPAGE = "jsessionid=";
 
 	private ServletContext context;
 
@@ -46,10 +52,10 @@ public class RequestLogFilter implements Filter {
 	private static Set<String> urls = new HashSet<String>();
 	
 	static{
-		urls.add("/console/topic");
-		urls.add("/console/message");
-		urls.add("/console/monitor/consumer/total/delay");
-		urls.add("/console/administrator");
+		urls.add(TOPICURL);
+		urls.add(MESSAGEURL);
+		urls.add(MONITORURL);
+		urls.add(ADMINURL);
 	}
 
 	public void init(FilterConfig fConfig) throws ServletException {
@@ -71,7 +77,7 @@ public class RequestLogFilter implements Filter {
 
 		String username = extractUsernameUtils.getUsername(req);
 
-		if(urls.contains(uri)){
+		if(urls.contains(uri) || uri.contains(MAINPAGE)){
 			if(recordVisitInAdminList(username)){
 				this.context.log(String.format("Save visit %s info into admin list successfully", username));
 			}
