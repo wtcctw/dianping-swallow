@@ -159,6 +159,7 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 			}).success(function(data, status, headers, config) {
 				var visitList = data;
 				$("#modalname").typeahead({
+					items: 16, 
 					source : visitList,
 					updater : function(c) {
 						$scope.adminname = c;  //have to add this statement, or adminnam will be not completed

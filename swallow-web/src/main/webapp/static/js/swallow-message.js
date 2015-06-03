@@ -269,6 +269,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			}).success(function(data, status, headers, config) {
 				var topicNameList = data;
 				$("#topicname").typeahead({
+					items: 16, 
 					source : topicNameList,
 					updater : function(c) {
 						$scope.tname = c;

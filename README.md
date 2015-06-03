@@ -48,7 +48,7 @@
 
 ## 申请Topic
 
-如果有新的Topic，请联系：李明东/孟文超(mingdong.li@dianping.com, wenchao.meng@dianping.com)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。
+如果有新的Topic，请联系：李明冬/孟文超(mingdong.li@dianping.com, wenchao.meng@dianping.com)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。
 
 联系时，**请邮件里告知：**
 
@@ -414,6 +414,118 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 	}
 
 
+# Swallow Web使用说明
+
+## Topic查询
+
+### 根据Topic名称查询
+
+* 在左侧搜索栏里输入所要查询的topic名称，系统会提示可以搜索到的与用户关联的topic，如果提示没有返回任何内容，则说明用户没有权限查询任何topic。
+
+* 对于每个topic，管理员首先需要添加至少一名topic的申请人，授权其访问topic的权限，得到相应权限的申请人可以根据需要添加或者删除其他topic关联人。
+
+### 根据申请人和申请人部门查询
+
+* 在右侧搜索栏中输入申请人或者申请人部门，系统会返回相关的提示，如果没有提示信息，则说明没有相关的查询结果。
+
+## Message查询与重发
+
+### 查询Topic下所有Message
+
+* 在左侧搜索栏里输入查询message所属的topic名称，系统会提示可以搜索到的与用户关联的topic，如果提示没有返回任何内容，则说明用户没有权限查询任何topic的message信息。
+
+### 根据Message ID精确查询
+
+* topic确定的前提下，在右侧搜索栏中输入message ID可精确查询相应message。
+
+### 根据保存时间精确查询
+
+* topic确定的前提下，选择开始时间和结束时间可以查询出特定时间段发送的所有message。
+
+### Message重发
+
+#### 重发已保存的message
+
+* 对于已经存在于mongo中的消息，用户可以根据查询返回结果选择需要重发的message。
+
+* 对于重新发送的消息，其原始ID不为空，原始ID为重发消息的消息ID。
+
+#### 重发自定义message
+
+* 对于不存在于mongo中的message，用户可以使用发送自定义消息功能批量发送message。批量发送时，用户只需在文本框中输入消息的内容，其中每行代表一条消息。
+
+* 用户需要对所发的自定义消息负责，swallow web不检查消息内容的格式。
+
+### 查看Swallow消息
+
+* 如果需要查看消息的详细内容，请点击更多选项，将会列出json格式的swallow消息内容，其中键值_id 表示保存消息的时间戳，c 表示消息体，v 表示swallow版本，s 表示消息体的sha1值， gt 表示消息的产生时间， p 表示用户设置的消息属性， _p 表示 swallow设置的消息内部属性， si 表示产生消息的主机ip。
+
+## Topic监控和Swallow Server监控
+
+### Topic监控
+
+#### 监控时间段划分
+
+* 延时监控中监控时间被分为3段：依次为用户发送-存储延时(message存储到mongo与用户发出message的时间差值)，存储-发送延迟(swallow发出message与message存储到mongo的时间差值)，发送-ack延迟(swallow收到用户ack确认与swallow发出message的时间差值)。
+
+* topic监控分为延时监控，消息量监控和堆积量监控。
+![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/13.png)
+
+#### 延时监控
+
+* 在搜索栏中输入所要查询的topic，系统会返回topic与每个consumer在不同时间段的延时统计结果。
+![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/8.png)
+
+#### 消息量监控
+
+* 消息量监控分别从发送端，swallow端和消费端进行统计分析。用户发送频率统计每秒钟用户发送的消息数目(图表中会显示每30秒钟的发送频率)，swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack频率统计每秒钟用户返回ack的消息数目。在某一时间段，如果系统一切工作正常，应该有消费者发送频率 = swallow发送频率 = 用户返回ack频率。如果出现不相等，请对比其他消费者是否正常，如果正常，则请查看客户端代码是否正确实现了功能。
+![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/9.png)
+
+* 如果只想查看某一端的每秒钟统计量，只需点击右侧的图例即可切换显示和隐藏。
+![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/10.png)
+
+#### 堆积量监控
+
+* 堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。
+
+*如果客户端工作正常并且及时处理消息,则不会出现消息堆积现象。
+![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/14.png)
+
+### Swallow Server监控
+
+#### producer server监控
+
+* producer server统计用户发送频率，即每秒钟发动到producer server的消息数目。
+![producer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/11.png)
+
+#### consumer server监控
+
+* consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。
+![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/12.png)
+
+## 权限管理
+
+### 管理员行为
+
+* 管理员可以添加删除管理员名单的权限。
+
+* 管理员可以可以编辑topic关联人员名单。
+
+* 管理员可以查看访问swallow web的来访者信息。
+
+### 用户行为
+
+* 用户表示至少关联一个topic,可以访问关联topic的所有message的人员。
+
+### Visitor行为
+
+* Visitor表示没有关联任何topic,无法访问任何topic及其message的人员，只可以查看监控性能。
+
+### 权限提升
+
+* 用户和Visitor如需提升权限，请联系运维 jiaxing.fan@dianping.com。
+
+
 # Swallow常见问题以及处理
 
 ## 如何查找某个topic对应的consumer
@@ -422,6 +534,9 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 
 ## 如何查看我的消费是否有延迟、延迟多少条消息？
+
+### Cat端追踪
+
 * 从[CAT](http://cat.dp/)中查看Swallow项目的Transaction，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&ampdomain=Swallow)）。
 * 以dp\_action这个topic为例（仅作示例，具体到自己的topic，请做相应变通），先找到In:dp_action这个type：
 ![Swallow Transaction In CAT](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=nNZxCU0aNpSP9auXeT5wSL2YMPMj63HXrNkVSUwks6I%3d&docid=0fce2e89b5fc04bfe8138dcb41716deb0)
@@ -433,11 +548,24 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 ![Producer Count In CAT](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=pjSbpxdW21OsilhumHJpBaTGDdHicOI7Noq2YrAXYRE%3d&docid=039c404696c4942828bb4be894448236b)
 * 对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp\_action的数量），如果消费的消息总量小于生产的消息总量，那么消费是有延迟的。
 
+### Swallow Web端追踪
+
+* 从Swallow Web端[延时监控](http://ppe.swallow.dp/console/monitor/consumer/total/delay)中查询出topic的延时统计数据。如果消费者出现消费延时的情况，可以查看3段延时中主要哪一段导致了消费的延迟。
+* 通过查看其他消费者的发送-ack延迟是否正常，如果其他消费者消费正常，那么就需要查看客户端代码是否正确实现了功能。
+
 ## 如何查看我的Consumer消费一条消息的平均时间？
+
+### Cat端追踪
+
 * 从[CAT](http://cat.dp/)中查看Consumer ID对应项目的Transaction，找到MsgConsumed和MsgConsumeTried这两个type：
 ![Producer Count In CAT](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=0QH8os%2fIyyQHtz77AR5t4TzV8v6mlwQXss8n8R3kjh8%3d&docid=0426de8c2bfe84c219f857ad9a3b3b716)
 * MsgConsumed表示consumer server给这个consumer推送的消息数量，MsgConsumeTried表示consumer尝试消费消息的次数，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。
 * 右边的三列可以看出consumer调用onMessage回调函数耗费的最小最大以及平均时间，如果consumer消费状况一直良好，突然某个时刻开始有消费延时，可以观察一下这里的平均时间是不是比之前更高，如果平均消费时间比正常情况高出很多，可能会造成消费延时。
+
+### Swallow Web端追踪
+
+* 从Swallow Web端[消息量监控](http://ppe.swallow.dp/console/monitor/consumer/total/qps)中查看用户返回ack频率，除以相应的时间段即可得到消费一条消息的平均时间。
+![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/15.png)
 
 ## 我的Consumer有延时，该怎么确认问题所在？
 * 首先观察consumer的平均消费时间是否存在异常，如果consumer的平均消费时间比正常情况高出许多，说明onMessage回调函数依赖的服务存在问题，可以考虑_最近的代码变更_，或询问_依赖的服务_是否存在故障。
@@ -457,8 +585,17 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 	![Producer Count In CAT](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=vFNs7GHYywskM9LsejdM0Mko3IIzn8cMPhZ77JWBSEk%3d&docid=0a6b63223125843d791b57dad311a79c0)
 	* 如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因包括但不限于死循环、等待IO、死锁、数据库操作、依赖的服务超时等情况，请仔细检查这些情况，修复并重启consumer即可。
 	* 如果consumer的线程不存在block现象，请及时联系swallow团队成员。
+
 ## 如何确认我的Producer正常工作？
+
+### Cat端追踪
+
 * 首先确认生产者是否正常启动，判别方法跟[问题4](#consumer_2)中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。
 * 在CAT上观察Producer对应项目的transaction，找到MsgProduced以及MsgProduceTried这两个Type，MsgProduced的数量表示程序产生的消息数量，MsgProduceTried表示Swallow的producer client尝试发送给producer server的次数，如果这两个数量相差过大，说明存在异常。
 ![Producer Count In CAT](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=OE0h%2fxsUP%2b3CveKDt0t5w%2f8Gjc1jTKZqV0zmmmMfvNc%3d&docid=091aef7f093d24e04bee0c251551113f9)
 * 正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，此时请联系swallow团队成员。
+
+### Swallow Web端追踪
+
+* 从Swallow Web端[Message管理](http://ppe.swallow.dp/console/message)中查看相关topic下的message信息，检查消息是否正确发送。
+![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/16.png)
