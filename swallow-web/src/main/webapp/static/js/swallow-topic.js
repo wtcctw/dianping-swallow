@@ -168,6 +168,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 					}).success(function(data, status, headers, config) {
 						var topicNameList = data;
 						$("#searchname").typeahead({
+							items: 16, 
 							source : topicNameList,
 							updater : function(c) {
 								$scope.name = c
@@ -186,6 +187,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						var props = data.prop;
 						var depts = data.dept;
 						$("#searchprop").typeahead({
+							items: 16, 
 							source : props,
 							updater : function(c) {
 								$scope.prop = c
@@ -194,6 +196,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 							}
 						})
 						$("#searchdept").typeahead({
+							items: 16, 
 							source : depts,
 							updater : function(c) {
 								$scope.dept = c
@@ -203,7 +206,8 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						})
 						//work
 						$('#topicprops').tagsinput({
-							  typeahead: {      
+							  typeahead: {
+								  items: 16, 
 								  source: props,
 								  displayText: function(item){ return item;}  //necessary
 							  }
