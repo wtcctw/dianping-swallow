@@ -47,17 +47,17 @@
 			<artifactId>swallow-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.dianping.dpsf</groupId>
-			<artifactId>dpsf-net</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- pigeon -->
+		<dependency>
+			<groupId>com.dianping.dpsf</groupId>
+			<artifactId>dpsf-net</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<!-- lion -->
 		<dependency>
 			<groupId>com.dianping.lion</groupId>
@@ -75,10 +75,6 @@
 			<groupId>com.dianping.platform</groupId>
 			<artifactId>phoenix-environment</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
 		</dependency>
 	</dependencies>
 
