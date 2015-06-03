@@ -20,7 +20,6 @@ module.factory('Paginator', function(){
 						items = data.message;
 						//items = angular.fromJson(items); //反序列化
 						length = data.size;
-						self.show = localStorage.getItem("isadmin");
 						self.totalpieces = length;
 						self.totalPage = Math.ceil(length/pageSize);
 						self.endPage = self.totalPage;
@@ -78,7 +77,6 @@ module.factory('Paginator', function(){
 				currentPage: 1,
 				endPage: 1,
 				totalpieces: 0,
-				show : false,
 				
 				currentPageItems: [],
 				currentPartialCon: [],
@@ -92,8 +90,8 @@ module.factory('Paginator', function(){
 	};
 });
 
-module.controller('MessageController', ['$scope', '$http', 'Paginator',
-        function($scope, $http, Paginator){
+module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog',
+        function($rootScope, $scope, $http, Paginator, ngDialog){
 				var fetchFunction = function(offset, limit, tname, messageId, startdt, stopdt, callback){
 				var transFn = function(data){
 					return $.param(data);
@@ -281,15 +279,37 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 			}).error(function(data, status, headers, config) {
 			});
 			
-			//judge if redirected from topic view
-			var tmpname = localStorage.getItem("name");
-			if(tmpname != null){
-				$scope.tname = localStorage.getItem("name");
-				localStorage.clear();
-				$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
-			}
-			
 	        //for deal with re transmit for selected messages
+			$scope.dialog = function() {
+				if($(".swallowcheckbox:checked").length <1){
+					alert("请先勾选需要发送的消息！");
+					return;
+				}
+				else{
+					ngDialog.open({
+								template : '\
+								<div class="widget-box">\
+								<div class="widget-header">\
+									<h4 class="widget-title">警告</h4>\
+								</div>\
+								<div class="widget-body">\
+									<div class="widget-main">\
+										<p class="alert alert-info">\
+											您确认要重新发送所选的消息吗？\
+										</p>\
+									</div>\
+									<div class="modal-footer">\
+										<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
+										<button type="button" class="btn btn-primary" ng-click="retransmit()&&closeThisDialog()">确定</button>\
+									</div>\
+								</div>\
+							</div>',
+							plain : true,
+							className : 'ngdialog-theme-default'
+					});
+				}
+			};
+			
 			$scope.selectall = function(){
 				$(".swallowcheckbox").prop('checked', $("#selectall").prop('checked'));
 				$("#selectnone").prop('checked', false);
@@ -300,7 +320,7 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 				$("#selectall").prop('checked', false);
 			};
 			
-	        $scope.retransmit = function(){
+			$rootScope.retransmit = function(){
 	        	var needtotrans = "";
 	        	var scb = $(".swallowcheckbox");
 	        	for(var i=0;i < scb.length;i++){
@@ -314,21 +334,19 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 	        	}
 	        	
 	        	$scope.starttransmit(needtotrans);
+	        	return true;
 	        }
 	        
 	        
 	        $scope.starttransmit = function(data){
-	        		if(data.length == 0)
-	        			alert("请先勾选需要发送的消息！");
-	        		else
-	        			$http.post(window.contextPath + '/console/message/auth/sendmessage', {"param": data,"topic":$scope.tname}).success(function(response) {
-	        			  $("#selectnone").prop('checked', false);
-	        			  $("#selectall").prop('checked', false);
-	        			  $(".swallowcheckbox").prop('checked', false);
-	        			  $scope.messageId = "";
-	        			  $scope.startdt = "";
-	        			  $scope.stopdt = "";
-	        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+        			$http.post(window.contextPath + '/console/message/auth/sendmessage', {"param": data,"topic":$scope.tname}).success(function(response) {
+        			  $("#selectnone").prop('checked', false);
+        			  $("#selectall").prop('checked', false);
+        			  $(".swallowcheckbox").prop('checked', false);
+        			  $scope.messageId = "";
+        			  $scope.startdt = "";
+        			  $scope.stopdt = "";
+        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
 	        });
 	        
 	        }
@@ -344,7 +362,12 @@ module.controller('MessageController', ['$scope', '$http', 'Paginator',
 	        	});
 	        }
 	        
-			$("a[href='/console/message'] button").removeClass("btn-info");
-			$("a[href='/console/message'] button").addClass("btn-purple");
+			//judge if redirected from topic view
+			var tmpname = localStorage.getItem("name");
+			if(tmpname != null){
+				$scope.tname = localStorage.getItem("name");
+				localStorage.clear();
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+			}
 	        
 }]);

@@ -25,7 +25,7 @@ import com.dianping.swallow.web.service.MessageService;
  *         2015年4月22日 上午12:04:03
  */
 @Controller
-public class MessageController extends AbstractController {
+public class MessageController extends AbstractMenuController {
 
 	@Resource(name = "messageService")
 	private MessageService messageService;
@@ -36,8 +36,8 @@ public class MessageController extends AbstractController {
 	@RequestMapping(value = "/console/message")
 	public ModelAndView message(HttpServletRequest request,
 			HttpServletResponse response) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		return new ModelAndView("message/index", map);
+
+		return new ModelAndView("message/index", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/message/messagedefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -60,6 +60,12 @@ public class MessageController extends AbstractController {
 			throws UnknownHostException {
 
 		return messageService.getMessageContent(topic, mid);
+	}
+
+	@Override
+	protected String getMenu() {
+		
+		return "message";
 	}
 
 }

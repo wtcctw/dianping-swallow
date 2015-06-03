@@ -2,8 +2,8 @@ package com.dianping.swallow.web.filter;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -33,7 +33,6 @@ import com.dianping.swallow.web.service.impl.FilterMetaDataServiceImpl;
  */
 public class RequestLogFilter implements Filter {
 
-	private static final String LOGINURI = "/console/admin/queryadminandlogin";
 	private ServletContext context;
 
 	private ExtractUsernameUtils extractUsernameUtils;
@@ -43,6 +42,15 @@ public class RequestLogFilter implements Filter {
 	private FilterMetaDataService filterMetaDataService;
 	
 	private AdministratorDao administratorDao;
+	
+	private static Set<String> urls = new HashSet<String>();
+	
+	static{
+		urls.add("/console/topic");
+		urls.add("/console/message");
+		urls.add("/console/monitor/consumer/total/delay");
+		urls.add("/console/administrator");
+	}
 
 	public void init(FilterConfig fConfig) throws ServletException {
 		this.context = fConfig.getServletContext();
@@ -63,7 +71,7 @@ public class RequestLogFilter implements Filter {
 
 		String username = extractUsernameUtils.getUsername(req);
 
-		if(uri.equals(LOGINURI)){
+		if(urls.contains(uri)){
 			if(recordVisitInAdminList(username)){
 				this.context.log(String.format("Save visit %s info into admin list successfully", username));
 			}

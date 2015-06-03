@@ -25,7 +25,7 @@ import com.dianping.swallow.web.service.AdministratorService;
  * @author mingdongli 2015年5月5日 下午2:42:57
  */
 @Controller
-public class AdministratorController extends AbstractController {
+public class AdministratorController extends AbstractMenuController {
 
 	private static final String ADMINISTRATOR = "Administrator";
 	private static final String USER = "User";
@@ -39,8 +39,8 @@ public class AdministratorController extends AbstractController {
 	@RequestMapping(value = "/console/administrator")
 	public ModelAndView allApps(HttpServletRequest request,
 			HttpServletResponse response) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		return new ModelAndView("admin/index", map);
+		
+		return new ModelAndView("admin/index", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/admin/auth/admindefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -111,6 +111,12 @@ public class AdministratorController extends AbstractController {
 				auth = AccessControlServiceConstants.VISITOR;
 		}
 		return auth;
+	}
+
+	@Override
+	protected String getMenu() {
+		
+		return "admin";
 	}
 
 }

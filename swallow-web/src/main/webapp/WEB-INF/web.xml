@@ -150,7 +150,10 @@
 		<url-pattern>/console/topic/auth/*</url-pattern>
 		<url-pattern>/console/message/auth/*</url-pattern>
 		<url-pattern>/console/admin/auth/*</url-pattern>
-		<url-pattern>/console/admin/queryadminandlogin</url-pattern>
+		<url-pattern>/console/topic</url-pattern>
+		<url-pattern>/console/message</url-pattern>
+		<url-pattern>/console/monitor/consumer/total/delay</url-pattern>
+		<url-pattern>/console/administrator</url-pattern>
 	</filter-mapping>
 	
 
