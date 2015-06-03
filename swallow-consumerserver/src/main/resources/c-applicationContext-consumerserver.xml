@@ -73,6 +73,5 @@
         </constructor-arg>
     </bean>
     
-	<bean id="defaultThreadException" class="com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler">
-	</bean>
+	<bean id="defaultThreadException" class="com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler"/>
 </beans>

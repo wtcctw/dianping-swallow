@@ -14,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,9 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
-import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
@@ -49,7 +51,21 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	@Autowired
 	private MessageDAO messageDao;
 	
-	private ExecutorService executors = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT*5, new MQThreadFactory("ACCUMULATION_RETRIEVER-"));
+	@Autowired
+	private MongoManager mongoManager;
+	
+	private ExecutorService executors;
+	
+	@PostConstruct
+	public void postDefaultAccumulationRetriever(){
+		
+		int corePoolSize = mongoManager.getMongoCount() * mongoManager.getMongoOptions().getConnectionsPerHost();
+		if(logger.isInfoEnabled()){
+			logger.info("[postDefaultAccumulationRetriever]" + corePoolSize);
+		}
+		executors = Executors.newFixedThreadPool(corePoolSize, new MQThreadFactory("ACCUMULATION_RETRIEVER-"));
+	}
+	
 
 	@Override
 	protected void doBuild() {
@@ -73,24 +89,28 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			logger.debug("[buildAllAccumulations]" + topics);
 		}
 		
-		final CountDownLatch latch = new CountDownLatch(topics.size());
+		
+		final CountDownLatch latch = new CountDownLatch(latchSize(topics));
 		for(Entry<String, Set<String>> entry : topics.entrySet()){
 			
 			final String topicName = entry.getKey();
 			final Set<String> consumerIds = entry.getValue();
 			
-			executors.execute(new Runnable(){
-
-				@Override
-				public void run() {
-					try{
-						putAccumulation(topicName, consumerIds);
-					}finally{
-						latch.countDown();
-					}
-				}
+			for(final String consumerId : consumerIds){
 				
-			});
+				executors.execute(new Runnable(){
+
+					@Override
+					public void run() {
+						try{
+							putAccumulation(topicName, consumerId);
+						}finally{
+							latch.countDown();
+						}
+					}
+					
+				});
+			}
 		}
 		
 		try {
@@ -103,16 +123,28 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		}
 	}
 	
-	protected void putAccumulation(String topicName, Set<String> consumerIds) {
+	private int latchSize(Map<String, Set<String>> topics) {
 		
+		int size = 0;
 		
-		for(String consumerId : consumerIds){
-			
-			long size = messageDao.getAccumulation(topicName, consumerId);
-			
-			TopicAccumulation topicAccumulation = MapUtil.getOrCreate(topics, topicName, TopicAccumulation.class);
-			topicAccumulation.addConsumerId(consumerId, size);
+		for(Set<String> consumerIds : topics.values()){
+			size += consumerIds.size();
 		}
+		return size;
+	}
+
+
+	protected void putAccumulation(String topicName, String consumerId) {
+		
+		
+		long size = 0;
+		try{
+			size = messageDao.getAccumulation(topicName, consumerId);
+		}catch(Exception e){
+			logger.error("[putAccumulation]" + topicName + "," + consumerId, e);
+		}
+		TopicAccumulation topicAccumulation = MapUtil.getOrCreate(topics, topicName, TopicAccumulation.class);
+		topicAccumulation.addConsumerId(consumerId, size);
 		
 	}
 

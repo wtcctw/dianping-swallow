@@ -25,6 +25,10 @@
 			<artifactId>swallow-producerclient</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-web</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.dianping.lion</groupId>
 			<artifactId>lion-client</artifactId>
 		</dependency>
@@ -47,6 +51,10 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.tools.btrace</groupId>
+			<artifactId>btrace-client</artifactId>
 		</dependency>
 	</dependencies>
 

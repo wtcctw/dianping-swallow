@@ -29,6 +29,7 @@ import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
+import com.dianping.swallow.web.task.TopicScanner;
 
 
 /**
@@ -57,6 +58,9 @@ public class DataMonitorController extends AbstractMonitorController{
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
+
+	@Autowired
+	private TopicScanner topicScanner;
 	
 	@RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
 	public ModelAndView viewConsumerServerQps(){
@@ -129,8 +133,16 @@ public class DataMonitorController extends AbstractMonitorController{
 			logger.info(consumerDataRetriever.getDebugInfo(server));
 		}
 		return "ok";
+	}
+	
+	@RequestMapping(value = "/console/monitor/scanner/debug", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Set<String>> getScannerDebug(){
+		
+		return topicScanner.getTopics();
 	} 
 
+	
 	@RequestMapping(value = "/console/monitor/producer/debug/{server}", method = RequestMethod.GET)
 	@ResponseBody
 	public String getProducerDebug(@PathVariable String server){

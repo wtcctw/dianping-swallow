@@ -45,6 +45,9 @@ public class AbstractConfig {
 			logger.warn("[loadLocalConfig][file not found]" + localFileName);
 			return;
 		}
+		if(logger.isInfoEnabled()){
+			logger.info("[loadConfig]" + localFileName);
+		}
 		loadLocalConfig(ins);
 
 	}
