@@ -60,7 +60,7 @@
 * 计划上线时间
 * 每天大概的消息量	(例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成"100")
 
-# Swallow使用说明
+# Swallow客户端使用说明
 ## 使用swallow发送消息
 ### 基本概念说明
 #### Producer配置信息详解
@@ -464,21 +464,26 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 ### Topic监控
 
-#### 监控时间段划分
-
-* 延时监控中监控时间被分为3段：依次为用户发送-存储延时(message存储到mongo与用户发出message的时间差值)，存储-发送延迟(swallow发出message与message存储到mongo的时间差值)，发送-ack延迟(swallow收到用户ack确认与swallow发出message的时间差值)。
-
-* topic监控分为延时监控，消息量监控和堆积量监控。
-![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/13.png)
+#### 基础概念
 
 #### 延时监控
+
+延时监控中监控时间被分为3段
+
+1. 用户发送-存储延时(message存储到mongo与用户发出message的时间差值)
+1. 存储-发送延迟(swallow发出message与message存储到mongo的时间差值)
+1. 发送-ack延迟(swallow收到用户ack确认与swallow发出message的时间差值)
+
+![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/13.png)
 
 * 在搜索栏中输入所要查询的topic，系统会返回topic与每个consumer在不同时间段的延时统计结果。
 ![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/8.png)
 
-#### 消息量监控
+#### 每秒消息(QPS)监控
 
-* 消息量监控分别从发送端，swallow端和消费端进行统计分析。用户发送频率统计每秒钟用户发送的消息数目(图表中会显示每30秒钟的发送频率)，swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack频率统计每秒钟用户返回ack的消息数目。在某一时间段，如果系统一切工作正常，应该有消费者发送频率 = swallow发送频率 = 用户返回ack频率。如果出现不相等，请对比其他消费者是否正常，如果正常，则请查看客户端代码是否正确实现了功能。
+* 消息量监控从swallow服务器端统计消息发送频率(QPS)，分为三段进行统计，和上述延时分段对应。
+
+swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack频率统计每秒钟用户返回ack的消息数目。在某一时间段，如果系统一切工作正常，对应特定的consumerID，应该有消费者发送频率 = swallow发送频率 = 用户返回ack频率。如果出现不相等，请对比其他消费者是否正常，如果正常，则请查看客户端代码是否正确实现了功能。
 ![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/9.png)
 
 * 如果只想查看某一端的每秒钟统计量，只需点击右侧的图例即可切换显示和隐藏。
@@ -488,7 +493,7 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 * 堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。
 
-*如果客户端工作正常并且及时处理消息,则不会出现消息堆积现象。
+*如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。
 ![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/14.png)
 
 ### Swallow Server监控
@@ -507,15 +512,15 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 ### 管理员行为
 
-* 管理员可以添加删除管理员名单的权限。
+* 添加删除管理员名单的权限
+* 编辑topic关联人员名单
+* 查看访问swallow web的来访者信息
+* 查看、重发消息
 
-* 管理员可以可以编辑topic关联人员名单。
-
-* 管理员可以查看访问swallow web的来访者信息。
 
 ### 用户行为
 
-* 用户表示至少关联一个topic,可以访问关联topic的所有message的人员。
+* 每个用户管理一个或者多个topic，可以查看、重发相应的topic的消息
 
 ### Visitor行为
 
@@ -523,7 +528,7 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 ### 权限提升
 
-* 用户和Visitor如需提升权限，请联系运维 jiaxing.fan@dianping.com。
+* 用户和Visitor如需提升权限，请联系对应的业务运维
 
 
 # Swallow常见问题以及处理

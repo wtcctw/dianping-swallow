@@ -1021,7 +1021,7 @@ body .markdown-body
 
 		</ul>
 	</div>
-<article class="markdown-body"><p>注：<strong>本文针对Swallow0.7.1版本</strong></p>
+<article class="markdown-body"><p>注：<strong>本文针对Swallow0.7.1版本</strong>,下文中，${currentVersion}, currentVersion指0.7.1</p>
 <div class="toc">
 <ul>
 <li><a href="#_1">基础概念</a><ul>
@@ -1038,7 +1038,7 @@ body .markdown-body
 <li><a href="#topic">申请Topic</a></li>
 </ul>
 </li>
-<li><a href="#swallow_2">Swallow使用说明</a><ul>
+<li><a href="#swallow_2">Swallow客户端使用说明</a><ul>
 <li><a href="#swallow_3">使用swallow发送消息</a><ul>
 <li><a href="#_6">基本概念说明</a><ul>
 <li><a href="#producer">Producer配置信息详解</a></li>
@@ -1076,12 +1076,67 @@ body .markdown-body
 </li>
 </ul>
 </li>
-<li><a href="#swallow_5">Swallow常见问题以及处理</a><ul>
-<li><a href="#_13">如何查看我的消费是否有延迟、延迟多少条消息？</a></li>
-<li><a href="#consumer">如何查看我的Consumer消费一条消息的平均时间？</a></li>
+<li><a href="#swallow-web">Swallow Web使用说明</a><ul>
+<li><a href="#topic_1">Topic查询</a><ul>
+<li><a href="#topic_2">根据Topic名称查询</a></li>
+<li><a href="#_13">根据申请人和申请人部门查询</a></li>
+</ul>
+</li>
+<li><a href="#message">Message查询与重发</a><ul>
+<li><a href="#topicmessage">查询Topic下所有Message</a></li>
+<li><a href="#message-id">根据Message ID精确查询</a></li>
+<li><a href="#_14">根据保存时间精确查询</a></li>
+<li><a href="#message_1">Message重发</a><ul>
+<li><a href="#message_2">重发已保存的message</a></li>
+<li><a href="#message_3">重发自定义message</a></li>
+</ul>
+</li>
+<li><a href="#swallow_5">查看Swallow消息</a></li>
+</ul>
+</li>
+<li><a href="#topicswallow-server">Topic监控和Swallow Server监控</a><ul>
+<li><a href="#topic_3">Topic监控</a><ul>
+<li><a href="#_15">基础概念</a></li>
+<li><a href="#_16">延时监控</a></li>
+<li><a href="#qps">每秒消息(QPS)监控</a></li>
+<li><a href="#_17">堆积量监控</a></li>
+</ul>
+</li>
+<li><a href="#swallow-server">Swallow Server监控</a><ul>
+<li><a href="#producer-server">producer server监控</a></li>
+<li><a href="#consumer-server">consumer server监控</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_18">权限管理</a><ul>
+<li><a href="#_19">管理员行为</a></li>
+<li><a href="#_20">用户行为</a></li>
+<li><a href="#visitor">Visitor行为</a></li>
+<li><a href="#_21">权限提升</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#swallow_6">Swallow常见问题以及处理</a><ul>
+<li><a href="#topicconsumer">如何查找某个topic对应的consumer</a></li>
+<li><a href="#_22">如何查看我的消费是否有延迟、延迟多少条消息？</a><ul>
+<li><a href="#cat">Cat端追踪</a></li>
+<li><a href="#swallow-web_1">Swallow Web端追踪</a></li>
+</ul>
+</li>
+<li><a href="#consumer">如何查看我的Consumer消费一条消息的平均时间？</a><ul>
+<li><a href="#cat_1">Cat端追踪</a></li>
+<li><a href="#swallow-web_2">Swallow Web端追踪</a></li>
+</ul>
+</li>
 <li><a href="#consumer_1">我的Consumer有延时，该怎么确认问题所在？</a></li>
 <li><a href="#consumer_2">我的Consumer堵了，该怎么确认问题所在？</a></li>
-<li><a href="#producer_1">如何确认我的Producer正常工作？</a></li>
+<li><a href="#producer_1">如何确认我的Producer正常工作？</a><ul>
+<li><a href="#cat_2">Cat端追踪</a></li>
+<li><a href="#swallow-web_3">Swallow Web端追踪</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1132,7 +1187,7 @@ body .markdown-body
 </ul>
 <h1 id="swallow_1"><a name="user-content-swallow_1" href="#swallow_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow系统接入流程</h1>
 <h2 id="topic"><a name="user-content-topic" href="#topic" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>申请Topic</h2>
-<p>如果有新的Topic，请联系：李明东/孟文超(<a href="mailto:mingdong.li@dianping.com">mingdong.li@dianping.com</a>, <a href="mailto:wenchao.meng@dianping.com">wenchao.meng@dianping.com</a>)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。</p>
+<p>如果有新的Topic，请联系：李明冬/孟文超(<a href="mailto:mingdong.li@dianping.com">mingdong.li@dianping.com</a>, <a href="mailto:wenchao.meng@dianping.com">wenchao.meng@dianping.com</a>)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。</p>
 <p>联系时，<strong>请邮件里告知：</strong></p>
 <ul>
 <li>申请人所在业务部门 (例如：支付中心业务部门)</li>
@@ -1143,7 +1198,7 @@ body .markdown-body
 <li>计划上线时间</li>
 <li>每天大概的消息量  (例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成&rdquo;100&rdquo;)</li>
 </ul>
-<h1 id="swallow_2"><a name="user-content-swallow_2" href="#swallow_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用说明</h1>
+<h1 id="swallow_2"><a name="user-content-swallow_2" href="#swallow_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow客户端使用说明</h1>
 <h2 id="swallow_3"><a name="user-content-swallow_3" href="#swallow_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用swallow发送消息</h2>
 <h3 id="_6"><a name="user-content-_6" href="#_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基本概念说明</h3>
 <h4 id="producer"><a name="user-content-producer" href="#producer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Producer配置信息详解</h4>
@@ -1238,35 +1293,37 @@ body .markdown-body
 &lt;dependency&gt;
     &lt;groupId&gt;com.dianping.swallow&lt;/groupId&gt;
     &lt;artifactId&gt;swallow-producerclient&lt;/artifactId&gt;
-    &lt;version&gt;0.7.0&lt;/version&gt; 
+    &lt;version&gt;${currentVersion}&lt;/version&gt; 
 &lt;/dependency&gt;
-&lt;!-- lion --&gt;
+&lt;!-- lion  请使用lion最新稳定版--&gt;
 &lt;dependency&gt;
      &lt;groupId&gt;com.dianping.lion&lt;/groupId&gt;
      &lt;artifactId&gt;lion-client&lt;/artifactId&gt;
-     &lt;version&gt;0.4.6&lt;/version&gt;
+     &lt;version&gt;${lion.version}&lt;/version&gt;
 &lt;/dependency&gt;
+&lt;!--  如果你的应用在tomcat中启动，则此依赖无必要，否则，请添加
 &lt;dependency&gt;
     &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
     &lt;artifactId&gt;servlet-api&lt;/artifactId&gt;
     &lt;version&gt;2.5&lt;/version&gt;
 &lt;/dependency&gt;
-&lt;!-- 监控 --&gt;
+--&gt;
+&lt;!-- 监控  请使用cat最新稳定版--&gt;
 &lt;dependency&gt;
      &lt;groupId&gt;com.dianping.cat&lt;/groupId&gt;
      &lt;artifactId&gt;cat-core&lt;/artifactId&gt;
-     &lt;version&gt;1.2.1&lt;/version&gt;
+     &lt;version&gt;${cat.version}&lt;/version&gt;
 &lt;/dependency&gt;
-&lt;!-- 远程调用Pigeon --&gt;
+&lt;!-- 远程调用Pigeon  请使用pigeon最新版本--&gt;
 &lt;dependency&gt;
      &lt;groupId&gt;com.dianping.dpsf&lt;/groupId&gt;
      &lt;artifactId&gt;dpsf-net&lt;/artifactId&gt;
-     &lt;version&gt;2.3.13&lt;/version&gt;
+     &lt;version&gt;${pigeon.version}&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <h4 id="spring"><a name="user-content-spring" href="#spring" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>在Spring中配置使用</h4>
 <ul>
-<li>swallow-producerclient的版本可以在<a href="http://mvn.dianpingoa.com/webapp/home.html">mvn repo</a>查询所有的发行版本。本例中使用0.7.0版本。</li>
+<li>swallow-producerclient的版本可以在<a href="http://mvn.dianpingoa.com/webapp/home.html">mvn repo</a>查询所有的发行版本。</li>
 </ul>
 <h5 id="springapplicationcontext-producerxmlbean"><a name="user-content-springapplicationcontext-producerxmlbean" href="#springapplicationcontext-producerxmlbean" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Spring配置文件applicationContext-producer.xml配置相关bean</h5>
 <pre><code>&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" /&gt;
@@ -1420,23 +1477,24 @@ public class ProducerSpring {
 &lt;dependency&gt;
     &lt;groupId&gt;com.dianping.swallow&lt;/groupId&gt;
     &lt;artifactId&gt;swallow-consumerclient&lt;/artifactId&gt;
-    &lt;version&gt;0.7.0&lt;/version&gt; 
+    &lt;version&gt;${currentVersion}&lt;/version&gt; 
 &lt;/dependency&gt;
-&lt;!-- lion --&gt;
+&lt;!-- lion  请使用lion最新稳定版--&gt;
 &lt;dependency&gt;
      &lt;groupId&gt;com.dianping.lion&lt;/groupId&gt;
      &lt;artifactId&gt;lion-client&lt;/artifactId&gt;
-     &lt;version&gt;0.4.6&lt;/version&gt;
+     &lt;version&gt;${lion.version}&lt;/version&gt;
 &lt;/dependency&gt;
-&lt;!-- 监控 --&gt;
+
+&lt;!-- 监控  请使用cat最新稳定版--&gt;
 &lt;dependency&gt;
      &lt;groupId&gt;com.dianping.cat&lt;/groupId&gt;
      &lt;artifactId&gt;cat-core&lt;/artifactId&gt;
-     &lt;version&gt;1.2.1&lt;/version&gt;
+     &lt;version&gt;${cat.version}&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 <ul>
-<li>swallow-consumerclient的版本可以在<a href="http://mvn.dianpingoa.com/webapp/home.html">mvn repo</a>查询所有的发行版本。本例中使用0.7.0版本。</li>
+<li>swallow-consumerclient的版本可以在<a href="http://mvn.dianpingoa.com/webapp/home.html">mvn repo</a>查询所有的发行版本。</li>
 </ul>
 <h4 id="spring_1"><a name="user-content-spring_1" href="#spring_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Spring中配置实现</h4>
 <h5 id="springapplicationcontext-consumerxmlbean"><a name="user-content-springapplicationcontext-consumerxmlbean" href="#springapplicationcontext-consumerxmlbean" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Spring配置文件applicationContext-consumer.xml配置相关bean</h5>
@@ -1524,8 +1582,127 @@ public class TestConsumer {
     }
 }
 </code></pre>
-<h1 id="swallow_5"><a name="user-content-swallow_5" href="#swallow_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
-<h2 id="_13"><a name="user-content-_13" href="#_13" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查看我的消费是否有延迟、延迟多少条消息？</h2>
+<h1 id="swallow-web"><a name="user-content-swallow-web" href="#swallow-web" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web使用说明</h1>
+<h2 id="topic_1"><a name="user-content-topic_1" href="#topic_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic查询</h2>
+<h3 id="topic_2"><a name="user-content-topic_2" href="#topic_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据Topic名称查询</h3>
+<ul>
+<li>
+<p>在左侧搜索栏里输入所要查询的topic名称，系统会提示可以搜索到的与用户关联的topic，如果提示没有返回任何内容，则说明用户没有权限查询任何topic。</p>
+</li>
+<li>
+<p>对于每个topic，管理员首先需要添加至少一名topic的申请人，授权其访问topic的权限，得到相应权限的申请人可以根据需要添加或者删除其他topic关联人。</p>
+</li>
+</ul>
+<h3 id="_13"><a name="user-content-_13" href="#_13" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据申请人和申请人部门查询</h3>
+<ul>
+<li>在右侧搜索栏中输入申请人或者申请人部门，系统会返回相关的提示，如果没有提示信息，则说明没有相关的查询结果。</li>
+</ul>
+<h2 id="message"><a name="user-content-message" href="#message" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Message查询与重发</h2>
+<h3 id="topicmessage"><a name="user-content-topicmessage" href="#topicmessage" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>查询Topic下所有Message</h3>
+<ul>
+<li>在左侧搜索栏里输入查询message所属的topic名称，系统会提示可以搜索到的与用户关联的topic，如果提示没有返回任何内容，则说明用户没有权限查询任何topic的message信息。</li>
+</ul>
+<h3 id="message-id"><a name="user-content-message-id" href="#message-id" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据Message ID精确查询</h3>
+<ul>
+<li>topic确定的前提下，在右侧搜索栏中输入message ID可精确查询相应message。</li>
+</ul>
+<h3 id="_14"><a name="user-content-_14" href="#_14" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据保存时间精确查询</h3>
+<ul>
+<li>topic确定的前提下，选择开始时间和结束时间可以查询出特定时间段发送的所有message。</li>
+</ul>
+<h3 id="message_1"><a name="user-content-message_1" href="#message_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Message重发</h3>
+<h4 id="message_2"><a name="user-content-message_2" href="#message_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>重发已保存的message</h4>
+<ul>
+<li>
+<p>对于已经存在于mongo中的消息，用户可以根据查询返回结果选择需要重发的message。</p>
+</li>
+<li>
+<p>对于重新发送的消息，其原始ID不为空，原始ID为重发消息的消息ID。</p>
+</li>
+</ul>
+<h4 id="message_3"><a name="user-content-message_3" href="#message_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>重发自定义message</h4>
+<ul>
+<li>
+<p>对于不存在于mongo中的message，用户可以使用发送自定义消息功能批量发送message。批量发送时，用户只需在文本框中输入消息的内容，其中每行代表一条消息。</p>
+</li>
+<li>
+<p>用户需要对所发的自定义消息负责，swallow web不检查消息内容的格式。</p>
+</li>
+</ul>
+<h3 id="swallow_5"><a name="user-content-swallow_5" href="#swallow_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>查看Swallow消息</h3>
+<ul>
+<li>如果需要查看消息的详细内容，请点击更多选项，将会列出json格式的swallow消息内容，其中键值_id 表示保存消息的时间戳，c 表示消息体，v 表示swallow版本，s 表示消息体的sha1值， gt 表示消息的产生时间， p 表示用户设置的消息属性， _p 表示 swallow设置的消息内部属性， si 表示产生消息的主机ip。</li>
+</ul>
+<h2 id="topicswallow-server"><a name="user-content-topicswallow-server" href="#topicswallow-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic监控和Swallow Server监控</h2>
+<h3 id="topic_3"><a name="user-content-topic_3" href="#topic_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic监控</h3>
+<h4 id="_15"><a name="user-content-_15" href="#_15" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基础概念</h4>
+<h4 id="_16"><a name="user-content-_16" href="#_16" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>延时监控</h4>
+<p>延时监控中监控时间被分为3段</p>
+<ol>
+<li>用户发送-存储延时(message存储到mongo与用户发出message的时间差值)</li>
+<li>存储-发送延迟(swallow发出message与message存储到mongo的时间差值)</li>
+<li>发送-ack延迟(swallow收到用户ack确认与swallow发出message的时间差值)</li>
+</ol>
+<p><img alt="topic-consumer延时统计" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/13.png" /></p>
+<ul>
+<li>在搜索栏中输入所要查询的topic，系统会返回topic与每个consumer在不同时间段的延时统计结果。<br />
+<img alt="topic-consumer延时统计" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/8.png" /></li>
+</ul>
+<h4 id="qps"><a name="user-content-qps" href="#qps" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>每秒消息(QPS)监控</h4>
+<ul>
+<li>消息量监控从swallow服务器端统计消息发送频率(QPS)，分为三段进行统计，和上述延时分段对应。</li>
+</ul>
+<p>swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack频率统计每秒钟用户返回ack的消息数目。在某一时间段，如果系统一切工作正常，对应特定的consumerID，应该有消费者发送频率 = swallow发送频率 = 用户返回ack频率。如果出现不相等，请对比其他消费者是否正常，如果正常，则请查看客户端代码是否正确实现了功能。<br />
+<img alt="每秒消息" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/9.png" /></p>
+<ul>
+<li>如果只想查看某一端的每秒钟统计量，只需点击右侧的图例即可切换显示和隐藏。<br />
+<img alt="每秒消息" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/10.png" /></li>
+</ul>
+<h4 id="_17"><a name="user-content-_17" href="#_17" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>堆积量监控</h4>
+<ul>
+<li>堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。</li>
+</ul>
+<p>*如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。<br />
+<img alt="每秒消息" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/14.png" /></p>
+<h3 id="swallow-server"><a name="user-content-swallow-server" href="#swallow-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Server监控</h3>
+<h4 id="producer-server"><a name="user-content-producer-server" href="#producer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>producer server监控</h4>
+<ul>
+<li>producer server统计用户发送频率，即每秒钟发动到producer server的消息数目。<br />
+<img alt="producer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/11.png" /></li>
+</ul>
+<h4 id="consumer-server"><a name="user-content-consumer-server" href="#consumer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumer server监控</h4>
+<ul>
+<li>consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。<br />
+<img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/12.png" /></li>
+</ul>
+<h2 id="_18"><a name="user-content-_18" href="#_18" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限管理</h2>
+<h3 id="_19"><a name="user-content-_19" href="#_19" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>管理员行为</h3>
+<ul>
+<li>添加删除管理员名单的权限</li>
+<li>编辑topic关联人员名单</li>
+<li>查看访问swallow web的来访者信息</li>
+<li>查看、重发消息</li>
+</ul>
+<h3 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>用户行为</h3>
+<ul>
+<li>每个用户管理一个或者多个topic，可以查看、重发相应的topic的消息</li>
+</ul>
+<h3 id="visitor"><a name="user-content-visitor" href="#visitor" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Visitor行为</h3>
+<ul>
+<li>Visitor表示没有关联任何topic,无法访问任何topic及其message的人员，只可以查看监控性能。</li>
+</ul>
+<h3 id="_21"><a name="user-content-_21" href="#_21" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限提升</h3>
+<ul>
+<li>用户和Visitor如需提升权限，请联系对应的业务运维</li>
+</ul>
+<h1 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
+<h2 id="topicconsumer"><a name="user-content-topicconsumer" href="#topicconsumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查找某个topic对应的consumer</h2>
+<ul>
+<li>从<a href="http://cat.dp">CAT</a>中，找到swallow项目<a href="http://cat.dp/cat/r/t?op=view&amp;domain=Swallow">Swallow</a></li>
+<li>找到<code>Out:topic</code>(topic即你关心的topic名字)，点开，即可看到consumer信息</li>
+</ul>
+<h2 id="_22"><a name="user-content-_22" href="#_22" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查看我的消费是否有延迟、延迟多少条消息？</h2>
+<h3 id="cat"><a name="user-content-cat" href="#cat" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cat端追踪</h3>
 <ul>
 <li>从<a href="http://cat.dp/">CAT</a>中查看Swallow项目的Transaction，可以获得相应的信息（<a href="http://cat.dp/cat/r/t?op=view&amp;ampdomain=Swallow">传送门</a>）。</li>
 <li>以dp_action这个topic为例（仅作示例，具体到自己的topic，请做相应变通），先找到In:dp_action这个type：<br />
@@ -1538,12 +1715,23 @@ public class TestConsumer {
 <img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=pjSbpxdW21OsilhumHJpBaTGDdHicOI7Noq2YrAXYRE%3d&amp;docid=039c404696c4942828bb4be894448236b" /></li>
 <li>对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp_action的数量），如果消费的消息总量小于生产的消息总量，那么消费是有延迟的。</li>
 </ul>
+<h3 id="swallow-web_1"><a name="user-content-swallow-web_1" href="#swallow-web_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
+<ul>
+<li>从Swallow Web端<a href="http://ppe.swallow.dp/console/monitor/consumer/total/delay">延时监控</a>中查询出topic的延时统计数据。如果消费者出现消费延时的情况，可以查看3段延时中主要哪一段导致了消费的延迟。</li>
+<li>通过查看其他消费者的发送-ack延迟是否正常，如果其他消费者消费正常，那么就需要查看客户端代码是否正确实现了功能。</li>
+</ul>
 <h2 id="consumer"><a name="user-content-consumer" href="#consumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查看我的Consumer消费一条消息的平均时间？</h2>
+<h3 id="cat_1"><a name="user-content-cat_1" href="#cat_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cat端追踪</h3>
 <ul>
 <li>从<a href="http://cat.dp/">CAT</a>中查看Consumer ID对应项目的Transaction，找到MsgConsumed和MsgConsumeTried这两个type：<br />
 <img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=0QH8os%2fIyyQHtz77AR5t4TzV8v6mlwQXss8n8R3kjh8%3d&amp;docid=0426de8c2bfe84c219f857ad9a3b3b716" /></li>
 <li>MsgConsumed表示consumer server给这个consumer推送的消息数量，MsgConsumeTried表示consumer尝试消费消息的次数，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。</li>
 <li>右边的三列可以看出consumer调用onMessage回调函数耗费的最小最大以及平均时间，如果consumer消费状况一直良好，突然某个时刻开始有消费延时，可以观察一下这里的平均时间是不是比之前更高，如果平均消费时间比正常情况高出很多，可能会造成消费延时。</li>
+</ul>
+<h3 id="swallow-web_2"><a name="user-content-swallow-web_2" href="#swallow-web_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
+<ul>
+<li>从Swallow Web端<a href="http://ppe.swallow.dp/console/monitor/consumer/total/qps">消息量监控</a>中查看用户返回ack频率，除以相应的时间段即可得到消费一条消息的平均时间。<br />
+<img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/15.png" /></li>
 </ul>
 <h2 id="consumer_1"><a name="user-content-consumer_1" href="#consumer_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>我的Consumer有延时，该怎么确认问题所在？</h2>
 <ul>
@@ -1571,11 +1759,17 @@ public class TestConsumer {
 </li>
 </ul>
 <h2 id="producer_1"><a name="user-content-producer_1" href="#producer_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何确认我的Producer正常工作？</h2>
+<h3 id="cat_2"><a name="user-content-cat_2" href="#cat_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cat端追踪</h3>
 <ul>
 <li>首先确认生产者是否正常启动，判别方法跟<a href="#consumer_2">问题4</a>中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。</li>
 <li>在CAT上观察Producer对应项目的transaction，找到MsgProduced以及MsgProduceTried这两个Type，MsgProduced的数量表示程序产生的消息数量，MsgProduceTried表示Swallow的producer client尝试发送给producer server的次数，如果这两个数量相差过大，说明存在异常。<br />
 <img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=OE0h%2fxsUP%2b3CveKDt0t5w%2f8Gjc1jTKZqV0zmmmMfvNc%3d&amp;docid=091aef7f093d24e04bee0c251551113f9" /></li>
 <li>正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，此时请联系swallow团队成员。</li>
+</ul>
+<h3 id="swallow-web_3"><a name="user-content-swallow-web_3" href="#swallow-web_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
+<ul>
+<li>从Swallow Web端<a href="http://ppe.swallow.dp/console/message">Message管理</a>中查看相关topic下的message信息，检查消息是否正确发送。<br />
+<img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/16.png" /></li>
 </ul></article></body></html>
 <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>
