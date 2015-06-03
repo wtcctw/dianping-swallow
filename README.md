@@ -1,4 +1,4 @@
-注：**本文针对Swallow0.7.1版本**
+注：**本文针对Swallow0.7.1版本**,下文中，${currentVersion}, currentVersion指0.7.1
 
 [TOC]
 
@@ -151,34 +151,36 @@
 	<dependency>
 	    <groupId>com.dianping.swallow</groupId>
 	    <artifactId>swallow-producerclient</artifactId>
-	    <version>0.7.0</version> 
+	    <version>${currentVersion}</version> 
 	</dependency>
-	<!-- lion -->
+	<!-- lion  请使用lion最新稳定版-->
 	<dependency>
 	     <groupId>com.dianping.lion</groupId>
 	     <artifactId>lion-client</artifactId>
-	     <version>0.4.6</version>
+	     <version>${lion.version}</version>
 	</dependency>
+	<!--  如果你的应用在tomcat中启动，则此依赖无必要，否则，请添加
 	<dependency>
 	    <groupId>javax.servlet</groupId>
 	    <artifactId>servlet-api</artifactId>
 	    <version>2.5</version>
 	</dependency>
-	<!-- 监控 -->
+	-->
+	<!-- 监控  请使用cat最新稳定版-->
 	<dependency>
 	     <groupId>com.dianping.cat</groupId>
 	     <artifactId>cat-core</artifactId>
-	     <version>1.2.1</version>
+	     <version>${cat.version}</version>
 	</dependency>
-	<!-- 远程调用Pigeon -->
+	<!-- 远程调用Pigeon  请使用pigeon最新版本-->
 	<dependency>
 	     <groupId>com.dianping.dpsf</groupId>
 	     <artifactId>dpsf-net</artifactId>
-	     <version>2.3.13</version>
+	     <version>${pigeon.version}</version>
 	</dependency>
 
 #### 在Spring中配置使用
-* swallow-producerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.7.0版本。
+* swallow-producerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。
 
 ##### Spring配置文件applicationContext-producer.xml配置相关bean
 
@@ -302,21 +304,23 @@ longTaskAlertTime | 5000
 	<dependency>
 	    <groupId>com.dianping.swallow</groupId>
 	    <artifactId>swallow-consumerclient</artifactId>
-	    <version>0.7.0</version> 
+	    <version>${currentVersion}</version> 
 	</dependency>
-	<!-- lion -->
-	<dependency>
-	     <groupId>com.dianping.lion</groupId>
-	     <artifactId>lion-client</artifactId>
-	     <version>0.4.6</version>
-	</dependency>
-	<!-- 监控 -->
-	<dependency>
-	     <groupId>com.dianping.cat</groupId>
-	     <artifactId>cat-core</artifactId>
-	     <version>1.2.1</version>
-	</dependency>
-* swallow-consumerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。本例中使用0.7.0版本。
+    <!-- lion  请使用lion最新稳定版-->
+    <dependency>
+         <groupId>com.dianping.lion</groupId>
+         <artifactId>lion-client</artifactId>
+         <version>${lion.version}</version>
+    </dependency>
+
+    <!-- 监控  请使用cat最新稳定版-->
+    <dependency>
+         <groupId>com.dianping.cat</groupId>
+         <artifactId>cat-core</artifactId>
+         <version>${cat.version}</version>
+    </dependency>
+
+* swallow-consumerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。
 
 #### Spring中配置实现
 ##### Spring配置文件applicationContext-consumer.xml配置相关bean
