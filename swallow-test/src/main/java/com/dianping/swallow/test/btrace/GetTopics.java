@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sun.btrace.AnyType;
-import com.sun.btrace.BTraceUtils;
 import com.sun.btrace.annotations.BTrace;
 import com.sun.btrace.annotations.Kind;
 import com.sun.btrace.annotations.Location;

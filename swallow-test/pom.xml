@@ -25,10 +25,6 @@
 			<artifactId>swallow-producerclient</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.dianping.swallow</groupId>
-			<artifactId>swallow-web</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.dianping.lion</groupId>
 			<artifactId>lion-client</artifactId>
 		</dependency>
