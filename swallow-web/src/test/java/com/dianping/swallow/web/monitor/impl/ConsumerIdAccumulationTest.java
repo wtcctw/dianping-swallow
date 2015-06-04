@@ -34,6 +34,10 @@ public class ConsumerIdAccumulationTest {
 		Assert.assertEquals(4, result.size());
 
 		Assert.assertTrue(result.get(7L) == 0L);
+	}
+	
+	@Test
+	public void testRetain(){
 		
 	}
 }

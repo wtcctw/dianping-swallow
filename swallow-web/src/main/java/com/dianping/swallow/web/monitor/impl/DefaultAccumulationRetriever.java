@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor.impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +142,10 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			public void doAction() throws SwallowException {
 				
 				for(String consumerId : consumerIds){
+					
 					putAccumulation(topicName, consumerId);
+					TopicAccumulation topic = topics.get(topicName);
+					topic.retain(consumerIds);
 				}
 			}
 		});
@@ -238,12 +242,28 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			consumerIdAccumulation.add(accumulation);
 		}
 		
+		public void retain(Set<String> consumerIds) {
+			
+			Set<String> currentIds = new HashSet<String>(consumers.keySet());
+			currentIds.removeAll(consumerIds);
+			
+			for(String removeId : currentIds){
+				
+				consumers.remove(removeId);
+			}
+		}
+
 		public void removeBefore(Long toKey){
 			
 			for(ConsumerIdAccumulation consumer : consumers.values()){
 				
 				consumer.removeBefore(toKey);
 			}
+		}
+		
+		public void remove(String consumerId){
+			
+			consumers.remove(consumerId);
 		}
 		
 		public Map<String, ConsumerIdAccumulation> consumers(){
