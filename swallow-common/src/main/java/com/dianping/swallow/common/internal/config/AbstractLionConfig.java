@@ -1,12 +1,15 @@
 package com.dianping.swallow.common.internal.config;
 
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.ConfigChange;
 import com.dianping.swallow.common.internal.util.StringUtils;
 
 
@@ -16,7 +19,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
  * 
  *         2015年4月18日 下午10:04:45
  */
-public class AbstractLionConfig extends AbstractConfig{
+public class AbstractLionConfig extends AbstractConfig implements ConfigChange, ObjectConfig{
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -30,6 +33,7 @@ public class AbstractLionConfig extends AbstractConfig{
 	
 	private boolean isUseLion = true;
 	
+	private List<ObjectConfigChangeListener> listeners = new LinkedList<ObjectConfigChangeListener>();
 
 	public AbstractLionConfig(String localFileConfig, String suffix, boolean isUseLion) {
 		
@@ -40,8 +44,13 @@ public class AbstractLionConfig extends AbstractConfig{
 		}else{
 			fullSuffix = BASIC_SUFFIX;
 		}
-		cc = ConfigCache.getInstance();
 		this.isUseLion = isUseLion;
+		
+		if(isUseLion){
+			cc = ConfigCache.getInstance();
+			cc.addChange(this);
+		}
+		
 
 	}
 	
@@ -53,7 +62,7 @@ public class AbstractLionConfig extends AbstractConfig{
 	protected String getValue(String key, Properties props) {
 		
 		if(isUseLion){
-			String lionKey = StringUtils.join(SPLIT, fullSuffix, key);
+			String lionKey = getLionKey(key);
 			String value = cc.getProperty(lionKey);
 			if(value != null){
 				if(logger.isInfoEnabled()){
@@ -64,5 +73,44 @@ public class AbstractLionConfig extends AbstractConfig{
 		}
 		return super.getValue(key, props);
 	}
+
+	private String getLionKey(String key) {
+		
+		return StringUtils.join(SPLIT, fullSuffix, key);
+	}
+
+	private String getRawKey(String lionKey) {
+
+		return lionKey.substring(fullSuffix.length() + 1);
+	}
+
+	@Override
+	public void onChange(String lionKey, String value) {
+		
+		if(lionKey.startsWith(fullSuffix)){
+			
+			if(logger.isInfoEnabled()){
+				logger.info("[onChange]" + lionKey + "," + value);
+			}
+			String rawKey = getRawKey(lionKey); 
+			setFieldValue(rawKey, value);
+			notifyListeners(rawKey);
+		}
+	}
+
+	public synchronized void addChangeListener(ObjectConfigChangeListener listener){
+
+		listeners.add(listener);
+	}
 	
+	public synchronized void notifyListeners(String key){
+		
+		for(ObjectConfigChangeListener listener : listeners){
+			try{
+				listener.onChange(this, key);
+			}catch(Throwable th){
+				logger.error("[notifyListeners]" + listener + "," + key, th);
+			}
+		}
+	}
 }

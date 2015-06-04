@@ -12,10 +12,8 @@
 		</mvc:message-converters>
 	</mvc:annotation-driven>
 
-	<bean name="jacksonConverterFactory" class="com.dianping.swallow.web.controller.utils.JacksonConverterFactory">
-	</bean>
+	<bean name="jacksonConverterFactory" class="com.dianping.swallow.web.controller.utils.JacksonConverterFactory"/>
+
+	<bean id="defaultThreadException" class="com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler"/>
 	   
-
-
-
 </beans>

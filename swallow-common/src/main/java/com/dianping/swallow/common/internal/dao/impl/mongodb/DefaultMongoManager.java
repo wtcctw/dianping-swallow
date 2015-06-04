@@ -661,4 +661,17 @@ public class DefaultMongoManager implements ConfigChangeListener, MongoManager {
    }
 
 
+	@Override
+	public MongoClientOptions getMongoOptions() {
+		return mongoOptions;
+	}
+	
+	
+	@Override
+	public int getMongoCount() {
+		
+		return topicNameToMongoMap.values().size();
+	}
+	
+
 }

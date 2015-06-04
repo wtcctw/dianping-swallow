@@ -25,6 +25,7 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 	private volatile boolean isDirty = false;
 	private AtomicInteger noneZeroMergeCount = new AtomicInteger();
 	
+
 	public MessageInfo(){
 		this(true);
 	}
@@ -126,4 +127,10 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 	public int getNonZeroMergeCount(){
 		return noneZeroMergeCount.get();
 	}
+	
+	public void setNoneZeroMergeCount(int noneZeroMergeCount) {
+		
+		this.noneZeroMergeCount.set(noneZeroMergeCount);;
+	}
+
 }

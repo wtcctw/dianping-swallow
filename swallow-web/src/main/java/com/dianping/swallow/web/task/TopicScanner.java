@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.task;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,9 +88,10 @@ public class TopicScanner {
 		scanAdminCollection();
 	}
 
+	@SuppressWarnings("unchecked")
 	public Map<String, Set<String>> getTopics() {
 
-		return topics;
+		return (Map<String, Set<String>>) SerializationUtils.clone((Serializable) topics);
 	}
 
 	private void getTopicAndConsumerIds(List<String> dbs) {

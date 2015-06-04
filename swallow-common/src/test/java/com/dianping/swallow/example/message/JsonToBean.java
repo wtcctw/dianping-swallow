@@ -8,7 +8,8 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 public class JsonToBean {
 
-   public static void main(String[] args) throws Exception {
+   @SuppressWarnings("unchecked")
+public static void main(String[] args) throws Exception {
 
       //自定义bean
       JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();

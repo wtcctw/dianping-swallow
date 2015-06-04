@@ -7,14 +7,12 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
+import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
@@ -27,9 +25,7 @@ import com.dianping.swallow.web.monitor.StatsDataDesc;
  *
  * 2015年5月28日 下午3:02:25
  */
-public abstract class AbstractRetriever implements Retriever{
-
-	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+public abstract class AbstractRetriever extends AbstractLifecycle implements Retriever{
 
 	protected final int DEFAULT_INTERVAL = 30;//每隔多少秒采样
 	
@@ -43,16 +39,27 @@ public abstract class AbstractRetriever implements Retriever{
 	protected ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT);
 	
 	protected long lastBuildTime = System.currentTimeMillis(), current = System.currentTimeMillis();
-
-	@PostConstruct
-	public void startAbstractRetriever(){
+	
+	private ScheduledFuture<?> future; 
+	
+	@Override
+	protected void doStart() throws Exception {
+		
+		super.doStart();
 		
 		startBuilder();
 	}
 	
+	@Override
+	protected void doStop() throws Exception {
+		super.doStop();
+		
+		future.cancel(false);
+	}
+	
 	private void startBuilder() {
 		
-		scheduled.scheduleAtFixedRate(new Runnable(){
+		future = scheduled.scheduleAtFixedRate(new Runnable(){
 
 			@Override
 			public void run() {
@@ -72,9 +79,14 @@ public abstract class AbstractRetriever implements Retriever{
 				
 			}
 
-		}, DEFAULT_INTERVAL, DEFAULT_INTERVAL, TimeUnit.SECONDS);
+		}, getBuildInterval(), getBuildInterval(), TimeUnit.SECONDS);
 	}
-	
+		
+	protected long getBuildInterval() {
+		
+		return DEFAULT_INTERVAL;
+	}
+
 	protected abstract void doBuild();
 
 	protected abstract void doRemove(long toKey);
@@ -113,7 +125,7 @@ public abstract class AbstractRetriever implements Retriever{
 		return System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(keepInMemoryHour, TimeUnit.HOURS);
 	}
 
-	protected int getDefaultInterval(){
+	protected int getSampleInterval(){
 		return DEFAULT_INTERVAL;
 	}
 
@@ -170,9 +182,7 @@ public abstract class AbstractRetriever implements Retriever{
 	protected StatsData createStatsData(StatsDataDesc desc,
 			NavigableMap<Long, Long> rawData, long start, long end) {
 
-		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getDefaultInterval());
+		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getSampleInterval());
 	}
-
-
 
 }

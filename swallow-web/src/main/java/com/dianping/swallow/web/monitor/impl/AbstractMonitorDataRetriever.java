@@ -42,7 +42,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	public void postAbstractMonitorDataStats(){
 		
 		keepInMemoryCount = keepInMemoryHour * 3600 / AbstractCollector.SEND_INTERVAL;
-		intervalCount = DEFAULT_INTERVAL/AbstractCollector.SEND_INTERVAL;
+		intervalCount = getSampleInterval()/AbstractCollector.SEND_INTERVAL;
 		
 		statis = createServerStatis();
 	}
