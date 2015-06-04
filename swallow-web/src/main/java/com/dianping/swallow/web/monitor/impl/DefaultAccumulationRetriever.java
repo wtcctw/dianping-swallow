@@ -131,7 +131,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 	private void putAccumulation(final String topicName, final Set<String> consumerIds) {
 		
-		CatActionWrapper catAction = new CatActionWrapper("putAccumulation", topicName);
+		CatActionWrapper catAction = new CatActionWrapper("putAccumulationTopic", topicName);
 		
 		catAction.doAction(new SwallowAction() {
 			
@@ -147,7 +147,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 	protected void putAccumulation(final String topicName, final String consumerId) {
 		
-		CatActionWrapper catAction = new CatActionWrapper("putAccumulation:" + topicName, consumerId);
+		CatActionWrapper catAction = new CatActionWrapper("putAccumulationConsumerId",  topicName + ":" + consumerId);
 
 		catAction.doAction(new SwallowAction() {
 			
