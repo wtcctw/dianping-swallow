@@ -20,7 +20,6 @@ public class MongoConfig extends AbstractLionConfig {
 
 	private static final String MONGO_CONIFG_BASIC_SUFFIX = "mongoconfig";
 	
-	private boolean slaveOk = true;
 	private boolean socketKeepAlive = true;
 	private int socketTimeout = 5000;
 	private int connectionsPerHost = 100;
@@ -126,10 +125,6 @@ public class MongoConfig extends AbstractLionConfig {
 		}
 		return ReadPreference.secondary();
 		
-	}
-
-	public boolean isSlaveOk() {
-		return slaveOk;
 	}
 
 	public boolean isSocketKeepAlive() {

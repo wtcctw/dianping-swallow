@@ -24,12 +24,15 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.config.ObjectConfigChangeListener;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
+import com.dianping.swallow.web.config.WebConfig;
+import com.dianping.swallow.web.config.impl.DefaultWebConfig;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
@@ -41,7 +44,7 @@ import com.dianping.swallow.web.task.TopicScanner;
  * 2015年5月28日 下午3:06:46
  */
 @Component
-public class DefaultAccumulationRetriever extends AbstractRetriever implements AccumulationRetriever{
+public class DefaultAccumulationRetriever extends AbstractRetriever implements AccumulationRetriever, ObjectConfigChangeListener{
 
 	private Map<String, TopicAccumulation> topics = new ConcurrentHashMap<String, DefaultAccumulationRetriever.TopicAccumulation>();
 	
@@ -54,6 +57,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	@Autowired
 	private MongoManager mongoManager;
 	
+	@Autowired
+	private WebConfig webConfig;
+	
 	private ExecutorService executors;
 	
 	@PostConstruct
@@ -64,6 +70,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			logger.info("[postDefaultAccumulationRetriever]" + corePoolSize);
 		}
 		executors = Executors.newFixedThreadPool(corePoolSize, new MQThreadFactory("ACCUMULATION_RETRIEVER-"));
+		webConfig.addChangeListener(this);
 	}
 	
 
@@ -85,10 +92,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		
 		Map<String, Set<String>> topics = topicScanner.getTopics();
 		
-		if(logger.isDebugEnabled()){
-			logger.debug("[buildAllAccumulations]" + topics);
+		if(logger.isInfoEnabled()){
+			logger.info("[buildAllAccumulations][begin]");
 		}
-		
 		
 		final CountDownLatch latch = new CountDownLatch(latchSize(topics));
 		for(Entry<String, Set<String>> entry : topics.entrySet()){
@@ -96,25 +102,20 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			final String topicName = entry.getKey();
 			final Set<String> consumerIds = entry.getValue();
 			
-			for(final String consumerId : consumerIds){
-				
-				executors.execute(new Runnable(){
+			executors.execute(new Runnable(){
 
-					@Override
-					public void run() {
-						try{
-							putAccumulation(topicName, consumerId);
-						}finally{
-							latch.countDown();
-						}
+				@Override
+				public void run() {
+					try{
+						putAccumulation(topicName, consumerIds);
+					}finally{
+						latch.countDown();
 					}
-					
-				});
-			}
+				}
+			});
 		}
-		
 		try {
-			boolean result = latch.await(getDefaultInterval(), TimeUnit.SECONDS);
+			boolean result = latch.await(getBuildInterval(), TimeUnit.SECONDS);
 			if(!result){
 				logger.error("[buildAllAccumulations][wait returned, but task has not finished yet!]");
 			}
@@ -125,26 +126,44 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	
 	private int latchSize(Map<String, Set<String>> topics) {
 		
-		int size = 0;
-		
-		for(Set<String> consumerIds : topics.values()){
-			size += consumerIds.size();
-		}
-		return size;
+		return topics.size();
 	}
 
+	private void putAccumulation(final String topicName, final Set<String> consumerIds) {
+		
+		CatActionWrapper catAction = new CatActionWrapper("putAccumulation", topicName);
+		
+		catAction.doAction(new SwallowAction() {
+			
+			@Override
+			public void doAction() throws SwallowException {
+				
+				for(String consumerId : consumerIds){
+					putAccumulation(topicName, consumerId);
+				}
+			}
+		});
+	}
 
-	protected void putAccumulation(String topicName, String consumerId) {
+	protected void putAccumulation(final String topicName, final String consumerId) {
 		
-		
-		long size = 0;
-		try{
-			size = messageDao.getAccumulation(topicName, consumerId);
-		}catch(Exception e){
-			logger.error("[putAccumulation]" + topicName + "," + consumerId, e);
-		}
-		TopicAccumulation topicAccumulation = MapUtil.getOrCreate(topics, topicName, TopicAccumulation.class);
-		topicAccumulation.addConsumerId(consumerId, size);
+		CatActionWrapper catAction = new CatActionWrapper("putAccumulation:" + topicName, consumerId);
+
+		catAction.doAction(new SwallowAction() {
+			
+			@Override
+			public void doAction() throws SwallowException {
+				
+				long size = 0;
+				try{
+					size = messageDao.getAccumulation(topicName, consumerId);
+				}catch(Exception e){
+					logger.error("[putAccumulation]" + topicName + "," + consumerId, e);
+				}
+				TopicAccumulation topicAccumulation = MapUtil.getOrCreate(topics, topicName, TopicAccumulation.class);
+				topicAccumulation.addConsumerId(consumerId, size);
+			}
+		});
 		
 	}
 
@@ -258,6 +277,28 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 				}
 				accumulations.remove(key);
 			}
+		}
+	}
+	
+	@Override
+	protected long getBuildInterval() {
+		
+		return webConfig.getAccumulationBuildInterval();
+	}
+
+	@Override
+	protected int getSampleInterval() {
+		
+		return webConfig.getAccumulationBuildInterval();
+	}
+
+
+	@Override
+	public void onChange(Object config, String key) throws Exception {
+		
+		if(key.equals(DefaultWebConfig.FIELD_ACCUMULATION)){
+			stop();
+			start();
 		}
 	}
 }

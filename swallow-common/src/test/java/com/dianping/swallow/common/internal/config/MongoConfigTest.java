@@ -2,6 +2,9 @@ package com.dianping.swallow.common.internal.config;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,5 +87,25 @@ public class MongoConfigTest extends AbstractTest{
 		
 		Assert.assertEquals(0, read.getTagSets().size());
 
+	}
+	
+	
+	@Test
+	public void testOnChange() throws InterruptedException{
+
+		ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(4);
+		final MongoConfig config = new MongoConfig("swallow-mongo.properties");
+		scheduled.scheduleAtFixedRate(new Runnable(){
+
+			@Override
+			public void run() {
+				MongoClientOptions options = config.buildMongoOptions();
+				System.out.println(options.getReadPreference());
+			}
+			
+		}, 0, 5, TimeUnit.SECONDS);
+		
+		
+//		TimeUnit.SECONDS.sleep(3000);
 	}
 }

@@ -61,56 +61,14 @@ public class AbstractConfig {
 			throw new RuntimeException(e1.getMessage(), e1);
 		}
 
-		Class<?> clazz = this.getClass();
 		for (String key : props.stringPropertyNames()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("[loadLocalConfig][key:value]" + key + ":" + props.getProperty(key));
-			}
+			
 			String value = getValue(key, props).trim();
-			Field field = null;
-			try {
-				field = clazz.getDeclaredField(key.trim());
-			} catch (Exception e) {
-				logger.error("unknown property found: " + key);
-				continue;
-			}
-			field.setAccessible(true);
-			if (field.getType().equals(Integer.TYPE)) {
-				try {
-					field.set(this,
-							Integer.parseInt(value));
-				} catch (Exception e) {
-					logger.error("can not parse property " + key, e);
-					continue;
-				}
-			} else if (field.getType().equals(Long.TYPE)) {
-				try {
-					field.set(this,
-							Long.parseLong(value));
-				} catch (Exception e) {
-					logger.error("can not set property " + key, e);
-					continue;
-				}
-			} else if (field.getType().equals(String.class)) {
-				try {
-					field.set(this, value);
-				} catch (Exception e) {
-					logger.error("can not set property " + key, e);
-					continue;
-				}
-			} else {
-				try {
-					field.set(this,
-							Boolean.parseBoolean(value));
-				} catch (Exception e) {
-					logger.error("can not set property " + key, e);
-					continue;
-				}
-			}
+			setFieldValue(key, value);
 		}
 
 		if (logger.isInfoEnabled()) {
-			Field[] fields = clazz.getDeclaredFields();
+			Field[] fields = getClass().getDeclaredFields();
 			for (int i = 0; i < fields.length; i++) {
 				Field f = fields[i];
 				f.setAccessible(true);
@@ -122,6 +80,39 @@ public class AbstractConfig {
 				}
 			}
 		}
+	}
+
+	protected void setFieldValue(String key, String value) {
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[setFieldValue]" + key + ":" + value);
+		}
+		
+		Class<?> clazz = this.getClass();
+		Field field = null;
+		try {
+			field = clazz.getDeclaredField(key.trim());
+		} catch (Exception e) {
+			logger.error("unknown property found: " + key);
+			return;
+		}
+		
+		field.setAccessible(true);
+		try {
+			
+			if (field.getType().equals(Integer.TYPE)) {
+				field.set(this, Integer.parseInt(value));
+			} else if (field.getType().equals(Long.TYPE)) {
+				field.set(this, Long.parseLong(value));
+			} else if (field.getType().equals(String.class)) {
+				field.set(this, value);
+			} else {
+				field.set(this, Boolean.parseBoolean(value));
+			}
+		} catch (Exception e) {
+			logger.error("can not parse property " + key, e);
+		}
+		
 	}
 
 	protected String getValue(String key, Properties props) {

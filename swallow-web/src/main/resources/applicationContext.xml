@@ -20,6 +20,8 @@
             </list>
         </property>
     </bean>
+
+	<bean class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager"/>
     
     <bean id="administratorDAO"
         class="com.dianping.swallow.web.dao.impl.DefaultAdministratorDao">
