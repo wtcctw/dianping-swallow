@@ -1,9 +1,9 @@
 package com.dianping.swallow.web.filter;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -22,9 +22,9 @@ import com.dianping.swallow.web.dao.impl.DefaultAdministratorDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.service.AccessControlServiceConstants;
 import com.dianping.swallow.web.service.AdministratorListService;
-import com.dianping.swallow.web.service.FilterMetaDataService;
+import com.dianping.swallow.web.service.IdentityRecognitionService;
 import com.dianping.swallow.web.service.impl.AdministratorListServiceImpl;
-import com.dianping.swallow.web.service.impl.FilterMetaDataServiceImpl;
+import com.dianping.swallow.web.service.impl.IdentityRecognitionServiceImpl;
 
 /**
  * @author mingdongli
@@ -45,7 +45,7 @@ public class RequestLogFilter implements Filter {
 	
 	private AdministratorListService administratorListService;
 	
-	private FilterMetaDataService filterMetaDataService;
+	private IdentityRecognitionService identityRecognitionService;
 	
 	private AdministratorDao administratorDao;
 	
@@ -64,7 +64,7 @@ public class RequestLogFilter implements Filter {
 				.getRequiredWebApplicationContext(this.context);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
 		this.administratorListService = ctx.getBean(AdministratorListServiceImpl.class);
-		this.filterMetaDataService = ctx.getBean(FilterMetaDataServiceImpl.class);
+		this.identityRecognitionService = ctx.getBean(IdentityRecognitionServiceImpl.class);
 		this.administratorDao = ctx.getBean(DefaultAdministratorDao.class);
 	}
 
@@ -116,18 +116,8 @@ public class RequestLogFilter implements Filter {
 		}
 	}
 	
-	private boolean isUser(String username){
-		Collection<Set<String>> topicUsers = filterMetaDataService.loadTopicToWhiteList().values();
-		for(Set<String> set : topicUsers){
-			if(set.contains(username)){
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	private boolean switchUserAndVisitor(String username){
-		if(isUser(username)){
+		if(identityRecognitionService.isUser(username)){
 			return administratorListService.updateAdmin(username, AccessControlServiceConstants.USER);
 		}
 		else{
