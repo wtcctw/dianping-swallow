@@ -94,11 +94,11 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		filterMetaDataService.loadTopicToWhiteList().put(name, splitProps(prop));
 		if (topicDao.updateTopic(name, prop, dept, time)) {
 			logger.info(String.format(
-					"Edit s% to [prop: s%, dept: s%, time: s%] successfully",
+					"Edit %s to [prop: %s, dept: %s, time: %s] successfully",
 					name, prop, dept, time));
 		} else {
 			logger.info(String.format(
-					"Edit s% to [prop: s%, dept: s%, time: s%] failed", name,
+					"Edit %s to [prop: %s, dept: %s, time: %s] failed", name,
 					prop, dept, time));
 		}
 	}

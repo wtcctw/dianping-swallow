@@ -97,29 +97,41 @@ public class RequestLogFilter implements Filter {
 	}
 
 	public void destroy() {
-		// close any resources here
+		// ignore
 	}
 	
 	private boolean recordVisitInAdminList(String username){
 		Administrator admin = administratorDao.readByName(username);
 		if(admin != null){
-			return administratorListService.updateAdmin(username, admin.getRole());
+			int role = admin.getRole();
+			if(role == 0){
+				return administratorListService.updateAdmin(username, role);
+			}
+			else {
+				return switchUserAndVisitor(username);
+			}
 		}
 		else{
-			boolean user = false;
-			Collection<Set<String>> topicUsers = filterMetaDataService.loadTopicToWhiteList().values();
-			for(Set<String> set : topicUsers){
-				if(set.contains(username)){
-					user = true;
-					break;
-				}
+			return switchUserAndVisitor(username);
+		}
+	}
+	
+	private boolean isUser(String username){
+		Collection<Set<String>> topicUsers = filterMetaDataService.loadTopicToWhiteList().values();
+		for(Set<String> set : topicUsers){
+			if(set.contains(username)){
+				return true;
 			}
-			if(user){
-				return administratorListService.updateAdmin(username, AccessControlServiceConstants.USER);
-			}
-			else{
-				return administratorListService.updateAdmin(username, AccessControlServiceConstants.VISITOR);
-			}
+		}
+		return false;
+	}
+	
+	private boolean switchUserAndVisitor(String username){
+		if(isUser(username)){
+			return administratorListService.updateAdmin(username, AccessControlServiceConstants.USER);
+		}
+		else{
+			return administratorListService.updateAdmin(username, AccessControlServiceConstants.VISITOR);
 		}
 	}
 
