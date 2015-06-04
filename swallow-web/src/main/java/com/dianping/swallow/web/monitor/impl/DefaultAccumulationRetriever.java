@@ -34,9 +34,9 @@ import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 import com.dianping.swallow.web.config.WebConfig;
 import com.dianping.swallow.web.config.impl.DefaultWebConfig;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
-import com.dianping.swallow.web.task.TopicScanner;
 
 /**
  * @author mengwenchao
@@ -48,8 +48,6 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 	private Map<String, TopicAccumulation> topics = new ConcurrentHashMap<String, DefaultAccumulationRetriever.TopicAccumulation>();
 	
-	@Autowired
-	private TopicScanner  topicScanner;
 	
 	@Autowired
 	private MessageDAO messageDao;
@@ -59,6 +57,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	
 	@Autowired
 	private WebConfig webConfig;
+
+	@Autowired
+	private ConsumerDataRetriever consumerDataRetriever;
 	
 	private ExecutorService executors;
 	
@@ -90,7 +91,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 	protected void buildAllAccumulations() {
 		
-		Map<String, Set<String>> topics = topicScanner.getTopics();
+		Map<String, Set<String>> topics = consumerDataRetriever.getAllTopics();
 		
 		if(logger.isInfoEnabled()){
 			logger.info("[buildAllAccumulations][begin]");

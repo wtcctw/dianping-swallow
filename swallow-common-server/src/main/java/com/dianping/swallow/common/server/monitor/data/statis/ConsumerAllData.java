@@ -1,5 +1,6 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
@@ -9,6 +10,7 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao
@@ -71,6 +73,23 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 		}
 		
 		return ctss.keySet(includeTotal);
+	}
+
+	@Override
+	public Map<String, Set<String>> getAllTopics() {
+		
+		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+		
+		Set<String> topics = total.keySet(false);
+		for(String topic : topics){
+			if(topic.equals(MonitorData.TOTAL_KEY)){
+				continue;
+			}
+			Set<String> consumerIds = getConsumerIds(topic, false);
+			consumerIds.remove(MonitorData.TOTAL_KEY);
+			result.put(topic, consumerIds);
+		}
+		return result;
 	}
 
 
