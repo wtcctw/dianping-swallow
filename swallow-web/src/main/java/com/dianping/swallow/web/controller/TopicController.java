@@ -2,17 +2,16 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import jodd.util.StringUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,23 +46,32 @@ public class TopicController extends AbstractMenuController {
 	@RequestMapping(value = "/console/topic")
 	public ModelAndView allApps(HttpServletRequest request,
 			HttpServletResponse response) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		createViewMap();
-		return new ModelAndView("topic/index", map);
+
+		return new ModelAndView("topic/index", createViewMap());
 	}
-	
+
 	@RequestMapping(value = "/console/topic/topicdefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object topicDefault(int offset, int limit, String topic,
 			String prop, String dept, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-
-		boolean findAll = StringUtils.isEmpty(topic + prop + dept);
-		if (findAll) {
-			return topicService.loadAllTopic(offset, limit);
-		} else {
-			return topicService.loadSpecificTopic(offset, limit, topic, prop,
-					dept);
+		
+		boolean isAllEmpty = StringUtil.isEmpty(topic + prop + dept);
+		if(isAllEmpty){  //first access
+			String username = extractUsernameUtils.getUsername(request);
+			boolean findAll = filterMetaDataService.loadAdminSet().contains(
+					username);
+			boolean switchenv = filterMetaDataService.isShowContentToAll();
+			if (findAll || switchenv) {
+				return topicService.loadAllTopic(offset, limit);
+			} else {
+				return topicService.loadSpecificTopic(offset, limit, topic,
+						username, dept);
+			}
+		}
+		else{
+			return topicService.loadSpecificTopic(offset, limit, topic,
+					prop, dept);
 		}
 
 	}
@@ -74,16 +82,19 @@ public class TopicController extends AbstractMenuController {
 			HttpServletResponse response) throws UnknownHostException {
 
 		String userName = extractUsernameUtils.getUsername(request);
-		boolean isAdmin = filterMetaDataService.loadAdminSet()
-				.contains(userName);
-		boolean isproduct = filterMetaDataService.isShowContentToAll();
-		return topicService.loadAllTopicNames(userName, isAdmin || isproduct);
+		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(
+				userName);
+		boolean switchenv = filterMetaDataService.isShowContentToAll();
+		return topicService.loadAllTopicNames(userName, isAdmin || switchenv);
 	}
 
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object propName() throws UnknownHostException {
-		return topicService.getPropAndDept();
+	public Object propName(HttpServletRequest request,
+			HttpServletResponse response) throws UnknownHostException {
+		
+		String userName = extractUsernameUtils.getUsername(request);
+		return topicService.getPropAndDept(userName);
 	}
 
 	@RequestMapping(value = "/console/topic/auth/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")

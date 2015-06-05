@@ -108,9 +108,6 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 		
 		$scope.suburl = "/console/admin/auth/admindefault";
 	
-		$("a[href='/console/administrator'] button").removeClass("btn-info");
-		$("a[href='/console/administrator'] button").addClass("btn-purple");
-		
 		//edit admin and save it in database
 		$scope.adminrole = "";
 		$scope.adminname = "";
@@ -148,26 +145,22 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 		}
 		
 		//add below to control access
-		$scope.adminornot = false;
-		$scope.$on('ngLoadFinished',  function (ngLoadFinishedEvent, admin, user){
-			$scope.adminornot = admin;
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
-			
-			$http({
-				method : 'GET',
-				url : window.contextPath + '/console/admin/queryvisits'
-			}).success(function(data, status, headers, config) {
-				var visitList = data;
-				$("#modalname").typeahead({
-					items: 16, 
-					source : visitList,
-					updater : function(c) {
-						$scope.adminname = c;  //have to add this statement, or adminnam will be not completed
-						return c;
-					}
-				})
-			}).error(function(data, status, headers, config) {
-			});
+		$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
+		
+		$http({
+			method : 'GET',
+			url : window.contextPath + '/console/admin/queryvisits'
+		}).success(function(data, status, headers, config) {
+			var visitList = data;
+			$("#modalname").typeahead({
+				items: 16, 
+				source : visitList,
+				updater : function(c) {
+					$scope.adminname = c;  //have to add this statement, or adminnam will be not completed
+					return c;
+				}
+			})
+		}).error(function(data, status, headers, config) {
 		});
 		
 		$scope.dialog = function(name) {

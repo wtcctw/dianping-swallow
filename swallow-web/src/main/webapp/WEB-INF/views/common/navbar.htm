@@ -12,12 +12,12 @@
 					class="icon-gift"></i> Swallow管理中心
 			</small>
 			</a> <a href="${rc.contextPath}/console/topic" class="navbar-brand">
-				<button class="btn btn-info  btn-xs swallow-nav-btn">
+				<button class="btn #if(${menu}=='topic')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
 					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
 					Topic管理
 				</button>
 			</a> <a href="${rc.contextPath}/console/message" class="navbar-brand">
-				<button class="btn  btn-info btn-xs swallow-nav-btn">
+				<button class="btn  #if(${menu}=='message')btn-purple #else btn-info#end btn-xs swallow-nav-btn">
 					<i class="icon-cloud  align-top bigger-125 icon-on-right"></i>
 					Message管理
 				</button>
@@ -30,8 +30,8 @@
 				</button>
 			</a> <a href="${rc.contextPath}/console/administrator"
 				class="navbar-brand">
-				<button class="btn  btn-info btn-xs swallow-nav-btn"
-					id="navbar-admin" style="display: none;">
+				<button class="btn  #if(${menu}=='admin')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
+					id="navbar-admin" style="#if(${isadmin})display: block;#else display: none;#end">
 					<i class="icon-lock align-top bigger-125 icon-on-right"></i> 管理员
 				</button>
 			</a>
@@ -49,15 +49,12 @@
 			<ul class="nav nav-pills" style="margin-top: 4px">
 				<li><a href="${rc.contextPath}/help"
 					style="background: white">帮助</a></li>
-				<!-- 				<li><a
-					href="https://sso.51ping.com/login?TARGET=http%3A%2F%2F192.168.78.29%3A8080%2F"
-					style="background: white" ng-show="login">登录</a></li> -->
-				<li class="dropdown all-camera-dropdown"><a ng-show="logout"
+				<li class="dropdown all-camera-dropdown"><a
 					class="dropdown-toggle" data-toggle="dropdown" href="#"
-					style="background: white" ng-bind="username"><b class="caret"></b>
+					style="background: white">欢迎 ${username}<b class="caret"></b>
 				</a>
 					<ul class="dropdown-menu">
-						<li><a ng-href="{{logouturl}}">登出</a></li>
+						<li><a ng-href="${logouturl}">登出</a></li>
 					</ul></li>
 			</ul>
 

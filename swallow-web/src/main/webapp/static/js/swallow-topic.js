@@ -135,32 +135,16 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 				localStorage.setItem("name", name);
 			}
 			
-			//display different view for different login user
-			$scope.firstaccess = false;
-			$scope.$on('ngLoadFinished',  function (ngLoadFinishedEvent, admin, user){
-				if(!$scope.firstaccess){
-					if(!admin)
-						$scope.prop = user;  //if not admin, show all topic, so that it can edit
-					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
-					$scope.prop = "";
-					$scope.firstaccess = true;
-				}
-				else
-					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
-
-				$("a[href='/console/topic'] button").removeClass("btn-info");
-				$("a[href='/console/topic'] button").addClass("btn-purple");
-			});
+			//发送默认请求
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
 			
-			
+			//如果topic列表返回空，则不会执行initpage
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
 				$scope.initpage();
 			});
 			
 			$scope.initpage = function(){
 
-				$scope.adminornot = localStorage.getItem("isadmin");
-				
 		          //下面是在table render完成后执行的js
 				 $http({
 						method : 'GET',
@@ -186,11 +170,12 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 					}).success(function(data, status, headers, config) {
 						var props = data.prop;
 						var depts = data.dept;
+						var edits = data.edit;
 						$("#searchprop").typeahead({
 							items: 16, 
 							source : props,
 							updater : function(c) {
-								$scope.prop = c
+								$scope.prop = c;
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
 								return c;
 							}
@@ -208,12 +193,16 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						$('#topicprops').tagsinput({
 							  typeahead: {
 								  items: 16, 
-								  source: props,
+								  source: edits,
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
+		        		$('#topicprops').typeahead().data('typeahead').source = props;
+		        		$('#searchdept').typeahead().data('typeahead').source = depts;
+		        		$('#searchprop').typeahead().data('typeahead').source = props;
 					}).error(function(data, status, headers, config) {
 					});
+					
 			}
 			
 }]);

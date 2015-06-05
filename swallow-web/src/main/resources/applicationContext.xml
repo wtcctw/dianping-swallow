@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    	xmlns:context="http://www.springframework.org/schema/context"
-		xmlns:mvc="http://www.springframework.org/schema/mvc"
-    		
-		xsi:schemaLocation="
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+
+	xsi:schemaLocation="
             http://www.springframework.org/schema/beans 
             http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
             http://www.springframework.org/schema/context
             http://www.springframework.org/schema/context/spring-context-3.2.xsd
             http://www.springframework.org/schema/mvc
             http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
-	
+
 	<bean
         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
@@ -32,39 +31,56 @@
         <property name="mongoManager" >
 			<ref local="mongoManager"/>
 		</property>
-    </bean>
-    
-    <bean id="webMongoManager"
-        class="com.dianping.swallow.web.dao.impl.DefaultWebMongoManager"
-        init-method="initMongoServer">
-        <property name="mongoManager" >
-			<ref local="mongoManager"/>
-		</property>
-    </bean>
-    
-    <bean id="mongoManager"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-        <constructor-arg value="swallow.mongo.producerServerURI" index="0"/>
-        <constructor-arg value="web" index="1"/>
-    </bean>
-    
-    <bean id="topicDAO"
-        class="com.dianping.swallow.web.dao.impl.DefaultTopicDao">
-    </bean>
-    
-    <bean id="webMessageDAO"
-        class="com.dianping.swallow.web.dao.impl.DefaultMessageDao">
-        <property name="webMongoManager" >
-			<ref local="webMongoManager"/>
-		</property>
-    </bean>
-    
-	<context:component-scan base-package="com.dianping.swallow.web" />
-	<context:annotation-config />  
+	</bean>
 
-	<import resource="applicationContext-utils.xml"/>
-	<import resource="applicationContext-mongo.xml"/>
-	<import resource="applicationContext-springtask.xml"/>
-	
+	<bean id="webMongoManager"
+		class="com.dianping.swallow.web.dao.impl.DefaultWebMongoManager"
+		init-method="initMongoServer">
+		<property name="mongoManager">
+			<ref local="mongoManager" />
+		</property>
+	</bean>
+
+	<bean id="mongoManager"
+		class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
+		<constructor-arg value="swallow.mongo.producerServerURI"
+			index="0" />
+		<constructor-arg value="web" index="1" />
+	</bean>
+
+	<bean id="topicDAO" class="com.dianping.swallow.web.dao.impl.DefaultTopicDao">
+	</bean>
+
+	<bean id="webMessageDAO" class="com.dianping.swallow.web.dao.impl.DefaultMessageDao">
+		<property name="webMongoManager">
+			<ref local="webMongoManager" />
+		</property>
+	</bean>
+
+	<context:component-scan base-package="com.dianping.swallow.web" />
+	<context:annotation-config />
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/" />
+			<mvc:mapping path="/console/topic" />
+			<mvc:mapping path="/console/topic" />
+			<mvc:mapping path="/console/message" />
+			<mvc:mapping path="/console/administrator" />
+			<mvc:mapping path="/console/monitor/consumerserver/qps" />
+			<mvc:mapping path="/console/monitor/producerserver/qps" />
+			<mvc:mapping path="/console/monitor/consumer/*/qps" />
+			<mvc:mapping path="/console/monitor/consumer/*/accu" />
+			<mvc:mapping path="/console/monitor/producer/*/savedelay" />
+			<mvc:mapping path="/console/monitor/consumer/*/delay" />
+			<bean class="com.dianping.swallow.web.interceptor.ModelAndViewInterceptor">
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<import resource="applicationContext-utils.xml" />
+	<import resource="applicationContext-mongo.xml" />
+	<import resource="applicationContext-springtask.xml" />
+
 
 </beans>

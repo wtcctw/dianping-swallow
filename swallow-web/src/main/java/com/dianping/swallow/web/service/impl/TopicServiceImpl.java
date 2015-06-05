@@ -94,28 +94,44 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		filterMetaDataService.loadTopicToWhiteList().put(name, splitProps(prop));
 		if (topicDao.updateTopic(name, prop, dept, time)) {
 			logger.info(String.format(
-					"Edit s% to [prop: s%, dept: s%, time: s%] successfully",
+					"Edit %s to [prop: %s, dept: %s, time: %s] successfully",
 					name, prop, dept, time));
 		} else {
 			logger.info(String.format(
-					"Edit s% to [prop: s%, dept: s%, time: s%] failed", name,
+					"Edit %s to [prop: %s, dept: %s, time: %s] failed", name,
 					prop, dept, time));
 		}
 	}
 
 	@Override
-	public Map<String, Object[]> getPropAndDept() {
+	public Map<String, Object[]> getPropAndDept(String username) {
 		Map<String, Object[]> map = new HashMap<String, Object[]>();
 		Set<String> proposal = new HashSet<String>();
 		Set<String> department = new HashSet<String>();
 		List<Topic> topics = topicDao.findAll();
 
-		for (Topic topic : topics) {
-			proposal.addAll(getPropList(topic));
-			department.addAll(getDeptList(topic));
+		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(username);
+		boolean switchenv = filterMetaDataService.isShowContentToAll();
+		if(isAdmin || switchenv){
+			for (Topic topic : topics) {
+				proposal.addAll(getPropList(topic));
+				department.addAll(getDeptList(topic));
+			}
 		}
+		else{
+			for (Topic topic : topics) {
+				Set<String> tmpprop = getPropList(topic);
+				if(tmpprop.contains(username)){
+					proposal.addAll(tmpprop);
+					department.addAll(getDeptList(topic));
+				}
+			}
+
+		}
+		
 		map.put("prop", proposal.toArray());
 		map.put("dept", department.toArray());
+		map.put("edit", filterMetaDataService.loadAllUsers().toArray());
 		
 		return map;
 	}
