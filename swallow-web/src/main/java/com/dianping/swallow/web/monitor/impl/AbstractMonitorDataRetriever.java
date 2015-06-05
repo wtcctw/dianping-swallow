@@ -54,6 +54,11 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	
 	@Override
 	protected void doBuild() {
+		
+		if(getKey(lastBuildTime) >= getKey(current)){
+			logger.warn("[doBuild][lastBuildTime key >= current key]" + lastBuildTime + "," + current);
+			return;
+		}
 
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doBuild");
 		catWrapper.doAction(new SwallowAction() {

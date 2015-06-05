@@ -73,7 +73,9 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 				}catch(Throwable th){
 					logger.error("[startBuilder]", th);
 				}finally{
-					lastBuildTime = current;
+					if(lastBuildTime < current){
+						lastBuildTime = current;
+					}
 				}
 				
 				

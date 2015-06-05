@@ -19,6 +19,9 @@
 	
 	<appender name="catAppender" class="com.dianping.cat.log4j.CatAppender"/>
 	
+	<logger name="com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis" additivity="true">
+		<priority value ="DEBUG"/>
+	</logger>
 
 	<logger name="org.jasig.cas" additivity="true">
 		<priority value ="ERROR"/>
