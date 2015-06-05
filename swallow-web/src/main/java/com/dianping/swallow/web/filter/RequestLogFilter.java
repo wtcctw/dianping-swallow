@@ -22,8 +22,10 @@ import com.dianping.swallow.web.dao.impl.DefaultAdministratorDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.service.AccessControlServiceConstants;
 import com.dianping.swallow.web.service.AdministratorListService;
+import com.dianping.swallow.web.service.FilterMetaDataService;
 import com.dianping.swallow.web.service.IdentityRecognitionService;
 import com.dianping.swallow.web.service.impl.AdministratorListServiceImpl;
+import com.dianping.swallow.web.service.impl.FilterMetaDataServiceImpl;
 import com.dianping.swallow.web.service.impl.IdentityRecognitionServiceImpl;
 
 /**
@@ -49,6 +51,8 @@ public class RequestLogFilter implements Filter {
 	
 	private AdministratorDao administratorDao;
 	
+	private FilterMetaDataService filterMetaDataService;
+	
 	private static Set<String> urls = new HashSet<String>();
 	
 	static{
@@ -65,6 +69,7 @@ public class RequestLogFilter implements Filter {
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
 		this.administratorListService = ctx.getBean(AdministratorListServiceImpl.class);
 		this.identityRecognitionService = ctx.getBean(IdentityRecognitionServiceImpl.class);
+		this.filterMetaDataService = ctx.getBean(FilterMetaDataServiceImpl.class);
 		this.administratorDao = ctx.getBean(DefaultAdministratorDao.class);
 	}
 
@@ -112,6 +117,7 @@ public class RequestLogFilter implements Filter {
 			}
 		}
 		else{
+			filterMetaDataService.loadAllUsers().add(username);
 			return switchUserAndVisitor(username);
 		}
 	}
