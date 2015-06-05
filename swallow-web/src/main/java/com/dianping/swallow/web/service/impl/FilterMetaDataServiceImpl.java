@@ -88,7 +88,8 @@ public class FilterMetaDataServiceImpl extends AbstractSwallowService implements
 
 	@Override
 	public boolean isShowContentToAll() {
-		return showContentToAll;
+		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
+		return showContentToAll && !env;
 	}
 
 	@Override

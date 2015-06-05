@@ -15,10 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.service.AccessControlService;
+import com.dianping.swallow.web.service.FilterMetaDataService;
 import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
+import com.dianping.swallow.web.service.impl.FilterMetaDataServiceImpl;
 
 /**
  * @author mingdongli
@@ -38,12 +39,15 @@ public class AuthenticationFilter implements Filter {
 	private AccessControlService accessControlService;
 
 	private ExtractUsernameUtils extractUsernameUtils;
+	
+	private FilterMetaDataService filterMetaDataService;
 
 	public void init(FilterConfig fConfig) throws ServletException {
 		this.context = fConfig.getServletContext();
 		ApplicationContext ctx = WebApplicationContextUtils
 				.getRequiredWebApplicationContext(this.context);
 		this.accessControlService = ctx.getBean(AccessControlServiceImpl.class);
+		this.filterMetaDataService = ctx.getBean(FilterMetaDataServiceImpl.class);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
 	}
 
@@ -59,8 +63,8 @@ public class AuthenticationFilter implements Filter {
 		this.context.log("Requested Resource::" + uri);
 
 		String username = extractUsernameUtils.getUsername(req);
-		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
-		if(!env){
+		boolean switchenv = filterMetaDataService.isShowContentToAll();
+		if(switchenv){
 			chain.doFilter(request, response);
 		}
 		else if (uri.startsWith(TOPICURI) || uri.startsWith(MESSAGEURI)) {
