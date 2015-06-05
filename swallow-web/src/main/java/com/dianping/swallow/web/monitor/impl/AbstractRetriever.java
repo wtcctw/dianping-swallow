@@ -125,8 +125,17 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(keepInMemoryHour, TimeUnit.HOURS);
 	}
 
-	protected int getSampleInterval(){
+	/**
+	 * 采样时间间隔
+	 * @return
+	 */
+	protected int getSampleIntervalTime(){
+		
 		return DEFAULT_INTERVAL;
+	}
+	
+	protected int getSampleIntervalCount(){
+		return getSampleIntervalTime()/AbstractCollector.SEND_INTERVAL;
 	}
 
 	@Override
@@ -182,7 +191,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 	protected StatsData createStatsData(StatsDataDesc desc,
 			NavigableMap<Long, Long> rawData, long start, long end) {
 
-		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getSampleInterval());
+		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getSampleIntervalTime());
 	}
 
 }

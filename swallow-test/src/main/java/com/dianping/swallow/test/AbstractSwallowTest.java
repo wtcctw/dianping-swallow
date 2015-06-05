@@ -203,7 +203,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		
 		return addListener(topic, false, null, 1, null, 0);
 	}
-	
+
 	protected Consumer addListener(String topic, String consumerId, Set<String> filters) {
 	
 		return addListener(topic, true, consumerId, 10, filters, 0);

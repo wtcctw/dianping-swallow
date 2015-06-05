@@ -2,6 +2,7 @@ package com.dianping.swallow.web.monitor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.dianping.swallow.common.server.monitor.data.QPX;
 
@@ -26,6 +27,7 @@ public interface ConsumerDataRetriever extends MonitorDataRetriever{
 
 	Map<String, ConsumerDataPair> getServerQpx(QPX qpx);
 	
+	Map<String, Set<String>>  	  getAllTopics();
 
 	
 	

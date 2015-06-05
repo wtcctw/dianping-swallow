@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -187,6 +188,14 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 			StatisType type) {
 
 		return new ConsumerStatsDataDesc(topic, consumerId, type.getQpxDetailType());
+	}
+
+	@Override
+	public Map<String, Set<String>> getAllTopics() {
+		
+		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
+
+		return retriever.getAllTopics();
 	}
 
 

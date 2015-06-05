@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor.impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +30,15 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
+import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 import com.dianping.swallow.web.config.WebConfig;
 import com.dianping.swallow.web.config.impl.DefaultWebConfig;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
-import com.dianping.swallow.web.task.TopicScanner;
 
 /**
  * @author mengwenchao
@@ -48,8 +50,6 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 	private Map<String, TopicAccumulation> topics = new ConcurrentHashMap<String, DefaultAccumulationRetriever.TopicAccumulation>();
 	
-	@Autowired
-	private TopicScanner  topicScanner;
 	
 	@Autowired
 	private MessageDAO messageDao;
@@ -59,6 +59,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	
 	@Autowired
 	private WebConfig webConfig;
+
+	@Autowired
+	private ConsumerDataRetriever consumerDataRetriever;
 	
 	private ExecutorService executors;
 	
@@ -90,7 +93,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 	protected void buildAllAccumulations() {
 		
-		Map<String, Set<String>> topics = topicScanner.getTopics();
+		Map<String, Set<String>> topics = consumerDataRetriever.getAllTopics();
 		
 		if(logger.isInfoEnabled()){
 			logger.info("[buildAllAccumulations][begin]");
@@ -139,16 +142,23 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			public void doAction() throws SwallowException {
 				
 				for(String consumerId : consumerIds){
+					
 					putAccumulation(topicName, consumerId);
+					TopicAccumulation topic = topics.get(topicName);
+					topic.retain(consumerIds);
 				}
 			}
 		});
 	}
 
 	protected void putAccumulation(final String topicName, final String consumerId) {
-		
-		CatActionWrapper catAction = new CatActionWrapper("putAccumulationConsumerId",  topicName + ":" + consumerId);
 
+		if(ConsumerIdUtil.isNonDurableConsumerId(consumerId)){
+			return; 
+		}
+
+		CatActionWrapper catAction = new CatActionWrapper("putAccumulationConsumerId",  topicName + ":" + consumerId);
+		
 		catAction.doAction(new SwallowAction() {
 			
 			@Override
@@ -167,15 +177,15 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		
 	}
 
+
 	@Override
 	protected void doRemove(long toKey) {
 
 		for(TopicAccumulation topicAccumulation : topics.values()){
 			topicAccumulation.removeBefore(toKey);
 		}
-		
 	}
-
+	
 	@Override
 	protected Set<String> getTopicsInMemory(long start, long end) {
 		
@@ -210,7 +220,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			ConsumerIdAccumulation consumerIdAccumulation = entry.getValue();
 			
 			StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
-			result.put(consumerId, createStatsData(desc, consumerIdAccumulation.accumulations, start, end));
+			result.put(consumerId, createStatsData(desc, consumerIdAccumulation.getAccumulations(getSampleIntervalCount()), start, end));
 		}
 		
 		return result;
@@ -232,12 +242,28 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			consumerIdAccumulation.add(accumulation);
 		}
 		
+		public void retain(Set<String> consumerIds) {
+			
+			Set<String> currentIds = new HashSet<String>(consumers.keySet());
+			currentIds.removeAll(consumerIds);
+			
+			for(String removeId : currentIds){
+				
+				consumers.remove(removeId);
+			}
+		}
+
 		public void removeBefore(Long toKey){
 			
 			for(ConsumerIdAccumulation consumer : consumers.values()){
 				
 				consumer.removeBefore(toKey);
 			}
+		}
+		
+		public void remove(String consumerId){
+			
+			consumers.remove(consumerId);
 		}
 		
 		public Map<String, ConsumerIdAccumulation> consumers(){
@@ -250,6 +276,8 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		private NavigableMap<Long, Long> accumulations = new ConcurrentSkipListMap<Long, Long>();
 		
 		protected final Logger logger     = LoggerFactory.getLogger(getClass());
+		
+		protected long lastInsertTime = System.currentTimeMillis();
 
 		public void add(long accumulation) {
 			
@@ -261,6 +289,53 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			accumulations.put(key, accumulation);
 		}
 		
+		/**
+		 * For unit test
+		 * @param key
+		 * @param accumulation
+		 */
+		@Deprecated
+		public void add(Long key, long accumulation) {
+			
+			if(logger.isDebugEnabled()){
+				logger.debug("[add]" + key + ":" + accumulation);
+			}
+			accumulations.put(key, accumulation);
+		}
+
+		
+		private void ajustData(int intervalCount) {
+			
+			Long current = System.currentTimeMillis();
+			
+			Long lastKey = getKey(lastInsertTime);
+			Long currentKey = getKey(current);
+			
+			NavigableMap<Long, Long> sub = accumulations.subMap(lastKey, true, currentKey, false);
+			
+			Long last = -1L;
+			
+			for(Long key : sub.keySet()){
+				
+				if(last != -1){
+					Long add = (key - last)/intervalCount -1;
+					
+					for(int i=0 ; i<add ; i++){
+						accumulations.put(last + intervalCount, 0L);
+					}
+				}
+				last = key;
+			}
+			
+			lastInsertTime = current;
+		}
+
+		public NavigableMap<Long, Long> getAccumulations(int intervalCount) {
+			
+			ajustData(intervalCount);
+			return accumulations;
+		}
+
 		public List<Long> data() {
 			
 			List<Long> result = new LinkedList<Long>();
@@ -287,11 +362,12 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	}
 
 	@Override
-	protected int getSampleInterval() {
+	protected int getSampleIntervalTime() {
 		
 		return webConfig.getAccumulationBuildInterval();
 	}
 
+	
 
 	@Override
 	public void onChange(Object config, String key) throws Exception {
