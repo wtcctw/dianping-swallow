@@ -108,9 +108,6 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 		
 		$scope.suburl = "/console/admin/auth/admindefault";
 	
-		$("a[href='/console/administrator'] button").removeClass("btn-info");
-		$("a[href='/console/administrator'] button").addClass("btn-purple");
-		
 		//edit admin and save it in database
 		$scope.adminrole = "";
 		$scope.adminname = "";

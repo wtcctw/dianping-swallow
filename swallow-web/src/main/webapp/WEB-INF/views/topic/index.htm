@@ -80,7 +80,7 @@
 					<li><a href="" ng-click="searchPaginator.previous()"
 						ng-show="searchPaginator.hasPrevious()">上一页</a></li>
 					<li ng-repeat="p in searchPaginator.pages"><a href=""
-						ng-click="searchPaginator.fetch(p)">{{p}}</a></li>
+						ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
 					<li class="disabled"><a href="javascript:;">...</a></li>
 
 					<li><a href="" ng-click="searchPaginator.next()"

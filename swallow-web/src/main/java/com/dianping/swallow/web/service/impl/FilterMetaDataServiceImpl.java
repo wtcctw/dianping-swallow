@@ -38,6 +38,8 @@ public class FilterMetaDataServiceImpl extends AbstractSwallowService implements
 
 	private Set<String> adminSet = new HashSet<String>();
 	
+	private Set<String> allUsers = new HashSet<String>();
+	
 	@PostConstruct
 	private void environment(){
 		try {
@@ -50,36 +52,56 @@ public class FilterMetaDataServiceImpl extends AbstractSwallowService implements
 		}
 	}
 
+	@Override
 	public Map<String, Set<String>> loadTopicToWhiteList() {
 		return topicToWhiteList;
 	}
 
+	@Override
 	public void setTopicToWhiteList(Map<String, Set<String>> topicToWhiteList) {
 		this.topicToWhiteList = topicToWhiteList;
 	}
 
+	@Override
 	public Collection<String> loadAdminSet() {
 		Collection<String> collection = Collections.synchronizedCollection(adminSet);
 		return collection;
 	}
 
+	@Override
 	public void setAdminSet(Set<String> adminSet) {
 		Collection<String> collection = Collections.synchronizedCollection(adminSet);
 		this.adminSet = (Set<String>) collection;
 	}
+	
+	@Override
+	public Collection<String> loadAllUsers() {
+		Collection<String> collection = Collections.synchronizedCollection(allUsers);
+		return collection;
+	}
 
+	@Override
+	public void setAllUsers(Set<String> allUsers) {
+		Collection<String> collection = Collections.synchronizedCollection(allUsers);
+		this.allUsers = (Set<String>) collection;
+	}
+
+	@Override
 	public boolean isShowContentToAll() {
 		return showContentToAll;
 	}
 
+	@Override
 	public void setShowContentToAll(boolean showContentToAll) {
 		this.showContentToAll = showContentToAll;
 	}
 
+	@Override
 	public String loadDefaultAdmin() {
 		return defaultAdmin;
 	}
 
+	@Override
 	public void setDefaultAdmin(String defaultAdmin) {
 		this.defaultAdmin = defaultAdmin;
 	}

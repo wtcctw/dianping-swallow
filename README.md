@@ -65,7 +65,7 @@
 ### 基本概念说明
 #### Producer配置信息详解
 
-* mode表示producer表示工作模式。
+* mode表示producer工作模式。
 * asyncRetryTimes表示异步模式下发送失败重试次数。
 * syncRetryTimes表示同步模式下发送失败重试次数。
 * zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。
@@ -493,7 +493,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 * 堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。
 
-*如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。
+* 如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。
 ![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/14.png)
 
 ### Swallow Server监控

@@ -19,6 +19,10 @@ public interface FilterMetaDataService extends SwallowService{
 	Collection<String> loadAdminSet();
 
 	void setAdminSet(Set<String> adminSet);
+	
+	Collection<String> loadAllUsers();
+	
+	void setAllUsers(Set<String> allUsers);
 
 	boolean isShowContentToAll();
 

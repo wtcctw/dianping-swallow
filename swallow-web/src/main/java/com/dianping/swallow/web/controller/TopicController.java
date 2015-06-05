@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.service.FilterMetaDataService;
 import com.dianping.swallow.web.service.TopicService;
@@ -61,7 +62,8 @@ public class TopicController extends AbstractMenuController {
 			String username = extractUsernameUtils.getUsername(request);
 			boolean findAll = filterMetaDataService.loadAdminSet().contains(
 					username);
-			if (findAll) {
+			boolean env = EnvZooKeeperConfig.getEnv().equals("product");
+			if (findAll || !env) {
 				return topicService.loadAllTopic(offset, limit);
 			} else {
 				return topicService.loadSpecificTopic(offset, limit, topic,
@@ -83,8 +85,8 @@ public class TopicController extends AbstractMenuController {
 		String userName = extractUsernameUtils.getUsername(request);
 		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(
 				userName);
-		boolean isproduct = filterMetaDataService.isShowContentToAll();
-		return topicService.loadAllTopicNames(userName, isAdmin || isproduct);
+		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
+		return topicService.loadAllTopicNames(userName, isAdmin || !env);
 	}
 
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")

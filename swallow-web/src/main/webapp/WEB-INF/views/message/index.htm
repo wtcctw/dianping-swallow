@@ -107,7 +107,7 @@
 					<li><a href="" ng-click="searchPaginator.previous()"
 						ng-show="searchPaginator.hasPrevious()">&lt;&lt; 上一页</a></li>
 					<li ng-repeat="p in searchPaginator.pages"><a href=""
-						ng-click="searchPaginator.fetch(p)">{{p}}</a></li>
+						ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
 					<li class="disabled"><a href="javascript:;">...</a></li>
 					<li><a href="" ng-click="searchPaginator.next()"
 						ng-show="searchPaginator.hasNext()">下一页</a></li>
@@ -115,7 +115,7 @@
 						ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
 					<li><a href=""
 						ng-click="searchPaginator.fetch(searchPaginator.endPage)"
-						ng-show="searchPaginator.pages.length">{{searchPaginator.totalpieces}}条</a></li>
+						ng-show="searchPaginator.pages.length" ng-bind="searchPaginator.totalpieces"></a></li>
 					<select class="selectpicker" ng-model="recordofperpage"
 						ng-change="makeChanged()"
 						ng-options="item.num as item.num for item in numperpage"></select>

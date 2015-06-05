@@ -202,12 +202,14 @@ public class TopicScanner {
 		if (!aList.isEmpty()) {
 			for (Administrator list : aList) {
 				role = list.getRole();
+				String name = list.getName();
 				if (role == AccessControlServiceConstants.ADMINI) {
 					if (filterMetaDataService.loadAdminSet()
-							.add(list.getName())) {
-						logger.info("admiSet add " + list.getName());
+							.add(name)) {
+						logger.info("admiSet add " + name);
 					}
 				}
+				filterMetaDataService.loadAllUsers().add(name);
 			}
 		} else {
 			String[] admins = loadDefaultAdminFromConf();

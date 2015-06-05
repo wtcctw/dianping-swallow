@@ -16,11 +16,6 @@ public interface AdministratorService extends SwallowService{
 	 */
 	Map<String, Object> queryAllRecordFromAdminList(int offset, int limit);
 
-	/**
-	 * 返回用户是否为管理员
-	 * @param request
-	 */
-	Object queryIfAdmin(String userName);
 	
 	/**
 	 * 创建用户

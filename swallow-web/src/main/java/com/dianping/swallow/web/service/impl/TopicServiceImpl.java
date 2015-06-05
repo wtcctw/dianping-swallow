@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.TopicDao;
@@ -111,7 +112,8 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		List<Topic> topics = topicDao.findAll();
 
 		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(username);
-		if(isAdmin){
+		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
+		if(isAdmin || !env ){
 			for (Topic topic : topics) {
 				proposal.addAll(getPropList(topic));
 				department.addAll(getDeptList(topic));
@@ -127,8 +129,10 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 			}
 
 		}
+		
 		map.put("prop", proposal.toArray());
 		map.put("dept", department.toArray());
+		map.put("edit", filterMetaDataService.loadAllUsers().toArray());
 		
 		return map;
 	}

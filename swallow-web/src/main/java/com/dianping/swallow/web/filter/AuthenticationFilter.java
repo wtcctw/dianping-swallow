@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.service.AccessControlService;
 import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
@@ -58,7 +59,11 @@ public class AuthenticationFilter implements Filter {
 		this.context.log("Requested Resource::" + uri);
 
 		String username = extractUsernameUtils.getUsername(req);
-		if (uri.startsWith(TOPICURI) || uri.startsWith(MESSAGEURI)) {
+		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
+		if(!env){
+			chain.doFilter(request, response);
+		}
+		else if (uri.startsWith(TOPICURI) || uri.startsWith(MESSAGEURI)) {
 			String topicname = req.getParameter("topic");
 
 			if (!accessControlService.checkVisitIsValid(username, topicname)) {

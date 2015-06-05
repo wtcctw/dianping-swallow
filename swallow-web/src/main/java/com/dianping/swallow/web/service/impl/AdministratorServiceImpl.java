@@ -28,9 +28,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 		AdministratorService {
 
 	private static final String ADMIN = "admin";
-	private static final String ENV = "env";
 	private static final String SIZE = "size";
-	private static final String LOGINNAME = "loginname";
 
 	@Autowired
 	private TopicDao topicDao;
@@ -88,24 +86,6 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 		}
 	}
 
-	@Override
-	public Object queryIfAdmin(String tongXingZheng) {
-		boolean notproduct = filterMetaDataService.isShowContentToAll();
-		String env = filterMetaDataService.loadLogoutUrl();
-		logger.info(String.format("logout url is %s", env));
-		Map<String, Object> map = new HashMap<String, Object>();
-		Administrator a = administratorDao.readByName(tongXingZheng);
-		if (a != null && a.getRole() == 0) {
-			map.put(ADMIN, true);
-		} else {
-			map.put(ADMIN, false || notproduct);
-		}
-
-		map.put(LOGINNAME, tongXingZheng);
-		map.put(ENV, env);
-		return map;
-
-	}
 
 	@Override
 	public Object queryAllNameFromAdminList() {

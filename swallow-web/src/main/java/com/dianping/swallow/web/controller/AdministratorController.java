@@ -82,15 +82,6 @@ public class AdministratorController extends AbstractMenuController {
 		}
 	}
 
-	@RequestMapping(value = "/console/admin/queryadminandlogin", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public Object queryAdmin(HttpServletRequest request,
-			HttpServletResponse response) {
-
-		String username = extractUsernameUtils.getUsername(request);
-		return administratorService.queryIfAdmin(username);
-	}
-
 	@RequestMapping(value = "/console/admin/queryvisits", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object queryAllVisits(HttpServletRequest request,

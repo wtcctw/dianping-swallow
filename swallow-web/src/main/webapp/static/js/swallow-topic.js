@@ -170,6 +170,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 					}).success(function(data, status, headers, config) {
 						var props = data.prop;
 						var depts = data.dept;
+						var edits = data.edit;
 						$("#searchprop").typeahead({
 							items: 16, 
 							source : props,
@@ -192,7 +193,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						$('#topicprops').tagsinput({
 							  typeahead: {
 								  items: 16, 
-								  source: props,
+								  source: edits,
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
