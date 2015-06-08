@@ -69,7 +69,14 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 	@Override
 	public boolean createInAdminList(String name, int auth) {
 
-		filterMetaDataService.loadAdminSet().add(name);  //need add in adminSet in memory
+		if(auth == 0){
+			filterMetaDataService.loadAdminSet().add(name);  //create, need add in adminSet in memory
+			logger.info(String.format("Add administrator %s to admin list.", name));
+		}
+		else{
+			filterMetaDataService.loadAdminSet().remove(name);  //edit, need remove in adminSet in memory
+			logger.info(String.format("Remove administrator %s from admin list.", name));
+		}
 		return administratorListService.updateAdmin(name, auth);
 	}
 
@@ -78,7 +85,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 		filterMetaDataService.loadAdminSet().remove(name);
 		int n = administratorDao.deleteByName(name);
 		if (n != 1) {
-				logger.info("deleteByEmail is wrong with email: " + name);
+				logger.info("deleteByName is wrong with name: " + name);
 				return false;
 		} else {
 				logger.info("delete administrator with name [" + name + "]");
