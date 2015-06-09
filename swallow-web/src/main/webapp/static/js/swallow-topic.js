@@ -1,5 +1,5 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize,  name, prop, dept){
+	return function(fetchFunction, pageSize,  name, prop){
 		var paginator = {
 				hasNextVar: false,
 				fetch: function(page){
@@ -15,7 +15,7 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, name, prop, dept, function(data){
+					fetchFunction(this.currentOffset, pageSize + 1, name, prop, function(data){
 						items = data.topic;
 						length = data.size;
 						self.totalPage = Math.ceil(length/pageSize);
@@ -72,7 +72,7 @@ module.factory('Paginator', function(){
 
 module.controller('TopicController', ['$scope', '$http', 'Paginator',
         function($scope, $http, Paginator){
-				var fetchFunction = function(offset, limit, name, prop, dept, callback){
+				var fetchFunction = function(offset, limit, name, prop, callback){
 				var transFn = function(data){
 					return $.param(data);
 				}
@@ -82,21 +82,18 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 				var data = {'offset' : offset,
 										'limit': limit,
 										'topic': name,
-										'prop': prop,
-										'dept': dept};
+										'prop': prop};
 				$http.get(window.contextPath + $scope.suburl, {
 					params : {
 						offset : offset,
 						limit : limit,
 						topic: name,
-						prop: prop,
-						dept: dept
+						prop: prop
 					}
 				}).success(callback);
 			};
 			$scope.name = "";
 			$scope.prop = "";
-			$scope.dept = "";
 			
 			$scope.suburl = "/console/topic/topicdefault";
 			$scope.topicnum = 30;
@@ -105,9 +102,8 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 			//for modal
 			$scope.topicname = "";
 			$scope.topicprop = "";
-			$scope.topicdept = "";
 			$scope.topictime = "";
-			$scope.setModalInput = function(name,prop,dept,time){
+			$scope.setModalInput = function(name,prop,time){
 				$scope.topicname = name;
 				//clear all first
 				$('#topicprops').tagsinput('removeAll');
@@ -117,7 +113,6 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						$('#topicprops').tagsinput('add', props[i]);
 				}
 				$scope.topicprop  = prop;
-				$scope.topicdept = dept;
 				$scope.topictime = time;
 			}
 			
@@ -126,8 +121,8 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 	        	$scope.topictime = $("#datetimepicker").val();
 	        	$scope.topicprop = $("#topicprops").val();
 	        	$http.post(window.contextPath + '/console/topic/auth/edittopic', {"topic":$scope.topicname,"prop":$scope.topicprop,
-	        		"dept":$scope.topicdept,"time":$scope.topictime}).success(function(response) {
-					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" , "");
+	        		"time":$scope.topictime}).success(function(response) {
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" );
 	        	});
 	        }
 						
@@ -136,7 +131,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 			}
 			
 			//发送默认请求
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop);
 			
 			//如果topic列表返回空，则不会执行initpage
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
@@ -156,7 +151,7 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 							source : topicNameList,
 							updater : function(c) {
 								$scope.name = c
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop);		
 								return c;
 							}
 						})
@@ -169,23 +164,13 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 						url : window.contextPath + '/console/topic/propdept'
 					}).success(function(data, status, headers, config) {
 						var props = data.prop;
-						var depts = data.dept;
 						var edits = data.edit;
 						$("#searchprop").typeahead({
 							items: 16, 
 							source : props,
 							updater : function(c) {
 								$scope.prop = c;
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
-								return c;
-							}
-						})
-						$("#searchdept").typeahead({
-							items: 16, 
-							source : depts,
-							updater : function(c) {
-								$scope.dept = c
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop , $scope.dept);		
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop);		
 								return c;
 							}
 						})
@@ -198,7 +183,6 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 							  }
 						});
 		        		$('#topicprops').typeahead().data('typeahead').source = props;
-		        		$('#searchdept').typeahead().data('typeahead').source = depts;
 		        		$('#searchprop').typeahead().data('typeahead').source = props;
 					}).error(function(data, status, headers, config) {
 					});

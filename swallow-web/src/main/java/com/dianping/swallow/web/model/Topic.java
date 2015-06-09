@@ -14,7 +14,6 @@ public class Topic {
 	private String id;
 	private String name;
 	private String prop;
-	private String dept;
 	private String time;
 	private long messageNum;
 
@@ -48,15 +47,6 @@ public class Topic {
 		return this;
 	}
 
-	public String getDept() {
-		return dept;
-	}
-
-	public Topic setDept(String dept) {
-		this.dept = dept;
-		return this;
-	}
-
 	public String getTime() {
 		return time;
 	}
@@ -77,7 +67,7 @@ public class Topic {
 
 	@Override
 	public String toString() {
-		return id + "::" + name + "::" + prop + "::" + dept + "::" + time
+		return id + "::" + name + "::" + prop + "::" + time
 				+ "::" + messageNum;
 	}
 }

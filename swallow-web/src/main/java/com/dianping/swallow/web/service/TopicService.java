@@ -27,7 +27,7 @@ public interface TopicService extends SwallowService {
 	 * @param dept  申请人部门
 	 */
 	Map<String, Object> loadSpecificTopic(int start, int span, String name,
-			String prop, String dept);
+			String prop);
 
 	/**
 	 * 返回所有topic名称
@@ -43,7 +43,7 @@ public interface TopicService extends SwallowService {
 	 * @param dept 申请人部门
 	 * @param time 申请时间
 	 */
-	void editTopic(String name, String prop, String dept, String time);
+	void editTopic(String name, String prop, String time);
 
 	/**
 	 *  查询所有申请人和部门

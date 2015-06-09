@@ -53,11 +53,11 @@ public class TopicController extends AbstractMenuController {
 	@RequestMapping(value = "/console/topic/topicdefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object topicDefault(int offset, int limit, String topic,
-			String prop, String dept, HttpServletRequest request,
+			String prop, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-		
-		boolean isAllEmpty = StringUtil.isEmpty(topic + prop + dept);
-		if(isAllEmpty){  //first access
+
+		boolean isAllEmpty = StringUtil.isEmpty(topic + prop);
+		if (isAllEmpty) { // first access
 			String username = extractUsernameUtils.getUsername(request);
 			boolean findAll = filterMetaDataService.loadAdminSet().contains(
 					username);
@@ -66,12 +66,10 @@ public class TopicController extends AbstractMenuController {
 				return topicService.loadAllTopic(offset, limit);
 			} else {
 				return topicService.loadSpecificTopic(offset, limit, topic,
-						username, dept);
+						username);
 			}
-		}
-		else{
-			return topicService.loadSpecificTopic(offset, limit, topic,
-					prop, dept);
+		} else {
+			return topicService.loadSpecificTopic(offset, limit, topic, prop);
 		}
 
 	}
@@ -92,7 +90,7 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object propName(HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-		
+
 		String userName = extractUsernameUtils.getUsername(request);
 		return topicService.getPropAndDept(userName);
 	}
@@ -101,11 +99,10 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public void editTopic(@RequestParam(value = "topic") String topic,
 			@RequestParam("prop") String prop,
-			@RequestParam("dept") String dept,
 			@RequestParam("time") String time, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		topicService.editTopic(topic, prop, dept, time);
+		topicService.editTopic(topic, prop, time);
 		logger.info(String.format(
 				"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ].",
 				extractUsernameUtils.getUsername(request), topic, prop,

@@ -24,7 +24,6 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 
 	private static final String NAME = "name";
 	private static final String PROP = "prop";
-	private static final String DEPT = "dept";
 
 	private static final String SIZE = "size";
 	private static final String TOPIC = "topic";
@@ -47,10 +46,9 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 	}
 
 	@Override
-	public boolean updateTopic(String name, String prop, String dept,
-			String time) {
+	public boolean updateTopic(String name, String prop, String time) {
 		Topic topic = readByName(name);
-		topic.setProp(prop).setDept(dept).setTime(time);
+		topic.setProp(prop).setTime(time);
 		return saveTopic(topic);
 	}
 
@@ -83,13 +81,12 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 
 	@Override
 	public Map<String, Object> findSpecific(int offset, int limit, String name,
-			String prop, String dept) {
+			String prop) {
 		List<Topic> topicList = new ArrayList<Topic>();
 		String namer = name.isEmpty() ? ".*" : name;
 		String propr = prop.isEmpty() ? ".*" : prop;
-		String deptr = dept.isEmpty() ? ".*" : dept;
 		Query query1 = new Query(Criteria.where(NAME).regex("^" + namer)
-				.and(PROP).regex(propr).and(DEPT).regex(deptr));
+				.and(PROP).regex(propr));
 		Query query2 = query1;
 		query1.skip(offset).limit(limit)
 				.with(new Sort(new Sort.Order(Direction.ASC, "name")));

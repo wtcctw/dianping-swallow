@@ -91,7 +91,8 @@ public class TopicScanner {
 	@SuppressWarnings("unchecked")
 	public Map<String, Set<String>> getTopics() {
 
-		return (Map<String, Set<String>>) SerializationUtils.clone((Serializable) topics);
+		return (Map<String, Set<String>>) SerializationUtils
+				.clone((Serializable) topics);
 	}
 
 	private void getTopicAndConsumerIds(List<String> dbs) {
@@ -204,8 +205,7 @@ public class TopicScanner {
 				role = list.getRole();
 				String name = list.getName();
 				if (role == AccessControlServiceConstants.ADMINI) {
-					if (filterMetaDataService.loadAdminSet()
-							.add(name)) {
+					if (filterMetaDataService.loadAdminSet().add(name)) {
 						logger.info("admiSet add " + name);
 					}
 				}
@@ -247,8 +247,8 @@ public class TopicScanner {
 		Long id = System.currentTimeMillis();
 		String date = new SimpleDateFormat(TIMEFORMAT).format(new Date());
 		Topic p = new Topic();
-		p.setId(id.toString()).setName(subStr).setProp("").setDept("")
-				.setTime(date).setMessageNum(num);
+		p.setId(id.toString()).setName(subStr).setProp("").setTime(date)
+				.setMessageNum(num);
 		return p;
 	}
 }

@@ -32,7 +32,7 @@ public interface TopicDao extends Dao {
 	 * @param dept  申请人部门
 	 * @param time  申请时间
 	 */
-	boolean updateTopic(String name, String prop, String dept, String time);
+	boolean updateTopic(String name, String prop, String time);
 
 	/**
 	 *  删除集合
@@ -64,7 +64,7 @@ public interface TopicDao extends Dao {
 	 * @param prop    申请人
 	 * @param dept	  申请人部门
 	 */
-	Map<String, Object> findSpecific(int offset, int limit, String name, String prop, String dept);
+	Map<String, Object> findSpecific(int offset, int limit, String name, String prop);
 	
 	
 	/**

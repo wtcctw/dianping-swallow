@@ -62,9 +62,9 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	 */
 	@Override
 	public Map<String, Object> loadSpecificTopic(int start, int span,
-			String name, String prop, String dept) {
+			String name, String prop) {
 
-		return topicDao.findSpecific(start, span, name, prop, dept);
+		return topicDao.findSpecific(start, span, name, prop);
 	}
 
 	@Override
@@ -89,17 +89,17 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	}
 
 	@Override
-	public void editTopic(String name, String prop, String dept, String time) {
+	public void editTopic(String name, String prop, String time) {
 		
 		filterMetaDataService.loadTopicToWhiteList().put(name, splitProps(prop));
-		if (topicDao.updateTopic(name, prop, dept, time)) {
+		if (topicDao.updateTopic(name, prop, time)) {
 			logger.info(String.format(
-					"Edit %s to [prop: %s, dept: %s, time: %s] successfully",
-					name, prop, dept, time));
+					"Edit %s to [prop: %s, time: %s] successfully",
+					name, prop, time));
 		} else {
 			logger.info(String.format(
-					"Edit %s to [prop: %s, dept: %s, time: %s] failed", name,
-					prop, dept, time));
+					"Edit %s to [prop: %s, time: %s] failed", name,
+					prop, time));
 		}
 	}
 
@@ -107,7 +107,6 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	public Map<String, Object[]> getPropAndDept(String username) {
 		Map<String, Object[]> map = new HashMap<String, Object[]>();
 		Set<String> proposal = new HashSet<String>();
-		Set<String> department = new HashSet<String>();
 		List<Topic> topics = topicDao.findAll();
 
 		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(username);
@@ -115,7 +114,6 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		if(isAdmin || switchenv){
 			for (Topic topic : topics) {
 				proposal.addAll(getPropList(topic));
-				department.addAll(getDeptList(topic));
 			}
 		}
 		else{
@@ -123,14 +121,12 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 				Set<String> tmpprop = getPropList(topic);
 				if(tmpprop.contains(username)){
 					proposal.addAll(tmpprop);
-					department.addAll(getDeptList(topic));
 				}
 			}
 
 		}
 		
 		map.put("prop", proposal.toArray());
-		map.put("dept", department.toArray());
 		map.put("edit", filterMetaDataService.loadAllUsers().toArray());
 		
 		return map;
@@ -148,14 +144,6 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		return props;
 	}
 
-	private Set<String> getDeptList(Topic topic) {
-		Set<String> depts = new HashSet<String>();
-		String dept = topic.getDept();
-		if (!StringUtils.isEmpty(dept))
-			depts.add(dept);
-		return depts;
-	}
-	
 	private Set<String> splitProps(String props) {
 		String[] prop = props.split(DELIMITOR);
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
