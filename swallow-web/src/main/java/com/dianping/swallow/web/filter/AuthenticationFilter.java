@@ -39,7 +39,7 @@ public class AuthenticationFilter implements Filter {
 	private AccessControlService accessControlService;
 
 	private ExtractUsernameUtils extractUsernameUtils;
-	
+
 	private FilterMetaDataService filterMetaDataService;
 
 	public void init(FilterConfig fConfig) throws ServletException {
@@ -47,52 +47,58 @@ public class AuthenticationFilter implements Filter {
 		ApplicationContext ctx = WebApplicationContextUtils
 				.getRequiredWebApplicationContext(this.context);
 		this.accessControlService = ctx.getBean(AccessControlServiceImpl.class);
-		this.filterMetaDataService = ctx.getBean(FilterMetaDataServiceImpl.class);
+		this.filterMetaDataService = ctx
+				.getBean(FilterMetaDataServiceImpl.class);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
-		HttpServletRequest req = (HttpServletRequest) request;
-
-		HttpServletResponse res = (HttpServletResponse) response;
-
-		String uri = req.getRequestURI();
-
-		this.context.log("Requested Resource::" + uri);
-
-		String username = extractUsernameUtils.getUsername(req);
-		boolean switchenv = filterMetaDataService.isShowContentToAll();
-		if(switchenv){
+		if (request.getAttribute("skipfilter") != null) {
 			chain.doFilter(request, response);
-		}
-		else if (uri.startsWith(TOPICURI) || uri.startsWith(MESSAGEURI)) {
-			String topicname = req.getParameter("topic");
-
-			if (!accessControlService.checkVisitIsValid(username, topicname)) {
-				this.context.log(String.format(
-						"%s have no authenticaton to access %s", username,
-						topicname));
-				res.sendError(javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
-				return;
-			} else {
-				chain.doFilter(request, response);
-			}
-		} else if (uri.startsWith(ADMINURI)) {
-
-			if (!accessControlService.checkVisitIsValid(username)) {
-				this.context.log(String.format(
-						"%s have no authenticaton to access admin memu",
-						username));
-				res.sendError(javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
-				return;
-			} else {
-				chain.doFilter(request, response);
-			}
 		} else {
-			// pass the request along the filter chain
-			chain.doFilter(request, response);
+
+			HttpServletRequest req = (HttpServletRequest) request;
+
+			HttpServletResponse res = (HttpServletResponse) response;
+
+			String uri = req.getRequestURI();
+
+			this.context.log("Requested Resource::" + uri);
+
+			String username = extractUsernameUtils.getUsername(req);
+			boolean switchenv = filterMetaDataService.isShowContentToAll();
+			if (switchenv) {
+				chain.doFilter(request, response);
+			} else if (uri.startsWith(TOPICURI) || uri.startsWith(MESSAGEURI)) {
+				String topicname = req.getParameter("topic");
+
+				if (!accessControlService
+						.checkVisitIsValid(username, topicname)) {
+					this.context.log(String.format(
+							"%s have no authenticaton to access %s", username,
+							topicname));
+					res.sendError(javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+					return;
+				} else {
+					chain.doFilter(request, response);
+				}
+			} else if (uri.startsWith(ADMINURI)) {
+
+				if (!accessControlService.checkVisitIsValid(username)) {
+					this.context.log(String.format(
+							"%s have no authenticaton to access admin memu",
+							username));
+					res.sendError(javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+					return;
+				} else {
+					chain.doFilter(request, response);
+				}
+			} else {
+				// pass the request along the filter chain
+				chain.doFilter(request, response);
+			}
 		}
 
 	}

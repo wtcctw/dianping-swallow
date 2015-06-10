@@ -34,7 +34,7 @@ import com.dianping.swallow.web.service.impl.IdentityRecognitionServiceImpl;
  *         2015年5月25日下午5:51:54
  */
 public class RequestLogFilter implements Filter {
-	
+
 	private static final String TOPICURL = "/console/topic";
 	private static final String MESSAGEURL = "/console/message";
 	private static final String MONITORURL = "/console/monitor/consumer/total/delay";
@@ -44,18 +44,18 @@ public class RequestLogFilter implements Filter {
 	private ServletContext context;
 
 	private ExtractUsernameUtils extractUsernameUtils;
-	
+
 	private AdministratorListService administratorListService;
-	
+
 	private IdentityRecognitionService identityRecognitionService;
-	
+
 	private AdministratorDao administratorDao;
-	
+
 	private FilterMetaDataService filterMetaDataService;
-	
+
 	private static Set<String> urls = new HashSet<String>();
-	
-	static{
+
+	static {
 		urls.add(TOPICURL);
 		urls.add(MESSAGEURL);
 		urls.add(MONITORURL);
@@ -67,67 +67,76 @@ public class RequestLogFilter implements Filter {
 		ApplicationContext ctx = WebApplicationContextUtils
 				.getRequiredWebApplicationContext(this.context);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
-		this.administratorListService = ctx.getBean(AdministratorListServiceImpl.class);
-		this.identityRecognitionService = ctx.getBean(IdentityRecognitionServiceImpl.class);
-		this.filterMetaDataService = ctx.getBean(FilterMetaDataServiceImpl.class);
+		this.administratorListService = ctx
+				.getBean(AdministratorListServiceImpl.class);
+		this.identityRecognitionService = ctx
+				.getBean(IdentityRecognitionServiceImpl.class);
+		this.filterMetaDataService = ctx
+				.getBean(FilterMetaDataServiceImpl.class);
 		this.administratorDao = ctx.getBean(DefaultAdministratorDao.class);
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
-		HttpServletRequest req = (HttpServletRequest) request;
+		if (request.getAttribute("skipfilter") != null) {
+			chain.doFilter(request, response);
+		} else {
+			HttpServletRequest req = (HttpServletRequest) request;
 
-		String uri = req.getRequestURI();
+			String uri = req.getRequestURI();
 
-		String username = extractUsernameUtils.getUsername(req);
+			String username = extractUsernameUtils.getUsername(req);
 
-		if(urls.contains(uri) || uri.contains(MAINPAGE)){
-			if(recordVisitInAdminList(username)){
-				this.context.log(String.format("Save visit %s info into admin list successfully", username));
+			if (urls.contains(uri) || uri.contains(MAINPAGE)) {
+				if (recordVisitInAdminList(username)) {
+					this.context.log(String.format(
+							"Save visit %s info into admin list successfully",
+							username));
+				} else {
+					this.context.log(String.format(
+							"Save visit %s info into admin list failed",
+							username));
+				}
+			} else {
+				String addr = req.getRemoteAddr();
+				int port = req.getRemotePort();
+				this.context.log(String.format(
+						"%s request %s with parameters %s from %s:%d",
+						username, uri, req.getParameterMap().toString(), addr,
+						port));
 			}
-			else{
-				this.context.log(String.format("Save visit %s info into admin list failed", username));
-			}
+			chain.doFilter(request, response);
 		}
-		else{
-			String addr = req.getRemoteAddr();
-			int port = req.getRemotePort();
-			this.context.log(String.format(
-					"%s request %s with parameters %s from %s:%d", username, uri,
-					req.getParameterMap().toString(), addr, port));
-		}
-		chain.doFilter(request, response);
 
 	}
 
 	public void destroy() {
 		// ignore
 	}
-	
-	private boolean recordVisitInAdminList(String username){
+
+	private boolean recordVisitInAdminList(String username) {
 		Administrator admin = administratorDao.readByName(username);
-		if(admin != null){
+		if (admin != null) {
 			int role = admin.getRole();
-			if(role == 0){
+			if (role == 0) {
 				return administratorListService.updateAdmin(username, role);
-			}
-			else {
+			} else {
 				return switchUserAndVisitor(username);
 			}
-		}
-		else{
+		} else {
 			filterMetaDataService.loadAllUsers().add(username);
 			return switchUserAndVisitor(username);
 		}
 	}
-	
-	private boolean switchUserAndVisitor(String username){
-		if(identityRecognitionService.isUser(username)){
-			return administratorListService.updateAdmin(username, AccessControlServiceConstants.USER);
-		}
-		else{
-			return administratorListService.updateAdmin(username, AccessControlServiceConstants.VISITOR);
+
+	private boolean switchUserAndVisitor(String username) {
+		if (identityRecognitionService.isUser(username)) {
+			return administratorListService.updateAdmin(username,
+					AccessControlServiceConstants.USER);
+		} else {
+			return administratorListService.updateAdmin(username,
+					AccessControlServiceConstants.VISITOR);
 		}
 	}
 
