@@ -383,7 +383,17 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			if(tmpname != null){
 				$scope.tname = localStorage.getItem("name");
 				localStorage.clear();
-				$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+				$http.get(window.contextPath + "/console/message/timespan", {
+					params : {
+						topic: $scope.tname
+					}
+				}).success(function(data){
+					$scope.mintime = data.min;
+					$scope.maxtime = data.max;
+					if(data.min.length > 0){  //没有纪录就不用查询了
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+					}
+				});
 			}
 	        
 }]);
