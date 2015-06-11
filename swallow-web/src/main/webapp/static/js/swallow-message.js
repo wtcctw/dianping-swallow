@@ -362,7 +362,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        
 	        
 	        $scope.starttransmit = function(data){
-        			$http.post(window.contextPath + '/console/message/auth/sendmessage', {"param": data,"topic":$scope.tname}).success(function(response) {
+        			$http.post(window.contextPath + '/console/message/auth/sendmessage', {"mids": data,"topic":$scope.tname}).success(function(response) {
         			  $("#selectnone").prop('checked', false);
         			  $("#selectall").prop('checked', false);
         			  $(".swallowcheckbox").prop('checked', false);
@@ -375,9 +375,11 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        }
 	        // for retransmit self defined messages
 	        $scope.textarea = "";
+	        $scope.ttype = "";
+	        $scope.tproperty = "";
 	        $scope.refreshpage = function(myForm){
 	        	$('#myModal').modal('hide');
-	        	$http.post(window.contextPath + '/console/message/auth/sendgroupmessage', {"textarea":$scope.textarea,"topic":$scope.tname}).success(function(response) {
+	        	$http.post(window.contextPath + '/console/message/auth/sendgroupmessage', {"textarea":$scope.textarea,"topic":$scope.tname,"type":$scope.ttype,"property":$scope.tproperty}).success(function(response) {
 	        		$scope.startdt = "";
 					$scope.stopdt = "";
 					$scope.messageId = "";

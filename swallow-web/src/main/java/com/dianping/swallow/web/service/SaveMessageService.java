@@ -19,7 +19,9 @@ public interface SaveMessageService extends SwallowService{
 	 * 发送自定义消息
 	 * @param topicName	topic名称
 	 * @param content	消息内容
+	 * @param type	    消息类型
+	 * @param property	消息属性
 	 */
-	void saveNewMessage(String topicName, String content);
+	void saveNewMessage(String topicName, String content, String type, String property);
 	
 }

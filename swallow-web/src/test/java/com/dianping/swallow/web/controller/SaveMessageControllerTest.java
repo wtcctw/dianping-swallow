@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.io.IOException;
+
 import javax.annotation.Resource;
 
 import org.junit.Before;
@@ -13,6 +14,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -21,6 +24,10 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
+
+import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.service.SaveMessageService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -29,7 +36,7 @@ import com.dianping.swallow.web.service.SaveMessageService;
 public class SaveMessageControllerTest {
 
 	private static final String AUTHORIZATION = "Authorization";
-	private static final String RANDOMSTRING = "dzpzpndcnwkhgvzfallnelxtaikmxmbb";
+	private static final String RANDOMSTRING = "esqxrmxuglqdimwbdwhxsvtdbdctbbcm";
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -49,8 +56,9 @@ public class SaveMessageControllerTest {
 	public void testRetransmitMessage() {
 
 		try {
-			this.mockMvc.perform(post("/hotels").param("param",
-					"test sendGroupMessage").param("topic", "example"));
+			this.mockMvc.perform(post("/console/message/sendgroupmessage")
+					.param("param", "test sendGroupMessage").param("topic",
+							"example"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -68,33 +76,47 @@ public class SaveMessageControllerTest {
 	public void testSendGroupMessages() {
 		String topicName = "example";
 		String content = "test sendGroupMessages API";
-		saveMessageService.saveNewMessage(topicName, content);
+		String type = "";
+		String property = "";
+		saveMessageService.saveNewMessage(topicName, content, type, property);
 	}
 
 	private static HttpMethod postMethod(String url) throws IOException {
 		PostMethod post = new PostMethod(url);
 		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
 		NameValuePair[] param = {
-				new NameValuePair("param", "6158666846842126337"),
-				new NameValuePair("topic", "example"), };
+				//new NameValuePair("mids", "6158666846842126337,6156724155824734216"),
+				new NameValuePair("mids", ""),
+				new NameValuePair("topic", "example") };
 		post.setRequestBody(param);
 		post.releaseConnection();
 		return post;
 	}
-	
+
 	private static HttpMethod postMethod2(String url) throws IOException {
 		PostMethod post = new PostMethod(url);
 		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
 		NameValuePair[] param = {
-				new NameValuePair("textarea", "test group message api"),
-				new NameValuePair("topic", "example"), };
+				//new NameValuePair("textarea", "test group message api with type and property, No 1\ntest group message api with type and property, No 2"),
+				new NameValuePair("textarea", ""),
+				new NameValuePair("topic", "example"),
+				new NameValuePair("type", "jiagou"),
+				new NameValuePair("property", "test:true,work:on") };
 		post.setRequestBody(param);
 		post.releaseConnection();
 		return post;
 	}
 
 	public static void main(String[] args) {
-		String url = "http://localhost:8080/console/message/auth/sendmessage";
+		String host = null;
+		try {
+			ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
+			host = configCache.getProperty("swallow.web.sso.url");
+		} catch (LionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String url = host + "/console/message/auth/sendmessage";
 		HttpClient httpClient = new HttpClient();
 
 		try {
@@ -102,21 +124,35 @@ public class SaveMessageControllerTest {
 			httpClient.executeMethod(method);
 
 			String response = method.getResponseBodyAsString();
-			// String(method.getResponseBodyAsString().getBytes("ISO-8859-1"));
-			System.out.println(response);
+			try {
+				JSONObject json = new JSONObject(response);
+				System.out.println(response);
+				System.out.println(json.getString("status"));
+				System.out.println(json.getString("retransmit"));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		String url2 = "http://localhost:8080/console/message/auth/sendgroupmessage";
+
+		String url2 = host + "/console/message/auth/sendgroupmessage";
 
 		try {
 			HttpMethod method = postMethod2(url2);
 			httpClient.executeMethod(method);
 
 			String response = method.getResponseBodyAsString();
+			try {
+				JSONObject json = new JSONObject(response);
+				
+				System.out.println(response);
+				System.out.println(json.getString("status"));
+				System.out.println(json.getString("retransmit"));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 			// String(method.getResponseBodyAsString().getBytes("ISO-8859-1"));
-			System.out.println(response);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +44,22 @@ public class SaveMessageServiceImpl extends AbstractSwallowService implements
 		}
 	}
 
-	public void saveNewMessage(String topicName, String content) {
+	public void saveNewMessage(String topicName, String content, String type, String property) {
 		SwallowMessage sm = new SwallowMessage();
+		if(!StringUtils.isEmpty(type)){
+			sm.setType(type);
+		}
+		if(!StringUtils.isEmpty(property)){
+			Map<String, String> propertyMap = new HashMap<String, String>();
+			String[] entrys = property.split(",");
+			for(String entry : entrys){
+				String[] pair = entry.split(":");
+				if(pair.length == 2){
+					propertyMap.put(pair[0], pair[1]);
+				}
+			}
+			sm.setProperties(propertyMap);
+		}
 		setMessageProperty(sm, content);
 		messageDAO.saveMessage(topicName, sm);
 	}

@@ -151,7 +151,21 @@
 										ng-model="tname" required>
 								</div>
 							</div>
-
+							<div class="control-group">
+								<label class="control-label">消息类型 :</label>
+								<div class="controls">
+									<input type="text" name="type" class="input-xlarge"
+										ng-model="ttype" placeholder="没有可以忽略">
+								</div>
+							</div>
+								<label class="control-label">消息属性 :</label>
+								<div class="controls">
+									<input type="text" name="type" class="input-xlarge"
+										ng-model="tproperty" placeholder="没有可以忽略"><span
+							class="help-inline"> <span
+							class="middle">格式:key1:value2,key2:value2...</span>
+								</div>
+							</div>
 							<div class="control-group">
 								<label class="control-label">输入需要发送的消息(每行代表一条消息)</label>
 								<div class="controls">
