@@ -58,8 +58,12 @@
 			<button type="button" class="btn btn-success btn-swallow-ok"
 				ng-click="dialog()">发送下表消息</button>
 			<input type="checkbox" id="selectall" ng-click="selectall()">
-			全选 <input type="checkbox" id="selectnone" ng-click="selectnone()">
-			全不选
+			全选
+
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存消息起始时间
+			<input type="text" ng-model="mintime" readonly="readonly"> 至 <input
+				type="text" ng-model="maxtime" readonly="readonly">
+
 		</div>
 
 	</div>
@@ -90,9 +94,9 @@
 							class="swallowcheckbox"></td>
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="m.mid"></td>
-						<td style="text-align: left"><a
-							ng-click="formatres(m.mid)" class="edit-config-btn"
-							style="cursor: pointer;" ng-bind="searchPaginator.currentPartialCon[$index]"></a></td>
+						<td style="text-align: left"><a ng-click="formatres(m.mid)"
+							class="edit-config-btn" style="cursor: pointer;"
+							ng-bind="searchPaginator.currentPartialCon[$index]"></a></td>
 						<td style="text-align: left" ng-bind="m.ststring"></td>
 						<td style="text-align: left" ng-bind="m.gtstring"></td>
 						<td style="text-align: left" ng-bind="m.mo_id"></td>
@@ -115,7 +119,8 @@
 						ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
 					<li><a href=""
 						ng-click="searchPaginator.fetch(searchPaginator.endPage)"
-						ng-show="searchPaginator.pages.length" ng-bind="searchPaginator.totalpieces"></a></li>
+						ng-show="searchPaginator.pages.length"
+						ng-bind="searchPaginator.totalpieces"></a></li>
 					<select class="selectpicker" ng-model="recordofperpage"
 						ng-change="makeChanged()"
 						ng-options="item.num as item.num for item in numperpage"></select>

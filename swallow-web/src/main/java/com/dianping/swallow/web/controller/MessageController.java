@@ -29,7 +29,7 @@ public class MessageController extends AbstractMenuController {
 
 	@Resource(name = "messageService")
 	private MessageService messageService;
-	
+
 	@Autowired
 	ExtractUsernameUtils extractUsernameUtils;
 
@@ -53,6 +53,16 @@ public class MessageController extends AbstractMenuController {
 		return map;
 	}
 
+	@RequestMapping(value = "/console/message/timespan", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public Object getMinAndMaxTime(String topic, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map = messageService.loadMinAndMaxTime(topic);
+		return map;
+	}
+
 	@RequestMapping(value = "/console/message/auth/content", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Message showMessageContent(String topic, String mid,
@@ -64,7 +74,7 @@ public class MessageController extends AbstractMenuController {
 
 	@Override
 	protected String getMenu() {
-		
+
 		return "message";
 	}
 

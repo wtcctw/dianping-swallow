@@ -31,9 +31,6 @@
 
 package com.dianping.swallow.web.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,7 +42,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
-public class IndexController extends AbstractController {
+public class IndexController extends AbstractMenuController {
 
  	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory
@@ -55,9 +52,14 @@ public class IndexController extends AbstractController {
 	@RequestMapping(value = "/")
 	public ModelAndView allApps(HttpServletRequest request,
 			HttpServletResponse response) {
-		Map<String, Object> map = new HashMap<String, Object>();
 	    
-		return new ModelAndView("topic/index", map);
+		return new ModelAndView("topic/index", createViewMap());
+	}
+
+
+	@Override
+	protected String getMenu() {
+		return "topic";
 	}
 	
 }

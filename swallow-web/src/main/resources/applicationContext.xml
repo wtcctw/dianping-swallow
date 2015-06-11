@@ -64,7 +64,6 @@
 		<mvc:interceptor>
 			<mvc:mapping path="/" />
 			<mvc:mapping path="/console/topic" />
-			<mvc:mapping path="/console/topic" />
 			<mvc:mapping path="/console/message" />
 			<mvc:mapping path="/console/administrator" />
 			<mvc:mapping path="/console/monitor/consumerserver/qps" />

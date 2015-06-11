@@ -32,4 +32,11 @@ public interface MessageService extends SwallowService{
 	 */
 	Message getMessageContent(String topic, String mid);
 	
+
+	/**
+	 * 
+	 * @param topicName
+	 */
+	Map<String, Object> loadMinAndMaxTime(String topicName);
+	
 }

@@ -261,6 +261,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        $scope.recordofperpage = $scope.numperpage[0].num;
 	        
 			// search topic name
+	        $scope.mintime = "";
+	        $scope.maxtime = "";
 			$http({
 				method : 'GET',
 				url : window.contextPath + '/console/topic/namelist'
@@ -270,9 +272,23 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					items: 16, 
 					source : topicNameList,
 					updater : function(c) {
-						$scope.tname = c;
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
-
+						if($scope.tname != c){
+							$http.get(window.contextPath + "/console/message/timespan", {
+								params : {
+									topic: c
+								}
+							}).success(function(data){
+								$scope.mintime = data.min;
+								$scope.maxtime = data.max;
+								$scope.tname = c;
+								if(data.min.length > 0){  //没有纪录就不用查询了
+									$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+								}
+							});
+						}
+						else{
+							$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+						}
 						return c;
 					}
 				})

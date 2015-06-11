@@ -95,4 +95,11 @@ public interface MessageDao extends Dao, WebMongoManager{
 	 */
 	Map<String, Object> findByTopicname(int offset, int limit, String topicName);
 	
+
+	/**
+	 * 
+	 * @param topicName 
+	 */
+	Map<String, Object> findMinAndMaxTime(String topicName);
+	
 }

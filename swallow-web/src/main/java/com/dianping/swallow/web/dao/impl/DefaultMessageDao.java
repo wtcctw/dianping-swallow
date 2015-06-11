@@ -30,8 +30,7 @@ import com.mongodb.WriteResult;
  *
  *         2015年4月20日 下午9:31:41
  */
-public class DefaultMessageDao extends AbstractDao implements
-		MessageDao {
+public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 	private WebMongoManager webMongoManager;
 	private static final String MESSAGE_COLLECTION = "c";
@@ -103,8 +102,7 @@ public class DefaultMessageDao extends AbstractDao implements
 	public int deleteById(String id, String topicName) {
 		Query query = new Query(Criteria.where(ID).is(id));
 		WriteResult result = this.webMongoManager.getMessageMongoTemplate(
-				topicName).remove(query, Message.class,
-				MESSAGE_COLLECTION);
+				topicName).remove(query, Message.class, MESSAGE_COLLECTION);
 		return result.getN();
 	}
 
@@ -147,8 +145,8 @@ public class DefaultMessageDao extends AbstractDao implements
 			query.fields().exclude(C);
 		}
 		List<Message> messageList = this.webMongoManager
-				.getMessageMongoTemplate(topicName).find(query,
-						Message.class, MESSAGE_COLLECTION);
+				.getMessageMongoTemplate(topicName).find(query, Message.class,
+						MESSAGE_COLLECTION);
 
 		return getResponse(messageList, this.count(topicName));
 	}
@@ -238,8 +236,8 @@ public class DefaultMessageDao extends AbstractDao implements
 			list = this.webMongoManager.getMessageMongoTemplate(topicName)
 					.find(query, Message.class, MESSAGE_COLLECTION);
 		} else {
-			list = (List<Message>) findSpecificWithId(offset, limit,
-					mid, topicName).get(MESSAGE);
+			list = (List<Message>) findSpecificWithId(offset, limit, mid,
+					topicName).get(MESSAGE);
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
 
@@ -334,12 +332,45 @@ public class DefaultMessageDao extends AbstractDao implements
 		return this.webMongoManager;
 	}
 
-	private Map<String, Object> getResponse(List<Message> list,
-			Long size) {
+	private Map<String, Object> getResponse(List<Message> list, Long size) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put(SIZE, size);
 		map.put(MESSAGE, list);
 		return map;
+	}
+
+	@Override
+	public Map<String, Object> findMinAndMaxTime(String topicName) {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		Query query1 = new Query();
+		query1.with(new Sort(new Sort.Order(Direction.DESC, ID))).limit(1);
+		query1.fields().exclude(C);
+		List<Message> msgs = this.webMongoManager.getMessageMongoTemplate(topicName).find(query1,
+				Message.class, MESSAGE_COLLECTION);
+		if(msgs.size() == 0){
+			map.put("max", "");
+			map.put("min", "");
+			return map;
+		}
+
+		Message msg = msgs.get(0);
+		map.put("max", convertToStstring(msg.get_id()) );
+		
+		Query query2 = new Query();
+		query2.with(new Sort(new Sort.Order(Direction.ASC, ID))).limit(1);
+		query2.fields().exclude(C);
+		msg = this.webMongoManager.getMessageMongoTemplate(topicName).find(query2,
+				Message.class, MESSAGE_COLLECTION).get(0);
+		map.put("min", convertToStstring(msg.get_id()) );
+		
+		return map;
+	}
+	
+	private String convertToStstring(BSONTimestamp ts) {
+		int seconds = ts.getTime();
+		long millions = new Long(seconds)*1000;
+		return new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
 	}
 
 }

@@ -40,6 +40,7 @@ public class RequestLogFilter implements Filter {
 	private static final String MONITORURL = "/console/monitor/consumer/total/delay";
 	private static final String ADMINURL = "/console/administrator";
 	private static final String MAINPAGE = "jsessionid=";
+	private static final String ROOT = "/";
 
 	private ServletContext context;
 
@@ -60,6 +61,7 @@ public class RequestLogFilter implements Filter {
 		urls.add(MESSAGEURL);
 		urls.add(MONITORURL);
 		urls.add(ADMINURL);
+		urls.add(ROOT);
 	}
 
 	public void init(FilterConfig fConfig) throws ServletException {

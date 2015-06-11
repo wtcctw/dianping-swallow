@@ -103,6 +103,14 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		for (Message m : messageList)
 			setSMessageProperty(m);
 	}
+	
+	@Override
+	public Map<String, Object> loadMinAndMaxTime(String topicName){
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map = webSwallowMessageDao.findMinAndMaxTime(topicName);
+		return map;
+	}
 
 	private void setSMessageProperty(Message m) {
 		m.setMid(m.get_id());

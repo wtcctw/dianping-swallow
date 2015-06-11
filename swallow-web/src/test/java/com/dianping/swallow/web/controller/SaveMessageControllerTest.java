@@ -29,7 +29,7 @@ import com.dianping.swallow.web.service.SaveMessageService;
 public class SaveMessageControllerTest {
 
 	private static final String AUTHORIZATION = "Authorization";
-	private static final String RANDOMSTRING = "fpuugwyfshzgsnbiewguorlbvtrjiqtx";
+	private static final String RANDOMSTRING = "dzpzpndcnwkhgvzfallnelxtaikmxmbb";
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -81,6 +81,17 @@ public class SaveMessageControllerTest {
 		post.releaseConnection();
 		return post;
 	}
+	
+	private static HttpMethod postMethod2(String url) throws IOException {
+		PostMethod post = new PostMethod(url);
+		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
+		NameValuePair[] param = {
+				new NameValuePair("textarea", "test group message api"),
+				new NameValuePair("topic", "example"), };
+		post.setRequestBody(param);
+		post.releaseConnection();
+		return post;
+	}
 
 	public static void main(String[] args) {
 		String url = "http://localhost:8080/console/message/auth/sendmessage";
@@ -88,6 +99,19 @@ public class SaveMessageControllerTest {
 
 		try {
 			HttpMethod method = postMethod(url);
+			httpClient.executeMethod(method);
+
+			String response = method.getResponseBodyAsString();
+			// String(method.getResponseBodyAsString().getBytes("ISO-8859-1"));
+			System.out.println(response);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		String url2 = "http://localhost:8080/console/message/auth/sendgroupmessage";
+
+		try {
+			HttpMethod method = postMethod2(url2);
 			httpClient.executeMethod(method);
 
 			String response = method.getResponseBodyAsString();
