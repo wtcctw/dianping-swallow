@@ -41,7 +41,12 @@ module.factory('Paginator', function(){
 			                    self.currentPage
 			                ];
 			            }
-						self.currentPageItems = items.slice(0, pageSize);
+						if(!self.reverse){
+							self.currentPageItems = items.slice(0, pageSize);
+						}
+						else{
+							self.currentPageItems = items.slice(0, pageSize).reverse();
+						}
 						if (self.currentPageItems.length > 0) {
 							$("#message-retransmit").css(
 									'display', 'block');
@@ -81,7 +86,9 @@ module.factory('Paginator', function(){
 				currentPageItems: [],
 				currentPartialCon: [],
 				currentParsedItems: [],
-				currentOffset: 0
+				currentOffset: 0,
+				
+				reverse: false,
 		};
 		
 		//加载第一页
@@ -394,6 +401,12 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
 					}
 				});
+			}
+			
+			//reverse record
+			$scope.reverse = function(){
+				$scope.searchPaginator.currentPageItems.reverse();
+				$scope.searchPaginator.reverse = !$scope.searchPaginator.reverse;
 			}
 	        
 }]);

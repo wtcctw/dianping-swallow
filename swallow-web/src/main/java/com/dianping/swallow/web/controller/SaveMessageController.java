@@ -22,7 +22,7 @@ public class SaveMessageController extends AbstractController {
 
 	@Resource(name = "saveMessageService")
 	private SaveMessageService saveMessageService;
-	
+
 	@Autowired
 	private RandomStringGenerator randomStringGenerator;
 
@@ -37,18 +37,15 @@ public class SaveMessageController extends AbstractController {
 
 		String topicName = topic.trim();
 		String[] mids = param.split(",");
-		int size = mids.length;
-		for(int i = size - 1; i >= 0; --i){
+		for (String mid : mids) {
 			successornot = saveMessageService.doRetransmit(topicName,
-					Long.parseLong(mids[i]));
+					Long.parseLong(mid));
 			if (successornot) {
 				logger.info(String.format(
-						"retransmit messages with mid: %s successfully.",
-						mids[i].toString()));
+						"retransmit messages with mid: %s successfully.", mid));
 			} else {
 				logger.info(String.format(
-						"retransmit messages with mid: %s failed.",
-						mids[i].toString()));
+						"retransmit messages with mid: %s failed.", mid));
 			}
 		}
 
@@ -72,12 +69,12 @@ public class SaveMessageController extends AbstractController {
 			saveMessageService.saveNewMessage(topicName, contents[i]);
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/message/randomstring", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String randomString(HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-		
+
 		return randomStringGenerator.loadRandomString();
 	}
 

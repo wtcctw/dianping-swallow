@@ -59,11 +59,12 @@
 				ng-click="dialog()">发送下表消息</button>
 			<input type="checkbox" id="selectall" ng-click="selectall()">
 			全选
-
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保存消息起始时间
-			<input type="text" ng-model="mintime" readonly="readonly"> 至 <input
-				type="text" ng-model="maxtime" readonly="readonly">
-
+		</div>
+		<div class="pull-right">
+			<a href="" data-toggle="tooltip"
+				title="mongo存储使用Capped Collection,当分配的磁盘空间耗尽,最新的消息会覆盖最早的消息">最早时间</a>
+			<input type="text" ng-model="mintime"
+				style="width: 150px; margin-right: 10px;" readonly="readonly">
 		</div>
 
 	</div>
@@ -81,7 +82,8 @@
 					<tr>
 						<th style="text-align: left">操作</th>
 						<th style="text-align: left">序号</th>
-						<th style="text-align: left">消息ID</th>
+						<th style="text-align: left"><a href="" data-toggle="tooltip" ng-click="reverse()"
+							title="点击逆序显示">消息ID</a></th>
 						<th style="text-align: left">消息内容</th>
 						<th style="text-align: left">保存时间</th>
 						<th style="text-align: left">产生时间</th>
