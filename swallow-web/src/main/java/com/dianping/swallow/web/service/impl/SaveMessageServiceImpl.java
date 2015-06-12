@@ -38,22 +38,21 @@ public class SaveMessageServiceImpl extends AbstractSwallowService implements
 			messageDAO.retransmitMessage(topic, sm);
 			return true;
 		} else {
-			if (logger.isInfoEnabled())
-				logger.info(topic + " is not in database!");
+			logger.info("Error when convert resultset to SwallowMessage");
 			return false;
 		}
 	}
 
-	public void saveNewMessage(String topicName, String content, String type, String property) {
+	public void saveNewMessage(String topicName, String content, String type, String delimitor, String property) {
 		SwallowMessage sm = new SwallowMessage();
 		if(!StringUtils.isEmpty(type)){
 			sm.setType(type);
 		}
 		if(!StringUtils.isEmpty(property)){
 			Map<String, String> propertyMap = new HashMap<String, String>();
-			String[] entrys = property.split(",");
+			String[] entrys = property.split(" ");
 			for(String entry : entrys){
-				String[] pair = entry.split(":");
+				String[] pair = entry.split(delimitor);
 				if(pair.length == 2){
 					propertyMap.put(pair[0], pair[1]);
 				}
@@ -89,7 +88,6 @@ public class SaveMessageServiceImpl extends AbstractSwallowService implements
 			ip = LOCALHOST;
 			if (logger.isErrorEnabled()) {
 				logger.error("Error when getHostAddress.", e);
-				;
 			}
 		}
 

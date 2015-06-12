@@ -51,7 +51,7 @@
 						<th style="text-align: left">主题名称</th>
 						<th style="text-align: left">申请者</th>
 						<th style="text-align: left">申请时间</th>
-						<th style="text-align: left">操作</th>
+						<th style="text-align: left; #if(${isadmin})display: block;#else display: none;#end">操作</th>
 					</tr>
 					<tr ng-repeat="t in searchPaginator.currentPageItems"
 						on-finish-render-filters>
@@ -61,7 +61,7 @@
 							ng-click="setTopicName(t.name)" ng-bind="t.name"></a></td>
 						<td style="text-align: left" ng-bind="t.prop"></td>
 						<td style="text-align: left" ng-bind="t.time"></td>
-						<td style="text-align: left"><a href="#myModal"
+						<td style="text-align: left; #if(${isadmin})display: block;#else display: none;#end"><a href="#myModal"
 							ng-click="setModalInput(t.name, t.prop, t.time);"
 							data-toggle="modal" class="edit-config-btn"><i
 								class="icon-edit" rel="tooltip" data-original-title="编辑配置值"></i></a></td>
@@ -109,7 +109,7 @@
 							<div class="control-group">
 								<label class="control-label">申请人</label>
 								<div class="controls">
-									<input name="prop" class="input-xlarge" type="text" required
+									<input name="prop" class="input-xlarge" type="text"
 										data-provide="typeahead" ng-model="topicprop" id="topicprops"
 										autocomplete="off" style="width: 800px">
 								</div>

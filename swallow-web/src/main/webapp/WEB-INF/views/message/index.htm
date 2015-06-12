@@ -82,8 +82,8 @@
 					<tr>
 						<th style="text-align: left">操作</th>
 						<th style="text-align: left">序号</th>
-						<th style="text-align: left"><a href="" data-toggle="tooltip" ng-click="reverse()"
-							title="点击逆序显示">消息ID</a></th>
+						<th style="text-align: left"><a href="" data-toggle="tooltip"
+							ng-click="reverse()" title="点击逆序显示">消息ID</a></th>
 						<th style="text-align: left">消息内容</th>
 						<th style="text-align: left">保存时间</th>
 						<th style="text-align: left">产生时间</th>
@@ -158,16 +158,27 @@
 										ng-model="ttype" placeholder="没有可以忽略">
 								</div>
 							</div>
-								<label class="control-label">消息属性 :</label>
-								<div class="controls">
-									<input type="text" name="type" class="input-xlarge"
-										ng-model="tproperty" placeholder="没有可以忽略"><span
-							class="help-inline"> <span
-							class="middle">格式:key1:value2,key2:value2...</span>
+							<div class="control-group input_fields_wrap">
+								<label class="control-label">消息属性 :</label> <a
+									class="add_field_button" href=""
+									ng-click="addfield();$event.preventDefault()"
+									style="margin-left: 205px;"><i class="icon-plus"></i> Add</a>
+								<!-- <button class="add_field_button" ng-click="addfield();$event.preventDefault()">Add More Fields</button> -->
+								<div class="input-group">
+									<input type="text" name="property"
+										class="input-xlarge property-input" 
+										placeholder="key:value形式,点击Add添加,否则忽略">
+										<input type="text" value=":" style="width:31px" id="delimitor" required data-toggle="tooltip"
+				title="key和value的分隔符,可选分隔符有':_;#,'"><span
+							class="help-inline col-xs-12 col-sm-7"> 
+										<ul class="typeahead dropdown-menu"
+						style="top: 28px; left: 0px; display: none;">
+					</ul>
 								</div>
 							</div>
+
 							<div class="control-group">
-								<label class="control-label">输入需要发送的消息(每行代表一条消息)</label>
+								<label class="control-label">输入需要发送的消息体(每次只能发送一条,如需批量发送请查看帮助文档中的API)</label>
 								<div class="controls">
 									<textarea class="form-control" name="textarea"
 										id="message-text" rows="10" ng-model="textarea" required></textarea>
@@ -181,7 +192,6 @@
 									<button type="submit" class="btn btn-success">发送消息</button>
 								</div>
 							</div>
-
 						</form>
 					</div>
 

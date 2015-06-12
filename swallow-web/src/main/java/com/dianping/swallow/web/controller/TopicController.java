@@ -2,8 +2,10 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -23,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.service.FilterMetaDataService;
 import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
  * @author mingdongli
@@ -33,6 +36,8 @@ import com.dianping.swallow.web.service.TopicService;
 public class TopicController extends AbstractMenuController {
 
 	private static final String DELIMITOR = ",";
+	private static final String M_SUCCESS = "success";
+	private static final String M_MONGOWRITE = "write mongo error";
 
 	@Resource(name = "filterMetaDataService")
 	private FilterMetaDataService filterMetaDataService;
@@ -97,17 +102,30 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/auth/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void editTopic(@RequestParam(value = "topic") String topic,
+	public Object editTopic(@RequestParam("topic") String topic,
 			@RequestParam("prop") String prop,
 			@RequestParam("time") String time, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		topicService.editTopic(topic, prop, time);
-		logger.info(String.format(
-				"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ].",
-				extractUsernameUtils.getUsername(request), topic, prop,
-				splitProps(prop.trim()).toString(), time.toString()));
-
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean result = topicService.editTopic(topic, prop, time);
+		if(result){
+			map.put(SaveMessageController.STATUS, ResponseStatus.SUCCESS);
+			map.put(SaveMessageController.MESSAGE, M_SUCCESS);
+			logger.info(String.format(
+					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
+					extractUsernameUtils.getUsername(request), topic, prop,
+					splitProps(prop.trim()).toString(), time.toString()));
+		}else{
+			map.put(SaveMessageController.STATUS, ResponseStatus.E_TRY_MONGOWRITE);
+			map.put(SaveMessageController.MESSAGE, M_MONGOWRITE);
+			logger.info(String.format(
+					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.",
+					extractUsernameUtils.getUsername(request), topic, prop,
+					splitProps(prop.trim()).toString(), time.toString()));
+		}
+		
+		return map;
 	}
 
 	private Set<String> splitProps(String props) {

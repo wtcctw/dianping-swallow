@@ -30,13 +30,19 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.service.SaveMessageService;
 
+
+/**
+ * @author mingdongli
+ *
+ * 2015年6月12日下午2:28:49
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:applicationContext.xml" })
 @WebAppConfiguration
 public class SaveMessageControllerTest {
 
 	private static final String AUTHORIZATION = "Authorization";
-	private static final String RANDOMSTRING = "esqxrmxuglqdimwbdwhxsvtdbdctbbcm";
+	private static final String RANDOMSTRING = "ufrweftgwvnrutqnmktcyewmkcoqblpj";
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -78,15 +84,16 @@ public class SaveMessageControllerTest {
 		String content = "test sendGroupMessages API";
 		String type = "";
 		String property = "";
-		saveMessageService.saveNewMessage(topicName, content, type, property);
+		String delimitor = ":";
+		saveMessageService.saveNewMessage(topicName, content, type, delimitor, property);
 	}
 
 	private static HttpMethod postMethod(String url) throws IOException {
 		PostMethod post = new PostMethod(url);
 		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
 		NameValuePair[] param = {
-				//new NameValuePair("mids", "6158666846842126337,6156724155824734216"),
-				new NameValuePair("mids", ""),
+				new NameValuePair("mids", "6158666846842126337,6156724155824734216"),
+				//new NameValuePair("mids", ""),
 				new NameValuePair("topic", "example") };
 		post.setRequestBody(param);
 		post.releaseConnection();
@@ -97,8 +104,8 @@ public class SaveMessageControllerTest {
 		PostMethod post = new PostMethod(url);
 		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
 		NameValuePair[] param = {
-				//new NameValuePair("textarea", "test group message api with type and property, No 1\ntest group message api with type and property, No 2"),
-				new NameValuePair("textarea", ""),
+				new NameValuePair("textarea", "test group message api with type and property, No 1\ntest group message api with type and property, No 2"),
+				//new NameValuePair("textarea", ""),
 				new NameValuePair("topic", "example"),
 				new NameValuePair("type", "jiagou"),
 				new NameValuePair("property", "test:true,work:on") };
@@ -112,6 +119,7 @@ public class SaveMessageControllerTest {
 		try {
 			ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 			host = configCache.getProperty("swallow.web.sso.url");
+			host = "http://localhost:8080";  //本机测试使用，真实环境时注释之
 		} catch (LionException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -127,8 +135,9 @@ public class SaveMessageControllerTest {
 			try {
 				JSONObject json = new JSONObject(response);
 				System.out.println(response);
-				System.out.println(json.getString("status"));
-				System.out.println(json.getString("retransmit"));
+				System.out.println(json.getInt("status"));
+				System.out.println(json.getInt("send"));
+				System.out.println(json.getString("message"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -147,8 +156,9 @@ public class SaveMessageControllerTest {
 				JSONObject json = new JSONObject(response);
 				
 				System.out.println(response);
-				System.out.println(json.getString("status"));
-				System.out.println(json.getString("retransmit"));
+				System.out.println(json.getInt("status"));
+				System.out.println(json.getInt("send"));
+				System.out.println(json.getString("message"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

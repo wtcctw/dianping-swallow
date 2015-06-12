@@ -18,14 +18,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dianping.swallow.web.service.SaveMessageService;
 import com.dianping.swallow.web.task.RandomStringGenerator;
+import com.dianping.swallow.web.util.ResponseStatus;
 
 @Controller
 public class SaveMessageController extends AbstractController {
 
-	private static final String STATUS = "status";
+	public static final String STATUS = "status";
 	
-	private static final String RETRANSMIT = "retransmit";
+	public static final String SEND = "send";
 	
+	public static final String MESSAGE = "message";
+
+	public static final String KEYVALUE = "\\n";
+
 	@Resource(name = "saveMessageService")
 	private SaveMessageService saveMessageService;
 
@@ -40,7 +45,8 @@ public class SaveMessageController extends AbstractController {
 		int send = 0;
 		boolean successornot = false;
 		if (StringUtils.isEmpty(param)) {
-			return failResponse(send);
+			logger.info(String.format("mid is empty"));
+			return generateResponse(send, ResponseStatus.E_TRY_EMPTYCONTENT, ResponseStatus.M_TRY_EMPTYCONTENT);
 		}
 
 		String topicName = topic.trim();
@@ -55,17 +61,20 @@ public class SaveMessageController extends AbstractController {
 			} else {
 				logger.info(String.format(
 						"retransmit messages with mid: %s failed.", mid));
-				return failResponse(send);
+				return generateResponse(send, ResponseStatus.E_MONGOWRITE, ResponseStatus.M_MONGOWRITE);
 			}
 		}
-		return successResponse(send);
+		
+		logger.info(String.format("Send all message of %s successfully", topicName));
+		return generateResponse(send, ResponseStatus.SUCCESS, ResponseStatus.M_SUCCESS);
 	}
 
-	@RequestMapping(value = "/console/message/auth/sendgroupmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/auth/sendonemessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object sendGroupMessages(@RequestParam(value = "topic") String topic,
+	public Object sendOneMessages(@RequestParam(value = "topic") String topic,
 			@RequestParam("textarea") String text,
 			@RequestParam(value = "type") String type,
+			@RequestParam(value = "delimitor") String delimitor,
 			@RequestParam(value = "property") String property,
 			HttpServletRequest request, HttpServletResponse response) {
 
@@ -76,38 +85,66 @@ public class SaveMessageController extends AbstractController {
 		String textarea = text.trim();
 		if (StringUtils.isEmpty(textarea)) {
 			logger.info(String.format("Content is empty"));
-			return failResponse(send);
+			return generateResponse(send, ResponseStatus.E_TRY_EMPTYCONTENT, ResponseStatus.M_TRY_EMPTYCONTENT);
 		}
-		String[] contents = textarea.split("\\n");
+		
+		try {
+			saveMessageService.saveNewMessage(topicName, textarea,
+					topicType, delimitor, topicProperty);
+			++send;
+		} catch (Exception e) {
+			return generateResponse(send, ResponseStatus.E_MONGOWRITE, ResponseStatus.M_MONGOWRITE);
+		}
+		
+		logger.info(String.format("Send all message of %s successfully", topicName));
+		return generateResponse(send, ResponseStatus.SUCCESS, ResponseStatus.M_SUCCESS);
+	}
+	
+	@RequestMapping(value = "/console/message/auth/sendgroupmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public Object sendGroupMessages(@RequestParam(value = "topic") String topic,
+			@RequestParam("textarea") String text,
+			@RequestParam(value = "type") String type,
+			@RequestParam(value = "property") String property,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		int send = 0;
+		String delimitor = ":";
+		String topicName = topic.trim();
+		String topicType = type.trim();
+		String topicProperty = property.trim();
+		String textarea = text.trim();
+		if (StringUtils.isEmpty(textarea)) {
+			logger.info(String.format("Content is empty"));
+			return generateResponse(send, ResponseStatus.E_TRY_EMPTYCONTENT, ResponseStatus.M_TRY_EMPTYCONTENT);
+		}
+		String[] contents = textarea.split(KEYVALUE);
 		int pieces = contents.length;
 
 		for (int i = 0; i < pieces; ++i) {
+			if(StringUtils.isEmpty(contents[i])){
+				continue;
+			}
 			try{
-				saveMessageService.saveNewMessage(topicName, contents[i], topicType ,topicProperty);
+				saveMessageService.saveNewMessage(topicName, contents[i], topicType ,delimitor, topicProperty);
 				++send;
 			}catch(Exception e){
-				return failResponse(send);
+				return generateResponse(send, ResponseStatus.E_MONGOWRITE, ResponseStatus.M_MONGOWRITE);
 			}
 		}
-		return successResponse(send);
+		logger.info(String.format("Send message of %s successfully", topicName));
+		return generateResponse(send, ResponseStatus.SUCCESS, ResponseStatus.M_SUCCESS);
 	}
 	
-	private Object failResponse(int send){
+	private Object generateResponse(int send, int status, String message){
 		
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put(STATUS, "fail");
-		result.put(RETRANSMIT, send);
+		result.put(STATUS, status);
+		result.put(SEND, send);
+		result.put(MESSAGE, message);
 		return result;
 	}
 	
-	private Object successResponse(int send){
-		
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put(STATUS, "success");
-		result.put(RETRANSMIT, send);
-		return result;
-	}
-
 	@RequestMapping(value = "/console/message/randomstring", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String randomString(HttpServletRequest request,

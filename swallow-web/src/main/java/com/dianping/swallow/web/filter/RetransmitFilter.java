@@ -1,6 +1,9 @@
 package com.dianping.swallow.web.filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -10,13 +13,15 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.codehaus.jettison.json.JSONObject;
 
+import com.dianping.swallow.web.controller.SaveMessageController;
 import com.dianping.swallow.web.task.RandomStringGenerator;
+import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
  * @author mingdongli
@@ -25,7 +30,7 @@ import com.dianping.swallow.web.task.RandomStringGenerator;
  */
 public class RetransmitFilter implements Filter {
 
-	private static final String AUTHORIZATION = "Authorization";
+	public static final String AUTHORIZATION = "Authorization";
 
 	private ServletContext context;
 
@@ -45,7 +50,6 @@ public class RetransmitFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 
 		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse res = (HttpServletResponse) response;
 		String randomString = req.getHeader(AUTHORIZATION);
 		if (StringUtils.isEmpty(randomString)) {
 			chain.doFilter(request, response); // 没有AUTHORIZATION,正常通过web端访问
@@ -54,15 +58,19 @@ public class RetransmitFilter implements Filter {
 			request.setAttribute("skipfilter", true);
 			chain.doFilter(request, response);
 		} else {
+			Map<String, Object> result = new HashMap<String, Object>();
+			result.put(SaveMessageController.STATUS, ResponseStatus.E_UNTHENTICATION);
+			result.put(SaveMessageController.SEND, 0);
+			result.put(SaveMessageController.MESSAGE, ResponseStatus.M_UNAUTHENTICATION);
 			this.context
 					.log(String
-							.format("Authentication String %s out of time! Please contact operation to get right Authentication key",
+							.format("Authentication String %s out of date! Please contact operation to get right Authentication key",
 									randomString));
-			res.sendError(
-					javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED,
-					String.format(
-							"Authentication string %s is out of time, please contact operator to get latest string.",
-							randomString));
+			JSONObject json=new JSONObject(result);
+			response.setContentType("application/json");
+			PrintWriter out = response.getWriter();
+			out.print(json);
+			out.flush();
 			return;
 		}
 	}

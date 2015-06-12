@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.task;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,7 +24,12 @@ public class RandomStringGenerator {
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	@Scheduled(fixedDelay = 86400000)  //每隔一天
+	@PostConstruct
+	private void init(){
+		generateRandomString();
+	}
+	
+	@Scheduled(cron = "0 0 3 * * ?")  //每天3点更新
 	public void generateRandomString() {
 		
 		logger.info(String.format("Start generate random string for retransmit message"));

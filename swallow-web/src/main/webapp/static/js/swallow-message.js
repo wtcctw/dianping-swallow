@@ -360,7 +360,6 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        	return true;
 	        }
 	        
-	        
 	        $scope.starttransmit = function(data){
         			$http.post(window.contextPath + '/console/message/auth/sendmessage', {"mids": data,"topic":$scope.tname}).success(function(response) {
         			  $("#selectnone").prop('checked', false);
@@ -374,18 +373,80 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        
 	        }
 	        // for retransmit self defined messages
+			$scope.delimitor = ':';
+			$scope.dearray = [',','_','#',':',';'];
+			$("#delimitor").typeahead({
+				source : $scope.dearray,
+				updater : function(c) {
+					$scope.delimitor = c;
+					return c;
+				}
+			})
+			$('#delimitor').tooltip({
+				showDelay: 0,
+				hideDelay: 0
+			})
+			
 	        $scope.textarea = "";
 	        $scope.ttype = "";
 	        $scope.tproperty = "";
 	        $scope.refreshpage = function(myForm){
+	        	if($scope.dearray.indexOf($('#delimitor').val()) < 0){
+	        		alert("不合法的分隔符!");
+	        		return;
+	        	}
+	        	var property = "";
+	        	var hasproperty = false;
+	        	var propertyinput = $(".property-input");
+	        	for(var i = 0 ; i < propertyinput.length; i++){
+	        		var p = propertyinput.eq(i).val(); //or propertyinput[i].value
+	        		p = p.replace(/ /g, '');
+	        		if(p.length > 2){ //至少3个字符
+	        			var re = new RegExp($scope.delimitor, 'g');
+	        			var count = (p.match(re) || []).length
+	        			if(count != 1){
+	        				if(count == 0){
+	        					alert("请使用选择的分隔符"+$scope.delimitor+"分隔键值对!");
+	        					return;
+	        				}
+	        				else{
+	        					alert("键值对中不要出现" + $scope.delimitor + ",您可以切换为其他分隔符");
+	        					return;
+	        				}
+	        			}
+	        			else{
+	        				hasproperty = true;
+	        				property = property + p + " ";
+	        			}
+	        		}else if(p.length != 0){
+	        			alert("请准确输入键值对");
+	        			return;
+	        		}
+	        	}
 	        	$('#myModal').modal('hide');
-	        	$http.post(window.contextPath + '/console/message/auth/sendgroupmessage', {"textarea":$scope.textarea,"topic":$scope.tname,"type":$scope.ttype,"property":$scope.tproperty}).success(function(response) {
+	        	if(hasproperty){
+	        		$scope.tproperty = property.substring(0,property.length-1);
+	        	}
+	        	$http.post(window.contextPath + '/console/message/auth/sendonemessage', {"textarea":$scope.textarea,"topic":$scope.tname,"type":$scope.ttype,"delimitor":$scope.delimitor,"property":$scope.tproperty}).success(function(response) {
 	        		$scope.startdt = "";
 					$scope.stopdt = "";
 					$scope.messageId = "";
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
 	        	});
 	        }
+	        
+	        $scope.max_fields = 10;
+	        $scope.fields     = 1;
+	        $scope.addfield = function(){
+	        	if($scope.fields < $scope.max_fields){ //max input box allowed
+	        		$scope.fields++; //text box increment
+                    $(".input_fields_wrap").append('<div><input type="text" name="property" class="input-xlarge property-input"/><a href="#" class="remove_field" ng-click="removefield();$event.preventDefault()"><i class="icon-minus"></i> Remove</a></div>'); //add input box
+                }
+	        }
+	        $(".input_fields_wrap").on("click",".remove_field", function(e){ //user click on remove text
+                e.preventDefault(); $(this).parent('div').remove(); $scope.fields--;
+            })
+
 	        
 			//judge if redirected from topic view
 			var tmpname = localStorage.getItem("name");
@@ -404,6 +465,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					}
 				});
 			}
+			
 			
 			//reverse record
 			$scope.reverse = function(){
