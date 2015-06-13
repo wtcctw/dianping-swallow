@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -42,7 +44,7 @@ import com.dianping.swallow.web.service.SaveMessageService;
 public class SaveMessageControllerTest {
 
 	private static final String AUTHORIZATION = "Authorization";
-	private static final String RANDOMSTRING = "ufrweftgwvnrutqnmktcyewmkcoqblpj";
+	private static final String RANDOMSTRING = "yuzevcjhdhwqbmdfvtoluinfabcrvpig";
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -103,13 +105,19 @@ public class SaveMessageControllerTest {
 	private static HttpMethod postMethod2(String url) throws IOException {
 		PostMethod post = new PostMethod(url);
 		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
-		NameValuePair[] param = {
-				new NameValuePair("textarea", "test group message api with type and property, No 1\ntest group message api with type and property, No 2"),
-				//new NameValuePair("textarea", ""),
-				new NameValuePair("topic", "example"),
-				new NameValuePair("type", "jiagou"),
-				new NameValuePair("property", "test:true,work:on") };
-		post.setRequestBody(param);
+		String textarea[]={"test group message api with type and property, No 1", "test group message api with type and property, No 2"};
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+		
+		for (int i = 0; i < textarea.length; i++) {
+            nameValuePairs.add(new NameValuePair("textarea[]",textarea[i]));
+        }
+		nameValuePairs.add(new NameValuePair("topic", "example"));
+		nameValuePairs.add(new NameValuePair("type", "jiagou"));
+		nameValuePairs.add(new NameValuePair("property", "test:true,work:on"));
+		
+		NameValuePair[] array = new NameValuePair[nameValuePairs.size()];
+		nameValuePairs.toArray(array); // fill the array
+		post.setRequestBody(array);
 		post.releaseConnection();
 		return post;
 	}

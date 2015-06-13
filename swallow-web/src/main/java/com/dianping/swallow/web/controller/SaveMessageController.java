@@ -29,7 +29,7 @@ public class SaveMessageController extends AbstractController {
 	
 	public static final String MESSAGE = "message";
 
-	public static final String KEYVALUE = "\\n";
+	public static final String DEFAULT_DELIMITOR = ":";
 
 	@Resource(name = "saveMessageService")
 	private SaveMessageService saveMessageService;
@@ -103,30 +103,29 @@ public class SaveMessageController extends AbstractController {
 	@RequestMapping(value = "/console/message/auth/sendgroupmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object sendGroupMessages(@RequestParam(value = "topic") String topic,
-			@RequestParam("textarea") String text,
+			@RequestParam(value = "textarea[]") String[] textarea,
 			@RequestParam(value = "type") String type,
 			@RequestParam(value = "property") String property,
+			@RequestParam(value = "delimitor", required = false) String delimitor,
 			HttpServletRequest request, HttpServletResponse response) {
 
 		int send = 0;
-		String delimitor = ":";
+		String delim = StringUtils.isEmpty(delimitor) ? DEFAULT_DELIMITOR :delimitor;
 		String topicName = topic.trim();
 		String topicType = type.trim();
 		String topicProperty = property.trim();
-		String textarea = text.trim();
-		if (StringUtils.isEmpty(textarea)) {
+		int pieces = textarea.length;
+		if (pieces == 0) {
 			logger.info(String.format("Content is empty"));
 			return generateResponse(send, ResponseStatus.E_TRY_EMPTYCONTENT, ResponseStatus.M_TRY_EMPTYCONTENT);
 		}
-		String[] contents = textarea.split(KEYVALUE);
-		int pieces = contents.length;
 
 		for (int i = 0; i < pieces; ++i) {
-			if(StringUtils.isEmpty(contents[i])){
+			if(StringUtils.isEmpty(textarea[i])){
 				continue;
 			}
 			try{
-				saveMessageService.saveNewMessage(topicName, contents[i], topicType ,delimitor, topicProperty);
+				saveMessageService.saveNewMessage(topicName, textarea[i], topicType ,delim, topicProperty);
 				++send;
 			}catch(Exception e){
 				return generateResponse(send, ResponseStatus.E_MONGOWRITE, ResponseStatus.M_MONGOWRITE);

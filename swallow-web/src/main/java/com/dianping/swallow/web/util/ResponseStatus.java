@@ -16,7 +16,7 @@ public class ResponseStatus {
 
 	public static final String M_SUCCESS = "success";  //0
 
-	public static final String M_TRY_MONGOWRITE = "write mongo error then retry";  //1
+	public static final String M_TRY_MONGOWRITE = "write mongo error to retry";  //1
 	
 	public static final String M_TRY_EMPTYCONTENT = "empty content";  //2
 

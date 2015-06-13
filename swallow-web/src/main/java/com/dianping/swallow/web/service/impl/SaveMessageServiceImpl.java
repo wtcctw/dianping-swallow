@@ -50,7 +50,7 @@ public class SaveMessageServiceImpl extends AbstractSwallowService implements
 		}
 		if(!StringUtils.isEmpty(property)){
 			Map<String, String> propertyMap = new HashMap<String, String>();
-			String[] entrys = property.split(" ");
+			String[] entrys = property.split(delimitor+delimitor);
 			for(String entry : entrys){
 				String[] pair = entry.split(delimitor);
 				if(pair.length == 2){

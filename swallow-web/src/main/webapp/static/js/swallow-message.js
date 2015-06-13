@@ -374,18 +374,17 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        }
 	        // for retransmit self defined messages
 			$scope.delimitor = ':';
-			$scope.dearray = [',','_','#',':',';'];
-			$("#delimitor").typeahead({
-				source : $scope.dearray,
-				updater : function(c) {
-					$scope.delimitor = c;
-					return c;
-				}
-			})
+			$scope.dearray = [',','_','#',';',':'];
 			$('#delimitor').tooltip({
 				showDelay: 0,
 				hideDelay: 0
-			})
+			});
+
+			
+			$scope.setdelimitor = function(index){
+				$('#delimitor').val($scope.dearray[index]);
+				$scope.delimitor = $scope.dearray[index];
+			}
 			
 	        $scope.textarea = "";
 	        $scope.ttype = "";
@@ -416,7 +415,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        			}
 	        			else{
 	        				hasproperty = true;
-	        				property = property + p + " ";
+	        				property = property + p + $scope.delimitor + $scope.delimitor;
 	        			}
 	        		}else if(p.length != 0){
 	        			alert("请准确输入键值对");
@@ -425,9 +424,12 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        	}
 	        	$('#myModal').modal('hide');
 	        	if(hasproperty){
-	        		$scope.tproperty = property.substring(0,property.length-1);
+	        		$scope.tproperty = property.substring(0,property.length-2);
 	        	}
 	        	$http.post(window.contextPath + '/console/message/auth/sendonemessage', {"textarea":$scope.textarea,"topic":$scope.tname,"type":$scope.ttype,"delimitor":$scope.delimitor,"property":$scope.tproperty}).success(function(response) {
+					$scope.textarea = "";
+					$scope.tproperty = "";
+					
 	        		$scope.startdt = "";
 					$scope.stopdt = "";
 					$scope.messageId = "";
@@ -435,7 +437,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        	});
 	        }
 	        
-	        $scope.max_fields = 10;
+	        $scope.max_fields = 100;
 	        $scope.fields     = 1;
 	        $scope.addfield = function(){
 	        	if($scope.fields < $scope.max_fields){ //max input box allowed
