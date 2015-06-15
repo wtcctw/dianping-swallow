@@ -89,20 +89,10 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	}
 
 	@Override
-	public boolean editTopic(String name, String prop, String time) {
+	public int editTopic(String name, String prop, String time) {
 		
 		filterMetaDataService.loadTopicToWhiteList().put(name, splitProps(prop));
-		if (topicDao.updateTopic(name, prop, time)) {
-			logger.info(String.format(
-					"Edit %s to [prop: %s, time: %s] successfully",
-					name, prop, time));
-			return true;
-		} else {
-			logger.info(String.format(
-					"Edit %s to [prop: %s, time: %s] failed", name,
-					prop, time));
-			return false;
-		}
+		return topicDao.updateTopic(name, prop, time);
 	}
 
 	@Override

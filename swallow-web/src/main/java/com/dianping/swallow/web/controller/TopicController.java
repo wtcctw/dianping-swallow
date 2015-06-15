@@ -36,8 +36,6 @@ import com.dianping.swallow.web.util.ResponseStatus;
 public class TopicController extends AbstractMenuController {
 
 	private static final String DELIMITOR = ",";
-	private static final String M_SUCCESS = "success";
-	private static final String M_MONGOWRITE = "write mongo error";
 
 	@Resource(name = "filterMetaDataService")
 	private FilterMetaDataService filterMetaDataService;
@@ -108,19 +106,27 @@ public class TopicController extends AbstractMenuController {
 			HttpServletResponse response) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
-		boolean result = topicService.editTopic(topic, prop, time);
-		if(result){
+		int result = topicService.editTopic(topic, prop, time);
+		
+		if(result == ResponseStatus.SUCCESS){
 			map.put(SaveMessageController.STATUS, ResponseStatus.SUCCESS);
-			map.put(SaveMessageController.MESSAGE, M_SUCCESS);
+			map.put(SaveMessageController.MESSAGE, ResponseStatus.M_SUCCESS);
 			logger.info(String.format(
 					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
 					extractUsernameUtils.getUsername(request), topic, prop,
 					splitProps(prop.trim()).toString(), time.toString()));
-		}else{
-			map.put(SaveMessageController.STATUS, ResponseStatus.E_TRY_MONGOWRITE);
-			map.put(SaveMessageController.MESSAGE, M_MONGOWRITE);
+		}else if(result == ResponseStatus.E_MONGOWRITE){
+			map.put(SaveMessageController.STATUS, ResponseStatus.E_MONGOWRITE);
+			map.put(SaveMessageController.MESSAGE, ResponseStatus.M_MONGOWRITE);
 			logger.info(String.format(
 					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.",
+					extractUsernameUtils.getUsername(request), topic, prop,
+					splitProps(prop.trim()).toString(), time.toString()));
+		}else{
+			map.put(SaveMessageController.STATUS, ResponseStatus.E_TRY_MONGOWRITE);
+			map.put(SaveMessageController.MESSAGE, ResponseStatus.M_TRY_MONGOWRITE);
+			logger.info(String.format(
+					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
 					extractUsernameUtils.getUsername(request), topic, prop,
 					splitProps(prop.trim()).toString(), time.toString()));
 		}

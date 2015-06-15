@@ -71,7 +71,7 @@ public class TopicControllerTest {
 		NameValuePair[] param = {
 				new NameValuePair("prop", "yapu.wang"),
 				new NameValuePair("time", "2015-06-12 35:35"),
-				new NameValuePair("topic", "example2") };
+				new NameValuePair("topic", "example") };
 		post.setRequestBody(param);
 		post.releaseConnection();
 		return post;
@@ -98,7 +98,7 @@ public class TopicControllerTest {
 			String response = method.getResponseBodyAsString();
 			try {
 				JSONObject json = new JSONObject(response);
-				assertEquals(json.getInt("status"), -1);
+				assertEquals(json.getInt("status"), -2);
 				System.out.println(response);
 				System.out.println(json.getInt("status"));
 				System.out.println(json.getString("message"));

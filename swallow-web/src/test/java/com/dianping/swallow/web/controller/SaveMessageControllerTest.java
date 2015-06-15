@@ -44,7 +44,7 @@ import com.dianping.swallow.web.service.SaveMessageService;
 public class SaveMessageControllerTest {
 
 	private static final String AUTHORIZATION = "Authorization";
-	private static final String RANDOMSTRING = "yuzevcjhdhwqbmdfvtoluinfabcrvpig";
+	private static final String RANDOMSTRING = "szirxstixdrkbrsrkmyxdosmpcanikvj";
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -94,7 +94,7 @@ public class SaveMessageControllerTest {
 		PostMethod post = new PostMethod(url);
 		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
 		NameValuePair[] param = {
-				new NameValuePair("mids", "6158666846842126337,6156724155824734216"),
+				new NameValuePair("mids", "6155726795699126273,6155726847238733826"),
 				//new NameValuePair("mids", ""),
 				new NameValuePair("topic", "example") };
 		post.setRequestBody(param);
@@ -155,25 +155,25 @@ public class SaveMessageControllerTest {
 
 		String url2 = host + "/console/message/auth/sendgroupmessage";
 
-		try {
-			HttpMethod method = postMethod2(url2);
-			httpClient.executeMethod(method);
-
-			String response = method.getResponseBodyAsString();
-			try {
-				JSONObject json = new JSONObject(response);
-				
-				System.out.println(response);
-				System.out.println(json.getInt("status"));
-				System.out.println(json.getInt("send"));
-				System.out.println(json.getString("message"));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			// String(method.getResponseBodyAsString().getBytes("ISO-8859-1"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			HttpMethod method = postMethod2(url2);
+//			httpClient.executeMethod(method);
+//
+//			String response = method.getResponseBodyAsString();
+//			try {
+//				JSONObject json = new JSONObject(response);
+//				
+//				System.out.println(response);
+//				System.out.println(json.getInt("status"));
+//				System.out.println(json.getInt("send"));
+//				System.out.println(json.getString("message"));
+//			} catch (JSONException e) {
+//				e.printStackTrace();
+//			}
+//			// String(method.getResponseBodyAsString().getBytes("ISO-8859-1"));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 	}
 

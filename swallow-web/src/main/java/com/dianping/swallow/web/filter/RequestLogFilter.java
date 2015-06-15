@@ -13,6 +13,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -91,15 +92,20 @@ public class RequestLogFilter implements Filter {
 			String username = extractUsernameUtils.getUsername(req);
 
 			if (urls.contains(uri) || uri.contains(MAINPAGE)) {
-				if (recordVisitInAdminList(username)) {
-					this.context.log(String.format(
-							"Save visit %s info into admin list successfully",
-							username));
-				} else {
-					this.context.log(String.format(
-							"Save visit %s info into admin list failed",
-							username));
+				if(StringUtils.isNotBlank(username)){
+					if (recordVisitInAdminList(username)) {
+						this.context.log(String.format(
+								"Save visit %s info into admin list successfully",
+								username));
+					} else {
+						this.context.log(String.format(
+								"Save visit %s info into admin list failed",
+								username));
+					}
+				}else{
+					this.context.log("visit name is empty, not need to save in administrator list");
 				}
+				
 			} else {
 				String addr = req.getRemoteAddr();
 				int port = req.getRemotePort();

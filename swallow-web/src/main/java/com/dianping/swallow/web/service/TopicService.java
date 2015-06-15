@@ -43,7 +43,7 @@ public interface TopicService extends SwallowService {
 	 * @param dept 申请人部门
 	 * @param time 申请时间
 	 */
-	boolean editTopic(String name, String prop, String time);
+	int editTopic(String name, String prop, String time);
 
 	/**
 	 *  查询所有申请人和部门

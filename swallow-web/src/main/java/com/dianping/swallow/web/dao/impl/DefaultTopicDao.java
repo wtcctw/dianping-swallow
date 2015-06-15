@@ -12,6 +12,9 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.model.Topic;
+import com.dianping.swallow.web.util.ResponseStatus;
+import com.mongodb.MongoException;
+import com.mongodb.MongoSocketException;
 
 /**
  * @author mingdongli
@@ -35,18 +38,21 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 	}
 
 	@Override
-	public boolean saveTopic(Topic p) {
+	public int saveTopic(Topic p) {
 		try {
 			mongoTemplate.save(p, TOPIC_COLLECTION);
-			return true;
-		} catch (Exception e) {
+			return ResponseStatus.SUCCESS;
+		} catch(MongoSocketException e){
+			logger.error(e.getMessage(), e);
+			return ResponseStatus.E_TRY_MONGOWRITE;
+		} catch (MongoException e) {
 			logger.error("Error when save topic " + p, e);
 		}
-		return false;
+		return ResponseStatus.E_MONGOWRITE;
 	}
 
 	@Override
-	public boolean updateTopic(String name, String prop, String time) {
+	public int updateTopic(String name, String prop, String time) {
 		Topic topic = readByName(name);
 		topic.setProp(prop).setTime(time);
 		return saveTopic(topic);

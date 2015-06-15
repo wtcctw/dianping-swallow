@@ -78,10 +78,10 @@ public class AuthenticationFilter implements Filter {
 			if (switchenv && !uri.startsWith(ADMINURI)) {
 				chain.doFilter(request, response);
 			} else if (uri.startsWith(TOPICURI)) {
-				if(StringUtils.isEmpty(username)){
+				if(StringUtils.isBlank(username)){
 					String nameencode = req.getHeader(RetransmitFilter.AUTHORIZATION);
-					if(StringUtils.isEmpty(nameencode)){
-						sendErrorMessage(response, ResponseStatus.E_UNTHENTICATION, ResponseStatus.M_UNAUTHENTICATION);
+					if(StringUtils.isBlank(nameencode)){
+						sendErrorMessage(response, ResponseStatus.E_NOAUTHENTICATION, ResponseStatus.M_NOAUTHENTICATION, false);
 						return;
 					}
 					byte[] nameArray = Base64.decodeBase64(nameencode);     
@@ -92,7 +92,7 @@ public class AuthenticationFilter implements Filter {
 							.log(String.format(
 									"%s have no authenticaton to eidt topic",
 									username));
-					sendErrorMessage(response, ResponseStatus.E_NOTHENTICATION, ResponseStatus.M_NOAUTHENTICATION);
+					sendErrorMessage(response, ResponseStatus.E_UNAUTHENTICATION, ResponseStatus.M_UNAUTHENTICATION, false);
 					return;
 				}else{
 					this.context.log(String.format(
@@ -108,7 +108,7 @@ public class AuthenticationFilter implements Filter {
 					this.context.log(String.format(
 							"%s have no authenticaton to access %s", username,
 							topicname));
-					sendErrorMessage(response, ResponseStatus.E_NOTHENTICATION, ResponseStatus.M_NOAUTHENTICATION );
+					sendErrorMessage(response, ResponseStatus.E_UNAUTHENTICATION, ResponseStatus.M_UNAUTHENTICATION, true);
 					return;
 				} else {
 					chain.doFilter(request, response);
@@ -119,7 +119,7 @@ public class AuthenticationFilter implements Filter {
 					this.context.log(String.format(
 							"%s have no authenticaton to access admin memu",
 							username));
-					sendErrorMessage(response, ResponseStatus.E_NOTHENTICATION, ResponseStatus.M_NOAUTHENTICATION);
+					sendErrorMessage(response, ResponseStatus.E_UNAUTHENTICATION, ResponseStatus.M_UNAUTHENTICATION, false);
 					return;
 				} else {
 					chain.doFilter(request, response);
@@ -136,17 +136,20 @@ public class AuthenticationFilter implements Filter {
 		// close any resources here
 	}
 	
-	private void sendErrorMessage(ServletResponse response, int status, String message){
+	private void sendErrorMessage(ServletResponse response, int status, String message, boolean send){
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put(SaveMessageController.STATUS, status);
 		result.put(SaveMessageController.MESSAGE, message);
+		if(send){
+			result.put(SaveMessageController.SEND, 0);
+		}
 		JSONObject json=new JSONObject(result);
 		response.setContentType("application/json");
 		PrintWriter out = null;
 		try {
 			out = response.getWriter();
 		} catch (IOException e) {
-			e.printStackTrace();
+			this.context.log("error when send response", e);
 		}
 		out.print(json);
 		out.flush();

@@ -59,7 +59,7 @@ public class RetransmitFilter implements Filter {
 			chain.doFilter(request, response);
 		} else {
 			Map<String, Object> result = new HashMap<String, Object>();
-			result.put(SaveMessageController.STATUS, ResponseStatus.E_UNTHENTICATION);
+			result.put(SaveMessageController.STATUS, ResponseStatus.E_UNAUTHENTICATION);
 			result.put(SaveMessageController.SEND, 0);
 			result.put(SaveMessageController.MESSAGE, ResponseStatus.M_UNAUTHENTICATION);
 			this.context

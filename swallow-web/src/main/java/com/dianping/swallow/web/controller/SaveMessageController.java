@@ -46,7 +46,7 @@ public class SaveMessageController extends AbstractController {
 		boolean successornot = false;
 		if (StringUtils.isEmpty(param)) {
 			logger.info(String.format("mid is empty"));
-			return generateResponse(send, ResponseStatus.E_TRY_EMPTYCONTENT, ResponseStatus.M_TRY_EMPTYCONTENT);
+			return generateResponse(send, ResponseStatus.E_EMPTYCONTENT, ResponseStatus.M_EMPTYCONTENT);
 		}
 
 		String topicName = topic.trim();
@@ -72,7 +72,7 @@ public class SaveMessageController extends AbstractController {
 	@RequestMapping(value = "/console/message/auth/sendonemessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object sendOneMessages(@RequestParam(value = "topic") String topic,
-			@RequestParam("textarea") String text,
+			@RequestParam(value = "textarea") String text,
 			@RequestParam(value = "type") String type,
 			@RequestParam(value = "delimitor") String delimitor,
 			@RequestParam(value = "property") String property,
@@ -85,7 +85,7 @@ public class SaveMessageController extends AbstractController {
 		String textarea = text.trim();
 		if (StringUtils.isEmpty(textarea)) {
 			logger.info(String.format("Content is empty"));
-			return generateResponse(send, ResponseStatus.E_TRY_EMPTYCONTENT, ResponseStatus.M_TRY_EMPTYCONTENT);
+			return generateResponse(send, ResponseStatus.E_EMPTYCONTENT, ResponseStatus.M_EMPTYCONTENT);
 		}
 		
 		try {
@@ -117,7 +117,7 @@ public class SaveMessageController extends AbstractController {
 		int pieces = textarea.length;
 		if (pieces == 0) {
 			logger.info(String.format("Content is empty"));
-			return generateResponse(send, ResponseStatus.E_TRY_EMPTYCONTENT, ResponseStatus.M_TRY_EMPTYCONTENT);
+			return generateResponse(send, ResponseStatus.E_EMPTYCONTENT, ResponseStatus.M_EMPTYCONTENT);
 		}
 
 		for (int i = 0; i < pieces; ++i) {
@@ -131,7 +131,7 @@ public class SaveMessageController extends AbstractController {
 				return generateResponse(send, ResponseStatus.E_MONGOWRITE, ResponseStatus.M_MONGOWRITE);
 			}
 		}
-		logger.info(String.format("Send message of %s successfully", topicName));
+		logger.info(String.format("Send message of topic %s successfully", topicName));
 		return generateResponse(send, ResponseStatus.SUCCESS, ResponseStatus.M_SUCCESS);
 	}
 	

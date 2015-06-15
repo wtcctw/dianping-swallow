@@ -164,7 +164,7 @@ public class TopicScanner {
 		}
 	}
 
-	private boolean saveTopic(String subStr) {
+	private int saveTopic(String subStr) {
 		return topicDao.saveTopic(getTopic(subStr, 0L));
 	}
 

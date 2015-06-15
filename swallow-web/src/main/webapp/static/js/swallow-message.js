@@ -235,7 +235,14 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						//alert("Topic不能为空!")
 					}
 					else{
+						var pre_reverse;
+						if(typeof($scope.searchPaginator) != "undefined"){
+							pre_reverse = $scope.searchPaginator.reverse;
+						}
 						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+	            		if(typeof($scope.searchPaginator) != "undefined"){
+	            			$scope.searchPaginator.reverse = pre_reverse;	            		
+	            		}
 					}
 				}
 			};
@@ -246,15 +253,30 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	            if(keycode==13){
 	            	if($scope.tname == null || $scope.tname.length == 0)
 	            		alert("请先输入Topic名称");  //query with mid but without topic name
-	            	else
+	            	else{
+						var pre_reverse;
+						if(typeof($scope.searchPaginator) != "undefined"){
+							pre_reverse = $scope.searchPaginator.reverse;
+						}
 	            		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
+	            		if(typeof($scope.searchPaginator) != "undefined"){
+	            			$scope.searchPaginator.reverse = pre_reverse;	            		
+	            		}
+	            	}
 	            }
 	        };
 	        
 	        //invoke when topic name is not empty and recordofperpage is changed
 	        $scope.makeChanged = function(){
 	        	if($scope.tname.length != 0){
+					var pre_reverse;
+					if(typeof($scope.searchPaginator) != "undefined"){
+						pre_reverse = $scope.searchPaginator.reverse;
+					}
 	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
+            		if(typeof($scope.searchPaginator) != "undefined"){
+            			$scope.searchPaginator.reverse = pre_reverse;	            		
+            		}
 	        	}
 	        };
 	        
@@ -270,6 +292,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			// search topic name
 	        $scope.mintime = "";
 	        $scope.maxtime = "";
+	        $scope.fulltopicname = "";
 			$http({
 				method : 'GET',
 				url : window.contextPath + '/console/topic/namelist'
@@ -279,7 +302,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					items: 16, 
 					source : topicNameList,
 					updater : function(c) {
-						if($scope.tname != c){
+						if($scope.fulltopicname != c){
 							$http.get(window.contextPath + "/console/message/timespan", {
 								params : {
 									topic: c
@@ -289,13 +312,29 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 								$scope.maxtime = data.max;
 								$scope.tname = c;
 								if(data.min.length > 0){  //没有纪录就不用查询了
+									var pre_reverse;
+									if(typeof($scope.searchPaginator) != "undefined"){
+										pre_reverse = $scope.searchPaginator.reverse;
+									}
 									$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+				            		if(typeof($scope.searchPaginator) != "undefined"){
+				            			$scope.searchPaginator.reverse = pre_reverse;	            		
+				            		}
 								}
 							});
 						}
 						else{
+							var pre_reverse;
+							if(typeof($scope.searchPaginator) != "undefined"){
+								pre_reverse = $scope.searchPaginator.reverse;
+							}
+							$scope.tname = c;
 							$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+		            		if(typeof($scope.searchPaginator) != "undefined"){
+		            			$scope.searchPaginator.reverse = pre_reverse;	            		
+		            		}
 						}
+						$scope.fulltopicname = c;
 						return c;
 					}
 				})
@@ -368,7 +407,14 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
         			  $scope.messageId = "";
         			  $scope.startdt = "";
         			  $scope.stopdt = "";
+        			  var pre_reverse;
+					  if(typeof($scope.searchPaginator) != "undefined"){
+						  pre_reverse = $scope.searchPaginator.reverse;
+					  }
         			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+	            	  if(typeof($scope.searchPaginator) != "undefined"){
+	            		  $scope.searchPaginator.reverse = pre_reverse;	            		
+	            	  }
 	        });
 	        
 	        }
@@ -433,7 +479,14 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        		$scope.startdt = "";
 					$scope.stopdt = "";
 					$scope.messageId = "";
+      			    var pre_reverse;
+				    if(typeof($scope.searchPaginator) != "undefined"){
+					    pre_reverse = $scope.searchPaginator.reverse;
+				    }
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+	            	if(typeof($scope.searchPaginator) != "undefined"){
+	            		$scope.searchPaginator.reverse = pre_reverse;	            		
+	            	}
 	        	});
 	        }
 	        
