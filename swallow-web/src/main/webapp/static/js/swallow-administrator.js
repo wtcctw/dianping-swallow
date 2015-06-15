@@ -188,5 +188,15 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 				});
 		};
 		
+		$scope.loadrs = function(){
+			$http({
+				method : 'GET',
+				url : window.contextPath + '/console/message/randomstring'
+			}).success(function(data, status, headers, config) {
+				confirm(data);
+			}).error(function(data, status, headers, config) {
+			});
+		};
+		
 }]);
 
