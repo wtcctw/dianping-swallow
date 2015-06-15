@@ -72,9 +72,10 @@ public interface MessageDao extends Dao, WebMongoManager{
 	 * @param startdt	开始时间
 	 * @param stopdt	结束时间
 	 * @param topicName	消息名称
+	 * @param basemid	消息ID查询基准值
 	 */
 	Map<String, Object> findByTime(int offset, int limit, String startdt,
-			String stopdt, String topicName);
+			String stopdt, String topicName, String basemid);
 	
 	/**
 	 * 根据时间和消息ID查询messages
@@ -92,8 +93,9 @@ public interface MessageDao extends Dao, WebMongoManager{
 	 * @param offset     起始位置
 	 * @param limit      偏移量
 	 * @param topicName  topic名称
+	 * @param baseMid    消息ID查询基准值
 	 */
-	Map<String, Object> findByTopicname(int offset, int limit, String topicName);
+	Map<String, Object> findByTopicname(int offset, int limit, String topicName, String baseMid);
 	
 
 	/**

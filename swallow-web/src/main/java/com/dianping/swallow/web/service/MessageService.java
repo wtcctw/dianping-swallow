@@ -21,9 +21,10 @@ public interface MessageService extends SwallowService{
 	 * @param startdt   开始时间
 	 * @param stopdt	结束时间	
 	 * @param username  用户名
+	 * @param baseMid   基准消息ID
 	 */
 	Map<String, Object> getMessageFromSpecificTopic(int start, int span, String tname, 
-			String messageId, String startdt, String stopdt, String username);
+			String messageId, String startdt, String stopdt, String username, String baseMid);
 	
 	/**
 	 * 查询指定消息ID的消息内容

@@ -122,7 +122,8 @@
 					<li><a href=""
 						ng-click="searchPaginator.fetch(searchPaginator.endPage)"
 						ng-show="searchPaginator.pages.length"
-						ng-bind="searchPaginator.totalpieces"></a></li>
+						ng-bind="searchPaginator.totalpieces" data-toggle="tooltip"
+				title="如果消息数大于100万,请使用上下页切换"></a></li>
 					<select class="selectpicker" ng-model="recordofperpage"
 						ng-change="makeChanged()"
 						ng-options="item.num as item.num for item in numperpage"></select>

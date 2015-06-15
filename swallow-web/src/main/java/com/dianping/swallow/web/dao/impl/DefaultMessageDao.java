@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.bson.types.BSONTimestamp;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Message;
+import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -115,14 +117,27 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 	@Override
 	public Map<String, Object> findByTopicname(int offset, int limit,
-			String topicName) {
+			String topicName, String baseMid) {
 		List<Message> messageList = new ArrayList<Message>();
 		Query query = new Query();
 		query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
-		query.skip(offset).limit(limit);
-		query.fields().exclude(C);
-		messageList = this.webMongoManager.getMessageMongoTemplate(topicName)
-				.find(query, Message.class, MESSAGE_COLLECTION);
+		if (StringUtils.isEmpty(baseMid)) {
+			query.skip(offset).limit(limit);
+			query.fields().exclude(C);
+			messageList = this.webMongoManager.getMessageMongoTemplate(topicName)
+					.find(query, Message.class, MESSAGE_COLLECTION);
+			
+		} else {
+			DBCollection collection = this.webMongoManager.getMessageMongoTemplate(
+					topicName).getCollection(MESSAGE_COLLECTION);
+			Long mid = Long.parseLong(baseMid);
+			if(mid > 0){
+				messageList = getMessageFromOneSide(mid, limit, collection, true);
+			}else{
+				messageList = getMessageFromOneSide(-mid, limit, collection, false);
+			}
+		}
+
 		return getResponse(messageList, this.count(topicName));
 	}
 
@@ -169,7 +184,9 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 	@Override
 	public Map<String, Object> findByTime(int offset, int limit,
-			String startdt, String stopdt, String topicName) {
+			String startdt, String stopdt, String topicName, String baseMid) {
+		
+		List<Message> list = new ArrayList<Message>();
 		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(
 				topicName).getCollection(MESSAGE_COLLECTION);
 		SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
@@ -200,8 +217,18 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 				.limit(limit);
 		DBCursor cursorall = collection.find(query);
 		Long size = (long) cursorall.count();
+		
+		if(StringUtils.isNotEmpty(baseMid)){
+			long time = Long.parseLong(baseMid);
+			if(time < 0){
+				list = getMessageFromOneSide(-time, limit, collection, false);
+				return getResponse(list, size);
+			}else{
+				list = getMessageFromOneSide(time, limit, collection, true);
+				return getResponse(list, size);
+			}
+		}
 
-		List<Message> list = new ArrayList<Message>();
 		try {
 			while (cursor.hasNext()) {
 				DBObject result = cursor.next();
@@ -341,36 +368,80 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 	@Override
 	public Map<String, Object> findMinAndMaxTime(String topicName) {
-		
+
 		Map<String, Object> map = new HashMap<String, Object>();
 		Query query1 = new Query();
 		query1.with(new Sort(new Sort.Order(Direction.DESC, ID))).limit(1);
 		query1.fields().exclude(C);
-		List<Message> msgs = this.webMongoManager.getMessageMongoTemplate(topicName).find(query1,
-				Message.class, MESSAGE_COLLECTION);
-		if(msgs.size() == 0){
+		List<Message> msgs = this.webMongoManager.getMessageMongoTemplate(
+				topicName).find(query1, Message.class, MESSAGE_COLLECTION);
+		if (msgs.size() == 0) {
 			map.put("max", "");
 			map.put("min", "");
 			return map;
 		}
 
 		Message msg = msgs.get(0);
-		map.put("max", convertToStstring(msg.get_id()) );
-		
+		map.put("max", convertToStstring(msg.get_id()));
+
 		Query query2 = new Query();
 		query2.with(new Sort(new Sort.Order(Direction.ASC, ID))).limit(1);
 		query2.fields().exclude(C);
-		msg = this.webMongoManager.getMessageMongoTemplate(topicName).find(query2,
-				Message.class, MESSAGE_COLLECTION).get(0);
-		map.put("min", convertToStstring(msg.get_id()) );
-		
+		msg = this.webMongoManager.getMessageMongoTemplate(topicName)
+				.find(query2, Message.class, MESSAGE_COLLECTION).get(0);
+		map.put("min", convertToStstring(msg.get_id()));
+
 		return map;
 	}
-	
+
 	private String convertToStstring(BSONTimestamp ts) {
 		int seconds = ts.getTime();
-		long millions = new Long(seconds)*1000;
+		long millions = new Long(seconds) * 1000;
 		return new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
+	}
+
+	private List<Message> getMessageFromOneSide(Long messageId, int size,
+			DBCollection collection, boolean side) {
+
+		DBObject dbo;
+		DBObject orderBy;
+		if(side){
+			dbo = BasicDBObjectBuilder.start()
+					.add("$gt", MongoUtils.longToBSONTimestamp(messageId)).get();
+			orderBy = BasicDBObjectBuilder.start()
+					.add(ID, Integer.valueOf(1)).get();
+		}else{
+			dbo = BasicDBObjectBuilder.start()
+					.add("$lt", MongoUtils.longToBSONTimestamp(messageId)).get();
+			orderBy = BasicDBObjectBuilder.start()
+					.add(ID, Integer.valueOf(-1)).get();
+		}
+		DBObject query = BasicDBObjectBuilder.start().add(ID, dbo).get();
+		DBObject exclude = BasicDBObjectBuilder.start().add(C, 0).get();
+		DBCursor cursor = collection.find(query, exclude).sort(orderBy).limit(size);
+
+		List<Message> list = new ArrayList<Message>();
+		try {
+			while (cursor.hasNext()) {
+				DBObject result = cursor.next();
+				Message swallowMessage = new Message();
+				try {
+					convert(result, swallowMessage);
+					list.add(swallowMessage);
+				} catch (RuntimeException e) {
+					logger.error(
+							"Error when convert resultset to Message.",
+							e);
+				}
+			}
+		} finally {
+			cursor.close();
+		}
+		
+		if(side){
+			return Lists.reverse(list);
+		}
+		return list;
 	}
 
 }

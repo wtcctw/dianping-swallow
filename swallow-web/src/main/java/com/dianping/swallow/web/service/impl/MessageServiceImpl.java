@@ -38,7 +38,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 
 	public Map<String, Object> getMessageFromSpecificTopic(int start, int span,
 			String tname, String messageId, String startdt, String stopdt,
-			String username) {
+			String username, String baseMid) {
 		String dbn = PRE_MSG + tname;
 		long mid = -1;
 		if (!messageId.isEmpty()) { // messageId is not empty
@@ -56,12 +56,14 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 				}
 			}
 		}
-		return getResults(dbn, start, span, mid, startdt, stopdt, username);
+		return getResults(dbn, start, span, mid, startdt, stopdt, username,
+				baseMid);
 	}
 
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> getByIp(String dbn, int start, int span,
 			String ip, String username) {
+		
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 		sizeAndMessage = webSwallowMessageDao.findByIp(start, span, ip, subStr);
@@ -71,29 +73,24 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> getResults(String dbn, int start, int span,
-			long mid, String startdt, String stopdt, String username) {
+			long mid, String startdt, String stopdt, String username,
+			String baseMid) {
+		
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
-		if (mid < 0 && (startdt + stopdt).isEmpty()) // just query by topicname
-
+		if (mid < 0 && (startdt + stopdt).isEmpty()) {
 			sizeAndMessage = webSwallowMessageDao.findByTopicname(start, span,
-					subStr);
-
-		else if (startdt == null || startdt.isEmpty()) // time is empty,
-
+					subStr, baseMid);
+		} else if (startdt == null || startdt.isEmpty()) {
 			sizeAndMessage = webSwallowMessageDao.findSpecific(start, span,
 					mid, subStr);
-
-		else if (mid < 0) // messageId is empty, query by time
-
+		} else if (mid < 0) {
 			sizeAndMessage = webSwallowMessageDao.findByTime(start, span,
-					startdt, stopdt, subStr);
-
-		else
-			// both are not empty, query by time and messageId
-
+					startdt, stopdt, subStr, baseMid);
+		} else {
 			sizeAndMessage = webSwallowMessageDao.findByTimeAndId(start, span,
 					mid, startdt, stopdt, subStr);
+		}
 
 		beforeResponse((List<Message>) sizeAndMessage.get(MESSAGE));
 		return sizeAndMessage;
@@ -103,10 +100,10 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		for (Message m : messageList)
 			setSMessageProperty(m);
 	}
-	
+
 	@Override
-	public Map<String, Object> loadMinAndMaxTime(String topicName){
-		
+	public Map<String, Object> loadMinAndMaxTime(String topicName) {
+
 		Map<String, Object> map = new HashMap<String, Object>();
 		map = webSwallowMessageDao.findMinAndMaxTime(topicName);
 		return map;
@@ -148,8 +145,8 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		List<Message> messageList = new ArrayList<Message>();
 
 		long messageId = Long.parseLong(mid);
-		messageList = (List<Message>) webSwallowMessageDao
-				.findSpecific(0, 1, messageId, topic).get(MESSAGE);
+		messageList = (List<Message>) webSwallowMessageDao.findSpecific(0, 1,
+				messageId, topic).get(MESSAGE);
 		isZipped(messageList.get(0));
 		return messageList.get(0);
 

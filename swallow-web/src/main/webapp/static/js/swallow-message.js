@@ -1,22 +1,34 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize,  tname, messageId, startdt, stopdt){
+	return function(fetchFunction, pageSize, tname, messageId, startdt, stopdt){
 		var paginator = {
 				hasNextVar: false,
+				limit : pageSize,
 				
 				fetch: function(page){
 					this.currentOffset = (page - 1) * pageSize;
+					if(page == this.endPage){
+						pageSize = this.totalpieces % this.limit - 1;
+						this.basemid = "1"; //取个小值
+					}else{
+						this.basemid = ""; //根据偏移量查询
+					}
 					this._load();
 				},
 				next: function(){
 					if(this.hasNextVar){
 						this.currentOffset += pageSize;
+						var len = this.currentPageItems.length;
+						this.basemid = "-" + this.currentPageItems[len-1].mid;
 						this._load();
 					}
 				},
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt,  function(data){
+					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt, this.basemid, function(data){
+						pageSize = self.limit;
+						self.basemid = "";
+						
 						items = data.message;
 						//items = angular.fromJson(items); //反序列化
 						length = data.size;
@@ -70,6 +82,7 @@ module.factory('Paginator', function(){
 				previous: function(){
 					if(this.hasPrevious()){
 						this.currentOffset -= pageSize;
+						this.basemid = this.currentPageItems[0].mid;
 						this._load();
 					}
 				},
@@ -89,6 +102,7 @@ module.factory('Paginator', function(){
 				currentOffset: 0,
 				
 				reverse: false,
+				basemid: ""
 		};
 		
 		//加载第一页
@@ -99,7 +113,7 @@ module.factory('Paginator', function(){
 
 module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog',
         function($rootScope, $scope, $http, Paginator, ngDialog){
-				var fetchFunction = function(offset, limit, tname, messageId, startdt, stopdt, callback){
+				var fetchFunction = function(offset, limit, tname, messageId, startdt, stopdt, basemid, callback){
 				var transFn = function(data){
 					return $.param(data);
 				}
@@ -111,7 +125,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 										'tname': tname,
 										'messageId': messageId,
 										'startdt' : startdt,
-										'stopdt' : stopdt};
+										'stopdt' : stopdt,
+										'basemid' : basemid};
 				$http.get(window.contextPath + $scope.suburl, {
 					params : {
 						offset : offset,
@@ -119,7 +134,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						tname: tname,
 						messageId: messageId,
 						startdt : startdt,
-						stopdt : stopdt
+						stopdt : stopdt,
+						basemid : basemid
 					}
 				}).success(callback);
 			};
@@ -239,7 +255,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						if(typeof($scope.searchPaginator) != "undefined"){
 							pre_reverse = $scope.searchPaginator.reverse;
 						}
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt, "");
 	            		if(typeof($scope.searchPaginator) != "undefined"){
 	            			$scope.searchPaginator.reverse = pre_reverse;	            		
 	            		}
@@ -258,7 +274,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						if(typeof($scope.searchPaginator) != "undefined"){
 							pre_reverse = $scope.searchPaginator.reverse;
 						}
-	            		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
+	            		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, "");
 	            		if(typeof($scope.searchPaginator) != "undefined"){
 	            			$scope.searchPaginator.reverse = pre_reverse;	            		
 	            		}
@@ -273,7 +289,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					if(typeof($scope.searchPaginator) != "undefined"){
 						pre_reverse = $scope.searchPaginator.reverse;
 					}
-	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt );
+	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, "");
             		if(typeof($scope.searchPaginator) != "undefined"){
             			$scope.searchPaginator.reverse = pre_reverse;	            		
             		}
@@ -316,7 +332,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 									if(typeof($scope.searchPaginator) != "undefined"){
 										pre_reverse = $scope.searchPaginator.reverse;
 									}
-									$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+									$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
 				            		if(typeof($scope.searchPaginator) != "undefined"){
 				            			$scope.searchPaginator.reverse = pre_reverse;	            		
 				            		}
@@ -329,7 +345,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 								pre_reverse = $scope.searchPaginator.reverse;
 							}
 							$scope.tname = c;
-							$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+							$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
 		            		if(typeof($scope.searchPaginator) != "undefined"){
 		            			$scope.searchPaginator.reverse = pre_reverse;	            		
 		            		}
@@ -411,7 +427,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					  if(typeof($scope.searchPaginator) != "undefined"){
 						  pre_reverse = $scope.searchPaginator.reverse;
 					  }
-        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
 	            	  if(typeof($scope.searchPaginator) != "undefined"){
 	            		  $scope.searchPaginator.reverse = pre_reverse;	            		
 	            	  }
@@ -483,7 +499,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 				    if(typeof($scope.searchPaginator) != "undefined"){
 					    pre_reverse = $scope.searchPaginator.reverse;
 				    }
-					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId,  $scope.startdt,  $scope.stopdt);
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
 	            	if(typeof($scope.searchPaginator) != "undefined"){
 	            		$scope.searchPaginator.reverse = pre_reverse;	            		
 	            	}
@@ -516,11 +532,10 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					$scope.mintime = data.min;
 					$scope.maxtime = data.max;
 					if(data.min.length > 0){  //没有纪录就不用查询了
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt);
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
 					}
 				});
 			}
-			
 			
 			//reverse record
 			$scope.reverse = function(){
