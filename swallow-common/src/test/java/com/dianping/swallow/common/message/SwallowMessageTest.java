@@ -3,8 +3,7 @@ package com.dianping.swallow.common.message;
 import java.util.Date;
 import java.util.HashMap;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.common.internal.message.SwallowMessage;

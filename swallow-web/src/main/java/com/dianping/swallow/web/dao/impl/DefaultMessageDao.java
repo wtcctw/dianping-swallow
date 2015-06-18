@@ -3,6 +3,7 @@ package com.dianping.swallow.web.dao.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,7 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.WriteResult;
 
 /**
@@ -30,8 +31,7 @@ import com.mongodb.WriteResult;
  *
  *         2015年4月20日 下午9:31:41
  */
-public class DefaultMessageDao extends AbstractDao implements
-		MessageDao {
+public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 	private WebMongoManager webMongoManager;
 	private static final String MESSAGE_COLLECTION = "c";
@@ -321,14 +321,10 @@ public class DefaultMessageDao extends AbstractDao implements
 	}
 
 	@Override
-	public List<Mongo> getAllReadMongo() {
+	public Collection<MongoClient> getAllReadMongo() {
 		return this.webMongoManager.getAllReadMongo();
 	}
 
-	@Override
-	public Map<String, Mongo> getTopicNameToMongoMap() {
-		return this.webMongoManager.getTopicNameToMongoMap();
-	}
 
 	public WebMongoManager getWebwebMongoManager() {
 		return this.webMongoManager;

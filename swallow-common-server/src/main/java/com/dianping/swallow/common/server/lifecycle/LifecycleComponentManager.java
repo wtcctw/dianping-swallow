@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
+import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
 
 /**
  * @author mengwenchao

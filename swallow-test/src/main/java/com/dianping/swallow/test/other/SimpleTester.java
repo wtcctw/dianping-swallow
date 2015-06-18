@@ -16,7 +16,7 @@ public class SimpleTester {
 		
 //		printTime(286349333);
 		
-		printTime(286700179);
+		printTime(286769512);
 		
 	}
 

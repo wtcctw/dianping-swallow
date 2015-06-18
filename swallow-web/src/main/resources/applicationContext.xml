@@ -41,12 +41,14 @@
 		</property>
 	</bean>
 
-	<bean id="mongoManager"
-		class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-		<constructor-arg value="swallow.mongo.producerServerURI"
-			index="0" />
-		<constructor-arg value="web" index="1" />
-	</bean>
+
+    <bean id="mongoManager"
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
+		<constructor-arg value="web" index="0" />
+        <property name="swallowConfig" ref="swallowConfig"/>
+    </bean>
+	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
+
 
 	<bean id="topicDAO" class="com.dianping.swallow.web.dao.impl.DefaultTopicDao">
 	</bean>

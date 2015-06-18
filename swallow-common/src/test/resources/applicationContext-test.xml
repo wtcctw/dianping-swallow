@@ -20,10 +20,8 @@
 	</bean>
 
 	<bean id="mongoManager"
-		class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-		<constructor-arg>
-			<value>swallow.mongo.consumerServerURI</value>
-		</constructor-arg>
-	</bean>
+		class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager"/>
+		
+	
 
 </beans>

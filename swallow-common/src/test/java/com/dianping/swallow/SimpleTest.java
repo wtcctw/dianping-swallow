@@ -1,11 +1,10 @@
 package com.dianping.swallow;
 
 import java.text.ParseException;
-import java.util.Date;
 
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.util.DateUtils;
+import com.dianping.lion.client.ConfigCache;
 
 /**
  * @author mengwenchao
@@ -21,19 +20,22 @@ public class SimpleTest {
 		print("20150601165700");
 		print("20150601145600");
 		
-		
 	}
-
+	
+	@Test
+	public void testLionConfig(){
+		
+		ConfigCache cc = ConfigCache.getInstance();
+		String value = cc.getProperty("swallow.teSt");
+		System.out.println(String.format("#%s#", value));
+	}
+	
 	/**
 	 * @param time
 	 * @throws ParseException 
 	 */
 	private void print(String timeStr) throws ParseException {
-		System.out.println();
-		long time = DateUtils.fromSimpleFormat(timeStr).getTime();
-		System.out.println(time);
-		System.out.println(time/5/1000);
-		System.out.println(new Date(time));
+		
 	}
 
 }

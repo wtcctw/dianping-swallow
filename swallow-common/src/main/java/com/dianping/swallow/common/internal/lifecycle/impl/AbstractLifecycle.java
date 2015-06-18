@@ -1,7 +1,9 @@
-package com.dianping.swallow.common.internal.lifecycle;
+package com.dianping.swallow.common.internal.lifecycle.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 
 /**
  * 生命周期抽象实现，只记录日志

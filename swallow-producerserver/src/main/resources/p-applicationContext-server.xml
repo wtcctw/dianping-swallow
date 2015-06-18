@@ -35,10 +35,10 @@
 
     <bean id="mongoManager"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-        <constructor-arg>
-            <value>swallow.mongo.producerServerURI</value>
-        </constructor-arg>
+        <property name="swallowConfig" ref="swallowConfig"/>
     </bean>
+	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
+
 
     <bean id="producerServerForClient"
         class="com.dianping.swallow.producerserver.impl.ProducerServerForClient"
