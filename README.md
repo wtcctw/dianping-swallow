@@ -442,6 +442,10 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 * topic确定的前提下，选择开始时间和结束时间可以查询出特定时间段发送的所有message。尽量缩小查找的时间段，减轻查询的时间开销。
 
+### 导出消息
+
+* 根据时间查询的消息可以导出到文件并且下载到本地。消息导出后页面会自动跳转到下载页，点击链接即可下载文件。如果导出的数据量很大，则需要一定的时间等待任务执行完成。
+
 ### Message重发
 
 #### web端重发已保存的message
@@ -469,17 +473,17 @@ product | http://swallow.dp
 * 返回值为json字符串，包含3个键值对，status(状态码)，send(发送成功的消息数)，message(状态码对应的消息)。下表列出了不同状态码表示的意义。
 
 	* 0表示操作成功。
-	* 正的状态码表示不可重试的错误。
-	* 负的状态码表示可以重试成果的错误。 
+	* 负的状态码表示不可重试的错误。
+	* 正的状态码表示可以重试成功的错误。 
 
 状态码|消息
 -|-
-－3 | write mongo error
-－2  | no authenticaton in http header
-－1   | have no authenticaton
+-4 | empty content
+－3  | no authenticaton
+－2   | unauthorized
+－1 | write mongo error
 0 | success
-1 | write mongo error to retry
-2 | empty content
+1 | read time out
 
 * 当其中某条消息发送失败时，则立即返回。之前的消息发送成功，之后的消息则放弃发送。
 
@@ -519,9 +523,9 @@ product | http://swallow.dp
 			String response = method.getResponseBodyAsString();
 			try {
 				JSONObject json = new JSONObject(response);
-				System.out.println(response);  // {"retransmit":2,"status":"success"}
-				System.out.println(json.getString("status"));  // success
-				System.out.println(json.getString("retransmit")); // 2
+				System.out.println(json.getInt("status"));
+				System.out.println(json.getInt("send"));
+				System.out.println(json.getString("message"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
