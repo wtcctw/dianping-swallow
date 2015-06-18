@@ -71,7 +71,7 @@ public class MessageController extends AbstractMenuController {
 
 		return messageService.getMessageContent(topic, mid);
 	}
-
+	
 	@Override
 	protected String getMenu() {
 

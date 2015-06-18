@@ -183,4 +183,12 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>downloadServlet</servlet-name>
+		<servlet-class>com.dianping.swallow.web.servlet.FileDownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>downloadServlet</servlet-name>
+		<url-pattern>/console/download/file</url-pattern>
+	</servlet-mapping>
 </web-app>

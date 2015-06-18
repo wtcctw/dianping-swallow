@@ -1,5 +1,9 @@
 package com.dianping.swallow.web.dao.impl;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.BSONTimestamp;
@@ -17,8 +22,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.web.controller.DumpMessageController;
 import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Message;
+import com.dianping.swallow.web.util.ResponseStatus;
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
@@ -26,6 +33,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.WriteResult;
+
 
 /**
  * @author mingdongli
@@ -140,6 +148,8 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 		return getResponse(messageList, this.count(topicName));
 	}
+	
+
 
 	@Override
 	public Map<String, Object> findSpecific(int offset, int limit, long mid,
@@ -219,7 +229,18 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 		Long size = (long) cursorall.count();
 		
 		if(StringUtils.isNotEmpty(baseMid)){
-			long time = Long.parseLong(baseMid);
+			long time = 0;
+			if(baseMid.contains(":")){
+				try {
+					time = MongoUtils.getLongByDate(sdf.parse(startdt));
+				} catch (ParseException e) {
+					if (logger.isErrorEnabled()) {
+						logger.error("Error when parse date to Long.", e);
+					}
+				}
+			}else{
+				time = Long.parseLong(baseMid);
+			}
 			if(time < 0){
 				list = getMessageFromOneSide(-time, limit, collection, false);
 				return getResponse(list, size);
@@ -443,5 +464,92 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 		}
 		return list;
 	}
-
+	
+	@Override
+	public int exportMessages(String topicName, String startdt, String stopdt, String filename){
+		
+		StringBuffer contents = new StringBuffer();
+		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(
+				topicName).getCollection(MESSAGE_COLLECTION);
+		SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
+		Long startlong = null;
+		Long stoplong = null;
+		try {
+			startlong = MongoUtils.getLongByDate(sdf.parse(startdt));
+			stoplong = MongoUtils.getLongByDate(sdf.parse(stopdt));
+		} catch (ParseException e) {
+			logger.error("Error when parse date to Long.", e);
+			return ResponseStatus.E_PARSEEXCEPTION;
+		}
+		DBObject query = BasicDBObjectBuilder
+				.start()
+				.add(ID,
+						BasicDBObjectBuilder
+								.start()
+								.add("$gt",
+										MongoUtils
+												.longToBSONTimestamp(startlong))
+								.add("$lt",
+										MongoUtils
+												.longToBSONTimestamp(stoplong))
+								.get()).get();
+		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, -1).get();
+		DBCursor cursor = collection.find(query).sort(orderBy);
+		int cursorcount = cursor.count();
+   	 	int size = 0;
+   	 	int threhold = -1;
+   	 	if(cursorcount > 10000){
+   	 		threhold = 10000;
+   	 	}else{
+   	 		threhold = cursorcount;
+   	 	}
+		try {
+			while (cursor.hasNext()) {
+				DBObject result = cursor.next();
+				size++;
+				contents.append(result).append("\n");
+				if(size >= threhold){ //10M
+					int status = writeContentToFile(filename, contents.toString());
+					if(status != 0){
+						return status;
+					}
+					size = 0;
+					contents.delete(0, contents.length());
+				}
+			}
+			if(size != 0){
+				int status = writeContentToFile(filename, contents.toString());
+				if(status != 0){
+					return status;
+				}
+			}
+		} finally {
+			cursor.close();
+		}
+		return ResponseStatus.SUCCESS;
+	}
+	
+	private int writeContentToFile(String filename, String contents){
+		GZIPOutputStream gos = null;
+		BufferedWriter writer = null;
+		try {
+			gos = new GZIPOutputStream( new FileOutputStream(DumpMessageController.PATH + filename, true) );
+			writer = new BufferedWriter(new OutputStreamWriter(gos, "UTF-8"));
+			writer.append(contents);
+			writer.flush();
+			return ResponseStatus.SUCCESS;
+		} catch (IOException e) {
+			logger.error("Open output stream error", e);
+			return ResponseStatus.E_IOEXCEPTION;
+		}finally{
+			try {
+				gos.close();
+			} catch (IOException e) {
+				logger.error("Open output stream error", e);
+				return ResponseStatus.E_IOEXCEPTION;
+			}
+		}
+		
+	}
+	
 }

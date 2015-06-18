@@ -104,4 +104,13 @@ public interface MessageDao extends Dao, WebMongoManager{
 	 */
 	Map<String, Object> findMinAndMaxTime(String topicName);
 	
+	/**
+	 * 
+	 * @param topicName  topic名称
+	 * @param startdt    开始时间
+	 * @param stopdt     结束时间
+	 * @param filename   保存文件名
+	 */
+	int exportMessages(String topicName, String startdt, String stopdt, String filename);
+	
 }

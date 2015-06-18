@@ -32,7 +32,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 	private static final String GZIP = "H4sIAAAAAAAAA";
 
 	@Autowired
-	private MessageDao webSwallowMessageDao;
+	private MessageDao webMessageDao;
 	@Autowired
 	private AdministratorDao administratorDao;
 
@@ -66,7 +66,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
-		sizeAndMessage = webSwallowMessageDao.findByIp(start, span, ip, subStr);
+		sizeAndMessage = webMessageDao.findByIp(start, span, ip, subStr);
 		beforeResponse((List<Message>) sizeAndMessage.get(MESSAGE));
 		return sizeAndMessage;
 	}
@@ -79,16 +79,16 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 		if (mid < 0 && (startdt + stopdt).isEmpty()) {
-			sizeAndMessage = webSwallowMessageDao.findByTopicname(start, span,
+			sizeAndMessage = webMessageDao.findByTopicname(start, span,
 					subStr, baseMid);
 		} else if (startdt == null || startdt.isEmpty()) {
-			sizeAndMessage = webSwallowMessageDao.findSpecific(start, span,
+			sizeAndMessage = webMessageDao.findSpecific(start, span,
 					mid, subStr);
 		} else if (mid < 0) {
-			sizeAndMessage = webSwallowMessageDao.findByTime(start, span,
+			sizeAndMessage = webMessageDao.findByTime(start, span,
 					startdt, stopdt, subStr, baseMid);
 		} else {
-			sizeAndMessage = webSwallowMessageDao.findByTimeAndId(start, span,
+			sizeAndMessage = webMessageDao.findByTimeAndId(start, span,
 					mid, startdt, stopdt, subStr);
 		}
 
@@ -105,7 +105,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 	public Map<String, Object> loadMinAndMaxTime(String topicName) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
-		map = webSwallowMessageDao.findMinAndMaxTime(topicName);
+		map = webMessageDao.findMinAndMaxTime(topicName);
 		return map;
 	}
 
@@ -145,7 +145,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		List<Message> messageList = new ArrayList<Message>();
 
 		long messageId = Long.parseLong(mid);
-		messageList = (List<Message>) webSwallowMessageDao.findSpecific(0, 1,
+		messageList = (List<Message>) webMessageDao.findSpecific(0, 1,
 				messageId, topic).get(MESSAGE);
 		isZipped(messageList.get(0));
 		return messageList.get(0);

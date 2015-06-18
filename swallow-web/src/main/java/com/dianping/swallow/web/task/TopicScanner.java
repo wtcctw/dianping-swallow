@@ -56,7 +56,7 @@ public class TopicScanner {
 	private FilterMetaDataService filterMetaDataService;
 
 	@Autowired
-	private MessageDao webSwallowMessageDao;
+	private MessageDao webMessageDao;
 
 	@Autowired
 	private TopicDao topicDao;
@@ -187,7 +187,7 @@ public class TopicScanner {
 
 	private List<String> getDatabaseName() {
 		Set<String> dbs = new HashSet<String>();
-		List<Mongo> allReadMongo = webSwallowMessageDao.getAllReadMongo();
+		List<Mongo> allReadMongo = webMessageDao.getAllReadMongo();
 		for (Mongo mc : allReadMongo) {
 			dbs.addAll(mc.getDatabaseNames());
 		}

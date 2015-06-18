@@ -1,0 +1,45 @@
+<div class="main-content main-content-local" style="opacity: 1.0;"
+	ng-controller="DownloadController">
+
+	<div class="breadcrumbs" id="breadcrumbs">
+		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/swallow-downloadfile.js"></script>
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
+
+		<div class="breadcrumbs" id="breadcrumbs">
+			<script type="text/javascript"
+				src="${rc.contextPath}/static/js/swallow-topic.js"></script>
+			<script type="text/javascript">
+				try {
+					ace.settings.check('breadcrumbs', 'fixed')
+				} catch (e) {
+				}
+			</script>
+
+
+			<!-- #nav-search -->
+			<div class="nav-search nav-search-local pull-right" id="nav-search">
+				<form class="form-search">
+					<span class="input-icon"> <input type="text"
+						placeholder="根据topic查找文件..." style="width: 220px"
+						class="nav-search-input" name="a" id="searchname"
+						autocomplete="off" ng-model='name'>
+						<ul class="typeahead dropdown-menu"
+							style="top: 28px; left: 0px; display: none;">
+						</ul> <i class="icon-search nav-search-icon"></i>
+					</span>
+				</form>
+			</div>
+
+		</div>
+		
+		<div style="margin-top: 20px; margin-left: 20px;">
+			<li ng-repeat="file in files"><a
+				href="/console/download/file?filename={{file}}" ng-bind="file"></a></li>
+		</div>
+	</div>

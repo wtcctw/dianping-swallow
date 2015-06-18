@@ -5,18 +5,25 @@ module.factory('Paginator', function(){
 				limit : pageSize,
 				
 				fetch: function(page){
-					this.currentOffset = (page - 1) * pageSize;
+					this.currentOffset = (page - 1) * this.limit;
 					if(page == this.endPage){
-						pageSize = this.totalpieces % this.limit - 1;
-						this.basemid = "1"; //取个小值
+						pageSize = this.totalpieces % this.limit - 1; //最后一页的大小
+						if(startdt.length > 0){
+							this.basemid = startdt;
+						}else{
+							this.basemid = "1"; //取个小值
+						} 
 					}else{
-						this.basemid = ""; //根据偏移量查询
+						this.basemid = "";
 					}
 					this._load();
 				},
 				next: function(){
 					if(this.hasNextVar){
-						this.currentOffset += pageSize;
+						this.currentOffset += this.limit;
+						if(this.totalpieces - this.currentOffset < this.limit){
+							this.fetch(Math.ceil(this.totalpieces/this.limit));
+						}
 						var len = this.currentPageItems.length;
 						this.basemid = "-" + this.currentPageItems[len-1].mid;
 						this._load();
@@ -24,7 +31,7 @@ module.factory('Paginator', function(){
 				},
 				_load: function(){
 					var self = this;  //must use  self
-					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
+					self.currentPage = Math.floor(self.currentOffset/self.limit) + 1;
 					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt, this.basemid, function(data){
 						pageSize = self.limit;
 						self.basemid = "";
@@ -69,7 +76,7 @@ module.factory('Paginator', function(){
 						for(var i=0;i<self.currentPageItems.length;i++){
 							self.currentPartialCon[i]= "点击展开";
 						} 
-						self.hasNextVar = items.length === pageSize + 1;
+						self.hasNextVar = items.length === self.limit + 1;
 					});
 				},
 				formatstr: function(str){
@@ -111,8 +118,8 @@ module.factory('Paginator', function(){
 	};
 });
 
-module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog',
-        function($rootScope, $scope, $http, Paginator, ngDialog){
+module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog', '$interval',
+        function($rootScope, $scope, $http, Paginator, ngDialog, $interval){
 				var fetchFunction = function(offset, limit, tname, messageId, startdt, stopdt, basemid, callback){
 				var transFn = function(data){
 					return $.param(data);
@@ -233,6 +240,57 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 				}
 			};
 			
+			$scope.dumprecord = function(){
+				$scope.startdt = $("#starttime").val();
+				$scope.stopdt = $("#stoptime").val();
+				var d1 = new Date($scope.startdt);
+				var d2 = new Date($scope.stopdt);
+				if(d1 > d2){
+					alert("开始时间不能小于结束时间!");
+					return;
+				}
+					
+				if($scope.startdt.length==0  || $scope.stopdt.length == 0)
+					alert("时间不能为空!")
+				else{
+					if($scope.tname.length == 0){
+					}
+					else{
+						$("#dumprecord").css(
+		                           'display', 'block');
+						//$interval( function(){ $scope.changeprogress(); }, 100);
+						setInterval(updateProgressBar,400);
+						$http.get(window.contextPath + "/console/message/auth/dump", {
+							params : {
+								topic: $scope.tname,
+								startdt: $scope.startdt,
+								stopdt: $scope.stopdt
+							}
+						}).success(function(data){
+							if(data.status != 0){
+								alert("error with status " + data.status);
+								return;
+							}
+							localStorage.setItem("file", JSON.stringify(data.file)); //json for array
+							window.location.href = window.contextPath + "/console/download";
+						});
+					}
+				}
+			};
+			
+			$scope.changeprogress = function(){
+				var p = $('.progress-bar').attr('aria-valuenow');
+				var pint = parseInt(p);
+				var value;
+				if(pint + 2 >= 95){
+					value = 95;
+				}else{
+					value = pint + 2;
+				}
+				var vstring = value.toString();
+				$('.progress-bar').css('width', vstring+'%').attr('aria-valuenow', vstring);
+			}
+			
 			//for query by time
 			$scope.queryByTime = function(){
 				$scope.startdt = $("#starttime").val();
@@ -327,16 +385,14 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 								$scope.mintime = data.min;
 								$scope.maxtime = data.max;
 								$scope.tname = c;
-								if(data.min.length > 0){  //没有纪录就不用查询了
-									var pre_reverse;
-									if(typeof($scope.searchPaginator) != "undefined"){
-										pre_reverse = $scope.searchPaginator.reverse;
-									}
-									$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
-				            		if(typeof($scope.searchPaginator) != "undefined"){
-				            			$scope.searchPaginator.reverse = pre_reverse;	            		
-				            		}
+								var pre_reverse;
+								if(typeof($scope.searchPaginator) != "undefined"){
+									pre_reverse = $scope.searchPaginator.reverse;
 								}
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
+			            		if(typeof($scope.searchPaginator) != "undefined"){
+			            			$scope.searchPaginator.reverse = pre_reverse;	            		
+			            		}
 							});
 						}
 						else{
@@ -438,6 +494,10 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			$scope.delimitor = ':';
 			$scope.dearray = [',','_','#',';',':'];
 			$('#delimitor').tooltip({
+				showDelay: 0,
+				hideDelay: 0
+			});
+			$('#dump').tooltip({
 				showDelay: 0,
 				hideDelay: 0
 			});
@@ -544,3 +604,17 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			}
 	        
 }]);
+		
+		function updateProgressBar (){
+			  var progressBar = $(".progress-bar-success");
+			  var currentPer = parseInt(progressBar.attr("aria-valuenow"));
+			  var updatedPer;
+			  if(currentPer > 95){
+			    updatedPer = 95;
+			  } else {
+			    updatedPer = currentPer + 2;
+			  }
+			  progressBar.attr("aria-valuenow", updatedPer.toString());
+			  progressBar.css("width",updatedPer.toString()+"%");
+		}
+
