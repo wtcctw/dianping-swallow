@@ -71,8 +71,8 @@ public interface SwallowConfig extends Observable, Lifecycle{
 		public boolean valid(){
 			
 			return !StringUtils.isEmpty(mongoUrl)
-					&& size != null && size > 0
-					&& max != null && max >0;
+					|| size != null && size > 0
+					|| max != null && max >0;
 		}
 		
 		public void merge(TopicConfig defaultConfig){
@@ -124,6 +124,18 @@ public interface SwallowConfig extends Observable, Lifecycle{
 		
 		public String toJson(){
 			return JsonBinder.getNonEmptyBinder().toJson(this);
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if(!(obj instanceof TopicConfig)){
+				return false;
+			}
+			TopicConfig cmp = (TopicConfig) obj;
+			
+			return (mongoUrl == null? cmp.mongoUrl == null : mongoUrl.equals(cmp.mongoUrl))
+					&& ( size == cmp.size )
+					&& ( max == cmp.max );
 		}
 	}
 

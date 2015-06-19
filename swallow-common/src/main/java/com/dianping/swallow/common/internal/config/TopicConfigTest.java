@@ -39,4 +39,14 @@ public class TopicConfigTest {
 		
 	}
 	
+	
+	@Test
+	public void testEquals(){
+		
+		Integer a = null;
+		Integer b = 1;
+		
+		System.out.println( a == b);
+		
+	}
 }

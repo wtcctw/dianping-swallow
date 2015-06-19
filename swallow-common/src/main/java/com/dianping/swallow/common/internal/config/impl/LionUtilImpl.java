@@ -45,11 +45,11 @@ public class LionUtilImpl implements LionUtil{
 	public boolean createConfig(String key) {
 		
 		key = key.trim();
-		String args = getBasicArgs("topic config from LionUtilImpl");
+		String args = getBasicArgs("topic config from LionUtilImpl", true);
 		String url = BASIC_LION_CONFIG_URL + "/create?" + args;
 		url += "&" + keyValue("key", getRealKey(key));
 		
-		LionRet ret = executeGet(url);
+		LionRetResultString ret = executeGet(url, LionRetResultString.class);
 		return ret.isSuccess() || ret.getMessage().contains("exists");
 	
 	}
@@ -61,7 +61,7 @@ public class LionUtilImpl implements LionUtil{
 		String url = BASIC_LION_CONFIG_URL + "/get?" + args;
 		url += "&" + keyValue("prefix", getRealKey(prefix));
 		
-		LionRet ret = executeGet(url);
+		LionRetResultMap ret = executeGet(url, LionRetResultMap.class);
 		return ret.getResult();
 	}
 
@@ -73,13 +73,13 @@ public class LionUtilImpl implements LionUtil{
 
 		if(withProject){
 			
-			result += StringUtils.join("&", keyValue("project", PROJECT));
+			result = StringUtils.join("&", result, keyValue("project", PROJECT));
 		}
 
 		return result;
 	}
 
-	private LionRet executeGet(String urlAddress) {
+	private <T extends LionRet> T executeGet(String urlAddress, Class<T> clazz) {
 		
 		if(logger.isInfoEnabled()){
 			logger.info("[executeGet]" + urlAddress);
@@ -106,7 +106,7 @@ public class LionUtilImpl implements LionUtil{
 			}
 		}
 		
-		return JsonBinder.getNonEmptyBinder().fromJson(result.toString(), LionRet.class);
+		return JsonBinder.getNonEmptyBinder().fromJson(result.toString(), clazz);
 		
 	}
 
@@ -144,7 +144,7 @@ public class LionUtilImpl implements LionUtil{
 		url += "&" + keyValue("key", key)
 				+ "&" + keyValue("value", value);
 		
-		LionRet ret = executeGet(url);
+		LionRetResultString ret = executeGet(url, LionRetResultString.class);
 		if(ret ==null || !ret.isSuccess()){
 			throw new IllegalStateException("[setValue][set value failed][" + key + ":" + value + "]" + ret);
 		}
@@ -165,7 +165,6 @@ public class LionUtilImpl implements LionUtil{
 		
 		private String status;
 		private String message;
-		private Map<String, String> result;
 		
 		public String getStatus() {
 			return status;
@@ -179,17 +178,10 @@ public class LionUtilImpl implements LionUtil{
 		public void setMessage(String message) {
 			this.message = message;
 		}
-		public Map<String, String> getResult() {
-			return result;
-		}
-		
 		public boolean isSuccess(){
 			return status != null && status.equals("success");
 		}
 		
-		public void setResult(Map<String, String> result) {
-			this.result = result;
-		}
 		
 		@Override
 		public String toString() {
@@ -198,4 +190,30 @@ public class LionUtilImpl implements LionUtil{
 		}
 	}
 
+	public static class LionRetResultString extends LionRet{
+
+		private String result;
+
+		public String getResult() {
+			return result;
+		}
+
+		public void setResult(String result) {
+			this.result = result;
+		}
+	}
+
+	public static class LionRetResultMap extends LionRet{
+		
+		private Map<String, String> result;
+
+		
+		public Map<String, String> getResult() {
+			return result;
+		}
+		
+		public void setResult(Map<String, String> result) {
+			this.result = result;
+		}
+	}
 }
