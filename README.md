@@ -416,6 +416,16 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 # Swallow Web使用说明
 
+各环境地址:
+
+*  alpha：http://alpha.swallow.dp/
+默认密码：123456
+*  beta：http://beta.swallow.dp/
+默认密码：123456
+*  ppe：http://ppe.swallow.dp/
+默认密码：112233
+*  线上：http://swallow.dp/
+
 ## Topic查询
 
 ### 根据Topic名称查询
