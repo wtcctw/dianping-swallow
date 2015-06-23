@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.WriteResultChecking;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
@@ -14,8 +15,11 @@ import org.springframework.data.mongodb.core.convert.MongoConverter;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.MongoConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
@@ -66,7 +70,29 @@ public class MongoTemplateFactory {
 	@Bean(name = "statisMongoTemplate")
 	public MongoTemplate getStatisMongoTemplate() {
 
-		return createMongoTemplate(statsMongoDbName);
+		MongoTemplate statisMongoTemplate = createMongoTemplate(statsMongoDbName);
+		
+		//create collection
+		
+		int size = Integer.parseInt(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionSize"));
+		int max =  Integer.parseInt(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionMaxDocNum"));
+		createCappedCollection(statisMongoTemplate, ProducerMonitorData.class.getSimpleName(), size, max);
+		createCappedCollection(statisMongoTemplate, ConsumerMonitorData.class.getSimpleName(), size, max);
+		
+		return statisMongoTemplate;
+	}
+
+	private synchronized void createCappedCollection(MongoTemplate mongoTemplate, String collectionName, int size, int max) {
+		
+		if(!mongoTemplate.collectionExists(collectionName)){			
+			if(logger.isInfoEnabled()){
+				logger.info("[createCappedCollection][createCollection]" + collectionName + ",size:" + size + ",max:" + max);
+			}
+			CollectionOptions options = new CollectionOptions(size * AbstractSwallowConfig.MILLION, max * AbstractSwallowConfig.MILLION, true);
+			mongoTemplate.createCollection(collectionName, options);
+		}
+		
+		
 	}
 
 	@SuppressWarnings("deprecation")

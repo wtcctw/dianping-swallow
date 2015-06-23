@@ -12,6 +12,7 @@ import org.junit.Before;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
@@ -50,9 +51,11 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	protected AckDAOImpl 	 ackdao;
 
 	@Before
-	public void beforeSwallowAbstractTest(){
+	public void beforeSwallowAbstractTest() throws Exception{
 		
 		DefaultMongoManager mongoManager = new DefaultMongoManager("swallow.mongo.producerServerURI");
+		mongoManager.setSwallowConfig(new SwallowConfigImpl());
+		mongoManager.initialize();
 		mdao = new MessageDAOImpl();
 		mdao.setMongoManager(mongoManager);
 		

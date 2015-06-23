@@ -21,12 +21,13 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
+import com.dianping.swallow.common.internal.lifecycle.MasterSlaveComponent;
+import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
-import com.dianping.swallow.common.server.lifecycle.SelfManagement;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.netty.MessageServerHandler;
@@ -43,7 +44,7 @@ public abstract class AbstractBootStrap {
 
 	protected ServerBootstrap bootstrap;
 	
-	protected Map<String, SelfManagement> selfManageMentComponents;
+	protected Map<String, MasterSlaveComponent> masterSlaveComponents;
 	protected ConsumerWorkerManager consumerWorkerManager;
 	protected TopicWhiteList topicWhiteList; 
     protected ConsumerAuthController consumerAuthController;
@@ -102,7 +103,7 @@ public abstract class AbstractBootStrap {
 	protected void stopConsumerServer() {
 
 		try {
-			for(Entry<String, SelfManagement> entry : selfManageMentComponents.entrySet()){
+			for(Entry<String, MasterSlaveComponent> entry : masterSlaveComponents.entrySet()){
 				
 				String name = entry.getKey();
 				SelfManagement component = entry.getValue();
@@ -119,7 +120,7 @@ public abstract class AbstractBootStrap {
 
 	protected void startConsumerServer() {
 		try {
-			for(Entry<String, SelfManagement> entry : selfManageMentComponents.entrySet()){
+			for(Entry<String, MasterSlaveComponent> entry : masterSlaveComponents.entrySet()){
 				
 				String name = entry.getKey();
 				SelfManagement component = entry.getValue();
@@ -182,7 +183,7 @@ public abstract class AbstractBootStrap {
 		  heartbeater = ctx.getBean(Heartbeater.class);
 	      consumerWorkerManager.isSlave(isSlave());
 	      
-	      selfManageMentComponents = ctx.getBeansOfType(SelfManagement.class);
+	      masterSlaveComponents = ctx.getBeansOfType(MasterSlaveComponent.class);
 	}
 
 	protected abstract boolean isSlave();

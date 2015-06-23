@@ -24,7 +24,7 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatReceiver;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatReceiver;
 import com.dianping.swallow.common.internal.heartbeat.NoHeartBeatListener;
-import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;

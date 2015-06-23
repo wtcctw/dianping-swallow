@@ -49,10 +49,9 @@
 
     <bean id="mongoManager"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-        <constructor-arg>
-            <value>swallow.mongo.consumerServerURI</value>
-        </constructor-arg>
+        <property name="swallowConfig" ref="swallowConfig"/>
     </bean>
+	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
 
     <bean id="topicWhiteList"
         class="com.dianping.swallow.common.internal.whitelist.TopicWhiteList"

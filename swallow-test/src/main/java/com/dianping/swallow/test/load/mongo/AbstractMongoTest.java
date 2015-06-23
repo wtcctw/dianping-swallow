@@ -9,9 +9,6 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.dianping.swallow.common.internal.config.ConfigChangeListener;
-import com.dianping.swallow.common.internal.config.DynamicConfig;
-import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
@@ -39,27 +36,8 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 	
 	protected MessageDAO createDao() throws IOException {
 		
-		DefaultMongoManager mc = new DefaultMongoManager("swallow.mongo.producerServerURI", new DynamicConfig() {
-			
-			private DynamicConfig config = new LionDynamicConfig("swallow-mongo-lion.properties");
-			
-			@Override
-			public String get(String key) {
-				
-				if(key.equals("swallow.mongo.producerServerURI")){
-					try {
-						return getTopicToMongo();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				return config.get(key);
-			}
-			@Override
-			public void addConfigChangeListener(ConfigChangeListener listener) {
-				
-			}
-		});
+		System.setProperty("lion.useLocal", "true");
+		DefaultMongoManager mc = new DefaultMongoManager();
 		
 		MessageDAOImpl mdao = new MessageDAOImpl();
 		mdao.setMongoManager(mc);

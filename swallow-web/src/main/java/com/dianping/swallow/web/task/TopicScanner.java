@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import com.dianping.swallow.web.service.AccessControlServiceConstants;
 import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.FilterMetaDataService;
 import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 
 /**
  * @author mingdongli 2015年5月12日 下午2:52:05
@@ -187,7 +189,7 @@ public class TopicScanner {
 
 	private List<String> getDatabaseName() {
 		Set<String> dbs = new HashSet<String>();
-		List<Mongo> allReadMongo = webSwallowMessageDao.getAllReadMongo();
+		Collection<MongoClient> allReadMongo = webSwallowMessageDao.getAllReadMongo();
 		for (Mongo mc : allReadMongo) {
 			dbs.addAll(mc.getDatabaseNames());
 		}
