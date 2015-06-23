@@ -134,8 +134,8 @@ public interface SwallowConfig extends Observable, Lifecycle{
 			TopicConfig cmp = (TopicConfig) obj;
 			
 			return (mongoUrl == null? cmp.mongoUrl == null : mongoUrl.equals(cmp.mongoUrl))
-					&& ( size == cmp.size )
-					&& ( max == cmp.max );
+					&& ( size == null ? cmp.size == null : size.equals(cmp.size))
+					&& ( max == null ? cmp.max == null : max.equals(cmp.max));
 		}
 	}
 

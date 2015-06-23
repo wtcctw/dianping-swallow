@@ -55,7 +55,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 
 	private final Map<DB, Byte> collectionExistsSign = new ConcurrentHashMap<DB, Byte>();
 
-	private volatile Map<String, MongoClient> topicNameToMongoMap;
+	protected volatile Map<String, MongoClient> topicNameToMongoMap;
 
 	private volatile MongoClient heartbeatMongo;
 
@@ -140,12 +140,21 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		
 		for(MongoClient mongo : mongos){
 			
-			if(seedIn(mongo.getServerAddressList(), replicaSetSeeds)){
+			List<ServerAddress> servers = mongo.getAllAddress();
+			
+			try{
+				servers = mongo.getServerAddressList();
+			}catch(MongoException e){
+				logger.warn("[createOrUseExistingMongo]", e);
+			}
+			
+			if(seedIn(servers, replicaSetSeeds)){
 				if(logger.isDebugEnabled()){
 					logger.debug("[createOrUseExistingMongo][use exist mongo]");
 				}
 				return mongo;
 			}
+			
 		}
 		
 		if(logger.isInfoEnabled()){
@@ -157,6 +166,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		return mongo;
 	}
 
+	@SuppressWarnings("unused")
 	private void closeMongo(MongoClient mongo) {
 		
 		if (logger.isInfoEnabled()) {
@@ -174,7 +184,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	}
 
 	public void createTopicMongo() {
-		
 		try {
 			topicNameToMongoMap = new HashMap<String, MongoClient>();
 			for (String topicName : swallowConfig.getCfgTopics()){
@@ -187,12 +196,15 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 			throw new IllegalArgumentException("Error parsing the '*ServerURI' property, the format is '<topicName>,default=<mongoURI>;<topicName>=<mongoURI>': " + e.getMessage(), e);
 		}
 	}
+	
+	private void deleteTopicMongo(String topic) {
+		
+		MongoClient mongoClient = topicNameToMongoMap.remove(topic);
+		if(logger.isInfoEnabled()){
+			logger.info("[deleteTopicMongo][" + topic + "]" + mongoClient);
+		}
+	}
 
-	/**
-	 * 返回之前的MongoClient
-	 * @param topicName
-	 * @return
-	 */
 	private MongoClient createTopicMongo(String topicName) {
 		
 		TopicConfig topicConfig = swallowConfig.getTopicConfig(topicName);
@@ -221,39 +233,28 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		switch (args.getItem()) {
 
 		case ALL_TOPIC_MONGO_MAPPING:
-			Map<String, MongoClient> oldTopicNameToMongoMap = this.topicNameToMongoMap;
 			createTopicMongo();
-			closeUnuseMongo(oldTopicNameToMongoMap.values(), this.topicNameToMongoMap.values(), heartbeatMongo);
 			break;
 		case TOPIC_MONGO:
-			MongoClient oldClient = createTopicMongo(args.getTopic());
-			if(oldClient != null){
-				closeUnuseMongo(oldClient, topicNameToMongoMap.values(), heartbeatMongo);
+			
+			switch(args.getBehavior()){
+			
+				case ADD:
+				case UPDATE:
+					createTopicMongo(args.getTopic());
+					break;
+				case DELETE:
+					deleteTopicMongo(args.getTopic());
+					break;
+				default:
+					logger.warn("[update][unknown behavior]" + args.getBehavior());
 			}
 			break;
 		case HEART_BEAT_MONGO:
-			MongoClient oldMongo = this.heartbeatMongo;
 			createHeartbeatMongo();
-			closeUnuseMongo(oldMongo, this.topicNameToMongoMap.values(), this.heartbeatMongo);
 			break;
 		default:
 			logger.warn("[update][unknown item]" + args);
-		}
-	}
-
-	private void closeUnuseMongo(Collection<MongoClient> oldMongos, Collection<MongoClient> curMongos, MongoClient curMongo) {
-		oldMongos.removeAll(curMongos);
-		oldMongos.remove(curMongo);
-		for (MongoClient unuseMongo : oldMongos) {
-			if (unuseMongo != null) {
-				closeMongo(unuseMongo);
-			}
-		}
-	}
-
-	private void closeUnuseMongo(MongoClient oldMongo, Collection<MongoClient> curMongos, MongoClient curMongo) {
-		if (!curMongos.contains(oldMongo) && oldMongo != curMongo) {
-			closeMongo(oldMongo);
 		}
 	}
 

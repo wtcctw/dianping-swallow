@@ -106,16 +106,27 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 	public static class SwallowConfigArgs{
 		
 		private CHANGED_ITEM item;
+		
 		private String  topic;
+		
+		private CHANGED_BEHAVIOR behavior = CHANGED_BEHAVIOR.UPDATE;
 
 		public SwallowConfigArgs(CHANGED_ITEM item){
 			this.item = item;
 		}
 
 		public SwallowConfigArgs(CHANGED_ITEM item, String topic){
+			
+			this(item, topic, CHANGED_BEHAVIOR.UPDATE);
+		}
+		
+		public SwallowConfigArgs(CHANGED_ITEM item, String topic, CHANGED_BEHAVIOR behavior){
+			
 			this.item = item;
 			this.topic = topic;
+			this.behavior = behavior;
 		}
+
 		
 		public CHANGED_ITEM getItem(){
 			return item;
@@ -125,9 +136,13 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 			return topic; 
 		}
 
+		public CHANGED_BEHAVIOR getBehavior() {
+			return behavior;
+		}
+		
 		@Override
 		public String toString() {
-			return item + "," + topic;
+			return item + "," + topic + "," + behavior;
 		}
 		
 	}
@@ -140,9 +155,10 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 		ALL_TOPIC_MONGO_MAPPING,
 		
 		/**
-		 * 特定topic对应mongo更新
+		 * 特定topic对应配置
 		 */
 		TOPIC_MONGO,
+
 		
 		/**
 		 * 心跳配置更新 
@@ -150,4 +166,12 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 		HEART_BEAT_MONGO
 		
 	}
+
+	public enum CHANGED_BEHAVIOR{
+		
+		UPDATE,
+		ADD,
+		DELETE
+	}
+
 }

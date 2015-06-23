@@ -53,7 +53,7 @@ public class LionUtilImpl implements LionUtil{
 		return ret.isSuccess() || ret.getMessage().contains("exists");
 	
 	}
-
+	
 	@Override
 	public Map<String, String> getCfgs(String prefix) {
 		
@@ -111,6 +111,8 @@ public class LionUtilImpl implements LionUtil{
 	}
 
 	private String getRealKey(String key) {
+		
+		key = key.trim();
 		if(key.startsWith(PROJECT)){
 			return key;
 		}
@@ -216,4 +218,5 @@ public class LionUtilImpl implements LionUtil{
 			this.result = result;
 		}
 	}
+
 }

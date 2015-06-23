@@ -59,7 +59,7 @@ public class SwallowConfigImplCentralTest extends AbstractTest {
 	
 	@Test
 	public void testTopicMongo(){
-		if(EnvUtil.isDev()){
+		if(!EnvUtil.isAlpha()){
 			return;
 		}
 		
