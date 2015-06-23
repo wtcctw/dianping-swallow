@@ -5,61 +5,53 @@ package com.dianping.swallow.web.util;
  *
  *         2015年6月12日下午5:44:19
  */
-public class ResponseStatus {
+public enum ResponseStatus {
 
-	public static final String M_IOEXCEPTION = "io exception"; // -8
-	
-	public static final String M_RUNTIMEEXCEPTION = "runtime exception"; // -7
-	
-	public static final String M_INTERRUPTEDEXCEPTION = "interrupted exception"; // -6
-	
-	public static final String M_PARSEEXCEPTION = "parse error"; // -5
+	IOEXCEPTION("io exception", -8), RUNTIMEEXCEPTION("runtime exception", -7), INTERRUPTEDEXCEPTION(
+			"interrupted exception", -6), PARSEEXCEPTION("parse error", -5), EMPTYCONTENT(
+			"empty content", -4), NOAUTHENTICATION("no authenticaton", -3), UNAUTHENTICATION(
+			"unauthorized", -2), MONGOWRITE("write mongo error", -1), SUCCESS(
+			"success", 0), TRY_MONGOWRITE("read time out", 1);
 
-	public static final String M_EMPTYCONTENT = "empty content"; // -4
+	private String message;
 
-	public static final String M_NOAUTHENTICATION = "no authenticaton"; // -3
+	private int status;
 
-	public static final String M_UNAUTHENTICATION = "unauthorized"; // -2
+	private ResponseStatus(String message, int status) {
+		this.message = message;
+		this.status = status;
+	}
 
-	public static final String M_MONGOWRITE = "write mongo error"; // -1
+	public String getMessage() {
+		return message;
+	}
 
-	public static final String M_SUCCESS = "success"; // 0
+	public ResponseStatus setMessage(String message) {
+		this.message = message;
+		return this;
+	}
 
-	public static final String M_TRY_MONGOWRITE = "read time out"; // 1
+	public int getStatus() {
+		return status;
+	}
 
-	// io exception
-	public static final int E_IOEXCEPTION = -8;
+	public ResponseStatus setStatus(int status) {
+		this.status = status;
+		return this;
+	}
 
-	// runtime exception
-	public static final int E_RUNTIMEEXCEPTION = -7;
-	
-	// interrupted exception
-	public static final int E_INTERRUPTEDEXCEPTION = -6;
-	
-	// parse error
-	public static final int E_PARSEEXCEPTION = -5;
+	public static ResponseStatus findByStatus(int status) {
+		for (ResponseStatus code : values()) {
+			if (status == code.getStatus()) {
+				return code;
+			}
+		}
+		throw new RuntimeException("Error status : " + status);
+	}
 
-	// empty content
-	public static final int E_EMPTYCONTENT = -4;
-
-	// http header中没有Authentication
-	public static final int E_NOAUTHENTICATION = -3;
-
-	// 没有权限
-	public static final int E_UNAUTHENTICATION = -2;
-
-	// mongo错误，不可重试
-	public static final int E_MONGOWRITE = -1;
-	// 操作成功
-	public static final int SUCCESS = 0;
-
-	// mongo错误，可重试
-	public static final int E_TRY_MONGOWRITE = 1;
-
-	public static final String[] M_ERRORTRYSTRING = { M_SUCCESS, M_TRY_MONGOWRITE };
-
-	public static final String[] M_ERRORSTRING = { M_SUCCESS, M_TRY_MONGOWRITE,
-			M_MONGOWRITE, M_UNAUTHENTICATION, M_NOAUTHENTICATION,
-			M_EMPTYCONTENT, M_PARSEEXCEPTION, M_INTERRUPTEDEXCEPTION, M_RUNTIMEEXCEPTION, M_IOEXCEPTION };
+	@Override
+	public String toString() {
+		return this.message + "_" + this.status;
+	}
 
 }

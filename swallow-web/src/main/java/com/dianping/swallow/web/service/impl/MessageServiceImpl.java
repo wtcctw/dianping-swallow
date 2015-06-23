@@ -5,18 +5,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.ZipUtil;
-import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Message;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MessageService;
+import com.dianping.swallow.web.task.DumpMessageTask;
+import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
  * @author mingdongli
@@ -33,8 +39,6 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 
 	@Autowired
 	private MessageDao webMessageDao;
-	@Autowired
-	private AdministratorDao administratorDao;
 
 	public Map<String, Object> getMessageFromSpecificTopic(int start, int span,
 			String tname, String messageId, String startdt, String stopdt,
@@ -108,6 +112,36 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		map = webMessageDao.findMinAndMaxTime(topicName);
 		return map;
 	}
+	
+	@Override
+	public Integer exportMessage(String topicName, String startdt,
+			String stopdt, String filename) {
+		ExecutorService exec = Executors.newFixedThreadPool(1);
+		DumpMessageTask fileDownloadTask = new DumpMessageTask();
+		fileDownloadTask.setTopic(topicName).setStartdt(startdt)
+				.setStopdt(stopdt).setFilename(filename)
+				.setWebMessageDao(webMessageDao);
+		FutureTask<Integer> futureTask = new FutureTask<Integer>(
+				fileDownloadTask);
+		exec.submit(futureTask);
+		exec.shutdown();
+		logger.info(String.format(
+				"Start download task for %s to export messages from %s to %s",
+				topicName, startdt, stopdt));
+		
+		try {
+			int result = futureTask.get();
+			return result;
+		} catch (InterruptedException e) {
+			logger.error("InterruptedException occur when get FutureTask", e);
+			return ResponseStatus.INTERRUPTEDEXCEPTION.getStatus();
+		} catch (ExecutionException e) {
+			logger.error("ExecutionException occur when get FutureTask", e);
+			return ResponseStatus.RUNTIMEEXCEPTION.getStatus();
+		}
+		
+	}
+
 
 	private void setSMessageProperty(Message m) {
 		m.setMid(m.get_id());
@@ -117,11 +151,12 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		}
 		m.setGtstring(m.getGt());
 		m.setStstring(m.get_id());
-		m.set_id(null); // no need to transmit
+		m.set_id(null);
 	}
 
 	private void isZipped(Message m) {
-		if (m.getC().startsWith(GZIP)) {
+		String content = m.getC();
+		if (StringUtils.isNotEmpty(content) && m.getC().startsWith(GZIP)) {
 			try {
 				m.setC(ZipUtil.unzip(m.getC()));
 			} catch (IOException e) {

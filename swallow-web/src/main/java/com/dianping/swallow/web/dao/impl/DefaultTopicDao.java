@@ -41,14 +41,14 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 	public int saveTopic(Topic p) {
 		try {
 			mongoTemplate.save(p, TOPIC_COLLECTION);
-			return ResponseStatus.SUCCESS;
+			return ResponseStatus.SUCCESS.getStatus();
 		} catch(MongoSocketException e){
 			logger.error(e.getMessage(), e);
-			return ResponseStatus.E_TRY_MONGOWRITE;
+			return ResponseStatus.TRY_MONGOWRITE.getStatus();
 		} catch (MongoException e) {
 			logger.error("Error when save topic " + p, e);
 		}
-		return ResponseStatus.E_MONGOWRITE;
+		return ResponseStatus.MONGOWRITE.getStatus();
 	}
 
 	@Override

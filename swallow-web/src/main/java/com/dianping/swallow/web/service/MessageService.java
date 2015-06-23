@@ -10,8 +10,9 @@ import com.dianping.swallow.web.model.Message;
  *
  * 2015年5月14日下午1:16:39
  */
-public interface MessageService extends SwallowService{
+public interface MessageService {
 
+	
 	/**
 	 * 在限定条件下查询topic指定数量的messages
 	 * @param start  	开始位置
@@ -39,5 +40,14 @@ public interface MessageService extends SwallowService{
 	 * @param topicName
 	 */
 	Map<String, Object> loadMinAndMaxTime(String topicName);
+	
+	/**
+	 * 
+	 * @param topicName  topic名称
+	 * @param startdt    开始时间
+	 * @param stopdt     结束时间
+	 * @param filename   保存文件名
+	 */
+	Integer exportMessage(String topicName, String startdt, String stopdt, String filename);
 	
 }

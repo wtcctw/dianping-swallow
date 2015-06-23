@@ -30,9 +30,9 @@ import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
-import com.dianping.swallow.web.service.AccessControlServiceConstants;
+import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.AdministratorService;
-import com.dianping.swallow.web.service.FilterMetaDataService;
+import com.dianping.swallow.web.service.TopicService;
 import com.mongodb.Mongo;
 
 /**
@@ -48,12 +48,12 @@ public class TopicScanner {
 
 	@Resource(name = "administratorService")
 	private AdministratorService administratorService;
+	
+	@Resource(name = "topicService")
+	private TopicService topicService;
 
 	@Resource(name = "topicMongoTemplate")
 	private MongoTemplate mongoTemplate;
-
-	@Resource(name = "filterMetaDataService")
-	private FilterMetaDataService filterMetaDataService;
 
 	@Autowired
 	private MessageDao webMessageDao;
@@ -169,9 +169,9 @@ public class TopicScanner {
 	}
 
 	private void updateTopicToWhiteList(String subStr, Topic t) {
-		if (filterMetaDataService.loadTopicToWhiteList().get(subStr) == null) {
+		if (topicService.loadTopicToWhiteList().get(subStr) == null) {
 			Set<String> lists = splitProps(t.getProp());
-			filterMetaDataService.loadTopicToWhiteList().put(subStr, lists);
+			topicService.loadTopicToWhiteList().put(subStr, lists);
 			logger.info("add " + subStr + " 's whitelist " + lists);
 		}
 	}
@@ -204,26 +204,25 @@ public class TopicScanner {
 			for (Administrator list : aList) {
 				role = list.getRole();
 				String name = list.getName();
-				if (role == AccessControlServiceConstants.ADMINI) {
-					if (filterMetaDataService.loadAdminSet().add(name)) {
+				if (role == AuthenticationService.ADMINI) {
+					if (administratorService.loadAdminSet().add(name)) {
 						logger.info("admiSet add " + name);
 					}
 				}
-				filterMetaDataService.loadAllUsers().add(name);
 			}
 		} else {
 			String[] admins = loadDefaultAdminFromConf();
 			for (String admin : admins) {
-				filterMetaDataService.loadAdminSet().add(admin);
-				administratorService.createInAdminList(admin,
-						AccessControlServiceConstants.ADMINI);
+				administratorService.loadAdminSet().add(admin);
+				administratorService.createAdmin(admin,
+						AuthenticationService.ADMINI);
 				logger.info("admiSet add admin " + admin);
 			}
 		}
 	}
 
 	private String[] loadDefaultAdminFromConf() {
-		String defaultAdmin = filterMetaDataService.loadDefaultAdmin();
+		String defaultAdmin = administratorService.loadDefaultAdmin();
 		String[] admins = defaultAdmin.split(DELIMITOR);
 		return admins;
 	}

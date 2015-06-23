@@ -20,20 +20,17 @@ import com.dianping.swallow.web.controller.DumpMessageController;
 public class FileDownloadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		// 获得请求文件名
 		String filename = request.getParameter("filename");
 
-		// 设置文件MIME类型
 		response.setContentType(getServletContext().getMimeType(filename));
-		// 设置Content-Disposition
 		response.setHeader("Content-Disposition", "attachment;filename="
 				+ filename);
 		response.setContentType("text/html;charset=utf-8");
-		String fullFileName = DumpMessageController.PATH + filename;
-		// 读取文件
+		String fullFileName = DumpMessageController.FILEPATH + filename;
 		InputStream in = new FileInputStream(fullFileName);
 		OutputStream out = response.getOutputStream();
 
@@ -44,11 +41,6 @@ public class FileDownloadServlet extends HttpServlet {
 
 		in.close();
 		out.close();
-	}
-
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		// ignore
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -14,13 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.StringUtils;
-import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.TopicDao;
-import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AbstractSwallowService;
-import com.dianping.swallow.web.service.AdministratorListService;
-import com.dianping.swallow.web.service.FilterMetaDataService;
+import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.TopicService;
 
 /**
@@ -35,31 +33,18 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	private static final String DELIMITOR = ",";
 
 	@Autowired
-	private AdministratorDao administratorDao;
-
-	@Autowired
 	private TopicDao topicDao;
 
-	@Autowired
-	private MessageDao webSwallowMessageDao;
-
-	@Resource(name = "administratorListService")
-	private AdministratorListService administratorListService;
+	@Resource(name = "administratorService")
+	private AdministratorService administratorService;
 	
-	@Resource(name = "filterMetaDataService")
-	private FilterMetaDataService filterMetaDataService;
+	private Map<String, Set<String>> topicToWhiteList = new ConcurrentHashMap<String, Set<String>>();
 
-	/*
-	 * read records from writeMongo due to it already exists
-	 */
 	@Override
 	public Map<String, Object> loadAllTopic(int start, int span) {
 		return topicDao.findFixedTopic(start, span);
 	}
 
-	/*
-	 * just read, so use writeMongo
-	 */
 	@Override
 	public Map<String, Object> loadSpecificTopic(int start, int span,
 			String name, String prop) {
@@ -70,7 +55,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	@Override
 	public List<String> loadAllTopicNames(String tongXingZheng, boolean isAdmin) {
 		
-		Map<String, Set<String>> topicToWhiteList = filterMetaDataService.loadTopicToWhiteList();
+		Map<String, Set<String>> topicToWhiteList = this.loadTopicToWhiteList();
 		if(isAdmin){
 			return new ArrayList<String>(topicToWhiteList.keySet());
 		}
@@ -91,19 +76,17 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	@Override
 	public int editTopic(String name, String prop, String time) {
 		
-		filterMetaDataService.loadTopicToWhiteList().put(name, splitProps(prop));
+		this.loadTopicToWhiteList().put(name, splitProps(prop));
 		return topicDao.updateTopic(name, prop, time);
 	}
 
 	@Override
-	public Map<String, Object[]> getPropAndDept(String username) {
+	public Map<String, Object[]> getPropAndDept(String username, boolean all) {
 		Map<String, Object[]> map = new HashMap<String, Object[]>();
 		Set<String> proposal = new HashSet<String>();
 		List<Topic> topics = topicDao.findAll();
 
-		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(username);
-		boolean switchenv = filterMetaDataService.isShowContentToAll();
-		if(isAdmin || switchenv){
+		if(all){
 			for (Topic topic : topics) {
 				proposal.addAll(getPropList(topic));
 			}
@@ -119,7 +102,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		}
 		
 		map.put("prop", proposal.toArray());
-		map.put("edit", filterMetaDataService.loadAllUsers().toArray());
+		map.put("edit", administratorService.loadAllTypeName().toArray());
 		
 		return map;
 	}
@@ -140,6 +123,11 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		String[] prop = props.split(DELIMITOR);
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
 		return lists;
+	}
+	
+	@Override
+	public Map<String, Set<String>> loadTopicToWhiteList() {
+		return topicToWhiteList;
 	}
 
 }

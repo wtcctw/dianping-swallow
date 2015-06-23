@@ -72,7 +72,6 @@ public class DumpMessageTask implements Callable<Integer>{
 
 	@Override
 	public Integer call() throws Exception {
-		
 		int status = webMessageDao.exportMessages(topic, startdt, stopdt, filename);
 		return status;
 	}      

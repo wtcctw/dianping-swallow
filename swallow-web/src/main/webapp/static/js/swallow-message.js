@@ -472,7 +472,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        }
 	        
 	        $scope.starttransmit = function(data){
-        			$http.post(window.contextPath + '/console/message/auth/sendmessage', {"mids": data,"topic":$scope.tname}).success(function(response) {
+        			$http.post(window.contextPath + '/api/message/sendmessageid', {"mid": data,"topic":$scope.tname}).success(function(response) {
         			  $("#selectnone").prop('checked', false);
         			  $("#selectall").prop('checked', false);
         			  $(".swallowcheckbox").prop('checked', false);
@@ -548,7 +548,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        	if(hasproperty){
 	        		$scope.tproperty = property.substring(0,property.length-2);
 	        	}
-	        	$http.post(window.contextPath + '/console/message/auth/sendonemessage', {"textarea":$scope.textarea,"topic":$scope.tname,"type":$scope.ttype,"delimitor":$scope.delimitor,"property":$scope.tproperty}).success(function(response) {
+	        	$http.post(window.contextPath + '/console/message/auth/sendmessage', {"content":$scope.textarea,"topic":$scope.tname,"type":$scope.ttype,"delimitor":$scope.delimitor,"property":$scope.tproperty}).success(function(response) {
 					$scope.textarea = "";
 					$scope.tproperty = "";
 					

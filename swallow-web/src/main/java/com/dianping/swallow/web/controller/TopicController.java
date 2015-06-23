@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jodd.util.StringUtil;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
-import com.dianping.swallow.web.service.FilterMetaDataService;
+import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
@@ -37,14 +38,16 @@ public class TopicController extends AbstractMenuController {
 
 	private static final String DELIMITOR = ",";
 
-	@Resource(name = "filterMetaDataService")
-	private FilterMetaDataService filterMetaDataService;
+	public static final String ALL = "all";
 
 	@Resource(name = "topicService")
 	private TopicService topicService;
 
+	@Resource(name = "administratorService")
+	private AdministratorService administratorService;
+
 	@Autowired
-	ExtractUsernameUtils extractUsernameUtils;
+	private ExtractUsernameUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/topic")
 	public ModelAndView allApps(HttpServletRequest request,
@@ -58,14 +61,13 @@ public class TopicController extends AbstractMenuController {
 	public Object topicDefault(int offset, int limit, String topic,
 			String prop, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-
 		boolean isAllEmpty = StringUtil.isEmpty(topic + prop);
-		if (isAllEmpty) { // first access
+		if (isAllEmpty) {
 			String username = extractUsernameUtils.getUsername(request);
-			boolean findAll = filterMetaDataService.loadAdminSet().contains(
-					username);
-			boolean switchenv = filterMetaDataService.isShowContentToAll();
-			if (findAll || switchenv) {
+			Set<String> adminSet = administratorService.loadAdminSet();
+			boolean findAll = adminSet.contains(username)
+					|| adminSet.contains(ALL);
+			if (findAll) {
 				return topicService.loadAllTopic(offset, limit);
 			} else {
 				return topicService.loadSpecificTopic(offset, limit, topic,
@@ -82,11 +84,11 @@ public class TopicController extends AbstractMenuController {
 	public List<String> topicName(HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
 
-		String userName = extractUsernameUtils.getUsername(request);
-		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(
-				userName);
-		boolean switchenv = filterMetaDataService.isShowContentToAll();
-		return topicService.loadAllTopicNames(userName, isAdmin || switchenv);
+		String username = extractUsernameUtils.getUsername(request);
+		Set<String> adminSet = administratorService.loadAdminSet();
+		boolean findAll = adminSet.contains(username)
+				|| adminSet.contains(ALL);
+		return topicService.loadAllTopicNames(username, findAll);
 	}
 
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -94,43 +96,59 @@ public class TopicController extends AbstractMenuController {
 	public Object propName(HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
 
-		String userName = extractUsernameUtils.getUsername(request);
-		return topicService.getPropAndDept(userName);
+		String username = extractUsernameUtils.getUsername(request);
+		Set<String> adminSet = administratorService.loadAdminSet();
+		boolean findAll = adminSet.contains(username)
+				|| adminSet.contains(ALL);
+		return topicService.getPropAndDept(username, findAll);
 	}
 
 	@RequestMapping(value = "/console/topic/auth/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object editTopic(@RequestParam("topic") String topic,
-			@RequestParam("prop") String prop,
-			@RequestParam("time") String time, HttpServletRequest request,
-			HttpServletResponse response) {
+	public Object editTopic(@RequestParam(value = "topic") String topic,
+			@RequestParam(value = "prop") String prop,
+			@RequestParam(value = "time") String time,
+			@RequestParam(value = "exec_user", required = false) String approver,
+			HttpServletRequest request, HttpServletResponse response) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		int result = topicService.editTopic(topic, prop, time);
-		
-		if(result == ResponseStatus.SUCCESS){
-			map.put(SaveMessageController.STATUS, ResponseStatus.SUCCESS);
-			map.put(SaveMessageController.MESSAGE, ResponseStatus.M_SUCCESS);
-			logger.info(String.format(
-					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
-					extractUsernameUtils.getUsername(request), topic, prop,
-					splitProps(prop.trim()).toString(), time.toString()));
-		}else if(result == ResponseStatus.E_MONGOWRITE){
-			map.put(SaveMessageController.STATUS, ResponseStatus.E_MONGOWRITE);
-			map.put(SaveMessageController.MESSAGE, ResponseStatus.M_MONGOWRITE);
-			logger.info(String.format(
-					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.",
-					extractUsernameUtils.getUsername(request), topic, prop,
-					splitProps(prop.trim()).toString(), time.toString()));
-		}else{
-			map.put(SaveMessageController.STATUS, ResponseStatus.E_TRY_MONGOWRITE);
-			map.put(SaveMessageController.MESSAGE, ResponseStatus.M_TRY_MONGOWRITE);
-			logger.info(String.format(
-					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
-					extractUsernameUtils.getUsername(request), topic, prop,
-					splitProps(prop.trim()).toString(), time.toString()));
+
+		if (result == ResponseStatus.SUCCESS.getStatus()) {
+			map.put(SaveMessageController.STATUS,
+					ResponseStatus.SUCCESS.getStatus());
+			map.put(SaveMessageController.MESSAGE,
+					ResponseStatus.SUCCESS.getMessage());
+			if (StringUtils.isBlank(approver)) {
+
+			}
+			logger.info(String
+					.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
+							extractUsernameUtils.getUsername(request), topic,
+							prop, splitProps(prop.trim()).toString(),
+							time.toString()));
+		} else if (result == ResponseStatus.MONGOWRITE.getStatus()) {
+			map.put(SaveMessageController.STATUS,
+					ResponseStatus.MONGOWRITE.getStatus());
+			map.put(SaveMessageController.MESSAGE,
+					ResponseStatus.MONGOWRITE.getMessage());
+			logger.info(String
+					.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.",
+							extractUsernameUtils.getUsername(request), topic,
+							prop, splitProps(prop.trim()).toString(),
+							time.toString()));
+		} else {
+			map.put(SaveMessageController.STATUS,
+					ResponseStatus.TRY_MONGOWRITE.getStatus());
+			map.put(SaveMessageController.MESSAGE,
+					ResponseStatus.TRY_MONGOWRITE.getMessage());
+			logger.info(String
+					.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
+							extractUsernameUtils.getUsername(request), topic,
+							prop, splitProps(prop.trim()).toString(),
+							time.toString()));
 		}
-		
+
 		return map;
 	}
 

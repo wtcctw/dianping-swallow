@@ -27,15 +27,11 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 	}).error(function(data, status, headers, config) {
 	});
 	
-	$scope.showornot = true;
 	$scope.files = [];
 	var tmpfile = JSON.parse(localStorage.getItem("file"));
 	if(typeof(tmpfile) != "undefined"){
 		$scope.files = tmpfile;
 		localStorage.clear("file");
-	}
-	$scope.update = function(){
-		$('.progress-bar').css({'width':'80%'}).find('span').html('80%');
 	}
 			
 }]);

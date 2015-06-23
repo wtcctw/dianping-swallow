@@ -27,9 +27,8 @@ public class ClearDownloadFileTask {
 
 	@Scheduled(fixedDelay = 86400000)
 	public void clearFile() {
-		
-		logger.info("Start clear files that exists too long time.");
-		File file = new File(DumpMessageController.PATH);
+		logger.info("Start clear files that exists more than 3 days.");
+		File file = new File(DumpMessageController.FILEPATH);
 		if (!file.exists() && !file.isDirectory()) {
 			file.mkdir();
 			return;

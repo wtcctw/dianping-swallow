@@ -129,17 +129,6 @@
 	</filter-mapping>
 
 	<filter>
-		<filter-name>RetransmitFilter</filter-name>
-		<filter-class>com.dianping.swallow.web.filter.RetransmitFilter</filter-class>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>RetransmitFilter</filter-name>
-		<url-pattern>/console/message/auth/sendmessage</url-pattern>
-		<url-pattern>/console/message/auth/sendgroupmessage</url-pattern>
-	</filter-mapping>
-
-	<filter>
 		<filter-name>AuthenticationFilter</filter-name>
 		<filter-class>com.dianping.swallow.web.filter.AuthenticationFilter</filter-class>
 	</filter>
@@ -149,23 +138,6 @@
 		<url-pattern>/console/topic/auth/*</url-pattern>
 		<url-pattern>/console/message/auth/*</url-pattern>
 		<url-pattern>/console/admin/auth/*</url-pattern>
-	</filter-mapping>
-
-	<filter>
-		<filter-name>RequestLogFilter</filter-name>
-		<filter-class>com.dianping.swallow.web.filter.RequestLogFilter</filter-class>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>RequestLogFilter</filter-name>
-		<url-pattern>/console/topic/auth/*</url-pattern>
-		<url-pattern>/console/admin/auth/*</url-pattern>
-		<url-pattern>/console/topic</url-pattern>
-		<url-pattern>/console/message</url-pattern>
-		<url-pattern>/</url-pattern>
-		<url-pattern>/console/message/auth/*</url-pattern>
-		<url-pattern>/console/monitor/consumer/total/delay</url-pattern>
-		<url-pattern>/console/administrator</url-pattern>
 	</filter-mapping>
 
 	<servlet>

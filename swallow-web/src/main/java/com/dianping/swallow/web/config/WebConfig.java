@@ -11,5 +11,4 @@ public interface WebConfig extends ObjectConfig{
 
 	int getAccumulationBuildInterval();
 
-
 }

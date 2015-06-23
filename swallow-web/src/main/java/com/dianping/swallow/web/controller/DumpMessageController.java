@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.service.DumpMessageService;
+import com.dianping.swallow.web.service.MessageService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
@@ -32,18 +32,19 @@ import com.dianping.swallow.web.util.ResponseStatus;
 @Controller
 public class DumpMessageController extends AbstractMenuController {
 
-	public static final String PATH = "/data/appdatas/swalllowweb/";
+	public static final String FILEPATH = "/data/appdatas/swalllowweb/";
 
 	private static final String FILE = "file";
 
 	private static final String STATUS = "status";
 
-	@Resource(name = "fileDownloadService")
-	private DumpMessageService fileDownloadService;
+	@Resource(name = "messageService")
+	private MessageService messageService;
 
 	@RequestMapping(value = "/console/download")
 	public ModelAndView allApps(HttpServletRequest request,
 			HttpServletResponse response) {
+		
 		return new ModelAndView("message/filedownload", createViewMap());
 	}
 
@@ -52,34 +53,28 @@ public class DumpMessageController extends AbstractMenuController {
 	public Object dumpMessageByTime(String topic, String startdt,
 			String stopdt, HttpServletRequest request,
 			HttpServletResponse response) {
-
 		List<String> topicFiles = getListFile(topic);
 
 		if (StringUtils.isBlank(stopdt + startdt)) { // just query filename
-			return getResponse(topicFiles, ResponseStatus.SUCCESS);
+			return getResponse(topicFiles, ResponseStatus.SUCCESS.getStatus());
 		}
 		String post = new SimpleDateFormat("yyyyMMddHHmm'.gz'")
 				.format(new Date());
-		String filename = topic + "_" + post;
-		File dir = new File(PATH + filename);
+		StringBuffer sb = new StringBuffer();
+		String filename = sb.append(topic).append("_").append(post).toString();
+		File dir = new File(FILEPATH + filename);
 		if (!dir.exists()) {
 			try {
 				dir.createNewFile();
 			} catch (IOException e) {
 				logger.error("create file error", e);
-				return getResponse(topicFiles, ResponseStatus.E_IOEXCEPTION);
+				return getResponse(topicFiles, ResponseStatus.IOEXCEPTION.getStatus());
 			}
 		}
 		topicFiles.add(filename);
 
-		int status = fileDownloadService.exportMessageByTimeSpan(topic,
+		int status = messageService.exportMessage(topic,
 				startdt, stopdt, filename);
-//		try {
-//			Thread.sleep(8000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		return getResponse(topicFiles, status);
 	}
 
@@ -95,7 +90,7 @@ public class DumpMessageController extends AbstractMenuController {
 	
 	private List<String> getListFile(String topic){
 		List<String> topicFiles = new ArrayList<String>();
-		File file = new File(PATH);
+		File file = new File(FILEPATH);
 		if (!file.exists() && !file.isDirectory()) {
 			file.mkdir();
 		}

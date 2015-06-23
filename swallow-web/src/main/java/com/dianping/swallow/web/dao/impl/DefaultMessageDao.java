@@ -467,7 +467,6 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	
 	@Override
 	public int exportMessages(String topicName, String startdt, String stopdt, String filename){
-		
 		StringBuffer contents = new StringBuffer();
 		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(
 				topicName).getCollection(MESSAGE_COLLECTION);
@@ -479,7 +478,7 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 			stoplong = MongoUtils.getLongByDate(sdf.parse(stopdt));
 		} catch (ParseException e) {
 			logger.error("Error when parse date to Long.", e);
-			return ResponseStatus.E_PARSEEXCEPTION;
+			return ResponseStatus.PARSEEXCEPTION.getStatus();
 		}
 		DBObject query = BasicDBObjectBuilder
 				.start()
@@ -526,27 +525,27 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 		} finally {
 			cursor.close();
 		}
-		return ResponseStatus.SUCCESS;
+		return ResponseStatus.SUCCESS.getStatus();
 	}
 	
 	private int writeContentToFile(String filename, String contents){
 		GZIPOutputStream gos = null;
 		BufferedWriter writer = null;
 		try {
-			gos = new GZIPOutputStream( new FileOutputStream(DumpMessageController.PATH + filename, true) );
+			gos = new GZIPOutputStream( new FileOutputStream(DumpMessageController.FILEPATH + filename, true) );
 			writer = new BufferedWriter(new OutputStreamWriter(gos, "UTF-8"));
 			writer.append(contents);
 			writer.flush();
-			return ResponseStatus.SUCCESS;
+			return ResponseStatus.SUCCESS.getStatus();
 		} catch (IOException e) {
 			logger.error("Open output stream error", e);
-			return ResponseStatus.E_IOEXCEPTION;
+			return ResponseStatus.IOEXCEPTION.getStatus();
 		}finally{
 			try {
 				gos.close();
 			} catch (IOException e) {
 				logger.error("Open output stream error", e);
-				return ResponseStatus.E_IOEXCEPTION;
+				return ResponseStatus.IOEXCEPTION.getStatus();
 			}
 		}
 		
