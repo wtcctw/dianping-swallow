@@ -21,6 +21,7 @@ import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.SwallowConfigArgs;
 import com.dianping.swallow.common.internal.dao.MongoManager;
+import com.dianping.swallow.common.internal.lifecycle.Ordered;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.observer.Observer;
@@ -528,5 +529,11 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	public Collection<MongoClient> getAllMongo(){
 		
 		return Collections.unmodifiableCollection(mongos);
+	}
+	
+	@Override
+	public int getOrder() {
+		
+		return Ordered.FIRST;
 	}
 }

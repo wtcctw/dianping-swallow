@@ -22,9 +22,9 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 	
 	public static final int DEFAULT_BACKUP_CAPPED_COLLECTION_MAX_DOC_NUM = 1;
 
-	public static final long MILLION = 1024 * 1024;
+	public static final int MILLION = 1024 * 1024;
 	
-	private static final String 	LION_CONFIG_FILENAME          = PropertiesUtils.getProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-mongo-lion.properties");
+	private final String 	LION_CONFIG_FILENAME          = PropertiesUtils.getProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-mongo-lion.properties");
 	
 	public static final String 	TOPICNAME_DEFAULT             = "default";
 

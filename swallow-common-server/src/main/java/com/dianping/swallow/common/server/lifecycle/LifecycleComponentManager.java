@@ -1,5 +1,9 @@
 package com.dianping.swallow.common.server.lifecycle;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -22,76 +26,85 @@ import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
 public class LifecycleComponentManager implements ApplicationContextAware, InitializingBean, DisposableBean{
 
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
-
+	
 	private ApplicationContext applicationContext;
 
 	@Override
 	public void destroy() throws Exception {
 		
-		Map<String, Lifecycle> beans = getBeans();
 		
-		for(Entry<String, Lifecycle> entry : beans.entrySet()){
+		List<ComponentWrapper> componentWrappers  = getComponents();
+		for(int i = componentWrappers.size() -1 ; i>=0 ; i--){
 			
-			if(selfManagement(entry)){
+			ComponentWrapper componentWrapper = componentWrappers.get(i); 
+					
+			String name = componentWrapper.getName();
+			Lifecycle lifecycleComponent = componentWrapper.getComponent(); 
+			if(selfManagement(componentWrapper)){
 				continue;
 			}
 			
 			if(logger.isInfoEnabled()){
-				logger.info("[stop]" + entry.getKey());
+				logger.info("[stop]" + name);
 			}
-			entry.getValue().stop();
+			lifecycleComponent.stop();
 		}
 
-		for(Entry<String, Lifecycle> entry : beans.entrySet()){
-
-			if(selfManagement(entry)){
+		for(int i = componentWrappers.size() -1 ; i>=0 ; i--){
+			
+			ComponentWrapper componentWrapper = componentWrappers.get(i); 
+			
+			String name = componentWrapper.getName();
+			Lifecycle lifecycleComponent = componentWrapper.getComponent(); 
+			if(selfManagement(componentWrapper)){
 				continue;
 			}
-
+			
 			if(logger.isInfoEnabled()){
-				logger.info("[dispose]" + entry.getKey());
+				logger.info("[dispose]" + name);
 			}
-			entry.getValue().dispose();
+			lifecycleComponent.dispose();;
 		}
+
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		
-		Map<String, Lifecycle> beans = getBeans();
-		
-		for(Entry<String, Lifecycle> entry : beans.entrySet()){
+				
+		for(ComponentWrapper componentWrapper : getComponents()){
 			
-			if(selfManagement(entry)){
+			String name = componentWrapper.getName();
+			Lifecycle lifecycleComponent = componentWrapper.getComponent(); 
+			if(selfManagement(componentWrapper)){
 				continue;
 			}
 			
 			if(logger.isInfoEnabled()){
-				logger.info("[init]" + entry.getKey());
+				logger.info("[init]" + name);
 			}
-			entry.getValue().initialize();
+			lifecycleComponent.initialize();
 		}
 
-		for(Entry<String, Lifecycle> entry : beans.entrySet()){
-
-			if(selfManagement(entry)){
+		for(ComponentWrapper componentWrapper : getComponents()){
+			
+			String name = componentWrapper.getName();
+			Lifecycle lifecycleComponent = componentWrapper.getComponent(); 
+			if(selfManagement(componentWrapper)){
 				continue;
 			}
-
+			
 			if(logger.isInfoEnabled()){
-				logger.info("[start]" + entry.getKey());
+				logger.info("[start]" + name);
 			}
-			entry.getValue().start();
+			lifecycleComponent.start();
 		}
-
-		
 	}
 
-	private boolean selfManagement(Entry<String, Lifecycle> entry) {
+	private boolean selfManagement(ComponentWrapper component) {
 		
-		if(entry.getValue() instanceof SelfManagement){
+		if(component.getComponent() instanceof SelfManagement){
 			if(logger.isInfoEnabled()){
-				logger.info("[selfManagement]" + entry.getKey());
+				logger.info("[selfManagement]" + component.getName());
 			}
 			return true;
 		}
@@ -99,9 +112,28 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		return false;
 	}
 
-	private Map<String, Lifecycle> getBeans() {
+	private List<ComponentWrapper> getComponents() {
 		
-		return applicationContext.getBeansOfType(Lifecycle.class);
+		Map<String, Lifecycle> components = applicationContext.getBeansOfType(Lifecycle.class);
+		List<ComponentWrapper> result = new LinkedList<LifecycleComponentManager.ComponentWrapper>();
+		for(Entry<String, Lifecycle> entry : components.entrySet()){
+			
+			result.add(new ComponentWrapper(entry.getKey(), entry.getValue()));
+		}
+		
+		Collections.sort(result, new Comparator<ComponentWrapper>() {
+
+			@Override
+			public int compare(ComponentWrapper o1, ComponentWrapper o2) {
+				return o1.getComponent().getOrder() <= o2.getComponent().getOrder() ? -1 : 1;
+			}
+		});
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[getComponents]" + result);
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -111,4 +143,28 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		this.applicationContext = applicationContext;
 	}
 
+	
+	class ComponentWrapper{
+		
+		private String name;
+		private Lifecycle component;
+		
+		public ComponentWrapper(String name, Lifecycle component) {
+			this.name = name;
+			this.component = component;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public Lifecycle getComponent() {
+			return component;
+		}
+		
+		@Override
+		public String toString() {
+			return name;
+		}
+	}
 }

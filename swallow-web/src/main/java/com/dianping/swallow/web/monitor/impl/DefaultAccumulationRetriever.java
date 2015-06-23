@@ -15,8 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +63,11 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	
 	private ExecutorService executors;
 	
-	@PostConstruct
-	public void postDefaultAccumulationRetriever(){
+	
+	@Override
+	protected void doInitialize() throws Exception {
+		
+		super.doInitialize();
 		
 		int corePoolSize = mongoManager.getMongoCount() * mongoManager.getMongoOptions().getConnectionsPerHost();
 		if(logger.isInfoEnabled()){
@@ -74,8 +75,8 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		}
 		executors = Executors.newFixedThreadPool(corePoolSize, new MQThreadFactory("ACCUMULATION_RETRIEVER-"));
 		webConfig.addChangeListener(this);
+
 	}
-	
 
 	@Override
 	protected void doBuild() {

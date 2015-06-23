@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
+import com.dianping.swallow.common.internal.lifecycle.Ordered;
 
 /**
  * 生命周期抽象实现，只记录日志
@@ -11,7 +12,7 @@ import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
  *
  * 2014年11月7日 下午2:27:39
  */
-public class AbstractLifecycle implements Lifecycle{
+public abstract class AbstractLifecycle implements Lifecycle{
 
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 
@@ -66,6 +67,12 @@ public class AbstractLifecycle implements Lifecycle{
 
 	protected void doDispose() throws Exception {
 		
+	}
+
+	@Override
+	public int getOrder() {
+		
+		return Ordered.LAST;
 	}
 
 }

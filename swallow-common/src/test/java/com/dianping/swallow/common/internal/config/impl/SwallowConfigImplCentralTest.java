@@ -1,10 +1,6 @@
 package com.dianping.swallow.common.internal.config.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+
 import java.util.Map;
 
 import org.junit.Assert;
@@ -101,29 +97,5 @@ public class SwallowConfigImplCentralTest extends AbstractTest {
 			lionUtil.createOrSetConfig(SwallowConfigCentral.LION_KEY_MSG_CAPPED_COLLECTION_MAX_DOC_NUM, rawConfigMax);
 		}
 		
-	}
-	
-	@Test
-	public void testUrlConnection() throws IOException{
-		
-		URL url = new URL("http://192.168.218.22:1234");
-		
-		for(int i=0 ;i<1;i++){
-			
-			HttpURLConnection connection = null;
-			try{
-				connection = (HttpURLConnection) url.openConnection();
-				BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-				
-				String line = null;
-				while((line = reader.readLine()) != null){
-					System.out.println(line);
-				}
-			}finally{
-				if(connection != null){
-					connection.disconnect();
-				}
-			}
-		}
 	}
 }

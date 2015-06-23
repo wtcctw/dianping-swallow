@@ -19,9 +19,13 @@
 		class="com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl">
 	</bean>
 
-	<bean id="mongoManager"
-		class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager"/>
+    <bean id="mongoManager"
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager" 
+        init-method="initialize" destroy-method="dispose">
+        <property name="swallowConfig" ref="swallowConfig"/>
+    </bean>
+	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
 		
-	
+		
 
 </beans>
