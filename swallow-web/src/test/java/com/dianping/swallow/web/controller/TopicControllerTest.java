@@ -56,7 +56,7 @@ public class TopicControllerTest {
 	public void testEditTopic() {
 		
 		try {
-			this.mockMvc.perform(post("/console/topic/auth/edittopic")
+			this.mockMvc.perform(post("/api/topic/edittopic")
 					.param("prop", "yapu.wang").param("topic",
 							"example2").param("time", "2015-05-12 09:46"));
 		} catch (Exception e) {
@@ -69,9 +69,10 @@ public class TopicControllerTest {
 		String encodeuser = Base64.encodeBase64String(USERNAME.getBytes());     
 		post.setRequestHeader(AUTHORIZATION, encodeuser);
 		NameValuePair[] param = {
-				new NameValuePair("prop", "yapu.wang"),
+				new NameValuePair("prop", "jialin.tian"),
 				new NameValuePair("time", "2015-06-12 35:35"),
-				new NameValuePair("topic", "example") };
+				new NameValuePair("topic", "example"),
+				new NameValuePair("exec_user", "hongjun.zhong")};
 		post.setRequestBody(param);
 		post.releaseConnection();
 		return post;
@@ -85,10 +86,9 @@ public class TopicControllerTest {
 			host = configCache.getProperty("swallow.web.sso.url");
 			host = "http://localhost:8080";  //本机测试使用，真实环境时注释之
 		} catch (LionException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		String url = host + "/console/topic/auth/edittopic";
+		String url = host + "/api/topic/edittopic";
 		HttpClient httpClient = new HttpClient();
 
 		try {
@@ -98,7 +98,7 @@ public class TopicControllerTest {
 			String response = method.getResponseBodyAsString();
 			try {
 				JSONObject json = new JSONObject(response);
-				assertEquals(json.getInt("status"), -2);
+				assertEquals(json.getInt("status"), 0);
 				System.out.println(response);
 				System.out.println(json.getInt("status"));
 				System.out.println(json.getString("message"));

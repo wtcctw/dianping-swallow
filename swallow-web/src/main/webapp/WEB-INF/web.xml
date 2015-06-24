@@ -135,7 +135,6 @@
 
 	<filter-mapping>
 		<filter-name>AuthenticationFilter</filter-name>
-		<url-pattern>/console/topic/auth/*</url-pattern>
 		<url-pattern>/console/message/auth/*</url-pattern>
 		<url-pattern>/console/admin/auth/*</url-pattern>
 	</filter-mapping>
