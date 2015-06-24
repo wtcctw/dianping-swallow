@@ -107,7 +107,7 @@ public class DumpMessageController extends AbstractMenuController {
 
 	@Override
 	protected String getMenu() {
-		return "";
+		return "download";
 	}
 
 }

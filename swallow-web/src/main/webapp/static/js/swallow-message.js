@@ -197,11 +197,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        
 			$scope.formatres3 = function(items){
 				var str; 
-				//if($scope.isjsonstring(items))
 					str = JSON.stringify(items,null, 3);
-				//else
-				//	str = items;
-			    //alert(str);
 				$scope.fullmessage = str;
 				$('#myModal3').modal('show');
 			},
@@ -311,13 +307,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						//alert("Topic不能为空!")
 					}
 					else{
-						var pre_reverse;
+						var sort = false;
 						if(typeof($scope.searchPaginator) != "undefined"){
-							pre_reverse = $scope.searchPaginator.reverse;
+							sort = $scope.searchPaginator.reverse;
 						}
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt, "");
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt, "", sort);
 	            		if(typeof($scope.searchPaginator) != "undefined"){
-	            			$scope.searchPaginator.reverse = pre_reverse;	            		
+	            			$scope.searchPaginator.reverse = sort;	            		
 	            		}
 					}
 				}
@@ -330,13 +326,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	            	if($scope.tname == null || $scope.tname.length == 0)
 	            		alert("请先输入Topic名称");  //query with mid but without topic name
 	            	else{
-						var pre_reverse;
+						var sort = false;
 						if(typeof($scope.searchPaginator) != "undefined"){
-							pre_reverse = $scope.searchPaginator.reverse;
+							sort = $scope.searchPaginator.reverse;
 						}
-	            		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, "");
+	            		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, "", sort);
 	            		if(typeof($scope.searchPaginator) != "undefined"){
-	            			$scope.searchPaginator.reverse = pre_reverse;	            		
+	            			$scope.searchPaginator.reverse = sort;	            		
 	            		}
 	            	}
 	            }
@@ -345,13 +341,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        //invoke when topic name is not empty and recordofperpage is changed
 	        $scope.makeChanged = function(){
 	        	if($scope.tname.length != 0){
-					var pre_reverse;
+					var sort;
 					if(typeof($scope.searchPaginator) != "undefined"){
-						pre_reverse = $scope.searchPaginator.reverse;
+						sort = $scope.searchPaginator.reverse;
 					}
-	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, "");
+	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, "", sort);
             		if(typeof($scope.searchPaginator) != "undefined"){
-            			$scope.searchPaginator.reverse = pre_reverse;	            		
+            			$scope.searchPaginator.reverse = sort;	            		
             		}
 	        	}
 	        };
@@ -398,14 +394,14 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 							});
 						}
 						else{
-							var pre_reverse;
+							var sort;
 							if(typeof($scope.searchPaginator) != "undefined"){
-								pre_reverse = $scope.searchPaginator.reverse;
+								sort = $scope.searchPaginator.reverse;
 							}
 							$scope.tname = c;
-							$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
+							$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "", sort);
 		            		if(typeof($scope.searchPaginator) != "undefined"){
-		            			$scope.searchPaginator.reverse = pre_reverse;	            		
+		            			$scope.searchPaginator.reverse = sort;	            		
 		            		}
 						}
 						$scope.fulltopicname = c;
@@ -481,13 +477,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
         			  $scope.messageId = "";
         			  $scope.startdt = "";
         			  $scope.stopdt = "";
-        			  var pre_reverse;
+        			  var sort;
 					  if(typeof($scope.searchPaginator) != "undefined"){
-						  pre_reverse = $scope.searchPaginator.reverse;
+						  sort = $scope.searchPaginator.reverse;
 					  }
-        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
+        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "", sort);
 	            	  if(typeof($scope.searchPaginator) != "undefined"){
-	            		  $scope.searchPaginator.reverse = pre_reverse;	            		
+	            		  $scope.searchPaginator.reverse = sort;	            		
 	            	  }
 	        });
 	        
@@ -557,13 +553,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        		$scope.startdt = "";
 					$scope.stopdt = "";
 					$scope.messageId = "";
-      			    var pre_reverse;
+      			    var sort;
 				    if(typeof($scope.searchPaginator) != "undefined"){
-					    pre_reverse = $scope.searchPaginator.reverse;
+					    sort = $scope.searchPaginator.reverse;
 				    }
-					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "", sort);
 	            	if(typeof($scope.searchPaginator) != "undefined"){
-	            		$scope.searchPaginator.reverse = pre_reverse;	            		
+	            		$scope.searchPaginator.reverse = sort;	            		
 	            	}
 	        	});
 	        }
@@ -594,7 +590,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					$scope.mintime = data.min;
 					$scope.maxtime = data.max;
 					if(data.min.length > 0){  //没有纪录就不用查询了
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "", false);
 					}
 				});
 			}
