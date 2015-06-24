@@ -27,8 +27,7 @@ import com.dianping.swallow.web.service.TopicService;
  *         2015年5月14日下午1:16:09
  */
 @Service("topicService")
-public class TopicServiceImpl extends AbstractSwallowService implements
-		TopicService {
+public class TopicServiceImpl extends AbstractSwallowService implements TopicService {
 
 	private static final String DELIMITOR = ",";
 
@@ -37,7 +36,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 
 	@Resource(name = "administratorService")
 	private AdministratorService administratorService;
-	
+
 	private Map<String, Set<String>> topicToWhiteList = new ConcurrentHashMap<String, Set<String>>();
 
 	@Override
@@ -46,36 +45,34 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 	}
 
 	@Override
-	public Map<String, Object> loadSpecificTopic(int start, int span,
-			String name, String prop) {
+	public Map<String, Object> loadSpecificTopic(int start, int span, String name, String prop) {
 
 		return topicDao.findSpecific(start, span, name, prop);
 	}
 
 	@Override
 	public List<String> loadAllTopicNames(String tongXingZheng, boolean isAdmin) {
-		
+
 		Map<String, Set<String>> topicToWhiteList = this.loadTopicToWhiteList();
-		if(isAdmin){
+		if (isAdmin) {
 			return new ArrayList<String>(topicToWhiteList.keySet());
-		}
-		else{
+		} else {
 			List<String> topics = new ArrayList<String>();
-			for(Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()){
-				if(entry.getValue().contains(tongXingZheng)){
+			for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
+				if (entry.getValue().contains(tongXingZheng)) {
 					String topic = entry.getKey();
-					if(!topics.contains(topic)){
+					if (!topics.contains(topic)) {
 						topics.add(topic);
 					}
 				}
-			} 
+			}
 			return topics;
 		}
 	}
 
 	@Override
 	public int editTopic(String name, String prop, String time) {
-		
+
 		this.loadTopicToWhiteList().put(name, splitProps(prop));
 		return topicDao.updateTopic(name, prop, time);
 	}
@@ -86,24 +83,23 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		Set<String> proposal = new HashSet<String>();
 		List<Topic> topics = topicDao.findAll();
 
-		if(all){
+		if (all) {
 			for (Topic topic : topics) {
 				proposal.addAll(getPropList(topic));
 			}
-		}
-		else{
+		} else {
 			for (Topic topic : topics) {
 				Set<String> tmpprop = getPropList(topic);
-				if(tmpprop.contains(username)){
+				if (tmpprop.contains(username)) {
 					proposal.addAll(tmpprop);
 				}
 			}
 
 		}
-		
+
 		map.put("prop", proposal.toArray());
 		map.put("edit", administratorService.loadAllTypeName().toArray());
-		
+
 		return map;
 	}
 
@@ -124,10 +120,20 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
 		return lists;
 	}
-	
+
 	@Override
 	public Map<String, Set<String>> loadTopicToWhiteList() {
 		return topicToWhiteList;
+	}
+
+	@Override
+	public int saveTopic(Topic topic) {
+		return topicDao.saveTopic(topic);
+	}
+
+	@Override
+	public Topic loadTopic(String name) {
+		return topicDao.readByName(name);
 	}
 
 }

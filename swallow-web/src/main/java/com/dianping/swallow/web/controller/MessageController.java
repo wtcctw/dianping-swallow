@@ -34,30 +34,27 @@ public class MessageController extends AbstractMenuController {
 	ExtractUsernameUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/message")
-	public ModelAndView message(HttpServletRequest request,
-			HttpServletResponse response) {
-		
+	public ModelAndView message(HttpServletRequest request, HttpServletResponse response) {
+
 		return new ModelAndView("message/index", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/message/messagedefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object messageDefault(int offset, int limit, String tname,
-			String messageId, String startdt, String stopdt, String basemid,
-			HttpServletRequest request, HttpServletResponse response) {
+	public Object messageDefault(int offset, int limit, String tname, String messageId, String startdt, String stopdt,
+			String basemid, Boolean sort, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String username = extractUsernameUtils.getUsername(request);
 
-		map = messageService.getMessageFromSpecificTopic(offset, limit, tname,
-				messageId, startdt, stopdt, username, basemid);
+		map = messageService.getMessageFromSpecificTopic(offset, limit, tname, messageId, startdt, stopdt, username,
+				basemid, sort);
 		return map;
 	}
 
 	@RequestMapping(value = "/console/message/timespan", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object getMinAndMaxTime(String topic, HttpServletRequest request,
-			HttpServletResponse response) {
-		
+	public Object getMinAndMaxTime(String topic, HttpServletRequest request, HttpServletResponse response) {
+
 		Map<String, Object> map = new HashMap<String, Object>();
 		map = messageService.loadMinAndMaxTime(topic);
 		return map;
@@ -65,13 +62,12 @@ public class MessageController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/message/auth/content", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Message showMessageContent(String topic, String mid,
-			HttpServletRequest request, HttpServletResponse response)
+	public Message showMessageContent(String topic, String mid, HttpServletRequest request, HttpServletResponse response)
 			throws UnknownHostException {
 
 		return messageService.getMessageContent(topic, mid);
 	}
-	
+
 	@Override
 	protected String getMenu() {
 

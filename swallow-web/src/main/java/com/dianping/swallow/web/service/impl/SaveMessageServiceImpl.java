@@ -21,8 +21,7 @@ import com.dianping.swallow.web.service.SaveMessageService;
  *         2015年5月20日下午6:27:32
  */
 @Service("saveMessageService")
-public class SaveMessageServiceImpl extends AbstractSwallowService implements
-		SaveMessageService {
+public class SaveMessageServiceImpl extends AbstractSwallowService implements SaveMessageService {
 
 	private static final String VERSION = "0.7.1";
 	private static final String LOCALHOST = "127.0.0.1";
@@ -45,15 +44,15 @@ public class SaveMessageServiceImpl extends AbstractSwallowService implements
 
 	public void saveNewMessage(String topicName, String content, String type, String delimitor, String property) {
 		SwallowMessage sm = new SwallowMessage();
-		if(!StringUtils.isEmpty(type)){
+		if (!StringUtils.isEmpty(type)) {
 			sm.setType(type);
 		}
-		if(!StringUtils.isEmpty(property)){
+		if (!StringUtils.isEmpty(property)) {
 			Map<String, String> propertyMap = new HashMap<String, String>();
-			String[] entrys = property.split(delimitor+delimitor);
-			for(String entry : entrys){
+			String[] entrys = property.split(delimitor + delimitor);
+			for (String entry : entrys) {
 				String[] pair = entry.split(delimitor);
-				if(pair.length == 2){
+				if (pair.length == 2) {
 					propertyMap.put(pair[0], pair[1]);
 				}
 			}

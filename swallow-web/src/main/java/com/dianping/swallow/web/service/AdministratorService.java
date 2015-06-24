@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.dianping.swallow.web.model.Administrator;
+
 /**
  * @author mingdongli
  *
@@ -17,6 +19,8 @@ public interface AdministratorService {
 	 * @param limit	  偏移量
 	 */
 	Map<String, Object> loadAdmin(int offset, int limit);
+	
+	List<Administrator> loadAllAdmin();
 
 	
 	/**
@@ -28,7 +32,7 @@ public interface AdministratorService {
 	
 	/**
 	 * 根据通行证删除用户
-	 * @param name 通行证
+	 * @param name 用户名
 	 */
 	boolean removeAdmin(String name);
 	
@@ -42,14 +46,18 @@ public interface AdministratorService {
 	/**
 	 * 更新Administrator列表
 	 * @param admin  管理员纪录
-	 * @param name   通行证
+	 * @param name   用户名
 	 * @param auth	 角色
 	 */
 	boolean updateAdmin(String name, int auth);
+
+	/**
+	 * 
+	 * @param username 用户名
+	 */
+	boolean recordVisitToAdmin(String username);
 	
 	String loadDefaultAdmin();
-	
-	boolean recordVisitInAdmin(String username);
 	
 	
 }

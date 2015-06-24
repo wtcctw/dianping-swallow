@@ -14,7 +14,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -36,32 +35,29 @@ public class AuthenticationFilter implements Filter {
 
 	private ExtractUsernameUtils extractUsernameUtils;
 
-	private static final Logger logger = Logger
-			.getLogger(AuthenticationFilter.class);
-
+	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		ServletContext context = fConfig.getServletContext();
-		ApplicationContext ctx = WebApplicationContextUtils
-				.getRequiredWebApplicationContext(context);
-		this.authenticationService = ctx
-				.getBean(AuthenticationServiceImpl.class);
+		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
+		this.authenticationService = ctx.getBean(AuthenticationServiceImpl.class);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
 	}
 
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+			ServletException {
 
 		HttpServletRequest req = (HttpServletRequest) request;
 		String uri = req.getRequestURI();
 		String username = extractUsernameUtils.getUsername(req);
 		String topicname = req.getParameter("topic");
 
-		boolean pass = authenticationService.isValid(username, topicname, uri);
-		if (pass) {
+		boolean isPassed = authenticationService.isValid(username, topicname, uri);
+
+		if (isPassed) {
 			chain.doFilter(request, response);
 		} else {
-			sendErrorMessage(response,
-					ResponseStatus.UNAUTHENTICATION.getStatus(),
+			sendErrorMessage(response, ResponseStatus.UNAUTHENTICATION.getStatus(),
 					ResponseStatus.UNAUTHENTICATION.getMessage(), false);
 			return;
 		}
@@ -72,24 +68,27 @@ public class AuthenticationFilter implements Filter {
 		// ignore
 	}
 
-	private void sendErrorMessage(ServletResponse response, int status,
-			String message, boolean send) {
+	private void sendErrorMessage(ServletResponse response, int status, String message, boolean needSend)
+			throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put(SaveMessageController.STATUS, status);
 		result.put(SaveMessageController.MESSAGE, message);
-		if (send) {
+		if (needSend) {
 			result.put(SaveMessageController.SEND, 0);
 		}
+
 		JSONObject json = new JSONObject(result);
+
 		response.setContentType("application/json");
-		PrintWriter out = null;
+
+		PrintWriter out = response.getWriter();
+
 		try {
-			out = response.getWriter();
-		} catch (IOException e) {
-			logger.error("error when send response", e);
+			out.print(json);
+			out.flush();
+		} finally {
+			out.close();
 		}
-		out.print(json);
-		out.flush();
 	}
 
 }

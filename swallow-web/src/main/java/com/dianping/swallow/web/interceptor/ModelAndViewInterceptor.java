@@ -37,16 +37,17 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
 	ExtractUsernameUtils extractUsernameUtils;
-
+	
 	private static final Logger logger = Logger
 			.getLogger(ModelAndViewInterceptor.class);
 
+	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler) throws Exception {
-
 		return true;
 	}
 
+	@Override
 	public void postHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
@@ -61,6 +62,7 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 			logger.error("Use lion to get swallow.web.sso.url error.", e);
 		}
 		String username = extractUsernameUtils.getUsername(request);
+		
 		int visittype = authenticationService.checkVisitType(username);
 		
 		if (visittype == AuthenticationService.ADMINI) {
@@ -76,11 +78,10 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 			modelAndView.addObject(ISUSER, false);
 			modelAndView.addObject(ISVISITOR, true);
 		}
-
 		modelAndView.addObject(USERNAME, username);
 		modelAndView.addObject(LOGOUTURL, logoutUrl);
 		
-		administratorService.recordVisitInAdmin(username);
+		administratorService.recordVisitToAdmin(username);
 
 		logger.info(String
 				.format("Add [username : %s], [visittype : %d],  [logouturl : %s] to ModelAndView",

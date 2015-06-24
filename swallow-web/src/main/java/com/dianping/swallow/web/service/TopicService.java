@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.dianping.swallow.web.model.Topic;
+
 
 /**
  * @author mingdongli
@@ -29,6 +31,12 @@ public interface TopicService {
 	 */
 	Map<String, Object> loadSpecificTopic(int start, int span, String name,
 			String prop);
+	
+	/**
+	 * 
+	 * @param name  topic名称
+	 */
+	Topic loadTopic(String name);
 
 
 	/**
@@ -53,6 +61,12 @@ public interface TopicService {
 	 * @param all       是否返回所有
 	 */
 	Map<String, Object[]> getPropAndDept(String username, boolean all);
+	
+	/**
+	 * 
+	 * @param topic topic实例
+	 */
+	int saveTopic(Topic topic);
 	
 	Map<String, Set<String>> loadTopicToWhiteList();
 	

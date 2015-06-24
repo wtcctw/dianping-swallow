@@ -32,8 +32,7 @@ public class DefaultWebMongoManager implements WebMongoManager {
 
 	DefaultMongoManager mongoManager;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(DefaultWebMongoManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultWebMongoManager.class);
 
 	public void setMongoManager(DefaultMongoManager mongoManager) {
 		this.mongoManager = mongoManager;
@@ -44,16 +43,14 @@ public class DefaultWebMongoManager implements WebMongoManager {
 		try {
 			uri = ConfigCache.getInstance().getProperty(SWALLOW_W_MONGO);
 		} catch (LionException e) {
-			logger.error("Error when read " + SWALLOW_W_MONGO + " from lion.",
-					e);
+			logger.error("Error when read " + SWALLOW_W_MONGO + " from lion.", e);
 		}
 		try {
 			uri = ConfigCache.getInstance().getProperty(SWALLOW_MONGO);
 		} catch (LionException e) {
 			logger.error("Error when read " + SWALLOW_MONGO + " from lion.", e);
 		}
-		topicNameToMongoMap = mongoManager.parseURIAndCreateTopicMongo(uri
-				.trim());
+		topicNameToMongoMap = mongoManager.parseURIAndCreateTopicMongo(uri.trim());
 		try {
 			ConfigCache.getInstance().addChange(new ConfigChange() {
 
@@ -77,7 +74,7 @@ public class DefaultWebMongoManager implements WebMongoManager {
 	@Override
 	public MongoTemplate getMessageMongoTemplate(String topicName) {
 		Mongo mongo = this.getMongoClient(topicName);
-		MongoTemplate template = new MongoTemplate(new SimMongoDbFactory(mongo, PRE_MSG+ topicName));
+		MongoTemplate template = new MongoTemplate(new SimMongoDbFactory(mongo, PRE_MSG + topicName));
 		template.setReadPreference(mongo.getReadPreference());
 		return template;
 	}
@@ -85,8 +82,7 @@ public class DefaultWebMongoManager implements WebMongoManager {
 	private Mongo getMongoClient(String topicName) {
 		Mongo mongo = this.topicNameToMongoMap.get(topicName);
 		if (mongo == null) {
-			logger.debug("topicname '" + topicName
-					+ "' do not match any Mongo Server, use default.");
+			logger.debug("topicname '" + topicName + "' do not match any Mongo Server, use default.");
 			mongo = this.topicNameToMongoMap.get(TOPICNAME_DEFAULT);
 		}
 		return mongo;
@@ -101,14 +97,12 @@ public class DefaultWebMongoManager implements WebMongoManager {
 		value = value.trim();
 		try {
 			if (SWALLOW_MONGO.equals(key)) {
-				this.topicNameToMongoMap = mongoManager
-						.parseURIAndCreateTopicMongo(value);
+				this.topicNameToMongoMap = mongoManager.parseURIAndCreateTopicMongo(value);
 				Thread.sleep(5000);
 			}
 		} catch (Exception e) {
 			logger.error(
-					"Error occour when reset config from Lion, no config property would changed :"
-							+ e.getMessage(), e);
+					"Error occour when reset config from Lion, no config property would changed :" + e.getMessage(), e);
 		}
 	}
 

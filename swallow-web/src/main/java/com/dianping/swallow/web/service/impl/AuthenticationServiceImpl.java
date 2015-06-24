@@ -21,64 +21,66 @@ import com.dianping.swallow.web.service.TopicService;
  */
 @Service("authenticationService")
 public class AuthenticationServiceImpl extends AbstractSwallowService implements AuthenticationService {
-	
+
 	private static final String MESSAGEURI = "/console/message/auth";
 
 	private static final String ADMINURI = "/console/admin/auth";
 
 	private static final String ALL = "all";
-	
+
 	@Value("${swallow.web.env.notproduct}")
 	private boolean showContentToAll;
-	
+
 	@Resource(name = "administratorService")
 	private AdministratorService administratorService;
-	
+
 	@Resource(name = "topicService")
 	private TopicService topicService;
-	
+
 	@PostConstruct
-	private void addAllToAdmin(){
-		
+	private void addAllToAdmin() {
+
 		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
-		if(showContentToAll && !env){
+		if (showContentToAll && !env) {
 			administratorService.loadAdminSet().add(ALL);
 		}
 	}
-	
+
 	@Override
 	public boolean isValid(String username, String topic, String uri) {
-
 		logger.info(String.format("%s request %s", username, uri));
-		if(administratorService.loadAdminSet().contains(username)){
+
+		Set<String> loadAdminSet = administratorService.loadAdminSet();
+
+		if (loadAdminSet.contains(username)) {
 			return true;
-		}else if (administratorService.loadAdminSet().contains(ALL) && !uri.startsWith(ADMINURI)) {
+		} else if (loadAdminSet.contains(ALL) && !uri.startsWith(ADMINURI)) {
 			return true;
-		}else if (uri.startsWith(MESSAGEURI)) {
-			if(StringUtils.isNotBlank(topic) && topicService.loadTopicToWhiteList().get(topic).contains(username)){
+		} else if (uri.startsWith(MESSAGEURI)) {
+			if (StringUtils.isNotBlank(topic) && topicService.loadTopicToWhiteList().get(topic).contains(username)) {
 				return true;
-			}else{
+			} else {
 				return false;
 			}
-		}else{
+		} else {
 			return false;
-		} 
+		}
 	}
 
 	@Override
 	public int checkVisitType(String username) {
-		
-		if(administratorService.loadAdminSet().contains(username)){
+
+		if (administratorService.loadAdminSet().contains(username)) {
 			return AuthenticationService.ADMINI;
-		}else {
+		} else {
 			Collection<Set<String>> topicUsers = topicService.loadTopicToWhiteList().values();
-			for(Set<String> set : topicUsers){
-				if(set.contains(username)){
+			for (Set<String> set : topicUsers) {
+				if (set.contains(username)) {
 					return AuthenticationService.USER;
 				}
 			}
 			return AuthenticationService.VISITOR;
 		}
 	}
-	
+
 }

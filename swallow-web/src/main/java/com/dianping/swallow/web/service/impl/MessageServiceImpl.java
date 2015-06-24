@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -16,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Message;
@@ -30,19 +30,19 @@ import com.dianping.swallow.web.util.ResponseStatus;
  *         2015年5月14日下午1:20:29
  */
 @Service("messageService")
-public class MessageServiceImpl extends AbstractSwallowService implements
-		MessageService {
+public class MessageServiceImpl extends AbstractSwallowService implements MessageService {
 
 	private static final String PRE_MSG = "msg#";
 	private static final String MESSAGE = "message";
 	private static final String GZIP = "H4sIAAAAAAAAA";
 
+	ExecutorService exec = Executors.newFixedThreadPool(CommonUtils.getCpuCount());
+
 	@Autowired
 	private MessageDao webMessageDao;
 
-	public Map<String, Object> getMessageFromSpecificTopic(int start, int span,
-			String tname, String messageId, String startdt, String stopdt,
-			String username, String baseMid) {
+	public Map<String, Object> getMessageFromSpecificTopic(int start, int span, String tname, String messageId,
+			String startdt, String stopdt, String username, String baseMid, boolean sort) {
 		String dbn = PRE_MSG + tname;
 		long mid = -1;
 		if (!messageId.isEmpty()) { // messageId is not empty
@@ -53,21 +53,18 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 					mid = Long.parseLong(messageId.trim());
 				} catch (NumberFormatException e) {
 					if (logger.isErrorEnabled()) {
-						logger.error("Error when parse " + messageId.trim()
-								+ " to Long.", e);
+						logger.error("Error when parse " + messageId.trim() + " to Long.", e);
 					}
 					mid = 0;
 				}
 			}
 		}
-		return getResults(dbn, start, span, mid, startdt, stopdt, username,
-				baseMid);
+		return getResults(dbn, start, span, mid, startdt, stopdt, username, baseMid, sort);
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> getByIp(String dbn, int start, int span,
-			String ip, String username) {
-		
+	private Map<String, Object> getByIp(String dbn, int start, int span, String ip, String username) {
+
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 		sizeAndMessage = webMessageDao.findByIp(start, span, ip, subStr);
@@ -76,24 +73,19 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 	}
 
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> getResults(String dbn, int start, int span,
-			long mid, String startdt, String stopdt, String username,
-			String baseMid) {
-		
+	private Map<String, Object> getResults(String dbn, int start, int span, long mid, String startdt, String stopdt,
+			String username, String baseMid, boolean sort) {
+
 		String subStr = dbn.substring(PRE_MSG.length());
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
 		if (mid < 0 && (startdt + stopdt).isEmpty()) {
-			sizeAndMessage = webMessageDao.findByTopicname(start, span,
-					subStr, baseMid);
-		} else if (startdt == null || startdt.isEmpty()) {
-			sizeAndMessage = webMessageDao.findSpecific(start, span,
-					mid, subStr);
+			sizeAndMessage = webMessageDao.findByTopicname(start, span, subStr, baseMid, sort);
+		} else if (StringUtils.isEmpty(startdt)) {
+			sizeAndMessage = webMessageDao.findSpecific(start, span, mid, subStr, sort);
 		} else if (mid < 0) {
-			sizeAndMessage = webMessageDao.findByTime(start, span,
-					startdt, stopdt, subStr, baseMid);
+			sizeAndMessage = webMessageDao.findByTime(start, span, startdt, stopdt, subStr, baseMid, sort);
 		} else {
-			sizeAndMessage = webMessageDao.findByTimeAndId(start, span,
-					mid, startdt, stopdt, subStr);
+			sizeAndMessage = webMessageDao.findByTimeAndId(start, span, mid, startdt, stopdt, subStr);
 		}
 
 		beforeResponse((List<Message>) sizeAndMessage.get(MESSAGE));
@@ -112,36 +104,20 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		map = webMessageDao.findMinAndMaxTime(topicName);
 		return map;
 	}
-	
-	@Override
-	public Integer exportMessage(String topicName, String startdt,
-			String stopdt, String filename) {
-		ExecutorService exec = Executors.newFixedThreadPool(1);
-		DumpMessageTask fileDownloadTask = new DumpMessageTask();
-		fileDownloadTask.setTopic(topicName).setStartdt(startdt)
-				.setStopdt(stopdt).setFilename(filename)
-				.setWebMessageDao(webMessageDao);
-		FutureTask<Integer> futureTask = new FutureTask<Integer>(
-				fileDownloadTask);
-		exec.submit(futureTask);
-		exec.shutdown();
-		logger.info(String.format(
-				"Start download task for %s to export messages from %s to %s",
-				topicName, startdt, stopdt));
-		
-		try {
-			int result = futureTask.get();
-			return result;
-		} catch (InterruptedException e) {
-			logger.error("InterruptedException occur when get FutureTask", e);
-			return ResponseStatus.INTERRUPTEDEXCEPTION.getStatus();
-		} catch (ExecutionException e) {
-			logger.error("ExecutionException occur when get FutureTask", e);
-			return ResponseStatus.RUNTIMEEXCEPTION.getStatus();
-		}
-		
-	}
 
+	@Override
+	public Integer exportMessage(String topicName, String startdt, String stopdt, String filename) {
+
+		DumpMessageTask fileDownloadTask = new DumpMessageTask();
+		fileDownloadTask.setTopic(topicName).setStartdt(startdt).setStopdt(stopdt).setFilename(filename)
+				.setWebMessageDao(webMessageDao);
+		FutureTask<Integer> futureTask = new FutureTask<Integer>(fileDownloadTask);
+		exec.submit(futureTask);
+		logger.info(String.format("Start download task for %s to export messages from %s to %s", topicName, startdt,
+				stopdt));
+
+		return ResponseStatus.SUCCESS.getStatus();
+	}
 
 	private void setSMessageProperty(Message m) {
 		m.setMid(m.get_id());
@@ -180,8 +156,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements
 		List<Message> messageList = new ArrayList<Message>();
 
 		long messageId = Long.parseLong(mid);
-		messageList = (List<Message>) webMessageDao.findSpecific(0, 1,
-				messageId, topic).get(MESSAGE);
+		messageList = (List<Message>) webMessageDao.findSpecific(0, 1, messageId, topic, false).get(MESSAGE);
 		isZipped(messageList.get(0));
 		return messageList.get(0);
 

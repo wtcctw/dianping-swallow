@@ -12,17 +12,16 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.controller.DumpMessageController;
 
-
 /**
  * @author mingdongli
  *
- * 2015年6月17日下午6:26:07
+ *         2015年6月17日下午6:26:07
  */
 @Component
 public class ClearDownloadFileTask {
-	
+
 	private static final String TIMEFORMATE = "yyyyMMddHHmm";
-	
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Scheduled(fixedDelay = 86400000)
@@ -34,40 +33,40 @@ public class ClearDownloadFileTask {
 			return;
 		}
 		File[] allFiles = file.listFiles();
-		for(File f : allFiles){
+		for (File f : allFiles) {
 			String fname = f.getName();
-			if(checkIfOutOfTime(fname)){
-				boolean  deleted = f.delete();
-				if(deleted){
+			if (checkIfOutOfTime(fname)) {
+				boolean deleted = f.delete();
+				if (deleted) {
 					logger.info(String.format("Delete file %s", fname));
-				}else{
+				} else {
 					logger.info(String.format("Error when delete file %s", fname));
 				}
 			}
 		}
 	}
-	
-	private boolean checkIfOutOfTime(String filename){
+
+	private boolean checkIfOutOfTime(String filename) {
 		String[] pieces = filename.split("_|\\.");
-		if(pieces.length < 3){
+		if (pieces.length < 3) {
 			logger.info("File name format is wrong");
 			return true;
-		}else{
+		} else {
 			String datestring = pieces[pieces.length - 2];
-			SimpleDateFormat sdf=new SimpleDateFormat(TIMEFORMATE); 
+			SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATE);
 			try {
-				Date date=sdf.parse(datestring);
+				Date date = sdf.parse(datestring);
 				long diff = new Date().getTime() - date.getTime();
 				long days = diff / 86400000;
-				if(days > 2 || days < 0){
+				if (days > 2 || days < 0) {
 					return true;
-				}else{
+				} else {
 					return false;
 				}
 			} catch (ParseException e) {
 				logger.info("Error when parse date in filename");
 				return true;
-			}  
+			}
 		}
 	}
 }

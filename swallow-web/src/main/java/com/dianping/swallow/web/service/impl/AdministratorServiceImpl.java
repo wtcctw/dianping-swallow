@@ -29,8 +29,7 @@ import com.dianping.swallow.web.service.TopicService;
  *         2015年5月14日下午8:04:43
  */
 @Service("administratorService")
-public class AdministratorServiceImpl extends AbstractSwallowService implements
-		AdministratorService {
+public class AdministratorServiceImpl extends AbstractSwallowService implements AdministratorService {
 
 	private static final String ADMIN = "admin";
 	private static final String SIZE = "size";
@@ -38,32 +37,29 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 
 	@Value("${swallow.web.admin.defaultadmin}")
 	private String defaultAdmin;
-	
+
 	@Autowired
 	private AdministratorDao administratorDao;
-	
+
 	@Resource(name = "topicService")
 	private TopicService topicService;
 
 	private Set<String> adminSet = new HashSet<String>();
-	
+
 	@Override
 	public Map<String, Object> loadAdmin(int offset, int limit) {
 
 		return getFixedAdministratorFromExisting(offset, limit);
 	}
 
-	private Map<String, Object> getFixedAdministratorFromExisting(int start,
-			int span) {
+	private Map<String, Object> getFixedAdministratorFromExisting(int start, int span) {
 		Long totalNumOfTopic = administratorDao.countAdministrator();
-		List<Administrator> administratorList = administratorDao
-				.findFixedAdministrator(start, span);
+		List<Administrator> administratorList = administratorDao.findFixedAdministrator(start, span);
 
 		return buildResponse(administratorList, totalNumOfTopic);
 	}
 
-	private Map<String, Object> buildResponse(
-			List<Administrator> administratorList, Long adminSize) {
+	private Map<String, Object> buildResponse(List<Administrator> administratorList, Long adminSize) {
 		Map<String, Object> map = new HashMap<String, Object>();
 
 		map.put(SIZE, adminSize);
@@ -74,12 +70,13 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 	@Override
 	public boolean createAdmin(String name, int auth) {
 
-		if(auth == 0){
-			this.loadAdminSet().add(name);  //create, need add in adminSet in memory
+		if (auth == 0) {
+			this.loadAdminSet().add(name); // create, need add in adminSet in
+											// memory
 			logger.info(String.format("Add administrator %s to admin list.", name));
-		}
-		else{
-			this.loadAdminSet().remove(name);  //edit, need remove in adminSet in memory
+		} else {
+			this.loadAdminSet().remove(name); // edit, need remove in adminSet
+												// in memory
 			logger.info(String.format("Remove administrator %s from admin list.", name));
 		}
 		return this.updateAdmin(name, auth);
@@ -90,11 +87,11 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 		this.loadAdminSet().remove(name);
 		int n = administratorDao.deleteByName(name);
 		if (n != 1) {
-				logger.info("deleteByName is wrong with name: " + name);
-				return false;
+			logger.info("deleteByName is wrong with name: " + name);
+			return false;
 		} else {
-				logger.info("delete administrator with name [" + name + "]");
-				return true;
+			logger.info("delete administrator with name [" + name + "]");
+			return true;
 		}
 	}
 
@@ -107,14 +104,13 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 		}
 		return adminLists;
 	}
-	
+
 	@Override
 	public boolean updateAdmin(String name, int auth) {
 		Administrator admin = administratorDao.readByName(name);
-		if(admin == null){
+		if (admin == null) {
 			return doneCreateAdmin(name, auth);
-		}
-		else{
+		} else {
 			admin.setName(name).setRole(auth).setDate(new SimpleDateFormat(TIMEFORMAT).format(new Date()));
 			return administratorDao.saveAdministrator(admin);
 		}
@@ -132,7 +128,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 		admin.setName(name).setRole(role).setDate(date);
 		return admin;
 	}
-	
+
 	@Override
 	public Set<String> loadAdminSet() {
 
@@ -145,37 +141,40 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements
 	}
 
 	@Override
-	public boolean recordVisitInAdmin(String username) {
+	public boolean recordVisitToAdmin(String username) {
 		Administrator admin = administratorDao.readByName(username);
 		if (admin != null) {
 			int role = admin.getRole();
 			if (role == 0) {
 				return updateAdmin(username, role);
 			}
-		} 
+		}
 
 		return switchUserAndVisitor(username);
 	}
-	
+
 	private boolean switchUserAndVisitor(String username) {
 		if (isUser(username)) {
-			return this.updateAdmin(username,
-					AuthenticationService.USER);
+			return this.updateAdmin(username, AuthenticationService.USER);
 		} else {
-			return this.updateAdmin(username,
-					AuthenticationService.VISITOR);
+			return this.updateAdmin(username, AuthenticationService.VISITOR);
 		}
 	}
-	
+
 	private boolean isUser(String username) {
-		
+
 		Collection<Set<String>> topicUsers = topicService.loadTopicToWhiteList().values();
-		for(Set<String> set : topicUsers){
-			if(set.contains(username)){
+		for (Set<String> set : topicUsers) {
+			if (set.contains(username)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public List<Administrator> loadAllAdmin() {
+		return administratorDao.findAll();
 	}
 
 }

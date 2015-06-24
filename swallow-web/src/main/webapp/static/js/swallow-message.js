@@ -1,5 +1,5 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize, tname, messageId, startdt, stopdt){
+	return function(fetchFunction, pageSize, tname, messageId, startdt, stopdt, sort){
 		var paginator = {
 				hasNextVar: false,
 				limit : pageSize,
@@ -32,7 +32,7 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/self.limit) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt, this.basemid, function(data){
+					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt, this.basemid, sort, function(data){
 						pageSize = self.limit;
 						self.basemid = "";
 						
@@ -60,12 +60,12 @@ module.factory('Paginator', function(){
 			                    self.currentPage
 			                ];
 			            }
-						if(!self.reverse){
-							self.currentPageItems = items.slice(0, pageSize);
-						}
-						else{
-							self.currentPageItems = items.slice(0, pageSize).reverse();
-						}
+//						if(!self.reverse){
+//							self.currentPageItems = items.slice(0, pageSize);
+//						}
+//						else{
+//							self.currentPageItems = items.slice(0, pageSize).reverse();
+//						}
 						if (self.currentPageItems.length > 0) {
 							$("#message-retransmit").css(
 									'display', 'block');
@@ -120,12 +120,12 @@ module.factory('Paginator', function(){
 
 module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog', '$interval',
         function($rootScope, $scope, $http, Paginator, ngDialog, $interval){
-				var fetchFunction = function(offset, limit, tname, messageId, startdt, stopdt, basemid, callback){
+				var fetchFunction = function(offset, limit, tname, messageId, startdt, stopdt, basemid, sort, callback){
 				var transFn = function(data){
 					return $.param(data);
 				}
 				var postConfig = {
-						transformRequest: transFn
+					transformRequest: transFn
 				};
 				var data = {'offset' : offset,
 										'limit': limit,
@@ -133,7 +133,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 										'messageId': messageId,
 										'startdt' : startdt,
 										'stopdt' : stopdt,
-										'basemid' : basemid};
+										'basemid' : basemid,
+										'sort' : sort};
 				$http.get(window.contextPath + $scope.suburl, {
 					params : {
 						offset : offset,
@@ -142,7 +143,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						messageId: messageId,
 						startdt : startdt,
 						stopdt : stopdt,
-						basemid : basemid
+						basemid : basemid,
+						sort : sort
 					}
 				}).success(callback);
 			};
@@ -385,13 +387,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 								$scope.mintime = data.min;
 								$scope.maxtime = data.max;
 								$scope.tname = c;
-								var pre_reverse;
+								var sort = false;
 								if(typeof($scope.searchPaginator) != "undefined"){
-									pre_reverse = $scope.searchPaginator.reverse;
+									sort = $scope.searchPaginator.reverse;
 								}
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "");
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "",sort);
 			            		if(typeof($scope.searchPaginator) != "undefined"){
-			            			$scope.searchPaginator.reverse = pre_reverse;	            		
+			            			$scope.searchPaginator.reverse = sort;	            		
 			            		}
 							});
 						}
@@ -599,8 +601,9 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			
 			//reverse record
 			$scope.reverse = function(){
-				$scope.searchPaginator.currentPageItems.reverse();
-				$scope.searchPaginator.reverse = !$scope.searchPaginator.reverse;
+				var tmprev = !$scope.searchPaginator.reverse;
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, "", tmprev);
+				$scope.searchPaginator.reverse = tmprev;
 			}
 	        
 }]);
