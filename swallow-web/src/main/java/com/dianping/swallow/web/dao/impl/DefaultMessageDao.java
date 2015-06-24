@@ -128,9 +128,9 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 					MESSAGE_COLLECTION);
 			Long mid = Long.parseLong(baseMid);
 			if (mid > 0) {
-				messageList = getMessageFromOneSide(mid, limit, collection, true);
+				messageList = getMessageFromOneSide(mid, limit, collection, true, sort);
 			} else {
-				messageList = getMessageFromOneSide(-mid, limit, collection, false);
+				messageList = getMessageFromOneSide(-mid, limit, collection, false, sort);
 			}
 		}
 
@@ -224,10 +224,10 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 				time = Long.parseLong(baseMid);
 			}
 			if (time < 0) {
-				list = getMessageFromOneSide(-time, limit, collection, false);
+				list = getMessageFromOneSide(-time, limit, collection, false, sort);
 				return getResponse(list, size);
 			} else {
-				list = getMessageFromOneSide(time, limit, collection, true);
+				list = getMessageFromOneSide(time, limit, collection, true, sort);
 				return getResponse(list, size);
 			}
 		}
@@ -370,14 +370,14 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 		return map;
 	}
-
+	
 	private String convertToStstring(BSONTimestamp ts) {
 		int seconds = ts.getTime();
 		long millions = new Long(seconds) * 1000;
 		return new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
 	}
 
-	private List<Message> getMessageFromOneSide(Long messageId, int size, DBCollection collection, boolean side) {
+	private List<Message> getMessageFromOneSide(Long messageId, int size, DBCollection collection, boolean side, boolean sort) {
 
 		DBObject dbo;
 		DBObject orderBy;
@@ -385,7 +385,11 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 			dbo = BasicDBObjectBuilder.start().add("$gt", MongoUtils.longToBSONTimestamp(messageId)).get();
 			orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(1)).get();
 		} else {
-			dbo = BasicDBObjectBuilder.start().add("$lt", MongoUtils.longToBSONTimestamp(messageId)).get();
+			if(messageId == 1){
+				dbo = BasicDBObjectBuilder.start().add("$lt", MongoUtils.getTimestampByCurTime()).get();
+			}else{
+				dbo = BasicDBObjectBuilder.start().add("$lt", MongoUtils.longToBSONTimestamp(messageId)).get();
+			}
 			orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
 		}
 		DBObject query = BasicDBObjectBuilder.start().add(ID, dbo).get();
@@ -408,7 +412,7 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 			cursor.close();
 		}
 
-		if (side) {
+		if ( messageId == 1 ) {
 			return Lists.reverse(list);
 		}
 		return list;

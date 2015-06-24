@@ -3,6 +3,12 @@ package com.dianping.swallow.consumerserver.bootstrap;
 
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 
+/**
+ *  slave启动
+ * @author mengwenchao
+ *
+ * 2015年6月15日 下午5:04:52
+ */
 public class SlaveBootStrap extends AbstractBootStrap{
 
    private static boolean          isSlave   = true;

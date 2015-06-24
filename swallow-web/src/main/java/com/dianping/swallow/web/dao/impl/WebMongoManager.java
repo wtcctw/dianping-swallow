@@ -1,11 +1,11 @@
 package com.dianping.swallow.web.dao.impl;
 
-import java.util.List;
-import java.util.Map;
+
+import java.util.Collection;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 
 /**
  * @author mingdongli 
@@ -15,8 +15,6 @@ public interface WebMongoManager {
 
 	MongoTemplate getMessageMongoTemplate(String topicName);
 
-	List<Mongo> getAllReadMongo();
-
-	Map<String, Mongo> getTopicNameToMongoMap();
+	Collection<MongoClient> getAllReadMongo();
 
 }

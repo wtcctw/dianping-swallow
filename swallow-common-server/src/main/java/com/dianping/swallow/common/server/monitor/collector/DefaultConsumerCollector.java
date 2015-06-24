@@ -1,11 +1,12 @@
 package com.dianping.swallow.common.server.monitor.collector;
 
 
+
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.common.internal.lifecycle.MasterSlaveComponent;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
-import com.dianping.swallow.common.server.lifecycle.SelfManagement;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
@@ -14,7 +15,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
  *
  * 2015年4月10日 上午11:51:05
  */
-public class DefaultConsumerCollector extends AbstractCollector implements ConsumerCollector, SelfManagement{
+public class DefaultConsumerCollector extends AbstractCollector implements ConsumerCollector, MasterSlaveComponent{
 	
 	
 	private ConsumerMonitorData consumerMonitorData = new ConsumerMonitorData(IPUtil.getFirstNoLoopbackIP4Address());

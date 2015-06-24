@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import com.dianping.swallow.common.internal.lifecycle.AbstractLifecycle;
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;

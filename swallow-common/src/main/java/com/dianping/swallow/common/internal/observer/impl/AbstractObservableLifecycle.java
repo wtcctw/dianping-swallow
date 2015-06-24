@@ -1,16 +1,19 @@
-package com.dianping.swallow.common.internal.lifecycle;
+package com.dianping.swallow.common.internal.observer.impl;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
+import com.dianping.swallow.common.internal.lifecycle.Ordered;
+
 /**
- * 生命周期抽象实现，只记录日志
  * @author mengwenchao
  *
- * 2014年11月7日 下午2:27:39
+ * 2015年6月11日 下午6:13:26
  */
-public class AbstractLifecycle implements Lifecycle{
-
+public abstract class AbstractObservableLifecycle extends AbstractObservable implements Lifecycle{
+	
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 
 	@Override
@@ -65,5 +68,12 @@ public class AbstractLifecycle implements Lifecycle{
 	protected void doDispose() throws Exception {
 		
 	}
+	
+	@Override
+	public int getOrder() {
+		
+		return Ordered.LAST;
+	}
+
 
 }

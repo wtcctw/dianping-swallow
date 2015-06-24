@@ -14,9 +14,9 @@ public class SimpleTester {
 	@Test
 	public void testDate(){
 		
-//		printTime(286349333);
+		String tmp = "123";
 		
-		printTime(286700179);
+		System.out.println(tmp.substring(10));
 		
 	}
 

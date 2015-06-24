@@ -42,7 +42,7 @@ public class MessageController extends AbstractMenuController {
 	@RequestMapping(value = "/console/message/messagedefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object messageDefault(int offset, int limit, String tname, String messageId, String startdt, String stopdt,
-			String basemid, Boolean sort, HttpServletRequest request, HttpServletResponse response) {
+			String basemid, boolean sort, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String username = extractUsernameUtils.getUsername(request);
 
