@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
  *         2015年6月10日上午10:35:36
  */
 @Component
-public class RandomStringGenerator {
+public class AuthenticationStringGenerator {
 
 	private static final String BASESTRING = "abcdefghijklmnopqrstuvwxyz";
 
 	private static final int LENGTH = 32;
 
-	private String randomString;
+	private String authenticationString;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -32,7 +32,7 @@ public class RandomStringGenerator {
 	public void generateRandomString() {
 
 		logger.info(String.format("Start generate random string for retransmit message"));
-		setRandomString(getRandomString(LENGTH));
+		setAuthenticationString(getAuthenticationString(LENGTH));
 	}
 
 	private int getRandom(int count) {
@@ -40,23 +40,23 @@ public class RandomStringGenerator {
 		return (int) Math.round(Math.random() * (count));
 	}
 
-	private String getRandomString(int length) {
+	private String getAuthenticationString(int length) {
 		StringBuffer sb = new StringBuffer();
 		int len = BASESTRING.length();
 		for (int i = 0; i < length; i++) {
 			sb.append(BASESTRING.charAt(getRandom(len - 1)));
 		}
-		logger.info(String.format("Generage randow string [ %s ] for retransmit messages", sb.toString()));
+		logger.info(String.format("Generage authentication string [ %s ] for retransmit messages", sb.toString()));
 
 		return sb.toString();
 	}
 
-	public String loadRandomString() {
-		return randomString;
+	public String loadAuthenticationString() {
+		return authenticationString;
 	}
 
-	public void setRandomString(String randomString) {
-		this.randomString = randomString;
+	public void setAuthenticationString(String authenticationString) {
+		this.authenticationString = authenticationString;
 	}
 
 }

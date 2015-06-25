@@ -133,7 +133,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			
 			$rootScope.doedit = function(topicname, topicprop, topictime){
 				$('#myModal').modal('hide');
-				$http.post(window.contextPath + '/api/topic/auth/edittopic', {"topic":topicname,"prop":topicprop,
+				$http.post(window.contextPath + '/api/topic/edittopic', {"topic":topicname,"prop":topicprop,
 	        		"time":topictime}).success(function(response) {
 					$scope.searchPaginator = Paginator(fetchFunction, 30, topicname , "");
 	        	});

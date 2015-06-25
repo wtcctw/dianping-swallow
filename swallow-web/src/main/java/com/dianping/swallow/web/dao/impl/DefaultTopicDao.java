@@ -38,21 +38,14 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 	}
 
 	@Override
-	public int saveTopic(Topic p) {
-		try {
+	public int saveTopic(Topic p) throws MongoSocketException, MongoException{
 			mongoTemplate.save(p, TOPIC_COLLECTION);
 			return ResponseStatus.SUCCESS.getStatus();
-		} catch (MongoSocketException e) {
-			logger.error(e.getMessage(), e);
-			return ResponseStatus.TRY_MONGOWRITE.getStatus();
-		} catch (MongoException e) {
-			logger.error("Error when save topic " + p, e);
-		}
-		return ResponseStatus.MONGOWRITE.getStatus();
+		
 	}
 
 	@Override
-	public int updateTopic(String name, String prop, String time) {
+	public int updateTopic(String name, String prop, String time) throws MongoSocketException, MongoException{
 		Topic topic = readByName(name);
 		topic.setProp(prop).setTime(time);
 		return saveTopic(topic);

@@ -43,8 +43,7 @@ import com.dianping.swallow.web.service.SaveMessageService;
 @WebAppConfiguration
 public class SaveMessageControllerTest {
 
-	private static final String AUTHORIZATION = "Authorization";
-	private static final String RANDOMSTRING = "szirxstixdrkbrsrkmyxdosmpcanikvj";
+	private static final String RANDOMSTRING = "lfimuqqxjlgvniueuiqooorkkyxdmwrm";
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -92,10 +91,9 @@ public class SaveMessageControllerTest {
 
 	private static HttpMethod postMethod(String url) throws IOException {
 		PostMethod post = new PostMethod(url);
-		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
 		NameValuePair[] param = {
-				new NameValuePair("mids", "6155726795699126273,6155726847238733826"),
-				//new NameValuePair("mids", ""),
+				new NameValuePair("mid", "6161611639629021185,6161611631039086593"),
+				new NameValuePair("authentication", RANDOMSTRING),
 				new NameValuePair("topic", "example") };
 		post.setRequestBody(param);
 		post.releaseConnection();
@@ -103,17 +101,16 @@ public class SaveMessageControllerTest {
 	}
 
 	private static HttpMethod postMethod2(String url) throws IOException {
+		
 		PostMethod post = new PostMethod(url);
-		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING);
 		String textarea[]={"test group message api with type and property, No 1", "test group message api with type and property, No 2"};
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 		
-		for (int i = 0; i < textarea.length; i++) {
-            nameValuePairs.add(new NameValuePair("textarea[]",textarea[i]));
-        }
+		nameValuePairs.add(new NameValuePair("content",textarea[0]));
 		nameValuePairs.add(new NameValuePair("topic", "example"));
 		nameValuePairs.add(new NameValuePair("type", "jiagou"));
-		nameValuePairs.add(new NameValuePair("property", "test:true,work:on"));
+		nameValuePairs.add(new NameValuePair("authentication", RANDOMSTRING));
+		nameValuePairs.add(new NameValuePair("property", "test:true::work:on"));
 		
 		NameValuePair[] array = new NameValuePair[nameValuePairs.size()];
 		nameValuePairs.toArray(array); // fill the array
@@ -129,10 +126,9 @@ public class SaveMessageControllerTest {
 			host = configCache.getProperty("swallow.web.sso.url");
 			host = "http://localhost:8080";  //本机测试使用，真实环境时注释之
 		} catch (LionException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		String url = host + "/console/message/auth/sendmessage";
+		String url = host + "/api/message/sendmessageid";
 		HttpClient httpClient = new HttpClient();
 
 		try {
@@ -144,7 +140,6 @@ public class SaveMessageControllerTest {
 				JSONObject json = new JSONObject(response);
 				System.out.println(response);
 				System.out.println(json.getInt("status"));
-				System.out.println(json.getInt("send"));
 				System.out.println(json.getString("message"));
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -153,27 +148,26 @@ public class SaveMessageControllerTest {
 			e.printStackTrace();
 		}
 
-		String url2 = host + "/console/message/auth/sendgroupmessage";
+		String url2 = host + "/api/message/sendmessage";
 
-//		try {
-//			HttpMethod method = postMethod2(url2);
-//			httpClient.executeMethod(method);
-//
-//			String response = method.getResponseBodyAsString();
-//			try {
-//				JSONObject json = new JSONObject(response);
-//				
-//				System.out.println(response);
-//				System.out.println(json.getInt("status"));
-//				System.out.println(json.getInt("send"));
-//				System.out.println(json.getString("message"));
-//			} catch (JSONException e) {
-//				e.printStackTrace();
-//			}
-//			// String(method.getResponseBodyAsString().getBytes("ISO-8859-1"));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			HttpMethod method = postMethod2(url2);
+			httpClient.executeMethod(method);
+
+			String response = method.getResponseBodyAsString();
+			try {
+				JSONObject json = new JSONObject(response);
+				
+				System.out.println(response);
+				System.out.println(json.getInt("status"));
+				System.out.println(json.getString("message"));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			// String(method.getResponseBodyAsString().getBytes("ISO-8859-1"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 

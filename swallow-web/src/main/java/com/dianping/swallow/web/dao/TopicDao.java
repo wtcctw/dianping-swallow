@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.web.model.Topic;
+import com.mongodb.MongoException;
+import com.mongodb.MongoSocketException;
 
 
 /**
@@ -23,7 +25,7 @@ public interface TopicDao extends Dao {
      * 保存topic
      * @param topic 
      */
-	int saveTopic(Topic topic);
+	int saveTopic(Topic topic) throws MongoSocketException, MongoException;
 	
 	/**
 	 * 更新topic
@@ -32,7 +34,7 @@ public interface TopicDao extends Dao {
 	 * @param dept  申请人部门
 	 * @param time  申请时间
 	 */
-	int updateTopic(String name, String prop, String time);
+	int updateTopic(String name, String prop, String time) throws MongoSocketException, MongoException;
 
 	/**
 	 *  删除集合

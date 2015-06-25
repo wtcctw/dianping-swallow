@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.avatar.util.IPUtils;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.web.service.AbstractSwallowService;
@@ -24,7 +23,6 @@ import com.dianping.swallow.web.service.SaveMessageService;
 public class SaveMessageServiceImpl extends AbstractSwallowService implements SaveMessageService {
 
 	private static final String VERSION = "0.7.1";
-	private static final String LOCALHOST = "127.0.0.1";
 	private static final String RETRANSMIT = "retransmit";
 
 	@Autowired
@@ -66,9 +64,8 @@ public class SaveMessageServiceImpl extends AbstractSwallowService implements Sa
 		sm.setContent(c);
 		sm.setVersion(VERSION);
 		sm.setGeneratedTime(new Date());
-		InetAddress addr = null;
 
-		sm.setSourceIp(getHostIp(addr));
+		sm.setSourceIp(IPUtils.getFirstNoLoopbackIP4Address());
 		if (sm.getInternalProperties() != null)
 			sm.getInternalProperties().put(RETRANSMIT, "true");
 		else {
@@ -76,21 +73,6 @@ public class SaveMessageServiceImpl extends AbstractSwallowService implements Sa
 			map.put(RETRANSMIT, "true");
 			sm.setInternalProperties(map);
 		}
-	}
-
-	private String getHostIp(InetAddress addr) {
-		String ip = null;
-		try {
-			addr = InetAddress.getLocalHost();
-			ip = addr.getHostAddress().toString();// 获得本机IP
-		} catch (UnknownHostException e) {
-			ip = LOCALHOST;
-			if (logger.isErrorEnabled()) {
-				logger.error("Error when getHostAddress.", e);
-			}
-		}
-
-		return ip;
 	}
 
 }

@@ -18,7 +18,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.dianping.swallow.web.controller.SaveMessageController;
+import com.dianping.swallow.web.controller.RetransmitMessageController;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.impl.AuthenticationServiceImpl;
@@ -71,10 +71,10 @@ public class AuthenticationFilter implements Filter {
 	private void sendErrorMessage(ServletResponse response, int status, String message, boolean needSend)
 			throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put(SaveMessageController.STATUS, status);
-		result.put(SaveMessageController.MESSAGE, message);
+		result.put(RetransmitMessageController.STATUS, status);
+		result.put(RetransmitMessageController.MESSAGE, message);
 		if (needSend) {
-			result.put(SaveMessageController.SEND, 0);
+			result.put(RetransmitMessageController.SEND, 0);
 		}
 
 		JSONObject json = new JSONObject(result);

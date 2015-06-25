@@ -20,6 +20,8 @@ import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.TopicService;
+import com.mongodb.MongoException;
+import com.mongodb.MongoSocketException;
 
 /**
  * @author mingdongli
@@ -71,10 +73,21 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public int editTopic(String name, String prop, String time) {
+	public int editTopic(String name, String prop, String time) throws MongoSocketException, MongoException{
 
-		this.loadTopicToWhiteList().put(name, splitProps(prop));
-		return topicDao.updateTopic(name, prop, time);
+		Set<String> proposal = splitProps(prop);
+		this.loadTopicToWhiteList().put(name, proposal);
+		StringBuffer sb = new StringBuffer();
+		boolean first = false;
+		for(String p : proposal){
+			if(!first){
+				sb.append(p);
+				first = true;
+			}else{
+				sb.append(",").append(p);
+			}
+		}
+		return topicDao.updateTopic(name, sb.toString(), time);
 	}
 
 	@Override

@@ -23,10 +23,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.cat.Cat;
+import com.dianping.cat.message.Message;
+import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.util.ResponseStatus;
+import com.mongodb.MongoException;
+import com.mongodb.MongoSocketException;
 
 /**
  * @author mingdongli
@@ -103,48 +108,63 @@ public class TopicController extends AbstractMenuController {
 			HttpServletResponse response) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
+		String username = extractUsernameUtils.getUsername(request);
+
+		username = StringUtils.isEmpty(username) ? approver : username;
 
 		if (approver != null) {
-			if(!administratorService.loadAdminSet().contains(approver)){
-				map.put(SaveMessageController.STATUS, ResponseStatus.UNAUTHENTICATION.getStatus());
-				map.put(SaveMessageController.MESSAGE, ResponseStatus.UNAUTHENTICATION.getMessage());
+			if (!administratorService.loadAdminSet().contains(approver)) {
+				map.put(RetransmitMessageController.STATUS, ResponseStatus.UNAUTHENTICATION.getStatus());
+				map.put(RetransmitMessageController.MESSAGE, ResponseStatus.UNAUTHENTICATION.getMessage());
 				logger.info(String.format(
 						"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
-						extractUsernameUtils.getUsername(request), topic, prop, splitProps(prop.trim()).toString(),
-						time.toString()));
+						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 				return map;
-			}else{
+			} else {
 				String proposal = topicService.loadTopic(topic).getProp();
 				StringBuffer sb = new StringBuffer();
-				sb.append(proposal).append(",").append(prop);
+				if(StringUtils.isNotEmpty(proposal)){
+					sb.append(proposal).append(",").append(prop);
+				}else{
+					sb.append(prop);
+				}
 				prop = sb.toString();
 			}
 		}
 
-		int result = topicService.editTopic(topic, prop, time);
+		int result = -1;
+
+		Transaction producerTransaction = Cat.getProducer().newTransaction("TopicEdit", topic + ":" + username);
+
+		try {
+			result = topicService.editTopic(topic, prop, time);
+			producerTransaction.setStatus(Message.SUCCESS);
+		} catch (MongoSocketException e) {
+			producerTransaction.setStatus(e);
+			Cat.getProducer().logError(e);
+		} catch (MongoException e) {
+			producerTransaction.setStatus(e);
+			Cat.getProducer().logError(e);
+		} finally {
+			producerTransaction.complete();
+		}
 
 		if (result == ResponseStatus.SUCCESS.getStatus()) {
-			map.put(SaveMessageController.STATUS, ResponseStatus.SUCCESS.getStatus());
-			map.put(SaveMessageController.MESSAGE, ResponseStatus.SUCCESS.getMessage());
-			if (StringUtils.isBlank(approver)) {
-
-			}
+			map.put(RetransmitMessageController.STATUS, ResponseStatus.SUCCESS.getStatus());
+			map.put(RetransmitMessageController.MESSAGE, ResponseStatus.SUCCESS.getMessage());
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
-					extractUsernameUtils.getUsername(request), topic, prop, splitProps(prop.trim()).toString(),
-					time.toString()));
+					username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 		} else if (result == ResponseStatus.MONGOWRITE.getStatus()) {
-			map.put(SaveMessageController.STATUS, ResponseStatus.MONGOWRITE.getStatus());
-			map.put(SaveMessageController.MESSAGE, ResponseStatus.MONGOWRITE.getMessage());
-			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.",
-					extractUsernameUtils.getUsername(request), topic, prop, splitProps(prop.trim()).toString(),
-					time.toString()));
+			map.put(RetransmitMessageController.STATUS, ResponseStatus.MONGOWRITE.getStatus());
+			map.put(RetransmitMessageController.MESSAGE, ResponseStatus.MONGOWRITE.getMessage());
+			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.", username,
+					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 		} else {
-			map.put(SaveMessageController.STATUS, ResponseStatus.TRY_MONGOWRITE.getStatus());
-			map.put(SaveMessageController.MESSAGE, ResponseStatus.TRY_MONGOWRITE.getMessage());
+			map.put(RetransmitMessageController.STATUS, ResponseStatus.TRY_MONGOWRITE.getStatus());
+			map.put(RetransmitMessageController.MESSAGE, ResponseStatus.TRY_MONGOWRITE.getMessage());
 			logger.info(String.format(
-					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
-					extractUsernameUtils.getUsername(request), topic, prop, splitProps(prop.trim()).toString(),
-					time.toString()));
+					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.", username,
+					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 		}
 
 		return map;
