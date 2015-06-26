@@ -1,4 +1,5 @@
 注：**本文针对Swallow0.7.1版本**,下文中，${currentVersion}, currentVersion指0.7.1
+使用之前，请仔细阅读[swallow使用注意事项](#takeAttention)
 
 [TOC]
 
@@ -251,8 +252,11 @@
 
 ## 使用Swallow接收消息
 ### 基本概念
+<span id="consumerConfig"></span>
 #### ConsumerConfig配置详解
+
 使用Swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成:
+
 
 * threadPoolSize：consumer处理消息的线程池线程数，默认为1。Consumer接收到消息时，会调用用户实现的onMessage方法。默认情况下，Consumer内部使用单线程来调用，只有onMessage执行完并响应给服务器（即发送ack给服务器），服务器在收到ack后，才会推送下一个消息过来。**如果希望并行地处理更多消息，可以通过设置threadPoolSize，实现多线程接收消息，但是如此一来，消息的时序则无法保证**
 * messageFilter：consumer只消费“Message.type属性包含在指定集合中”的消息
@@ -413,7 +417,6 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 	    }
 	}
 
-
 # Swallow Web使用说明
 
 ## Topic查询
@@ -529,6 +532,19 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 ### 权限提升
 
 * 用户和Visitor如需提升权限，请联系对应的业务运维
+
+
+<span id="takeAttention"></span>
+# Swallow使用注意事项
+
+
+以下是业务在swallow的过程中遇到的一些常见问题，希望大家仔细阅读，避免类似的问题发生
+
+1. swallow保证消息不丢，所以针对特定一条消息，可能会重复发送。
+	* 要求业务做幂等处理，尤其是支付相关的业务（当消息重复被投递的时候，处理多次结果是一样的）
+1. swallow作为异步消息队列，正常情况下延时在秒级别。但是异常情况下（数据库升级等），可能会出现分钟级别的延时，如果业务对延时特别敏感，建议谨慎使用
+1. consumer接收消息默认并发为1，如果业务处理速度过慢，可能会出现消息堆积（如每条消息处理时间100ms，则一秒只能处理10条消息）
+	* 设置线程池大小参见[consumer配置](#consumerConfig)
 
 
 # Swallow常见问题以及处理
