@@ -30,7 +30,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
-import com.dianping.swallow.web.service.SaveMessageService;
+import com.dianping.swallow.web.service.MessageRetransmitService;
 
 
 /**
@@ -51,7 +51,7 @@ public class SaveMessageControllerTest {
 	private MockMvc mockMvc;
 
 	@Resource(name = "saveMessageService")
-	private SaveMessageService saveMessageService;
+	private MessageRetransmitService saveMessageService;
 
 	@Before
 	public void setUp() throws Exception {

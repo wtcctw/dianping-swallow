@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.service.impl;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,19 +9,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.ZipUtil;
+import com.dianping.swallow.web.controller.MessageDumpController;
 import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Message;
+import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.AbstractSwallowService;
+import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.MessageService;
 import com.dianping.swallow.web.task.DumpMessageTask;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -30,7 +38,8 @@ import com.dianping.swallow.web.util.ResponseStatus;
  *         2015年5月14日下午1:20:29
  */
 @Service("messageService")
-public class MessageServiceImpl extends AbstractSwallowService implements MessageService {
+public class MessageServiceImpl extends AbstractSwallowService implements MessageService,
+		ApplicationListener<ContextRefreshedEvent> {
 
 	private static final String PRE_MSG = "msg#";
 	private static final String MESSAGE = "message";
@@ -40,6 +49,9 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 
 	@Autowired
 	private MessageDao webMessageDao;
+
+	@Resource(name = "messageDumpService")
+	private MessageDumpService messageDumpService;
 
 	public Map<String, Object> getMessageFromSpecificTopic(int start, int span, String tname, String messageId,
 			String startdt, String stopdt, String username, String baseMid, boolean sort) {
@@ -110,9 +122,9 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 
 		DumpMessageTask fileDownloadTask = new DumpMessageTask();
 		fileDownloadTask.setTopic(topicName).setStartdt(startdt).setStopdt(stopdt).setFilename(filename)
-				.setWebMessageDao(webMessageDao);
-		FutureTask<Integer> futureTask = new FutureTask<Integer>(fileDownloadTask);
-		exec.submit(futureTask);
+				.setWebMessageDao(webMessageDao).setMessageDumpService(messageDumpService);
+
+		exec.submit(fileDownloadTask);
 		logger.info(String.format("Start download task for %s to export messages from %s to %s", topicName, startdt,
 				stopdt));
 
@@ -160,6 +172,34 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		isZipped(messageList.get(0));
 		return messageList.get(0);
 
+	}
+
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+
+		if (event.getApplicationContext().getParent() == null) {
+			List<MessageDump> mds = messageDumpService.loadAllDumpMessage();
+			for (MessageDump md : mds) {
+				if (!md.isFinished()) {
+					String f = md.getFilename();
+					File file = new File(MessageDumpController.FILEPATH + f);
+					try {
+						if (!file.exists()) {
+							file.createNewFile();
+						}
+						FileWriter fileWriter = new FileWriter(file);
+						fileWriter.write("");
+						fileWriter.flush();
+						fileWriter.close();
+					} catch (IOException e) {
+						logger.error("Create filewriter error", e);
+					}
+					String topic = md.getTopic();
+					exportMessage(md.getTopic(), md.getStartdt(), md.getStopdt(), md.getFilename());
+					logger.info(String.format("Start export message of %s to file %s", topic, f));
+				}
+			}
+		}
 	}
 
 }

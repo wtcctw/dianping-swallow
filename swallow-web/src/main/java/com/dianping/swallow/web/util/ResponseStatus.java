@@ -40,10 +40,10 @@ public enum ResponseStatus {
 		return this;
 	}
 
-	public static ResponseStatus findByStatus(int status) {
+	public static String findByStatus(int status) {
 		for (ResponseStatus code : values()) {
 			if (status == code.getStatus()) {
-				return code;
+				return code.getMessage();
 			}
 		}
 		throw new RuntimeException("Error status : " + status);

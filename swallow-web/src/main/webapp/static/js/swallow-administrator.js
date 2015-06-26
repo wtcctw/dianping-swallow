@@ -1,5 +1,5 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize,  name, prop, dept){
+	return function(fetchFunction, pageSize,  name, email, role){
 		var paginator = {
 				hasNextVar: false,
 				fetch: function(page){
@@ -15,7 +15,7 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, name, prop, dept, function(data){
+					fetchFunction(this.currentOffset, pageSize + 1, name, email, role, function(data){
 						items = data.admin;
 						length = data.size;
 						self.totalPage = Math.ceil(length/pageSize);

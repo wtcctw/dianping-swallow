@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.model.Topic;
@@ -21,6 +22,7 @@ import com.mongodb.MongoSocketException;
  *
  *         2015年4月20日 下午9:32:19
  */
+@Component
 public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 
 	private static final String TOPIC_COLLECTION = "swallowwebtopicc";

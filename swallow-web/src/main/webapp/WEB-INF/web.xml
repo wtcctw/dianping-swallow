@@ -137,6 +137,7 @@
 		<filter-name>AuthenticationFilter</filter-name>
 		<url-pattern>/console/message/auth/*</url-pattern>
 		<url-pattern>/console/admin/auth/*</url-pattern>
+		<url-pattern>/console/download/auth/*</url-pattern>
 	</filter-mapping>
 
 	<servlet>

@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.dianping.swallow.web.controller.DumpMessageController;
+import com.dianping.swallow.web.controller.MessageDumpController;
 
 /**
  * @author mingdongli
@@ -30,7 +30,7 @@ public class FileDownloadServlet extends HttpServlet {
 		response.setHeader("Content-Disposition", "attachment;filename="
 				+ filename);
 		response.setContentType("text/html;charset=utf-8");
-		String fullFileName = DumpMessageController.FILEPATH + filename;
+		String fullFileName = MessageDumpController.FILEPATH + filename;
 		InputStream in = new FileInputStream(fullFileName);
 		OutputStream out = response.getOutputStream();
 

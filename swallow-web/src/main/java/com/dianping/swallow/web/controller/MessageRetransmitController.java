@@ -20,12 +20,12 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.internal.util.IPUtil;
-import com.dianping.swallow.web.service.SaveMessageService;
+import com.dianping.swallow.web.service.MessageRetransmitService;
 import com.dianping.swallow.web.task.AuthenticationStringGenerator;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 @Controller
-public class RetransmitMessageController extends AbstractController {
+public class MessageRetransmitController extends AbstractController {
 
 	public static final String STATUS = "status";
 
@@ -35,8 +35,8 @@ public class RetransmitMessageController extends AbstractController {
 
 	public static final String DEFAULT_DELIMITOR = ":";
 
-	@Resource(name = "saveMessageService")
-	private SaveMessageService saveMessageService;
+	@Resource(name = "messageRetransmitService")
+	private MessageRetransmitService messageRetransmitService;
 
 	@Autowired
 	private AuthenticationStringGenerator authenticationStringGenerator;
@@ -63,7 +63,7 @@ public class RetransmitMessageController extends AbstractController {
 			Transaction producerTransaction = Cat.getProducer().newTransaction("MsgRetransmit",
 					topic + ":" + IPUtil.getFirstNoLoopbackIP4Address());
 			try {
-				successornot = saveMessageService.doRetransmit(topicName, Long.parseLong(mid));
+				successornot = messageRetransmitService.doRetransmit(topicName, Long.parseLong(mid));
 				producerTransaction.setStatus(Message.SUCCESS);
 			} catch (Exception e) {
 				producerTransaction.setStatus(e);
@@ -117,7 +117,7 @@ public class RetransmitMessageController extends AbstractController {
 				topic + ":" + IPUtil.getFirstNoLoopbackIP4Address());
 
 		try {
-			saveMessageService.saveNewMessage(topicName, textarea, topicType, delimitor, topicProperty);
+			messageRetransmitService.saveNewMessage(topicName, textarea, topicType, delimitor, topicProperty);
 			producerTransaction.setStatus(Message.SUCCESS);
 		} catch (Exception e) {
 			producerTransaction.setStatus(e);

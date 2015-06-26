@@ -114,8 +114,8 @@ public class TopicController extends AbstractMenuController {
 
 		if (approver != null) {
 			if (!administratorService.loadAdminSet().contains(approver)) {
-				map.put(RetransmitMessageController.STATUS, ResponseStatus.UNAUTHENTICATION.getStatus());
-				map.put(RetransmitMessageController.MESSAGE, ResponseStatus.UNAUTHENTICATION.getMessage());
+				map.put(MessageRetransmitController.STATUS, ResponseStatus.UNAUTHENTICATION.getStatus());
+				map.put(MessageRetransmitController.MESSAGE, ResponseStatus.UNAUTHENTICATION.getMessage());
 				logger.info(String.format(
 						"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
 						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
@@ -150,18 +150,18 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		if (result == ResponseStatus.SUCCESS.getStatus()) {
-			map.put(RetransmitMessageController.STATUS, ResponseStatus.SUCCESS.getStatus());
-			map.put(RetransmitMessageController.MESSAGE, ResponseStatus.SUCCESS.getMessage());
+			map.put(MessageRetransmitController.STATUS, ResponseStatus.SUCCESS.getStatus());
+			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.SUCCESS.getMessage());
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
 					username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 		} else if (result == ResponseStatus.MONGOWRITE.getStatus()) {
-			map.put(RetransmitMessageController.STATUS, ResponseStatus.MONGOWRITE.getStatus());
-			map.put(RetransmitMessageController.MESSAGE, ResponseStatus.MONGOWRITE.getMessage());
+			map.put(MessageRetransmitController.STATUS, ResponseStatus.MONGOWRITE.getStatus());
+			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.MONGOWRITE.getMessage());
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.", username,
 					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 		} else {
-			map.put(RetransmitMessageController.STATUS, ResponseStatus.TRY_MONGOWRITE.getStatus());
-			map.put(RetransmitMessageController.MESSAGE, ResponseStatus.TRY_MONGOWRITE.getMessage());
+			map.put(MessageRetransmitController.STATUS, ResponseStatus.TRY_MONGOWRITE.getStatus());
+			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.TRY_MONGOWRITE.getMessage());
 			logger.info(String.format(
 					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.", username,
 					topic, prop, splitProps(prop.trim()).toString(), time.toString()));

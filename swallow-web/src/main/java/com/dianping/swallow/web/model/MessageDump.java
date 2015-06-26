@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.model;
 
-import org.bson.types.BSONTimestamp;
 import org.springframework.data.annotation.Id;
 
 
@@ -12,23 +11,24 @@ import org.springframework.data.annotation.Id;
 public class MessageDump {
 	
 	@Id
-	private BSONTimestamp _id;
+	private String _id;
 	private String topic;
 	private String name;
 	private String time;
 	private String startdt;
 	private String stopdt;
 	private String filename;
+	private boolean finished;
 	
 	public MessageDump(){
 		
 	}
 	
-	public BSONTimestamp get_id() {
+	public String get_id() {
 		return _id;
 	}
 	
-	public MessageDump set_id(BSONTimestamp _id) {
+	public MessageDump set_id(String _id) {
 		this._id = _id;
 		return this;
 	}
@@ -86,11 +86,20 @@ public class MessageDump {
 		this.filename = filename;
 		return this;
 	}
+	
+	public boolean isFinished() {
+		return finished;
+	}
+
+	public MessageDump setFinished(boolean finished) {
+		this.finished = finished;
+		return this;
+	}
 
 	@Override
 	public String toString() {
 		return "MessageDump [_id=" + _id + ", topic=" + topic + ", name=" + name + ", time=" + time + ", startdt="
-				+ startdt + ", stopdt=" + stopdt + ", filename=" + filename + "]";
+				+ startdt + ", stopdt=" + stopdt + ", filename=" + filename + ", finished=" + finished + "]";
 	}
 
 }

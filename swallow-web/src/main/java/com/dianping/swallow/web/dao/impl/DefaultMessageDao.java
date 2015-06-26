@@ -11,10 +11,12 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.BSONTimestamp;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.web.dao.MessageDao;
@@ -31,8 +33,10 @@ import com.mongodb.WriteResult;
  *
  *         2015年4月20日 下午9:31:41
  */
+@Component
 public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
+	@Autowired
 	private WebMongoManager webMongoManager;
 	private static final String MESSAGE_COLLECTION = "c";
 	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -53,7 +57,7 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 		this.webMongoManager = webMongoManager;
 	}
-
+	
 	@Override
 	public boolean create(Message p, String topicName) {
 		try {
@@ -422,8 +426,7 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	public List<DBObject> exportMessages(String topicName, String startdt, String stopdt) {
 		int maxSize = 1000000;
 		List<DBObject> dboList = new ArrayList<DBObject>();
-		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(topicName).getCollection(
-				MESSAGE_COLLECTION);
+		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(topicName).getCollection(MESSAGE_COLLECTION);
 		SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
 		Long startlong = null;
 		Long stoplong = null;
@@ -447,16 +450,17 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 			int size = 0;
 			try {
 				size = result.toString().getBytes("UTF-8").length;
+				if (size > 1000) {
+					maxSize = maxSize * 1000 / size;
+				}
+				dboList = cursor.toArray(maxSize);
 			} catch (UnsupportedEncodingException e) {
 				logger.info("Encoding error of cursor result");
 			} finally {
+				dbc.close();
 				cursor.close();
 			}
-			if (size > 1000) {
-				maxSize = maxSize * 1000 / size;
-			}
 		}
-		dboList = cursor.toArray(maxSize);
 		return dboList;
 
 	}

@@ -12,15 +12,15 @@ import com.dianping.avatar.util.IPUtils;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.web.service.AbstractSwallowService;
-import com.dianping.swallow.web.service.SaveMessageService;
+import com.dianping.swallow.web.service.MessageRetransmitService;
 
 /**
  * @author mingdongli
  *
  *         2015年5月20日下午6:27:32
  */
-@Service("saveMessageService")
-public class SaveMessageServiceImpl extends AbstractSwallowService implements SaveMessageService {
+@Service("messageRetransmitService")
+public class MessageRetransmitServiceImpl extends AbstractSwallowService implements MessageRetransmitService {
 
 	private static final String VERSION = "0.7.1";
 	private static final String RETRANSMIT = "retransmit";

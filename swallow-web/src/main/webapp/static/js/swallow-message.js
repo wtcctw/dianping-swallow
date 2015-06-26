@@ -263,12 +263,11 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					alert("时间不能为空!")
 				else{
 					if($scope.tname.length == 0){
+						return;
 					}
 					else{
-						$("#dumprecord").css(
-		                           'display', 'block');
-						//$interval( function(){ $scope.changeprogress(); }, 100);
-						setInterval(updateProgressBar,400);
+						
+						//setInterval(updateProgressBar,400);
 						$http.get(window.contextPath + "/console/message/auth/dump", {
 							params : {
 								topic: $scope.tname,
@@ -280,7 +279,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 								alert("error with status " + data.status);
 								return;
 							}
-							localStorage.setItem("file", JSON.stringify(data.file)); //json for array
+							localStorage.setItem("topic", $scope.tname);
+							//localStorage.setItem("file", JSON.stringify(data.file)); //json for array
 							window.location.href = window.contextPath + "/console/download";
 						});
 					}
