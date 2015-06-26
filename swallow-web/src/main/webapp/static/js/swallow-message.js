@@ -9,7 +9,8 @@ module.factory('Paginator', function(){
 					if(page == this.endPage){
 						pageSize = this.totalpieces % this.limit - 1; //最后一页的大小
 						if(startdt.length > 0){
-							this.basemid = startdt;
+							lastpagerev = true;
+							this.basemid = !this.reverse ? startdt : ("-" + startdt);
 						}else{
 							this.basemid = !this.reverse ? "1" : "-1"; //取个小值
 						} 
@@ -72,6 +73,10 @@ module.factory('Paginator', function(){
 							self.currentPageItems = items.slice(0, pageSize).reverse();
 							self.byprevious = false;
 						}
+						if(lastpagerev){
+							self.currentPageItems = self.currentPageItems.reverse();
+							lastpagerev = false;
+						}
 						if (self.currentPageItems.length > 0) {
 							$("#message-retransmit").css(
 									'display', 'block');
@@ -120,7 +125,8 @@ module.factory('Paginator', function(){
 				
 				reverse: false,
 				basemid: "",
-				byprevious: false
+				byprevious: false,
+				lastpagerev : false
 		};
 		
 		//加载第一页

@@ -218,7 +218,11 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 			long time = 0;
 			if (baseMid.contains(":")) {
 				try {
-					time = MongoUtils.getLongByDate(sdf.parse(startdt));
+					if(!baseMid.startsWith("-")){
+						time = MongoUtils.getLongByDate(sdf.parse(startdt));
+					}else{
+						time = -MongoUtils.getLongByDate(sdf.parse(stopdt));
+					}
 				} catch (ParseException e) {
 					if (logger.isErrorEnabled()) {
 						logger.error("Error when parse date to Long.", e);
