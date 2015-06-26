@@ -42,6 +42,13 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
+						for(var i = 0; i < self.currentPageItems.length; ++i){
+							if(self.currentPageItems[i].finished){
+								self.currentPageItems[i].finished = "已导出";
+							}else{
+								self.currentPageItems[i].finished = "导出中";
+							}
+						}
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -125,6 +132,13 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 				topic: $scope.topic
 			}
 		}).success(function(data){
+			for(var i = 0; i < data.message.length; ++i){
+				if(data.message[i].finished){
+					data.message[i].finished = "已导出";
+				}else{
+					data.message[i].finished = "导出中";
+				}
+			}
 			$scope.searchPaginator.currentPageItems = data.message;
 			var concel = true;
 			for(var i=0;i<data.message.length;i++){

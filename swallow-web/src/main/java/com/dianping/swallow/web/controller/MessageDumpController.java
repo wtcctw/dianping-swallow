@@ -58,7 +58,7 @@ public class MessageDumpController extends AbstractMenuController {
 	public Object dumpMessageByTime(String topic, String startdt, String stopdt, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		String post = new SimpleDateFormat("yyyyMMddHHmm'.gz'").format(new Date());
+		String post = new SimpleDateFormat("yyyyMMddHHmmss'.gz'").format(new Date());
 		StringBuffer sb = new StringBuffer();
 		String filename = sb.append(topic).append("_").append(post).toString();
 		File dir = new File(FILEPATH + filename);

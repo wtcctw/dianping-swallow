@@ -61,7 +61,7 @@
 						<td style="text-align: left" ng-bind="t.stopdt"></td>
 						<td style="text-align: left" ng-bind="t.filename"></td>
 						<td style="text-align: left" ng-bind="t.finished"></td>
-						<td style="text-align: left" ng-show="t.finished"><a
+						<td style="text-align: left" ng-show='t.finished=="已导出"'><a
 							href="/console/download/file?filename={{t.filename}}"
 							class="edit-config-btn"><i class="icon-download "
 								rel="tooltip" data-original-title="下载"></i></a> <a href=""
