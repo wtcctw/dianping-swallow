@@ -60,7 +60,7 @@ public interface TopicService {
 	 * @param username  通行证
 	 * @param all       是否返回所有
 	 */
-	Map<String, Object[]> getPropAndDept(String username, boolean all);
+	Map<String, String[]> getPropAndDept(String username, boolean all);
 	
 	/**
 	 * 
@@ -69,6 +69,8 @@ public interface TopicService {
 	int saveTopic(Topic topic);
 	
 	Map<String, Set<String>> loadTopicToWhiteList();
+	
+	List<String> loadTopicNames(String username);
 	
 
 }

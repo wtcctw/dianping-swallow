@@ -73,9 +73,9 @@ module.factory('Paginator', function(){
 							self.currentPageItems = items.slice(0, pageSize).reverse();
 							self.byprevious = false;
 						}
-						if(lastpagerev){
+						if(self.lastpagerev){
 							self.currentPageItems = self.currentPageItems.reverse();
-							lastpagerev = false;
+							self.lastpagerev = false;
 						}
 						if (self.currentPageItems.length > 0) {
 							$("#message-retransmit").css(

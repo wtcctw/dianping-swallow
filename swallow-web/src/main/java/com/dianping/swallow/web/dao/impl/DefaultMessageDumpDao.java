@@ -62,9 +62,18 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	public Map<String, Object> loadSpecifitMessageDump(int offset, int limit, String topic) {
 		List<MessageDump> messageDumpList = new ArrayList<MessageDump>();
 
-		Query query1 = new Query(Criteria.where(TOPIC).is(topic));
+		String[] topics = topic.split(",");
+		
+		List<Criteria> criterias = new ArrayList<Criteria>();
+		for (String t : topics) {
+			criterias.add(Criteria.where(TOPIC).is(t));
+		}
+		Query query1 = new Query(new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()])));
+		
 		Query query2 = query1;
-		query1.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, TOPIC)));
+		
+		query1.skip(offset).limit(limit)
+				.with(new Sort(new Sort.Order(Direction.DESC, FINISHED), new Sort.Order(Direction.ASC, TOPIC)));
 		messageDumpList = mongoTemplate.find(query1, MessageDump.class, MESSAGEDUMP_COLLECTION);
 		Long messageDumpSize = mongoTemplate.count(query2, MESSAGEDUMP_COLLECTION);
 		return getResponse(messageDumpSize, messageDumpList);
@@ -110,7 +119,7 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	}
 
 	@Override
-	public int removeMessageDump(String filename) throws MongoException{
+	public int removeMessageDump(String filename) throws MongoException {
 
 		Query query = new Query(Criteria.where(FILENAME).is(filename));
 		WriteResult result = mongoTemplate.remove(query, MessageDump.class, MESSAGEDUMP_COLLECTION);
@@ -119,7 +128,7 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 
 	@Override
 	public List<MessageDump> loadAllMessageDumps() {
-		
+
 		return mongoTemplate.findAll(MessageDump.class, MESSAGEDUMP_COLLECTION);
 	}
 

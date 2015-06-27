@@ -91,8 +91,8 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public Map<String, Object[]> getPropAndDept(String username, boolean all) {
-		Map<String, Object[]> map = new HashMap<String, Object[]>();
+	public Map<String, String[]> getPropAndDept(String username, boolean all) {
+		Map<String, String[]> map = new HashMap<String, String[]>();
 		Set<String> proposal = new HashSet<String>();
 		List<Topic> topics = topicDao.findAll();
 
@@ -110,8 +110,9 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 
 		}
 
-		map.put("prop", proposal.toArray());
-		map.put("edit", administratorService.loadAllTypeName().toArray());
+		map.put("prop", proposal.toArray(new String[proposal.size()]));
+		List<String> tmpList = administratorService.loadAllTypeName();
+		map.put("edit", tmpList.toArray(new String[tmpList.size()]));
 
 		return map;
 	}
@@ -147,6 +148,18 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	@Override
 	public Topic loadTopic(String name) {
 		return topicDao.readByName(name);
+	}
+
+	@Override
+	public List<String> loadTopicNames(String username) {
+
+		List<String> topics = new ArrayList<String>();
+		for(Map.Entry<String, Set<String>> entry:topicToWhiteList.entrySet()){
+			if(entry.getValue().contains(username)){
+				topics.add(entry.getKey());
+			}
+		}
+		return topics;
 	}
 
 }
