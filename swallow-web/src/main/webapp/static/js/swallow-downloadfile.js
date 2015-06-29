@@ -142,7 +142,7 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 			$scope.searchPaginator.currentPageItems = data.message;
 			var concel = true;
 			for(var i=0;i<data.message.length;i++){
-				if(!data.message[i]){
+				if(data.message[i].finished == "导出中"){
 					concel = false;
 					break;
 				}

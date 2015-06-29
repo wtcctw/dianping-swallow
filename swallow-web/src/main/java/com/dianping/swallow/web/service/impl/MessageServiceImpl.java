@@ -7,10 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +18,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.controller.MessageDumpController;
 import com.dianping.swallow.web.dao.MessageDao;
@@ -44,10 +39,6 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	private static final String PRE_MSG = "msg#";
 	private static final String MESSAGE = "message";
 	private static final String GZIP = "H4sIAAAAAAAAA";
-
-	ExecutorService exec = Executors.newFixedThreadPool(CommonUtils.getCpuCount());
-
-	Map<String, LinkedBlockingQueue<Runnable>> tasks = new ConcurrentHashMap<String, LinkedBlockingQueue<Runnable>>();
 
 	@Autowired
 	private MessageDao webMessageDao;
