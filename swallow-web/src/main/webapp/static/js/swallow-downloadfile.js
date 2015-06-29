@@ -200,6 +200,7 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 		$scope.Timer = $interval( function(){ $scope.updatefilestatus(); }, 3000);
 	}else{
 		$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topic);
+		$scope.Timer = $interval( function(){ $scope.updatefilestatus(); }, 3000);
 	}
 
 			
