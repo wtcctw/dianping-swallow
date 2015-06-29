@@ -23,7 +23,7 @@ import com.dianping.swallow.web.service.MessageDumpService;
 @Component
 public class ClearDownloadFileTask {
 
-	private static final String TIMEFORMATE = "yyyyMMddHHmm";
+	private static final String TIMEFORMATE = "yyyyMMddHHmmss";
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	

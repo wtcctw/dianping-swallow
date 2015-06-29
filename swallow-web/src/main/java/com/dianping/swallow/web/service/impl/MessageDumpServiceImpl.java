@@ -111,12 +111,13 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 		if (loadUnfinishedDumpMessage(topic) != null) {
 			LinkedBlockingQueue<Runnable> lbq = tasks.get(topic);
 			if (lbq == null) {
-				lbq = new LinkedBlockingQueue<Runnable>();
+				lbq = new LinkedBlockingQueue<Runnable>(5);
 			}
 			try {
-				lbq.put(fileDownloadTask);
-			} catch (InterruptedException e) {
-				logger.info("Error when put task to blockqueue", e);
+				lbq.add(fileDownloadTask);
+				logger.info(String.format("Add dump message task %s to blocking queue", fileDownloadTask.toString()));
+			} catch (Exception e) {
+				logger.error("LinkedBlockingQueue's size is 5, no space for extra task", e);
 			}
 			saveDumpMessage(topic, username, startdt, stopdt, filename, false);
 			tasks.put(topic, lbq);
@@ -134,12 +135,9 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 	public void execBlockingDumpMessageTask(String topicName) {
 		LinkedBlockingQueue<Runnable> lbq = tasks.get(topicName);
 		if (lbq != null && !lbq.isEmpty()) {
-			try {
-				Runnable dmt = lbq.take();
-				exec.submit(dmt);
-			} catch (InterruptedException e) {
-				logger.error("Take task from blocking queue error", e);
-			}
+			Runnable dmt = lbq.poll();
+			logger.info(String.format("poll dump message task %s out of blocking queue", dmt.toString()));
+			exec.submit(dmt);
 		}
 	}
 

@@ -35,6 +35,7 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	private static final String FILENAME = "filename";
 	private static final String FINISHED = "finished";
 	private static final String DESC = "desc";
+	private static final String TIME = "time";
 
 	@Override
 	public int saveMessageDump(MessageDump mdump) {
@@ -64,19 +65,24 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 		List<MessageDump> messageDumpList = new ArrayList<MessageDump>();
 
 		String[] topics = topic.split(",");
-		
+
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		for (String t : topics) {
 			criterias.add(Criteria.where(TOPIC).is(t));
 		}
-		Query query1 = new Query(new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()])));
-		
-		Query query2 = query1;
-		
-		query1.skip(offset).limit(limit)
-				.with(new Sort(new Sort.Order(Direction.DESC, FINISHED), new Sort.Order(Direction.ASC, TOPIC)));
+
+		Query query1 = new Query();
+		query1.addCriteria(Criteria.where(TOPIC).exists(true)
+				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
+
+		//Query query2 = query1;
+
+		query1.skip(offset)
+				.limit(limit)
+				.with(new Sort(new Sort.Order(Direction.DESC, FINISHED), new Sort.Order(Direction.ASC, TOPIC),
+						new Sort.Order(Direction.DESC, TIME)));
 		messageDumpList = mongoTemplate.find(query1, MessageDump.class, MESSAGEDUMP_COLLECTION);
-		Long messageDumpSize = mongoTemplate.count(query2, MESSAGEDUMP_COLLECTION);
+		Long messageDumpSize = mongoTemplate.count(query1, MESSAGEDUMP_COLLECTION);
 		return getResponse(messageDumpSize, messageDumpList);
 	}
 
@@ -136,8 +142,9 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 
 	@Override
 	public MessageDump loadUnfinishedMessageDump(String topic) {
-		
-		Query query = new Query(new Criteria().andOperator(Criteria.where(TOPIC).is(topic),Criteria.where(FINISHED).is(false)));
+
+		Query query = new Query(new Criteria().andOperator(Criteria.where(TOPIC).is(topic), Criteria.where(FINISHED)
+				.is(false)));
 		return mongoTemplate.findOne(query, MessageDump.class, MESSAGEDUMP_COLLECTION);
 	}
 
