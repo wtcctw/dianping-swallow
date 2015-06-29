@@ -23,7 +23,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.MessageDumpService;
-import com.dianping.swallow.web.service.MessageService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
@@ -44,10 +43,7 @@ public class MessageDumpController extends AbstractMenuController {
 
 	@Resource(name = "topicService")
 	private TopicService topicService;
-	
-	@Resource(name = "messageService")
-	private MessageService messageService;
-	
+
 	@Resource(name = "administratorService")
 	private AdministratorService administratorService;
 
@@ -58,7 +54,7 @@ public class MessageDumpController extends AbstractMenuController {
 	private ExtractUsernameUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/download")
-	public ModelAndView allApps(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView download(HttpServletRequest request, HttpServletResponse response) {
 
 		return new ModelAndView("message/filedownload", createViewMap());
 	}
@@ -82,9 +78,8 @@ public class MessageDumpController extends AbstractMenuController {
 		}
 
 		String username = extractUsernameUtils.getUsername(request);
-		messageDumpService.saveDumpMessage(topic, username, startdt, stopdt, filename, false);
 
-		int status = messageService.exportMessage(topic, startdt, stopdt, filename);
+		int status = messageDumpService.execDumpMessageTask(topic, startdt, stopdt, filename, username);
 		return getResponse(ResponseStatus.findByStatus(status), status);
 	}
 
@@ -96,22 +91,21 @@ public class MessageDumpController extends AbstractMenuController {
 		return map;
 	}
 
-
 	@RequestMapping(value = "/console/download/filename", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object loadFilename(int offset, int limit, String topic, HttpServletRequest request,
 			HttpServletResponse response) {
-		
+
 		String username = extractUsernameUtils.getUsername(request);
-		if(StringUtils.isNotEmpty(topic)){
+		if (StringUtils.isNotEmpty(topic)) {
 			;
-		}else if(administratorService.loadAdminSet().contains(username)){
+		} else if (administratorService.loadAdminSet().contains(username)) {
 			topic = "";
-		}else{
+		} else {
 			List<String> t = topicService.loadTopicNames(username);
-			if(t == null || t.size() == 0){
+			if (t == null || t.size() == 0) {
 				topic = "";
-			}else{
+			} else {
 				topic = StringUtils.join(t, ",");
 			}
 		}
@@ -123,27 +117,27 @@ public class MessageDumpController extends AbstractMenuController {
 	@ResponseBody
 	public Object removeFilename(String topic, String filename, HttpServletRequest request, HttpServletResponse response) {
 
-		try{
+		try {
 			int status = messageDumpService.removeDumpMessage(filename);
-			if(status == 1){
+			if (status == 1) {
 				deleteFile(FILEPATH + filename);
 				logger.info(String.format("Delete file %s and remove record in database successfully", filename));
 			}
 			return status;
-		}catch(MongoException e){
+		} catch (MongoException e) {
 			logger.info("MongoException when remove messagedump", e);
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 
 	}
-	
-	private boolean deleteFile(String sPath) {  
-	    File file = new File(sPath);  
-	    if (file.isFile() && file.exists()) {  
-	        return file.delete();  
-	    } 
-	    return false;
-	}  
+
+	private boolean deleteFile(String sPath) {
+		File file = new File(sPath);
+		if (file.isFile() && file.exists()) {
+			return file.delete();
+		}
+		return false;
+	}
 
 	@Override
 	protected String getMenu() {

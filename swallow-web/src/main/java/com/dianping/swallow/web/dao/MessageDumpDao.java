@@ -22,9 +22,11 @@ public interface MessageDumpDao extends Dao{
 	
 	int removeMessageDump(String filename) throws MongoException;
 	
-	int updateMessageDumpStatus(String filename, boolean finished) throws MongoException;
+	int updateMessageDumpStatus(String filename, boolean finished, String desc) throws MongoException;
 	
 	List<MessageDump> loadAllMessageDumps();
+	
+	MessageDump loadUnfinishedMessageDump(String topic);
 
 	Map<String, Object> loadMessageDumps(int offset, int limit);
 

@@ -427,8 +427,9 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	}
 
 	@Override
-	public List<DBObject> exportMessages(String topicName, String startdt, String stopdt) {
+	public Map<String, Object> exportMessages(String topicName, String startdt, String stopdt) {
 		int maxSize = 1000000;
+		Map<String, Object> map = new HashMap<String, Object>();
 		List<DBObject> dboList = new ArrayList<DBObject>();
 		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(topicName).getCollection(MESSAGE_COLLECTION);
 		SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
@@ -439,7 +440,9 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 			stoplong = MongoUtils.getLongByDate(sdf.parse(stopdt));
 		} catch (ParseException e) {
 			logger.error("Error when parse date to Long.", e);
-			return dboList;
+			map.put("message", dboList);
+			map.put("size", 0);
+			return map;
 		}
 		DBObject query = BasicDBObjectBuilder
 				.start()
@@ -447,7 +450,8 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 						BasicDBObjectBuilder.start().add("$gt", MongoUtils.longToBSONTimestamp(startlong))
 								.add("$lt", MongoUtils.longToBSONTimestamp(stoplong)).get()).get();
 		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, -1).get();
-		DBCursor cursor = collection.find(query).sort(orderBy).limit(maxSize);
+		DBCursor cursor = collection.find(query).sort(orderBy);
+		int totalcount = cursor.count();
 		DBCursor dbc = collection.find().limit(1);
 		if (dbc.hasNext()) {
 			DBObject result = dbc.next();
@@ -465,8 +469,22 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 				cursor.close();
 			}
 		}
-		return dboList;
+		BSONTimestamp lasttime = (BSONTimestamp) dboList.get(0).get(ID);
+		String laststring = BSONTimestampToString(lasttime);
+		BSONTimestamp firsttime = (BSONTimestamp) dboList.get(dboList.size() - 1).get(ID);
+		String firststring = BSONTimestampToString(firsttime);
+		map.put("message", dboList);
+		map.put("size", totalcount);
+		map.put("first", firststring);
+		map.put("last", laststring);
+		return map;
 
+	}
+	
+	private String BSONTimestampToString(BSONTimestamp ts){
+		int seconds = ts.getTime();
+		long millions = new Long(seconds)*1000;
+		return new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
 	}
 
 }

@@ -5,14 +5,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.web.controller.MessageDumpController;
-import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.service.MessageDumpService;
+import com.dianping.swallow.web.service.MessageService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
@@ -32,12 +33,12 @@ public class DumpMessageTask implements Runnable {
 
 	private String filename;
 
-	private MessageDao webMessageDao;
-	
+	private MessageService messageService;
+
 	private MessageDumpService messageDumpService;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	public MessageDumpService getMessageDumpService() {
 		return messageDumpService;
 	}
@@ -47,12 +48,12 @@ public class DumpMessageTask implements Runnable {
 		return this;
 	}
 
-	public MessageDao getWebMessageDao() {
-		return webMessageDao;
+	public MessageService getMessageService() {
+		return messageService;
 	}
 
-	public DumpMessageTask setWebMessageDao(MessageDao webMessageDao) {
-		this.webMessageDao = webMessageDao;
+	public DumpMessageTask setMessageService(MessageService messageService) {
+		this.messageService = messageService;
 		return this;
 	}
 
@@ -92,27 +93,33 @@ public class DumpMessageTask implements Runnable {
 		return this;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
-		System.out.println("beginnnnn");
-		List<DBObject> dboList = webMessageDao.exportMessages(topic, startdt, stopdt);
-		System.out.println(String.format("dboList size is %d", dboList.size()));
-		int status = writeContentToFile(filename, dboList);
-		if(status == 0){
-			try{
-				int n = messageDumpService.updateDumpMessageStatus(filename, true);
-				if(n == 1){
+
+		Map<String, Object> result = messageService.exportMessage(topic, startdt, stopdt);
+		int count = (Integer) result.get("size");
+		List<DBObject> dboList = (List<DBObject>) result.get("message");
+		int size = dboList.size();
+		String firsttime = (String) result.get("first");
+		String lasttime = (String) result.get("last");
+		int status = writeContentToFile(dboList);
+		if (status == 0) {
+			try {
+				int n = messageDumpService.updateDumpMessage(filename, true, count, size, firsttime, lasttime);
+				if (n > 0) {
 					logger.info(String.format("Update file %s status to true successfully", filename));
-				}else{
+				} else {
 					logger.info(String.format("Update file %s status to true failed with n equal to %d", filename, n));
 				}
-			}catch(MongoException e){
+				messageDumpService.execBlockingDumpMessageTask(topic);
+			} catch (MongoException e) {
 				logger.info("MongoException when update messagedump", e);
 			}
 		}
 	}
 
-	private int writeContentToFile(String filename, List<DBObject> dboList) {
+	private int writeContentToFile(List<DBObject> dboList) {
 		GZIPOutputStream gos = null;
 		BufferedWriter writer = null;
 		try {

@@ -48,6 +48,7 @@
 						<th style="text-align: left">查询起始时间</th>
 						<th style="text-align: left">查询结束时间</th>
 						<th style="text-align: left">文件</th>
+						<th style="text-align: left">描述</th>
 						<th style="text-align: left">状态</th>
 						<th style="text-align: left">操作</th>
 					</tr>
@@ -60,6 +61,7 @@
 						<td style="text-align: left" ng-bind="t.startdt"></td>
 						<td style="text-align: left" ng-bind="t.stopdt"></td>
 						<td style="text-align: left" ng-bind="t.filename"></td>
+						<td style="text-align: left" ng-bind="t.desc"></td>
 						<td style="text-align: left" ng-bind="t.finished"></td>
 						<td style="text-align: left" ng-show='t.finished=="已导出"'><a
 							href="/console/download/file?filename={{t.filename}}"

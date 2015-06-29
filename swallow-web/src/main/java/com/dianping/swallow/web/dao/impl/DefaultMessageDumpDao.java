@@ -34,6 +34,7 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	private static final String MESSAGE = "message";
 	private static final String FILENAME = "filename";
 	private static final String FINISHED = "finished";
+	private static final String DESC = "desc";
 
 	@Override
 	public int saveMessageDump(MessageDump mdump) {
@@ -106,12 +107,13 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	}
 
 	@Override
-	public int updateMessageDumpStatus(String filename, boolean finished) throws MongoException {
+	public int updateMessageDumpStatus(String filename, boolean finished, String desc) throws MongoException {
 
 		Query query = new Query(Criteria.where(FILENAME).is(filename));
 
 		Update update = new Update();
 		update.set(FINISHED, finished);
+		update.set(DESC, desc);
 
 		WriteResult wr = mongoTemplate.upsert(query, update, MESSAGEDUMP_COLLECTION);
 		return wr.getN();
@@ -130,6 +132,13 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	public List<MessageDump> loadAllMessageDumps() {
 
 		return mongoTemplate.findAll(MessageDump.class, MESSAGEDUMP_COLLECTION);
+	}
+
+	@Override
+	public MessageDump loadUnfinishedMessageDump(String topic) {
+		
+		Query query = new Query(new Criteria().andOperator(Criteria.where(TOPIC).is(topic),Criteria.where(FINISHED).is(false)));
+		return mongoTemplate.findOne(query, MessageDump.class, MESSAGEDUMP_COLLECTION);
 	}
 
 }

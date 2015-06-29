@@ -19,6 +19,7 @@ public class MessageDump {
 	private String stopdt;
 	private String filename;
 	private boolean finished;
+	private String desc;
 	
 	public MessageDump(){
 		
@@ -95,11 +96,21 @@ public class MessageDump {
 		this.finished = finished;
 		return this;
 	}
+	
+	public String getDesc() {
+		return desc;
+	}
+
+	public MessageDump setDesc(String desc) {
+		this.desc = desc;
+		return this;
+	}
 
 	@Override
 	public String toString() {
 		return "MessageDump [_id=" + _id + ", topic=" + topic + ", name=" + name + ", time=" + time + ", startdt="
-				+ startdt + ", stopdt=" + stopdt + ", filename=" + filename + ", finished=" + finished + "]";
+				+ startdt + ", stopdt=" + stopdt + ", filename=" + filename + ", finished=" + finished + ", desc="
+				+ desc + "]";
 	}
 
 }

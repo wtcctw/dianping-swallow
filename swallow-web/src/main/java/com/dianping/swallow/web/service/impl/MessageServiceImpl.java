@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +31,6 @@ import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.MessageService;
-import com.dianping.swallow.web.task.DumpMessageTask;
-import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
  * @author mingdongli
@@ -46,6 +46,8 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	private static final String GZIP = "H4sIAAAAAAAAA";
 
 	ExecutorService exec = Executors.newFixedThreadPool(CommonUtils.getCpuCount());
+
+	Map<String, LinkedBlockingQueue<Runnable>> tasks = new ConcurrentHashMap<String, LinkedBlockingQueue<Runnable>>();
 
 	@Autowired
 	private MessageDao webMessageDao;
@@ -117,20 +119,6 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		return map;
 	}
 
-	@Override
-	public Integer exportMessage(String topicName, String startdt, String stopdt, String filename) {
-
-		DumpMessageTask fileDownloadTask = new DumpMessageTask();
-		fileDownloadTask.setTopic(topicName).setStartdt(startdt).setStopdt(stopdt).setFilename(filename)
-				.setWebMessageDao(webMessageDao).setMessageDumpService(messageDumpService);
-
-		exec.submit(fileDownloadTask);
-		logger.info(String.format("Start download task for %s to export messages from %s to %s", topicName, startdt,
-				stopdt));
-
-		return ResponseStatus.SUCCESS.getStatus();
-	}
-
 	private void setSMessageProperty(Message m) {
 		m.setMid(m.get_id());
 		if (m.getO_id() != null) {
@@ -195,11 +183,17 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 						logger.error("Create filewriter error", e);
 					}
 					String topic = md.getTopic();
-					exportMessage(md.getTopic(), md.getStartdt(), md.getStopdt(), md.getFilename());
+					exportMessage(md.getTopic(), md.getStartdt(), md.getStopdt());
 					logger.info(String.format("Start export message of %s to file %s", topic, f));
 				}
 			}
 		}
+	}
+
+	@Override
+	public Map<String, Object> exportMessage(String topicName, String startdt, String stopdt) {
+
+		return webMessageDao.exportMessages(topicName, startdt, stopdt);
 	}
 
 }

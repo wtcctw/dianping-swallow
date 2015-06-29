@@ -45,8 +45,7 @@ public interface MessageService {
 	 * @param topicName topic名称
 	 * @param startdt   开始时间
 	 * @param stopdt    结束时间
-	 * @param filename  保存文件名
 	 */
-	Integer exportMessage(String topicName, String startdt, String stopdt, String filename);
-
+	Map<String, Object> exportMessage(String topicName, String startdt, String stopdt);
+	
 }

@@ -4,17 +4,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.dao.MessageDumpDao;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.MessageService;
+import com.dianping.swallow.web.task.DumpMessageTask;
+import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
 
 /**
@@ -26,6 +33,7 @@ import com.mongodb.MongoException;
 public class MessageDumpServiceImpl extends AbstractSwallowService implements MessageDumpService {
 
 	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
+	private static final String DELIMITOR = "|";
 
 	@Autowired
 	private MessageDumpDao messageDumpDao;
@@ -33,7 +41,9 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 	@Resource(name = "messageService")
 	private MessageService messageService;
 
-	boolean allFinished = false;
+	ExecutorService exec = Executors.newFixedThreadPool(CommonUtils.getCpuCount());
+
+	Map<String, LinkedBlockingQueue<Runnable>> tasks = new ConcurrentHashMap<String, LinkedBlockingQueue<Runnable>>();
 
 	@Override
 	public Map<String, Object> loadSpecificDumpMessage(int start, int span, String topic) {
@@ -51,7 +61,7 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 
 		String date = new SimpleDateFormat(TIMEFORMAT).format(new Date());
 		md.set_id(id.toString()).setTopic(topic).setName(name).setTime(date).setStartdt(startdt).setStopdt(stopdt)
-				.setFilename(filename).setFinished(finished);
+				.setFilename(filename).setFinished(finished).setDesc("");
 		int status = messageDumpDao.saveMessageDump(md);
 
 		return status;
@@ -64,9 +74,13 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 	}
 
 	@Override
-	public int updateDumpMessageStatus(String filename, boolean finished) {
+	public int updateDumpMessage(String filename, boolean finished, int count, int size, String firsttime,
+			String laststring) {
 
-		return messageDumpDao.updateMessageDumpStatus(filename, finished);
+		StringBuffer sb = new StringBuffer();
+		sb.append(size).append(DELIMITOR).append(count).append(DELIMITOR).append(firsttime).append(DELIMITOR)
+				.append(laststring);
+		return messageDumpDao.updateMessageDumpStatus(filename, finished, sb.toString());
 	}
 
 	@Override
@@ -77,8 +91,56 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 
 	@Override
 	public List<MessageDump> loadAllDumpMessage() {
-		
+
 		return messageDumpDao.loadAllMessageDumps();
+	}
+
+	@Override
+	public MessageDump loadUnfinishedDumpMessage(String topic) {
+
+		return messageDumpDao.loadUnfinishedMessageDump(topic);
+	}
+
+	@Override
+	public int execDumpMessageTask(String topic, String startdt, String stopdt, String filename, String username) {
+
+		DumpMessageTask fileDownloadTask = new DumpMessageTask();
+		fileDownloadTask.setTopic(topic).setStartdt(startdt).setStopdt(stopdt).setFilename(filename)
+				.setMessageService(messageService).setMessageDumpService(this);
+
+		if (loadUnfinishedDumpMessage(topic) != null) {
+			LinkedBlockingQueue<Runnable> lbq = tasks.get(topic);
+			if (lbq == null) {
+				lbq = new LinkedBlockingQueue<Runnable>();
+			}
+			try {
+				lbq.put(fileDownloadTask);
+			} catch (InterruptedException e) {
+				logger.info("Error when put task to blockqueue", e);
+			}
+			saveDumpMessage(topic, username, startdt, stopdt, filename, false);
+			tasks.put(topic, lbq);
+		} else {
+			saveDumpMessage(topic, username, startdt, stopdt, filename, false);
+			exec.submit(fileDownloadTask);
+			logger.info(String.format("Start download task for %s to export messages from %s to %s", topic, startdt,
+					stopdt));
+		}
+
+		return ResponseStatus.SUCCESS.getStatus();
+	}
+
+	@Override
+	public void execBlockingDumpMessageTask(String topicName) {
+		LinkedBlockingQueue<Runnable> lbq = tasks.get(topicName);
+		if (lbq != null && !lbq.isEmpty()) {
+			try {
+				Runnable dmt = lbq.take();
+				exec.submit(dmt);
+			} catch (InterruptedException e) {
+				logger.error("Take task from blocking queue error", e);
+			}
+		}
 	}
 
 }

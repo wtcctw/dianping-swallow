@@ -1,10 +1,8 @@
 package com.dianping.swallow.web.dao;
 
-import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.web.model.Message;
-import com.mongodb.DBObject;
 
 /**
  * @author mingdongli
@@ -155,6 +153,6 @@ public interface MessageDao extends Dao {
 	 * @param filename
 	 *            保存文件名
 	 */
-	List<DBObject> exportMessages(String topicName, String startdt, String stopdt);
+	Map<String, Object> exportMessages(String topicName, String startdt, String stopdt);
 
 }
