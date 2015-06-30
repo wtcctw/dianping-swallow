@@ -449,6 +449,10 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 * 根据时间查询的消息可以导出到文件并且下载到本地。消息导出后页面会自动跳转到下载页，点击链接即可下载文件。如果导出的数据量很大，则需要一定的时间等待任务执行完成。
 
+* 在消息大小不超过1KB的前提下，允许导出的最多100万条数据，如果消息大小大于1KB，则最多只能导出1G大小的消息。
+
+* 导出的消息保存7天后自动从磁盘删除。
+
 ### Message重发
 
 #### web端重发已保存的message
@@ -459,9 +463,9 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 #### 通过api重发已保存的message
 
-* 联系运维人员获得重发消息的认证字符串(RANDOMSTRING)，该字符串每天更新一次。
+* 联系运维人员获得重发消息的认证字符串(AuthenticationString)，该字符串每天更新一次。
 
-* api接口为{swallow.web.sso.url}/console/message/auth/sendmessage，通过读取lion获得key为swallow.web.sso.url的值。也可根据运行环境固定服务器，下表列出swallow.web.sso.url在不同环境下值。
+* api接口为{swallow.web.sso.url}/api/message/sendmessageid，通过读取lion获得key为swallow.web.sso.url的值。也可根据运行环境固定服务器，下表列出swallow.web.sso.url在不同环境下值。
 
 环境|swallow.web.sso.url
 -|-
@@ -471,9 +475,9 @@ ppe   | http://ppe.swallow.dp
 product | http://swallow.dp
 
 
-* 发送post请求，需要2个参数，topic(topic名称)，mids(消息ID，多个消息ID用‘,’分隔)。
+* 发送post请求，需要3个参数，topic(topic名称)，mid(消息ID)和authentication(认证字符串)。
 
-* 返回值为json字符串，包含3个键值对，status(状态码)，send(发送成功的消息数)，message(状态码对应的消息)。下表列出了不同状态码表示的意义。
+* 返回值为json字符串，包含2个键值对，status(状态码)，message(状态码对应的消息)。下表列出了不同状态码表示的意义。
 
 	* 0表示操作成功。
 	* 负的状态码表示不可重试的错误。
@@ -482,13 +486,12 @@ product | http://swallow.dp
 状态码|消息
 -|-
 -4 | empty content
-－3  | no authenticaton
-－2   | unauthorized
-－1 | write mongo error
+-3  | no authenticaton
+-2   | unauthorized
+-1 | write mongo error
 0 | success
 1 | read time out
 
-* 当其中某条消息发送失败时，则立即返回。之前的消息发送成功，之后的消息则放弃发送。
 
 #### 使用示范
 
@@ -498,12 +501,11 @@ product | http://swallow.dp
 	import org.apache.commons.httpclient.HttpMethod;
 	import org.apache.commons.httpclient.NameValuePair;
 	import org.apache.commons.httpclient.methods.PostMethod;
-	private static final String AUTHORIZATION = "Authorization";
 	private HttpMethod postMethod(String url) throws IOException {
 		PostMethod post = new PostMethod(url);
-		post.setRequestHeader("Authentication", RANDOMSTRING);  //设置消息头
 		NameValuePair[] param = {
-				new NameValuePair("mids", "6158666846842126337,6156724155824734216"), //','分隔消息ID
+				new NameValuePair("mid", "6161611639629021185"),
+				new NameValuePair("authentication", "lfimuqqxjlgvniueuiqooorkkyxdmwrm"),
 				new NameValuePair("topic", "example") }; //topic名称
 		post.setRequestBody(param);  //设置消息体
 		post.releaseConnection();
@@ -517,7 +519,7 @@ product | http://swallow.dp
 		} catch (LionException e1) {
 			e1.printStackTrace();
 		}
-		String url = host + "/console/message/auth/sendmessage";
+		String url = host + "/api/message/sendmessageid";
 		HttpClient httpClient = new HttpClient();
 		try {
 			HttpMethod method = postMethod(url);
@@ -527,7 +529,6 @@ product | http://swallow.dp
 			try {
 				JSONObject json = new JSONObject(response);
 				System.out.println(json.getInt("status"));
-				System.out.println(json.getInt("send"));
 				System.out.println(json.getString("message"));
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -546,35 +547,31 @@ product | http://swallow.dp
 
 #### 通过api重发自定义的message
 
-* 联系运维人员获得重发消息的认证字符串(RANDOMSTRING)，该字符串每天更新一次。
+* 联系运维人员获得重发消息的认证字符串(AuthenticationString)，该字符串每天更新一次。
 
-* api接口为{swallow.web.sso.url}/console/message/auth/sendgroupmessage，通过读取lion获得key为swallow.web.sso.url的值。
+* api接口为{swallow.web.sso.url}/api/message/sendmessage，通过读取lion获得key为swallow.web.sso.url的值。
 
-* 发送post请求，4个必选参数，topic(topic名称)，type(消息类型)，property(消息属性)，textarea(消息体内容)和一个可选参数delimitor(property键值对分隔符)。
+* 发送post请求，5个必选参数，topic(topic名称)，type(消息类型)，property(消息属性)，authentication(认证字符串)，content(消息体内容)和一个可选参数delimitor(property键值对分隔符)。
 
 	* property键值对默认使用':'作为分隔符，如果用户的键值中有':'，可以在可选参数delimitor中设置分隔符字符串。
 
-	* textarea为字符串数组类型，表示消息内容。
+	* content字符串，表示消息内容。
 
-* 返回值为json字符串，包含3个键值对，status(状态码)，send(发送成功的消息数)，message(状态码对应的消息)，与通过api重发已保存的message返回值意义一致。
+* 返回值为json字符串，包含2个键值对，status(状态码)，message(状态码对应的消息)，与通过api重发已保存的message返回值意义一致。
 
-* 当其中某条消息发送失败时，则立即返回。之前的消息发送成功，之后的消息则放弃发送。消息体为空的消息自动跳过。
 
 #### 使用示范
 
 	private HttpMethod postMethod(String url) throws IOException{
 		PostMethod post = new PostMethod(url);
-		post.setRequestHeader(AUTHORIZATION, RANDOMSTRING); //设置消息头
-		String textarea[]={"test group message api with type and property, No 1", "test group message api with type and property, No 2"};
+		String contents = "test group message api with type and property, No 1";
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
-		for (int i = 0; i < textarea.length; i++) {
-			nameValuePairs.add(new NameValuePair("textarea[]",textarea[i]));
-		}
-
+		nameValuePairs.add(new NameValuePair("content",contents));
 		nameValuePairs.add(new NameValuePair("topic", "example"));
 		nameValuePairs.add(new NameValuePair("type", "jiagou"));
-		nameValuePairs.add(new NameValuePair("property", "test:true,work:on"));
+		nameValuePairs.add(new NameValuePair("property", "test:true::work:on"));  //::用于分割多个键值对
+		nameValuePairs.add(new NameValuePair("authentication", "lfimuqqxjlgvniueuiqooorkkyxdmwrm"));
 
 		NameValuePair[] array = new NameValuePair[nameValuePairs.size()];
 		nameValuePairs.toArray(array);
@@ -585,7 +582,7 @@ product | http://swallow.dp
 
 * 与重发已保存的message相似，只需更改请求url和post参数。
 
-* 请求url: String url = host + "/console/message/auth/sendgroupmessage"。
+* 请求url: String url = host + "/api/message/sendmessage"。
 
 
 ### 查看Swallow消息

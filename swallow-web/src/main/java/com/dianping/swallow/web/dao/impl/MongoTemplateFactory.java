@@ -21,7 +21,6 @@ import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 
@@ -49,7 +48,7 @@ public class MongoTemplateFactory {
 
 	public static final String SWALLOW_MONGO_CONFIG_FILE = "swallow-web-mongo.properties";
 
-	private Mongo mongo;
+	private MongoClient mongo;
 
 	private MongoConfig config;
 	private DynamicConfig dynamicConfig;
@@ -95,7 +94,6 @@ public class MongoTemplateFactory {
 		
 	}
 
-	@SuppressWarnings("deprecation")
 	@Bean(name = "topicMongoTemplate")
 	public MongoTemplate getTopicMongoTemplate() {
 
