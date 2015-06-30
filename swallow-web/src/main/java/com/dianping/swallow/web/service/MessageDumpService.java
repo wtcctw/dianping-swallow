@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.service;
 
-import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.web.model.MessageDump;
@@ -19,7 +18,7 @@ public interface MessageDumpService {
 
 	MessageDump loadDumpMessage(String filename);
 
-	List<MessageDump> loadAllDumpMessage();
+	Map<String, Object> loadAllDumpMessage();
 
 	int removeDumpMessage(String filename) throws MongoException;
 

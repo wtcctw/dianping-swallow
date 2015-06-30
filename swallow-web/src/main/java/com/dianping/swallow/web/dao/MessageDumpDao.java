@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.dao;
 
-import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.web.model.MessageDump;
@@ -24,7 +23,7 @@ public interface MessageDumpDao extends Dao{
 	
 	int updateMessageDumpStatus(String filename, boolean finished, String desc) throws MongoException;
 	
-	List<MessageDump> loadAllMessageDumps();
+	Map<String, Object> loadAllMessageDumps();
 	
 	MessageDump loadUnfinishedMessageDump(String topic);
 

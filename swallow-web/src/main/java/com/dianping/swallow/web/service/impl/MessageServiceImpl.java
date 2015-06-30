@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.controller.MessageDumpController;
 import com.dianping.swallow.web.dao.MessageDao;
+import com.dianping.swallow.web.dao.impl.DefaultMessageDumpDao;
 import com.dianping.swallow.web.model.Message;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.AbstractSwallowService;
@@ -157,7 +158,8 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 
 		if (event.getApplicationContext().getParent() == null) {
-			List<MessageDump> mds = messageDumpService.loadAllDumpMessage();
+			@SuppressWarnings("unchecked")
+			List<MessageDump> mds = (List<MessageDump>) messageDumpService.loadAllDumpMessage().get(DefaultMessageDumpDao.MESSAGE);
 			for (MessageDump md : mds) {
 				if (!md.isFinished()) {
 					String f = md.getFilename();

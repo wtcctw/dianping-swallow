@@ -2,7 +2,6 @@ package com.dianping.swallow.web.service.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -90,7 +89,7 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 	}
 
 	@Override
-	public List<MessageDump> loadAllDumpMessage() {
+	public Map<String, Object> loadAllDumpMessage() {
 
 		return messageDumpDao.loadAllMessageDumps();
 	}

@@ -30,8 +30,8 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	private static final String MESSAGEDUMP_COLLECTION = "swallowwebmessagedumpc";
 
 	private static final String TOPIC = "topic";
-	private static final String SIZE = "size";
-	private static final String MESSAGE = "message";
+	public static final String SIZE = "size";
+	public static final String MESSAGE = "message";
 	private static final String FILENAME = "filename";
 	private static final String FINISHED = "finished";
 	private static final String DESC = "desc";
@@ -135,9 +135,11 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	}
 
 	@Override
-	public List<MessageDump> loadAllMessageDumps() {
+	public Map<String, Object> loadAllMessageDumps() {
 
-		return mongoTemplate.findAll(MessageDump.class, MESSAGEDUMP_COLLECTION);
+		List<MessageDump> messageDumpList = mongoTemplate.findAll(MessageDump.class, MESSAGEDUMP_COLLECTION);
+		Long size = (long) messageDumpList.size();
+		return getResponse(size, messageDumpList);
 	}
 
 	@Override

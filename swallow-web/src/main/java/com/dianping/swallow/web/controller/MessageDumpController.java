@@ -100,7 +100,7 @@ public class MessageDumpController extends AbstractMenuController {
 		if (StringUtils.isNotEmpty(topic)) {
 			;
 		} else if (administratorService.loadAdminSet().contains(username)) {
-			topic = "";
+			return messageDumpService.loadAllDumpMessage();
 		} else {
 			List<String> t = topicService.loadTopicNames(username);
 			if (t == null || t.size() == 0) {
