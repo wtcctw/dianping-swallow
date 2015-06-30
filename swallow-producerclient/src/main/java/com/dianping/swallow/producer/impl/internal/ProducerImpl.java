@@ -180,6 +180,8 @@ public class ProducerImpl implements Producer {
 
          //构造packet
          PktMessage pktMessage = new PktMessage(destination, swallowMsg);
+         pktMessage.setCatEventID(getCatEventId());
+         
          switch (producerConfig.getMode()) {
             case SYNC_MODE://同步模式
                PktSwallowPACK pktSwallowPACK = (PktSwallowPACK) producerHandler.doSendMsg(pktMessage);
@@ -214,7 +216,15 @@ public class ProducerImpl implements Producer {
       return ret;
    }
 
-   /**
+	private String getCatEventId() {
+		try{
+			return Cat.getProducer().createMessageId();
+		}catch(Exception e){
+			return "UnknownMessageId";
+		}
+	}
+
+/**
     * @return 返回远程调用接口
     */
    public ProducerSwallowService getRemoteService() {
