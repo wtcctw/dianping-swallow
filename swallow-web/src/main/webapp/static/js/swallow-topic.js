@@ -70,8 +70,8 @@ module.factory('Paginator', function(){
 	};
 });
 
-module.controller('TopicController', ['$scope', '$http', 'Paginator',
-        function($scope, $http, Paginator){
+module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog',
+        function($rootScope, $scope, $http, Paginator, ngDialog){
 				var fetchFunction = function(offset, limit, name, prop, callback){
 				var transFn = function(data){
 					return $.param(data);
@@ -117,14 +117,56 @@ module.controller('TopicController', ['$scope', '$http', 'Paginator',
 			}
 			
 			$scope.refreshpage = function(myForm){
-	        	$('#myModal').modal('hide');
 	        	$scope.topictime = $("#datetimepicker").val();
 	        	$scope.topicprop = $("#topicprops").val();
-	        	$http.post(window.contextPath + '/console/topic/auth/edittopic', {"topic":$scope.topicname,"prop":$scope.topicprop,
-	        		"time":$scope.topictime}).success(function(response) {
-					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" );
-	        	});
+	        	if($scope.topicprop.length == 0){
+	        		$scope.dialog($scope.topicname, $scope.topicprop, $scope.topictime);
+	        	}
+	        	else{
+	        		$('#myModal').modal('hide');
+		        	$http.post(window.contextPath + '/api/topic/edittopic', {"topic":$scope.topicname,"prop":$scope.topicprop,
+		        		"time":$scope.topictime}).success(function(response) {
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" );
+		        	});
+	        	}
 	        }
+			
+			$rootScope.doedit = function(topicname, topicprop, topictime){
+				$('#myModal').modal('hide');
+				$http.post(window.contextPath + '/api/topic/edittopic', {"topic":topicname,"prop":topicprop,
+	        		"time":topictime}).success(function(response) {
+					$scope.searchPaginator = Paginator(fetchFunction, 30, topicname , "");
+	        	});
+				return true;
+			}
+			
+			//for deal with re transmit for selected messages
+			$scope.dialog = function(topicname, topicprop, topictime) {
+				$rootScope.topicname = topicname;
+				$rootScope.topicprop = topicprop;
+				$rootScope.topictime = topictime;
+				ngDialog.open({
+							template : '\
+							<div class="widget-box">\
+							<div class="widget-header">\
+								<h4 class="widget-title">警告</h4>\
+							</div>\
+							<div class="widget-body">\
+								<div class="widget-main">\
+									<p class="alert alert-info">\
+										您确认要清空消息申请人么？\
+									</p>\
+								</div>\
+								<div class="modal-footer">\
+									<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
+									<button type="button" class="btn btn-primary" ng-click="doedit(topicname,topicprop,topictime)&&closeThisDialog()">确定</button>\
+								</div>\
+							</div>\
+						</div>',
+						plain : true,
+						className : 'ngdialog-theme-default'
+				});
+			};
 						
 			$scope.setTopicName = function(name){
 				localStorage.setItem("name", name);

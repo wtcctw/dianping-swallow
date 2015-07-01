@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -14,14 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.StringUtils;
-import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.dao.TopicDao;
-import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AbstractSwallowService;
-import com.dianping.swallow.web.service.AdministratorListService;
-import com.dianping.swallow.web.service.FilterMetaDataService;
+import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.TopicService;
+import com.mongodb.MongoException;
+import com.mongodb.MongoSocketException;
 
 /**
  * @author mingdongli
@@ -29,106 +29,91 @@ import com.dianping.swallow.web.service.TopicService;
  *         2015年5月14日下午1:16:09
  */
 @Service("topicService")
-public class TopicServiceImpl extends AbstractSwallowService implements
-		TopicService {
+public class TopicServiceImpl extends AbstractSwallowService implements TopicService {
 
 	private static final String DELIMITOR = ",";
 
 	@Autowired
-	private AdministratorDao administratorDao;
-
-	@Autowired
 	private TopicDao topicDao;
 
-	@Autowired
-	private MessageDao webSwallowMessageDao;
+	@Resource(name = "administratorService")
+	private AdministratorService administratorService;
 
-	@Resource(name = "administratorListService")
-	private AdministratorListService administratorListService;
-	
-	@Resource(name = "filterMetaDataService")
-	private FilterMetaDataService filterMetaDataService;
+	private Map<String, Set<String>> topicToWhiteList = new ConcurrentHashMap<String, Set<String>>();
 
-	/*
-	 * read records from writeMongo due to it already exists
-	 */
 	@Override
 	public Map<String, Object> loadAllTopic(int start, int span) {
 		return topicDao.findFixedTopic(start, span);
 	}
 
-	/*
-	 * just read, so use writeMongo
-	 */
 	@Override
-	public Map<String, Object> loadSpecificTopic(int start, int span,
-			String name, String prop) {
+	public Map<String, Object> loadSpecificTopic(int start, int span, String name, String prop) {
 
 		return topicDao.findSpecific(start, span, name, prop);
 	}
 
 	@Override
 	public List<String> loadAllTopicNames(String tongXingZheng, boolean isAdmin) {
-		
-		Map<String, Set<String>> topicToWhiteList = filterMetaDataService.loadTopicToWhiteList();
-		if(isAdmin){
+
+		Map<String, Set<String>> topicToWhiteList = this.loadTopicToWhiteList();
+		if (isAdmin) {
 			return new ArrayList<String>(topicToWhiteList.keySet());
-		}
-		else{
+		} else {
 			List<String> topics = new ArrayList<String>();
-			for(Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()){
-				if(entry.getValue().contains(tongXingZheng)){
+			for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
+				if (entry.getValue().contains(tongXingZheng)) {
 					String topic = entry.getKey();
-					if(!topics.contains(topic)){
+					if (!topics.contains(topic)) {
 						topics.add(topic);
 					}
 				}
-			} 
+			}
 			return topics;
 		}
 	}
 
 	@Override
-	public void editTopic(String name, String prop, String time) {
-		
-		filterMetaDataService.loadTopicToWhiteList().put(name, splitProps(prop));
-		if (topicDao.updateTopic(name, prop, time)) {
-			logger.info(String.format(
-					"Edit %s to [prop: %s, time: %s] successfully",
-					name, prop, time));
-		} else {
-			logger.info(String.format(
-					"Edit %s to [prop: %s, time: %s] failed", name,
-					prop, time));
+	public int editTopic(String name, String prop, String time) throws MongoSocketException, MongoException{
+
+		Set<String> proposal = splitProps(prop);
+		this.loadTopicToWhiteList().put(name, proposal);
+		StringBuffer sb = new StringBuffer();
+		boolean first = false;
+		for(String p : proposal){
+			if(!first){
+				sb.append(p);
+				first = true;
+			}else{
+				sb.append(",").append(p);
+			}
 		}
+		return topicDao.updateTopic(name, sb.toString(), time);
 	}
 
 	@Override
-	public Map<String, Object[]> getPropAndDept(String username) {
-		Map<String, Object[]> map = new HashMap<String, Object[]>();
+	public Map<String, String[]> getPropAndDept(String username, boolean all) {
+		Map<String, String[]> map = new HashMap<String, String[]>();
 		Set<String> proposal = new HashSet<String>();
 		List<Topic> topics = topicDao.findAll();
 
-		boolean isAdmin = filterMetaDataService.loadAdminSet().contains(username);
-		boolean switchenv = filterMetaDataService.isShowContentToAll();
-		if(isAdmin || switchenv){
+		if (all) {
 			for (Topic topic : topics) {
 				proposal.addAll(getPropList(topic));
 			}
-		}
-		else{
+		} else {
 			for (Topic topic : topics) {
 				Set<String> tmpprop = getPropList(topic);
-				if(tmpprop.contains(username)){
+				if (tmpprop.contains(username)) {
 					proposal.addAll(tmpprop);
 				}
 			}
 
 		}
-		
-		map.put("prop", proposal.toArray());
-		map.put("edit", filterMetaDataService.loadAllUsers().toArray());
-		
+
+		map.put("prop", proposal.toArray(new String[proposal.size()]));
+		List<String> tmpList = administratorService.loadAllTypeName();
+		map.put("edit", tmpList.toArray(new String[tmpList.size()]));
+
 		return map;
 	}
 
@@ -148,6 +133,33 @@ public class TopicServiceImpl extends AbstractSwallowService implements
 		String[] prop = props.split(DELIMITOR);
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
 		return lists;
+	}
+
+	@Override
+	public Map<String, Set<String>> loadTopicToWhiteList() {
+		return topicToWhiteList;
+	}
+
+	@Override
+	public int saveTopic(Topic topic) {
+		return topicDao.saveTopic(topic);
+	}
+
+	@Override
+	public Topic loadTopic(String name) {
+		return topicDao.readByName(name);
+	}
+
+	@Override
+	public List<String> loadTopicNames(String username) {
+
+		List<String> topics = new ArrayList<String>();
+		for(Map.Entry<String, Set<String>> entry:topicToWhiteList.entrySet()){
+			if(entry.getValue().contains(username)){
+				topics.add(entry.getKey());
+			}
+		}
+		return topics;
 	}
 
 }

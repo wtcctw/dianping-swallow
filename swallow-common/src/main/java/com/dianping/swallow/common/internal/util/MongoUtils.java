@@ -94,8 +94,9 @@ public class MongoUtils {
 		System.out.println(-1 << 32);
 
 		System.out
-				.println(MongoUtils.longToBSONTimestamp(5759378400351354888L));
-		BSONTimestamp ts = new BSONTimestamp(1376825482, 573);
+				.println(MongoUtils.longToBSONTimestamp(6163932025775456305L));
+		BSONTimestamp ts = new BSONTimestamp(1435152261, 49);
+		System.out.println(BSONTimestampToLong (ts));
 		System.out.println(new Date(ts.getTime() * 1000L));
 		System.out.println(Integer.MAX_VALUE / 86400 / 30 / 12);
 	}

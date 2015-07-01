@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.model.Administrator;
@@ -16,6 +17,7 @@ import com.mongodb.WriteResult;
  *
  *         2015年5月11日 上午12:00:31
  */
+@Component
 public class DefaultAdministratorDao extends AbstractWriteDao implements
 		AdministratorDao {
 

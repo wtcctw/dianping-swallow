@@ -1,9 +1,8 @@
-
 <div class="main-content main-content-local" style="opacity: 1.0;"
 	ng-controller="AdministratorController">
 	<div class="breadcrumbs" id="breadcrumbs">
-		<!-- 		<script type="text/javascript"
-			src="${rc.contextPath}/static/js/swallow-admin.js"></script> -->
+		 		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/swallow-administrator.js"></script>
 		<script type="text/javascript">
 			try {
 				ace.settings.check('breadcrumbs', 'fixed')
@@ -11,6 +10,10 @@
 			}
 		</script>
 
+		<div class="btn-group" role="group" aria-label="">
+			<button type="button" class="btn btn-success btn-swallow-ok adminbut"
+				style="margin-left: 20px; height: 36px;" ng-click="loadrs()">校验字符串</button>
+		</div>
 		<a class="pull-right" href="#myModal" ng-click="clearModal()"
 			data-toggle="modal"><i class="icon-plus"></i> 新建管理员名单</a>
 	</div>
@@ -19,7 +22,6 @@
 	<div class="page-content">
 		<!--page-header  -->
 		<div class="page-header">
-
 			<!--row  -->
 			<div class="row">
 				<table
@@ -31,18 +33,18 @@
 						<th style="text-align: left">权限</th>
 						<th style="text-align: left">操作</th>
 					</tr>
-					<tr ng-repeat="a in searchPaginator.currentPageItems"
-						on-finish-render-filters>
+					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left" ng-bind="a.name"></td>
-						<td style="text-align: left" ng-bind="a.date"></td>
-						<td style="text-align: left" ng-bind="a.role"></td>
+						<td style="text-align: left" ng-bind="ad.name"></td>
+						<td style="text-align: left" ng-bind="ad.date"></td>
+						<td style="text-align: left" ng-bind="ad.role"></td>
 						<td style="text-align: left"><a href="#myModal"
-							ng-click="setModalInput(a.name, a.role);" data-toggle="modal"
+							ng-click="setModalInput(ad.name, ad.role);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
 								data-original-title="编辑配置值"></i></a> <a href=""
-							ng-click="dialog(a.name);" class="edit-config-btn"><i
+							ng-click="dialog(ad.name);" class="edit-config-btn"><i
 								class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
+					</tr>
 				</table>
 
 				<ul style="margin-top: 20px;" class="pagination">
@@ -126,5 +128,4 @@
 
 		<!--end page-header  -->
 	</div>
-	<!-- end page-content -->
 </div>

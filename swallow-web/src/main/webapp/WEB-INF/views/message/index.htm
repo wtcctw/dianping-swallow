@@ -11,7 +11,7 @@
 		</script>
 
 		<form class="bs-example bs-example-form" role="form">
-			<div class="input-group">
+			<div class="input-group" style="margin-left: 20px">
 				<span class="input-group-addon">Topic名称</span> <input type="text"
 					class="form-control" placeholder="请先输入Topic 名称"
 					style="width: 200px" id="topicname" ng-model='tname' required>
@@ -24,7 +24,10 @@
 				<input type="text" placeholder="结束时间..." ng-model="stopdt"
 					id="stoptime">
 				<button type="button" class="btn btn-success btn-swallow-ok"
-					id="summittime" ng-click="queryByTime()">提交</button>
+					id="summittime" ng-click="queryByTime()">查询</button>
+				<button type="button" class="btn btn-success btn-swallow-ok"
+					id="dump" ng-click="dumprecord()" data-toggle="tooltip"
+					title="导出查询结果，任务结束后系统会自动跳转到下载页面,请耐心等待页面跳转">导出</button>
 			</div>
 		</form>
 
@@ -52,18 +55,23 @@
 			}
 		</script>
 
-		<div class="btn-group" role="group" aria-label="">
+		<div class="btn-group" role="group" aria-label=""
+			style="margin-left: 20px;">
 			<button type="submit" class="btn btn-success btn-swallow-ok"
 				data-toggle="modal" data-target="#myModal">发送自定义消息</button>
 			<button type="button" class="btn btn-success btn-swallow-ok"
 				ng-click="dialog()">发送下表消息</button>
 			<input type="checkbox" id="selectall" ng-click="selectall()">
-			全选 <input type="checkbox" id="selectnone" ng-click="selectnone()">
-			全不选
+			全选
+		</div>
+		<div class="pull-right">
+			<a href="" data-toggle="tooltip"
+				title="mongo存储使用Capped Collection,当分配的磁盘空间耗尽,最新的消息会覆盖最早的消息">最早时间</a>
+			<input type="text" ng-model="mintime"
+				style="width: 150px; margin-right: 10px;" readonly="readonly">
 		</div>
 
 	</div>
-
 
 	<!-- page-content -->
 	<div class="page-content">
@@ -77,7 +85,8 @@
 					<tr>
 						<th style="text-align: left">操作</th>
 						<th style="text-align: left">序号</th>
-						<th style="text-align: left">消息ID</th>
+						<th style="text-align: left"><a href="" data-toggle="tooltip"
+							ng-click="reverse()" title="点击逆序显示">消息ID</a></th>
 						<th style="text-align: left">消息内容</th>
 						<th style="text-align: left">保存时间</th>
 						<th style="text-align: left">产生时间</th>
@@ -90,9 +99,9 @@
 							class="swallowcheckbox"></td>
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="m.mid"></td>
-						<td style="text-align: left"><a
-							ng-click="formatres(m.mid)" class="edit-config-btn"
-							style="cursor: pointer;" ng-bind="searchPaginator.currentPartialCon[$index]"></a></td>
+						<td style="text-align: left"><a ng-click="formatres(m.mid)"
+							class="edit-config-btn" style="cursor: pointer;"
+							ng-bind="searchPaginator.currentPartialCon[$index]"></a></td>
 						<td style="text-align: left" ng-bind="m.ststring"></td>
 						<td style="text-align: left" ng-bind="m.gtstring"></td>
 						<td style="text-align: left" ng-bind="m.mo_id"></td>
@@ -115,7 +124,9 @@
 						ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
 					<li><a href=""
 						ng-click="searchPaginator.fetch(searchPaginator.endPage)"
-						ng-show="searchPaginator.pages.length" ng-bind="searchPaginator.totalpieces"></a></li>
+						ng-show="searchPaginator.pages.length"
+						ng-bind="searchPaginator.totalpieces" data-toggle="tooltip"
+						title="如果消息数大于100万,请使用上下页切换"></a></li>
 					<select class="selectpicker" ng-model="recordofperpage"
 						ng-change="makeChanged()"
 						ng-options="item.num as item.num for item in numperpage"></select>
@@ -144,12 +155,52 @@
 										ng-model="tname" required>
 								</div>
 							</div>
+							<div class="control-group">
+								<label class="control-label">消息类型 :</label>
+								<div class="controls">
+									<input type="text" name="type" class="input-xlarge"
+										ng-model="ttype" placeholder="没有可以忽略">
+								</div>
+							</div>
+							<div class="control-group input_fields_wrap">
+								<label class="control-label">消息属性 :</label> <a
+									class="add_field_button" href=""
+									ng-click="addfield();$event.preventDefault()"
+									style="margin-left: 205px;"><i class="icon-plus"></i> Add</a>
+								<!-- <button class="add_field_button" ng-click="addfield();$event.preventDefault()">Add More Fields</button> -->
+								<div class="input-group">
+									<input type="text" name="property"
+										class="input-xlarge property-input"
+										placeholder="key:value形式,点击Add添加,否则忽略"> <input
+										class="dropdown-toggle" type="text" id="delimitor"
+										data-toggle="dropdown" aria-expanded="true" value=":"
+										style="width: 31px" required data-toggle="tooltip"
+										title="key和value的分隔符">
+									<ul class="dropdown-menu" role="menu"
+										aria-labelledby="dropdownMenu1" style="margin-left: 270px;">
+										<li role="presentation" ng-repeat="d in dearray"><a
+											role="menuitem" tabindex="-1" href=""
+											ng-click="setdelimitor($index)" ng-bind="d"></a></li>
+									</ul>
+								</div>
+							</div>
 
 							<div class="control-group">
-								<label class="control-label">输入需要发送的消息(每行代表一条消息)</label>
+								<label class="control-label">输入json化的消息体(每次只能发送一条,如需批量发送请查看帮助文档中的API)</label>
 								<div class="controls">
 									<textarea class="form-control" name="textarea"
-										id="message-text" rows="10" ng-model="textarea" required></textarea>
+										id="message-text" rows="10" ng-model="textarea"
+										placeholder='{
+  "swallow": {
+    "developer": "[]",
+    "user": "xxx"
+  },
+  "web": {
+    "key1": -1,
+    "key2": -2
+  }
+}'
+										required></textarea>
 								</div>
 							</div>
 
@@ -160,7 +211,6 @@
 									<button type="submit" class="btn btn-success">发送消息</button>
 								</div>
 							</div>
-
 						</form>
 					</div>
 

@@ -1,6 +1,9 @@
 package com.dianping.swallow.web.filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -10,16 +13,16 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.dianping.swallow.web.controller.MessageRetransmitController;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
-import com.dianping.swallow.web.service.AccessControlService;
-import com.dianping.swallow.web.service.FilterMetaDataService;
-import com.dianping.swallow.web.service.impl.AccessControlServiceImpl;
-import com.dianping.swallow.web.service.impl.FilterMetaDataServiceImpl;
+import com.dianping.swallow.web.service.AuthenticationService;
+import com.dianping.swallow.web.service.impl.AuthenticationServiceImpl;
+import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
  * @author mingdongli
@@ -28,77 +31,64 @@ import com.dianping.swallow.web.service.impl.FilterMetaDataServiceImpl;
  */
 public class AuthenticationFilter implements Filter {
 
-	private static final String TOPICURI = "/console/topic/auth";
-
-	private static final String MESSAGEURI = "/console/message/auth";
-
-	private static final String ADMINURI = "/console/admin/auth";
-
-	private ServletContext context;
-
-	private AccessControlService accessControlService;
+	private AuthenticationService authenticationService;
 
 	private ExtractUsernameUtils extractUsernameUtils;
-	
-	private FilterMetaDataService filterMetaDataService;
 
+	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
-		this.context = fConfig.getServletContext();
-		ApplicationContext ctx = WebApplicationContextUtils
-				.getRequiredWebApplicationContext(this.context);
-		this.accessControlService = ctx.getBean(AccessControlServiceImpl.class);
-		this.filterMetaDataService = ctx.getBean(FilterMetaDataServiceImpl.class);
+		ServletContext context = fConfig.getServletContext();
+		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
+		this.authenticationService = ctx.getBean(AuthenticationServiceImpl.class);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
 	}
 
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+			ServletException {
 
 		HttpServletRequest req = (HttpServletRequest) request;
-
-		HttpServletResponse res = (HttpServletResponse) response;
-
 		String uri = req.getRequestURI();
-
-		this.context.log("Requested Resource::" + uri);
-
 		String username = extractUsernameUtils.getUsername(req);
-		boolean switchenv = filterMetaDataService.isShowContentToAll();
-		if(switchenv){
+		String topicname = req.getParameter("topic");
+
+		boolean isPassed = authenticationService.isValid(username, topicname, uri);
+
+		if (isPassed) {
 			chain.doFilter(request, response);
-		}
-		else if (uri.startsWith(TOPICURI) || uri.startsWith(MESSAGEURI)) {
-			String topicname = req.getParameter("topic");
-
-			if (!accessControlService.checkVisitIsValid(username, topicname)) {
-				this.context.log(String.format(
-						"%s have no authenticaton to access %s", username,
-						topicname));
-				res.sendError(javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
-				return;
-			} else {
-				chain.doFilter(request, response);
-			}
-		} else if (uri.startsWith(ADMINURI)) {
-
-			if (!accessControlService.checkVisitIsValid(username)) {
-				this.context.log(String.format(
-						"%s have no authenticaton to access admin memu",
-						username));
-				res.sendError(javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
-				return;
-			} else {
-				chain.doFilter(request, response);
-			}
 		} else {
-			// pass the request along the filter chain
-			chain.doFilter(request, response);
+			sendErrorMessage(response, ResponseStatus.UNAUTHENTICATION.getStatus(),
+					ResponseStatus.UNAUTHENTICATION.getMessage(), false);
+			return;
 		}
 
 	}
 
 	public void destroy() {
-		// close any resources here
+		// ignore
+	}
+
+	private void sendErrorMessage(ServletResponse response, int status, String message, boolean needSend)
+			throws IOException {
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put(MessageRetransmitController.STATUS, status);
+		result.put(MessageRetransmitController.MESSAGE, message);
+		if (needSend) {
+			result.put(MessageRetransmitController.SEND, 0);
+		}
+
+		JSONObject json = new JSONObject(result);
+
+		response.setContentType("application/json");
+
+		PrintWriter out = response.getWriter();
+
+		try {
+			out.print(json);
+			out.flush();
+		} finally {
+			out.close();
+		}
 	}
 
 }

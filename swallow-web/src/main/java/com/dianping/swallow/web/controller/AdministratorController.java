@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
-import com.dianping.swallow.web.service.AccessControlServiceConstants;
+import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.AdministratorService;
 
 /**
@@ -50,7 +50,7 @@ public class AdministratorController extends AbstractMenuController {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		map = administratorService.queryAllRecordFromAdminList(offset, limit);
+		map = administratorService.loadAdmin(offset, limit);
 		return map;
 	}
 
@@ -61,7 +61,7 @@ public class AdministratorController extends AbstractMenuController {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		int auth = convertRole(role);
-		if(administratorService.createInAdminList(name, auth)){
+		if(administratorService.createAdmin(name, auth)){
 			logger.info(String.format("Create %s in administrator list successfully", name));
 		}
 		else{
@@ -74,7 +74,7 @@ public class AdministratorController extends AbstractMenuController {
 	public void removeAdmin(@RequestParam(value = "name") String name,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		if(administratorService.removeFromAdminList(name)){
+		if(administratorService.removeAdmin(name)){
 			logger.info(String.format("Remove %s from administrator list successfully", name));
 		}
 		else{
@@ -87,7 +87,7 @@ public class AdministratorController extends AbstractMenuController {
 	public Object queryAllVisits(HttpServletRequest request,
 			HttpServletResponse response) {
 
-		return administratorService.queryAllNameFromAdminList();
+		return administratorService.loadAllTypeName();
 	}
 
 	private int convertRole(String role) {
@@ -95,11 +95,11 @@ public class AdministratorController extends AbstractMenuController {
 		int auth = -1;
 		if (!StringUtil.isEmpty(role)) {
 			if (ADMINISTRATOR.equals(role.trim()))
-				auth = AccessControlServiceConstants.ADMINI;
+				auth = AuthenticationService.ADMINI;
 			else if (USER.equals(role.trim()))
-				auth = AccessControlServiceConstants.USER;
+				auth = AuthenticationService.USER;
 			else
-				auth = AccessControlServiceConstants.VISITOR;
+				auth = AuthenticationService.VISITOR;
 		}
 		return auth;
 	}

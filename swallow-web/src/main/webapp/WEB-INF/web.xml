@@ -18,17 +18,17 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
-    <filter>
-        <filter-name>cat-filter</filter-name>
-        <filter-class>com.dianping.cat.servlet.CatFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>cat-filter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
-	
+	<filter>
+		<filter-name>cat-filter</filter-name>
+		<filter-class>com.dianping.cat.servlet.CatFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>cat-filter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+
 
 	<!--for cas-server -->
 	<filter>
@@ -57,7 +57,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludeURLs</param-name>
-			<param-value>/exclude,/api/*,/console/monitor/*,/static/*,/assets/*,/help/*</param-value>
+			<param-value>/exclude,/api/*,/console/monitor/*,/static/*,/assets/*,/help/*,/console/message/auth/sendmessage,/console/message/auth/sendgroupmessage,/console/message/randomstring,/console/topic/auth/edittopic</param-value>
 		</init-param>
 	</filter>
 
@@ -122,7 +122,7 @@
 			<param-value>true</param-value>
 		</init-param>
 	</filter>
-	
+
 	<filter-mapping>
 		<filter-name>characterEncodingFilter</filter-name>
 		<url-pattern>/</url-pattern>
@@ -135,27 +135,10 @@
 
 	<filter-mapping>
 		<filter-name>AuthenticationFilter</filter-name>
-		<url-pattern>/console/topic/auth/*</url-pattern>
 		<url-pattern>/console/message/auth/*</url-pattern>
 		<url-pattern>/console/admin/auth/*</url-pattern>
+		<url-pattern>/console/download/auth/*</url-pattern>
 	</filter-mapping>
-	
-	<filter>
-		<filter-name>RequestLogFilter</filter-name>
-		<filter-class>com.dianping.swallow.web.filter.RequestLogFilter</filter-class>
-	</filter>
-	 
-	<filter-mapping>
-		<filter-name>RequestLogFilter</filter-name>
-		<url-pattern>/console/topic/auth/*</url-pattern>
-		<url-pattern>/console/message/auth/*</url-pattern>
-		<url-pattern>/console/admin/auth/*</url-pattern>
-		<url-pattern>/console/topic</url-pattern>
-		<url-pattern>/console/message</url-pattern>
-		<!-- <url-pattern>/console/monitor/consumer/total/delay</url-pattern> -->
-		<url-pattern>/console/administrator</url-pattern>
-	</filter-mapping>
-	
 
 	<servlet>
 		<servlet-name>appServlet</servlet-name>
@@ -172,4 +155,12 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>downloadServlet</servlet-name>
+		<servlet-class>com.dianping.swallow.web.servlet.FileDownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>downloadServlet</servlet-name>
+		<url-pattern>/console/download/file</url-pattern>
+	</servlet-mapping>
 </web-app>

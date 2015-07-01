@@ -453,21 +453,147 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 ### 根据保存时间精确查询
 
-* topic确定的前提下，选择开始时间和结束时间可以查询出特定时间段发送的所有message。
+* topic确定的前提下，选择开始时间和结束时间可以查询出特定时间段发送的所有message。尽量缩小查找的时间段，减轻查询的时间开销。
+
+### 导出消息
+
+* 根据时间查询的消息可以导出到文件并且下载到本地。消息导出后页面会自动跳转到下载页，点击链接即可下载文件。如果导出的数据量很大，则需要一定的时间等待任务执行完成。
+
+* 在消息大小不超过1KB的前提下，允许导出的最多100万条数据，如果消息大小大于1KB，则最多只能导出1G大小的消息。
+
+* 导出的消息保存7天后自动从磁盘删除。
 
 ### Message重发
 
-#### 重发已保存的message
+#### web端重发已保存的message
 
 * 对于已经存在于mongo中的消息，用户可以根据查询返回结果选择需要重发的message。
 
 * 对于重新发送的消息，其原始ID不为空，原始ID为重发消息的消息ID。
 
+#### 通过api重发已保存的message
+
+* 联系运维人员获得重发消息的认证字符串(AuthenticationString)，该字符串每天更新一次。
+
+* api接口为{swallow.web.sso.url}/api/message/sendmessageid，通过读取lion获得key为swallow.web.sso.url的值。也可根据运行环境固定服务器，下表列出swallow.web.sso.url在不同环境下值。
+
+环境|swallow.web.sso.url
+-|-
+alpha | http://alpha.swallow.dp 
+beta  | http://beta.swallow.dp
+ppe   | http://ppe.swallow.dp
+product | http://swallow.dp
+
+
+* 发送post请求，需要3个参数，topic(topic名称)，mid(消息ID)和authentication(认证字符串)。
+
+* 返回值为json字符串，包含2个键值对，status(状态码)，message(状态码对应的消息)。下表列出了不同状态码表示的意义。
+
+	* 0表示操作成功。
+	* 负的状态码表示不可重试的错误。
+	* 正的状态码表示可以重试成功的错误。 
+
+状态码|消息
+-|-
+-4 | empty content
+-3  | no authenticaton
+-2   | unauthorized
+-1 | write mongo error
+0 | success
+1 | read time out
+
+
+#### 使用示范
+
+	import org.codehaus.jettison.json.JSONException;
+	import org.codehaus.jettison.json.JSONObject;
+	import org.apache.commons.httpclient.HttpClient;
+	import org.apache.commons.httpclient.HttpMethod;
+	import org.apache.commons.httpclient.NameValuePair;
+	import org.apache.commons.httpclient.methods.PostMethod;
+	private HttpMethod postMethod(String url) throws IOException {
+		PostMethod post = new PostMethod(url);
+		NameValuePair[] param = {
+				new NameValuePair("mid", "6161611639629021185"),
+				new NameValuePair("authentication", "lfimuqqxjlgvniueuiqooorkkyxdmwrm"),
+				new NameValuePair("topic", "example") }; //topic名称
+		post.setRequestBody(param);  //设置消息体
+		post.releaseConnection();
+		return post;
+	}
+	public static void main(String[] args) {
+		String host = null;
+		try {
+			ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
+			host = configCache.getProperty("swallow.web.sso.url");
+		} catch (LionException e1) {
+			e1.printStackTrace();
+		}
+		String url = host + "/api/message/sendmessageid";
+		HttpClient httpClient = new HttpClient();
+		try {
+			HttpMethod method = postMethod(url);
+			httpClient.executeMethod(method);
+
+			String response = method.getResponseBodyAsString();
+			try {
+				JSONObject json = new JSONObject(response);
+				System.out.println(json.getInt("status"));
+				System.out.println(json.getString("message"));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 #### 重发自定义message
 
-* 对于不存在于mongo中的message，用户可以使用发送自定义消息功能批量发送message。批量发送时，用户只需在文本框中输入消息的内容，其中每行代表一条消息。
+* 对于不存在于mongo中的message，用户可以使用发送自定义消息功能批量发送message。批量发送时，如果消息有类型则输入相应的类型，否则可忽略；如果需要添加消息属性，可以输入形式如key1:value1,key2:value2的键值对字符串，分隔符有5个不同的选择，分别为':'，';'，','，'_'和'#'。如果键值对中包含了分隔符，则可以选择其他的分隔符以示区分。如果有多个属性键值对，可以点击Add添加属性，最多支持100个属性。文本框中输入消息体的内容。
 
 * 用户需要对所发的自定义消息负责，swallow web不检查消息内容的格式。
+
+#### 通过api重发自定义的message
+
+* 联系运维人员获得重发消息的认证字符串(AuthenticationString)，该字符串每天更新一次。
+
+* api接口为{swallow.web.sso.url}/api/message/sendmessage，通过读取lion获得key为swallow.web.sso.url的值。
+
+* 发送post请求，5个必选参数，topic(topic名称)，type(消息类型)，property(消息属性)，authentication(认证字符串)，content(消息体内容)和一个可选参数delimitor(property键值对分隔符)。
+
+	* property键值对默认使用':'作为分隔符，如果用户的键值中有':'，可以在可选参数delimitor中设置分隔符字符串。
+
+	* content字符串，表示消息内容。
+
+* 返回值为json字符串，包含2个键值对，status(状态码)，message(状态码对应的消息)，与通过api重发已保存的message返回值意义一致。
+
+
+#### 使用示范
+
+	private HttpMethod postMethod(String url) throws IOException{
+		PostMethod post = new PostMethod(url);
+		String contents = "test group message api with type and property, No 1";
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+		nameValuePairs.add(new NameValuePair("content",contents));
+		nameValuePairs.add(new NameValuePair("topic", "example"));
+		nameValuePairs.add(new NameValuePair("type", "jiagou"));
+		nameValuePairs.add(new NameValuePair("property", "test:true::work:on"));  //::用于分割多个键值对
+		nameValuePairs.add(new NameValuePair("authentication", "lfimuqqxjlgvniueuiqooorkkyxdmwrm"));
+
+		NameValuePair[] array = new NameValuePair[nameValuePairs.size()];
+		nameValuePairs.toArray(array);
+		post.setRequestBody(array);  //设置消息体
+		post.releaseConnection();
+		return post;
+	}
+
+* 与重发已保存的message相似，只需更改请求url和post参数。
+
+* 请求url: String url = host + "/api/message/sendmessage"。
+
 
 ### 查看Swallow消息
 

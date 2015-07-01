@@ -22,9 +22,9 @@
 
 	<bean class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager"/>
     
-    <bean id="administratorDAO"
+<!--     <bean id="administratorDAO"
         class="com.dianping.swallow.web.dao.impl.DefaultAdministratorDao">
-    </bean>
+    </bean> -->
     
     <bean id="messageDAO"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
@@ -33,13 +33,13 @@
 		</property>
 	</bean>
 
-	<bean id="webMongoManager"
+<!-- 	<bean id="webMongoManager"
 		class="com.dianping.swallow.web.dao.impl.DefaultWebMongoManager"
 		init-method="initMongoServer">
 		<property name="mongoManager">
 			<ref local="mongoManager" />
 		</property>
-	</bean>
+	</bean> -->
 
 
     <bean id="mongoManager"
@@ -47,17 +47,14 @@
 		<constructor-arg value="web" index="0" />
         <property name="swallowConfig" ref="swallowConfig"/>
     </bean>
+    
 	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
 
-
-	<bean id="topicDAO" class="com.dianping.swallow.web.dao.impl.DefaultTopicDao">
-	</bean>
-
-	<bean id="webMessageDAO" class="com.dianping.swallow.web.dao.impl.DefaultMessageDao">
+<!-- 	<bean id="webMessageDAO" class="com.dianping.swallow.web.dao.impl.DefaultMessageDao">
 		<property name="webMongoManager">
 			<ref local="webMongoManager" />
 		</property>
-	</bean>
+	</bean> -->
 
 	<context:component-scan base-package="com.dianping.swallow.web" />
 	<context:annotation-config />
@@ -66,9 +63,9 @@
 		<mvc:interceptor>
 			<mvc:mapping path="/" />
 			<mvc:mapping path="/console/topic" />
-			<mvc:mapping path="/console/topic" />
 			<mvc:mapping path="/console/message" />
 			<mvc:mapping path="/console/administrator" />
+			<mvc:mapping path="/console/download" />
 			<mvc:mapping path="/console/monitor/consumerserver/qps" />
 			<mvc:mapping path="/console/monitor/producerserver/qps" />
 			<mvc:mapping path="/console/monitor/consumer/*/qps" />
