@@ -87,8 +87,8 @@ public class LionUtilImpl implements LionUtil{
 
 	private <T extends LionRet> T executeGet(String urlAddress, Class<T> clazz) {
 		
-		if(logger.isInfoEnabled()){
-			logger.info("[executeGet]" + urlAddress);
+		if(logger.isDebugEnabled()){
+			logger.debug("[executeGet]" + urlAddress);
 		}
 		
 		URL url;
