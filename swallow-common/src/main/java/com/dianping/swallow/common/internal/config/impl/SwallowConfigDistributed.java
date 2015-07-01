@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.exception.SwallowAlertException;
 import com.dianping.swallow.common.internal.util.StringUtils;
 
 /**
@@ -26,6 +27,8 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 	private Thread checkNewConfig;
 	
 	protected final static int CHECK_NEW_CONFIG_INTERVAL = 5;//SECONDS
+	
+	protected final static int CHECK_NEW_CONFIG_MAX = 20;//一次检查，如果多于N个增加或者删除，废弃(可能lion系统故障)
 
 	@Override
 	public Set<String> getCfgTopics() {
@@ -211,11 +214,20 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 			return;
 		}
 		
+		if(checkChangeSizeShouldExit(rawTopicSet, "checkDelete")){
+			return;
+		}
+		
 		if(logger.isInfoEnabled()){
 			logger.info("[checkDelete][delete config]" + rawTopicSet);
 		}
 		
 		for(String topic : rawTopicSet){
+			
+			if(topic.equals(TOPICNAME_DEFAULT)){
+				logger.error("[checkDelete][can not delete default config]");
+				continue;
+			}
 			
 			TopicConfig cfg = topicCfgs.remove(topic);
 			if(cfg == null){
@@ -233,6 +245,10 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 			return;
 		}
 		
+		if(checkChangeSizeShouldExit(currentTopicSet, "checkAdd")){
+			return;
+		}
+		
 		if(logger.isInfoEnabled()){
 			logger.info("[checkAdd][add new config]" + currentTopicSet);
 		}
@@ -241,5 +257,16 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 			putConfig(topicKey);
 			updateObservers(new SwallowConfigArgs(CHANGED_ITEM.TOPIC_MONGO, getTopicFromLionKey(topicKey), CHANGED_BEHAVIOR.ADD));
 		}
+	}
+
+	private boolean checkChangeSizeShouldExit(Set<String> topics, String func) {
+		
+		if(topics.size() >= CHECK_NEW_CONFIG_MAX){
+			
+			logger.error("[" + func + "]", new SwallowAlertException("["+func+"][size]" + topics.size()) + ",[topics]" + topics);
+			return true;
+		}
+		
+		return false;
 	}
 }

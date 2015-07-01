@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 
 import org.jboss.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
@@ -88,6 +90,9 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
    
    private ConsumerCollector 								consumerCollector;
    
+   protected final Logger ackLogger     = LoggerFactory.getLogger("ackLogger");
+
+   
    @SuppressWarnings("deprecation")
    public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager, MessageFilter messageFilter, 
 		   	ConsumerAuthController consumerAuthController, ConsumerThreadPoolManager consumerThreadPoolManager, long startMessageId, ConsumerCollector consumerCollector) {
@@ -118,6 +123,9 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
          messageIdOfTailBackupMessage = (startMessageId != -1 ? startMessageId : getMaxMessageId(true));
       }
       
+      if(logger.isInfoEnabled()){
+    	  logger.info("[<cinit>][startId]" + messageIdOfTailMessage + "," + messageIdOfTailBackupMessage);
+      }
       messageQueue = swallowBuffer.createMessageQueue(this.consumerInfo, messageIdOfTailMessage,
             messageIdOfTailBackupMessage, this.messageFilter);
       heartBeatReceiver = new DefaultHeartBeatReceiver(consumerThreadPoolManager.getScheduledThreadPool(), this);
@@ -131,8 +139,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
          public void run() {
             try {
             	String consumerIp = IPUtil.getIpFromChannel(channel);
-            	if(logger.isInfoEnabled()){
-	               logger.info(consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
+            	if(ackLogger.isInfoEnabled()){
+	               ackLogger.info(consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
 	                     + ackId + "," + IPUtil.simpleLogIp(connectedChannels.get(channel)));
             	}
             	

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +24,7 @@ import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.Sw
 import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.lifecycle.Ordered;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
+import com.dianping.swallow.common.internal.monitor.ComponentMonitable;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.observer.Observer;
 import com.dianping.swallow.common.internal.util.MongoUtils;
@@ -41,7 +43,7 @@ import com.mongodb.ServerAddress;
  *
  * 2015年6月12日 下午3:57:42
  */
-public class DefaultMongoManager extends AbstractLifecycle implements MongoManager, Observer{
+public class DefaultMongoManager extends AbstractLifecycle implements MongoManager, Observer, ComponentMonitable{
 
 	public static final String MSG_PREFIX = "msg#";
 	public static final String ACK_PREFIX = "ack#";
@@ -536,5 +538,19 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	public int getOrder() {
 		
 		return Ordered.FIRST;
+	}
+	
+	@Override
+	public Object getStatus() {
+		
+		Map<String, MongoStatus> result = new HashMap<String, MongoStatus>();
+		
+		for(Entry<String, MongoClient> entry : topicNameToMongoMap.entrySet()){
+			
+			String topic = entry.getKey();
+			result.put(topic, new MongoStatus(entry.getValue()));
+		}
+
+		return result;
 	}
 }

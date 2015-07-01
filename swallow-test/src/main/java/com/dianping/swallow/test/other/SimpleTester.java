@@ -2,7 +2,10 @@ package com.dianping.swallow.test.other;
 
 import java.util.Date;
 
+import org.bson.types.BSONTimestamp;
 import org.junit.Test;
+
+import com.dianping.swallow.common.internal.util.MongoUtils;
 
 /**
  * @author mengwenchao
@@ -16,13 +19,13 @@ public class SimpleTester {
 		
 		String tmp = "123";
 		
-		System.out.println(tmp.substring(10));
-		
+		printTime(1);
 	}
 
 	private void printTime(int time) {
 		
-		System.out.println(new Date((long)time * 5 * 1000));
+		BSONTimestamp stamp = new BSONTimestamp(1435663543, 667);
+		System.out.println(MongoUtils.BSONTimestampToLong(stamp));
 		
 	}
 }

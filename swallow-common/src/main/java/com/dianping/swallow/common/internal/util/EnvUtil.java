@@ -1,6 +1,8 @@
 package com.dianping.swallow.common.internal.util;
 
+import com.dianping.lion.Constants;
 import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.lion.client.ConfigCache;
 
 /**
  * @author mengwenchao
@@ -71,4 +73,15 @@ public class EnvUtil {
 		return "http://" + basicWebAddress;
 	}
 
+	public static String getGroup(){
+		
+		String group = ConfigCache.getInstance().getAppenv(Constants.KEY_SWIMLANE);
+		return StringUtils.trimToNull(group);
+		
+	}
+
+	public static String getSwimeline(){
+		
+		return getGroup();
+	}
 }
