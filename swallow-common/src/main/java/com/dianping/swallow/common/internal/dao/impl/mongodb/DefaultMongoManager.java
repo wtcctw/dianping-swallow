@@ -136,10 +136,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 
 	private synchronized MongoClient createOrUseExistingMongo(List<ServerAddress> replicaSetSeeds) {
 		
-		if(logger.isInfoEnabled()){
-			logger.info("[createOrUseExistingMongo]" + replicaSetSeeds);
-		}
-		
 		for(MongoClient mongo : mongos){
 			
 			List<ServerAddress> servers = mongo.getAllAddress();
@@ -151,8 +147,8 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 			}
 			
 			if(seedIn(servers, replicaSetSeeds)){
-				if(logger.isDebugEnabled()){
-					logger.debug("[createOrUseExistingMongo][use exist mongo]");
+				if(logger.isInfoEnabled()){
+					logger.info("[createOrUseExistingMongo][use exist mongo]");
 				}
 				return mongo;
 			}

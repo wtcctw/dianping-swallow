@@ -31,6 +31,15 @@ public class TopicConfigTest {
 		
 	}
 	
+	
+	@Test
+	public void testJson(){
+		
+		JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
+		TopicConfig config = jsonBinder.fromJson("{}", TopicConfig.class);
+		System.out.println(config);
+	}
+	
 	@Test
 	public void testMerge(){
 		

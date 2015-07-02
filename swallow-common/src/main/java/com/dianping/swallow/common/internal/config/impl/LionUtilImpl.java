@@ -162,6 +162,13 @@ public class LionUtilImpl implements LionUtil{
 	@Override
 	public void createOrSetConfig(String key, String value) {
 		
+		if(StringUtils.isEmpty(key)){
+			throw new IllegalArgumentException("key null:" + key);
+		}
+		if(value == null){
+			throw new IllegalArgumentException("value null:" + key);
+		}
+		
 		key = key.trim();
 		value = value.trim();
 		

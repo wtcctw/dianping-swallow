@@ -103,8 +103,36 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		}
 		
 		TopicConfig topicCfg = getConfigFromString(value);
-		return topicCfgs.put(getTopicFromLionKey(topicKey), topicCfg);
 		
+		putConfig(topicKey, topicCfg);
+		
+		return topicCfg;
+		
+	}
+
+	/**
+	 * 放置新配置，返回老配置
+	 * 如果新配置为null，清除老配置
+	 * @param topicKey
+	 * @param topicCfg
+	 */
+	private TopicConfig putConfig(String topicKey, TopicConfig topicCfg) {
+		
+		String topic = getTopicFromLionKey(topicKey);
+		TopicConfig oldConfig = null;
+		
+		if(topicCfg == null){
+			if(logger.isInfoEnabled()){
+				logger.info("[putConfig][config null]" +topicKey + "," + topicCfg);
+			}
+			topicCfg = new TopicConfig();
+		}
+		
+		oldConfig = topicCfgs.put(topic, topicCfg);
+		if(oldConfig != null){
+			logger.info("[putConfig][replace old config]" + oldConfig);
+		}
+		return oldConfig;
 	}
 
 	@Override
@@ -124,21 +152,23 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		
 		TopicConfig topicConfig = getConfigFromString(value);
 		
-		TopicConfig oldCfg = topicCfgs.put(topic, topicConfig);
-		if(oldCfg != null){
-			logger.info("[doOnConfigChange][replace old cfg]" + topicConfig + "," + oldCfg);
-			if(oldCfg.equals(topicConfig)){
-				logger.info("[doOnConfigChange][old == new]");
-				return null;
-			}
+		TopicConfig oldConfig = putConfig(topic, topicConfig);
+		
+		if((oldConfig == topicConfig) || (oldConfig!= null && oldConfig.equals(topicConfig))){
+			logger.info("[doOnConfigChange][old == new]");
+			return null;
 		}
 		
 		return new SwallowConfigArgs(CHANGED_ITEM.TOPIC_MONGO, topic);
 	}
 
 	private TopicConfig getConfigFromString(String config) {
-		
-		return jsonBinder.fromJson(config, TopicConfig.class);
+		try{
+			return jsonBinder.fromJson(config, TopicConfig.class);
+		}catch(Exception e){
+			logger.error("[getConfigFromString][config]" + config, e);
+			return null;
+		}
 	}
 
 	private String getTopicFromLionKey(String key) {
