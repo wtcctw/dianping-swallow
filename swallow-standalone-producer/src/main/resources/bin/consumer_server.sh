@@ -137,15 +137,17 @@ fi
 ###########  检查是否启动成功 ############
 
 echo "Sleeping $SleepTime sec for waiting process started ..."
-mysleep 15
 
 
 if [ "$MODE" == "master" ]; then
     SuccessLog="Server started at port "
+    SleepTime=15
 else
     SuccessLog="start to wait $MASTER_IP master stop beating"
+    SleepTime=15
 fi
 
+mysleep $SleepTime
 checkLog "$SuccessLog" $STD_OUT 
 
 Pid=$(jps |grep $ProcessName |cut -d\  -f1)
