@@ -26,6 +26,7 @@ import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
+import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.consumerserver.Heartbeater;
@@ -94,7 +95,7 @@ public abstract class AbstractBootStrap {
 		if(logger.isInfoEnabled()){
 	    	  logger.info("[startNetty][Server started at port]" + port);
 	    }
-		System.out.println("[startNetty][Server started at port " + port + "]");
+		System.out.println(DateUtils.current() + "[startNetty][Server started at port " + port + "]");
 		
 		
 		return bootstrap;

@@ -14,6 +14,7 @@ import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.packet.PktSwallowPACK;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
+import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.SHAUtil;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.ServerDaoException;
@@ -49,7 +50,7 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
          if(logger.isInfoEnabled()){
         	 logger.info("[Initialize pigeon sucessfully, Producer service for client is ready.]");
          }
-         System.out.println("[Initialize pigeon sucessfully, Producer service for client is ready.]");//用来检查系统启动成功
+         System.out.println(DateUtils.current() + "[Initialize pigeon sucessfully, Producer service for client is ready.]");//用来检查系统启动成功
       } catch (Exception e) {
          logger.error("[Initialize pigeon failed.]", e);
          throw new RemoteServiceInitFailedException(e);

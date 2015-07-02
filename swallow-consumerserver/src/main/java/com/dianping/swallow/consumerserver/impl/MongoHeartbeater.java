@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.HeartbeatDAO;
+import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
@@ -30,7 +31,7 @@ public class MongoHeartbeater implements Heartbeater {
    public void waitUntilMasterDown(String ip, long checkInterval, long maxStopTime) throws InterruptedException {
       long startTime = System.currentTimeMillis();
       logger.info("start to wait " + ip + " master stop beating");
-      System.out.println("start to wait " + ip + " master stop beating");//检查是否启动成功
+      System.out.println(DateUtils.current() + "[start to wait " + ip + " master stop beating]");//检查是否启动成功
       while (true) {
          Date beat = null;
          beat = heartbeatDAO.findLastHeartbeat(ip);

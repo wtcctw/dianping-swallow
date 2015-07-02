@@ -31,4 +31,7 @@ public class DateUtils {
 		return format.format(date);
 	}
 	
+	public static String current(){
+		return toPrettyFormat(new Date());
+	}
 }
