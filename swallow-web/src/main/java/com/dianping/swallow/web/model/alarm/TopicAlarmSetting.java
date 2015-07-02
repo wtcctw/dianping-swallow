@@ -73,6 +73,7 @@ public class TopicAlarmSetting {
 		this.updateTime = updateTime;
 	}
 
+	@Override
 	public String toString() {
 		return "TopicAlarmSetting [ id = " + id + ",topicName = " + topicName + ", producerSetting = "
 				+ producerSetting + ", consumerSettings = " + consumerSettings + ", createTime = " + createTime

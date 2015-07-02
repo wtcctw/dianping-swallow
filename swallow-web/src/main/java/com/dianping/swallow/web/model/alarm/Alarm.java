@@ -2,8 +2,6 @@ package com.dianping.swallow.web.model.alarm;
 
 import java.util.Date;
 
-import javax.annotation.Resource;
-
 import org.springframework.data.annotation.Id;
 
 /**

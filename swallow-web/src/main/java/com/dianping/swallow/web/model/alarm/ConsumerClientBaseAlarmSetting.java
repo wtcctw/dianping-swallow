@@ -47,6 +47,7 @@ public class ConsumerClientBaseAlarmSetting {
 		this.piler = piler;
 	}
 
+	@Override
 	public String toString() {
 		return "ConsumerClientBaseAlarmSetting [qpsAlarmSetting = " + qpsAlarmSetting + ",fetcherDelay = "
 				+ fetcherDelay + ", ackDelay = " + ackDelay + ", piler = " + piler + "]";
