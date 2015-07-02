@@ -6,7 +6,7 @@ MASTER_IP=$3
 
 . ${PRGDIR}/common.sh
 
-LOCAL_IP=`ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+LOCAL_IP=`ifconfig  | grep 'inet addr:' | cut -d: -f2 | awk 'BEGIN{count=0}$1!~/127.0.0.1/{if(count == 0){print $1;count++}}'`
 
 
 

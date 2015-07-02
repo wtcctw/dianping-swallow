@@ -145,18 +145,17 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
       this.remoteServiceName = remoteServiceName;
    }
 
-/**
- * @return the autoSelectPort
- */
-public boolean isAutoSelectPort() {
-	return autoSelectPort;
-}
-
-/**
- * @param autoSelectPort the autoSelectPort to set
- */
-public void setAutoSelectPort(boolean autoSelectPort) {
-	this.autoSelectPort = autoSelectPort;
-}
-
+	/**
+	 * @return the autoSelectPort
+	 */
+	public boolean isAutoSelectPort() {
+		return autoSelectPort;
+	}
+	
+	/**
+	 * @param autoSelectPort the autoSelectPort to set
+	 */
+	public void setAutoSelectPort(boolean autoSelectPort) {
+		this.autoSelectPort = autoSelectPort;
+	}
 }

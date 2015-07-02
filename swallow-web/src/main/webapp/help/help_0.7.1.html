@@ -1021,7 +1021,8 @@ body .markdown-body
 
 		</ul>
 	</div>
-<article class="markdown-body"><p>注：<strong>本文针对Swallow0.7.1版本</strong>,下文中，${currentVersion}, currentVersion指0.7.1</p>
+<article class="markdown-body"><p>注：<strong>本文针对Swallow0.7.1版本</strong>,下文中，${currentVersion}, currentVersion指0.7.1<br />
+使用之前，请仔细阅读<a href="#takeAttention">swallow使用注意事项</a></p>
 <div class="toc">
 <ul>
 <li><a href="#_1">基础概念</a><ul>
@@ -1118,7 +1119,8 @@ body .markdown-body
 </li>
 </ul>
 </li>
-<li><a href="#swallow_6">Swallow常见问题以及处理</a><ul>
+<li><a href="#swallow_6">Swallow使用注意事项</a></li>
+<li><a href="#swallow_7">Swallow常见问题以及处理</a><ul>
 <li><a href="#topicconsumer">如何查找某个topic对应的consumer</a></li>
 <li><a href="#_22">如何查看我的消费是否有延迟、延迟多少条消息？</a><ul>
 <li><a href="#cat">Cat端追踪</a></li>
@@ -1203,7 +1205,7 @@ body .markdown-body
 <h3 id="_6"><a name="user-content-_6" href="#_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基本概念说明</h3>
 <h4 id="producer"><a name="user-content-producer" href="#producer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Producer配置信息详解</h4>
 <ul>
-<li>mode表示producer表示工作模式。</li>
+<li>mode表示producer工作模式。</li>
 <li>asyncRetryTimes表示异步模式下发送失败重试次数。</li>
 <li>syncRetryTimes表示同步模式下发送失败重试次数。</li>
 <li>zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。</li>
@@ -1390,6 +1392,7 @@ public class ProducerSpring {
 </code></pre>
 <h2 id="swallow_4"><a name="user-content-swallow_4" href="#swallow_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用Swallow接收消息</h2>
 <h3 id="_9"><a name="user-content-_9" href="#_9" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基本概念</h3>
+<p><span id="consumerConfig"></span></p>
 <h4 id="consumerconfig"><a name="user-content-consumerconfig" href="#consumerconfig" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>ConsumerConfig配置详解</h4>
 <p>使用Swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成:</p>
 <ul>
@@ -1583,6 +1586,16 @@ public class TestConsumer {
 }
 </code></pre>
 <h1 id="swallow-web"><a name="user-content-swallow-web" href="#swallow-web" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web使用说明</h1>
+<p>各环境地址:</p>
+<ul>
+<li>alpha：<a href="http://alpha.swallow.dp/">http://alpha.swallow.dp/</a><br />
+默认密码：123456</li>
+<li>beta：<a href="http://beta.swallow.dp/">http://beta.swallow.dp/</a><br />
+默认密码：123456</li>
+<li>ppe：<a href="http://ppe.swallow.dp/">http://ppe.swallow.dp/</a><br />
+默认密码：112233</li>
+<li>线上：<a href="http://swallow.dp/">http://swallow.dp/</a></li>
+</ul>
 <h2 id="topic_1"><a name="user-content-topic_1" href="#topic_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic查询</h2>
 <h3 id="topic_2"><a name="user-content-topic_2" href="#topic_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据Topic名称查询</h3>
 <ul>
@@ -1660,10 +1673,14 @@ public class TestConsumer {
 </ul>
 <h4 id="_17"><a name="user-content-_17" href="#_17" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>堆积量监控</h4>
 <ul>
-<li>堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。</li>
-</ul>
-<p>*如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。<br />
+<li>
+<p>堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。</p>
+</li>
+<li>
+<p>如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。<br />
 <img alt="每秒消息" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/14.png" /></p>
+</li>
+</ul>
 <h3 id="swallow-server"><a name="user-content-swallow-server" href="#swallow-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Server监控</h3>
 <h4 id="producer-server"><a name="user-content-producer-server" href="#producer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>producer server监控</h4>
 <ul>
@@ -1695,7 +1712,21 @@ public class TestConsumer {
 <ul>
 <li>用户和Visitor如需提升权限，请联系对应的业务运维</li>
 </ul>
-<h1 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
+<p><span id="takeAttention"></span></p>
+<h1 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用注意事项</h1>
+<p>以下是业务在swallow的过程中遇到的一些常见问题，希望大家仔细阅读，避免类似的问题发生</p>
+<ol>
+<li>swallow保证消息不丢，所以针对特定一条消息，可能会重复发送。<ul>
+<li>要求业务做幂等处理，尤其是支付相关的业务（当消息重复被投递的时候，处理多次结果是一样的）</li>
+</ul>
+</li>
+<li>consumer接收消息默认并发为1，如果业务处理速度过慢，可能会出现消息堆积（如每条消息处理时间100ms，则一秒只能处理10条消息）<ul>
+<li>建议并发值:50，设置方法参见<a href="#consumerConfig">consumer配置</a></li>
+</ul>
+</li>
+<li>swallow作为异步消息队列，正常情况下延时在秒级别。但是异常情况下（数据库升级等），可能会出现分钟级别的延时，如果业务对延时特别敏感，建议谨慎使用</li>
+</ol>
+<h1 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
 <h2 id="topicconsumer"><a name="user-content-topicconsumer" href="#topicconsumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查找某个topic对应的consumer</h2>
 <ul>
 <li>从<a href="http://cat.dp">CAT</a>中，找到swallow项目<a href="http://cat.dp/cat/r/t?op=view&amp;domain=Swallow">Swallow</a></li>

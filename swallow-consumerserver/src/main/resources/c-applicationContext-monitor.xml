@@ -13,5 +13,11 @@
 			<value>${swallow.monitor.turnoff}</value>
 		</property>
 	</bean>
+	
+	<bean id="monitorServer" class="com.dianping.swallow.common.server.monitor.server.MonitorServer">
+		<property name="port">
+				<value>${swallow.monitor.port}</value>
+		</property>
+	</bean>
 
 </beans>

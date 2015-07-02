@@ -31,7 +31,7 @@ public class LionUtilImpl implements LionUtil{
 	
 	private final String BASIC_LION_CONFIG_URL = "http://lionapi.dp:8080/config2";
 		
-	private final String PROJECT = "swallow";
+	private static final String PROJECT = "swallow";
 	
 	public LionUtilImpl(){
 		
@@ -71,9 +71,15 @@ public class LionUtilImpl implements LionUtil{
 				keyValue("desc", desc),
 				keyValue("env", EnvUtil.getEnv()));
 
+		
 		if(withProject){
 			
 			result = StringUtils.join("&", result, keyValue("project", PROJECT));
+		}
+		
+		String group = EnvUtil.getGroup();
+		if(group != null){
+			result = StringUtils.join("&", result, keyValue("group", group));
 		}
 
 		return result;
@@ -81,8 +87,8 @@ public class LionUtilImpl implements LionUtil{
 
 	private <T extends LionRet> T executeGet(String urlAddress, Class<T> clazz) {
 		
-		if(logger.isInfoEnabled()){
-			logger.info("[executeGet]" + urlAddress);
+		if(logger.isDebugEnabled()){
+			logger.debug("[executeGet]" + urlAddress);
 		}
 		
 		URL url;
@@ -110,7 +116,7 @@ public class LionUtilImpl implements LionUtil{
 		
 	}
 
-	private String getRealKey(String key) {
+	public static String getRealKey(String key) {
 		
 		key = key.trim();
 		if(key.startsWith(PROJECT)){

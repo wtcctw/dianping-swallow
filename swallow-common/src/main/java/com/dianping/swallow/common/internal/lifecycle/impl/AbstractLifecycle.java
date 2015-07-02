@@ -4,7 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
+import com.dianping.swallow.common.internal.lifecycle.LifecycleCallback;
+import com.dianping.swallow.common.internal.lifecycle.LifecycleManager;
 import com.dianping.swallow.common.internal.lifecycle.Ordered;
+import com.dianping.swallow.common.internal.monitor.LifecycleComponentStatus;
+import com.dianping.swallow.common.internal.monitor.impl.AbstractComponentMonitorable;
 
 /**
  * 生命周期抽象实现，只记录日志
@@ -12,18 +16,22 @@ import com.dianping.swallow.common.internal.lifecycle.Ordered;
  *
  * 2014年11月7日 下午2:27:39
  */
-public abstract class AbstractLifecycle implements Lifecycle{
+public abstract class AbstractLifecycle extends AbstractComponentMonitorable implements Lifecycle, LifecycleComponentStatus{
 
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+	
+	private LifecycleManager lifecycleManager = new DefaultLifecycleManager();
 
 	@Override
 	public void initialize() throws Exception {
-		if(logger.isInfoEnabled()){
-			logger.info("[initialize]");
-		}
 		
-		doInitialize();
-		
+		lifecycleManager.initialize(new LifecycleCallback() {
+			
+			@Override
+			public void onTransition() throws Exception {
+				doInitialize();
+			}
+		});
 	}
 
 	protected void doInitialize() throws Exception {
@@ -32,11 +40,16 @@ public abstract class AbstractLifecycle implements Lifecycle{
 
 	@Override
 	public void start() throws Exception {
-		if(logger.isInfoEnabled()){
-			logger.info("[start]");
-		}
+
+		lifecycleManager.start(new LifecycleCallback() {
+			
+			@Override
+			public void onTransition() throws Exception {
+				
+				doStart();
+			}
+		});
 		
-		doStart();
 	}
 
 	protected void doStart() throws Exception {
@@ -45,11 +58,14 @@ public abstract class AbstractLifecycle implements Lifecycle{
 
 	@Override
 	public void stop() throws Exception {
-		if(logger.isInfoEnabled()){
-			logger.info("[stop]");
-		}
+		lifecycleManager.stop(new LifecycleCallback() {
+			
+			@Override
+			public void onTransition() throws Exception {
+				doStop();
+			}
+		});
 		
-		doStop();
 	}
 
 	protected void doStop() throws Exception {
@@ -58,11 +74,13 @@ public abstract class AbstractLifecycle implements Lifecycle{
 
 	@Override
 	public void dispose() throws Exception {
-		if(logger.isInfoEnabled()){
-			logger.info("[dispose]");
-		}
-		
-		doDispose();
+		lifecycleManager.dispose(new LifecycleCallback() {
+			
+			@Override
+			public void onTransition() throws Exception {
+				doDispose();
+			}
+		});
 	}
 
 	protected void doDispose() throws Exception {
@@ -75,4 +93,8 @@ public abstract class AbstractLifecycle implements Lifecycle{
 		return Ordered.LAST;
 	}
 
+	@Override
+	public String getLifecyclePhase() {
+		return lifecycleManager.getCurrentPhaseName();
+	}
 }

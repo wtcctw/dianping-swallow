@@ -7,6 +7,6 @@ package com.dianping.swallow.common.internal.lifecycle;
  */
 public interface LifecycleCallback {
 	
-	void onTransition();
+	void onTransition() throws Exception;
 
 }

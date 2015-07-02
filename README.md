@@ -419,6 +419,16 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 # Swallow Web使用说明
 
+各环境地址:
+
+*  alpha：http://alpha.swallow.dp/
+默认密码：123456
+*  beta：http://beta.swallow.dp/
+默认密码：123456
+*  ppe：http://ppe.swallow.dp/
+默认密码：112233
+*  线上：http://swallow.dp/
+
 ## Topic查询
 
 ### 根据Topic名称查询
@@ -667,11 +677,10 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 以下是业务在swallow的过程中遇到的一些常见问题，希望大家仔细阅读，避免类似的问题发生
 
 1. swallow保证消息不丢，所以针对特定一条消息，可能会重复发送。
-	* 要求业务做幂等处理，尤其是支付相关的业务（当消息重复被投递的时候，处理多次结果是一样的）
+	* 要求业务做幂等处理，尤其是支付相关的业务（当消息重复被投递的时候，多次处理结果是一样的）
+1. consumer接收消息默认并发为1，如果业务处理速度过慢，可能会出现消息堆积（假设每条消息处理时间100ms，则一秒只能处理10条消息）
+	* 如果业务不要求时序，可以将并发至调高，建议并发值:50，设置方法参见[consumer配置](#consumerConfig)
 1. swallow作为异步消息队列，正常情况下延时在秒级别。但是异常情况下（数据库升级等），可能会出现分钟级别的延时，如果业务对延时特别敏感，建议谨慎使用
-1. consumer接收消息默认并发为1，如果业务处理速度过慢，可能会出现消息堆积（如每条消息处理时间100ms，则一秒只能处理10条消息）
-	* 设置线程池大小参见[consumer配置](#consumerConfig)
-
 
 # Swallow常见问题以及处理
 

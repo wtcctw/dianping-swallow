@@ -33,6 +33,21 @@ public class StringUtils {
 		return false;
 	}
 	
+	public static String trimToNull(String buff){
+		
+		if( buff == null){
+			return null;
+		}
+		buff = buff.trim();
+		
+		if(buff.length() == 0){
+			return null;
+		}
+		
+		return buff;
+		
+	}
+	
 	
 	public static String join(String split, String ...str){
 		
