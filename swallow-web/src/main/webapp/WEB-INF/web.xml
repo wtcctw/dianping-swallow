@@ -57,7 +57,7 @@
 		</init-param>
 		<init-param>
 			<param-name>excludeURLs</param-name>
-			<param-value>/exclude,/api/*,/console/monitor/*,/static/*,/assets/*,/help/*,/console/message/auth/sendmessage,/console/message/auth/sendgroupmessage,/console/message/randomstring,/console/topic/auth/edittopic</param-value>
+			<param-value>/exclude,/api/*,/console/monitor/*,/static/*,/assets/*,/help/*,/console/message/randomstring</param-value>
 		</init-param>
 	</filter>
 

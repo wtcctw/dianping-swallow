@@ -263,12 +263,7 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 	      DBCollection collection = getCollection(topicName, null);
 
 	      BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
-	      //如果有backupMessageId，则表示是备份消息，那么messageId则作为ORIGINAL_ID存起来
 	      
-	      if(message.isBackup())
-	    	  builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getBackupMessageId()));
-	      else
-	    	  builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getMessageId()));
 	      //content
 	      String content = message.getContent();
 	      if (content != null && !"".equals(content.trim())) {
@@ -294,6 +289,8 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 	      if(internalProperties == null){
 	    	  internalProperties = new HashMap<String, String>();
 	      }
+	      //标记重发
+	      internalProperties.put("retransmit", message.getMessageId().toString());
 	 	  addDefaultInternalProperties(internalProperties);
 	      builder.add(INTERNAL_PROPERTIES, internalProperties);
 	      //sha1

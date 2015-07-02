@@ -213,8 +213,9 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        },
 	        
 			$scope.formatres3 = function(items){
-				var str; 
-					str = JSON.stringify(items,null, 3);
+	        	items.gt = items.gtstring;
+	        	delete items["gtstring"];
+				var str = JSON.stringify(items,null, 3);
 				$scope.fullmessage = str;
 				$('#myModal3').modal('show');
 			},

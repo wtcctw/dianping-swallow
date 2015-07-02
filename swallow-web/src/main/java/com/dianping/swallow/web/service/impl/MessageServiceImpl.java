@@ -3,6 +3,7 @@ package com.dianping.swallow.web.service.impl;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.regex.Pattern;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -149,9 +152,26 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 
 		long messageId = Long.parseLong(mid);
 		messageList = (List<Message>) webMessageDao.findSpecific(0, 1, messageId, topic, false).get(MESSAGE);
-		isZipped(messageList.get(0));
-		return messageList.get(0);
+		Message m = messageList.get(0);
+		isZipped(m);
+		prettyDisplay(m);
+		return m;
 
+	}
+
+	private void prettyDisplay(Message m) {
+		m.setGtstring(m.getGt());
+		String internalP = m.get_p();
+		JSONObject json;
+		try {
+			json = new JSONObject(internalP);
+			Long time = json.getLong("save_time");
+			String ststring = new SimpleDateFormat(Message.TIMEFORMAT).format(time);
+			json.put("save_time", ststring);
+			m.set_p(json.toString().replaceAll("\"", ""));
+		} catch (JSONException e) {
+			logger.error("no save_time in o_ip",e);
+		}
 	}
 
 	@Override
@@ -159,7 +179,8 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 
 		if (event.getApplicationContext().getParent() == null) {
 			@SuppressWarnings("unchecked")
-			List<MessageDump> mds = (List<MessageDump>) messageDumpService.loadAllDumpMessage().get(DefaultMessageDumpDao.MESSAGE);
+			List<MessageDump> mds = (List<MessageDump>) messageDumpService.loadAllDumpMessage().get(
+					DefaultMessageDumpDao.MESSAGE);
 			for (MessageDump md : mds) {
 				if (!md.isFinished()) {
 					String f = md.getFilename();
