@@ -6,7 +6,7 @@ package com.dianping.swallow.web.model.alarm;
  *
  */
 public class ConsumerClientMachineAlarmSetting {
-	
+
 	private String ip;
 
 	private ConsumerClientBaseAlarmSetting baseSetting;
@@ -25,6 +25,11 @@ public class ConsumerClientMachineAlarmSetting {
 
 	public void setBaseSetting(ConsumerClientBaseAlarmSetting baseSetting) {
 		this.baseSetting = baseSetting;
+	}
+
+	@Override
+	public String toString() {
+		return "ConsumerClientMachineAlarmSetting[ ip = " + ip + ", baseSetting = " + baseSetting + "]";
 	}
 
 }

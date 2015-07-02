@@ -9,16 +9,16 @@ import java.util.List;
  */
 public class ProducerClientAlarmSetting {
 
-	private ProducerClientBaseAlarmSetting baseSettings;
+	private ProducerClientBaseAlarmSetting baseSetting;
 
 	private List<ProducerClientMachineAlarmSetting> machineSettings;
 
-	public ProducerClientBaseAlarmSetting getBaseSettings() {
-		return baseSettings;
+	public ProducerClientBaseAlarmSetting getBaseSetting() {
+		return baseSetting;
 	}
 
-	public void setBaseSettings(ProducerClientBaseAlarmSetting baseSettings) {
-		this.baseSettings = baseSettings;
+	public void setBaseSettings(ProducerClientBaseAlarmSetting baseSetting) {
+		this.baseSetting = baseSetting;
 	}
 
 	public List<ProducerClientMachineAlarmSetting> getMachineSettings() {
@@ -27,6 +27,12 @@ public class ProducerClientAlarmSetting {
 
 	public void setMachineSettings(List<ProducerClientMachineAlarmSetting> machineSettings) {
 		this.machineSettings = machineSettings;
+	}
+	
+	@Override
+	public String toString() {
+		return "ProducerClientAlarmSetting [baseSetting = " + baseSetting + ", machineSettings = " + machineSettings
+				+ "]";
 	}
 
 }

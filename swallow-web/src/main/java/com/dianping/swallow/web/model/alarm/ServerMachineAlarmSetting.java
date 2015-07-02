@@ -6,9 +6,9 @@ package com.dianping.swallow.web.model.alarm;
  *
  */
 public class ServerMachineAlarmSetting {
-	
+
 	private String ip;
-	
+
 	private QPSAlarmSetting qpsAlarmSetting;
 
 	public String getIp() {
@@ -26,6 +26,10 @@ public class ServerMachineAlarmSetting {
 	public void setQpsAlarmSetting(QPSAlarmSetting qpsAlarmSetting) {
 		this.qpsAlarmSetting = qpsAlarmSetting;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "ServerMachineAlarmSetting [ip = " + ip + ", qpsAlarmSetting = " + qpsAlarmSetting + "]";
+	}
 
 }

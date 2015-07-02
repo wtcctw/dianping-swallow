@@ -8,9 +8,9 @@ package com.dianping.swallow.web.model.alarm;
 public class QPSAlarmSetting {
 
 	private long peak;
-	
+
 	private long valley;
-	
+
 	private long fluctuation;
 
 	public long getPeak() {
@@ -35,6 +35,11 @@ public class QPSAlarmSetting {
 
 	public void setFluctuation(long fluctuation) {
 		this.fluctuation = fluctuation;
+	}
+
+	@Override
+	public String toString() {
+		return "QPSAlarmSetting[ peak = " + peak + ", valley=" + valley + ", fluctuation = " + fluctuation + "]";
 	}
 
 }

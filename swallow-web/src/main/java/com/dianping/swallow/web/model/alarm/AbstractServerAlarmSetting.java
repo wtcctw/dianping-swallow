@@ -8,7 +8,7 @@ import java.util.List;
  *
  */
 public abstract class AbstractServerAlarmSetting {
-	
+
 	private QPSAlarmSetting qpsAlarmSetting;
 
 	private List<ServerMachineAlarmSetting> machineAlarmSettings;
@@ -27,5 +27,11 @@ public abstract class AbstractServerAlarmSetting {
 
 	public void setMachineAlarmSettings(List<ServerMachineAlarmSetting> machineAlarmSettings) {
 		this.machineAlarmSettings = machineAlarmSettings;
+	}
+
+	@Override
+	public String toString() {
+		return "AbstractServerAlarmSetting [qpsAlarmSetting = " + qpsAlarmSetting + ", machineAlarmSettings = "
+				+ machineAlarmSettings + "]";
 	}
 }

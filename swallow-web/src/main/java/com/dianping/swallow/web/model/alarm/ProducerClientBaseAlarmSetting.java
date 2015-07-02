@@ -8,7 +8,7 @@ package com.dianping.swallow.web.model.alarm;
 public class ProducerClientBaseAlarmSetting {
 
 	private QPSAlarmSetting qpsAlarmSetting;
-	
+
 	private long delay;
 
 	public QPSAlarmSetting getQpsAlarmSetting() {
@@ -25,5 +25,10 @@ public class ProducerClientBaseAlarmSetting {
 
 	public void setDelay(long delay) {
 		this.delay = delay;
+	}
+
+	@Override
+	public String toString() {
+		return "ProducerClientBaseAlarmSetting [ qpsAlarmSetting = " + qpsAlarmSetting + ", delay = " + delay + "]";
 	}
 }

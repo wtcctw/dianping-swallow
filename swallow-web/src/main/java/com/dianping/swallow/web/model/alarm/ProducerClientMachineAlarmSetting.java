@@ -27,4 +27,8 @@ public class ProducerClientMachineAlarmSetting {
 		this.baseSetting = baseSetting;
 	}
 
+	@Override
+	public String toString() {
+		return "ProducerClientMachineAlarmSetting [ip = " + ip + ",baseSetting=" + baseSetting + "]";
+	}
 }

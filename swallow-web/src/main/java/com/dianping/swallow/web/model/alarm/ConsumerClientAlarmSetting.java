@@ -8,11 +8,11 @@ import java.util.List;
  *
  */
 public class ConsumerClientAlarmSetting {
-	
+
 	private String consumerId;
-	
+
 	ConsumerClientBaseAlarmSetting baseSetting;
-	
+
 	private List<ConsumerClientMachineAlarmSetting> machineSettings;
 
 	public String getConsumerId() {
@@ -37,5 +37,11 @@ public class ConsumerClientAlarmSetting {
 
 	public void setMachineSettings(List<ConsumerClientMachineAlarmSetting> machineSettings) {
 		this.machineSettings = machineSettings;
+	}
+
+	@Override
+	public String toString() {
+		return "ConsumerClientAlarmSetting [consumerId = " + consumerId + ", baseSetting = " + baseSetting
+				+ ", machineSettings = " + machineSettings + "]";
 	}
 }

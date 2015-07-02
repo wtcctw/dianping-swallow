@@ -2,6 +2,8 @@ package com.dianping.swallow.web.model.alarm;
 
 import java.util.Date;
 
+import javax.annotation.Resource;
+
 import org.springframework.data.annotation.Id;
 
 /**
@@ -10,20 +12,20 @@ import org.springframework.data.annotation.Id;
  *
  */
 public class Alarm {
-	
+
 	@Id
 	private String id;
-	
+
 	private AlarmType type;
-	
+
 	private String title;
-	
+
 	private String body;
-	
+
 	private String receiver;
-	
+
 	private Date createTime;
-	
+
 	private String sourceIp;
 
 	public String getId() {
@@ -81,5 +83,10 @@ public class Alarm {
 	public void setSourceIp(String sourceIp) {
 		this.sourceIp = sourceIp;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Alarm[ id = " + id + ", type = " + type + ", title = " + title + ",body = " + body + ",receiver = "
+				+ receiver + ", createTime = " + createTime + ", sourceIp = " + sourceIp + "]";
+	}
 }

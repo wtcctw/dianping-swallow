@@ -6,13 +6,13 @@ package com.dianping.swallow.web.model.alarm;
  *
  */
 public class ConsumerClientBaseAlarmSetting {
-	
+
 	private QPSAlarmSetting qpsAlarmSetting;
-	
+
 	private long fetcherDelay;
-	
+
 	private long ackDelay;
-	
+
 	private long piler;
 
 	public QPSAlarmSetting getQpsAlarmSetting() {
@@ -46,5 +46,9 @@ public class ConsumerClientBaseAlarmSetting {
 	public void setPiler(long piler) {
 		this.piler = piler;
 	}
-	
+
+	public String toString() {
+		return "ConsumerClientBaseAlarmSetting [qpsAlarmSetting = " + qpsAlarmSetting + ",fetcherDelay = "
+				+ fetcherDelay + ", ackDelay = " + ackDelay + ", piler = " + piler + "]";
+	}
 }
