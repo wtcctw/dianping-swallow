@@ -92,6 +92,7 @@
 						<th style="text-align: left">产生时间</th>
 						<th style="text-align: left">原始ID</th>
 						<th style="text-align: left">属性</th>
+						<th style="text-align: left">重发</th>
 						<th style="text-align: left">更多选项</th>
 					</tr>
 					<tr ng-repeat="m in searchPaginator.currentPageItems">
@@ -106,6 +107,7 @@
 						<td style="text-align: left" ng-bind="m.gtstring"></td>
 						<td style="text-align: left" ng-bind="m.mo_id"></td>
 						<td style="text-align: left" ng-bind="m.p"></td>
+						<td style="text-align: left" ng-bind="m.retransmit"></td>
 						<td style="text-align: left"><a
 							ng-click="showfullmessage(m.mid)" class="edit-config-btn"
 							style="cursor: pointer;"><i class="icon-folder-open"></i></a></td>

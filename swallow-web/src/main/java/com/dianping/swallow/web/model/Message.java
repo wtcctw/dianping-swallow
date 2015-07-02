@@ -27,11 +27,13 @@ public class Message implements Comparable<Message> {
    private  String        					p;
    private  String							_p;
    private  String        					t;
-   public   String        					si;  //SOURCE_IP
-   public   String          				mo_id; //message ID
-   public   String          				mid; //message ID
-   public   String     						gtstring;
-   public   String     						ststring;
+   private  String        					si;  //SOURCE_IP
+   private  String          				mo_id; //message ID
+   private  String          				mid; //message ID
+   private  String     						gtstring;
+   private  String     						ststring;
+   private  String							retransmit;
+   
 
    public static final String  				TIMEFORMAT      = "yyyy-MM-dd HH:mm:ss";  //H means 24 hours
   
@@ -171,7 +173,16 @@ public class Message implements Comparable<Message> {
 		return this;
 	}
 	
-    @Override
+    public String getRetransmit() {
+		return retransmit;
+	}
+
+	public Message setRetransmit(String retransmit) {
+		this.retransmit = retransmit;
+		return this;
+	}
+
+	@Override
     public int compareTo(Message ts) {
     	int bs= ts.get_id().getTime();
     	int thisbs = this.get_id().getTime();
@@ -185,12 +196,9 @@ public class Message implements Comparable<Message> {
 
 	@Override
 	public String toString() {
-		return "WebSwallowMessage [_id=" + _id + ", o_id=" + o_id + ", c=" + c
-				+ ", v=" + v + ", s=" + s + ", gt=" + gt + ", p=" + p + ", _p="
-				+ _p + ", t=" + t + ", si=" + si + ", mo_id=" + mo_id
-				+ ", mid=" + mid + ", gtstring=" + gtstring + ", ststring="
-				+ ststring + "]";
+		return "Message [_id=" + _id + ", o_id=" + o_id + ", c=" + c + ", v=" + v + ", s=" + s + ", gt=" + gt + ", p="
+				+ p + ", _p=" + _p + ", t=" + t + ", si=" + si + ", mo_id=" + mo_id + ", mid=" + mid + ", gtstring="
+				+ gtstring + ", ststring=" + ststring + ", retransmit=" + retransmit + "]";
 	}
-
 
 }

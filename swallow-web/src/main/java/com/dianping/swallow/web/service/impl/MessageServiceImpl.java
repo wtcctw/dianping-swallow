@@ -123,6 +123,19 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		m.setGtstring(m.getGt());
 		m.setStstring(m.get_id());
 		m.set_id(null);
+		
+		String internalP = m.get_p();
+		try {
+			JSONObject json = new JSONObject(internalP);
+			String retrans = json.getString("retransmit");
+			if(retrans != null && !retrans.equals("true")){
+				m.setRetransmit(retrans);
+			}else{
+				m.setRetransmit("");
+			}
+		} catch (JSONException e) {
+			logger.error("no save_time in o_ip",e);
+		}
 	}
 
 	private void isZipped(Message m) {
