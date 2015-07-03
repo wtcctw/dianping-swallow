@@ -38,9 +38,9 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 	@Autowired
 	private WebMongoManager webMongoManager;
+	public  static final String TIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
+	public  static final String ID = "_id";
 	private static final String MESSAGE_COLLECTION = "c";
-	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
-	private static final String ID = "_id";
 	private static final String OID = "o_id";
 	private static final String GT = "gt";
 	private static final String SIZE = "size";
@@ -449,7 +449,7 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 				.add(ID,
 						BasicDBObjectBuilder.start().add("$gt", MongoUtils.longToBSONTimestamp(startlong))
 								.add("$lt", MongoUtils.longToBSONTimestamp(stoplong)).get()).get();
-		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, -1).get();
+		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, 1).get();
 		DBCursor cursor = collection.find(query).sort(orderBy);
 		int totalcount = cursor.count();
 		DBCursor dbc = collection.find().limit(1);
@@ -461,30 +461,17 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 				if (size > 1000) {
 					maxSize = maxSize * 1000 / size;
 				}
-				dboList = cursor.toArray(maxSize);
 			} catch (UnsupportedEncodingException e) {
 				logger.info("Encoding error of cursor result");
 			} finally {
 				dbc.close();
-				cursor.close();
 			}
 		}
-		BSONTimestamp lasttime = (BSONTimestamp) dboList.get(0).get(ID);
-		String laststring = BSONTimestampToString(lasttime);
-		BSONTimestamp firsttime = (BSONTimestamp) dboList.get(dboList.size() - 1).get(ID);
-		String firststring = BSONTimestampToString(firsttime);
-		map.put("message", dboList);
-		map.put("size", totalcount);
-		map.put("first", firststring);
-		map.put("last", laststring);
+		map.put("message", cursor);
+		map.put("maxsize", maxSize);
+		map.put("total", totalcount);
 		return map;
 
 	}
 	
-	private String BSONTimestampToString(BSONTimestamp ts){
-		int seconds = ts.getTime();
-		long millions = new Long(seconds)*1000;
-		return new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
-	}
-
 }

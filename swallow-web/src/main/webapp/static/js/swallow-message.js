@@ -72,6 +72,7 @@ module.factory('Paginator', function(){
 						else{
 							self.currentPageItems = items.slice(0, pageSize).reverse();
 							self.byprevious = false;
+							self.hasNextVar = items.length === self.limit + 1;
 						}
 						if(self.lastpagerev){
 							self.currentPageItems = self.currentPageItems.reverse();

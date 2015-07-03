@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,16 +15,11 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.ZipUtil;
-import com.dianping.swallow.web.controller.MessageDumpController;
 import com.dianping.swallow.web.dao.MessageDao;
-import com.dianping.swallow.web.dao.impl.DefaultMessageDumpDao;
 import com.dianping.swallow.web.model.Message;
-import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.MessageService;
@@ -37,8 +30,7 @@ import com.dianping.swallow.web.service.MessageService;
  *         2015年5月14日下午1:20:29
  */
 @Service("messageService")
-public class MessageServiceImpl extends AbstractSwallowService implements MessageService,
-		ApplicationListener<ContextRefreshedEvent> {
+public class MessageServiceImpl extends AbstractSwallowService implements MessageService {
 
 	private static final String PRE_MSG = "msg#";
 	private static final String MESSAGE = "message";
@@ -123,6 +115,19 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		m.setGtstring(m.getGt());
 		m.setStstring(m.get_id());
 		m.set_id(null);
+
+		String internalP = m.get_p();
+		try {
+			JSONObject json = new JSONObject(internalP);
+			String retrans = json.getString("retransmit");
+			if (retrans != null && !retrans.equals("true")) {
+				m.setRetransmit(retrans);
+			} else {
+				m.setRetransmit("");
+			}
+		} catch (JSONException e) {
+			logger.info("no save_time in o_ip");
+		}
 	}
 
 	private void isZipped(Message m) {
@@ -170,37 +175,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 			json.put("save_time", ststring);
 			m.set_p(json.toString().replaceAll("\"", ""));
 		} catch (JSONException e) {
-			logger.error("no save_time in o_ip",e);
-		}
-	}
-
-	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-
-		if (event.getApplicationContext().getParent() == null) {
-			@SuppressWarnings("unchecked")
-			List<MessageDump> mds = (List<MessageDump>) messageDumpService.loadAllDumpMessage().get(
-					DefaultMessageDumpDao.MESSAGE);
-			for (MessageDump md : mds) {
-				if (!md.isFinished()) {
-					String f = md.getFilename();
-					File file = new File(MessageDumpController.FILEPATH + f);
-					try {
-						if (!file.exists()) {
-							file.createNewFile();
-						}
-						FileWriter fileWriter = new FileWriter(file);
-						fileWriter.write("");
-						fileWriter.flush();
-						fileWriter.close();
-					} catch (IOException e) {
-						logger.error("Create filewriter error", e);
-					}
-					String topic = md.getTopic();
-					exportMessage(md.getTopic(), md.getStartdt(), md.getStopdt());
-					logger.info(String.format("Start export message of %s to file %s", topic, f));
-				}
-			}
+			logger.info("no save_time in o_ip");
 		}
 	}
 
