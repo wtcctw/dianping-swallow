@@ -154,25 +154,16 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 	@SuppressWarnings("unchecked")
 	public Object clone() throws CloneNotSupportedException {
 		
-		TotalMap<? extends Mergeable> map = (TotalMap<? extends Mergeable>) super.clone();
+		TotalMap<Mergeable> map = (TotalMap<Mergeable>) super.clone();
 		
 		for(java.util.Map.Entry<String, ? extends Mergeable>  entry : map.entrySet()){
 			
 			String key = entry.getKey(); 
 			Mergeable value = entry.getValue();
-			map.put(key, value.clone());
+			map.put(key, (Mergeable) value.clone());
 		}
 		
 		return map;
 	}
 
-	/**
-	 * @param key
-	 * @param clone
-	 */
-	private void put(String key, Object clone) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }
