@@ -57,8 +57,8 @@ public class AbstractTest {
 
 	protected void sleep(int miliSeconds) {
 		
-		if(logger.isInfoEnabled() && miliSeconds > 0){
-			logger.info("[sleep]" + miliSeconds);
+		if(logger.isDebugEnabled() && miliSeconds > 0){
+			logger.debug("[sleep]" + miliSeconds);
 		}
 		
 		try {

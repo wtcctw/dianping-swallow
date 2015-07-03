@@ -2,7 +2,7 @@
 function renderGraph(url, divName,  http){
 		http({
 			method : 'POST',
-			url : window.contextpath + url
+			url : window.contextpath + url + location.search
 		}).success(function(data, status, headers, config) {
 			
 				var parent = $('#' + divName);
