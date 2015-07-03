@@ -136,9 +136,10 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 
 	private synchronized MongoClient createOrUseExistingMongo(List<ServerAddress> replicaSetSeeds) {
 		
+		List<ServerAddress> servers = null;
 		for(MongoClient mongo : mongos){
 			
-			List<ServerAddress> servers = mongo.getAllAddress();
+			servers = mongo.getAllAddress();
 			
 			try{
 				servers = mongo.getServerAddressList();
@@ -261,7 +262,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 
 		boolean result = false;
 		
-		if (allAddress != null && allAddress != null) {
+		if (allAddress != null && seeds != null) {
 			result = allAddress.containsAll(seeds);
 		}
 		if(logger.isDebugEnabled()){
