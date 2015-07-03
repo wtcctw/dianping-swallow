@@ -44,6 +44,8 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 			TimeUnit.SECONDS.sleep(SwallowConfigDistributed.CHECK_NEW_CONFIG_INTERVAL + 2);
 			TopicConfig newConfig = swallowConfig.getTopicConfig(topicName);
 			Assert.assertTrue(config.equals(newConfig));
+
+			
 		}finally{
 			removeConfig(topicName);
 		}
@@ -61,6 +63,11 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 		lionUtil.createOrSetConfig(SwallowConfigDistributed.TOPIC_CFG_PREFIX + "." + topicName, config.toJson());
 	}
 
+	private void addOrUpdateConfig(String topicName, String config) {
+		LionUtilImpl lionUtil = new LionUtilImpl();
+		lionUtil.createOrSetConfig(SwallowConfigDistributed.TOPIC_CFG_PREFIX + "." + topicName, config);
+	}
+
 
 	@Test
 	public void testUpdate() throws InterruptedException{
@@ -69,8 +76,8 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 		}
 		
 		TopicConfig config = new TopicConfig("mongodb://127.0.0.1:27018", 111, 11);
+		TopicConfig defaultConfig = swallowConfig.getTopicConfig(AbstractSwallowConfig.TOPICNAME_DEFAULT);
 		String topicName = UUID.randomUUID().toString();
-		
 		try{
 			
 			addOrUpdateConfig(topicName, config);
@@ -84,9 +91,17 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 			TimeUnit.SECONDS.sleep(1);
 			realConfig = swallowConfig.getTopicConfig(topicName);
 			Assert.assertTrue(realConfig.equals(newConfig));
+			
+			addOrUpdateConfig(topicName, "");
+			TimeUnit.SECONDS.sleep(1);
+			realConfig = swallowConfig.getTopicConfig(topicName);
+			Assert.assertTrue(realConfig.equals(defaultConfig));
+			
 		}finally{
 			removeConfig(topicName);
 		}
+		
+		sleep(300000);
 	}
 	
 	@Test

@@ -29,6 +29,8 @@ public class SwallowConfigChange {
 	
 	protected Map<String, TopicConfig> oldConfigs = new ConcurrentHashMap<String, SwallowConfig.TopicConfig>();
 	
+	protected boolean putLionConfig = Boolean.parseBoolean(System.getProperty("putLionConfig"));
+	
 	public static void main(String []argc) throws Exception{
 		
 		new SwallowConfigChange().start();
@@ -38,10 +40,17 @@ public class SwallowConfigChange {
 
 	private void start() throws Exception {
 		
+		if(logger.isInfoEnabled()){
+			logger.info("[putLionConfig]" + putLionConfig);
+		}
 		
 		createNewConfig();
-		checkConfig();
 		
+		if(putLionConfig){
+			checkConfig();
+		}
+		
+		System.exit(0);
 	}
 
 	
@@ -109,8 +118,10 @@ public class SwallowConfigChange {
 	}
 
 	private void putConfig(String topic, TopicConfig config) {
-
-		lionUtil.createOrSetConfig(SwallowConfigCentral.TOPIC_PREFIX + "." + topic, config.toJson());
+		
+		if(putLionConfig){
+			lionUtil.createOrSetConfig(SwallowConfigCentral.TOPIC_PREFIX + "." + topic, config.toJson());
+		}
 
 	}
 	

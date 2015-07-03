@@ -19,8 +19,18 @@ public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfi
 	protected Logger logger = Logger.getLogger(getClass());
 
 	private SwallowConfig config;
+	
+	private boolean forceDistrubuted = Boolean.parseBoolean(System.getProperty("forceDistrubuted"));
 
 	public SwallowConfigImpl() throws Exception{
+		
+		if(forceDistrubuted){
+			if(logger.isInfoEnabled()){
+				logger.info("[<init>][forceDistributedVersion]");
+			}
+			config = new SwallowConfigDistributed();
+			return;
+		}
 		
 		config = new SwallowConfigCentral();
 		if(!config.isSupported()){

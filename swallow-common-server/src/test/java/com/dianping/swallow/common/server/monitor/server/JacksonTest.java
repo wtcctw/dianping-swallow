@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.annotate.JsonMethod;
-import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
@@ -27,7 +25,7 @@ public class JacksonTest {
 		try{
 			ObjectMapper mapper = new ObjectMapper();
 			// 设置输出时包含属性的风格
-			mapper.setVisibility(JsonMethod.FIELD, Visibility.ANY);
+//			mapper.setVisibility(JsonMethod.FIELD, Visibility.ANY);
 			mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
 			
 			MongoStatus status = createMongoStatus();
