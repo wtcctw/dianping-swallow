@@ -4,17 +4,20 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
+import org.bson.types.BSONTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.web.controller.MessageDumpController;
+import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
 import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.MessageService;
-import com.dianping.swallow.web.util.ResponseStatus;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 
@@ -93,56 +96,82 @@ public class DumpMessageTask implements Runnable {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 
 		Map<String, Object> result = messageService.exportMessage(topic, startdt, stopdt);
-		int count = (Integer) result.get("size");
-		List<DBObject> dboList = (List<DBObject>) result.get("message");
-		int size = dboList.size();
-		String firsttime = (String) result.get("first");
-		String lasttime = (String) result.get("last");
-		int status = writeContentToFile(dboList);
-		if (status == 0) {
-			try {
-				int n = messageDumpService.updateDumpMessage(filename, true, count, size, firsttime, lasttime);
-				if (n > 0) {
-					logger.info(String.format("Update file %s status to true successfully", filename));
-				} else {
-					logger.info(String.format("Update file %s status to true failed with n equal to %d", filename, n));
-				}
-				messageDumpService.execBlockingDumpMessageTask(topic);
-			} catch (MongoException e) {
-				logger.info("MongoException when update messagedump", e);
-			}
-		}
-	}
 
-	private int writeContentToFile(List<DBObject> dboList) {
 		GZIPOutputStream gos = null;
 		BufferedWriter writer = null;
 		try {
 			gos = new GZIPOutputStream(new FileOutputStream(MessageDumpController.FILEPATH + filename, true));
 			writer = new BufferedWriter(new OutputStreamWriter(gos, "UTF-8"));
-			for (DBObject dbo : dboList) {
+		} catch (Exception e) {
+			logger.error("open io error", e);
+		} 
+		String laststring = null;
+		String firststring = null;
+		int maxsize = (Integer) result.get("maxsize");
+		int total = (Integer) result.get("total");
+		DBCursor cursor = (DBCursor) result.get("message");
+		int size = Math.min(maxsize, total);
+		int iterator = 0;
+        while (cursor.hasNext()) {
+        	DBObject dbo = cursor.next();
+        	try {
 				writer.append(dbo.toString());
 				writer.newLine();
-				writer.flush();
-			}
-			return ResponseStatus.SUCCESS.getStatus();
-		} catch (IOException e) {
-			logger.error("Open output stream error", e);
-			return ResponseStatus.IOEXCEPTION.getStatus();
-		} finally {
-			try {
-				writer.close();
-				gos.close();
 			} catch (IOException e) {
-				logger.error("Open output stream error", e);
-				return ResponseStatus.IOEXCEPTION.getStatus();
+				logger.error("Operator io error", e);
 			}
-		}
+        	iterator++;
+        	if(iterator == 1){
+        		BSONTimestamp firsttime = (BSONTimestamp) dbo.get(DefaultMessageDao.ID);
+        		firststring = BSONTimestampToString(firsttime);
+        	}
+        	
+        	if(iterator == size){
+        		BSONTimestamp lasttime = (BSONTimestamp) dbo.get(DefaultMessageDao.ID);
+        		laststring = BSONTimestampToString(lasttime);
+        		try {
+					writer.flush();
+					break;
+				} catch (IOException e) {
+					logger.error("Operator io error", e);
+				} finally {
+					try {
+						writer.close();
+						gos.close();
+					} catch (IOException e) {
+						logger.error("Operator io error", e);
+					}
+				} 
+        	}else if(iterator % 10000 == 0){
+        		try {
+					writer.flush();
+				} catch (IOException e) {
+					logger.error("Operator io error", e);
+				}
+        	}
+        }
 
+		try {
+			int n = messageDumpService.updateDumpMessage(filename, true, total, size,firststring, laststring);
+			if (n > 0) {
+				logger.info(String.format("Update file %s status to true successfully", filename));
+			} else {
+				logger.info(String.format("Update file %s status to true failed with n equal to %d", filename, n));
+			}
+			messageDumpService.execBlockingDumpMessageTask(topic);
+		} catch (MongoException e) {
+			logger.info("MongoException when update messagedump", e);
+		}
+	}
+
+
+	private String BSONTimestampToString(BSONTimestamp ts) {
+		int seconds = ts.getTime();
+		long millions = new Long(seconds) * 1000;
+		return new SimpleDateFormat(DefaultMessageDao.TIMEFORMAT).format(new Date(millions));
 	}
 }
