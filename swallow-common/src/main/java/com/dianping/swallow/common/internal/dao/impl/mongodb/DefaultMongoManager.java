@@ -515,7 +515,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	@Override
 	public int getMongoCount() {
 
-		return topicNameToMongoMap.values().size();
+		return mongos.size();
 	}
 
 	public SwallowConfig getSwallowConfig() {
