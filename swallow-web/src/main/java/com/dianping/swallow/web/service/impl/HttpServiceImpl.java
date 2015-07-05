@@ -11,6 +11,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.mortbay.jetty.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,36 +35,42 @@ public class HttpServiceImpl implements HttpService {
 	private static final HttpClient httpClient = new DefaultHttpClient();
 
 	@Override
-	public boolean httpPost(String url, List<NameValuePair> params) {
+	public HttpResult httpPost(String url, List<NameValuePair> params) {
 		HttpPost httpPost = new HttpPost(url);
+		HttpResult result = new HttpResult();
 		try {
 			httpPost.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 		} catch (UnsupportedEncodingException e) {
 			logger.error("http post param encoded failed", e);
 		}
 		try {
-			HttpResponse result = httpClient.execute(httpPost);
-			if (result.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
-				return true;
+			HttpResponse response = httpClient.execute(httpPost);
+			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
+				result.setResponseBody(EntityUtils.toString(response.getEntity()));
+				result.setSuccess(true);
 			}
 		} catch (IOException e) {
+			result.setSuccess(false);
 			logger.error("http post request failed .", e);
 		}
-		return false;
+		return result;
 	}
 
 	@Override
-	public boolean httpGet(String url) {
+	public HttpResult httpGet(String url) {
 		HttpGet httpGet = new HttpGet(url);
+		HttpResult result = new HttpResult();
 		try {
-			HttpResponse result = httpClient.execute(httpGet);
-			if (result.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
-				return true;
+			HttpResponse response = httpClient.execute(httpGet);
+			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
+				result.setResponseBody(EntityUtils.toString(response.getEntity()));
+				result.setSuccess(true);
 			}
 		} catch (IOException e) {
+			result.setSuccess(false);
 			logger.error("http get request failed .", e);
 		}
-		return false;
+		return result;
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class AlarmServiceImpl implements AlarmService {
 	private static final Logger logger = LoggerFactory.getLogger(AlarmServiceImpl.class);
 
 	private static final String AlARM_URL_FILE = "alarm-url.properties";
-	
+
 	private static final String MAIL_KEY = "mail";
 	private static final String WEIXIN_KEY = "weiXin";
 	private static final String SMS_KEY = "sms";
@@ -48,12 +49,12 @@ public class AlarmServiceImpl implements AlarmService {
 					logger.info("loading " + AlARM_URL_FILE);
 				}
 
-				Properties props = new Properties();
+				Properties prop = new Properties();
 				try {
-					props.load(in);
-					setMailUrl(String.valueOf(props.get(MAIL_KEY)));
-					setWeiXinUrl(String.valueOf(props.get(WEIXIN_KEY)));
-					setSmsUrl(String.valueOf(props.get(SMS_KEY)));
+					prop.load(in);
+					setMailUrl(StringUtils.trim(prop.getProperty(MAIL_KEY)));
+					setWeiXinUrl(StringUtils.trim(prop.getProperty(WEIXIN_KEY)));
+					setSmsUrl(StringUtils.trim(prop.getProperty(SMS_KEY)));
 				} catch (IOException e) {
 					if (logger.isInfoEnabled()) {
 						logger.info("Load alarm config file failed.");
@@ -73,7 +74,7 @@ public class AlarmServiceImpl implements AlarmService {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("mobile", mobile));
 		params.add(new BasicNameValuePair("body", body));
-		return httpService.httpPost(getSmsUrl(), params);
+		return httpService.httpPost(getSmsUrl(), params).isSuccess();
 	}
 
 	@Override
@@ -82,7 +83,7 @@ public class AlarmServiceImpl implements AlarmService {
 		params.add(new BasicNameValuePair("email", email));
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("content", content));
-		return httpService.httpPost(getWeiXinUrl(), params);
+		return httpService.httpPost(getWeiXinUrl(), params).isSuccess();
 	}
 
 	@Override
@@ -91,7 +92,7 @@ public class AlarmServiceImpl implements AlarmService {
 		params.add(new BasicNameValuePair("recipients", email));
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("body", content));
-		return httpService.httpPost(getMailUrl(), params);
+		return httpService.httpPost(getMailUrl(), params).isSuccess();
 	}
 
 	public String getMailUrl() {

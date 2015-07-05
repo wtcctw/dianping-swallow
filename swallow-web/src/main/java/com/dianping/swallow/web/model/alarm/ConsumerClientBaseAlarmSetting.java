@@ -9,11 +9,11 @@ public class ConsumerClientBaseAlarmSetting {
 
 	private QPSAlarmSetting qpsAlarmSetting;
 
-	private long fetcherDelay;
+	private long senderDelay;
 
 	private long ackDelay;
 
-	private long piler;
+	private long accumulation;
 
 	public QPSAlarmSetting getQpsAlarmSetting() {
 		return qpsAlarmSetting;
@@ -23,12 +23,12 @@ public class ConsumerClientBaseAlarmSetting {
 		this.qpsAlarmSetting = qpsAlarmSetting;
 	}
 
-	public long getFetcherDelay() {
-		return fetcherDelay;
+	public long getSenderDelay() {
+		return senderDelay;
 	}
 
-	public void setFetcherDelay(long fetcherDelay) {
-		this.fetcherDelay = fetcherDelay;
+	public void setSenderDelay(long senderDelay) {
+		this.senderDelay = senderDelay;
 	}
 
 	public long getAckDelay() {
@@ -39,17 +39,17 @@ public class ConsumerClientBaseAlarmSetting {
 		this.ackDelay = ackDelay;
 	}
 
-	public long getPiler() {
-		return piler;
-	}
-
-	public void setPiler(long piler) {
-		this.piler = piler;
-	}
-
 	@Override
 	public String toString() {
-		return "ConsumerClientBaseAlarmSetting [qpsAlarmSetting = " + qpsAlarmSetting + ",fetcherDelay = "
-				+ fetcherDelay + ", ackDelay = " + ackDelay + ", piler = " + piler + "]";
+		return "ConsumerClientBaseAlarmSetting [qpsAlarmSetting = " + qpsAlarmSetting + ",senderDelay = "
+				+ senderDelay + ", ackDelay = " + ackDelay + ", accumulation = " + accumulation + "]";
+	}
+
+	public long getAccumulation() {
+		return accumulation;
+	}
+
+	public void setAccumulation(long accumulation) {
+		this.accumulation = accumulation;
 	}
 }

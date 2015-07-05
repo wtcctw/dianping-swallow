@@ -26,16 +26,6 @@ public enum AlarmType {
 		this.desc = desc;
 	}
 	
-	public static AlarmType valuesOf(String value) {
-		AlarmType[] types = values();
-		for (AlarmType type : types) {
-			if (type.getDesc().equalsIgnoreCase(value)) {
-				return type;
-			}
-		}
-		return null;
-	}
-	
 	@Override
 	public String toString() {
 		return desc;

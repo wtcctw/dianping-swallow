@@ -7,23 +7,57 @@ import org.apache.http.NameValuePair;
 /**
  * 
  * http 访问接口
+ * 
  * @author qiyin
  *
  */
 public interface HttpService {
 
 	/**
-	 * http post请求
+	 * http post request
+	 * 
 	 * @param url
-	 * @param params请求参数
-	 * @return
+	 * @param params
+	 * @return json
 	 */
-	public boolean httpPost(String url, List<NameValuePair> params);
+	public HttpResult httpPost(String url, List<NameValuePair> params);
+
 	/**
-	 * http get请求
+	 * http get request
+	 * 
 	 * @param url
-	 * @return
+	 * @return json
 	 */
-	public boolean httpGet(String url);
+	public HttpResult httpGet(String url);
 	
+	
+	/**
+	 * 
+	 * http request result
+	 * @author qiyin
+	 *
+	 */
+	public static class HttpResult {
+
+		private boolean isSuccess;
+
+		private String responseBody;
+
+		public boolean isSuccess() {
+			return isSuccess;
+		}
+
+		public void setSuccess(boolean isSuccess) {
+			this.isSuccess = isSuccess;
+		}
+
+		public String getResponseBody() {
+			return responseBody;
+		}
+
+		public void setResponseBody(String responseBody) {
+			this.responseBody = responseBody;
+		}
+	}
+
 }
