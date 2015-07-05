@@ -1,0 +1,38 @@
+package com.dianping.swallow.web.service.impl;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.dianping.swallow.web.service.HttpService;
+
+/**
+ * 
+ * @author qiyin
+ *
+ */
+public class AlarmServiceImplTest {
+	
+	static AlarmServiceImpl alarmService=null;
+	
+	@BeforeClass
+	public static void beforeClass(){
+		alarmService = new AlarmServiceImpl();
+		HttpService httpService = new HttpServiceImpl();
+		alarmService.setHttpService(httpService);
+	}
+
+	@Test
+	public void sendSmsTest(){
+		alarmService.sendSms("13162757679", "test");
+	}
+	
+	@Test
+	public void sendMailTest(){
+		alarmService.sendMail("qi.yin@dianping.com", "test", "test");
+	}
+	
+	@Test
+	public void sendWeiXinTest(){
+		alarmService.sendWeixin("qi.yin@dianping.com", "test", "test");
+	}
+}

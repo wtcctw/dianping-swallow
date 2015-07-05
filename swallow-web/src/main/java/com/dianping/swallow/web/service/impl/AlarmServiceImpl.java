@@ -89,8 +89,8 @@ public class AlarmServiceImpl implements AlarmService {
 	@Override
 	public boolean sendMail(String email, String title, String content) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("recipients", email));
 		params.add(new BasicNameValuePair("title", title));
+		params.add(new BasicNameValuePair("recipients", email));
 		params.add(new BasicNameValuePair("body", content));
 		return httpService.httpPost(getMailUrl(), params).isSuccess();
 	}
@@ -117,6 +117,10 @@ public class AlarmServiceImpl implements AlarmService {
 
 	public void setWeiXinUrl(String weiXinUrl) {
 		this.weiXinUrl = weiXinUrl;
+	}
+	
+	public void setHttpService(HttpService httpService){
+		this.httpService = httpService;
 	}
 
 }

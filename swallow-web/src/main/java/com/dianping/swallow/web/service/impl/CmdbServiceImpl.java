@@ -27,7 +27,7 @@ public class CmdbServiceImpl implements CmdbService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CmdbServiceImpl.class);
 
-	private static final String CMDB_API_FILE = "cmdb-api.properties";
+	private static final String CMDB_API_FILE = "cmdb-api-url.properties";
 
 	private static final String URLBYIP_KEY = "urlByIp";
 
@@ -97,7 +97,7 @@ public class CmdbServiceImpl implements CmdbService {
 		this.httpService = httpService;
 	}
 
-	public IpDesc transformToIpDesc(String content) throws Exception {
+	private IpDesc transformToIpDesc(String content) throws Exception {
 		JsonNode rootNode = objectMapper.readTree(content);
 		JsonNode projectsNode = rootNode.path("projects");
 		JsonNode jsonNode = projectsNode.get(0);

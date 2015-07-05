@@ -2,23 +2,31 @@ package com.dianping.swallow.web.service.impl;
 
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.dianping.swallow.web.model.cmdb.IpDesc;
 import com.dianping.swallow.web.service.HttpService;
+
 /**
  * 
  * @author qiyin
  *
  */
 public class CmdbServiceImplTest {
+	
+	static CmdbServiceImpl cmdbService = null;
+	
+	@BeforeClass
+	public static void beforeClass(){
+		cmdbService = new CmdbServiceImpl();
+		HttpService httpService = new HttpServiceImpl();
+		cmdbService.setHttpService(httpService);
+	}
 
 	@Test
-	public void Test() {
-		CmdbServiceImpl cmdbServiceImpl = new CmdbServiceImpl();
-		HttpService httpService = new HttpServiceImpl();
-		cmdbServiceImpl.setHttpService(httpService);
-		IpDesc ipDesc = cmdbServiceImpl.getIpDesc("10.2.9.15");
+	public void getIpDescTest() {
+		IpDesc ipDesc = cmdbService.getIpDesc("10.2.9.15");
 		Assert.assertEquals("10.2.9.15", ipDesc.getIp());
 		Assert.assertEquals("swallow-producer", ipDesc.getName());
 		Assert.assertEquals("wenchao.meng@dianping.com", ipDesc.getEmail());
