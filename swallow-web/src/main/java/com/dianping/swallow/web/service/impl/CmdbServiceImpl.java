@@ -17,6 +17,11 @@ import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 import com.dianping.swallow.web.service.IpDescService;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 @Service("cmdbService")
 public class CmdbServiceImpl implements CmdbService {
 
@@ -96,17 +101,18 @@ public class CmdbServiceImpl implements CmdbService {
 		JsonNode rootNode = objectMapper.readTree(content);
 		JsonNode projectsNode = rootNode.path("projects");
 		JsonNode jsonNode = projectsNode.get(0);
-		if (jsonNode == null) {
-			return null;
+		IpDesc ipDesc = null;
+		if (jsonNode != null) {
+			ipDesc = new IpDesc();
+			ipDesc.setName(jsonNode.path("project_name").getTextValue());
+			ipDesc.setEmail(jsonNode.path("project_email").getTextValue());
+			ipDesc.setOpEmail(jsonNode.path("op_email").getTextValue());
+			ipDesc.setOpManager(jsonNode.path("op_duty").getTextValue());
+			ipDesc.setOpMobile(jsonNode.path("op_mobile").getTextValue());
+			ipDesc.setDpManager(jsonNode.path("rd_duty").getTextValue());
+			ipDesc.setDpMobile(jsonNode.path("rd_mobile").getTextValue());
+			return ipDesc;
 		}
-		IpDesc ipDesc = new IpDesc();
-		ipDesc.setName(jsonNode.path("project_name").getTextValue());
-		ipDesc.setEmail(jsonNode.path("project_email").getTextValue());
-		ipDesc.setOpEmail(jsonNode.path("op_email").getTextValue());
-		ipDesc.setOpManager(jsonNode.path("op_duty").getTextValue());
-		ipDesc.setOpMobile(jsonNode.path("op_mobile").getTextValue());
-		ipDesc.setDpManager(jsonNode.path("rd_duty").getTextValue());
-		ipDesc.setDpMobile(jsonNode.path("rd_mobile").getTextValue());
 		return ipDesc;
 	}
 }

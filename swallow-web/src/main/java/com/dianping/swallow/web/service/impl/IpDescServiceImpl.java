@@ -9,6 +9,11 @@ import com.dianping.swallow.web.dao.IpDescDao;
 import com.dianping.swallow.web.model.cmdb.IpDesc;
 import com.dianping.swallow.web.service.IpDescService;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 @Service("ipDescService")
 public class IpDescServiceImpl implements IpDescService {
 

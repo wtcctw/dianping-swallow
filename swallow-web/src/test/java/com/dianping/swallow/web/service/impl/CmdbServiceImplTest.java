@@ -6,7 +6,11 @@ import org.junit.Test;
 
 import com.dianping.swallow.web.model.cmdb.IpDesc;
 import com.dianping.swallow.web.service.HttpService;
-
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class CmdbServiceImplTest {
 
 	@Test
@@ -23,7 +27,6 @@ public class CmdbServiceImplTest {
 		Assert.assertEquals("13472696059", ipDesc.getOpMobile());
 		Assert.assertEquals("孟文超", ipDesc.getDpManager());
 		Assert.assertEquals("18721147511", ipDesc.getDpMobile());
-		
 	}
 
 }

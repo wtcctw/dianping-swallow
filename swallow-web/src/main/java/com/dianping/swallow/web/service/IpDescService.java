@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.cmdb.IpDesc;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public interface IpDescService extends SwallowService {
 	
 	/**
