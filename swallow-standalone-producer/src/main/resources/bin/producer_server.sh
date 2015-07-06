@@ -88,7 +88,7 @@ echo "output: $STD_OUT"
 exec java $JAVA_OPTS $MAIN_CLASS > "$STD_OUT" 2>&1 &
 
 ###########  检查是否启动成功 ############
-mysleep 8
+mysleep 12
 
 
 SuccessLog="Producer service for client is ready"
