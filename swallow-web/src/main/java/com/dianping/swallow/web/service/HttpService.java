@@ -6,12 +6,12 @@ import org.apache.http.NameValuePair;
 
 /**
  * 
- * http 访问接口
+ * http api
  * 
  * @author qiyin
  *
  */
-public interface HttpService {
+public interface HttpService extends SwallowService {  
 
 	/**
 	 * http post request

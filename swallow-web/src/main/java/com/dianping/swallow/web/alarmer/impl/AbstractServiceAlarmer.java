@@ -6,9 +6,18 @@ package com.dianping.swallow.web.alarmer.impl;
 *
 */
 public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
-
+	
 	@Override
-	protected void doAlarm() {
-
+	public void doAlarm(){
+		doCheckProcess();
+		doCheckPort();
+		doCheckService();
 	}
+	
+	public abstract void doCheckProcess();
+	
+	public abstract void doCheckPort();
+	
+	public abstract void doCheckService();
+
 }

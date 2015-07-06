@@ -9,6 +9,8 @@ import java.util.List;
  */
 public abstract class AbstractServerAlarmSetting {
 
+	private String whiteList;
+
 	private QPSAlarmSetting qpsAlarmSetting;
 
 	private List<ServerMachineAlarmSetting> machineAlarmSettings;
@@ -31,7 +33,15 @@ public abstract class AbstractServerAlarmSetting {
 
 	@Override
 	public String toString() {
-		return "AbstractServerAlarmSetting [qpsAlarmSetting = " + qpsAlarmSetting + ", machineAlarmSettings = "
-				+ machineAlarmSettings + "]";
+		return "AbstractServerAlarmSetting [whiteList = " + whiteList + ", qpsAlarmSetting = " + qpsAlarmSetting
+				+ ", machineAlarmSettings = " + machineAlarmSettings + "]";
+	}
+
+	public String getWhiteList() {
+		return whiteList;
+	}
+
+	public void setWhiteList(String whiteList) {
+		this.whiteList = whiteList;
 	}
 }

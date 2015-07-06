@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.manager.impl;
+package com.dianping.swallow.web.manager;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

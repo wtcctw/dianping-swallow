@@ -21,7 +21,7 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 	
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAlarmer.class);
 
-	protected final int DEFAULT_INTERVAL = 5;
+	protected int alarmInterval = 30;
 	
 	private static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT);
 	
@@ -58,7 +58,11 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 	protected abstract void doAlarm();
 	
 	protected int getAlarmInterval(){
-		return DEFAULT_INTERVAL;
+		return alarmInterval;
+	}
+	
+	protected void setAlarmInterval(int interval){
+		this.alarmInterval = interval;
 	}
 	
 }

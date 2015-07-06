@@ -1,8 +1,8 @@
-package com.dianping.swallow.web.manager;
+package com.dianping.swallow.web.manager.impl;
 
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.manager.impl.CacheManager;
+import com.dianping.swallow.web.manager.CacheManager;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

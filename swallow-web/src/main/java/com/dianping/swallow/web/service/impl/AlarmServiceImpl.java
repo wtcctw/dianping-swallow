@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
 
@@ -40,6 +42,9 @@ public class AlarmServiceImpl implements AlarmService {
 
 	@Autowired
 	private HttpService httpService;
+	
+	@Autowired
+	private IPDescManager ipDescManager;
 
 	public AlarmServiceImpl() {
 		try {
@@ -93,6 +98,18 @@ public class AlarmServiceImpl implements AlarmService {
 		params.add(new BasicNameValuePair("recipients", email));
 		params.add(new BasicNameValuePair("body", content));
 		return httpService.httpPost(getMailUrl(), params).isSuccess();
+	}
+	
+	@Override
+	public void sendAll(String ip,String title,String message){
+		IPDesc ipDesc = ipDescManager.getIPDesc(ip);
+		if (ipDesc != null) {
+			sendSms(ipDesc.getDpMobile(), message);
+			sendWeixin(ipDesc.getEmail(), title, message);
+			sendMail(ipDesc.getEmail(), title, message);
+		} else {
+			logger.error("[doCheckPort] cannot find ipDesc info.");
+		}
 	}
 
 	public String getMailUrl() {

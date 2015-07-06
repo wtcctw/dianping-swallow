@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.service.impl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
@@ -11,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.swallow.common.internal.util.EnvUtil;
+import com.dianping.swallow.web.model.cmdb.EnvDevice;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.HttpService;
@@ -27,11 +32,21 @@ public class CmdbServiceImpl implements CmdbService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CmdbServiceImpl.class);
 
-	private static final String CMDB_API_FILE = "cmdb-api-url.properties";
+	private static final String CMDB_API_URL_FILE = "cmdb-api-url.properties";
 
-	private static final String URLBYIP_KEY = "urlByIp";
+	private static final String PROJECT_URL_KEY = "projectUrl";
 
-	private String urlByIpFormat;
+	private static final String DEVICE_URL_KEY = "deviceUrl";
+
+	private static final String env;
+
+	static {
+		env = EnvZooKeeperConfig.getEnv().trim();
+	}
+
+	private String projectUrlFormat;
+
+	private String deviceUrlFormat;
 
 	@Autowired
 	private HttpService httpService;
@@ -44,15 +59,16 @@ public class CmdbServiceImpl implements CmdbService {
 	public CmdbServiceImpl() {
 		setObjectMapper(new ObjectMapper());
 		try {
-			InputStream in = CmdbServiceImpl.class.getClassLoader().getResourceAsStream(CMDB_API_FILE);
+			InputStream in = CmdbServiceImpl.class.getClassLoader().getResourceAsStream(CMDB_API_URL_FILE);
 			if (in != null) {
 				if (logger.isInfoEnabled()) {
-					logger.info("loading " + CMDB_API_FILE);
+					logger.info("loading " + CMDB_API_URL_FILE);
 				}
 				Properties prop = new Properties();
 				try {
 					prop.load(in);
-					urlByIpFormat = StringUtils.trim(prop.getProperty(URLBYIP_KEY));
+					projectUrlFormat = StringUtils.trim(prop.getProperty(PROJECT_URL_KEY));
+					deviceUrlFormat = StringUtils.trim(prop.getProperty(DEVICE_URL_KEY));
 				} finally {
 					in.close();
 				}
@@ -65,7 +81,7 @@ public class CmdbServiceImpl implements CmdbService {
 
 	@Override
 	public IPDesc getIpDesc(String ip) {
-		String url = getRealUrl(ip);
+		String url = getRealUrl(projectUrlFormat, "{ip}", ip);
 		HttpResult result = httpService.httpGet(url);
 		if (!result.isSuccess()) {
 			return null;
@@ -81,8 +97,28 @@ public class CmdbServiceImpl implements CmdbService {
 		return ipDesc;
 	}
 
-	private String getRealUrl(String ip) {
-		return StringUtils.replace(urlByIpFormat, "{ip}", ip);
+	@Override
+	public List<EnvDevice> getEnvDevices(String project) {
+		String url = getRealUrl(deviceUrlFormat, "{project}", project);
+		String env = transformEnv();
+		url = getRealUrl(url, "{env}", env);
+		url = getRealUrl(url, "{page}", String.valueOf(1));
+		HttpResult result = httpService.httpGet(url);
+		if (!result.isSuccess()) {
+			return null;
+		}
+		String content = result.getResponseBody();
+		List<EnvDevice> envDevices = null;
+		try {
+			envDevices = transformToEnvDevices(content);
+		} catch (Exception e) {
+			logger.info("json transform to object failed .", e);
+		}
+		return envDevices;
+	}
+
+	private String getRealUrl(String format, String key, String value) {
+		return StringUtils.replace(format, key, value);
 	}
 
 	public ObjectMapper getObjectMapper() {
@@ -114,5 +150,47 @@ public class CmdbServiceImpl implements CmdbService {
 			return ipDesc;
 		}
 		return ipDesc;
+	}
+
+	private List<EnvDevice> transformToEnvDevices(String content) throws Exception {
+		JsonNode rootNode = objectMapper.readTree(content);
+		JsonNode totalNode = rootNode.path("total");
+		int num = totalNode.getIntValue();
+		JsonNode devicesNode = rootNode.path("devices");
+		List<EnvDevice> envDevices = new ArrayList<EnvDevice>();
+		for (int i = 0; i < num; i++) {
+			JsonNode deviceNode = devicesNode.get(i);
+			EnvDevice envDevice = null;
+			if (deviceNode != null) {
+				envDevice = new EnvDevice();
+				envDevice.setHostName(deviceNode.path("hostname").getTextValue());
+				envDevice.setEnv(env);
+				JsonNode ipNode = deviceNode.path("private_ip");
+				if (ipNode.get(0) != null){
+					envDevice.setIp(ipNode.get(0).getTextValue());
+				}
+				envDevices.add(envDevice);
+			}
+		}
+		return envDevices;
+	}
+
+	private String transformEnv() {
+		if (env.equals("dev")) {
+			return "dev";
+		} else if (env.equals("alpha")) {
+			return "alpha";
+		} else if (env.equals("beta") || env.equals("qa")) {
+			return "beta";
+		} else if (env.equals("prelease") || env.equals("ppe")) {
+			return "ppe";
+		} else if (env.equals("perf")) {
+			return "perf";
+		} else if (env.equals("product")) {
+			return "生产";
+		} else {
+			return "";
+		}
+
 	}
 }

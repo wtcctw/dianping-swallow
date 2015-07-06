@@ -1,7 +1,14 @@
 package com.dianping.swallow.web.model.cmdb;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class IPDesc {
 
 	@Id
@@ -23,9 +30,9 @@ public class IPDesc {
 
 	private String dpMobile;
 
-	private String createTime;
+	private Date createTime;
 
-	private String updateTime;
+	private Date updateTime;
 
 	public String getId() {
 		return id;
@@ -99,19 +106,19 @@ public class IPDesc {
 		this.dpMobile = dpMobile;
 	}
 
-	public String getCreateTime() {
+	public Date getCreateTime() {
 		return createTime;
 	}
 
-	public void setCreateTime(String createTime) {
+	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
 
-	public String getUpdateTime() {
+	public Date getUpdateTime() {
 		return updateTime;
 	}
 
-	public void setUpdateTime(String updateTime) {
+	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
 

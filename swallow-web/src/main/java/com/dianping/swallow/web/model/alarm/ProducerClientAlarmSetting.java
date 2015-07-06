@@ -8,6 +8,8 @@ import java.util.List;
  *
  */
 public class ProducerClientAlarmSetting {
+	
+	private String whiteList;
 
 	private ProducerClientBaseAlarmSetting baseSetting;
 
@@ -31,8 +33,16 @@ public class ProducerClientAlarmSetting {
 	
 	@Override
 	public String toString() {
-		return "ProducerClientAlarmSetting [baseSetting = " + baseSetting + ", machineSettings = " + machineSettings
+		return "ProducerClientAlarmSetting [whiteList = " + whiteList + ", baseSetting = " + baseSetting + ", machineSettings = " + machineSettings
 				+ "]";
+	}
+
+	public String getWhiteList() {
+		return whiteList;
+	}
+
+	public void setWhiteList(String whiteList) {
+		this.whiteList = whiteList;
 	}
 
 }

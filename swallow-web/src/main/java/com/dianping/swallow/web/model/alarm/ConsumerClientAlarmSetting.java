@@ -8,6 +8,8 @@ import java.util.List;
  *
  */
 public class ConsumerClientAlarmSetting {
+	
+	private String whiteList;
 
 	private String consumerId;
 
@@ -41,7 +43,15 @@ public class ConsumerClientAlarmSetting {
 
 	@Override
 	public String toString() {
-		return "ConsumerClientAlarmSetting [consumerId = " + consumerId + ", baseSetting = " + baseSetting
+		return "ConsumerClientAlarmSetting [whiteList = " + whiteList + ", consumerId = " + consumerId + ", baseSetting = " + baseSetting
 				+ ", machineSettings = " + machineSettings + "]";
+	}
+
+	public String getWhiteList() {
+		return whiteList;
+	}
+
+	public void setWhiteList(String whiteList) {
+		this.whiteList = whiteList;
 	}
 }
