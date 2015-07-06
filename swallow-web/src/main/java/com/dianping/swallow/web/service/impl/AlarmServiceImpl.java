@@ -3,7 +3,9 @@ package com.dianping.swallow.web.service.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
@@ -14,7 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
@@ -39,6 +43,9 @@ public class AlarmServiceImpl implements AlarmService {
 	private String mailUrl;
 	private String smsUrl;
 	private String weiXinUrl;
+	
+	@Autowired
+	private AlarmDao alarmDao;
 
 	@Autowired
 	private HttpService httpService;
@@ -138,6 +145,41 @@ public class AlarmServiceImpl implements AlarmService {
 	
 	public void setHttpService(HttpService httpService){
 		this.httpService = httpService;
+	}
+
+	@Override
+	public boolean insert(Alarm alarm) {
+		return alarmDao.insert(alarm);
+	}
+
+	@Override
+	public boolean update(Alarm alarm) {
+		return alarmDao.update(alarm);
+	}
+
+	@Override
+	public int deleteById(String id) {
+		return alarmDao.deleteById(id);
+	}
+
+	@Override
+	public Alarm findById(String id) {
+		return alarmDao.findById(id);
+	}
+
+	@Override
+	public Map<String, Object> findByReceiver(String receiver, int offset, int limit) {
+		return alarmDao.findByReceiver(receiver, offset, limit);
+	}
+
+	@Override
+	public Map<String, Object> findByCreateTime(Date createTime, int offset, int limit) {
+		return alarmDao.findByCreateTime(createTime, offset, limit);
+	}
+
+	@Override
+	public List<Alarm> findAll() {
+		return alarmDao.findAll();
 	}
 
 }

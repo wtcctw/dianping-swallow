@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultProducerServiceAlarmer.class);
 
 	private static final String PEGION_PRODUCER_URL = "http://service.dianping.com/swallowService/producerService_1.0.0";
-	
+
 	private ConfigCache configCache;
 
 	private volatile String producerServerValue;
@@ -55,14 +56,14 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer {
 			}
 		});
 	}
-	
+
 	public DefaultProducerServiceAlarmer() {
 		setAlarmInterval(30);
 	}
 
 	@Override
 	public void doCheckProcess() {
-		
+
 	}
 
 	@Override
@@ -72,8 +73,20 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer {
 
 	@Override
 	public void doCheckService() {
-		Map<String,String> cmdbProducers = ipCollectorService.getCmdbProducers();
-		
+		Map<String, String> cmdbProducers = ipCollectorService.getCmdbProducers();
+		if (StringUtils.isNotBlank(producerServerValue)) {
+			String[] ips = producerServerValue.split(",");
+			if (ips != null) {
+
+			}
+
+		}
+
+	}
+
+	@Override
+	public void doCheckSender() {
+
 	}
 
 	public String getProducerServerValue() {

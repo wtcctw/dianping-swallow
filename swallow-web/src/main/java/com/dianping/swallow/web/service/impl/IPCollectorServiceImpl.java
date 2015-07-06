@@ -1,8 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
 import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +29,6 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.web.model.cmdb.EnvDevice;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.IPDescService;

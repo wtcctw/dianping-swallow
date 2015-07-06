@@ -12,6 +12,7 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 		doCheckProcess();
 		doCheckPort();
 		doCheckService();
+		doCheckSender();
 	}
 	
 	public abstract void doCheckProcess();
@@ -19,5 +20,7 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	public abstract void doCheckPort();
 	
 	public abstract void doCheckService();
+	
+	public abstract void doCheckSender();
 
 }

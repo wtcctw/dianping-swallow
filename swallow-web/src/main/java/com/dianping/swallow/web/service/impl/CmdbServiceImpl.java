@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.lion.EnvZooKeeperConfig;
-import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.model.cmdb.EnvDevice;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.CmdbService;

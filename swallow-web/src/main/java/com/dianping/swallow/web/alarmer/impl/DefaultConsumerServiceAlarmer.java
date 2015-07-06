@@ -41,7 +41,7 @@ public class DefaultConsumerServiceAlarmer extends AbstractServiceAlarmer {
 	private IPCollectorService ipCollectorService;
 	
 	public DefaultConsumerServiceAlarmer() {
-		setAlarmInterval(5);
+		setAlarmInterval(30);
 	}
 
 	@Autowired
@@ -87,8 +87,15 @@ public class DefaultConsumerServiceAlarmer extends AbstractServiceAlarmer {
 
 	@Override
 	public void doCheckService() {
-		// TODO Auto-generated method stub
+		
 
 	}
+	
+	@Override
+	public void doCheckSender() {
+		
+
+	}
+	
 
 }
