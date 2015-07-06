@@ -1,8 +1,6 @@
 package com.dianping.swallow.web.alarmer.impl;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
@@ -12,11 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.swallow.web.manager.IPDescManager;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.IPDescService;
-import com.dianping.swallow.web.util.NetUtil;
 
 /**
  *
@@ -28,6 +23,8 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultProducerServiceAlarmer.class);
 
 	private static final String PEGION_PRODUCER_URL = "http://service.dianping.com/swallowService/producerService_1.0.0";
+
+	private static final String PEGION_PRODUCER_SPLIT = ",";
 
 	private ConfigCache configCache;
 
@@ -75,8 +72,9 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer {
 	public void doCheckService() {
 		Map<String, String> cmdbProducers = ipCollectorService.getCmdbProducers();
 		if (StringUtils.isNotBlank(producerServerValue)) {
-			String[] ips = producerServerValue.split(",");
+			String[] ips = producerServerValue.split(PEGION_PRODUCER_SPLIT);
 			if (ips != null) {
+			} else {
 
 			}
 

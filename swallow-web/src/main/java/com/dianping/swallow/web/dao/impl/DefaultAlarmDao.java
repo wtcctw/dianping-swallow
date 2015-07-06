@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
@@ -21,6 +22,8 @@ import com.mongodb.WriteResult;
  * @author qiyin
  *
  */
+
+@Service("alarmDao")
 public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultAlarmDao.class);

@@ -3,6 +3,8 @@ package com.dianping.swallow.web.service.impl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.dianping.swallow.web.dao.AlarmDao;
+import com.dianping.swallow.web.dao.impl.DefaultAlarmDao;
 import com.dianping.swallow.web.service.HttpService;
 
 /**
@@ -19,6 +21,8 @@ public class AlarmServiceImplTest {
 		alarmService = new AlarmServiceImpl();
 		HttpService httpService = new HttpServiceImpl();
 		alarmService.setHttpService(httpService);
+		AlarmDao alarmDao =new DefaultAlarmDao();
+		alarmService.setAlarmDao(alarmDao);
 	}
 
 	@Test
@@ -35,4 +39,5 @@ public class AlarmServiceImplTest {
 	public void sendWeiXinTest(){
 		alarmService.sendWeixin("qi.yin@dianping.com", "test", "test");
 	}
+	
 }

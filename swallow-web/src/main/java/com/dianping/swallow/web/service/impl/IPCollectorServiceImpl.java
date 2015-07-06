@@ -77,7 +77,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	@PostConstruct
 	public void startTask() {
-		future = scheduled.scheduleAtFixedRate(new Runnable() {
+		setFuture(scheduled.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {
@@ -90,7 +90,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 				}
 			}
 
-		}, getDelay(), getInterval(), TimeUnit.SECONDS);
+		}, getDelay(), getInterval(), TimeUnit.SECONDS));
 	}
 
 	private void doTask() {
@@ -239,6 +239,14 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	public int getDelay() {
 		return delay;
+	}
+
+	public ScheduledFuture<?> getFuture() {
+		return future;
+	}
+
+	public void setFuture(ScheduledFuture<?> future) {
+		this.future = future;
 	}
 
 

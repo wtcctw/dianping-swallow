@@ -6,10 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.IpDescDao;
-import com.dianping.swallow.web.model.Administrator;
-import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.mongodb.WriteResult;
 
@@ -18,6 +17,7 @@ import com.mongodb.WriteResult;
  * @author qi.yin
  *
  */
+@Service("ipDescDao")
 public class DefaultIpDescDao extends AbstractWriteDao implements IpDescDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultIpDescDao.class);

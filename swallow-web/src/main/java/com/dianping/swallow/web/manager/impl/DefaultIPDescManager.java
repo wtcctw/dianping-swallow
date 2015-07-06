@@ -51,7 +51,7 @@ public class DefaultIPDescManager implements IPDescManager {
 
 	@PostConstruct
 	public void startTask() {
-		future = scheduled.scheduleAtFixedRate(new Runnable() {
+		setFuture(scheduled.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {
@@ -64,7 +64,7 @@ public class DefaultIPDescManager implements IPDescManager {
 				}
 			}
 
-		}, getDelay(), getInterval(), TimeUnit.HOURS);
+		}, getDelay(), getInterval(), TimeUnit.HOURS));
 	}
 
 	private void doTask() {
@@ -112,6 +112,14 @@ public class DefaultIPDescManager implements IPDescManager {
 			ipDescService.insert(ipDesc);
 		}
 		return ipDesc;
+	}
+
+	public ScheduledFuture<?> getFuture() {
+		return future;
+	}
+
+	public void setFuture(ScheduledFuture<?> future) {
+		this.future = future;
 	}
 
 }

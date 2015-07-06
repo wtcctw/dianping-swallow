@@ -146,6 +146,10 @@ public class AlarmServiceImpl implements AlarmService {
 	public void setHttpService(HttpService httpService){
 		this.httpService = httpService;
 	}
+	
+	public void setAlarmDao(AlarmDao alarmDao){
+		this.alarmDao = alarmDao;
+	}
 
 	@Override
 	public boolean insert(Alarm alarm) {
@@ -181,5 +185,5 @@ public class AlarmServiceImpl implements AlarmService {
 	public List<Alarm> findAll() {
 		return alarmDao.findAll();
 	}
-
+	
 }
