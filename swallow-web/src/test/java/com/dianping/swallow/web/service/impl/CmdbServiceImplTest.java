@@ -5,7 +5,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.dianping.swallow.web.model.cmdb.IpDesc;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.HttpService;
 
 /**
@@ -26,7 +26,7 @@ public class CmdbServiceImplTest {
 
 	@Test
 	public void getIpDescTest() {
-		IpDesc ipDesc = cmdbService.getIpDesc("10.2.9.15");
+		IPDesc ipDesc = cmdbService.getIpDesc("10.2.9.15");
 		Assert.assertEquals("10.2.9.15", ipDesc.getIp());
 		Assert.assertEquals("swallow-producer", ipDesc.getName());
 		Assert.assertEquals("wenchao.meng@dianping.com", ipDesc.getEmail());

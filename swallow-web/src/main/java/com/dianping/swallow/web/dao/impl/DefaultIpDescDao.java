@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import com.dianping.swallow.web.dao.IpDescDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
-import com.dianping.swallow.web.model.cmdb.IpDesc;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.mongodb.WriteResult;
 
 /**
@@ -29,7 +29,7 @@ public class DefaultIpDescDao extends AbstractWriteDao implements IpDescDao {
 	private static final String ID_FIELD = "id";
 
 	@Override
-	public boolean insert(IpDesc ipDesc) {
+	public boolean insert(IPDesc ipDesc) {
 		try {
 			mongoTemplate.save(ipDesc, IPDESC_COLLECTION);
 			return true;
@@ -40,41 +40,41 @@ public class DefaultIpDescDao extends AbstractWriteDao implements IpDescDao {
 	}
 
 	@Override
-	public boolean update(IpDesc ipDesc) {
+	public boolean update(IPDesc ipDesc) {
 		return insert(ipDesc);
 	}
 
 	@Override
 	public int deleteById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, IpDesc.class, IPDESC_COLLECTION);
+		WriteResult result = mongoTemplate.remove(query, IPDesc.class, IPDESC_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
 	public int deleteByIp(String ip) {
 		Query query = new Query(Criteria.where(IP_FIELD).is(ip));
-		WriteResult result = mongoTemplate.remove(query, IpDesc.class, IPDESC_COLLECTION);
+		WriteResult result = mongoTemplate.remove(query, IPDesc.class, IPDESC_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
-	public IpDesc findByIp(String ip) {
+	public IPDesc findByIp(String ip) {
 		Query query = new Query(Criteria.where(IP_FIELD).is(ip));
-		IpDesc ipDesc = mongoTemplate.findOne(query, IpDesc.class, IPDESC_COLLECTION);
+		IPDesc ipDesc = mongoTemplate.findOne(query, IPDesc.class, IPDESC_COLLECTION);
 		return ipDesc;
 	}
 
 	@Override
-	public IpDesc findById(String id) {
+	public IPDesc findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		IpDesc ipDesc = mongoTemplate.findOne(query, IpDesc.class, IPDESC_COLLECTION);
+		IPDesc ipDesc = mongoTemplate.findOne(query, IPDesc.class, IPDESC_COLLECTION);
 		return ipDesc;
 	}
 
 	@Override
-	public List<IpDesc> findAll() {
-		return mongoTemplate.findAll(IpDesc.class, IPDESC_COLLECTION);
+	public List<IPDesc> findAll() {
+		return mongoTemplate.findAll(IPDesc.class, IPDESC_COLLECTION);
 	}
 
 }

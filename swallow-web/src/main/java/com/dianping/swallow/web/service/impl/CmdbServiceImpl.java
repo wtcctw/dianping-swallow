@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.model.cmdb.IpDesc;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
-import com.dianping.swallow.web.service.IpDescService;
+import com.dianping.swallow.web.service.IPDescService;
 
 /**
  * 
@@ -37,7 +37,7 @@ public class CmdbServiceImpl implements CmdbService {
 	private HttpService httpService;
 
 	@Autowired
-	private IpDescService ipDescService;
+	private IPDescService ipDescService;
 
 	private ObjectMapper objectMapper;
 
@@ -64,14 +64,14 @@ public class CmdbServiceImpl implements CmdbService {
 	}
 
 	@Override
-	public IpDesc getIpDesc(String ip) {
+	public IPDesc getIpDesc(String ip) {
 		String url = getRealUrl(ip);
 		HttpResult result = httpService.httpGet(url);
 		if (!result.isSuccess()) {
 			return null;
 		}
 		String content = result.getResponseBody();
-		IpDesc ipDesc = null;
+		IPDesc ipDesc = null;
 		try {
 			ipDesc = transformToIpDesc(content);
 			ipDesc.setIp(ip);
@@ -97,13 +97,13 @@ public class CmdbServiceImpl implements CmdbService {
 		this.httpService = httpService;
 	}
 
-	private IpDesc transformToIpDesc(String content) throws Exception {
+	private IPDesc transformToIpDesc(String content) throws Exception {
 		JsonNode rootNode = objectMapper.readTree(content);
 		JsonNode projectsNode = rootNode.path("projects");
 		JsonNode jsonNode = projectsNode.get(0);
-		IpDesc ipDesc = null;
+		IPDesc ipDesc = null;
 		if (jsonNode != null) {
-			ipDesc = new IpDesc();
+			ipDesc = new IPDesc();
 			ipDesc.setName(jsonNode.path("project_name").getTextValue());
 			ipDesc.setEmail(jsonNode.path("project_email").getTextValue());
 			ipDesc.setOpEmail(jsonNode.path("op_email").getTextValue());

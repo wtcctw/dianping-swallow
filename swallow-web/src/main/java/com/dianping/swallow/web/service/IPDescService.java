@@ -2,14 +2,14 @@ package com.dianping.swallow.web.service;
 
 import java.util.List;
 
-import com.dianping.swallow.web.model.cmdb.IpDesc;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 
 /**
  * 
  * @author qiyin
  *
  */
-public interface IpDescService extends SwallowService {
+public interface IPDescService extends SwallowService {
 	
 	/**
 	 * insert
@@ -17,7 +17,7 @@ public interface IpDescService extends SwallowService {
 	 * @param ipDesc
 	 * @return
 	 */
-	public boolean insert(IpDesc ipDesc);
+	public boolean insert(IPDesc ipDesc);
 
 	/**
 	 * update
@@ -25,7 +25,7 @@ public interface IpDescService extends SwallowService {
 	 * @param ipDesc
 	 * @return
 	 */
-	public boolean update(IpDesc ipDesc);
+	public boolean update(IPDesc ipDesc);
 
 	/**
 	 * delete by id
@@ -49,7 +49,7 @@ public interface IpDescService extends SwallowService {
 	 * @param ipDesc
 	 * @return
 	 */
-	public IpDesc findByIp(String ip);
+	public IPDesc findByIp(String ip);
 
 	/**
 	 * find by id
@@ -57,7 +57,7 @@ public interface IpDescService extends SwallowService {
 	 * @param ipDesc
 	 * @return
 	 */
-	public IpDesc findById(String id);
+	public IPDesc findById(String id);
 
 	/**
 	 * find all
@@ -65,6 +65,6 @@ public interface IpDescService extends SwallowService {
 	 * @param ipDesc
 	 * @return
 	 */
-	public List<IpDesc> findAll();
+	public List<IPDesc> findAll();
 
 }

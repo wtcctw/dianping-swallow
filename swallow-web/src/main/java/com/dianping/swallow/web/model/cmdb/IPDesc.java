@@ -2,7 +2,7 @@ package com.dianping.swallow.web.model.cmdb;
 
 import org.springframework.data.annotation.Id;
 
-public class IpDesc {
+public class IPDesc {
 
 	@Id
 	private String id;
@@ -117,7 +117,7 @@ public class IpDesc {
 
 	@Override
 	public String toString() {
-		return "IpDesc [id = " + id + ", ip = " + ip + ", name = " + name + ", email = " + email + ", opManager = "
+		return "IPDesc [id = " + id + ", ip = " + ip + ", name = " + name + ", email = " + email + ", opManager = "
 				+ opManager + ", opMobile = " + opMobile + ", opEmail = " + opEmail + ", dpManager = " + dpManager
 				+ ", dpMobile = " + dpMobile + ", createTime = " + createTime + ", updateTime = " + updateTime + "]";
 	}

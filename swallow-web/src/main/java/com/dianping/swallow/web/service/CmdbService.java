@@ -1,6 +1,6 @@
 package com.dianping.swallow.web.service;
 
-import com.dianping.swallow.web.model.cmdb.IpDesc;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 
 /**
  * 
@@ -14,6 +14,6 @@ public interface CmdbService {
 	 * @param ip
 	 * @return
 	 */
-	public IpDesc getIpDesc(String ip);
+	public IPDesc getIpDesc(String ip);
 	
 }

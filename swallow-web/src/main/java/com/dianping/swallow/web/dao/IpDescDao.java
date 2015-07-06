@@ -2,7 +2,7 @@ package com.dianping.swallow.web.dao;
 
 import java.util.List;
 
-import com.dianping.swallow.web.model.cmdb.IpDesc;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 
 /**
  * 
@@ -17,7 +17,7 @@ public interface IpDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public boolean insert(IpDesc ipDesc);
+	public boolean insert(IPDesc ipDesc);
 
 	/**
 	 * update
@@ -25,7 +25,7 @@ public interface IpDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public boolean update(IpDesc ipDesc);
+	public boolean update(IPDesc ipDesc);
 
 	/**
 	 * delete by id
@@ -49,7 +49,7 @@ public interface IpDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public IpDesc findByIp(String ip);
+	public IPDesc findByIp(String ip);
 
 	/**
 	 * find by id
@@ -57,7 +57,7 @@ public interface IpDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public IpDesc findById(String id);
+	public IPDesc findById(String id);
 
 	/**
 	 * find all
@@ -65,6 +65,6 @@ public interface IpDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public List<IpDesc> findAll();
+	public List<IPDesc> findAll();
 
 }

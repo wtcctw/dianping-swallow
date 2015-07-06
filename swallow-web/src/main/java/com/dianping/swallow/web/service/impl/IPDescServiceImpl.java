@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.IpDescDao;
-import com.dianping.swallow.web.model.cmdb.IpDesc;
-import com.dianping.swallow.web.service.IpDescService;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
+import com.dianping.swallow.web.service.IPDescService;
 
 /**
  * 
@@ -15,18 +15,18 @@ import com.dianping.swallow.web.service.IpDescService;
  *
  */
 @Service("ipDescService")
-public class IpDescServiceImpl implements IpDescService {
+public class IPDescServiceImpl implements IPDescService {
 
 	@Autowired
 	private IpDescDao ipDescDao;
 
 	@Override
-	public boolean insert(IpDesc ipDesc) {
+	public boolean insert(IPDesc ipDesc) {
 		return ipDescDao.insert(ipDesc);
 	}
 
 	@Override
-	public boolean update(IpDesc ipDesc) {
+	public boolean update(IPDesc ipDesc) {
 		return ipDescDao.update(ipDesc);
 	}
 
@@ -41,17 +41,17 @@ public class IpDescServiceImpl implements IpDescService {
 	}
 
 	@Override
-	public IpDesc findByIp(String ip) {
+	public IPDesc findByIp(String ip) {
 		return ipDescDao.findByIp(ip);
 	}
 
 	@Override
-	public IpDesc findById(String id) {
+	public IPDesc findById(String id) {
 		return ipDescDao.findById(id);
 	}
 
 	@Override
-	public List<IpDesc> findAll() {
+	public List<IPDesc> findAll() {
 		return ipDescDao.findAll();
 	}
 

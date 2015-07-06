@@ -12,6 +12,11 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.alarmer.Alarmer;
 
+/**
+*
+* @author qiyin
+*
+*/
 public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarmer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAlarmer.class);
