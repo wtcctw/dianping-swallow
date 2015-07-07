@@ -4,7 +4,7 @@ public class ConsumerIdStatisData {
 	
 	private String consumerId;
 	
-	private ConsumerClientBaseStatisData statisData;
+	private ConsumerBaseStatisData statisData;
 	
 	private ConsumerClientMachineStatisData machineStatisDatas;
 

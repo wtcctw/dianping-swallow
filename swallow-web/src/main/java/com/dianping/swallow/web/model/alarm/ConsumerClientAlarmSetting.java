@@ -11,7 +11,7 @@ public class ConsumerClientAlarmSetting {
 
 	private String consumerIdWhiteList;
 
-	private ConsumerClientBaseAlarmSetting consumerIdDefaultSetting;
+	private ConsumerBaseAlarmSetting consumerIdDefaultSetting;
 
 	private List<ConsumerIdAlarmSetting> consumerIdSettings;
 

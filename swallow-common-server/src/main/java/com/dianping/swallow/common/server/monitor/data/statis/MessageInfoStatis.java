@@ -36,7 +36,6 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 		if(!(rawAdded instanceof MessageInfo)){
 			throw new IllegalArgumentException("not MessageInfo, but " + rawAdded.getClass());
 		}
-		
 		MessageInfo added = null;
 		try {
 			added = (MessageInfo) rawAdded.clone();

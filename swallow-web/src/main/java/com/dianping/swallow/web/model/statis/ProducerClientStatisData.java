@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ProducerClientStatisData {
 	
-	private ProducerClientBaseStatisData statisData;
+	private ProducerBaseStatisData statisData;
 	
 	private List<ProducerClientMachineStatisData> machineStatisDatas;
 

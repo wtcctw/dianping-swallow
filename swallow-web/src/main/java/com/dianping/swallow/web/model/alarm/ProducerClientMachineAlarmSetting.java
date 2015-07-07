@@ -9,7 +9,7 @@ public class ProducerClientMachineAlarmSetting {
 
 	private String ip;
 
-	private ProducerClientBaseAlarmSetting baseSetting;
+	private ProducerBaseAlarmSetting baseSetting;
 
 	public String getIp() {
 		return ip;
@@ -19,11 +19,11 @@ public class ProducerClientMachineAlarmSetting {
 		this.ip = ip;
 	}
 
-	public ProducerClientBaseAlarmSetting getBaseSetting() {
+	public ProducerBaseAlarmSetting getBaseSetting() {
 		return baseSetting;
 	}
 
-	public void setBaseSetting(ProducerClientBaseAlarmSetting baseSetting) {
+	public void setBaseSetting(ProducerBaseAlarmSetting baseSetting) {
 		this.baseSetting = baseSetting;
 	}
 

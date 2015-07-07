@@ -9,7 +9,7 @@ public class ConsumerClientMachineAlarmSetting {
 
 	private String ip;
 
-	private ConsumerClientBaseAlarmSetting baseSetting;
+	private ConsumerBaseAlarmSetting baseSetting;
 
 	public String getIp() {
 		return ip;
@@ -19,11 +19,11 @@ public class ConsumerClientMachineAlarmSetting {
 		this.ip = ip;
 	}
 
-	public ConsumerClientBaseAlarmSetting getBaseSetting() {
+	public ConsumerBaseAlarmSetting getBaseSetting() {
 		return baseSetting;
 	}
 
-	public void setBaseSetting(ConsumerClientBaseAlarmSetting baseSetting) {
+	public void setBaseSetting(ConsumerBaseAlarmSetting baseSetting) {
 		this.baseSetting = baseSetting;
 	}
 

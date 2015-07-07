@@ -5,7 +5,7 @@ package com.dianping.swallow.web.model.alarm;
  * @author qiyin
  *
  */
-public class ConsumerClientBaseAlarmSetting {
+public class ConsumerBaseAlarmSetting {
 
 	private QPSAlarmSetting senderQpsAlarmSetting;
 

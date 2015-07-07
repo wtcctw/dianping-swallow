@@ -5,19 +5,11 @@ package com.dianping.swallow.web.model.alarm;
  * @author qiyin
  *
  */
-public class ServerMachineAlarmSetting {
-
-	private String ip;
+public class ProducerBaseAlarmSetting {
 
 	private QPSAlarmSetting qpsAlarmSetting;
 
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
+	private long delay;
 
 	public QPSAlarmSetting getQpsAlarmSetting() {
 		return qpsAlarmSetting;
@@ -27,9 +19,16 @@ public class ServerMachineAlarmSetting {
 		this.qpsAlarmSetting = qpsAlarmSetting;
 	}
 
-	@Override
-	public String toString() {
-		return "ServerMachineAlarmSetting [ip = " + ip + ", qpsAlarmSetting = " + qpsAlarmSetting + "]";
+	public long getDelay() {
+		return delay;
 	}
 
+	public void setDelay(long delay) {
+		this.delay = delay;
+	}
+
+	@Override
+	public String toString() {
+		return "ProducerClientBaseAlarmSetting [ qpsAlarmSetting = " + qpsAlarmSetting + ", delay = " + delay + "]";
+	}
 }

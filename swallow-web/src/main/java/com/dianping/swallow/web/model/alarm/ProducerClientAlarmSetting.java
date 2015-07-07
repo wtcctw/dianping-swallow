@@ -11,7 +11,7 @@ public class ProducerClientAlarmSetting {
 
 	private String machineWhiteList;
 
-	private ProducerClientBaseAlarmSetting machineDefaultSetting;
+	private ProducerBaseAlarmSetting machineDefaultSetting;
 
 	private List<ProducerClientMachineAlarmSetting> machineSettings;
 
@@ -31,11 +31,11 @@ public class ProducerClientAlarmSetting {
 		this.machineWhiteList = machineWhiteList;
 	}
 
-	public ProducerClientBaseAlarmSetting getMachineDefaultSetting() {
+	public ProducerBaseAlarmSetting getMachineDefaultSetting() {
 		return machineDefaultSetting;
 	}
 
-	public void setMachineDefaultSetting(ProducerClientBaseAlarmSetting machineDefaultSetting) {
+	public void setMachineDefaultSetting(ProducerBaseAlarmSetting machineDefaultSetting) {
 		this.machineDefaultSetting = machineDefaultSetting;
 	}
 

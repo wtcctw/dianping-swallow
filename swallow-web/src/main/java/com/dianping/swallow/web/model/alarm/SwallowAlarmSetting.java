@@ -11,11 +11,11 @@ public class SwallowAlarmSetting {
 
 	private String produceWhiteList;
 
-	private QPSAlarmSetting producerDefaultSetting;
+	private ProducerBaseAlarmSetting producerDefaultSetting;
 
 	private String consumerWhiteList;
 
-	private QPSAlarmSetting consumerDefaultSetting;
+	private ConsumerBaseAlarmSetting consumerDefaultSetting;
 
 	private Date createTime;
 
@@ -61,11 +61,11 @@ public class SwallowAlarmSetting {
 		this.produceWhiteList = produceWhiteList;
 	}
 
-	public QPSAlarmSetting getProducerDefaultSetting() {
+	public ProducerBaseAlarmSetting getProducerDefaultSetting() {
 		return producerDefaultSetting;
 	}
 
-	public void setProducerDefaultSetting(QPSAlarmSetting producerDefaultSetting) {
+	public void setProducerDefaultSetting(ProducerBaseAlarmSetting producerDefaultSetting) {
 		this.producerDefaultSetting = producerDefaultSetting;
 	}
 
@@ -77,11 +77,11 @@ public class SwallowAlarmSetting {
 		this.consumerWhiteList = consumerWhiteList;
 	}
 
-	public QPSAlarmSetting getConsumerDefaultSetting() {
+	public ConsumerBaseAlarmSetting getConsumerDefaultSetting() {
 		return consumerDefaultSetting;
 	}
 
-	public void setConsumerDefaultSetting(QPSAlarmSetting consumerDefaultSetting) {
+	public void setConsumerDefaultSetting(ConsumerBaseAlarmSetting consumerDefaultSetting) {
 		this.consumerDefaultSetting = consumerDefaultSetting;
 	}
 

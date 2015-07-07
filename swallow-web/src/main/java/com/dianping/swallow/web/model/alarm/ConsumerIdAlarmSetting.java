@@ -8,7 +8,7 @@ public class ConsumerIdAlarmSetting {
 
 	private String machineWhiteList;
 
-	private ConsumerClientBaseAlarmSetting machineDefalutSetting;
+	private ConsumerBaseAlarmSetting machineDefalutSetting;
 
 	private List<ConsumerClientMachineAlarmSetting> machineSettings;
 

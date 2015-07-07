@@ -18,7 +18,7 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.web.monitor.Retriever;
-import com.dianping.swallow.web.monitor.StatisListener;
+import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 
@@ -28,8 +28,6 @@ import com.dianping.swallow.web.monitor.StatsDataDesc;
  *         2015年5月28日 下午3:02:25
  */
 public abstract class AbstractRetriever extends AbstractLifecycle implements Retriever {
-
-	List<StatisListener> statisListener = new ArrayList<StatisListener>();
 
 	protected final int DEFAULT_INTERVAL = 30;// 每隔多少秒采样
 
@@ -107,7 +105,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return false;
 	}
 
-	protected static Long getKey(long timeMili) {
+	public static Long getKey(long timeMili) {
 
 		return timeMili / AbstractCollector.SEND_INTERVAL / 1000;
 	}
@@ -198,5 +196,5 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getSampleIntervalTime());
 	}
-
+	
 }

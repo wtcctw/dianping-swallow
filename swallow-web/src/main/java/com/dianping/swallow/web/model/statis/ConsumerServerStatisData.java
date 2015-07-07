@@ -1,5 +1,11 @@
 package com.dianping.swallow.web.model.statis;
 
-public class ConsumerServerStatisData extends ServerStatisData {
+import java.util.List;
+
+public class ConsumerServerStatisData extends AbstractServerStatisData{
+	
+	private ConsumerBaseStatisData statisData;
+	
+	private List<ConsumerClientMachineStatisData> machineStatisDatas;
 
 }

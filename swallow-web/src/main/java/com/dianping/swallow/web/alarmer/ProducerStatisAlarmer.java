@@ -6,9 +6,9 @@ package com.dianping.swallow.web.alarmer;
  *
  */
 public interface ProducerStatisAlarmer extends Alarmer {
-	public void doServerQPSAlarm();
+	public void doServerQpsAlarm();
 
-	public void doTopicQPSAlarm();
+	public void doTopicQpsAlarm();
 
 	public void doServerDelayAlarm();
 

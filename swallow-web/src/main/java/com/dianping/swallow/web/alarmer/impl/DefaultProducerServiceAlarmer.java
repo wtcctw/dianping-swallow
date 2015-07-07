@@ -11,6 +11,7 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.swallow.web.alarmer.ProducerServiceAlarmer;
 import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
 
@@ -19,6 +20,7 @@ import com.dianping.swallow.web.service.IPCollectorService;
  * @author qiyin
  *
  */
+
 public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer implements ProducerServiceAlarmer{
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultProducerServiceAlarmer.class);
@@ -39,7 +41,7 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer implem
 
 	@Autowired
 	private IPDescManager ipDescManager;
-
+	
 	@Override
 	public void doInitialize() throws Exception {
 		super.doInitialize();

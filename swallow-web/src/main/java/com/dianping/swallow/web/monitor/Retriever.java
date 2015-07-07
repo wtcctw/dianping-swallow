@@ -14,5 +14,5 @@ public interface Retriever {
 	Set<String>  getTopics();
 
 	Set<String>  getTopics(long start, long end);
-
+	
 }

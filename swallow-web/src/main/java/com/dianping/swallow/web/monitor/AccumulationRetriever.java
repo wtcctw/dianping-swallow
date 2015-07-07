@@ -14,5 +14,7 @@ public interface AccumulationRetriever extends Retriever{
 	Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end);
 	
 	Map<String, StatsData> getAccumulationForAllConsumerId(String topic);
+	
+	void registerListener(AccumulationListener listener);
 
 }

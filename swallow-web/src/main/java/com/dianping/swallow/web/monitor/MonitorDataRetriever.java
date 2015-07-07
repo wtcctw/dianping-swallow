@@ -1,17 +1,20 @@
 package com.dianping.swallow.web.monitor;
 
-
-
+import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * @author mengwenchao
  *
- * 2015年4月21日 上午10:38:07
+ *         2015年4月21日 上午10:38:07
  */
-public interface MonitorDataRetriever extends Retriever{
+public interface MonitorDataRetriever extends Retriever {
 
 	void add(MonitorData monitorData);
-	
+
 	String getDebugInfo(String server);
+	
+	void registerListener(MonitorDataListener listener);
+	
+	public AbstractAllData getAlldata();
 }

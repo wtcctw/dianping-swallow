@@ -1,7 +1,11 @@
 package com.dianping.swallow.web.model.statis;
 
+import java.util.List;
+
 public class ConsumerClientStatisData {
 	
-	private ConsumerClientBaseStatisData statisData;
+	private ConsumerBaseStatisData statisData;
+	
+	private List<ConsumerIdStatisData> consumerIdStatisDatas;
 	
 }

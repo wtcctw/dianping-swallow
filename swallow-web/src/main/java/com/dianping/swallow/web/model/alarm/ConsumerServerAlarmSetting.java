@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model.alarm;
 
+import java.util.List;
+
 /**
  * 
  * @author qiyin
@@ -7,19 +9,29 @@ package com.dianping.swallow.web.model.alarm;
  */
 public class ConsumerServerAlarmSetting extends AbstractServerAlarmSetting{
 
-	private ConsumerClientBaseAlarmSetting topicDefaultSetting;
+	private ConsumerBaseAlarmSetting topicDefaultSetting;
+	
+	private List<ConsumerServerMachineAlarmSetting> machineAlarmSettings;
 
-	public ConsumerClientBaseAlarmSetting getTopicDefaultSetting() {
+	public ConsumerBaseAlarmSetting getTopicDefaultSetting() {
 		return topicDefaultSetting;
 	}
 
-	public void setTopicDefaultSetting(ConsumerClientBaseAlarmSetting topicDefaultSetting) {
+	public void setTopicDefaultSetting(ConsumerBaseAlarmSetting topicDefaultSetting) {
 		this.topicDefaultSetting = topicDefaultSetting;
 	}
 	
 	@Override
 	public String toString() {
 		return "ConsumerServerAlarmSetting [topicDefaultSetting = " + topicDefaultSetting + " ]";
+	}
+
+	public List<ConsumerServerMachineAlarmSetting> getMachineAlarmSettings() {
+		return machineAlarmSettings;
+	}
+
+	public void setMachineAlarmSettings(List<ConsumerServerMachineAlarmSetting> machineAlarmSettings) {
+		this.machineAlarmSettings = machineAlarmSettings;
 	}
 	
 }

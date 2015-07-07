@@ -1,9 +1,8 @@
 package com.dianping.swallow.web.model.statis;
 
-public class ConsumerClientMachineStatisData {
-	
-	private String ip;
-	
+public class ConsumerServerMachineStatisData {
+
 	private ConsumerBaseStatisData statisData;
 
+	private String ip;
 }

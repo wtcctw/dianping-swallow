@@ -17,25 +17,14 @@ public abstract class AbstractServerAlarmSetting {
 
 	private String topicWhiteList;
 
-	private List<ServerMachineAlarmSetting> machineAlarmSettings;
-
 	private Date createTime;
 
 	private Date updateTime;
 
-	public List<ServerMachineAlarmSetting> getMachineAlarmSettings() {
-		return machineAlarmSettings;
-	}
-
-	public void setMachineAlarmSettings(List<ServerMachineAlarmSetting> machineAlarmSettings) {
-		this.machineAlarmSettings = machineAlarmSettings;
-	}
-
 	@Override
 	public String toString() {
-		return "AbstractServerAlarmSetting [id = " + id + ", topicWhiteList = " + topicWhiteList
-				+ ", machineAlarmSettings = " + machineAlarmSettings + ", createTime = " + createTime
-				+ ", updateTime = " + updateTime + "]";
+		return "AbstractServerAlarmSetting [id = " + id + ", topicWhiteList = " + topicWhiteList + ", createTime = "
+				+ createTime + ", updateTime = " + updateTime + "]";
 	}
 
 	public String getId() {

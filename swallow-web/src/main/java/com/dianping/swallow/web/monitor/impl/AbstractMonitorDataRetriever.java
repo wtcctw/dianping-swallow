@@ -2,7 +2,9 @@ package com.dianping.swallow.web.monitor.impl;
 
 
 import java.util.Map.Entry;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
@@ -21,6 +23,7 @@ import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractTotalMapStatisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
@@ -32,7 +35,9 @@ import com.dianping.swallow.web.monitor.StatsDataDesc;
  */
 public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extends TotalMap<M>, S extends AbstractTotalMapStatisable<M, T>, V extends MonitorData> 
 				extends AbstractRetriever 
-		implements MonitorDataRetriever{
+		implements MonitorDataRetriever {
+	
+	private List<MonitorDataListener> statisListeners = new ArrayList<MonitorDataListener>();
 	
 	protected AbstractAllData<M, T, S, V> statis; 
 	
@@ -69,7 +74,8 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 				statis.build(QPX.SECOND, getKey(lastBuildTime), getKey(current), intervalCount);
 			}
 		});
-		
+		//通知监听者
+		doNotify();
 	}
 
 	
@@ -173,4 +179,20 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 			}
 		});
 	}
+	
+	@Override
+	public void registerListener(MonitorDataListener statisListener){
+		statisListeners.add(statisListener);
+	}
+	
+	protected void doNotify(){
+		for(MonitorDataListener statisListener: statisListeners){
+			statisListener.achieveMonitorData();
+		}
+	}
+	
+	public AbstractAllData getAlldata(){
+		return statis;
+	}
+	
 }
