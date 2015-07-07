@@ -19,7 +19,7 @@ public class TopicAlarmSetting {
 
 	private ProducerClientAlarmSetting producerSetting;
 
-	private List<ConsumerClientAlarmSetting> consumerSettings;
+	private ConsumerClientAlarmSetting consumerSetting;
 
 	private Date createTime;
 
@@ -39,14 +39,6 @@ public class TopicAlarmSetting {
 
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
-	}
-
-	public List<ConsumerClientAlarmSetting> getConsumerSettings() {
-		return consumerSettings;
-	}
-
-	public void setConsumerSettings(List<ConsumerClientAlarmSetting> consumerSettings) {
-		this.consumerSettings = consumerSettings;
 	}
 
 	public ProducerClientAlarmSetting getProducerSetting() {
@@ -73,10 +65,18 @@ public class TopicAlarmSetting {
 		this.updateTime = updateTime;
 	}
 
+	public ConsumerClientAlarmSetting getConsumerSetting() {
+		return consumerSetting;
+	}
+
+	public void setConsumerSetting(ConsumerClientAlarmSetting consumerSetting) {
+		this.consumerSetting = consumerSetting;
+	}
+	
 	@Override
 	public String toString() {
 		return "TopicAlarmSetting [ id = " + id + ",topicName = " + topicName + ", producerSetting = "
-				+ producerSetting + ", consumerSettings = " + consumerSettings + ", createTime = " + createTime
+				+ producerSetting + ", consumerSetting = " + consumerSetting + ", createTime = " + createTime
 				+ ", updateTime = " + updateTime + "]";
 	}
 }

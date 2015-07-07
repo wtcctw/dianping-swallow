@@ -8,20 +8,12 @@ import java.util.List;
  *
  */
 public class ProducerClientAlarmSetting {
-	
-	private String whiteList;
 
-	private ProducerClientBaseAlarmSetting baseSetting;
+	private String machineWhiteList;
+
+	private ProducerClientBaseAlarmSetting machineDefaultSetting;
 
 	private List<ProducerClientMachineAlarmSetting> machineSettings;
-
-	public ProducerClientBaseAlarmSetting getBaseSetting() {
-		return baseSetting;
-	}
-
-	public void setBaseSettings(ProducerClientBaseAlarmSetting baseSetting) {
-		this.baseSetting = baseSetting;
-	}
 
 	public List<ProducerClientMachineAlarmSetting> getMachineSettings() {
 		return machineSettings;
@@ -30,19 +22,27 @@ public class ProducerClientAlarmSetting {
 	public void setMachineSettings(List<ProducerClientMachineAlarmSetting> machineSettings) {
 		this.machineSettings = machineSettings;
 	}
-	
+
+	public String getMachineWhiteList() {
+		return machineWhiteList;
+	}
+
+	public void setMachineWhiteList(String machineWhiteList) {
+		this.machineWhiteList = machineWhiteList;
+	}
+
+	public ProducerClientBaseAlarmSetting getMachineDefaultSetting() {
+		return machineDefaultSetting;
+	}
+
+	public void setMachineDefaultSetting(ProducerClientBaseAlarmSetting machineDefaultSetting) {
+		this.machineDefaultSetting = machineDefaultSetting;
+	}
+
 	@Override
 	public String toString() {
-		return "ProducerClientAlarmSetting [whiteList = " + whiteList + ", baseSetting = " + baseSetting + ", machineSettings = " + machineSettings
-				+ "]";
-	}
-
-	public String getWhiteList() {
-		return whiteList;
-	}
-
-	public void setWhiteList(String whiteList) {
-		this.whiteList = whiteList;
+		return "ProducerClientAlarmSetting [ machineWhiteList = " + machineWhiteList + ", machineDefaultSetting = "
+				+ machineDefaultSetting + ", machineSettings = " + machineSettings + "]";
 	}
 
 }

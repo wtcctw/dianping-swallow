@@ -1,6 +1,9 @@
 package com.dianping.swallow.web.model.alarm;
 
+import java.util.Date;
 import java.util.List;
+
+import org.springframework.data.annotation.Id;
 
 /**
  * 
@@ -9,19 +12,16 @@ import java.util.List;
  */
 public abstract class AbstractServerAlarmSetting {
 
-	private String whiteList;
+	@Id
+	private String id;
 
-	private QPSAlarmSetting qpsAlarmSetting;
+	private String topicWhiteList;
 
 	private List<ServerMachineAlarmSetting> machineAlarmSettings;
 
-	public QPSAlarmSetting getQpsAlarmSetting() {
-		return qpsAlarmSetting;
-	}
+	private Date createTime;
 
-	public void setQpsAlarmSetting(QPSAlarmSetting qpsAlarmSetting) {
-		this.qpsAlarmSetting = qpsAlarmSetting;
-	}
+	private Date updateTime;
 
 	public List<ServerMachineAlarmSetting> getMachineAlarmSettings() {
 		return machineAlarmSettings;
@@ -33,15 +33,41 @@ public abstract class AbstractServerAlarmSetting {
 
 	@Override
 	public String toString() {
-		return "AbstractServerAlarmSetting [whiteList = " + whiteList + ", qpsAlarmSetting = " + qpsAlarmSetting
-				+ ", machineAlarmSettings = " + machineAlarmSettings + "]";
+		return "AbstractServerAlarmSetting [id = " + id + ", topicWhiteList = " + topicWhiteList
+				+ ", machineAlarmSettings = " + machineAlarmSettings + ", createTime = " + createTime
+				+ ", updateTime = " + updateTime + "]";
 	}
 
-	public String getWhiteList() {
-		return whiteList;
+	public String getId() {
+		return id;
 	}
 
-	public void setWhiteList(String whiteList) {
-		this.whiteList = whiteList;
+	public void setId(String id) {
+		this.id = id;
 	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public String getTopicWhiteList() {
+		return topicWhiteList;
+	}
+
+	public void setTopicWhiteList(String topicWhiteList) {
+		this.topicWhiteList = topicWhiteList;
+	}
+
 }

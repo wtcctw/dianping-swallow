@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.alarmer.ConsumerServiceAlarmer;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
@@ -19,7 +20,7 @@ import com.dianping.swallow.web.util.NetUtil;
  *
  */
 @Service
-public class DefaultConsumerServiceAlarmer extends AbstractServiceAlarmer {
+public class DefaultConsumerServiceAlarmer extends AbstractServiceAlarmer implements ConsumerServiceAlarmer{
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultConsumerServiceAlarmer.class);
 
@@ -43,6 +44,14 @@ public class DefaultConsumerServiceAlarmer extends AbstractServiceAlarmer {
 
 	@Autowired
 	private AlarmService alarmService;
+	
+	@Override
+	public void doAlarm(){
+		doCheckProcess();
+		doCheckPort();
+		doCheckService();
+		doCheckSender();
+	}
 
 	@Override
 	public void doCheckProcess() {

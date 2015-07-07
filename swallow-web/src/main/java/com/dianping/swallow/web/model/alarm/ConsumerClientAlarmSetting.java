@@ -8,50 +8,18 @@ import java.util.List;
  *
  */
 public class ConsumerClientAlarmSetting {
-	
-	private String whiteList;
 
-	private String consumerId;
+	private String consumerIdWhiteList;
 
-	ConsumerClientBaseAlarmSetting baseSetting;
+	private ConsumerClientBaseAlarmSetting consumerIdDefaultSetting;
 
-	private List<ConsumerClientMachineAlarmSetting> machineSettings;
-
-	public String getConsumerId() {
-		return consumerId;
-	}
-
-	public void setConsumerId(String consumerId) {
-		this.consumerId = consumerId;
-	}
-
-	public ConsumerClientBaseAlarmSetting getAlarmSetting() {
-		return baseSetting;
-	}
-
-	public void setAlarmSetting(ConsumerClientBaseAlarmSetting baseSetting) {
-		this.baseSetting = baseSetting;
-	}
-
-	public List<ConsumerClientMachineAlarmSetting> getMachineSettings() {
-		return machineSettings;
-	}
-
-	public void setMachineSettings(List<ConsumerClientMachineAlarmSetting> machineSettings) {
-		this.machineSettings = machineSettings;
-	}
+	private List<ConsumerIdAlarmSetting> consumerIdSettings;
 
 	@Override
 	public String toString() {
-		return "ConsumerClientAlarmSetting [whiteList = " + whiteList + ", consumerId = " + consumerId + ", baseSetting = " + baseSetting
-				+ ", machineSettings = " + machineSettings + "]";
+		return "ConsumerClientAlarmSetting [consumerIdWhiteList = " + consumerIdWhiteList
+				+ ", consumerIdDefaultSetting = " + consumerIdDefaultSetting + ", consumerIdSettings = "
+				+ consumerIdSettings + "]";
 	}
 
-	public String getWhiteList() {
-		return whiteList;
-	}
-
-	public void setWhiteList(String whiteList) {
-		this.whiteList = whiteList;
-	}
 }
