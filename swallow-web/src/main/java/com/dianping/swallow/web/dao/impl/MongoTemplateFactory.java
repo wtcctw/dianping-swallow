@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.WriteResultChecking;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
@@ -21,6 +20,8 @@ import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 
@@ -73,25 +74,37 @@ public class MongoTemplateFactory {
 		
 		//create collection
 		
-		int size = Integer.parseInt(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionSize"));
-		int max =  Integer.parseInt(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionMaxDocNum"));
+		long size = Long.parseLong(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionSize"));
+		long max =  Long.parseLong(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionMaxDocNum"));
 		createCappedCollection(statisMongoTemplate, ProducerMonitorData.class.getSimpleName(), size, max);
 		createCappedCollection(statisMongoTemplate, ConsumerMonitorData.class.getSimpleName(), size, max);
 		
 		return statisMongoTemplate;
 	}
 
-	private synchronized void createCappedCollection(MongoTemplate mongoTemplate, String collectionName, int size, int max) {
+	private synchronized void createCappedCollection(MongoTemplate mongoTemplate, String collectionName, long size, long max) {
 		
 		if(!mongoTemplate.collectionExists(collectionName)){			
 			if(logger.isInfoEnabled()){
 				logger.info("[createCappedCollection][createCollection]" + collectionName + ",size:" + size + ",max:" + max);
 			}
-			CollectionOptions options = new CollectionOptions(size * AbstractSwallowConfig.MILLION, max * AbstractSwallowConfig.MILLION, true);
-			mongoTemplate.createCollection(collectionName, options);
+			mongoTemplate.getDb().createCollection(collectionName, getCappedOptions(size, max));
 		}
 		
 		
+	}
+
+	private DBObject getCappedOptions(long size, long max) {
+
+		DBObject options = new BasicDBObject();
+		if (size > 0) {
+			options.put("capped", true);
+			options.put("size", size * AbstractSwallowConfig.MILLION);
+			if (max > 0) {
+				options.put("max", max * AbstractSwallowConfig.MILLION);
+			}
+		}
+		return options;
 	}
 
 	@Bean(name = "topicMongoTemplate")

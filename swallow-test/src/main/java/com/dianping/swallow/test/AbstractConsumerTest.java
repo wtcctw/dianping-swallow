@@ -19,8 +19,10 @@ public abstract class AbstractConsumerTest extends AbstractSwallowTest{
 	@Before
 	public void beforeAbstractConsumerTest() throws SendFailedException, RemoteServiceInitFailedException{
 		
-		mdao.cleanMessage(topic, getConsumerId());
-		mdao.cleanMessage(topic, null);
+		if(isCleanData()){
+			mdao.cleanMessage(topic, getConsumerId());
+			mdao.cleanMessage(topic, null);
+		}
 		
 		ackdao.clean(topic, getConsumerId());
 		ackdao.clean(topic, getConsumerId(), true);
@@ -31,6 +33,12 @@ public abstract class AbstractConsumerTest extends AbstractSwallowTest{
 	}
 
 	
+
+	protected boolean isCleanData() {
+		return true;
+	}
+
+
 
 	protected String getConsumerId() {
 		
