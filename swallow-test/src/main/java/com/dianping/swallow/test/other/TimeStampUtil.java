@@ -1,10 +1,12 @@
 package com.dianping.swallow.test.other;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import org.bson.types.BSONTimestamp;
 import org.junit.Test;
 
+import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 
 /**
@@ -29,6 +31,15 @@ public class TimeStampUtil {
 		
 		Long cur = MongoUtils.getLongByCurTime();
 		print(cur);
+	}
+	
+	
+	@Test
+	public void testTimeStampToId() throws ParseException{
+		
+		Date date = DateUtils.fromSimpleFormat("20150706134900");
+		System.out.println(date.getTime()/5000L);
+		
 	}
 
 	private void print(Long id) {

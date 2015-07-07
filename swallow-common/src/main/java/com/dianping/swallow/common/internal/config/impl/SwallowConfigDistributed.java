@@ -91,6 +91,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		
 		checkNewConfig = new Thread(this);
 		checkNewConfig.setName("SwallowConfigDistributed-checkNewConfig");
+		checkNewConfig.setDaemon(true);
 		checkNewConfig.start();
 	}
 
