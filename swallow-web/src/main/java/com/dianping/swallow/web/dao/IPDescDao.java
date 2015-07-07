@@ -9,7 +9,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
  * @author qi.yin
  *
  */
-public interface IpDescDao extends Dao {
+public interface IPDescDao extends Dao {
 
 	/**
 	 * insert

@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.dao.IpDescDao;
+import com.dianping.swallow.web.dao.IPDescDao;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.mongodb.WriteResult;
 
@@ -18,9 +18,9 @@ import com.mongodb.WriteResult;
  *
  */
 @Service("ipDescDao")
-public class DefaultIpDescDao extends AbstractWriteDao implements IpDescDao {
+public class DefaultIPDescDao extends AbstractWriteDao implements IPDescDao {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultIpDescDao.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultIPDescDao.class);
 
 	private static final String IPDESC_COLLECTION = "swallowwebipdescc";
 

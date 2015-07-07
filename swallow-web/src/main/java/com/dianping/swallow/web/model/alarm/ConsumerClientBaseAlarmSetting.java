@@ -7,21 +7,15 @@ package com.dianping.swallow.web.model.alarm;
  */
 public class ConsumerClientBaseAlarmSetting {
 
-	private QPSAlarmSetting qpsAlarmSetting;
+	private QPSAlarmSetting senderQpsAlarmSetting;
+
+	private QPSAlarmSetting ackQpsAlarmSetting;
 
 	private long senderDelay;
 
 	private long ackDelay;
 
 	private long accumulation;
-
-	public QPSAlarmSetting getQpsAlarmSetting() {
-		return qpsAlarmSetting;
-	}
-
-	public void setQpsAlarmSetting(QPSAlarmSetting qpsAlarmSetting) {
-		this.qpsAlarmSetting = qpsAlarmSetting;
-	}
 
 	public long getSenderDelay() {
 		return senderDelay;
@@ -41,8 +35,9 @@ public class ConsumerClientBaseAlarmSetting {
 
 	@Override
 	public String toString() {
-		return "ConsumerClientBaseAlarmSetting [qpsAlarmSetting = " + qpsAlarmSetting + ",senderDelay = "
-				+ senderDelay + ", ackDelay = " + ackDelay + ", accumulation = " + accumulation + "]";
+		return "ConsumerClientBaseAlarmSetting [senderQpsAlarmSetting = " + senderQpsAlarmSetting
+				+ ", ackQpsAlarmSetting = " + ackQpsAlarmSetting + ", senderDelay = " + senderDelay + ", ackDelay = "
+				+ ackDelay + ", accumulation = " + accumulation + "]";
 	}
 
 	public long getAccumulation() {
@@ -51,5 +46,21 @@ public class ConsumerClientBaseAlarmSetting {
 
 	public void setAccumulation(long accumulation) {
 		this.accumulation = accumulation;
+	}
+
+	public QPSAlarmSetting getSenderQpsAlarmSetting() {
+		return senderQpsAlarmSetting;
+	}
+
+	public void setSenderQpsAlarmSetting(QPSAlarmSetting senderQpsAlarmSetting) {
+		this.senderQpsAlarmSetting = senderQpsAlarmSetting;
+	}
+
+	public QPSAlarmSetting getAckQpsAlarmSetting() {
+		return ackQpsAlarmSetting;
+	}
+
+	public void setAckQpsAlarmSetting(QPSAlarmSetting ackQpsAlarmSetting) {
+		this.ackQpsAlarmSetting = ackQpsAlarmSetting;
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.dao.IpDescDao;
+import com.dianping.swallow.web.dao.IPDescDao;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.IPDescService;
 
@@ -18,7 +18,7 @@ import com.dianping.swallow.web.service.IPDescService;
 public class IPDescServiceImpl implements IPDescService {
 
 	@Autowired
-	private IpDescDao ipDescDao;
+	private IPDescDao ipDescDao;
 
 	@Override
 	public boolean insert(IPDesc ipDesc) {
