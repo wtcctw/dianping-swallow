@@ -1,5 +1,6 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
+
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 
@@ -11,6 +12,7 @@ import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
+import com.dianping.swallow.common.server.monitor.visitor.impl.GetResultVisitor;
 
 /**
  * @author mengwenchao
@@ -28,9 +30,25 @@ public class ProducerServerDataTest extends AbstractServerDataTest{
 		
 		producerAllData = new ProducerAllData();
 		prepareData(producerAllData);
-		System.out.println(producerAllData.toString());
 		producerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
-		System.out.println(producerAllData.toString());
+	}
+	
+	
+	@Test
+	public void testVisitor(){
+		
+		String server = ips[0];
+		String topic = topics[0];
+		String ip = ips[0];
+		
+		
+		GetResultVisitor getResult = new GetResultVisitor(server, topic, ip);
+		Object result = getResult.getResult();
+		producerAllData.accept(getResult);
+
+		System.out.println(getResult.getResult());
+		System.out.println(getResult.getResult().getClass());
+		
 	}
 	
 	@Test

@@ -19,6 +19,8 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.common.server.monitor.visitor.KeyBasedVisitor;
+import com.dianping.swallow.common.server.monitor.visitor.impl.UnfoundKeyException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -228,6 +230,34 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 	}
 
 
+	@Override
+	public void accept(KeyBasedVisitor visitor){
+		
+		if(visitor.hasNextKey()){
+			
+			String key = visitor.getNextKey();
+			Statisable<M> result = map.get(key);
+			
+			if(result == null){
+				throw new UnfoundKeyException("key:" + key);
+			}
+			
+			if(visitor.hasNextKey()){
+				
+				if(result instanceof MapStatisable){
+					((MapStatisable<M>) result).accept(visitor);
+				}else{
+					throw new IllegalArgumentException("has next key, but next is not Map type!!");
+				}
+				
+			}else{
+				visitor.visit(result);
+			}
+		}
+	}
+
+
+	
 	@Override
 	public String toString() {
 		

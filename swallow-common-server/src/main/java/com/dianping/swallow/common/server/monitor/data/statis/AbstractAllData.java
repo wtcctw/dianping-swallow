@@ -18,6 +18,8 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.common.server.monitor.visitor.KeyBasedVisitor;
+import com.dianping.swallow.common.server.monitor.visitor.impl.UnfoundKeyException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -152,6 +154,23 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	private void checkSupported(StatisType type) {
 		if(!supportedTypes.contains(type)){
 			throw new IllegalArgumentException("unsupported type:" + type + ", class:" + getClass());
+		}
+	}
+
+	
+	
+	public void accept(KeyBasedVisitor visitor){
+		
+		String key = visitor.getNextKey();
+		S result = servers.get(key);
+		if(result == null){
+			throw new UnfoundKeyException(key);
+		}
+		
+		if(visitor.hasNextKey()){
+			result.accept(visitor);
+		}else{
+			visitor.visit(result);
 		}
 	}
 

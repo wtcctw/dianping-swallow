@@ -1,8 +1,11 @@
 package com.dianping.swallow.common.server.monitor.data;
 
+
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
+
+import com.dianping.swallow.common.server.monitor.visitor.KeyBasedVisitor;
 
 /**
  * @author mengwenchao
@@ -18,6 +21,7 @@ public interface StatisRetriever {
 	NavigableMap<Long, Long> getDelayForTopic(String topic, StatisType type);
 
 	Map<String, NavigableMap<Long, Long>> getQpxForServers(StatisType type);
-	
 
+	
+	void accept(KeyBasedVisitor visitor);
 }
