@@ -223,6 +223,5 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 			for (ProducerTopicStatisData producerTopicStatisData : producerTopicStatisDatas)
 				producertopicStatisDataService.insert(producerTopicStatisData);
 		}
-
 	}
 }

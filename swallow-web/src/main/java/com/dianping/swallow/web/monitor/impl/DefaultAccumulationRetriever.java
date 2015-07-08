@@ -37,7 +37,6 @@ import com.dianping.swallow.web.config.impl.DefaultWebConfig;
 import com.dianping.swallow.web.monitor.AccumulationListener;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 

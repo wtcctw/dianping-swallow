@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.monitor.impl;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableMap;
@@ -18,7 +17,6 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.web.monitor.Retriever;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 
