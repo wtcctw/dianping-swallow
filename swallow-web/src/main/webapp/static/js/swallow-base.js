@@ -103,4 +103,9 @@ module.directive('ngConfirmClick', [
         };
 }])
 
+module.filter('reverse', function() {
+  return function(items) {
+    return items.slice().reverse();
+  };
+});
 

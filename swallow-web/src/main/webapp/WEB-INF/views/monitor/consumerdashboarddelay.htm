@@ -1,0 +1,97 @@
+<style>
+.pagination {
+	margin: 4px 0;
+}
+
+.pagination ul {
+	margin-top: 0px;
+}
+
+.pagination ul>li>a, .pagination ul>li>span {
+	padding: 3px 10px;
+}
+
+.alert-row {
+	background-color: red;
+	color: white;
+}
+
+.red-num {
+	color: rgb(255, 0, 0) !important;
+	font-weight: bold;
+}
+
+.disabled-num {
+	disabled: disabled !important;
+}
+
+.not-active {
+	pointer-events: none !important;
+	cursor: default !important;
+	color: gray !important;
+}
+</style>
+<div class="main-container-inner"
+	ng-controller="ConsumerDashboardController"
+	id="ConsumerDashboardController">
+
+	<div class="main-content">
+		<div class="page-header">
+			<div class="breadcrumbs" id="breadcrumbs">
+				<script type="text/javascript">
+					try {
+						ace.settings.check('breadcrumbs', 'fixed')
+					} catch (e) {
+					}
+				</script>
+				<span class="text-danger title">【报表时间】</span><span
+					class="text-success">{{starttime}} to {{stoptime}}</span>
+				<div class="nav-search nav" id="nav-search" style="cursor: pointer">
+					<span class="text-danger switch"></span> &nbsp;[ <a
+						ng-click="getDashboardDelay(180, true)">-3h</a> ] &nbsp;[ <a
+						ng-click="getDashboardDelay(120, true)">-2h</a> ] &nbsp;[ <a
+						ng-click="getDashboardDelay(60, true)">-1h</a> ] &nbsp;[ <a
+						ng-click="getDashboardDelay(60, true)">+1h</a> ] &nbsp;[ <a
+						ng-click="getDashboardDelay(60, true)">+2h</a> ] &nbsp;[ <a
+						ng-click="getDashboardDelay(60, true)">+3h</a> ] &nbsp;[ <a
+						ng-click="getDashboardDelay(0,false)">now</a> ]&nbsp;
+				</div>
+				<!-- /.nav-search -->
+			</div>
+			<div class="report">
+				<div class="text-center">
+
+
+					<ul class="pagination" style="cursor: pointer">
+						<li id='minute{{$index}}' ng-repeat="page in pages"><a
+							ng-class="whatClassIsIt($index)"
+							ng-click="getDashboardDelay($index, false)" ng-bind="page"> </a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="page-content" id="container">
+				<div>
+					<div class="row">
+						<table ng-repeat="minuteEntry in minuteEntrys"
+							style="float: left;font-size=small;width=150px" border=1>
+							<tr>
+								<th colspan="2" class="text-danger" class="text-danger"><h6
+										ng-bind="minuteEntry.time"></h6></th>
+							</tr>
+							<tr>
+								<td style="text-align: left; width: 120px">ConsumerID</td>
+								<td style="text-align: left; width: 40px">状态</td>
+							</tr>
+							<tr ng-repeat="entry in minuteEntry.delayEntry"
+								ng-class="{'alert-row': entry.numAlarm>0}">
+								<td style="text-align: left; width: 120px"
+									ng-bind="entry.consumerId"></td>
+								<td style="text-align: left; width: 40px" ng-bind="entry.senddelay"></td>
+						</table>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

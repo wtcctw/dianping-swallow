@@ -21,26 +21,13 @@
     </bean>
 
 	<bean class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager"/>
-    
-<!--     <bean id="administratorDAO"
-        class="com.dianping.swallow.web.dao.impl.DefaultAdministratorDao">
-    </bean> -->
-    
+
     <bean id="messageDAO"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
         <property name="mongoManager" >
 			<ref local="mongoManager"/>
 		</property>
 	</bean>
-
-<!-- 	<bean id="webMongoManager"
-		class="com.dianping.swallow.web.dao.impl.DefaultWebMongoManager"
-		init-method="initMongoServer">
-		<property name="mongoManager">
-			<ref local="mongoManager" />
-		</property>
-	</bean> -->
-
 
     <bean id="mongoManager"
         class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
@@ -49,12 +36,6 @@
     </bean>
     
 	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
-
-<!-- 	<bean id="webMessageDAO" class="com.dianping.swallow.web.dao.impl.DefaultMessageDao">
-		<property name="webMongoManager">
-			<ref local="webMongoManager" />
-		</property>
-	</bean> -->
 
 	<context:component-scan base-package="com.dianping.swallow.web" />
 	<context:annotation-config />
@@ -72,6 +53,7 @@
 			<mvc:mapping path="/console/monitor/consumer/*/accu" />
 			<mvc:mapping path="/console/monitor/producer/*/savedelay" />
 			<mvc:mapping path="/console/monitor/consumer/*/delay" />
+			<mvc:mapping path="/console/monitor/dashboard/delay" />
 			<mvc:mapping path="/help" />
 			<bean class="com.dianping.swallow.web.interceptor.ModelAndViewInterceptor">
 			</bean>

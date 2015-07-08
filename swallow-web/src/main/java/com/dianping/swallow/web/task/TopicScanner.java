@@ -69,6 +69,9 @@ public class TopicScanner {
 			logger.info("[scanTopicDatabase]");
 		}
 
+		// scan admin collection to add
+		scanAdminCollection();
+		
 		List<String> dbs = getDatabaseName();
 		getTopicAndConsumerIds(dbs);
 		boolean isTopicDbexist = isDatabaseExist();
@@ -78,8 +81,6 @@ public class TopicScanner {
 		else
 			createTopicDb(dbs);
 
-		// scan admin collection to add
-		scanAdminCollection();
 	}
 
 	@SuppressWarnings("unchecked")

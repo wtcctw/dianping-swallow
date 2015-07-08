@@ -37,7 +37,7 @@ public abstract class AbstractStatisable<V> implements Statisable<V>{
 
 	protected abstract void doRemoveBefore(Long time);
 
-	protected abstract Statisable<?> getValue(Object key);;
+	protected abstract Statisable<?> getValue(Object key);
 
 	public abstract void cleanEmpty();
 

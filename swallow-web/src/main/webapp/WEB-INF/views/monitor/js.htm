@@ -36,6 +36,9 @@
 				if ($('#ProducerServerQpsController').length > 0) {
 					angular.element($('#ProducerServerQpsController')).scope().getProducerServerQps();
 				}
+				if ($('#ConsumerDashboardController').length > 0) {
+					angular.element($('#ConsumerDashboardController')).scope().getDashboardDelay(0);
+				}
 			});
 </script>
 
