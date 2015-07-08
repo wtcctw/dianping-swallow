@@ -1,30 +1,33 @@
-package com.dianping.swallow.common.server.monitor.visitor.impl;
+package com.dianping.swallow.common.server.monitor.data.statis;
 
-import com.dianping.swallow.common.server.monitor.visitor.KeyBasedVisitor;
+import com.dianping.swallow.common.internal.util.StringUtils;
 
 /**
  * @author mengwenchao
  *
- * 2015年7月8日 下午2:46:10
+ * 2015年7月8日 下午5:35:15
  */
-public abstract class AbstractKeyBasedVisitor implements KeyBasedVisitor{
-	
-	@SuppressWarnings("unused")
+public class CasKeys {
+
 	private String key = "topic1.consumerid1";
 	
 	private String []keys ;
 	private int 	keyIndex = 0;
 
 	
-	public AbstractKeyBasedVisitor(String ...keys) {
+	public CasKeys(String ...keys) {
 		
 		this.keys = keys;
+		key = StringUtils.join(".", keys);
 	}
 
-	public AbstractKeyBasedVisitor(String key) {
-		
+	public CasKeys(String key) {
+
 		this.key = key;
 		this.keys = key.split("\\s*.\\s*");
+		if(this.keys.length == 0){
+			this.keys = new String[]{key};
+		}
 	}
 
 	
@@ -40,5 +43,10 @@ public abstract class AbstractKeyBasedVisitor implements KeyBasedVisitor{
 	public boolean hasNextKey(){
 		
 		return keyIndex < keys.length; 
+	}
+
+	@Override
+	public String toString() {
+		return key;
 	}
 }

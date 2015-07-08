@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
 
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,14 +14,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.dianping.swallow.common.internal.codec.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
+import com.dianping.swallow.common.server.monitor.data.MapRetriever;
 import com.dianping.swallow.common.server.monitor.data.MapStatisable;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
-import com.dianping.swallow.common.server.monitor.visitor.KeyBasedVisitor;
-import com.dianping.swallow.common.server.monitor.visitor.impl.UnfoundKeyException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -230,33 +230,66 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 	}
 
 
+	
 	@Override
-	public void accept(KeyBasedVisitor visitor){
+	public Set<String> getKeys(CasKeys keys, StatisType type){
+
+		if(!keys.hasNextKey()){
+			return new HashSet<String>(map.keySet());
+		}
 		
-		if(visitor.hasNextKey()){
+		String key = keys.getNextKey();
+		Statisable<M> result = map.get(key);
+		
+		if(result == null){
+			throw new UnfoundKeyException(key);
+		}
+		
+		if(result instanceof MapRetriever){
+			return ((MapRetriever) result).getKeys(keys, type); 
+		}
+		
+		throw new IllegalArgumentException("next not instanceof Map type!" + result.getClass());
+	}
+	
+	@Override
+	public Object getValue(CasKeys keys, StatisType type){
+		
+		if(!keys.hasNextKey()){
+			throw new UnfoundKeyException(keys.toString());
+		}
+
+		String key = keys.getNextKey();
+		Statisable<M> result = map.get(key);
+		
+		if(result == null){
+			throw new UnfoundKeyException("key:" + key);
+		}
+		
+		if(keys.hasNextKey()){
 			
-			String key = visitor.getNextKey();
-			Statisable<M> result = map.get(key);
-			
-			if(result == null){
-				throw new UnfoundKeyException("key:" + key);
-			}
-			
-			if(visitor.hasNextKey()){
-				
-				if(result instanceof MapStatisable){
-					((MapStatisable<M>) result).accept(visitor);
-				}else{
-					throw new IllegalArgumentException("has next key, but next is not Map type!!");
-				}
-				
+			if(result instanceof MapRetriever){
+				return ((MapRetriever) result).getValue(keys, type);
 			}else{
-				visitor.visit(result);
+				throw new IllegalArgumentException("has next key, but next is not Map type!!");
 			}
+			
+		}else{
+			return result;
 		}
 	}
 
+	@Override
+	public Set<String> getKeys(CasKeys keys) {
+		
+		return getKeys(keys, null);
+	}
 
+	public Object getValue(CasKeys keys) {
+		
+		return getValue(keys, null);
+		
+	}
 	
 	@Override
 	public String toString() {

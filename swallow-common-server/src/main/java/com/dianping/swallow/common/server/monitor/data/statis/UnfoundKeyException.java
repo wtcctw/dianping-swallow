@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.server.monitor.visitor.impl;
+package com.dianping.swallow.common.server.monitor.data.statis;
 
 import com.dianping.swallow.common.server.monitor.MonitorException;
 

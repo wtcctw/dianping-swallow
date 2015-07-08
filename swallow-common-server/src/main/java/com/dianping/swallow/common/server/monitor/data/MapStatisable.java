@@ -3,7 +3,6 @@ package com.dianping.swallow.common.server.monitor.data;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import com.dianping.swallow.common.server.monitor.visitor.KeyBasedVisitor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -11,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年5月19日 下午5:04:56
  */
-public interface MapStatisable<V> extends Statisable<V>{
+public interface MapStatisable<V> extends Statisable<V>, MapRetriever{
 
 	@JsonIgnore
 	NavigableMap<Long, Long> getDelay(StatisType type, Object key);
@@ -22,7 +21,5 @@ public interface MapStatisable<V> extends Statisable<V>{
 	Map<String, NavigableMap<Long, Long>> allDelay(StatisType type, boolean includeTotal);
 	
 	Map<String, NavigableMap<Long, Long>> allQpx(StatisType type, boolean includeTotal);
-
-	void accept(KeyBasedVisitor visitor);
 
 }

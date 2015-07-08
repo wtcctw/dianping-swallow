@@ -12,7 +12,6 @@ import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
-import com.dianping.swallow.common.server.monitor.visitor.impl.GetResultVisitor;
 
 /**
  * @author mengwenchao
@@ -35,19 +34,15 @@ public class ProducerServerDataTest extends AbstractServerDataTest{
 	
 	
 	@Test
-	public void testVisitor(){
+	public void testRetriever(){
 		
 		String server = ips[0];
 		String topic = topics[0];
 		String ip = ips[0];
 		
+		System.out.println(producerAllData.getKeys(new CasKeys(server, topic)));
+		System.out.println(producerAllData.getValue(new CasKeys(server, topic, ip)));
 		
-		GetResultVisitor getResult = new GetResultVisitor(server, topic, ip);
-		Object result = getResult.getResult();
-		producerAllData.accept(getResult);
-
-		System.out.println(getResult.getResult());
-		System.out.println(getResult.getResult().getClass());
 		
 	}
 	

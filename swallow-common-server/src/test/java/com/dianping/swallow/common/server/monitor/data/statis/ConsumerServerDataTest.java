@@ -48,6 +48,17 @@ public class ConsumerServerDataTest extends AbstractServerDataTest{
 		consumerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
 	}
 	
+	@Test
+	public void testRetriever(){
+		
+		String server = ips[0];
+		String topic = topics[0];
+		String consumerId = consumerIds[0];
+		String ip = ips[0];
+		
+		System.out.println(consumerAllData.getKeys(new CasKeys()));
+		System.out.println(consumerAllData.getValue(new CasKeys(server, topic, consumerId, ip)));
+	}
 	
 	@Test
 	public void testClean(){

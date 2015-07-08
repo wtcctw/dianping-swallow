@@ -18,8 +18,6 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
-import com.dianping.swallow.common.server.monitor.visitor.KeyBasedVisitor;
-import com.dianping.swallow.common.server.monitor.visitor.impl.UnfoundKeyException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -151,6 +149,52 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 		return null;
 	}
 
+	
+	public Set<String> getKeys(CasKeys keys, StatisType type){
+		
+		if(!keys.hasNextKey()){
+			return new HashSet<String>(servers.keySet());
+		}
+		
+		String key = keys.getNextKey();
+		S server = servers.get(key);
+		
+		if(server == null){
+			throw new UnfoundKeyException(key);
+		}
+		
+		return server.getKeys(keys, type);
+	}
+	
+	public Object getValue(CasKeys keys, StatisType type){
+
+		if(!keys.hasNextKey()){
+			throw new UnfoundKeyException(keys.toString());
+		}
+		
+		String key = keys.getNextKey();
+		S server = servers.get(key);
+		
+		if(server == null){
+			throw new UnfoundKeyException(key);
+		}
+		
+		return server.getValue(keys, type);
+
+	}
+	
+	
+	public Set<String> getKeys(CasKeys keys){
+	
+		return getKeys(keys, null);
+	}
+	
+	public Object getValue(CasKeys keys){
+		
+		return getValue(keys, null);
+	}
+
+
 	private void checkSupported(StatisType type) {
 		if(!supportedTypes.contains(type)){
 			throw new IllegalArgumentException("unsupported type:" + type + ", class:" + getClass());
@@ -158,23 +202,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	}
 
 	
-	
-	public void accept(KeyBasedVisitor visitor){
-		
-		String key = visitor.getNextKey();
-		S result = servers.get(key);
-		if(result == null){
-			throw new UnfoundKeyException(key);
-		}
-		
-		if(visitor.hasNextKey()){
-			result.accept(visitor);
-		}else{
-			visitor.visit(result);
-		}
-	}
-
-
 	@Override
 	public NavigableMap<Long, Long> getDelayForTopic(String topic, StatisType type) {
 		

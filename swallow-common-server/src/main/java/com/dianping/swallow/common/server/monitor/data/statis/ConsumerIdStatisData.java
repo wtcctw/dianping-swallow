@@ -1,7 +1,9 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
 import java.util.NavigableMap;
+import java.util.Set;
 
+import com.dianping.swallow.common.server.monitor.data.MapRetriever;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
@@ -12,7 +14,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.ConsumerIdData;
  *
  * 2015年5月20日 下午5:32:22
  */
-public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData>{
+public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> implements MapRetriever{
 	
 	private MessageInfoTotalMapStatis sendMessages = new MessageInfoTotalMapStatis();
 	
@@ -85,6 +87,50 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData>{
 			default:
 				throw new IllegalStateException("unsupported type:" + type);
 		}
+	}
+
+	@Override
+	public Set<String> getKeys(CasKeys keys, StatisType type) {
+		
+		if(type  == null){
+			return sendMessages.getKeys(keys, type); 
+		}
+		switch(type){
+			case SEND:
+				return sendMessages.getKeys(keys, type);
+			case ACK:
+				return ackMessages.getKeys(keys, type);
+			default:
+				throw new IllegalStateException("unsupported type:" + type);
+		}
+	}
+
+	@Override
+	public Object getValue(CasKeys keys, StatisType type) {
+
+		if(type == null){
+			return sendMessages.getValue(keys, type);
+		}
+		
+		switch(type){
+		
+			case SEND:
+				return sendMessages.getValue(keys, type);
+			case ACK:
+				return ackMessages.getValue(keys, type);
+			default:
+				throw new IllegalStateException("unsupported type:" + type);
+		}
+	}
+
+	@Override
+	public Set<String> getKeys(CasKeys keys) {
+		return getKeys(keys, null);
+	}
+
+	@Override
+	public Object getValue(CasKeys keys) {
+		return getValue(keys, null);
 	}
 
 }
