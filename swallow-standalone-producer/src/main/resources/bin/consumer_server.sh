@@ -14,46 +14,31 @@ LOCAL_IP=`ifconfig  | grep 'inet addr:' | cut -d: -f2 | awk 'BEGIN{count=0}$1!~/
 ##################################################
 # Some utility functions
 ##################################################
-running()
-{
-    PID=$1
-    ps -p $PID >/dev/null 2>/dev/null || return 1
-    return 0
-}
 usage(){
     echo "  Usage:"
     echo "     use '$0 start/restart/stop master' as master."
     echo "     use '$0 start/restart/stop slave [<masterIp>]' as slave."
     exit 1
 }
-mysleep(){
-    TIMEOUT=$1
-    while [ $TIMEOUT -gt 0 ]
-      do
-        sleep 1
-        let TIMEOUT=$TIMEOUT-1
-        echo  "Time left $TIMEOUT sec.\r"
-    done
-    echo ""
-}
+
 
 if [ "$MODE" == "master" ]; then
     ProcessName="MasterBootStrap"
 elif [ "$MODE" == "slave" ]; then
     ProcessName="SlaveBootStrap"
 else
-    echo "Your input is not corrent!"
+    log "Your input is not corrent!"
     usage
     exit 1
 fi
 
 ######### 关闭进程 #########
 if [ "$ACTION" = "stop" -o "$ACTION" = "restart" ];  then
-    echo "========================= swallow stoping =========================="
+    log "========================= swallow stoping =========================="
     PidCount=$(jps |grep $ProcessName|wc -l)
     if [ $PidCount -ge 1 ]; then
         Pid=$(jps |grep $ProcessName |cut -d\  -f1)
-        echo "Now stoping $ProcessName(pid=$Pid) ..."
+        log "Now stoping $ProcessName(pid=$Pid) ..."
         #模仿jetty的方式去kill
         TIMEOUT=5
         while running $Pid && [ $TIMEOUT -gt 0 ]
@@ -61,22 +46,22 @@ if [ "$ACTION" = "stop" -o "$ACTION" = "restart" ];  then
             kill $Pid 2>/dev/null
             sleep 1
             let TIMEOUT=$TIMEOUT-1
-            echo  "Stoping, please wait for $TIMEOUT sec ...\r"
+            log  "Stoping, please wait for $TIMEOUT sec ...\r"
           done
         [ $TIMEOUT -gt 0 ] || kill -9 $Pid 2>/dev/null
-        echo ""
+        log ""
         #确保进程已经关闭
         PidCount=$(jps |grep $ProcessName|wc -l)
         while [ $PidCount -ge 1 ]
          do
            Pid=$(jps |grep $ProcessName |cut -d\  -f1)
-           echo  "Pid $Pid is still running! Now Kill it ..."
+           log  "Pid $Pid is still running! Now Kill it ..."
            kill -9  $Pid
            PidCount=$(jps |grep $ProcessName|wc -l)
         done
-       echo "Pid $Pid is stoped."
+       log "Pid $Pid is stoped."
     else
-       echo "No process of name '$ProcessName' is running, so no need to stop. "
+       log "No process of name '$ProcessName' is running, so no need to stop. "
     fi
     if [ "$ACTION" == "stop" ] ; then
        exit 0
@@ -88,11 +73,11 @@ fi
 PidCount=$(jps |grep $ProcessName|wc -l)
 if [ $PidCount -ge 1 ]; then
     Pid=$(jps |grep $ProcessName |cut -d\  -f1)
-    echo  "$ProcessName with Pid $Pid is already running! Can not start ..."
+    log  "$ProcessName with Pid $Pid is already running! Can not start ..."
     exit 1
 fi
 
-echo "========================= swallow starting =========================="
+log "========================= swallow starting =========================="
 MASTER_JMX_PORT=9011
 SLAVE_JMX_PORT=9012
 MEM=`getmem`
@@ -107,44 +92,44 @@ SLAVE_CLASS="com.dianping.swallow.consumerserver.bootstrap.SlaveBootStrap"
 if [ "$MODE" == "master" ]; then
     STD_OUT="/data/applogs/swallow/swallow-consumerserver-master-std.out"
     MASTER_JAVA_OPTS="${MASTER_JAVA_OPTS} -DmasterIp=$LOCAL_IP"
-    echo "Starting as master(masterIp is $LOCAL_IP ) ..."
-    echo "Output: $STD_OUT"
+    log "Starting as master(masterIp is $LOCAL_IP ) ..."
+    log "Output: $STD_OUT"
     exec java $MASTER_JAVA_OPTS  $MASTER_CLASS > "$STD_OUT" 2>&1 &
 elif [ "$MODE" == "slave" ]; then
     if [ "$MASTER_IP" != "" ]; then
-       echo "MASTER_IP option: $MASTER_IP"
+       log "MASTER_IP option: $MASTER_IP"
        echo $MASTER_IP |grep "^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$" > /dev/null
        if [ $? == 1 ]; then
-          echo "'$MASTER_IP' is an illegal ip address!"
+          log "'$MASTER_IP' is an illegal ip address!"
           usage
           exit 1
        fi
        SLAVE_JAVA_OPTS="${SLAVE_JAVA_OPTS} -DmasterIp=$MASTER_IP"
     else
-       echo "     No masterIp option!"
-       echo "     use '$0 start/restart/stop slave [<masterIp>]' as slave."
+       log "     No masterIp option!"
+       log "     use '$0 start/restart/stop slave [<masterIp>]' as slave."
        exit 1
     fi
     STD_OUT="/data/applogs/swallow/swallow-consumerserver-slave-std.out"
-    echo "Starting as slave ..."
-    echo "Output: $STD_OUT"
+    log "Starting as slave ..."
+    log "Output: $STD_OUT"
     exec java $SLAVE_JAVA_OPTS $SLAVE_CLASS > "$STD_OUT" 2>&1 &
 else
-    echo "Your input is not corrent!"
+    log "Your input is not corrent!"
     usage
     exit 1
 fi
 ###########  检查是否启动成功 ############
 
-echo "Sleeping $SleepTime sec for waiting process started ..."
+log "Sleeping $SleepTime sec for waiting process started ..."
 
 
 if [ "$MODE" == "master" ]; then
     SuccessLog="Server started at port "
-    SleepTime=15
+    SleepTime=10
 else
     SuccessLog="start to wait $MASTER_IP master stop beating"
-    SleepTime=15
+    SleepTime=5
 fi
 
 mysleep $SleepTime
@@ -153,8 +138,8 @@ checkLog "$SuccessLog" $STD_OUT
 Pid=$(jps |grep $ProcessName |cut -d\  -f1)
 
 if [ -n "$Pid" ]; then
-	echo "$ProcessName started as PID $Pid."
+	log "$ProcessName started as PID $Pid."
 else
-	echo "start failed, none process exist."
+	log "start failed, none process exist."
 	exit 1
 fi

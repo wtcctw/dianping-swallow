@@ -52,8 +52,8 @@ public class SlaveBootStrap extends AbstractBootStrap{
 	          logger.warn("slave interruptted, will stop", e);
 	          break;
 	       }
-	       stopConsumerServer();
 	       closeNettyRelatedResource();
+	       stopConsumerServer();
 	    }
 	    
 	    if(logger.isInfoEnabled()){

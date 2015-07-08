@@ -31,6 +31,7 @@ import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
+import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.netty.MessageServerHandler;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
 
@@ -175,14 +176,16 @@ public abstract class AbstractBootStrap {
 
 	protected void createContext() {
 		
+		ConfigManager.getInstance().setSlave(isSlave());
+		
 		@SuppressWarnings("resource")
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(
 		            new String[] { "c-applicationContext.xml" });
+		
 	      consumerWorkerManager = ctx.getBean(ConsumerWorkerManager.class);
 	      topicWhiteList = ctx.getBean(TopicWhiteList.class);
 	      consumerAuthController = ctx.getBean(ConsumerAuthController.class);
 		  heartbeater = ctx.getBean(Heartbeater.class);
-	      consumerWorkerManager.isSlave(isSlave());
 	      
 	      masterSlaveComponents = ctx.getBeansOfType(MasterSlaveComponent.class);
 	}

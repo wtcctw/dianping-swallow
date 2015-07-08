@@ -69,7 +69,7 @@ public final class Destination implements Serializable {
         }
       if (!NameCheckUtil.isTopicNameValid(name)) {
          throw new IllegalArgumentException(
-               "Topic name is illegal, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-50 long：" + name);
+               "Topic name is illegal, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-50 long:\"" + name+"\"");
       }
       return new Destination(name, Type.TOPIC);
    }

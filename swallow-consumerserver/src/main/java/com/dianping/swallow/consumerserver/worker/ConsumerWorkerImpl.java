@@ -398,15 +398,11 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
             //cat打点，记录一次备份消息的record
             catTraceForBackupRecord(consumerMessage.message);
          }
-
-         //Cat begin
          consumerServerTransaction.addData(pktMessage.getContent().toKeyValuePairs());
          consumerServerTransaction.setStatus(e);
-         Cat.getProducer().logError(e);
       } finally {
          consumerServerTransaction.complete();
       }
-      //Cat end
    }
 
    private void catTraceForBackupRecord(SwallowMessage message) {

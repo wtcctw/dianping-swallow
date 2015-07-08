@@ -6,21 +6,74 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.HeartbeatDAO;
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 
-public class MongoHeartbeater implements Heartbeater {
+public class MongoHeartbeater extends AbstractLifecycle implements Heartbeater {
 
    private static final Logger logger           = LoggerFactory.getLogger(MongoHeartbeater.class);
+   
    private HeartbeatDAO        heartbeatDAO;
    private ConfigManager       configManager = ConfigManager.getInstance();
+   
+   private Thread 			   heartbeatThread;
 
    public void setHeartbeatDAO(HeartbeatDAO heartbeatDAO) {
       this.heartbeatDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(heartbeatDAO,
     		  configManager.getRetryIntervalWhenMongoException(), configManager.getRetryTimesWhenMongoException());
    }
+   
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		
+		if(!ConfigManager.getInstance().isSlave()){
+			startHeartbeater();
+		}
+		
+	}
+	
+    private void startHeartbeater() {
+
+    	if(logger.isInfoEnabled()){
+    		logger.info("[startHeartbeater]");
+    	}
+    	
+        Runnable runnable = new Runnable() {
+        	
+            @Override
+            public void run() {
+            	
+                while (!Thread.interrupted()) {
+                	
+                    try {
+                        beat(ConfigManager.getInstance().getMasterIp());
+                        Thread.sleep(ConfigManager.getInstance().getHeartbeatUpdateInterval());
+                    } catch(InterruptedException e){
+                    	logger.error("Error update heart beat", e);
+                    	Thread.currentThread().interrupt();
+                    }catch (Throwable e) {
+                        logger.error("Error update heart beat", e);
+                    }
+                }
+            }
+        };
+
+        heartbeatThread = new Thread(runnable, "heartbeater");
+        heartbeatThread.setDaemon(true);
+        heartbeatThread.start();
+    }
+
+	
+	@Override
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		
+		heartbeatThread.interrupt();
+	}
 
    @Override
    public void beat(String ip) {
@@ -29,6 +82,7 @@ public class MongoHeartbeater implements Heartbeater {
 
    @Override
    public void waitUntilMasterDown(String ip, long checkInterval, long maxStopTime) throws InterruptedException {
+	   
       long startTime = System.currentTimeMillis();
       logger.info("start to wait " + ip + " master stop beating");
       System.out.println(DateUtils.current() + "[start to wait " + ip + " master stop beating]");//检查是否启动成功

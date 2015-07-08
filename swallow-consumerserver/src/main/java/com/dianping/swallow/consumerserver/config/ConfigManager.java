@@ -36,16 +36,16 @@ public final class ConfigManager extends AbstractConfig{
 
    //Master Ip
    private String               masterIp                        = "127.0.0.1";
+   private boolean 				isSlave							= false;
    
    private int 					minRetrieveInterval 			= 100;
    private int					backupMinRetrieveInterval		= 10000;
    
    
-   private final long                 waitAckTimeWhenCloseSwc         = 2000;
    private final int                  heartbeatCheckInterval          = 2000;
    private final int                  heartbeatMaxStopTime            = 10000;
    private final int                  heartbeatUpdateInterval         = 2000;
-   private final long                 waitSlaveShutDown               = waitAckTimeWhenCloseSwc + 2*heartbeatCheckInterval;
+   
    
    public int getPullFailDelayBase() {
       return pullFailDelayBase;
@@ -77,14 +77,6 @@ public final class ConfigManager extends AbstractConfig{
 
    public long getRetryIntervalWhenMongoException() {
       return retryIntervalWhenMongoException;
-   }
-
-   public long getWaitAckTimeWhenCloseSwc() {
-      return waitAckTimeWhenCloseSwc;
-   }
-
-   public long getWaitSlaveShutDown() {
-      return waitSlaveShutDown;
    }
 
    public String getMasterIp() {
@@ -184,6 +176,14 @@ public final class ConfigManager extends AbstractConfig{
 
 	public void setRetryTimesWhenMongoException(int retryTimesWhenMongoException) {
 		this.retryTimesWhenMongoException = retryTimesWhenMongoException;
+	}
+
+	public boolean isSlave() {
+		return isSlave;
+	}
+
+	public void setSlave(boolean isSlave) {
+		this.isSlave = isSlave;
 	}
 
 }

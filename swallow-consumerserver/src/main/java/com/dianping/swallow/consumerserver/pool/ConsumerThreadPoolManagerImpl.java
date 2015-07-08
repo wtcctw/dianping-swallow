@@ -4,10 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import javax.annotation.PreDestroy;
 
-import org.springframework.beans.factory.InitializingBean;
-
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.pool.DefaultThreadProfile;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 
@@ -17,7 +15,7 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
  *
  * 2014年11月5日 下午5:40:34
  */
-public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager, InitializingBean{
+public class ConsumerThreadPoolManagerImpl extends AbstractLifecycle implements ConsumerThreadPoolManager{
 
 	private int cpuNum = Runtime.getRuntime().availableProcessors();
 	
@@ -65,6 +63,12 @@ public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager,
 
 	}
 
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		
+		createPool();
+	}
 
 	public void createPool(){
 
@@ -149,13 +153,10 @@ public class ConsumerThreadPoolManagerImpl implements ConsumerThreadPoolManager,
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		createPool();
-	}
-
-	@Override
-	@PreDestroy
-	public void dispose() throws Exception {
+	protected void doDispose() throws Exception {
+		
+		super.doDispose();
+		
 		serviceHandlerThreadPool.shutdownNow();
 		sendMessageThreadPool.shutdownNow();
 		retrieverThreadPool.shutdownNow();

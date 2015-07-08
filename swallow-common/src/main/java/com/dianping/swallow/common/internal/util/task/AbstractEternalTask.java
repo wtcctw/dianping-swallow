@@ -24,9 +24,15 @@ public abstract class AbstractEternalTask implements Runnable{
 			}
 		}
 		
+		doOnThreadExit();
+		
 		if(logger.isInfoEnabled()){
 			logger.info("[run][exit]" + Thread.currentThread());
 		}
+	}
+
+	protected void doOnThreadExit() {
+		
 	}
 
 	protected  void sleep() {

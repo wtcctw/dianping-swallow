@@ -1,6 +1,23 @@
-
 function log {
 	echo "[`date +'%m-%d %H:%M:%S'`] [INFO] $@"
+}
+
+
+running()
+{
+    PID=$1
+    ps -p $PID >/dev/null 2>/dev/null || return 1
+    return 0
+}
+mysleep(){
+    TIMEOUT=$1
+    while [ $TIMEOUT -gt 0 ]
+      do
+        sleep 1
+        let TIMEOUT=$TIMEOUT-1
+        log  "Time left $TIMEOUT sec.\r"
+    done
+    log ""
 }
 
 getmem(){

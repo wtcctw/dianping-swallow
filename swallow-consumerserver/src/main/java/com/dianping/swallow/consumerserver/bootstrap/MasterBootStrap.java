@@ -27,15 +27,6 @@ public class MasterBootStrap extends AbstractBootStrap {
 		startConsumerServer();
 
 		if (logger.isInfoEnabled()) {
-			logger.info("[run][wait " + ConfigManager.getInstance().getWaitSlaveShutDown() + "ms for slave to stop working]");
-		}
-
-		try {
-			Thread.sleep(ConfigManager.getInstance().getWaitSlaveShutDown());// 主机启动的时候睡眠一会，给时间给slave关闭。
-		} catch (InterruptedException e) {
-			logger.error("thread InterruptedException", e);
-		}
-		if (logger.isInfoEnabled()) {
 			logger.info("[run][start working]");
 		}
 

@@ -26,7 +26,6 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.common.internal.util.task.AbstractEternalTask;
 import com.dianping.swallow.common.server.monitor.collector.ConsumerCollector;
-import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
@@ -40,7 +39,6 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     private final long                        MESSAGE_SEND_NONE_INTERVAL = ConfigManager.getInstance().getMessageSendNoneInterval();
 
     private AckDAO                            ackDAO;
-    private Heartbeater                       heartbeater;
     private SwallowBuffer                     swallowBuffer;
     private MessageDAO                        messageDAO;
 
@@ -59,6 +57,11 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     private DefaultLifecycleManager 		lifecycleManager;
     
     private ConsumerCollector 				consumerCollector;
+
+    private int senderThreadSize 			= CommonUtils.getCpuCount();
+    
+	private ExecutorService sendMessageExecutor  	=  null;
+
     
     public ConsumerWorkerManager(){
     	
@@ -73,10 +76,6 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 
     public MQThreadFactory getThreadFactory() {
         return threadFactory;
-    }
-
-    public void setHeartbeater(Heartbeater heartbeater) {
-        this.heartbeater = heartbeater;
     }
 
     public void setSwallowBuffer(SwallowBuffer swallowBuffer) {
@@ -136,16 +135,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 			
 			@Override
 			public void onTransition() {
-		        try {
-		            long waitAckTimeWhenCloseSwc = ConfigManager.getInstance().getWaitAckTimeWhenCloseSwc();
-		            logger.info("[onTransition]Sleeping " + waitAckTimeWhenCloseSwc + "ms to wait receiving client's Acks.");
-		            Thread.sleep(waitAckTimeWhenCloseSwc);
-		            logger.info("[onTransition]Sleep done.");
-		        } catch (InterruptedException e) {
-		            logger.error("Close Swc thread InterruptedException", e);
-		        }
-
-		        //关闭ConsumerWorker的资源（关闭内部的“用于获取消息的队列”）
+				
 		        if (consumerInfo2ConsumerWorker != null) {
 		            for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
 		                try {
@@ -213,12 +203,6 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         }
 	}
 
-	public void isSlave(boolean isSlave) {
-        if (!isSlave) {
-            startHeartbeater(ConfigManager.getInstance().getMasterIp());
-        }
-    }
-
 	@Override
     public void initialize() throws Exception {
 		
@@ -228,6 +212,12 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 			public void onTransition() {
 		        readyForAcceptConn = true;
 		        consumerInfo2ConsumerWorker = new ConcurrentHashMap<ConsumerInfo, ConsumerWorker>();
+		        
+				senderThreadSize = ConfigManager.getInstance().getMessageSendThreadPoolSize();
+				if(senderThreadSize <= 0){
+					senderThreadSize = CommonUtils.getCpuCount();
+				}
+				
 			}
 		});
     }
@@ -238,6 +228,9 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 			
 			@Override
 			public void onTransition() {
+				
+				sendMessageExecutor = Executors.newFixedThreadPool(senderThreadSize, new MQThreadFactory("MessageSenderTricker"));
+				
 		        startSendMessageThread();
 		        startIdleWorkerCheckerThread();
 		        startAckIdUpdaterThread();
@@ -251,6 +244,13 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 			
 			@Override
 			public void onTransition() {
+				recordAck();
+				
+				for(Thread thread : threads){
+					thread.interrupt();
+				}
+				threads.clear();
+				sendMessageExecutor.shutdownNow();
 			}
 		});
 		
@@ -265,14 +265,8 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 	
 	private void startSendMessageThread() {
 		
-		int senderThreadSize = ConfigManager.getInstance().getMessageSendThreadPoolSize();
-		if(senderThreadSize <= 0){
-			senderThreadSize = CommonUtils.getCpuCount();
-		}
-		ExecutorService executors = Executors.newFixedThreadPool(senderThreadSize, new MQThreadFactory("MessageSenderTricker"));
-		
 		for(int i=0; i < senderThreadSize; i++){
-			executors.execute(new SendMessageThread(i, senderThreadSize));
+			sendMessageExecutor.execute(new SendMessageThread(i, senderThreadSize));
 		}
 		
 	}
@@ -287,8 +281,14 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 
 	
 	private void startAckIdUpdaterThread() {
+		
         startTask(new AbstractEternalTask() {
 			
+			@Override
+			protected void doOnThreadExit() {
+				threads.remove(Thread.currentThread());
+			}
+
         	@Override
         	public void sleep(){
                 try {
@@ -305,14 +305,20 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 			
 			@Override
 			protected void doRun() {
-                for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
-                    ConsumerWorker worker = entry.getValue();
-                    worker.recordAck();
-                }
+				recordAck();
 			}
         }, "AckIdUpdaterThread-");
 	}
 
+	
+	protected void recordAck(){
+		
+        for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
+            ConsumerWorker worker = entry.getValue();
+            worker.recordAck();
+        }
+	}
+	
 	private boolean shouldStop() {
 
 		return !(lifecycleManager.isInitialized() || lifecycleManager.isStarted());
@@ -335,6 +341,11 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 			@Override
 			protected boolean stop() {
 				return shoudStop();
+			}
+			
+			@Override
+			protected void doOnThreadExit() {
+				threads.remove(Thread.currentThread());
 			}
 			
 			@Override
@@ -368,33 +379,6 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         }, "idleConsumerWorkerChecker-");
     }
 
-    private void startHeartbeater(final String ip) {
-
-        Runnable runnable = new Runnable() {
-
-            @Override
-            public void run() {
-                while (true) {
-
-                    try {
-                        heartbeater.beat(ip);
-                        Thread.sleep(ConfigManager.getInstance().getHeartbeatUpdateInterval());
-                    } catch (Throwable e) {
-                        logger.error("Error update heart beat", e);
-                    }
-                }
-            }
-
-        };
-
-        Thread heartbeatThread = threadFactory.newThread(runnable, "heartbeat-");
-        heartbeatThread.setDaemon(true);
-        heartbeatThread.start();
-    }
-
-    /**
-     * consumerId对应的ConsumerWorker已经没有任何连接，所以移除ConsumerWorker
-     */
     private void removeConsumerWorker(ConsumerInfo consumerInfo) {
         consumerInfo2ConsumerWorker.remove(consumerInfo);
     }

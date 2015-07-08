@@ -30,4 +30,5 @@ public interface Heartbeater {
    void waitUntilMasterUp(String ip, long checkInterval, long maxStopTime)
          throws InterruptedException;
 
+   
 }
