@@ -122,5 +122,5 @@ public class DefaultProducerDataRetriever extends AbstractMonitorDataRetriever<P
 		
 		return new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getDelayDetailType());
 	}
-
+	
 }

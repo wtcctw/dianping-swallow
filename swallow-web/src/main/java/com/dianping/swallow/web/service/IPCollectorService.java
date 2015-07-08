@@ -12,7 +12,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
  * @author qi.yin
  *
  */
-public interface IPCollectorService extends SwallowService {
+public interface IPCollectorService {
 
 	/**
 	 * add all ip

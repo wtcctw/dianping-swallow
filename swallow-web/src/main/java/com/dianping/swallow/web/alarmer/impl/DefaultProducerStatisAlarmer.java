@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,10 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 	private volatile ProducerServerStatisData serverStatisData;
 
 	private volatile List<ProducerTopicStatisData> producerTopicStatisDatas;
+	
+	private volatile AtomicLong dataCount;
+	
+	private volatile AtomicLong lastTimeKey;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -67,10 +72,12 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 
 	@Override
 	protected void doAlarm() {
-		doServerAlarm();
-		doTopicAlarm();
-		storageServerStatis();
-		storageTopicStatis();
+		if(dataCount.get() > 0){
+//			storageServerStatis();
+//			storageTopicStatis();
+			doServerAlarm();
+			doTopicAlarm();
+		}
 	}
 
 	public void doServerAlarm() {
@@ -145,16 +152,17 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 
 	@Override
 	public void achieveMonitorData() {
-		try {
-			@SuppressWarnings("rawtypes")
-			AbstractAllData allData = producerDataRetriever.getAlldata();
-			achieveServerStatis(allData);
-			achieveTopicStatis(allData);
-		} catch (Exception e) {
-			logger.error("achieve monitor Data exception", e);
-		}
+		dataCount.incrementAndGet();
+//		try {
+//			@SuppressWarnings("rawtypes")
+//			AbstractAllData allData = producerDataRetriever.getAlldata();
+//			achieveServerStatis(allData);
+//			achieveTopicStatis(allData);
+//		} catch (Exception e) {
+//			logger.error("achieve monitor Data exception", e);
+//		}
 	}
-
+/*
 	private void achieveServerStatis(@SuppressWarnings("rawtypes") AbstractAllData allData) {
 		@SuppressWarnings("unchecked")
 		Map<String, NavigableMap<Long, Long>> qpxForServers = allData.getQpxForServers(StatisType.SAVE);
@@ -224,4 +232,5 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 				producertopicStatisDataService.insert(producerTopicStatisData);
 		}
 	}
+	*/
 }

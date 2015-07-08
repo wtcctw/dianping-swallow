@@ -103,7 +103,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return false;
 	}
 
-	public static Long getKey(long timeMili) {
+	protected static Long getKey(long timeMili) {
 
 		return timeMili / AbstractCollector.SEND_INTERVAL / 1000;
 	}

@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.monitor;
 
-import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
@@ -16,5 +15,4 @@ public interface MonitorDataRetriever extends Retriever {
 	
 	void registerListener(MonitorDataListener listener);
 	
-	public AbstractAllData getAlldata();
 }

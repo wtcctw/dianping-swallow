@@ -9,8 +9,8 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
  * @author qiyin
  *
  */
-public interface IPDescService extends SwallowService {
-	
+public interface IPDescService {
+
 	/**
 	 * insert
 	 * 

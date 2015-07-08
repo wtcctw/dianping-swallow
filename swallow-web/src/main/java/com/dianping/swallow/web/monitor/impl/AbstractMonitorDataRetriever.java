@@ -191,8 +191,4 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		}
 	}
 	
-	public AbstractAllData getAlldata(){
-		return statis;
-	}
-	
 }

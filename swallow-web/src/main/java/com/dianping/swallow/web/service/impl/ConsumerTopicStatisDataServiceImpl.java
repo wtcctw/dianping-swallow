@@ -6,11 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ConsumerTopicStatisDataDao;
-import com.dianping.swallow.web.dao.TopicStatisDataDao;
 import com.dianping.swallow.web.model.statis.ConsumerTopicStatisData;
-import com.dianping.swallow.web.model.statis.TopicStatisData;
 import com.dianping.swallow.web.service.ConsumerTopicStatisDataService;
-import com.dianping.swallow.web.service.TopicStatisDataService;
 
 
 @Service("consumerTopicStatisDataService")

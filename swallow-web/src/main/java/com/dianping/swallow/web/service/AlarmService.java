@@ -8,41 +8,48 @@ import com.dianping.swallow.web.model.alarm.Alarm;
 
 /**
  *
- *@author qiyin 
+ * @author qiyin
  * 
  */
-public interface AlarmService  extends SwallowService {
+public interface AlarmService {
 	/**
 	 * sms alarm
+	 * 
 	 * @param mobile
 	 * @param body
 	 * @return
 	 */
-	public boolean sendSms(String mobile,String body);
+	public boolean sendSms(String mobile, String body);
+
 	/**
 	 * weiXin alarm
+	 * 
 	 * @param email
 	 * @param title
 	 * @param content
 	 * @return
 	 */
-	public boolean sendWeixin(String email,String title,String content);
+	public boolean sendWeixin(String email, String title, String content);
+
 	/**
 	 * mail alarm
+	 * 
 	 * @param email
 	 * @param title
 	 * @param content
 	 * @return
 	 */
-	public boolean sendMail(String email,String title,String content);
+	public boolean sendMail(String email, String title, String content);
+
 	/**
 	 * send sms weiXin mail
+	 * 
 	 * @param ip
 	 * @param title
 	 * @param message
 	 */
-	public void sendAll(String ip,String title,String message);
-	
+	public void sendAll(String ip, String title, String message);
+
 	/**
 	 * insert
 	 * 
@@ -66,9 +73,10 @@ public interface AlarmService  extends SwallowService {
 	 * @return
 	 */
 	public int deleteById(String id);
-	
+
 	/**
 	 * find by id
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -93,7 +101,7 @@ public interface AlarmService  extends SwallowService {
 	/**
 	 * find all
 	 * 
-	 * @param 
+	 * @param
 	 * @return
 	 */
 	public List<Alarm> findAll();

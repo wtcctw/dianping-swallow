@@ -11,7 +11,7 @@ import org.apache.http.NameValuePair;
  * @author qiyin
  *
  */
-public interface HttpService extends SwallowService {  
+public interface HttpService {
 
 	/**
 	 * http post request
@@ -29,11 +29,11 @@ public interface HttpService extends SwallowService {
 	 * @return json
 	 */
 	public HttpResult httpGet(String url);
-	
-	
+
 	/**
 	 * 
 	 * http request result
+	 * 
 	 * @author qiyin
 	 *
 	 */
