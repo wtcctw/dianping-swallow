@@ -14,9 +14,8 @@ public interface TopicStatisDataDao {
 
 	public TopicStatisData findById(String id);
 	
-	public TopicStatisData findByTimeKey(String timeKey);
+	public TopicStatisData findByTimeKey(long timeKey);
 	
-	public TopicStatisData findByTopic(String topicName);
+	public List<TopicStatisData> findByTopic(String topicName);
 
-	public List<TopicStatisData> findAll();
 }

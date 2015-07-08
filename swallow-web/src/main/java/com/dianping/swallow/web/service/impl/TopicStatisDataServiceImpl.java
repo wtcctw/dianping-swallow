@@ -2,54 +2,48 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.dao.TopicStatisDataDao;
 import com.dianping.swallow.web.model.statis.TopicStatisData;
 import com.dianping.swallow.web.service.TopicStatisDataService;
+
 
 @Service("topicStatisDataService")
 public class TopicStatisDataServiceImpl implements TopicStatisDataService {
 
+	@Autowired
+	private TopicStatisDataDao topicStatisDataDao;
+	
 	@Override
 	public boolean insert(TopicStatisData statisData) {
-		// TODO Auto-generated method stub
-		return false;
+		return topicStatisDataDao.insert(statisData);
 	}
 
 	@Override
 	public boolean update(TopicStatisData statisData) {
-		// TODO Auto-generated method stub
-		return false;
+		return topicStatisDataDao.update(statisData);
 	}
 
 	@Override
 	public int deleteById(String id) {
-		// TODO Auto-generated method stub
-		return 0;
+		return topicStatisDataDao.deleteById(id);
 	}
 
 	@Override
 	public TopicStatisData findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		return topicStatisDataDao.findById(id);
 	}
 
 	@Override
-	public TopicStatisData findByTimeKey(String timeKey) {
-		// TODO Auto-generated method stub
-		return null;
+	public TopicStatisData findByTimeKey(long timeKey) {
+		return topicStatisDataDao.findByTimeKey(timeKey);
 	}
 
 	@Override
-	public TopicStatisData findByTopic(String topicName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<TopicStatisData> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<TopicStatisData> findByTopic(String topicName) {
+		return topicStatisDataDao.findByTopic(topicName);
 	}
 
 }

@@ -12,38 +12,32 @@ import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 @Service("producerServerAlarmSettingService")
 public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlarmSettingService {
 
-	
 	@Autowired
 	private ProducerServerAlarmSettingDao producerServerAlarmSettingDao;
 	
 	@Override
 	public boolean insert(ProducerServerAlarmSetting setting) {
-		// TODO Auto-generated method stub
-		return false;
+		return producerServerAlarmSettingDao.insert(setting);
 	}
 
 	@Override
 	public boolean update(ProducerServerAlarmSetting setting) {
-		// TODO Auto-generated method stub
-		return false;
+		return producerServerAlarmSettingDao.update(setting);
 	}
 
 	@Override
 	public int deleteById(String id) {
-		// TODO Auto-generated method stub
-		return 0;
+		return producerServerAlarmSettingDao.deleteById(id);
 	}
 
 	@Override
 	public ProducerServerAlarmSetting findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		return producerServerAlarmSettingDao.findById(id);
 	}
 
 	@Override
 	public List<ProducerServerAlarmSetting> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		return producerServerAlarmSettingDao.findAll();
 	}
 
 }

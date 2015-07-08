@@ -14,7 +14,7 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
 import com.dianping.swallow.web.alarmer.ProducerStatisAlarmer;
 import com.dianping.swallow.web.model.statis.ProducerBaseStatisData;
-import com.dianping.swallow.web.model.statis.ProducerServerMachineStatisData;
+import com.dianping.swallow.web.model.statis.ProducerMachineStatisData;
 import com.dianping.swallow.web.model.statis.ProducerServerStatisData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
@@ -22,7 +22,6 @@ import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.impl.DefaultProducerDataRetriever;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerStatisDataService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 import com.dianping.swallow.web.service.TopicStatisDataService;
 
@@ -42,9 +41,6 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 
 	@Autowired
 	private ProducerServerAlarmSettingService producerServerAlarmSettingService;
-
-	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
 
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
@@ -105,13 +101,13 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 		Map<String, NavigableMap<Long, Long>> qpxForServers = allData.getQpxForServers(StatisType.SAVE);
 		if (qpxForServers != null) {
 			ProducerServerStatisData statisData = new ProducerServerStatisData();
-			List<ProducerServerMachineStatisData> machineStatisDatas = new ArrayList<ProducerServerMachineStatisData>();
+			List<ProducerMachineStatisData> machineStatisDatas = new ArrayList<ProducerMachineStatisData>();
 			for (Map.Entry<String, NavigableMap<Long, Long>> statis : qpxForServers.entrySet()) {
 				String serverIp = statis.getKey();
 				Long timekey = statis.getValue().floorKey(
 						DefaultProducerDataRetriever.getKey(System.currentTimeMillis()));
 				statisData.setTimeKey(timekey);
-				ProducerServerMachineStatisData machineStatisData = new ProducerServerMachineStatisData();
+				ProducerMachineStatisData machineStatisData = new ProducerMachineStatisData();
 				machineStatisData.setIp(serverIp);
 				ProducerBaseStatisData baseStatisData = new ProducerBaseStatisData();
 				baseStatisData.setDelay(0);
@@ -130,7 +126,7 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 			Iterator iterator = topics.iterator();
 			while(iterator.hasNext()){
 				String topic = String.valueOf(iterator.next());
-				
+				allData.getQpxForTopic(topic, StatisType.SAVE);
 			}
 		}
 	}

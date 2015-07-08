@@ -1,11 +1,14 @@
 package com.dianping.swallow.web.model.statis;
 
-import java.util.List;
-
 public class ConsumerClientStatisData {
 	
 	private ConsumerBaseStatisData statisData;
-	
-	private List<ConsumerIdStatisData> consumerIdStatisDatas;
-	
+
+	public ConsumerBaseStatisData getStatisData() {
+		return statisData;
+	}
+
+	public void setStatisData(ConsumerBaseStatisData statisData) {
+		this.statisData = statisData;
+	}
 }

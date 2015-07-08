@@ -8,9 +8,9 @@ public class TopicStatisData {
 
 	private String topicName;
 
-	private ProducerClientStatisData producerStatisData;
+	private ProducerBaseStatisData producerStatisData;
 	
-	private ConsumerClientStatisData consumerStatisData;
+	private ConsumerBaseStatisData consumerStatisData;
 
 	public String getId() {
 		return id;
@@ -36,21 +36,20 @@ public class TopicStatisData {
 		this.topicName = topicName;
 	}
 
-	public ProducerClientStatisData getProducerStatisData() {
+	public ProducerBaseStatisData getProducerStatisData() {
 		return producerStatisData;
 	}
 
-	public void setProducerStatisData(ProducerClientStatisData producerStatisData) {
+	public void setProducerStatisData(ProducerBaseStatisData producerStatisData) {
 		this.producerStatisData = producerStatisData;
 	}
 
-	public ConsumerClientStatisData getConsumerStatisData() {
+	public ConsumerBaseStatisData getConsumerStatisData() {
 		return consumerStatisData;
 	}
 
-	public void setConsumerStatisData(ConsumerClientStatisData consumerStatisData) {
+	public void setConsumerStatisData(ConsumerBaseStatisData consumerStatisData) {
 		this.consumerStatisData = consumerStatisData;
 	}
-	
 
 }

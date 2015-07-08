@@ -4,13 +4,13 @@ import java.util.List;
 
 public class ProducerServerStatisData extends AbstractServerStatisData {
 	
-	private List<ProducerServerMachineStatisData> statisDatas;
+	private List<ProducerMachineStatisData> statisDatas;
 
-	public List<ProducerServerMachineStatisData> getStatisDatas() {
+	public List<ProducerMachineStatisData> getStatisDatas() {
 		return statisDatas;
 	}
 
-	public void setStatisDatas(List<ProducerServerMachineStatisData> statisDatas) {
+	public void setStatisDatas(List<ProducerMachineStatisData> statisDatas) {
 		this.statisDatas = statisDatas;
 	}
 

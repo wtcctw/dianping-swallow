@@ -1,29 +1,19 @@
 package com.dianping.swallow.web.model.alarm;
 
-import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
-/**
- * 
- * @author qiyin
- *
- */
 public class TopicAlarmSetting {
-
 	@Id
 	private String id;
-
-	private String topicName;
-
-	private ProducerClientAlarmSetting producerSetting;
-
-	private ConsumerClientAlarmSetting consumerSetting;
-
-	private Date createTime;
-
-	private Date updateTime;
-
+	
+	private List<String> whiteList;
+	
+	private ProducerBaseAlarmSetting producerAlarmSetting;
+	
+	private ConsumerBaseAlarmSetting consumerAlarmSetting;
+	
 	public String getId() {
 		return id;
 	}
@@ -32,50 +22,29 @@ public class TopicAlarmSetting {
 		this.id = id;
 	}
 
-	public String getTopicName() {
-		return topicName;
+	public List<String> getWhiteList() {
+		return whiteList;
 	}
 
-	public void setTopicName(String topicName) {
-		this.topicName = topicName;
+	public void setWhiteList(List<String> whiteList) {
+		this.whiteList = whiteList;
 	}
 
-	public ProducerClientAlarmSetting getProducerSetting() {
-		return producerSetting;
+	public ProducerBaseAlarmSetting getProducerAlarmSetting() {
+		return producerAlarmSetting;
 	}
 
-	public void setProducerSetting(ProducerClientAlarmSetting producerSetting) {
-		this.producerSetting = producerSetting;
+	public void setProducerAlarmSetting(ProducerBaseAlarmSetting producerAlarmSetting) {
+		this.producerAlarmSetting = producerAlarmSetting;
 	}
 
-	public Date getCreateTime() {
-		return createTime;
+	public ConsumerBaseAlarmSetting getConsumerAlarmSetting() {
+		return consumerAlarmSetting;
 	}
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public ConsumerClientAlarmSetting getConsumerSetting() {
-		return consumerSetting;
-	}
-
-	public void setConsumerSetting(ConsumerClientAlarmSetting consumerSetting) {
-		this.consumerSetting = consumerSetting;
+	public void setConsumerAlarmSetting(ConsumerBaseAlarmSetting consumerAlarmSetting) {
+		this.consumerAlarmSetting = consumerAlarmSetting;
 	}
 	
-	@Override
-	public String toString() {
-		return "TopicAlarmSetting [ id = " + id + ",topicName = " + topicName + ", producerSetting = "
-				+ producerSetting + ", consumerSetting = " + consumerSetting + ", createTime = " + createTime
-				+ ", updateTime = " + updateTime + "]";
-	}
+	
 }

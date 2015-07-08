@@ -14,7 +14,5 @@ public interface TopicAlarmSettingDao {
 
 	public TopicAlarmSetting findById(String id);
 	
-	public TopicAlarmSetting findByTopic(String topicName);
-
 	public List<TopicAlarmSetting> findAll();
 }

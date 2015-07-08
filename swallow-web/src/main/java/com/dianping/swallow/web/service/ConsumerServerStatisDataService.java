@@ -14,9 +14,6 @@ public interface ConsumerServerStatisDataService {
 
 	public ConsumerServerStatisData findById(String id);
 	
-	public ConsumerServerStatisData findByTimeKey(String timeKey);
+	public ConsumerServerStatisData findByTimeKey(long timeKey);
 	
-	public ConsumerServerStatisData findByTopic(String topicName);
-
-	public List<ConsumerServerStatisData> findAll();
 }

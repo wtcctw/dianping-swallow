@@ -2,37 +2,39 @@ package com.dianping.swallow.web.model.alarm;
 
 import java.util.List;
 
-/**
- * 
- * @author qiyin
- *
- */
-public class ProducerServerAlarmSetting extends AbstractServerAlarmSetting {
+import org.springframework.data.annotation.Id;
 
-	private ProducerBaseAlarmSetting topicDefaultSetting;
+public class ProducerServerAlarmSetting {
 	
-	private List<ProducerServerMachineAlarmSetting> machineAlarmSettings;
+	@Id
+	private String id;
 	
-
-	public ProducerBaseAlarmSetting getTopicDefaultSetting() {
-		return topicDefaultSetting;
+	private List<String> whiteList;
+	
+	private QPSAlarmSetting defaultAlarmSetting;
+	
+	public String getId() {
+		return id;
 	}
 
-	public void setTopicDefaultSetting(ProducerBaseAlarmSetting topicDefaultSetting) {
-		this.topicDefaultSetting = topicDefaultSetting;
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public List<String> getWhiteList() {
+		return whiteList;
+	}
+
+	public void setWhiteList(List<String> whiteList) {
+		this.whiteList = whiteList;
+	}
+
+	public QPSAlarmSetting getDefaultAlarmSetting() {
+		return defaultAlarmSetting;
+	}
+
+	public void setDefaultAlarmSetting(QPSAlarmSetting defaultAlarmSetting) {
+		this.defaultAlarmSetting = defaultAlarmSetting;
 	}
 	
-	public List<ProducerServerMachineAlarmSetting> getMachineAlarmSettings() {
-		return machineAlarmSettings;
-	}
-
-	public void setMachineAlarmSettings(List<ProducerServerMachineAlarmSetting> machineAlarmSettings) {
-		this.machineAlarmSettings = machineAlarmSettings;
-	}
-
-	@Override
-	public String toString() {
-		return "ProducerServerAlarmSetting [topicDefaultSetting = " + topicDefaultSetting + " ]";
-	}
-
 }

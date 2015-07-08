@@ -2,43 +2,61 @@ package com.dianping.swallow.web.dao.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ProducerServerAlarmSettingDao;
+import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
-
+import com.mongodb.WriteResult;
 
 @Service("producerServerAlarmSettingDao")
 public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao implements ProducerServerAlarmSettingDao {
 
+	private static final Logger logger = LoggerFactory.getLogger(DefaultProducerServerAlarmSettingDao.class);
+
+	private static final String PRODUCERSERVERALARMSETTING_COLLECTION = "swallowwebproducerserveralarmsettingc";
+
+	private static final String ID_FIELD = "id";
+
 	@Override
 	public boolean insert(ProducerServerAlarmSetting setting) {
-		// TODO Auto-generated method stub
+		try {
+			mongoTemplate.save(setting, PRODUCERSERVERALARMSETTING_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("Error when save topic " + setting, e);
+		}
 		return false;
 	}
 
 	@Override
 	public boolean update(ProducerServerAlarmSetting setting) {
-		// TODO Auto-generated method stub
-		return false;
+		return insert(setting);
 	}
 
 	@Override
 	public int deleteById(String id) {
-		// TODO Auto-generated method stub
-		return 0;
+		Query query = new Query(Criteria.where(ID_FIELD).is(id));
+		WriteResult result = mongoTemplate.remove(query, ProducerServerAlarmSetting.class,
+				PRODUCERSERVERALARMSETTING_COLLECTION);
+		return result.getN();
 	}
 
 	@Override
 	public ProducerServerAlarmSetting findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		Query query = new Query(Criteria.where(ID_FIELD).is(id));
+		ProducerServerAlarmSetting serverAlarmSetting = mongoTemplate.findOne(query, ProducerServerAlarmSetting.class,
+				PRODUCERSERVERALARMSETTING_COLLECTION);
+		return serverAlarmSetting;
 	}
 
 	@Override
 	public List<ProducerServerAlarmSetting> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		return mongoTemplate.findAll(ProducerServerAlarmSetting.class, PRODUCERSERVERALARMSETTING_COLLECTION);
 	}
 
 }

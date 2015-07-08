@@ -2,35 +2,38 @@ package com.dianping.swallow.web.model.alarm;
 
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
+
 public class ConsumerIdAlarmSetting {
-
-	private String consumerId;
-
-	private String machineWhiteList;
-
-	private ConsumerBaseAlarmSetting machineDefalutSetting;
-
-	private List<ConsumerClientMachineAlarmSetting> machineSettings;
-
-	public String getConsumerId() {
-		return consumerId;
+	
+	@Id
+	private String id;
+	
+	private List<String> whiteList;
+	
+	private ConsumerBaseAlarmSetting consumerAlarmSetting;
+	
+	public String getId() {
+		return id;
 	}
 
-	public void setConsumerId(String consumerId) {
-		this.consumerId = consumerId;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public List<ConsumerClientMachineAlarmSetting> getMachineSettings() {
-		return machineSettings;
+	public List<String> getWhiteList() {
+		return whiteList;
 	}
 
-	public void setMachineSettings(List<ConsumerClientMachineAlarmSetting> machineSettings) {
-		this.machineSettings = machineSettings;
+	public void setWhiteList(List<String> whiteList) {
+		this.whiteList = whiteList;
 	}
 
-	@Override
-	public String toString() {
-		return "ConsumerIdAlarmSetting [consumerId = " + consumerId + ", machineWhiteList = " + machineWhiteList
-				+ ", machineDefalutSetting = " + machineDefalutSetting + ", machineSettings=" + machineSettings + "]";
+	public ConsumerBaseAlarmSetting getConsumerAlarmSetting() {
+		return consumerAlarmSetting;
+	}
+
+	public void setConsumerAlarmSetting(ConsumerBaseAlarmSetting consumerAlarmSetting) {
+		this.consumerAlarmSetting = consumerAlarmSetting;
 	}
 }

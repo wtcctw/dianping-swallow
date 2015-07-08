@@ -13,18 +13,16 @@ import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlarmSettingService {
 
 	@Autowired
-	private ConsumerServerAlarmSettingDao cconsumerServerAlarmSettingDao;
+	private ConsumerServerAlarmSettingDao consumerServerAlarmSettingDao;
 
 	@Override
 	public boolean insert(ConsumerServerAlarmSetting setting) {
-		cconsumerServerAlarmSettingDao.insert(setting);
-		return false;
+		return consumerServerAlarmSettingDao.insert(setting);
 	}
 
 	@Override
 	public boolean update(ConsumerServerAlarmSetting setting) {
-		// TODO Auto-generated method stub
-		return false;
+		return consumerServerAlarmSettingDao.update(setting);
 	}
 
 	@Override
@@ -35,14 +33,12 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 
 	@Override
 	public ConsumerServerAlarmSetting findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		return consumerServerAlarmSettingDao.findById(id);
 	}
 
 	@Override
 	public List<ConsumerServerAlarmSetting> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		return consumerServerAlarmSettingDao.findAll();
 	}
 
 }
