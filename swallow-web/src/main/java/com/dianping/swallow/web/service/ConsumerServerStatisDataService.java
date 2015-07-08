@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.service;
 
-import java.util.List;
-
 import com.dianping.swallow.web.model.statis.ConsumerServerStatisData;
 
 public interface ConsumerServerStatisDataService {

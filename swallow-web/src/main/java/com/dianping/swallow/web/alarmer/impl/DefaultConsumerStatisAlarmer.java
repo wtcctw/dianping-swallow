@@ -34,37 +34,11 @@ public class DefaultConsumerStatisAlarmer extends AbstractStatisAlarmer implemen
 		
 	}
 	
-	public void doServerQpsAlarm(){
+	public void doServerAlarm(){
 		consumerDataRetriever.getServerQpx(QPX.SECOND);
 	}
 	
-	public void doTopicQpsAlarm(){
-		
-	}
-	
-	public void doServerDelayAlarm(){
-		consumerDataRetriever.getServerQpx(QPX.SECOND);
-	}
-	
-	public void doTopicDelayAlarm(){
-		
-	}
-
-	@Override
-	public void doConsumerIdQpsAlarm() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void doConsumerIdDelayAlarm() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void achieveMonitorData() {
-		// TODO Auto-generated method stub
+	public void doTopicAlarm(){
 		
 	}
 
@@ -73,4 +47,18 @@ public class DefaultConsumerStatisAlarmer extends AbstractStatisAlarmer implemen
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void doConsumerIdAlarm() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void achieveMonitorData() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 }

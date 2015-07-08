@@ -51,6 +51,7 @@ public class DefaultConsumerServiceAlarmer extends AbstractServiceAlarmer implem
 		doCheckPort();
 		doCheckService();
 		doCheckSender();
+		logger.info("[doAlarm] check consumer service.");
 	}
 
 	@Override

@@ -7,15 +7,10 @@ package com.dianping.swallow.web.alarmer;
 */
 public interface ConsumerStatisAlarmer extends Alarmer {
 	
-	public void doServerQpsAlarm();
+	public void doServerAlarm();
 	
-	public void doTopicQpsAlarm();
+	public void doConsumerIdAlarm();
 	
-	public void doConsumerIdQpsAlarm();
+	public void doTopicAlarm();
 	
-	public void doServerDelayAlarm();
-	
-	public void doTopicDelayAlarm();
-	
-	public void doConsumerIdDelayAlarm();
 }
