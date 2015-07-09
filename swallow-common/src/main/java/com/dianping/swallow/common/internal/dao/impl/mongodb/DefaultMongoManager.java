@@ -2,32 +2,29 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.cat.Cat;
 import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.SwallowConfigArgs;
 import com.dianping.swallow.common.internal.dao.MongoManager;
+import com.dianping.swallow.common.internal.exception.SwallowAlertException;
 import com.dianping.swallow.common.internal.lifecycle.Ordered;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.monitor.ComponentMonitable;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.observer.Observer;
-import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.common.internal.util.StringUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -35,7 +32,6 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoException;
-import com.mongodb.ServerAddress;
 
 /**
  * 管理Mongo以及Collection的获取
@@ -62,30 +58,35 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	private volatile MongoClient heartbeatMongo;
 
 	private SwallowConfig swallowConfig;
+	
+	private String mongoConfigLionSuffix;
 
 	private MongoClientOptions mongoOptions;
 
 	private boolean messageCollectionCapped = true;
 	
-	private Set<MongoClient>  mongos = new HashSet<MongoClient>();
-
+	private MongoContainer mongoContainer;
+	
 	public DefaultMongoManager() {
 		this(null);
 	}
 
 	public DefaultMongoManager(String mongoConfigLionSuffix) {
-
-		MongoConfig config = new MongoConfig(MONGO_CONFIG_FILENAME, mongoConfigLionSuffix);
-		mongoOptions = config.buildMongoOptions();
-		if (logger.isInfoEnabled()) {
-			logger.info("MongoOptions=" + mongoOptions.toString());
-		}
+		this.mongoConfigLionSuffix = mongoConfigLionSuffix;
 	}
 
 	
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
+
+		MongoConfig config = new MongoConfig(MONGO_CONFIG_FILENAME, mongoConfigLionSuffix);
+		mongoOptions = config.buildMongoOptions();
+		if (logger.isInfoEnabled()) {
+			logger.info("MongoOptions=" + mongoOptions.toString());
+		}
+		
+		mongoContainer = new MongoContainer(mongoOptions);
 		
 		swallowConfig.addObserver(this);
 		swallowConfig.initialize();
@@ -96,24 +97,13 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	
 	@Override
 	protected void doDispose() throws Exception {
-		
-		closeAllMongo();
+
+		mongoContainer.closeAllMongo();
 		swallowConfig.dispose();
+		
 		super.doDispose();
 	}
 	
-	private void closeAllMongo() {
-		
-		if(logger.isInfoEnabled()){
-			logger.info("[closeAllMongo]");
-		}
-		
-		for(MongoClient mongo : topicNameToMongoMap.values()){
-			mongo.close();
-		}
-		heartbeatMongo.close();
-	}
-
 	private void loadSwallowConfig() {
 
 		try {
@@ -127,59 +117,10 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	private void createHeartbeatMongo() {
 
 		String serverURI = swallowConfig.getHeartBeatMongo();
-		List<ServerAddress> replicaSetSeeds = MongoUtils.parseUriToAddressList(serverURI);
-		heartbeatMongo = createOrUseExistingMongo(replicaSetSeeds);
+		heartbeatMongo = mongoContainer.getMongo(serverURI);
 		if (logger.isInfoEnabled()) {
 			logger.info("[createHeartbeatMongo]" + heartbeatMongo);
 		}
-	}
-
-	private synchronized MongoClient createOrUseExistingMongo(List<ServerAddress> replicaSetSeeds) {
-		
-		List<ServerAddress> servers = null;
-		for(MongoClient mongo : mongos){
-			
-			servers = mongo.getAllAddress();
-			
-			try{
-				servers = mongo.getServerAddressList();
-			}catch(MongoException e){
-				logger.warn("[createOrUseExistingMongo]", e);
-			}
-			
-			if(seedIn(servers, replicaSetSeeds)){
-				if(logger.isInfoEnabled()){
-					logger.info("[createOrUseExistingMongo][use exist mongo]");
-				}
-				return mongo;
-			}
-			
-		}
-		
-		if(logger.isInfoEnabled()){
-			logger.info("[createMongo]" + replicaSetSeeds);
-		}
-		
-		MongoClient mongo = new MongoClient(replicaSetSeeds, mongoOptions);
-		mongos.add(mongo);
-		return mongo;
-	}
-
-	@SuppressWarnings("unused")
-	private void closeMongo(MongoClient mongo) {
-		
-		if (logger.isInfoEnabled()) {
-			logger.info("[closeMongo]" + mongo);
-		}
-		
-		boolean contains = mongos.remove(mongo);
-		if(!contains){
-			
-			String errorMessage = "[close unexist mongo]" + mongo + "," + mongos;
-			logger.error(errorMessage);
-			Cat.logError(new IllegalStateException(errorMessage));
-		}
-		mongo.close();
 	}
 
 	public void createTopicMongo() {
@@ -204,20 +145,22 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		}
 	}
 
-	private MongoClient createTopicMongo(String topicName) {
+	private void createTopicMongo(String topicName) {
 		
 		TopicConfig topicConfig = swallowConfig.getTopicConfig(topicName);
 		String uri = topicConfig.getMongoUrl();
-		List<ServerAddress> replicaSetSeeds = MongoUtils.parseUriToAddressList(uri);
-		MongoClient mongo = null;
-		mongo = createOrUseExistingMongo(replicaSetSeeds);
 		
-		MongoClient oldMongoClient = topicNameToMongoMap.put(topicName, mongo);
-		if (logger.isInfoEnabled()) {
-			logger.info("[createreateTopicMongo]["+topicName+"]" + mongo);
+		if(StringUtils.isEmpty(uri)){
+			return;
 		}
 		
-		return oldMongoClient;
+		MongoClient mongo = mongoContainer.getMongo(uri);
+		
+		@SuppressWarnings("unused")
+		MongoClient oldMongoClient = topicNameToMongoMap.put(topicName, mongo);
+		if (logger.isInfoEnabled()) {
+			logger.info("[createTopicMongo]["+topicName+"]" + mongo);
+		}
 	}
 
 	@Override
@@ -257,20 +200,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private boolean seedIn(List allAddress, List seeds) {
-
-		boolean result = false;
-		
-		if (allAddress != null && seeds != null) {
-			result = allAddress.containsAll(seeds);
-		}
-		if(logger.isDebugEnabled()){
-			logger.debug("[seedIn][" + result + "]" + allAddress + "," + seeds);
-		}
-		return result;
-	}
-
 	public DBCollection getMessageCollection(String topicName) {
 		return getMessageCollection(topicName, null);
 	}
@@ -279,8 +208,8 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 
 		MongoClient mongo = getMongo(topicName);
 		List<DBObject> index = new LinkedList<DBObject>();
-		int size = -1;
-		int max = 0;
+		Integer size = -1;
+		Integer max = 0;
 		String dbName = getMessageDbName(topicName, consumerId);
 
 		index.add(new BasicDBObject(MessageDAOImpl.ID, -1));
@@ -288,8 +217,8 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 			
 			TopicConfig config = swallowConfig.getTopicConfig(topicName);
 			if (messageCollectionCapped) {
-				size = config.getSize();
-				max = config.getMax();
+				size = getSize(config);
+				max = getMax(config);
 			}
 		} else {
 			index.add(new BasicDBObject(MessageDAOImpl.ORIGINAL_ID, -1));
@@ -299,6 +228,16 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 			}
 		}
 		return getCollection(mongo, size, max, dbName, index);
+	}
+
+	private int getMax(TopicConfig config) {
+		
+		return config.getMax() == null ? swallowConfig.defaultTopicConfig().getMax() : config.getMax();
+	}
+
+	private int getSize(TopicConfig config) {
+		
+		return config.getSize() == null ? swallowConfig.defaultTopicConfig().getSize() : config.getSize();
 	}
 
 	private String getMessageDbName(String topicName, String consumerId) {
@@ -411,8 +350,8 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 				new BasicDBObject(HeartbeatDAOImpl.TICK, -1));
 	}
 
-	private DBCollection getCollection(MongoClient mongo, int size,
-			int cappedCollectionMaxDocNum, String dbName,
+	private DBCollection getCollection(MongoClient mongo, Integer size,
+			Integer cappedCollectionMaxDocNum, String dbName,
 			DBObject... indexDBObjects) {
 		List<DBObject> index = new LinkedList<DBObject>();
 		for (DBObject dbObject : indexDBObjects) {
@@ -422,8 +361,8 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 				index);
 	}
 
-	private DBCollection getCollection(MongoClient mongo, int size,
-			int cappedCollectionMaxDocNum, String dbName,
+	private DBCollection getCollection(MongoClient mongo, Integer size,
+			Integer cappedCollectionMaxDocNum, String dbName,
 			List<DBObject> indexDBObjects) {
 		// 根据topicname从Mongo实例从获取DB
 		DB db = mongo.getDB(dbName);
@@ -463,7 +402,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	}
 
 	private DBCollection createColletcion(DB db, String collectionName,
-			int size, int cappedCollectionMaxDocNum,
+			Integer size, Integer cappedCollectionMaxDocNum,
 			List<DBObject> indexDBObjects) {
 
 		if (logger.isInfoEnabled()) {
@@ -473,12 +412,14 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		}
 
 		DBObject options = new BasicDBObject();
-		if (size > 0) {
+		if (size != null && size > 0) {
 			options.put("capped", true);
 			options.put("size", size * AbstractSwallowConfig.MILLION);
 			if (cappedCollectionMaxDocNum > 0) {
 				options.put("max", cappedCollectionMaxDocNum * AbstractSwallowConfig.MILLION);
 			}
+		}else{
+			logger.error("size not correct:" + db.getName() + "," + size, new SwallowAlertException("CollectionSize not right"));
 		}
 		try {
 			DBCollection collection = db.createCollection(collectionName,
@@ -515,7 +456,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	@Override
 	public int getMongoCount() {
 
-		return mongos.size();
+		return mongoContainer.mongoSize();
 	}
 
 	public SwallowConfig getSwallowConfig() {
@@ -528,7 +469,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 
 	public Collection<MongoClient> getAllMongo(){
 		
-		return Collections.unmodifiableCollection(mongos);
+		return mongoContainer.getAllMongo();
 	}
 	
 	@Override

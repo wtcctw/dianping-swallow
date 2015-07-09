@@ -22,7 +22,6 @@ public class DestinationTest {
 		
 		for(byte b : str.getBytes()){
 			
-			int data = b;
 			System.out.print((char)b);
 			System.out.println(" " + b);
 		}

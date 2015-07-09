@@ -40,8 +40,8 @@ public class ProducerServerDataTest extends AbstractServerDataTest{
 		String topic = topics[0];
 		String ip = ips[0];
 		
-		System.out.println(producerAllData.getKeys(new CasKeys(server, topic)));
-		System.out.println(producerAllData.getValue(new CasKeys(server, topic, ip)));
+		System.out.println(producerAllData.getKeys(new CasKeys(server)));
+		System.out.println(producerAllData.getValue(new CasKeys(server, topic, ip)).getClass());
 		
 		
 	}

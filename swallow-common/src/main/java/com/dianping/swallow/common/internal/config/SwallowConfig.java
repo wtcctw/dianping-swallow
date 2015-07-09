@@ -33,6 +33,8 @@ public interface SwallowConfig extends Observable, Lifecycle{
 	 * @return
 	 */
 	TopicConfig getTopicConfig(String topic);
+	
+	TopicConfig defaultTopicConfig();
 
 	String getHeartBeatMongo();
 	
@@ -50,7 +52,7 @@ public interface SwallowConfig extends Observable, Lifecycle{
 		
 		public TopicConfig(String mongoUrl, int size, int max){
 			
-			this.mongoUrl = mongoUrl;
+			this.mongoUrl = StringUtils.trimToNull(mongoUrl);
 			this.size = size;
 			this.max = max;
 			

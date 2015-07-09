@@ -49,6 +49,12 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 	}
 
 	@Override
+	public TopicConfig defaultTopicConfig() {
+		
+		return getTopicConfig(TOPICNAME_DEFAULT);
+	}
+	
+	@Override
 	protected void doDispose() throws Exception {
 		
 		dynamicConfig.removeConfigChangeListener(this);

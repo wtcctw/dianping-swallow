@@ -51,8 +51,6 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		} catch (CloneNotSupportedException e) {
 			
 		}
-		//融合默认配置
-		retCfg.merge(topicCfgs.get(TOPICNAME_DEFAULT));
 		return retCfg;
 	}
 

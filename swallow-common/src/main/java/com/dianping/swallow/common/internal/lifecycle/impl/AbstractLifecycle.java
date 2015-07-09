@@ -20,7 +20,7 @@ public abstract class AbstractLifecycle extends AbstractComponentMonitorable imp
 
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 	
-	private LifecycleManager lifecycleManager = new DefaultLifecycleManager();
+	private LifecycleManager lifecycleManager = new DefaultLifecycleManager(this);
 
 	@Override
 	public void initialize() throws Exception {
