@@ -15,6 +15,10 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
+<<<<<<< HEAD
+=======
+import com.mongodb.MongoException;
+>>>>>>> mongo管理
 import com.mongodb.ServerAddress;
 
 /**
@@ -62,6 +66,21 @@ public class MongoContainer {
 					logger.info("[createOrUseExistingMongo][use exist mongo]");
 				}
 				return mongo;
+<<<<<<< HEAD
+=======
+			}else{
+				try{
+					servers = mongo.getServerAddressList();
+					if(seedIn(servers, replicaSetSeeds)){
+						if(logger.isInfoEnabled()){
+							logger.info("[createOrUseExistingMongo][use exist mongo]");
+						}
+						return mongo;
+					}
+				}catch(MongoException e){
+					logger.warn("[createOrUseExistingMongo]", e);
+				}
+>>>>>>> mongo管理
 			}
 		}
 		
