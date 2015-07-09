@@ -179,6 +179,9 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 			throw new UnfoundKeyException(key);
 		}
 		
+		if(!keys.hasNextKey()){
+			return server;
+		}
 		return server.getValue(keys, type);
 
 	}
