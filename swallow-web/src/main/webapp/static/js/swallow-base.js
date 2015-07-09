@@ -109,3 +109,41 @@ module.filter('reverse', function() {
   };
 });
 
+module.directive('popOver', function ($compile) {
+    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{topic}}/qps?cid={{cid}}'>发送延迟</a></th><th>ack延迟</th><th>消息堆积</th></tr><tr><td>{{topic}}</td><td ng-repeat='item in items'>{{item}}</td></tr></table>";
+    var getTemplate = function (contentType) {
+        var template = '';
+        switch (contentType) {
+            case 'items':
+                template = itemsTemplate;
+                break;
+        }
+        return template;
+    }
+    return {
+        restrict: "A",
+        transclude: true,
+        template: "<span ng-transclude></span>",
+        link: function (scope, element, attrs) {
+            var popOverContent;
+            if (scope.items) {
+                var html = getTemplate("items");
+                popOverContent = $compile(html)(scope);                    
+            }
+            var options = {
+                content: popOverContent,
+                placement: "bottom",
+                html: true,
+                title: scope.title
+            };
+            $(element).popover(options);
+        },
+        scope: {
+            items: '=',
+            topic: '=',
+            cid: '=',
+            title: '@'
+        }
+    };
+});
+

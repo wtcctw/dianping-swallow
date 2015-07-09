@@ -3,9 +3,11 @@ package com.dianping.swallow.web.monitor.dashboard;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,8 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.util.CommonUtils;
+import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
+import com.dianping.swallow.common.server.monitor.data.statis.ConsumerAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.task.TopicScanner;
 import com.google.common.collect.Lists;
@@ -48,6 +55,14 @@ public class DashboardContainerUpdater implements Runnable {
 	@Autowired
 	private TopicScanner topicScanner;
 
+	private ConsumerAllData consumerAllData = new ConsumerAllData();
+
+	private Set<String> servers = new HashSet<String>();
+
+	private Set<String> topics = new HashSet<String>();
+
+	private Set<String> consumerids = new HashSet<String>();
+
 	private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(CommonUtils.getCpuCount());
 
 	private Map<String, TotalData> totalDataMap = new ConcurrentHashMap<String, TotalData>();
@@ -59,6 +74,8 @@ public class DashboardContainerUpdater implements Runnable {
 	private static int ACKTHRELSH = 27;
 
 	private static int ACCUTHRELSH = 28;
+
+	private static final String TOTAL = "total";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -75,48 +92,81 @@ public class DashboardContainerUpdater implements Runnable {
 			getConsumerIdDashboard();
 			logger.info("Update minute entry");
 		} catch (Exception e) {
-			logger.error("Error when get data for all consumerid!",e);
+			logger.error("Error when get data for all consumerid!", e);
 		}
 	};
 
 	private void getConsumerIdDashboard() throws Exception {
 
-		Set<String> topics = topicScanner.getTopics().keySet();
-		// for (String topic : topics) {
-		// List<ConsumerDataPair> topicDelays =
-		// consumerDataRetriever.getDelayForAllConsumerId(topic);
-		// Map<String, StatsData> statsData =
-		// accumulationRetriever.getAccumulationForAllConsumerId(topic);
-		// if (topicDelays != null) {
-		// for (ConsumerDataPair topicDelay : topicDelays) {
-		// String cid = topicDelay.getConsumerId();
-		// StatsData sdSend = topicDelay.getSendData();
-		// StatsData ackSend = topicDelay.getAckData();
-		// StatsData accu = statsData.get(cid);
-		// if (isEmpty(sdSend) && isEmpty(ackSend) && isEmpty(accu)) {
-		// continue;
-		// }
-		// int size = dashboardContainer.getEntrySize();
-		// int offset = size == DashboardContainer.ENTRYSIZE ? 2 : SAMPLENUMBER;
-		// List<Long> tmpSend = sdSend.getData().subList(SAMPLENUMBER - offset,
-		// SAMPLENUMBER);
-		// List<Long> tmpAck = ackSend.getData().subList(SAMPLENUMBER - offset,
-		// SAMPLENUMBER);
-		// List<Long> tmpAccu = accu.getData().subList(SAMPLENUMBER - offset,
-		// SAMPLENUMBER);
-		// TotalData td = totalDataMap.get(cid);
-		// if (td == null) {
-		// TotalData totalData = new TotalData();
-		// totalData.setCid(cid).setTopic(topic).setListSend(tmpAck).setListAck(tmpAck)
-		// .setListAccu(tmpAccu);
-		// totalDataMap.put(cid, totalData);
-		// } else {
-		// td.setListSend(tmpSend).setListAck(tmpAck).setListAccu(tmpAccu);
-		// totalDataMap.put(cid, td);
-		// }
-		// }
-		// }
-		// }
+//		servers = consumerAllData.getKeys(new CasKeys());
+//		if (servers.contains(TOTAL)) {
+//			servers.remove(TOTAL);
+//		}
+//		for (String server : servers) {
+//			topics = consumerAllData.getKeys(new CasKeys(server));
+//			if (topics.contains(TOTAL)) {
+//				topics.remove(TOTAL);
+//			}
+//			for (String topic : topics) {
+//				consumerids = consumerAllData.getKeys(new CasKeys(server, topic));
+//				if (consumerids.contains(TOTAL)) {
+//					consumerids.remove(TOTAL);
+//				}
+//				Map<String, StatsData> accuStatsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
+//				for (String consumerid : consumerids) {
+//					ConsumerIdStatisData result = (ConsumerIdStatisData) consumerAllData.getValue(new CasKeys(server,
+//							topic, consumerid));
+//					NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
+//					List<Long> sendList = new ArrayList<Long>(senddelay.values());
+//					NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
+//					List<Long> ackList = new ArrayList<Long>(ackdelay.values());
+//					List<Long> accuList = accuStatsData.get(consumerid).getData();
+//					int statsLastIndex = sendList.size() - 1;
+//					int entrySize = dashboardContainer.getEntrySize();
+//					int offset = entrySize == DashboardContainer.ENTRYSIZE ? 2 : statsLastIndex;
+//					TotalData td = totalDataMap.get(consumerid);
+//					if (td == null) {
+//						td = new TotalData();
+//					}
+//					td.setCid(consumerid).setTopic(topic).setListSend(sendList.subList(statsLastIndex - offset, statsLastIndex))
+//							.setListAck(ackList.subList(statsLastIndex - offset, statsLastIndex))
+//							.setListAccu(accuList.subList(statsLastIndex - offset, statsLastIndex));
+//					totalDataMap.put(consumerid, td);
+//				}
+//			}
+//		}
+
+//		Set<String> topics = topicScanner.getTopics().keySet();
+//		for (String topic : topics) {
+//			List<ConsumerDataPair> topicDelays = consumerDataRetriever.getDelayForAllConsumerId(topic);
+//			Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
+//			if (topicDelays != null) {
+//				for (ConsumerDataPair topicDelay : topicDelays) {
+//					String cid = topicDelay.getConsumerId();
+//					StatsData sdSend = topicDelay.getSendData();
+//					StatsData ackSend = topicDelay.getAckData();
+//					StatsData accu = statsData.get(cid);
+//					if (isEmpty(sdSend) && isEmpty(ackSend) && isEmpty(accu)) {
+//						continue;
+//					}
+//					int size = dashboardContainer.getEntrySize();
+//					int offset = size == DashboardContainer.ENTRYSIZE ? 2 : SAMPLENUMBER;
+//					List<Long> tmpSend = sdSend.getData().subList(SAMPLENUMBER - offset, SAMPLENUMBER);
+//					List<Long> tmpAck = ackSend.getData().subList(SAMPLENUMBER - offset, SAMPLENUMBER);
+//					List<Long> tmpAccu = accu.getData().subList(SAMPLENUMBER - offset, SAMPLENUMBER);
+//					TotalData td = totalDataMap.get(cid);
+//					if (td == null) {
+//						TotalData totalData = new TotalData();
+//						totalData.setCid(cid).setTopic(topic).setListSend(tmpAck).setListAck(tmpAck)
+//								.setListAccu(tmpAccu);
+//						totalDataMap.put(cid, totalData);
+//					} else {
+//						td.setListSend(tmpSend).setListAck(tmpAck).setListAccu(tmpAccu);
+//						totalDataMap.put(cid, td);
+//					}
+//				}
+//			}
+//		}
 
 		// ------------------------------------------------------------------
 		Map<String, List<Long>> mapSend = new ConcurrentHashMap<String, List<Long>>();

@@ -1,42 +1,7 @@
-<style>
-.pagination {
-	margin: 4px 0;
-}
-
-.pagination ul {
-	margin-top: 0px;
-}
-
-.pagination ul>li>a, .pagination ul>li>span {
-	padding: 3px 10px;
-}
-
-.alert-row {
-	background-color: red;
-	color: white;
-}
-
-.red-num {
-	color: rgb(255, 0, 0) !important;
-	font-weight: bold;
-}
-
-.disabled-num {
-	disabled: disabled !important;
-}
-
-.not-active {
-	pointer-events: none !important;
-	cursor: default !important;
-	color: gray !important;
-}
-</style>
-<div class="main-container-inner"
-	ng-controller="ConsumerDashboardController"
+<div class="main-content" ng-controller="ConsumerDashboardController"
 	id="ConsumerDashboardController">
-
-	<div class="main-content">
-		<div class="page-header">
+	<div style="padding-top: 2px; padding-left: 2px; padding-right: 8px;">
+		<div class="report">
 			<div class="breadcrumbs" id="breadcrumbs">
 				<script type="text/javascript">
 					try {
@@ -56,16 +21,13 @@
 						ng-click="getDashboardDelay(60, true)">+3h</a> ] &nbsp;[ <a
 						ng-click="getDashboardDelay(0,false)">now</a> ]&nbsp;
 				</div>
-				<!-- /.nav-search -->
 			</div>
 			<div class="report">
 				<div class="text-center">
-
-
 					<ul class="pagination" style="cursor: pointer">
 						<li id='minute{{$index}}' ng-repeat="page in pages"><a
 							ng-class="whatClassIsIt($index)"
-							ng-click="getDashboardDelay($index, false)" ng-bind="page"> </a></li>
+							ng-click="getDashboardDelay($index)" ng-bind="page"> </a></li>
 					</ul>
 				</div>
 			</div>
@@ -86,7 +48,12 @@
 								ng-class="{'alert-row': entry.numAlarm>0}">
 								<td style="text-align: left; width: 120px"
 									ng-bind="entry.consumerId"></td>
-								<td style="text-align: left; width: 40px" ng-bind="entry.senddelay"></td>
+								<td style="text-align: left; width: 40px; cursor: pointer;"
+									pop-over items="items" topic="topic" cid="cid" title="统计值"
+									id="{{$parent.$index}}{{$index}}"
+									ng-click="table($parent.$index,$index)"
+									ng-bind="entry.numAlarm > 0 ? '异常' : '正常' "></td>
+							</tr>
 						</table>
 					</div>
 

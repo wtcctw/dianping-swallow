@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class TotalData {
 	
+	private String server;
+	
 	private String topic;
 	
 	private String cid;
@@ -29,6 +31,15 @@ public class TotalData {
 
 	public TotalData setEntrys(List<Entry> entrys) {
 		this.entrys = entrys;
+		return this;
+	}
+	
+	public String getServer() {
+		return server;
+	}
+
+	public TotalData setServer(String server) {
+		this.server = server;
 		return this;
 	}
 
@@ -76,5 +87,12 @@ public class TotalData {
 		this.listAccu = listAccu;
 		return this;
 	}
+
+	@Override
+	public String toString() {
+		return "TotalData [server=" + server + ", topic=" + topic + ", cid=" + cid + ", listSend=" + listSend
+				+ ", listAck=" + listAck + ", listAccu=" + listAccu + ", entrys=" + entrys + "]";
+	}
+	
 
 }

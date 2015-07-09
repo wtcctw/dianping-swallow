@@ -6,6 +6,12 @@ package com.dianping.swallow.web.monitor.dashboard;
  *         2015年7月8日上午10:32:58
  */
 public class Entry implements Comparable<Entry>{
+	
+	private String server;
+
+	private String topic;
+	
+	private String developer;
 
 	private String consumerId;
 
@@ -14,8 +20,6 @@ public class Entry implements Comparable<Entry>{
 	private long ackdelay;
 
 	private long accu;
-
-	private String topic;
 	
 	private int senddelayAlarm;
 	
@@ -29,12 +33,30 @@ public class Entry implements Comparable<Entry>{
 
 	}
 
+	public String getServer() {
+		return server;
+	}
+
+	public Entry setServer(String server) {
+		this.server = server;
+		return this;
+	}
+
 	public String getTopic() {
 		return topic;
 	}
 
 	public Entry setTopic(String topic) {
 		this.topic = topic;
+		return this;
+	}
+
+	public String getDeveloper() {
+		return developer;
+	}
+
+	public Entry setDeveloper(String developer) {
+		this.developer = developer;
 		return this;
 	}
 
@@ -118,9 +140,11 @@ public class Entry implements Comparable<Entry>{
 
 	@Override
 	public String toString() {
-		return "Entry [consumerId=" + consumerId + ", senddelay=" + senddelay + ", ackdelay=" + ackdelay + ", accu="
-				+ accu + ", topic=" + topic + ", senddelayAlarm=" + senddelayAlarm + ", ackdelayAlarm=" + ackdelayAlarm
-				+ ", accuAlarm=" + accuAlarm + ", numAlarm=" + numAlarm + "]";
+		return "Entry [server=" + server + ", topic=" + topic + ", developer=" + developer + ", consumerId="
+				+ consumerId + ", senddelay=" + senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu
+				+ ", senddelayAlarm=" + senddelayAlarm + ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm="
+				+ accuAlarm + ", numAlarm=" + numAlarm + "]";
 	}
-	
+
+
 }

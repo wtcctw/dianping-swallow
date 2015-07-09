@@ -16,7 +16,7 @@ public class MinuteEntry {
 
 	List<Entry> delayEntry = new ArrayList<Entry>(); //cid
 	
-	private static final int ENTRYSIZE = 15;
+	private static final int ENTRYSIZE = 12;
 	
 	public MinuteEntry() {
 

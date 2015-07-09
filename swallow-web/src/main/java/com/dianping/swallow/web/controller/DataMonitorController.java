@@ -120,10 +120,22 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@RequestMapping(value = "/console/monitor/dashboard/delay/{offset}", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> getConsumerIdDelayDashboard(@PathVariable int offset) throws Exception {
+	public Map<String, Object> getConsumerIdDelayDashboard(@PathVariable int offset, int currentmin) throws Exception {
 		
+		int realOffset;
+		if(currentmin == -1){
+			realOffset = 0;
+		}else{
+			Calendar calendar = Calendar.getInstance();
+			int min = calendar.get(Calendar.MINUTE);
+			if(min - currentmin < 0){
+				realOffset = min + 60 - currentmin + offset;
+			}else{
+				realOffset = min - currentmin + offset;
+			}
+		}
 		Map<String, Object> result = new HashMap<String, Object>();
-		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries("dashboard", offset, ENTRYSIZE);
+		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries("dashboard", realOffset, ENTRYSIZE);
 		result.put(ENTRYS, entrys);
 		addTimeToReport(result, offset);
 		return result;
