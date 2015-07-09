@@ -65,7 +65,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     
     public ConsumerWorkerManager(){
     	
-    	lifecycleManager = new DefaultLifecycleManager();
+    	lifecycleManager = new DefaultLifecycleManager(this);
     }
     
     public void setAckDAO(AckDAO ackDAO) {
