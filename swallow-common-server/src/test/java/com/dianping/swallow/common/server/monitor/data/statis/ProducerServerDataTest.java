@@ -35,20 +35,10 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
 		String server = ips[0];
 		String topic = topics[0];
 		String ip = ips[0];
-		System.out.println(producerAllData.getKeys(new CasKeys()).getClass());
-
-		System.out.println(producerAllData.getValue(new CasKeys(server)).getClass());
-		ProducerServerStatisData producerServerStatisData = (ProducerServerStatisData) producerAllData
-				.getValue(new CasKeys("total"));
-		System.out.println(producerServerStatisData);
-		System.out.println(producerAllData.getKeys(new CasKeys(server)).getClass());
-		System.out.println(producerAllData.getKeys(new CasKeys(server, topic)).getClass());
-		System.out.println(producerAllData.getValue(new CasKeys(server, topic)).getClass());
-//		ProducerTopicStatisData producerTopicStatisData = (ProducerTopicStatisData) producerAllData
-//				.getValue(new CasKeys(server, "total"));
-//		System.out.println(producerTopicStatisData);
+		
+		System.out.println(producerAllData.getKeys(new CasKeys(server)));
 		System.out.println(producerAllData.getValue(new CasKeys(server, topic, ip)).getClass());
-
+		
 	}
 
 	@Test

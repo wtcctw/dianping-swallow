@@ -50,7 +50,6 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 			removeConfig(topicName);
 		}
 		
-		TimeUnit.SECONDS.sleep(1000);
 	}
 
 	private void removeConfig(String topicName) {
@@ -76,6 +75,7 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 		}
 		
 		TopicConfig config = new TopicConfig("mongodb://127.0.0.1:27018", 111, 11);
+		@SuppressWarnings("unused")
 		TopicConfig defaultConfig = swallowConfig.getTopicConfig(AbstractSwallowConfig.TOPICNAME_DEFAULT);
 		String topicName = UUID.randomUUID().toString();
 		try{
@@ -95,13 +95,11 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 			addOrUpdateConfig(topicName, "");
 			TimeUnit.SECONDS.sleep(1);
 			realConfig = swallowConfig.getTopicConfig(topicName);
-			Assert.assertTrue(realConfig.equals(defaultConfig));
+			Assert.assertTrue(!realConfig.valid());
 			
 		}finally{
 			removeConfig(topicName);
 		}
-		
-		sleep(300000);
 	}
 	
 	@Test
@@ -117,6 +115,9 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 	@Test
 	public void testConfig(){
 		
+		if(!EnvUtil.isDev()){
+			return;
+		}
 		/**
 		 * swallow.topiccfg.default={"mongoUrl":"mongodb://192.168.213.143:27018","size":100,"max":100}
 		 * swallow.topiccfg.topic1={"size":100,"max":100}
@@ -132,14 +133,14 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 		
 
 		config = swallowConfig.getTopicConfig("topic1");
-		Assert.assertEquals("mongodb://192.168.213.143:27018", config.getMongoUrl());
+		Assert.assertEquals(null, config.getMongoUrl());
 		Assert.assertEquals(new Integer(100), config.getMax());
 		Assert.assertEquals(new Integer(100), config.getSize());
 
 		config = swallowConfig.getTopicConfig("topic2");
-		Assert.assertEquals("mongodb://192.168.213.143:27018", config.getMongoUrl());
-		Assert.assertEquals(new Integer(100), config.getMax());
-		Assert.assertEquals(new Integer(100), config.getSize());
+		Assert.assertEquals(null, config.getMongoUrl());
+		Assert.assertEquals(null, config.getMax());
+		Assert.assertEquals(null, config.getSize());
 		
 		config = swallowConfig.getTopicConfig("topic3");
 		Assert.assertEquals("mongodb://192.168.213.143:27118", config.getMongoUrl());

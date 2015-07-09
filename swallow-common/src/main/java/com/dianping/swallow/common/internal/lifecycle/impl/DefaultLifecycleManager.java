@@ -21,18 +21,27 @@ public class DefaultLifecycleManager implements LifecycleManager {
 
 	private String currentPhaseName = LifecycleManager.CREATED_PHASE_NAME;
 	
+	private Object component;
+	
+	public DefaultLifecycleManager(Object component){
+		this.component = component;
+	}
+	
 	@Override
 	public void initialize(LifecycleCallback callback) throws Exception {
 		
 		if(isCreated() || isDisposed()){
 			if(logger.isInfoEnabled()){
-				logger.info("[initialize]" + callback);
+				logger.info("[initialize][begin]" + component);
 			}
 			callback.onTransition();
 			currentPhaseName = Initializble.PHASE_NAME;
+			if(logger.isInfoEnabled()){
+				logger.info("[initialize][end]" + component);
+			}
 			return;
 		}
-		logger.warn("[initialize][can not initialize]" + getCurrentPhaseName() + ", " + callback);
+		logger.warn("[initialize][can not initialize]" + getCurrentPhaseName() + ", " + component);
 	}
 
 	@Override
@@ -40,13 +49,16 @@ public class DefaultLifecycleManager implements LifecycleManager {
 
 		if(isInitialized() || isStopped()){
 			if(logger.isInfoEnabled()){
-				logger.info("[start]" + callback);
+				logger.info("[start][begin]" + component);
 			}
 			callback.onTransition();
 			currentPhaseName = Startable.PHASE_NAME;
+			if(logger.isInfoEnabled()){
+				logger.info("[start][end]" + component);
+			}
 			return;
 		}
-		logger.warn("[start][can not start]" + getCurrentPhaseName() + ", " + callback);
+		logger.warn("[start][can not start]" + getCurrentPhaseName() + ", " + component);
 	}
 
 	@Override
@@ -54,13 +66,16 @@ public class DefaultLifecycleManager implements LifecycleManager {
 
 		if(isStarted()){
 			if(logger.isInfoEnabled()){
-				logger.info("[stop]" + callback);
+				logger.info("[stop][begin]" + component);
 			}
 			callback.onTransition();
 			currentPhaseName = Stopable.PHASE_NAME;
+			if(logger.isInfoEnabled()){
+				logger.info("[stop][end]" + component);
+			}
 			return;
 		}
-		logger.warn("[stop][can not stop]" + getCurrentPhaseName() + ", " + callback);
+		logger.warn("[stop][can not stop]" + getCurrentPhaseName() + ", " + component);
 	}
 
 	@Override
@@ -68,13 +83,16 @@ public class DefaultLifecycleManager implements LifecycleManager {
 
 		if(isInitialized() || isStopped()){
 			if(logger.isInfoEnabled()){
-				logger.info("[dispose]" + callback);
+				logger.info("[dispose][begin]" + component);
 			}
 			callback.onTransition();
 			currentPhaseName = Disposable.PHASE_NAME;
+			if(logger.isInfoEnabled()){
+				logger.info("[dispose][end]" + component);
+			}
 			return;
 		}
-		logger.warn("[dispose][can not dispose]" + getCurrentPhaseName() + ", " + callback);
+		logger.warn("[dispose][can not dispose]" + getCurrentPhaseName() + ", " + component);
 	}
 
 	@Override

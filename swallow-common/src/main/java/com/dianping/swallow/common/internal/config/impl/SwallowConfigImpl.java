@@ -84,4 +84,10 @@ public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfi
 	public boolean isSupported() {
 		return true;
 	}
+
+	@Override
+	public TopicConfig defaultTopicConfig() {
+		
+		return config.defaultTopicConfig();
+	}
 }
