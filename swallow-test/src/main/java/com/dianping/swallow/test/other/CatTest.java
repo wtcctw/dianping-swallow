@@ -22,11 +22,13 @@ public class CatTest extends AbstractTest {
 	@Test
 	public void testLogError() {
 
-		logger.error("message", new Exception());
+		
 		for (int i = 0; i < 100; i++) {
+			
 			newTransaction(i);
 			Cat.logError(new Exception("log error"));
-			sleep(10);
+			logger.error("message", new Exception("just test"));
+			sleep(1000);
 			
 		}
 	}
