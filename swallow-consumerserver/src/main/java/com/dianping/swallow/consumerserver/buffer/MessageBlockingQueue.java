@@ -183,7 +183,4 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		}
 		this.tailBackupMessageId = tailBackupMessageId;
 	}
-
-
-	
 }

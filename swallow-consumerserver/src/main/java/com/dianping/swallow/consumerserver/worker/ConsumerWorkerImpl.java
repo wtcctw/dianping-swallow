@@ -384,10 +384,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
          //发送消息
          channel.write(pktMessage);
 
-         //Cat begin
          consumerServerTransaction.addData("mid", pktMessage.getContent().getMessageId());
          consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
-         //Cat end
       } catch (RuntimeException e) {
          logger.error(consumerInfo.toString() + "：channel write error.", e);
 
