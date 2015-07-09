@@ -134,6 +134,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 
    @Override
    public void handleAck(final Channel channel, final long ackId, final ACKHandlerType type) {
+	   
       ackExecutor.execute(new Runnable() {
          @Override
          public void run() {
@@ -359,6 +360,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
    }
 
    private void sendMessage(Channel channel, ConsumerMessage consumerMessage) throws InterruptedException {
+	   
       PktMessage pktMessage = new PktMessage(consumerInfo.getDest(), consumerMessage.message);
 
       String consumerIpPort = IPUtil.getIpFromChannel(channel);

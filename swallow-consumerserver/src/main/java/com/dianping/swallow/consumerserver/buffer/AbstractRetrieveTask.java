@@ -117,7 +117,7 @@ public abstract class AbstractRetrieveTask implements Runnable {
 		
 		blockingQueue.putMessage(messages);
 		
-		if(EnvUtil.isAlpha()){
+		if(EnvUtil.isQa()){
 			blockingQueue.putMessage(messages);
 		}
 	}
