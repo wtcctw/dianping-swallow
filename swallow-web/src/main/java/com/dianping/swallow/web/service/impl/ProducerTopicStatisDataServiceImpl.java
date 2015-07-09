@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ProducerTopicStatisDataDao;
-import com.dianping.swallow.web.model.statis.ProducerTopicStatisData;
+import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
 
 
@@ -17,12 +17,12 @@ public class ProducerTopicStatisDataServiceImpl implements ProducerTopicStatisDa
 	private ProducerTopicStatisDataDao producerTopicStatisDataDao;
 	
 	@Override
-	public boolean insert(ProducerTopicStatisData statisData) {
+	public boolean insert(ProducerTopicStatsData statisData) {
 		return producerTopicStatisDataDao.insert(statisData);
 	}
 
 	@Override
-	public boolean update(ProducerTopicStatisData statisData) {
+	public boolean update(ProducerTopicStatsData statisData) {
 		return producerTopicStatisDataDao.update(statisData);
 	}
 
@@ -32,18 +32,23 @@ public class ProducerTopicStatisDataServiceImpl implements ProducerTopicStatisDa
 	}
 
 	@Override
-	public ProducerTopicStatisData findById(String id) {
+	public ProducerTopicStatsData findById(String id) {
 		return producerTopicStatisDataDao.findById(id);
 	}
 
 	@Override
-	public ProducerTopicStatisData findByTimeKey(long timeKey) {
+	public ProducerTopicStatsData findByTimeKey(long timeKey) {
 		return producerTopicStatisDataDao.findByTimeKey(timeKey);
 	}
 
 	@Override
-	public List<ProducerTopicStatisData> findByTopic(String topicName) {
+	public List<ProducerTopicStatsData> findByTopic(String topicName) {
 		return producerTopicStatisDataDao.findByTopic(topicName);
+	}
+
+	@Override
+	public List<ProducerTopicStatsData> findSectionData(long startKey, long endKey) {
+		return producerTopicStatisDataDao.findSectionData(startKey, endKey);
 	}
 
 }

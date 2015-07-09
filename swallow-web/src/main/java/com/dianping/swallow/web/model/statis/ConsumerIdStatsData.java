@@ -2,7 +2,7 @@ package com.dianping.swallow.web.model.statis;
 
 import org.springframework.data.annotation.Id;
 
-public class ConsumerIdStatisData {
+public class ConsumerIdStatsData {
 	
 	@Id
 	private String id;
@@ -13,7 +13,7 @@ public class ConsumerIdStatisData {
 	
 	private String consumerId;
 	
-	private ConsumerBaseStatisData statisData;
+	private ConsumerBaseStatsData statisData;
 	
 	public String getConsumerId() {
 		return consumerId;
@@ -23,11 +23,11 @@ public class ConsumerIdStatisData {
 		this.consumerId = consumerId;
 	}
 
-	public ConsumerBaseStatisData getStatisData() {
+	public ConsumerBaseStatsData getStatisData() {
 		return statisData;
 	}
 
-	public void setStatisData(ConsumerBaseStatisData statisData) {
+	public void setStatisData(ConsumerBaseStatsData statisData) {
 		this.statisData = statisData;
 	}
 

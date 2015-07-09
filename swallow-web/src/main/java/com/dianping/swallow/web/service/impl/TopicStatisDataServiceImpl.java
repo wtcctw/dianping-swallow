@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.TopicStatisDataDao;
-import com.dianping.swallow.web.model.statis.TopicStatisData;
+import com.dianping.swallow.web.model.statis.TopicStatsData;
 import com.dianping.swallow.web.service.TopicStatisDataService;
 
 
@@ -17,12 +17,12 @@ public class TopicStatisDataServiceImpl implements TopicStatisDataService {
 	private TopicStatisDataDao topicStatisDataDao;
 	
 	@Override
-	public boolean insert(TopicStatisData statisData) {
+	public boolean insert(TopicStatsData statisData) {
 		return topicStatisDataDao.insert(statisData);
 	}
 
 	@Override
-	public boolean update(TopicStatisData statisData) {
+	public boolean update(TopicStatsData statisData) {
 		return topicStatisDataDao.update(statisData);
 	}
 
@@ -32,17 +32,17 @@ public class TopicStatisDataServiceImpl implements TopicStatisDataService {
 	}
 
 	@Override
-	public TopicStatisData findById(String id) {
+	public TopicStatsData findById(String id) {
 		return topicStatisDataDao.findById(id);
 	}
 
 	@Override
-	public TopicStatisData findByTimeKey(long timeKey) {
+	public TopicStatsData findByTimeKey(long timeKey) {
 		return topicStatisDataDao.findByTimeKey(timeKey);
 	}
 
 	@Override
-	public List<TopicStatisData> findByTopic(String topicName) {
+	public List<TopicStatsData> findByTopic(String topicName) {
 		return topicStatisDataDao.findByTopic(topicName);
 	}
 

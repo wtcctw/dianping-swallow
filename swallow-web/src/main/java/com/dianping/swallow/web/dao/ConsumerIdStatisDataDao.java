@@ -2,26 +2,26 @@ package com.dianping.swallow.web.dao;
 
 import java.util.List;
 
-import com.dianping.swallow.web.model.statis.ConsumerIdStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerIdStatsData;
 
 public interface ConsumerIdStatisDataDao {
 
-	public boolean insert(ConsumerIdStatisData statisData);
+	public boolean insert(ConsumerIdStatsData statisData);
 
-	public boolean update(ConsumerIdStatisData statisData);
+	public boolean update(ConsumerIdStatsData statisData);
 
 	public int deleteById(String id);
 
-	public ConsumerIdStatisData findById(String id);
+	public ConsumerIdStatsData findById(String id);
 
-	public List<ConsumerIdStatisData> findByTimeKey(long timeKey);
+	public List<ConsumerIdStatsData> findByTimeKey(long timeKey);
 
-	public List<ConsumerIdStatisData> findByTopic(String topicName);
+	public List<ConsumerIdStatsData> findByTopic(String topicName);
 
-	public List<ConsumerIdStatisData> findByTopicAndTime(String topicName, long timeKey);
+	public List<ConsumerIdStatsData> findByTopicAndTime(String topicName, long timeKey);
 
-	public List<ConsumerIdStatisData> findByTopicAndConsumerId(String topicName, String consumerId);
+	public List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId);
 
-	public List<ConsumerIdStatisData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
+	public List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
 
 }

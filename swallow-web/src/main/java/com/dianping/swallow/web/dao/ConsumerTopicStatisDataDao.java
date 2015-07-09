@@ -2,20 +2,20 @@ package com.dianping.swallow.web.dao;
 
 import java.util.List;
 
-import com.dianping.swallow.web.model.statis.ConsumerTopicStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerTopicStatsData;
 
 public interface ConsumerTopicStatisDataDao {
 
-	public boolean insert(ConsumerTopicStatisData statisData);
+	public boolean insert(ConsumerTopicStatsData statisData);
 
-	public boolean update(ConsumerTopicStatisData statisData);
+	public boolean update(ConsumerTopicStatsData statisData);
 
 	public int deleteById(String id);
 
-	public ConsumerTopicStatisData findById(String id);
+	public ConsumerTopicStatsData findById(String id);
 	
-	public ConsumerTopicStatisData findByTimeKey(long timeKey);
+	public ConsumerTopicStatsData findByTimeKey(long timeKey);
 	
-	public List<ConsumerTopicStatisData> findByTopic(String topicName);
+	public List<ConsumerTopicStatsData> findByTopic(String topicName);
 
 }

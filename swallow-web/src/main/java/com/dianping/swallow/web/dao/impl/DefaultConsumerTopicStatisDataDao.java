@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ConsumerTopicStatisDataDao;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
-import com.dianping.swallow.web.model.statis.ConsumerTopicStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerTopicStatsData;
 import com.mongodb.WriteResult;
 
 @Service("consumerTopicStatisDataDao")
@@ -27,7 +27,7 @@ public class DefaultConsumerTopicStatisDataDao extends AbstractWriteDao implemen
 	private static final String ID_FIELD = "id";
 
 	@Override
-	public boolean insert(ConsumerTopicStatisData statisData) {
+	public boolean insert(ConsumerTopicStatsData statisData) {
 		try {
 			mongoTemplate.save(statisData, TOPICSTATISDATA_COLLECTION);
 			return true;
@@ -38,37 +38,37 @@ public class DefaultConsumerTopicStatisDataDao extends AbstractWriteDao implemen
 	}
 
 	@Override
-	public boolean update(ConsumerTopicStatisData statisData) {
+	public boolean update(ConsumerTopicStatsData statisData) {
 		return insert(statisData);
 	}
 
 	@Override
 	public int deleteById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, ConsumerTopicStatisData.class, TOPICSTATISDATA_COLLECTION);
+		WriteResult result = mongoTemplate.remove(query, ConsumerTopicStatsData.class, TOPICSTATISDATA_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
-	public ConsumerTopicStatisData findById(String id) {
+	public ConsumerTopicStatsData findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		ConsumerTopicStatisData topicStatisData = mongoTemplate.findOne(query, ConsumerTopicStatisData.class,
+		ConsumerTopicStatsData topicStatisData = mongoTemplate.findOne(query, ConsumerTopicStatsData.class,
 				TOPICSTATISDATA_COLLECTION);
 		return topicStatisData;
 	}
 
 	@Override
-	public ConsumerTopicStatisData findByTimeKey(long timeKey) {
+	public ConsumerTopicStatsData findByTimeKey(long timeKey) {
 		Query query = new Query(Criteria.where(TIMEKEY_FIELD).is(timeKey));
-		ConsumerTopicStatisData topicStatisData = mongoTemplate.findOne(query, ConsumerTopicStatisData.class,
+		ConsumerTopicStatsData topicStatisData = mongoTemplate.findOne(query, ConsumerTopicStatsData.class,
 				TOPICSTATISDATA_COLLECTION);
 		return topicStatisData;
 	}
 
 	@Override
-	public List<ConsumerTopicStatisData> findByTopic(String topicName) {
+	public List<ConsumerTopicStatsData> findByTopic(String topicName) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
-		List<ConsumerTopicStatisData> topicStatisDatas = mongoTemplate.find(query, ConsumerTopicStatisData.class,
+		List<ConsumerTopicStatsData> topicStatisDatas = mongoTemplate.find(query, ConsumerTopicStatsData.class,
 				TOPICSTATISDATA_COLLECTION);
 		return topicStatisDatas;
 	}

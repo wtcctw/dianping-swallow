@@ -1,6 +1,6 @@
 package com.dianping.swallow.web.model.statis;
 
-public class ConsumerBaseStatisData {
+public class ConsumerBaseStatsData {
 
 	private long senderQpx;
 	

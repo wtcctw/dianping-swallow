@@ -14,15 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
+import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.web.alarmer.ProducerStatisAlarmer;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
-import com.dianping.swallow.web.model.statis.ProducerBaseStatisData;
-import com.dianping.swallow.web.model.statis.ProducerMachineStatisData;
-import com.dianping.swallow.web.model.statis.ProducerServerStatisData;
-import com.dianping.swallow.web.model.statis.ProducerTopicStatisData;
+import com.dianping.swallow.web.model.statis.ProducerBaseStatsData;
+import com.dianping.swallow.web.model.statis.ProducerMachineStatsData;
+import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
+import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.impl.DefaultProducerDataRetriever;
@@ -54,29 +56,37 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 	private TopicAlarmSettingService topicAlarmSettingService;
 
 	@Autowired
-	private ProducerTopicStatisDataService producertopicStatisDataService;
+	private ProducerTopicStatisDataService producerTopicStatisDataService;
 
-	private volatile ProducerServerStatisData serverStatisData;
+	private volatile ProducerServerStatsData serverStatisData;
 
-	private volatile List<ProducerTopicStatisData> producerTopicStatisDatas;
-	
+	private volatile List<ProducerTopicStatsData> producerTopicStatisDatas;
+
 	private volatile AtomicLong dataCount;
-	
+
 	private volatile AtomicLong lastTimeKey;
 
 	@Override
 	public void doInitialize() throws Exception {
 		super.doInitialize();
 		producerDataRetriever.registerListener(this);
+		dataCount.set(0);
+		lastTimeKey.set(-1);
 	}
 
 	@Override
 	protected void doAlarm() {
-		if(dataCount.get() > 0){
-//			storageServerStatis();
-//			storageTopicStatis();
+		if (dataCount.getAndDecrement() > 0) {
+			serverStatisData = producerDataRetriever.getServerStatis(lastTimeKey.get(), StatisType.SAVE);
+			producerTopicStatisDatas = producerDataRetriever.getTopicStatis(lastTimeKey.get(), StatisType.SAVE);
+			if (serverStatisData == null) {
+				return;
+			}
+			lastTimeKey.set(serverStatisData.getTimeKey());
 			doServerAlarm();
 			doTopicAlarm();
+			storageServerStatis();
+			storageTopicStatis();
 		}
 	}
 
@@ -95,22 +105,20 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 		if (qps == null || serverStatisData == null || serverStatisData.getStatisDatas() == null) {
 			return;
 		}
-		List<ProducerMachineStatisData> machineStatisDatas = serverStatisData.getStatisDatas();
+		List<ProducerMachineStatsData> machineStatisDatas = serverStatisData.getStatisDatas();
 		if (machineStatisDatas == null || machineStatisDatas.size() == 0) {
 			return;
 		}
 
-		for (ProducerMachineStatisData machineStatisData : machineStatisDatas) {
-			ProducerBaseStatisData baseStatisData = machineStatisData.getStatisData();
+		for (ProducerMachineStatsData machineStatisData : machineStatisDatas) {
+			ProducerBaseStatsData baseStatisData = machineStatisData.getStatisData();
 			if (whiteList == null || (!whiteList.contains(machineStatisData.getIp()) && baseStatisData != null)) {
 				long qpx = baseStatisData.getQpx();
 				if (qpx > qps.getPeak() || qpx < qps.getValley()) {
 					// alram
 				}
 			}
-
 		}
-
 	}
 
 	public void doTopicAlarm() {
@@ -129,22 +137,18 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 		if (producerTopicStatisDatas == null) {
 			return;
 		}
-		for (ProducerTopicStatisData producerTopicStatisData : producerTopicStatisDatas) {
+		for (ProducerTopicStatsData producerTopicStatisData : producerTopicStatisDatas) {
 			if (whiteList == null || !whiteList.contains(producerTopicStatisData.getTopicName())) {
-				ProducerBaseStatisData producerBaseStatisData = producerTopicStatisData.getProducerStatisData();
+				ProducerBaseStatsData producerBaseStatisData = producerTopicStatisData.getProducerStatisData();
 				if (producerBaseStatisData == null) {
 					continue;
 				}
 				if (qps != null) {
-					if (producerBaseStatisData.getQpx() > qps.getPeak()
-							|| producerBaseStatisData.getQpx() < qps.getValley()) {
-						// alarm
-					}
+					qpsAlarm(producerBaseStatisData.getQpx(), qps.getPeak(), qps.getValley());
+					fluctuationAlarm(producerBaseStatisData.getQpx(), qps.getFluctuation(),
+							producerTopicStatisData.getTimeKey());
 				}
-				if (producerBaseStatisData.getDelay() > delay) {
-					// alarm
-				}
-
+				delayAlarm(delay, producerAlarmSetting.getDelay());
 			}
 		}
 
@@ -153,71 +157,6 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 	@Override
 	public void achieveMonitorData() {
 		dataCount.incrementAndGet();
-//		try {
-//			@SuppressWarnings("rawtypes")
-//			AbstractAllData allData = producerDataRetriever.getAlldata();
-//			achieveServerStatis(allData);
-//			achieveTopicStatis(allData);
-//		} catch (Exception e) {
-//			logger.error("achieve monitor Data exception", e);
-//		}
-	}
-/*
-	private void achieveServerStatis(@SuppressWarnings("rawtypes") AbstractAllData allData) {
-		@SuppressWarnings("unchecked")
-		Map<String, NavigableMap<Long, Long>> qpxForServers = allData.getQpxForServers(StatisType.SAVE);
-		if (qpxForServers != null) {
-			ProducerServerStatisData serverStatisDataTemp = new ProducerServerStatisData();
-			List<ProducerMachineStatisData> machineStatisDatas = new ArrayList<ProducerMachineStatisData>();
-			for (Map.Entry<String, NavigableMap<Long, Long>> statis : qpxForServers.entrySet()) {
-				String serverIp = statis.getKey();
-				Long timekey = statis.getValue().floorKey(
-						DefaultProducerDataRetriever.getKey(System.currentTimeMillis()));
-				if (timekey == null) {
-					continue;
-				}
-				serverStatisDataTemp.setTimeKey(timekey);
-				ProducerMachineStatisData machineStatisData = new ProducerMachineStatisData();
-				machineStatisData.setIp(serverIp);
-				ProducerBaseStatisData baseStatisData = new ProducerBaseStatisData();
-				baseStatisData.setDelay(0);
-				baseStatisData.setQpx(statis.getValue().get(timekey));
-				machineStatisData.setStatisData(baseStatisData);
-				machineStatisDatas.add(machineStatisData);
-			}
-			serverStatisDataTemp.setStatisDatas(machineStatisDatas);
-			this.serverStatisData = serverStatisDataTemp;
-		}
-	}
-
-	private void achieveTopicStatis(@SuppressWarnings("rawtypes") AbstractAllData allData) {
-		List<ProducerTopicStatisData> producerTopicStatisDataTemps = new ArrayList<ProducerTopicStatisData>();
-		@SuppressWarnings("unchecked")
-		Set<String> topics = allData.getTopics(true);
-		if (topics != null) {
-			@SuppressWarnings("rawtypes")
-			Iterator iterator = topics.iterator();
-			while (iterator.hasNext()) {
-				ProducerTopicStatisData producerTopicStatisData = new ProducerTopicStatisData();
-				String topicName = String.valueOf(iterator.next());
-				producerTopicStatisData.setTopicName(topicName);
-				@SuppressWarnings("unchecked")
-				NavigableMap<Long, Long> topicQpxs = allData.getQpxForTopic(topicName, StatisType.SAVE);
-				Long timekey = topicQpxs.floorKey(DefaultProducerDataRetriever.getKey(System.currentTimeMillis()));
-				if (timekey == null) {
-					continue;
-				}
-				producerTopicStatisData.setTimeKey(timekey);
-				@SuppressWarnings("unchecked")
-				NavigableMap<Long, Long> topicDelays = allData.getDelayForTopic(topicName, StatisType.SAVE);
-				ProducerBaseStatisData producerBaseStatisData = new ProducerBaseStatisData();
-				producerBaseStatisData.setQpx(topicQpxs.get(timekey));
-				producerBaseStatisData.setDelay(topicDelays.get(timekey));
-				producerTopicStatisData.setProducerStatisData(producerBaseStatisData);
-				producerTopicStatisDataTemps.add(producerTopicStatisData);
-			}
-			this.producerTopicStatisDatas = producerTopicStatisDataTemps;
-		}
 	}
 
 	private void storageServerStatis() {
@@ -228,9 +167,45 @@ public class DefaultProducerStatisAlarmer extends AbstractStatisAlarmer implemen
 
 	private void storageTopicStatis() {
 		if (producerTopicStatisDatas != null) {
-			for (ProducerTopicStatisData producerTopicStatisData : producerTopicStatisDatas)
-				producertopicStatisDataService.insert(producerTopicStatisData);
+			for (ProducerTopicStatsData producerTopicStatisData : producerTopicStatisDatas)
+				producerTopicStatisDataService.insert(producerTopicStatisData);
 		}
 	}
-	*/
+
+	private void qpsAlarm(long qpx, long peak, long valley) {
+		if (qpx > peak || qpx < valley) {
+			// alarm
+		}
+
+	}
+
+	private void fluctuationAlarm(long qpx, long fluctuation, long timeKey) {
+		List<ProducerTopicStatsData> topicStatsDatas = producerTopicStatisDataService.findSectionData(timeKey
+				- getTimeSection(), timeKey + getTimeSection());
+		int sampleCount = 0;
+		int sumQpx = 0;
+		if (topicStatsDatas == null || topicStatsDatas.size() == 0) {
+			return;
+		}
+		for (ProducerTopicStatsData topicStatsData : topicStatsDatas) {
+			if (topicStatsData == null || topicStatsData.getProducerStatisData() == null
+					|| topicStatsData.getProducerStatisData().getQpx() == 0) {
+				continue;
+			}
+			sumQpx += topicStatsData.getProducerStatisData().getQpx();
+			sampleCount++;
+		}
+		if (sampleCount == 0) {
+			return;
+		}
+		if (Math.abs(qpx - sumQpx / sampleCount) > fluctuation) {
+			// alarm
+		}
+	}
+
+	private void delayAlarm(long delay, long expectDelay) {
+		if (delay > expectDelay) {
+			// alarm
+		}
+	}
 }

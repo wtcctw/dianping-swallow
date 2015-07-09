@@ -1,13 +1,13 @@
 package com.dianping.swallow.web.model.statis;
 
-public class ConsumerTopicStatisData {
+public class ConsumerTopicStatsData {
 	private String id;
 
 	private long timeKey;
 
 	private String topicName;
 
-	private ConsumerBaseStatisData consumerStatisData;
+	private ConsumerBaseStatsData consumerStatisData;
 
 	public String getId() {
 		return id;
@@ -33,11 +33,11 @@ public class ConsumerTopicStatisData {
 		this.topicName = topicName;
 	}
 
-	public ConsumerBaseStatisData getConsumerStatisData() {
+	public ConsumerBaseStatsData getConsumerStatisData() {
 		return consumerStatisData;
 	}
 
-	public void setConsumerStatisData(ConsumerBaseStatisData consumerStatisData) {
+	public void setConsumerStatisData(ConsumerBaseStatsData consumerStatisData) {
 		this.consumerStatisData = consumerStatisData;
 	}
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ConsumerServerStatisDataDao;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
-import com.dianping.swallow.web.model.statis.ConsumerServerStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerServerStatsData;
 import com.mongodb.WriteResult;
 
 @Service("consumerServerStatisDataDao")
@@ -23,7 +23,7 @@ public class DefaultConsumerServerStatisDataDao extends AbstractWriteDao impleme
 	private static final String ID_FIELD = "id";
 
 	@Override
-	public boolean insert(ConsumerServerStatisData statisData) {
+	public boolean insert(ConsumerServerStatsData statisData) {
 		try {
 			mongoTemplate.save(statisData, CONSUMERSERVERSTATICDATA_COLLECTION);
 			return true;
@@ -34,30 +34,30 @@ public class DefaultConsumerServerStatisDataDao extends AbstractWriteDao impleme
 	}
 
 	@Override
-	public boolean update(ConsumerServerStatisData statisData) {
+	public boolean update(ConsumerServerStatsData statisData) {
 		return insert(statisData);
 	}
 
 	@Override
 	public int deleteById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, ConsumerServerStatisData.class,
+		WriteResult result = mongoTemplate.remove(query, ConsumerServerStatsData.class,
 				CONSUMERSERVERSTATICDATA_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
-	public ConsumerServerStatisData findById(String id) {
+	public ConsumerServerStatsData findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		ConsumerServerStatisData serverStatisData = mongoTemplate.findOne(query, ConsumerServerStatisData.class,
+		ConsumerServerStatsData serverStatisData = mongoTemplate.findOne(query, ConsumerServerStatsData.class,
 				CONSUMERSERVERSTATICDATA_COLLECTION);
 		return serverStatisData;
 	}
 
 	@Override
-	public ConsumerServerStatisData findByTimeKey(long timeKey) {
+	public ConsumerServerStatsData findByTimeKey(long timeKey) {
 		Query query = new Query(Criteria.where(TIMEKEY_FIELD).is(timeKey));
-		ConsumerServerStatisData serverStatisData = mongoTemplate.findOne(query, ConsumerServerStatisData.class,
+		ConsumerServerStatsData serverStatisData = mongoTemplate.findOne(query, ConsumerServerStatsData.class,
 				CONSUMERSERVERSTATICDATA_COLLECTION);
 		return serverStatisData;
 	}

@@ -1,8 +1,10 @@
 package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
@@ -100,11 +102,12 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer implem
 		List<String> ipList = getIpList();
 
 		for (Map.Entry<String, String> cmdbProducer : cmdbProducers.entrySet()) {
-			if(StringUtils.isBlank(cmdbProducer.getValue())){
+			if (StringUtils.isBlank(cmdbProducer.getValue())) {
 				continue;
 			}
-			if (!whiteList.contains(cmdbProducer.getValue())&&!ipList.contains(cmdbProducer.getValue())) {
-				String message = "[ip] " +cmdbProducer.getValue()+"service is not work,Please Please handle immediately.";
+			if (!whiteList.contains(cmdbProducer.getValue()) && !ipList.contains(cmdbProducer.getValue())) {
+				String message = "[ip] " + cmdbProducer.getValue()
+						+ "service is not work,Please Please handle immediately.";
 				alarmService.sendAll(cmdbProducer.getValue(), "[producerServer not work]", message);
 			}
 		}
@@ -130,7 +133,7 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer implem
 
 	private List<String> getWhiteList() {
 		List<String> whiteList = new ArrayList<String>();
-		if (StringUtils.isNotBlank(producerServerValue)) {
+		if (StringUtils.isNotBlank(producerServerWhiteList)) {
 			String[] whites = producerServerWhiteList.split(COMMA_SPLIT);
 			for (String white : whites) {
 				if (StringUtils.isNotBlank(white)) {
@@ -143,7 +146,17 @@ public class DefaultProducerServiceAlarmer extends AbstractServiceAlarmer implem
 
 	@Override
 	public void doCheckSender() {
+		Set<String> serverIps = ipCollectorService.getProducerServerIps();
+		if (serverIps != null) {
+			Iterator<String> iterator = serverIps.iterator();
+			List<String> whiteList = getWhiteList();
+			while (iterator.hasNext()) {
+				String serverIp = iterator.next();
+				if (whiteList == null && !whiteList.contains(serverIp)) {
 
+				}
+			}
+		}
 	}
 
 	public String getProducerServerValue() {

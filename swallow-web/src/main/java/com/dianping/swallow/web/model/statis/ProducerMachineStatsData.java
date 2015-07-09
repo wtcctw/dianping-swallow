@@ -1,10 +1,10 @@
 package com.dianping.swallow.web.model.statis;
 
-public class ConsumerMachineStatisData {
-	
+public class ProducerMachineStatsData {
+
 	private String ip;
 	
-	private ConsumerBaseStatisData statisData;
+	private ProducerBaseStatsData statisData;
 
 	public String getIp() {
 		return ip;
@@ -14,12 +14,12 @@ public class ConsumerMachineStatisData {
 		this.ip = ip;
 	}
 
-	public ConsumerBaseStatisData getStatisData() {
+	public ProducerBaseStatsData getStatisData() {
 		return statisData;
 	}
 
-	public void setStatisData(ConsumerBaseStatisData statisData) {
+	public void setStatisData(ProducerBaseStatsData statisData) {
 		this.statisData = statisData;
 	}
-
 }
+

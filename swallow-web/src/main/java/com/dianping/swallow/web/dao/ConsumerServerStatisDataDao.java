@@ -1,18 +1,18 @@
 package com.dianping.swallow.web.dao;
 
 
-import com.dianping.swallow.web.model.statis.ConsumerServerStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerServerStatsData;
 
 public interface ConsumerServerStatisDataDao {
 
-	public boolean insert(ConsumerServerStatisData statisData);
+	public boolean insert(ConsumerServerStatsData statisData);
 
-	public boolean update(ConsumerServerStatisData statisData);
+	public boolean update(ConsumerServerStatsData statisData);
 
 	public int deleteById(String id);
 
-	public ConsumerServerStatisData findById(String id);
+	public ConsumerServerStatsData findById(String id);
 	
-	public ConsumerServerStatisData findByTimeKey(long timeKey);
+	public ConsumerServerStatsData findByTimeKey(long timeKey);
 	
 }

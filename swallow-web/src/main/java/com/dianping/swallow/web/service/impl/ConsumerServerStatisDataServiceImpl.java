@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ConsumerServerStatisDataDao;
-import com.dianping.swallow.web.model.statis.ConsumerServerStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerServerStatsData;
 import com.dianping.swallow.web.service.ConsumerServerStatisDataService;
 
 @Service("consumerServerStatisDataService")
@@ -13,12 +13,12 @@ public class ConsumerServerStatisDataServiceImpl implements ConsumerServerStatis
 	@Autowired
 	private ConsumerServerStatisDataDao consumerServerStatisDataDao;
 	@Override
-	public boolean insert(ConsumerServerStatisData statisData) {
+	public boolean insert(ConsumerServerStatsData statisData) {
 		return consumerServerStatisDataDao.insert(statisData);
 	}
 
 	@Override
-	public boolean update(ConsumerServerStatisData statisData) {
+	public boolean update(ConsumerServerStatsData statisData) {
 		return consumerServerStatisDataDao.update(statisData);
 	}
 
@@ -28,12 +28,12 @@ public class ConsumerServerStatisDataServiceImpl implements ConsumerServerStatis
 	}
 
 	@Override
-	public ConsumerServerStatisData findById(String id) {
+	public ConsumerServerStatsData findById(String id) {
 		return consumerServerStatisDataDao.findById(id);
 	}
 
 	@Override
-	public ConsumerServerStatisData findByTimeKey(long timeKey) {
+	public ConsumerServerStatsData findByTimeKey(long timeKey) {
 		return consumerServerStatisDataDao.findByTimeKey(timeKey);
 	}
 

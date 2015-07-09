@@ -1,6 +1,6 @@
 package com.dianping.swallow.web.model.statis;
 
-public class TopicStatisData {
+public class TopicStatsData {
 	
 	private String id;
 	
@@ -8,9 +8,9 @@ public class TopicStatisData {
 
 	private String topicName;
 
-	private ProducerBaseStatisData producerStatisData;
+	private ProducerBaseStatsData producerStatisData;
 	
-	private ConsumerBaseStatisData consumerStatisData;
+	private ConsumerBaseStatsData consumerStatisData;
 
 	public String getId() {
 		return id;
@@ -36,19 +36,19 @@ public class TopicStatisData {
 		this.topicName = topicName;
 	}
 
-	public ProducerBaseStatisData getProducerStatisData() {
+	public ProducerBaseStatsData getProducerStatisData() {
 		return producerStatisData;
 	}
 
-	public void setProducerStatisData(ProducerBaseStatisData producerStatisData) {
+	public void setProducerStatisData(ProducerBaseStatsData producerStatisData) {
 		this.producerStatisData = producerStatisData;
 	}
 
-	public ConsumerBaseStatisData getConsumerStatisData() {
+	public ConsumerBaseStatsData getConsumerStatisData() {
 		return consumerStatisData;
 	}
 
-	public void setConsumerStatisData(ConsumerBaseStatisData consumerStatisData) {
+	public void setConsumerStatisData(ConsumerBaseStatsData consumerStatisData) {
 		this.consumerStatisData = consumerStatisData;
 	}
 

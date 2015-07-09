@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.dao.impl;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -8,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ProducerServerStatisDataDao;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
-import com.dianping.swallow.web.model.statis.ProducerServerStatisData;
+import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
 import com.mongodb.WriteResult;
 
 @Service("producerServerStatisDataDao")
@@ -23,7 +25,7 @@ public class DefaultProducerServerStatisDataDao extends AbstractWriteDao impleme
 	private static final String ID_FIELD = "id";
 
 	@Override
-	public boolean insert(ProducerServerStatisData statisData) {
+	public boolean insert(ProducerServerStatsData statisData) {
 		try {
 			mongoTemplate.save(statisData, PRODUCERSERVERSTATICDATA_COLLECTION);
 			return true;
@@ -34,32 +36,39 @@ public class DefaultProducerServerStatisDataDao extends AbstractWriteDao impleme
 	}
 
 	@Override
-	public boolean update(ProducerServerStatisData statisData) {
+	public boolean update(ProducerServerStatsData statisData) {
 		return insert(statisData);
 	}
 
 	@Override
 	public int deleteById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, ProducerServerStatisData.class,
+		WriteResult result = mongoTemplate.remove(query, ProducerServerStatsData.class,
 				PRODUCERSERVERSTATICDATA_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
-	public ProducerServerStatisData findById(String id) {
+	public ProducerServerStatsData findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		ProducerServerStatisData serverStatisData = mongoTemplate.findOne(query, ProducerServerStatisData.class,
+		ProducerServerStatsData serverStatisData = mongoTemplate.findOne(query, ProducerServerStatsData.class,
 				PRODUCERSERVERSTATICDATA_COLLECTION);
 		return serverStatisData;
 	}
 
 	@Override
-	public ProducerServerStatisData findByTimeKey(long timeKey) {
+	public ProducerServerStatsData findByTimeKey(long timeKey) {
 		Query query = new Query(Criteria.where(TIMEKEY_FIELD).is(timeKey));
-		ProducerServerStatisData serverStatisData = mongoTemplate.findOne(query, ProducerServerStatisData.class,
+		ProducerServerStatsData serverStatisData = mongoTemplate.findOne(query, ProducerServerStatsData.class,
 				PRODUCERSERVERSTATICDATA_COLLECTION);
 		return serverStatisData;
+	}
+
+	public List<ProducerServerStatsData> findSectionData(long startKey, long endKey) {
+		Query query = new Query(Criteria.where(TIMEKEY_FIELD).gte(startKey).and(TIMEKEY_FIELD).lte(endKey));
+		List<ProducerServerStatsData> serverStatisDatas = mongoTemplate.find(query, ProducerServerStatsData.class,
+				PRODUCERSERVERSTATICDATA_COLLECTION);
+		return serverStatisDatas;
 	}
 
 }

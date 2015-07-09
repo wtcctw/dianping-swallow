@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ConsumerIdStatisDataDao;
-import com.dianping.swallow.web.model.statis.ConsumerIdStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerIdStatsData;
 import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
 
 @Service("consumerIdStatisDataService")
@@ -16,12 +16,12 @@ public class ConsumerIdStatisDataServiceImpl implements ConsumerIdStatisDataServ
 	private ConsumerIdStatisDataDao consumerIdStatisDataDao;
 
 	@Override
-	public boolean insert(ConsumerIdStatisData statisData) {
+	public boolean insert(ConsumerIdStatsData statisData) {
 		return consumerIdStatisDataDao.insert(statisData);
 	}
 
 	@Override
-	public boolean update(ConsumerIdStatisData statisData) {
+	public boolean update(ConsumerIdStatsData statisData) {
 		return consumerIdStatisDataDao.update(statisData);
 	}
 
@@ -31,32 +31,32 @@ public class ConsumerIdStatisDataServiceImpl implements ConsumerIdStatisDataServ
 	}
 
 	@Override
-	public ConsumerIdStatisData findById(String id) {
+	public ConsumerIdStatsData findById(String id) {
 		return consumerIdStatisDataDao.findById(id);
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTimeKey(long timeKey) {
+	public List<ConsumerIdStatsData> findByTimeKey(long timeKey) {
 		return consumerIdStatisDataDao.findByTimeKey(timeKey);
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTopic(String topicName) {
+	public List<ConsumerIdStatsData> findByTopic(String topicName) {
 		return consumerIdStatisDataDao.findByTopic(topicName);
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTopicAndTime(String topicName, long timeKey) {
+	public List<ConsumerIdStatsData> findByTopicAndTime(String topicName, long timeKey) {
 		return consumerIdStatisDataDao.findByTopicAndTime(topicName, timeKey);
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTopicAndConsumerId(String topicName, String consumerId) {
+	public List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId) {
 		return consumerIdStatisDataDao.findByTopicAndConsumerId(topicName, consumerId);
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId) {
+	public List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId) {
 		return consumerIdStatisDataDao.findByTopicAndTimeAndConsumerId(topicName, timeKey, consumerId);
 	}
 

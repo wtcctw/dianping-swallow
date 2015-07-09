@@ -233,6 +233,16 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		return Collections.unmodifiableMap(cmdbConsumerMasters);
 	}
 	
+	@Override
+	public void clearProducerServerIps(){
+		producerServerIps.clear();
+	}
+	
+	@Override
+	public void clearConsumerServerIps(){
+		consumerServerIps.clear();
+	}
+	
 	public int getInterval() {
 		return interval;
 	}

@@ -1,8 +1,12 @@
 package com.dianping.swallow.web.monitor;
 
+import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
+import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 
 /**
  * @author mengwenchao
@@ -23,6 +27,7 @@ public interface ProducerDataRetriever extends MonitorDataRetriever{
 
 	Map<String, StatsData> getServerQpx(QPX qpx);
 	
+	List<ProducerTopicStatsData> getTopicStatis(long timeKey, StatisType type);
 	
-
+	ProducerServerStatsData getServerStatis(long timeKey, StatisType type);
 }

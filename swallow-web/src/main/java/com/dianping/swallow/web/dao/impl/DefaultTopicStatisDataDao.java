@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.TopicStatisDataDao;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
-import com.dianping.swallow.web.model.statis.TopicStatisData;
+import com.dianping.swallow.web.model.statis.TopicStatsData;
 import com.mongodb.WriteResult;
 
 @Service("topicStatisDataDao")
@@ -27,7 +27,7 @@ public class DefaultTopicStatisDataDao extends AbstractWriteDao implements Topic
 	private static final String ID_FIELD = "id";
 
 	@Override
-	public boolean insert(TopicStatisData statisData) {
+	public boolean insert(TopicStatsData statisData) {
 		try {
 			mongoTemplate.save(statisData, TOPICSTATISDATA_COLLECTION);
 			return true;
@@ -38,35 +38,35 @@ public class DefaultTopicStatisDataDao extends AbstractWriteDao implements Topic
 	}
 
 	@Override
-	public boolean update(TopicStatisData statisData) {
+	public boolean update(TopicStatsData statisData) {
 		return insert(statisData);
 	}
 
 	@Override
 	public int deleteById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, TopicStatisData.class, TOPICSTATISDATA_COLLECTION);
+		WriteResult result = mongoTemplate.remove(query, TopicStatsData.class, TOPICSTATISDATA_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
-	public TopicStatisData findById(String id) {
+	public TopicStatsData findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		TopicStatisData topicStatisData = mongoTemplate.findOne(query, TopicStatisData.class, TOPICSTATISDATA_COLLECTION);
+		TopicStatsData topicStatisData = mongoTemplate.findOne(query, TopicStatsData.class, TOPICSTATISDATA_COLLECTION);
 		return topicStatisData;
 	}
 
 	@Override
-	public TopicStatisData findByTimeKey(long timeKey) {
+	public TopicStatsData findByTimeKey(long timeKey) {
 		Query query = new Query(Criteria.where(TIMEKEY_FIELD).is(timeKey));
-		TopicStatisData topicStatisData = mongoTemplate.findOne(query, TopicStatisData.class, TOPICSTATISDATA_COLLECTION);
+		TopicStatsData topicStatisData = mongoTemplate.findOne(query, TopicStatsData.class, TOPICSTATISDATA_COLLECTION);
 		return topicStatisData;
 	}
 
 	@Override
-	public List<TopicStatisData> findByTopic(String topicName) {
+	public List<TopicStatsData> findByTopic(String topicName) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
-		List<TopicStatisData> topicStatisDatas = mongoTemplate.find(query, TopicStatisData.class, TOPICSTATISDATA_COLLECTION);
+		List<TopicStatsData> topicStatisDatas = mongoTemplate.find(query, TopicStatsData.class, TOPICSTATISDATA_COLLECTION);
 		return topicStatisDatas;
 	}
 

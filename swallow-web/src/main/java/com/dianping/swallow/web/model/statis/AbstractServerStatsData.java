@@ -2,7 +2,7 @@ package com.dianping.swallow.web.model.statis;
 
 import org.springframework.data.annotation.Id;
 
-public abstract class AbstractServerStatisData {
+public abstract class AbstractServerStatsData {
 	
 	@Id
 	private String id;

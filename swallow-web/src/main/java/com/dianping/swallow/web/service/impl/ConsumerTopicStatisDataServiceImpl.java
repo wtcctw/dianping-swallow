@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ConsumerTopicStatisDataDao;
-import com.dianping.swallow.web.model.statis.ConsumerTopicStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerTopicStatsData;
 import com.dianping.swallow.web.service.ConsumerTopicStatisDataService;
 
 
@@ -17,12 +17,12 @@ public class ConsumerTopicStatisDataServiceImpl implements ConsumerTopicStatisDa
 	private ConsumerTopicStatisDataDao consumerTopicStatisDataDao;
 	
 	@Override
-	public boolean insert(ConsumerTopicStatisData statisData) {
+	public boolean insert(ConsumerTopicStatsData statisData) {
 		return consumerTopicStatisDataDao.insert(statisData);
 	}
 
 	@Override
-	public boolean update(ConsumerTopicStatisData statisData) {
+	public boolean update(ConsumerTopicStatsData statisData) {
 		return consumerTopicStatisDataDao.update(statisData);
 	}
 
@@ -32,17 +32,17 @@ public class ConsumerTopicStatisDataServiceImpl implements ConsumerTopicStatisDa
 	}
 
 	@Override
-	public ConsumerTopicStatisData findById(String id) {
+	public ConsumerTopicStatsData findById(String id) {
 		return consumerTopicStatisDataDao.findById(id);
 	}
 
 	@Override
-	public ConsumerTopicStatisData findByTimeKey(long timeKey) {
+	public ConsumerTopicStatsData findByTimeKey(long timeKey) {
 		return consumerTopicStatisDataDao.findByTimeKey(timeKey);
 	}
 
 	@Override
-	public List<ConsumerTopicStatisData> findByTopic(String topicName) {
+	public List<ConsumerTopicStatsData> findByTopic(String topicName) {
 		return consumerTopicStatisDataDao.findByTopic(topicName);
 	}
 

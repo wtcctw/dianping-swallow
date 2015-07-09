@@ -76,5 +76,15 @@ public interface IPCollectorService {
 	 * @return
 	 */
 	public Map<String, String> getCmdbConsumerMasters();
+	
+	/**
+	 * clear producerServerIps
+	 */
+	public void clearProducerServerIps();
+	
+	/**
+	 * clear consumerServerIps
+	 */
+	public void clearConsumerServerIps();
 
 }

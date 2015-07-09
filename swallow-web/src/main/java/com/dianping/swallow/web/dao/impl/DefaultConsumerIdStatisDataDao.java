@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ConsumerIdStatisDataDao;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
-import com.dianping.swallow.web.model.statis.ConsumerIdStatisData;
+import com.dianping.swallow.web.model.statis.ConsumerIdStatsData;
 import com.mongodb.WriteResult;
 
 @Service("consumerIdStatisDataDao")
@@ -29,7 +29,7 @@ public class DefaultConsumerIdStatisDataDao extends AbstractWriteDao implements 
 	private static final String ID_FIELD = "id";
 
 	@Override
-	public boolean insert(ConsumerIdStatisData statisData) {
+	public boolean insert(ConsumerIdStatsData statisData) {
 		try {
 			mongoTemplate.save(statisData, CONSUMERIDTATISDATA_COLLECTION);
 			return true;
@@ -40,62 +40,62 @@ public class DefaultConsumerIdStatisDataDao extends AbstractWriteDao implements 
 	}
 
 	@Override
-	public boolean update(ConsumerIdStatisData statisData) {
+	public boolean update(ConsumerIdStatsData statisData) {
 		return insert(statisData);
 	}
 
 	@Override
 	public int deleteById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, ConsumerIdStatisData.class, CONSUMERIDTATISDATA_COLLECTION);
+		WriteResult result = mongoTemplate.remove(query, ConsumerIdStatsData.class, CONSUMERIDTATISDATA_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
-	public ConsumerIdStatisData findById(String id) {
+	public ConsumerIdStatsData findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		ConsumerIdStatisData statisData = mongoTemplate.findOne(query, ConsumerIdStatisData.class,
+		ConsumerIdStatsData statisData = mongoTemplate.findOne(query, ConsumerIdStatsData.class,
 				CONSUMERIDTATISDATA_COLLECTION);
 		return statisData;
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTimeKey(long timeKey) {
+	public List<ConsumerIdStatsData> findByTimeKey(long timeKey) {
 		Query query = new Query(Criteria.where(TIMEKEY_FIELD).is(timeKey));
-		List<ConsumerIdStatisData> statisDatas = mongoTemplate.find(query, ConsumerIdStatisData.class,
+		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
 				CONSUMERIDTATISDATA_COLLECTION);
 		return statisDatas;
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTopic(String topicName) {
+	public List<ConsumerIdStatsData> findByTopic(String topicName) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
-		List<ConsumerIdStatisData> statisDatas = mongoTemplate.find(query, ConsumerIdStatisData.class,
+		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
 				CONSUMERIDTATISDATA_COLLECTION);
 		return statisDatas;
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTopicAndTime(String topicName, long timeKey) {
+	public List<ConsumerIdStatsData> findByTopicAndTime(String topicName, long timeKey) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).is(timeKey));
-		List<ConsumerIdStatisData> statisDatas = mongoTemplate.find(query, ConsumerIdStatisData.class,
+		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
 				CONSUMERIDTATISDATA_COLLECTION);
 		return statisDatas;
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTopicAndConsumerId(String topicName, String consumerId) {
+	public List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId));
-		List<ConsumerIdStatisData> statisDatas = mongoTemplate.find(query, ConsumerIdStatisData.class,
+		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
 				CONSUMERIDTATISDATA_COLLECTION);
 		return statisDatas;
 	}
 
 	@Override
-	public List<ConsumerIdStatisData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId) {
+	public List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).is(timeKey)
 				.and(CONSUMERID_FIELD).is(consumerId));
-		List<ConsumerIdStatisData> statisDatas = mongoTemplate.find(query, ConsumerIdStatisData.class,
+		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
 				CONSUMERIDTATISDATA_COLLECTION);
 		return statisDatas;
 	}

@@ -1,26 +1,27 @@
 package com.dianping.swallow.web.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ProducerServerStatisDataDao;
-import com.dianping.swallow.web.model.statis.ProducerServerStatisData;
+import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
 import com.dianping.swallow.web.service.ProducerServerStatisDataService;
-
 
 @Service("producerServerStatisDataService")
 public class ProducerServerStatisDataServiceImpl implements ProducerServerStatisDataService {
 
 	@Autowired
 	private ProducerServerStatisDataDao producerServerStatisDataDao;
-	
+
 	@Override
-	public boolean insert(ProducerServerStatisData statisData) {
+	public boolean insert(ProducerServerStatsData statisData) {
 		return producerServerStatisDataDao.insert(statisData);
 	}
 
 	@Override
-	public boolean update(ProducerServerStatisData statisData) {
+	public boolean update(ProducerServerStatsData statisData) {
 		return producerServerStatisDataDao.update(statisData);
 	}
 
@@ -30,13 +31,18 @@ public class ProducerServerStatisDataServiceImpl implements ProducerServerStatis
 	}
 
 	@Override
-	public ProducerServerStatisData findById(String id) {
+	public ProducerServerStatsData findById(String id) {
 		return producerServerStatisDataDao.findById(id);
 	}
 
 	@Override
-	public ProducerServerStatisData findByTimeKey(long timeKey) {
+	public ProducerServerStatsData findByTimeKey(long timeKey) {
 		return producerServerStatisDataDao.findByTimeKey(timeKey);
+	}
+
+	@Override
+	public List<ProducerServerStatsData> findSectionData(long startKey, long endKey) {
+		return producerServerStatisDataDao.findSectionData(startKey, endKey);
 	}
 
 }

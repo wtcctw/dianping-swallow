@@ -1,5 +1,9 @@
 package com.dianping.swallow.web.monitor;
 
+import java.util.Set;
+
+import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
@@ -12,7 +16,7 @@ public interface MonitorDataRetriever extends Retriever {
 	void add(MonitorData monitorData);
 
 	String getDebugInfo(String server);
-	
+
 	void registerListener(MonitorDataListener listener);
-	
+
 }
