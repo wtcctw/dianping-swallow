@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.consumerserver.buffer.MessageRetriever.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 
@@ -113,7 +114,12 @@ public abstract class AbstractRetrieveTask implements Runnable {
 	}
 
 	protected void putMessage(List<SwallowMessage> messages) {
-		blockingQueue.putMessage(messages);;
+		
+		blockingQueue.putMessage(messages);
+		
+		if(EnvUtil.isAlpha()){
+			blockingQueue.putMessage(messages);
+		}
 	}
 
 	protected abstract void setTailId(Long tailId);
@@ -121,7 +127,6 @@ public abstract class AbstractRetrieveTask implements Runnable {
 	protected abstract String getConsumerId();
 
 	protected abstract Long getTailId();
-
 
 
 }

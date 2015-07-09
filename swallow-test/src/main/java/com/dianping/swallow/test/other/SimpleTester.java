@@ -17,6 +17,7 @@ public class SimpleTester {
 	public void testDate(){
 
 		System.out.println(40000 * AbstractSwallowConfig.MILLION);
+		printTime(1);
 	}
 
 	private void printTime(int time) {
