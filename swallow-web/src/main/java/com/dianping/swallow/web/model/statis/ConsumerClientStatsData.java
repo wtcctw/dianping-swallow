@@ -1,23 +1,8 @@
 package com.dianping.swallow.web.model.statis;
 
-/**
- * 
- * @author qiyin
- *
- */
-public class ConsumerMachineStatsData {
-	
-	private String ip;
+public class ConsumerClientStatsData {
 	
 	private ConsumerBaseStatsData statisData;
-
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
 
 	public ConsumerBaseStatsData getStatisData() {
 		return statisData;
@@ -26,5 +11,4 @@ public class ConsumerMachineStatsData {
 	public void setStatisData(ConsumerBaseStatsData statisData) {
 		this.statisData = statisData;
 	}
-
 }
