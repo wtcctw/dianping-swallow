@@ -15,4 +15,6 @@ public interface TopicAlarmSettingService {
 	public TopicAlarmSetting findById(String id);
 	
 	public List<TopicAlarmSetting> findAll();
+
+	TopicAlarmSetting findOne();
 }

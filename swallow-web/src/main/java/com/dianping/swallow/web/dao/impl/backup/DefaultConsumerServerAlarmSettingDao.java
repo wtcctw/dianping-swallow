@@ -2,8 +2,6 @@ package com.dianping.swallow.web.dao.impl.backup;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import com.dianping.swallow.web.dao.backup.ConsumerServerAlarmSettingDao;
 import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.alarm.backup.ConsumerServerAlarmSetting;

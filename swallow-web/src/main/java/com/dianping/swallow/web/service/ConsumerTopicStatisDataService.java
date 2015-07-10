@@ -3,7 +3,6 @@ package com.dianping.swallow.web.service;
 import java.util.List;
 
 import com.dianping.swallow.web.model.statis.ConsumerTopicStatsData;
-import com.dianping.swallow.web.model.statis.TopicStatsData;
 
 public interface ConsumerTopicStatisDataService {
 

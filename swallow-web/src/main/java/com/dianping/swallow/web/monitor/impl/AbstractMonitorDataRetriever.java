@@ -204,4 +204,12 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 			return null;
 		}
 	}
+
+	public Set<String> getKeys(CasKeys keys) {
+		return getKeys(keys, null);
+	}
+
+	public Object getValue(CasKeys keys) {
+		return getValue(keys, null);
+	}
 }

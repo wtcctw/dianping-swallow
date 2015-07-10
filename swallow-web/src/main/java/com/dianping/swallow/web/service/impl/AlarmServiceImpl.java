@@ -19,9 +19,12 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.Alarm;
+import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.alarm.SendType;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
+import com.dianping.swallow.web.util.NetUtil;
 
 /**
  * 
@@ -40,16 +43,21 @@ public class AlarmServiceImpl implements AlarmService {
 	private static final String WEIXIN_KEY = "weiXin";
 	private static final String SMS_KEY = "sms";
 
+	private static final String RECIEVER_SPLIT = ",";
+
 	private String mailUrl;
 	private String smsUrl;
 	private String weiXinUrl;
-	
+
 	@Autowired
 	private AlarmDao alarmDao;
 
 	@Autowired
 	private HttpService httpService;
-	
+
+	@Autowired
+	private AlarmService alarmService;
+
 	@Autowired
 	private IPDescManager ipDescManager;
 
@@ -82,38 +90,64 @@ public class AlarmServiceImpl implements AlarmService {
 	}
 
 	@Override
-	public boolean sendSms(String mobile, String body) {
+	public boolean sendSms(String mobile, String title, String body, AlarmType type) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("mobile", mobile));
-		params.add(new BasicNameValuePair("body", body));
-		return httpService.httpPost(getSmsUrl(), params).isSuccess();
+		params.add(new BasicNameValuePair("body", "[" + title + "]" + body));
+		boolean result = httpService.httpPost(getSmsUrl(), params).isSuccess();
+		alarmService.insert(new Alarm().buildType(type).buildReceiver(mobile).buildTitle(title).buildBody(body)
+				.buildSendType(SendType.SMS).buildSourceIp(NetUtil.IP).buildCreateTime(new Date()));
+		return result;
 	}
 
 	@Override
-	public boolean sendWeixin(String email, String title, String content) {
+	public boolean sendWeixin(String email, String title, String content, AlarmType type) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("email", email));
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("content", content));
-		return httpService.httpPost(getWeiXinUrl(), params).isSuccess();
+		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
+		alarmService.insert(new Alarm().buildType(type).buildReceiver(email).buildTitle(title).buildBody(content)
+				.buildSendType(SendType.WEIXIN).buildSourceIp(NetUtil.IP).buildCreateTime(new Date()));
+		return result;
 	}
 
 	@Override
-	public boolean sendMail(String email, String title, String content) {
+	public boolean sendMail(String email, String title, String content, AlarmType type) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("recipients", email));
 		params.add(new BasicNameValuePair("body", content));
-		return httpService.httpPost(getMailUrl(), params).isSuccess();
+		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
+		alarmService.insert(new Alarm().buildType(type).buildReceiver(email).buildTitle(title).buildBody(content)
+				.buildSendType(SendType.SMS).buildSourceIp(NetUtil.IP).buildCreateTime(new Date()));
+		return result;
 	}
-	
+
 	@Override
-	public void sendAll(String ip,String title,String message){
+	public void sendAll(String ip, String title, String message, AlarmType type) {
 		IPDesc ipDesc = ipDescManager.getIPDesc(ip);
 		if (ipDesc != null) {
-			sendSms(ipDesc.getDpMobile(), message);
-			sendWeixin(ipDesc.getEmail(), title, message);
-			sendMail(ipDesc.getEmail(), title, message);
+			if (StringUtils.isNotBlank(ipDesc.getDpMobile())) {
+				String[] mobiles = StringUtils.split(ipDesc.getDpMobile(), RECIEVER_SPLIT);
+				for (String mobile : mobiles) {
+					if (StringUtils.isBlank(mobile)) {
+						continue;
+					}
+					sendSms(mobile, title, message, type);
+				}
+			}
+			if (StringUtils.isNotBlank(ipDesc.getEmail())) {
+				String[] emails = StringUtils.split(ipDesc.getEmail(), RECIEVER_SPLIT);
+				for (String email : emails) {
+					if (StringUtils.isBlank(email)) {
+						continue;
+					}
+					sendWeixin(ipDesc.getEmail(), title, message, type);
+					sendMail(ipDesc.getEmail(), title, message, type);
+				}
+			}
+
 		} else {
 			logger.error("[doCheckPort] cannot find ipDesc info.");
 		}
@@ -142,12 +176,12 @@ public class AlarmServiceImpl implements AlarmService {
 	public void setWeiXinUrl(String weiXinUrl) {
 		this.weiXinUrl = weiXinUrl;
 	}
-	
-	public void setHttpService(HttpService httpService){
+
+	public void setHttpService(HttpService httpService) {
 		this.httpService = httpService;
 	}
-	
-	public void setAlarmDao(AlarmDao alarmDao){
+
+	public void setAlarmDao(AlarmDao alarmDao) {
 		this.alarmDao = alarmDao;
 	}
 
@@ -185,5 +219,5 @@ public class AlarmServiceImpl implements AlarmService {
 	public List<Alarm> findAll() {
 		return alarmDao.findAll();
 	}
-	
+
 }

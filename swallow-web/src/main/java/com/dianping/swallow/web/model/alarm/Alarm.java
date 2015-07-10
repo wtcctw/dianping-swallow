@@ -16,6 +16,8 @@ public class Alarm {
 
 	private AlarmType type;
 
+	private SendType sendType;
+
 	private String title;
 
 	private String body;
@@ -25,6 +27,46 @@ public class Alarm {
 	private Date createTime;
 
 	private String sourceIp;
+
+	public Alarm() {
+
+	}
+
+	public Alarm buildType(AlarmType type) {
+		this.setType(type);
+		return this;
+	}
+
+	public Alarm buildSendType(SendType sendType) {
+		this.setSendType(sendType);
+		return this;
+	}
+
+	public Alarm buildTitle(String title) {
+		this.setTitle(title);
+		return this;
+	}
+
+	public Alarm buildBody(String body) {
+		this.setBody(body);
+		return this;
+	}
+
+	public Alarm buildReceiver(String receiver) {
+		this.setReceiver(receiver);
+		;
+		return this;
+	}
+
+	public Alarm buildCreateTime(Date createTime) {
+		this.setCreateTime(createTime);
+		return this;
+	}
+
+	public Alarm buildSourceIp(String sourceIp) {
+		this.setSourceIp(sourceIp);
+		return this;
+	}
 
 	public String getId() {
 		return id;
@@ -87,4 +129,13 @@ public class Alarm {
 		return "Alarm[ id = " + id + ", type = " + type + ", title = " + title + ",body = " + body + ",receiver = "
 				+ receiver + ", createTime = " + createTime + ", sourceIp = " + sourceIp + "]";
 	}
+
+	public SendType getSendType() {
+		return sendType;
+	}
+
+	public void setSendType(SendType sendType) {
+		this.sendType = sendType;
+	}
+
 }

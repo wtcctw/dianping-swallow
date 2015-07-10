@@ -41,4 +41,23 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 		return consumerServerAlarmSettingDao.findAll();
 	}
 
+	@Override
+	public List<String> getWhiteList() {
+		List<ConsumerServerAlarmSetting> serverAlarmSettings = findAll();
+		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
+			return null;
+		}
+		ConsumerServerAlarmSetting serverAlarmSetting = serverAlarmSettings.get(0);
+		return serverAlarmSetting.getWhiteList();
+	}
+	
+	@Override
+	public ConsumerServerAlarmSetting findOne(){
+		List<ConsumerServerAlarmSetting> serverAlarmSettings = findAll();
+		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
+			return null;
+		}
+		return serverAlarmSettings.get(0);
+	}
+
 }

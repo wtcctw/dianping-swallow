@@ -14,7 +14,7 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 
 	@Autowired
 	private ProducerServerAlarmSettingDao producerServerAlarmSettingDao;
-	
+
 	@Override
 	public boolean insert(ProducerServerAlarmSetting setting) {
 		return producerServerAlarmSettingDao.insert(setting);
@@ -38,6 +38,21 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 	@Override
 	public List<ProducerServerAlarmSetting> findAll() {
 		return producerServerAlarmSettingDao.findAll();
+	}
+
+	@Override
+	public List<String> getWhiteList() {
+		ProducerServerAlarmSetting serverAlarmSetting = findOne();
+		return serverAlarmSetting.getWhiteList();
+	}
+	
+	@Override
+	public ProducerServerAlarmSetting findOne(){
+		List<ProducerServerAlarmSetting> serverAlarmSettings = findAll();
+		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
+			return null;
+		}
+		return serverAlarmSettings.get(0);
 	}
 
 }

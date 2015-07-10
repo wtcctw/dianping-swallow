@@ -13,19 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
-import com.dianping.swallow.web.alarmer.AlarmFilter;
-import com.dianping.swallow.web.alarmer.AlarmFilterChain;
+import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.manager.IPDescManager;
-import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 
-public class ProducerServiceAlarmFilter extends AbstractProducerAlarmFilter{
+public class ProducerServiceAlarmFilter extends AbstractProducerAlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProducerServiceAlarmFilter.class);
 
-	private static final String PEGION_PRODUCER_URL_KEY = "http://service.dianping.com/swallowService/producerService_1.0.0";
+	private static final String PIGEON_PRODUCER_URL_KEY = "http://service.dianping.com/swallowService/producerService_1.0.0";
 
 	private static final String COMMA_SPLIT = ",";
 
@@ -40,7 +38,7 @@ public class ProducerServiceAlarmFilter extends AbstractProducerAlarmFilter{
 
 	@Autowired
 	private IPDescManager ipDescManager;
-	
+
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
@@ -49,25 +47,31 @@ public class ProducerServiceAlarmFilter extends AbstractProducerAlarmFilter{
 
 	@PostConstruct
 	public void initialize() {
-		configCache = ConfigCache.getInstance();
-		setProducerServerIp(configCache.getProperty(PEGION_PRODUCER_URL_KEY));
-		configCache.addChange(new ConfigChange() {
+		try {
+			configCache = ConfigCache.getInstance();
+			setProducerServerIp(configCache.getProperty(PIGEON_PRODUCER_URL_KEY));
+			configCache.addChange(new ConfigChange() {
 
-			public void onChange(String key, String value) {
-				if (key.equals(PEGION_PRODUCER_URL_KEY)) {
-					setProducerServerIp(value);
+				public void onChange(String key, String value) {
+					if (key.equals(PIGEON_PRODUCER_URL_KEY)) {
+						setProducerServerIp(value);
+					}
 				}
-			}
-		});
+			});
+		} catch (LionException e) {
+			logger.error("[initialize] lion read pigeon producer service url.");
+			throw new RuntimeException();
+		}
 	}
 
-	public boolean doAccept(){
+	@Override
+	public boolean doAccept() {
 		return checkService();
 	}
-	
-	private boolean checkService(){
+
+	private boolean checkService() {
 		Map<String, String> cmdbProducers = ipCollectorService.getCmdbProducers();
-		List<String> whiteList = getWhiteList();
+		List<String> whiteList = serverAlarmSettingService.getWhiteList();
 		List<String> ipList = getIpList();
 
 		for (Map.Entry<String, String> cmdbProducer : cmdbProducers.entrySet()) {
@@ -75,41 +79,31 @@ public class ProducerServiceAlarmFilter extends AbstractProducerAlarmFilter{
 				continue;
 			}
 			if (!whiteList.contains(cmdbProducer.getValue()) && !ipList.contains(cmdbProducer.getValue())) {
-				String message = "[ip] " + cmdbProducer.getValue()
-						+ "service is not work,Please Please handle immediately.";
-				alarmService.sendAll(cmdbProducer.getValue(), "[producerServer not work]", message);
+				//
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	protected List<String> getIpList() {
-		List<String> ipList = new ArrayList<String>();
-		if (StringUtils.isNotBlank(producerServerIp)) {
-			String[] hosts = producerServerIp.split(COMMA_SPLIT);
-			if (hosts != null) {
-				for (String host : hosts) {
-					String[] temp = host.split(COLON_SPLIT);
-					if (temp != null && temp.length > 0) {
-						ipList.add(temp[0]);
-					}
-				}
-			}
 
+	private List<String> getIpList() {
+		List<String> ipList = new ArrayList<String>();
+		if (StringUtils.isBlank(producerServerIp)) {
+			return ipList;
+		}
+		String[] hosts = producerServerIp.split(COMMA_SPLIT);
+		if (hosts == null) {
+			return ipList;
+		}
+		for (String host : hosts) {
+			String[] temp = host.split(COLON_SPLIT);
+			if (temp != null && temp.length > 0) {
+				ipList.add(temp[0]);
+			}
 		}
 		return ipList;
 	}
 
-	protected List<String> getWhiteList() {
-		List<ProducerServerAlarmSetting> serverAlarmSettings = serverAlarmSettingService.findAll();
-		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
-			return null;
-		}
-		ProducerServerAlarmSetting serverAlarmSetting = serverAlarmSettings.get(0);
-		return serverAlarmSetting.getWhiteList();
-	}
-	
 	public String getProducerServerIp() {
 		return producerServerIp;
 	}

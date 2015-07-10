@@ -15,4 +15,6 @@ public interface ConsumerIdAlarmSettingService {
 	public ConsumerIdAlarmSetting findById(String id);
 
 	public List<ConsumerIdAlarmSetting> findAll();
+
+	ConsumerIdAlarmSetting findOne();
 }

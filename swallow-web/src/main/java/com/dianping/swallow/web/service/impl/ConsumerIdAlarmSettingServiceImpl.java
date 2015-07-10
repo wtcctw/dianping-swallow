@@ -40,4 +40,13 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 		return consumerIdAlarmSettingDao.findAll();
 	}
 
+	@Override
+	public ConsumerIdAlarmSetting findOne() {
+		List<ConsumerIdAlarmSetting> consumerIdAlarmSettings = findAll();
+		if (consumerIdAlarmSettings == null || consumerIdAlarmSettings.size() == 0) {
+			return null;
+		}
+		return consumerIdAlarmSettings.get(0);
+	}
+
 }
