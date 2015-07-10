@@ -19,6 +19,11 @@ import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
 import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("producerDataWapper")
 public class ProducerDataWapperImpl implements ProducerDataWapper {
 

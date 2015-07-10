@@ -5,6 +5,11 @@ import java.util.List;
 import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
 import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface ProducerDataWapper {
 	
 	ProducerServerStatsData getServerStatsData(long timeKey);
