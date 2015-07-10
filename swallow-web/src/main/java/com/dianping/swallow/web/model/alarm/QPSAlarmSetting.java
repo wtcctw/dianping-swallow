@@ -11,7 +11,7 @@ public class QPSAlarmSetting {
 
 	private long valley;
 
-	private long fluctuation;
+	private int fluctuation;
 
 	public long getPeak() {
 		return peak;
@@ -33,7 +33,7 @@ public class QPSAlarmSetting {
 		return fluctuation;
 	}
 
-	public void setFluctuation(long fluctuation) {
+	public void setFluctuation(int fluctuation) {
 		this.fluctuation = fluctuation;
 	}
 

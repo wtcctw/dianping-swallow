@@ -13,10 +13,10 @@ import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.NetUtil;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 public class ConsumerPortAlarmFilter extends AbstractConsumerAlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerPortAlarmFilter.class);
@@ -57,12 +57,12 @@ public class ConsumerPortAlarmFilter extends AbstractConsumerAlarmFilter {
 			if (!cmdbConsumerSlaves.containsKey(slaveName)) {
 				continue;
 			}
-			boolean usingMaster = NetUtil.isPortUsing(consumerMaster.getValue(), CONSUMER_MASTER_SERVICE_PORT);
-			boolean usingSlave = NetUtil.isPortUsing(cmdbConsumerSlaves.get(slaveName), CONSUMER_SLAVE_SERVICE_PORT);
+			boolean usingMaster = NetUtil.isPortOpen(consumerMaster.getValue(), CONSUMER_MASTER_SERVICE_PORT);
+			boolean usingSlave = NetUtil.isPortOpen(cmdbConsumerSlaves.get(slaveName), CONSUMER_SLAVE_SERVICE_PORT);
 			if (!usingMaster && usingSlave) {
 				// alarm
 				return false;
-			} else if (usingMaster && usingSlave) {
+			} else if (!usingMaster && !usingSlave) {
 				// alarm
 				return false;
 			}

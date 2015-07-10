@@ -1,8 +1,14 @@
 package com.dianping.swallow.web.model.statis;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class ProducerTopicStatsData {
-private String id;
 	
+	private String id;
+
 	private long timeKey;
 
 	private String topicName;

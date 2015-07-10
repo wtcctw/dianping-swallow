@@ -24,14 +24,14 @@ public class NetUtil {
 
 	public static final String IP = getFirstNoLoopbackIP4Address();
 
-	public static boolean isPortUsing(String host, int port) {
+	public static boolean isPortOpen(String host, int port) {
 		Socket socket = null;
 		try {
 			InetAddress inetAddr = InetAddress.getByName(host);
 			socket = new Socket(inetAddr, port);
-			return false;
-		} catch (IOException e) {
 			return true;
+		} catch (IOException e) {
+			return false;
 		} finally {
 			if (socket != null && socket.isConnected()) {
 				try {

@@ -15,5 +15,5 @@ public interface ProducerDataWapper {
 	ProducerServerStatsData getServerStatsData(long timeKey);
 	
 	List<ProducerTopicStatsData> getTopicStatsDatas(long timeKey);
-
+	
 }

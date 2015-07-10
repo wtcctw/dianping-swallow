@@ -2,6 +2,11 @@ package com.dianping.swallow.web.model.statis;
 
 import org.springframework.data.annotation.Id;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class ConsumerIdStatsData {
 	
 	@Id

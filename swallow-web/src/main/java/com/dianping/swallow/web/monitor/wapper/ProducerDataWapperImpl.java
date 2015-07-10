@@ -25,11 +25,7 @@ import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 *
 */
 @Service("producerDataWapper")
-public class ProducerDataWapperImpl implements ProducerDataWapper {
-
-	private static final long DEFAULT_VALUE = -1L;
-	
-	private static final String TOTAL_KEY = "total";
+public class ProducerDataWapperImpl extends AbstractDataWapper implements ProducerDataWapper {
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;

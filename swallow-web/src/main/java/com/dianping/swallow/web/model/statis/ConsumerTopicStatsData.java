@@ -1,6 +1,12 @@
 package com.dianping.swallow.web.model.statis;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class ConsumerTopicStatsData {
+	
 	private String id;
 
 	private long timeKey;

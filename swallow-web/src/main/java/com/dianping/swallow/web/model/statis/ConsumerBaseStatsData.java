@@ -4,11 +4,13 @@ public class ConsumerBaseStatsData {
 
 	private long senderQpx;
 	
-	private long senderdelay;
+	private long senderDelay;
 	
 	private long ackQpx;
 	
-	private long ackdelay;
+	private long ackDelay;
+	
+	private long accumulation;
 
 	public long getSenderQpx() {
 		return senderQpx;
@@ -18,12 +20,12 @@ public class ConsumerBaseStatsData {
 		this.senderQpx = senderQpx;
 	}
 
-	public long getSenderdelay() {
-		return senderdelay;
+	public long getSenderDelay() {
+		return senderDelay;
 	}
 
-	public void setSenderdelay(long senderdelay) {
-		this.senderdelay = senderdelay;
+	public void setSenderDelay(long senderDelay) {
+		this.senderDelay = senderDelay;
 	}
 
 	public long getAckQpx() {
@@ -34,11 +36,19 @@ public class ConsumerBaseStatsData {
 		this.ackQpx = ackQpx;
 	}
 
-	public long getAckdelay() {
-		return ackdelay;
+	public long getAckDelay() {
+		return ackDelay;
 	}
 
-	public void setAckdelay(long ackdelay) {
-		this.ackdelay = ackdelay;
+	public void setAckDelay(long ackDelay) {
+		this.ackDelay = ackDelay;
+	}
+
+	public long getAccumulation() {
+		return accumulation;
+	}
+
+	public void setAccumulation(long accumulation) {
+		this.accumulation = accumulation;
 	}
 }
