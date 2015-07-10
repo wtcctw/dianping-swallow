@@ -9,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class ProducerSenderAlarmFilter extends AbstractProducerAlarmFilter {
 
 	@Autowired

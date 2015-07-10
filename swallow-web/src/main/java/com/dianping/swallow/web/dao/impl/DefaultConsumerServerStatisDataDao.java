@@ -11,6 +11,11 @@ import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.statis.ConsumerServerStatsData;
 import com.mongodb.WriteResult;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("consumerServerStatisDataDao")
 public class DefaultConsumerServerStatisDataDao extends AbstractWriteDao implements ConsumerServerStatisDataDao {
 

@@ -9,6 +9,11 @@ import com.dianping.swallow.web.dao.TopicAlarmSettingDao;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("topicAlarmSettingService")
 public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 

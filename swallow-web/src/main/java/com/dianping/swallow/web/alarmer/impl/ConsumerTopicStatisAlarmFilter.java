@@ -2,6 +2,11 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class ConsumerTopicStatisAlarmFilter extends AbstractConsumerAlarmFilter implements MonitorDataListener {
 
 	@Override

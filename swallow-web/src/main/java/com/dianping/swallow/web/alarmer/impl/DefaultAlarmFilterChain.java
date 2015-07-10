@@ -6,6 +6,11 @@ import java.util.List;
 import com.dianping.swallow.web.alarmer.AlarmFilter;
 import com.dianping.swallow.web.alarmer.AlarmFilterChain;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class DefaultAlarmFilterChain implements AlarmFilterChain {
 
 	private List<AlarmFilter> alarmFilters = new ArrayList<AlarmFilter>();

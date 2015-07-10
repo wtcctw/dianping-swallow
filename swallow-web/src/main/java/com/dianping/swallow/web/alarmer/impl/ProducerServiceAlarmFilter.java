@@ -19,6 +19,11 @@ import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class ProducerServiceAlarmFilter extends AbstractProducerAlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProducerServiceAlarmFilter.class);

@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface ProducerServerAlarmSettingDao {
 
 	public boolean insert(ProducerServerAlarmSetting setting);

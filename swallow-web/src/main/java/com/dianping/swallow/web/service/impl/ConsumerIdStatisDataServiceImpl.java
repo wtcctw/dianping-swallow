@@ -9,6 +9,11 @@ import com.dianping.swallow.web.dao.ConsumerIdStatisDataDao;
 import com.dianping.swallow.web.model.statis.ConsumerIdStatsData;
 import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("consumerIdStatisDataService")
 public class ConsumerIdStatisDataServiceImpl implements ConsumerIdStatisDataService {
 	

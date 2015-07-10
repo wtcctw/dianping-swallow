@@ -9,6 +9,11 @@ import com.dianping.swallow.web.dao.ConsumerIdAlarmSettingDao;
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("consumerIdAlarmSettingService")
 public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSettingService {
 

@@ -13,6 +13,11 @@ import java.util.Enumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class NetUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(NetUtil.class);
@@ -58,7 +63,6 @@ public class NetUtil {
 			}
 		}
 		if (noLoopbackIP4Addresses.isEmpty()) {
-			// 降低过滤标准，将site local address纳入结果
 			for (InetAddress address : allInetAddresses) {
 				if (!address.isLoopbackAddress() && !Inet6Address.class.isInstance(address)) {
 					noLoopbackIP4Addresses.add(address.getHostAddress());

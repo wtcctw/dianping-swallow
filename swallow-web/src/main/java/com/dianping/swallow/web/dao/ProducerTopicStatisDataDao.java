@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface ProducerTopicStatisDataDao {
 
 	public boolean insert(ProducerTopicStatsData statisData);

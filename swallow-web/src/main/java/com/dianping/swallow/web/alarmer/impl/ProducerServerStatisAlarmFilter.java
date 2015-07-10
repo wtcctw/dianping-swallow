@@ -18,6 +18,11 @@ import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerStatisDataService;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class ProducerServerStatisAlarmFilter extends AbstractProducerAlarmFilter implements MonitorDataListener {
 
 	private volatile ProducerServerStatsData serverStatisData;

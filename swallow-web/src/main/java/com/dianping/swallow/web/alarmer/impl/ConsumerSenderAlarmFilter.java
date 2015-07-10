@@ -9,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.IPCollectorService;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class ConsumerSenderAlarmFilter extends AbstractConsumerAlarmFilter {
 
 	@Autowired

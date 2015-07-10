@@ -13,6 +13,11 @@ import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.mongodb.WriteResult;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("producerTopicStatisDataDao")
 public class DefaultProducerTopicStatisDataDao extends AbstractWriteDao implements ProducerTopicStatisDataDao {
 

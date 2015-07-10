@@ -13,6 +13,11 @@ import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.mongodb.WriteResult;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("consumerServerAlarmSettingDao")
 public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao implements ConsumerServerAlarmSettingDao {
 

@@ -4,6 +4,11 @@ import com.dianping.swallow.web.alarmer.AlarmFilter;
 import com.dianping.swallow.web.alarmer.AlarmFilterChain;
 import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
 
+/**
+*
+* @author qiyin
+*
+*/
 public abstract class AbstractAlarmFilter implements AlarmFilter {
 
 	@Override

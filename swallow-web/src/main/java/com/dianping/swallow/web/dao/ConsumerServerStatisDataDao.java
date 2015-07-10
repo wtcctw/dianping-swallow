@@ -3,6 +3,11 @@ package com.dianping.swallow.web.dao;
 
 import com.dianping.swallow.web.model.statis.ConsumerServerStatsData;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface ConsumerServerStatisDataDao {
 
 	public boolean insert(ConsumerServerStatsData statisData);

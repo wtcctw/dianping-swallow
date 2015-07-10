@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface TopicAlarmSettingDao {
 
 	public boolean insert(TopicAlarmSetting setting);

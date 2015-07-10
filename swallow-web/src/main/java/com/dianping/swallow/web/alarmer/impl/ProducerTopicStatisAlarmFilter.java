@@ -18,6 +18,11 @@ import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
 import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class ProducerTopicStatisAlarmFilter extends AbstractProducerAlarmFilter implements MonitorDataListener {
 
 	private volatile AtomicLong dataCount;

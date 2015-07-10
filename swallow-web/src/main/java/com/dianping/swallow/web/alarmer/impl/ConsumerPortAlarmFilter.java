@@ -12,6 +12,11 @@ import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.NetUtil;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class ConsumerPortAlarmFilter extends AbstractConsumerAlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerPortAlarmFilter.class);

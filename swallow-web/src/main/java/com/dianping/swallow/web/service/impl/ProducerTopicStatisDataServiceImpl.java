@@ -9,7 +9,11 @@ import com.dianping.swallow.web.dao.ProducerTopicStatisDataDao;
 import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
 
-
+/**
+*
+* @author qiyin
+*
+*/
 @Service("producerTopicStatisDataService")
 public class ProducerTopicStatisDataServiceImpl implements ProducerTopicStatisDataService {
 

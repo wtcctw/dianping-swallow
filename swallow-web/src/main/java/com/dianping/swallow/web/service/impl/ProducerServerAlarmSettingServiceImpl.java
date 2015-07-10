@@ -9,6 +9,11 @@ import com.dianping.swallow.web.dao.ProducerServerAlarmSettingDao;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("producerServerAlarmSettingService")
 public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlarmSettingService {
 

@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface ConsumerServerAlarmSettingService {
 	
 	public boolean insert(ConsumerServerAlarmSetting setting);

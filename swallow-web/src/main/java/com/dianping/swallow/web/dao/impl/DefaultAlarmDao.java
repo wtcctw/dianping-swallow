@@ -22,7 +22,6 @@ import com.mongodb.WriteResult;
  * @author qiyin
  *
  */
-
 @Service("alarmDao")
 public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 

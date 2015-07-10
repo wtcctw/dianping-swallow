@@ -5,6 +5,12 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.alarmer.AlarmFilterChain;
 
+/**
+*
+* @author qiyin
+*
+*/
+
 @Component
 public class AlarmFilterChainFactory implements InitializingBean {
 
