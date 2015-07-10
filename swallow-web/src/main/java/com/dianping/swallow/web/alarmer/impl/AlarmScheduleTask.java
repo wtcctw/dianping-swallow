@@ -10,24 +10,26 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
-import com.dianping.swallow.web.alarmer.Alarmer;
 
 /**
-*
-* @author qiyin
-*
-*/
-public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarmer {
+ * 
+ * @author qiyin
+ *
+ */
+public class AlarmScheduleTask extends AbstractLifecycle {
 	
-	private static final Logger logger = LoggerFactory.getLogger(AbstractAlarmer.class);
+	private static final Logger logger = LoggerFactory.getLogger(AlarmScheduleTask.class);
 
 	protected int alarmInterval = 30;
 	
 	private static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT);
 	
 	private ScheduledFuture<?> future = null;
+	
+	
 	@Override
 	protected void doStart() throws Exception{
+		
 		super.doStart();
 		startAlarmer();
 	}
@@ -38,7 +40,6 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 			@Override
 			public void run(){
 				try{
-					doAlarm();
 				}catch(Throwable th){
 					logger.error("[startAlarmer]",th);
 				}finally{
@@ -55,14 +56,7 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 		future.cancel(true);
 	}
 	
-	protected abstract void doAlarm();
-	
 	protected int getAlarmInterval(){
 		return alarmInterval;
 	}
-	
-	protected void setAlarmInterval(int interval){
-		this.alarmInterval = interval;
-	}
-	
 }
