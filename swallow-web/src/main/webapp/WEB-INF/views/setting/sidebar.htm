@@ -6,25 +6,25 @@
 		}
 	</script>
 	<ul class="nav nav-list">
-		<li class="#if($menu == 'delay') open #end"><a href="#"
+		<li class="#if($menu == 'setting') open #end"><a href="#"
 			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
 				class="menu-text">报警设置</span> <b class="arrow icon-angle-down"></b>
 		</a>
 			<ul class="submenu" style="display: block;">
-				<li class="#if($subside == 'delay') active #end"><a
-					href="${contextPath}/console/setting/producerserver/default"> <i
+				<li class="#if($subside == 'producer') active #end"><a
+					href="${contextPath}/console/setting/producerserver"> <i
 						class="icon-globe"></i> producerserver设置
 				</a></li>
-				<li class="#if($subside == 'qps') active #end"><a
-					href="${contextPath}/console/setting/consumerserver/default"> <i
+				<li class="#if($subside == 'consumer') active #end"><a
+					href="${contextPath}/console/setting/consumerserver"> <i
 						class="icon-globe"></i> consumerserver设置
 				</a></li>
-				<li class="#if($subside == 'consumeraccu') active #end"><a
-					href="${contextPath}/console/setting/topic/default"> <i
+				<li class="#if($subside == 'topic') active #end"><a
+					href="${contextPath}/console/setting/topic"> <i
 						class="icon-globe"></i> topic设置
 				</a></li>
-				<li class="#if($subside == 'consumeraccu') active #end"><a
-					href="${contextPath}/console/setting/consumerid/default"> <i
+				<li class="#if($subside == 'consumerid') active #end"><a
+					href="${contextPath}/console/setting/consumerid"> <i
 						class="icon-globe"></i> consumerid设置
 				</a></li>
 			</ul>

@@ -41,7 +41,7 @@
 			</div>
 		</div>
 
-	
+
 		<!-- 模态框（Modal） -->
 		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
 			aria-labelledby="myModalLabel" aria-hidden="true">
@@ -57,40 +57,70 @@
 							ng-submit="refreshpage(myForm)">
 							<div class="control-group">
 								<label class="control-label">白名单</label>
-								<div class="form-group" style="margin-right: 39px; margin-left: 0px;">
-									<textarea class="form-control" name="whiteList" ng-model="whiteList">
-									</textarea>
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;">
+									<input class="form-control" name="whiteList"
+										ng-model="consumeridEntry.whiteList" data-provide="typeahead"
+										id="whiteList" autocomplete="off"> </input>
 								</div>
 							</div>
+							<div class="control-group">
+								<label class="control-label">发送延迟</label>
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;">
+									<input type="text" class="form-control"
+										ng-model="consumeridEntry.senderdelay" name="senderdelay"
+										required> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">确认延迟</label>
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;">
+									<input type="text" class="form-control"
+										ng-model="consumeridEntry.ackdelay" name="ackdelay" required>
+									</input>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">消息堆积</label>
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;">
+									<input type="text" class="form-control"
+										ng-model="consumeridEntry.accumulation" name="accumulation"
+										required> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">发送QPS</label>
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;">
+									<div class="col-sm-12">
+										<label class="col-sm-2 control-label">峰值</label> <input
+											class="col-sm-2" type="text" id="form-field-icon-1" /> <label
+											class="col-sm-2 control-label">谷值</label><input type="text"
+											class="col-sm-2" id="form-field-icon-2" /> <label
+											class="col-sm-2 control-label">波动</label><input type="text"
+											class="col-sm-2" id="form-field-icon-3" />
+									</div>
 
-							<div class="control-group">
-								<label class="control-label">峰值</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<input type="text" class="form-control" ng-model="peak"
-										id="roleselect" required>
-									</input>
 								</div>
 							</div>
 							<div class="control-group">
-								<label class="control-label">谷值</label>
+								<label class="control-label">确认QPS</label>
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;">
-								<input type="text" class="form-control" ng-model="peak"
-										id="roleselect" required>
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">波动</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<input type="text" class="form-control" ng-model="peak"
-										id="roleselect" required>
-									</input>
-								</div>
-							</div>
+									<div class="col-sm-12">
+										<label class="col-sm-2 control-label">峰值</label> <input
+											class="col-sm-2" type="text" id="form-field-icon-1" /> <label
+											class="col-sm-2 control-label">谷值</label><input type="text"
+											class="col-sm-2" id="form-field-icon-2" /> <label
+											class="col-sm-2 control-label">波动</label><input type="text"
+											class="col-sm-2" id="form-field-icon-3" />
+									</div>
 
+								</div>
+							</div>
 							<div class="control-group" style="margin-top: 40px">
 								<div class="controls">
 									<button type="button" class="btn btn-default"

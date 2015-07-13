@@ -11,12 +11,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.controller.dto.ConsumerIdAlarmSettingDto;
 import com.dianping.swallow.web.controller.dto.ProducerServerAlarmSettingDto;
+import com.dianping.swallow.web.controller.mapper.ConsumerIdAlarmSettingMapper;
 import com.dianping.swallow.web.controller.mapper.ProducerServerAlarmSettingMapper;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
@@ -29,7 +33,7 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
  *
  */
 @Controller
-public class AlarmSettingController extends AbstractMenuController {
+public class AlarmSettingController extends AbstractSidebarBasedController {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmSettingController.class);
 
@@ -58,27 +62,34 @@ public class AlarmSettingController extends AbstractMenuController {
 		return producerSetting(request, response);
 	}
 
-	@RequestMapping(value = "/console/setting/producerserver/default")
+	@RequestMapping(value = "/console/setting/producerserver")
 	public ModelAndView producerSetting(HttpServletRequest request, HttpServletResponse response) {
+
 		return new ModelAndView("setting/producerserversetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/consumerserver/default")
+	@RequestMapping(value = "/console/setting/consumerserver")
 	public ModelAndView consumerSetting(HttpServletRequest request, HttpServletResponse response) {
+
+		subSide = "consumer";
 		return new ModelAndView("setting/consumerserversetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/topic/default")
+	@RequestMapping(value = "/console/setting/topic")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
+
+		subSide = "topic";
 		return new ModelAndView("setting/topicsetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/consumerid/default")
+	@RequestMapping(value = "/console/setting/consumerid")
 	public ModelAndView consumerIdSetting(HttpServletRequest request, HttpServletResponse response) {
+
+		subSide = "consumerid";
 		return new ModelAndView("setting/consumeridsetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/producerserver/default/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/setting/producerserver/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public void producerSettingCreatePost(@RequestBody ProducerServerAlarmSettingDto dto) {
 		if (producerServerAlarmSettingService.findOne() != null) {
@@ -87,18 +98,41 @@ public class AlarmSettingController extends AbstractMenuController {
 			producerServerAlarmSettingService.insert(alarmSetting);
 		}
 	}
-	
-	@RequestMapping(value = "/console/setting/producerserver/default/update/", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+
+	@RequestMapping(value = "/console/setting/producerserver/update/", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public void producerSettingUpdatePost(@RequestBody ProducerServerAlarmSettingDto dto) {
-			ProducerServerAlarmSetting alarmSetting = ProducerServerAlarmSettingMapper
-					.toProducerServerAlarmSetting(dto);
-			producerServerAlarmSettingService.update(alarmSetting);
+		ProducerServerAlarmSetting alarmSetting = ProducerServerAlarmSettingMapper.toProducerServerAlarmSetting(dto);
+		producerServerAlarmSettingService.update(alarmSetting);
+	}
+
+	@RequestMapping(value = "/console/setting/consumerid/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public void comsumeridSettingCreate(@RequestBody ConsumerIdAlarmSettingDto dto) {
+//		public void comsumeridSettingCreate(@RequestParam(value = "whitelist") String whitelist,
+//				@RequestParam(value = "peak") String peak, @RequestParam(value = "valley") String valley,
+//				@RequestParam(value = "fluctuate") String fluctuate, HttpServletRequest request,
+//				HttpServletResponse response) {
+		
+		ConsumerIdAlarmSetting consumerIdAlarmSetting = ConsumerIdAlarmSettingMapper.toConsumerIdAlarmSetting(dto);
+		consumerIdAlarmSettingService.update(consumerIdAlarmSetting);
 	}
 
 	@Override
 	protected String getMenu() {
 		return "setting";
+	}
+
+	@Override
+	protected String getSide() {
+		return "warn";
+	}
+
+	private String subSide = "producer";
+
+	@Override
+	public String getSubSide() {
+		return subSide;
 	}
 
 }
