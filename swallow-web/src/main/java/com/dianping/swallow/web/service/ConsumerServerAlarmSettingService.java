@@ -21,7 +21,7 @@ public interface ConsumerServerAlarmSettingService {
 
 	public List<ConsumerServerAlarmSetting> findAll();
 	
-	public List<String> getWhiteList();
+	public List<String> getTopicWhiteList();
 
 	ConsumerServerAlarmSetting findOne();
 	

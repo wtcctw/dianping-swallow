@@ -4,19 +4,11 @@ import java.util.List;
 
 public class TopicAlarmSetting extends BaseAlarmSetting {
 
-	private List<String> whiteList;
+	private List<String> consumerIdWhiteList;
 
 	private ProducerBaseAlarmSetting producerAlarmSetting;
 
 	private ConsumerBaseAlarmSetting consumerAlarmSetting;
-
-	public List<String> getWhiteList() {
-		return whiteList;
-	}
-
-	public void setWhiteList(List<String> whiteList) {
-		this.whiteList = whiteList;
-	}
 
 	public ProducerBaseAlarmSetting getProducerAlarmSetting() {
 		return producerAlarmSetting;
@@ -32,6 +24,14 @@ public class TopicAlarmSetting extends BaseAlarmSetting {
 
 	public void setConsumerAlarmSetting(ConsumerBaseAlarmSetting consumerAlarmSetting) {
 		this.consumerAlarmSetting = consumerAlarmSetting;
+	}
+
+	public List<String> getConsumerIdWhiteList() {
+		return consumerIdWhiteList;
+	}
+
+	public void setConsumerIdWhiteList(List<String> consumerIdWhiteList) {
+		this.consumerIdWhiteList = consumerIdWhiteList;
 	}
 
 }

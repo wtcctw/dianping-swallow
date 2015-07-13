@@ -4,24 +4,24 @@ import java.util.List;
 
 public class ProducerServerAlarmSetting  extends BaseAlarmSetting{
 	
-	private List<String> whiteList;
+	private List<String> topicWhiteList;
 	
 	private QPSAlarmSetting defaultAlarmSetting;
 	
-	public List<String> getWhiteList() {
-		return whiteList;
-	}
-
-	public void setWhiteList(List<String> whiteList) {
-		this.whiteList = whiteList;
-	}
-
 	public QPSAlarmSetting getDefaultAlarmSetting() {
 		return defaultAlarmSetting;
 	}
 
 	public void setDefaultAlarmSetting(QPSAlarmSetting defaultAlarmSetting) {
 		this.defaultAlarmSetting = defaultAlarmSetting;
+	}
+
+	public List<String> getTopicWhiteList() {
+		return topicWhiteList;
+	}
+
+	public void setTopicWhiteList(List<String> topicWhiteList) {
+		this.topicWhiteList = topicWhiteList;
 	}
 	
 }

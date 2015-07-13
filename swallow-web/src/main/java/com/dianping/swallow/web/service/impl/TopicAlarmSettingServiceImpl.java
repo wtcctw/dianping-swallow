@@ -10,10 +10,10 @@ import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("topicAlarmSettingService")
 public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 
@@ -43,6 +43,15 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 	@Override
 	public List<TopicAlarmSetting> findAll() {
 		return topicAlarmSettingDao.findAll();
+	}
+	
+	@Override
+	public List<String> getConsumerIdWhiteList() {
+		TopicAlarmSetting topicAlarmSetting = findOne();
+		if (topicAlarmSetting == null) {
+			return null;
+		}
+		return topicAlarmSetting.getConsumerIdWhiteList();
 	}
 
 	@Override

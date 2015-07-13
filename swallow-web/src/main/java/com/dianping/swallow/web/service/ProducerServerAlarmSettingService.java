@@ -21,7 +21,7 @@ public interface ProducerServerAlarmSettingService {
 
 	public List<ProducerServerAlarmSetting> findAll();
 	
-	public List<String> getWhiteList();
+	public List<String> getTopicWhiteList();
 
 	ProducerServerAlarmSetting findOne();
 	

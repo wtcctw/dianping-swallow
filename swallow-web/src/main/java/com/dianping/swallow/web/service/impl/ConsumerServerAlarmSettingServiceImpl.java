@@ -10,10 +10,10 @@ import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("consumerServerAlarmSettingService")
 public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlarmSettingService {
 
@@ -47,17 +47,16 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 	}
 
 	@Override
-	public List<String> getWhiteList() {
-		List<ConsumerServerAlarmSetting> serverAlarmSettings = findAll();
-		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
+	public List<String> getTopicWhiteList() {
+		ConsumerServerAlarmSetting serverAlarmSetting = findOne();
+		if (serverAlarmSetting == null) {
 			return null;
 		}
-		ConsumerServerAlarmSetting serverAlarmSetting = serverAlarmSettings.get(0);
-		return serverAlarmSetting.getWhiteList();
+		return serverAlarmSetting.getTopicWhiteList();
 	}
-	
+
 	@Override
-	public ConsumerServerAlarmSetting findOne(){
+	public ConsumerServerAlarmSetting findOne() {
 		List<ConsumerServerAlarmSetting> serverAlarmSettings = findAll();
 		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
 			return null;

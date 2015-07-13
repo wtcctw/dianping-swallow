@@ -21,5 +21,8 @@ public interface TopicAlarmSettingService {
 	
 	public List<TopicAlarmSetting> findAll();
 
-	TopicAlarmSetting findOne();
+	public TopicAlarmSetting findOne();
+	
+	public List<String> getConsumerIdWhiteList();
+	
 }

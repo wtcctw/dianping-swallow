@@ -29,9 +29,10 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.web.model.cmdb.EnvDevice;
+import com.dianping.swallow.web.monitor.wapper.ConsumerDataWapper;
+import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.IPDescService;
 
 /**
  * 
@@ -72,10 +73,13 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	private String serverIp;
 
 	@Autowired
-	private IPDescService ipDescService;
+	private CmdbService cmdbService;
 
 	@Autowired
-	private CmdbService cmdbService;
+	private ProducerDataWapper producerDataWapper;
+
+	@Autowired
+	private ConsumerDataWapper consumerDataWapper;
 
 	private int interval = 120;// 秒
 
@@ -109,21 +113,27 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		List<EnvDevice> consumerMasterEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_MASTER_NAME);
 		if (producerEnvDevices != null) {
 			for (EnvDevice envDevice : producerEnvDevices) {
-				cmdbProducers.put(envDevice.getHostName(), envDevice.getIp());
-				serverIp = envDevice.getIp();
+				updateDataMap(cmdbProducers, envDevice.getHostName(), envDevice.getIp());
 			}
 		}
 		if (consumerSlaveEnvDevices != null) {
 			for (EnvDevice envDevice : consumerSlaveEnvDevices) {
-				cmdbConsumerSlaves.put(envDevice.getHostName(), envDevice.getIp());
+				updateDataMap(cmdbConsumerSlaves, envDevice.getHostName(), envDevice.getIp());
 			}
 		}
 		if (consumerMasterEnvDevices != null) {
 			for (EnvDevice envDevice : consumerMasterEnvDevices) {
-				cmdbConsumerMasters.put(envDevice.getHostName(), envDevice.getIp());
+				updateDataMap(cmdbConsumerMasters, envDevice.getHostName(), envDevice.getIp());
 			}
 		}
+	}
 
+	private void updateDataMap(Map<String, String> dataMap, String key, String value) {
+		if (!dataMap.containsKey(key)) {
+			dataMap.put(key, value);
+		} else {
+			dataMap.remove(key);
+		}
 	}
 
 	private void addSetData(Set<String> set, String data) {
@@ -148,6 +158,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			return;
 		}
 		addSetData(ips, producerMonitorData.getSwallowServerIp());
+		addProducerServerIps(producerMonitorData);
 		ProducerServerData serverData = (ProducerServerData) producerMonitorData.getServerData();
 		if (serverData == null) {
 			return;
@@ -162,7 +173,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 				}
 				addSetData(ips, messageInfo.getKey());
 				if (!StringUtils.equals(TOTAL_KEY, messageInfo.getKey())) {
-					producerTopicIps.put(topicData.getKey(), messageInfo.getKey());
+					updateDataMap(producerTopicIps, topicData.getKey(), messageInfo.getKey());
 				}
 			}
 		}
@@ -173,6 +184,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			return;
 		}
 		addSetData(ips, consumerMonitorData.getSwallowServerIp());
+		addConsumerServerIps(consumerMonitorData);
 		ConsumerServerData serverData = (ConsumerServerData) consumerMonitorData.getServerData();
 		if (serverData == null) {
 			return;
@@ -198,9 +210,8 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 					}
 					addSetData(ips, messageInfo.getKey());
 					if (!StringUtils.equals(TOTAL_KEY, messageInfo.getKey())) {
-						topicConsumerIdIps.put(topicData.getKey() + TOPIC_CONSUMERID_SPLIT + consumerIdData.getKey(),
-								messageInfo.getKey());
-						topicConsumerIdIps.put(topicData.getKey(), messageInfo.getKey());
+						String key = topicData.getKey() + TOPIC_CONSUMERID_SPLIT + consumerIdData.getKey();
+						updateDataMap(topicConsumerIdIps, key, messageInfo.getKey());
 					}
 				}
 			}

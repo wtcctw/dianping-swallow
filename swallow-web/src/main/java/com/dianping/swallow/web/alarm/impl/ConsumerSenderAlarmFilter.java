@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
-import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.SwallowAlarmSettingService;
 
 /**
 *
@@ -26,7 +26,7 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private ConsumerServerAlarmSettingService serverAlarmSettingService;
+	private SwallowAlarmSettingService swallowAlarmSettingService;
 
 	@Override
 	public boolean doAccept() {
@@ -36,7 +36,7 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 	public boolean checkSender() {
 		Map<String, String> cmdbmdbConsumerMasters = ipCollectorService.getCmdbConsumerMasters();
 		Set<String> serverIps = ipCollectorService.getConsumerServerIps();
-		List<String> whiteList = serverAlarmSettingService.getWhiteList();
+		List<String> whiteList = swallowAlarmSettingService.getConsumerWhiteList();
 		for (Map.Entry<String, String> cmdbConsumer : cmdbmdbConsumerMasters.entrySet()) {
 			String ip = cmdbConsumer.getValue();
 			if (whiteList == null || !whiteList.contains(ip)) {

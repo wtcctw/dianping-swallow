@@ -19,6 +19,7 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
+import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
 /**
  *
@@ -44,6 +45,9 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 
 	@Autowired
 	private ConsumerIdAlarmSettingService consumerIdAlarmSettingService;
+	
+	@Autowired
+	private TopicAlarmSettingService topicAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -74,7 +78,7 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 		if (consumerIdAlarmSetting == null) {
 			return true;
 		}
-		List<String> whiteList = consumerIdAlarmSetting.getWhiteList();
+		List<String> whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
 		ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdAlarmSetting.getConsumerAlarmSetting();
 		QPSAlarmSetting sendQps = consumerAlarmSetting.getSenderQpsAlarmSetting();
 		QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
