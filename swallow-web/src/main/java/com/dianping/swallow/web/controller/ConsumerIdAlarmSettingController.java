@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -42,11 +44,12 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 		return new ModelAndView("setting/consumeridsetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/consumerid/list", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/setting/consumerid/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void comsumeridSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
+	public Object comsumeridSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 
 		List<ConsumerIdAlarmSetting> consumerIdAlarmSetting = consumerIdAlarmSettingService.findAll();
+		return generateResponst(consumerIdAlarmSetting);
 		
 	}
 
@@ -58,6 +61,14 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 		consumerIdAlarmSettingService.insert(consumerIdAlarmSetting);
 	}
 
+	private Map<String, Object> generateResponst(List<ConsumerIdAlarmSetting> consumerIdAlarmSetting){
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("size", consumerIdAlarmSetting.size());
+		map.put("message", consumerIdAlarmSetting);
+		return map;
+	}
+	
 	@Override
 	protected String getMenu() {
 		return "setting";

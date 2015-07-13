@@ -38,6 +38,7 @@ public class ConsumerIdAlarmSettingMapper {
 		consumerBaseAlarmSetting.setAccumulation(dto.getAccumulation());
 		
 		alarmSetting.setConsumerAlarmSetting(consumerBaseAlarmSetting);
+		alarmSetting.setConsumerId(dto.getConsumerId());
 		return alarmSetting;
 	}
 

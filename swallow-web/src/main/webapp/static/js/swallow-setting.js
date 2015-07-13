@@ -113,6 +113,7 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 	});
 	
 	$scope.consumeridEntry = {};
+	$scope.consumeridEntry.consumerId;
 	$scope.consumeridEntry.sendlelay;
 	$scope.consumeridEntry.ackdelay;
 	$scope.consumeridEntry.accumulation;
@@ -122,6 +123,7 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 	$scope.consumeridEntry.ackpeak;
 	$scope.consumeridEntry.ackvalley;
 	$scope.consumeridEntry.ackfluctuation;
+	
 	$scope.refreshpage = function(myForm){
 		$('#myModal').modal('hide');
 //    	$http.post(window.contextPath + '/console/setting/consumerid/create', {"peak":$scope.peak, 
@@ -129,10 +131,36 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 //    		.success(function(response) {
 //    			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
 //    	});
-    	$http.post(window.contextPath + '/console/setting/consumerid/create', {"dto":$scope.consumeridEntry})
-    		.success(function(response) {
-    			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
-    		});
+//		$http({
+//		    method: 'POST',
+//		    url: window.contextPath + '/console/setting/consumerid/create',
+//		    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+//		    transformRequest: function(obj) {
+//		        var str = [];
+//		        for(var p in obj)
+//		        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+//		        return str.join("&");
+//		    },
+//		    data: $scope.consumeridEntry
+//		}).success(function (response) {
+//		});
+		var param = JSON.stringify($scope.consumeridEntry);
+//    	$http.post(window.contextPath + '/console/setting/consumerid/create', param)
+//    		.success(function(response) {
+//		$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
+//    		});
+    	
+    	$.ajax({
+    	    type: "POST",
+    	    url: window.contextPath + '/console/setting/consumerid/create',
+    	    contentType: "application/json; charset=utf-8",
+    	    dataType: "json",
+    	    data: param,
+    	    success: function(data) {
+    	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
+    	    }
+
+    	});
     }
 	
 	

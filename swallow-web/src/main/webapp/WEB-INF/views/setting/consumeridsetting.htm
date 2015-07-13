@@ -19,17 +19,34 @@
 				<table
 					class="table table-bordered table-striped  table-condensed table-hover">
 					<tr>
-						<th style="text-align: left">白名单</th>
-						<th style="text-align: left">峰值</th>
-						<th style="text-align: left">谷值</th>
-						<th style="text-align: left">波动</th>
-						<th style="text-align: left">修改时间</th>
+						<th style="text-align: left">序号</th>
+						<th style="text-align: left">发送峰值</th>
+						<th style="text-align: left">发送谷值</th>
+						<th style="text-align: left">发送波动</th>
+						<th style="text-align: left">确认峰值</th>
+						<th style="text-align: left">确认谷值</th>
+						<th style="text-align: left">确认波动</th>
+						<th style="text-align: left">发送延迟</th>
+						<th style="text-align: left">确认延迟</th>
+						<th style="text-align: left">消息堆积</th>
+						<th style="text-align: left">操作</th>
 					</tr>
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left" ng-bind="ad.name"></td>
-						<td style="text-align: left" ng-bind="ad.date"></td>
-						<td style="text-align: left" ng-bind="ad.role"></td>
+						<td style="text-align: left"
+							ng-bind="ad.consumerAlarmSetting.senderQpsAlarmSetting.peak"></td>
+						<td style="text-align: left"
+							ng-bind="ad.consumerAlarmSetting.senderQpsAlarmSetting.valley"></td>
+						<td style="text-align: left"
+							ng-bind="ad.consumerAlarmSetting.senderQpsAlarmSetting.fluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.ackQpsAlarmSetting.peak"></td>
+						<td style="text-align: left"
+							ng-bind="ad.consumerAlarmSetting.ackQpsAlarmSetting.valley"></td>
+						<td style="text-align: left"
+							ng-bind="ad.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.senderDelay"></td>
+						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.ackDelay"></td>
+						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.accumulation"></td>
 						<td style="text-align: left"><a href="#myModal"
 							ng-click="setModalInput(ad.name, ad.role);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
@@ -56,12 +73,21 @@
 						<form method="post" class="form-horizontal" name="myForm"
 							ng-submit="refreshpage(myForm)">
 							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label">ConsumerId</label> <input type="text"
+										class="form-control" ng-model="consumeridEntry.consumerId"
+										name="consumerId" required> </input>
+								</div>
+							</div>
+							<div class="control-group">
 								<label class="control-label">发送QPS</label>
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;">
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text" ng-model="consumeridEntry.sendpeak" /> <label
+											class="col-sm-2" type="text"
+											ng-model="consumeridEntry.sendpeak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
 											class="col-sm-2" ng-model="consumeridEntry.sendvalley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
@@ -75,7 +101,8 @@
 									style="margin-right: 39px; margin-left: 0px;">
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text" ng-model="consumeridEntry.ackpeak" /> <label
+											class="col-sm-2" type="text"
+											ng-model="consumeridEntry.ackpeak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
 											class="col-sm-2" ng-model="consumeridEntry.ackvalley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
@@ -88,8 +115,8 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px; width: 50%;">
 									<input type="text" class="form-control"
-										ng-model="consumeridEntry.senddelay" name="senddelay"
-										required> </input>
+										ng-model="consumeridEntry.senddelay" name="senddelay" required>
+									</input>
 								</div>
 							</div>
 							<div class="control-group">

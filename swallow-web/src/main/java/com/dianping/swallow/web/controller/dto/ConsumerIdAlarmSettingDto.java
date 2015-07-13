@@ -20,6 +20,8 @@ public class ConsumerIdAlarmSettingDto {
 	private long ackdelay;
 	
 	private long accumulation;
+	
+	private String consumerId;
 
 	public long getSendpeak() {
 		return sendpeak;
@@ -92,6 +94,14 @@ public class ConsumerIdAlarmSettingDto {
 	public void setAccumulation(long accumulation) {
 		this.accumulation = accumulation;
 	}
-	
 
+	public String getConsumerId() {
+		return consumerId;
+	}
+
+	public void setConsumerId(String consumerId) {
+		this.consumerId = consumerId;
+	}
+	
+	
 }
