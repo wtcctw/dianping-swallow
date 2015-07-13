@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.model.statis.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.statis.ConsumerMachineStatsData;
@@ -16,6 +17,13 @@ import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
 import com.dianping.swallow.web.service.ConsumerMachineStatisDataService;
 import com.dianping.swallow.web.service.ConsumerTopicStatisDataService;
 
+
+/**
+ *
+ * @author qiyin
+ *
+ */
+@Component
 public class ConsumerStatisStorager extends AbstractStatisStorager implements MonitorDataListener {
 
 	@Autowired

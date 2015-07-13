@@ -9,6 +9,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 
+/**
+ *
+ * @author qiyin
+ *
+ */
 public abstract class AbstractStatisStorager extends AbstractLifecycle {
 	
 	protected volatile AtomicLong dataCount = new AtomicLong();
