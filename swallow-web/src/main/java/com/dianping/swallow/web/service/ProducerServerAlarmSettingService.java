@@ -22,7 +22,9 @@ public interface ProducerServerAlarmSettingService {
 	public List<ProducerServerAlarmSetting> findAll();
 	
 	public List<String> getTopicWhiteList();
+	
+	public ProducerServerAlarmSetting findByServerId(String serverId);
 
-	ProducerServerAlarmSetting findOne();
+	public ProducerServerAlarmSetting findOne();
 	
 }

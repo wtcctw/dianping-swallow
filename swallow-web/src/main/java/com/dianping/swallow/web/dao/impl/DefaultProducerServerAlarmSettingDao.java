@@ -14,10 +14,10 @@ import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.mongodb.WriteResult;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("producerServerAlarmSettingDao")
 public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao implements ProducerServerAlarmSettingDao {
 
@@ -26,6 +26,8 @@ public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao imple
 	private static final String PRODUCERSERVERALARMSETTING_COLLECTION = "swallowwebproducerserveralarmsettingc";
 
 	private static final String ID_FIELD = "id";
+
+	private static final String SERVERID_FIELD = "serverId";
 
 	@Override
 	public boolean insert(ProducerServerAlarmSetting setting) {
@@ -62,6 +64,14 @@ public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao imple
 	@Override
 	public List<ProducerServerAlarmSetting> findAll() {
 		return mongoTemplate.findAll(ProducerServerAlarmSetting.class, PRODUCERSERVERALARMSETTING_COLLECTION);
+	}
+
+	@Override
+	public ProducerServerAlarmSetting findByServerId(String serverId) {
+		Query query = new Query(Criteria.where(SERVERID_FIELD).is(serverId));
+		ProducerServerAlarmSetting serverAlarmSetting = mongoTemplate.findOne(query, ProducerServerAlarmSetting.class,
+				PRODUCERSERVERALARMSETTING_COLLECTION);
+		return serverAlarmSetting;
 	}
 
 }

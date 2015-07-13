@@ -18,6 +18,8 @@ public interface ProducerServerAlarmSettingDao {
 	public int deleteById(String id);
 
 	public ProducerServerAlarmSetting findById(String id);
+	
+	public ProducerServerAlarmSetting findByServerId(String serverId);
 
 	public List<ProducerServerAlarmSetting> findAll();
 	

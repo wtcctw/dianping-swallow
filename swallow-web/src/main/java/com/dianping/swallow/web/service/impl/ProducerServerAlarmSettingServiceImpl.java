@@ -60,4 +60,9 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 		return serverAlarmSettings.get(0);
 	}
 
+	@Override
+	public ProducerServerAlarmSetting findByServerId(String serverId) {
+		return producerServerAlarmSettingDao.findByServerId(serverId);
+	}
+
 }

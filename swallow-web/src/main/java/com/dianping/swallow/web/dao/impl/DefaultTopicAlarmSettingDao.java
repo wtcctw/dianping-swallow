@@ -14,10 +14,10 @@ import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
 import com.mongodb.WriteResult;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("topicAlarmSettingDao")
 public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements TopicAlarmSettingDao {
 
@@ -26,6 +26,8 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 	private static final String TOPICSALARMSETTING_COLLECTION = "swallowwebtopicalarmsettingc";
 
 	private static final String ID_FIELD = "id";
+
+	private static final String TOPICNAME_FIELD = "topicName";
 
 	@Override
 	public boolean insert(TopicAlarmSetting setting) {
@@ -61,6 +63,14 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 	@Override
 	public List<TopicAlarmSetting> findAll() {
 		return mongoTemplate.findAll(TopicAlarmSetting.class, TOPICSALARMSETTING_COLLECTION);
+	}
+
+	@Override
+	public TopicAlarmSetting findByTopicName(String topicName) {
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
+		TopicAlarmSetting topicAlarmSetting = mongoTemplate.findOne(query, TopicAlarmSetting.class,
+				TOPICSALARMSETTING_COLLECTION);
+		return topicAlarmSetting;
 	}
 
 }

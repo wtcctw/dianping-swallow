@@ -63,4 +63,9 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 		return topicAlarmSetting.get(0);
 	}
 
+	@Override
+	public TopicAlarmSetting findByTopicName(String topicName) {
+		return topicAlarmSettingDao.findByTopicName(topicName);
+	}
+
 }

@@ -18,6 +18,8 @@ public interface ConsumerIdAlarmSettingDao {
 	public int deleteById(String id);
 
 	public ConsumerIdAlarmSetting findById(String id);
+	
+	public ConsumerIdAlarmSetting findByConsumerId(String consumerId);
 
 	public List<ConsumerIdAlarmSetting> findAll();
 }
