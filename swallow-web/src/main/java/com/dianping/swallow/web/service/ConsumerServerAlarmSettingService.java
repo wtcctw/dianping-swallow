@@ -22,7 +22,9 @@ public interface ConsumerServerAlarmSettingService {
 	public List<ConsumerServerAlarmSetting> findAll();
 	
 	public List<String> getTopicWhiteList();
+	
+	public ConsumerServerAlarmSetting findByServerId(String serverId);
 
-	ConsumerServerAlarmSetting findOne();
+	public ConsumerServerAlarmSetting findOne();
 	
 }

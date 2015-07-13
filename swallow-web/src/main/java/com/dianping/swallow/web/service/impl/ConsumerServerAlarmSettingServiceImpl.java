@@ -64,4 +64,9 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 		return serverAlarmSettings.get(0);
 	}
 
+	@Override
+	public ConsumerServerAlarmSetting findByServerId(String serverId) {
+		return consumerServerAlarmSettingDao.findByServerId(serverId);
+	}
+
 }

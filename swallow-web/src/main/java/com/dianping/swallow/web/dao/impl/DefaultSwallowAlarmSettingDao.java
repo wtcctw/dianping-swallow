@@ -26,6 +26,8 @@ public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements S
 
 	private static final String ID_FIELD = "id";
 
+	private static final String SWALLOWID_FIELD = "swallowId";
+
 	@Override
 	public boolean insert(SwallowAlarmSetting setting) {
 		try {
@@ -60,6 +62,14 @@ public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements S
 	@Override
 	public List<SwallowAlarmSetting> findAll() {
 		return mongoTemplate.findAll(SwallowAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
+	}
+
+	@Override
+	public SwallowAlarmSetting findBySwallowId(String swallowId) {
+		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(swallowId));
+		SwallowAlarmSetting swallowAlarmSetting = mongoTemplate.findOne(query, SwallowAlarmSetting.class,
+				SWALLOWALARMSETTING_COLLECTION);
+		return swallowAlarmSetting;
 	}
 
 }

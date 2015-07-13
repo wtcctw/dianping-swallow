@@ -25,5 +25,7 @@ public interface SwallowAlarmSettingService {
 	
 	public List<String> getConsumerWhiteList();
 	
+	public SwallowAlarmSetting findBySwallowId(String swallowId);
+	
 	public SwallowAlarmSetting findOne();
 }

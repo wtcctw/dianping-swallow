@@ -72,4 +72,9 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 		return swallowAlarmSettings.get(0);
 	}
 
+	@Override
+	public SwallowAlarmSetting findBySwallowId(String swallowId) {
+		return swallowAlarmSettingDao.findBySwallowId(swallowId);
+	}
+
 }

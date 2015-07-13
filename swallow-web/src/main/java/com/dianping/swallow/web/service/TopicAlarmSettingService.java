@@ -23,6 +23,8 @@ public interface TopicAlarmSettingService {
 
 	public TopicAlarmSetting findOne();
 	
+	public TopicAlarmSetting findByTopicName(String topicName);
+	
 	public List<String> getConsumerIdWhiteList();
 	
 }

@@ -54,4 +54,9 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 		return consumerIdAlarmSettings.get(0);
 	}
 
+	@Override
+	public ConsumerIdAlarmSetting findByConsumerId(String consumerId) {
+		return consumerIdAlarmSettingDao.findByConsumerId(consumerId);
+	}
+
 }

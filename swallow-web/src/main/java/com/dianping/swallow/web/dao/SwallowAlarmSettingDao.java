@@ -18,6 +18,8 @@ public interface SwallowAlarmSettingDao {
 	public int deleteById(String id);
 
 	public SwallowAlarmSetting findById(String id);
+	
+	public SwallowAlarmSetting findBySwallowId(String swallowId);
 
 	public List<SwallowAlarmSetting> findAll();
 
