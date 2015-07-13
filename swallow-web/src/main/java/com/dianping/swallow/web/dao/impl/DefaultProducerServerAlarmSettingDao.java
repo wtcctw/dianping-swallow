@@ -54,6 +54,14 @@ public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao imple
 	}
 
 	@Override
+	public int deleteByServerId(String serverId) {
+		Query query = new Query(Criteria.where(SERVERID_FIELD).is(serverId));
+		WriteResult result = mongoTemplate.remove(query, ProducerServerAlarmSetting.class,
+				PRODUCERSERVERALARMSETTING_COLLECTION);
+		return result.getN();
+	}
+	
+	@Override
 	public ProducerServerAlarmSetting findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
 		ProducerServerAlarmSetting serverAlarmSetting = mongoTemplate.findOne(query, ProducerServerAlarmSetting.class,

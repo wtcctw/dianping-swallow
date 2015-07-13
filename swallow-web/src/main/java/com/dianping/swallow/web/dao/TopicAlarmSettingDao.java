@@ -16,6 +16,8 @@ public interface TopicAlarmSettingDao {
 	public boolean update(TopicAlarmSetting setting);
 
 	public int deleteById(String id);
+	
+	public int deleteByTopicName(String topicName);
 
 	public TopicAlarmSetting findById(String id);
 	

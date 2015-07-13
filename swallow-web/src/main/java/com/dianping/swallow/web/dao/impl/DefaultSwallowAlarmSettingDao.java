@@ -50,6 +50,13 @@ public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements S
 		WriteResult result = mongoTemplate.remove(query, SwallowAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
 		return result.getN();
 	}
+	
+	@Override
+	public int deleteByBySwallowId(String swallowId) {
+		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(swallowId));
+		WriteResult result = mongoTemplate.remove(query, SwallowAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
+		return result.getN();
+	}
 
 	@Override
 	public SwallowAlarmSetting findById(String id) {

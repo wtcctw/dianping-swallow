@@ -35,6 +35,12 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 		return consumerIdAlarmSettingDao.deleteById(id);
 	}
 
+
+	@Override
+	public int deleteByConsumerId(String consumerId) {
+		return consumerIdAlarmSettingDao.deleteByConsumerId(consumerId);
+	}
+	
 	@Override
 	public ConsumerIdAlarmSetting findById(String id) {
 		return consumerIdAlarmSettingDao.findById(id);

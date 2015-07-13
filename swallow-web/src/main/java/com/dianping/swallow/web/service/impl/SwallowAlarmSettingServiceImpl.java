@@ -34,6 +34,12 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 	public int deleteById(String id) {
 		return swallowAlarmSettingDao.deleteById(id);
 	}
+	
+	@Override
+	public int deleteByBySwallowId(String swallowId) {
+		return swallowAlarmSettingDao.deleteByBySwallowId(swallowId);
+	}
+
 
 	@Override
 	public SwallowAlarmSetting findById(String id) {

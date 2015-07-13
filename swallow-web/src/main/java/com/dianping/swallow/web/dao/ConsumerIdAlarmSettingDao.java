@@ -16,6 +16,8 @@ public interface ConsumerIdAlarmSettingDao {
 	public boolean update(ConsumerIdAlarmSetting setting);
 
 	public int deleteById(String id);
+	
+	public int deleteByConsumerId(String consumerId);
 
 	public ConsumerIdAlarmSetting findById(String id);
 	

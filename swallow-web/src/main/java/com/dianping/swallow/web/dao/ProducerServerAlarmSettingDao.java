@@ -16,6 +16,8 @@ public interface ProducerServerAlarmSettingDao {
 	public boolean update(ProducerServerAlarmSetting setting);
 
 	public int deleteById(String id);
+	
+	public int deleteByServerId(String serverId);
 
 	public ProducerServerAlarmSetting findById(String id);
 	

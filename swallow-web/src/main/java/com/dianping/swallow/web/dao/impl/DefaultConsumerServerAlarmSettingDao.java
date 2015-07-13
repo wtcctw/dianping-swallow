@@ -52,6 +52,14 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 				CONSUMERSERVERALARMSETTING_COLLECTION);
 		return result.getN();
 	}
+	
+	@Override
+	public int deleteByServerId(String serverId) {
+		Query query = new Query(Criteria.where(SERVERID_FIELD).is(serverId));
+		WriteResult result = mongoTemplate.remove(query, ConsumerServerAlarmSetting.class,
+				CONSUMERSERVERALARMSETTING_COLLECTION);
+		return result.getN();
+	}
 
 	@Override
 	public ConsumerServerAlarmSetting findById(String id) {

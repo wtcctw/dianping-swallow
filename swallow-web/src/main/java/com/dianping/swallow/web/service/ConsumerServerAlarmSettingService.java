@@ -16,6 +16,8 @@ public interface ConsumerServerAlarmSettingService {
 	public boolean update(ConsumerServerAlarmSetting setting);
 
 	public int deleteById(String id);
+	
+	public int deleteByServerId(String serverId);
 
 	public ConsumerServerAlarmSetting findById(String id);
 
