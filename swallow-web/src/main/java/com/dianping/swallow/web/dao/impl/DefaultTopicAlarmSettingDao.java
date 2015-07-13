@@ -53,6 +53,13 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 	}
 
 	@Override
+	public int deleteByTopicName(String topicName) {
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
+		WriteResult result = mongoTemplate.remove(query, TopicAlarmSetting.class, TOPICSALARMSETTING_COLLECTION);
+		return result.getN();
+	}
+	
+	@Override
 	public TopicAlarmSetting findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
 		TopicAlarmSetting topicAlarmSetting = mongoTemplate.findOne(query, TopicAlarmSetting.class,

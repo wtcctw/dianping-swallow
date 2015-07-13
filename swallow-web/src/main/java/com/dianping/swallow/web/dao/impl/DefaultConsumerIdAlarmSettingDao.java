@@ -35,7 +35,7 @@ public class DefaultConsumerIdAlarmSettingDao extends AbstractWriteDao implement
 			mongoTemplate.save(setting, CONSUMERIDALARMSETTING_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + setting, e);
+			logger.error("Error when save consumerid alarmsetting " + setting, e);
 		}
 		return false;
 	}
@@ -48,6 +48,14 @@ public class DefaultConsumerIdAlarmSettingDao extends AbstractWriteDao implement
 	@Override
 	public int deleteById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
+		WriteResult result = mongoTemplate.remove(query, ConsumerIdAlarmSetting.class,
+				CONSUMERIDALARMSETTING_COLLECTION);
+		return result.getN();
+	}
+	
+	@Override
+	public int deleteByConsumerId(String consumerId) {
+		Query query = new Query(Criteria.where(CONSUMERID_FIELD).is(consumerId));
 		WriteResult result = mongoTemplate.remove(query, ConsumerIdAlarmSetting.class,
 				CONSUMERIDALARMSETTING_COLLECTION);
 		return result.getN();

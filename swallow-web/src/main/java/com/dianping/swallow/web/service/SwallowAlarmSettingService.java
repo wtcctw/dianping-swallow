@@ -16,6 +16,8 @@ public interface SwallowAlarmSettingService {
 	public boolean update(SwallowAlarmSetting setting);
 
 	public int deleteById(String id);
+	
+	public int deleteByBySwallowId(String swallowId);
 
 	public SwallowAlarmSetting findById(String id);
 

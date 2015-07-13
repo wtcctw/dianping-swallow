@@ -34,6 +34,12 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 	public int deleteById(String id) {
 		return producerServerAlarmSettingDao.deleteById(id);
 	}
+	
+	@Override
+	public int deleteByServerId(String serverId) {
+		return producerServerAlarmSettingDao.deleteByServerId(serverId);
+	}
+
 
 	@Override
 	public ProducerServerAlarmSetting findById(String id) {

@@ -32,10 +32,14 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 
 	@Override
 	public int deleteById(String id) {
-		// TODO Auto-generated method stub
-		return 0;
+		return consumerServerAlarmSettingDao.deleteById(id);
 	}
 
+	@Override
+	public int deleteByServerId(String serverId) {
+		return consumerServerAlarmSettingDao.deleteByServerId(serverId);
+	}
+	
 	@Override
 	public ConsumerServerAlarmSetting findById(String id) {
 		return consumerServerAlarmSettingDao.findById(id);

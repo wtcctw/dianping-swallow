@@ -36,6 +36,11 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 	}
 
 	@Override
+	public int deleteByTopicName(String topicName) {
+		return topicAlarmSettingDao.deleteByTopicName(topicName);
+	}
+
+	@Override
 	public TopicAlarmSetting findById(String id) {
 		return topicAlarmSettingDao.findById(id);
 	}
@@ -44,7 +49,7 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 	public List<TopicAlarmSetting> findAll() {
 		return topicAlarmSettingDao.findAll();
 	}
-	
+
 	@Override
 	public List<String> getConsumerIdWhiteList() {
 		TopicAlarmSetting topicAlarmSetting = findOne();
