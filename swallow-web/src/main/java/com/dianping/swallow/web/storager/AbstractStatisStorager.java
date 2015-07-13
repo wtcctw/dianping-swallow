@@ -45,7 +45,7 @@ public abstract class AbstractStatisStorager extends AbstractLifecycle {
 			@Override
 			public void run() {
 				try {
-					doStorage();
+					//doStorage();
 				} catch (Throwable th) {
 					logger.error("[startStorage]", th);
 				} finally {
