@@ -53,7 +53,6 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	@Override
 	public void achieveMonitorData() {
 		dataCount.incrementAndGet();
-		storageServerStats();
 	}
 
 	@Override
@@ -103,12 +102,6 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 			}
 		}
 		return true;
-	}
-
-	public void storageServerStats() {
-		if (serverStatisData != null) {
-			serverStatisDataService.insert(serverStatisData);
-		}
 	}
 
 }

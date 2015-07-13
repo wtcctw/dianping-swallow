@@ -53,20 +53,12 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	@Override
 	public void achieveMonitorData() {
 		dataCount.incrementAndGet();
-		// storageTopicStatis();
-	}
-
-	private void storageTopicStatis() {
-		if (dataCount.get() > 0) {
-			dataCount.incrementAndGet();
-			for (ConsumerTopicStatsData consumerTopicStatisData : topicStatisDatas)
-				topicStatisDataService.insert(consumerTopicStatisData);
-		}
 	}
 
 	@Override
 	public boolean doAccept() {
 		if (dataCount.getAndDecrement() > 0) {
+			dataCount.incrementAndGet();
 			topicStatisDatas = consumerDataWapper.getTopicStatsData(lastTimeKey.get());
 			return topicAlarm();
 		}
