@@ -40,7 +40,7 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 
 	@Override
 	public boolean update(ConsumerServerAlarmSetting setting) {
-		return mongoTemplate.upinsert(setting);
+		return insert(setting);
 	}
 
 	@Override
