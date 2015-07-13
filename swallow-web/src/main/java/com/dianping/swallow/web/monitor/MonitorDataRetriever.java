@@ -19,4 +19,12 @@ public interface MonitorDataRetriever extends Retriever {
 
 	void registerListener(MonitorDataListener listener);
 
+	Set<String> getKeys(CasKeys keys, StatisType type);
+
+	Object getValue(CasKeys keys, StatisType type);
+
+	Set<String> getKeys(CasKeys keys);
+
+	Object getValue(CasKeys keys);
+
 }

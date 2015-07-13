@@ -110,7 +110,7 @@ module.filter('reverse', function() {
 });
 
 module.directive('popOver', function ($compile) {
-    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{topic}}/qps?cid={{cid}}'>发送延迟</a></th><th>ack延迟</th><th>消息堆积</th></tr><tr><td>{{topic}}</td><td ng-repeat='item in items'>{{item}}</td></tr></table>";
+    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/qps?cid={{clicked.cid}}'>发送延迟</a></th><th>ack延迟</th><th>消息堆积</th></tr><tr><td>{{topic}}</td><td ng-repeat='item in items'>{{item}}</td></tr></table>";
     var getTemplate = function (contentType) {
         var template = '';
         switch (contentType) {
@@ -142,6 +142,7 @@ module.directive('popOver', function ($compile) {
             items: '=',
             topic: '=',
             cid: '=',
+            clicked: '=',
             title: '@'
         }
     };

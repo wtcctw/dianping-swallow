@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.monitor.impl;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableMap;

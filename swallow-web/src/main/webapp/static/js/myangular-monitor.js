@@ -222,6 +222,7 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.table = function(parentindex, index) {
 		$scope.topic = $scope.minuteEntrys[parentindex].delayEntry[index].topic;
 		$scope.cid = $scope.minuteEntrys[parentindex].delayEntry[index].consumerId;
+		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry[index];
 		
 		$scope.items = [$scope.minuteEntrys[parentindex].delayEntry[index].senddelay,
 		                $scope.minuteEntrys[parentindex].delayEntry[index].ackdelay, 

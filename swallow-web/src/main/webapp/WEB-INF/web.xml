@@ -77,8 +77,8 @@
 			<param-value>true</param-value>
 		</init-param>
 		<init-param>
-			<param-name>validate</param-name>
-			<param-value>false</param-value>
+			<param-name>validateLionKey</param-name>
+			<param-value>cas-server-webapp.ticket.validate</param-value>
 		</init-param>
 		<init-param>
 			<param-name>tolerance</param-name>

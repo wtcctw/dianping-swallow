@@ -189,6 +189,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		}
 	}
 
+	@Override
 	public Set<String> getKeys(CasKeys keys, StatisType type) {
 		try {
 			return statis.getKeys(keys, type);
@@ -197,11 +198,22 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		}
 	}
 
+	@Override
 	public Object getValue(CasKeys keys, StatisType type) {
 		try {
 			return statis.getValue(keys, type);
 		} catch (UnfoundKeyException e) {
 			return null;
 		}
+	}
+
+	@Override
+	public Set<String> getKeys(CasKeys keys) {
+		return getKeys(keys, null);
+	}
+
+	@Override
+	public Object getValue(CasKeys keys) {
+		return getValue(keys, null);
 	}
 }

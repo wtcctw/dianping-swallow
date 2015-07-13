@@ -17,6 +17,12 @@ public class TotalData {
 	
 	private String cid;
 	
+	private String email;
+	
+	private String dpMobile;
+	
+	private int minute;
+	
 	List<Long> listSend = new ArrayList<Long>();
 
 	List<Long> listAck = new ArrayList<Long>();
@@ -60,6 +66,24 @@ public class TotalData {
 		this.cid = cid;
 		return this;
 	}
+	
+	public String getEmail() {
+		return email;
+	}
+
+	public TotalData setEmail(String email) {
+		this.email = email;
+		return this;
+	}
+
+	public String getDpMobile() {
+		return dpMobile;
+	}
+
+	public TotalData setDpMobile(String dpMobile) {
+		this.dpMobile = dpMobile;
+		return this;
+	}
 
 	public List<Long> getListSend() {
 		return listSend;
@@ -88,11 +112,21 @@ public class TotalData {
 		return this;
 	}
 
+	public int getMinute() {
+		return minute;
+	}
+
+	public TotalData setMinute(int minute) {
+		this.minute = minute;
+		return this;
+	}
+
 	@Override
 	public String toString() {
-		return "TotalData [server=" + server + ", topic=" + topic + ", cid=" + cid + ", listSend=" + listSend
-				+ ", listAck=" + listAck + ", listAccu=" + listAccu + ", entrys=" + entrys + "]";
+		return "TotalData [server=" + server + ", topic=" + topic + ", cid=" + cid + ", email=" + email + ", dpMobile="
+				+ dpMobile + ", minute=" + minute + ", listSend=" + listSend + ", listAck=" + listAck + ", listAccu="
+				+ listAccu + ", entrys=" + entrys + "]";
 	}
-	
+
 
 }

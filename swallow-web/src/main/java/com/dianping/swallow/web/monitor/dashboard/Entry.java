@@ -11,8 +11,6 @@ public class Entry implements Comparable<Entry>{
 
 	private String topic;
 	
-	private String developer;
-
 	private String consumerId;
 
 	private long senddelay;
@@ -28,6 +26,10 @@ public class Entry implements Comparable<Entry>{
 	private int accuAlarm;
 	
 	private Integer numAlarm;
+	
+	private String email;
+	
+	private String dpMobile;
 	
 	public Entry() {
 
@@ -48,15 +50,6 @@ public class Entry implements Comparable<Entry>{
 
 	public Entry setTopic(String topic) {
 		this.topic = topic;
-		return this;
-	}
-
-	public String getDeveloper() {
-		return developer;
-	}
-
-	public Entry setDeveloper(String developer) {
-		this.developer = developer;
 		return this;
 	}
 
@@ -137,13 +130,32 @@ public class Entry implements Comparable<Entry>{
 
 		return entry.getNumAlarm().compareTo(this.getNumAlarm());
 	}
+	
+	public String getEmail() {
+		return email;
+	}
+
+	public Entry setEmail(String email) {
+		this.email = email;
+		return this;
+	}
+
+	public String getDpMobile() {
+		return dpMobile;
+	}
+
+	public Entry setDpMobile(String dpMobile) {
+		this.dpMobile = dpMobile;
+		return this;
+	}
 
 	@Override
 	public String toString() {
-		return "Entry [server=" + server + ", topic=" + topic + ", developer=" + developer + ", consumerId="
-				+ consumerId + ", senddelay=" + senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu
-				+ ", senddelayAlarm=" + senddelayAlarm + ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm="
-				+ accuAlarm + ", numAlarm=" + numAlarm + "]";
+		return "Entry [server=" + server + ", topic=" + topic + ", consumerId=" + consumerId + ", senddelay="
+				+ senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu + ", senddelayAlarm=" + senddelayAlarm
+				+ ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm=" + accuAlarm + ", numAlarm=" + numAlarm
+				+ ", email=" + email + ", dpMobile=" + dpMobile + "]";
 	}
+
 
 }

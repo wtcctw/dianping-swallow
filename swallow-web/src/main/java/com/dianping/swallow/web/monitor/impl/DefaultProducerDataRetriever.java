@@ -16,7 +16,6 @@ import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
-import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;

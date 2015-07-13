@@ -29,7 +29,7 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 	@Override
 	protected void doStart() throws Exception{
 		super.doStart();
-		startAlarmer();
+		//startAlarmer();
 	}
 	
 	private void startAlarmer(){
