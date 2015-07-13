@@ -14,10 +14,10 @@ import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.mongodb.WriteResult;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("producerTopicStatisDataDao")
 public class DefaultProducerTopicStatisDataDao extends AbstractWriteDao implements ProducerTopicStatisDataDao {
 
@@ -78,8 +78,9 @@ public class DefaultProducerTopicStatisDataDao extends AbstractWriteDao implemen
 		return topicStatisDatas;
 	}
 
-	public List<ProducerTopicStatsData> findSectionData(long startKey, long endKey) {
-		Query query = new Query(Criteria.where(TIMEKEY_FIELD).gte(startKey).and(TIMEKEY_FIELD).lte(endKey));
+	public List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)
+				.and(TIMEKEY_FIELD).lte(endKey));
 		List<ProducerTopicStatsData> topicStatisDatas = mongoTemplate.find(query, ProducerTopicStatsData.class,
 				TOPICSTATISDATA_COLLECTION);
 		return topicStatisDatas;

@@ -56,9 +56,6 @@ public class AlarmServiceImpl implements AlarmService {
 	private HttpService httpService;
 
 	@Autowired
-	private AlarmService alarmService;
-
-	@Autowired
 	private IPDescManager ipDescManager;
 
 	public AlarmServiceImpl() {
@@ -95,7 +92,7 @@ public class AlarmServiceImpl implements AlarmService {
 		params.add(new BasicNameValuePair("mobile", mobile));
 		params.add(new BasicNameValuePair("body", "[" + title + "]" + body));
 		boolean result = httpService.httpPost(getSmsUrl(), params).isSuccess();
-		alarmService.insert(new Alarm().buildType(type).buildReceiver(mobile).buildTitle(title).buildBody(body)
+		insert(new Alarm().buildType(type).buildReceiver(mobile).buildTitle(title).buildBody(body)
 				.buildSendType(SendType.SMS).buildSourceIp(NetUtil.IP).buildCreateTime(new Date()));
 		return result;
 	}
@@ -107,7 +104,7 @@ public class AlarmServiceImpl implements AlarmService {
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("content", content));
 		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
-		alarmService.insert(new Alarm().buildType(type).buildReceiver(email).buildTitle(title).buildBody(content)
+		insert(new Alarm().buildType(type).buildReceiver(email).buildTitle(title).buildBody(content)
 				.buildSendType(SendType.WEIXIN).buildSourceIp(NetUtil.IP).buildCreateTime(new Date()));
 		return result;
 	}
@@ -119,7 +116,7 @@ public class AlarmServiceImpl implements AlarmService {
 		params.add(new BasicNameValuePair("recipients", email));
 		params.add(new BasicNameValuePair("body", content));
 		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
-		alarmService.insert(new Alarm().buildType(type).buildReceiver(email).buildTitle(title).buildBody(content)
+		insert(new Alarm().buildType(type).buildReceiver(email).buildTitle(title).buildBody(content)
 				.buildSendType(SendType.SMS).buildSourceIp(NetUtil.IP).buildCreateTime(new Date()));
 		return result;
 	}

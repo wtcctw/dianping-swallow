@@ -105,4 +105,13 @@ public class DefaultConsumerIdStatisDataDao extends AbstractWriteDao implements 
 		return statisDatas;
 	}
 
+	@Override
+	public List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey) {
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId).and(TIMEKEY_FIELD).gte(startKey)
+				.and(TIMEKEY_FIELD).lte(endKey));
+		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
+				CONSUMERIDTATISDATA_COLLECTION);
+		return statisDatas;
+	}
+
 }

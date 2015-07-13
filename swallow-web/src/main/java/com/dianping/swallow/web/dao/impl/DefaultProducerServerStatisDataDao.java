@@ -14,10 +14,10 @@ import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
 import com.mongodb.WriteResult;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("producerServerStatisDataDao")
 public class DefaultProducerServerStatisDataDao extends AbstractWriteDao implements ProducerServerStatisDataDao {
 

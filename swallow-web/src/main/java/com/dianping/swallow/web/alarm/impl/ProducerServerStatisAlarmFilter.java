@@ -1,0 +1,105 @@
+package com.dianping.swallow.web.alarm.impl;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
+import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
+import com.dianping.swallow.web.model.statis.ProducerBaseStatsData;
+import com.dianping.swallow.web.model.statis.ProducerMachineStatsData;
+import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
+import com.dianping.swallow.web.monitor.MonitorDataListener;
+import com.dianping.swallow.web.monitor.ProducerDataRetriever;
+import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
+import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
+import com.dianping.swallow.web.service.ProducerServerStatisDataService;
+
+/**
+ *
+ * @author qiyin
+ *
+ */
+@Service("producerServerStatisAlarmFilter")
+public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter implements MonitorDataListener {
+
+	private volatile ProducerServerStatsData serverStatisData;
+
+	@Autowired
+	private AlarmManager alarmManager;
+	
+	@Autowired
+	private ProducerDataRetriever producerDataRetriever;
+
+	@Autowired
+	private ProducerDataWapper producerDataWapper;
+
+	@Autowired
+	private ProducerServerStatisDataService serverStatisDataService;
+
+	@Autowired
+	private ProducerServerAlarmSettingService serverAlarmSettingService;
+
+	@PostConstruct
+	public void initialize() {
+		super.initialize();
+		producerDataRetriever.registerListener(this);
+	}
+
+	@Override
+	public void achieveMonitorData() {
+		dataCount.incrementAndGet();
+		serverStatisData = producerDataWapper.getServerStatsData(lastTimeKey.get());
+		storageServerStats();
+	}
+
+	@Override
+	public boolean doAccept() {
+		if (dataCount.get() > 0) {
+			dataCount.incrementAndGet();
+			serverStatisData = producerDataWapper.getServerStatsData(lastTimeKey.get());
+			return serverAlarm();
+		}
+		return true;
+	}
+
+	public boolean serverAlarm() {
+		ProducerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findOne();
+		if (serverAlarmSetting == null) {
+			return true;
+		}
+		QPSAlarmSetting qps = serverAlarmSetting.getDefaultAlarmSetting();
+		List<String> whiteList = serverAlarmSetting.getWhiteList();
+
+		if (qps == null || serverStatisData == null || serverStatisData.getStatisDatas() == null) {
+			return true;
+		}
+		List<ProducerMachineStatsData> machineStatisDatas = serverStatisData.getStatisDatas();
+		for (ProducerMachineStatsData machineStatisData : machineStatisDatas) {
+			ProducerBaseStatsData baseStatisData = machineStatisData.getStatisData();
+			if (whiteList == null || (!whiteList.contains(machineStatisData.getIp()) && baseStatisData != null)) {
+				long qpx = baseStatisData.getQpx();
+				if (qpx > qps.getPeak()) {
+					alarmManager.producerServerStatisQpsPAlarm(machineStatisData.getIp(), qpx);
+					return false;
+				}
+				if (qpx < qps.getValley()){
+					alarmManager.producerServerStatisQpsVAlarm(machineStatisData.getIp(), qpx);
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private void storageServerStats() {
+		if (serverStatisData != null) {
+			serverStatisDataService.insert(serverStatisData);
+		}
+	}
+
+}

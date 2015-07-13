@@ -2,25 +2,13 @@ package com.dianping.swallow.web.model.alarm;
 
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
+public class TopicAlarmSetting extends BaseAlarmSetting {
 
-public class TopicAlarmSetting {
-	@Id
-	private String id;
-	
 	private List<String> whiteList;
-	
-	private ProducerBaseAlarmSetting producerAlarmSetting;
-	
-	private ConsumerBaseAlarmSetting consumerAlarmSetting;
-	
-	public String getId() {
-		return id;
-	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
+	private ProducerBaseAlarmSetting producerAlarmSetting;
+
+	private ConsumerBaseAlarmSetting consumerAlarmSetting;
 
 	public List<String> getWhiteList() {
 		return whiteList;
@@ -45,6 +33,5 @@ public class TopicAlarmSetting {
 	public void setConsumerAlarmSetting(ConsumerBaseAlarmSetting consumerAlarmSetting) {
 		this.consumerAlarmSetting = consumerAlarmSetting;
 	}
-	
-	
+
 }

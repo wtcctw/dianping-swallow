@@ -29,7 +29,7 @@ public class QPSAlarmSetting {
 		this.valley = valley;
 	}
 
-	public long getFluctuation() {
+	public int getFluctuation() {
 		return fluctuation;
 	}
 

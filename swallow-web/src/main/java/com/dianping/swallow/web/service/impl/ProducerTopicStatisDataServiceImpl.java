@@ -10,16 +10,16 @@ import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("producerTopicStatisDataService")
 public class ProducerTopicStatisDataServiceImpl implements ProducerTopicStatisDataService {
 
 	@Autowired
 	private ProducerTopicStatisDataDao producerTopicStatisDataDao;
-	
+
 	@Override
 	public boolean insert(ProducerTopicStatsData statisData) {
 		return producerTopicStatisDataDao.insert(statisData);
@@ -51,8 +51,8 @@ public class ProducerTopicStatisDataServiceImpl implements ProducerTopicStatisDa
 	}
 
 	@Override
-	public List<ProducerTopicStatsData> findSectionData(long startKey, long endKey) {
-		return producerTopicStatisDataDao.findSectionData(startKey, endKey);
+	public List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
+		return producerTopicStatisDataDao.findSectionData(topicName, startKey, endKey);
 	}
 
 }

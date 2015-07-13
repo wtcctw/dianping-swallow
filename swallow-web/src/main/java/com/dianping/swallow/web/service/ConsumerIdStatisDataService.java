@@ -5,10 +5,10 @@ import java.util.List;
 import com.dianping.swallow.web.model.statis.ConsumerIdStatsData;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 public interface ConsumerIdStatisDataService {
 
 	public boolean insert(ConsumerIdStatsData statisData);
@@ -29,4 +29,5 @@ public interface ConsumerIdStatisDataService {
 
 	public List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
 
+	List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey);
 }

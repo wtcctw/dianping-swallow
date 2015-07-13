@@ -10,13 +10,13 @@ import com.dianping.swallow.web.model.statis.ConsumerIdStatsData;
 import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("consumerIdStatisDataService")
 public class ConsumerIdStatisDataServiceImpl implements ConsumerIdStatisDataService {
-	
+
 	@Autowired
 	private ConsumerIdStatisDataDao consumerIdStatisDataDao;
 
@@ -63,6 +63,11 @@ public class ConsumerIdStatisDataServiceImpl implements ConsumerIdStatisDataServ
 	@Override
 	public List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId) {
 		return consumerIdStatisDataDao.findByTopicAndTimeAndConsumerId(topicName, timeKey, consumerId);
+	}
+
+	@Override
+	public List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey) {
+		return consumerIdStatisDataDao.findSectionData(topicName, consumerId, startKey, endKey);
 	}
 
 }

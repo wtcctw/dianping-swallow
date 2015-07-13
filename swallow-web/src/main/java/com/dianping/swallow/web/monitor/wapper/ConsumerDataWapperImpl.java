@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,15 +48,22 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 		Iterator<String> iterator = serverKeys.iterator();
 		ConsumerServerStatsData serverStatsData = new ConsumerServerStatsData();
 		List<ConsumerMachineStatsData> machineStatsDatas = new ArrayList<ConsumerMachineStatsData>();
+		int index = 0;
 		while (iterator.hasNext()) {
 			String serverIp = iterator.next();
+			if(StringUtils.equals(serverIp, TOTAL_KEY)){
+				continue;
+			}
 			ConsumerServerStatisData serverStatisData = (ConsumerServerStatisData) consumerDataRetriever.getValue(
 					new CasKeys(serverIp), StatisType.SEND);
 			NavigableMap<Long, Long> sendQpx = serverStatisData.getQpx(StatisType.SEND);
 			NavigableMap<Long, Long> ackQpx = serverStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = serverStatisData.getDelay(StatisType.SEND);
 			NavigableMap<Long, Long> ackDelay = serverStatisData.getDelay(StatisType.ACK);
-			timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+			if (index == 0) {
+				timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				index++;
+			}
 			ConsumerMachineStatsData machineStatsData = new ConsumerMachineStatsData();
 			machineStatsData.setIp(serverIp);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
@@ -78,6 +86,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 		}
 		Iterator<String> iterator = topicKeys.iterator();
 		List<ConsumerTopicStatsData> topicStatsDatas = new ArrayList<ConsumerTopicStatsData>();
+		int index = 0;
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
 			ConsumerTopicStatsData topicStatsData = new ConsumerTopicStatsData();
@@ -87,7 +96,10 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			NavigableMap<Long, Long> ackQpx = topicStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = topicStatisData.getDelay(StatisType.SEND);
 			NavigableMap<Long, Long> ackDelay = topicStatisData.getDelay(StatisType.ACK);
-			timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+			if (index == 0) {
+				timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				index++;
+			}
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
 			baseStatsData.setSenderQpx(sendQpx.get(timeKey));
 			baseStatsData.setSenderDelay(sendDelay.get(timeKey));
@@ -122,6 +134,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 		}
 		Iterator<String> iterator = consumerIdKeys.iterator();
 		List<ConsumerIdStatsData> consumerIdStatsDatas = new ArrayList<ConsumerIdStatsData>();
+		int index = 0;
 		while (iterator.hasNext()) {
 			String consumerId = iterator.next();
 			ConsumerIdStatsData consumerIdStatsData = new ConsumerIdStatsData();
@@ -133,7 +146,10 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			NavigableMap<Long, Long> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = consumerIdStatisData.getDelay(StatisType.SEND);
 			NavigableMap<Long, Long> ackDelay = consumerIdStatisData.getDelay(StatisType.ACK);
-			timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+			if (index == 0) {
+				timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				index++;
+			}
 			consumerIdStatsData.setTimeKey(timeKey);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
 			baseStatsData.setSenderQpx(sendQpx.get(timeKey));
