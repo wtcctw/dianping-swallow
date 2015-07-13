@@ -114,7 +114,7 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 	
 	$scope.consumeridEntry = {};
 	$scope.consumeridEntry.consumerId;
-	$scope.consumeridEntry.sendlelay;
+	$scope.consumeridEntry.senddelay;
 	$scope.consumeridEntry.ackdelay;
 	$scope.consumeridEntry.accumulation;
 	$scope.consumeridEntry.sendpeak;
@@ -126,29 +126,7 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 	
 	$scope.refreshpage = function(myForm){
 		$('#myModal').modal('hide');
-//    	$http.post(window.contextPath + '/console/setting/consumerid/create', {"peak":$scope.peak, 
-//    		"valley":$scope.vallely, "fluctuation":$scope.fluctuation, "whitelist":$scope.whitelist})
-//    		.success(function(response) {
-//    			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
-//    	});
-//		$http({
-//		    method: 'POST',
-//		    url: window.contextPath + '/console/setting/consumerid/create',
-//		    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-//		    transformRequest: function(obj) {
-//		        var str = [];
-//		        for(var p in obj)
-//		        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-//		        return str.join("&");
-//		    },
-//		    data: $scope.consumeridEntry
-//		}).success(function (response) {
-//		});
 		var param = JSON.stringify($scope.consumeridEntry);
-//    	$http.post(window.contextPath + '/console/setting/consumerid/create', param)
-//    		.success(function(response) {
-//		$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
-//    		});
     	
     	$.ajax({
     	    type: "POST",
@@ -163,9 +141,32 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
     	});
     }
 	
+	$scope.setModalInput = function(index){
+		$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.consumerId;
+		$scope.consumeridEntry.senddelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderDelay;
+		$scope.consumeridEntry.ackdelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackDelay;
+		$scope.consumeridEntry.accumulation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.accumulation;
+		$scope.consumeridEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderQpsAlarmSetting.peak;
+		$scope.consumeridEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderQpsAlarmSetting.valley;
+		$scope.consumeridEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderQpsAlarmSetting.fluctuation;
+		$scope.consumeridEntry.ackpeak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.peak;
+		$scope.consumeridEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.valley;
+		$scope.consumeridEntry.ackfluctuation =$scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuation;
+	}
 	
-	$scope.dialog = function(name) {
-		$rootScope.removeName = name;
+	$rootScope.removerecord = function(cid){
+		$http.get(window.contextPath + "/console/setting/consumerid/remove", {
+			params : {
+				cid : cid
+			}
+		}).success(function(data){
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
+		});
+		return true;
+	}
+	
+	$scope.dialog = function(cid) {
+		$rootScope.cid = cid;
 		ngDialog.open({
 						template : '\
 						<div class="widget-box">\
@@ -180,7 +181,7 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 							</div>\
 							<div class="modal-footer">\
 								<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
-								<button type="button" class="btn btn-primary" ng-click="removefile(removeName)&&closeThisDialog()">确定</button>\
+								<button type="button" class="btn btn-primary" ng-click="removerecord(cid)&&closeThisDialog()">确定</button>\
 							</div>\
 						</div>\
 					</div>',

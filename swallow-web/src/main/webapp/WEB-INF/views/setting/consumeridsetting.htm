@@ -20,6 +20,7 @@
 					class="table table-bordered table-striped  table-condensed table-hover">
 					<tr>
 						<th style="text-align: left">序号</th>
+						<th style="text-align: left">ConsumerId</th>
 						<th style="text-align: left">发送峰值</th>
 						<th style="text-align: left">发送谷值</th>
 						<th style="text-align: left">发送波动</th>
@@ -33,6 +34,7 @@
 					</tr>
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
+						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.consumerId"></td>
 						<td style="text-align: left"
 							ng-bind="ad.consumerAlarmSetting.senderQpsAlarmSetting.peak"></td>
 						<td style="text-align: left"
@@ -48,10 +50,10 @@
 						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.ackDelay"></td>
 						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.accumulation"></td>
 						<td style="text-align: left"><a href="#myModal"
-							ng-click="setModalInput(ad.name, ad.role);" data-toggle="modal"
+							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
 								data-original-title="编辑配置值"></i></a> <a href=""
-							ng-click="dialog(ad.name);" class="edit-config-btn"><i
+							ng-click="dialog(ad.consumerAlarmSetting.consumerId);" class="edit-config-btn"><i
 								class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
 					</tr>
 				</table>

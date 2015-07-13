@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -59,6 +60,13 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 
 		ConsumerIdAlarmSetting consumerIdAlarmSetting = ConsumerIdAlarmSettingMapper.toConsumerIdAlarmSetting(dto);
 		consumerIdAlarmSettingService.insert(consumerIdAlarmSetting);
+	}
+
+	@RequestMapping(value = "/console/setting/consumerid/remove", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public void remvoeComsumeridSettingCreate(@RequestParam(value = "cid") String cid) {
+		
+		
 	}
 
 	private Map<String, Object> generateResponst(List<ConsumerIdAlarmSetting> consumerIdAlarmSetting){
