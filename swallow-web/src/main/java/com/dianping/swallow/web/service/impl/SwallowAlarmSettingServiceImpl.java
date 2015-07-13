@@ -36,7 +36,6 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 			return insert(setting);
 		}else{
 			setting.setId(swallowAlarmSetting.getId());
-			setting.setSwallowId(swallowAlarmSetting.getSwallowId());
 			return swallowAlarmSettingDao.update(setting);
 		}
 	}
