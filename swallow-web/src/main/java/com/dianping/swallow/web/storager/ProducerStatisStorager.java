@@ -15,6 +15,12 @@ import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
 import com.dianping.swallow.web.service.ProducerMachineStatisDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
 
+
+/**
+ *
+ * @author qiyin
+ *
+ */
 @Component
 public class ProducerStatisStorager extends AbstractStatisStorager implements MonitorDataListener {
 
