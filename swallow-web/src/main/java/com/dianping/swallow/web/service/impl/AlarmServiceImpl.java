@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
-import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.alarm.AlarmLevelType;
 import com.dianping.swallow.web.model.alarm.SendType;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
@@ -82,7 +82,7 @@ public class AlarmServiceImpl implements AlarmService {
 	}
 
 	@Override
-	public boolean sendSms(String mobile, String title, String body, AlarmType type) {
+	public boolean sendSms(String mobile, String title, String body, AlarmLevelType type) {
 		if (StringUtils.isBlank(mobile)) {
 			return true;
 		}
@@ -96,7 +96,7 @@ public class AlarmServiceImpl implements AlarmService {
 	}
 
 	@Override
-	public boolean sendWeiXin(String email, String title, String content, AlarmType type) {
+	public boolean sendWeiXin(String email, String title, String content, AlarmLevelType type) {
 		if (StringUtils.isBlank(email)) {
 			return true;
 		}
@@ -111,7 +111,7 @@ public class AlarmServiceImpl implements AlarmService {
 	}
 
 	@Override
-	public boolean sendMail(String email, String title, String content, AlarmType type) {
+	public boolean sendMail(String email, String title, String content, AlarmLevelType type) {
 		if (StringUtils.isBlank(email)) {
 			return true;
 		}
@@ -125,7 +125,7 @@ public class AlarmServiceImpl implements AlarmService {
 		return result;
 	}
 
-	public boolean sendSms(Set<String> mobiles, String title, String message, AlarmType type) {
+	public boolean sendSms(Set<String> mobiles, String title, String message, AlarmLevelType type) {
 		if (mobiles != null) {
 			Iterator<String> iterator = mobiles.iterator();
 			while (iterator.hasNext()) {
@@ -136,7 +136,7 @@ public class AlarmServiceImpl implements AlarmService {
 		return true;
 	}
 	
-	public boolean sendMail(Set<String> emails, String title, String message, AlarmType type){
+	public boolean sendMail(Set<String> emails, String title, String message, AlarmLevelType type){
 		if (emails != null) {
 			Iterator<String> iterator = emails.iterator();
 			while (iterator.hasNext()) {
@@ -147,7 +147,7 @@ public class AlarmServiceImpl implements AlarmService {
 		return true;
 	}
 
-	public boolean sendWeiXin(Set<String> emails, String title, String message, AlarmType type){
+	public boolean sendWeiXin(Set<String> emails, String title, String message, AlarmLevelType type){
 		if (emails != null) {
 			Iterator<String> iterator = emails.iterator();
 			while (iterator.hasNext()) {

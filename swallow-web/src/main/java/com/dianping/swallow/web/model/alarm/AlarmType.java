@@ -6,49 +6,164 @@ package com.dianping.swallow.web.model.alarm;
  *
  */
 public enum AlarmType {
-	CRITICAL("严重告警"),
-	MAJOR("重大告警"),
-	MINOR("次要告警"),
-	GENERAL("一般告警"),
-	WARNING("警告告警");
-
-	private String desc;
 	
-	private AlarmType(String desc) {
-		this.desc = desc;
-	}
-
-	public String getDesc() {
-		return desc;
-	}
-
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
+	/**
+	 * producer server service type
+	 */
+	PRODUCER_SERVER_SERVICE,
 	
-	@Override
-	public String toString() {
-		return desc;
-	}
+	/**
+	 * producer server data sender type
+	 */
+	PRODUCER_SERVER_SENDER, 
+	
+	/**
+	 * 
+	 */
+	PRODUCER_SERVER_STATIS_QPS_P,
+	
+	/**
+	 * 
+	 */
+	PRODUCER_SERVER_STATIS_QPS_V,
 
-	public boolean isCRITICAL() {
-		return this == CRITICAL;
-	}
+	/**
+	 * 
+	 */
+	PRODUCER_TOPIC_STATIS_QPS_P, 
 
-	public boolean isMAJOR() {
-		return this == MAJOR;
-	}
+	/**
+	 * 
+	 */
+	PRODUCER_TOPIC_STATIS_QPS_V, 
 
-	public boolean isMINOR() {
-		return this == MINOR;
-	}
+	/**
+	 * 
+	 */
+	PRODUCER_TOPIC_STATIS_QPS_F, 
 
-	public boolean isGENERAL() {
-		return this == GENERAL;
-	}
+	/**
+	 * 
+	 */
+	PRODUCER_TOPIC_STATIS_DELAY, 
 
-	public boolean isWARNING() {
-		return this == WARNING;
-	}
+	/**
+	 * 
+	 */
+	CONSUMER_SERVER_SENDER,
 
+	/**
+	 * 
+	 */
+	CONSUMER_SERVER_PORT, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_SERVER_PORT_BOTH, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_SERVER_STATIS_SENDQPS_P, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_SERVER_STATIS_SENDQPS_V, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_SERVER_STATIS_ACKQPS_P, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_SERVER_STATIS_ACKQPS_V, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_TOPIC_STATIS_SENDQPS_P, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_TOPIC_STATIS_SENDQPS_V, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_TOPIC_STATIS_SENDQPS_F, 
+
+	/**
+	 * 
+	 */
+	CONSUMER_TOPIC_STATIS_SEND_DELAY, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_TOPIC_STATIS_ACKQPS_P, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_TOPIC_STATIS_ACKQPS_V, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_TOPIC_STATIS_ACKQPS_F,
+	
+	/**
+	 * 
+	 */
+	CONSUMER_TOPIC_STATIS_ACK_DELAY, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_SENDQPS_P, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_SENDQPS_V, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_SENDQPS_F, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_SEND_DELAY, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_SEND_ACCU, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_ACKQPS_P, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_ACKQPS_V, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_ACKQPS_F, 
+	
+	/**
+	 * 
+	 */
+	CONSUMER_CONSUMERID_STATIS_ACK_DELAY,
 }

@@ -2,6 +2,7 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,17 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 
 	@Override
 	public boolean update(SwallowAlarmSetting setting) {
-		return swallowAlarmSettingDao.insert(setting);
+		SwallowAlarmSetting swallowAlarmSetting = null;
+		if (StringUtils.isNotBlank(setting.getSwallowId())) {
+			swallowAlarmSetting = findBySwallowId(setting.getSwallowId());
+		}
+		if (swallowAlarmSetting == null) {
+			return insert(setting);
+		}else{
+			setting.setId(swallowAlarmSetting.getId());
+			setting.setSwallowId(swallowAlarmSetting.getSwallowId());
+			return swallowAlarmSettingDao.update(setting);
+		}
 	}
 
 	@Override
