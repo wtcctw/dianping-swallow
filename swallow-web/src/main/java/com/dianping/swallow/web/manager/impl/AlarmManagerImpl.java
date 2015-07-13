@@ -27,7 +27,7 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void producerServiceAlarm(String ip) {
-		String message = "producer server is not work,please immediately repair. [date] " + new Date().toString();
+		String message = "producer server is not work, please immediately repair. [date] " + new Date().toString();
 		alarmService.sendAll(ip, "ProducerServerService Alarm", message, AlarmType.CRITICAL);
 	}
 

@@ -25,7 +25,7 @@ public class ProducerServerAlarmSettingMapper {
 				}
 			}
 		}
-		alarmSetting.setWhiteList(whiteList);
+		alarmSetting.setTopicWhiteList(whiteList);
 		alarmSetting.setCreateTime(dto.getCreateTime());
 		alarmSetting.setUpdateTime(dto.getCreateTime());
 		QPSAlarmSetting qps = new QPSAlarmSetting();
@@ -39,8 +39,8 @@ public class ProducerServerAlarmSettingMapper {
 	public static ProducerServerAlarmSettingDto toProducerServerAlarmSettingDto(ProducerServerAlarmSetting alarmSetting) {
 		ProducerServerAlarmSettingDto dto = new ProducerServerAlarmSettingDto();
 		StringBuilder strWhiteBuilder = new StringBuilder();
-		if (alarmSetting.getWhiteList() != null) {
-			for (String whiteName : alarmSetting.getWhiteList()) {
+		if (alarmSetting.getTopicWhiteList() != null) {
+			for (String whiteName : alarmSetting.getTopicWhiteList()) {
 				if (StringUtils.isNotBlank(whiteName)) {
 					strWhiteBuilder.append(whiteName).append(WHITELIST_SPLIT);
 				}

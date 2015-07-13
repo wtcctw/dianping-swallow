@@ -172,4 +172,8 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 		return 0L;
 	}
 
+	public Set<String> getConsumerIdIps(String topicName, String consumerId){
+		return consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
+	}
+
 }

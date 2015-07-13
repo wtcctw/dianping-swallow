@@ -29,6 +29,7 @@ import com.dianping.swallow.web.monitor.ProducerDataRetriever;
  */
 @Service("producerDataWapper")
 public class ProducerDataWapperImpl extends AbstractDataWapper implements ProducerDataWapper {
+
 	private static final Logger logger = LoggerFactory.getLogger(ProducerDataWapperImpl.class);
 
 	@Autowired
@@ -47,7 +48,7 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 		int index = 0;
 		while (iterator.hasNext()) {
 			String serverIp = iterator.next();
-			if(StringUtils.equals(serverIp, TOTAL_KEY)){
+			if (StringUtils.equals(serverIp, TOTAL_KEY)) {
 				continue;
 			}
 			logger.info("#######" + serverIp);
@@ -94,7 +95,7 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 					.getValue(new CasKeys(TOTAL_KEY, topicName));
 			NavigableMap<Long, Long> topicQpxs = serverStatisData.getQpx(StatisType.SAVE);
 			if (index == 0) {
-				timeKey = timeKey == DEFAULT_VALUE ?  topicQpxs.lastKey() : topicQpxs.higherKey(timeKey);
+				timeKey = timeKey == DEFAULT_VALUE ? topicQpxs.lastKey() : topicQpxs.higherKey(timeKey);
 				index++;
 			}
 			producerTopicStatisData.setTimeKey(timeKey);
@@ -108,4 +109,7 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 		return producerTopicStatisDataTemps;
 	}
 
+	public Set<String> getTopicIps(String topicName) {
+		return producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
+	}
 }

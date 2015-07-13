@@ -18,6 +18,7 @@ import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerStatisDataService;
+import com.dianping.swallow.web.service.SwallowAlarmSettingService;
 
 /**
  *
@@ -43,6 +44,9 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 
 	@Autowired
 	private ProducerServerAlarmSettingService serverAlarmSettingService;
+	
+	@Autowired
+	private SwallowAlarmSettingService swallowAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -71,7 +75,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 			return true;
 		}
 		QPSAlarmSetting qps = serverAlarmSetting.getDefaultAlarmSetting();
-		List<String> whiteList = serverAlarmSetting.getWhiteList();
+		List<String> whiteList = swallowAlarmSettingService.getProducerWhiteList();
 
 		if (qps == null || serverStatisData == null || serverStatisData.getStatisDatas() == null) {
 			return true;

@@ -18,13 +18,13 @@ import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
+import com.dianping.swallow.web.service.SwallowAlarmSettingService;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("producerServiceAlarmFilter")
 public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 
@@ -39,7 +39,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 	private ConfigCache configCache;
 
 	private volatile String producerServerIp;
-	
+
 	@Autowired
 	private AlarmManager alarmManager;
 
@@ -50,7 +50,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private ProducerServerAlarmSettingService serverAlarmSettingService;
+	private SwallowAlarmSettingService swallowAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -67,7 +67,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 			});
 		} catch (LionException e) {
 			logger.error("[initialize] lion read pigeon producer service url.");
-			//throw new RuntimeException();
+			// throw new RuntimeException();
 		}
 	}
 
@@ -78,7 +78,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private boolean checkService() {
 		Map<String, String> cmdbProducers = ipCollectorService.getCmdbProducers();
-		List<String> whiteList = serverAlarmSettingService.getWhiteList();
+		List<String> whiteList = swallowAlarmSettingService.getProducerWhiteList();
 		List<String> ipList = getIpList();
 
 		for (Map.Entry<String, String> cmdbProducer : cmdbProducers.entrySet()) {

@@ -16,6 +16,7 @@ import com.dianping.swallow.web.model.statis.ConsumerTopicStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerDataWapper;
+import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerTopicStatisDataService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
@@ -43,6 +44,9 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
+	
+	@Autowired
+	private ConsumerServerAlarmSettingService serverAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -73,7 +77,7 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 		ConsumerBaseAlarmSetting consumerAlarmSetting = topicAlarmSetting.getConsumerAlarmSetting();
 		QPSAlarmSetting sendQps = consumerAlarmSetting.getSenderQpsAlarmSetting();
 		QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
-		List<String> whiteList = topicAlarmSetting.getWhiteList();
+		List<String> whiteList = serverAlarmSettingService.getTopicWhiteList();
 		long sendDelay = consumerAlarmSetting.getSenderDelay();
 		long ackDelay = consumerAlarmSetting.getAckDelay();
 		if (topicStatisDatas == null) {

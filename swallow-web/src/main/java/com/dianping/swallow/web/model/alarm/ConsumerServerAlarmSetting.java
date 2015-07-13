@@ -4,19 +4,11 @@ import java.util.List;
 
 public class ConsumerServerAlarmSetting extends BaseAlarmSetting {
 
-	private List<String> whiteList;
+	private List<String> topicWhiteList;
 
 	private QPSAlarmSetting senderAlarmSetting;
 
 	private QPSAlarmSetting ackAlarmSetting;
-
-	public List<String> getWhiteList() {
-		return whiteList;
-	}
-
-	public void setWhiteList(List<String> whiteList) {
-		this.whiteList = whiteList;
-	}
 
 	public QPSAlarmSetting getSenderAlarmSetting() {
 		return senderAlarmSetting;
@@ -32,6 +24,14 @@ public class ConsumerServerAlarmSetting extends BaseAlarmSetting {
 
 	public void setAckAlarmSetting(QPSAlarmSetting ackAlarmSetting) {
 		this.ackAlarmSetting = ackAlarmSetting;
+	}
+
+	public List<String> getTopicWhiteList() {
+		return topicWhiteList;
+	}
+
+	public void setTopicWhiteList(List<String> topicWhiteList) {
+		this.topicWhiteList = topicWhiteList;
 	}
 
 }

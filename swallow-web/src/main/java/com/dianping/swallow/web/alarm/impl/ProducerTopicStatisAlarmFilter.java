@@ -16,6 +16,7 @@ import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
+import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
@@ -43,6 +44,9 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
+	
+	@Autowired
+	private ProducerServerAlarmSettingService serverAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -72,7 +76,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 		}
 		ProducerBaseAlarmSetting producerAlarmSetting = topicAlarmSetting.getProducerAlarmSetting();
 		QPSAlarmSetting qps = producerAlarmSetting.getQpsAlarmSetting();
-		List<String> whiteList = topicAlarmSetting.getWhiteList();
+		List<String> whiteList = serverAlarmSettingService.getTopicWhiteList();
 		long delay = producerAlarmSetting.getDelay();
 		if (topicStatisDatas == null) {
 			return true;

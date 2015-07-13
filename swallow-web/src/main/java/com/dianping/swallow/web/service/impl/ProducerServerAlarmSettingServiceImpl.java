@@ -46,9 +46,9 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 	}
 
 	@Override
-	public List<String> getWhiteList() {
+	public List<String> getTopicWhiteList() {
 		ProducerServerAlarmSetting serverAlarmSetting = findOne();
-		return serverAlarmSetting.getWhiteList();
+		return serverAlarmSetting.getTopicWhiteList();
 	}
 	
 	@Override
