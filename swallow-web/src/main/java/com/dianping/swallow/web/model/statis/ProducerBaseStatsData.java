@@ -1,5 +1,10 @@
 package com.dianping.swallow.web.model.statis;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class ProducerBaseStatsData {
 
 	private long qpx;

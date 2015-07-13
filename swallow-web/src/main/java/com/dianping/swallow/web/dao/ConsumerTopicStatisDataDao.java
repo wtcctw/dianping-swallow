@@ -4,18 +4,25 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.statis.ConsumerTopicStatsData;
 
+/**
+ *
+ * @author qiyin
+ *
+ */
 public interface ConsumerTopicStatisDataDao {
 
-	public boolean insert(ConsumerTopicStatsData statisData);
+	boolean insert(ConsumerTopicStatsData statisData);
 
-	public boolean update(ConsumerTopicStatsData statisData);
+	boolean update(ConsumerTopicStatsData statisData);
 
-	public int deleteById(String id);
+	int deleteById(String id);
 
-	public ConsumerTopicStatsData findById(String id);
-	
-	public ConsumerTopicStatsData findByTimeKey(long timeKey);
-	
-	public List<ConsumerTopicStatsData> findByTopic(String topicName);
+	ConsumerTopicStatsData findById(String id);
+
+	ConsumerTopicStatsData findByTimeKey(long timeKey);
+
+	List<ConsumerTopicStatsData> findByTopic(String topicName);
+
+	List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
 
 }

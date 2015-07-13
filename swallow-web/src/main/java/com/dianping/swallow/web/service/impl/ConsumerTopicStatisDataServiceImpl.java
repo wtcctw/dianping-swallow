@@ -9,13 +9,17 @@ import com.dianping.swallow.web.dao.ConsumerTopicStatisDataDao;
 import com.dianping.swallow.web.model.statis.ConsumerTopicStatsData;
 import com.dianping.swallow.web.service.ConsumerTopicStatisDataService;
 
-
+/**
+ *
+ * @author qiyin
+ *
+ */
 @Service("consumerTopicStatisDataService")
 public class ConsumerTopicStatisDataServiceImpl implements ConsumerTopicStatisDataService {
 
 	@Autowired
 	private ConsumerTopicStatisDataDao consumerTopicStatisDataDao;
-	
+
 	@Override
 	public boolean insert(ConsumerTopicStatsData statisData) {
 		return consumerTopicStatisDataDao.insert(statisData);
@@ -46,4 +50,8 @@ public class ConsumerTopicStatisDataServiceImpl implements ConsumerTopicStatisDa
 		return consumerTopicStatisDataDao.findByTopic(topicName);
 	}
 
+	@Override
+	public List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
+		return consumerTopicStatisDataDao.findSectionData(topicName, startKey, endKey);
+	}
 }

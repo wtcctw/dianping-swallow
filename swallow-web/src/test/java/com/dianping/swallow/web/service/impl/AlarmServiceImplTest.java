@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.dao.impl.DefaultAlarmDao;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.HttpService;
 
 /**
@@ -13,31 +14,31 @@ import com.dianping.swallow.web.service.HttpService;
  *
  */
 public class AlarmServiceImplTest {
-	
-	static AlarmServiceImpl alarmService=null;
-	
+
+	static AlarmServiceImpl alarmService = null;
+
 	@BeforeClass
-	public static void beforeClass(){
+	public static void beforeClass() {
 		alarmService = new AlarmServiceImpl();
 		HttpService httpService = new HttpServiceImpl();
 		alarmService.setHttpService(httpService);
-		AlarmDao alarmDao =new DefaultAlarmDao();
+		AlarmDao alarmDao = new DefaultAlarmDao();
 		alarmService.setAlarmDao(alarmDao);
 	}
 
 	@Test
-	public void sendSmsTest(){
-		alarmService.sendSms("13162757679", "test");
+	public void sendSmsTest() {
+		alarmService.sendSms("13162757679", "test", "test", AlarmType.CRITICAL);
 	}
-	
+
 	@Test
-	public void sendMailTest(){
-		alarmService.sendMail("qi.yin@dianping.com", "test", "test");
+	public void sendMailTest() {
+		alarmService.sendMail("qi.yin@dianping.com", "test", "test", AlarmType.CRITICAL);
 	}
-	
+
 	@Test
-	public void sendWeiXinTest(){
-		alarmService.sendWeixin("qi.yin@dianping.com", "test", "test");
+	public void sendWeiXinTest() {
+		alarmService.sendWeixin("qi.yin@dianping.com", "test", "test", AlarmType.CRITICAL);
 	}
-	
+
 }

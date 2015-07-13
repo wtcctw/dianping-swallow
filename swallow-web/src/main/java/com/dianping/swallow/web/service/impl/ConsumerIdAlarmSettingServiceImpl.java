@@ -9,6 +9,11 @@ import com.dianping.swallow.web.dao.ConsumerIdAlarmSettingDao;
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("consumerIdAlarmSettingService")
 public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSettingService {
 
@@ -38,6 +43,15 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 	@Override
 	public List<ConsumerIdAlarmSetting> findAll() {
 		return consumerIdAlarmSettingDao.findAll();
+	}
+
+	@Override
+	public ConsumerIdAlarmSetting findOne() {
+		List<ConsumerIdAlarmSetting> consumerIdAlarmSettings = findAll();
+		if (consumerIdAlarmSettings == null || consumerIdAlarmSettings.size() == 0) {
+			return null;
+		}
+		return consumerIdAlarmSettings.get(0);
 	}
 
 }

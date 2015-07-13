@@ -3,8 +3,12 @@ package com.dianping.swallow.web.service;
 import java.util.List;
 
 import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
-import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface ProducerServerStatisDataService {
 	
 	public boolean insert(ProducerServerStatsData statisData);

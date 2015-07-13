@@ -86,5 +86,31 @@ public interface IPCollectorService {
 	 * clear consumerServerIps
 	 */
 	public void clearConsumerServerIps();
+	
+	/**
+	 * topic consumerId related ip
+	 * @return
+	 */
+	public Map<String,String> getTopicConsumerIdIps();
+	
+	/**
+	 * producer topic related ip
+	 * @return
+	 */
+	public Map<String,String> getProducerTopicIps();
+	
+	/**
+	 * get one swallow ip
+	 * @return
+	 */
+	public String getServerIp();
+	/**
+	 * topicConsumerIdIps' key
+	 * @param topic
+	 * @param consumerId
+	 * @return
+	 */
+	public String getTopicConsumerIdKey(String topic, String consumerId);
+	
 
 }

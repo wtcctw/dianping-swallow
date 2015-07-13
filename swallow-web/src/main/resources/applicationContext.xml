@@ -47,6 +47,7 @@
 			<mvc:mapping path="/console/message" />
 			<mvc:mapping path="/console/administrator" />
 			<mvc:mapping path="/console/download" />
+			<mvc:mapping path="/console/setting" />
 			<mvc:mapping path="/console/monitor/consumerserver/qps" />
 			<mvc:mapping path="/console/monitor/producerserver/qps" />
 			<mvc:mapping path="/console/monitor/consumer/*/qps" />

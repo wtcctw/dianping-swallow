@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.web.model.alarm.Alarm;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 
 /**
  *
@@ -16,10 +17,12 @@ public interface AlarmService {
 	 * sms alarm
 	 * 
 	 * @param mobile
+	 * @param title
 	 * @param body
+	 * @param type
 	 * @return
 	 */
-	public boolean sendSms(String mobile, String body);
+	public boolean sendSms(String mobile, String title, String body, AlarmType type);
 
 	/**
 	 * weiXin alarm
@@ -29,7 +32,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendWeixin(String email, String title, String content);
+	public boolean sendWeixin(String email, String title, String content, AlarmType type);
 
 	/**
 	 * mail alarm
@@ -39,7 +42,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendMail(String email, String title, String content);
+	public boolean sendMail(String email, String title, String content, AlarmType type);
 
 	/**
 	 * send sms weiXin mail
@@ -48,7 +51,7 @@ public interface AlarmService {
 	 * @param title
 	 * @param message
 	 */
-	public void sendAll(String ip, String title, String message);
+	public void sendAll(String ip, String title, String message, AlarmType type);
 
 	/**
 	 * insert

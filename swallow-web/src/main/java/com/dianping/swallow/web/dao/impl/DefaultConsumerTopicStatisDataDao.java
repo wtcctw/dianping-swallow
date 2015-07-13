@@ -13,6 +13,11 @@ import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.statis.ConsumerTopicStatsData;
 import com.mongodb.WriteResult;
 
+/**
+ *
+ * @author qiyin
+ *
+ */
 @Service("consumerTopicStatisDataDao")
 public class DefaultConsumerTopicStatisDataDao extends AbstractWriteDao implements ConsumerTopicStatisDataDao {
 
@@ -68,6 +73,15 @@ public class DefaultConsumerTopicStatisDataDao extends AbstractWriteDao implemen
 	@Override
 	public List<ConsumerTopicStatsData> findByTopic(String topicName) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
+		List<ConsumerTopicStatsData> topicStatisDatas = mongoTemplate.find(query, ConsumerTopicStatsData.class,
+				TOPICSTATISDATA_COLLECTION);
+		return topicStatisDatas;
+	}
+
+	@Override
+	public List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)
+				.and(TIMEKEY_FIELD).lte(endKey));
 		List<ConsumerTopicStatsData> topicStatisDatas = mongoTemplate.find(query, ConsumerTopicStatsData.class,
 				TOPICSTATISDATA_COLLECTION);
 		return topicStatisDatas;

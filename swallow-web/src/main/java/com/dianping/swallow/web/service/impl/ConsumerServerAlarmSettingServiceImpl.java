@@ -9,6 +9,11 @@ import com.dianping.swallow.web.dao.ConsumerServerAlarmSettingDao;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("consumerServerAlarmSettingService")
 public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlarmSettingService {
 
@@ -39,6 +44,25 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 	@Override
 	public List<ConsumerServerAlarmSetting> findAll() {
 		return consumerServerAlarmSettingDao.findAll();
+	}
+
+	@Override
+	public List<String> getWhiteList() {
+		List<ConsumerServerAlarmSetting> serverAlarmSettings = findAll();
+		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
+			return null;
+		}
+		ConsumerServerAlarmSetting serverAlarmSetting = serverAlarmSettings.get(0);
+		return serverAlarmSetting.getWhiteList();
+	}
+	
+	@Override
+	public ConsumerServerAlarmSetting findOne(){
+		List<ConsumerServerAlarmSetting> serverAlarmSettings = findAll();
+		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
+			return null;
+		}
+		return serverAlarmSettings.get(0);
 	}
 
 }

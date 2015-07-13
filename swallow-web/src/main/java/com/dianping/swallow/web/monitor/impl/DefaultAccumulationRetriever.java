@@ -392,4 +392,15 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		}
 	}
 
+	public NavigableMap<Long, Long> getConsumerIdAccumulation(String topic, String consumerId) {
+		TopicAccumulation topicAccumulation = topics.get(topic);
+		if (topicAccumulation == null) {
+			return null;
+		}
+		ConsumerIdAccumulation consumerIdAccumulation = topicAccumulation.consumers().get(consumerId);
+		if (consumerIdAccumulation == null) {
+			return null;
+		}
+		return consumerIdAccumulation.getAccumulations(getSampleIntervalCount());
+	}
 }

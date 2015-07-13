@@ -2,6 +2,11 @@ package com.dianping.swallow.web.model.statis;
 
 import java.util.List;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class ProducerClientStatsData {
 	
 	private ProducerBaseStatsData statisData;

@@ -9,7 +9,11 @@ import com.dianping.swallow.web.dao.TopicStatisDataDao;
 import com.dianping.swallow.web.model.statis.TopicStatsData;
 import com.dianping.swallow.web.service.TopicStatisDataService;
 
-
+/**
+*
+* @author qiyin
+*
+*/
 @Service("topicStatisDataService")
 public class TopicStatisDataServiceImpl implements TopicStatisDataService {
 

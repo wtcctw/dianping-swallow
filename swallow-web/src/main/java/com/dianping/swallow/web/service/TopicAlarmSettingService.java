@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface TopicAlarmSettingService {
 
 	public boolean insert(TopicAlarmSetting setting);
@@ -15,4 +20,6 @@ public interface TopicAlarmSettingService {
 	public TopicAlarmSetting findById(String id);
 	
 	public List<TopicAlarmSetting> findAll();
+
+	TopicAlarmSetting findOne();
 }

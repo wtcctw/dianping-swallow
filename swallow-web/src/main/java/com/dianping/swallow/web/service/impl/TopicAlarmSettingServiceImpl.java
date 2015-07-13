@@ -9,12 +9,16 @@ import com.dianping.swallow.web.dao.TopicAlarmSettingDao;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("topicAlarmSettingService")
 public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
-	
+
 	@Autowired
 	private TopicAlarmSettingDao topicAlarmSettingDao;
-	
 
 	@Override
 	public boolean insert(TopicAlarmSetting setting) {
@@ -39,6 +43,15 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 	@Override
 	public List<TopicAlarmSetting> findAll() {
 		return topicAlarmSettingDao.findAll();
+	}
+
+	@Override
+	public TopicAlarmSetting findOne() {
+		List<TopicAlarmSetting> topicAlarmSetting = topicAlarmSettingDao.findAll();
+		if (topicAlarmSetting == null || topicAlarmSetting.size() == 0) {
+			return null;
+		}
+		return topicAlarmSetting.get(0);
 	}
 
 }

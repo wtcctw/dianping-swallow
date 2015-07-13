@@ -6,6 +6,11 @@ import java.util.Map;
 
 import com.dianping.swallow.web.model.alarm.Alarm;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface AlarmDao extends Dao {
 
 	/**

@@ -7,6 +7,11 @@ import com.dianping.swallow.web.dao.ConsumerServerStatisDataDao;
 import com.dianping.swallow.web.model.statis.ConsumerServerStatsData;
 import com.dianping.swallow.web.service.ConsumerServerStatisDataService;
 
+/**
+*
+* @author qiyin
+*
+*/
 @Service("consumerServerStatisDataService")
 public class ConsumerServerStatisDataServiceImpl implements ConsumerServerStatisDataService {
 

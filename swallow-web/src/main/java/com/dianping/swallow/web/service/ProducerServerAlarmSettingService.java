@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface ProducerServerAlarmSettingService {
 
 	public boolean insert(ProducerServerAlarmSetting setting);
@@ -15,5 +20,9 @@ public interface ProducerServerAlarmSettingService {
 	public ProducerServerAlarmSetting findById(String id);
 
 	public List<ProducerServerAlarmSetting> findAll();
+	
+	public List<String> getWhiteList();
+
+	ProducerServerAlarmSetting findOne();
 	
 }

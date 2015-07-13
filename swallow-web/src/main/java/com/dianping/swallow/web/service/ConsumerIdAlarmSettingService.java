@@ -4,6 +4,11 @@ import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 
+/**
+*
+* @author qiyin
+*
+*/
 public interface ConsumerIdAlarmSettingService {
 
 	public boolean insert(ConsumerIdAlarmSetting setting);
@@ -15,4 +20,6 @@ public interface ConsumerIdAlarmSettingService {
 	public ConsumerIdAlarmSetting findById(String id);
 
 	public List<ConsumerIdAlarmSetting> findAll();
+
+	ConsumerIdAlarmSetting findOne();
 }
