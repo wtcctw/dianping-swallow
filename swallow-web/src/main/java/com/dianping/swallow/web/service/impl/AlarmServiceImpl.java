@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -17,11 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.AlarmDao;
-import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.SendType;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.util.NetUtil;
@@ -43,8 +43,6 @@ public class AlarmServiceImpl implements AlarmService {
 	private static final String WEIXIN_KEY = "weiXin";
 	private static final String SMS_KEY = "sms";
 
-	private static final String RECIEVER_SPLIT = ",";
-
 	private String mailUrl;
 	private String smsUrl;
 	private String weiXinUrl;
@@ -54,9 +52,6 @@ public class AlarmServiceImpl implements AlarmService {
 
 	@Autowired
 	private HttpService httpService;
-
-	@Autowired
-	private IPDescManager ipDescManager;
 
 	public AlarmServiceImpl() {
 		try {
@@ -88,6 +83,9 @@ public class AlarmServiceImpl implements AlarmService {
 
 	@Override
 	public boolean sendSms(String mobile, String title, String body, AlarmType type) {
+		if (StringUtils.isBlank(mobile)) {
+			return true;
+		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("mobile", mobile));
 		params.add(new BasicNameValuePair("body", "[" + title + "]" + body));
@@ -98,7 +96,10 @@ public class AlarmServiceImpl implements AlarmService {
 	}
 
 	@Override
-	public boolean sendWeixin(String email, String title, String content, AlarmType type) {
+	public boolean sendWeiXin(String email, String title, String content, AlarmType type) {
+		if (StringUtils.isBlank(email)) {
+			return true;
+		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("email", email));
 		params.add(new BasicNameValuePair("title", title));
@@ -111,6 +112,9 @@ public class AlarmServiceImpl implements AlarmService {
 
 	@Override
 	public boolean sendMail(String email, String title, String content, AlarmType type) {
+		if (StringUtils.isBlank(email)) {
+			return true;
+		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("recipients", email));
@@ -121,35 +125,38 @@ public class AlarmServiceImpl implements AlarmService {
 		return result;
 	}
 
-	@Override
-	public void sendAll(String ip, String title, String message, AlarmType type) {
-		IPDesc ipDesc = ipDescManager.getIPDesc(ip);
-		if (ipDesc != null) {
-			if (StringUtils.isNotBlank(ipDesc.getDpMobile())) {
-				String[] mobiles = StringUtils.split(ipDesc.getDpMobile(), RECIEVER_SPLIT);
-				for (String mobile : mobiles) {
-					if (StringUtils.isBlank(mobile)) {
-						continue;
-					}
-					sendSms(mobile, title, message, type);
-				}
+	public boolean sendSms(Set<String> mobiles, String title, String message, AlarmType type) {
+		if (mobiles != null) {
+			Iterator<String> iterator = mobiles.iterator();
+			while (iterator.hasNext()) {
+				String mobile = iterator.next();
+				sendSms(mobile, title, message, type);
 			}
-			if (StringUtils.isNotBlank(ipDesc.getEmail())) {
-				String[] emails = StringUtils.split(ipDesc.getEmail(), RECIEVER_SPLIT);
-				for (String email : emails) {
-					if (StringUtils.isBlank(email)) {
-						continue;
-					}
-					sendWeixin(ipDesc.getEmail(), title, message, type);
-					sendMail(ipDesc.getEmail(), title, message, type);
-				}
-			}
-
-		} else {
-			logger.error("[doCheckPort] cannot find ipDesc info.");
 		}
+		return true;
+	}
+	
+	public boolean sendMail(Set<String> emails, String title, String message, AlarmType type){
+		if (emails != null) {
+			Iterator<String> iterator = emails.iterator();
+			while (iterator.hasNext()) {
+				String email = iterator.next();
+				sendMail(email, title, message, type);
+			}
+		}
+		return true;
 	}
 
+	public boolean sendWeiXin(Set<String> emails, String title, String message, AlarmType type){
+		if (emails != null) {
+			Iterator<String> iterator = emails.iterator();
+			while (iterator.hasNext()) {
+				String email = iterator.next();
+				sendWeiXin(email, title, message, type);
+			}
+		}
+		return true;
+	}
 	public String getMailUrl() {
 		return mailUrl;
 	}

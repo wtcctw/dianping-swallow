@@ -4,6 +4,8 @@ import java.util.List;
 
 public class ConsumerServerAlarmSetting extends BaseAlarmSetting {
 
+	private String serverId;
+	
 	private List<String> topicWhiteList;
 
 	private QPSAlarmSetting senderAlarmSetting;
@@ -32,6 +34,14 @@ public class ConsumerServerAlarmSetting extends BaseAlarmSetting {
 
 	public void setTopicWhiteList(List<String> topicWhiteList) {
 		this.topicWhiteList = topicWhiteList;
+	}
+
+	public String getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(String serverId) {
+		this.serverId = serverId;
 	}
 
 }

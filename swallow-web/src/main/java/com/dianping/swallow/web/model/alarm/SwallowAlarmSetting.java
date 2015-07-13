@@ -4,6 +4,8 @@ import java.util.List;
 
 public class SwallowAlarmSetting extends BaseAlarmSetting{
 	
+	private String swallowId;
+	
 	private List<String> producerWhiteList;
 	
 	private List<String> consumerWhiteList;
@@ -22,6 +24,14 @@ public class SwallowAlarmSetting extends BaseAlarmSetting{
 
 	public void setConsumerWhiteList(List<String> consumerWhiteList) {
 		this.consumerWhiteList = consumerWhiteList;
+	}
+
+	public String getSwallowId() {
+		return swallowId;
+	}
+
+	public void setSwallowId(String swallowId) {
+		this.swallowId = swallowId;
 	}
 
 }

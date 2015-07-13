@@ -76,41 +76,51 @@ public interface IPCollectorService {
 	 * @return
 	 */
 	public Map<String, String> getCmdbConsumerMasters();
-	
+
 	/**
 	 * clear producerServerIps
 	 */
 	public void clearProducerServerIps();
-	
+
 	/**
 	 * clear consumerServerIps
 	 */
 	public void clearConsumerServerIps();
-	
+
 	/**
 	 * topic consumerId related ip
+	 * 
 	 * @return
 	 */
-	public Map<String,String> getTopicConsumerIdIps();
-	
+	public Set<String> getTopicConsumerIdIps(String topicName, String consumerId);
+
 	/**
 	 * producer topic related ip
+	 * 
 	 * @return
 	 */
-	public Map<String,String> getProducerTopicIps();
+	public Set<String> getProducerTopicIps(String topicName);
+
+	/**
+	 * get one swallow producer server ip
+	 * 
+	 * @return
+	 */
+	public String getProducerServerIp();
 	
 	/**
-	 * get one swallow ip
+	 * get one swallow consumer server ip
+	 * 
 	 * @return
 	 */
-	public String getServerIp();
+	public String getConsumerServerIp();
 	/**
 	 * topicConsumerIdIps' key
+	 * 
 	 * @param topic
 	 * @param consumerId
 	 * @return
 	 */
 	public String getTopicConsumerIdKey(String topic, String consumerId);
-	
 
 }
