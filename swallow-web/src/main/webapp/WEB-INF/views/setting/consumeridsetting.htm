@@ -56,54 +56,17 @@
 						<form method="post" class="form-horizontal" name="myForm"
 							ng-submit="refreshpage(myForm)">
 							<div class="control-group">
-								<label class="control-label">白名单</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<input class="form-control" name="whiteList"
-										ng-model="consumeridEntry.whiteList" data-provide="typeahead"
-										id="whiteList" autocomplete="off"> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">发送延迟</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<input type="text" class="form-control"
-										ng-model="consumeridEntry.senderdelay" name="senderdelay"
-										required> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">确认延迟</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<input type="text" class="form-control"
-										ng-model="consumeridEntry.ackdelay" name="ackdelay" required>
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">消息堆积</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<input type="text" class="form-control"
-										ng-model="consumeridEntry.accumulation" name="accumulation"
-										required> </input>
-								</div>
-							</div>
-							<div class="control-group">
 								<label class="control-label">发送QPS</label>
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;">
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text" id="form-field-icon-1" /> <label
+											class="col-sm-2" type="text" ng-model="consumeridEntry.sendpeak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" id="form-field-icon-2" /> <label
+											class="col-sm-2" ng-model="consumeridEntry.sendvalley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" id="form-field-icon-3" />
+											class="col-sm-2" ng-model="consumeridEntry.sendfluctuation" />
 									</div>
-
 								</div>
 							</div>
 							<div class="control-group">
@@ -112,13 +75,38 @@
 									style="margin-right: 39px; margin-left: 0px;">
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text" id="form-field-icon-1" /> <label
+											class="col-sm-2" type="text" ng-model="consumeridEntry.ackpeak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" id="form-field-icon-2" /> <label
+											class="col-sm-2" ng-model="consumeridEntry.ackvalley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" id="form-field-icon-3" />
+											class="col-sm-2" ng-model="consumeridEntry.ackfluctuation" />
 									</div>
-
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">发送延迟</label>
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px; width: 50%;">
+									<input type="text" class="form-control"
+										ng-model="consumeridEntry.senddelay" name="senddelay"
+										required> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">确认延迟</label>
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<input type="text" class="form-control"
+										ng-model="consumeridEntry.ackdelay" name="ackdelay" required>
+									</input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label">消息堆积</label> <input type="text"
+										class="form-control" ng-model="consumeridEntry.accumulation"
+										name="accumulation" required> </input>
 								</div>
 							</div>
 							<div class="control-group" style="margin-top: 40px">

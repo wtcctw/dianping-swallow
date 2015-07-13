@@ -1,51 +1,97 @@
 package com.dianping.swallow.web.controller.dto;
 
-import java.util.Date;
 
 public class ConsumerIdAlarmSettingDto {
 	
-	private String whiteList;
+	private long sendpeak;
 	
-	private long peak;
+	private long sendvalley;
+
+	private int sendfluctuation;
+
+	private long ackpeak;
 	
-	private long valley;
-
-	private int fluctuation;
+	private long ackvalley;
 	
-	private String date;
+	private int ackfluctuation;
+
+	private long senddelay;
 	
-	public String getWhiteList() {
-		return whiteList;
+	private long ackdelay;
+	
+	private long accumulation;
+
+	public long getSendpeak() {
+		return sendpeak;
 	}
 
-	public void setWhiteList(String whiteList) {
-		this.whiteList = whiteList;
+	public void setSendpeak(long sendpeak) {
+		this.sendpeak = sendpeak;
 	}
 
-	public long getPeak() {
-		return peak;
+	public long getSendvalley() {
+		return sendvalley;
 	}
 
-	public void setPeak(long peak) {
-		this.peak = peak;
+	public void setSendvalley(long sendvalley) {
+		this.sendvalley = sendvalley;
 	}
 
-	public long getValley() {
-		return valley;
+	public int getSendfluctuation() {
+		return sendfluctuation;
 	}
 
-	public void setValley(long valley) {
-		this.valley = valley;
+	public void setSendfluctuation(int sendfluctuation) {
+		this.sendfluctuation = sendfluctuation;
 	}
 
-	public int getFluctuation() {
-		return fluctuation;
+	public long getAckpeak() {
+		return ackpeak;
 	}
 
-	public void setFluctuation(int fluctuation) {
-		this.fluctuation = fluctuation;
+	public void setAckpeak(long ackpeak) {
+		this.ackpeak = ackpeak;
 	}
 
+	public long getAckvalley() {
+		return ackvalley;
+	}
 
+	public void setAckvalley(long ackvalley) {
+		this.ackvalley = ackvalley;
+	}
+
+	public int getAckfluctuation() {
+		return ackfluctuation;
+	}
+
+	public void setAckfluctuation(int ackfluctuation) {
+		this.ackfluctuation = ackfluctuation;
+	}
+
+	public long getSenddelay() {
+		return senddelay;
+	}
+
+	public void setSenddelay(long senddelay) {
+		this.senddelay = senddelay;
+	}
+
+	public long getAckdelay() {
+		return ackdelay;
+	}
+
+	public void setAckdelay(long ackdelay) {
+		this.ackdelay = ackdelay;
+	}
+
+	public long getAccumulation() {
+		return accumulation;
+	}
+
+	public void setAccumulation(long accumulation) {
+		this.accumulation = accumulation;
+	}
+	
 
 }

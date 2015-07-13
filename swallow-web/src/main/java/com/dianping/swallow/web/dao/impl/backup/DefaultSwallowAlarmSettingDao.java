@@ -9,7 +9,7 @@ import com.dianping.swallow.web.dao.impl.AbstractWriteDao;
 import com.dianping.swallow.web.model.alarm.backup.SwallowAlarmSetting;
 
 
-@Service("swallowAlarmSettingDao")
+//@Service("swallowAlarmSettingDao")
 public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements SwallowAlarmSettingDao {
 
 	@Override

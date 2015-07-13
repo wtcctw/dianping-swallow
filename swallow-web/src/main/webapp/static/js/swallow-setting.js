@@ -1,5 +1,5 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize, topic){
+	return function(fetchFunction, pageSize){
 		var paginator = {
 				hasNextVar: false,
 				fetch: function(page){
@@ -15,7 +15,7 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, topic, function(data){
+					fetchFunction(this.currentOffset, pageSize + 1, function(data){
 						items = data.message;
 						length = data.size;
 						if(length == 0){
@@ -42,13 +42,6 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
-						for(var i = 0; i < self.currentPageItems.length; ++i){
-							if(self.currentPageItems[i].finished){
-								self.currentPageItems[i].finished = "已导出";
-							}else{
-								self.currentPageItems[i].finished = "导出中";
-							}
-						}
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -82,7 +75,7 @@ module.factory('Paginator', function(){
 
 module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog','$interval',
                 function($rootScope, $scope, $http, Paginator, ngDialog,$interval){
-	var fetchFunction = function(offset, limit, name, callback){
+	var fetchFunction = function(offset, limit, callback){
 		var transFn = function(data){
 			return $.param(data);
 		}
@@ -90,16 +83,19 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 				transformRequest: transFn
 		};
 		var data = {'offset' : offset,
-								'limit': limit,
-								'topic': name};
+								'limit': limit};
 		$http.get(window.contextPath + $scope.suburl, {
 			params : {
 				offset : offset,
-				limit : limit,
-				topic: name
+				limit : limit
 			}
 		}).success(callback);
 	};
+	
+	$scope.suburl = "/console/setting/consumerid/list";
+	$scope.numrecord = 30;
+	
+	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
 	
 	//for whitelist
 	$http({
@@ -117,13 +113,17 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 	});
 	
 	$scope.consumeridEntry = {};
-	$scope.consumeridEntry.peak = 0;
-	$scope.consumeridEntry.valley = 0;
-	$scope.consumeridEntry.fluctuation = 0;
-	$scope.consumeridEntry.whitelist = "";
+	$scope.consumeridEntry.sendlelay;
+	$scope.consumeridEntry.ackdelay;
+	$scope.consumeridEntry.accumulation;
+	$scope.consumeridEntry.sendpeak;
+	$scope.consumeridEntry.sendvalley;
+	$scope.consumeridEntry.sendfluctuation;
+	$scope.consumeridEntry.ackpeak;
+	$scope.consumeridEntry.ackvalley;
+	$scope.consumeridEntry.ackfluctuation;
 	$scope.refreshpage = function(myForm){
 		$('#myModal').modal('hide');
-    	$scope.consumeridEntry.whitelist = $("#whitelist").val();
 //    	$http.post(window.contextPath + '/console/setting/consumerid/create', {"peak":$scope.peak, 
 //    		"valley":$scope.vallely, "fluctuation":$scope.fluctuation, "whitelist":$scope.whitelist})
 //    		.success(function(response) {

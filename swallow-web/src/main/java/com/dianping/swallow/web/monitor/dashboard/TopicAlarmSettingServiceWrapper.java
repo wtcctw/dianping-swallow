@@ -22,7 +22,7 @@ public class TopicAlarmSettingServiceWrapper {
 	@Resource(name = "topicAlarmSettingService")
 	private TopicAlarmSettingService topicAlarmSettingService;
 	
-	public ConsumerBaseAlarmSetting loadConsumerBaseAlarmSetting(String topic){
+	public ConsumerBaseAlarmSetting loadConsumerBaseAlarmSetting(String consumerId){
 		
 		List<TopicAlarmSetting> topicAlarmSettings = topicAlarmSettingService.findAll();
 		TopicAlarmSetting topicAlarmSetting;
@@ -32,14 +32,25 @@ public class TopicAlarmSettingServiceWrapper {
 		else{
 			return new ConsumerBaseAlarmSetting();
 		}
-		List<String> whiteList = topicAlarmSetting.getWhiteList();
-		if(whiteList.contains(topic)){
-			return new ConsumerBaseAlarmSetting();
+		List<String> whiteList = topicAlarmSetting.getConsumerIdWhiteList();
+		if(whiteList.contains(consumerId)){
+			return loadConsumerBaseAlarmSettingWithMaxValue();
+			
 		}
 		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSetting.getConsumerAlarmSetting();
 		if(consumerBaseAlarmSetting == null){
 			consumerBaseAlarmSetting = new ConsumerBaseAlarmSetting();
 		}
+		return consumerBaseAlarmSetting;
+	}
+	
+	private ConsumerBaseAlarmSetting loadConsumerBaseAlarmSettingWithMaxValue(){
+		
+		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = new ConsumerBaseAlarmSetting();
+		
+		consumerBaseAlarmSetting.setAccumulation(Integer.MAX_VALUE);
+		consumerBaseAlarmSetting.setSenderDelay(Integer.MAX_VALUE);
+		consumerBaseAlarmSetting.setAckDelay(Integer.MAX_VALUE);
 		return consumerBaseAlarmSetting;
 	}
 	

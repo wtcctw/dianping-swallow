@@ -57,11 +57,6 @@ public class AlarmSettingController extends AbstractSidebarBasedController {
 
 	}
 
-	@RequestMapping(value = "/console/setting")
-	public ModelAndView mainSetting(HttpServletRequest request, HttpServletResponse response) {
-		return producerSetting(request, response);
-	}
-
 	@RequestMapping(value = "/console/setting/producerserver")
 	public ModelAndView producerSetting(HttpServletRequest request, HttpServletResponse response) {
 
@@ -82,13 +77,6 @@ public class AlarmSettingController extends AbstractSidebarBasedController {
 		return new ModelAndView("setting/topicsetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/consumerid")
-	public ModelAndView consumerIdSetting(HttpServletRequest request, HttpServletResponse response) {
-
-		subSide = "consumerid";
-		return new ModelAndView("setting/consumeridsetting", createViewMap());
-	}
-
 	@RequestMapping(value = "/console/setting/producerserver/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public void producerSettingCreatePost(@RequestBody ProducerServerAlarmSettingDto dto) {
@@ -104,18 +92,6 @@ public class AlarmSettingController extends AbstractSidebarBasedController {
 	public void producerSettingUpdatePost(@RequestBody ProducerServerAlarmSettingDto dto) {
 		ProducerServerAlarmSetting alarmSetting = ProducerServerAlarmSettingMapper.toProducerServerAlarmSetting(dto);
 		producerServerAlarmSettingService.update(alarmSetting);
-	}
-
-	@RequestMapping(value = "/console/setting/consumerid/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public void comsumeridSettingCreate(@RequestBody ConsumerIdAlarmSettingDto dto) {
-//		public void comsumeridSettingCreate(@RequestParam(value = "whitelist") String whitelist,
-//				@RequestParam(value = "peak") String peak, @RequestParam(value = "valley") String valley,
-//				@RequestParam(value = "fluctuate") String fluctuate, HttpServletRequest request,
-//				HttpServletResponse response) {
-		
-		ConsumerIdAlarmSetting consumerIdAlarmSetting = ConsumerIdAlarmSettingMapper.toConsumerIdAlarmSetting(dto);
-		consumerIdAlarmSettingService.update(consumerIdAlarmSetting);
 	}
 
 	@Override

@@ -1,14 +1,8 @@
 package com.dianping.swallow.web.controller.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.codehaus.plexus.util.StringUtils;
-
 import com.dianping.swallow.web.controller.dto.ConsumerIdAlarmSettingDto;
-import com.dianping.swallow.web.controller.dto.ProducerServerAlarmSettingDto;
+import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
-import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 
 
@@ -19,53 +13,52 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
  */
 public class ConsumerIdAlarmSettingMapper {
 	
-	private static final String WHITELIST_SPLIT = ",";
-	
 	public static ConsumerIdAlarmSetting toConsumerIdAlarmSetting(ConsumerIdAlarmSettingDto dto) {
+		
 		ConsumerIdAlarmSetting alarmSetting = new ConsumerIdAlarmSetting();
-		List<String> whiteList = null;
-		if (dto.getWhiteList() != null) {
-			whiteList = new ArrayList<String>();
-			String strWhiteArr[] = dto.getWhiteList().split(WHITELIST_SPLIT);
-			for (String whiteName : strWhiteArr) {
-				if (StringUtils.isNotBlank(whiteName)) {
-					whiteList.add(whiteName);
-				}
-			}
-		}
-		alarmSetting.setWhiteList(whiteList);
-		alarmSetting.setCreateTime(dto.getCreateTime());
-		alarmSetting.setUpdateTime(dto.getCreateTime());
-		QPSAlarmSetting qps = new QPSAlarmSetting();
-		qps.setPeak(dto.getPeak());
-		qps.setValley(dto.getValley());
-		qps.setFluctuation(dto.getFluctuation());
-		alarmSetting.setDefaultAlarmSetting(qps);
+		
+		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = new ConsumerBaseAlarmSetting();
+		
+		QPSAlarmSetting sendQPSAlarmSetting = new QPSAlarmSetting();
+		
+		sendQPSAlarmSetting.setPeak(dto.getSendpeak());
+		sendQPSAlarmSetting.setValley(dto.getSendvalley());
+		sendQPSAlarmSetting.setFluctuation(dto.getSendfluctuation());
+		consumerBaseAlarmSetting.setSenderQpsAlarmSetting(sendQPSAlarmSetting);
+		
+		QPSAlarmSetting ackQPSAlarmSetting = new QPSAlarmSetting();
+		
+		ackQPSAlarmSetting.setPeak(dto.getAckpeak());
+		ackQPSAlarmSetting.setValley(dto.getAckvalley());
+		ackQPSAlarmSetting.setFluctuation(dto.getAckfluctuation());
+		consumerBaseAlarmSetting.setAckQpsAlarmSetting(ackQPSAlarmSetting);
+		
+		consumerBaseAlarmSetting.setSenderDelay(dto.getSenddelay());
+		consumerBaseAlarmSetting.setAckDelay(dto.getAckdelay());
+		consumerBaseAlarmSetting.setAccumulation(dto.getAccumulation());
+		
+		alarmSetting.setConsumerAlarmSetting(consumerBaseAlarmSetting);
 		return alarmSetting;
 	}
 
-	public static ProducerServerAlarmSettingDto toProducerServerAlarmSettingDto(ProducerServerAlarmSetting alarmSetting) {
-		ProducerServerAlarmSettingDto dto = new ProducerServerAlarmSettingDto();
-		StringBuilder strWhiteBuilder = new StringBuilder();
-		if (alarmSetting.getWhiteList() != null) {
-			for (String whiteName : alarmSetting.getWhiteList()) {
-				if (StringUtils.isNotBlank(whiteName)) {
-					strWhiteBuilder.append(whiteName).append(WHITELIST_SPLIT);
-				}
-			}
-		}
-		String strWhite = strWhiteBuilder.toString();
-		if (strWhite.length() > 0) {
-			strWhite = strWhite.substring(0, strWhite.length());
-		}
-		dto.setWhiteList(strWhite);
-		dto.setCreateTime(alarmSetting.getCreateTime());
-		dto.setUpdateTime(alarmSetting.getCreateTime());
-		if (alarmSetting.getDefaultAlarmSetting() != null) {
-			dto.setPeak(alarmSetting.getDefaultAlarmSetting().getPeak());
-			dto.setValley(alarmSetting.getDefaultAlarmSetting().getValley());
-			dto.setFluctuation(alarmSetting.getDefaultAlarmSetting().getFluctuation());
-		}
+	public static ConsumerIdAlarmSettingDto toConsumerIdAlarmSettingDto(ConsumerIdAlarmSetting alarmSetting) {
+		
+		ConsumerIdAlarmSettingDto dto = new ConsumerIdAlarmSettingDto();
+		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = alarmSetting.getConsumerAlarmSetting();
+		
+		QPSAlarmSetting sendQPSAlarmSetting = consumerBaseAlarmSetting.getSenderQpsAlarmSetting();
+		dto.setSendpeak(sendQPSAlarmSetting.getPeak());
+		dto.setSendvalley(sendQPSAlarmSetting.getValley());
+		dto.setSendfluctuation(sendQPSAlarmSetting.getFluctuation());
+		
+		QPSAlarmSetting ackQPSAlarmSetting = consumerBaseAlarmSetting.getAckQpsAlarmSetting();
+		dto.setAckpeak(ackQPSAlarmSetting.getPeak());
+		dto.setAckvalley(ackQPSAlarmSetting.getValley());
+		dto.setAckfluctuation(ackQPSAlarmSetting.getFluctuation());
+		
+		dto.setSenddelay(consumerBaseAlarmSetting.getSenderDelay());
+		dto.setAckdelay(consumerBaseAlarmSetting.getAckDelay());
+		dto.setAccumulation(consumerBaseAlarmSetting.getAccumulation());
 		return dto;
 	}
 
