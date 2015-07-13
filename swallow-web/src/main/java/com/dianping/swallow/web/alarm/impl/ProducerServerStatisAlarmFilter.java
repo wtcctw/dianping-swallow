@@ -53,8 +53,6 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	@Override
 	public void achieveMonitorData() {
 		dataCount.incrementAndGet();
-		serverStatisData = producerDataWapper.getServerStatsData(lastTimeKey.get());
-		storageServerStats();
 	}
 
 	@Override
@@ -94,12 +92,6 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 			}
 		}
 		return true;
-	}
-
-	private void storageServerStats() {
-		if (serverStatisData != null) {
-			serverStatisDataService.insert(serverStatisData);
-		}
 	}
 
 }

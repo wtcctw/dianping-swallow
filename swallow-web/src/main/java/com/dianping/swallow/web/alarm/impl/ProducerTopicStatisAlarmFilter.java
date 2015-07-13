@@ -53,7 +53,6 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	@Override
 	public void achieveMonitorData() {
 		dataCount.incrementAndGet();
-		storageTopicStatis();
 	}
 
 	@Override
@@ -64,13 +63,6 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 			return topicAlarm();
 		}
 		return true;
-	}
-
-	private void storageTopicStatis() {
-		if (topicStatisDatas != null) {
-			for (ProducerTopicStatsData producerTopicStatisData : topicStatisDatas)
-				topicStatisDataService.insert(producerTopicStatisData);
-		}
 	}
 
 	public boolean topicAlarm() {
