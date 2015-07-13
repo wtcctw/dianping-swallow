@@ -44,7 +44,7 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
-	
+
 	@Autowired
 	private ConsumerServerAlarmSettingService serverAlarmSettingService;
 

@@ -44,7 +44,8 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 	public List<TopicAlarmSetting> findAll() {
 		return topicAlarmSettingDao.findAll();
 	}
-
+	
+	@Override
 	public List<String> getConsumerIdWhiteList() {
 		TopicAlarmSetting topicAlarmSetting = findOne();
 		if (topicAlarmSetting == null) {
