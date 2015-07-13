@@ -3,6 +3,8 @@ package com.dianping.swallow.web.model.alarm;
 import java.util.List;
 
 public class TopicAlarmSetting extends BaseAlarmSetting {
+	
+	private String topicName;
 
 	private List<String> consumerIdWhiteList;
 
@@ -32,6 +34,14 @@ public class TopicAlarmSetting extends BaseAlarmSetting {
 
 	public void setConsumerIdWhiteList(List<String> consumerIdWhiteList) {
 		this.consumerIdWhiteList = consumerIdWhiteList;
+	}
+
+	public String getTopicName() {
+		return topicName;
+	}
+
+	public void setTopicName(String topicName) {
+		this.topicName = topicName;
 	}
 
 }

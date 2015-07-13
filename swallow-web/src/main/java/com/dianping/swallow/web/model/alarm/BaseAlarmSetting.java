@@ -9,8 +9,6 @@ public class BaseAlarmSetting {
 	@Id
 	private String id;
 	
-	private String name;
-	
 	private Date createTime;
 	
 	private Date updateTime;
@@ -37,14 +35,6 @@ public class BaseAlarmSetting {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 }

@@ -60,17 +60,15 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private Set<String> producerServerIps = new ConcurrentSkipListSet<String>();
 
-	private Map<String, String> cmdbProducers = new ConcurrentHashMap<String, String>();
+	private volatile Map<String, String> cmdbProducers = new ConcurrentHashMap<String, String>();
 
-	private Map<String, String> cmdbConsumerSlaves = new ConcurrentHashMap<String, String>();
+	private volatile Map<String, String> cmdbConsumerSlaves = new ConcurrentHashMap<String, String>();
 
-	private Map<String, String> cmdbConsumerMasters = new ConcurrentHashMap<String, String>();
+	private volatile Map<String, String> cmdbConsumerMasters = new ConcurrentHashMap<String, String>();
 
-	private Map<String, String> topicConsumerIdIps = new ConcurrentHashMap<String, String>();
-
-	private Map<String, String> producerTopicIps = new ConcurrentHashMap<String, String>();
-
-	private String serverIp;
+	private String producerServerIp;
+	
+	private String consumerServerIp;
 
 	@Autowired
 	private CmdbService cmdbService;
@@ -111,29 +109,29 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		List<EnvDevice> producerEnvDevices = cmdbService.getEnvDevices(SWALLOW_PRODUCER_NAME);
 		List<EnvDevice> consumerSlaveEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_SLAVE_NAME);
 		List<EnvDevice> consumerMasterEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_MASTER_NAME);
+		Map<String, String> cmdbProducers = new ConcurrentHashMap<String, String>();
+		Map<String, String> cmdbConsumerSlaves = new ConcurrentHashMap<String, String>();
+		Map<String, String> cmdbConsumerMasters = new ConcurrentHashMap<String, String>();
 		if (producerEnvDevices != null) {
 			for (EnvDevice envDevice : producerEnvDevices) {
-				updateDataMap(cmdbProducers, envDevice.getHostName(), envDevice.getIp());
+				cmdbProducers.put(envDevice.getHostName(), envDevice.getIp());
+				setProducerServerIp(envDevice.getIp());
 			}
 		}
 		if (consumerSlaveEnvDevices != null) {
 			for (EnvDevice envDevice : consumerSlaveEnvDevices) {
-				updateDataMap(cmdbConsumerSlaves, envDevice.getHostName(), envDevice.getIp());
+				cmdbConsumerSlaves.put(envDevice.getHostName(), envDevice.getIp());
 			}
 		}
 		if (consumerMasterEnvDevices != null) {
 			for (EnvDevice envDevice : consumerMasterEnvDevices) {
-				updateDataMap(cmdbConsumerMasters, envDevice.getHostName(), envDevice.getIp());
+				cmdbConsumerMasters.put(envDevice.getHostName(), envDevice.getIp());
+				setConsumerServerIp(envDevice.getIp());
 			}
 		}
-	}
-
-	private void updateDataMap(Map<String, String> dataMap, String key, String value) {
-		if (!dataMap.containsKey(key)) {
-			dataMap.put(key, value);
-		} else {
-			dataMap.remove(key);
-		}
+		this.cmdbProducers = cmdbProducers;
+		this.cmdbConsumerMasters = cmdbConsumerMasters;
+		this.cmdbConsumerSlaves = cmdbConsumerSlaves;
 	}
 
 	private void addSetData(Set<String> set, String data) {
@@ -172,9 +170,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 					continue;
 				}
 				addSetData(ips, messageInfo.getKey());
-				if (!StringUtils.equals(TOTAL_KEY, messageInfo.getKey())) {
-					updateDataMap(producerTopicIps, topicData.getKey(), messageInfo.getKey());
-				}
 			}
 		}
 	}
@@ -209,10 +204,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 						continue;
 					}
 					addSetData(ips, messageInfo.getKey());
-					if (!StringUtils.equals(TOTAL_KEY, messageInfo.getKey())) {
-						String key = topicData.getKey() + TOPIC_CONSUMERID_SPLIT + consumerIdData.getKey();
-						updateDataMap(topicConsumerIdIps, key, messageInfo.getKey());
-					}
 				}
 			}
 
@@ -264,13 +255,21 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	}
 
 	@Override
-	public Map<String, String> getTopicConsumerIdIps() {
-		return Collections.unmodifiableMap(topicConsumerIdIps);
+	public Set<String> getTopicConsumerIdIps(String topicName, String consumerId) {
+		Set<String> consumerIdIps = consumerDataWapper.getConsumerIdIps(topicName, consumerId);
+		if (consumerIdIps != null) {
+			consumerIdIps.remove(TOTAL_KEY);
+		}
+		return consumerIdIps;
 	}
 
 	@Override
-	public Map<String, String> getProducerTopicIps() {
-		return Collections.unmodifiableMap(producerTopicIps);
+	public Set<String> getProducerTopicIps(String topicName) {
+		Set<String> topicIps = producerDataWapper.getTopicIps(topicName);
+		if (topicIps != null) {
+			topicIps.remove(TOTAL_KEY);
+		}
+		return topicIps;
 	}
 
 	@Override
@@ -305,8 +304,21 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	}
 
 	@Override
-	public String getServerIp() {
-		return serverIp;
+	public String getProducerServerIp() {
+		return producerServerIp;
+	}
+
+	public void setProducerServerIp(String producerServerIp) {
+		this.producerServerIp = producerServerIp;
+	}
+	
+	@Override
+	public String getConsumerServerIp() {
+		return consumerServerIp;
+	}
+
+	public void setConsumerServerIp(String consumerServerIp) {
+		this.consumerServerIp = consumerServerIp;
 	}
 
 }

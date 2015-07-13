@@ -4,6 +4,8 @@ import java.util.List;
 
 public class SwallowAlarmSetting extends BaseAlarmSetting{
 	
+	private String swallow
+	
 	private List<String> producerWhiteList;
 	
 	private List<String> consumerWhiteList;

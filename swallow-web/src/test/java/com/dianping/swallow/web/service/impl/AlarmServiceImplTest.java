@@ -38,7 +38,7 @@ public class AlarmServiceImplTest {
 
 	@Test
 	public void sendWeiXinTest() {
-		alarmService.sendWeixin("qi.yin@dianping.com", "test", "test", AlarmType.CRITICAL);
+		alarmService.sendWeiXin("qi.yin@dianping.com", "test", "test", AlarmType.CRITICAL);
 	}
 
 }
