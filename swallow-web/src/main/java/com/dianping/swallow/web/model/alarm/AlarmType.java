@@ -6,49 +6,179 @@ package com.dianping.swallow.web.model.alarm;
  *
  */
 public enum AlarmType {
-	CRITICAL("严重告警"),
-	MAJOR("重大告警"),
-	MINOR("次要告警"),
-	GENERAL("一般告警"),
-	WARNING("警告告警");
 
-	private String desc;
+	/**
+	 * producer server service type
+	 */
+	PRODUCER_SERVER_SERVICE,
+
+	/**
+	 * producer server data sender type
+	 */
+	PRODUCER_SERVER_SENDER,
+
+	/**
+	 * producer server statis data qps peak type
+	 */
+	PRODUCER_SERVER_STATIS_QPS_P,
+
+	/**
+	 * producer server statis data qps valley type
+	 */
+	PRODUCER_SERVER_STATIS_QPS_V,
 	
-	private AlarmType(String desc) {
-		this.desc = desc;
-	}
+	/**
+	 * producer server statis data qps fluctuation type
+	 */
+	PRODUCER_SERVER_STATIS_QPS_F,
 
-	public String getDesc() {
-		return desc;
-	}
+	/**
+	 * producer topic statis data qps peak type
+	 */
+	PRODUCER_TOPIC_STATIS_QPS_P,
 
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
+	/**
+	 * producer topic statis data qps valley type
+	 */
+	PRODUCER_TOPIC_STATIS_QPS_V,
+
+	/**
+	 * producer topic statis data qps fluctuation type
+	 */
+	PRODUCER_TOPIC_STATIS_QPS_F,
+
+	/**
+	 * producer topic statis data delay type
+	 */
+	PRODUCER_TOPIC_STATIS_DELAY,
+
+	/**
+	 * consumer server data sender type
+	 */
+	CONSUMER_SERVER_SENDER,
+
+	/**
+	 * consumer server slave port open type
+	 */
+	CONSUMER_SERVER_PORT,
+
+	/**
+	 * consumer server slave and master port both open type
+	 */
+	CONSUMER_SERVER_PORT_BOTH,
+
+	/**
+	 * consumer server statis data send qps peak type
+	 */
+	CONSUMER_SERVER_STATIS_SENDQPS_P,
+
+	/**
+	 * consumer server statis data send qps valley type
+	 */
+	CONSUMER_SERVER_STATIS_SENDQPS_V,
 	
-	@Override
-	public String toString() {
-		return desc;
-	}
+	/**
+	 * consumer server statis data send qps fluctuation type
+	 */
+	CONSUMER_SERVER_STATIS_SENDQPS_F,
 
-	public boolean isCRITICAL() {
-		return this == CRITICAL;
-	}
+	/**
+	 * consumer server statis data ack qps peak type
+	 */
+	CONSUMER_SERVER_STATIS_ACKQPS_P,
 
-	public boolean isMAJOR() {
-		return this == MAJOR;
-	}
+	/**
+	 * consumer server statis data ack qps valley type
+	 */
+	CONSUMER_SERVER_STATIS_ACKQPS_V,
+	
+	/**
+	 * consumer server statis data ack qps fluctuation type
+	 */
+	CONSUMER_SERVER_STATIS_ACKQPS_F,
 
-	public boolean isMINOR() {
-		return this == MINOR;
-	}
+	/**
+	 * consumer topic statis data send qps peak type
+	 */
+	CONSUMER_TOPIC_STATIS_SENDQPS_P,
 
-	public boolean isGENERAL() {
-		return this == GENERAL;
-	}
+	/**
+	 * consumer topic statis data send qps valley type
+	 */
+	CONSUMER_TOPIC_STATIS_SENDQPS_V,
 
-	public boolean isWARNING() {
-		return this == WARNING;
-	}
+	/**
+	 * consumer topic statis data send qps fluctuation type
+	 */
+	CONSUMER_TOPIC_STATIS_SENDQPS_F,
 
+	/**
+	 * consumer topic statis data send delay type
+	 */
+	CONSUMER_TOPIC_STATIS_SEND_DELAY,
+
+	/**
+	 * consumer topic statis data ack qps peak type
+	 */
+	CONSUMER_TOPIC_STATIS_ACKQPS_P,
+
+	/**
+	 * consumer topic statis data ack qps valley type
+	 */
+	CONSUMER_TOPIC_STATIS_ACKQPS_V,
+
+	/**
+	 * consumer topic statis data ack qps fluctuation type
+	 */
+	CONSUMER_TOPIC_STATIS_ACKQPS_F,
+
+	/**
+	 * consumer topic statis data ack delay type
+	 */
+	CONSUMER_TOPIC_STATIS_ACK_DELAY,
+
+	/**
+	 * consumer consumerid statis data send qps peak type
+	 */
+	CONSUMER_CONSUMERID_STATIS_SENDQPS_P,
+
+	/**
+	 * consumer consumerid statis data send qps valley type
+	 */
+	CONSUMER_CONSUMERID_STATIS_SENDQPS_V,
+
+	/**
+	 * consumer consumerid statis data send qps fluctuation type
+	 */
+	CONSUMER_CONSUMERID_STATIS_SENDQPS_F,
+
+	/**
+	 * consumer consumerid statis data send delay type
+	 */
+	CONSUMER_CONSUMERID_STATIS_SEND_DELAY,
+
+	/**
+	 * consumer consumerid statis data send accumulation type
+	 */
+	CONSUMER_CONSUMERID_STATIS_SEND_ACCU,
+
+	/**
+	 * consumer consumerid statis data ack qps peak type
+	 */
+	CONSUMER_CONSUMERID_STATIS_ACKQPS_P,
+
+	/**
+	 * consumer consumerid statis data ack qps valley type
+	 */
+	CONSUMER_CONSUMERID_STATIS_ACKQPS_V,
+
+	/**
+	 * consumer consumerid statis data send qps fluctuation type
+	 */
+	CONSUMER_CONSUMERID_STATIS_ACKQPS_F,
+
+	/**
+	 * consumer consumerid statis data ack delay type
+	 */
+	CONSUMER_CONSUMERID_STATIS_ACK_DELAY,
 }

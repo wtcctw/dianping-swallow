@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.dianping.swallow.web.model.alarm.Alarm;
-import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.alarm.AlarmLevelType;
 
 /**
  *
@@ -23,7 +23,7 @@ public interface AlarmService {
 	 * @param type
 	 * @return
 	 */
-	public boolean sendSms(String mobile, String title, String body, AlarmType type);
+	public boolean sendSms(String mobile, String title, String body, AlarmLevelType type);
 
 	/**
 	 * weiXin alarm
@@ -33,7 +33,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendWeiXin(String email, String title, String content, AlarmType type);
+	public boolean sendWeiXin(String email, String title, String content, AlarmLevelType type);
 
 	/**
 	 * mail alarm
@@ -43,7 +43,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendMail(Set<String> emails, String title, String content, AlarmType type);
+	public boolean sendMail(Set<String> emails, String title, String content, AlarmLevelType type);
 	
 	/**
 	 * sms alarm
@@ -54,7 +54,7 @@ public interface AlarmService {
 	 * @param type
 	 * @return
 	 */
-	public boolean sendSms(Set<String> mobiles, String title, String body, AlarmType type);
+	public boolean sendSms(Set<String> mobiles, String title, String body, AlarmLevelType type);
 
 	/**
 	 * weiXin alarm
@@ -64,7 +64,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendWeiXin(Set<String> emails, String title, String content, AlarmType type);
+	public boolean sendWeiXin(Set<String> emails, String title, String content, AlarmLevelType type);
 
 	/**
 	 * mail alarm
@@ -74,7 +74,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendMail(String email, String title, String content, AlarmType type);
+	public boolean sendMail(String email, String title, String content, AlarmLevelType type);
 
 	/**
 	 * insert

@@ -2,6 +2,7 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,16 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 
 	@Override
 	public boolean update(ProducerServerAlarmSetting setting) {
-		return producerServerAlarmSettingDao.update(setting);
+		ProducerServerAlarmSetting serverAlarmSetting = null;
+		if (StringUtils.isNotBlank(setting.getServerId())) {
+			serverAlarmSetting = findByServerId(setting.getServerId());
+		}
+		if (serverAlarmSetting == null) {
+			return insert(setting);
+		} else {
+			setting.setId(serverAlarmSetting.getId());
+			return producerServerAlarmSettingDao.update(setting);
+		}
 	}
 
 	@Override

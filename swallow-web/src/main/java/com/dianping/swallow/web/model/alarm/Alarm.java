@@ -14,7 +14,7 @@ public class Alarm {
 	@Id
 	private String id;
 
-	private AlarmType type;
+	private AlarmLevelType type;
 
 	private SendType sendType;
 
@@ -32,7 +32,7 @@ public class Alarm {
 
 	}
 
-	public Alarm buildType(AlarmType type) {
+	public Alarm buildType(AlarmLevelType type) {
 		this.setType(type);
 		return this;
 	}
@@ -76,11 +76,11 @@ public class Alarm {
 		this.id = id;
 	}
 
-	public AlarmType getType() {
+	public AlarmLevelType getType() {
 		return type;
 	}
 
-	public void setType(AlarmType type) {
+	public void setType(AlarmLevelType type) {
 		this.type = type;
 	}
 
