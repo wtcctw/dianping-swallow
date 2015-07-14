@@ -29,6 +29,8 @@ public class DefaultConsumerIdAlarmSettingDao extends AbstractWriteDao implement
 
 	private static final String CONSUMERID_FIELD = "consumerId";
 
+	private static final String TOPICNAME_FEILD = "topicName";
+
 	@Override
 	public boolean insert(ConsumerIdAlarmSetting setting) {
 		try {
@@ -52,7 +54,7 @@ public class DefaultConsumerIdAlarmSettingDao extends AbstractWriteDao implement
 				CONSUMERIDALARMSETTING_COLLECTION);
 		return result.getN();
 	}
-	
+
 	@Override
 	public int deleteByConsumerId(String consumerId) {
 		Query query = new Query(Criteria.where(CONSUMERID_FIELD).is(consumerId));
@@ -75,8 +77,8 @@ public class DefaultConsumerIdAlarmSettingDao extends AbstractWriteDao implement
 	}
 
 	@Override
-	public ConsumerIdAlarmSetting findByConsumerId(String consumerId) {
-		Query query = new Query(Criteria.where(CONSUMERID_FIELD).is(consumerId));
+	public ConsumerIdAlarmSetting findByConsumerId(String topicName, String consumerId) {
+		Query query = new Query(Criteria.where(CONSUMERID_FIELD).is(consumerId).and(TOPICNAME_FEILD).is(topicName));
 		ConsumerIdAlarmSetting alarmSetting = mongoTemplate.findOne(query, ConsumerIdAlarmSetting.class,
 				CONSUMERIDALARMSETTING_COLLECTION);
 		return alarmSetting;

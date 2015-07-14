@@ -23,7 +23,7 @@ public interface ConsumerIdAlarmSettingService {
 
 	public List<ConsumerIdAlarmSetting> findAll();
 
-	public ConsumerIdAlarmSetting findByConsumerId(String consumerId);
+	public ConsumerIdAlarmSetting findByConsumerId(String topicName, String consumerId);
 	
 	public ConsumerIdAlarmSetting findOne();
 }

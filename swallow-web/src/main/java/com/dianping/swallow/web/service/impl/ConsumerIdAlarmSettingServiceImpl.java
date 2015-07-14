@@ -70,8 +70,8 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 	}
 
 	@Override
-	public ConsumerIdAlarmSetting findByConsumerId(String consumerId) {
-		return consumerIdAlarmSettingDao.findByConsumerId(consumerId);
+	public ConsumerIdAlarmSetting findByConsumerId(String topicName, String consumerId) {
+		return consumerIdAlarmSettingDao.findByConsumerId(topicName, consumerId);
 	}
-
+	
 }
