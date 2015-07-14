@@ -129,7 +129,7 @@ if [ "$MODE" == "master" ]; then
     SleepTime=10
 else
     SuccessLog="start to wait $MASTER_IP master stop beating"
-    SleepTime=5
+    SleepTime=8
 fi
 
 mysleep $SleepTime

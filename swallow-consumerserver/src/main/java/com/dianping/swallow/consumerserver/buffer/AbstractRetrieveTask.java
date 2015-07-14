@@ -76,13 +76,13 @@ public abstract class AbstractRetrieveTask implements Runnable {
 
 	protected void updateRetrieveStrategy(int rawMessageSize, List<SwallowMessage> messages, Long tailId) {
 		
-		if (logger.isInfoEnabled() && rawMessageSize > 0) {
+		if (logger.isDebugEnabled() && rawMessageSize > 0) {
 			
-			logger.info(String.format("[updateRetrieveStrategy][read message]%s,%d,%d", consumerInfo, tailId, rawMessageSize));
+			logger.debug(String.format("[updateRetrieveStrategy][read message]%s,%d,%d", consumerInfo, tailId, rawMessageSize));
 			
 			int messageSize = messages == null ? 0 : messages.size();
 			if(messageSize != rawMessageSize){
-				logger.info("[updateRetrieveStrategy][real message size]" + messageSize);
+				logger.debug("[updateRetrieveStrategy][real message size]" + messageSize);
 			}
 		}
 		

@@ -78,7 +78,7 @@ Thumbs.db
 !*.properties
 
 #
-*lion*properties*
+#*lion*properties*
 
 #test
 config.online
