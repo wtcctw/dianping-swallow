@@ -141,6 +141,19 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
     	});
     }
 	
+	$scope.clearModal = function(){
+		$scope.consumeridEntry.consumerId = "";
+		$scope.consumeridEntry.senddelay = "";
+		$scope.consumeridEntry.ackdelay = "";
+		$scope.consumeridEntry.accumulation = "";
+		$scope.consumeridEntry.sendpeak = "";
+		$scope.consumeridEntry.sendvalley = "";
+		$scope.consumeridEntry.sendfluctuation = "";
+		$scope.consumeridEntry.ackpeak = "";
+		$scope.consumeridEntry.ackvalley = "";
+		$scope.consumeridEntry.ackfluctuation = "";
+	}
+	
 	$scope.setModalInput = function(index){
 		$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.consumerId;
 		$scope.consumeridEntry.senddelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderDelay;

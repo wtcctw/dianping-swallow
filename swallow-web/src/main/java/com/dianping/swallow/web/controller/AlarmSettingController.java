@@ -70,13 +70,6 @@ public class AlarmSettingController extends AbstractSidebarBasedController {
 		return new ModelAndView("setting/consumerserversetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/topic")
-	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
-
-		subSide = "topic";
-		return new ModelAndView("setting/topicsetting", createViewMap());
-	}
-
 	@RequestMapping(value = "/console/setting/producerserver/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public void producerSettingCreatePost(@RequestBody ProducerServerAlarmSettingDto dto) {

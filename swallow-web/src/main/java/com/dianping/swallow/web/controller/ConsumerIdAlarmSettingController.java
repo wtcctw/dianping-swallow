@@ -20,6 +20,7 @@ import com.dianping.swallow.web.controller.dto.ConsumerIdAlarmSettingDto;
 import com.dianping.swallow.web.controller.mapper.ConsumerIdAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
+import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
  * @author mingdongli
@@ -59,14 +60,19 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 	public void comsumeridSettingCreate(@RequestBody ConsumerIdAlarmSettingDto dto) {
 
 		ConsumerIdAlarmSetting consumerIdAlarmSetting = ConsumerIdAlarmSettingMapper.toConsumerIdAlarmSetting(dto);
-		consumerIdAlarmSettingService.insert(consumerIdAlarmSetting);
+		consumerIdAlarmSettingService.update(consumerIdAlarmSetting);
 	}
 
 	@RequestMapping(value = "/console/setting/consumerid/remove", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void remvoeComsumeridSettingCreate(@RequestParam(value = "cid") String cid) {
+	public int remvoeComsumeridSettingCreate(@RequestParam(value = "cid") String cid) {
 		
-		
+		int result = consumerIdAlarmSettingService.deleteByConsumerId(cid);
+		if(result > 0){
+			return ResponseStatus.SUCCESS.getStatus();
+		}else{
+			return ResponseStatus.MONGOWRITE.getStatus();
+		}
 	}
 
 	private Map<String, Object> generateResponst(List<ConsumerIdAlarmSetting> consumerIdAlarmSetting){

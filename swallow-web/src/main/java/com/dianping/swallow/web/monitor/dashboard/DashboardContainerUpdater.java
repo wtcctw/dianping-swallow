@@ -252,6 +252,10 @@ public class DashboardContainerUpdater implements Runnable {
 		int entrySize = minuteEntryList.size();
 		int size = entrySize == 0 ? DashboardContainer.ENTRYSIZE : (entrySize == DashboardContainer.ENTRYSIZE ? 1
 				: DashboardContainer.ENTRYSIZE - entrySize);
+		//后面需去掉
+		Calendar cal = Calendar.getInstance();
+		int m = cal.get(Calendar.MINUTE);
+		currentMin.set(m);
 		List<String> times = getTimes(size, currentMin.get());
 
 		// 按时间升序
