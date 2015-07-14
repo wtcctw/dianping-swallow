@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +51,12 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 	@ResponseBody
 	public Object comsumeridSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 
-		List<ConsumerIdAlarmSetting> consumerIdAlarmSetting = consumerIdAlarmSettingService.findAll();
-		return generateResponst(consumerIdAlarmSetting);
+		List<ConsumerIdAlarmSetting> consumerIdAlarmSettingList = consumerIdAlarmSettingService.findAll();
+		List<ConsumerIdAlarmSettingDto> consumerAlarmSettingListDto = new ArrayList<ConsumerIdAlarmSettingDto>();
+		for(ConsumerIdAlarmSetting consumerIdAlarmSetting : consumerIdAlarmSettingList){
+			consumerAlarmSettingListDto.add(ConsumerIdAlarmSettingMapper.toConsumerIdAlarmSettingDto(consumerIdAlarmSetting));
+		}
+		return generateResponst(consumerAlarmSettingListDto);
 		
 	}
 
@@ -63,7 +68,7 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 		consumerIdAlarmSettingService.update(consumerIdAlarmSetting);
 	}
 
-	@RequestMapping(value = "/console/setting/consumerid/remove", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/setting/consumerid/remove", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public int remvoeComsumeridSettingCreate(@RequestParam(value = "cid") String cid) {
 		
@@ -75,7 +80,7 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 		}
 	}
 
-	private Map<String, Object> generateResponst(List<ConsumerIdAlarmSetting> consumerIdAlarmSetting){
+	private Map<String, Object> generateResponst(List<ConsumerIdAlarmSettingDto> consumerIdAlarmSetting){
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("size", consumerIdAlarmSetting.size());

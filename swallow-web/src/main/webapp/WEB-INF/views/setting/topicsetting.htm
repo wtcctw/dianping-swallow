@@ -66,12 +66,12 @@
 						<td style="text-align: left"
 							ng-bind="ad.consumerackdelay"></td>
 						<td style="text-align: left"
-							ng-bind="ad.consumerfluctuation"></td>
+							ng-bind="ad.consumeraccumulation"></td>
 						<td style="text-align: left"><a href="#myModal"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
 								data-original-title="编辑配置值"></i></a> <a href=""
-							ng-click="dialog(ad.consumerAlarmSetting.consumerId);"
+							ng-click="dialog(ad.topic);"
 							class="edit-config-btn"><i class="icon-remove" rel="tooltip"
 								data-original-title="删除配置项"></i></a></td>
 					</tr>
@@ -173,7 +173,7 @@
 											class="col-sm-2 control-label">确认</label><input type="text"
 											class="col-sm-2" ng-model="topicEntry.consumerackdelay" /> <label
 											class="col-sm-2 control-label">堆积</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.consumerfluctuation" />
+											class="col-sm-2" ng-model="topicEntry.consumeraccumulation" />
 									</div>
 								</div>
 							</div>

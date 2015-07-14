@@ -3,7 +3,7 @@ package com.dianping.swallow.web.controller.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.web.controller.dto.ProducerServerAlarmSettingDto;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
@@ -11,54 +11,47 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 
 public class ProducerServerAlarmSettingMapper {
 
-	private static final String WHITELIST_SPLIT = ",";
+	private static final String DELIMITOR = ",";
 
 	public static ProducerServerAlarmSetting toProducerServerAlarmSetting(ProducerServerAlarmSettingDto dto) {
+		
 		ProducerServerAlarmSetting alarmSetting = new ProducerServerAlarmSetting();
-		List<String> whiteList = null;
-		if (dto.getWhiteList() != null) {
-			whiteList = new ArrayList<String>();
-			String strWhiteArr[] = dto.getWhiteList().split(WHITELIST_SPLIT);
-			for (String whiteName : strWhiteArr) {
-				if (StringUtils.isNotBlank(whiteName)) {
-					whiteList.add(whiteName);
-				}
+
+		List<String> topicWhiteList = new ArrayList<String>();
+
+		QPSAlarmSetting producerQPSAlarmSetting = new QPSAlarmSetting();
+		producerQPSAlarmSetting.setPeak(dto.getProducerpeak());
+		producerQPSAlarmSetting.setValley(dto.getProducervalley());
+		producerQPSAlarmSetting.setFluctuation(dto.getProducerfluctuation());
+		alarmSetting.setDefaultAlarmSetting(producerQPSAlarmSetting);
+		
+		alarmSetting.setServerId(dto.getServerId());
+		
+		String whiteList = dto.getWhitelist();
+		String[] whiteLists = whiteList.split(DELIMITOR);
+		for(String wl : whiteLists){
+			if(!topicWhiteList.contains(wl)){
+				topicWhiteList.add(wl);
 			}
 		}
-		alarmSetting.setTopicWhiteList(whiteList);
-		alarmSetting.setCreateTime(dto.getCreateTime());
-		alarmSetting.setUpdateTime(dto.getCreateTime());
-		QPSAlarmSetting qps = new QPSAlarmSetting();
-		qps.setPeak(dto.getPeak());
-		qps.setValley(dto.getValley());
-		qps.setFluctuation(dto.getFluctuation());
-		alarmSetting.setDefaultAlarmSetting(qps);
+		alarmSetting.setTopicWhiteList(topicWhiteList);
+		
 		return alarmSetting;
 	}
 
 	public static ProducerServerAlarmSettingDto toProducerServerAlarmSettingDto(ProducerServerAlarmSetting alarmSetting) {
+
 		ProducerServerAlarmSettingDto dto = new ProducerServerAlarmSettingDto();
-		StringBuilder strWhiteBuilder = new StringBuilder();
-		if (alarmSetting.getTopicWhiteList() != null) {
-			for (String whiteName : alarmSetting.getTopicWhiteList()) {
-				if (StringUtils.isNotBlank(whiteName)) {
-					strWhiteBuilder.append(whiteName).append(WHITELIST_SPLIT);
-				}
-			}
-		}
-		String strWhite = strWhiteBuilder.toString();
-		if (strWhite.length() > 0) {
-			strWhite = strWhite.substring(0, strWhite.length());
-		}
-		dto.setWhiteList(strWhite);
-		dto.setCreateTime(alarmSetting.getCreateTime());
-		dto.setUpdateTime(alarmSetting.getCreateTime());
-		if (alarmSetting.getDefaultAlarmSetting() != null) {
-			dto.setPeak(alarmSetting.getDefaultAlarmSetting().getPeak());
-			dto.setValley(alarmSetting.getDefaultAlarmSetting().getValley());
-			dto.setFluctuation(alarmSetting.getDefaultAlarmSetting().getFluctuation());
-		}
+		
+		QPSAlarmSetting producerQPSAlarmSetting = alarmSetting.getDefaultAlarmSetting();
+		dto.setProducerpeak(producerQPSAlarmSetting.getPeak());
+		dto.setProducervalley(producerQPSAlarmSetting.getValley());
+		dto.setProducerfluctuation(producerQPSAlarmSetting.getFluctuation());
+		
+		List<String> whiteList = alarmSetting.getTopicWhiteList();
+		dto.setWhitelist(StringUtils.join(whiteList, DELIMITOR));
+		dto.setServerId(alarmSetting.getServerId());
+
 		return dto;
 	}
-
 }

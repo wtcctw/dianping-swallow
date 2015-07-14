@@ -34,26 +34,26 @@
 					</tr>
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.consumerId"></td>
+						<td style="text-align: left" ng-bind="ad.consumerId"></td>
 						<td style="text-align: left"
-							ng-bind="ad.consumerAlarmSetting.senderQpsAlarmSetting.peak"></td>
+							ng-bind="ad.sendpeak"></td>
 						<td style="text-align: left"
-							ng-bind="ad.consumerAlarmSetting.senderQpsAlarmSetting.valley"></td>
+							ng-bind="ad.sendvalley"></td>
 						<td style="text-align: left"
-							ng-bind="ad.consumerAlarmSetting.senderQpsAlarmSetting.fluctuation"></td>
-						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.ackQpsAlarmSetting.peak"></td>
+							ng-bind="ad.sendfluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.ackpeak"></td>
 						<td style="text-align: left"
-							ng-bind="ad.consumerAlarmSetting.ackQpsAlarmSetting.valley"></td>
+							ng-bind="ad.ackvalley"></td>
 						<td style="text-align: left"
-							ng-bind="ad.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation"></td>
-						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.senderDelay"></td>
-						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.ackDelay"></td>
-						<td style="text-align: left" ng-bind="ad.consumerAlarmSetting.accumulation"></td>
+							ng-bind="ad.ackfluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.senddelay"></td>
+						<td style="text-align: left" ng-bind="ad.ackdelay"></td>
+						<td style="text-align: left" ng-bind="ad.accumulation"></td>
 						<td style="text-align: left"><a href="#myModal"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
 								data-original-title="编辑配置值"></i></a> <a href=""
-							ng-click="dialog(ad.consumerAlarmSetting.consumerId);" class="edit-config-btn"><i
+							ng-click="dialog(ad.consumerId);" class="edit-config-btn"><i
 								class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
 					</tr>
 				</table>

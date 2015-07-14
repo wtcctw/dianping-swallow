@@ -1,66 +1,63 @@
 package com.dianping.swallow.web.controller.dto;
 
-import java.util.Date;
 
+/**
+ * 
+ * @author mingdongli
+ *
+ * 2015年7月14日下午2:26:06
+ */
 public class ProducerServerAlarmSettingDto {
-	private String whiteList;
 	
-	private long peak;
+	private String serverId;
 	
-	private long valley;
-
-	private int fluctuation;
+	private String whitelist;
 	
-	private Date createTime;
+	private long producerpeak;
 	
-	private Date updateTime;
+	private long producervalley;
+	
+	private int producerfluctuation;
 
-	public String getWhiteList() {
-		return whiteList;
+	public String getServerId() {
+		return serverId;
 	}
 
-	public void setWhiteList(String whiteList) {
-		this.whiteList = whiteList;
+	public void setServerId(String serverId) {
+		this.serverId = serverId;
 	}
 
-	public long getPeak() {
-		return peak;
+	public String getWhitelist() {
+		return whitelist;
 	}
 
-	public void setPeak(long peak) {
-		this.peak = peak;
+	public void setWhitelist(String whitelist) {
+		this.whitelist = whitelist;
 	}
 
-	public long getValley() {
-		return valley;
+	public long getProducerpeak() {
+		return producerpeak;
 	}
 
-	public void setValley(long valley) {
-		this.valley = valley;
+	public void setProducerpeak(long producerpeak) {
+		this.producerpeak = producerpeak;
 	}
 
-	public int getFluctuation() {
-		return fluctuation;
+	public long getProducervalley() {
+		return producervalley;
 	}
 
-	public void setFluctuation(int fluctuation) {
-		this.fluctuation = fluctuation;
+	public void setProducervalley(long producervalley) {
+		this.producervalley = producervalley;
 	}
 
-	public Date getCreateTime() {
-		return createTime;
+	public int getProducerfluctuation() {
+		return producerfluctuation;
 	}
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
+	public void setProducerfluctuation(int producerfluctuation) {
+		this.producerfluctuation = producerfluctuation;
 	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	} 
+	
 
 }

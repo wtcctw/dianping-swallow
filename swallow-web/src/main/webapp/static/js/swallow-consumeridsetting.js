@@ -155,16 +155,16 @@ module.controller('ConsumerIdSettingController', ['$rootScope', '$scope', '$http
 	}
 	
 	$scope.setModalInput = function(index){
-		$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.consumerId;
-		$scope.consumeridEntry.senddelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderDelay;
-		$scope.consumeridEntry.ackdelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackDelay;
-		$scope.consumeridEntry.accumulation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.accumulation;
-		$scope.consumeridEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderQpsAlarmSetting.peak;
-		$scope.consumeridEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderQpsAlarmSetting.valley;
-		$scope.consumeridEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.senderQpsAlarmSetting.fluctuation;
-		$scope.consumeridEntry.ackpeak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.peak;
-		$scope.consumeridEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.valley;
-		$scope.consumeridEntry.ackfluctuation =$scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuation;
+		$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerId;
+		$scope.consumeridEntry.senddelay = $scope.searchPaginator.currentPageItems[index].senddelay;
+		$scope.consumeridEntry.ackdelay = $scope.searchPaginator.currentPageItems[index].ackdelay;
+		$scope.consumeridEntry.accumulation = $scope.searchPaginator.currentPageItems[index].accumulation;
+		$scope.consumeridEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
+		$scope.consumeridEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
+		$scope.consumeridEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
+		$scope.consumeridEntry.ackpeak = $scope.searchPaginator.currentPageItems[index].ackpeak;
+		$scope.consumeridEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
+		$scope.consumeridEntry.ackfluctuation =$scope.searchPaginator.currentPageItems[index].ackfluctuation;
 	}
 	
 	$rootScope.removerecord = function(cid){

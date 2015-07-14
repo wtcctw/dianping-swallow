@@ -73,7 +73,7 @@ module.factory('Paginator', function(){
 	};
 });
 
-module.controller('TopicSettingController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog','$interval',
+module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog','$interval',
                 function($rootScope, $scope, $http, Paginator, ngDialog,$interval){
 	var fetchFunction = function(offset, limit, callback){
 		var transFn = function(data){
@@ -92,7 +92,7 @@ module.controller('TopicSettingController', ['$rootScope', '$scope', '$http', 'P
 		}).success(callback);
 	};
 	
-	$scope.suburl = "/console/setting/topic/list";
+	$scope.suburl = "/console/setting/producerserver/list";
 	$scope.numrecord = 30;
 	
 	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
@@ -112,30 +112,20 @@ module.controller('TopicSettingController', ['$rootScope', '$scope', '$http', 'P
 	}).error(function(data, status, headers, config) {
 	});
 	
-	$scope.topicEntry = {};
-	$scope.topicEntry.topic;
-	$scope.topicEntry.whitelist;
-	$scope.topicEntry.sendpeak;
-	$scope.topicEntry.sendvalley;
-	$scope.topicEntry.sendfluctuation;
-	$scope.topicEntry.senddelay;
-	$scope.topicEntry.consumersendpeak;
-	$scope.topicEntry.consumersendvalley;
-	$scope.topicEntry.consumersendfluctuation;
-	$scope.topicEntry.consumerackpeak;
-	$scope.topicEntry.consumerackvalley;
-	$scope.topicEntry.consumerackfluctuation;
-	$scope.topicEntry.consumersenddelay;
-	$scope.topicEntry.consumerackdelay;
-	$scope.topicEntry.consumeraccumulation;
+	$scope.producerserverEntry = {};
+	$scope.producerserverEntry.serverId;
+	$scope.producerserverEntry.whitelist;
+	$scope.producerserverEntry.producerpeak;
+	$scope.producerserverEntry.producervalley;
+	$scope.producerserverEntry.producerfluctuation;
 	
 	$scope.refreshpage = function(myForm){
 		$('#myModal').modal('hide');
-		var param = JSON.stringify($scope.topicEntry);
+		var param = JSON.stringify($scope.producerserverEntry);
     	
     	$.ajax({
     	    type: "POST",
-    	    url: window.contextPath + '/console/setting/topic/create',
+    	    url: window.contextPath + '/console/setting/producerserver/create',
     	    contentType: "application/json; charset=utf-8",
     	    dataType: "json",
     	    data: param,
@@ -147,45 +137,25 @@ module.controller('TopicSettingController', ['$rootScope', '$scope', '$http', 'P
     }
 	
 	$scope.clearModal = function(){
-		$scope.topicEntry.topic = "";
-		$scope.topicEntry.whitelist = "";
-		$scope.topicEntry.producerpeak = "";
-		$scope.topicEntry.producervalley = "";
-		$scope.topicEntry.producerfluctuation = "";
-		$scope.topicEntry.producerdelay = "";
-		$scope.topicEntry.consumersendpeak = "";
-		$scope.topicEntry.consumersendvalley = "";
-		$scope.topicEntry.consumersendfluctuation = "";
-		$scope.topicEntry.consumerackpeak = "";
-		$scope.topicEntry.consumerackvalley = "";
-		$scope.topicEntry.consumerackfluctuation = "";
-		$scope.topicEntry.consumersenddelay = "";
-		$scope.topicEntry.consumerackdelay = "";
-		$scope.topicEntry.consumeraccumulation = "";
+		$scope.producerserverEntry.serverId = "";
+		$scope.producerserverEntry.whitelist = "";
+		$scope.producerserverEntry.producerpeak = "";
+		$scope.producerserverEntry.producervalley = "";
+		$scope.producerserverEntry.producerfluctuation = "";
 	}
 	
 	$scope.setModalInput = function(index){
-		$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
-		$scope.topicEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
-		$scope.topicEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;
-		$scope.topicEntry.producervalley = $scope.searchPaginator.currentPageItems[index].producervalley;
-		$scope.topicEntry.producerfluctuation = $scope.searchPaginator.currentPageItems[index].producerfluctuation;
-		$scope.topicEntry.producerdelay = $scope.searchPaginator.currentPageItems[index].producerdelay;
-		$scope.topicEntry.consumersendpeak = $scope.searchPaginator.currentPageItems[index].consumersendpeak;
-		$scope.topicEntry.consumersendvalley = $scope.searchPaginator.currentPageItems[index].consumersendvalley;
-		$scope.topicEntry.consumersendfluctuation = $scope.searchPaginator.currentPageItems[index].consumersendfluctuation;
-		$scope.topicEntry.consumerackpeak = $scope.searchPaginator.currentPageItems[index].consumerackpeak;
-		$scope.topicEntry.consumerackvalley = $scope.searchPaginator.currentPageItems[index].consumerackvalley;
-		$scope.topicEntry.consumerackfluctuation = $scope.searchPaginator.currentPageItems[index].consumerackfluctuation;
-		$scope.topicEntry.consumersenddelay = $scope.searchPaginator.currentPageItems[index].consumersenddelay;
-		$scope.topicEntry.consumerackdelay = $scope.searchPaginator.currentPageItems[index].consumerackdelay;
-		$scope.topicEntry.consumeraccumulation = $scope.searchPaginator.currentPageItems[index].consumeraccumulation;
+		$scope.producerserverEntry.serverId = $scope.searchPaginator.currentPageItems[index].serverId;
+		$scope.producerserverEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
+		$scope.producerserverEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;
+		$scope.producerserverEntry.producervalley = $scope.searchPaginator.currentPageItems[index].producervalley;
+		$scope.producerserverEntry.producerfluctuation = $scope.searchPaginator.currentPageItems[index].producerfluctuation;
 	}
 	
-	$rootScope.removerecord = function(cid){
-		$http.get(window.contextPath + "/console/setting/topic/remove", {
+	$rootScope.removerecord = function(sid){
+		$http.get(window.contextPath + "/console/setting/producerserver/remove", {
 			params : {
-				topic : cid
+				serverId : sid
 			}
 		}).success(function(data){
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);

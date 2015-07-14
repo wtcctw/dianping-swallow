@@ -150,7 +150,7 @@ public class TopicAlarmSettingDto {
 		this.consumerackdelay = consumerackdelay;
 	}
 
-	public long getConsumerfluctuation() {
+	public long getConsumeraccumulation() {
 		return consumeraccumulation;
 	}
 

@@ -60,6 +60,9 @@ public class ConsumerIdAlarmSettingMapper {
 		dto.setSenddelay(consumerBaseAlarmSetting.getSenderDelay());
 		dto.setAckdelay(consumerBaseAlarmSetting.getAckDelay());
 		dto.setAccumulation(consumerBaseAlarmSetting.getAccumulation());
+		
+		dto.setConsumerId(alarmSetting.getConsumerId());
+		
 		return dto;
 	}
 

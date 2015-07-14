@@ -69,7 +69,7 @@ public class TopicAlarmSettingController extends AbstractSidebarBasedController 
 		}
 	}
 
-	@RequestMapping(value = "/console/setting/topic/remove", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/setting/topic/remove", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public int remvoeTopicSettingCreate(@RequestParam(value = "topic") String topic) {
 		

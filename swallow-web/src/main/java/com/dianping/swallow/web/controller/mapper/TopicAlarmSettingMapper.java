@@ -5,10 +5,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.dianping.swallow.web.controller.dto.ConsumerIdAlarmSettingDto;
 import com.dianping.swallow.web.controller.dto.TopicAlarmSettingDto;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
-import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
@@ -52,12 +50,12 @@ public class TopicAlarmSettingMapper {
 		consumerAckQPSAlarmSetting.setPeak(dto.getConsumerackpeak());
 		consumerAckQPSAlarmSetting.setValley(dto.getConsumerackvalley());
 		consumerAckQPSAlarmSetting.setFluctuation(dto.getConsumerackfluctuation());
-		consumerBaseAlarmSetting.setSenderQpsAlarmSetting(consumerAckQPSAlarmSetting);
+		consumerBaseAlarmSetting.setAckQpsAlarmSetting(consumerAckQPSAlarmSetting);
 		
 		consumerBaseAlarmSetting.setAckQpsAlarmSetting(consumerAckQPSAlarmSetting);
 		consumerBaseAlarmSetting.setSenderDelay(dto.getConsumersenddelay());
 		consumerBaseAlarmSetting.setAckDelay(dto.getConsumerackdelay());
-		consumerBaseAlarmSetting.setAccumulation(dto.getConsumerfluctuation());
+		consumerBaseAlarmSetting.setAccumulation(dto.getConsumeraccumulation());
 		
 		alarmSetting.setConsumerAlarmSetting(consumerBaseAlarmSetting);
 		alarmSetting.setProducerAlarmSetting(producerBaseAlarmSetting);
