@@ -17,7 +17,6 @@ import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
 import com.dianping.swallow.web.service.ConsumerMachineStatisDataService;
 import com.dianping.swallow.web.service.ConsumerTopicStatisDataService;
 
-
 /**
  *
  * @author qiyin
@@ -66,7 +65,6 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
 				lastTimeKey.set(serverStatisData.getTimeKey());
 			}
-			
 			topicStatisDatas = consumerDataWapper.getTopicStatsData(lastTimeKey.get());
 			consumerIdStatsDataMap = consumerDataWapper.getConsumerIdStatsData(lastTimeKey.get());
 			storageServerStatis();
@@ -76,7 +74,7 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 	}
 
 	private void storageServerStatis() {
-		if (serverStatisData != null) {
+		if (serverStatisData == null || serverStatisData.getMachineStatisDatas() == null) {
 			return;
 		}
 		for (ConsumerMachineStatsData consumerMachineStatsData : serverStatisData.getMachineStatisDatas()) {
@@ -92,6 +90,9 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 	}
 
 	private void storageConsumerIdStatis() {
+		if (consumerIdStatsDataMap == null) {
+			return;
+		}
 		for (Map.Entry<String, List<ConsumerIdStatsData>> consumerIdStatsDataEntry : consumerIdStatsDataMap.entrySet()) {
 			List<ConsumerIdStatsData> consumerIdStatsDatas = consumerIdStatsDataEntry.getValue();
 			if (consumerIdStatsDatas == null) {
