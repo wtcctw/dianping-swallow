@@ -44,8 +44,8 @@
 							</tr>
 							<tr ng-repeat="entry in minuteEntry.delayEntry"
 								ng-class="{'alert-row': entry.numAlarm>0}">
-								<td style="text-align: left; width: 120px" data-toggle="tooltip"
-									title="{{entry.email}}" ng-bind="entry.consumerId"></td>
+								<td style="text-align: left; width: 120px" 
+									data-toggle="tooltip" data-html="true" data-placement="top" title="Email: {{entry.email}} Phone: {{entry.dpMobile}}" ng-bind="entry.consumerId"></td>
 								<td style="text-align: left; width: 40px; cursor: pointer;"
 									pop-over items="items" title="统计值" clicked="clicked"
 									id="{{$parent.$index}}{{$index}}"
