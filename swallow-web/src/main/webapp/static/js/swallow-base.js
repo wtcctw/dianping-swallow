@@ -110,7 +110,7 @@ module.filter('reverse', function() {
 });
 
 module.directive('popOver', function ($compile) {
-    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/qps?cid={{clicked.cid}}'>发送延迟</a></th><th>ack延迟</th><th>消息堆积</th></tr><tr><td>{{topic}}</td><td ng-repeat='item in items'>{{item}}</td></tr></table>";
+    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/qps?cid={{clicked.consumerId}}'>发送延迟</a></th><th>ack延迟</th><th>消息堆积</th></tr><tr ng-repeat='item in items'><td>{{item.topic}}</td><td id='send'>{{item.senddelay}}</td><td id='ack'>{{item.ackdelay}}</td><td : id='accu'>{{item.accu}}</td></tr></table>";
     var getTemplate = function (contentType) {
         var template = '';
         switch (contentType) {
@@ -130,6 +130,17 @@ module.directive('popOver', function ($compile) {
                 var html = getTemplate("items");
                 popOverContent = $compile(html)(scope);                    
             }
+            scope.$watch('clicked', function(clicked){
+                if(clicked.senddelayAlarm > 0){
+                    $('#send').css('color', 'red');
+                }
+                if(clicked.ackdelayAlarm > 0){
+                    $('#ack').css('color', 'red');
+                }
+                if(clicked.accuAlarm > 0){
+                    $('#accu').css('color', 'red');
+                }
+            });
             var options = {
                 content: popOverContent,
                 placement: "bottom",

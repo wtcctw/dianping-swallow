@@ -18,14 +18,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DashboardContainer {
 
-	public static final int ENTRYSIZE = 3 * 60;
+	public static final int TOTALENTRYSIZE = 70;
 
 	private Map<String, List<MinuteEntry>> dashboards = new  ConcurrentHashMap<String, List<MinuteEntry>>();
 	
 	private AtomicInteger entrySize = new AtomicInteger(0);
 	
-	private AtomicInteger currentMinute = new AtomicInteger(-1);
-
 	public boolean insertMinuteEntry(String key, MinuteEntry minuteEntry) {
 		List<MinuteEntry> minuteEntries = null;
 		boolean result;
@@ -39,7 +37,7 @@ public class DashboardContainer {
 		synchronized (minuteEntries) {
 			int size = minuteEntries.size();
 
-			while (size >= ENTRYSIZE) {
+			while (size >= TOTALENTRYSIZE) {
 				minuteEntries.remove(0);
 				size--;
 			}
@@ -84,14 +82,5 @@ public class DashboardContainer {
 		return entrySize.get();
 	}
 
-	public int getCurrentMinute() {
-		return currentMinute.get();
-	}
-
-	public void setCurrentMinute(int currentMinute) {
-		this.currentMinute.set(currentMinute);
-	}
-	
-	
 }
 

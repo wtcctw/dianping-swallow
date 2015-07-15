@@ -39,7 +39,6 @@ public class TopicAlarmSettingServiceWrapper {
 		List<String> whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
 		if(whiteList.contains(consumerId)){
 			return loadConsumerIdAlarmSettingWithMaxValue();
-			
 		}
 		
 		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = consumerIdAlarmSetting.getConsumerAlarmSetting();
