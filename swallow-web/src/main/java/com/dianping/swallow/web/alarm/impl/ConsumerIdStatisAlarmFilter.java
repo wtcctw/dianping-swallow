@@ -98,21 +98,21 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 					boolean isSendQpsOk = sendQpsAlarm(topic, consumerId, consumerBaseStatsData.getSendQpx(), sendQps);
 
 					boolean isAckQpsOk = ackQpsAlarm(topic, consumerId, consumerBaseStatsData.getAckQpx(), ackQps);
-					if (!isSendQpsOk || !isAckQpsOk) {
+					if (isSendQpsOk || isAckQpsOk) {
 						ConsumerBaseStatsData baseStatsData = getSectionData(topic,
 								consumerIdStatsData.getConsumerId(), consumerIdStatsData.getTimeKey());
-						if (!isSendQpsOk) {
+						if (isSendQpsOk) {
 							sendFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getSendQpx(),
 									baseStatsData.getSendQpx(), sendQps);
 						}
-						if (!isAckQpsOk) {
+						if (isAckQpsOk) {
 							ackFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getAckQpx(),
 									baseStatsData.getAckQpx(), ackQps);
 						}
 					}
 
-					sendDelayAlarm(topic, consumerId, sendDelay, consumerBaseStatsData.getSendDelay());
-					ackDelayAlarm(topic, consumerId, ackDelay, consumerBaseStatsData.getAckDelay());
+					sendDelayAlarm(topic, consumerId, consumerBaseStatsData.getSendDelay(), sendDelay);
+					ackDelayAlarm(topic, consumerId, consumerBaseStatsData.getAckDelay(), ackDelay);
 					accumulationAlarm(topic, consumerId, consumerBaseStatsData.getAccumulation(), accumulation);
 				}
 			}
