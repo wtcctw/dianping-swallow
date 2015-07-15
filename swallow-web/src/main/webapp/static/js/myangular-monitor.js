@@ -172,6 +172,7 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.starttime = "";
 	$scope.stoptime = "";
 	$scope.currentMin = -1;  //当前分钟，第一次时设置
+	$scope.hour = 0;
 	$scope.firstaccess = true;
 	$scope.currentRed = -1;
 	$scope.hourchange = false;
@@ -183,6 +184,7 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		else
 			return "";
 	}
+	
 	$scope.getDashboardDelay = function(index) {
 		$scope.minuteEntrys = [];
 		var offset;
@@ -216,12 +218,15 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 			"53", "54", "55", "56", "57", "58", "59" ];
 
 
+	$scope.clicked = [];
+	$scope.items = [];
 	$scope.table = function(parentindex, index) {
 		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry[index];
 		
-		$scope.items = [$scope.minuteEntrys[parentindex].delayEntry[index].senddelay,
-		                $scope.minuteEntrys[parentindex].delayEntry[index].ackdelay, 
-		                $scope.minuteEntrys[parentindex].delayEntry[index].accu ];
+		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry[index].senddelay,
+		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry[index].ackdelay, 
+		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry[index].accu,
+		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry[index].topic} ];
 //		if($('.popover').length > 0){
 //			$('.popover').attr("style", "width : 600px");
 //		}

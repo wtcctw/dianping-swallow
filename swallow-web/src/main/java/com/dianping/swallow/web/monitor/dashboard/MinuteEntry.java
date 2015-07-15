@@ -14,7 +14,7 @@ public class MinuteEntry {
 
 	private String time;
 
-	List<Entry> delayEntry = new ArrayList<Entry>(); //cid
+	List<Entry> delayEntry = new ArrayList<Entry>();
 	
 	private static final int ENTRYSIZE = 12;
 	
@@ -56,29 +56,5 @@ public class MinuteEntry {
 		return this;
 	}
 
-	public static void main(String[] args) {
-		
-		MinuteEntry me = new MinuteEntry();
-		Entry e1 = new Entry();
-		e1.setNumAlarm(3);
-		Entry e2 = new Entry();
-		e2.setNumAlarm(2);
-		Entry e3 = new Entry();
-		e3.setNumAlarm(1);
-		Entry e4 = new Entry();
-		e4.setNumAlarm(0);
-		Entry e5 = new Entry();
-		e5.setNumAlarm(1);
-		me.addEntry(e1);
-		me.addEntry(e2);
-		me.addEntry(e3);
-		me.addEntry(e4);
-		me.addEntry(e5);
-		List<Entry> entryList = me.getDelayEntry();
-		Collections.sort(entryList);
-		for(int i = 0; i < entryList.size(); ++i){
-			System.out.println(entryList.get(i));
-		}
-	}
 }
 

@@ -53,71 +53,69 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	private Map<String, TotalData> totalDataMap = new ConcurrentHashMap<String, TotalData>();
 
-	public static final int SAMPLENUMBER = DashboardContainer.ENTRYSIZE * 2;
-
-	private static final String TOTAL = "total";
-
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
-	
-	private AtomicInteger currentMin = new AtomicInteger(-2);
-	
+
+	private AtomicInteger currentMin = new AtomicInteger(Integer.MIN_VALUE);
+
 	private int i = 0;
-	
+
 	@PostConstruct
 	void updateDashboardContainer() {
-		
+
 		consumerDataRetrieverWrapper.registerListener(this);
 	}
-	
+
 	@Override
 	public void achieveMonitorData() {
 
-		if (delayeven.get()){
+		if (delayeven.get()) {
 			try {
 				updateDelayInsDashboard();
 			} catch (Exception e) {
 				logger.error("Error when get data for all consumerid!", e);
-			}finally{
+			} finally {
 				delayeven.compareAndSet(true, false);
 			}
 			System.out.println("i is " + (++i));
-		}else{
+		} else {
 			delayeven.compareAndSet(false, true);
 			System.out.println("i is " + (++i));
 		}
 	}
-	
+
 	private void updateDelayInsDashboard() throws Exception {
 
 		String time = getCurrentTime();
-		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL);
+		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL);
 		for (String topic : topics) {
-			Set<String> consumerids = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL, topic);
+			Set<String> consumerids = consumerDataRetrieverWrapper.getKeyWithoutTotal(
+					ConsumerDataRetrieverWrapper.TOTAL, topic);
 			Map<String, StatsData> accuStatsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
 			for (String consumerid : consumerids) {
-				ConsumerIdStatisData result = (ConsumerIdStatisData) consumerDataRetrieverWrapper.getValue(TOTAL,
+				ConsumerIdStatisData result = (ConsumerIdStatisData) consumerDataRetrieverWrapper.getValue(
+						ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid);
+				Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
 						topic, consumerid);
-				Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL, topic, consumerid);
 				String ip = loadFirstElement(ips);
 				String mobile = iPDescManagerWrap.loadDpMobile(ip);
 				System.out.println("ip is " + ip);
-				System.out.println(delayeven.get());
+				System.out.println("consumerid is " + consumerid);
 				String email = iPDescManagerWrap.loadEmail(ip);
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
 				List<Long> sendList = new ArrayList<Long>(senddelay.values());
 				int sendListSize = sendList.size();
-				if(sendListSize < 2){
+				if (sendListSize < 2) {
 					return;
 				}
 				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
 				List<Long> ackList = new ArrayList<Long>(ackdelay.values());
 				List<Long> accuList = new ArrayList<Long>(Collections.nCopies(sendListSize, 0L));
-				while(accuList.size() < 2){
+				while (accuList.size() < 2) {
 					accuList.add(0L);
 				}
-				if(accuStatsData != null){
+				if (accuStatsData != null) {
 					StatsData accuSD = accuStatsData.get(consumerid);
 					if (!isEmpty(accuSD)) {
 						accuList = accuSD.getData();
@@ -138,57 +136,6 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			}
 		}
 
-		// //
-		// ----------------------------------------------------------------------------
-		// Map<String, List<Long>> mapSend = new ConcurrentHashMap<String,
-		// List<Long>>();
-		// Map<String, List<Long>> mapAck = new ConcurrentHashMap<String,
-		// List<Long>>();
-		// Map<String, List<Long>> mapAccu = new ConcurrentHashMap<String,
-		// List<Long>>();
-		// Random random = new Random();
-		// int size = dashboardContainer.getEntrySize();
-		// int offset = size == DashboardContainer.ENTRYSIZE ? 2 : SAMPLENUMBER;
-		// String topic = "topic";
-		//
-		// for (int i = 0; i < SAMPLENUMBER; ++i) {
-		// List<Long> number = new ArrayList<Long>(offset);
-		// for (int j = 0; j < offset; ++j) {
-		// long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
-		// number.add(tmp);
-		// }
-		// mapAck.put("key" + i, number);
-		// }
-		// for (int i = 0; i < SAMPLENUMBER; ++i) {
-		// List<Long> number = new ArrayList<Long>(offset);
-		// for (int j = 0; j < offset; ++j) {
-		// long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
-		// number.add(tmp);
-		// }
-		// mapSend.put("key" + i, number);
-		// }
-		// for (int i = 0; i < SAMPLENUMBER; ++i) {
-		// List<Long> number = new ArrayList<Long>(offset);
-		// for (int j = 0; j < offset; ++j) {
-		// long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
-		// number.add(tmp);
-		// }
-		// mapAccu.put("key" + i, number);
-		// }
-		// for (Map.Entry<String, List<Long>> send : mapSend.entrySet()) {
-		// String cid = send.getKey();
-		// TotalData td = totalDataMap.get(cid);
-		// if (td == null) {
-		// TotalData totalData = new TotalData();
-		// totalData.setCid(cid).setTopic(topic).setListSend(send.getValue()).setListAck(mapAck.get(cid))
-		// .setListAccu(mapAccu.get(cid));
-		// totalDataMap.put(cid, totalData);
-		// } else {
-		// td.setListSend(send.getValue()).setListAck(mapAck.get(cid)).setListAccu(mapAccu.get(cid));
-		// totalDataMap.put(cid, td);
-		// }
-		// }
-		// -------------------------------------------------------------------------------------------
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			generateEntrys(entry.getValue());
 		}
@@ -233,7 +180,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			int numAlarm = sendAlarm + ackAlarm + accuAlarm;
 			e.setConsumerId(totalData.getCid()).setTopic(totalData.getTopic()).setSenddelay(senddelay)
 					.setAckdelay(ackdelay).setAccu(accu).setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm)
-					.setAccuAlarm(accuAlarm).setNumAlarm(numAlarm);
+					.setAccuAlarm(accuAlarm).setNumAlarm(numAlarm).setEmail(totalData.getEmail())
+					.setDpMobile(totalData.getDpMobile());
 			entrys.add(e);
 		}
 		totalData.setEntrys(entrys);
@@ -259,7 +207,6 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			minuteEntryList = new ArrayList<MinuteEntry>();
 		}
 
-		// 按时间升序
 		Map<String, MinuteEntry> minuteEntryMap = new LinkedHashMap<String, MinuteEntry>();
 
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
@@ -286,34 +233,15 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		totalDataMap.clear();
 	}
 
-//	private List<String> getTimes(final int size, final int currentMin) {
-//
-//		List<String> times = new ArrayList<String>();
-//		Calendar cal = Calendar.getInstance();
-//		int m = cal.get(Calendar.MINUTE);
-//		if (m < currentMin) {
-//			cal.add(Calendar.HOUR_OF_DAY, -1);
-//		}
-//		cal.set(Calendar.MINUTE, currentMin);
-//		dashboardContainer.setCurrentMinute(currentMin);
-//		for (int i = 0; i < size; ++i) {
-//			cal.add(Calendar.MINUTE, i == 0 ? 0 : -1);
-//			int min = cal.get(Calendar.MINUTE);
-//			times.add(cal.get(Calendar.HOUR_OF_DAY) + ":" + (min < 10 ? "0" + min : min));
-//		}
-//		return Lists.reverse(times);
-//	}
-	
-	private String getCurrentTime(){
-		
+	private String getCurrentTime() {
+
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MINUTE, -1);
 		int min = cal.get(Calendar.MINUTE);
 		int curMin = currentMin.get();
 		int diff = min - curMin;
-		if(curMin < 0){
+		if (curMin < 0) {
 			curMin = min;
-		}else if(diff != 1 && diff != -59){
+		} else if (diff != 1 && diff != -59) {
 			min = curMin + 1;
 		}
 		currentMin.set(min);
@@ -334,19 +262,5 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		}
 		return "";
 	}
-
-
-//	private int loadLastKeyOfMinute(NavigableMap<Long, Long> map) {
-//
-//		Calendar cal = Calendar.getInstance();
-//		if (map.size() != 0) {
-//			Long lastKey = map.lastKey();
-//			Long milis = lastKey * AbstractCollector.SEND_INTERVAL * 1000;
-//			cal.setTimeInMillis(milis);
-//			return cal.get(Calendar.MINUTE);
-//		}
-//		return cal.get(Calendar.MINUTE);
-//
-//	}
 
 }

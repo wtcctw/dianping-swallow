@@ -20,7 +20,7 @@ public class ConsumerDataRetrieverWrapper {
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 	
-	private static final String TOTAL = "total";
+	public static final String TOTAL = "total";
 	
 	public Set<String> getKey(String ... keys){
 		
