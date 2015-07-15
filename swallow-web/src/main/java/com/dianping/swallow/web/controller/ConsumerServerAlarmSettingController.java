@@ -39,7 +39,6 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 	@RequestMapping(value = "/console/setting/consumerserver")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
 
-		subSide = "consumerserver";
 		return new ModelAndView("setting/consumerserversetting", createViewMap());
 	}
 
@@ -99,7 +98,7 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 		return "warn";
 	}
 
-	private String subSide = "consumerserver";
+	private String subSide = "consumer";
 
 	@Override
 	public String getSubSide() {

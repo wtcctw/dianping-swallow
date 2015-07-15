@@ -39,7 +39,6 @@ public class TopicAlarmSettingController extends AbstractSidebarBasedController 
 	@RequestMapping(value = "/console/setting/topic")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
 
-		subSide = "topic";
 		return new ModelAndView("setting/topicsetting", createViewMap());
 	}
 

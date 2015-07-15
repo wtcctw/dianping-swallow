@@ -217,6 +217,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 		Map<String, StatsData> result = new HashMap<String, StatsData>();
 		TopicAccumulation topicAccumulation = topics.get(topic);
+		if(topicAccumulation == null){
+			return result;
+		}
 		for (Entry<String, ConsumerIdAccumulation> entry : topicAccumulation.consumers.entrySet()) {
 
 			String consumerId = entry.getKey();

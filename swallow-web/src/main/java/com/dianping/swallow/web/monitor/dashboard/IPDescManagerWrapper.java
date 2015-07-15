@@ -16,6 +16,8 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 @Component
 public class IPDescManagerWrapper {
 	
+	private static final String BLANK = "Blank";
+	
 	@Resource(name = "ipDescManager")
 	private IPDescManager ipDescManager;
 	
@@ -23,12 +25,18 @@ public class IPDescManagerWrapper {
 	public String loadDpMobile(String ip){
 		
 		IPDesc ipdesc = ipDescManager.getIPDesc(ip);
+		if(ipdesc == null){
+			return BLANK;
+		}
 		return ipdesc.getDpMobile();
 	}
 	
 	public String loadEmail(String ip){
 		
 		IPDesc ipdesc = ipDescManager.getIPDesc(ip);
+		if(ipdesc == null){
+			return BLANK;
+		}
 		return ipdesc.getEmail();
 	}
 

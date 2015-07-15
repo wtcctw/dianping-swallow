@@ -21,7 +21,7 @@ public class TotalData {
 	
 	private String dpMobile;
 	
-	private int minute;
+	private String time;
 	
 	List<Long> listSend = new ArrayList<Long>();
 
@@ -112,21 +112,20 @@ public class TotalData {
 		return this;
 	}
 
-	public int getMinute() {
-		return minute;
+	public String getTime() {
+		return time;
 	}
 
-	public TotalData setMinute(int minute) {
-		this.minute = minute;
+	public TotalData setTime(String time) {
+		this.time = time;
 		return this;
 	}
 
 	@Override
 	public String toString() {
 		return "TotalData [server=" + server + ", topic=" + topic + ", cid=" + cid + ", email=" + email + ", dpMobile="
-				+ dpMobile + ", minute=" + minute + ", listSend=" + listSend + ", listAck=" + listAck + ", listAccu="
+				+ dpMobile + ", time=" + time + ", listSend=" + listSend + ", listAck=" + listAck + ", listAccu="
 				+ listAccu + ", entrys=" + entrys + "]";
 	}
-
 
 }

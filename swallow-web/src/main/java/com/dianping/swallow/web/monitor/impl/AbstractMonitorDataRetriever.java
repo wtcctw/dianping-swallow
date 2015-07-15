@@ -87,7 +87,6 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 			@Override
 			public void doAction() throws SwallowException {
 				statis.removeBefore(toKey);
-				;
 			}
 		});
 	}

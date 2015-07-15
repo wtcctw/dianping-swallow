@@ -49,7 +49,7 @@
 								<td style="text-align: left; width: 120px"
 									ng-bind="entry.consumerId"></td>
 								<td style="text-align: left; width: 40px; cursor: pointer;"
-									pop-over items="items" topic="topic" cid="cid" title="统计值" clicked="clicked"
+									pop-over items="items" title="统计值" clicked="clicked"
 									id="{{$parent.$index}}{{$index}}"
 									ng-click="table($parent.$index,$index)"
 									ng-bind="entry.numAlarm > 0 ? '异常' : '正常' "></td>

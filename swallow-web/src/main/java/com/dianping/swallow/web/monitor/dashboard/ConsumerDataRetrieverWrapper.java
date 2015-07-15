@@ -39,11 +39,17 @@ public class ConsumerDataRetrieverWrapper {
 		return set;
 	}
 	
+	public void registerListener(DashboardContainerUpdater dashboardContainerUpdater){
+		
+		consumerDataRetriever.registerListener(dashboardContainerUpdater);
+	}
+	
 	private void removeTotal(Set<String> set){
 		
 		if (set.contains(TOTAL)) {
 			set.remove(TOTAL);
 		}
 	}
+	
 
 }

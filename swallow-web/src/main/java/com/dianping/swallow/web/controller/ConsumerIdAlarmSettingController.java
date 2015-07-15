@@ -37,6 +37,7 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 	@RequestMapping(value = "/console/setting")
 	public ModelAndView mainSetting(HttpServletRequest request, HttpServletResponse response) {
 
+		subSide = "producer";
 		return new ModelAndView("setting/producerserversetting", createViewMap());
 	}
 

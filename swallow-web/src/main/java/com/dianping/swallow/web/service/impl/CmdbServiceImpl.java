@@ -89,6 +89,9 @@ public class CmdbServiceImpl implements CmdbService {
 		IPDesc ipDesc = null;
 		try {
 			ipDesc = transformToIpDesc(content);
+			if (ipDesc == null) {
+				return null;
+			}
 			ipDesc.setIp(ip);
 		} catch (Exception e) {
 			logger.info("json transform to object failed .", e);
@@ -165,7 +168,7 @@ public class CmdbServiceImpl implements CmdbService {
 				envDevice.setHostName(deviceNode.path("hostname").getTextValue());
 				envDevice.setEnv(env);
 				JsonNode ipNode = deviceNode.path("private_ip");
-				if (ipNode.get(0) != null){
+				if (ipNode.get(0) != null) {
 					envDevice.setIp(ipNode.get(0).getTextValue());
 				}
 				envDevices.add(envDevice);

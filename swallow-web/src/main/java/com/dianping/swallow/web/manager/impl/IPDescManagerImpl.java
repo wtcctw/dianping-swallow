@@ -107,6 +107,9 @@ public class IPDescManagerImpl implements IPDescManager {
 		IPDesc ipDesc = ipDescService.findByIp(ip);
 		if (ipDesc == null) {
 			ipDesc = cmdbService.getIpDesc(ip);
+			if (ipDesc == null) {
+				return null;
+			}
 			ipDesc.setCreateTime(new Date());
 			ipDesc.setUpdateTime(new Date());
 			ipDescService.insert(ipDesc);

@@ -216,17 +216,12 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 			"53", "54", "55", "56", "57", "58", "59" ];
 
 
-	$scope.items = [];
-	$scope.topic = "";
-	$scope.cid = "";
 	$scope.table = function(parentindex, index) {
-		$scope.topic = $scope.minuteEntrys[parentindex].delayEntry[index].topic;
-		$scope.cid = $scope.minuteEntrys[parentindex].delayEntry[index].consumerId;
 		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry[index];
 		
 		$scope.items = [$scope.minuteEntrys[parentindex].delayEntry[index].senddelay,
 		                $scope.minuteEntrys[parentindex].delayEntry[index].ackdelay, 
-		                $scope.minuteEntrys[parentindex].delayEntry[index].accu];
+		                $scope.minuteEntrys[parentindex].delayEntry[index].accu ];
 //		if($('.popover').length > 0){
 //			$('.popover').attr("style", "width : 600px");
 //		}

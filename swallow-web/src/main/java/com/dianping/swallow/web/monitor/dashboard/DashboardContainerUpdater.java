@@ -8,12 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
@@ -24,14 +21,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.util.CommonUtils;
-import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
+import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
-import com.google.common.collect.Lists;
 
 /**
  * @author mingdongli
@@ -39,7 +34,7 @@ import com.google.common.collect.Lists;
  *         2015年7月7日上午9:36:49
  */
 @Component
-public class DashboardContainerUpdater implements Runnable {
+public class DashboardContainerUpdater implements MonitorDataListener {
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
@@ -56,129 +51,143 @@ public class DashboardContainerUpdater implements Runnable {
 	@Autowired
 	TopicAlarmSettingServiceWrapper topicAlarmSettingServiceWrapper;
 
-	private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(CommonUtils.getCpuCount());
-
 	private Map<String, TotalData> totalDataMap = new ConcurrentHashMap<String, TotalData>();
 
 	public static final int SAMPLENUMBER = DashboardContainer.ENTRYSIZE * 2;
 
 	private static final String TOTAL = "total";
 
-	private AtomicInteger currentMin = new AtomicInteger(-1);
-
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-
+	
+	private AtomicBoolean delayeven = new AtomicBoolean(false);
+	
+	private AtomicInteger currentMin = new AtomicInteger(-2);
+	
+	private int i = 0;
+	
 	@PostConstruct
 	void updateDashboardContainer() {
-
-		executorService.scheduleAtFixedRate(this, 1, 60, TimeUnit.SECONDS);
+		
+		consumerDataRetrieverWrapper.registerListener(this);
 	}
-
+	
 	@Override
-	public void run() {
+	public void achieveMonitorData() {
 
-		try {
-			getConsumerIdDashboard();
-			logger.info("Update minute entry");
-		} catch (Exception e) {
-			logger.error("Error when get data for all consumerid!", e);
+		if (delayeven.get()){
+			try {
+				updateDelayInsDashboard();
+			} catch (Exception e) {
+				logger.error("Error when get data for all consumerid!", e);
+			}finally{
+				delayeven.compareAndSet(true, false);
+			}
+			System.out.println("i is " + (++i));
+		}else{
+			delayeven.compareAndSet(false, true);
+			System.out.println("i is " + (++i));
 		}
-	};
+	}
+	
+	private void updateDelayInsDashboard() throws Exception {
 
-	private void getConsumerIdDashboard() throws Exception {
+		String time = getCurrentTime();
+		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL);
+		for (String topic : topics) {
+			Set<String> consumerids = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL, topic);
+			Map<String, StatsData> accuStatsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
+			for (String consumerid : consumerids) {
+				ConsumerIdStatisData result = (ConsumerIdStatisData) consumerDataRetrieverWrapper.getValue(TOTAL,
+						topic, consumerid);
+				Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL, topic, consumerid);
+				String ip = loadFirstElement(ips);
+				String mobile = iPDescManagerWrap.loadDpMobile(ip);
+				System.out.println("ip is " + ip);
+				System.out.println(delayeven.get());
+				String email = iPDescManagerWrap.loadEmail(ip);
+				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
+				List<Long> sendList = new ArrayList<Long>(senddelay.values());
+				int sendListSize = sendList.size();
+				if(sendListSize < 2){
+					return;
+				}
+				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
+				List<Long> ackList = new ArrayList<Long>(ackdelay.values());
+				List<Long> accuList = new ArrayList<Long>(Collections.nCopies(sendListSize, 0L));
+				while(accuList.size() < 2){
+					accuList.add(0L);
+				}
+				if(accuStatsData != null){
+					StatsData accuSD = accuStatsData.get(consumerid);
+					if (!isEmpty(accuSD)) {
+						accuList = accuSD.getData();
+					}
+				}
 
-//		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL);
-//		for (String topic : topics) {
-//			Set<String> consumerids = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL, topic);
-//			Map<String, StatsData> accuStatsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
-//			for (String consumerid : consumerids) {
-//				ConsumerIdStatisData result = (ConsumerIdStatisData) consumerDataRetrieverWrapper.getValue(TOTAL,
-//						topic, consumerid);
-//				Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(TOTAL, topic, consumerid);
-//				String ip = loadFirstElement(ips);
-//				String mobile = iPDescManagerWrap.loadDpMobile(ip);
-//				String email = iPDescManagerWrap.loadEmail(ip);
-//				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
-//				List<Long> sendList = new ArrayList<Long>(senddelay.values());
-//				if (currentMin.get() < 0) {
-//					int minute = loadLastKeyOfMinute(senddelay);
-//					currentMin.set(minute);
-//				}
-//				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
-//				List<Long> ackList = new ArrayList<Long>(ackdelay.values());
-//				StatsData accuSD = accuStatsData.get(consumerid);
-//				List<Long> accuList = new ArrayList<Long>(Collections.nCopies(sendList.size(), 0L));
-//				if (!isEmpty(accuSD)) {
-//					accuList = accuSD.getData();
-//				}
-//
-//				int entrySize = dashboardContainer.getEntrySize();
-//				int offset = entrySize == 0 ? DashboardContainer.ENTRYSIZE * 2
-//								: (entrySize == DashboardContainer.ENTRYSIZE ? 2
-//								: (DashboardContainer.ENTRYSIZE - entrySize) * 2);
-//				int stopIndex = sendList.size();
-//				if(stopIndex < offset){
-//					stopIndex = DashboardContainer.ENTRYSIZE * 2;
-//				}
-//				int startIndex = stopIndex - offset;
-//				TotalData td = totalDataMap.get(consumerid);
-//				if (td == null) {
-//					td = new TotalData();
-//				}
-//				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setMinute(currentMin.get())
-//						.setListSend(sendList.subList(startIndex, stopIndex))
-//						.setListAck(ackList.subList(startIndex, stopIndex))
-//						.setListAccu(accuList.subList(startIndex, stopIndex));
-//				totalDataMap.put(consumerid, td);
-//			}
-//		}
+				int stopIndex = sendListSize;
+				int startIndex = stopIndex - 2;
+				TotalData td = totalDataMap.get(consumerid);
+				if (td == null) {
+					td = new TotalData();
+				}
+				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(time)
+						.setListSend(sendList.subList(startIndex, stopIndex))
+						.setListAck(ackList.subList(startIndex, stopIndex))
+						.setListAccu(accuList.subList(startIndex, stopIndex));
+				totalDataMap.put(consumerid, td);
+			}
+		}
 
+		// //
 		// ----------------------------------------------------------------------------
-		Map<String, List<Long>> mapSend = new ConcurrentHashMap<String, List<Long>>();
-		Map<String, List<Long>> mapAck = new ConcurrentHashMap<String, List<Long>>();
-		Map<String, List<Long>> mapAccu = new ConcurrentHashMap<String, List<Long>>();
-		Random random = new Random();
-		int size = dashboardContainer.getEntrySize();
-		int offset = size == DashboardContainer.ENTRYSIZE ? 2 : SAMPLENUMBER;
-		String topic = "topic";
-
-		for (int i = 0; i < SAMPLENUMBER; ++i) {
-			List<Long> number = new ArrayList<Long>(offset);
-			for (int j = 0; j < offset; ++j) {
-				long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
-				number.add(tmp);
-			}
-			mapAck.put("key" + i, number);
-		}
-		for (int i = 0; i < SAMPLENUMBER; ++i) {
-			List<Long> number = new ArrayList<Long>(offset);
-			for (int j = 0; j < offset; ++j) {
-				long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
-				number.add(tmp);
-			}
-			mapSend.put("key" + i, number);
-		}
-		for (int i = 0; i < SAMPLENUMBER; ++i) {
-			List<Long> number = new ArrayList<Long>(offset);
-			for (int j = 0; j < offset; ++j) {
-				long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
-				number.add(tmp);
-			}
-			mapAccu.put("key" + i, number);
-		}
-		for (Map.Entry<String, List<Long>> send : mapSend.entrySet()) {
-			String cid = send.getKey();
-			TotalData td = totalDataMap.get(cid);
-			if (td == null) {
-				TotalData totalData = new TotalData();
-				totalData.setCid(cid).setTopic(topic).setListSend(send.getValue()).setListAck(mapAck.get(cid))
-						.setListAccu(mapAccu.get(cid));
-				totalDataMap.put(cid, totalData);
-			} else {
-				td.setListSend(send.getValue()).setListAck(mapAck.get(cid)).setListAccu(mapAccu.get(cid));
-				totalDataMap.put(cid, td);
-			}
-		}
+		// Map<String, List<Long>> mapSend = new ConcurrentHashMap<String,
+		// List<Long>>();
+		// Map<String, List<Long>> mapAck = new ConcurrentHashMap<String,
+		// List<Long>>();
+		// Map<String, List<Long>> mapAccu = new ConcurrentHashMap<String,
+		// List<Long>>();
+		// Random random = new Random();
+		// int size = dashboardContainer.getEntrySize();
+		// int offset = size == DashboardContainer.ENTRYSIZE ? 2 : SAMPLENUMBER;
+		// String topic = "topic";
+		//
+		// for (int i = 0; i < SAMPLENUMBER; ++i) {
+		// List<Long> number = new ArrayList<Long>(offset);
+		// for (int j = 0; j < offset; ++j) {
+		// long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
+		// number.add(tmp);
+		// }
+		// mapAck.put("key" + i, number);
+		// }
+		// for (int i = 0; i < SAMPLENUMBER; ++i) {
+		// List<Long> number = new ArrayList<Long>(offset);
+		// for (int j = 0; j < offset; ++j) {
+		// long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
+		// number.add(tmp);
+		// }
+		// mapSend.put("key" + i, number);
+		// }
+		// for (int i = 0; i < SAMPLENUMBER; ++i) {
+		// List<Long> number = new ArrayList<Long>(offset);
+		// for (int j = 0; j < offset; ++j) {
+		// long tmp = (long) (random.nextInt(20) % (20 - 10 + 1) + 10);
+		// number.add(tmp);
+		// }
+		// mapAccu.put("key" + i, number);
+		// }
+		// for (Map.Entry<String, List<Long>> send : mapSend.entrySet()) {
+		// String cid = send.getKey();
+		// TotalData td = totalDataMap.get(cid);
+		// if (td == null) {
+		// TotalData totalData = new TotalData();
+		// totalData.setCid(cid).setTopic(topic).setListSend(send.getValue()).setListAck(mapAck.get(cid))
+		// .setListAccu(mapAccu.get(cid));
+		// totalDataMap.put(cid, totalData);
+		// } else {
+		// td.setListSend(send.getValue()).setListAck(mapAck.get(cid)).setListAccu(mapAccu.get(cid));
+		// totalDataMap.put(cid, td);
+		// }
+		// }
 		// -------------------------------------------------------------------------------------------
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			generateEntrys(entry.getValue());
@@ -249,14 +258,6 @@ public class DashboardContainerUpdater implements Runnable {
 		if (minuteEntryList == null) {
 			minuteEntryList = new ArrayList<MinuteEntry>();
 		}
-		int entrySize = minuteEntryList.size();
-		int size = entrySize == 0 ? DashboardContainer.ENTRYSIZE : (entrySize == DashboardContainer.ENTRYSIZE ? 1
-				: DashboardContainer.ENTRYSIZE - entrySize);
-		//后面需去掉
-		Calendar cal = Calendar.getInstance();
-		int m = cal.get(Calendar.MINUTE);
-		currentMin.set(m);
-		List<String> times = getTimes(size, currentMin.get());
 
 		// 按时间升序
 		Map<String, MinuteEntry> minuteEntryMap = new LinkedHashMap<String, MinuteEntry>();
@@ -265,7 +266,7 @@ public class DashboardContainerUpdater implements Runnable {
 			TotalData td = entry.getValue();
 			List<Entry> entrys = td.getEntrys();
 			for (int i = 0; i < entrys.size(); ++i) {
-				String time = times.get(i);
+				String time = td.getTime();
 				MinuteEntry me = minuteEntryMap.get(time);
 				if (me == null) {
 					me = new MinuteEntry();
@@ -282,26 +283,42 @@ public class DashboardContainerUpdater implements Runnable {
 			MinuteEntry me = entry.getValue();
 			dashboardContainer.insertMinuteEntry(key, me);
 		}
-		currentMin.set(-1);
 		totalDataMap.clear();
 	}
 
-	private List<String> getTimes(final int size, final int currentMin) {
-
-		List<String> times = new ArrayList<String>();
+//	private List<String> getTimes(final int size, final int currentMin) {
+//
+//		List<String> times = new ArrayList<String>();
+//		Calendar cal = Calendar.getInstance();
+//		int m = cal.get(Calendar.MINUTE);
+//		if (m < currentMin) {
+//			cal.add(Calendar.HOUR_OF_DAY, -1);
+//		}
+//		cal.set(Calendar.MINUTE, currentMin);
+//		dashboardContainer.setCurrentMinute(currentMin);
+//		for (int i = 0; i < size; ++i) {
+//			cal.add(Calendar.MINUTE, i == 0 ? 0 : -1);
+//			int min = cal.get(Calendar.MINUTE);
+//			times.add(cal.get(Calendar.HOUR_OF_DAY) + ":" + (min < 10 ? "0" + min : min));
+//		}
+//		return Lists.reverse(times);
+//	}
+	
+	private String getCurrentTime(){
+		
 		Calendar cal = Calendar.getInstance();
-		int m = cal.get(Calendar.MINUTE);
-		if(m < currentMin){
-			cal.add(Calendar.HOUR_OF_DAY, -1);
+		cal.add(Calendar.MINUTE, -1);
+		int min = cal.get(Calendar.MINUTE);
+		int curMin = currentMin.get();
+		int diff = min - curMin;
+		if(curMin < 0){
+			curMin = min;
+		}else if(diff != 1 && diff != -59){
+			min = curMin + 1;
 		}
-		cal.set(Calendar.MINUTE, currentMin);
-		dashboardContainer.setCurrentMinute(currentMin);
-		for (int i = 0; i < size; ++i) {
-			cal.add(Calendar.MINUTE, i == 0 ? 0 : -1);
-			int min = cal.get(Calendar.MINUTE);
-			times.add(cal.get(Calendar.HOUR_OF_DAY) + ":" + (min < 10 ? "0" + min : min));
-		}
-		return Lists.reverse(times);
+		currentMin.set(min);
+		String time = cal.get(Calendar.HOUR_OF_DAY) + ":" + (min < 10 ? "0" + min : min);
+		return time;
 	}
 
 	private boolean isEmpty(StatsData sendData) {
@@ -318,14 +335,18 @@ public class DashboardContainerUpdater implements Runnable {
 		return "";
 	}
 
-	private int loadLastKeyOfMinute(NavigableMap<Long, Long> map) {
 
-		Long lastKey = map.lastKey();
-		Long milis = lastKey * AbstractCollector.SEND_INTERVAL * 1000;
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(milis);
-		return cal.get(Calendar.MINUTE);
-
-	}
+//	private int loadLastKeyOfMinute(NavigableMap<Long, Long> map) {
+//
+//		Calendar cal = Calendar.getInstance();
+//		if (map.size() != 0) {
+//			Long lastKey = map.lastKey();
+//			Long milis = lastKey * AbstractCollector.SEND_INTERVAL * 1000;
+//			cal.setTimeInMillis(milis);
+//			return cal.get(Calendar.MINUTE);
+//		}
+//		return cal.get(Calendar.MINUTE);
+//
+//	}
 
 }

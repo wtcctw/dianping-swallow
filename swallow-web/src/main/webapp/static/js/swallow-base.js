@@ -140,8 +140,6 @@ module.directive('popOver', function ($compile) {
         },
         scope: {
             items: '=',
-            topic: '=',
-            cid: '=',
             clicked: '=',
             title: '@'
         }

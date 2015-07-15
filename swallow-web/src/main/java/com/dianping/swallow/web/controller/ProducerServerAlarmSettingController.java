@@ -39,7 +39,6 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 	@RequestMapping(value = "/console/setting/producerserver")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
 
-		subSide = "producerserver";
 		return new ModelAndView("setting/producerserversetting", createViewMap());
 	}
 
@@ -99,7 +98,7 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 		return "warn";
 	}
 
-	private String subSide = "producerserver";
+	private String subSide = "producer";
 
 	@Override
 	public String getSubSide() {

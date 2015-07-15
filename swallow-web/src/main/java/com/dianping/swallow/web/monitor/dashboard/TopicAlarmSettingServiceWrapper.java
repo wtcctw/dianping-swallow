@@ -7,7 +7,8 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
-import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
+import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
+import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
 
@@ -19,38 +20,42 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
 @Component
 public class TopicAlarmSettingServiceWrapper {
 	
+	@Resource(name = "consumerIdAlarmSettingService")
+	private ConsumerIdAlarmSettingService consumerIdAlarmSettingService;
+	
 	@Resource(name = "topicAlarmSettingService")
 	private TopicAlarmSettingService topicAlarmSettingService;
 	
 	public ConsumerBaseAlarmSetting loadConsumerBaseAlarmSetting(String consumerId){
 		
-		List<TopicAlarmSetting> topicAlarmSettings = topicAlarmSettingService.findAll();
-		TopicAlarmSetting topicAlarmSetting;
-		if(topicAlarmSettings.size() > 0){
-			topicAlarmSetting = topicAlarmSettings.get(0);
+		List<ConsumerIdAlarmSetting> consumerIdAlarmSettings = consumerIdAlarmSettingService.findAll();
+		ConsumerIdAlarmSetting consumerIdAlarmSetting;
+		if(consumerIdAlarmSettings.size() > 0){
+			consumerIdAlarmSetting = consumerIdAlarmSettings.get(0);
 		}
 		else{
-			return new ConsumerBaseAlarmSetting();
+			return loadConsumerIdAlarmSettingWithMaxValue();
 		}
-		List<String> whiteList = topicAlarmSetting.getConsumerIdWhiteList();
+		List<String> whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
 		if(whiteList.contains(consumerId)){
-			return loadConsumerBaseAlarmSettingWithMaxValue();
+			return loadConsumerIdAlarmSettingWithMaxValue();
 			
 		}
-		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSetting.getConsumerAlarmSetting();
+		
+		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = consumerIdAlarmSetting.getConsumerAlarmSetting();
 		if(consumerBaseAlarmSetting == null){
-			consumerBaseAlarmSetting = new ConsumerBaseAlarmSetting();
+			consumerBaseAlarmSetting = loadConsumerIdAlarmSettingWithMaxValue();
 		}
 		return consumerBaseAlarmSetting;
 	}
 	
-	private ConsumerBaseAlarmSetting loadConsumerBaseAlarmSettingWithMaxValue(){
+	private ConsumerBaseAlarmSetting loadConsumerIdAlarmSettingWithMaxValue(){
 		
 		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = new ConsumerBaseAlarmSetting();
 		
-		consumerBaseAlarmSetting.setAccumulation(Integer.MAX_VALUE);
 		consumerBaseAlarmSetting.setSenderDelay(Integer.MAX_VALUE);
 		consumerBaseAlarmSetting.setAckDelay(Integer.MAX_VALUE);
+		consumerBaseAlarmSetting.setAccumulation(Integer.MAX_VALUE);
 		return consumerBaseAlarmSetting;
 	}
 	
