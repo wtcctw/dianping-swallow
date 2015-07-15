@@ -70,7 +70,7 @@ public class DefaultProducerServerStatisDataDao extends AbstractWriteDao impleme
 	}
 
 	public List<ProducerServerStatsData> findSectionData(long startKey, long endKey) {
-		Query query = new Query(Criteria.where(TIMEKEY_FIELD).gte(startKey).and(TIMEKEY_FIELD).lte(endKey));
+		Query query = new Query(Criteria.where(TIMEKEY_FIELD).gte(startKey).lte(endKey));
 		List<ProducerServerStatsData> serverStatisDatas = mongoTemplate.find(query, ProducerServerStatsData.class,
 				PRODUCERSERVERSTATICDATA_COLLECTION);
 		return serverStatisDatas;

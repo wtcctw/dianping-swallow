@@ -15,7 +15,6 @@ import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
 import com.dianping.swallow.web.service.ProducerMachineStatisDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
 
-
 /**
  *
  * @author qiyin
@@ -62,18 +61,20 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 		if (dataCount.get() > 0) {
 			dataCount.incrementAndGet();
 			serverStatisData = producerDataWapper.getServerStatsData(lastTimeKey.get());
-			topicStatisDatas = producerDataWapper.getTopicStatsDatas(lastTimeKey.get());
-			storageServerStatis();
-			storageTopicStatis();
+			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
+				lastTimeKey.set(serverStatisData.getTimeKey());
+				topicStatisDatas = producerDataWapper.getTopicStatsDatas(lastTimeKey.get());
+				storageServerStatis();
+				storageTopicStatis();
+			}
 		}
 	}
 
 	private void storageServerStatis() {
 		if (serverStatisData != null) {
-			return;
-		}
-		for (ProducerMachineStatsData producerMachineStatsData : serverStatisData.getStatisDatas()) {
-			machineStatisDataService.insert(producerMachineStatsData);
+			for (ProducerMachineStatsData producerMachineStatsData : serverStatisData.getStatisDatas()) {
+				machineStatisDataService.insert(producerMachineStatsData);
+			}
 		}
 	}
 

@@ -27,4 +27,3 @@ public class ProducerMachineStatsData {
 		this.statisData = statisData;
 	}
 }
-

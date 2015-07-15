@@ -28,11 +28,11 @@ import com.dianping.swallow.web.service.SwallowAlarmSettingService;
 @Service("producerServerStatisAlarmFilter")
 public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter implements MonitorDataListener {
 
-	private volatile ProducerServerStatsData serverStatisData;
+	private ProducerServerStatsData serverStatisData;
 
 	@Autowired
 	private AlarmManager alarmManager;
-	
+
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 
@@ -44,7 +44,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 
 	@Autowired
 	private ProducerServerAlarmSettingService serverAlarmSettingService;
-	
+
 	@Autowired
 	private SwallowAlarmSettingService swallowAlarmSettingService;
 
@@ -84,15 +84,21 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 		for (ProducerMachineStatsData machineStatisData : machineStatisDatas) {
 			ProducerBaseStatsData baseStatisData = machineStatisData.getStatisData();
 			if (whiteList == null || (!whiteList.contains(machineStatisData.getIp()) && baseStatisData != null)) {
-				long qpx = baseStatisData.getQpx();
-				if (qpx > qps.getPeak()) {
-					alarmManager.producerServerStatisQpsPAlarm(machineStatisData.getIp(), qpx);
-					return false;
-				}
-				if (qpx < qps.getValley()){
-					alarmManager.producerServerStatisQpsVAlarm(machineStatisData.getIp(), qpx);
-					return false;
-				}
+				qpsAlarm(baseStatisData.getQpx(), machineStatisData.getIp(), qps);
+			}
+		}
+		return true;
+	}
+
+	private boolean qpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > qps.getPeak()) {
+				alarmManager.producerServerStatisQpsPAlarm(ip, qpx);
+				return false;
+			}
+			if (qpx < qps.getValley()) {
+				alarmManager.producerServerStatisQpsVAlarm(ip, qpx);
+				return false;
 			}
 		}
 		return true;

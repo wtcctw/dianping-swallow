@@ -52,7 +52,7 @@ public class TopicAlarmSettingServiceWrapper {
 		
 		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = new ConsumerBaseAlarmSetting();
 		
-		consumerBaseAlarmSetting.setSenderDelay(Integer.MAX_VALUE);
+		consumerBaseAlarmSetting.setSendDelay(Integer.MAX_VALUE);
 		consumerBaseAlarmSetting.setAckDelay(Integer.MAX_VALUE);
 		consumerBaseAlarmSetting.setAccumulation(Integer.MAX_VALUE);
 		return consumerBaseAlarmSetting;

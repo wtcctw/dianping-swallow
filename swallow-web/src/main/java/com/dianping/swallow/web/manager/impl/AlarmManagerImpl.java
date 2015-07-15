@@ -11,6 +11,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.model.alarm.AlarmLevelType;
 import com.dianping.swallow.web.model.alarm.AlarmType;
@@ -44,6 +45,12 @@ public class AlarmManagerImpl implements AlarmManager {
 	private final Map<String, Long> consumerTopicAlarms = new HashMap<String, Long>();
 
 	private final Map<String, Long> consumerIdAlarms = new HashMap<String, Long>();
+
+	private static final String env;
+
+	static {
+		env = EnvZooKeeperConfig.getEnv().trim();
+	}
 
 	@Autowired
 	private AlarmService alarmService;
@@ -225,7 +232,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "consumer [topic] " + topic + " [sendqpx = ]" + qpx
 				+ " is higher than peak value, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_P)) {
-			sendAlarmByProducerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
+			sendAlarmByConsumerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -235,7 +242,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "consumer [topic] " + topic + " [sendqpx = ]" + qpx
 				+ " is lower than peak value, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_V)) {
-			sendAlarmByProducerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
+			sendAlarmByConsumerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -245,7 +252,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "consumer [topic] " + topic + " [sendqpx = ]" + qpx + " [expected = ]" + expected
 				+ " fluctuation is too large, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_F)) {
-			sendAlarmByProducerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
+			sendAlarmByConsumerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -255,7 +262,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "consumer [topic] " + topic + " [senddelay = ]" + delay + " [expected = ]" + expected
 				+ " is too long, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SEND_DELAY)) {
-			sendAlarmByProducerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
+			sendAlarmByConsumerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -265,7 +272,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "consumer [topic] " + topic + " [ackqpx = ]" + qpx
 				+ " is higher than peak value, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_P)) {
-			sendAlarmByProducerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
+			sendAlarmByConsumerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -275,7 +282,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "consumer [topic] " + topic + " [ackqpx = ]" + qpx
 				+ " is lower than peak value, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_V)) {
-			sendAlarmByProducerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
+			sendAlarmByConsumerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -285,7 +292,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "consumer [topic] " + topic + " [ackqpx = ]" + qpx + " [expected = ]" + expected
 				+ " fluctuation is too large, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_F)) {
-			sendAlarmByProducerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
+			sendAlarmByConsumerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -295,7 +302,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "consumer [topic] " + topic + " [ackdelay = ]" + delay + " [expected = ]" + expected
 				+ " is too long, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACK_DELAY)) {
-			sendAlarmByProducerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
+			sendAlarmByConsumerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -414,6 +421,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		Set<String> ips = new HashSet<String>();
 		ips.add(ip);
 		fillReciever(ips, mobiles, emails);
+		fillRecieverDev(mobiles, emails);
 		sendAll(mobiles, emails, title, message, type);
 	}
 
@@ -422,6 +430,16 @@ public class AlarmManagerImpl implements AlarmManager {
 		Set<String> mobiles = new HashSet<String>();
 		Set<String> emails = new HashSet<String>();
 		fillReciever(ips, mobiles, emails);
+		fillRecieverDev(mobiles, emails);
+		sendAll(mobiles, emails, title, message, type);
+	}
+	
+	private void sendAlarmByConsumerTopic(String topicName, String title, String message, AlarmLevelType type) {
+		Set<String> ips = ipCollectorService.getConsumerTopicIps(topicName);
+		Set<String> mobiles = new HashSet<String>();
+		Set<String> emails = new HashSet<String>();
+		fillReciever(ips, mobiles, emails);
+		fillRecieverDev(mobiles, emails);
 		sendAll(mobiles, emails, title, message, type);
 	}
 
@@ -431,6 +449,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		Set<String> mobiles = new HashSet<String>();
 		Set<String> emails = new HashSet<String>();
 		fillReciever(ips, mobiles, emails);
+		fillRecieverDev(mobiles, emails);
 		sendAll(mobiles, emails, title, message, type);
 	}
 
@@ -443,6 +462,9 @@ public class AlarmManagerImpl implements AlarmManager {
 			String ip = iterator.next();
 			if (!StringUtils.equals(ip, TOTAL_KEY)) {
 				IPDesc ipDesc = ipDescManager.getIPDesc(ip);
+				if (ipDesc == null) {
+					continue;
+				}
 				String strEmail = ipDesc.getEmail();
 				String strDpMobile = ipDesc.getDpMobile();
 				String strOpMobile = ipDesc.getOpMobile();
@@ -514,6 +536,15 @@ public class AlarmManagerImpl implements AlarmManager {
 	private boolean isConsumerIdAlarm(String topic, String consumerId, AlarmType alarmType) {
 		String key = topic + KEY_SPLIT + consumerId + KEY_SPLIT + alarmType.hashCode();
 		return isAlarm(consumerIdAlarms, key);
+	}
+
+	private void fillRecieverDev(Set<String> mobiles, Set<String> emails) {
+		if (env.equals("dev")) {
+			mobiles.clear();
+			emails.clear();
+			mobiles.add("13162757679");
+			emails.add("qi.yin@dianping.com");
+		}
 	}
 
 }

@@ -1,10 +1,14 @@
 package com.dianping.swallow.web.model.statis;
-
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class ConsumerBaseStatsData {
 
-	private long senderQpx;
+	private long sendQpx;
 	
-	private long senderDelay;
+	private long sendDelay;
 	
 	private long ackQpx;
 	
@@ -12,20 +16,20 @@ public class ConsumerBaseStatsData {
 	
 	private long accumulation;
 
-	public long getSenderQpx() {
-		return senderQpx;
+	public long getSendQpx() {
+		return sendQpx;
 	}
 
-	public void setSenderQpx(long senderQpx) {
-		this.senderQpx = senderQpx;
+	public void setSendQpx(long sendQpx) {
+		this.sendQpx = sendQpx;
 	}
 
-	public long getSenderDelay() {
-		return senderDelay;
+	public long getSendDelay() {
+		return sendDelay;
 	}
 
-	public void setSenderDelay(long senderDelay) {
-		this.senderDelay = senderDelay;
+	public void setSendDelay(long sendDelay) {
+		this.sendDelay = sendDelay;
 	}
 
 	public long getAckQpx() {
@@ -39,7 +43,7 @@ public class ConsumerBaseStatsData {
 	public long getAckDelay() {
 		return ackDelay;
 	}
-
+	
 	public void setAckDelay(long ackDelay) {
 		this.ackDelay = ackDelay;
 	}
@@ -51,4 +55,5 @@ public class ConsumerBaseStatsData {
 	public void setAccumulation(long accumulation) {
 		this.accumulation = accumulation;
 	}
+
 }

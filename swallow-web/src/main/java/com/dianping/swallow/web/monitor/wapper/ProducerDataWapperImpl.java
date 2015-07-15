@@ -7,8 +7,6 @@ import java.util.NavigableMap;
 import java.util.Set;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +28,6 @@ import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 @Service("producerDataWapper")
 public class ProducerDataWapperImpl extends AbstractDataWapper implements ProducerDataWapper {
 
-	private static final Logger logger = LoggerFactory.getLogger(ProducerDataWapperImpl.class);
-
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 
@@ -42,40 +38,45 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 			return null;
 		}
 		Iterator<String> iterator = serverKeys.iterator();
-		ProducerServerStatsData serverStatsDataTemp = new ProducerServerStatsData();
-		serverStatsDataTemp.setTimeKey(timeKey);
+		ProducerServerStatsData serverStatsData = new ProducerServerStatsData();
 		List<ProducerMachineStatsData> machineStatsDatas = new ArrayList<ProducerMachineStatsData>();
 		int index = 0;
 		while (iterator.hasNext()) {
 			String serverIp = iterator.next();
+
 			if (StringUtils.equals(serverIp, TOTAL_KEY)) {
 				continue;
 			}
-			logger.info("#######" + serverIp);
+
 			ProducerServerStatisData serverStatisData = (ProducerServerStatisData) producerDataRetriever
 					.getValue(new CasKeys(serverIp));
-			logger.info("#######" + serverStatisData);
 			NavigableMap<Long, Long> qpx = serverStatisData.getQpx(StatisType.SAVE);
-			logger.info("#######" + String.valueOf(timeKey));
-			if (qpx == null) {
-				continue;
+			if (qpx == null || qpx.isEmpty()) {
+				return null;
 			}
+
 			if (index == 0) {
-				timeKey = timeKey == DEFAULT_VALUE ? qpx.lastKey() : qpx.higherKey(timeKey);
+				Long tempKey = timeKey == DEFAULT_VALUE ? qpx.lastKey() : qpx.higherKey(timeKey);
+				if (tempKey == null) {
+					return null;
+				}
+				timeKey = tempKey.longValue();
+				serverStatsData.setTimeKey(timeKey);
 				index++;
 			}
-			serverStatsDataTemp.setTimeKey(timeKey);
+
 			ProducerMachineStatsData machineStatsData = new ProducerMachineStatsData();
 			machineStatsData.setIp(serverIp);
 			ProducerBaseStatsData baseStatsData = new ProducerBaseStatsData();
 			baseStatsData.setDelay(0);
 			baseStatsData.setQpx(qpx.get(timeKey));
 			machineStatsData.setStatisData(baseStatsData);
+
 			machineStatsDatas.add(machineStatsData);
 
 		}
-		serverStatsDataTemp.setStatisDatas(machineStatsDatas);
-		return serverStatsDataTemp;
+		serverStatsData.setStatisDatas(machineStatsDatas);
+		return serverStatsData;
 	}
 
 	@Override
@@ -85,28 +86,46 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 			return null;
 		}
 		Iterator<String> iterator = topicKeys.iterator();
-		List<ProducerTopicStatsData> producerTopicStatisDataTemps = new ArrayList<ProducerTopicStatsData>();
+		List<ProducerTopicStatsData> producerTopicStatsDatas = new ArrayList<ProducerTopicStatsData>();
 		int index = 0;
 		while (iterator.hasNext()) {
 			ProducerTopicStatsData producerTopicStatisData = new ProducerTopicStatsData();
 			String topicName = String.valueOf(iterator.next());
+			if (StringUtils.equals(topicName, TOTAL_KEY)) {
+				continue;
+			}
 			producerTopicStatisData.setTopicName(topicName);
 			ProducerTopicStatisData serverStatisData = (ProducerTopicStatisData) producerDataRetriever
 					.getValue(new CasKeys(TOTAL_KEY, topicName));
 			NavigableMap<Long, Long> topicQpxs = serverStatisData.getQpx(StatisType.SAVE);
+			if (topicQpxs == null || topicQpxs.isEmpty()) {
+				continue;
+			}
 			if (index == 0) {
-				timeKey = timeKey == DEFAULT_VALUE ? topicQpxs.lastKey() : topicQpxs.higherKey(timeKey);
+				Long tempKey = timeKey == DEFAULT_VALUE ? topicQpxs.lastKey() : topicQpxs.higherKey(timeKey);
+				if (tempKey == null) {
+					return null;
+				}
+				timeKey = tempKey.longValue();
 				index++;
 			}
+
 			producerTopicStatisData.setTimeKey(timeKey);
+
 			NavigableMap<Long, Long> topicDelays = serverStatisData.getDelay(StatisType.SAVE);
+
 			ProducerBaseStatsData producerBaseStatisData = new ProducerBaseStatsData();
 			producerBaseStatisData.setQpx(topicQpxs.get(timeKey));
-			producerBaseStatisData.setDelay(topicDelays.get(timeKey));
+
+			Long delay = topicDelays.get(timeKey);
+			if (delay != null) {
+				producerBaseStatisData.setDelay(delay.longValue());
+			}
 			producerTopicStatisData.setProducerStatisData(producerBaseStatisData);
-			producerTopicStatisDataTemps.add(producerTopicStatisData);
+
+			producerTopicStatsDatas.add(producerTopicStatisData);
 		}
-		return producerTopicStatisDataTemps;
+		return producerTopicStatsDatas;
 	}
 
 	public Set<String> getTopicIps(String topicName) {

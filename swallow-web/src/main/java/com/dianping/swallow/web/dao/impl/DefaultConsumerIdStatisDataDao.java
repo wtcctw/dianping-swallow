@@ -14,10 +14,10 @@ import com.dianping.swallow.web.model.statis.ConsumerIdStatsData;
 import com.mongodb.WriteResult;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("consumerIdStatisDataDao")
 public class DefaultConsumerIdStatisDataDao extends AbstractWriteDao implements ConsumerIdStatisDataDao {
 
@@ -107,8 +107,8 @@ public class DefaultConsumerIdStatisDataDao extends AbstractWriteDao implements 
 
 	@Override
 	public List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey) {
-		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId).and(TIMEKEY_FIELD).gte(startKey)
-				.and(TIMEKEY_FIELD).lte(endKey));
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId)
+				.and(TIMEKEY_FIELD).gte(startKey).lte(endKey));
 		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
 				CONSUMERIDTATISDATA_COLLECTION);
 		return statisDatas;

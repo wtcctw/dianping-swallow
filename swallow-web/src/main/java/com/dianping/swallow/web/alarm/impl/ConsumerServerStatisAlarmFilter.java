@@ -28,7 +28,7 @@ import com.dianping.swallow.web.service.SwallowAlarmSettingService;
 @Service("consumerServerStatisAlarmFilter")
 public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter implements MonitorDataListener {
 
-	private volatile ConsumerServerStatsData serverStatisData;
+	private ConsumerServerStatsData serverStatisData;
 
 	@Autowired
 	private AlarmManager alarmManager;
@@ -44,7 +44,7 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 
 	@Autowired
 	private ConsumerServerAlarmSettingService serverAlarmSettingService;
-	
+
 	@Autowired
 	private SwallowAlarmSettingService swallowAlarmSettingService;
 
@@ -85,24 +85,38 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 		for (ConsumerMachineStatsData machineStatisData : machineStatisDatas) {
 			ConsumerBaseStatsData baseStatisData = machineStatisData.getStatisData();
 			if (whiteList == null || (!whiteList.contains(machineStatisData.getIp()) && baseStatisData != null)) {
-				long sendQpx = baseStatisData.getSenderQpx();
-				if (sendQpx > sendQps.getPeak()) {
-					alarmManager.consumerServerStatisSQpsPAlarm(machineStatisData.getIp(), sendQpx);
-					return false;
-				}
-				if (sendQpx < sendQps.getValley()) {
-					alarmManager.consumerServerStatisSQpsVAlarm(machineStatisData.getIp(), sendQpx);
-					return false;
-				}
+				long sendQpx = baseStatisData.getSendQpx();
+				sendQpsAlarm(sendQpx, machineStatisData.getIp(), sendQps);
 				long ackQpx = baseStatisData.getAckQpx();
-				if (ackQpx > ackQps.getPeak()) {
-					alarmManager.consumerServerStatisAQpsPAlarm(machineStatisData.getIp(), ackQpx);
-					return false;
-				}
-				if (ackQpx < ackQps.getValley()) {
-					alarmManager.consumerServerStatisAQpsVAlarm(machineStatisData.getIp(), ackQpx);
-					return false;
-				}
+				ackQpsAlarm(ackQpx, machineStatisData.getIp(), ackQps);
+			}
+		}
+		return true;
+	}
+
+	private boolean sendQpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > qps.getPeak()) {
+				alarmManager.consumerServerStatisSQpsPAlarm(ip, qpx);
+				return false;
+			}
+			if (qpx < qps.getValley()) {
+				alarmManager.consumerServerStatisSQpsVAlarm(ip, qpx);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean ackQpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0) {
+			if (qpx > qps.getPeak()) {
+				alarmManager.consumerServerStatisAQpsPAlarm(ip, qpx);
+				return false;
+			}
+			if (qpx < qps.getValley()) {
+				alarmManager.consumerServerStatisAQpsVAlarm(ip, qpx);
+				return false;
 			}
 		}
 		return true;

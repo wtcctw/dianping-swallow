@@ -2,6 +2,7 @@ package com.dianping.swallow.web.monitor.wapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 		int index = 0;
 		while (iterator.hasNext()) {
 			String serverIp = iterator.next();
-			if(StringUtils.equals(serverIp, TOTAL_KEY)){
+			if (StringUtils.equals(serverIp, TOTAL_KEY)) {
 				continue;
 			}
 			ConsumerServerStatisData serverStatisData = (ConsumerServerStatisData) consumerDataRetriever.getValue(
@@ -60,17 +61,40 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			NavigableMap<Long, Long> ackQpx = serverStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = serverStatisData.getDelay(StatisType.SEND);
 			NavigableMap<Long, Long> ackDelay = serverStatisData.getDelay(StatisType.ACK);
+			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
+					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+				return null;
+			}
 			if (index == 0) {
-				timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				if (tempKey == null) {
+					return null;
+				}
+				timeKey = tempKey.longValue();
+				serverStatsData.setTimeKey(timeKey);
 				index++;
 			}
+
 			ConsumerMachineStatsData machineStatsData = new ConsumerMachineStatsData();
 			machineStatsData.setIp(serverIp);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			baseStatsData.setSenderQpx(sendQpx.get(timeKey));
-			baseStatsData.setAckQpx(ackQpx.get(timeKey));
-			baseStatsData.setSenderDelay(sendDelay.get(timeKey));
-			baseStatsData.setAckDelay(ackDelay.get(timeKey));
+			baseStatsData.setSendQpx(sendQpx.get(timeKey));
+
+			Long ackQpxValue = ackQpx.get(timeKey);
+			if (ackQpxValue != null) {
+				baseStatsData.setAckQpx(ackQpxValue.longValue());
+			}
+
+			Long sendDelayValue = sendDelay.get(timeKey);
+			if (sendDelayValue != null) {
+				baseStatsData.setSendDelay(sendDelayValue.longValue());
+			}
+
+			Long ackDelayValue = ackDelay.get(timeKey);
+			if (ackDelayValue != null) {
+				baseStatsData.setAckDelay(ackDelayValue.longValue());
+			}
+
 			machineStatsData.setStatisData(baseStatsData);
 			machineStatsDatas.add(machineStatsData);
 		}
@@ -89,22 +113,51 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 		int index = 0;
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
+			if (StringUtils.equals(topicName, TOTAL_KEY)) {
+				continue;
+			}
 			ConsumerTopicStatsData topicStatsData = new ConsumerTopicStatsData();
 			ConsumerTopicStatisData topicStatisData = (ConsumerTopicStatisData) consumerDataRetriever.getValue(
 					new CasKeys(TOTAL_KEY, topicName), StatisType.SEND);
+			if (topicStatisData == null) {
+				return null;
+			}
 			NavigableMap<Long, Long> sendQpx = topicStatisData.getQpx(StatisType.SEND);
 			NavigableMap<Long, Long> ackQpx = topicStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = topicStatisData.getDelay(StatisType.SEND);
 			NavigableMap<Long, Long> ackDelay = topicStatisData.getDelay(StatisType.ACK);
+			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
+					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+				return null;
+			}
 			if (index == 0) {
-				timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				if (tempKey == null) {
+					return null;
+				}
+				timeKey = tempKey.longValue();
 				index++;
 			}
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			baseStatsData.setSenderQpx(sendQpx.get(timeKey));
-			baseStatsData.setSenderDelay(sendDelay.get(timeKey));
-			baseStatsData.setAckQpx(ackQpx.get(timeKey));
-			baseStatsData.setAckDelay(ackDelay.get(timeKey));
+			baseStatsData.setSendQpx(sendQpx.get(timeKey));
+
+			Long ackQpxValue = ackQpx.get(timeKey);
+			if (ackQpxValue != null) {
+				baseStatsData.setAckQpx(ackQpxValue.longValue());
+			}
+
+			Long sendDelayValue = sendDelay.get(timeKey);
+			if (sendDelayValue != null) {
+				baseStatsData.setSendDelay(sendDelayValue.longValue());
+			}
+
+			Long ackDelayValue = ackDelay.get(timeKey);
+			if (ackDelayValue != null) {
+				baseStatsData.setAckDelay(ackDelayValue.longValue());
+			}
+			topicStatsData.setTopicName(topicName);
+			topicStatsData.setTimeKey(timeKey);
+			topicStatsData.setConsumerStatisData(baseStatsData);
 			topicStatsDatas.add(topicStatsData);
 		}
 		return topicStatsDatas;
@@ -120,7 +173,13 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 		Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = new HashMap<String, List<ConsumerIdStatsData>>();
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
-			List<ConsumerIdStatsData> consumerIdStatsDatas = new ArrayList<ConsumerIdStatsData>();
+			if (StringUtils.equals(topicName, TOTAL_KEY)) {
+				continue;
+			}
+			List<ConsumerIdStatsData> consumerIdStatsDatas = getConsumerIdStatsData(topicName, timeKey);
+			if (consumerIdStatsDatas == null) {
+				continue;
+			}
 			consumerIdStatsDataMap.put(topicName, consumerIdStatsDatas);
 		}
 		return consumerIdStatsDataMap;
@@ -137,28 +196,56 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 		int index = 0;
 		while (iterator.hasNext()) {
 			String consumerId = iterator.next();
+			if (StringUtils.equals(consumerId, TOTAL_KEY)) {
+				continue;
+			}
 			ConsumerIdStatsData consumerIdStatsData = new ConsumerIdStatsData();
 			consumerIdStatsData.setConsumerId(consumerId);
 			consumerIdStatsData.setTopicName(topicName);
 			ConsumerIdStatisData consumerIdStatisData = (ConsumerIdStatisData) consumerDataRetriever.getValue(
 					new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
+			if (consumerIdStatisData == null) {
+				return null;
+			}
 			NavigableMap<Long, Long> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
 			NavigableMap<Long, Long> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = consumerIdStatisData.getDelay(StatisType.SEND);
 			NavigableMap<Long, Long> ackDelay = consumerIdStatisData.getDelay(StatisType.ACK);
+
+			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
+					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+				return null;
+			}
 			if (index == 0) {
-				timeKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				if (tempKey == null) {
+					return null;
+				}
+				timeKey = tempKey.longValue();
 				index++;
 			}
 			consumerIdStatsData.setTimeKey(timeKey);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			baseStatsData.setSenderQpx(sendQpx.get(timeKey));
-			baseStatsData.setSenderDelay(sendDelay.get(timeKey));
-			baseStatsData.setAckQpx(ackQpx.get(timeKey));
-			baseStatsData.setAckDelay(ackDelay.get(timeKey));
+			baseStatsData.setSendQpx(sendQpx.get(timeKey));
+
+			Long ackQpxValue = ackQpx.get(timeKey);
+			if (ackQpxValue != null) {
+				baseStatsData.setAckQpx(ackQpxValue.longValue());
+			}
+
+			Long sendDelayValue = sendDelay.get(timeKey);
+			if (sendDelayValue != null) {
+				baseStatsData.setSendDelay(sendDelayValue.longValue());
+			}
+
+			Long ackDelayValue = ackDelay.get(timeKey);
+			if (ackDelayValue != null) {
+				baseStatsData.setAckDelay(ackDelayValue.longValue());
+			}
 
 			baseStatsData.setAccumulation(getConsumerIdAccumulation(topicName, consumerId, timeKey));
 			consumerIdStatsData.setStatisData(baseStatsData);
+			consumerIdStatsDatas.add(consumerIdStatsData);
 
 		}
 		return consumerIdStatsDatas;
@@ -167,13 +254,40 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 	private long getConsumerIdAccumulation(String topic, String consumerId, long timeKey) {
 		NavigableMap<Long, Long> accumulations = accumulationRetriever.getConsumerIdAccumulation(topic, consumerId);
 		if (accumulations != null) {
-			return accumulations.get(timeKey);
+			Long accumulation = accumulations.get(timeKey);
+			if (accumulation == null || accumulations.isEmpty()) {
+				return 0;
+			} else {
+				accumulation = accumulations.lastKey();
+				if (accumulation != null) {
+					return accumulation.longValue();
+				}
+			}
 		}
 		return 0L;
 	}
 
-	public Set<String> getConsumerIdIps(String topicName, String consumerId){
+	@Override
+	public Set<String> getConsumerIdIps(String topicName, String consumerId) {
 		return consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
+	}
+
+	@Override
+	public Set<String> getTopicIps(String topicName) {
+		Set<String> consumerIds = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName), StatisType.SEND);
+		if (consumerIds != null) {
+			Iterator<String> iterator = consumerIds.iterator();
+			Set<String> ips = new HashSet<String>();
+			while (iterator.hasNext()) {
+				String consumerId = iterator.next();
+				Set<String> tempIps = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId),
+						StatisType.SEND);
+				ips.addAll(tempIps);
+			}
+			return ips;
+		} else {
+			return null;
+		}
 	}
 
 }

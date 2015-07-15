@@ -183,6 +183,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	}
 
 	protected void doNotify() {
+		
 		for (MonitorDataListener statisListener : statisListeners) {
 			statisListener.achieveMonitorData();
 		}

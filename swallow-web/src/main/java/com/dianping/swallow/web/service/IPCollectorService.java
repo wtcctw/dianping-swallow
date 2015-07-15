@@ -76,7 +76,7 @@ public interface IPCollectorService {
 	 * @return
 	 */
 	public Map<String, String> getCmdbConsumerMasters();
-
+	
 	/**
 	 * clear producerServerIps
 	 */
@@ -100,6 +100,13 @@ public interface IPCollectorService {
 	 * @return
 	 */
 	public Set<String> getProducerTopicIps(String topicName);
+	
+	/**
+	 * producer topic related ip
+	 * 
+	 * @return
+	 */
+	public Set<String> getConsumerTopicIps(String topicName);
 
 	/**
 	 * get one swallow producer server ip

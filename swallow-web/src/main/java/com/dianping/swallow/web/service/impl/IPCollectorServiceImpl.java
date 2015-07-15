@@ -271,6 +271,14 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		}
 		return topicIps;
 	}
+	@Override
+	public Set<String> getConsumerTopicIps(String topicName){
+		Set<String> topicIps = consumerDataWapper.getTopicIps(topicName);
+		if (topicIps != null) {
+			topicIps.remove(TOTAL_KEY);
+		}
+		return topicIps;
+	}
 
 	@Override
 	public String getTopicConsumerIdKey(String topic, String consumerId) {
