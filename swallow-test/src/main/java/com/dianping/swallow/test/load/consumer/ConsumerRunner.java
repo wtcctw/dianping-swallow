@@ -18,12 +18,12 @@ import com.dianping.swallow.test.load.AbstractLoadTest;
  */
 public class ConsumerRunner extends AbstractLoadTest{
 
-    private static int topicCount    = 1;
+    private static int topicCount    = 5;
     private static int consumerCount = 10;
     private static int threadPoolSize = 2;
     private static int totalMessageCount = -1;
     
-    private static boolean differentConsumerId = false;
+    private static boolean differentConsumerId = true;
     
     private String consumerIdPrefix = System.getProperty("consumerIdPrefix");
     
