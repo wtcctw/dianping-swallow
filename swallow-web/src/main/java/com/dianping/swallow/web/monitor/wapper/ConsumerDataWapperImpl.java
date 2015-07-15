@@ -78,7 +78,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			ConsumerMachineStatsData machineStatsData = new ConsumerMachineStatsData();
 			machineStatsData.setIp(serverIp);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			baseStatsData.setSenderQpx(sendQpx.get(timeKey));
+			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
@@ -87,7 +87,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 
 			Long sendDelayValue = sendDelay.get(timeKey);
 			if (sendDelayValue != null) {
-				baseStatsData.setSenderDelay(sendDelayValue.longValue());
+				baseStatsData.setSendDelay(sendDelayValue.longValue());
 			}
 
 			Long ackDelayValue = ackDelay.get(timeKey);
@@ -139,7 +139,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 				index++;
 			}
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			baseStatsData.setSenderQpx(sendQpx.get(timeKey));
+			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
@@ -148,7 +148,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 
 			Long sendDelayValue = sendDelay.get(timeKey);
 			if (sendDelayValue != null) {
-				baseStatsData.setSenderDelay(sendDelayValue.longValue());
+				baseStatsData.setSendDelay(sendDelayValue.longValue());
 			}
 
 			Long ackDelayValue = ackDelay.get(timeKey);
@@ -226,7 +226,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			}
 			consumerIdStatsData.setTimeKey(timeKey);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			baseStatsData.setSenderQpx(sendQpx.get(timeKey));
+			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
@@ -235,7 +235,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 
 			Long sendDelayValue = sendDelay.get(timeKey);
 			if (sendDelayValue != null) {
-				baseStatsData.setSenderDelay(sendDelayValue.longValue());
+				baseStatsData.setSendDelay(sendDelayValue.longValue());
 			}
 
 			Long ackDelayValue = ackDelay.get(timeKey);
@@ -245,6 +245,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 
 			baseStatsData.setAccumulation(getConsumerIdAccumulation(topicName, consumerId, timeKey));
 			consumerIdStatsData.setStatisData(baseStatsData);
+			consumerIdStatsDatas.add(consumerIdStatsData);
 
 		}
 		return consumerIdStatsDatas;

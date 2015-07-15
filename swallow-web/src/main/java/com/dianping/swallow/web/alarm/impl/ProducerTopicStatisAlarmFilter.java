@@ -37,7 +37,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	@Autowired
 	private ProducerDataWapper producerDataWapper;
 
-	private volatile List<ProducerTopicStatsData> topicStatisDatas;
+	private List<ProducerTopicStatsData> topicStatisDatas;
 
 	@Autowired
 	private ProducerTopicStatisDataService topicStatisDataService;
@@ -87,45 +87,36 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 				if (producerBaseStatisData == null) {
 					continue;
 				}
-				boolean isContinue = true;
-				if (qps != null) {
-					isContinue = qpsAlarm(producerBaseStatisData.getQpx(), qps.getPeak(), qps.getValley(),
-							topicStatisData.getTopicName());
-					if (!isContinue) {
-						return false;
-					}
-					isContinue = fluctuationAlarm(topicStatisData.getTopicName(), producerBaseStatisData.getQpx(),
-							qps.getFluctuation(), topicStatisData.getTimeKey());
-				}
-				if (!isContinue) {
-					return false;
-				}
-				isContinue = delayAlarm(topicStatisData.getTopicName(), producerBaseStatisData.getDelay(), delay);
-				if (!isContinue) {
-					return false;
-				}
+				qpsAlarm(producerBaseStatisData.getQpx(), topicStatisData.getTopicName(), qps,
+						topicStatisData.getTimeKey());
+				delayAlarm(topicStatisData.getTopicName(), producerBaseStatisData.getDelay(), delay);
 			}
 		}
 		return true;
 
 	}
 
-	private boolean qpsAlarm(long qpx, long peak, long valley, String topic) {
-		if (qpx > peak) {
-			alarmManager.producerTopicStatisQpsPAlarm(topic, qpx);
-			return false;
+	private boolean qpsAlarm(long qpx, String topicName, QPSAlarmSetting qps, long timeKey) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > qps.getPeak()) {
+				alarmManager.producerTopicStatisQpsPAlarm(topicName, qpx);
+				return false;
+			}
+			if (qpx < qps.getValley()) {
+				alarmManager.producerTopicStatisQpsVAlarm(topicName, qpx);
+				return false;
+			}
+			fluctuationAlarm(topicName, qpx, qps.getFluctuation(), timeKey);
 		}
-		if (qpx < valley) {
-			alarmManager.producerTopicStatisQpsVAlarm(topic, qpx);
-			return false;
-		}
+
 		return true;
 
 	}
 
 	private boolean fluctuationAlarm(String topicName, long qpx, int fluctuation, long timeKey) {
-		List<ProducerTopicStatsData> topicStatsDatas = topicStatisDataService.findSectionData(topicName, timeKey
-				- getTimeSection(), timeKey + getTimeSection());
+		long preDayTimeKey = getPreDayKey(timeKey);
+		List<ProducerTopicStatsData> topicStatsDatas = topicStatisDataService.findSectionData(topicName, preDayTimeKey
+				- getTimeSection(), preDayTimeKey + getTimeSection());
 		int sampleCount = 0;
 		int sumQpx = 0;
 		if (topicStatsDatas == null || topicStatsDatas.size() == 0) {
@@ -143,11 +134,11 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 			return true;
 		}
 		int expectedQpx = sumQpx / sampleCount;
-		if (qpx > expectedQpx && (qpx / expectedQpx) < fluctuation) {
+		if (qpx > expectedQpx && (qpx / expectedQpx) > fluctuation) {
 			alarmManager.producerTopicStatisQpsFAlarm(topicName, qpx, expectedQpx);
 			return false;
 		}
-		if (qpx < expectedQpx && (expectedQpx / qpx) < fluctuation) {
+		if (qpx < expectedQpx && (expectedQpx / qpx) > fluctuation) {
 			alarmManager.producerTopicStatisQpsFAlarm(topicName, qpx, expectedQpx);
 			return false;
 		}

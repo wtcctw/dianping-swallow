@@ -81,16 +81,6 @@ public interface IPCollectorService {
 	 * clear producerServerIps
 	 */
 	public void clearProducerServerIps();
-	
-	/**
-	 * clear consumerServerIps
-	 */
-	public void clearConsumerServerIps();
-
-	/**
-	 * clear producerServerIps
-	 */
-	public void clearProducerServerIps();
 
 	/**
 	 * clear consumerServerIps

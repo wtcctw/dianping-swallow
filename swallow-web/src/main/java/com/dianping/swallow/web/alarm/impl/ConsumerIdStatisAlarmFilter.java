@@ -38,14 +38,14 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 
-	private volatile Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap;
+	private Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap;
 
 	@Autowired
 	private ConsumerIdStatisDataService consumerIdStatisDataService;
 
 	@Autowired
 	private ConsumerIdAlarmSettingService consumerIdAlarmSettingService;
-	
+
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
 
@@ -80,9 +80,9 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 		}
 		List<String> whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
 		ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdAlarmSetting.getConsumerAlarmSetting();
-		QPSAlarmSetting sendQps = consumerAlarmSetting.getSenderQpsAlarmSetting();
+		QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
 		QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
-		long sendDelay = consumerAlarmSetting.getSenderDelay();
+		long sendDelay = consumerAlarmSetting.getSendDelay();
 		long ackDelay = consumerAlarmSetting.getAckDelay();
 		long accumulation = consumerAlarmSetting.getAccumulation();
 		for (Map.Entry<String, List<ConsumerIdStatsData>> consumerIdStatsDataEntry : consumerIdStatsDataMap.entrySet()) {
@@ -95,109 +95,94 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 					if (consumerBaseStatsData == null) {
 						continue;
 					}
-					boolean isContinue = true;
-					if (sendQps != null) {
-						isContinue = sendQpsAlarm(topic, consumerId, consumerBaseStatsData.getSenderQpx(),
-								sendQps.getPeak(), sendQps.getValley());
+					boolean isSendQpsOk = sendQpsAlarm(topic, consumerId, consumerBaseStatsData.getSendQpx(), sendQps);
+
+					boolean isAckQpsOk = ackQpsAlarm(topic, consumerId, consumerBaseStatsData.getAckQpx(), ackQps);
+					if (!isSendQpsOk || !isAckQpsOk) {
+						ConsumerBaseStatsData baseStatsData = getSectionData(topic,
+								consumerIdStatsData.getConsumerId(), consumerIdStatsData.getTimeKey());
+						if (!isSendQpsOk) {
+							sendFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getSendQpx(),
+									baseStatsData.getSendQpx(), sendQps);
+						}
+						if (!isAckQpsOk) {
+							ackFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getAckQpx(),
+									baseStatsData.getAckQpx(), ackQps);
+						}
 					}
-					if (!isContinue) {
-						return false;
-					}
-					if (ackQps != null) {
-						isContinue = ackQpsAlarm(topic, consumerId, consumerBaseStatsData.getAckQpx(),
-								ackQps.getPeak(), ackQps.getValley());
-					}
-					if (!isContinue) {
-						return false;
-					}
-					ConsumerBaseStatsData baseStatsData = getSectionData(topic, consumerIdStatsData.getConsumerId(),
-							consumerIdStatsData.getTimeKey());
-					if (sendQps != null && baseStatsData != null) {
-						isContinue = sendFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getSenderQpx(),
-								baseStatsData.getSenderQpx(), sendQps.getFluctuation());
-					}
-					if (!isContinue) {
-						return false;
-					}
-					if (ackQps != null && baseStatsData != null) {
-						isContinue = ackFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getAckQpx(),
-								baseStatsData.getAckQpx(), ackQps.getFluctuation());
-					}
-					if (!isContinue) {
-						return false;
-					}
-					isContinue = sendDelayAlarm(topic, consumerId, sendDelay, consumerBaseStatsData.getSenderDelay());
-					if (!isContinue) {
-						return false;
-					}
-					isContinue = ackDelayAlarm(topic, consumerId, ackDelay, consumerBaseStatsData.getAckDelay());
-					if (!isContinue) {
-						return false;
-					}
-					isContinue = accumulationAlarm(topic, consumerId, consumerBaseStatsData.getAccumulation(),
-							accumulation);
-					if (!isContinue) {
-						return false;
-					}
+
+					sendDelayAlarm(topic, consumerId, sendDelay, consumerBaseStatsData.getSendDelay());
+					ackDelayAlarm(topic, consumerId, ackDelay, consumerBaseStatsData.getAckDelay());
+					accumulationAlarm(topic, consumerId, consumerBaseStatsData.getAccumulation(), accumulation);
 				}
 			}
 		}
 		return true;
 	}
 
-	private boolean sendQpsAlarm(String topic, String consumerId, long qpx, long peak, long valley) {
-		if (qpx > peak) {
-			alarmManager.consumerIdStatisSQpsPAlarm(topic, consumerId, qpx);
-			return false;
-		}
-		if (qpx < valley) {
-			alarmManager.consumerIdStatisSQpsVAlarm(topic, consumerId, qpx);
-			return false;
-		}
-		return true;
-
-	}
-
-	private boolean ackQpsAlarm(String topic, String consumerId, long qpx, long peak, long valley) {
-		if (qpx > peak) {
-			alarmManager.consumerIdStatisAQpsPAlarm(topic, consumerId, qpx);
-			return false;
-		}
-		if (qpx < valley) {
-			alarmManager.consumerIdStatisAQpsVAlarm(topic, consumerId, qpx);
-			return false;
+	private boolean sendQpsAlarm(String topic, String consumerId, long qpx, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > qps.getPeak()) {
+				alarmManager.consumerIdStatisSQpsPAlarm(topic, consumerId, qpx);
+				return false;
+			}
+			if (qpx < qps.getValley()) {
+				alarmManager.consumerIdStatisSQpsVAlarm(topic, consumerId, qpx);
+				return false;
+			}
 		}
 		return true;
 
 	}
 
-	private boolean sendFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx, int fluctuation) {
-		if (qpx > expectedQpx && (qpx / expectedQpx) < fluctuation) {
-			alarmManager.consumerIdStatisSQpsFAlarm(topic, consumerId, qpx, expectedQpx);
-			return false;
+	private boolean ackQpsAlarm(String topic, String consumerId, long qpx, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > qps.getPeak()) {
+				alarmManager.consumerIdStatisAQpsPAlarm(topic, consumerId, qpx);
+				return false;
+			}
+			if (qpx < qps.getValley()) {
+				alarmManager.consumerIdStatisAQpsVAlarm(topic, consumerId, qpx);
+				return false;
+			}
 		}
-		if (qpx < expectedQpx && (expectedQpx / qpx) < fluctuation) {
-			alarmManager.consumerIdStatisSQpsFAlarm(topic, consumerId, qpx, expectedQpx);
-			return false;
+		return true;
+
+	}
+
+	private boolean sendFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx,
+			QPSAlarmSetting qps) {
+		if (qpx != 0 && expectedQpx != 0 && qps != null) {
+			if (qpx > expectedQpx && (qpx / expectedQpx) < qps.getFluctuation()) {
+				alarmManager.consumerIdStatisSQpsFAlarm(topic, consumerId, qpx, expectedQpx);
+				return false;
+			}
+			if (qpx < expectedQpx && (expectedQpx / qpx) < qps.getFluctuation()) {
+				alarmManager.consumerIdStatisSQpsFAlarm(topic, consumerId, qpx, expectedQpx);
+				return false;
+			}
 		}
 		return true;
 	}
 
-	private boolean ackFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx, int fluctuation) {
-		if (qpx > expectedQpx && (qpx / expectedQpx) < fluctuation) {
-			alarmManager.consumerIdStatisAQpsFAlarm(topic, consumerId, qpx, expectedQpx);
-			return false;
-		}
-		if (qpx < expectedQpx && (expectedQpx / qpx) < fluctuation) {
-			alarmManager.consumerIdStatisAQpsFAlarm(topic, consumerId, qpx, expectedQpx);
-			return false;
+	private boolean ackFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx, QPSAlarmSetting qps) {
+		if (qpx != 0 && expectedQpx != 0 && qps != null) {
+			if (qpx > expectedQpx && (qpx / expectedQpx) < qps.getFluctuation()) {
+				alarmManager.consumerIdStatisAQpsFAlarm(topic, consumerId, qpx, expectedQpx);
+				return false;
+			}
+			if (qpx < expectedQpx && (expectedQpx / qpx) < qps.getFluctuation()) {
+				alarmManager.consumerIdStatisAQpsFAlarm(topic, consumerId, qpx, expectedQpx);
+				return false;
+			}
 		}
 		return true;
 	}
 
 	private ConsumerBaseStatsData getSectionData(String topicName, String consumerId, long timeKey) {
+		long preDayTimeKey = getPreDayKey(timeKey);
 		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerIdStatisDataService.findSectionData(topicName,
-				consumerId, timeKey - getTimeSection(), timeKey + getTimeSection());
+				consumerId, preDayTimeKey - getTimeSection(), preDayTimeKey + getTimeSection());
 		int sendCount = 0;
 		int ackCount = 0;
 		long sumSendQpx = 0;
@@ -210,19 +195,19 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 			if (consumerIdStatsData == null || consumerIdStatsData.getStatisData() == null) {
 				continue;
 			}
-			if (consumerIdStatsData.getStatisData().getSenderQpx() == 0) {
-				sumSendQpx += consumerIdStatsData.getStatisData().getSenderQpx();
+			if (consumerIdStatsData.getStatisData().getSendQpx() != 0) {
+				sumSendQpx += consumerIdStatsData.getStatisData().getSendQpx();
 				sendCount++;
-			} else if (consumerIdStatsData.getStatisData().getAckQpx() == 0) {
+			} else if (consumerIdStatsData.getStatisData().getAckQpx() != 0) {
 				sumAckQpx += consumerIdStatsData.getStatisData().getAckQpx();
 				ackCount++;
 			}
 		}
 		if (sendCount != 0) {
-			baseStatsData.setSenderQpx(sumSendQpx / sendCount);
+			baseStatsData.setSendQpx(sumSendQpx / sendCount);
 		}
 		if (ackCount != 0) {
-			baseStatsData.setSenderQpx(sumAckQpx / ackCount);
+			baseStatsData.setSendQpx(sumAckQpx / ackCount);
 		}
 		return baseStatsData;
 

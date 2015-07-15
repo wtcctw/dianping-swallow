@@ -1,11 +1,6 @@
 package com.dianping.swallow.web.monitor.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +11,6 @@ import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
-import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
@@ -24,10 +18,6 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
-import com.dianping.swallow.web.model.statis.ProducerBaseStatsData;
-import com.dianping.swallow.web.model.statis.ProducerMachineStatsData;
-import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
-import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;

@@ -44,7 +44,7 @@ public class TopicAlarmSettingMapper {
 		consumerSendQPSAlarmSetting.setPeak(dto.getConsumersendpeak());
 		consumerSendQPSAlarmSetting.setValley(dto.getConsumersendvalley());
 		consumerSendQPSAlarmSetting.setFluctuation(dto.getConsumersendfluctuation());
-		consumerBaseAlarmSetting.setSenderQpsAlarmSetting(consumerSendQPSAlarmSetting);
+		consumerBaseAlarmSetting.setSendQpsAlarmSetting(consumerSendQPSAlarmSetting);
 
 		QPSAlarmSetting consumerAckQPSAlarmSetting = new QPSAlarmSetting();
 		consumerAckQPSAlarmSetting.setPeak(dto.getConsumerackpeak());
@@ -53,7 +53,7 @@ public class TopicAlarmSettingMapper {
 		consumerBaseAlarmSetting.setAckQpsAlarmSetting(consumerAckQPSAlarmSetting);
 		
 		consumerBaseAlarmSetting.setAckQpsAlarmSetting(consumerAckQPSAlarmSetting);
-		consumerBaseAlarmSetting.setSenderDelay(dto.getConsumersenddelay());
+		consumerBaseAlarmSetting.setSendDelay(dto.getConsumersenddelay());
 		consumerBaseAlarmSetting.setAckDelay(dto.getConsumerackdelay());
 		consumerBaseAlarmSetting.setAccumulation(dto.getConsumeraccumulation());
 		
@@ -79,7 +79,7 @@ public class TopicAlarmSettingMapper {
 		TopicAlarmSettingDto dto = new TopicAlarmSettingDto();
 		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = alarmSetting.getConsumerAlarmSetting();
 
-		QPSAlarmSetting sendQPSAlarmSetting = consumerBaseAlarmSetting.getSenderQpsAlarmSetting();
+		QPSAlarmSetting sendQPSAlarmSetting = consumerBaseAlarmSetting.getSendQpsAlarmSetting();
 		dto.setConsumersendpeak(sendQPSAlarmSetting.getPeak());
 		dto.setConsumersendvalley(sendQPSAlarmSetting.getValley());
 		dto.setConsumersendfluctuation(sendQPSAlarmSetting.getFluctuation());
@@ -89,7 +89,7 @@ public class TopicAlarmSettingMapper {
 		dto.setConsumerackvalley(ackQPSAlarmSetting.getValley());
 		dto.setConsumerackfluctuation(ackQPSAlarmSetting.getFluctuation());
 		
-		dto.setConsumersenddelay(consumerBaseAlarmSetting.getSenderDelay());
+		dto.setConsumersenddelay(consumerBaseAlarmSetting.getSendDelay());
 		dto.setConsumerackdelay(consumerBaseAlarmSetting.getAckDelay());
 		dto.setConsumeraccumulation(consumerBaseAlarmSetting.getAccumulation());
 		

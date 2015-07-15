@@ -37,7 +37,7 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	@Autowired
 	private ConsumerDataWapper consumerDataWapper;
 
-	private volatile List<ConsumerTopicStatsData> topicStatisDatas;
+	private List<ConsumerTopicStatsData> topicStatisDatas;
 
 	@Autowired
 	private ConsumerTopicStatisDataService topicStatisDataService;
@@ -75,10 +75,10 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 			return true;
 		}
 		ConsumerBaseAlarmSetting consumerAlarmSetting = topicAlarmSetting.getConsumerAlarmSetting();
-		QPSAlarmSetting sendQps = consumerAlarmSetting.getSenderQpsAlarmSetting();
+		QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
 		QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
 		List<String> whiteList = serverAlarmSettingService.getTopicWhiteList();
-		long sendDelay = consumerAlarmSetting.getSenderDelay();
+		long sendDelay = consumerAlarmSetting.getSendDelay();
 		long ackDelay = consumerAlarmSetting.getAckDelay();
 		if (topicStatisDatas == null) {
 			return true;
@@ -90,102 +90,88 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 				if (consumerBaseStatsData == null) {
 					continue;
 				}
-				boolean isContinue = true;
-				if (sendQps != null) {
-					isContinue = sendQpsAlarm(topic, consumerBaseStatsData.getSenderQpx(), sendQps.getPeak(),
-							sendQps.getValley());
+				boolean isSendQpsOk = sendQpsAlarm(topic, consumerBaseStatsData.getSendQpx(), sendQps);
+
+				boolean isAckQpsOk = ackQpsAlarm(topic, consumerBaseStatsData.getAckQpx(), ackQps);
+				if (!isSendQpsOk || !isAckQpsOk) {
+					ConsumerBaseStatsData baseStatsData = getSectionData(topic, topicStatisData.getTimeKey());
+					if (!isSendQpsOk) {
+						sendFluctuationAlarm(topic, consumerBaseStatsData.getSendQpx(), baseStatsData.getSendQpx(),
+								sendQps);
+					}
+					if (!isAckQpsOk) {
+						ackFluctuationAlarm(topic, consumerBaseStatsData.getAckQpx(), baseStatsData.getAckQpx(), ackQps);
+					}
 				}
-				if (!isContinue) {
-					return false;
-				}
-				if (ackQps != null) {
-					isContinue = ackQpsAlarm(topic, consumerBaseStatsData.getAckQpx(), ackQps.getPeak(),
-							ackQps.getValley());
-				}
-				if (!isContinue) {
-					return false;
-				}
-				ConsumerBaseStatsData baseStatsData = getSectionData(topicStatisData.getTopicName(),
-						topicStatisData.getTimeKey());
-				if (sendQps != null && baseStatsData != null) {
-					isContinue = sendFluctuationAlarm(topic, consumerBaseStatsData.getSenderQpx(),
-							baseStatsData.getSenderQpx(), sendQps.getFluctuation());
-				}
-				if (!isContinue) {
-					return false;
-				}
-				if (ackQps != null && baseStatsData != null) {
-					isContinue = ackFluctuationAlarm(topic, consumerBaseStatsData.getAckQpx(),
-							baseStatsData.getAckQpx(), ackQps.getFluctuation());
-				}
-				if (!isContinue) {
-					return false;
-				}
-				isContinue = sendDelayAlarm(topic, sendDelay, consumerBaseStatsData.getSenderDelay());
-				if (!isContinue) {
-					return false;
-				}
-				isContinue = ackDelayAlarm(topic, ackDelay, consumerBaseStatsData.getAckDelay());
-				if (!isContinue) {
-					return false;
-				}
+
+				sendDelayAlarm(topic, sendDelay, consumerBaseStatsData.getSendDelay());
+				ackDelayAlarm(topic, ackDelay, consumerBaseStatsData.getAckDelay());
 			}
 		}
 		return true;
 
 	}
 
-	private boolean sendQpsAlarm(String topic, long qpx, long peak, long valley) {
-		if (qpx > peak) {
-			alarmManager.consumerTopicStatisSQpsPAlarm(topic, qpx);
-			return false;
-		}
-		if (qpx < valley) {
-			alarmManager.consumerTopicStatisSQpsVAlarm(topic, qpx);
-			return false;
-		}
-		return true;
-	}
-
-	private boolean ackQpsAlarm(String topic, long qpx, long peak, long valley) {
-		if (qpx > peak) {
-			alarmManager.consumerTopicStatisSQpsPAlarm(topic, qpx);
-			return false;
-		}
-		if (qpx < valley) {
-			alarmManager.consumerTopicStatisSQpsVAlarm(topic, qpx);
-			return false;
+	private boolean sendQpsAlarm(String topic, long qpx, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > qps.getPeak()) {
+				alarmManager.consumerTopicStatisSQpsPAlarm(topic, qpx);
+				return false;
+			}
+			if (qpx < qps.getValley()) {
+				alarmManager.consumerTopicStatisSQpsVAlarm(topic, qpx);
+				return false;
+			}
 		}
 		return true;
 	}
 
-	private boolean sendFluctuationAlarm(String topic, long qpx, long expectedQpx, int fluctuation) {
-		if (qpx > expectedQpx && (qpx / expectedQpx) < fluctuation) {
-			alarmManager.consumerTopicStatisSQpsFAlarm(topic, qpx, expectedQpx);
-			return false;
-		}
-		if (qpx < expectedQpx && (expectedQpx / qpx) < fluctuation) {
-			alarmManager.consumerTopicStatisSQpsFAlarm(topic, qpx, expectedQpx);
-			return false;
+	private boolean ackQpsAlarm(String topic, long qpx, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > qps.getPeak()) {
+				alarmManager.consumerTopicStatisSQpsPAlarm(topic, qpx);
+				return false;
+			}
+			if (qpx < qps.getValley()) {
+				alarmManager.consumerTopicStatisSQpsVAlarm(topic, qpx);
+				return false;
+			}
 		}
 		return true;
 	}
 
-	private boolean ackFluctuationAlarm(String topic, long qpx, long expectedQpx, int fluctuation) {
-		if (qpx > expectedQpx && (qpx / expectedQpx) < fluctuation) {
-			alarmManager.consumerTopicStatisAQpsFAlarm(topic, qpx, expectedQpx);
-			return false;
+	private boolean sendFluctuationAlarm(String topic, long qpx, long expectedQpx, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
+				alarmManager.consumerTopicStatisSQpsFAlarm(topic, qpx, expectedQpx);
+				return false;
+			}
+			if (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuation()) {
+				alarmManager.consumerTopicStatisSQpsFAlarm(topic, qpx, expectedQpx);
+				return false;
+			}
 		}
-		if (qpx < expectedQpx && (expectedQpx / qpx) < fluctuation) {
-			alarmManager.consumerTopicStatisAQpsFAlarm(topic, qpx, expectedQpx);
-			return false;
+		return true;
+	}
+
+	private boolean ackFluctuationAlarm(String topic, long qpx, long expectedQpx, QPSAlarmSetting qps) {
+		if (qps != null && qpx != 0L) {
+			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
+				alarmManager.consumerTopicStatisAQpsFAlarm(topic, qpx, expectedQpx);
+				return false;
+			}
+			if (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuation()) {
+				alarmManager.consumerTopicStatisAQpsFAlarm(topic, qpx, expectedQpx);
+				return false;
+			}
 		}
 		return true;
 	}
 
 	private ConsumerBaseStatsData getSectionData(String topicName, long timeKey) {
-		List<ConsumerTopicStatsData> topicStatsDatas = topicStatisDataService.findSectionData(topicName, timeKey
-				- getTimeSection(), timeKey + getTimeSection());
+		long preDayTimeKey = getPreDayKey(timeKey);
+		List<ConsumerTopicStatsData> topicStatsDatas = topicStatisDataService.findSectionData(topicName, preDayTimeKey
+				- getTimeSection(), preDayTimeKey + getTimeSection());
 		int sendCount = 0;
 		int ackCount = 0;
 		long sumSendQpx = 0;
@@ -198,19 +184,19 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 			if (topicStatsData == null || topicStatsData.getConsumerStatisData() == null) {
 				continue;
 			}
-			if (topicStatsData.getConsumerStatisData().getSenderQpx() == 0) {
-				sumSendQpx += topicStatsData.getConsumerStatisData().getSenderQpx();
+			if (topicStatsData.getConsumerStatisData().getSendQpx() != 0) {
+				sumSendQpx += topicStatsData.getConsumerStatisData().getSendQpx();
 				sendCount++;
-			} else if (topicStatsData.getConsumerStatisData().getAckQpx() == 0) {
+			} else if (topicStatsData.getConsumerStatisData().getAckQpx() != 0) {
 				sumAckQpx += topicStatsData.getConsumerStatisData().getAckQpx();
 				ackCount++;
 			}
 		}
 		if (sendCount != 0) {
-			baseStatsData.setSenderQpx(sumSendQpx / sendCount);
+			baseStatsData.setSendQpx(sumSendQpx / sendCount);
 		}
 		if (ackCount != 0) {
-			baseStatsData.setSenderQpx(sumAckQpx / ackCount);
+			baseStatsData.setSendQpx(sumAckQpx / ackCount);
 		}
 		return baseStatsData;
 	}
