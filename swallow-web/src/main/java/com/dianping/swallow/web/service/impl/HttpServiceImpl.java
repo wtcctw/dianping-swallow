@@ -32,8 +32,6 @@ public class HttpServiceImpl implements HttpService {
 	
 	private static final String UTF_8 = "UTF-8";
 
-	private static final HttpClient httpClient = new DefaultHttpClient();
-
 	@Override
 	public HttpResult httpPost(String url, List<NameValuePair> params) {
 		HttpPost httpPost = new HttpPost(url);
@@ -44,6 +42,7 @@ public class HttpServiceImpl implements HttpService {
 			logger.error("http post param encoded failed", e);
 		}
 		try {
+			HttpClient httpClient = new DefaultHttpClient();
 			HttpResponse response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
@@ -61,6 +60,7 @@ public class HttpServiceImpl implements HttpService {
 		HttpGet httpGet = new HttpGet(url);
 		HttpResult result = new HttpResult();
 		try {
+			HttpClient httpClient = new DefaultHttpClient();
 			HttpResponse response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));

@@ -81,7 +81,7 @@ public class DefaultConsumerTopicStatisDataDao extends AbstractWriteDao implemen
 	@Override
 	public List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)
-				.and(TIMEKEY_FIELD).lte(endKey));
+				.lte(endKey));
 		List<ConsumerTopicStatsData> topicStatisDatas = mongoTemplate.find(query, ConsumerTopicStatsData.class,
 				TOPICSTATISDATA_COLLECTION);
 		return topicStatisDatas;

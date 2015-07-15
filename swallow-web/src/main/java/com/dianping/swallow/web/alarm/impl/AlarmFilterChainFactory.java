@@ -70,7 +70,7 @@ public class AlarmFilterChainFactory implements InitializingBean {
 	public AlarmFilterChain createConsumerStatisFilterChain(){
 		AlarmFilterChain alarmFilterChain = new DefaultAlarmFilterChain();
 		alarmFilterChain.registerFilter(consumerServerStatisAlarmFilter);
-		alarmFilterChain.registerFilter(consumerTopicStatisAlarmFilter);
+		//alarmFilterChain.registerFilter(consumerTopicStatisAlarmFilter);
 		alarmFilterChain.registerFilter(consumerIdStatisAlarmFilter);
 		return alarmFilterChain;
 	}

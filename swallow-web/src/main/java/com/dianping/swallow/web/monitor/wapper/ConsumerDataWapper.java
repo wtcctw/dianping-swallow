@@ -50,4 +50,10 @@ public interface ConsumerDataWapper {
 	 */
 	Set<String> getConsumerIdIps(String topicName, String consumerId);
 
+	/**
+	 * get topic related ip
+	 * @param timeKey
+	 * @return
+	 */
+	Set<String> getTopicIps(String topicName);
 }

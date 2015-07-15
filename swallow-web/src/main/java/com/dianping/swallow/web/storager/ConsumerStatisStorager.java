@@ -63,6 +63,10 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 		if (dataCount.get() > 0) {
 			dataCount.incrementAndGet();
 			serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
+			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
+				lastTimeKey.set(serverStatisData.getTimeKey());
+			}
+			
 			topicStatisDatas = consumerDataWapper.getTopicStatsData(lastTimeKey.get());
 			consumerIdStatsDataMap = consumerDataWapper.getConsumerIdStatsData(lastTimeKey.get());
 			storageServerStatis();

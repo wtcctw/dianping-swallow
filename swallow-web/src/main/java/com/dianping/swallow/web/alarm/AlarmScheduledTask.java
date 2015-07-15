@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
@@ -20,6 +21,7 @@ import com.dianping.swallow.web.alarm.impl.AlarmFilterChainFactory;
  * @author qiyin
  *
  */
+@Component
 public class AlarmScheduledTask extends AbstractLifecycle {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmScheduledTask.class);
@@ -38,26 +40,26 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 	private AlarmFilterChain consumerStatisFilterChain;
 
 	@Override
-	protected void doInitialize() throws Exception {
+	public void doInitialize() throws Exception {
 		super.doInitialize();
 		createChain();
 	}
 
 	@Override
-	protected void doStart() throws Exception {
+	public void doStart() throws Exception {
 		super.doStart();
-//		startAlarm(producerServiceFilterChain);
-//		startAlarm(producerStatisFilterChain);
-//		startAlarm(consumerServiceFilterChain);
-//		startAlarm(consumerStatisFilterChain);
+		startAlarm(producerServiceFilterChain);
+		startAlarm(producerStatisFilterChain);
+		startAlarm(consumerServiceFilterChain);
+		startAlarm(consumerStatisFilterChain);
 	}
 
 	private void createChain() {
 		chainFactory = AlarmFilterChainFactory.chainFactoryInstance;
 		producerServiceFilterChain = chainFactory.createProducerServiceFilterChain();
-		producerStatisFilterChain = chainFactory.createProducerServiceFilterChain();
-		consumerServiceFilterChain = chainFactory.createProducerServiceFilterChain();
-		consumerStatisFilterChain = chainFactory.createProducerServiceFilterChain();
+		producerStatisFilterChain = chainFactory.createProducerStatisFilterChain();
+		consumerServiceFilterChain = chainFactory.createConsumerServiceFilterChain();
+		consumerStatisFilterChain = chainFactory.createConsumerStatisFilterChain();
 	}
 
 	private void startAlarm(final AlarmFilterChain filterChain) {
@@ -80,7 +82,7 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 	}
 
 	@Override
-	protected void doStop() throws Exception {
+	public void doStop() throws Exception {
 		super.doStop();
 		for (WeakReference<ScheduledFuture<?>> future : futures) {
 			if (future.get() == null) {
@@ -90,7 +92,7 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 		}
 	}
 
-	protected int getAlarmInterval() {
+	private int getAlarmInterval() {
 		return alarmInterval;
 	}
 }

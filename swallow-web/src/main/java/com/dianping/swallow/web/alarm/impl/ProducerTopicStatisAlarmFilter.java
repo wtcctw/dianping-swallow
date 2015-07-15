@@ -44,7 +44,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
-	
+
 	@Autowired
 	private ProducerServerAlarmSettingService serverAlarmSettingService;
 
@@ -100,7 +100,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 				if (!isContinue) {
 					return false;
 				}
-				isContinue = delayAlarm(topicStatisData.getTopicName(), delay, producerBaseStatisData.getDelay());
+				isContinue = delayAlarm(topicStatisData.getTopicName(), producerBaseStatisData.getDelay(), delay);
 				if (!isContinue) {
 					return false;
 				}

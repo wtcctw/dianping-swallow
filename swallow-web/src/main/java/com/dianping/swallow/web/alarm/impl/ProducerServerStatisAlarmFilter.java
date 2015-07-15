@@ -32,7 +32,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 
 	@Autowired
 	private AlarmManager alarmManager;
-	
+
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 
@@ -44,7 +44,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 
 	@Autowired
 	private ProducerServerAlarmSettingService serverAlarmSettingService;
-	
+
 	@Autowired
 	private SwallowAlarmSettingService swallowAlarmSettingService;
 
@@ -89,7 +89,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 					alarmManager.producerServerStatisQpsPAlarm(machineStatisData.getIp(), qpx);
 					return false;
 				}
-				if (qpx < qps.getValley()){
+				if (qpx < qps.getValley()) {
 					alarmManager.producerServerStatisQpsVAlarm(machineStatisData.getIp(), qpx);
 					return false;
 				}

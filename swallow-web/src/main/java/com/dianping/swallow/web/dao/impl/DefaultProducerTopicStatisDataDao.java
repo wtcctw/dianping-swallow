@@ -80,7 +80,7 @@ public class DefaultProducerTopicStatisDataDao extends AbstractWriteDao implemen
 
 	public List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)
-				.and(TIMEKEY_FIELD).lte(endKey));
+				.lte(endKey));
 		List<ProducerTopicStatsData> topicStatisDatas = mongoTemplate.find(query, ProducerTopicStatsData.class,
 				TOPICSTATISDATA_COLLECTION);
 		return topicStatisDatas;
