@@ -29,7 +29,6 @@
 		<module>swallow-test</module>
 		<module>swallow-web</module>
 		<module>swallow-common-server</module>
-    <module>Producer</module>
   </modules>
 
 	<description>swallow is a message service!</description>
@@ -147,7 +146,7 @@
 				<artifactId>cat-client</artifactId>
 				<version>${cat.version}</version>
 			</dependency>
-			<!-- requestIdé¡¹ç??????????¨å?¹å??(??ºä??ThreadLocal) -->
+			<!-- requestIdé¡¹ï¿½??????????ï¿½ï¿½?ï¿½ï¿½??(??ï¿½ï¿½??ThreadLocal) -->
 			<dependency>
 				<groupId>com.dianping.dpsf</groupId>
 				<artifactId>dpsf-net</artifactId>
