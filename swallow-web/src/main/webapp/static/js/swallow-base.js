@@ -110,7 +110,7 @@ module.filter('reverse', function() {
 });
 
 module.directive('popOver', function ($compile) {
-    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/qps?cid={{clicked.consumerId}}'>发送延迟</a></th><th>ack延迟</th><th>消息堆积</th></tr><tr ng-repeat='item in items'><td>{{item.topic}}</td><td id='send'>{{item.senddelay}}</td><td id='ack'>{{item.ackdelay}}</td><td : id='accu'>{{item.accu}}</td></tr></table>";
+    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/qps?cid={{clicked.consumerId}}'>发送延迟</a></th><th><a href='/console/monitor/consumer/{{clicked.topic}}/qps?cid={{clicked.consumerId}}'>ack延迟</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/accu?cid={{clicked.consumerId}}'>消息堆积</th></tr><tr ng-repeat='item in items'><td>{{item.topic}}</td><td id='send'>{{item.senddelay}}</td><td id='ack'>{{item.ackdelay}}</td><td : id='accu'>{{item.accu}}</td></tr></table>";
     var getTemplate = function (contentType) {
         var template = '';
         switch (contentType) {
