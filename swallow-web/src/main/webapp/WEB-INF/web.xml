@@ -90,10 +90,6 @@
 		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
 		<filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>
 	</filter>
-<<<<<<< HEAD
-
-=======
->>>>>>> update alarmManager
 	<!-- 不要修改 filter-mapping的顺序 -->
 	<filter-mapping>
 		<filter-name>CAS Single Sign Out Filter</filter-name>
