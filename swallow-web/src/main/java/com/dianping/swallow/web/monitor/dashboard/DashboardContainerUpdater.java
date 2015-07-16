@@ -175,9 +175,9 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			String topic = totalData.getTopic();
 			ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
 					.loadConsumerBaseAlarmSetting(topic);
-			int sendAlarm = senddelay >= consumerBaseAlarmSetting.getSendDelay() ? 1 : 0;
-			int ackAlarm = ackdelay >= consumerBaseAlarmSetting.getAckDelay() ? 1 : 0;
-			int accuAlarm = accu >= consumerBaseAlarmSetting.getAccumulation() ? 1 : 0;
+			int sendAlarm = senddelay/1000 >= consumerBaseAlarmSetting.getSendDelay() ? 1 : 0;
+			int ackAlarm = ackdelay/1000 >= consumerBaseAlarmSetting.getAckDelay() ? 1 : 0;
+			int accuAlarm = accu/1000 >= consumerBaseAlarmSetting.getAccumulation() ? 1 : 0;
 			int numAlarm = sendAlarm + ackAlarm + accuAlarm;
 			e.setConsumerId(totalData.getCid()).setTopic(totalData.getTopic()).setSenddelay(senddelay)
 					.setAckdelay(ackdelay).setAccu(accu).setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm)
