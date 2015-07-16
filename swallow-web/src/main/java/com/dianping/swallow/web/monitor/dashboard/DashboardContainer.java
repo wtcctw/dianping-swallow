@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.controller.DataMonitorController;
+import com.dianping.swallow.web.model.dashboard.MinuteEntry;
 
 
 /**

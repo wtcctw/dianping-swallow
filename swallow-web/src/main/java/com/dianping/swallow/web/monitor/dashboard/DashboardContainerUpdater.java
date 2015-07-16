@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
+import com.dianping.swallow.web.model.dashboard.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -24,9 +25,13 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
+import com.dianping.swallow.web.model.dashboard.MinuteEntry;
+import com.dianping.swallow.web.model.dashboard.TotalData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
+import com.dianping.swallow.web.monitor.wapper.ConsumerDataRetrieverWrapper;
+import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
 
 /**
  * @author mingdongli

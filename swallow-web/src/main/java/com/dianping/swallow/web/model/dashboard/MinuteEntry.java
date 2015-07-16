@@ -1,8 +1,9 @@
-package com.dianping.swallow.web.monitor.dashboard;
+package com.dianping.swallow.web.model.dashboard;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 
 
 /**

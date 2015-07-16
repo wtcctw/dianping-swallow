@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.monitor.dashboard;
+package com.dianping.swallow.web.monitor.wapper;
 
 import java.util.Set;
 
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.dashboard.DashboardContainerUpdater;
 
 
 /**

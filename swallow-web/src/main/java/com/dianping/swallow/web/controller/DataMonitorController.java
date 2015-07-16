@@ -28,6 +28,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
+import com.dianping.swallow.web.model.dashboard.MinuteEntry;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
@@ -36,7 +37,6 @@ import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
 import com.dianping.swallow.web.monitor.dashboard.DashboardContainer;
-import com.dianping.swallow.web.monitor.dashboard.MinuteEntry;
 import com.dianping.swallow.web.task.TopicScanner;
 
 /**
