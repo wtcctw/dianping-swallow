@@ -3,7 +3,6 @@ package com.dianping.swallow.test.load.mongo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
-import java.sql.Savepoint;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
