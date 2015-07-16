@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -118,7 +119,7 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void producerTopicStatisQpsVAlarm(String topic, long qpx) {
 		String message = "producer [topic] " + topic + " [qpx = ]" + qpx
-				+ " is lower than peak value, please immediately check. [date] " + new Date().toString();
+				+ " is lower than valley value, please immediately check. [date] " + new Date().toString();
 		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_STATIS_QPS_V)) {
 			sendAlarmByProducerTopic(topic, "ProducerTopicQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ProducerTopicQps Alarm", message, AlarmLevelType.MAJOR);
@@ -240,7 +241,7 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerTopicStatisSQpsVAlarm(String topic, long qpx) {
 		String message = "consumer [topic] " + topic + " [sendqpx = ]" + qpx
-				+ " is lower than peak value, please immediately check. [date] " + new Date().toString();
+				+ " is lower than valley value, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_V)) {
 			sendAlarmByConsumerTopic(topic, "ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicSendQps Alarm", message, AlarmLevelType.MAJOR);
@@ -280,7 +281,7 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerTopicStatisAQpsVAlarm(String topic, long qpx) {
 		String message = "consumer [topic] " + topic + " [ackqpx = ]" + qpx
-				+ " is lower than peak value, please immediately check. [date] " + new Date().toString();
+				+ " is lower than valley value, please immediately check. [date] " + new Date().toString();
 		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_V)) {
 			sendAlarmByConsumerTopic(topic, "ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("ConsumerTopicAckQps Alarm", message, AlarmLevelType.MAJOR);
@@ -321,7 +322,7 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisSQpsVAlarm(String topic, String consumerId, long qpx) {
 		String message = "consumer [topic] " + topic + " [consumerId] " + consumerId + " [sendqpx = ]" + qpx
-				+ " is lower than peak value, please immediately check. [date] " + new Date().toString();
+				+ " is lower than valley value, please immediately check. [date] " + new Date().toString();
 		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_SENDQPS_V)) {
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "ConsumerConsumerIdSendQps Alarm", message,
 					AlarmLevelType.MAJOR);
@@ -379,7 +380,7 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisAQpsVAlarm(String topic, String consumerId, long qpx) {
 		String message = "consumer [topic] " + topic + " [consumerId] " + consumerId + " [ackqpx = ]" + qpx
-				+ " is lower than peak value, please immediately check. [date] " + new Date().toString();
+				+ " is lower than valley value, please immediately check. [date] " + new Date().toString();
 		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_ACKQPS_V)) {
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "ConsumerConsumerIdAckQps Alarm", message,
 					AlarmLevelType.MAJOR);
@@ -412,17 +413,22 @@ public class AlarmManagerImpl implements AlarmManager {
 	}
 
 	private void sendAlarmSwallowDp(String title, String message, AlarmLevelType type) {
-		sendAlarmByIp(ipCollectorService.getProducerServerIp(), title, message, type);
+		List<String> serverIps = ipCollectorService.getProducerServerIps();
+		if (serverIps != null && serverIps.size() > 0) {
+			sendAlarmByIp(serverIps.get(0), title, message, type);
+		}
 	}
 
 	private void sendAlarmByIp(String ip, String title, String message, AlarmLevelType type) {
-		Set<String> mobiles = new HashSet<String>();
-		Set<String> emails = new HashSet<String>();
-		Set<String> ips = new HashSet<String>();
-		ips.add(ip);
-		fillReciever(ips, mobiles, emails);
-		fillRecieverDev(mobiles, emails);
-		sendAll(mobiles, emails, title, message, type);
+		if (StringUtils.isNotBlank(ip)) {
+			Set<String> mobiles = new HashSet<String>();
+			Set<String> emails = new HashSet<String>();
+			Set<String> ips = new HashSet<String>();
+			ips.add(ip);
+			fillReciever(ips, mobiles, emails);
+			fillRecieverDev(mobiles, emails);
+			sendAll(mobiles, emails, title, message, type);
+		}
 	}
 
 	private void sendAlarmByProducerTopic(String topicName, String title, String message, AlarmLevelType type) {
@@ -433,7 +439,7 @@ public class AlarmManagerImpl implements AlarmManager {
 		fillRecieverDev(mobiles, emails);
 		sendAll(mobiles, emails, title, message, type);
 	}
-	
+
 	private void sendAlarmByConsumerTopic(String topicName, String title, String message, AlarmLevelType type) {
 		Set<String> ips = ipCollectorService.getConsumerTopicIps(topicName);
 		Set<String> mobiles = new HashSet<String>();

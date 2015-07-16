@@ -95,12 +95,15 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 				boolean isAckQpsOk = ackQpsAlarm(topic, consumerBaseStatsData.getAckQpx(), ackQps);
 				if (isSendQpsOk || isAckQpsOk) {
 					ConsumerBaseStatsData baseStatsData = getSectionData(topic, topicStatisData.getTimeKey());
-					if (isSendQpsOk) {
-						sendFluctuationAlarm(topic, consumerBaseStatsData.getSendQpx(), baseStatsData.getSendQpx(),
-								sendQps);
-					}
-					if (isAckQpsOk) {
-						ackFluctuationAlarm(topic, consumerBaseStatsData.getAckQpx(), baseStatsData.getAckQpx(), ackQps);
+					if (baseStatsData != null) {
+						if (isSendQpsOk) {
+							sendFluctuationAlarm(topic, consumerBaseStatsData.getSendQpx(), baseStatsData.getSendQpx(),
+									sendQps);
+						}
+						if (isAckQpsOk) {
+							ackFluctuationAlarm(topic, consumerBaseStatsData.getAckQpx(), baseStatsData.getAckQpx(),
+									ackQps);
+						}
 					}
 				}
 

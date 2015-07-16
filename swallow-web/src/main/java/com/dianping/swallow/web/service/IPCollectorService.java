@@ -1,11 +1,9 @@
 package com.dianping.swallow.web.service;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
-import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 
 /**
  * 
@@ -19,63 +17,49 @@ public interface IPCollectorService {
 	 * 
 	 * @param monitorData
 	 */
-	public void addIps(MonitorData monitorData);
+	public void addStatisIps(MonitorData monitorData);
 
 	/**
-	 * add producerServer ip
+	 * get statis consumerServer ip
 	 * 
 	 * @param monitorData
 	 */
-	public void addProducerServerIps(ProducerMonitorData producerMonitorData);
+	public Set<String> getStatisConsumerServerIps();
 
 	/**
-	 * add consumerServer ip
+	 * get statis producerServer ip
 	 * 
 	 * @param monitorData
 	 */
-	public void addConsumerServerIps(ConsumerMonitorData consumerMonitorData);
+	public Set<String> getStatisProducerServerIps();
 
 	/**
-	 * get consumerServer ip
+	 * get all statis ip
 	 * 
 	 * @param monitorData
 	 */
-	public Set<String> getConsumerServerIps();
+	public Set<String> getStatisIps();
 
 	/**
-	 * get producerServer ip
-	 * 
-	 * @param monitorData
-	 */
-	public Set<String> getProducerServerIps();
-
-	/**
-	 * get all ip
-	 * 
-	 * @param monitorData
-	 */
-	public Set<String> getIps();
-
-	/**
-	 * get cmdb producers
+	 * get producer server ips
 	 * 
 	 * @return
 	 */
-	public Map<String, String> getCmdbProducers();
+	public List<String> getProducerServerIps();
 
 	/**
-	 * get cmdb consumer slaves
+	 * get consumer server slave ips
 	 * 
 	 * @return
 	 */
-	public Map<String, String> getCmdbConsumerSlaves();
+	public List<String> getConsumerServerSlaveIps();
 
 	/**
-	 * get cmdb consumer masters
+	 * get consumer server master ips
 	 * 
 	 * @return
 	 */
-	public Map<String, String> getCmdbConsumerMasters();
+	public List<String> getConsumerServerMasterIps();
 	
 	/**
 	 * clear producerServerIps
@@ -108,19 +92,6 @@ public interface IPCollectorService {
 	 */
 	public Set<String> getConsumerTopicIps(String topicName);
 
-	/**
-	 * get one swallow producer server ip
-	 * 
-	 * @return
-	 */
-	public String getProducerServerIp();
-	
-	/**
-	 * get one swallow consumer server ip
-	 * 
-	 * @return
-	 */
-	public String getConsumerServerIp();
 	/**
 	 * topicConsumerIdIps' key
 	 * 

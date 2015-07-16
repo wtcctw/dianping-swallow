@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.alarm.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +33,13 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 	}
 
 	public boolean checkSender() {
-		Map<String, String> cmdbProducers = ipCollectorService.getCmdbProducers();
-		Set<String> serverIps = ipCollectorService.getProducerServerIps();
+		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
+		Set<String> statisProducerServerIps = ipCollectorService.getStatisProducerServerIps();
 		List<String> whiteList = swallowAlarmSettingService.getProducerWhiteList();
-		for (Map.Entry<String, String> cmdbProducer : cmdbProducers.entrySet()) {
-			String ip = cmdbProducer.getValue();
-			if (whiteList == null || !whiteList.contains(ip)) {
-				if (!serverIps.contains(ip)) {
-					alarmManager.producerSenderAlarm(ip);
-					return false;
+		for (String serverIp : producerServerIps) {
+			if (whiteList == null || !whiteList.contains(serverIp)) {
+				if (!statisProducerServerIps.contains(serverIp)) {
+					alarmManager.producerSenderAlarm(serverIp);
 				}
 			}
 		}

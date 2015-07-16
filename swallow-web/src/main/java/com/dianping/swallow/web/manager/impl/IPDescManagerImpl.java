@@ -68,12 +68,11 @@ public class IPDescManagerImpl implements IPDescManager {
 	}
 
 	private void doTask() {
-		Set<String> ips = ipCollectorService.getIps();
+		Set<String> ips = ipCollectorService.getStatisIps();
 		if (ips != null && ips.size() > 0) {
-			@SuppressWarnings("rawtypes")
-			Iterator it = ips.iterator();
-			while (it.hasNext()) {
-				String ip = String.valueOf(it.next());
+			Iterator<String> iterator = ips.iterator();
+			while (iterator.hasNext()) {
+				String ip = iterator.next();
 				IPDesc ipDesc = cmdbService.getIpDesc(ip);
 				if (ipDesc != null) {
 					IPDesc ipDescDB = ipDescService.findByIp(ip);

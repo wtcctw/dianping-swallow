@@ -1,10 +1,10 @@
 package com.dianping.swallow.web.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.ConfigChange;
+import com.dianping.lion.client.LionException;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerIdData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerData;
@@ -50,25 +53,41 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private static final String SWALLOW_CONSUMER_MASTER_NAME = "swallow-consumermaster";
 
+	private static final String PRODUCER_SERVER_IPLIST_KEY = "swallow.producer.server.iplist";
+
+	private static final String CONSUMER_SERVER_MASTER_IPLIST_KEY = "swallow.consumer.server.master.iplist";
+
+	private static final String CONSUMER_SERVER_SLAVE_IPLIST_KEY = "swallow.consumer.server.slave.iplist";
+
 	private static final String TOTAL_KEY = "total";
 
 	private static final String TOPIC_CONSUMERID_SPLIT = "&";
 
-	private Set<String> ips = new ConcurrentSkipListSet<String>();
+	private static final String IP_SPLIT = ",";
 
-	private Set<String> consumerServerIps = new ConcurrentSkipListSet<String>();
+	private static final String MASTER_NAME = "master";
 
-	private Set<String> producerServerIps = new ConcurrentSkipListSet<String>();
+	private static final String SLAVE_NAME = "slave";
 
-	private volatile Map<String, String> cmdbProducers = new ConcurrentHashMap<String, String>();
+	private Set<String> statisIps = new ConcurrentSkipListSet<String>();
 
-	private volatile Map<String, String> cmdbConsumerSlaves = new ConcurrentHashMap<String, String>();
+	private Set<String> statisConsumerServerIps = new ConcurrentSkipListSet<String>();
 
-	private volatile Map<String, String> cmdbConsumerMasters = new ConcurrentHashMap<String, String>();
+	private Set<String> statisProducerServerIps = new ConcurrentSkipListSet<String>();
 
-	private String producerServerIp;
-	
-	private String consumerServerIp;
+	private Object lockObj = new Object();
+
+	private List<String> cmdbProducerIps = new ArrayList<String>();
+
+	private List<String> cmdbConsumerSlaveIps = new ArrayList<String>();
+
+	private List<String> cmdbConsumerMasterIps = new ArrayList<String>();
+
+	private List<String> lionProducerIps = new ArrayList<String>();
+
+	private List<String> lionConsumerSlaveIps = new ArrayList<String>();
+
+	private List<String> lionConsumerMasterIps = new ArrayList<String>();
 
 	@Autowired
 	private CmdbService cmdbService;
@@ -87,8 +106,59 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private ScheduledFuture<?> future = null;
 
+	private ConfigCache configCache;
+
 	@PostConstruct
 	public void startTask() {
+		scheduleCmdbDataTask();
+		initLionConfig();
+	}
+
+	private void initLionConfig() {
+		try {
+			configCache = ConfigCache.getInstance();
+			String strProducerServerIp = configCache.getProperty(PRODUCER_SERVER_IPLIST_KEY);
+			String strConsumerMasterServerIp = configCache.getProperty(CONSUMER_SERVER_MASTER_IPLIST_KEY);
+			String strConsumerSlaveServerIp = configCache.getProperty(CONSUMER_SERVER_SLAVE_IPLIST_KEY);
+			convertToList(strProducerServerIp, lionProducerIps);
+			convertToList(strConsumerMasterServerIp, lionConsumerMasterIps);
+			convertToList(strConsumerSlaveServerIp, lionConsumerSlaveIps);
+			configCache.addChange(new ConfigChange() {
+				@Override
+				public void onChange(String key, String value) {
+					if (key.equals(PRODUCER_SERVER_IPLIST_KEY)) {
+						convertToList(value, lionProducerIps);
+					} else if (key.equals(CONSUMER_SERVER_MASTER_IPLIST_KEY)) {
+						convertToList(value, lionConsumerMasterIps);
+					} else if (key.equals(CONSUMER_SERVER_SLAVE_IPLIST_KEY)) {
+						convertToList(value, lionConsumerSlaveIps);
+					}
+				}
+
+			});
+		} catch (LionException e) {
+			logger.error("lion read producer and consumer server ips failed", e);
+		}
+	}
+
+	private void convertToList(String strValue, List<String> resultList) {
+		if (StringUtils.isBlank(strValue)) {
+			return;
+		}
+		String[] strArr = strValue.split(IP_SPLIT);
+		if (strArr != null) {
+			synchronized (resultList) {
+				resultList.clear();
+				for (String strTemp : strArr) {
+					if (StringUtils.isNotBlank(strTemp)) {
+						resultList.add(strTemp);
+					}
+				}
+			}
+		}
+	}
+
+	private void scheduleCmdbDataTask() {
 		setFuture(scheduled.scheduleAtFixedRate(new Runnable() {
 
 			@Override
@@ -109,54 +179,48 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		List<EnvDevice> producerEnvDevices = cmdbService.getEnvDevices(SWALLOW_PRODUCER_NAME);
 		List<EnvDevice> consumerSlaveEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_SLAVE_NAME);
 		List<EnvDevice> consumerMasterEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_MASTER_NAME);
-		Map<String, String> cmdbProducers = new ConcurrentHashMap<String, String>();
-		Map<String, String> cmdbConsumerSlaves = new ConcurrentHashMap<String, String>();
-		Map<String, String> cmdbConsumerMasters = new ConcurrentHashMap<String, String>();
-		if (producerEnvDevices != null) {
-			for (EnvDevice envDevice : producerEnvDevices) {
-				cmdbProducers.put(envDevice.getHostName(), envDevice.getIp());
-				setProducerServerIp(envDevice.getIp());
+		synchronized (cmdbProducerIps) {
+			if (producerEnvDevices != null) {
+				cmdbProducerIps.clear();
+				for (EnvDevice envDevice : producerEnvDevices) {
+					cmdbProducerIps.add(envDevice.getIp());
+				}
 			}
 		}
-		if (consumerSlaveEnvDevices != null) {
-			for (EnvDevice envDevice : consumerSlaveEnvDevices) {
-				cmdbConsumerSlaves.put(envDevice.getHostName(), envDevice.getIp());
+		synchronized (lockObj) {
+			if (consumerMasterEnvDevices != null && consumerSlaveEnvDevices != null) {
+				cmdbConsumerMasterIps.clear();
+				cmdbConsumerSlaveIps.clear();
+				for (EnvDevice envMasterDevice : consumerMasterEnvDevices) {
+					for (EnvDevice envSlaveDevice : consumerSlaveEnvDevices) {
+						String slaveName = StringUtils.replace(envMasterDevice.getHostName(), MASTER_NAME, SLAVE_NAME);
+						if (slaveName.equals(envSlaveDevice.getHostName())) {
+							cmdbConsumerMasterIps.add(envMasterDevice.getIp());
+							cmdbConsumerSlaveIps.add(envSlaveDevice.getIp());
+						}
+					}
+				}
 			}
-		}
-		if (consumerMasterEnvDevices != null) {
-			for (EnvDevice envDevice : consumerMasterEnvDevices) {
-				cmdbConsumerMasters.put(envDevice.getHostName(), envDevice.getIp());
-				setConsumerServerIp(envDevice.getIp());
-			}
-		}
-		this.cmdbProducers = cmdbProducers;
-		this.cmdbConsumerMasters = cmdbConsumerMasters;
-		this.cmdbConsumerSlaves = cmdbConsumerSlaves;
-	}
-
-	private void addSetData(Set<String> set, String data) {
-		if (StringUtils.isNotBlank(data)) {
-			set.add(data);
 		}
 	}
 
 	@Override
-	public void addIps(MonitorData monitorData) {
+	public void addStatisIps(MonitorData monitorData) {
 		if (monitorData instanceof ProducerMonitorData) {
-			addProducerIps((ProducerMonitorData) monitorData);
+			addStatisProducerIps((ProducerMonitorData) monitorData);
 		} else if (monitorData instanceof ConsumerMonitorData) {
-			addConsumerIps((ConsumerMonitorData) monitorData);
+			addStatisConsumerIps((ConsumerMonitorData) monitorData);
 		} else {
 			return;
 		}
 	}
 
-	private void addProducerIps(ProducerMonitorData producerMonitorData) {
+	private void addStatisProducerIps(ProducerMonitorData producerMonitorData) {
 		if (producerMonitorData == null) {
 			return;
 		}
-		addSetData(ips, producerMonitorData.getSwallowServerIp());
-		addProducerServerIps(producerMonitorData);
+		addSetData(statisIps, producerMonitorData.getSwallowServerIp());
+		addSetData(statisProducerServerIps, producerMonitorData.getSwallowServerIp());
 		ProducerServerData serverData = (ProducerServerData) producerMonitorData.getServerData();
 		if (serverData == null) {
 			return;
@@ -169,17 +233,17 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 				if (messageInfo == null) {
 					continue;
 				}
-				addSetData(ips, messageInfo.getKey());
+				addSetData(statisIps, messageInfo.getKey());
 			}
 		}
 	}
 
-	private void addConsumerIps(ConsumerMonitorData consumerMonitorData) {
+	private void addStatisConsumerIps(ConsumerMonitorData consumerMonitorData) {
 		if (consumerMonitorData == null) {
 			return;
 		}
-		addSetData(ips, consumerMonitorData.getSwallowServerIp());
-		addConsumerServerIps(consumerMonitorData);
+		addSetData(statisIps, consumerMonitorData.getSwallowServerIp());
+		addSetData(statisConsumerServerIps, consumerMonitorData.getSwallowServerIp());
 		ConsumerServerData serverData = (ConsumerServerData) consumerMonitorData.getServerData();
 		if (serverData == null) {
 			return;
@@ -196,62 +260,78 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 					if (messageInfo == null) {
 						continue;
 					}
-					addSetData(ips, messageInfo.getKey());
+					addSetData(statisIps, messageInfo.getKey());
 				}
 				for (Map.Entry<String, MessageInfo> messageInfo : consumerIdData.getValue().getSendMessages()
 						.entrySet()) {
 					if (messageInfo == null) {
 						continue;
 					}
-					addSetData(ips, messageInfo.getKey());
+					addSetData(statisIps, messageInfo.getKey());
 				}
 			}
 
 		}
 	}
-
-	@Override
-	public void addProducerServerIps(ProducerMonitorData producerMonitorData) {
-		if (producerMonitorData != null) {
-			addSetData(producerServerIps, producerMonitorData.getSwallowServerIp());
+	
+	private void addSetData(Set<String> set, String data) {
+		if (StringUtils.isNotBlank(data)) {
+			set.add(data);
 		}
 	}
 
 	@Override
-	public void addConsumerServerIps(ConsumerMonitorData consumerMonitorData) {
-		if (consumerMonitorData != null) {
-			addSetData(consumerServerIps, consumerMonitorData.getSwallowServerIp());
+	public Set<String> getStatisConsumerServerIps() {
+		return Collections.unmodifiableSet(statisConsumerServerIps);
+	}
+
+	@Override
+	public Set<String> getStatisProducerServerIps() {
+		return Collections.unmodifiableSet(statisProducerServerIps);
+	}
+
+	@Override
+	public Set<String> getStatisIps() {
+		return Collections.unmodifiableSet(statisIps);
+	}
+
+	@Override
+	public List<String> getProducerServerIps() {
+		synchronized (cmdbProducerIps) {
+			if (cmdbProducerIps != null && !cmdbProducerIps.isEmpty()) {
+				return Collections.unmodifiableList(cmdbProducerIps);
+			} else {
+				synchronized (lionProducerIps) {
+					return lionProducerIps;
+				}
+			}
 		}
 	}
 
 	@Override
-	public Set<String> getConsumerServerIps() {
-		return Collections.unmodifiableSet(consumerServerIps);
+	public List<String> getConsumerServerSlaveIps() {
+		synchronized (lockObj) {
+			if (cmdbConsumerSlaveIps != null && !cmdbConsumerSlaveIps.isEmpty()) {
+				return Collections.unmodifiableList(cmdbConsumerSlaveIps);
+			} else {
+				synchronized (lionConsumerSlaveIps) {
+					return lionConsumerSlaveIps;
+				}
+			}
+		}
 	}
 
 	@Override
-	public Set<String> getProducerServerIps() {
-		return Collections.unmodifiableSet(consumerServerIps);
-	}
-
-	@Override
-	public Set<String> getIps() {
-		return Collections.unmodifiableSet(ips);
-	}
-
-	@Override
-	public Map<String, String> getCmdbProducers() {
-		return Collections.unmodifiableMap(cmdbProducers);
-	}
-
-	@Override
-	public Map<String, String> getCmdbConsumerSlaves() {
-		return Collections.unmodifiableMap(cmdbConsumerSlaves);
-	}
-
-	@Override
-	public Map<String, String> getCmdbConsumerMasters() {
-		return Collections.unmodifiableMap(cmdbConsumerMasters);
+	public List<String> getConsumerServerMasterIps() {
+		synchronized (lockObj) {
+			if (cmdbConsumerMasterIps != null && !cmdbConsumerMasterIps.isEmpty()) {
+				return Collections.unmodifiableList(cmdbConsumerMasterIps);
+			} else {
+				synchronized (lionConsumerMasterIps) {
+					return lionConsumerMasterIps;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -271,8 +351,9 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		}
 		return topicIps;
 	}
+
 	@Override
-	public Set<String> getConsumerTopicIps(String topicName){
+	public Set<String> getConsumerTopicIps(String topicName) {
 		Set<String> topicIps = consumerDataWapper.getTopicIps(topicName);
 		if (topicIps != null) {
 			topicIps.remove(TOTAL_KEY);
@@ -287,12 +368,12 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	@Override
 	public void clearProducerServerIps() {
-		producerServerIps.clear();
+		statisProducerServerIps.clear();
 	}
 
 	@Override
 	public void clearConsumerServerIps() {
-		consumerServerIps.clear();
+		statisConsumerServerIps.clear();
 	}
 
 	public int getInterval() {
@@ -309,24 +390,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	public void setFuture(ScheduledFuture<?> future) {
 		this.future = future;
-	}
-
-	@Override
-	public String getProducerServerIp() {
-		return producerServerIp;
-	}
-
-	public void setProducerServerIp(String producerServerIp) {
-		this.producerServerIp = producerServerIp;
-	}
-	
-	@Override
-	public String getConsumerServerIp() {
-		return consumerServerIp;
-	}
-
-	public void setConsumerServerIp(String consumerServerIp) {
-		this.consumerServerIp = consumerServerIp;
 	}
 
 }
