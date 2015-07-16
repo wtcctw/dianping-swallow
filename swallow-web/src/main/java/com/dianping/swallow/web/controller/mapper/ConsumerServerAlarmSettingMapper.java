@@ -9,18 +9,16 @@ import com.dianping.swallow.web.controller.dto.ConsumerServerAlarmSettingDto;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 
-
 /**
  * @author mingdongli
  *
- * 2015年7月14日下午1:42:05
+ *         2015年7月14日下午1:42:05
  */
 public class ConsumerServerAlarmSettingMapper {
-	
+
 	private static final String DELIMITOR = ",";
 
 	public static ConsumerServerAlarmSetting toConsumerServerAlarmSetting(ConsumerServerAlarmSettingDto dto) {
-		
 
 		ConsumerServerAlarmSetting alarmSetting = new ConsumerServerAlarmSetting();
 
@@ -37,36 +35,37 @@ public class ConsumerServerAlarmSettingMapper {
 		consumerAckQPSAlarmSetting.setValley(dto.getConsumerackvalley());
 		consumerAckQPSAlarmSetting.setFluctuation(dto.getConsumerackfluctuation());
 		alarmSetting.setAckAlarmSetting(consumerAckQPSAlarmSetting);
-		
+
 		alarmSetting.setServerId(dto.getServerId());
-		
+
 		String whiteList = dto.getWhitelist();
-		String[] whiteLists = whiteList.split(DELIMITOR);
-		for(String wl : whiteLists){
-			if(!topicWhiteList.contains(wl)){
-				topicWhiteList.add(wl);
+		if (StringUtils.isNotBlank(whiteList)) {
+			String[] whiteLists = whiteList.split(DELIMITOR);
+			for (String wl : whiteLists) {
+				if (!topicWhiteList.contains(wl)) {
+					topicWhiteList.add(wl);
+				}
 			}
 		}
 		alarmSetting.setTopicWhiteList(topicWhiteList);
-		
+
 		return alarmSetting;
 	}
 
 	public static ConsumerServerAlarmSettingDto toConsumerServerAlarmSettingDto(ConsumerServerAlarmSetting alarmSetting) {
 
 		ConsumerServerAlarmSettingDto dto = new ConsumerServerAlarmSettingDto();
-		
+
 		QPSAlarmSetting sendQPSAlarmSetting = alarmSetting.getSenderAlarmSetting();
 		dto.setConsumersendpeak(sendQPSAlarmSetting.getPeak());
 		dto.setConsumersendvalley(sendQPSAlarmSetting.getValley());
 		dto.setConsumersendfluctuation(sendQPSAlarmSetting.getFluctuation());
-		
+
 		QPSAlarmSetting ackQPSAlarmSetting = alarmSetting.getAckAlarmSetting();
 		dto.setConsumerackpeak(ackQPSAlarmSetting.getPeak());
 		dto.setConsumerackvalley(ackQPSAlarmSetting.getValley());
 		dto.setConsumerackfluctuation(ackQPSAlarmSetting.getFluctuation());
-		
-		
+
 		List<String> whiteList = alarmSetting.getTopicWhiteList();
 		dto.setWhitelist(StringUtils.join(whiteList, DELIMITOR));
 		dto.setServerId(alarmSetting.getServerId());

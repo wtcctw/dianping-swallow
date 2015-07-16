@@ -31,7 +31,6 @@
 
 
 	<!--for cas-server -->
-	<!--
  	<filter>
 		<filter-name>CAS Single Sign Out Filter</filter-name>
 		<filter-class>org.jasig.cas.client.session.SingleSignOutFilter</filter-class>
@@ -91,9 +90,8 @@
 		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
 		<filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>
 	</filter>
-	-->
+
 	<!-- 不要修改 filter-mapping的顺序 -->
-	<!--
 	<filter-mapping>
 		<filter-name>CAS Single Sign Out Filter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -139,9 +137,9 @@
 		<url-pattern>/console/message/auth/*</url-pattern>
 		<url-pattern>/console/admin/auth/*</url-pattern>
 		<url-pattern>/console/download/auth/*</url-pattern>
-		<url-pattern>/console/setting/*</url-pattern>
+		<url-pattern>/console/setting/auth/*</url-pattern>
 	</filter-mapping>
-  	-->
+
 	<servlet>
 		<servlet-name>appServlet</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

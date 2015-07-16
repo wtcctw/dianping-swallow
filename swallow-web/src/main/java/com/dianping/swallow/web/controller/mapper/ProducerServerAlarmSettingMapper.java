@@ -19,7 +19,7 @@ public class ProducerServerAlarmSettingMapper {
 	private static final String DELIMITOR = ",";
 
 	public static ProducerServerAlarmSetting toProducerServerAlarmSetting(ProducerServerAlarmSettingDto dto) {
-		
+
 		ProducerServerAlarmSetting alarmSetting = new ProducerServerAlarmSetting();
 
 		List<String> topicWhiteList = new ArrayList<String>();
@@ -29,30 +29,32 @@ public class ProducerServerAlarmSettingMapper {
 		producerQPSAlarmSetting.setValley(dto.getProducervalley());
 		producerQPSAlarmSetting.setFluctuation(dto.getProducerfluctuation());
 		alarmSetting.setDefaultAlarmSetting(producerQPSAlarmSetting);
-		
+
 		alarmSetting.setServerId(dto.getServerId());
-		
+
 		String whiteList = dto.getWhitelist();
-		String[] whiteLists = whiteList.split(DELIMITOR);
-		for(String wl : whiteLists){
-			if(!topicWhiteList.contains(wl)){
-				topicWhiteList.add(wl);
+		if (StringUtils.isNotBlank(whiteList)) {
+			String[] whiteLists = whiteList.split(DELIMITOR);
+			for (String wl : whiteLists) {
+				if (!topicWhiteList.contains(wl)) {
+					topicWhiteList.add(wl);
+				}
 			}
 		}
 		alarmSetting.setTopicWhiteList(topicWhiteList);
-		
+
 		return alarmSetting;
 	}
 
 	public static ProducerServerAlarmSettingDto toProducerServerAlarmSettingDto(ProducerServerAlarmSetting alarmSetting) {
 
 		ProducerServerAlarmSettingDto dto = new ProducerServerAlarmSettingDto();
-		
+
 		QPSAlarmSetting producerQPSAlarmSetting = alarmSetting.getDefaultAlarmSetting();
 		dto.setProducerpeak(producerQPSAlarmSetting.getPeak());
 		dto.setProducervalley(producerQPSAlarmSetting.getValley());
 		dto.setProducerfluctuation(producerQPSAlarmSetting.getFluctuation());
-		
+
 		List<String> whiteList = alarmSetting.getTopicWhiteList();
 		dto.setWhitelist(StringUtils.join(whiteList, DELIMITOR));
 		dto.setServerId(alarmSetting.getServerId());

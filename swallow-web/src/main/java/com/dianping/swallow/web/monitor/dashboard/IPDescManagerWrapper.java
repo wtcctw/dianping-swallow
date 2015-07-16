@@ -39,5 +39,14 @@ public class IPDescManagerWrapper {
 		}
 		return ipdesc.getEmail();
 	}
+	
+	public String loadName(String ip){
+		
+		IPDesc ipdesc = ipDescManager.getIPDesc(ip);
+		if(ipdesc == null){
+			return BLANK;
+		}
+		return ipdesc.getName();
+	}
 
 }

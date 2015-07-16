@@ -61,10 +61,12 @@ public class TopicAlarmSettingMapper {
 		alarmSetting.setProducerAlarmSetting(producerBaseAlarmSetting);
 		
 		String whiteList = dto.getWhitelist();
-		String[] whiteLists = whiteList.split(DELIMITOR);
-		for(String wl : whiteLists){
-			if(!consumerIdWhiteList.contains(wl)){
-				consumerIdWhiteList.add(wl);
+		if(StringUtils.isNotBlank(whiteList)){
+			String[] whiteLists = whiteList.split(DELIMITOR);
+			for(String wl : whiteLists){
+				if(!consumerIdWhiteList.contains(wl)){
+					consumerIdWhiteList.add(wl);
+				}
 			}
 		}
 		

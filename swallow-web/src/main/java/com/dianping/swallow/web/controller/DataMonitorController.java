@@ -109,7 +109,7 @@ public class DataMonitorController extends AbstractMonitorController {
 		return new ModelAndView("monitor/consumeraccu", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/monitor/dashboard/delay", method = RequestMethod.GET)
+	@RequestMapping(value = "/console/monitor/dashboard", method = RequestMethod.GET)
 	public ModelAndView viewTopicdashboarddelay() {
 
 		subSide = "dashboarddelay";

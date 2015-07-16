@@ -103,6 +103,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				System.out.println("ip is " + ip);
 				System.out.println("consumerid is " + consumerid);
 				String email = iPDescManagerWrap.loadEmail(ip);
+				String name = iPDescManagerWrap.loadName(ip);
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
 				List<Long> sendList = new ArrayList<Long>(senddelay.values());
 				int sendListSize = sendList.size();
@@ -248,6 +249,9 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			curMin = min;
 		} else if (diff != 1 && diff != -59) {
 			min = curMin + 1;
+			if(min == 60){
+				min = 0;
+			}
 		}
 		currentMin.set(min);
 		String time = cal.get(Calendar.HOUR_OF_DAY) + ":" + (min < 10 ? "0" + min : min);

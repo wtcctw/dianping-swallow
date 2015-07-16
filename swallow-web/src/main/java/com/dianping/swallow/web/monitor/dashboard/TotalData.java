@@ -21,6 +21,8 @@ public class TotalData {
 	
 	private String dpMobile;
 	
+	private String name;
+	
 	private String time;
 	
 	List<Long> listSend = new ArrayList<Long>();
