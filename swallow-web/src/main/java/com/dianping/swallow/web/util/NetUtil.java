@@ -3,6 +3,7 @@ package com.dianping.swallow.web.util;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
@@ -14,25 +15,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 public class NetUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(NetUtil.class);
 
 	public static final String IP = getFirstNoLoopbackIP4Address();
 
+	private static final int TIME_OUT = 500;
+
 	public static boolean isPortOpen(String host, int port) {
 		Socket socket = null;
 		try {
 			InetAddress inetAddr = InetAddress.getByName(host);
-			socket = new Socket(inetAddr, port);
+			socket = new Socket();
+			socket.connect(new InetSocketAddress(inetAddr, port), TIME_OUT);
 			return true;
 		} catch (IOException e) {
 			return false;
-		} finally {
+		}
+		finally {
 			if (socket != null && socket.isConnected()) {
 				try {
 					socket.close();

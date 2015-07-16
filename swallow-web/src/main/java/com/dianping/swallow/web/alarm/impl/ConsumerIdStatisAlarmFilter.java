@@ -101,13 +101,15 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 					if (isSendQpsOk || isAckQpsOk) {
 						ConsumerBaseStatsData baseStatsData = getSectionData(topic,
 								consumerIdStatsData.getConsumerId(), consumerIdStatsData.getTimeKey());
-						if (isSendQpsOk) {
-							sendFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getSendQpx(),
-									baseStatsData.getSendQpx(), sendQps);
-						}
-						if (isAckQpsOk) {
-							ackFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getAckQpx(),
-									baseStatsData.getAckQpx(), ackQps);
+						if (baseStatsData != null) {
+							if (isSendQpsOk) {
+								sendFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getSendQpx(),
+										baseStatsData.getSendQpx(), sendQps);
+							}
+							if (isAckQpsOk) {
+								ackFluctuationAlarm(topic, consumerId, consumerBaseStatsData.getAckQpx(),
+										baseStatsData.getAckQpx(), ackQps);
+							}
 						}
 					}
 

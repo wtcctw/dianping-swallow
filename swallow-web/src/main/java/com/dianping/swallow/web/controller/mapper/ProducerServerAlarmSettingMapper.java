@@ -9,6 +9,11 @@ import com.dianping.swallow.web.controller.dto.ProducerServerAlarmSettingDto;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 
+/**
+ * 
+ * @author qiyin
+ *
+ */
 public class ProducerServerAlarmSettingMapper {
 
 	private static final String DELIMITOR = ",";

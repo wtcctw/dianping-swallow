@@ -28,7 +28,8 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 
 	protected int alarmInterval = 30;
 
-	private static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2);
+	private static ScheduledExecutorService scheduled = Executors
+			.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2);
 
 	private List<WeakReference<ScheduledFuture<?>>> futures = new ArrayList<WeakReference<ScheduledFuture<?>>>();
 
@@ -77,7 +78,7 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 				}
 			}
 
-		}, getAlarmInterval(), getAlarmInterval(), TimeUnit.SECONDS);
+		}, getAlarmInterval() * 3, getAlarmInterval(), TimeUnit.SECONDS);
 		futures.add(new WeakReference<ScheduledFuture<?>>(future));
 	}
 
