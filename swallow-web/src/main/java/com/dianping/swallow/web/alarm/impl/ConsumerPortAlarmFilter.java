@@ -105,10 +105,13 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 		boolean usingMaster = NetUtil.isPortOpen(masterIp, masterPort);
 		boolean usingSlave = NetUtil.isPortOpen(slaveIp, slavePort);
 		if (!usingMaster && usingSlave) {
-			alarmManager.consumerPortAlarm(masterIp, slaveIp, false);
+			alarmManager.consumerPortAlarm(masterIp, slaveIp, false, true);
 			return false;
 		} else if (usingMaster && usingSlave) {
-			alarmManager.consumerPortAlarm(masterIp, slaveIp, true);
+			alarmManager.consumerPortAlarm(masterIp, slaveIp, true, true);
+			return false;
+		} else if (!usingMaster && !usingSlave) {
+			alarmManager.consumerPortAlarm(masterIp, slaveIp, false, false);
 			return false;
 		}
 		return true;

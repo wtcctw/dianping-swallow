@@ -125,11 +125,11 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	private boolean sendQpsAlarm(String topic, String consumerId, long qpx, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerIdStatisSQpsPAlarm(topic, consumerId, qpx);
+				alarmManager.consumerIdStatisSQpsPAlarm(topic, consumerId, qpx, qps.getPeak());
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerIdStatisSQpsVAlarm(topic, consumerId, qpx);
+				alarmManager.consumerIdStatisSQpsVAlarm(topic, consumerId, qpx, qps.getValley());
 				return false;
 			}
 		}
@@ -140,11 +140,11 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	private boolean ackQpsAlarm(String topic, String consumerId, long qpx, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerIdStatisAQpsPAlarm(topic, consumerId, qpx);
+				alarmManager.consumerIdStatisAQpsPAlarm(topic, consumerId, qpx, qps.getPeak());
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerIdStatisAQpsVAlarm(topic, consumerId, qpx);
+				alarmManager.consumerIdStatisAQpsVAlarm(topic, consumerId, qpx, qps.getValley());
 				return false;
 			}
 		}
