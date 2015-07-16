@@ -24,9 +24,12 @@ public class MongoConfig extends AbstractLionConfig {
 	private int socketTimeout = 5000;
 	private int connectionsPerHost = 100;
 	private int threadsAllowedToBlockForConnectionMultiplier = 5;
+	
 	private int w = 1;
 	private int wtimeout = 5000;
 	private boolean fsync = false;
+	private boolean journal = false;
+	
 	private int connectTimeout = 2000;
 	private int maxWaitTime = 2000;
 	private boolean safe = true;
@@ -61,7 +64,7 @@ public class MongoConfig extends AbstractLionConfig {
 		builder.connectTimeout(getConnectTimeout());
 		builder.maxWaitTime(getMaxWaitTime());
 
-		builder.writeConcern(new WriteConcern(getW(), getWtimeout(), isFsync()));
+		builder.writeConcern(new WriteConcern(getW(), getWtimeout(), isFsync(), isJournal()));
 		builder.readPreference(buildReadPreference());
 
 		return builder.build();
@@ -173,5 +176,19 @@ public class MongoConfig extends AbstractLionConfig {
 
 	public void setTags(String tags) {
 		this.tags = tags;
+	}
+
+	/**
+	 * @return the journal
+	 */
+	public boolean isJournal() {
+		return journal;
+	}
+
+	/**
+	 * @param journal the journal to set
+	 */
+	public void setJournal(boolean journal) {
+		this.journal = journal;
 	}
 }

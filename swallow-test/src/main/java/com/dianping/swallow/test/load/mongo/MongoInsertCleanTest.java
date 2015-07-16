@@ -21,10 +21,9 @@ public class MongoInsertCleanTest extends AbstractMongoTest {
 	
 	/**
 	 * @param args
-	 * @throws InterruptedException
-	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws Exception {
 		
 		if (args.length >= 1) {
 			topicCount  = Integer.parseInt(args[0]);

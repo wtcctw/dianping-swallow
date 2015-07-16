@@ -25,10 +25,9 @@ public class MongoInsertCollectionTest extends AbstractMongoTest {
 	
 	/**
 	 * @param args
-	 * @throws InterruptedException
-	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws Exception {
 		
 		totalMessageCount = 1000;
 		

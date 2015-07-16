@@ -58,7 +58,7 @@ public abstract class AbstractLoadTest {
 	}
     
     
-	protected void start() throws InterruptedException, IOException{
+	protected void start() throws Exception{
 
 		createMessage();
 		
