@@ -1,13 +1,14 @@
 package com.dianping.swallow.web.monitor.dashboard;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Component;
+
+import com.dianping.swallow.web.controller.DataMonitorController;
 
 
 /**
@@ -58,16 +59,18 @@ public class DashboardContainer {
 		synchronized (minuteEntries) {
 			int actualSize = minuteEntries.size();
 
-			if (size > actualSize) {
-				size = actualSize;
+			int restSize = actualSize - offset;
+			if(offset >= actualSize){
+				return result;
+			}else if (restSize < DataMonitorController.ENTRYSIZE) {
+				result = minuteEntries.subList(0, restSize);
+			}else{
+				for (int i = restSize - size ; i < restSize; i++) {
+					result.add(minuteEntries.get(i));
+				}
 			}
-			for (int i = actualSize - size - offset; i < actualSize - offset; i++) {
-				result.add(minuteEntries.get(i));
-			}
-			entrySize.set(minuteEntries.size());
 		}
-		Collections.reverse(result);
-		return result;
+		return reverseList(result);
 	}
 
 	public Map<String, List<MinuteEntry>> getDashboards() {
@@ -80,6 +83,16 @@ public class DashboardContainer {
 
 	public int getEntrySize() {
 		return entrySize.get();
+	}
+	
+	private List<MinuteEntry> reverseList(List<MinuteEntry> entry){
+		
+		List<MinuteEntry> result = new ArrayList<MinuteEntry>();
+		int size = entry.size();
+		for(int i = size - 1; i >= 0; i--){
+			result.add(entry.get(i));
+		}
+		return result;
 	}
 
 }

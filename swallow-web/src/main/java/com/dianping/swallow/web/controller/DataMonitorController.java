@@ -133,11 +133,9 @@ public class DataMonitorController extends AbstractMonitorController {
 				realOffset = min - currentmin + offset;
 			}
 		}
-		Map<String, Object> result = new HashMap<String, Object>();
+		
 		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries("dashboard", realOffset, ENTRYSIZE);
-		result.put(ENTRYS, entrys);
-		addTimeToReport(result, offset);
-		return result;
+		return addTimeToReport(entrys, offset);
 		
 	}
 
@@ -369,8 +367,9 @@ public class DataMonitorController extends AbstractMonitorController {
 		return topic;
 	}
 	
-	private void addTimeToReport(Map<String, Object> map, int offset){
+	private Map<String, Object> addTimeToReport(List<MinuteEntry> entry, int offset){
 		 
+		Map<String, Object> map = new HashMap<String, Object>();
 		int stepHour = offset / 60;
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.HOUR_OF_DAY, -stepHour);
@@ -382,6 +381,9 @@ public class DataMonitorController extends AbstractMonitorController {
 		String stoptime = convertDateToString(calendar.getTime());
 		map.put("starttime", starttime);
 		map.put("stoptime", stoptime);
+		map.put(ENTRYS, entry);
+		
+		return map;
 	}
 	
 	private String convertDateToString(Date date){
