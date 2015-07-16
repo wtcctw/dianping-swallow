@@ -78,7 +78,7 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 				}
 			}
 
-		}, getAlarmInterval() * 3, getAlarmInterval(), TimeUnit.SECONDS);
+		}, getAlarmInterval() , getAlarmInterval(), TimeUnit.SECONDS);
 		futures.add(new WeakReference<ScheduledFuture<?>>(future));
 	}
 

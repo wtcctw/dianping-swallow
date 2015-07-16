@@ -49,6 +49,8 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	private static final String env;
 
+	private static final boolean ISTEST = true;
+
 	static {
 		env = EnvZooKeeperConfig.getEnv().trim();
 	}
@@ -420,6 +422,12 @@ public class AlarmManagerImpl implements AlarmManager {
 	}
 
 	private void sendAlarmByIp(String ip, String title, String message, AlarmLevelType type) {
+		if (ISTEST) {
+			List<String> serverIps = ipCollectorService.getProducerServerIps();
+			if (serverIps != null && serverIps.size() > 0) {
+				ip = serverIps.get(0);
+			}
+		}
 		if (StringUtils.isNotBlank(ip)) {
 			Set<String> mobiles = new HashSet<String>();
 			Set<String> emails = new HashSet<String>();
@@ -429,34 +437,47 @@ public class AlarmManagerImpl implements AlarmManager {
 			fillRecieverDev(mobiles, emails);
 			sendAll(mobiles, emails, title, message, type);
 		}
+
 	}
 
 	private void sendAlarmByProducerTopic(String topicName, String title, String message, AlarmLevelType type) {
-		Set<String> ips = ipCollectorService.getProducerTopicIps(topicName);
-		Set<String> mobiles = new HashSet<String>();
-		Set<String> emails = new HashSet<String>();
-		fillReciever(ips, mobiles, emails);
-		fillRecieverDev(mobiles, emails);
-		sendAll(mobiles, emails, title, message, type);
+		if (ISTEST) {
+			sendAlarmSwallowDp(title, message, type);
+		} else {
+			Set<String> ips = ipCollectorService.getProducerTopicIps(topicName);
+			Set<String> mobiles = new HashSet<String>();
+			Set<String> emails = new HashSet<String>();
+			fillReciever(ips, mobiles, emails);
+			//fillRecieverDev(mobiles, emails);
+			sendAll(mobiles, emails, title, message, type);
+		}
 	}
 
 	private void sendAlarmByConsumerTopic(String topicName, String title, String message, AlarmLevelType type) {
-		Set<String> ips = ipCollectorService.getConsumerTopicIps(topicName);
-		Set<String> mobiles = new HashSet<String>();
-		Set<String> emails = new HashSet<String>();
-		fillReciever(ips, mobiles, emails);
-		fillRecieverDev(mobiles, emails);
-		sendAll(mobiles, emails, title, message, type);
+		if (ISTEST) {
+			sendAlarmSwallowDp(title, message, type);
+		} else {
+			Set<String> ips = ipCollectorService.getConsumerTopicIps(topicName);
+			Set<String> mobiles = new HashSet<String>();
+			Set<String> emails = new HashSet<String>();
+			fillReciever(ips, mobiles, emails);
+			//fillRecieverDev(mobiles, emails);
+			sendAll(mobiles, emails, title, message, type);
+		}
 	}
 
 	private void sendAlarmByTopicAndConsumerId(String topicName, String consumerId, String title, String message,
 			AlarmLevelType type) {
-		Set<String> ips = ipCollectorService.getTopicConsumerIdIps(topicName, consumerId);
-		Set<String> mobiles = new HashSet<String>();
-		Set<String> emails = new HashSet<String>();
-		fillReciever(ips, mobiles, emails);
-		fillRecieverDev(mobiles, emails);
-		sendAll(mobiles, emails, title, message, type);
+		if (ISTEST) {
+			sendAlarmSwallowDp(title, message, type);
+		} else {
+			Set<String> ips = ipCollectorService.getTopicConsumerIdIps(topicName, consumerId);
+			Set<String> mobiles = new HashSet<String>();
+			Set<String> emails = new HashSet<String>();
+			fillReciever(ips, mobiles, emails);
+			//fillRecieverDev(mobiles, emails);
+			sendAll(mobiles, emails, title, message, type);
+		}
 	}
 
 	private void fillReciever(Set<String> ips, Set<String> mobiles, Set<String> emails) {
