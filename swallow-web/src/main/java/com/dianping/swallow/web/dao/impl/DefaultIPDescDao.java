@@ -34,7 +34,7 @@ public class DefaultIPDescDao extends AbstractWriteDao implements IPDescDao {
 			mongoTemplate.save(ipDesc, IPDESC_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + ipDesc, e);
+			logger.error("Error when save ipdesc " + ipDesc, e);
 		}
 		return false;
 	}

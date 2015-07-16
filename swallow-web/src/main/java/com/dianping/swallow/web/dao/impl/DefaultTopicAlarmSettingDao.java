@@ -35,7 +35,7 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 			mongoTemplate.save(setting, TOPICSALARMSETTING_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + setting, e);
+			logger.error("Error when save topic alarm setting " + setting, e);
 		}
 		return false;
 	}

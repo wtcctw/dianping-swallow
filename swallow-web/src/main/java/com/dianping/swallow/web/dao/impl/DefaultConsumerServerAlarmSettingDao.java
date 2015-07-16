@@ -35,7 +35,7 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 			mongoTemplate.save(setting, CONSUMERSERVERALARMSETTING_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + setting, e);
+			logger.error("Error when save consumer server alarm setting " + setting, e);
 		}
 		return false;
 	}

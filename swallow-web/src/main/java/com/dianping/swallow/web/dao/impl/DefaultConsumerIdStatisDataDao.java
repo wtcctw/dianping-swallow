@@ -39,7 +39,7 @@ public class DefaultConsumerIdStatisDataDao extends AbstractWriteDao implements 
 			mongoTemplate.save(statisData, CONSUMERIDTATISDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + statisData, e);
+			logger.error("Error when save consumerid statis data " + statisData, e);
 		}
 		return false;
 	}
