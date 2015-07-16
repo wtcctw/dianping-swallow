@@ -364,7 +364,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					if(typeof($scope.searchPaginator) != "undefined"){
 						sort = $scope.searchPaginator.reverse;
 					}
-	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, "", sort);
+	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, sort);
             		if(typeof($scope.searchPaginator) != "undefined"){
             			$scope.searchPaginator.reverse = sort;	            		
             		}

@@ -28,6 +28,8 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 
 	private static final String ADMINURI = "/console/admin/auth";
 
+	//private static final String ADMINURI = "/console/admin/auth";
+
 	private static final String ALL = "all";
 
 	@Value("${swallow.web.env.notproduct}")

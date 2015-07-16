@@ -68,7 +68,7 @@ public class TopicScanner {
 		if (logger.isInfoEnabled()) {
 			logger.info("[scanTopicDatabase]");
 		}
-
+		
 		List<String> dbs = getDatabaseName();
 		getTopicAndConsumerIds(dbs);
 		boolean isTopicDbexist = isDatabaseExist();

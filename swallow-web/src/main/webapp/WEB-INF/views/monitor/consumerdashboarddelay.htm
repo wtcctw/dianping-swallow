@@ -1,0 +1,54 @@
+<div class="main-content" ng-controller="ConsumerDashboardController"
+	id="ConsumerDashboardController">
+	<div style="padding-top: 2px; padding-left: 2px; padding-right: 8px;">
+		<div class="report">
+			<div class="breadcrumbs" id="breadcrumbs">
+				<script type="text/javascript">
+					try {
+						ace.settings.check('breadcrumbs', 'fixed')
+					} catch (e) {
+					}
+				</script>
+				<span class="text-danger title">【报表时间】</span><span
+					class="text-success">{{starttime}} to {{stoptime}}</span>
+			</div>
+			<div class="report">
+				<div class="text-center">
+					<ul class="pagination" style="cursor: pointer">
+						<li id='minute{{$index}}' ng-repeat="page in pages"><a
+							ng-class="whatClassIsIt($index)"
+							ng-click="getDashboardDelay($index)" ng-bind="page"> </a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="page-content" id="container">
+				<div>
+					<div class="row">
+						<table ng-repeat="minuteEntry in minuteEntrys"
+							style="float: left;font-size=small;width=150px" border=1>
+							<tr>
+								<th colspan="2" class="text-danger" class="text-danger"><h6
+										ng-bind="minuteEntry.time"></h6></th>
+							</tr>
+							<tr>
+								<td style="text-align: left; width: 120px">ConsumerID</td>
+								<td style="text-align: left; width: 40px">状态</td>
+							</tr>
+							<tr ng-repeat="entry in minuteEntry.delayEntry"
+								ng-class="{'alert-row': entry.numAlarm>0}">
+								<td style="text-align: left; width: 120px" 
+									data-toggle="tooltip" data-html="true" data-placement="top" title="业务名 {{entry.name}} Phone: {{entry.dpMobile}}" ng-bind="entry.consumerId"></td>
+								<td style="text-align: left; width: 40px; cursor: pointer;"
+									pop-over items="items" title="统计值" clicked="clicked"
+									id="{{$parent.$index}}{{$index}}"
+									ng-click="table($parent.$index,$index)"
+									ng-bind="entry.numAlarm > 0 ? '异常' : '正常' "></td>
+							</tr>
+						</table>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

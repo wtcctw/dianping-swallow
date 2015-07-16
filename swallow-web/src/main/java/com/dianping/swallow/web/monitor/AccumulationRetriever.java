@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor;
 
 import java.util.Map;
+import java.util.NavigableMap;
 
 
 /**
@@ -14,5 +15,9 @@ public interface AccumulationRetriever extends Retriever{
 	Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end);
 	
 	Map<String, StatsData> getAccumulationForAllConsumerId(String topic);
+	
+	void registerListener(AccumulationListener listener);
+	
+	NavigableMap<Long, Long> getConsumerIdAccumulation(String topic, String consumerId);
 
 }

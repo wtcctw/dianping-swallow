@@ -2,6 +2,7 @@ package com.dianping.swallow.web.dao.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -36,6 +37,9 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements
 	@Override
 	public boolean createAdministrator(Administrator a) {
 		try {
+			if(StringUtils.isBlank(a.getName())){
+				return false;
+			}
 			mongoTemplate.insert(a, ADMINISTRATOR_COLLECTION);
 			return true;
 		} catch (Exception e) {
@@ -47,6 +51,9 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements
 	@Override
 	public boolean saveAdministrator(Administrator a) {
 		try {
+			if(StringUtils.isBlank(a.getName())){
+				return false;
+			}
 			mongoTemplate.save(a, ADMINISTRATOR_COLLECTION);
 			return true;
 		} catch (Exception e) {

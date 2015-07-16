@@ -1,4 +1,6 @@
-<div class="sidebar" id="sidebar">
+<div class="sidebar " id="sidebar"
+	data-sidebar="true" data-sidebar-scroll="true"
+	data-sidebar-hover="true" style="float:left">
 	<script type="text/javascript">
 		try {
 			ace.settings.check('sidebar', 'fixed')
@@ -23,29 +25,39 @@
 					href="${contextPath}/console/monitor/consumer/total/accu"> <i
 						class="icon-globe"></i> 消息堆积(topic)
 				</a></li>
-			</ul>
-			</li>
+			</ul></li>
 	</ul>
 	<ul class="nav nav-list">
-        <li class="#if($menu == 'delay') open #end">
-            <a href="#" class="dropdown-toggle"> <i class="icon-desktop"></i> <span
-                class="menu-text">swallow server监控</span> <b
-                class="arrow icon-angle-down"></b></a>
-            <ul class="submenu" style="display: block;">
-	            <li class="#if($subside == 'producerserverqps') active #end"><a
-	                href="${contextPath}/console/monitor/producerserver/qps"> <i
-	                    class="icon-globe"></i> 每秒消息(producer server)
-	            </a></li>
-	            <li class="#if($subside == 'consumerserverqps') active #end"><a
-	                href="${contextPath}/console/monitor/consumerserver/qps"> <i
-	                    class="icon-globe"></i> 每秒消息(consumer server)
-	            </a></li>
-            </ul>
-        </li>	
+		<li class="#if($menu == 'delay') open #end"><a href="#"
+			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
+				class="menu-text">swallow server监控</span> <b
+				class="arrow icon-angle-down"></b></a>
+			<ul class="submenu" style="display: block;">
+				<li class="#if($subside == 'producerserverqps') active #end"><a
+					href="${contextPath}/console/monitor/producerserver/qps"> <i
+						class="icon-globe"></i> 每秒消息(producer server)
+				</a></li>
+				<li class="#if($subside == 'consumerserverqps') active #end"><a
+					href="${contextPath}/console/monitor/consumerserver/qps"> <i
+						class="icon-globe"></i> 每秒消息(consumer server)
+				</a></li>
+			</ul></li>
+	</ul>
+	<ul class="nav nav-list">
+		<li class="#if($menu == 'delay') open #end" id="dashboardid"><a
+			href="#" class="dropdown-toggle"> <i class="icon-desktop"></i> <span
+				class="menu-text">监控大盘</span> <b class="arrow icon-angle-down"></b></a>
+			<ul class="submenu" style="display: block;">
+				<li class="#if($subside == 'dashboarddelay') active #end"><a
+					href="${contextPath}/console/monitor/dashboard"
+					ng-click="closecollasp()" style="cursor: pointer"> <i
+						class="icon-globe"></i>  延迟-堆积大盘
+				</a></li>
+			</ul></li>
 	</ul>
 	<!-- /.nav-list -->
 
-	<div class="sidebar-collapse" id="sidebar-collapse">
+	<div class="sidebar-collapse sidebar-toggle" id="sidebar-collapse">
 		<i class="icon-double-angle-left" data-icon1="icon-double-angle-left"
 			data-icon2="icon-double-angle-right"></i>
 	</div>

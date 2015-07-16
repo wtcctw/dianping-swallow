@@ -103,4 +103,57 @@ module.directive('ngConfirmClick', [
         };
 }])
 
+module.filter('reverse', function() {
+  return function(items) {
+    return items.slice().reverse();
+  };
+});
+
+module.directive('popOver', function ($compile) {
+    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/qps?cid={{clicked.consumerId}}'>发送延迟</a></th><th><a href='/console/monitor/consumer/{{clicked.topic}}/qps?cid={{clicked.consumerId}}'>ack延迟</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/accu?cid={{clicked.consumerId}}'>消息堆积</th></tr><tr ng-repeat='item in items'><td>{{item.topic}}</td><td id='send'>{{item.senddelay}}</td><td id='ack'>{{item.ackdelay}}</td><td : id='accu'>{{item.accu}}</td></tr></table>";
+    var getTemplate = function (contentType) {
+        var template = '';
+        switch (contentType) {
+            case 'items':
+                template = itemsTemplate;
+                break;
+        }
+        return template;
+    }
+    return {
+        restrict: "A",
+        transclude: true,
+        template: "<span ng-transclude></span>",
+        link: function (scope, element, attrs) {
+            var popOverContent;
+            if (scope.items) {
+                var html = getTemplate("items");
+                popOverContent = $compile(html)(scope);                    
+            }
+            scope.$watch('clicked', function(clicked){
+                if(clicked.senddelayAlarm > 0){
+                    $('#send').css('color', 'red');
+                }
+                if(clicked.ackdelayAlarm > 0){
+                    $('#ack').css('color', 'red');
+                }
+                if(clicked.accuAlarm > 0){
+                    $('#accu').css('color', 'red');
+                }
+            });
+            var options = {
+                content: popOverContent,
+                placement: "bottom",
+                html: true,
+                title: scope.title
+            };
+            $(element).popover(options);
+        },
+        scope: {
+            items: '=',
+            clicked: '=',
+            title: '@'
+        }
+    };
+});
 

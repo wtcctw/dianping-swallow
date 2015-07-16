@@ -2,6 +2,8 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +50,29 @@ public class ConsumerServerDataTest extends AbstractServerDataTest{
 		consumerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
 	}
 	
+    public static void method3(String fileName, String content) {   
+        RandomAccessFile randomFile = null;  
+        try {     
+            // 打开一个随机访问文件流，按读写方式     
+            randomFile = new RandomAccessFile(fileName, "rw");     
+            // 文件长度，字节数     
+            long fileLength = randomFile.length();     
+            // 将写文件指针移到文件尾。     
+            randomFile.seek(fileLength);     
+            randomFile.writeBytes(content);      
+        } catch (IOException e) {     
+            e.printStackTrace();     
+        } finally{  
+            if(randomFile != null){  
+                try {  
+                    randomFile.close();  
+                } catch (IOException e) {  
+                    e.printStackTrace();  
+                }  
+            }  
+        }  
+    }  
+	
 	@Test
 	public void testRetriever(){
 		
@@ -56,8 +81,10 @@ public class ConsumerServerDataTest extends AbstractServerDataTest{
 		String consumerId = consumerIds[0];
 		String ip = ips[0];
 		
-		System.out.println(consumerAllData.getKeys(new CasKeys(server)));
-		System.out.println(consumerAllData.getValue(new CasKeys(server, topic, consumerId, ip)));
+		System.out.println(consumerAllData.getKeys(new CasKeys()));
+		ConsumerIdStatisData cisd = (ConsumerIdStatisData) consumerAllData.getValue(new CasKeys(server, topic,consumerId));
+		
+		System.out.println(consumerAllData.getValue(new CasKeys(server, topic)));
 	}
 	
 	@Test

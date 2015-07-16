@@ -23,69 +23,68 @@ import com.dianping.swallow.web.monitor.StatsDataDesc;
 /**
  * @author mengwenchao
  *
- * 2015年5月28日 下午3:02:25
+ *         2015年5月28日 下午3:02:25
  */
-public abstract class AbstractRetriever extends AbstractLifecycle implements Retriever{
+public abstract class AbstractRetriever extends AbstractLifecycle implements Retriever {
 
-	protected final int DEFAULT_INTERVAL = 30;//每隔多少秒采样
-	
-	protected final int BUILD_TIMES_AGEO = 60000;//每次构建时，构建此时间(ms)以前的数据 
+	protected final int DEFAULT_INTERVAL = 30;// 每隔多少秒采样
+
+	protected final int BUILD_TIMES_AGEO = 60000;// 每次构建时，构建此时间(ms)以前的数据
 
 	@Value("${swallow.web.monitor.keepinmemory}")
-	public int keepInMemoryHour = 3;//保存最新小时
+	public int keepInMemoryHour = 3;// 保存最新小时
 
 	public static int keepInMemoryCount;
-	
+
 	protected ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT);
-	
+
 	protected long lastBuildTime = System.currentTimeMillis(), current = System.currentTimeMillis();
-	
-	private ScheduledFuture<?> future; 
-	
+
+	private ScheduledFuture<?> future;
+
 	@Override
 	protected void doStart() throws Exception {
-		
+
 		super.doStart();
-		
+
 		startBuilder();
 	}
-	
+
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
-		
+
 		future.cancel(false);
 	}
-	
+
 	private void startBuilder() {
-		
-		future = scheduled.scheduleAtFixedRate(new Runnable(){
+
+		future = scheduled.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {
-				
+
 				current = System.currentTimeMillis() - BUILD_TIMES_AGEO;
-				try{
+				try {
 					doBuild();
-					
-					long removeKey = getKey(current - keepInMemoryHour*3600000L);
+
+					long removeKey = getKey(current - keepInMemoryHour * 3600000L);
 					doRemove(removeKey);
-				}catch(Throwable th){
+				} catch (Throwable th) {
 					logger.error("[startBuilder]", th);
-				}finally{
-					if(lastBuildTime < current){
+				} finally {
+					if (lastBuildTime < current) {
 						lastBuildTime = current;
 					}
 				}
-				
-				
+
 			}
 
 		}, getBuildInterval(), getBuildInterval(), TimeUnit.SECONDS);
 	}
-		
+
 	protected long getBuildInterval() {
-		
+
 		return DEFAULT_INTERVAL;
 	}
 
@@ -94,19 +93,19 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 	protected abstract void doRemove(long toKey);
 
 	protected boolean dataExistInMemory(long start, long end) {
-		
+
 		long oldest = System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(keepInMemoryHour, TimeUnit.HOURS);
-		
-		//允许10s内的误差
-		if(oldest <= (start + 10*1000)){
+
+		// 允许10s内的误差
+		if (oldest <= (start + 10 * 1000)) {
 			return true;
 		}
 		return false;
 	}
 
-	protected static Long getKey(long timeMili) {
-		
-		return timeMili/AbstractCollector.SEND_INTERVAL/1000;
+	public static Long getKey(long timeMili) {
+
+		return timeMili / AbstractCollector.SEND_INTERVAL / 1000;
 	}
 	
 	@Override
@@ -119,7 +118,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 	}
 
 	protected long getDefaultEnd() {
-		
+
 		return System.currentTimeMillis();
 	}
 
@@ -129,35 +128,36 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 	/**
 	 * 采样时间间隔
+	 * 
 	 * @return
 	 */
-	protected int getSampleIntervalTime(){
-		
+	protected int getSampleIntervalTime() {
+
 		return DEFAULT_INTERVAL;
 	}
-	
-	protected int getSampleIntervalCount(){
-		return getSampleIntervalTime()/AbstractCollector.SEND_INTERVAL;
+
+	protected int getSampleIntervalCount() {
+		return getSampleIntervalTime() / AbstractCollector.SEND_INTERVAL;
 	}
 
 	@Override
-	public Set<String> getTopics(){
-		
+	public Set<String> getTopics() {
+
 		return getTopics(getDefaultStart(), getDefaultEnd());
-	}	
-	
+	}
+
 	@Override
-	public Set<String>  getTopics(long start, long end){
-		
-		if(dataExistInMemory(start, end)){
+	public Set<String> getTopics(long start, long end) {
+
+		if (dataExistInMemory(start, end)) {
 			getTopicsInMemory(start, end);
 		}
-		
+
 		return getTopicsInDb(start, end);
 	}
 
 	protected Set<String> getTopicsInDb(long start, long end) {
-		
+
 		return getTopicsInMemory(start, end);
 	}
 
@@ -165,13 +165,13 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 	protected long getStartTime(NavigableMap<Long, Long> rawData, long start, long end) {
 
-		if(rawData == null){
+		if (rawData == null) {
 			return end;
 		}
-		try{
-			return rawData.firstKey().longValue()*AbstractCollector.SEND_INTERVAL*1000;
-		}catch(NoSuchElementException e){
-			if(logger.isInfoEnabled()){
+		try {
+			return rawData.firstKey().longValue() * AbstractCollector.SEND_INTERVAL * 1000;
+		} catch (NoSuchElementException e) {
+			if (logger.isInfoEnabled()) {
 				logger.info("[getRealStartTime][no element, end instead]" + DateUtils.toPrettyFormat(end));
 			}
 			return end;
@@ -179,21 +179,20 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 	}
 
 	protected List<Long> getValue(NavigableMap<Long, Long> rawData) {
-		
+
 		List<Long> result = new LinkedList<Long>();
-		
-		if(rawData != null){
-			for(Long value : rawData.values()){
+
+		if (rawData != null) {
+			for (Long value : rawData.values()) {
 				result.add(value);
 			}
 		}
 		return result;
 	}
 
-	protected StatsData createStatsData(StatsDataDesc desc,
-			NavigableMap<Long, Long> rawData, long start, long end) {
+	protected StatsData createStatsData(StatsDataDesc desc, NavigableMap<Long, Long> rawData, long start, long end) {
 
 		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getSampleIntervalTime());
 	}
-
+	
 }

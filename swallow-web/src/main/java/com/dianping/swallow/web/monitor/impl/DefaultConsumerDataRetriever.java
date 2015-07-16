@@ -198,5 +198,4 @@ public class DefaultConsumerDataRetriever extends AbstractMonitorDataRetriever<C
 		return retriever.getAllTopics();
 	}
 
-
 }

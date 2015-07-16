@@ -33,6 +33,12 @@
 					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>
 					监控
 				</button>
+			</a> <a href="${rc.contextPath}/console/setting"
+				class="navbar-brand">
+				<button class="btn  #if(${menu}=='setting')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
+					id="navbar-setting" style="#if(${isadmin})display: block;#else display: none;#end">
+					<i class="icon-lock align-top bigger-125 icon-on-right"></i> 设置
+				</button>
 			</a> <a href="${rc.contextPath}/console/administrator"
 				class="navbar-brand">
 				<button class="btn  #if(${menu}=='admin')btn-purple #else btn-info#end btn-xs swallow-nav-btn"

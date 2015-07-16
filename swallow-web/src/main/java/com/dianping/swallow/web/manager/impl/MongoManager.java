@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.dianping.swallow.web.manager;
+package com.dianping.swallow.web.manager.impl;
 
 import java.net.UnknownHostException;
 
