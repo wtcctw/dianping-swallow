@@ -46,7 +46,7 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 			logger.error(e.getMessage(), e);
 			return ResponseStatus.TRY_MONGOWRITE.getStatus();
 		} catch (MongoException e) {
-			logger.error("Error when save topic " + mdump, e);
+			logger.error("Error when save message dump " + mdump, e);
 		}
 		return ResponseStatus.MONGOWRITE.getStatus();
 	}

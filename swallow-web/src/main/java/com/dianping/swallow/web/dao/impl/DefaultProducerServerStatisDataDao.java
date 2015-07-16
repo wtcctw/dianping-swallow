@@ -35,7 +35,7 @@ public class DefaultProducerServerStatisDataDao extends AbstractWriteDao impleme
 			mongoTemplate.save(statisData, PRODUCERSERVERSTATICDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + statisData, e);
+			logger.error("Error when save producer server statis data " + statisData, e);
 		}
 		return false;
 	}
