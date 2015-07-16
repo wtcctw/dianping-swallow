@@ -50,6 +50,15 @@ public class TotalData {
 		this.server = server;
 		return this;
 	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public TotalData setName(String name) {
+		this.name = name;
+		return this;
+	}
 
 	public String getTopic() {
 		return topic;

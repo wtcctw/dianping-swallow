@@ -120,6 +120,10 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.producerserverEntry.producerfluctuation;
 	
 	$scope.refreshpage = function(myForm){
+		if ($scope.producerserverEntry.producerpeak < $scope.producerserverEntry.producervalley){
+			alert("谷值不能小于峰值");
+			return;
+		}
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.producerserverEntry);
     	

@@ -13,6 +13,8 @@ public class Entry implements Comparable<Entry>{
 	
 	private String consumerId;
 
+	private String name;
+
 	private long senddelay;
 
 	private long ackdelay;
@@ -59,6 +61,15 @@ public class Entry implements Comparable<Entry>{
 
 	public Entry setConsumerId(String consumerId) {
 		this.consumerId = consumerId;
+		return this;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public Entry setName(String name) {
+		this.name = name;
 		return this;
 	}
 

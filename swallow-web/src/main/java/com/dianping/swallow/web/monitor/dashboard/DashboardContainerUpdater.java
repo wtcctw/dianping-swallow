@@ -59,8 +59,6 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	private AtomicInteger currentMin = new AtomicInteger(Integer.MIN_VALUE);
 
-	private int i = 0;
-
 	@PostConstruct
 	void updateDashboardContainer() {
 
@@ -78,10 +76,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			} finally {
 				delayeven.compareAndSet(true, false);
 			}
-			System.out.println("i is " + (++i));
 		} else {
 			delayeven.compareAndSet(false, true);
-			System.out.println("i is " + (++i));
 		}
 	}
 
@@ -100,8 +96,6 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 						topic, consumerid);
 				String ip = loadFirstElement(ips);
 				String mobile = iPDescManagerWrap.loadDpMobile(ip);
-				System.out.println("ip is " + ip);
-				System.out.println("consumerid is " + consumerid);
 				String email = iPDescManagerWrap.loadEmail(ip);
 				String name = iPDescManagerWrap.loadName(ip);
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
@@ -129,7 +123,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				if (td == null) {
 					td = new TotalData();
 				}
-				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(time)
+				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(time).setName(name)
 						.setListSend(sendList.subList(startIndex, stopIndex))
 						.setListAck(ackList.subList(startIndex, stopIndex))
 						.setListAccu(accuList.subList(startIndex, stopIndex));
@@ -175,14 +169,14 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			String topic = totalData.getTopic();
 			ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
 					.loadConsumerBaseAlarmSetting(topic);
-			int sendAlarm = senddelay/1000 >= consumerBaseAlarmSetting.getSendDelay() ? 1 : 0;
-			int ackAlarm = ackdelay/1000 >= consumerBaseAlarmSetting.getAckDelay() ? 1 : 0;
-			int accuAlarm = accu/1000 >= consumerBaseAlarmSetting.getAccumulation() ? 1 : 0;
+			int sendAlarm = senddelay / 1000 >= consumerBaseAlarmSetting.getSendDelay() ? 1 : 0;
+			int ackAlarm = ackdelay / 1000 >= consumerBaseAlarmSetting.getAckDelay() ? 1 : 0;
+			int accuAlarm = accu / 1000 >= consumerBaseAlarmSetting.getAccumulation() ? 1 : 0;
 			int numAlarm = sendAlarm + ackAlarm + accuAlarm;
 			e.setConsumerId(totalData.getCid()).setTopic(totalData.getTopic()).setSenddelay(senddelay)
 					.setAckdelay(ackdelay).setAccu(accu).setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm)
 					.setAccuAlarm(accuAlarm).setNumAlarm(numAlarm).setEmail(totalData.getEmail())
-					.setDpMobile(totalData.getDpMobile());
+					.setName(totalData.getName()).setDpMobile(totalData.getDpMobile());
 			entrys.add(e);
 		}
 		totalData.setEntrys(entrys);
@@ -195,10 +189,10 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		int size = number.size();
 		for (int i = 0; i < size;) {
 			delay = number.get(i++);
-			if(i < size){
+			if (i < size) {
 				delay += number.get(i++);
-				result.add((long) Math.floor(delay/2));
-			}else{
+				result.add((long) Math.floor(delay / 2));
+			} else {
 				result.add(delay);
 			}
 		}
@@ -249,7 +243,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			curMin = min;
 		} else if (diff != 1 && diff != -59) {
 			min = curMin + 1;
-			if(min == 60){
+			if (min == 60) {
 				min = 0;
 			}
 		}

@@ -11,14 +11,6 @@
 				</script>
 				<span class="text-danger title">【报表时间】</span><span
 					class="text-success">{{starttime}} to {{stoptime}}</span>
-				<!-- <div class="nav-search nav" id="nav-search" style="cursor: pointer">
-					<span class="text-danger switch"></span> &nbsp;[ <a
-						ng-click="getDashboardDelay(120, true)">-2h</a> ] &nbsp;[ <a
-						ng-click="getDashboardDelay(60, true)">-1h</a> ] &nbsp;[ <a
-						ng-click="getDashboardDelay(60, true)">+1h</a> ] &nbsp;[ <a
-						ng-click="getDashboardDelay(60, true)">+2h</a> ] &nbsp;[ <a
-						ng-click="getDashboardDelay(0,false)">now</a> ]&nbsp;
-				</div> -->
 			</div>
 			<div class="report">
 				<div class="text-center">
@@ -45,7 +37,7 @@
 							<tr ng-repeat="entry in minuteEntry.delayEntry"
 								ng-class="{'alert-row': entry.numAlarm>0}">
 								<td style="text-align: left; width: 120px" 
-									data-toggle="tooltip" data-html="true" data-placement="top" title="Email: {{entry.email}} Phone: {{entry.dpMobile}}" ng-bind="entry.consumerId"></td>
+									data-toggle="tooltip" data-html="true" data-placement="top" title="业务名 {{entry.name}} Phone: {{entry.dpMobile}}" ng-bind="entry.consumerId"></td>
 								<td style="text-align: left; width: 40px; cursor: pointer;"
 									pop-over items="items" title="统计值" clicked="clicked"
 									id="{{$parent.$index}}{{$index}}"

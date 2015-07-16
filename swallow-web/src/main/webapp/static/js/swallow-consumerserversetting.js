@@ -123,6 +123,11 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.consumerackfluctuation;
 	
 	$scope.refreshpage = function(myForm){
+		if ($scope.consumerserverEntry.consumersendpeak < $scope.consumerserverEntry.consumersendvalley
+				|| $scope.consumerserverEntry.consumerackpeak < $scope.consumerserverEntry.consumerackvalley){
+			alert("谷值不能小于峰值");
+			return;
+		}
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.consumerserverEntry);
     	
