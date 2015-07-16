@@ -191,10 +191,15 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 		List<Long> result = new ArrayList<Long>();
 		long delay = 0;
-		for (int i = 0; i < number.size();) {
+		int size = number.size();
+		for (int i = 0; i < size;) {
 			delay = number.get(i++);
-			delay += number.get(i++);
-			result.add(delay);
+			if(i < size){
+				delay += number.get(i++);
+				result.add((long) Math.floor(delay/2));
+			}else{
+				result.add(delay);
+			}
 		}
 		return result;
 	}

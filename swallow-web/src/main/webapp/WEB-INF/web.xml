@@ -139,6 +139,7 @@
 		<url-pattern>/console/message/auth/*</url-pattern>
 		<url-pattern>/console/admin/auth/*</url-pattern>
 		<url-pattern>/console/download/auth/*</url-pattern>
+		<url-pattern>/console/setting/*</url-pattern>
 	</filter-mapping>
   	-->
 	<servlet>
