@@ -93,11 +93,11 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean qpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.producerServerStatisQpsPAlarm(ip, qpx);
+				alarmManager.producerServerStatisQpsPAlarm(ip, qpx, qps.getPeak());
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.producerServerStatisQpsVAlarm(ip, qpx);
+				alarmManager.producerServerStatisQpsVAlarm(ip, qpx, qps.getValley());
 				return false;
 			}
 		}

@@ -66,6 +66,11 @@ public enum AlarmType {
 	 * consumer server slave and master port both open type
 	 */
 	CONSUMER_SERVER_PORT_BOTH,
+	
+	/**
+	 * consumer server slave and master port both open type
+	 */
+	CONSUMER_SERVER_PORT_BOTH_F,
 
 	/**
 	 * consumer server statis data send qps peak type

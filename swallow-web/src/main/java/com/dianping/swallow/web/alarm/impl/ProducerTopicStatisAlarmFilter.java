@@ -99,11 +99,11 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	private boolean qpsAlarm(long qpx, String topicName, QPSAlarmSetting qps, long timeKey) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.producerTopicStatisQpsPAlarm(topicName, qpx);
+				alarmManager.producerTopicStatisQpsPAlarm(topicName, qpx, qps.getPeak());
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.producerTopicStatisQpsVAlarm(topicName, qpx);
+				alarmManager.producerTopicStatisQpsVAlarm(topicName, qpx, qps.getValley());
 				return false;
 			}
 			fluctuationAlarm(topicName, qpx, qps.getFluctuation(), timeKey);
