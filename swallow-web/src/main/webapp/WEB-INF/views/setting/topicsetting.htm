@@ -19,61 +19,45 @@
 					<tr>
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">Topic</th>
-						<th style="text-align: left">白名单</th>
+						<th style="text-align: left">ConsumerId白名单</th>
 						<th style="text-align: left">生产发送峰值</th>
 						<th style="text-align: left">生产发送谷值</th>
 						<th style="text-align: left">生产发送波动</th>
-						<th style="text-align: left">生产发送延迟</th>
+						<th style="text-align: left">生产发送延迟/s</th>
 						<th style="text-align: left">消费发送峰值</th>
 						<th style="text-align: left">消费发送谷值</th>
 						<th style="text-align: left">消费发送波动</th>
 						<th style="text-align: left">消费确认峰值</th>
 						<th style="text-align: left">消费确认谷值</th>
 						<th style="text-align: left">消费确认波动</th>
-						<th style="text-align: left">消费发送延迟</th>
-						<th style="text-align: left">消费确认延迟</th>
+						<th style="text-align: left">消费发送延迟/s</th>
+						<th style="text-align: left">消费确认延迟/s</th>
 						<th style="text-align: left">消费消息累积</th>
 						<th style="text-align: left">操作</th>
 					</tr>
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left"
-							ng-bind="ad.topic"></td>
-						<td style="text-align: left"
-							ng-bind="ad.whitelist"></td>
-						<td style="text-align: left"
-							ng-bind="ad.producerpeak"></td>
-						<td style="text-align: left"
-							ng-bind="ad.producervalley"></td>
-						<td style="text-align: left"
-							ng-bind="ad.producerfluctuation"></td>
-						<td style="text-align: left"
-							ng-bind="ad.producerdelay"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumersendpeak"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumersendvalley"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumersendfluctuation"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumerackpeak"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumerackvalley"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumerackfluctuation"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumersenddelay"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumerackdelay"></td>
-						<td style="text-align: left"
-							ng-bind="ad.consumeraccumulation"></td>
+						<td style="text-align: left" ng-bind="ad.topic"></td>
+						<td style="text-align: left" ng-bind="ad.whitelist"></td>
+						<td style="text-align: left" ng-bind="ad.producerpeak"></td>
+						<td style="text-align: left" ng-bind="ad.producervalley"></td>
+						<td style="text-align: left" ng-bind="ad.producerfluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.producerdelay"></td>
+						<td style="text-align: left" ng-bind="ad.consumersendpeak"></td>
+						<td style="text-align: left" ng-bind="ad.consumersendvalley"></td>
+						<td style="text-align: left" ng-bind="ad.consumersendfluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.consumerackpeak"></td>
+						<td style="text-align: left" ng-bind="ad.consumerackvalley"></td>
+						<td style="text-align: left" ng-bind="ad.consumerackfluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.consumersenddelay"></td>
+						<td style="text-align: left" ng-bind="ad.consumerackdelay"></td>
+						<td style="text-align: left" ng-bind="ad.consumeraccumulation"></td>
 						<td style="text-align: left"><a href="#myModal"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
 								data-original-title="编辑配置值"></i></a> <a href=""
-							ng-click="dialog(ad.topic);"
-							class="edit-config-btn"><i class="icon-remove" rel="tooltip"
-								data-original-title="删除配置项"></i></a></td>
+							ng-click="dialog(ad.topic);" class="edit-config-btn"><i
+								class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
 					</tr>
 				</table>
 			</div>
@@ -96,9 +80,10 @@
 							<div class="control-group">
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>Topic</b></label> <input type="text"
-										class="form-control" ng-model="topicEntry.topic"
-										name="topic" required> </input>
+									<label class="control-label"><b>Topic</b></label> <input
+										type="text" class="form-control" ng-model="topicEntry.topic"
+										id="topic" data-provide="typeahead" autocomplete="off"
+										required> </input>
 								</div>
 							</div>
 							<div class="control-group">
@@ -106,8 +91,8 @@
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>ConsumerId白名单</b></label> <input
 										type="text" class="form-control"
-										ng-model="topicEntry.whitelist" name="whitelist" >
-									</input>
+										ng-model="topicEntry.whitelist" id="whitelist"
+										data-provide="typeahead" autocomplete="off"> </input>
 								</div>
 							</div>
 							<div class="control-group">
@@ -145,9 +130,10 @@
 											class="col-sm-2" type="text"
 											ng-model="topicEntry.consumersendpeak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.consumersendvalley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.consumersendfluctuation" />
+											class="col-sm-2" ng-model="topicEntry.consumersendvalley" />
+										<label class="col-sm-2 control-label">波动</label><input
+											type="text" class="col-sm-2"
+											ng-model="topicEntry.consumersendfluctuation" />
 									</div>
 								</div>
 								<div class="form-group"
@@ -158,9 +144,10 @@
 											class="col-sm-2" type="text"
 											ng-model="topicEntry.consumerackpeak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.consumerackvalley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.consumerackfluctuation" />
+											class="col-sm-2" ng-model="topicEntry.consumerackvalley" />
+										<label class="col-sm-2 control-label">波动</label><input
+											type="text" class="col-sm-2"
+											ng-model="topicEntry.consumerackfluctuation" />
 									</div>
 								</div>
 								<div class="form-group"

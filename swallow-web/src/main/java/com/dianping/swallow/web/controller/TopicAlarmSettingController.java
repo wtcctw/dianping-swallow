@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.swallow.web.controller.dto.TopicAlarmSettingDto;
 import com.dianping.swallow.web.controller.mapper.TopicAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
+import com.dianping.swallow.web.monitor.wapper.ConsumerDataRetrieverWrapper;
+import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
@@ -35,6 +39,11 @@ public class TopicAlarmSettingController extends AbstractSidebarBasedController 
 	@Resource(name = "topicAlarmSettingService")
 	private TopicAlarmSettingService topicAlarmSettingService;
 
+	@Resource(name = "ipCollectorService")
+	private IPCollectorService ipCollectorService;
+	
+	@Autowired
+	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
 	@RequestMapping(value = "/console/setting/topic")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
@@ -77,6 +86,19 @@ public class TopicAlarmSettingController extends AbstractSidebarBasedController 
 			return ResponseStatus.SUCCESS.getStatus();
 		}else{
 			return ResponseStatus.MONGOWRITE.getStatus();
+		}
+	}
+	
+	
+	@RequestMapping(value = "/console/setting/consumerids", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public List<String> loadConsumerids(@RequestParam(value = "topic") String topic) {
+		
+		Set<String> consumerids =  consumerDataRetrieverWrapper.getKey(ConsumerDataRetrieverWrapper.TOTAL, topic);
+		if(consumerids != null){
+			return new ArrayList<String>(consumerids);
+		}else{
+			return new ArrayList<String>();
 		}
 	}
 

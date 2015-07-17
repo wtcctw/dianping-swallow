@@ -11,10 +11,8 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
-import com.dianping.swallow.web.model.dashboard.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +23,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
+import com.dianping.swallow.web.model.dashboard.Entry;
 import com.dianping.swallow.web.model.dashboard.MinuteEntry;
 import com.dianping.swallow.web.model.dashboard.TotalData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
@@ -62,8 +61,6 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
 
-	private AtomicInteger currentMin = new AtomicInteger(Integer.MIN_VALUE);
-
 	@PostConstruct
 	void updateDashboardContainer() {
 
@@ -88,12 +85,15 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	private void updateDelayInsDashboard() throws Exception {
 
-		String time = getCurrentTime();
+		boolean timeSet = false;
+		String entryTime = null;
 		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL);
+
 		for (String topic : topics) {
 			Set<String> consumerids = consumerDataRetrieverWrapper.getKeyWithoutTotal(
 					ConsumerDataRetrieverWrapper.TOTAL, topic);
 			Map<String, StatsData> accuStatsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
+
 			for (String consumerid : consumerids) {
 				ConsumerIdStatisData result = (ConsumerIdStatisData) consumerDataRetrieverWrapper.getValue(
 						ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid);
@@ -108,6 +108,11 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				int sendListSize = sendList.size();
 				if (sendListSize < 2) {
 					return;
+				}
+				if(!timeSet){
+					entryTime = getMinuteEntryTime(senddelay.lastKey());
+					timeSet = true;
+					System.out.println("time is " + entryTime);
 				}
 				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
 				List<Long> ackList = new ArrayList<Long>(ackdelay.values());
@@ -128,8 +133,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				if (td == null) {
 					td = new TotalData();
 				}
-				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(time).setName(name)
-						.setListSend(sendList.subList(startIndex, stopIndex))
+				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(entryTime)
+						.setName(name).setListSend(sendList.subList(startIndex, stopIndex))
 						.setListAck(ackList.subList(startIndex, stopIndex))
 						.setListAccu(accuList.subList(startIndex, stopIndex));
 				totalDataMap.put(consumerid, td);
@@ -166,24 +171,27 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		List<Long> accuList = totalData.getListAccu();
 		List<Entry> entrys = totalData.getEntrys();
 		int size = sendList.size();
+		
 		for (int i = 0; i < size; ++i) {
 			Entry e = new Entry();
-			long senddelay = sendList.get(i);
-			long ackdelay = ackList.get(i);
+			float senddelay = sendList.get(i) / 1000;
+			float ackdelay = ackList.get(i) / 1000;
 			long accu = accuList.get(i);
 			String topic = totalData.getTopic();
 			ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
 					.loadConsumerBaseAlarmSetting(topic);
-			int sendAlarm = senddelay / 1000 >= consumerBaseAlarmSetting.getSendDelay() ? 1 : 0;
-			int ackAlarm = ackdelay / 1000 >= consumerBaseAlarmSetting.getAckDelay() ? 1 : 0;
-			int accuAlarm = accu / 1000 >= consumerBaseAlarmSetting.getAccumulation() ? 1 : 0;
+			int sendAlarm = senddelay >= consumerBaseAlarmSetting.getSendDelay() ? 1 : 0;
+			int ackAlarm = ackdelay >= consumerBaseAlarmSetting.getAckDelay() ? 1 : 0;
+			int accuAlarm = accu >= consumerBaseAlarmSetting.getAccumulation() ? 1 : 0;
 			int numAlarm = sendAlarm + ackAlarm + accuAlarm;
+			
 			e.setConsumerId(totalData.getCid()).setTopic(totalData.getTopic()).setSenddelay(senddelay)
 					.setAckdelay(ackdelay).setAccu(accu).setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm)
 					.setAccuAlarm(accuAlarm).setNumAlarm(numAlarm).setEmail(totalData.getEmail())
 					.setName(totalData.getName()).setDpMobile(totalData.getDpMobile());
 			entrys.add(e);
 		}
+		
 		totalData.setEntrys(entrys);
 	}
 
@@ -192,6 +200,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		List<Long> result = new ArrayList<Long>();
 		long delay = 0;
 		int size = number.size();
+		
 		for (int i = 0; i < size;) {
 			delay = number.get(i++);
 			if (i < size) {
@@ -201,6 +210,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				result.add(delay);
 			}
 		}
+		
 		return result;
 	}
 
@@ -217,6 +227,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			TotalData td = entry.getValue();
 			List<Entry> entrys = td.getEntrys();
+			
 			for (int i = 0; i < entrys.size(); ++i) {
 				String time = td.getTime();
 				MinuteEntry me = minuteEntryMap.get(time);
@@ -235,26 +246,20 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			MinuteEntry me = entry.getValue();
 			dashboardContainer.insertMinuteEntry(key, me);
 		}
+		
 		totalDataMap.clear();
 	}
 
-	private String getCurrentTime() {
+	private String getMinuteEntryTime(Long key) {
 
+		long millis = key * 1000 * 5;
 		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(millis);
+		cal.add(Calendar.MINUTE, 1);
 		int min = cal.get(Calendar.MINUTE);
-		int curMin = currentMin.get();
-		int diff = min - curMin;
-		if (curMin < 0) {
-			curMin = min;
-		} else if (diff != 1 && diff != -59) {
-			min = curMin + 1;
-			if (min == 60) {
-				min = 0;
-			}
-		}
-		currentMin.set(min);
 		String time = cal.get(Calendar.HOUR_OF_DAY) + ":" + (min < 10 ? "0" + min : min);
 		return time;
+
 	}
 
 	private boolean isEmpty(StatsData sendData) {

@@ -128,9 +128,9 @@ public class DataMonitorController extends AbstractMonitorController {
 			Calendar calendar = Calendar.getInstance();
 			int min = calendar.get(Calendar.MINUTE);
 			if(min - currentmin < 0){
-				realOffset = min + 60 - currentmin + offset;
+				realOffset = min + 60 - currentmin + offset - 1;
 			}else{
-				realOffset = min - currentmin + offset;
+				realOffset = min - currentmin + offset - 1;
 			}
 		}
 		
