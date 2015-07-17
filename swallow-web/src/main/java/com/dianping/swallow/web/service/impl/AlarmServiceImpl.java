@@ -17,6 +17,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmLevelType;
@@ -42,6 +43,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	private static final String WEIXIN_KEY = "weiXin";
 	private static final String SMS_KEY = "sms";
 
+	private static final String env = "[" + EnvZooKeeperConfig.getEnv().trim() + "]";
+
 	private String mailUrl;
 	private String smsUrl;
 	private String weiXinUrl;
@@ -63,7 +66,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("mobile", mobile));
-		params.add(new BasicNameValuePair("body", "[" + title + "]" + body));
+		params.add(new BasicNameValuePair("body", "[" + title + "]" + env + body));
 		boolean result = httpService.httpPost(getSmsUrl(), params).isSuccess();
 		insert(new Alarm().setType(type).setReceiver(mobile).setTitle(title).setBody(body).setSendType(SendType.SMS)
 				.setSourceIp(NetUtil.IP).setCreateTime(new Date()));
@@ -77,7 +80,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("email", email));
-		params.add(new BasicNameValuePair("title", title));
+		params.add(new BasicNameValuePair("title", title + env));
 		params.add(new BasicNameValuePair("content", content));
 		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
 		insert(new Alarm().setType(type).setReceiver(email).setTitle(title).setBody(content)
@@ -91,7 +94,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 			return true;
 		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("title", title));
+		params.add(new BasicNameValuePair("title", title + env));
 		params.add(new BasicNameValuePair("recipients", email));
 		params.add(new BasicNameValuePair("body", content));
 		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();

@@ -22,10 +22,11 @@ public interface ConsumerIdAlarmSettingService {
 
 	public ConsumerIdAlarmSetting findById(String id);
 
-	public ConsumerIdAlarmSetting findByConsumerId(String topicName, String consumerId);
+	public List<ConsumerIdAlarmSetting> findByConsumerId(String consumerId);
 	
 	public ConsumerIdAlarmSetting findDefault();
 	
 	public List<ConsumerIdAlarmSetting> findByPage(int offset, int limit);
 	
+	public ConsumerIdAlarmSetting findByTopicNameAndConsumerId(String topicName, String consumerId);
 }

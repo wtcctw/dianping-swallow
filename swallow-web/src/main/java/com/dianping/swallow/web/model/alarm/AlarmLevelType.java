@@ -14,6 +14,10 @@ public enum AlarmLevelType {
 
 	private String desc;
 	
+	private AlarmLevelType(){
+		
+	}
+	
 	private AlarmLevelType(String desc) {
 		this.desc = desc;
 	}

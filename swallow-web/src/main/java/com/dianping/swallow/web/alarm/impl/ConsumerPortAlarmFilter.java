@@ -116,5 +116,13 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 		}
 		return true;
 	}
+	
+	public int getMasterPort(){
+		return masterPort;
+	}
+	
+	public int getSlavePort(){
+		return slavePort;
+	}
 
 }

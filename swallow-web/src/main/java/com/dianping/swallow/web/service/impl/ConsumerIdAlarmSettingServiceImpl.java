@@ -32,7 +32,7 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 	public boolean update(ConsumerIdAlarmSetting setting) {
 		ConsumerIdAlarmSetting consumerIdAlarmSetting = null;
 		if (StringUtils.isNotBlank(setting.getConsumerId())) {
-			consumerIdAlarmSetting = findByConsumerId(setting.getTopicName(), setting.getConsumerId());
+			consumerIdAlarmSetting = findByTopicNameAndConsumerId(setting.getTopicName(), setting.getConsumerId());
 		}
 		if (consumerIdAlarmSetting == null) {
 			return insert(setting);
@@ -68,13 +68,18 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 	}
 
 	@Override
-	public ConsumerIdAlarmSetting findByConsumerId(String topicName, String consumerId) {
+	public ConsumerIdAlarmSetting findByTopicNameAndConsumerId(String topicName, String consumerId) {
 		return consumerIdAlarmSettingDao.findByTopicNameAndConsumerId(topicName, consumerId);
 	}
 
 	@Override
 	public List<ConsumerIdAlarmSetting> findByPage(int offset, int limit) {
 		return consumerIdAlarmSettingDao.findByPage(offset, limit);
+	}
+
+	@Override
+	public List<ConsumerIdAlarmSetting> findByConsumerId(String consumerId) {
+		return consumerIdAlarmSettingDao.findByConsumerId(consumerId);
 	}
 
 }
