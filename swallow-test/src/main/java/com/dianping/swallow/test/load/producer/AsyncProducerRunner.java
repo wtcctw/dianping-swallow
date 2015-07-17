@@ -1,6 +1,5 @@
 package com.dianping.swallow.test.load.producer;
 
-import java.io.IOException;
 
 import com.dianping.swallow.producer.ProducerMode;
 
@@ -15,7 +14,7 @@ public class AsyncProducerRunner extends AbstractProducerLoadTest{
 		return ProducerMode.ASYNC_MODE;
 	}
 	
-	public static void main(String []argc) throws InterruptedException, IOException{
+	public static void main(String []argc) throws Exception{
 		
 		parseArgs(argc);
 		new AsyncProducerRunner().start();

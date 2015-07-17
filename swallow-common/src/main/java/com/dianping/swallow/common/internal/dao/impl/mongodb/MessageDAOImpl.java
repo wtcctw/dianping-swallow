@@ -21,301 +21,329 @@ import com.mongodb.WriteResult;
 
 public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 
-   public static final String  ID                  = "_id";
-   public static final String  ORIGINAL_ID         = "o_id";
-   public static final String  CONTENT             = "c";
-   public static final String  VERSION             = "v";
-   public static final String  SHA1                = "s";
-   public static final String  GENERATED_TIME      = "gt";
-   public static final String  PROPERTIES          = "p";
-   public static final String  INTERNAL_PROPERTIES = "_p";
-   public static final String  TYPE                = "t";
-   public static final String  SOURCE_IP           = "si";
+	public static final String ID = "id";
+	public static final String ORIGINAL_ID = "o_id";
+	public static final String CONTENT = "c";
+	public static final String VERSION = "v";
+	public static final String SHA1 = "s";
+	public static final String GENERATED_TIME = "gt";
+	public static final String PROPERTIES = "p";
+	public static final String INTERNAL_PROPERTIES = "_p";
+	public static final String TYPE = "t";
+	public static final String SOURCE_IP = "si";
 
-   //internal properties
-   public static final String  SAVE_TIME      	   = "save_time";
-   
-   private MongoManager         mongoManager;
+	// internal properties
+	public static final String SAVE_TIME = "save_time";
 
-   public MessageDAOImpl(){
-	   
-   }
-   
-   public MessageDAOImpl(MongoManager mongoManager){
-	   
-	   this.mongoManager = mongoManager;
-   }
-   
-   public void setMongoManager(DefaultMongoManager mongoManager) {
-	      this.mongoManager = mongoManager;
-   }
-   
+	public MessageDAOImpl() {
 
-   @Override
-   public SwallowMessage getMessage(String topicName, Long messageId) {
-      DBCollection collection = this.mongoManager.getMessageCollection(topicName);
+	}
 
-      DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(messageId)).get();
-      DBObject result = collection.findOne(query);
-      if (result != null) {
-         SwallowMessage swallowMessage = new SwallowMessage();
-         try {
-            convert(result, swallowMessage);
-            return swallowMessage;
-         } catch (RuntimeException e) {
-            logger.error("Error when convert resultset to SwallowMessage.", e);
-         }
-      }
-      return null;
-   }
+	public MessageDAOImpl(MongoManager mongoManager) {
+		this.mongoManager = mongoManager;
 
-   @Override
-   public Long getMaxMessageId(String topicName, String consumerId) {
-      DBCollection collection = getCollection(topicName, consumerId);
-      return getMaxMessageId(collection);
-   }
+	}
 
-   @Override
-   public Long getMaxMessageId(String topicName) {
-      return getMaxMessageId(topicName, null);
-   }
+	public void setMongoManager(DefaultMongoManager mongoManager) {
+		this.mongoManager = mongoManager;
+	}
 
-   private DBCollection getCollection(String topicName, String consumerId) {
-      return this.mongoManager.getMessageCollection(topicName, consumerId);
-   }
+	@Override
+	public SwallowMessage getMessage(String topicName, Long messageId) {
+		DBCollection collection = this.mongoManager.getMessageCollection(topicName);
 
-   private Long getMaxMessageId(DBCollection collection) {
-      DBObject fields = BasicDBObjectBuilder.start().add(ID, 1).get();
-      DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
-      DBCursor cursor = collection.find(null, fields).sort(orderBy).limit(1);
-      try {
-         if (cursor.hasNext()) {
-            BSONTimestamp timestamp = (BSONTimestamp) cursor.next().get(ID);
-            return MongoUtils.BSONTimestampToLong(timestamp);
-         }
-      } finally {
-         cursor.close();
-      }
-      return null;
-   }
-
-   @Override
-   public SwallowMessage getMaxMessage(String topicName) {
-      DBCollection collection = this.mongoManager.getMessageCollection(topicName);
-
-      DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
-      DBCursor cursor = collection.find().sort(orderBy).limit(1);
-      try {
-         if (cursor.hasNext()) {
-            DBObject result = cursor.next();
-            SwallowMessage swallowMessage = new SwallowMessage();
-            try {
-               convert(result, swallowMessage);
-               return swallowMessage;
-            } catch (RuntimeException e) {
-               logger.error("Error when convert resultset to SwallowMessage.", e);
-            }
-         }
-      } finally {
-         cursor.close();
-      }
-      return null;
-   }
-
-   @Override
-   public List<SwallowMessage> getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size) {
-      DBCollection collection = getCollection(topicName, consumerId);
-      List<SwallowMessage> list = getMessageGreaterThan(messageId, size, collection);
-      return list;
-   }
-   
-   @Override
-   public void cleanMessage(String topicName, String consumerId){
-	   if(logger.isInfoEnabled()){
-		   logger.info("[cleanMessage][topic, consumerId]" + topicName + "," + consumerId);
-	   }
-	   mongoManager.cleanMessageCollection(topicName, consumerId);
-   }
-
-   private List<SwallowMessage> getMessageGreaterThan(Long messageId, int size, DBCollection collection) {
-      DBObject gt = BasicDBObjectBuilder.start().add("$gt", MongoUtils.longToBSONTimestamp(messageId)).get();
-      DBObject query = BasicDBObjectBuilder.start().add(ID, gt).get();
-      DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(1)).get();
-      DBCursor cursor = collection.find(query).sort(orderBy).limit(size);
-
-      List<SwallowMessage> list = new ArrayList<SwallowMessage>();
-      try {
-         while (cursor.hasNext()) {
-            DBObject result = cursor.next();
-            SwallowMessage swallowMessage = new SwallowMessage();
-            try {
-               convert(result, swallowMessage);
-               list.add(swallowMessage);
-            } catch (RuntimeException e) {
-               logger.error("Error when convert resultset to SwallowMessage.", e);
-            }
-         }
-      } finally {
-         cursor.close();
-      }
-      return list;
-   }
-
-   @SuppressWarnings({ "unchecked" })
-   private void convert(DBObject result, SwallowMessage swallowMessage) {
-      BSONTimestamp timestamp = (BSONTimestamp) result.get(ID);
-      BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(ORIGINAL_ID);
-
-      if (originalTimestamp != null) {
-         swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(originalTimestamp));
-         swallowMessage.setBackupMessageId(MongoUtils.BSONTimestampToLong(timestamp));
-         swallowMessage.setBackup(true);
-      } else {
-         swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(timestamp));
-         swallowMessage.setBackup(false);
-      }
-
-      swallowMessage.setContent(result.get(CONTENT));//content
-      swallowMessage.setVersion((String) result.get(VERSION));//version
-      swallowMessage.setGeneratedTime((Date) result.get(GENERATED_TIME));//generatedTime
-      Map<String, String> propertiesBasicDBObject = (Map<String, String>) result.get(PROPERTIES);//mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
-      if (propertiesBasicDBObject != null) {
-         HashMap<String, String> properties = new HashMap<String, String>(propertiesBasicDBObject);
-         swallowMessage.setProperties(properties);//properties
-      }
-      Map<String, String> internalPropertiesBasicDBObject = (Map<String, String>) result.get(INTERNAL_PROPERTIES);//mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
-      if (internalPropertiesBasicDBObject != null) {
-         HashMap<String, String> properties = new HashMap<String, String>(internalPropertiesBasicDBObject);
-         swallowMessage.setInternalProperties(properties);//properties
-      }
-      swallowMessage.setSha1((String) result.get(SHA1));//sha1
-      swallowMessage.setType((String) result.get(TYPE));//type
-      swallowMessage.setSourceIp((String) result.get(SOURCE_IP));//sourceIp
-   }
-
-   @Override
-   public void saveMessage(String topicName, SwallowMessage message) {
-      saveMessage(topicName, null, message);
-   }
-
-   @Override
-   public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
-      final DBCollection collection = getCollection(topicName, consumerId);
-
-      final BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
-      //如果有backupMessageId，则表示是备份消息，那么messageId则作为ORIGINAL_ID存起来
-      if (consumerId != null) {
-         builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getMessageId()));
-      }
-      //content
-      String content = message.getContent();
-      if (content != null && !"".equals(content.trim())) {
-         builder.add(CONTENT, content);
-      }
-      //generatedTime
-      Date generatedTime = message.getGeneratedTime();
-      if (generatedTime != null) {
-         builder.add(GENERATED_TIME, generatedTime);
-      }
-      //version
-      String version = message.getVersion();
-      if (version != null && !"".equals(version.trim())) {
-         builder.add(VERSION, version);
-      }
-      //properties
-      Map<String, String> properties = message.getProperties();
-      if (properties != null && properties.size() > 0) {
-         builder.add(PROPERTIES, properties);
-      }
-      //internalProperties
-      Map<String, String> internalProperties = message.getInternalProperties();
-      if(internalProperties == null){
-    	  internalProperties = new HashMap<String, String>();
-      }
- 	  addDefaultInternalProperties(internalProperties);
-      builder.add(INTERNAL_PROPERTIES, internalProperties);
-      //sha1
-      String sha1 = message.getSha1();
-      if (sha1 != null && !"".equals(sha1.trim())) {
-         builder.add(SHA1, sha1);
-      }
-      //type
-      String type = message.getType();
-      if (type != null && !"".equals(type.trim())) {
-         builder.add(TYPE, type);
-      }
-      //sourceIp
-      String sourceIp = message.getSourceIp();
-      if (sourceIp != null && !"".equals(sourceIp.trim())) {
-         builder.add(SOURCE_IP, sourceIp);
-      }
-      
-      doAndCheckResult(new MongoAction() {
-		@Override
-		public WriteResult doAction() {
-		     return collection.insert(builder.get());
+		DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(messageId)).get();
+		DBObject result = collection.findOne(query);
+		if (result != null) {
+			SwallowMessage swallowMessage = new SwallowMessage();
+			try {
+				convert(result, swallowMessage);
+				return swallowMessage;
+			} catch (RuntimeException e) {
+				logger.error("Error when convert resultset to SwallowMessage.", e);
+			}
 		}
-      });
-   }
-   
-   @Override
-   public void retransmitMessage(String topicName, SwallowMessage message) {
-	      DBCollection collection = getCollection(topicName, null);
+		return null;
+	}
 
-	      BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
-	      
-	      //content
-	      String content = message.getContent();
-	      if (content != null && !"".equals(content.trim())) {
-	         builder.add(CONTENT, content);
-	      }
-	      //generatedTime
-	      Date generatedTime = message.getGeneratedTime();
-	      if (generatedTime != null) {
-	         builder.add(GENERATED_TIME, generatedTime);
-	      }
-	      //version
-	      String version = message.getVersion();
-	      if (version != null && !"".equals(version.trim())) {
-	         builder.add(VERSION, version);
-	      }
-	      //properties
-	      Map<String, String> properties = message.getProperties();
-	      if (properties != null && properties.size() > 0) {
-	         builder.add(PROPERTIES, properties);
-	      }
-	      //internalProperties
-	      Map<String, String> internalProperties = message.getInternalProperties();
-	      if(internalProperties == null){
-	    	  internalProperties = new HashMap<String, String>();
-	      }
-	      //标记重发
-	      internalProperties.put("retransmit", message.getMessageId().toString());
-	 	  addDefaultInternalProperties(internalProperties);
-	      builder.add(INTERNAL_PROPERTIES, internalProperties);
-	      //sha1
-	      String sha1 = message.getSha1();
-	      if (sha1 != null && !"".equals(sha1.trim())) {
-	         builder.add(SHA1, sha1);
-	      }
-	      //type
-	      String type = message.getType();
-	      if (type != null && !"".equals(type.trim())) {
-	         builder.add(TYPE, type);
-	      }
-	      //sourceIp
-	      String sourceIp = message.getSourceIp();
-	      if (sourceIp != null && !"".equals(sourceIp.trim())) {
-	         builder.add(SOURCE_IP, sourceIp);
-	      }
+	@Override
+	public Long getMaxMessageId(String topicName, String consumerId) {
+		DBCollection collection = getCollection(topicName, consumerId);
+		return getMaxMessageId(collection);
+	}
 
-	      collection.insert(builder.get());
-	   }
+	@Override
+	public Long getMaxMessageId(String topicName) {
+		return getMaxMessageId(topicName, null);
+	}
 
-   private void addDefaultInternalProperties(Map<String, String> internalProperties) {
-	   internalProperties.put(SAVE_TIME, String.valueOf(System.currentTimeMillis()));
-   }
+	private DBCollection getCollection(String topicName, String consumerId) {
+		return this.mongoManager.getMessageCollection(topicName, consumerId);
+	}
 
+	private Long getMaxMessageId(DBCollection collection) {
+		DBObject fields = BasicDBObjectBuilder.start().add(ID, 1).get();
+		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
+		DBCursor cursor = collection.find(null, fields).sort(orderBy).limit(1);
+		try {
+			if (cursor.hasNext()) {
+				BSONTimestamp timestamp = (BSONTimestamp) cursor.next().get(ID);
+				return MongoUtils.BSONTimestampToLong(timestamp);
+			}
+		} finally {
+			cursor.close();
+		}
+		return null;
+	}
+
+	@Override
+	public SwallowMessage getMaxMessage(String topicName) {
+		DBCollection collection = this.mongoManager.getMessageCollection(topicName);
+
+		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
+		DBCursor cursor = collection.find().sort(orderBy).limit(1);
+		try {
+			if (cursor.hasNext()) {
+				DBObject result = cursor.next();
+				SwallowMessage swallowMessage = new SwallowMessage();
+				try {
+					convert(result, swallowMessage);
+					return swallowMessage;
+				} catch (RuntimeException e) {
+					logger.error("Error when convert resultset to SwallowMessage.", e);
+				}
+			}
+		} finally {
+			cursor.close();
+		}
+		return null;
+	}
+
+	@Override
+	public List<SwallowMessage> getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size) {
+		DBCollection collection = getCollection(topicName, consumerId);
+		List<SwallowMessage> list = getMessageGreaterThan(messageId, size, collection);
+		return list;
+	}
+
+	@Override
+	public void cleanMessage(String topicName, String consumerId) {
+		if (logger.isInfoEnabled()) {
+			logger.info("[cleanMessage][topic, consumerId]" + topicName + "," + consumerId);
+		}
+		mongoManager.cleanMessageCollection(topicName, consumerId);
+	}
+
+	private List<SwallowMessage> getMessageGreaterThan(Long messageId, int size, DBCollection collection) {
+		DBObject gt = BasicDBObjectBuilder.start().add("$gt", MongoUtils.longToBSONTimestamp(messageId)).get();
+		DBObject query = BasicDBObjectBuilder.start().add(ID, gt).get();
+		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(1)).get();
+		DBCursor cursor = collection.find(query).sort(orderBy).limit(size);
+
+		List<SwallowMessage> list = new ArrayList<SwallowMessage>();
+		try {
+			while (cursor.hasNext()) {
+				DBObject result = cursor.next();
+				SwallowMessage swallowMessage = new SwallowMessage();
+				try {
+					convert(result, swallowMessage);
+					list.add(swallowMessage);
+				} catch (RuntimeException e) {
+					logger.error("Error when convert resultset to SwallowMessage.", e);
+				}
+			}
+		} finally {
+			cursor.close();
+		}
+		return list;
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	private void convert(DBObject result, SwallowMessage swallowMessage) {
+		BSONTimestamp timestamp = (BSONTimestamp) result.get(ID);
+		BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(ORIGINAL_ID);
+
+		if (originalTimestamp != null) {
+			swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(originalTimestamp));
+			swallowMessage.setBackupMessageId(MongoUtils.BSONTimestampToLong(timestamp));
+			swallowMessage.setBackup(true);
+		} else {
+			swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(timestamp));
+			swallowMessage.setBackup(false);
+		}
+
+		swallowMessage.setContent(result.get(CONTENT));// content
+		swallowMessage.setVersion((String) result.get(VERSION));// version
+		swallowMessage.setGeneratedTime((Date) result.get(GENERATED_TIME));// generatedTime
+		Map<String, String> propertiesBasicDBObject = (Map<String, String>) result.get(PROPERTIES);// mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
+		if (propertiesBasicDBObject != null) {
+			HashMap<String, String> properties = new HashMap<String, String>(propertiesBasicDBObject);
+			swallowMessage.setProperties(properties);// properties
+		}
+		Map<String, String> internalPropertiesBasicDBObject = (Map<String, String>) result.get(INTERNAL_PROPERTIES);// mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
+		if (internalPropertiesBasicDBObject != null) {
+			HashMap<String, String> properties = new HashMap<String, String>(internalPropertiesBasicDBObject);
+			swallowMessage.setInternalProperties(properties);// properties
+		}
+		swallowMessage.setSha1((String) result.get(SHA1));// sha1
+		swallowMessage.setType((String) result.get(TYPE));// type
+		swallowMessage.setSourceIp((String) result.get(SOURCE_IP));// sourceIp
+	}
+
+	@Override
+	public void saveMessage(String topicName, SwallowMessage message) {
+		saveMessage(topicName, null, message);
+	}
+
+	public void saveMessage(String topicName, List<SwallowMessage> messages) {
+		saveMessage(topicName, null, messages);
+	}
+
+	private void saveMessage(String topicName, String consumerId, List<SwallowMessage> messages) {
+
+		final DBCollection collection = getCollection(topicName, consumerId);
+
+		final List<DBObject> mongoMessages = new ArrayList<DBObject>();
+		
+		for(SwallowMessage message : messages){
+			mongoMessages.add(createMongoMessage(topicName, consumerId, message));
+		}
+
+		doAndCheckResult(new MongoAction() {
+			@Override
+			public WriteResult doAction() {
+				
+				return collection.insert(mongoMessages);
+			}
+		});
+
+	}
+
+	@Override
+	public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
+		
+		final DBCollection collection = getCollection(topicName, consumerId);
+
+		final DBObject mongoMessage = createMongoMessage(topicName, consumerId, message);
+
+		doAndCheckResult(new MongoAction() {
+			@Override
+			public WriteResult doAction() {
+				return collection.insert(mongoMessage);
+			}
+		});
+	}
+
+	private DBObject createMongoMessage(String topicName, String consumerId, SwallowMessage message) {
+		
+		BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
+		// 如果有backupMessageId，则表示是备份消息，那么messageId则作为ORIGINAL_ID存起来
+		if (consumerId != null) {
+			builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getMessageId()));
+		}
+		// content
+		String content = message.getContent();
+		if (content != null && !"".equals(content.trim())) {
+			builder.add(CONTENT, content);
+		}
+		// generatedTime
+		Date generatedTime = message.getGeneratedTime();
+		if (generatedTime != null) {
+			builder.add(GENERATED_TIME, generatedTime);
+		}
+		// version
+		String version = message.getVersion();
+		if (version != null && !"".equals(version.trim())) {
+			builder.add(VERSION, version);
+		}
+		// properties
+		Map<String, String> properties = message.getProperties();
+		if (properties != null && properties.size() > 0) {
+			builder.add(PROPERTIES, properties);
+		}
+		// internalProperties
+		Map<String, String> internalProperties = message.getInternalProperties();
+		if (internalProperties == null) {
+			internalProperties = new HashMap<String, String>();
+		}
+		addDefaultInternalProperties(internalProperties);
+		builder.add(INTERNAL_PROPERTIES, internalProperties);
+		// sha1
+		String sha1 = message.getSha1();
+		if (sha1 != null && !"".equals(sha1.trim())) {
+			builder.add(SHA1, sha1);
+		}
+		// type
+		String type = message.getType();
+		if (type != null && !"".equals(type.trim())) {
+			builder.add(TYPE, type);
+		}
+		// sourceIp
+		String sourceIp = message.getSourceIp();
+		if (sourceIp != null && !"".equals(sourceIp.trim())) {
+			builder.add(SOURCE_IP, sourceIp);
+		}
+		
+		return builder.get();
+	}
+
+	@Override
+	public void retransmitMessage(String topicName, SwallowMessage message) {
+		DBCollection collection = getCollection(topicName, null);
+
+		BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
+
+		// content
+		String content = message.getContent();
+		if (content != null && !"".equals(content.trim())) {
+			builder.add(CONTENT, content);
+		}
+		// generatedTime
+		Date generatedTime = message.getGeneratedTime();
+		if (generatedTime != null) {
+			builder.add(GENERATED_TIME, generatedTime);
+		}
+		// version
+		String version = message.getVersion();
+		if (version != null && !"".equals(version.trim())) {
+			builder.add(VERSION, version);
+		}
+		// properties
+		Map<String, String> properties = message.getProperties();
+		if (properties != null && properties.size() > 0) {
+			builder.add(PROPERTIES, properties);
+		}
+		// internalProperties
+		Map<String, String> internalProperties = message.getInternalProperties();
+		if (internalProperties == null) {
+			internalProperties = new HashMap<String, String>();
+		}
+		// 标记重发
+		internalProperties.put("retransmit", message.getMessageId().toString());
+		addDefaultInternalProperties(internalProperties);
+		builder.add(INTERNAL_PROPERTIES, internalProperties);
+		// sha1
+		String sha1 = message.getSha1();
+		if (sha1 != null && !"".equals(sha1.trim())) {
+			builder.add(SHA1, sha1);
+		}
+		// type
+		String type = message.getType();
+		if (type != null && !"".equals(type.trim())) {
+			builder.add(TYPE, type);
+		}
+		// sourceIp
+		String sourceIp = message.getSourceIp();
+		if (sourceIp != null && !"".equals(sourceIp.trim())) {
+			builder.add(SOURCE_IP, sourceIp);
+		}
+
+		collection.insert(builder.get());
+	}
+
+	private void addDefaultInternalProperties(Map<String, String> internalProperties) {
+		internalProperties.put(SAVE_TIME, String.valueOf(System.currentTimeMillis()));
+	}
 
 	@Override
 	public int deleteMessage(String topicName, Long messageId) {
@@ -326,12 +354,12 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 	public int deleteMessage(String topicName, String consumerId, final Long messageId) {
 
 		final DBCollection collection = getCollection(topicName, consumerId);
-		if(collection.isCapped()){
+		if (collection.isCapped()) {
 			logger.error("[deleteMessage][capped collection, can not delete]" + topicName + "," + consumerId);
 			return 0;
 		}
-		
-		WriteResult  result = doAndCheckResult(new MongoAction() {
+
+		WriteResult result = doAndCheckResult(new MongoAction() {
 			@Override
 			public WriteResult doAction() {
 
@@ -339,29 +367,29 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 				return collection.remove(query);
 			}
 		});
-		
+
 		return result.getN();
 	}
 
 	@Override
 	public int count(String topicName, String consumerId) {
-		
+
 		DBCollection collection = getCollection(topicName, consumerId);
 		return collection.find().size();
 	}
 
 	@Override
 	public long getAccumulation(String topicName, String consumerId) {
-		
+
 		DBCollection collection = mongoManager.getAckCollection(topicName, consumerId);
 		DBCursor cursor = collection.find().sort(new BasicDBObject(ID, -1)).limit(1);
-				
+
 		BSONTimestamp currentIndex = MongoUtils.getTimestampByCurTime();
 
-		while(cursor.hasNext()){
+		while (cursor.hasNext()) {
 			currentIndex = (BSONTimestamp) cursor.next().get(ID);
 		}
-		
+
 		DBCollection msgCollection = getCollection(topicName, null);
 		return msgCollection.count(new Query().gt(ID, currentIndex).build());
 	}

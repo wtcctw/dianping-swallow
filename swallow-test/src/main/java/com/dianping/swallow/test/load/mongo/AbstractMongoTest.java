@@ -9,6 +9,9 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
+import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
@@ -28,16 +31,19 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 	
 
 	@Override
-	protected void start() throws InterruptedException ,IOException {
+	protected void start() throws Exception {
+		
 		dao = createDao();
 		super.start();
 		
 	};
 	
-	protected MessageDAO createDao() throws IOException {
+	protected MessageDAO createDao() throws Exception {
 		
 		System.setProperty("lion.useLocal", "true");
 		DefaultMongoManager mc = new DefaultMongoManager();
+		mc.setSwallowConfig(new SwallowConfigImpl());
+		mc.initialize();
 		
 		MessageDAOImpl mdao = new MessageDAOImpl();
 		mdao.setMongoManager(mc);
@@ -56,7 +62,7 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 			throw new IllegalStateException("file not found: swallow-mongo-lion.properties");
 		}
 		p.load(ins);
-		String result = p.getProperty("swallow.mongo.producerServerURI");
+		String result = p.getProperty("swallow.topiccfg.default");
 		if(StringUtils.isBlank(result)){
 			throw new IllegalStateException("swallow.mongo.producerServerURI not found!!!");
 		}
@@ -81,25 +87,13 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 	 * @throws NumberFormatException 
 	 */
 	private ServerAddress getAddress(String topicToMongo) throws NumberFormatException, UnknownHostException {
+
+		TopicConfig config = JsonBinder.getNonEmptyBinder().fromJson(topicToMongo, TopicConfig.class);
 		
-		for(String topicMongo : topicToMongo.split(";")){
-			
-			if(StringUtils.isBlank(topicMongo)){
-				continue;
-			}
-			String []sp = topicMongo.split("=");
-			if(sp.length !=2){
-				continue;
-			}
-			if(sp[0].equalsIgnoreCase("default")){
-				String address = sp[1].substring("mongodb://".length());
-				String []ipPort = address.split(":");
-				return new ServerAddress(ipPort[0], Integer.parseInt(ipPort[1]));
+		String address = config.getMongoUrl().substring("mongodb://".length());
+		String []ipPort = address.split(":");
+		return new ServerAddress(ipPort[0], Integer.parseInt(ipPort[1]));
 				
-			}
-		}
-		
-		return null;
 	}
 
 	protected SwallowMessage createMessage(String content) {
@@ -137,8 +131,7 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 								if(count.get() > messageCount){
 									exit();
 								}
-								dao.saveMessage(realTopicName, createMessage(message));
-								count.incrementAndGet();
+								saveMessge(realTopicName);
 							}catch(Exception e){
 								logger.error("error save message", e);
 							}finally{
@@ -149,6 +142,13 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 				});
 			}
 		}
+	}
+
+	protected void saveMessge(String topicName) {
+		
+		dao.saveMessage(topicName, createMessage(message));
+		count.incrementAndGet();
+		
 	}
 
 }

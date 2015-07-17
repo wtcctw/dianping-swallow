@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.dao.impl.mongodb;
+package com.dianping.swallow.common.internal.	dao.impl.mongodb;
 
 
 import java.util.Collection;
@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
@@ -45,8 +43,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	public static final String ACK_PREFIX = "ack#";
 	public static final String BACKUP_MSG_PREFIX = "b_m#";
 	public static final String BACKUP_ACK_PREFIX = "b_a#";
-
-	private static final Logger logger = LoggerFactory.getLogger(DefaultMongoManager.class);
 
 	private static final String MONGO_CONFIG_FILENAME = "swallow-mongo.properties";
 	private static final String DEFAULT_COLLECTION_NAME = "c";

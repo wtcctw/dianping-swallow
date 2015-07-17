@@ -3,11 +3,8 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 import java.util.Date;
 
 import org.bson.types.BSONTimestamp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.AckDAO;
-import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -16,19 +13,11 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 
-public class AckDAOImpl implements AckDAO {
-
-   private static final Logger logger             = LoggerFactory.getLogger(AckDAOImpl.class);
+public class AckDAOImpl extends AbstractDao implements AckDAO {
 
    public static final String  MSG_ID          = "_id";
    public static final String  SRC_CONSUMER_IP = "cip";
    public static final String  TICK            = "t";
-
-   private MongoManager         mongoManager;
-
-   public void setMongoManager(DefaultMongoManager mongoManager) {
-      this.mongoManager = mongoManager;
-   }
 
    @Override
    public Long getMaxMessageId(String topicName, String consumerId) {
