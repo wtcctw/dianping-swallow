@@ -40,7 +40,7 @@ public class SwallowAlarmSettingController extends AbstractSidebarBasedControlle
 	@ResponseBody
 	public Object producerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 		
-		List<SwallowAlarmSetting> swallowAlarmSettingList = swallowAlarmSettingService.findAll();
+		List<SwallowAlarmSetting> swallowAlarmSettingList = swallowAlarmSettingService.findByPage(offset, limit);
 		List<SwallowAlarmSettingDto> swallowAlarmSettingListDto = new ArrayList<SwallowAlarmSettingDto>();
 		for(SwallowAlarmSetting swallowAlarmSetting : swallowAlarmSettingList){
 			swallowAlarmSettingListDto.add(SwallowAlarmSettingMapper.toSwallowAlarmSettingDto(swallowAlarmSetting));

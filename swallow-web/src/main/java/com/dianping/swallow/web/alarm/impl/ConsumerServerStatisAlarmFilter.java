@@ -70,7 +70,7 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	}
 
 	public boolean serverAlarm() {
-		ConsumerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findOne();
+		ConsumerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findDefault();
 		if (serverAlarmSetting == null) {
 			return true;
 		}

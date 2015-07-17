@@ -21,12 +21,12 @@ public interface ProducerServerAlarmSettingService {
 
 	public ProducerServerAlarmSetting findById(String id);
 
-	public List<ProducerServerAlarmSetting> findAll();
-	
 	public List<String> getTopicWhiteList();
 	
 	public ProducerServerAlarmSetting findByServerId(String serverId);
 
-	public ProducerServerAlarmSetting findOne();
+	public ProducerServerAlarmSetting findDefault();
+	
+	public List<ProducerServerAlarmSetting> findByPage(int offset, int limit);
 	
 }

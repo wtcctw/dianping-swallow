@@ -302,7 +302,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 				return Collections.unmodifiableList(cmdbProducerIps);
 			} else {
 				synchronized (lionProducerIps) {
-					return lionProducerIps;
+					return Collections.unmodifiableList(lionProducerIps);
 				}
 			}
 		}
@@ -315,7 +315,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 				return Collections.unmodifiableList(cmdbConsumerSlaveIps);
 			} else {
 				synchronized (lionConsumerSlaveIps) {
-					return lionConsumerSlaveIps;
+					return Collections.unmodifiableList(lionConsumerSlaveIps);
 				}
 			}
 		}
@@ -328,7 +328,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 				return Collections.unmodifiableList(cmdbConsumerMasterIps);
 			} else {
 				synchronized (lionConsumerMasterIps) {
-					return lionConsumerMasterIps;
+					return Collections.unmodifiableList(lionConsumerMasterIps);
 				}
 			}
 		}

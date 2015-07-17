@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service;
 
+
 import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
@@ -21,9 +22,10 @@ public interface ConsumerIdAlarmSettingService {
 
 	public ConsumerIdAlarmSetting findById(String id);
 
-	public List<ConsumerIdAlarmSetting> findAll();
-
 	public ConsumerIdAlarmSetting findByConsumerId(String topicName, String consumerId);
 	
-	public ConsumerIdAlarmSetting findOne();
+	public ConsumerIdAlarmSetting findDefault();
+	
+	public List<ConsumerIdAlarmSetting> findByPage(int offset, int limit);
+	
 }

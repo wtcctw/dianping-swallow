@@ -70,7 +70,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	}
 
 	public boolean topicAlarm() {
-		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingService.findOne();
+		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingService.findDefault();
 		if (topicAlarmSetting == null || topicAlarmSetting.getProducerAlarmSetting() == null) {
 			return true;
 		}

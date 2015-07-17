@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -72,16 +74,28 @@ public class DefaultConsumerIdAlarmSettingDao extends AbstractWriteDao implement
 	}
 
 	@Override
-	public List<ConsumerIdAlarmSetting> findAll() {
-		return mongoTemplate.findAll(ConsumerIdAlarmSetting.class, CONSUMERIDALARMSETTING_COLLECTION);
-	}
-
-	@Override
-	public ConsumerIdAlarmSetting findByConsumerId(String topicName, String consumerId) {
+	public ConsumerIdAlarmSetting findByTopicNameAndConsumerId(String topicName, String consumerId) {
 		Query query = new Query(Criteria.where(CONSUMERID_FIELD).is(consumerId).and(TOPICNAME_FEILD).is(topicName));
 		ConsumerIdAlarmSetting alarmSetting = mongoTemplate.findOne(query, ConsumerIdAlarmSetting.class,
 				CONSUMERIDALARMSETTING_COLLECTION);
 		return alarmSetting;
+	}
+
+	@Override
+	public List<ConsumerIdAlarmSetting> findByConsumerId(String consumerId) {
+		Query query = new Query(Criteria.where(CONSUMERID_FIELD).is(consumerId));
+		List<ConsumerIdAlarmSetting> alarmSettings = mongoTemplate.find(query, ConsumerIdAlarmSetting.class,
+				CONSUMERIDALARMSETTING_COLLECTION);
+		return alarmSettings;
+	}
+	
+	@Override
+	public List<ConsumerIdAlarmSetting> findByPage(int offset, int limit) {
+		Query query = new Query();
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, CONSUMERID_FIELD)));
+		List<ConsumerIdAlarmSetting> consumerIdAlarmSettings = mongoTemplate.find(query,
+				ConsumerIdAlarmSetting.class, CONSUMERIDALARMSETTING_COLLECTION);
+		return consumerIdAlarmSettings;
 	}
 
 }

@@ -2,7 +2,6 @@ package com.dianping.swallow.web.service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.dianping.swallow.web.model.alarm.Alarm;
@@ -114,7 +113,7 @@ public interface AlarmService {
 	 * @param Alarm
 	 * @return
 	 */
-	public Map<String, Object> findByReceiver(String receiver, int offset, int limit);
+	public List<Alarm> findByReceiver(String receiver, int offset, int limit);
 
 	/**
 	 * find by id
@@ -122,13 +121,21 @@ public interface AlarmService {
 	 * @param ipDesc
 	 * @return
 	 */
-	public Map<String, Object> findByCreateTime(Date createTime, int offset, int limit);
+	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit);
 
 	/**
-	 * find all
+	 * find count by createTime
 	 * 
-	 * @param
+	 * @param 
 	 * @return
 	 */
-	public List<Alarm> findAll();
+	public long countByCreateTime(Date createTime);
+	
+	/**
+	 * find count by receiver
+	 * 
+	 * @param 
+	 * @return
+	 */
+	public long countByReceiver(String receiver);
 }

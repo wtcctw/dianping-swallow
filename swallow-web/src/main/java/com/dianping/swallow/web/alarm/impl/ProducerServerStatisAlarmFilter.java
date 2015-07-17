@@ -70,7 +70,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	}
 
 	public boolean serverAlarm() {
-		ProducerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findOne();
+		ProducerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findDefault();
 		if (serverAlarmSetting == null) {
 			return true;
 		}

@@ -22,7 +22,7 @@ public interface ConsumerServerAlarmSettingDao {
 	public ConsumerServerAlarmSetting findById(String id);
 	
 	public ConsumerServerAlarmSetting findByServerId(String serverId);
-
-	public List<ConsumerServerAlarmSetting> findAll();
 	
+	public List<ConsumerServerAlarmSetting> findByPage(int offset, int limit);
+
 }

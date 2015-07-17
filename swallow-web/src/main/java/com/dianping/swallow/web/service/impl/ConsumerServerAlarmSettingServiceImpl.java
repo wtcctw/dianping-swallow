@@ -18,6 +18,8 @@ import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 @Service("consumerServerAlarmSettingService")
 public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlarmSettingService {
 
+	private static final String DEFAULT_SERVERID = "default";
+
 	@Autowired
 	private ConsumerServerAlarmSettingDao consumerServerAlarmSettingDao;
 
@@ -49,20 +51,15 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 	public int deleteByServerId(String serverId) {
 		return consumerServerAlarmSettingDao.deleteByServerId(serverId);
 	}
-	
+
 	@Override
 	public ConsumerServerAlarmSetting findById(String id) {
 		return consumerServerAlarmSettingDao.findById(id);
 	}
 
 	@Override
-	public List<ConsumerServerAlarmSetting> findAll() {
-		return consumerServerAlarmSettingDao.findAll();
-	}
-
-	@Override
 	public List<String> getTopicWhiteList() {
-		ConsumerServerAlarmSetting serverAlarmSetting = findOne();
+		ConsumerServerAlarmSetting serverAlarmSetting = findDefault();
 		if (serverAlarmSetting == null) {
 			return null;
 		}
@@ -70,17 +67,19 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 	}
 
 	@Override
-	public ConsumerServerAlarmSetting findOne() {
-		List<ConsumerServerAlarmSetting> serverAlarmSettings = findAll();
-		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
-			return null;
-		}
-		return serverAlarmSettings.get(0);
+	public ConsumerServerAlarmSetting findDefault() {
+		ConsumerServerAlarmSetting serverAlarmSetting = consumerServerAlarmSettingDao.findByServerId(DEFAULT_SERVERID);
+		return serverAlarmSetting;
 	}
 
 	@Override
 	public ConsumerServerAlarmSetting findByServerId(String serverId) {
 		return consumerServerAlarmSettingDao.findByServerId(serverId);
+	}
+
+	@Override
+	public List<ConsumerServerAlarmSetting> findByPage(int offset, int limit) {
+		return consumerServerAlarmSettingDao.findByPage(offset, limit);
 	}
 
 }

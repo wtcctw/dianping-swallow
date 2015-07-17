@@ -23,6 +23,5 @@ public interface SwallowAlarmSettingDao {
 	
 	public SwallowAlarmSetting findBySwallowId(String swallowId);
 
-	public List<SwallowAlarmSetting> findAll();
-
+	public List<SwallowAlarmSetting> findByPage(int offset, int limit);
 }

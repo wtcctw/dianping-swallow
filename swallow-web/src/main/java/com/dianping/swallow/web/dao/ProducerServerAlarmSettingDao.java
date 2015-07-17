@@ -23,6 +23,5 @@ public interface ProducerServerAlarmSettingDao {
 	
 	public ProducerServerAlarmSetting findByServerId(String serverId);
 
-	public List<ProducerServerAlarmSetting> findAll();
-	
+	public List<ProducerServerAlarmSetting> findByPage(int offset, int limit);
 }

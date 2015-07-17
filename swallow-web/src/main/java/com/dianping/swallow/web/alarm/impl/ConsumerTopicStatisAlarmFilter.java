@@ -70,7 +70,7 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	}
 
 	public boolean topicAlarm() {
-		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingService.findOne();
+		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingService.findDefault();
 		if (topicAlarmSetting == null || topicAlarmSetting.getConsumerAlarmSetting() == null) {
 			return true;
 		}

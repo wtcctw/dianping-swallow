@@ -74,7 +74,7 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 		if (consumerIdStatsDataMap == null || consumerIdStatsDataMap.size() == 0) {
 			return true;
 		}
-		ConsumerIdAlarmSetting consumerIdAlarmSetting = consumerIdAlarmSettingService.findOne();
+		ConsumerIdAlarmSetting consumerIdAlarmSetting = consumerIdAlarmSettingService.findDefault();
 		if (consumerIdAlarmSetting == null) {
 			return true;
 		}

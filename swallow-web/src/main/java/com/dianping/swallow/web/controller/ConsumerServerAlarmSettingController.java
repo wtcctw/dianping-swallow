@@ -46,7 +46,7 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 	@ResponseBody
 	public Object consumerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 		
-		List<ConsumerServerAlarmSetting> consumerAlarmSettingList = consumerServerAlarmSettingService.findAll();
+		List<ConsumerServerAlarmSetting> consumerAlarmSettingList = consumerServerAlarmSettingService.findByPage(offset, limit);
 		List<ConsumerServerAlarmSettingDto> consumerAlarmSettingListDto = new ArrayList<ConsumerServerAlarmSettingDto>();
 		for(ConsumerServerAlarmSetting consumerAlarmSetting : consumerAlarmSettingList){
 			consumerAlarmSettingListDto.add(ConsumerServerAlarmSettingMapper.toConsumerServerAlarmSettingDto(consumerAlarmSetting));

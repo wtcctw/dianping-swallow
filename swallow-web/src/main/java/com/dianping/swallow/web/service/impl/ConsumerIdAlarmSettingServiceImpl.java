@@ -18,6 +18,8 @@ import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 @Service("consumerIdAlarmSettingService")
 public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSettingService {
 
+	private static final String DEFAULT_CONSUMERID = "default";
+
 	@Autowired
 	private ConsumerIdAlarmSettingDao consumerIdAlarmSettingDao;
 
@@ -56,13 +58,9 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 	}
 
 	@Override
-	public List<ConsumerIdAlarmSetting> findAll() {
-		return consumerIdAlarmSettingDao.findAll();
-	}
-
-	@Override
-	public ConsumerIdAlarmSetting findOne() {
-		List<ConsumerIdAlarmSetting> consumerIdAlarmSettings = findAll();
+	public ConsumerIdAlarmSetting findDefault() {
+		List<ConsumerIdAlarmSetting> consumerIdAlarmSettings = consumerIdAlarmSettingDao
+				.findByConsumerId(DEFAULT_CONSUMERID);
 		if (consumerIdAlarmSettings == null || consumerIdAlarmSettings.size() == 0) {
 			return null;
 		}
@@ -71,7 +69,12 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 
 	@Override
 	public ConsumerIdAlarmSetting findByConsumerId(String topicName, String consumerId) {
-		return consumerIdAlarmSettingDao.findByConsumerId(topicName, consumerId);
+		return consumerIdAlarmSettingDao.findByTopicNameAndConsumerId(topicName, consumerId);
+	}
+
+	@Override
+	public List<ConsumerIdAlarmSetting> findByPage(int offset, int limit) {
+		return consumerIdAlarmSettingDao.findByPage(offset, limit);
 	}
 
 }

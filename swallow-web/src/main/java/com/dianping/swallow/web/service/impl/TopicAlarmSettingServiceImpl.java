@@ -18,6 +18,8 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
 @Service("topicAlarmSettingService")
 public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 
+	private static final String DEFAULT_TOPICNAME = "default";
+
 	@Autowired
 	private TopicAlarmSettingDao topicAlarmSettingDao;
 
@@ -56,13 +58,8 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 	}
 
 	@Override
-	public List<TopicAlarmSetting> findAll() {
-		return topicAlarmSettingDao.findAll();
-	}
-
-	@Override
 	public List<String> getConsumerIdWhiteList() {
-		TopicAlarmSetting topicAlarmSetting = findOne();
+		TopicAlarmSetting topicAlarmSetting = findDefault();
 		if (topicAlarmSetting == null) {
 			return null;
 		}
@@ -70,17 +67,19 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 	}
 
 	@Override
-	public TopicAlarmSetting findOne() {
-		List<TopicAlarmSetting> topicAlarmSetting = topicAlarmSettingDao.findAll();
-		if (topicAlarmSetting == null || topicAlarmSetting.size() == 0) {
-			return null;
-		}
-		return topicAlarmSetting.get(0);
+	public TopicAlarmSetting findDefault() {
+		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingDao.findByTopicName(DEFAULT_TOPICNAME);
+		return topicAlarmSetting;
 	}
 
 	@Override
 	public TopicAlarmSetting findByTopicName(String topicName) {
 		return topicAlarmSettingDao.findByTopicName(topicName);
+	}
+
+	@Override
+	public List<TopicAlarmSetting> findByPage(int offset, int limit) {
+		return topicAlarmSettingDao.findByPage(offset, limit);
 	}
 
 }

@@ -11,51 +11,46 @@ import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
-
 /**
  * @author mingdongli
  *
- * 2015年7月12日下午2:46:21
+ *         2015年7月12日下午2:46:21
  */
 @Component
 public class TopicAlarmSettingServiceWrapper {
-	
+
 	@Resource(name = "consumerIdAlarmSettingService")
 	private ConsumerIdAlarmSettingService consumerIdAlarmSettingService;
-	
+
 	@Resource(name = "topicAlarmSettingService")
 	private TopicAlarmSettingService topicAlarmSettingService;
-	
-	public ConsumerBaseAlarmSetting loadConsumerBaseAlarmSetting(String consumerId){
-		
-		List<ConsumerIdAlarmSetting> consumerIdAlarmSettings = consumerIdAlarmSettingService.findAll();
-		ConsumerIdAlarmSetting consumerIdAlarmSetting;
-		if(consumerIdAlarmSettings.size() > 0){
-			consumerIdAlarmSetting = consumerIdAlarmSettings.get(0);
-		}
-		else{
+
+	public ConsumerBaseAlarmSetting loadConsumerBaseAlarmSetting(String consumerId) {
+
+		ConsumerIdAlarmSetting consumerIdAlarmSetting = consumerIdAlarmSettingService.findDefault();
+		if (consumerIdAlarmSetting == null) {
 			return loadConsumerIdAlarmSettingWithMaxValue();
 		}
 		List<String> whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
-		if(whiteList.contains(consumerId)){
+		if (whiteList.contains(consumerId)) {
 			return loadConsumerIdAlarmSettingWithMaxValue();
 		}
-		
+
 		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = consumerIdAlarmSetting.getConsumerAlarmSetting();
-		if(consumerBaseAlarmSetting == null){
+		if (consumerBaseAlarmSetting == null) {
 			consumerBaseAlarmSetting = loadConsumerIdAlarmSettingWithMaxValue();
 		}
 		return consumerBaseAlarmSetting;
 	}
-	
-	private ConsumerBaseAlarmSetting loadConsumerIdAlarmSettingWithMaxValue(){
-		
+
+	private ConsumerBaseAlarmSetting loadConsumerIdAlarmSettingWithMaxValue() {
+
 		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = new ConsumerBaseAlarmSetting();
-		
+
 		consumerBaseAlarmSetting.setSendDelay(Integer.MAX_VALUE);
 		consumerBaseAlarmSetting.setAckDelay(Integer.MAX_VALUE);
 		consumerBaseAlarmSetting.setAccumulation(Integer.MAX_VALUE);
 		return consumerBaseAlarmSetting;
 	}
-	
+
 }

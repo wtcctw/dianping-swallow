@@ -46,7 +46,7 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 	@ResponseBody
 	public Object producerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 		
-		List<ProducerServerAlarmSetting> producerAlarmSettingList = producerServerAlarmSettingService.findAll();
+		List<ProducerServerAlarmSetting> producerAlarmSettingList = producerServerAlarmSettingService.findByPage(offset, limit);
 		List<ProducerServerAlarmSettingDto> producerAlarmSettingListDto = new ArrayList<ProducerServerAlarmSettingDto>();
 		for(ProducerServerAlarmSetting producerAlarmSetting : producerAlarmSettingList){
 			producerAlarmSettingListDto.add(ProducerServerAlarmSettingMapper.toProducerServerAlarmSettingDto(producerAlarmSetting));
