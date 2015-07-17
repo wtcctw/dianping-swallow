@@ -70,7 +70,7 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	}
 
 	public boolean topicAlarm() {
-		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingService.findOne();
+		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingService.findDefault();
 		if (topicAlarmSetting == null || topicAlarmSetting.getConsumerAlarmSetting() == null) {
 			return true;
 		}
@@ -118,11 +118,11 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	private boolean sendQpsAlarm(String topic, long qpx, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerTopicStatisSQpsPAlarm(topic, qpx);
+				alarmManager.consumerTopicStatisSQpsPAlarm(topic, qpx, qps.getPeak());
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerTopicStatisSQpsVAlarm(topic, qpx);
+				alarmManager.consumerTopicStatisSQpsVAlarm(topic, qpx, qps.getValley());
 				return false;
 			}
 		}
@@ -132,11 +132,11 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	private boolean ackQpsAlarm(String topic, long qpx, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerTopicStatisSQpsPAlarm(topic, qpx);
+				alarmManager.consumerTopicStatisSQpsPAlarm(topic, qpx, qps.getPeak());
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerTopicStatisSQpsVAlarm(topic, qpx);
+				alarmManager.consumerTopicStatisSQpsVAlarm(topic, qpx, qps.getValley());
 				return false;
 			}
 		}

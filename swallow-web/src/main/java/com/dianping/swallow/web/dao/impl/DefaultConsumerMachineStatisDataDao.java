@@ -36,7 +36,7 @@ public class DefaultConsumerMachineStatisDataDao extends AbstractWriteDao implem
 			mongoTemplate.save(statisData, CONSUMERMACHINESTATICDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + statisData, e);
+			logger.error("Error when save consumer machine statis dao " + statisData, e);
 		}
 		return false;
 	}

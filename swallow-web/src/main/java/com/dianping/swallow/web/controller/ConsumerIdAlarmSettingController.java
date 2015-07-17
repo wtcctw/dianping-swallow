@@ -52,7 +52,7 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 	@ResponseBody
 	public Object comsumeridSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 
-		List<ConsumerIdAlarmSetting> consumerIdAlarmSettingList = consumerIdAlarmSettingService.findAll();
+		List<ConsumerIdAlarmSetting> consumerIdAlarmSettingList = consumerIdAlarmSettingService.findByPage(offset, limit);
 		List<ConsumerIdAlarmSettingDto> consumerAlarmSettingListDto = new ArrayList<ConsumerIdAlarmSettingDto>();
 		for(ConsumerIdAlarmSetting consumerIdAlarmSetting : consumerIdAlarmSettingList){
 			consumerAlarmSettingListDto.add(ConsumerIdAlarmSettingMapper.toConsumerIdAlarmSettingDto(consumerIdAlarmSetting));

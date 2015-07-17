@@ -10,6 +10,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ import com.dianping.swallow.web.service.IPDescService;
  *
  */
 @Service("cmdbService")
-public class CmdbServiceImpl implements CmdbService {
+public class CmdbServiceImpl implements CmdbService, InitializingBean {
 
 	private static final Logger logger = LoggerFactory.getLogger(CmdbServiceImpl.class);
 
@@ -56,26 +57,7 @@ public class CmdbServiceImpl implements CmdbService {
 	private ObjectMapper objectMapper;
 
 	public CmdbServiceImpl() {
-		setObjectMapper(new ObjectMapper());
-		try {
-			InputStream in = CmdbServiceImpl.class.getClassLoader().getResourceAsStream(CMDB_API_URL_FILE);
-			if (in != null) {
-				if (logger.isInfoEnabled()) {
-					logger.info("loading " + CMDB_API_URL_FILE);
-				}
-				Properties prop = new Properties();
-				try {
-					prop.load(in);
-					projectUrlFormat = StringUtils.trim(prop.getProperty(PROJECT_URL_KEY));
-					deviceUrlFormat = StringUtils.trim(prop.getProperty(DEVICE_URL_KEY));
-				} finally {
-					in.close();
-				}
-
-			}
-		} catch (Exception e) {
-			throw new RuntimeException();
-		}
+		objectMapper = new ObjectMapper();
 	}
 
 	@Override
@@ -177,6 +159,26 @@ public class CmdbServiceImpl implements CmdbService {
 		return envDevices;
 	}
 
+	private void initProperties() {
+		try {
+			InputStream in = CmdbServiceImpl.class.getClassLoader().getResourceAsStream(CMDB_API_URL_FILE);
+			if (in != null) {
+				Properties prop = new Properties();
+				try {
+					prop.load(in);
+					projectUrlFormat = StringUtils.trim(prop.getProperty(PROJECT_URL_KEY));
+					deviceUrlFormat = StringUtils.trim(prop.getProperty(DEVICE_URL_KEY));
+				} finally {
+					in.close();
+				}
+
+			}
+		} catch (Exception e) {
+			logger.info("Load " + CMDB_API_URL_FILE + " file failed.");
+			throw new RuntimeException();
+		}
+	}
+
 	private String transformEnv() {
 		if (env.equals("dev")) {
 			return "dev";
@@ -194,5 +196,10 @@ public class CmdbServiceImpl implements CmdbService {
 			return "";
 		}
 
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		initProperties();
 	}
 }

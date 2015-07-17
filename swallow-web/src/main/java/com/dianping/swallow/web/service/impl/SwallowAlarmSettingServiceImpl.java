@@ -18,6 +18,8 @@ import com.dianping.swallow.web.service.SwallowAlarmSettingService;
 @Service("swallowAlarmSettingService")
 public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingService {
 
+	private static final String DEFAULT_SWALLOWID = "default";
+
 	@Autowired
 	private SwallowAlarmSettingDao swallowAlarmSettingDao;
 
@@ -34,7 +36,7 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 		}
 		if (swallowAlarmSetting == null) {
 			return insert(setting);
-		}else{
+		} else {
 			setting.setId(swallowAlarmSetting.getId());
 			return swallowAlarmSettingDao.update(setting);
 		}
@@ -44,12 +46,11 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 	public int deleteById(String id) {
 		return swallowAlarmSettingDao.deleteById(id);
 	}
-	
+
 	@Override
 	public int deleteByBySwallowId(String swallowId) {
 		return swallowAlarmSettingDao.deleteByBySwallowId(swallowId);
 	}
-
 
 	@Override
 	public SwallowAlarmSetting findById(String id) {
@@ -57,13 +58,8 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 	}
 
 	@Override
-	public List<SwallowAlarmSetting> findAll() {
-		return swallowAlarmSettingDao.findAll();
-	}
-
-	@Override
 	public List<String> getProducerWhiteList() {
-		SwallowAlarmSetting swallowAlarmSetting = findOne();
+		SwallowAlarmSetting swallowAlarmSetting = findDefault();
 		if (swallowAlarmSetting == null) {
 			return null;
 		}
@@ -72,7 +68,7 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 
 	@Override
 	public List<String> getConsumerWhiteList() {
-		SwallowAlarmSetting swallowAlarmSetting = findOne();
+		SwallowAlarmSetting swallowAlarmSetting = findDefault();
 		if (swallowAlarmSetting == null) {
 			return null;
 		}
@@ -80,17 +76,19 @@ public class SwallowAlarmSettingServiceImpl implements SwallowAlarmSettingServic
 	}
 
 	@Override
-	public SwallowAlarmSetting findOne() {
-		List<SwallowAlarmSetting> swallowAlarmSettings = swallowAlarmSettingDao.findAll();
-		if (swallowAlarmSettings == null || swallowAlarmSettings.size() == 0) {
-			return null;
-		}
-		return swallowAlarmSettings.get(0);
+	public SwallowAlarmSetting findDefault() {
+		SwallowAlarmSetting swallowAlarmSetting = swallowAlarmSettingDao.findBySwallowId(DEFAULT_SWALLOWID);
+		return swallowAlarmSetting;
 	}
 
 	@Override
 	public SwallowAlarmSetting findBySwallowId(String swallowId) {
 		return swallowAlarmSettingDao.findBySwallowId(swallowId);
+	}
+
+	@Override
+	public List<SwallowAlarmSetting> findByPage(int offset, int limit) {
+		return swallowAlarmSettingDao.findByPage(offset, limit);
 	}
 
 }

@@ -55,7 +55,7 @@ public class TopicAlarmSettingController extends AbstractSidebarBasedController 
 	@ResponseBody
 	public Object topicSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 		
-		List<TopicAlarmSetting> topicAlarmSettingList = topicAlarmSettingService.findAll();
+		List<TopicAlarmSetting> topicAlarmSettingList = topicAlarmSettingService.findByPage(offset, limit);
 		List<TopicAlarmSettingDto> topicAlarmSettingDto = new ArrayList<TopicAlarmSettingDto>();
 		for(TopicAlarmSetting topicAlarmSetting : topicAlarmSettingList){
 			topicAlarmSettingDto.add(TopicAlarmSettingMapper.toTopicAlarmSettingDto(topicAlarmSetting));

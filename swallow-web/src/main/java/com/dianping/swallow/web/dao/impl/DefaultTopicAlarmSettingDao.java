@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 			mongoTemplate.save(setting, TOPICSALARMSETTING_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + setting, e);
+			logger.error("Error when save topic alarm setting " + setting, e);
 		}
 		return false;
 	}
@@ -58,7 +60,7 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 		WriteResult result = mongoTemplate.remove(query, TopicAlarmSetting.class, TOPICSALARMSETTING_COLLECTION);
 		return result.getN();
 	}
-	
+
 	@Override
 	public TopicAlarmSetting findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
@@ -68,16 +70,20 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 	}
 
 	@Override
-	public List<TopicAlarmSetting> findAll() {
-		return mongoTemplate.findAll(TopicAlarmSetting.class, TOPICSALARMSETTING_COLLECTION);
-	}
-
-	@Override
 	public TopicAlarmSetting findByTopicName(String topicName) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
 		TopicAlarmSetting topicAlarmSetting = mongoTemplate.findOne(query, TopicAlarmSetting.class,
 				TOPICSALARMSETTING_COLLECTION);
 		return topicAlarmSetting;
+	}
+
+	@Override
+	public List<TopicAlarmSetting> findByPage(int offset, int limit) {
+		Query query = new Query();
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, TOPICNAME_FIELD)));
+		List<TopicAlarmSetting> topicAlarmSettings = mongoTemplate.find(query, TopicAlarmSetting.class,
+				TOPICSALARMSETTING_COLLECTION);
+		return topicAlarmSettings;
 	}
 
 }

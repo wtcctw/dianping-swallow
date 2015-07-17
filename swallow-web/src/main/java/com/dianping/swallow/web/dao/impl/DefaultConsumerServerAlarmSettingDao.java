@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 			mongoTemplate.save(setting, CONSUMERSERVERALARMSETTING_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + setting, e);
+			logger.error("Error when save consumer server alarm setting " + setting, e);
 		}
 		return false;
 	}
@@ -70,11 +72,6 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 	}
 
 	@Override
-	public List<ConsumerServerAlarmSetting> findAll() {
-		return mongoTemplate.findAll(ConsumerServerAlarmSetting.class, CONSUMERSERVERALARMSETTING_COLLECTION);
-	}
-
-	@Override
 	public ConsumerServerAlarmSetting findByServerId(String serverId) {
 		Query query = new Query(Criteria.where(SERVERID_FIELD).is(serverId));
 		ConsumerServerAlarmSetting serverAlarmSetting = mongoTemplate.findOne(query, ConsumerServerAlarmSetting.class,
@@ -82,4 +79,12 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 		return serverAlarmSetting;
 	}
 
+	@Override
+	public List<ConsumerServerAlarmSetting> findByPage(int offset, int limit) {
+		Query query = new Query();
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, SERVERID_FIELD)));
+		List<ConsumerServerAlarmSetting> serverAlarmSettings = mongoTemplate.find(query,
+				ConsumerServerAlarmSetting.class, CONSUMERSERVERALARMSETTING_COLLECTION);
+		return serverAlarmSettings;
+	}
 }

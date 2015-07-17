@@ -21,6 +21,7 @@ import com.dianping.swallow.web.dao.ConsumerMonitorDao;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
+import com.dianping.swallow.web.service.IPCollectorService;
 
 
 /**
@@ -43,6 +44,9 @@ public class DataCollectorController extends AbstractController{
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 	
+	@Autowired
+	private IPCollectorService ipCollectorService;
+	
 	private static final Logger logger = LoggerFactory.getLogger(DataCollectorController.class);  
 	
 	@RequestMapping(value = "/api/stats/producer", method = RequestMethod.POST)
@@ -58,6 +62,7 @@ public class DataCollectorController extends AbstractController{
 			@Override
 			public void doAction() throws SwallowException {
 				producerDataRetriever.add(producerMonitorData);
+				ipCollectorService.addStatisIps(producerMonitorData);
 				producerMonitorDataDao.saveProducerMonotorData(producerMonitorData);
 			}
 		});
@@ -78,6 +83,7 @@ public class DataCollectorController extends AbstractController{
 			public void doAction() throws SwallowException {
 				
 				consumerDataRetriever.add(consumerMonitorData);
+				ipCollectorService.addStatisIps(consumerMonitorData);
 				consumerMonitorDataDao.saveConsumerMonotorData(consumerMonitorData);
 			}
 		});

@@ -11,12 +11,14 @@ import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("producerServerAlarmSettingService")
 public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlarmSettingService {
+
+	private static final String DEFAULT_SERVERID = "default";
 
 	@Autowired
 	private ProducerServerAlarmSettingDao producerServerAlarmSettingDao;
@@ -44,12 +46,11 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 	public int deleteById(String id) {
 		return producerServerAlarmSettingDao.deleteById(id);
 	}
-	
+
 	@Override
 	public int deleteByServerId(String serverId) {
 		return producerServerAlarmSettingDao.deleteByServerId(serverId);
 	}
-
 
 	@Override
 	public ProducerServerAlarmSetting findById(String id) {
@@ -57,28 +58,28 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 	}
 
 	@Override
-	public List<ProducerServerAlarmSetting> findAll() {
-		return producerServerAlarmSettingDao.findAll();
+	public List<String> getTopicWhiteList() {
+		ProducerServerAlarmSetting serverAlarmSetting = findDefault();
+		if (serverAlarmSetting == null) {
+			return null;
+		}
+		return serverAlarmSetting.getTopicWhiteList();
 	}
 
 	@Override
-	public List<String> getTopicWhiteList() {
-		ProducerServerAlarmSetting serverAlarmSetting = findOne();
-		return serverAlarmSetting.getTopicWhiteList();
-	}
-	
-	@Override
-	public ProducerServerAlarmSetting findOne(){
-		List<ProducerServerAlarmSetting> serverAlarmSettings = findAll();
-		if (serverAlarmSettings == null || serverAlarmSettings.size() == 0) {
-			return null;
-		}
-		return serverAlarmSettings.get(0);
+	public ProducerServerAlarmSetting findDefault() {
+		ProducerServerAlarmSetting serverAlarmSetting = producerServerAlarmSettingDao.findByServerId(DEFAULT_SERVERID);
+		return serverAlarmSetting;
 	}
 
 	@Override
 	public ProducerServerAlarmSetting findByServerId(String serverId) {
 		return producerServerAlarmSettingDao.findByServerId(serverId);
+	}
+
+	@Override
+	public List<ProducerServerAlarmSetting> findByPage(int offset, int limit) {
+		return producerServerAlarmSettingDao.findByPage(offset, limit);
 	}
 
 }

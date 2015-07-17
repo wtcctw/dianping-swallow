@@ -64,7 +64,7 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 			this.webMongoManager.getMessageMongoTemplate(topicName).insert(p, MESSAGE_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + p, e);
+			logger.error("Error when save message " + p, e);
 		}
 		return false;
 	}

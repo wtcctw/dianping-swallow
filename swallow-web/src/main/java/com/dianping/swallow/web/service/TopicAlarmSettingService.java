@@ -21,12 +21,13 @@ public interface TopicAlarmSettingService {
 
 	public TopicAlarmSetting findById(String id);
 	
-	public List<TopicAlarmSetting> findAll();
-
-	public TopicAlarmSetting findOne();
+	public TopicAlarmSetting findDefault();
 	
 	public TopicAlarmSetting findByTopicName(String topicName);
 	
 	public List<String> getConsumerIdWhiteList();
+	
+	public List<TopicAlarmSetting> findByPage(int offset, int limit);
+
 	
 }

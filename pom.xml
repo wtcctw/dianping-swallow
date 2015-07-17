@@ -146,7 +146,7 @@
 				<artifactId>cat-client</artifactId>
 				<version>${cat.version}</version>
 			</dependency>
-			<!-- requestIdé¡¹ç??????????¨å?¹å??(??ºä??ThreadLocal) -->
+			<!-- requestIdé¡¹ï¿½??????????ï¿½ï¿½?ï¿½ï¿½??(??ï¿½ï¿½??ThreadLocal) -->
 			<dependency>
 				<groupId>com.dianping.dpsf</groupId>
 				<artifactId>dpsf-net</artifactId>

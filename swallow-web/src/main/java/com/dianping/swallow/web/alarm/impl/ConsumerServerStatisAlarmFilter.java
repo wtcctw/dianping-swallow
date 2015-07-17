@@ -70,7 +70,7 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	}
 
 	public boolean serverAlarm() {
-		ConsumerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findOne();
+		ConsumerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findDefault();
 		if (serverAlarmSetting == null) {
 			return true;
 		}
@@ -97,11 +97,11 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean sendQpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerServerStatisSQpsPAlarm(ip, qpx);
+				alarmManager.consumerServerStatisSQpsPAlarm(ip, qpx, qps.getPeak());
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerServerStatisSQpsVAlarm(ip, qpx);
+				alarmManager.consumerServerStatisSQpsVAlarm(ip, qpx, qps.getValley());
 				return false;
 			}
 		}
@@ -111,11 +111,11 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean ackQpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerServerStatisAQpsPAlarm(ip, qpx);
+				alarmManager.consumerServerStatisAQpsPAlarm(ip, qpx, qps.getPeak());
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerServerStatisAQpsVAlarm(ip, qpx);
+				alarmManager.consumerServerStatisAQpsVAlarm(ip, qpx, qps.getValley());
 				return false;
 			}
 		}

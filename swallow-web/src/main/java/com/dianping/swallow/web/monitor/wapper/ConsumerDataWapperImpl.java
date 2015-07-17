@@ -10,7 +10,6 @@ import java.util.NavigableMap;
 import java.util.Set;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.mortbay.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -254,7 +253,6 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 
 	private long getConsumerIdAccumulation(String topic, String consumerId, long timeKey) {
 		NavigableMap<Long, Long> accumulations = accumulationRetriever.getConsumerIdAccumulation(topic, consumerId);
-		Log.info(accumulations.toString());
 		if (accumulations != null && !accumulations.isEmpty()) {
 			Long accumulation = accumulations.get(timeKey);
 			if (accumulation == null) {

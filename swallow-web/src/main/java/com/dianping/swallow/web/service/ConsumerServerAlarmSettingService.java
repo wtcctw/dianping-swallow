@@ -21,12 +21,12 @@ public interface ConsumerServerAlarmSettingService {
 
 	public ConsumerServerAlarmSetting findById(String id);
 
-	public List<ConsumerServerAlarmSetting> findAll();
-	
 	public List<String> getTopicWhiteList();
 	
 	public ConsumerServerAlarmSetting findByServerId(String serverId);
 
-	public ConsumerServerAlarmSetting findOne();
+	public ConsumerServerAlarmSetting findDefault();
+	
+	public List<ConsumerServerAlarmSetting> findByPage(int offset, int limit);
 	
 }

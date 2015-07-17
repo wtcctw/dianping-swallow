@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao imple
 			mongoTemplate.save(setting, PRODUCERSERVERALARMSETTING_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + setting, e);
+			logger.error("Error when save producer server alarm setting " + setting, e);
 		}
 		return false;
 	}
@@ -60,7 +62,7 @@ public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao imple
 				PRODUCERSERVERALARMSETTING_COLLECTION);
 		return result.getN();
 	}
-	
+
 	@Override
 	public ProducerServerAlarmSetting findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
@@ -70,16 +72,20 @@ public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao imple
 	}
 
 	@Override
-	public List<ProducerServerAlarmSetting> findAll() {
-		return mongoTemplate.findAll(ProducerServerAlarmSetting.class, PRODUCERSERVERALARMSETTING_COLLECTION);
-	}
-
-	@Override
 	public ProducerServerAlarmSetting findByServerId(String serverId) {
 		Query query = new Query(Criteria.where(SERVERID_FIELD).is(serverId));
 		ProducerServerAlarmSetting serverAlarmSetting = mongoTemplate.findOne(query, ProducerServerAlarmSetting.class,
 				PRODUCERSERVERALARMSETTING_COLLECTION);
 		return serverAlarmSetting;
+	}
+
+	@Override
+	public List<ProducerServerAlarmSetting> findByPage(int offset, int limit) {
+		Query query = new Query();
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, SERVERID_FIELD)));
+		List<ProducerServerAlarmSetting> serverAlarmSettings = mongoTemplate.find(query,
+				ProducerServerAlarmSetting.class, PRODUCERSERVERALARMSETTING_COLLECTION);
+		return serverAlarmSettings;
 	}
 
 }

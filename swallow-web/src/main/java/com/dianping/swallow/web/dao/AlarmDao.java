@@ -2,7 +2,6 @@ package com.dianping.swallow.web.dao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.dianping.swallow.web.model.alarm.Alarm;
 
@@ -50,22 +49,30 @@ public interface AlarmDao extends Dao {
 	 * @param Alarm
 	 * @return
 	 */
-	public Map<String, Object> findByReceiver(String receiver, int offset, int limit);
+	public List<Alarm> findByReceiver(String receiver, int offset, int limit);
 
 	/**
-	 * find by id
+	 * find by createTime
 	 * 
 	 * @param ipDesc
 	 * @return
 	 */
-	public Map<String, Object> findByCreateTime(Date createTime, int offset, int limit);
+	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit);
 
 	/**
-	 * find all
+	 * find count by createTime
 	 * 
 	 * @param 
 	 * @return
 	 */
-	public List<Alarm> findAll();
+	public long countByCreateTime(Date createTime);
+	
+	/**
+	 * find count by receiver
+	 * 
+	 * @param 
+	 * @return
+	 */
+	public long countByReceiver(String receiver);
 
 }

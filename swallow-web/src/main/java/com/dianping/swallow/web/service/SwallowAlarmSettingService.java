@@ -21,13 +21,14 @@ public interface SwallowAlarmSettingService {
 
 	public SwallowAlarmSetting findById(String id);
 
-	public List<SwallowAlarmSetting> findAll();
-	
 	public List<String> getProducerWhiteList();
 	
 	public List<String> getConsumerWhiteList();
 	
 	public SwallowAlarmSetting findBySwallowId(String swallowId);
 	
-	public SwallowAlarmSetting findOne();
+	public SwallowAlarmSetting findDefault();
+	
+	public List<SwallowAlarmSetting> findByPage(int offset, int limit);
+
 }

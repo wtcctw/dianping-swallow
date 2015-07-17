@@ -1,9 +1,7 @@
 package com.dianping.swallow.web.dao.impl;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +32,6 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 	private static final String CREATETIME_FIELD = "createTime";
 
 	private static final String ID_FIELD = "id";
-
-	private static final String SIZE = "size";
-	private static final String ALARM = "alarm";
 
 	@Override
 	public boolean insert(Alarm alarm) {
@@ -69,35 +64,32 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 	}
 
 	@Override
-	public Map<String, Object> findByReceiver(String receiver, int offset, int limit) {
+	public List<Alarm> findByReceiver(String receiver, int offset, int limit) {
 		Query query = new Query(Criteria.where(RECEIVER_FIELD).is(receiver));
-		Query queryCount = new Query(Criteria.where(RECEIVER_FIELD).is(receiver));
-		Long size = mongoTemplate.count(queryCount, ALARM_COLLECTION);
 		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, CREATETIME_FIELD)));
 		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
-		return getResponse(size, alarms);
+		return alarms;
 	}
 
 	@Override
-	public Map<String, Object> findByCreateTime(Date createTime, int offset, int limit) {
+	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit) {
 		Query query = new Query(Criteria.where(CREATETIME_FIELD).gte(createTime));
-		Query queryCount = new Query(Criteria.where(CREATETIME_FIELD).gte(createTime));
-		Long size = mongoTemplate.count(queryCount, ALARM_COLLECTION);
 		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, CREATETIME_FIELD)));
 		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
-		return getResponse(size, alarms);
+		return alarms;
 	}
 
 	@Override
-	public List<Alarm> findAll() {
-		return mongoTemplate.findAll(Alarm.class, ALARM_COLLECTION);
+	public long countByCreateTime(Date createTime) {
+		Query query = new Query(Criteria.where(CREATETIME_FIELD).gte(createTime));
+		return mongoTemplate.count(query, ALARM_COLLECTION);
+	}
+	
+	@Override
+	public long countByReceiver(String receiver) {
+		Query queryCount = new Query(Criteria.where(RECEIVER_FIELD).is(receiver));
+		return mongoTemplate.count(queryCount, ALARM_COLLECTION);
 	}
 
-	private Map<String, Object> getResponse(Long size, List<Alarm> alarms) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(SIZE, size);
-		map.put(ALARM, alarms);
-		return map;
-	}
 
 }

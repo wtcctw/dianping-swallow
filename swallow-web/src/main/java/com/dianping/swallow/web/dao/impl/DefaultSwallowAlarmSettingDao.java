@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements S
 		WriteResult result = mongoTemplate.remove(query, SwallowAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
 		return result.getN();
 	}
-	
+
 	@Override
 	public int deleteByBySwallowId(String swallowId) {
 		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(swallowId));
@@ -67,16 +69,20 @@ public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements S
 	}
 
 	@Override
-	public List<SwallowAlarmSetting> findAll() {
-		return mongoTemplate.findAll(SwallowAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
-	}
-
-	@Override
 	public SwallowAlarmSetting findBySwallowId(String swallowId) {
 		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(swallowId));
 		SwallowAlarmSetting swallowAlarmSetting = mongoTemplate.findOne(query, SwallowAlarmSetting.class,
 				SWALLOWALARMSETTING_COLLECTION);
 		return swallowAlarmSetting;
+	}
+
+	@Override
+	public List<SwallowAlarmSetting> findByPage(int offset, int limit) {
+		Query query = new Query();
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, SWALLOWID_FIELD)));
+		List<SwallowAlarmSetting> swallowAlarmSettings = mongoTemplate.find(query, SwallowAlarmSetting.class,
+				SWALLOWALARMSETTING_COLLECTION);
+		return swallowAlarmSettings;
 	}
 
 }
