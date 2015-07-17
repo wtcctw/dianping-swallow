@@ -113,8 +113,8 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 						}
 					}
 
-					sendDelayAlarm(topic, consumerId, consumerBaseStatsData.getSendDelay(), sendDelay);
-					ackDelayAlarm(topic, consumerId, consumerBaseStatsData.getAckDelay(), ackDelay);
+					sendDelayAlarm(topic, consumerId, consumerBaseStatsData.getSendDelay(), sendDelay * 1000);
+					ackDelayAlarm(topic, consumerId, consumerBaseStatsData.getAckDelay(), ackDelay * 1000);
 					accumulationAlarm(topic, consumerId, consumerBaseStatsData.getAccumulation(), accumulation);
 				}
 			}
@@ -155,11 +155,11 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	private boolean sendFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx,
 			QPSAlarmSetting qps) {
 		if (qpx != 0 && expectedQpx != 0 && qps != null) {
-			if (qpx > expectedQpx && (qpx / expectedQpx) < qps.getFluctuation()) {
+			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
 				alarmManager.consumerIdStatisSQpsFAlarm(topic, consumerId, qpx, expectedQpx);
 				return false;
 			}
-			if (qpx < expectedQpx && (expectedQpx / qpx) < qps.getFluctuation()) {
+			if (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuation()) {
 				alarmManager.consumerIdStatisSQpsFAlarm(topic, consumerId, qpx, expectedQpx);
 				return false;
 			}
@@ -169,11 +169,11 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 
 	private boolean ackFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx, QPSAlarmSetting qps) {
 		if (qpx != 0 && expectedQpx != 0 && qps != null) {
-			if (qpx > expectedQpx && (qpx / expectedQpx) < qps.getFluctuation()) {
+			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
 				alarmManager.consumerIdStatisAQpsFAlarm(topic, consumerId, qpx, expectedQpx);
 				return false;
 			}
-			if (qpx < expectedQpx && (expectedQpx / qpx) < qps.getFluctuation()) {
+			if (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuation()) {
 				alarmManager.consumerIdStatisAQpsFAlarm(topic, consumerId, qpx, expectedQpx);
 				return false;
 			}
