@@ -224,6 +224,7 @@ public class TopicScanner {
 	}
 
 	private Set<String> splitProps(String props) {
+		
 		String[] prop = props.split(DELIMITOR);
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
 		return lists;

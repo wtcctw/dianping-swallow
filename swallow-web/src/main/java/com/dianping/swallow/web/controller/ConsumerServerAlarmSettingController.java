@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +22,9 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.swallow.web.controller.dto.ConsumerServerAlarmSettingDto;
 import com.dianping.swallow.web.controller.mapper.ConsumerServerAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
+import com.dianping.swallow.web.monitor.wapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
+import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
@@ -34,6 +38,12 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 
 	@Resource(name = "consumerServerAlarmSettingService")
 	private ConsumerServerAlarmSettingService consumerServerAlarmSettingService;
+	
+	@Resource(name = "ipCollectorService")
+	private IPCollectorService ipCollectorService;
+	
+	@Autowired
+	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
 
 	@RequestMapping(value = "/console/setting/consumerserver")
@@ -77,6 +87,32 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 			return ResponseStatus.SUCCESS.getStatus();
 		}else{
 			return ResponseStatus.MONGOWRITE.getStatus();
+		}
+	}
+	
+	@RequestMapping(value = "/console/setting/consumerserver/serverids", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public List<String> loadProducerSereverIds() {
+		
+		List<String> masterIps =  ipCollectorService.getConsumerServerMasterIps();
+		List<String> slaveIps =  ipCollectorService.getConsumerServerSlaveIps();
+		
+		masterIps.removeAll(slaveIps);
+		masterIps.addAll(slaveIps);
+		return masterIps;
+		
+	}
+
+	@RequestMapping(value = "/console/setting/consumerserver/topics", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public List<String> loadProducerSereverTopics(@RequestParam(value = "serverId") String serverId) {
+		
+		Set<String> topics = consumerDataRetrieverWrapper.getKey(serverId);
+		if(topics != null){
+			return new ArrayList<String>(topics);
+		}else{
+			return new ArrayList<String>();
+
 		}
 	}
 

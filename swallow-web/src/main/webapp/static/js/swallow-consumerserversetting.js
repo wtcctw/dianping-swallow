@@ -97,21 +97,6 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	
 	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
 	
-	//for whitelist
-	$http({
-		method : 'GET',
-		url : window.contextPath + '/console/topic/namelist'
-	}).success(function(data, status, headers, config) {
-		$('#topicprops').tagsinput({
-			  typeahead: {
-				  items: 16, 
-				  source: data,
-				  displayText: function(item){ return item;}  //necessary
-			  }
-		});
-	}).error(function(data, status, headers, config) {
-	});
-	
 	$scope.consumerserverEntry = {};
 	$scope.consumerserverEntry.serverId;
 	$scope.consumerserverEntry.whitelist;
@@ -128,6 +113,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 			alert("谷值不能小于峰值");
 			return;
 		}
+		$scope.consumerserverEntry.whitelist = $("#whitelist").val();
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.consumerserverEntry);
     	
@@ -144,6 +130,47 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
     	});
     }
 	
+	$http({
+		method : 'GET',
+		url : window.contextPath + '/console/setting/consumerserver/serverids'
+	}).success(function(data, status, headers, config) {
+		var topicNameList = data;
+		$("#serverId").typeahead({
+			items: 16, 
+			source : topicNameList,
+			updater : function(c) {
+				$scope.consumerserverEntry.serverId = c;
+				$scope.loadtopics($scope.consumerserverEntry.serverId);
+				return c;
+			}
+		})
+	}).error(function(data, status, headers, config) {
+	});
+	
+	$scope.loadtopics = function(serverid){
+		$http(
+				{
+					method : 'GET',
+					params : { serverId: serverid},
+					url : window.contextPath
+					+ '/console/setting/consumerserver/topics'
+				}).success(
+						function(data, status, headers, config) {
+							$('#whitelist').tagsinput({
+								typeahead : {
+									items : 16,
+									source : data,
+									displayText : function(item) {
+										return item;
+									} // necessary
+								}
+							});
+						}).error(
+								function(data, status, headers, config) {
+								});
+		
+	}
+	
 	$scope.clearModal = function(){
 		$scope.consumerserverEntry.serverId = "";
 		$scope.consumerserverEntry.whitelist = "";
@@ -156,6 +183,13 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
+		var wl = $scope.consumerserverEntry.whitelist;
+		$('#whitelist').tagsinput('removeAll');
+		if(wl != null && wl.length > 0){
+			var list = wl.split(",");
+			for(var i = 0; i < list.length; ++i)
+				$('#whitelist').tagsinput('add', list[i]);
+		}
 		$scope.consumerserverEntry.serverId = $scope.searchPaginator.currentPageItems[index].serverId;
 		$scope.consumerserverEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
 		$scope.consumerserverEntry.consumersendpeak = $scope.searchPaginator.currentPageItems[index].consumersendpeak;

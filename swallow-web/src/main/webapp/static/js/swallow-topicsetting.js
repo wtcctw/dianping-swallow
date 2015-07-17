@@ -121,25 +121,45 @@ module
 									$scope.numrecord);
 
 							// for whitelist
-							$http(
-									{
-										method : 'GET',
-										url : window.contextPath
-												+ '/console/topic/namelist'
-									}).success(
-									function(data, status, headers, config) {
-										$('#topicprops').tagsinput({
-											typeahead : {
-												items : 16,
-												source : data,
-												displayText : function(item) {
-													return item;
-												} // necessary
-											}
-										});
-									}).error(
-									function(data, status, headers, config) {
-									});
+							$scope.loadconsumerids = function(topic){
+								
+								$http(
+										{
+											method : 'GET',
+											params : { topic: topic},
+											url : window.contextPath
+											+ '/console/setting/consumerids'
+										}).success(
+												function(data, status, headers, config) {
+													$('#whitelist').tagsinput({
+														typeahead : {
+															items : 16,
+															source : data,
+															displayText : function(item) {
+																return item;
+															} // necessary
+														}
+													});
+												}).error(
+														function(data, status, headers, config) {
+														});
+							}
+							$http({
+								method : 'GET',
+								url : window.contextPath + '/console/topic/namelist'
+							}).success(function(data, status, headers, config) {
+								var topicNameList = data;
+								$("#topic").typeahead({
+									items: 16, 
+									source : topicNameList,
+									updater : function(c) {
+										$scope.topicEntry.topic = c;
+										$scope.loadconsumerids($scope.topicEntry.topic);
+										return c;
+									}
+								})
+							}).error(function(data, status, headers, config) {
+							});
 
 							$scope.topicEntry = {};
 							$scope.topicEntry.topic;
@@ -165,6 +185,7 @@ module
 									alert("谷值不能小于峰值");
 									return;
 								}
+								$scope.topicEntry.whitelist = $("#whitelist").val();
 								$('#myModal').modal('hide');
 								var param = JSON.stringify($scope.topicEntry);
 
@@ -204,6 +225,13 @@ module
 							}
 
 							$scope.setModalInput = function(index) {
+								var wl = $scope.topicEntry.whitelist;
+								$('#whitelist').tagsinput('removeAll');
+								if(wl != null && wl.length > 0){
+									var list = wl.split(",");
+									for(var i = 0; i < list.length; ++i)
+										$('#whitelist').tagsinput('add', list[i]);
+								}
 								$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
 								$scope.topicEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
 								$scope.topicEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;

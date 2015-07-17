@@ -20,7 +20,7 @@
 					<tr>
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">ServerId</th>
-						<th style="text-align: left">白名单</th>
+						<th style="text-align: left">Topic白名单</th>
 						<th style="text-align: left">发送峰值</th>
 						<th style="text-align: left">发送谷值</th>
 						<th style="text-align: left">发送波动</th>
@@ -62,9 +62,9 @@
 							<div class="control-group">
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>ServerId</b></label> <input
-										type="text" class="form-control"
-										ng-model="producerserverEntry.serverId" name="topic" required>
+									<label class="control-label"><b>ServerId(IP)</b></label> <input
+										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+										ng-model="producerserverEntry.serverId" id="serverId" required>
 									</input>
 								</div>
 							</div>
@@ -72,8 +72,8 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>Topic白名单</b></label> <input
-										type="text" class="form-control"
-										ng-model="producerserverEntry.whitelist" name="whitelist">
+										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+										ng-model="producerserverEntry.whitelist" id="whitelist">
 									</input>
 								</div>
 							</div>

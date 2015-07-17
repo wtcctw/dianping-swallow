@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.swallow.web.controller.dto.ProducerServerAlarmSettingDto;
 import com.dianping.swallow.web.controller.mapper.ProducerServerAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
+import com.dianping.swallow.web.monitor.wapper.ConsumerDataRetrieverWrapper;
+import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
@@ -35,6 +39,11 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 	@Resource(name = "producerServerAlarmSettingService")
 	private ProducerServerAlarmSettingService producerServerAlarmSettingService;
 
+	@Resource(name = "ipCollectorService")
+	private IPCollectorService ipCollectorService;
+	
+	@Autowired
+	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
 	@RequestMapping(value = "/console/setting/producerserver")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
@@ -77,6 +86,25 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 			return ResponseStatus.SUCCESS.getStatus();
 		}else{
 			return ResponseStatus.MONGOWRITE.getStatus();
+		}
+	}
+	
+	@RequestMapping(value = "/console/setting/producerserver/serverids", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public List<String> loadProducerSereverIds() {
+		
+		return ipCollectorService.getProducerServerIps();
+	}
+
+	@RequestMapping(value = "/console/setting/producerserver/topics", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public List<String> loadProducerSereverTopics(@RequestParam(value = "serverId") String serverId) {
+		
+		Set<String> topics =  consumerDataRetrieverWrapper.getKey(serverId);
+		if(topics != null){
+			return new ArrayList<String>(topics);
+		}else{
+			return new ArrayList<String>();
 		}
 	}
 

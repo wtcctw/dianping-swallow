@@ -15,9 +15,9 @@ public class Entry implements Comparable<Entry>{
 
 	private String name;
 
-	private long senddelay;
+	private float senddelay;
 
-	private long ackdelay;
+	private float ackdelay;
 
 	private long accu;
 	
@@ -73,20 +73,20 @@ public class Entry implements Comparable<Entry>{
 		return this;
 	}
 
-	public long getSenddelay() {
+	public float getSenddelay() {
 		return senddelay;
 	}
 
-	public Entry setSenddelay(long senddelay) {
+	public Entry setSenddelay(float senddelay) {
 		this.senddelay = senddelay;
 		return this;
 	}
 
-	public long getAckdelay() {
+	public float getAckdelay() {
 		return ackdelay;
 	}
 
-	public Entry setAckdelay(long ackdelay) {
+	public Entry setAckdelay(float ackdelay) {
 		this.ackdelay = ackdelay;
 		return this;
 	}

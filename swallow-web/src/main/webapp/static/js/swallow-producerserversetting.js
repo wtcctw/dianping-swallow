@@ -124,6 +124,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 			alert("谷值不能小于峰值");
 			return;
 		}
+		$scope.producerserverEntry.whitelist = $("#whitelist").val();
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.producerserverEntry);
     	
@@ -149,6 +150,13 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
+		var wl = $scope.producerserverEntry.whitelist;
+		$('#whitelist').tagsinput('removeAll');
+		if(wl != null && wl.length > 0){
+			var list = wl.split(",");
+			for(var i = 0; i < list.length; ++i)
+				$('#whitelist').tagsinput('add', list[i]);
+		}
 		$scope.producerserverEntry.serverId = $scope.searchPaginator.currentPageItems[index].serverId;
 		$scope.producerserverEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
 		$scope.producerserverEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;
@@ -165,6 +173,47 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
 		});
 		return true;
+	}
+	
+	$http({
+		method : 'GET',
+		url : window.contextPath + '/console/setting/producerserver/serverids'
+	}).success(function(data, status, headers, config) {
+		var topicNameList = data;
+		$("#serverId").typeahead({
+			items: 16, 
+			source : topicNameList,
+			updater : function(c) {
+				$scope.producerserverEntry.serverId = c;
+				$scope.loadtopics($scope.producerserverEntry.serverId);
+				return c;
+			}
+		})
+	}).error(function(data, status, headers, config) {
+	});
+	
+	$scope.loadtopics = function(serverid){
+		$http(
+				{
+					method : 'GET',
+					params : { serverId: serverid},
+					url : window.contextPath
+					+ '/console/setting/producerserver/topics'
+				}).success(
+						function(data, status, headers, config) {
+							$('#whitelist').tagsinput({
+								typeahead : {
+									items : 16,
+									source : data,
+									displayText : function(item) {
+										return item;
+									} // necessary
+								}
+							});
+						}).error(
+								function(data, status, headers, config) {
+								});
+		
 	}
 	
 	$scope.dialog = function(cid) {

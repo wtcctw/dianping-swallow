@@ -64,7 +64,7 @@ public class DashboardContainer {
 			if(offset >= actualSize){
 				return result;
 			}else if (restSize < DataMonitorController.ENTRYSIZE) {
-				result = minuteEntries.subList(0, restSize + 1);
+				result = minuteEntries.subList(0, restSize );
 			}else{
 				for (int i = restSize - size ; i < restSize; i++) {
 					result.add(minuteEntries.get(i));
