@@ -468,7 +468,7 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void consumerIdStatisAQpsDAlarm(String topic, String consumerId, long delay, long expected) {
-		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "确认QPS" + delay + "延时大于阈值" + expected
+		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "确认延时" + delay + "延时大于阈值" + expected
 				+ "。" + "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
 		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_ACK_DELAY)) {
 			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_ACK_DELAY.getNumber();
