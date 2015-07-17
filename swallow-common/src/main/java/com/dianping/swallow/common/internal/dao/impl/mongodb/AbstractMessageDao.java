@@ -1,7 +1,5 @@
 package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.SwallowMongoException;
@@ -15,7 +13,7 @@ import com.mongodb.WriteResult;
  *
  * 2015年3月26日 下午1:47:15
  */
-public abstract class AbstractMessageDao implements MessageDAO{
+public abstract class AbstractMessageDao extends AbstractDao implements MessageDAO{
 
 	protected static final String gt = "$gt";
 
@@ -26,9 +24,6 @@ public abstract class AbstractMessageDao implements MessageDAO{
 	protected static final String lte = "$lte";
 
 	protected static final String ne = "$ne";
-
-	protected final Logger logger  = LoggerFactory.getLogger(getClass());
-
 
 	protected WriteResult doAndCheckResult(MongoAction mongoAction) throws SwallowMongoException {
 
