@@ -29,7 +29,6 @@
 		<module>swallow-test</module>
 		<module>swallow-web</module>
 		<module>swallow-common-server</module>
-    <module>Producer</module>
   </modules>
 
 	<description>swallow is a message service!</description>
