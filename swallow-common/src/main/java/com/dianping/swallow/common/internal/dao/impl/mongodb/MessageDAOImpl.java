@@ -21,7 +21,7 @@ import com.mongodb.WriteResult;
 
 public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 
-	public static final String ID = "id";
+	public static final String ID = "_id";
 	public static final String ORIGINAL_ID = "o_id";
 	public static final String CONTENT = "c";
 	public static final String VERSION = "v";
