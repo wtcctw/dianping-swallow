@@ -367,12 +367,12 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	}
 
 	@Override
-	public void clearProducerServerIps() {
+	public void clearStatisProducerServerIps() {
 		statisProducerServerIps.clear();
 	}
 
 	@Override
-	public void clearConsumerServerIps() {
+	public void clearStatisConsumerServerIps() {
 		statisConsumerServerIps.clear();
 	}
 

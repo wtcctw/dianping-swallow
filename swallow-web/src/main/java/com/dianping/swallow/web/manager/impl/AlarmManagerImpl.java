@@ -202,7 +202,7 @@ public class AlarmManagerImpl implements AlarmManager {
 				+ "]";
 		if (isConsumerServerAlarm(ip, AlarmType.CONSUMER_SERVER_SENDER)) {
 			int number = AlarmType.CONSUMER_SERVER_SENDER.getNumber();
-			sendAlarmByIp(ip, "[" + Integer.toString(number) + "]" + "消费服务器发送ER告警", message, AlarmLevelType.CRITICAL);
+			sendAlarmByIp(ip, "[" + Integer.toString(number) + "]" + "消费服务器SENDER告警", message, AlarmLevelType.CRITICAL);
 		}
 	}
 
@@ -506,7 +506,7 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	private void sendAlarmByProducerTopic(String topicName, String title, String message, AlarmLevelType type) {
 		if (ISTEST) {
-			sendAlarmSwallowDp(title, message, type);
+			// sendAlarmSwallowDp(title, message, type);
 		} else {
 			Set<String> ips = ipCollectorService.getProducerTopicIps(topicName);
 			Set<String> mobiles = new HashSet<String>();
@@ -519,7 +519,7 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	private void sendAlarmByConsumerTopic(String topicName, String title, String message, AlarmLevelType type) {
 		if (ISTEST) {
-			sendAlarmSwallowDp(title, message, type);
+			// sendAlarmSwallowDp(title, message, type);
 		} else {
 			Set<String> ips = ipCollectorService.getConsumerTopicIps(topicName);
 			Set<String> mobiles = new HashSet<String>();
@@ -533,7 +533,7 @@ public class AlarmManagerImpl implements AlarmManager {
 	private void sendAlarmByTopicAndConsumerId(String topicName, String consumerId, String title, String message,
 			AlarmLevelType type) {
 		if (ISTEST) {
-			sendAlarmSwallowDp(title, message, type);
+			// sendAlarmSwallowDp(title, message, type);
 		} else {
 			Set<String> ips = ipCollectorService.getTopicConsumerIdIps(topicName, consumerId);
 			Set<String> mobiles = new HashSet<String>();

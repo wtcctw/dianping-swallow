@@ -62,14 +62,14 @@ public interface IPCollectorService {
 	public List<String> getConsumerServerMasterIps();
 	
 	/**
-	 * clear producerServerIps
+	 * clear statis producerServerIps
 	 */
-	public void clearProducerServerIps();
+	public void clearStatisProducerServerIps();
 
 	/**
-	 * clear consumerServerIps
+	 * clear statis consumerServerIps
 	 */
-	public void clearConsumerServerIps();
+	public void clearStatisConsumerServerIps();
 
 	/**
 	 * topic consumerId related ip
