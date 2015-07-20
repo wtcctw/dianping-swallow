@@ -6,17 +6,17 @@ import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.dianping.swallow.web.controller.dto.SwallowAlarmSettingDto;
-import com.dianping.swallow.web.model.alarm.SwallowAlarmSetting;
+import com.dianping.swallow.web.model.alarm.GlobalAlarmSetting;
 
 public class SwallowAlarmSettingMapper {
 
 	private static final String DELIMITOR = ",";
 
-	public static SwallowAlarmSetting toSwallowAlarmSetting(SwallowAlarmSettingDto dto) {
+	public static GlobalAlarmSetting toSwallowAlarmSetting(SwallowAlarmSettingDto dto) {
 		if (dto == null) {
 			return null;
 		}
-		SwallowAlarmSetting swallowAlarmSetting = new SwallowAlarmSetting();
+		GlobalAlarmSetting swallowAlarmSetting = new GlobalAlarmSetting();
 		swallowAlarmSetting.setSwallowId(dto.getSwallowId());
 		String strProducerWhite = dto.getProducerWhiteList();
 		swallowAlarmSetting.setProducerWhiteList(convertToList(strProducerWhite));
@@ -25,7 +25,7 @@ public class SwallowAlarmSettingMapper {
 		return swallowAlarmSetting;
 	}
 
-	public static SwallowAlarmSettingDto toSwallowAlarmSettingDto(SwallowAlarmSetting swallowAlarmSetting) {
+	public static SwallowAlarmSettingDto toSwallowAlarmSettingDto(GlobalAlarmSetting swallowAlarmSetting) {
 		if (swallowAlarmSetting == null) {
 			return null;
 		}

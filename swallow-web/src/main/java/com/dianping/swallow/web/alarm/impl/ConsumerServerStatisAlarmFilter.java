@@ -18,7 +18,7 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerServerStatisDataService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 
 /**
  *
@@ -46,7 +46,7 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private ConsumerServerAlarmSettingService serverAlarmSettingService;
 
 	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService swallowAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {

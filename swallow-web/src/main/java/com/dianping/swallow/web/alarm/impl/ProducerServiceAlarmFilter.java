@@ -10,7 +10,7 @@ import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 
 /**
  *
@@ -37,7 +37,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService swallowAlarmSettingService;
 
 	@Override
 	public boolean doAccept() {

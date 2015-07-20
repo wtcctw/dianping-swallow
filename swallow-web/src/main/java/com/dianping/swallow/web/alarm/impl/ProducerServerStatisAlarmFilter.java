@@ -18,7 +18,7 @@ import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerStatisDataService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 
 /**
  *
@@ -46,7 +46,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private ProducerServerAlarmSettingService serverAlarmSettingService;
 
 	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService swallowAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {

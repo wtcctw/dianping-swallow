@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 
 /**
 *
@@ -25,7 +25,7 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService swallowAlarmSettingService;
 
 	@Override
 	public boolean doAccept() {

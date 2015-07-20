@@ -15,7 +15,7 @@ import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 import com.dianping.swallow.web.util.NetUtil;
 
 /**
@@ -48,7 +48,7 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 	private ConfigCache configCache;
 
 	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService swallowAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
