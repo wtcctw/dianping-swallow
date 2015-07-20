@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tools.ant.util.DateUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,17 +69,17 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void producerServiceAlarm(String ip) {
-		String message = "生产服务器[IP]" + ip + "不能访问pigeon健康监测页面，可能宕机。" + "[" + DateUtils.format(new Date(), DATE_PATTERN)
+		String message = "生产服务器[IP]" + ip + "不能访问pigeon健康监测页面，可能宕机。" + "[" + DateFormatUtils.format(new Date(), DATE_PATTERN)
 				+ "]";
-		if (isProducerServerAlarm(ip, AlarmType.PRODUCER_SERVER_SERVICE)) {
-			int number = AlarmType.PRODUCER_SERVER_SERVICE.getNumber();
+		if (isProducerServerAlarm(ip, AlarmType.PRODUCER_SERVER_PIGEON_SERVICE)) {
+			int number = AlarmType.PRODUCER_SERVER_PIGEON_SERVICE.getNumber();
 			sendAlarmByIp(ip, "[" + Integer.toString(number) + "]" + "生产服务器服务告警", message, AlarmLevelType.CRITICAL);
 		}
 	}
 
 	@Override
 	public void producerSenderAlarm(String ip) {
-		String message = "生产服务器[IP]" + ip + "未发送统计数据到管理端，可能宕机。" + "[" + DateUtils.format(new Date(), DATE_PATTERN)
+		String message = "生产服务器[IP]" + ip + "未发送统计数据到管理端，可能宕机。" + "[" + DateFormatUtils.format(new Date(), DATE_PATTERN)
 				+ "]";
 		if (isProducerServerAlarm(ip, AlarmType.PRODUCER_SERVER_SENDER)) {
 			int number = AlarmType.PRODUCER_SERVER_SENDER.getNumber();
@@ -90,9 +90,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void producerServerStatisQpsPAlarm(String serverIp, long qpx, long expected) {
 		String message = "生产服务器[IP]" + serverIp + "，[QPS]" + qpx + "高于峰值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isProducerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_STATIS_QPS_P)) {
-			int number = AlarmType.PRODUCER_SERVER_STATIS_QPS_P.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isProducerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_QPS_PEAK)) {
+			int number = AlarmType.PRODUCER_SERVER_QPS_PEAK.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "生产服务器QPS告警", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -100,9 +100,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void producerServerStatisQpsVAlarm(String serverIp, long qpx, long expected) {
 		String message = "生产服务器[IP]" + serverIp + "，[QPS]" + qpx + "低于谷值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isProducerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_STATIS_QPS_V)) {
-			int number = AlarmType.PRODUCER_SERVER_STATIS_QPS_V.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isProducerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_QPS_VALLEY)) {
+			int number = AlarmType.PRODUCER_SERVER_QPS_VALLEY.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "生产服务器QPS告警", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -110,9 +110,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void producerServerStatisQpsFAlarm(String serverIp, long qpx, long expected) {
 		String message = "生产服务器[IP]" + serverIp + "，[QPS]" + qpx + "与历史同期值" + expected + "波动较大。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isProducerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_STATIS_QPS_F)) {
-			int number = AlarmType.PRODUCER_SERVER_STATIS_QPS_F.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isProducerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_QPS_FLUCTUATION)) {
+			int number = AlarmType.PRODUCER_SERVER_QPS_FLUCTUATION.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "生产服务器QPS告警", message, AlarmLevelType.MAJOR);
 		}
 	}
@@ -120,9 +120,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void producerTopicStatisQpsPAlarm(String topic, long qpx, long expected) {
 		String message = "生产客户端[TOPIC]" + topic + "，[QPS]" + qpx + "高于峰值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_STATIS_QPS_P)) {
-			int number = AlarmType.PRODUCER_TOPIC_STATIS_QPS_P.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_QPS_PEAK)) {
+			int number = AlarmType.PRODUCER_TOPIC_QPS_PEAK.getNumber();
 			sendAlarmByProducerTopic(topic, "[" + Integer.toString(number) + "]" + "生产端TOPIC QPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "生产端TOPIC QPS告警", message, AlarmLevelType.MAJOR);
@@ -132,9 +132,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void producerTopicStatisQpsVAlarm(String topic, long qpx, long expected) {
 		String message = "生产客户端[TOPIC]" + topic + "，[QPS]" + qpx + "低于谷值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_STATIS_QPS_V)) {
-			int number = AlarmType.PRODUCER_TOPIC_STATIS_QPS_V.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_QPS_VALLEY)) {
+			int number = AlarmType.PRODUCER_TOPIC_QPS_VALLEY.getNumber();
 			sendAlarmByProducerTopic(topic, "[" + Integer.toString(number) + "]" + "生产端TOPIC QPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "生产端TOPIC QPS告警", message, AlarmLevelType.MAJOR);
@@ -144,9 +144,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void producerTopicStatisQpsFAlarm(String topic, long qpx, long expected) {
 		String message = "生产客户端[TOPIC]" + topic + " [QPS]" + qpx + "与历史同期值" + expected + "波动较大。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_STATIS_QPS_F)) {
-			int number = AlarmType.PRODUCER_TOPIC_STATIS_QPS_F.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION)) {
+			int number = AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION.getNumber();
 			sendAlarmByProducerTopic(topic, "[" + Integer.toString(number) + "]" + "生产端TOPIC QPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "生产端TOPIC QPS告警", message, AlarmLevelType.MAJOR);
@@ -155,10 +155,10 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void producerTopicStatisQpsDAlarm(String topic, long delay, long expected) {
-		String message = "生产客户端[TOPIC]" + topic + "延时" + delay + "大于阈值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_STATIS_DELAY)) {
-			int number = AlarmType.PRODUCER_TOPIC_STATIS_DELAY.getNumber();
+		String message = "生产客户端[TOPIC]" + topic + "延时" + delay + "s大于阈值" + expected + "s。" + "["
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isProducerTopicAlarm(topic, AlarmType.PRODUCER_TOPIC_MESSAGE_DELAY)) {
+			int number = AlarmType.PRODUCER_TOPIC_MESSAGE_DELAY.getNumber();
 			sendAlarmByProducerTopic(topic, "[" + Integer.toString(number) + "]" + "生产端TOPIC DELAY告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "生产端TOPIC 延时告警", message, AlarmLevelType.MAJOR);
@@ -170,25 +170,25 @@ public class AlarmManagerImpl implements AlarmManager {
 		String message = "";
 		if (isMasterOpen && isSlaveOpen) {
 			message = "消费服务器[MASTER IP]" + masterIp + "[SLAVE IP]" + slaveIp + "，MASTER SLAVE端口都处于打开状态。" + "["
-					+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-			if (isConsumerServerAlarm(masterIp, AlarmType.CONSUMER_SERVER_PORT_BOTH)) {
-				int number = AlarmType.CONSUMER_SERVER_PORT_BOTH.getNumber();
+					+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+			if (isConsumerServerAlarm(masterIp, AlarmType.CONSUMER_SERVER_BOTHPORT_OPENED)) {
+				int number = AlarmType.CONSUMER_SERVER_BOTHPORT_OPENED.getNumber();
 				sendAlarmByIp(masterIp, "[" + Integer.toString(number) + "]" + "消费服务器PORT告警", message,
 						AlarmLevelType.CRITICAL);
 			}
 		} else if (!isMasterOpen && isSlaveOpen) {
 			message = "消费服务器[MASTER IP]" + masterIp + "[SLAVE IP]" + slaveIp + "，SLAVE端口处于打开状态。" + "["
-					+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-			if (isConsumerServerAlarm(masterIp, AlarmType.CONSUMER_SERVER_PORT)) {
-				int number = AlarmType.CONSUMER_SERVER_PORT.getNumber();
+					+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+			if (isConsumerServerAlarm(masterIp, AlarmType.CONSUMER_SERVER_SLAVEPORT_OPENED)) {
+				int number = AlarmType.CONSUMER_SERVER_SLAVEPORT_OPENED.getNumber();
 				sendAlarmByIp(masterIp, "[" + Integer.toString(number) + "]" + "消费服务器PORT告警", message,
 						AlarmLevelType.CRITICAL);
 			}
 		} else if (!isMasterOpen && !isSlaveOpen) {
 			message = "消费服务器[MASTER IP]" + masterIp + "[SLAVE IP]" + slaveIp + "，MASTER SLAVE端口都处于未打开状态。" + "["
-					+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-			if (isConsumerServerAlarm(masterIp, AlarmType.CONSUMER_SERVER_PORT_BOTH_F)) {
-				int number = AlarmType.CONSUMER_SERVER_PORT_BOTH_F.getNumber();
+					+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+			if (isConsumerServerAlarm(masterIp, AlarmType.CONSUMER_SERVER_BOTHPORT_UNOPENED)) {
+				int number = AlarmType.CONSUMER_SERVER_BOTHPORT_UNOPENED.getNumber();
 				sendAlarmByIp(masterIp, "[" + Integer.toString(number) + "]" + "消费服务器PORT告警", message,
 						AlarmLevelType.CRITICAL);
 			}
@@ -198,7 +198,7 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void consumerSenderAlarm(String ip) {
-		String message = "消费服务器[IP]" + ip + "未发送统计数据到管理端，可能宕机。" + "[" + DateUtils.format(new Date(), DATE_PATTERN)
+		String message = "消费服务器[IP]" + ip + "未发送统计数据到管理端，可能宕机。" + "[" + DateFormatUtils.format(new Date(), DATE_PATTERN)
 				+ "]";
 		if (isConsumerServerAlarm(ip, AlarmType.CONSUMER_SERVER_SENDER)) {
 			int number = AlarmType.CONSUMER_SERVER_SENDER.getNumber();
@@ -209,9 +209,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerServerStatisSQpsPAlarm(String serverIp, long qpx, long expected) {
 		String message = "消费服务器[IP]" + serverIp + "发送QPS" + qpx + "高于峰值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_STATIS_SENDQPS_P)) {
-			int number = AlarmType.CONSUMER_SERVER_STATIS_SENDQPS_P.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_SENDQPS_PEAK)) {
+			int number = AlarmType.CONSUMER_SERVER_SENDQPS_PEAK.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "消费服务器发送QPS告警", message,
 					AlarmLevelType.MAJOR);
 		}
@@ -220,9 +220,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerServerStatisSQpsVAlarm(String serverIp, long qpx, long expected) {
 		String message = "消费服务器[IP]" + serverIp + "发送QPS" + qpx + "低于谷值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_STATIS_SENDQPS_V)) {
-			int number = AlarmType.CONSUMER_SERVER_STATIS_SENDQPS_V.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_SENDQPS_VALLEY)) {
+			int number = AlarmType.CONSUMER_SERVER_SENDQPS_VALLEY.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "消费服务器发送QPS告警", message,
 					AlarmLevelType.MAJOR);
 		}
@@ -231,9 +231,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerServerStatisSQpsFAlarm(String serverIp, long qpx, long expected) {
 		String message = "消费服务器[IP]" + serverIp + " 发送QPS" + qpx + "与历史同期值" + expected + "波动较大。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_STATIS_SENDQPS_F)) {
-			int number = AlarmType.CONSUMER_SERVER_STATIS_SENDQPS_F.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_SENDQPS_FLUCTUATION)) {
+			int number = AlarmType.CONSUMER_SERVER_SENDQPS_FLUCTUATION.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "消费服务器发送QPS告警", message,
 					AlarmLevelType.MAJOR);
 		}
@@ -242,9 +242,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerServerStatisAQpsPAlarm(String serverIp, long qpx, long expected) {
 		String message = "消费服务器[IP]" + serverIp + "确认QPS" + qpx + "高于峰值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_STATIS_ACKQPS_P)) {
-			int number = AlarmType.CONSUMER_SERVER_STATIS_ACKQPS_P.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_ACKQPS_PEAK)) {
+			int number = AlarmType.CONSUMER_SERVER_ACKQPS_PEAK.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "消费服务器确认QPS告警", message,
 					AlarmLevelType.MAJOR);
 		}
@@ -253,9 +253,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerServerStatisAQpsVAlarm(String serverIp, long qpx, long expected) {
 		String message = "消费服务器[IP]" + serverIp + "确认QPS" + qpx + "低于谷值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_STATIS_ACKQPS_V)) {
-			int number = AlarmType.CONSUMER_SERVER_STATIS_ACKQPS_V.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_ACKQPS_VALLEY)) {
+			int number = AlarmType.CONSUMER_SERVER_ACKQPS_VALLEY.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "消费服务器确认QPS告警", message,
 					AlarmLevelType.MAJOR);
 		}
@@ -264,9 +264,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerServerStatisAQpsFAlarm(String serverIp, long qpx, long expected) {
 		String message = "消费服务器[IP]" + serverIp + "确认QPS" + qpx + "与历史同期" + expected + "波动较大。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_STATIS_ACKQPS_F)) {
-			int number = AlarmType.CONSUMER_SERVER_STATIS_ACKQPS_F.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerServerAlarm(serverIp, AlarmType.CONSUMER_SERVER_ACKQPS_FLUCTUATION)) {
+			int number = AlarmType.CONSUMER_SERVER_ACKQPS_FLUCTUATION.getNumber();
 			sendAlarmByIp(serverIp, "[" + Integer.toString(number) + "]" + "消费服务器确认QPS告警", message,
 					AlarmLevelType.MAJOR);
 		}
@@ -275,9 +275,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerTopicStatisSQpsPAlarm(String topic, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "发送QPS" + qpx + "高于峰值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_P)) {
-			int number = AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_P.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_SENDQPS_PEAK)) {
+			int number = AlarmType.CONSUMER_TOPIC_SENDQPS_PEAK.getNumber();
 			sendAlarmByConsumerTopic(topic, "[" + Integer.toString(number) + "]" + "消费端TOPIC发送QPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端TOPIC发送QPS告警", message, AlarmLevelType.MAJOR);
@@ -287,9 +287,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerTopicStatisSQpsVAlarm(String topic, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "发送QPS" + qpx + "低于谷值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_V)) {
-			int number = AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_V.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_SENDQPS_VALLEY)) {
+			int number = AlarmType.CONSUMER_TOPIC_SENDQPS_VALLEY.getNumber();
 			sendAlarmByConsumerTopic(topic, "[" + Integer.toString(number) + "]" + "消费端TOPIC发送QPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端TOPIC发送QPS告警", message, AlarmLevelType.MAJOR);
@@ -299,9 +299,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerTopicStatisSQpsFAlarm(String topic, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "发送QPS" + qpx + "与历史同期值" + expected + "波动较大。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_F)) {
-			int number = AlarmType.CONSUMER_TOPIC_STATIS_SENDQPS_F.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_SENDQPS_FLUCTUATION)) {
+			int number = AlarmType.CONSUMER_TOPIC_SENDQPS_FLUCTUATION.getNumber();
 			sendAlarmByConsumerTopic(topic, "[" + Integer.toString(number) + "]" + "消费端TOPIC发送QPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端TOPIC发送QPS告警", message, AlarmLevelType.MAJOR);
@@ -310,10 +310,10 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void consumerTopicStatisSQpsDAlarm(String topic, long delay, long expected) {
-		String message = "消费客户端[TOPIC]" + topic + "发送延时" + delay + "延时大于阈值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_SEND_DELAY)) {
-			int number = AlarmType.CONSUMER_TOPIC_STATIS_SEND_DELAY.getNumber();
+		String message = "消费客户端[TOPIC]" + topic + "发送延时" + delay + "s延时大于阈值" + expected + "s。" + "["
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_SENDMESSAGE_DELAY)) {
+			int number = AlarmType.CONSUMER_TOPIC_SENDMESSAGE_DELAY.getNumber();
 			sendAlarmByConsumerTopic(topic, "[" + Integer.toString(number) + "]" + "消费端TOPIC发送延时告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端TOPIC SENDDELAY告警", message,
@@ -324,9 +324,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerTopicStatisAQpsPAlarm(String topic, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "确认QPS" + qpx + "高于峰值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_P)) {
-			int number = AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_P.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_ACKQPS_PEAK)) {
+			int number = AlarmType.CONSUMER_TOPIC_ACKQPS_PEAK.getNumber();
 			sendAlarmByConsumerTopic(topic, "[" + Integer.toString(number) + "]" + "消费端TOPIC确认QPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端TOPIC ACKQPS告警", message,
@@ -337,9 +337,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerTopicStatisAQpsVAlarm(String topic, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "确认QPS" + qpx + "低于谷值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_V)) {
-			int number = AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_V.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_ACKQPS_VALLEY)) {
+			int number = AlarmType.CONSUMER_TOPIC_ACKQPS_VALLEY.getNumber();
 			sendAlarmByConsumerTopic(topic, "[" + Integer.toString(number) + "]" + "消费端TOPIC ACKQPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端TOPIC确认QPS告警", message, AlarmLevelType.MAJOR);
@@ -349,9 +349,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerTopicStatisAQpsFAlarm(String topic, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "确认QPS" + qpx + "与历史同期值" + expected + "波动较大。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_F)) {
-			int number = AlarmType.CONSUMER_TOPIC_STATIS_ACKQPS_F.getNumber();
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_ACKQPS_FLUCTUATION)) {
+			int number = AlarmType.CONSUMER_TOPIC_ACKQPS_FLUCTUATION.getNumber();
 			sendAlarmByConsumerTopic(topic, "[" + Integer.toString(number) + "]" + "消费端TOPIC ACKQPS告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端TOPIC确认QPS告警", message, AlarmLevelType.MAJOR);
@@ -360,10 +360,10 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void consumerTopicStatisAQpsDAlarm(String topic, long delay, long expected) {
-		String message = "消费客户端[TOPIC]" + topic + "确认延时" + delay + "延时大于阈值" + expected + "。" + "["
-				+ DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_STATIS_ACK_DELAY)) {
-			int number = AlarmType.CONSUMER_TOPIC_STATIS_ACK_DELAY.getNumber();
+		String message = "消费客户端[TOPIC]" + topic + "确认延时s" + delay + "延时大于阈值" + expected + "s。" + "["
+				+ DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerTopicAlarm(topic, AlarmType.CONSUMER_TOPIC_ACKMESSAGE_DELAY)) {
+			int number = AlarmType.CONSUMER_TOPIC_ACKMESSAGE_DELAY.getNumber();
 			sendAlarmByConsumerTopic(topic, "[" + Integer.toString(number) + "]" + "消费端TOPIC ACKDELAY告警", message,
 					AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端TOPIC确认延时告警", message, AlarmLevelType.MAJOR);
@@ -373,9 +373,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisSQpsPAlarm(String topic, String consumerId, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "发送QPS" + qpx + "高于峰值" + expected + "。"
-				+ "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_SENDQPS_P)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_SENDQPS_P.getNumber();
+				+ "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_SENDQPS_PEAK)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_SENDQPS_PEAK.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费端发送QPS告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端发送QPS告警", message, AlarmLevelType.MAJOR);
@@ -385,9 +385,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisSQpsVAlarm(String topic, String consumerId, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "发送QPS" + qpx + "低于谷值" + expected + "。"
-				+ "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_SENDQPS_V)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_SENDQPS_V.getNumber();
+				+ "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_SENDQPS_VALLEY)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_SENDQPS_VALLEY.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费端发送QPS告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端发送QPS告警", message, AlarmLevelType.MAJOR);
@@ -397,9 +397,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisSQpsFAlarm(String topic, String consumerId, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "[发送QPS]" + qpx + "与历史同期值" + expected
-				+ "波动较大。" + "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_SENDQPS_V)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_SENDQPS_V.getNumber();
+				+ "波动较大。" + "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_SENDQPS_VALLEY)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_SENDQPS_VALLEY.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费端发送QPS告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端发送QPS告警", message, AlarmLevelType.MAJOR);
@@ -408,10 +408,10 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void consumerIdStatisSQpsDAlarm(String topic, String consumerId, long delay, long expected) {
-		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "发送延时" + delay + "延时大于阈值" + expected
-				+ "。" + "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_SEND_DELAY)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_SEND_DELAY.getNumber();
+		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "发送延时" + delay + "s延时大于阈值" + expected
+				+ "s。" + "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_SENDMESSAGE_DELAY)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_SENDMESSAGE_DELAY.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费客户端发送延时告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端发送延时告警", message, AlarmLevelType.MAJOR);
@@ -421,9 +421,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisSAccuAlarm(String topic, String consumerId, long accumulation, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "消息累积" + accumulation + "累积大于阈值"
-				+ expected + "。" + "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_SEND_ACCU)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_SEND_ACCU.getNumber();
+				+ expected + "。" + "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费端消息累积告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端消息累积告警", message, AlarmLevelType.MAJOR);
@@ -433,9 +433,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisAQpsPAlarm(String topic, String consumerId, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "确认QPS" + qpx + "高于峰值" + expected + "。"
-				+ "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_ACKQPS_P)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_ACKQPS_P.getNumber();
+				+ "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_ACKQPS_PEAK)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_ACKQPS_PEAK.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费端确认QPS告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端确认QPS告警", message, AlarmLevelType.MAJOR);
@@ -445,9 +445,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisAQpsVAlarm(String topic, String consumerId, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "确认QPS" + qpx + "低于谷值" + expected + "。"
-				+ "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_ACKQPS_V)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_ACKQPS_V.getNumber();
+				+ "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_ACKQPS_VALLEY)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_ACKQPS_VALLEY.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费端确认QPS告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端确认QPS告警", message, AlarmLevelType.MAJOR);
@@ -457,9 +457,9 @@ public class AlarmManagerImpl implements AlarmManager {
 	@Override
 	public void consumerIdStatisAQpsFAlarm(String topic, String consumerId, long qpx, long expected) {
 		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "确认QPS" + qpx + "与历史同期值" + expected
-				+ "波动较大。" + "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_ACKQPS_F)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_ACKQPS_F.getNumber();
+				+ "波动较大。" + "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费端确认QPS告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端确认QPS告警", message, AlarmLevelType.MAJOR);
@@ -468,10 +468,10 @@ public class AlarmManagerImpl implements AlarmManager {
 
 	@Override
 	public void consumerIdStatisAQpsDAlarm(String topic, String consumerId, long delay, long expected) {
-		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "确认延时" + delay + "延时大于阈值" + expected
-				+ "。" + "[" + DateUtils.format(new Date(), DATE_PATTERN) + "]";
-		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_STATIS_ACK_DELAY)) {
-			int number = AlarmType.CONSUMER_CONSUMERID_STATIS_ACK_DELAY.getNumber();
+		String message = "消费客户端[TOPIC]" + topic + "[CONSUMERID]" + consumerId + "确认延时" + delay + "s延时大于阈值" + expected
+				+ "s。" + "[" + DateFormatUtils.format(new Date(), DATE_PATTERN) + "]";
+		if (isConsumerIdAlarm(topic, consumerId, AlarmType.CONSUMER_CONSUMERID_ACKMESSAGE_DELAY)) {
+			int number = AlarmType.CONSUMER_CONSUMERID_ACKMESSAGE_DELAY.getNumber();
 			sendAlarmByTopicAndConsumerId(topic, consumerId, "[" + Integer.toString(number) + "]" + "消费端确认延时告警",
 					message, AlarmLevelType.MAJOR);
 			sendAlarmSwallowDp("[" + Integer.toString(number) + "]" + "消费端确认延时告警", message, AlarmLevelType.MAJOR);

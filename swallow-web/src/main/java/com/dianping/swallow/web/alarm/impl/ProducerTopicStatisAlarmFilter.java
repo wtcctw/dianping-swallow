@@ -89,7 +89,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 				}
 				qpsAlarm(producerBaseStatisData.getQpx(), topicStatisData.getTopicName(), qps,
 						topicStatisData.getTimeKey());
-				delayAlarm(topicStatisData.getTopicName(), producerBaseStatisData.getDelay(), delay * 1000);
+				delayAlarm(topicStatisData.getTopicName(), producerBaseStatisData.getDelay() / 1000, delay);
 			}
 		}
 		return true;

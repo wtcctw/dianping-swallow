@@ -107,8 +107,8 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 					}
 				}
 
-				sendDelayAlarm(topic, consumerBaseStatsData.getSendDelay(), sendDelay * 1000);
-				ackDelayAlarm(topic, consumerBaseStatsData.getAckDelay(), ackDelay * 1000);
+				sendDelayAlarm(topic, consumerBaseStatsData.getSendDelay() / 1000, sendDelay);
+				ackDelayAlarm(topic, consumerBaseStatsData.getAckDelay() / 1000, ackDelay);
 			}
 		}
 		return true;

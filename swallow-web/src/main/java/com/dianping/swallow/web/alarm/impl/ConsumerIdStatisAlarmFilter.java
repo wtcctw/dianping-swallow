@@ -19,6 +19,7 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
+import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
 /**
@@ -49,6 +50,8 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
 
+	private ConsumerServerAlarmSettingService serverAlarmSettingService;
+
 	@PostConstruct
 	public void initialize() {
 		super.initialize();
@@ -78,6 +81,7 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 		if (consumerIdAlarmSetting == null) {
 			return true;
 		}
+		List<String> topicWhiteList = serverAlarmSettingService.getTopicWhiteList();
 		List<String> whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
 		ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdAlarmSetting.getConsumerAlarmSetting();
 		QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
@@ -87,6 +91,9 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 		long accumulation = consumerAlarmSetting.getAccumulation();
 		for (Map.Entry<String, List<ConsumerIdStatsData>> consumerIdStatsDataEntry : consumerIdStatsDataMap.entrySet()) {
 			String topic = consumerIdStatsDataEntry.getKey();
+			if (topicWhiteList != null && topicWhiteList.contains(topic)) {
+				continue;
+			}
 			List<ConsumerIdStatsData> consumerIdStatsDatas = consumerIdStatsDataEntry.getValue();
 			for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
 				if (whiteList == null || !whiteList.contains(consumerIdStatsData.getConsumerId())) {
@@ -113,8 +120,8 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 						}
 					}
 
-					sendDelayAlarm(topic, consumerId, consumerBaseStatsData.getSendDelay(), sendDelay * 1000);
-					ackDelayAlarm(topic, consumerId, consumerBaseStatsData.getAckDelay(), ackDelay * 1000);
+					sendDelayAlarm(topic, consumerId, consumerBaseStatsData.getSendDelay() / 1000, sendDelay);
+					ackDelayAlarm(topic, consumerId, consumerBaseStatsData.getAckDelay() / 1000, ackDelay);
 					accumulationAlarm(topic, consumerId, consumerBaseStatsData.getAccumulation(), accumulation);
 				}
 			}
