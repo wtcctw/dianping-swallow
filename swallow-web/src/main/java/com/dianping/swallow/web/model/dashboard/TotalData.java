@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model.dashboard;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -23,7 +24,7 @@ public class TotalData {
 	
 	private String name;
 	
-	private String time;
+	private Date time;
 	
 	List<Long> listSend = new ArrayList<Long>();
 
@@ -123,11 +124,11 @@ public class TotalData {
 		return this;
 	}
 
-	public String getTime() {
+	public Date getTime() {
 		return time;
 	}
 
-	public TotalData setTime(String time) {
+	public TotalData setTime(Date time) {
 		this.time = time;
 		return this;
 	}

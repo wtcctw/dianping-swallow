@@ -3,6 +3,7 @@ package com.dianping.swallow.web.monitor.dashboard;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,7 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +86,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 	private void updateDelayInsDashboard() throws Exception {
 
 		boolean timeSet = false;
-		String entryTime = null;
+		Date entryTime = null;
 		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL);
 
 		for (String topic : topics) {
@@ -216,25 +216,19 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	private void doGenerateMinuteEntrys(Map<String, TotalData> map) {
 
-		String key = "dashboard";
-		List<MinuteEntry> minuteEntryList = dashboardContainer.getDashboards().get(key);
-		if (minuteEntryList == null) {
-			minuteEntryList = new ArrayList<MinuteEntry>();
-		}
-
-		Map<String, MinuteEntry> minuteEntryMap = new LinkedHashMap<String, MinuteEntry>();
+		Map<Date, MinuteEntry> minuteEntryMap = new LinkedHashMap<Date, MinuteEntry>();
 
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			TotalData td = entry.getValue();
 			List<Entry> entrys = td.getEntrys();
 			
 			for (int i = 0; i < entrys.size(); ++i) {
-				String time = td.getTime();
+				Date time = td.getTime();
 				MinuteEntry me = minuteEntryMap.get(time);
 				if (me == null) {
 					me = new MinuteEntry();
 				}
-				if (StringUtils.isBlank(me.getTime())) {
+				if (me.getTime() == null) {
 					me.setTime(time);
 				}
 				me.addEntry(entrys.get(i));
@@ -242,24 +236,21 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			}
 		}
 
-		for (Map.Entry<String, MinuteEntry> entry : minuteEntryMap.entrySet()) {
+		for (Map.Entry<Date, MinuteEntry> entry : minuteEntryMap.entrySet()) {
 			MinuteEntry me = entry.getValue();
-			dashboardContainer.insertMinuteEntry(key, me);
+			dashboardContainer.insertMinuteEntry(me);
 		}
 		
 		totalDataMap.clear();
 	}
 
-	private String getMinuteEntryTime(Long key) {
+	private Date getMinuteEntryTime(Long key) {
 
 		long millis = key * 1000 * 5;
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(millis);
 		cal.add(Calendar.MINUTE, 1);
-		int min = cal.get(Calendar.MINUTE);
-		String time = cal.get(Calendar.HOUR_OF_DAY) + ":" + (min < 10 ? "0" + min : min);
-		return time;
-
+		return cal.getTime();
 	}
 
 	private boolean isEmpty(StatsData sendData) {

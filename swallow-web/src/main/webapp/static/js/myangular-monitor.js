@@ -185,29 +185,48 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 			return "";
 	}
 	
+	Date.prototype.Format = function (fmt) { //author: meizz 
+	    var o = {
+	        "M+": this.getMonth() + 1, //月份 
+	        "d+": this.getDate(), //日 
+	        "h+": this.getHours(), //小时 
+	        "m+": this.getMinutes(), //分 
+	        "s+": this.getSeconds(), //秒 
+	        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+	        "S": this.getMilliseconds() //毫秒 
+	    };
+	    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+	    for (var k in o)
+	    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+	    return fmt;
+	}
+	
 	$scope.getDashboardDelay = function(index) {
 		$scope.minuteEntrys = [];
-		var offset;
-		if(!$scope.hourchange){
-			offset = $scope.currentMin - index;
+		var date = new Date();
+		if(index != -1){
+			date.setMinutes(index,59,999);
 		}else{
-			
+			date.setSeconds(59,999);
 		}
-		$http.post(
-				window.contextPath + '/console/monitor/dashboard/delay/'
-						+ offset, {"currentmin":$scope.currentMin}).success(
-				function(data) {
-					$scope.starttime = data.starttime;
-					$scope.stoptime = data.stoptime;
-					$scope.minuteEntrys = data.entry;
-					if($scope.firstaccess){
-						$scope.currentMin = Number($scope.minuteEntrys[0].time
-								.split(":")[1]);
-						$scope.firstaccess = false;
-					}
-					$scope.currentRed = index == -1 ? $scope.currentMin : Number($scope.minuteEntrys[0].time
-							.split(":")[1]);
-				});
+		
+		$http({
+			method : 'GET',
+			params : {date: date},
+			url : window.contextPath + '/console/monitor/dashboard/delay/minute'
+		}).success(function(data, status, headers, config) {
+			$scope.starttime = data.starttime;
+			$scope.stoptime = data.stoptime;
+			$scope.minuteEntrys = data.entry;
+			if($scope.firstaccess){
+				$scope.currentMin = Number($scope.minuteEntrys[0].time
+						.split(":")[1]);
+				$scope.firstaccess = false;
+			}
+			$scope.currentRed = index == -1 ? $scope.currentMin : Number($scope.minuteEntrys[0].time
+					.split(":")[1]);
+		});
+		
 	};
 
 	$scope.pages = [ "00", "01", "02", "03", "04", "05", "06", "07", "08",
@@ -227,9 +246,6 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry[index].ackdelay, 
 		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry[index].accu,
 		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry[index].topic} ];
-//		if($('.popover').length > 0){
-//			$('.popover').attr("style", "width : 600px");
-//		}
 	}
 	
 });

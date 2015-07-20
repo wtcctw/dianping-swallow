@@ -2,6 +2,7 @@ package com.dianping.swallow.web.model.dashboard;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class MinuteEntry {
 
-	private String time;
+	private Date time;
 
 	List<Entry> delayEntry = new ArrayList<Entry>();
 	
@@ -23,11 +24,11 @@ public class MinuteEntry {
 
 	}
 
-	public String getTime() {
+	public Date getTime() {
 		return time;
 	}
 
-	public MinuteEntry setTime(String time) {
+	public MinuteEntry setTime(Date time) {
 		this.time = time;
 		return this;
 	}
