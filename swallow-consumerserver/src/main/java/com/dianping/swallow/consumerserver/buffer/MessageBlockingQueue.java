@@ -26,7 +26,6 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 
 	private AtomicBoolean isClosed = new AtomicBoolean(false);
 
-	protected volatile Long tailMessageId;
 
 	protected MessageFilter messageFilter;
 	
@@ -34,11 +33,14 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 	private final int minThreshold;
 	private final int maxThreshold;
 
-	// 起一个线程定时从msg#<topic>#<cid>获取消息(该db存放backup消息)，放到queue里
+	protected volatile Long tailMessageId;
 	protected volatile Long tailBackupMessageId;
+
 	private ExecutorService retrieverThreadPool;
 
 	private RetriveStrategy retriveStrategy, backupRetriveStrategy;
+	
+	private Object getTailMessageIdLock = new Object();
 
 	public MessageBlockingQueue(ConsumerInfo consumerInfo, int minThreshold,
 			int maxThreshold, int capacity, Long messageIdOfTailMessage,
@@ -129,12 +131,6 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		this.messageRetriever = messageRetriever;
 	}
 
-	/**
-	 * 关闭BlockingQueue占用的资源。<br>
-	 * <note> 注意:close()只是中断了内部的后台线程，并不会导致poll()和poll(long timeout, TimeUnit
-	 * unit)方法不可用,您依然可以使用poll()和poll(long timeout, TimeUnit
-	 * unit)方法获取MessageBlockingQueue中剩余的消息。不过，不会再有后台线程去从DB获取更多的消息。 </note>
-	 */
 	@Override
 	public void close() {
 		if (isClosed.compareAndSet(false, true)) {
@@ -170,7 +166,9 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 	}
 
 	public void setTailMessageId(Long tailMessageId) {
-		this.tailMessageId = tailMessageId;
+		synchronized (getTailMessageIdLock) {
+			this.tailMessageId = tailMessageId;
+		}
 	}
 
 	public Long getTailBackupMessageId() {
@@ -181,6 +179,25 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		if(logger.isDebugEnabled()){
 			logger.debug("[setTailBackupMessageId]" + tailBackupMessageId);
 		}
-		this.tailBackupMessageId = tailBackupMessageId;
+		synchronized (getTailMessageIdLock) {
+			this.tailBackupMessageId = tailBackupMessageId;
+		}
+	}
+
+	@Override
+	public Long getEmptyTailMessageId(boolean isBackup) {
+
+		synchronized (getTailMessageIdLock) {
+			
+			if(isEmpty()){
+				
+				if(isBackup){
+					return getTailBackupMessageId();
+				}
+				return getTailMessageId();
+			}
+		}
+		
+		return null;
 	}
 }

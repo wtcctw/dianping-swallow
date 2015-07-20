@@ -387,7 +387,8 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 		BSONTimestamp currentIndex = MongoUtils.getTimestampByCurTime();
 
 		while (cursor.hasNext()) {
-			currentIndex = (BSONTimestamp) cursor.next().get(ID);
+			DBObject object = cursor.next();
+			currentIndex = (BSONTimestamp) object.get(ID);
 		}
 
 		DBCollection msgCollection = getCollection(topicName, null);

@@ -14,4 +14,12 @@ public interface CloseableBlockingQueue<E> extends Queue<E> {
     */
    void isClosed();
 
+   
+	/**
+	 * 在队列为空的前提下，返回最大Id
+	 * @param isBackup
+	 * @return
+	 */
+	Long getEmptyTailMessageId(boolean isBackup);
+
 }
