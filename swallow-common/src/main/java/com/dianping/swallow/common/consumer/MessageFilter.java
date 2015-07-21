@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.consumer;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,6 +31,16 @@ public final class MessageFilter implements Serializable {
    private MessageFilter(FilterType type, Set<String> param) {
       this.type = type;
       this.param = param;
+   }
+
+   public static MessageFilter createInSetMessageFilter(String ...types) {
+	   
+	   Set<String> filterSet = new HashSet<String>();
+	   for(String type : types){
+		   filterSet.add(type);
+	   }
+	   
+	   return new MessageFilter(FilterType.InSet, filterSet);
    }
 
    public static MessageFilter createInSetMessageFilter(Set<String> matchTypeSet) {

@@ -55,7 +55,7 @@ public abstract class AbstractProducerLoadTest extends AbstractLoadTest{
         for (int i = 0; i < topicCount; i++) {
             String topic = getTopicName(topicName, i);
             for (int j = 0; j < producerCount; j++) {
-                ProduceRunner runner = new ProduceRunner(topic);
+                ProduceRunner runner = new ProduceRunner(topic, type);
                 executors.execute(runner);
             }
         }
@@ -65,6 +65,11 @@ public abstract class AbstractProducerLoadTest extends AbstractLoadTest{
 	class ProduceRunner implements Runnable {
 
     	private String topic;
+    	private String type;
+        private ProduceRunner(String topic, String type) {
+            this.topic = topic;
+            this.type = type;
+        }
         private ProduceRunner(String topic) {
             this.topic = topic;
         }
@@ -85,14 +90,29 @@ public abstract class AbstractProducerLoadTest extends AbstractLoadTest{
                     if(count.get() >= totalCount){
                     	break;
                     }
-                    int currentCount = count.incrementAndGet();
-                    try {
-                        String msg = currentCount + ";" + new Date() + message;
-                        producer.sendMessage(msg);
-                    } catch (Exception e) {
-                    	logger.error(e.getMessage() + ", msg:" + currentCount, e);
-                    	count.decrementAndGet();
-                    }
+                    long currentCount = count.incrementAndGet();
+
+                    boolean retry = false;
+                    int retryCount = 0;
+                    do{
+	                    try {
+	                    	
+	                        String msg = currentCount + ";" + new Date() + message;
+	                        if(type == null || currentCount%10 != 0){
+	                        	producer.sendMessage(msg);
+	                        }else{
+	                        	
+	                        	producer.sendMessage(msg, type);
+	                        }
+	                        retry = false;
+	                    } catch (Exception e) {
+	                    	retry = true;
+	                    	retryCount++;
+	                    	logger.error(e.getMessage() + ", msg:" + currentCount + ", retry:" + retryCount, e);
+	                    	sleep(100);
+	                    }
+                    }while(retry == true);
+                    
                     sleep();
                 }
             } catch (RemoteServiceInitFailedException e1) {
