@@ -14,6 +14,7 @@ import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 import com.dianping.swallow.web.util.NetUtil;
@@ -105,23 +106,23 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 		boolean usingMaster = NetUtil.isPortOpen(masterIp, masterPort);
 		boolean usingSlave = NetUtil.isPortOpen(slaveIp, slavePort);
 		if (!usingMaster && usingSlave) {
-			alarmManager.consumerPortAlarm(masterIp, slaveIp, false, true);
+			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_SLAVEPORT_OPENED);
 			return false;
 		} else if (usingMaster && usingSlave) {
-			alarmManager.consumerPortAlarm(masterIp, slaveIp, true, true);
+			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_BOTHPORT_OPENED);
 			return false;
 		} else if (!usingMaster && !usingSlave) {
-			alarmManager.consumerPortAlarm(masterIp, slaveIp, false, false);
+			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_BOTHPORT_UNOPENED);
 			return false;
 		}
 		return true;
 	}
-	
-	public int getMasterPort(){
+
+	public int getMasterPort() {
 		return masterPort;
 	}
-	
-	public int getSlavePort(){
+
+	public int getSlavePort() {
 		return slavePort;
 	}
 

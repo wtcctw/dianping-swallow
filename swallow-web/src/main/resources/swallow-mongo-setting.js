@@ -1,4 +1,3 @@
-//rs.slaveOk();
 db = db.getSiblingDB('swallowwebapplication');
 
 db.swallowwebconsumeridalarmsettingc.update({"consumerId":"default"},{"consumerId": "default","consumerAlarmSetting" : { "sendQpsAlarmSetting" : { "peak" : NumberLong(1000), "valley" : NumberLong(0), "fluctuation" : 3 }, "ackQpsAlarmSetting" : { "peak" : NumberLong(1000), "valley" : NumberLong(0), "fluctuation" : 3 }, "sendDelay" : NumberLong(500), "ackDelay" : NumberLong(500), "accumulation" : NumberLong(100000) }},true,false);

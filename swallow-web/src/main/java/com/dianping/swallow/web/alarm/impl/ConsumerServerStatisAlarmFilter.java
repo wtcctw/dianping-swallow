@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.statis.ConsumerBaseStatsData;
@@ -97,11 +98,12 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean sendQpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerServerStatisSQpsPAlarm(ip, qpx, qps.getPeak());
+				alarmManager.consumerServerStatisAlarm(ip, qpx, qps.getPeak(), AlarmType.CONSUMER_SERVER_SENDQPS_PEAK);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerServerStatisSQpsVAlarm(ip, qpx, qps.getValley());
+				alarmManager.consumerServerStatisAlarm(ip, qpx, qps.getValley(),
+						AlarmType.CONSUMER_SERVER_SENDQPS_VALLEY);
 				return false;
 			}
 		}
@@ -111,11 +113,12 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean ackQpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerServerStatisAQpsPAlarm(ip, qpx, qps.getPeak());
+				alarmManager.consumerServerStatisAlarm(ip, qpx, qps.getPeak(), AlarmType.CONSUMER_SERVER_ACKQPS_PEAK);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerServerStatisAQpsVAlarm(ip, qpx, qps.getValley());
+				alarmManager.consumerServerStatisAlarm(ip, qpx, qps.getValley(),
+						AlarmType.CONSUMER_SERVER_ACKQPS_VALLEY);
 				return false;
 			}
 		}

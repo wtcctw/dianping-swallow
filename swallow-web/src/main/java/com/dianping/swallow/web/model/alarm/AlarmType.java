@@ -185,7 +185,12 @@ public enum AlarmType {
 	/**
 	 * consumer consumerid statis data ack delay type
 	 */
-	CONSUMER_CONSUMERID_ACKMESSAGE_DELAY(36);
+	CONSUMER_CONSUMERID_ACKMESSAGE_DELAY(36),
+	
+	/**
+	 * consumer server slave service is start up
+	 */
+	CONSUMER_SERVER_SLAVESERVICE_START(37);
 
 	private int number;
 

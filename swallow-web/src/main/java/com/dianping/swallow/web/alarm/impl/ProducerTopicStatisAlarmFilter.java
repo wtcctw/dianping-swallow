@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
@@ -99,11 +100,12 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	private boolean qpsAlarm(long qpx, String topicName, QPSAlarmSetting qps, long timeKey) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.producerTopicStatisQpsPAlarm(topicName, qpx, qps.getPeak());
+				alarmManager.producerTopicStatisAlarm(topicName, qpx, qps.getPeak(), AlarmType.PRODUCER_TOPIC_QPS_PEAK);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.producerTopicStatisQpsVAlarm(topicName, qpx, qps.getValley());
+				alarmManager.producerTopicStatisAlarm(topicName, qpx, qps.getValley(),
+						AlarmType.PRODUCER_TOPIC_QPS_VALLEY);
 				return false;
 			}
 			fluctuationAlarm(topicName, qpx, qps.getFluctuation(), timeKey);
@@ -135,11 +137,11 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 		}
 		int expectedQpx = sumQpx / sampleCount;
 		if (qpx > expectedQpx && (qpx / expectedQpx) > fluctuation) {
-			alarmManager.producerTopicStatisQpsFAlarm(topicName, qpx, expectedQpx);
+			alarmManager.producerTopicStatisAlarm(topicName, qpx, expectedQpx, AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION);
 			return false;
 		}
 		if (qpx < expectedQpx && (expectedQpx / qpx) > fluctuation) {
-			alarmManager.producerTopicStatisQpsFAlarm(topicName, qpx, expectedQpx);
+			alarmManager.producerTopicStatisAlarm(topicName, qpx, expectedQpx, AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION);
 			return false;
 		}
 		return true;
@@ -147,7 +149,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 
 	private boolean delayAlarm(String topicName, long delay, long expectDelay) {
 		if (delay > expectDelay) {
-			alarmManager.producerTopicStatisQpsDAlarm(topicName, delay, expectDelay);
+			alarmManager.producerTopicStatisAlarm(topicName, delay, expectDelay,AlarmType.PRODUCER_TOPIC_MESSAGE_DELAY);
 			return false;
 		}
 		return true;

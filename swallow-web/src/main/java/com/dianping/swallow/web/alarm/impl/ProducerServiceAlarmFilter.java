@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
@@ -54,7 +55,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 			if (!whiteList.contains(serverIp)) {
 				String url = StringUtils.replace(PIGEON_HEALTH_URL_KEY, "{ip}", serverIp);
 				if (!httpSerivice.httpGet(url).isSuccess()) {
-					alarmManager.producerServiceAlarm(serverIp);
+					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_PIGEON_SERVICE);
 				}
 			}
 		}

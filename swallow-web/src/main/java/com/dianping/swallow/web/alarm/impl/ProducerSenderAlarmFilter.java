@@ -7,20 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 @Service("producerSenderAlarmFilter")
 public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 
 	@Autowired
 	private AlarmManager alarmManager;
-	
+
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
@@ -39,7 +40,7 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 		for (String serverIp : producerServerIps) {
 			if (whiteList == null || !whiteList.contains(serverIp)) {
 				if (!statisProducerServerIps.contains(serverIp)) {
-					alarmManager.producerSenderAlarm(serverIp);
+					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_SENDER);
 				}
 			}
 		}

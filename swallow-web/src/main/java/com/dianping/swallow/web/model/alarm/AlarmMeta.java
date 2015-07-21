@@ -3,31 +3,35 @@ package com.dianping.swallow.web.model.alarm;
 import java.util.Date;
 
 public class AlarmMeta {
-	
+
 	private String id;
-	
+
 	private int metaId;
-	
+
 	private AlarmType type;
-	
+
 	private AlarmLevelType levelType;
-	
+
 	private boolean isSmsMode;
-	
+
 	private boolean isWeiXinMode;
-	
+
 	private boolean isMailMode;
-	
+
 	private boolean isSendSwallow;
-	
+
 	private boolean isSendBusiness;
-	
+
+	private String alarmTitle;
+
 	private String alarmTemplate;
 	
+	private String alarmDetail;
+
 	private int sendTimeSpan;
-	
+
 	private Date createTime;
-	
+
 	private Date updateTime;
 
 	public String getId() {
@@ -101,6 +105,14 @@ public class AlarmMeta {
 	public void setIsSendBusiness(boolean isSendBusiness) {
 		this.isSendBusiness = isSendBusiness;
 	}
+	
+	public String getAlarmTitle() {
+		return alarmTitle;
+	}
+
+	public void setAlarmTitle(String alarmTitle) {
+		this.alarmTitle = alarmTitle;
+	}
 
 	public String getAlarmTemplate() {
 		return alarmTemplate;
@@ -108,6 +120,14 @@ public class AlarmMeta {
 
 	public void setAlarmTemplate(String alarmTemplate) {
 		this.alarmTemplate = alarmTemplate;
+	}
+	
+	public String getAlarmDetail() {
+		return alarmDetail;
+	}
+
+	public void setAlarmDetail(String alarmDetail) {
+		this.alarmDetail = alarmDetail;
 	}
 
 	public Date getCreateTime() {

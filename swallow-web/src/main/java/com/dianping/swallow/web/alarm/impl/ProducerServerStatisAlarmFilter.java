@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.statis.ProducerBaseStatsData;
@@ -93,11 +94,11 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean qpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.producerServerStatisQpsPAlarm(ip, qpx, qps.getPeak());
+				alarmManager.producerServerStatisAlarm(ip, qpx, qps.getPeak(), AlarmType.PRODUCER_SERVER_QPS_PEAK);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.producerServerStatisQpsVAlarm(ip, qpx, qps.getValley());
+				alarmManager.producerServerStatisAlarm(ip, qpx, qps.getValley(), AlarmType.PRODUCER_SERVER_QPS_VALLEY);
 				return false;
 			}
 		}

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 import com.dianping.swallow.web.util.NetUtil;
@@ -56,7 +57,7 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 				if (!statisConsumerServerIps.contains(serverIp)) {
 					String slaveIp = consumerServerSlaveIps.get(index);
 					if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
-						alarmManager.consumerSenderAlarm(serverIp);
+						alarmManager.consumerServerAlarm(serverIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER);
 					}
 				}
 			}
@@ -70,7 +71,7 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 		if (!NetUtil.isPortOpen(masterIp, consumerPortAlarmFilter.getMasterPort())) {
 			if (NetUtil.isPortOpen(slaveIp, consumerPortAlarmFilter.getSlavePort())) {
 				if (!statisIps.contains(slaveIp)) {
-					alarmManager.consumerSenderAlarm(slaveIp);
+					alarmManager.consumerServerAlarm(slaveIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER);
 				}
 				return false;
 			}
