@@ -26,12 +26,15 @@ import org.springframework.stereotype.Service;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.alarm.SendType;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmMetaService;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.util.GenerateIdUtil;
 
 @Service("alarmManager")
 public class AlarmManagerImpl implements AlarmManager, InitializingBean {
@@ -121,7 +124,10 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
-				sendAlarmByIp(ip, message, alarmMeta);
+				Alarm alarm = new Alarm();
+				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
+				sendAlarmByIp(ip, alarm,alarmMeta);
 			}
 		}
 	}
@@ -138,7 +144,10 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
-				sendAlarmByIp(ip, message, alarmMeta);
+				Alarm alarm = new Alarm();
+				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
+				sendAlarmByIp(ip, alarm, alarmMeta);
 			}
 		}
 	}
@@ -154,10 +163,13 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
 				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
 			}
+			Alarm alarm = new Alarm();
+			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
-				sendAlarmSwallowDp(message, alarmMeta);
+				sendAlarmSwallowDp(alarm, alarmMeta);
 			} else if (alarmMeta.getIsSendBusiness()) {
-				sendAlarmByProducerTopic(topic, message, alarmMeta);
+				sendAlarmByProducerTopic(topic, alarm, alarmMeta);
 			}
 		}
 	}
@@ -174,7 +186,10 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
-				sendAlarmByIp(masterIp, message, alarmMeta);
+				Alarm alarm = new Alarm();
+				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
+				sendAlarmByIp(masterIp, alarm, alarmMeta);
 			}
 		}
 	}
@@ -191,7 +206,10 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
-				sendAlarmByIp(ip, message, alarmMeta);
+				Alarm alarm = new Alarm();
+				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
+				sendAlarmByIp(ip, alarm, alarmMeta);
 			}
 		}
 	}
@@ -207,10 +225,13 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
 				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
 			}
+			Alarm alarm = new Alarm();
+			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
-				sendAlarmSwallowDp(message, alarmMeta);
+				sendAlarmSwallowDp(alarm, alarmMeta);
 			} else if (alarmMeta.getIsSendBusiness()) {
-				sendAlarmByConsumerTopic(topic, message, alarmMeta);
+				sendAlarmByConsumerTopic(topic, alarm, alarmMeta);
 			}
 		}
 	}
@@ -228,57 +249,60 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
 				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
 			}
+			Alarm alarm = new Alarm();
+			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
-				sendAlarmSwallowDp(message, alarmMeta);
+				sendAlarmSwallowDp(alarm, alarmMeta);
 			} else if (alarmMeta.getIsSendBusiness()) {
-				sendAlarmByTopicAndConsumerId(topic, consumerId, message, alarmMeta);
+				sendAlarmByTopicAndConsumerId(topic, consumerId, alarm, alarmMeta);
 			}
 		}
 
 	}
 
-	private void sendAlarmSwallowDp(String message, AlarmMeta alarmMeta) {
+	private void sendAlarmSwallowDp(Alarm alarm, AlarmMeta alarmMeta) {
 		List<String> serverIps = ipCollectorService.getProducerServerIps();
 		if (serverIps != null && serverIps.size() > 0) {
-			sendAlarmByIp(serverIps.get(0), message, alarmMeta);
+			sendAlarmByIp(serverIps.get(0), alarm, alarmMeta);
 		}
 	}
 
-	private void sendAlarmByIp(String ip, String message, AlarmMeta alarmMeta) {
+	private void sendAlarmByIp(String ip, Alarm alarm, AlarmMeta alarmMeta) {
 		if (StringUtils.isNotBlank(ip)) {
 			Set<String> mobiles = new HashSet<String>();
 			Set<String> emails = new HashSet<String>();
 			Set<String> ips = new HashSet<String>();
 			ips.add(ip);
 			fillReciever(ips, mobiles, emails);
-			sendAlarm(mobiles, emails, alarmMeta, message);
+			sendAlarm(mobiles, emails, alarm, alarmMeta);
 		}
 
 	}
 
-	private void sendAlarmByProducerTopic(String topicName, String message, AlarmMeta alarmMeta) {
+	private void sendAlarmByProducerTopic(String topicName, Alarm alarm, AlarmMeta alarmMeta) {
 		Set<String> ips = ipCollectorService.getProducerTopicIps(topicName);
 		Set<String> mobiles = new HashSet<String>();
 		Set<String> emails = new HashSet<String>();
 		fillReciever(ips, mobiles, emails);
-		sendAlarm(mobiles, emails, alarmMeta, message);
+		sendAlarm(mobiles, emails, alarm, alarmMeta);
 	}
 
-	private void sendAlarmByConsumerTopic(String topicName, String message, AlarmMeta alarmMeta) {
+	private void sendAlarmByConsumerTopic(String topicName, Alarm alarm, AlarmMeta alarmMeta) {
 
 		Set<String> ips = ipCollectorService.getConsumerTopicIps(topicName);
 		Set<String> mobiles = new HashSet<String>();
 		Set<String> emails = new HashSet<String>();
 		fillReciever(ips, mobiles, emails);
-		sendAlarm(mobiles, emails, alarmMeta, message);
+		sendAlarm(mobiles, emails, alarm, alarmMeta);
 	}
 
-	private void sendAlarmByTopicAndConsumerId(String topicName, String consumerId, String message, AlarmMeta alarmMeta) {
+	private void sendAlarmByTopicAndConsumerId(String topicName, String consumerId, Alarm alarm, AlarmMeta alarmMeta) {
 		Set<String> ips = ipCollectorService.getTopicConsumerIdIps(topicName, consumerId);
 		Set<String> mobiles = new HashSet<String>();
 		Set<String> emails = new HashSet<String>();
 		fillReciever(ips, mobiles, emails);
-		sendAlarm(mobiles, emails, alarmMeta, message);
+		sendAlarm(mobiles, emails, alarm, alarmMeta);
 	}
 
 	private void fillReciever(Set<String> ips, Set<String> mobiles, Set<String> emails) {
@@ -310,15 +334,18 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 		}
 	}
 
-	private void sendAlarm(Set<String> mobiles, Set<String> emails, AlarmMeta alarmMeta, String message) {
+	private void sendAlarm(Set<String> mobiles, Set<String> emails, Alarm alarm, AlarmMeta alarmMeta) {
 		if (alarmMeta.getIsMailMode()) {
-			alarmService.sendMail(emails, alarmMeta.getAlarmTitle(), message, alarmMeta.getLevelType());
+			alarm.setSendType(SendType.MAIL);
+			alarmService.sendMail(emails, alarm);
 		}
 		if (alarmMeta.getIsSmsMode()) {
-			alarmService.sendSms(mobiles, alarmMeta.getAlarmTitle(), message, alarmMeta.getLevelType());
+			alarm.setSendType(SendType.SMS);
+			alarmService.sendSms(mobiles, alarm);
 		}
 		if (alarmMeta.getIsWeiXinMode()) {
-			alarmService.sendSms(emails, alarmMeta.getAlarmTitle(), message, alarmMeta.getLevelType());
+			alarm.setSendType(SendType.WEIXIN);
+			alarmService.sendSms(emails, alarm);
 		}
 	}
 

@@ -1,0 +1,91 @@
+<div class="main-content main-content-local" style="opacity: 1.0;"
+	ng-controller="AlarmController">
+	<div class="breadcrumbs" id="breadcrumbs">
+		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/swallow-alarm.js"></script>
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
+
+		<form class="bs-example bs-example-form" role="form">
+			<div class="input-group" style="margin-left: 20px">
+				<span class="input-group-addon">接收人</span> <input type="text"
+					class="form-control" placeholder="消息接收人"
+					style="width: 200px" id="receiver" ng-model='receiver' required>
+				<ul class="typeahead dropdown-menu"
+					style="top: 28px; left: 0px; display: none;">
+				</ul>
+
+				<span class="input-group-addon" style="opacity: 0;"></span> 时间 <input
+					type="text" placeholder="开始时间..." ng-model="startTime" id="starttime">
+				<input type="text" placeholder="结束时间..." ng-model="endTime"
+					id="stoptime">
+				<button type="button" class="btn btn-success btn-swallow-ok"
+					id="summittime" ng-click="query()">查询</button>
+			</div>
+		</form>
+
+		<!-- end  breadcrumbs-->
+	</div>
+
+	<div class="breadcrumbs" id="message-retransmit" style="display: none;">
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
+	</div>
+
+	<!-- page-content -->
+	<div class="page-content">
+		<!--page-header  -->
+		<div class="page-header">
+
+			<!--row  -->
+			<div class="row">
+				<table
+					class="table table-bordered table-striped table-condensed  table-hover">
+					<tr>
+						<th style="text-align: left">序号</th>
+						<th style="text-align: left">报警类别</th>
+						<th style="text-align: left">发送方式</th>
+						<th style="text-align: left">标题</th>
+						<th style="text-align: left">内容</th>
+						<th style="text-align: left">接收者</th>
+						<th style="text-align: left">时间</th>
+					</tr>
+					<tr ng-repeat="m in searchPaginator.currentPageItems">
+						<td style="text-align: left">{{$index+1}}</td>
+						<td style="text-align: left">{{m.type}}</td>
+						<td style="text-align: left">{{m.sendType}}</td>
+						<td style="text-align: left">{{m.title}}</td>
+						<td style="text-align: left">{{m.body}}</td>
+						<td style="text-align: left">{{m.receiver}}</td>
+						<td style="text-align: left">{{m.createTime | date:'yyyy-MM-dd hh:mm:ss'}}</td>
+				</table>
+
+				<ul style="margin-top: 20px;" class="pagination">
+					<li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+					<li><a href="" ng-click="searchPaginator.previous()"
+						ng-show="searchPaginator.hasPrevious()">上一页</a></li>
+					<li ng-repeat="p in searchPaginator.pages"><a href=""
+						ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
+					<li class="disabled"><a href="javascript:;">...</a></li>
+
+					<li><a href="" ng-click="searchPaginator.next()"
+						ng-show="searchPaginator.hasNext()">下一页</a></li>
+
+					<li><a href=""
+						ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!--end page-header  -->
+	</div>
+	<!-- end page-content -->
+</div>

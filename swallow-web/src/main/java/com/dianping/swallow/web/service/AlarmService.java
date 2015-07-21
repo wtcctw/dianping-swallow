@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.dianping.swallow.web.model.alarm.Alarm;
-import com.dianping.swallow.web.model.alarm.AlarmLevelType;
 
 /**
  *
@@ -14,66 +13,54 @@ import com.dianping.swallow.web.model.alarm.AlarmLevelType;
  */
 public interface AlarmService {
 	/**
-	 * sms alarm
-	 * 
-	 * @param mobile
-	 * @param title
-	 * @param body
-	 * @param type
+	 * send sms
+	 * @param alarm
 	 * @return
 	 */
-	public boolean sendSms(String mobile, String title, String body, AlarmLevelType type);
+	public boolean sendSms(Alarm alarm);
 
 	/**
 	 * weiXin alarm
 	 * 
-	 * @param email
-	 * @param title
-	 * @param content
+	 * @param alarm
 	 * @return
 	 */
-	public boolean sendWeiXin(String email, String title, String content, AlarmLevelType type);
+	public boolean sendWeiXin(Alarm alarm);
 
 	/**
 	 * mail alarm
 	 * 
-	 * @param email
-	 * @param title
-	 * @param content
+	 * @param emails
+	 * @param alarm
 	 * @return
 	 */
-	public boolean sendMail(Set<String> emails, String title, String content, AlarmLevelType type);
+	public boolean sendMail(Set<String> emails, Alarm alarm);
 	
 	/**
 	 * sms alarm
 	 * 
-	 * @param mobile
-	 * @param title
-	 * @param body
-	 * @param type
+	 * @param mobiles
+	 * @param alarm
 	 * @return
 	 */
-	public boolean sendSms(Set<String> mobiles, String title, String body, AlarmLevelType type);
+	public boolean sendSms(Set<String> mobiles, Alarm alarm);
 
 	/**
 	 * weiXin alarm
 	 * 
-	 * @param email
-	 * @param title
-	 * @param content
+	 * @param emails
+	 * @param alarm
 	 * @return
 	 */
-	public boolean sendWeiXin(Set<String> emails, String title, String content, AlarmLevelType type);
+	public boolean sendWeiXin(Set<String> emails, Alarm alarm);
 
 	/**
 	 * mail alarm
 	 * 
-	 * @param email
-	 * @param title
-	 * @param content
+	 * @param alarm
 	 * @return
 	 */
-	public boolean sendMail(String email, String title, String content, AlarmLevelType type);
+	public boolean sendMail(Alarm alarm);
 
 	/**
 	 * insert
@@ -124,18 +111,39 @@ public interface AlarmService {
 	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit);
 
 	/**
+	 * find by receiver and createTime
+	 * @param receiver
+	 * @param timeStart
+	 * @param timeEnd
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit);
+
+	/**
 	 * find count by createTime
 	 * 
-	 * @param 
+	 * @param
 	 * @return
 	 */
 	public long countByCreateTime(Date createTime);
-	
+
 	/**
 	 * find count by receiver
 	 * 
-	 * @param 
+	 * @param
 	 * @return
 	 */
 	public long countByReceiver(String receiver);
+	
+	/**
+	 * find count by receiver and createTime
+	 * @param receiver
+	 * @param timeStart
+	 * @param timeEnd
+	 * @return
+	 */
+	public long countByReceiverAndTime(String receiver, Date startTime, Date endTime);
+
 }

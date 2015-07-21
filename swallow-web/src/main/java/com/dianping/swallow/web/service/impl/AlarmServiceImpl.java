@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
-import com.dianping.swallow.web.model.alarm.AlarmLevelType;
 import com.dianping.swallow.web.model.alarm.SendType;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
@@ -45,6 +44,12 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
 	private static final String env = "[" + EnvZooKeeperConfig.getEnv().trim() + "]";
 
+	private static final String LEFT_BRACKET = "[";
+
+	private static final String RIGHT_BRACKET = "]";
+
+	private static final String NEW_LINE_SIGN = "\n";
+
 	private String mailUrl;
 	private String smsUrl;
 	private String weiXinUrl;
@@ -60,77 +65,80 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	}
 
 	@Override
-	public boolean sendSms(String mobile, String title, String body, AlarmLevelType type) {
-		if (StringUtils.isBlank(mobile)) {
+	public boolean sendSms(Alarm alarm) {
+		if (StringUtils.isBlank(alarm.getReceiver())) {
 			return true;
 		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("mobile", mobile));
-		params.add(new BasicNameValuePair("body", "[" + title + "]" + env + body));
+		params.add(new BasicNameValuePair("mobile", alarm.getReceiver()));
+		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
+		params.add(new BasicNameValuePair("body", title + NEW_LINE_SIGN + alarm.getBody()));
 		boolean result = httpService.httpPost(getSmsUrl(), params).isSuccess();
-		insert(new Alarm().setType(type).setReceiver(mobile).setTitle(title).setBody(body).setSendType(SendType.SMS)
-				.setSourceIp(NetUtil.IP).setCreateTime(new Date()));
+		insert(alarm.setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date()));
 		return result;
 	}
 
 	@Override
-	public boolean sendWeiXin(String email, String title, String content, AlarmLevelType type) {
-		if (StringUtils.isBlank(email)) {
+	public boolean sendWeiXin(Alarm alarm) {
+		if (StringUtils.isBlank(alarm.getReceiver())) {
 			return true;
 		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("email", email));
-		params.add(new BasicNameValuePair("title", title + env));
-		params.add(new BasicNameValuePair("content", content));
+		params.add(new BasicNameValuePair("email", alarm.getReceiver()));
+		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
+		params.add(new BasicNameValuePair("title", title));
+		params.add(new BasicNameValuePair("content", alarm.getBody()));
 		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
-		insert(new Alarm().setType(type).setReceiver(email).setTitle(title).setBody(content)
-				.setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP).setCreateTime(new Date()));
+		insert(alarm.setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP).setCreateTime(new Date()));
 		return result;
 	}
 
 	@Override
-	public boolean sendMail(String email, String title, String content, AlarmLevelType type) {
-		if (StringUtils.isBlank(email)) {
+	public boolean sendMail(Alarm alarm) {
+		if (StringUtils.isBlank(alarm.getReceiver())) {
 			return true;
 		}
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("title", title + env));
-		params.add(new BasicNameValuePair("recipients", email));
-		params.add(new BasicNameValuePair("body", content));
+		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
+		params.add(new BasicNameValuePair("title", title));
+		params.add(new BasicNameValuePair("recipients", alarm.getReceiver()));
+		params.add(new BasicNameValuePair("body", alarm.getBody()));
 		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
-		insert(new Alarm().setType(type).setReceiver(email).setTitle(title).setBody(content).setSendType(SendType.SMS)
-				.setSourceIp(NetUtil.IP).setCreateTime(new Date()));
+		insert(alarm.setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date()));
 		return result;
 	}
 
-	public boolean sendSms(Set<String> mobiles, String title, String message, AlarmLevelType type) {
+	public boolean sendSms(Set<String> mobiles, Alarm alarm) {
 		if (mobiles != null) {
 			Iterator<String> iterator = mobiles.iterator();
 			while (iterator.hasNext()) {
 				String mobile = iterator.next();
-				sendSms(mobile, title, message, type);
+				alarm.setReceiver(mobile);
+				sendSms(alarm);
 			}
 		}
 		return true;
 	}
 
-	public boolean sendMail(Set<String> emails, String title, String message, AlarmLevelType type) {
+	public boolean sendMail(Set<String> emails, Alarm alarm) {
 		if (emails != null) {
 			Iterator<String> iterator = emails.iterator();
 			while (iterator.hasNext()) {
 				String email = iterator.next();
-				sendMail(email, title, message, type);
+				alarm.setReceiver(email);
+				sendMail(alarm);
 			}
 		}
 		return true;
 	}
 
-	public boolean sendWeiXin(Set<String> emails, String title, String message, AlarmLevelType type) {
+	public boolean sendWeiXin(Set<String> emails, Alarm alarm) {
 		if (emails != null) {
 			Iterator<String> iterator = emails.iterator();
 			while (iterator.hasNext()) {
 				String email = iterator.next();
-				sendWeiXin(email, title, message, type);
+				alarm.setReceiver(email);
+				sendWeiXin(alarm);
 			}
 		}
 		return true;
@@ -221,6 +229,16 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		initProperties();
+	}
+
+	@Override
+	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit) {
+		return alarmDao.findByReceiverAndTime(receiver, startTime, endTime, offset, limit);
+	}
+
+	@Override
+	public long countByReceiverAndTime(String receiver, Date startTime, Date endTime) {
+		return alarmDao.countByReceiverAndTime(receiver, startTime, endTime);
 	}
 
 }

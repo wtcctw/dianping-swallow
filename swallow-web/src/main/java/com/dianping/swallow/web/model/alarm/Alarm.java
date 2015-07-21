@@ -13,6 +13,10 @@ public class Alarm {
 
 	@Id
 	private String id;
+	
+	private String eventId;
+	
+	private int number;
 
 	private AlarmLevelType type;
 
@@ -107,6 +111,24 @@ public class Alarm {
 
 	public Alarm setSendType(SendType sendType) {
 		this.sendType = sendType;
+		return this;
+	}
+
+	public String getEventId() {
+		return eventId;
+	}
+
+	public Alarm setEventId(String eventId) {
+		this.eventId = eventId;
+		return this;
+	}
+
+	public int getNumber() {
+		return number;
+	}
+
+	public Alarm setNumber(int number) {
+		this.number = number;
 		return this;
 	}
 

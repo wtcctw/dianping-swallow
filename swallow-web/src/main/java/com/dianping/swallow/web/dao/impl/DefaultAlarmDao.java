@@ -84,12 +84,27 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 		Query query = new Query(Criteria.where(CREATETIME_FIELD).gte(createTime));
 		return mongoTemplate.count(query, ALARM_COLLECTION);
 	}
-	
+
 	@Override
 	public long countByReceiver(String receiver) {
 		Query queryCount = new Query(Criteria.where(RECEIVER_FIELD).is(receiver));
 		return mongoTemplate.count(queryCount, ALARM_COLLECTION);
 	}
 
+	@Override
+	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit) {
+		Query query = new Query(Criteria.where(RECEIVER_FIELD).is(receiver).and(CREATETIME_FIELD).gte(startTime)
+				.lte(endTime));
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, CREATETIME_FIELD)));
+		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
+		return alarms;
+	}
+
+	@Override
+	public long countByReceiverAndTime(String receiver, Date startTime, Date endTime) {
+		Query queryCount = new Query(Criteria.where(RECEIVER_FIELD).is(receiver).and(CREATETIME_FIELD).gte(startTime)
+				.lte(endTime));
+		return mongoTemplate.count(queryCount, ALARM_COLLECTION);
+	}
 
 }
