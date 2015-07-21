@@ -1,9 +1,9 @@
 package com.dianping.swallow.web.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.Administrator;
 
 /**
@@ -11,37 +11,34 @@ import com.dianping.swallow.web.model.Administrator;
  *
  * 2015年5月20日下午2:05:39
  */
-public interface AdministratorService {
+public interface UserService {
 	
 	/**
 	 * 查询指定数量的Administrator信息
 	 * @param offset  起始位置
 	 * @param limit	  偏移量
 	 */
-	Map<String, Object> loadAdmin(int offset, int limit);
+	Pair<Long, List<Administrator>> loadUserPage(int offset, int limit);
 	
-	List<Administrator> loadAllAdmin();
 
+	/**
+	 * 
+	 * @param username 用户名
+	 */
+	boolean createOrUpdateUser(String username);
 	
 	/**
 	 * 创建用户
-	 * @param name  用户通行证  
+	 * @param username  用户通行证  
 	 * @param auth  用户级别， 0 － 管理员，3 － 用户， 10 － 访问者
 	 */
-	boolean createAdmin(String name, int auth);
+	boolean createUser(String username, int auth);
 	
 	/**
 	 * 根据通行证删除用户
 	 * @param name 用户名
 	 */
-	boolean removeAdmin(String name);
-	
-	/**
-	 * 查询所有访问者
-	 */
-	List<String> loadAllTypeName();
-	
-	Set<String> loadAdminSet();
+	boolean removeUser(String name);
 	
 	/**
 	 * 更新Administrator列表
@@ -49,15 +46,10 @@ public interface AdministratorService {
 	 * @param name   用户名
 	 * @param auth	 角色
 	 */
-	boolean updateAdmin(String name, int auth);
+	boolean updateUser(String name, int auth);
 
-	/**
-	 * 
-	 * @param username 用户名
-	 */
-	boolean recordVisitToAdmin(String username);
+	List<Administrator> loadUsers();
 	
-	String loadDefaultAdmin();
-	
-	
+	Set<String> loadCachedAdministratorSet();
+
 }

@@ -38,7 +38,7 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 	public ModelAndView mainSetting(HttpServletRequest request, HttpServletResponse response) {
 
 		subSide = "swallow";
-		return new ModelAndView("setting/producerserversetting", createViewMap());
+		return new ModelAndView("setting/swallowsetting", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/setting/consumerid")

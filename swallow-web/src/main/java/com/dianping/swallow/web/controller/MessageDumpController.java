@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
-import com.dianping.swallow.web.service.AdministratorService;
+import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -44,8 +44,8 @@ public class MessageDumpController extends AbstractMenuController {
 	@Resource(name = "topicService")
 	private TopicService topicService;
 
-	@Resource(name = "administratorService")
-	private AdministratorService administratorService;
+	@Resource(name = "userService")
+	private UserService userService;
 
 	@Resource(name = "messageDumpService")
 	private MessageDumpService messageDumpService;
@@ -99,7 +99,7 @@ public class MessageDumpController extends AbstractMenuController {
 		String username = extractUsernameUtils.getUsername(request);
 		if (StringUtils.isNotEmpty(topic)) {
 			;
-		} else if (administratorService.loadAdminSet().contains(username)) {
+		} else if (userService.loadCachedAdministratorSet().contains(username)) {
 			return messageDumpService.loadAllDumpMessage();
 		} else {
 			List<String> t = topicService.loadTopicNames(username);

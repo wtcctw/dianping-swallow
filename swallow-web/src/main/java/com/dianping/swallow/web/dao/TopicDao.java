@@ -1,8 +1,8 @@
 package com.dianping.swallow.web.dao;
 
 import java.util.List;
-import java.util.Map;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.Topic;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
@@ -20,6 +20,12 @@ public interface TopicDao extends Dao {
 	 * @param name  topic名称
 	 */
     Topic readByName(String name) ;
+    
+    /**
+     * 根据申请人查询topic
+     * @param prop
+     */
+    Topic readByProp(String prop);
 
     /**
      * 保存topic
@@ -37,26 +43,21 @@ public interface TopicDao extends Dao {
 	int updateTopic(String name, String prop, String time) throws MongoSocketException, MongoException;
 
 	/**
-	 *  删除集合
-	 */
-	void dropCol();
-	
-	/**
 	 * 查询所有纪录 
 	 */
-	List<Topic> findAll();
+	List<Topic> LoadTopics();
 	
 	/**
 	 * 查询纪录个数 
 	 */
-	long countTopic();
+	long count();
 	
 	/**
 	 * 查询指定数目的topic
 	 * @param offset
 	 * @param limit
 	 */
-	Map<String, Object> findFixedTopic(int offset, int limit);
+	Pair<Long, List<Topic>> loadTopicPage(int offset, int limit);
 	
 	/**
 	 * 在限定条件下查询特定的topic
@@ -64,15 +65,7 @@ public interface TopicDao extends Dao {
 	 * @param limit   偏移量
 	 * @param name    topic名称
 	 * @param prop    申请人
-	 * @param dept	  申请人部门
 	 */
-	Map<String, Object> findSpecific(int offset, int limit, String name, String prop);
-	
-	
-	/**
-	 * 根据申请人查询topic
-	 * @param prop
-	 */
-	Topic readByProp(String prop);
+	Pair<Long, List<Topic>> loadSpecificTopicPage(int offset, int limit, String name, String prop);
 	
  }

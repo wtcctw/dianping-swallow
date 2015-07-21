@@ -19,6 +19,7 @@ import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.web.dao.impl.WebMongoManager;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
-import com.dianping.swallow.web.service.AdministratorService;
+import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.TopicService;
 import com.mongodb.Mongo;
@@ -45,9 +46,12 @@ public class TopicScanner {
 	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm";
 
 	private static final String DELIMITOR = ",";
+	
+	@Value("${swallow.web.admin.defaultadmin}")
+	private String defaultAdmin;
 
-	@Resource(name = "administratorService")
-	private AdministratorService administratorService;
+	@Resource(name = "userService")
+	private UserService userService;
 
 	@Resource(name = "topicService")
 	private TopicService topicService;
@@ -143,7 +147,7 @@ public class TopicScanner {
 		for (String str : dbs) {
 			if (isTopicName(str)) {
 				String subStr = str.substring(DefaultMongoManager.MSG_PREFIX.length());
-				Topic t = topicService.loadTopic(subStr);
+				Topic t = topicService.loadTopicByName(subStr);
 				if (t != null) { // exists
 					updateTopicToWhiteList(subStr, t);
 				} else {
@@ -186,14 +190,14 @@ public class TopicScanner {
 	}
 
 	private void scanAdminCollection() {
-		List<Administrator> aList = administratorService.loadAllAdmin();
+		List<Administrator> aList = userService.loadUsers();
 		int role = -1;
 		if (!aList.isEmpty()) {
 			for (Administrator list : aList) {
 				role = list.getRole();
 				String name = list.getName();
 				if (role == AuthenticationService.ADMINI) {
-					if (administratorService.loadAdminSet().add(name)) {
+					if (userService.loadCachedAdministratorSet().add(name)) {
 						logger.info("admiSet add " + name);
 					}
 				}
@@ -201,15 +205,15 @@ public class TopicScanner {
 		} else {
 			String[] admins = loadDefaultAdminFromConf();
 			for (String admin : admins) {
-				administratorService.loadAdminSet().add(admin);
-				administratorService.createAdmin(admin, AuthenticationService.ADMINI);
+				userService.loadCachedAdministratorSet().add(admin);
+				userService.createUser(admin, AuthenticationService.ADMINI);
 				logger.info("admiSet add admin " + admin);
 			}
 		}
 	}
 
 	private String[] loadDefaultAdminFromConf() {
-		String defaultAdmin = administratorService.loadDefaultAdmin();
+		
 		String[] admins = defaultAdmin.split(DELIMITOR);
 		return admins;
 	}

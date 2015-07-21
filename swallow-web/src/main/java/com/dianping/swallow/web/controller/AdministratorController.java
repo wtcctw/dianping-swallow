@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jodd.util.StringUtil;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.service.AuthenticationService;
-import com.dianping.swallow.web.service.AdministratorService;
+import com.dianping.swallow.web.service.UserService;
 
 /**
  * @author mingdongli 2015年5月5日 下午2:42:57
@@ -30,8 +32,8 @@ public class AdministratorController extends AbstractMenuController {
 	private static final String ADMINISTRATOR = "Administrator";
 	private static final String USER = "User";
 
-	@Resource(name = "administratorService")
-	private AdministratorService administratorService;
+	@Resource(name = "userService")
+	private UserService userService;
 
 	@Autowired
 	ExtractUsernameUtils extractUsernameUtils;
@@ -48,10 +50,8 @@ public class AdministratorController extends AbstractMenuController {
 	public Object adminDefault(int offset, int limit, String name, String role,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		Map<String, Object> map = new HashMap<String, Object>();
 
-		map = administratorService.loadAdmin(offset, limit);
-		return map;
+		return userService.loadUserPage(offset, limit);
 	}
 
 	@RequestMapping(value = "/console/admin/auth/createadmin", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
@@ -61,7 +61,7 @@ public class AdministratorController extends AbstractMenuController {
 			HttpServletRequest request, HttpServletResponse response) {
 
 		int auth = convertRole(role);
-		if(administratorService.createAdmin(name, auth)){
+		if(userService.createUser(name, auth)){
 			logger.info(String.format("Create %s in administrator list successfully", name));
 		}
 		else{
@@ -74,7 +74,7 @@ public class AdministratorController extends AbstractMenuController {
 	public void removeAdmin(@RequestParam(value = "name") String name,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		if(administratorService.removeAdmin(name)){
+		if(userService.removeUser(name)){
 			logger.info(String.format("Remove %s from administrator list successfully", name));
 		}
 		else{
@@ -87,7 +87,15 @@ public class AdministratorController extends AbstractMenuController {
 	public Object queryAllVisits(HttpServletRequest request,
 			HttpServletResponse response) {
 
-		return administratorService.loadAllTypeName();
+		List<Administrator> adminList = userService.loadUsers();
+		List<String> users = new ArrayList<String>();
+		for(Administrator admin : adminList){
+			String name = admin.getName();
+			if(StringUtils.isNotBlank(name) && !users.contains(name)){
+				users.add(name);
+			}
+		}
+		return users;
 	}
 
 	private int convertRole(String role) {

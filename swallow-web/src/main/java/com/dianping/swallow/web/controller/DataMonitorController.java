@@ -131,7 +131,6 @@ public class DataMonitorController extends AbstractMonitorController {
 		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
 		String transferDate = date.replaceAll("Z", "+0800").replaceAll("\"", "");
 		Date newdate = formatter.parse(transferDate);
-		System.out.println("date is " + newdate);
 		
 		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries(newdate);
 		return addTimeToReport(entrys);

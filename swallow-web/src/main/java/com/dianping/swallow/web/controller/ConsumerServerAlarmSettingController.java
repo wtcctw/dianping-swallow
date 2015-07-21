@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -90,16 +92,14 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/console/setting/consumerserver/serverids", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public List<String> loadProducerSereverIds() {
+	public Collection<String> loadProducerSereverIds() {
 		
 		List<String> masterIps =  ipCollectorService.getConsumerServerMasterIps();
 		List<String> slaveIps =  ipCollectorService.getConsumerServerSlaveIps();
-		
-		masterIps.removeAll(slaveIps);
-		masterIps.addAll(slaveIps);
-		return masterIps;
+		return CollectionUtils.union(masterIps, slaveIps);
 		
 	}
 
