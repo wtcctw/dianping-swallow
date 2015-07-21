@@ -21,5 +21,5 @@ public interface CloseableBlockingQueue<E> extends Queue<E> {
 	 * @return
 	 */
 	Long getEmptyTailMessageId(boolean isBackup);
-
+	
 }
