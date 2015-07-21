@@ -2,6 +2,7 @@ package com.dianping.swallow.web.monitor.dashboard;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.springframework.stereotype.Component;
+
 import com.dianping.swallow.web.model.dashboard.MinuteEntry;
 
 /**
@@ -50,26 +52,37 @@ public class DashboardContainer {
 
 		Calendar calendarstart = Calendar.getInstance();
 		calendarstart.setTime(stop);
-		calendarstart.add(Calendar.MINUTE, -10);
+		calendarstart.add(Calendar.MINUTE, -11);
 		calendarstart.clear(Calendar.SECOND);
 		calendarstart.clear(Calendar.MILLISECOND);
 		Date start = calendarstart.getTime();
-		Set<Date> treeSet = new TreeSet<Date>();
+		Set<Date> treeSet = new TreeSet<Date>(new Comparator<Date>() {
+
+			@Override
+			public int compare(Date d1, Date d2) {
+				int num = d2.compareTo(d1);
+				return num;
+			}
+		});
+
 		List<MinuteEntry> result = new ArrayList<MinuteEntry>();
 
 		synchronized (dashboards) {
 			Set<Date> dates = dashboards.keySet();
 			for (Date dt : dates) {
-				if (dt.after(stop) && dt.before(start)) {
+				if (dt.after(start) && dt.before(stop)) {
 					treeSet.add(dt);
 				}
 			}
-			
-			for(Date dt : treeSet){
+
+			for (Date dt : treeSet) {
+				if(result.size() >= FETCHENTRYSIZE){
+					break;
+				}
 				result.add(dashboards.get(dt));
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -80,5 +93,6 @@ public class DashboardContainer {
 	public void setDashboards(Map<Date, MinuteEntry> dashboards) {
 		this.dashboards = dashboards;
 	}
+
 
 }

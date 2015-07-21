@@ -35,6 +35,7 @@ public class TotalData {
 	List<Entry> entrys = new ArrayList<Entry>();
 	
 	public List<Entry> getEntrys() {
+		
 		return entrys;
 	}
 

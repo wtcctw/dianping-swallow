@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	public static final int ENTRYSIZE = 10;
 	
-	public static final String FORMAT = "yyyy-MM-dd hh:mm:ss.S";
+	public static final String FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -126,15 +127,17 @@ public class DataMonitorController extends AbstractMonitorController {
 	@ResponseBody
 	public Map<String, Object> getConsumerIdDelayDashboard(
 			 @RequestParam("date") String date) throws Exception {
-		date.replaceAll("\"", "");
-		DateFormat format = new SimpleDateFormat(FORMAT);
-		Date stopdate = format.parse(date);
-		System.out.println("date is " + stopdate);
 		
-		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries(stopdate);
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+		String transferDate = date.replaceAll("Z", "+0800").replaceAll("\"", "");
+		Date newdate = formatter.parse(transferDate);
+		System.out.println("date is " + newdate);
+		
+		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries(newdate);
 		return addTimeToReport(entrys);
 
 	}
+	
 
 	private String getFirstTopic(Set<String> topics) {
 

@@ -1,9 +1,8 @@
 package com.dianping.swallow.web.model.dashboard;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+
+import com.dianping.swallow.web.common.MaxHeap;
 
 
 
@@ -16,46 +15,39 @@ public class MinuteEntry {
 
 	private Date time;
 
-	List<Entry> delayEntry = new ArrayList<Entry>();
-	
-	private static final int ENTRYSIZE = 12;
+	MaxHeap<Entry> delayEntry;
 	
 	public MinuteEntry() {
-
+		
+		Entry[] entry = new Entry[MaxHeap.DEFAULT_MAX];
+		delayEntry = new MaxHeap<Entry>(entry);
 	}
 
 	public Date getTime() {
+		
 		return time;
 	}
 
 	public MinuteEntry setTime(Date time) {
+		
 		this.time = time;
 		return this;
 	}
 
-	public List<Entry> getDelayEntry() {
+	
+	public MaxHeap<Entry> getDelayEntry() {
 		return delayEntry;
 	}
 
-	public MinuteEntry setDelayEntry(List<Entry> delayEntry) {
+	public MinuteEntry setDelayEntry(MaxHeap<Entry> delayEntry) {
+		
 		this.delayEntry = delayEntry;
 		return this;
 	}
-	
-	public MinuteEntry addEntry(Entry entry){
+
+	public boolean addEntry(Entry entry){
 		
-		int entrySize = delayEntry.size();
-		if(entrySize >= ENTRYSIZE){
-			if(entry.getNumAlarm() > delayEntry.get(entrySize - 1).getNumAlarm()){
-				delayEntry.remove(entrySize - 1);
-				delayEntry.add(entry);
-				Collections.sort(delayEntry);
-			}
-			return this;
-		}
-		delayEntry.add(entry);
-		Collections.sort(delayEntry);
-		return this;
+		return delayEntry.insert(entry);
 	}
 
 }
