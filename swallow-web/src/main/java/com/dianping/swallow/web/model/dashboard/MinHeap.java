@@ -3,9 +3,11 @@ package com.dianping.swallow.web.model.dashboard;
 import java.util.*;
 
 public class MinHeap {
+
 	private static final int CAPACITY = 2;
 
 	private int size; // Number of elements in Heap
+	
 	private Entry[] Heap; // The Heap array
 
 	public MinHeap() {
@@ -116,7 +118,7 @@ public class MinHeap {
 
 	public String toString() {
 		String out = "";
-		for (int k = 1; k <= size; k++)
+		for (int k = 0; k < size; k++)
 			out += Heap[k] + " ";
 		return out;
 	}
@@ -134,28 +136,66 @@ public class MinHeap {
 	}
 
 	public void setHeap(Entry[] Heap) {
-		this.Heap = Heap;
+		
+		int length = Heap.length;
+		for(int i = 0; i < length; ++i){
+			this.Heap[i] = Heap[i];
+		}
+		this.Heap[length] = null;
 	}
 
 	public static void main(String[] args) {
 
 		MinHeap entrys = new MinHeap();
-		Entry[] en = new Entry[10];
-		for (int i = 0; i < 10; ++i) {
+		//Entry[] en = new Entry[11];
+		for (int i = 1; i < 10; ++i) {
 			Entry e = new Entry();
 			e.setNumAlarm(i);
-			en[i] = e;
+			entrys.insert(e);
 		}
-		entrys.HeapSort(en);
-		entrys.setSize(11);
-		System.out.println(Arrays.toString(en));
+		System.out.println("size is " + entrys.getSize());
+		System.out.println(entrys);
+		System.out.println("---------------------------");
 		
-		Entry[] e2 = entrys.getHeap();
+//		Entry[] old = entrys.getHeap();
+//		int size = entrys.getSize();
+//		Entry[] new1 = new Entry[size];
+//		System.arraycopy(old, 1, new1, 0, size);
+//		entrys.HeapSort(new1);
+		
+		int size = entrys.getSize();
+		System.out.println("size is " + size);
+		Entry[] sorted = new Entry[size];
+		for(int i = size - 1; i >= 0; i--){
+			Entry eMin = entrys.deleteMin();
+			System.out.println("num is " + eMin.getNumAlarm());
+			sorted[i] = eMin;
+		}
+		for(int i = 0; i < size; ++i){
+			System.out.println(sorted[i]);
+		}
+		entrys.setHeap(sorted);
+		entrys.setSize(size);
+		//entrys.setHeap(new1);
+//		int size = entrys.getSize();
+//		Entry[] e2 = entrys.getHeap();
+//		entrys.HeapSort(entrys.getHeap());
+		System.out.println("-----------------------");
+		System.out.println(entrys.toString());
+		
+//		entrys.HeapSort(en);
+//		entrys.setHeap(en);
+//		entrys.setSize(11);
+//		for(int i = 0; i < size; ++i){
+//			System.out.println(new1[i]);
+//		}
+		//System.out.println(Arrays.toString(new1));
+//		
 		int s2 = entrys.getSize();
 
-		System.out.println("\n");
-		for (int k = 0; k < s2 - 1; k++)
-			System.out.println(e2[s2 - 1 - k]);
+//		System.out.println("\n");
+//		for (int k = 0; k < s2 - 1; k++)
+//			System.out.println(e2[s2 - 1 - k]);
 
 	}
 }

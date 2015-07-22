@@ -24,6 +24,7 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.dashboard.Entry;
+import com.dianping.swallow.web.model.dashboard.MinHeap;
 import com.dianping.swallow.web.model.dashboard.MinuteEntry;
 import com.dianping.swallow.web.model.dashboard.TotalData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
@@ -131,7 +132,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 					}
 				}
 
-				TotalData td = totalDataMap.get(consumerid);
+				String mapKey = topic + consumerid;
+				TotalData td = totalDataMap.get(mapKey);
 				if (td == null) {
 					td = new TotalData();
 				}
@@ -139,7 +141,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 						.setName(name).setListSend(sendList.subList(sendListSize - 2, sendListSize))
 						.setListAck(ackList.subList(ackListSize - 2, ackListSize))
 						.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
-				totalDataMap.put(consumerid, td);
+				totalDataMap.put(mapKey, td);
 				logger.info(String.format("Generate totalData for topic %s and consumerid %s", topic, consumerid));
 			}
 		}
@@ -227,22 +229,35 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			TotalData td = entry.getValue();
 			List<Entry> entrys = td.getEntrys();
 			
+			Date time = td.getTime();
+			MinuteEntry me = minuteEntryMap.get(time);
+			if (me == null) {
+				me = new MinuteEntry();
+			}
+			if (me.getTime() == null) {
+				me.setTime(time);
+			}
+			
 			for (int i = 0; i < entrys.size(); ++i) {
-				Date time = td.getTime();
-				MinuteEntry me = minuteEntryMap.get(time);
-				if (me == null) {
-					me = new MinuteEntry();
-				}
-				if (me.getTime() == null) {
-					me.setTime(time);
-				}
 				me.addEntry(entrys.get(i));
 				minuteEntryMap.put(time, me);
 			}
+			
 		}
 
 		for (Map.Entry<Date, MinuteEntry> entry : minuteEntryMap.entrySet()) {
 			MinuteEntry me = entry.getValue();
+			
+			MinHeap minHeap = me.getDelayEntry();
+			int size = minHeap.getSize();
+			Entry[] sorted = new Entry[size];
+			for(int i = size - 1; i >= 0; i--){
+				Entry eMin = minHeap.deleteMin();
+				sorted[i] = eMin;
+			}
+			minHeap.setHeap(sorted);
+			minHeap.setSize(size);
+			
 			boolean inserted = dashboardContainer.insertMinuteEntry(me);
 			logger.info(String.format("Insert MinuteEntry to dashboard %s", inserted ? "successfully" : "failed"));
 		}

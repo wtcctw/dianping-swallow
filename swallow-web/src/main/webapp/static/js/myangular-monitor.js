@@ -204,10 +204,8 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.getEntry = function(delayEntry){
 		defaultSize = 12;
 		var size = delayEntry.size > defaultSize ? defaultSize : delayEntry.size;
-		var entrys = [];
-		for (var k = 0; k < size; k++){
-			entrys.push(delayEntry.Heap[size - k]);
-		}
+		var emp = delayEntry.Heap;
+		var entrys = delayEntry.Heap.slice(0, size)
 		return entrys;
 	}
 	
@@ -259,13 +257,12 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.clicked = [];
 	$scope.items = [];
 	$scope.table = function(parentindex, index) {
-		var size = $scope.minuteEntrys[parentindex].delayEntry.size;
-		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index];
+		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry.Heap[index];
 		
-		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index].senddelay,
-		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index].ackdelay, 
-		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index].accu,
-		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index].topic} ];
+		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].senddelay,
+		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].ackdelay, 
+		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].accu,
+		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].topic} ];
 	}
 	
 });
