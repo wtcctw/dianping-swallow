@@ -8,7 +8,7 @@
     default-autowire="byName">
     
     <bean id="consumerWorkerManager"
-        class="com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager">
+        class="com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager">
     </bean>
     
     <bean id="consumerThreadPoolManager" class="com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManagerImpl">
@@ -72,5 +72,4 @@
         </constructor-arg>
     </bean>
     
-	<bean id="defaultThreadException" class="com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler"/>
 </beans>

@@ -21,7 +21,7 @@ import com.mongodb.WriteResult;
 
 public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 
-	public static final String ID = "id";
+	public static final String ID = "_id";
 	public static final String ORIGINAL_ID = "o_id";
 	public static final String CONTENT = "c";
 	public static final String VERSION = "v";
@@ -387,7 +387,8 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 		BSONTimestamp currentIndex = MongoUtils.getTimestampByCurTime();
 
 		while (cursor.hasNext()) {
-			currentIndex = (BSONTimestamp) cursor.next().get(ID);
+			DBObject object = cursor.next();
+			currentIndex = (BSONTimestamp) object.get(ID);
 		}
 
 		DBCollection msgCollection = getCollection(topicName, null);

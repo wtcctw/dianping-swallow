@@ -33,7 +33,7 @@ import com.dianping.swallow.consumerserver.Heartbeater;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.netty.MessageServerHandler;
-import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
+import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager;
 
 /**
  * @author mengwenchao

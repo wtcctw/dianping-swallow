@@ -27,7 +27,7 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
+import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager;
 
 public class ConsumerWorkerImplTest extends AbstractTest {
     @Autowired
@@ -248,6 +248,12 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         @Override
         public void isClosed() {
         }
+
+		@Override
+		public Long getEmptyTailMessageId(boolean isBackup) {
+			// TODO Auto-generated method stub
+			return null;
+		}
     }
 
 }

@@ -1,4 +1,4 @@
-package com.dianping.swallow.consumerserver.worker;
+package com.dianping.swallow.consumerserver.worker.impl;
 
 
 import java.util.Iterator;
@@ -30,6 +30,7 @@ import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
+import com.dianping.swallow.consumerserver.worker.ConsumerWorker;
 
 public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSlaveComponent{
 

@@ -43,7 +43,7 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 				}
 			}
 		}
-		ipCollectorService.clearProducerServerIps();
+		ipCollectorService.clearStatisProducerServerIps();
 		return true;
 	}
 }

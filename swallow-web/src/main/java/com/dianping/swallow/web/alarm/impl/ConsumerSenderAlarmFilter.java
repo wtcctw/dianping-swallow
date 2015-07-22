@@ -62,7 +62,7 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 			}
 			index++;
 		}
-		ipCollectorService.clearConsumerServerIps();
+		ipCollectorService.clearStatisConsumerServerIps();
 		return true;
 	}
 

@@ -26,7 +26,7 @@ import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.util.ConsumerUtil;
-import com.dianping.swallow.consumerserver.worker.ConsumerWorkerManager;
+import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager;
 
 public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 

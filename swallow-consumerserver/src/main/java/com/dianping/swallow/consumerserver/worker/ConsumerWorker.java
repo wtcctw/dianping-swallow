@@ -56,4 +56,5 @@ public interface ConsumerWorker extends Lifecycle{
    void recordAck();
 
    void handleHeartBeat(Channel channel);
+   
 }
