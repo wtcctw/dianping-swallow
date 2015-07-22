@@ -2,8 +2,6 @@ package com.dianping.swallow.web.model.dashboard;
 
 import java.util.Date;
 
-import com.dianping.swallow.web.common.MaxHeap;
-
 
 
 /**
@@ -15,12 +13,11 @@ public class MinuteEntry {
 
 	private Date time;
 
-	MaxHeap<Entry> delayEntry;
+	MinHeap delayEntry;
 	
 	public MinuteEntry() {
 		
-		Entry[] entry = new Entry[MaxHeap.DEFAULT_MAX];
-		delayEntry = new MaxHeap<Entry>(entry);
+		delayEntry = new MinHeap();
 	}
 
 	public Date getTime() {
@@ -35,11 +32,11 @@ public class MinuteEntry {
 	}
 
 	
-	public MaxHeap<Entry> getDelayEntry() {
+	public MinHeap getDelayEntry() {
 		return delayEntry;
 	}
 
-	public MinuteEntry setDelayEntry(MaxHeap<Entry> delayEntry) {
+	public MinuteEntry setDelayEntry(MinHeap delayEntry) {
 		
 		this.delayEntry = delayEntry;
 		return this;

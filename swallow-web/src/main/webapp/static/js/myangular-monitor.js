@@ -203,8 +203,11 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	
 	$scope.getEntry = function(delayEntry){
 		defaultSize = 12;
-		var size = delayEntry.n > defaultSize ? defaultSize : delayEntry.n
-		var entrys = delayEntry.Heap.slice(0, size);
+		var size = delayEntry.size > defaultSize ? defaultSize : delayEntry.size;
+		var entrys = [];
+		for (var k = 0; k < size; k++){
+			entrys.push(delayEntry.Heap[size - k]);
+		}
 		return entrys;
 	}
 	
