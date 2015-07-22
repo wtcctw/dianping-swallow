@@ -63,10 +63,10 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 
 	@RequestMapping(value = "/console/setting/consumerid/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void comsumeridSettingCreate(@RequestBody ConsumerIdAlarmSettingDto dto) {
+	public boolean comsumeridSettingCreate(@RequestBody ConsumerIdAlarmSettingDto dto) {
 
 		ConsumerIdAlarmSetting consumerIdAlarmSetting = ConsumerIdAlarmSettingMapper.toConsumerIdAlarmSetting(dto);
-		consumerIdAlarmSettingService.update(consumerIdAlarmSetting);
+		return consumerIdAlarmSettingService.update(consumerIdAlarmSetting);
 	}
 
 	@RequestMapping(value = "/console/setting/consumerid/remove", method = RequestMethod.GET, produces = "application/json; charset=utf-8")

@@ -222,9 +222,7 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 			params : {date: date},
 			url : window.contextPath + '/console/monitor/dashboard/delay/minute'
 		}).success(function(data, status, headers, config) {
-			$scope.starttime = data.starttime;
-			$scope.stoptime = data.stoptime;
-			$scope.minuteEntrys = data.entry;
+			$scope.minuteEntrys = data;
 			var len = data.entry.length;
 			for(var i = 0; i < len; ++i){
 				var time = $scope.minuteEntrys[i].time;

@@ -143,6 +143,7 @@ module
 
 							$scope.consumeridEntry = {};
 							$scope.consumeridEntry.consumerId;
+							$scope.consumeridEntry.topicName;
 							$scope.consumeridEntry.senddelay;
 							$scope.consumeridEntry.ackdelay;
 							$scope.consumeridEntry.accumulation;
@@ -163,18 +164,14 @@ module
 								var param = JSON
 										.stringify($scope.consumeridEntry);
 
-								$
-										.ajax({
-											type : "POST",
+								$.ajax({type : "POST",
 											url : window.contextPath
 													+ '/console/setting/consumerid/create',
 											contentType : "application/json; charset=utf-8",
 											dataType : "json",
 											data : param,
 											success : function(data) {
-												$scope.searchPaginator = Paginator(
-														fetchFunction,
-														$scope.numrecord);
+												$scope.searchPaginator = Paginator(fetchFunction,$scope.numrecord);
 											}
 
 										});
@@ -182,6 +179,7 @@ module
 
 							$scope.clearModal = function() {
 								$scope.consumeridEntry.consumerId = "";
+								$scope.consumeridEntry.topicName = "";
 								$scope.consumeridEntry.senddelay = "";
 								$scope.consumeridEntry.ackdelay = "";
 								$scope.consumeridEntry.accumulation = "";
@@ -195,6 +193,7 @@ module
 
 							$scope.setModalInput = function(index) {
 								$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerId;
+								$scope.consumeridEntry.topicName = $scope.searchPaginator.currentPageItems[index].topicName;
 								$scope.consumeridEntry.senddelay = $scope.searchPaginator.currentPageItems[index].senddelay;
 								$scope.consumeridEntry.ackdelay = $scope.searchPaginator.currentPageItems[index].ackdelay;
 								$scope.consumeridEntry.accumulation = $scope.searchPaginator.currentPageItems[index].accumulation;

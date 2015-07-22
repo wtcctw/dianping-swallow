@@ -119,13 +119,14 @@ public class DataMonitorController extends AbstractMonitorController {
 	public ModelAndView viewTopicdashboarddelay() {
 
 		subSide = "dashboarddelay";
-
-		return new ModelAndView("monitor/consumerdashboarddelay", createViewMap());
+		Map<String, Object> map = createViewMap();
+		addTimeToModel(map);
+		return new ModelAndView("monitor/consumerdashboarddelay", map);
 	}
 
 	@RequestMapping(value = "/console/monitor/dashboard/delay/minute", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getConsumerIdDelayDashboard(
+	public List<MinuteEntry> getConsumerIdDelayDashboard(
 			 @RequestParam("date") String date) throws Exception {
 		
 		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
@@ -133,7 +134,7 @@ public class DataMonitorController extends AbstractMonitorController {
 		Date newdate = formatter.parse(transferDate);
 		
 		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries(newdate);
-		return addTimeToReport(entrys);
+		return entrys;
 
 	}
 	
@@ -366,9 +367,8 @@ public class DataMonitorController extends AbstractMonitorController {
 		return topic;
 	}
 
-	private Map<String, Object> addTimeToReport(List<MinuteEntry> entry) {
+	private Map<String, Object> addTimeToModel(Map<String, Object> map) {
 
-		Map<String, Object> map = new HashMap<String, Object>();
 		Calendar calendar = Calendar.getInstance();
 		calendar.clear(Calendar.MINUTE);
 		calendar.clear(Calendar.SECOND);
@@ -378,7 +378,6 @@ public class DataMonitorController extends AbstractMonitorController {
 		String stoptime = convertDateToString(calendar.getTime());
 		map.put("starttime", starttime);
 		map.put("stoptime", stoptime);
-		map.put(ENTRYS, entry);
 
 		return map;
 	}
