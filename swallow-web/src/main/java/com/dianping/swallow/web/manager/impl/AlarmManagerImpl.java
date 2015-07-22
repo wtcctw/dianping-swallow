@@ -142,8 +142,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, ip);
-				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, ip);
-				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, ip);
+				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
+				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}

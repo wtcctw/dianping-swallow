@@ -701,8 +701,8 @@ db.swallowwebalarmmetac.update({
     "isSmsMode" : true,
     "isWeiXinMode" : true,
     "isMailMode" : false,
-    "isSendSwallow" : false,
-    "isSendBusiness" : true,
+    "isSendSwallow" : true,
+    "isSendBusiness" : false,
     "alarmTitle" : "消费服务器SLAVE服务开启告警",
     "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务未开启。[{date}]",
     "alarmDetail" : "",
@@ -720,8 +720,8 @@ db.swallowwebalarmmetac.update({
     "isSmsMode" : true,
     "isWeiXinMode" : true,
     "isMailMode" : false,
-    "isSendSwallow" : false,
-    "isSendBusiness" : true,
+    "isSendSwallow" : true,
+    "isSendBusiness" : false,
     "alarmTitle" : "生产服务器服务告警",
     "alarmTemplate" : "生产服务器[IP]{ip}访问pigeon健康监测页面，已经正常。[{date}]",
     "alarmDetail" : "",
@@ -739,8 +739,8 @@ db.swallowwebalarmmetac.update({
     "isSmsMode" : true,
     "isWeiXinMode" : true,
     "isMailMode" : false,
-    "isSendSwallow" : false,
-    "isSendBusiness" : true,
+    "isSendSwallow" : true,
+    "isSendBusiness" : false,
     "alarmTitle" : "生产服务器SENDER告警",
     "alarmTemplate" : "生产服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
     "alarmDetail" : "",
@@ -759,8 +759,8 @@ db.swallowwebalarmmetac.update({
     "isSmsMode" : true,
     "isWeiXinMode" : true,
     "isMailMode" : false,
-    "isSendSwallow" : false,
-    "isSendBusiness" : true,
+    "isSendSwallow" : true,
+    "isSendBusiness" : false,
     "alarmTitle" : "消费服务器SENDER告警",
     "alarmTemplate" : "消费服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
     "alarmDetail" : "",
@@ -779,8 +779,8 @@ db.swallowwebalarmmetac.update({
     "isSmsMode" : true,
     "isWeiXinMode" : true,
     "isMailMode" : false,
-    "isSendSwallow" : false,
-    "isSendBusiness" : true,
+    "isSendSwallow" : true,
+    "isSendBusiness" : false,
     "alarmTitle" : "消费服务器PORT告警",
     "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}，MASTER SLAVE端口已正常。[{date}]",
     "alarmDetail" : "",
@@ -799,8 +799,8 @@ db.swallowwebalarmmetac.update({
     "isSmsMode" : true,
     "isWeiXinMode" : true,
     "isMailMode" : false,
-    "isSendSwallow" : false,
-    "isSendBusiness" : true,
+    "isSendSwallow" : true,
+    "isSendBusiness" : false,
     "alarmTitle" : "消费服务器SLAVE服务开启告警",
     "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务已正常开启。[{date}]",
     "alarmDetail" : "",
@@ -808,6 +808,10 @@ db.swallowwebalarmmetac.update({
     "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
     "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
 }, true, false);
+
+
+//跟新某个字段
+db.swallowwebalarmmetac.update({ "sendTimeSpan" : 5}, { $set: {"sendTimeSpan" : 6}}, false, true);
 
 
 
