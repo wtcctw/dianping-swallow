@@ -186,17 +186,17 @@ public enum AlarmType {
 	 * consumer consumerid statis data ack delay type
 	 */
 	CONSUMER_CONSUMERID_ACKMESSAGE_DELAY(36),
-	
+
 	/**
 	 * consumer server slave service is start up
 	 */
 	CONSUMER_SERVER_SLAVESERVICE_STARTED(37),
-	
+
 	/**
 	 * producer server service repaired type
 	 */
 	PRODUCER_SERVER_PIGEON_SERVICE_OK(38),
-	
+
 	/**
 	 * producer server data sender repaired type
 	 */
@@ -209,27 +209,32 @@ public enum AlarmType {
 	/**
 	 * consumer server slave port open repaired type
 	 */
-	CONSUMER_SERVER_SLAVEPORT_OPENED_OK(41),
+	CONSUMER_SERVER_PORT_OPENED_OK(41),
 
-	/**
-	 * consumer server slave and master port both open repaired type
-	 */
-	CONSUMER_SERVER_BOTHPORT_OPENED_OK(42),
-
-	/**
-	 * consumer server slave and master port both open repaired type
-	 */
-	CONSUMER_SERVER_BOTHPORT_UNOPENED_OK(43),
-	
 	/**
 	 * consumer server slave service is start up repaired
 	 */
-	CONSUMER_SERVER_SLAVESERVICE_STARTED_OK(44);
-	
+	CONSUMER_SERVER_SLAVESERVICE_STARTED_OK(42),
+
+	/**
+	 * producer server statis data qps ok type
+	 */
+	PRODUCER_SERVER_QPS_OK(43),
+
+	/**
+	 * consumer server statis data send qps ok type
+	 */
+	CONSUMER_SERVER_SENDQPS_OK(44),
+
+	/**
+	 * consumer server statis data send qps ok type
+	 */
+	CONSUMER_SERVER_ACKQPS_OK(45);
+
 	private int number;
 
 	private AlarmType() {
-		
+
 	}
 
 	private AlarmType(int number) {

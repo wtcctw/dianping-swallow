@@ -15,7 +15,7 @@ import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
 public abstract class AbstractAlarmFilter implements AlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAlarmFilter.class);
-
+	
 	@Override
 	public boolean accept(AlarmFilterChain alarmFilterChain) {
 		try {

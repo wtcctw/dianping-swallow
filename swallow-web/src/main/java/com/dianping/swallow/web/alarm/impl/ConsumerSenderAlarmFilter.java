@@ -58,6 +58,12 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 					String slaveIp = consumerServerSlaveIps.get(index);
 					if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
 						alarmManager.consumerServerAlarm(serverIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER);
+						lastCheckStatus.put(serverIp, false);
+					} else {
+						if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp)) {
+							alarmManager.consumerServerAlarm(serverIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER_OK);
+							lastCheckStatus.put(serverIp, true);
+						}
 					}
 				}
 			}
@@ -72,6 +78,12 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 			if (NetUtil.isPortOpen(slaveIp, consumerPortAlarmFilter.getSlavePort())) {
 				if (!statisIps.contains(slaveIp)) {
 					alarmManager.consumerServerAlarm(slaveIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER);
+					lastCheckStatus.put(slaveIp, false);
+				} else {
+					if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp)) {
+						alarmManager.consumerServerAlarm(slaveIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER_OK);
+						lastCheckStatus.put(slaveIp, true);
+					}
 				}
 				return false;
 			}

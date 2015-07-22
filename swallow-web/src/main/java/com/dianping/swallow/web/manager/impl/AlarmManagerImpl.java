@@ -2,7 +2,6 @@ package com.dianping.swallow.web.manager.impl;
 
 import java.io.InputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -47,15 +46,15 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 
 	private static final String KEY_SPLIT = "&";
 
-	private final Map<String, Long> producerServerAlarms = new HashMap<String, Long>();
+	private final Map<String, Long> producerServerAlarms = new ConcurrentHashMap<String, Long>();
 
-	private final Map<String, Long> producerTopicAlarms = new HashMap<String, Long>();
+	private final Map<String, Long> producerTopicAlarms = new ConcurrentHashMap<String, Long>();
 
-	private final Map<String, Long> consumerServerAlarms = new HashMap<String, Long>();
+	private final Map<String, Long> consumerServerAlarms = new ConcurrentHashMap<String, Long>();
 
-	private final Map<String, Long> consumerTopicAlarms = new HashMap<String, Long>();
+	private final Map<String, Long> consumerTopicAlarms = new ConcurrentHashMap<String, Long>();
 
-	private final Map<String, Long> consumerIdAlarms = new HashMap<String, Long>();
+	private final Map<String, Long> consumerIdAlarms = new ConcurrentHashMap<String, Long>();
 
 	private final Map<Integer, AlarmMeta> alarmMetas = new ConcurrentHashMap<Integer, AlarmMeta>();
 
@@ -345,7 +344,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 		}
 		if (alarmMeta.getIsWeiXinMode()) {
 			alarm.setSendType(SendType.WEIXIN);
-			alarmService.sendSms(emails, alarm);
+			alarmService.sendWeiXin(emails, alarm);
 		}
 	}
 
@@ -421,8 +420,12 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 					} finally {
 						in.close();
 					}
+				}else{
+					logger.info("[initProperties] Load {} file failed.", ALARM_RECIEVER_FILE_NAME);
+					throw new RuntimeException();
 				}
 			} catch (Exception e) {
+				logger.info("[initProperties] Load {} file failed.", ALARM_RECIEVER_FILE_NAME);
 				throw new RuntimeException(e);
 			}
 		}

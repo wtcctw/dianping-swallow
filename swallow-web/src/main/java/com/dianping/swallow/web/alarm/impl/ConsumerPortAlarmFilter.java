@@ -36,6 +36,8 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private volatile int slavePort = 8082;
 
+	private static final String KEY_SPLIT = "&";
+
 	@Autowired
 	private AlarmManager alarmManager;
 
@@ -104,15 +106,24 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 		if (!usingSlave) {
 			usingSlave = NetUtil.isPortOpen(masterIp, masterPort);
 		}
+		String key = masterIp + KEY_SPLIT + slaveIp;
 		if (!usingMaster && usingSlave) {
 			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_SLAVEPORT_OPENED);
+			lastCheckStatus.put(key, false);
 			return false;
 		} else if (usingMaster && usingSlave) {
 			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_BOTHPORT_OPENED);
+			lastCheckStatus.put(key, false);
 			return false;
 		} else if (!usingMaster && !usingSlave) {
 			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_BOTHPORT_UNOPENED);
+			lastCheckStatus.put(key, false);
 			return false;
+		} else {
+			if (lastCheckStatus.containsKey(key) && !lastCheckStatus.get(key).booleanValue()) {
+				alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_PORT_OPENED_OK);
+				lastCheckStatus.put(key, true);
+			}
 		}
 		return true;
 	}

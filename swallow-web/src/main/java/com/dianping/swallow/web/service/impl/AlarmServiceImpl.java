@@ -218,10 +218,11 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 					in.close();
 				}
 			} else {
+				logger.info("[initProperties] Load {} file failed.", AlARM_URL_FILE);
 				throw new RuntimeException();
 			}
 		} catch (Exception e) {
-			logger.info("Load {} file failed.", AlARM_URL_FILE);
+			logger.info("[initProperties] Load {} file failed.", AlARM_URL_FILE);
 			throw new RuntimeException(e);
 		}
 	}

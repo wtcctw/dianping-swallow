@@ -47,7 +47,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private ProducerServerAlarmSettingService serverAlarmSettingService;
 
 	@Autowired
-	private GlobalAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -76,7 +76,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 			return true;
 		}
 		QPSAlarmSetting qps = serverAlarmSetting.getDefaultAlarmSetting();
-		List<String> whiteList = swallowAlarmSettingService.getProducerWhiteList();
+		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 
 		if (qps == null || serverStatisData == null || serverStatisData.getStatisDatas() == null) {
 			return true;

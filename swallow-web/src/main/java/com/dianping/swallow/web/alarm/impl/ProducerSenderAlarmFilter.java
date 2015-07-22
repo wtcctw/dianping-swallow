@@ -41,6 +41,10 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 			if (whiteList == null || !whiteList.contains(serverIp)) {
 				if (!statisProducerServerIps.contains(serverIp)) {
 					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_SENDER);
+					lastCheckStatus.put(serverIp, false);
+				}else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
+					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_SENDER_OK);
+					lastCheckStatus.put(serverIp, true);
 				}
 			}
 		}

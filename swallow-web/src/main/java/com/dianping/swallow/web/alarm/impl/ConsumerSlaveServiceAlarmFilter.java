@@ -47,15 +47,26 @@ public class ConsumerSlaveServiceAlarmFilter extends AbstractServiceAlarmFilter 
 		List<String> consumerServerSlaveIps = ipCollectorService.getConsumerServerSlaveIps();
 		if (consumerServerSlaveIps != null)
 			for (String slaveIp : consumerServerSlaveIps) {
+				
 				if (whiteList == null || !whiteList.contains(slaveIp)) {
 					String url = StringUtils.replace(SLAVE_MONITOR_URL, "{ip}", slaveIp);
 					HttpResult result = httpSerivice.httpGet(url);
 					if (!result.isSuccess()) {
 						result = httpSerivice.httpGet(url);
 					}
+					
 					if (!result.isSuccess() || !result.getResponseBody().contains(MONOGO_MONITOR_SIGN)) {
-						alarmManager.consumerServerAlarm("", slaveIp, AlarmType.CONSUMER_SERVER_SLAVESERVICE_STARTED);
+						alarmManager.consumerServerAlarm(slaveIp, slaveIp,
+								AlarmType.CONSUMER_SERVER_SLAVESERVICE_STARTED);
+						lastCheckStatus.put(slaveIp, false);
+					} else {
+						if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
+							alarmManager.consumerServerAlarm(slaveIp, slaveIp,
+									AlarmType.CONSUMER_SERVER_SLAVESERVICE_STARTED_OK);
+							lastCheckStatus.put(slaveIp, true);
+						}
 					}
+					
 				}
 			}
 		return true;

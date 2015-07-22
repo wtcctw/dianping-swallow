@@ -478,7 +478,7 @@ db.swallowwebalarmmetac.update({
 }, true, false);
 
 db.swallowwebalarmmetac.update({
-	 "metaId" : 36
+	 "metaId" : 26
 	}, {
     "metaId" : 26,
     "type" : "CONSUMER_TOPIC_ACKQPS_FLUCTUATION",
@@ -710,6 +710,106 @@ db.swallowwebalarmmetac.update({
     "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
     "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
 }, true, false);
+
+db.swallowwebalarmmetac.update({
+	 "metaId" : 38
+	},{
+    "metaId" : 38,
+    "type" : "PRODUCER_SERVER_PIGEON_SERVICE_OK",
+    "levelType" : "CRITICAL",
+    "isSmsMode" : true,
+    "isWeiXinMode" : true,
+    "isMailMode" : false,
+    "isSendSwallow" : false,
+    "isSendBusiness" : true,
+    "alarmTitle" : "生产服务器服务告警",
+    "alarmTemplate" : "生产服务器[IP]{ip}访问pigeon健康监测页面，已经正常。[{date}]",
+    "alarmDetail" : "",
+    "sendTimeSpan" : 5,
+    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
+    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+}, true, false);
+
+db.swallowwebalarmmetac.update({
+	 "metaId" : 39
+	},{
+    "metaId" : 39,
+    "type" : "PRODUCER_SERVER_SENDER_OK",
+    "levelType" : "CRITICAL",
+    "isSmsMode" : true,
+    "isWeiXinMode" : true,
+    "isMailMode" : false,
+    "isSendSwallow" : false,
+    "isSendBusiness" : true,
+    "alarmTitle" : "生产服务器SENDER告警",
+    "alarmTemplate" : "生产服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
+    "alarmDetail" : "",
+    "sendTimeSpan" : 5,
+    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
+    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+}, true, false);
+
+
+db.swallowwebalarmmetac.update({
+	 "metaId" : 40
+	},{
+    "metaId" : 40,
+    "type" : "CONSUMER_SERVER_SENDER_OK",
+    "levelType" : "CRITICAL",
+    "isSmsMode" : true,
+    "isWeiXinMode" : true,
+    "isMailMode" : false,
+    "isSendSwallow" : false,
+    "isSendBusiness" : true,
+    "alarmTitle" : "消费服务器SENDER告警",
+    "alarmTemplate" : "消费服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
+    "alarmDetail" : "",
+    "sendTimeSpan" : 5,
+    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
+    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+}, true, false);
+
+
+db.swallowwebalarmmetac.update({
+	 "metaId" : 41
+	},{
+    "metaId" : 41,
+    "type" : "CONSUMER_SERVER_PORT_OPENED_OK",
+    "levelType" : "CRITICAL",
+    "isSmsMode" : true,
+    "isWeiXinMode" : true,
+    "isMailMode" : false,
+    "isSendSwallow" : false,
+    "isSendBusiness" : true,
+    "alarmTitle" : "消费服务器PORT告警",
+    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}，MASTER SLAVE端口已正常。[{date}]",
+    "alarmDetail" : "",
+    "sendTimeSpan" : 5,
+    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
+    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+}, true, false);
+
+
+db.swallowwebalarmmetac.update({
+	 "metaId" : 42
+	},{
+    "metaId" : 42,
+    "type" : "CONSUMER_SERVER_SLAVESERVICE_STARTED_OK",
+    "levelType" : "CRITICAL",
+    "isSmsMode" : true,
+    "isWeiXinMode" : true,
+    "isMailMode" : false,
+    "isSendSwallow" : false,
+    "isSendBusiness" : true,
+    "alarmTitle" : "消费服务器SLAVE服务开启告警",
+    "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务已正常开启。[{date}]",
+    "alarmDetail" : "",
+    "sendTimeSpan" : 5,
+    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
+    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+}, true, false);
+
+
 
 
 
