@@ -18,7 +18,7 @@ import com.dianping.swallow.test.load.AbstractLoadTest;
  */
 public class ConsumerRunner extends AbstractLoadTest{
 
-    private static int topicCount    = 1;
+    private static int topicCount    = 2;
     private static int consumerCount = 10;
     private static int threadPoolSize = 2;
     private static int totalMessageCount = -1;
