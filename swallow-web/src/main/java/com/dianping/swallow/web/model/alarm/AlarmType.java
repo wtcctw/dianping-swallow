@@ -190,8 +190,42 @@ public enum AlarmType {
 	/**
 	 * consumer server slave service is start up
 	 */
-	CONSUMER_SERVER_SLAVESERVICE_START(37);
+	CONSUMER_SERVER_SLAVESERVICE_STARTED(37),
+	
+	/**
+	 * producer server service repaired type
+	 */
+	PRODUCER_SERVER_PIGEON_SERVICE_OK(38),
+	
+	/**
+	 * producer server data sender repaired type
+	 */
+	PRODUCER_SERVER_SENDER_OK(39),
+	/**
+	 * consumer server data sender repaired type
+	 */
+	CONSUMER_SERVER_SENDER_OK(40),
 
+	/**
+	 * consumer server slave port open repaired type
+	 */
+	CONSUMER_SERVER_SLAVEPORT_OPENED_OK(41),
+
+	/**
+	 * consumer server slave and master port both open repaired type
+	 */
+	CONSUMER_SERVER_BOTHPORT_OPENED_OK(42),
+
+	/**
+	 * consumer server slave and master port both open repaired type
+	 */
+	CONSUMER_SERVER_BOTHPORT_UNOPENED_OK(43),
+	
+	/**
+	 * consumer server slave service is start up repaired
+	 */
+	CONSUMER_SERVER_SLAVESERVICE_STARTED_OK(44);
+	
 	private int number;
 
 	private AlarmType() {

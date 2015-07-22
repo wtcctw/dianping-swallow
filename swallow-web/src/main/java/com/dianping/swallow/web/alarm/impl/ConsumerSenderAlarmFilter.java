@@ -31,7 +31,7 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private GlobalAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 	@Autowired
 	private ConsumerPortAlarmFilter consumerPortAlarmFilter;
@@ -50,7 +50,7 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 		}
 
 		Set<String> statisConsumerServerIps = ipCollectorService.getStatisConsumerServerIps();
-		List<String> whiteList = swallowAlarmSettingService.getConsumerWhiteList();
+		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 		int index = 0;
 		for (String serverIp : consumerServerMasterIps) {
 			if (whiteList == null || !whiteList.contains(serverIp)) {

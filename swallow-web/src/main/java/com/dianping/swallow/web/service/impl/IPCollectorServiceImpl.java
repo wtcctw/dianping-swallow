@@ -2,6 +2,7 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +76,9 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private Set<String> statisProducerServerIps = new ConcurrentSkipListSet<String>();
 
-	private Object lockObj = new Object();
+	private Object lockProducerObj = new Object();
+	
+	private Object lockConsumerObj = new Object();
 
 	private List<String> cmdbProducerIps = new ArrayList<String>();
 
@@ -88,6 +91,12 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	private List<String> lionConsumerSlaveIps = new ArrayList<String>();
 
 	private List<String> lionConsumerMasterIps = new ArrayList<String>();
+
+	private Map<String, String> cmdbProducerMap = new HashMap<String, String>();
+	
+	private Map<String, String> cmdbConsumerSlaveMap = new HashMap<String, String>();
+	
+	private Map<String, String> cmdbConsumerMasterMap = new HashMap<String, String>();
 
 	@Autowired
 	private CmdbService cmdbService;
@@ -179,24 +188,30 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		List<EnvDevice> producerEnvDevices = cmdbService.getEnvDevices(SWALLOW_PRODUCER_NAME);
 		List<EnvDevice> consumerSlaveEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_SLAVE_NAME);
 		List<EnvDevice> consumerMasterEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_MASTER_NAME);
-		synchronized (cmdbProducerIps) {
+		synchronized (lockProducerObj) {
 			if (producerEnvDevices != null) {
 				cmdbProducerIps.clear();
+				cmdbProducerMap.clear();
 				for (EnvDevice envDevice : producerEnvDevices) {
 					cmdbProducerIps.add(envDevice.getIp());
+					cmdbProducerMap.put(envDevice.getHostName(), envDevice.getIp());
 				}
 			}
 		}
-		synchronized (lockObj) {
+		synchronized (lockConsumerObj) {
 			if (consumerMasterEnvDevices != null && consumerSlaveEnvDevices != null) {
 				cmdbConsumerMasterIps.clear();
 				cmdbConsumerSlaveIps.clear();
+				cmdbConsumerMasterMap.clear();
+				cmdbConsumerSlaveMap.clear();
 				for (EnvDevice envMasterDevice : consumerMasterEnvDevices) {
 					for (EnvDevice envSlaveDevice : consumerSlaveEnvDevices) {
 						String slaveName = StringUtils.replace(envMasterDevice.getHostName(), MASTER_NAME, SLAVE_NAME);
 						if (slaveName.equals(envSlaveDevice.getHostName())) {
 							cmdbConsumerMasterIps.add(envMasterDevice.getIp());
 							cmdbConsumerSlaveIps.add(envSlaveDevice.getIp());
+							cmdbConsumerMasterMap.put(envMasterDevice.getHostName(), envMasterDevice.getIp());
+							cmdbConsumerSlaveMap.put(envSlaveDevice.getHostName(), envSlaveDevice.getIp());
 						}
 					}
 				}
@@ -273,7 +288,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 		}
 	}
-	
+
 	private void addSetData(Set<String> set, String data) {
 		if (StringUtils.isNotBlank(data)) {
 			set.add(data);
@@ -297,40 +312,55 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	@Override
 	public List<String> getProducerServerIps() {
-		synchronized (cmdbProducerIps) {
+		synchronized (lockProducerObj) {
 			if (cmdbProducerIps != null && !cmdbProducerIps.isEmpty()) {
 				return Collections.unmodifiableList(cmdbProducerIps);
-			} else {
-				synchronized (lionProducerIps) {
-					return Collections.unmodifiableList(lionProducerIps);
-				}
 			}
+		}
+		synchronized (lionProducerIps) {
+			return Collections.unmodifiableList(lionProducerIps);
 		}
 	}
 
 	@Override
 	public List<String> getConsumerServerSlaveIps() {
-		synchronized (lockObj) {
+		synchronized (lockConsumerObj) {
 			if (cmdbConsumerSlaveIps != null && !cmdbConsumerSlaveIps.isEmpty()) {
 				return Collections.unmodifiableList(cmdbConsumerSlaveIps);
-			} else {
-				synchronized (lionConsumerSlaveIps) {
-					return Collections.unmodifiableList(lionConsumerSlaveIps);
-				}
 			}
+		}
+		synchronized (lionConsumerSlaveIps) {
+			return Collections.unmodifiableList(lionConsumerSlaveIps);
 		}
 	}
 
 	@Override
 	public List<String> getConsumerServerMasterIps() {
-		synchronized (lockObj) {
+		synchronized (lockConsumerObj) {
 			if (cmdbConsumerMasterIps != null && !cmdbConsumerMasterIps.isEmpty()) {
 				return Collections.unmodifiableList(cmdbConsumerMasterIps);
-			} else {
-				synchronized (lionConsumerMasterIps) {
-					return Collections.unmodifiableList(lionConsumerMasterIps);
-				}
 			}
+		}
+		synchronized (lionConsumerMasterIps) {
+			return Collections.unmodifiableList(lionConsumerMasterIps);
+		}
+	}
+	
+	public Map<String,String> getProducerServerIpsMap(){
+		synchronized (lockProducerObj) {
+			return Collections.unmodifiableMap(cmdbProducerMap);
+		}
+	}
+	
+	public Map<String,String> getConsumerServerMasterIpsMap(){
+		synchronized (lockConsumerObj) {
+			return Collections.unmodifiableMap(cmdbConsumerMasterMap);
+		}
+	}
+	
+	public Map<String,String> getConsumerServerSlaveIpsMap(){
+		synchronized (lockConsumerObj) {
+			return Collections.unmodifiableMap(cmdbConsumerMasterMap);
 		}
 	}
 

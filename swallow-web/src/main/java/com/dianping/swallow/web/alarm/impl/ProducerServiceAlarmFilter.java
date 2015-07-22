@@ -38,7 +38,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private GlobalAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 	@Override
 	public boolean doAccept() {
@@ -47,14 +47,14 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private boolean checkService() {
 		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
-		List<String> whiteList = swallowAlarmSettingService.getProducerWhiteList();
+		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 		for (String serverIp : producerServerIps) {
 			if (StringUtils.isBlank(serverIp)) {
 				continue;
 			}
 			if (!whiteList.contains(serverIp)) {
 				String url = StringUtils.replace(PIGEON_HEALTH_URL_KEY, "{ip}", serverIp);
-				if (!httpSerivice.httpGet(url).isSuccess()) {
+				if (!httpSerivice.httpGet(url).isSuccess() && !httpSerivice.httpGet(url).isSuccess()) {
 					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_PIGEON_SERVICE);
 				}
 			}

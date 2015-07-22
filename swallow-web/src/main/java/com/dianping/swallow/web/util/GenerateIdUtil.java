@@ -1,5 +1,10 @@
 package com.dianping.swallow.web.util;
 
+/**
+*
+* @author qiyin
+*
+*/
 public class GenerateIdUtil {
 
 	private static volatile long lastTime;

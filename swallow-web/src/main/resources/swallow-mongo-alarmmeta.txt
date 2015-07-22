@@ -696,7 +696,7 @@ db.swallowwebalarmmetac.update({
 	 "metaId" : 37
 	},{
     "metaId" : 37,
-    "type" : "CONSUMER_SERVER_SLAVESERVICE_START",
+    "type" : "CONSUMER_SERVER_SLAVESERVICE_STARTED",
     "levelType" : "CRITICAL",
     "isSmsMode" : true,
     "isWeiXinMode" : true,

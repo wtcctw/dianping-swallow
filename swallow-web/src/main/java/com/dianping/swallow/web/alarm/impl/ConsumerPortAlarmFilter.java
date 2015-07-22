@@ -13,7 +13,6 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.manager.AlarmManager;
-import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
@@ -41,15 +40,12 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 	private AlarmManager alarmManager;
 
 	@Autowired
-	private IPDescManager ipDescManager;
-
-	@Autowired
 	private IPCollectorService ipCollectorService;
 
 	private ConfigCache configCache;
 
 	@Autowired
-	private GlobalAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -85,26 +81,29 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 		if (consumerServerMasterIps == null || consumerServerMasterIps.size() == 0 || consumerServerSlaveIps == null
 				|| consumerServerSlaveIps.size() == 0) {
 			logger.error("[checkPort] cannot find consumermaster or consumerslave ips.");
-			return true;
+			return false;
 		}
-		if (consumerServerMasterIps.size() != consumerServerSlaveIps.size()) {
-			logger.error("[checkPort] consumermaster ips is not corresponding with consumerslave ips.");
-			return true;
-		}
-		List<String> whiteList = swallowAlarmSettingService.getConsumerWhiteList();
+		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 		int index = 0;
 
 		for (String masterIp : consumerServerMasterIps) {
 			if (whiteList == null || !whiteList.contains(masterIp)) {
-				alarmPort(masterIp, consumerServerSlaveIps.get(index++));
+				alarmPort(masterIp, consumerServerSlaveIps.get(index));
 			}
+			index++;
 		}
 		return true;
 	}
 
 	private boolean alarmPort(String masterIp, String slaveIp) {
 		boolean usingMaster = NetUtil.isPortOpen(masterIp, masterPort);
+		if (!usingMaster) {
+			usingMaster = NetUtil.isPortOpen(masterIp, masterPort);
+		}
 		boolean usingSlave = NetUtil.isPortOpen(slaveIp, slavePort);
+		if (!usingSlave) {
+			usingSlave = NetUtil.isPortOpen(masterIp, masterPort);
+		}
 		if (!usingMaster && usingSlave) {
 			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_SLAVEPORT_OPENED);
 			return false;

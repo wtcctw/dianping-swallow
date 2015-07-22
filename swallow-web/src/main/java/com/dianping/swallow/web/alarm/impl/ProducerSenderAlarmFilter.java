@@ -26,7 +26,7 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private GlobalAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 	@Override
 	public boolean doAccept() {
@@ -36,7 +36,7 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 	public boolean checkSender() {
 		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
 		Set<String> statisProducerServerIps = ipCollectorService.getStatisProducerServerIps();
-		List<String> whiteList = swallowAlarmSettingService.getProducerWhiteList();
+		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 		for (String serverIp : producerServerIps) {
 			if (whiteList == null || !whiteList.contains(serverIp)) {
 				if (!statisProducerServerIps.contains(serverIp)) {
