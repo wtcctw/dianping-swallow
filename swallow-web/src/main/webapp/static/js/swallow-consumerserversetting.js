@@ -187,7 +187,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
-		var wl = $scope.consumerserverEntry.whitelist;
+		var wl = $scope.searchPaginator.currentPageItems[index].whitelist;
 		$('#whitelist').tagsinput('removeAll');
 		if(wl != null && wl.length > 0){
 			var list = wl.split(",");

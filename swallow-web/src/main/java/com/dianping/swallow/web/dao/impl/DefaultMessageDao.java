@@ -59,7 +59,7 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	}
 	
 	@Override
-	public boolean create(Message p, String topicName) {
+	public boolean createMessage(Message p, String topicName) {
 		try {
 			this.webMongoManager.getMessageMongoTemplate(topicName).insert(p, MESSAGE_COLLECTION);
 			return true;

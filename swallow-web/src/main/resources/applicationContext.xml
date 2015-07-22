@@ -65,6 +65,7 @@
 	<import resource="applicationContext-utils.xml" />
 	<import resource="applicationContext-mongo.xml" />
 	<import resource="applicationContext-springtask.xml" />
+	<import resource="applicationContext-aop.xml" />
 
 
 </beans>

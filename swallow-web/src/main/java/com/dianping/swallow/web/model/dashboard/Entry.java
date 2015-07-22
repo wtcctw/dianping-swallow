@@ -139,7 +139,7 @@ public class Entry implements Comparable<Entry>{
 	@Override
 	public int compareTo(Entry entry) {
 
-		return entry.getNumAlarm().compareTo(this.getNumAlarm());
+		return this.getNumAlarm().compareTo(entry.getNumAlarm());
 	}
 	
 	public String getEmail() {

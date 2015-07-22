@@ -1,11 +1,14 @@
 package com.dianping.swallow.test.man;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.SendFailedException;
+import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.test.AbstractConsumerTest;
 
 /**
@@ -35,6 +38,26 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 		return false;
 	}
 
+	@Test
+	public void testFilter() throws SendFailedException, RemoteServiceInitFailedException, InterruptedException{
+
+		String type = "type";
+		Set<String> filters = new HashSet<String>();
+		filters.add(type);
+		Consumer consumer = addListener(topic, getConsumerId(), filters);
+		
+		sendMessage(10, topic, type);
+
+		for(int i=0;i<600;i++){
+			sendMessage(10, topic);
+			TimeUnit.SECONDS.sleep(1);
+		}
+		
+		sendMessage(10, topic, type);
+	
+		
+		sleep(1000000);
+	}
 	
 	
 }

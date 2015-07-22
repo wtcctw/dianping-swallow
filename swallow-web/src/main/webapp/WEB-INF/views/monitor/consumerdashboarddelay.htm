@@ -10,7 +10,7 @@
 					}
 				</script>
 				<span class="text-danger title">【报表时间】</span><span
-					class="text-success">{{starttime}} to {{stoptime}}</span>
+					class="text-success">${starttime} to ${stoptime}</span>
 			</div>
 			<div class="report">
 				<div class="text-center">
@@ -34,10 +34,10 @@
 								<td style="text-align: left; width: 120px">ConsumerID</td>
 								<td style="text-align: left; width: 40px">状态</td>
 							</tr>
-							<tr ng-repeat="entry in minuteEntry.delayEntry"
+							<tr ng-repeat="entry in getEntry(minuteEntry.delayEntry)"
 								ng-class="{'alert-row': entry.numAlarm>0}">
 								<td style="text-align: left; width: 120px" 
-									data-toggle="tooltip" data-html="true" data-placement="top" title="业务名 {{entry.name}} Phone: {{entry.dpMobile}}" ng-bind="entry.consumerId"></td>
+									data-toggle="tooltip" data-html="true" data-placement="top" title="业务名 {{entry.name}} 开发: {{entry.dpMobile}}" ng-bind="entry.consumerId"></td>
 								<td style="text-align: left; width: 40px; cursor: pointer;"
 									pop-over items="items" title="统计值" clicked="clicked"
 									id="{{$parent.$index}}{{$index}}"

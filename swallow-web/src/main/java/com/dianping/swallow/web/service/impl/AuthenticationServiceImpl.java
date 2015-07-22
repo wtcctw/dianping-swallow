@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.AuthenticationService;
-import com.dianping.swallow.web.service.AdministratorService;
+import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.TopicService;
 
 /**
@@ -28,15 +28,13 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 
 	private static final String ADMINURI = "/console/admin/auth";
 
-	//private static final String ADMINURI = "/console/admin/auth";
-
 	private static final String ALL = "all";
 
 	@Value("${swallow.web.env.notproduct}")
 	private boolean showContentToAll;
 
-	@Resource(name = "administratorService")
-	private AdministratorService administratorService;
+	@Resource(name = "userService")
+	private UserService userService;
 
 	@Resource(name = "topicService")
 	private TopicService topicService;
@@ -46,7 +44,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 
 		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
 		if (showContentToAll && !env) {
-			administratorService.loadAdminSet().add(ALL);
+			userService.loadCachedAdministratorSet().add(ALL);
 		}
 	}
 
@@ -54,7 +52,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 	public boolean isValid(String username, String topic, String uri) {
 		logger.info(String.format("%s request %s", username, uri));
 
-		Set<String> loadAdminSet = administratorService.loadAdminSet();
+		Set<String> loadAdminSet = userService.loadCachedAdministratorSet();
 
 		if (loadAdminSet.contains(username)) {
 			return true;
@@ -74,7 +72,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 	@Override
 	public int checkVisitType(String username) {
 
-		if (administratorService.loadAdminSet().contains(username)) {
+		if (userService.loadCachedAdministratorSet().contains(username)) {
 			return AuthenticationService.ADMINI;
 		} else {
 			Collection<Set<String>> topicUsers = topicService.loadTopicToWhiteList().values();

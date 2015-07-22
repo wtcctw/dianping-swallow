@@ -27,7 +27,11 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
-import com.dianping.swallow.web.service.AdministratorService;
+import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
+import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
+import com.dianping.swallow.web.service.UserService;
+import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
+import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
@@ -48,34 +52,42 @@ public class TopicController extends AbstractMenuController {
 	@Resource(name = "topicService")
 	private TopicService topicService;
 
-	@Resource(name = "administratorService")
-	private AdministratorService administratorService;
+	@Resource(name = "userService")
+	private UserService userService;
+
+	@Resource(name = "consumerServerAlarmSettingService")
+	private ConsumerServerAlarmSettingService consumerServerAlarmSettingService;
+	
+	@Resource(name = "producerServerAlarmSettingService")
+	private ProducerServerAlarmSettingService producerServerAlarmSettingService;
 
 	@Autowired
 	private ExtractUsernameUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/topic")
-	public ModelAndView allApps(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
 
 		return new ModelAndView("topic/index", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/topic/topicdefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object topicDefault(int offset, int limit, String topic, String prop, HttpServletRequest request,
+	public Object fetchTopicPage(int offset, int limit, String topic, String prop, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
+		
 		boolean isAllEmpty = StringUtil.isEmpty(topic + prop);
+		
 		if (isAllEmpty) {
 			String username = extractUsernameUtils.getUsername(request);
-			Set<String> adminSet = administratorService.loadAdminSet();
+			Set<String> adminSet = userService.loadCachedAdministratorSet();
 			boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 			if (findAll) {
-				return topicService.loadAllTopic(offset, limit);
+				return topicService.loadTopicPage(offset, limit);
 			} else {
-				return topicService.loadSpecificTopic(offset, limit, topic, username);
+				return topicService.loadSpecificTopicPage(offset, limit, topic, username);
 			}
 		} else {
-			return topicService.loadSpecificTopic(offset, limit, topic, prop);
+			return topicService.loadSpecificTopicPage(offset, limit, topic, prop);
 		}
 
 	}
@@ -85,9 +97,9 @@ public class TopicController extends AbstractMenuController {
 	public List<String> topicName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
 		String username = extractUsernameUtils.getUsername(request);
-		Set<String> adminSet = administratorService.loadAdminSet();
+		Set<String> adminSet = userService.loadCachedAdministratorSet();
 		boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
-		return topicService.loadAllTopicNames(username, findAll);
+		return topicService.loadTopicNames(username, findAll);
 	}
 
 	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -95,16 +107,17 @@ public class TopicController extends AbstractMenuController {
 	public Object propName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
 		String username = extractUsernameUtils.getUsername(request);
-		Set<String> adminSet = administratorService.loadAdminSet();
+		Set<String> adminSet = userService.loadCachedAdministratorSet();
 		boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
-		return topicService.getPropAndDept(username, findAll);
+		return topicService.loadTopicProposal(username, findAll);
 	}
 
 	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
 			@RequestParam(value = "time") String time,
-			@RequestParam(value = "exec_user", required = false) String approver, HttpServletRequest request,
+			@RequestParam(value = "exec_user", required = false) String approver,
+			@RequestParam(value = "alarm", required = false) boolean alarm, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -113,7 +126,7 @@ public class TopicController extends AbstractMenuController {
 		username = StringUtils.isEmpty(username) ? approver : username;
 
 		if (approver != null) {
-			if (!administratorService.loadAdminSet().contains(approver)) {
+			if (!userService.loadCachedAdministratorSet().contains(approver)) {
 				map.put(MessageRetransmitController.STATUS, ResponseStatus.UNAUTHENTICATION.getStatus());
 				map.put(MessageRetransmitController.MESSAGE, ResponseStatus.UNAUTHENTICATION.getMessage());
 				logger.info(String.format(
@@ -121,11 +134,11 @@ public class TopicController extends AbstractMenuController {
 						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 				return map;
 			} else {
-				String proposal = topicService.loadTopic(topic).getProp();
+				String proposal = topicService.loadTopicByName(topic).getProp();
 				StringBuffer sb = new StringBuffer();
-				if(StringUtils.isNotEmpty(proposal)){
+				if (StringUtils.isNotEmpty(proposal)) {
 					sb.append(proposal).append(",").append(prop);
-				}else{
+				} else {
 					sb.append(prop);
 				}
 				prop = sb.toString();
@@ -154,6 +167,8 @@ public class TopicController extends AbstractMenuController {
 			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.SUCCESS.getMessage());
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
 					username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			updateConsumerServerAlarmSetting(topic, alarm);
+			updateProducerServerAlarmSetting(topic, alarm);
 		} else if (result == ResponseStatus.MONGOWRITE.getStatus()) {
 			map.put(MessageRetransmitController.STATUS, ResponseStatus.MONGOWRITE.getStatus());
 			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.MONGOWRITE.getMessage());
@@ -168,6 +183,66 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		return map;
+	}
+
+	private void updateConsumerServerAlarmSetting(String topic, boolean alarm) {
+
+		ConsumerServerAlarmSetting consumerServerAlarmSetting = consumerServerAlarmSettingService.findDefault();
+
+		if (consumerServerAlarmSetting != null) {
+			List<String> topics = consumerServerAlarmSetting.getTopicWhiteList();
+			boolean updated = false;
+
+			if (alarm) {
+				if (!topics.contains(topic)) {
+					topics.add(topic);
+					updated = consumerServerAlarmSettingService.update(consumerServerAlarmSetting);
+					logger.info(String.format("Add topic %s to whitelist of ConsumerServerAlarmSetting %s", topic,
+							updated ? "successfully" : "failed"));
+					return;
+				}
+			} else {
+				if (topics.contains(topic)) {
+					topics.remove(topic);
+					updated = consumerServerAlarmSettingService.update(consumerServerAlarmSetting);
+					logger.info(String.format("Remove topic %s from wihtelist of ConsumerServerAlarmSetting %s", topic,
+							updated ? "successfully" : "failed"));
+					return;
+				}
+			}
+
+		}
+		logger.info(String.format("Nothing need to do about topic %s concerned with ConsumerServerAlarmSetting", topic));
+	}
+	
+	private void updateProducerServerAlarmSetting(String topic, boolean alarm) {
+
+		ProducerServerAlarmSetting producerServerAlarmSetting = producerServerAlarmSettingService.findDefault();
+
+		if (producerServerAlarmSetting != null) {
+			List<String> topics = producerServerAlarmSetting.getTopicWhiteList();
+			boolean updated = false;
+
+			if (alarm) {
+				if (!topics.contains(topic)) {
+					topics.add(topic);
+					updated = producerServerAlarmSettingService.update(producerServerAlarmSetting);
+					logger.info(String.format("Add topic %s to whitelist of ProducerServerAlarmSetting %s", topic,
+							updated ? "successfully" : "failed"));
+					return;
+				}
+			} else {
+				if (topics.contains(topic)) {
+					topics.remove(topic);
+					updated = producerServerAlarmSettingService.update(producerServerAlarmSetting);
+					logger.info(String.format("Remove topic %s from wihtelist of ProducerServerAlarmSetting %s", topic,
+							updated ? "successfully" : "failed"));
+					return;
+				}
+			}
+
+		}
+		logger.info(String.format("Nothing need to do about topic %s concerned with ProducerServerAlarmSetting", topic));
 	}
 
 	private Set<String> splitProps(String props) {

@@ -22,6 +22,7 @@
 					<tr>
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">ConsumerId</th>
+						<th style="text-align: left">Topic</th>
 						<th style="text-align: left">发送峰值</th>
 						<th style="text-align: left">发送谷值</th>
 						<th style="text-align: left">发送波动/倍</th>
@@ -38,6 +39,7 @@
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="ad.consumerId"></td>
+						<td style="text-align: left" ng-bind="ad.topicName"></td>
 						<td style="text-align: left"
 							ng-bind="ad.sendpeak"></td>
 						<td style="text-align: left"

@@ -1,13 +1,10 @@
 package com.dianping.swallow.web.service.impl;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -16,23 +13,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.service.AbstractSwallowService;
-import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.UserService;
 
 /**
  * @author mingdongli
  *
  *         2015年5月14日下午8:04:43
  */
-@Service("administratorService")
-public class AdministratorServiceImpl extends AbstractSwallowService implements AdministratorService {
+@Service("userService")
+public class UserServiceImpl extends AbstractSwallowService implements UserService {
 
-	private static final String ADMIN = "admin";
-	private static final String SIZE = "size";
 	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	@Value("${swallow.web.admin.defaultadmin}")
@@ -47,44 +43,37 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements 
 	private Set<String> adminSet = new HashSet<String>();
 
 	@Override
-	public Map<String, Object> loadAdmin(int offset, int limit) {
+	public Pair<Long, List<Administrator>> loadUserPage(int offset, int limit) {
 
-		return getFixedAdministratorFromExisting(offset, limit);
-	}
-
-	private Map<String, Object> getFixedAdministratorFromExisting(int start, int span) {
 		Long totalNumOfTopic = administratorDao.countAdministrator();
-		List<Administrator> administratorList = administratorDao.findFixedAdministrator(start, span);
-
+		List<Administrator> administratorList = administratorDao.findFixedAdministrator(offset, limit);
+		
 		return buildResponse(administratorList, totalNumOfTopic);
 	}
 
-	private Map<String, Object> buildResponse(List<Administrator> administratorList, Long adminSize) {
-		Map<String, Object> map = new HashMap<String, Object>();
+	private Pair<Long, List<Administrator>> buildResponse(List<Administrator> administratorList, Long adminSize) {
 
-		map.put(SIZE, adminSize);
-		map.put(ADMIN, administratorList);
-		return map;
+		return new Pair<Long, List<Administrator>>(adminSize, administratorList);
 	}
 
 	@Override
-	public boolean createAdmin(String name, int auth) {
+	public boolean createUser(String name, int auth) {
 
 		if (auth == 0) {
-			this.loadAdminSet().add(name); // create, need add in adminSet in
+			this.loadCachedAdministratorSet().add(name); // create, need add in adminSet in
 											// memory
 			logger.info(String.format("Add administrator %s to admin list.", name));
 		} else {
-			this.loadAdminSet().remove(name); // edit, need remove in adminSet
+			this.loadCachedAdministratorSet().remove(name); // edit, need remove in adminSet
 												// in memory
 			logger.info(String.format("Remove administrator %s from admin list.", name));
 		}
-		return this.updateAdmin(name, auth);
+		return this.updateUser(name, auth);
 	}
 
 	@Override
-	public boolean removeAdmin(String name) {
-		this.loadAdminSet().remove(name);
+	public boolean removeUser(String name) {
+		this.loadCachedAdministratorSet().remove(name);
 		int n = administratorDao.deleteByName(name);
 		if (n != 1) {
 			logger.info("deleteByName is wrong with name: " + name);
@@ -95,18 +84,18 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements 
 		}
 	}
 
-	@Override
-	public List<String> loadAllTypeName() {
-		List<String> adminLists = new ArrayList<String>();
-		List<Administrator> admins = administratorDao.findAll();
-		for (int i = 0; i < admins.size(); ++i) {
-			adminLists.add(admins.get(i).getName());
-		}
-		return adminLists;
-	}
+//	@Override
+//	public List<String> loadAllTypeName() {
+//		List<String> adminLists = new ArrayList<String>();
+//		List<Administrator> admins = administratorDao.findAll();
+//		for (int i = 0; i < admins.size(); ++i) {
+//			adminLists.add(admins.get(i).getName());
+//		}
+//		return adminLists;
+//	}
 
 	@Override
-	public boolean updateAdmin(String name, int auth) {
+	public boolean updateUser(String name, int auth) {
 		Administrator admin = administratorDao.readByName(name);
 		if (admin == null) {
 			return doneCreateAdmin(name, auth);
@@ -130,23 +119,18 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public Set<String> loadAdminSet() {
+	public Set<String> loadCachedAdministratorSet() {
 
 		return adminSet;
 	}
 
 	@Override
-	public String loadDefaultAdmin() {
-		return defaultAdmin;
-	}
-
-	@Override
-	public boolean recordVisitToAdmin(String username) {
+	public boolean createOrUpdateUser(String username) {
 		Administrator admin = administratorDao.readByName(username);
 		if (admin != null) {
 			int role = admin.getRole();
 			if (role == 0) {
-				return updateAdmin(username, role);
+				return updateUser(username, role);
 			}
 		}
 
@@ -155,9 +139,9 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements 
 
 	private boolean switchUserAndVisitor(String username) {
 		if (isUser(username)) {
-			return this.updateAdmin(username, AuthenticationService.USER);
+			return this.updateUser(username, AuthenticationService.USER);
 		} else {
-			return this.updateAdmin(username, AuthenticationService.VISITOR);
+			return this.updateUser(username, AuthenticationService.VISITOR);
 		}
 	}
 
@@ -173,7 +157,7 @@ public class AdministratorServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public List<Administrator> loadAllAdmin() {
+	public List<Administrator> loadUsers() {
 		return administratorDao.findAll();
 	}
 

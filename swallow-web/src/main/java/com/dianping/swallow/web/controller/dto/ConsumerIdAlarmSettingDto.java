@@ -32,6 +32,8 @@ public class ConsumerIdAlarmSettingDto {
 	
 	private String consumerId;
 
+	private String topicName;
+
 	public long getSendpeak() {
 		return sendpeak;
 	}
@@ -112,6 +114,7 @@ public class ConsumerIdAlarmSettingDto {
 		this.consumerId = consumerId;
 	}
 
+<<<<<<< HEAD
 	public long getSendFluctuationBase() {
 		return sendFluctuationBase;
 	}
@@ -128,5 +131,12 @@ public class ConsumerIdAlarmSettingDto {
 		this.ackFluctuationBase = ackFluctuationBase;
 	}
 	
+	public String getTopicName() {
+		return topicName;
+	}
+
+	public void setTopicName(String topicName) {
+		this.topicName = topicName;
+	}
 	
 }

@@ -18,13 +18,17 @@ public class IPDescManagerWrapper {
 	
 	private static final String BLANK = "Blank";
 	
+	private IPDesc ipdesc;
+	
 	@Resource(name = "ipDescManager")
 	private IPDescManager ipDescManager;
 	
 	
 	public String loadDpMobile(String ip){
 		
-		IPDesc ipdesc = ipDescManager.getIPDesc(ip);
+		if(ipdesc == null){
+			ipdesc = ipDescManager.getIPDesc(ip);
+		}
 		if(ipdesc == null){
 			return BLANK;
 		}
@@ -33,7 +37,9 @@ public class IPDescManagerWrapper {
 	
 	public String loadEmail(String ip){
 		
-		IPDesc ipdesc = ipDescManager.getIPDesc(ip);
+		if(ipdesc == null){
+			ipdesc = ipDescManager.getIPDesc(ip);
+		}
 		if(ipdesc == null){
 			return BLANK;
 		}
@@ -42,11 +48,29 @@ public class IPDescManagerWrapper {
 	
 	public String loadName(String ip){
 		
-		IPDesc ipdesc = ipDescManager.getIPDesc(ip);
+		if(ipdesc == null){
+			ipdesc = ipDescManager.getIPDesc(ip);
+		}
 		if(ipdesc == null){
 			return BLANK;
 		}
 		return ipdesc.getName();
+	}
+
+	public String loadDpManager(String ip){
+		
+		if(ipdesc == null){
+			ipdesc = ipDescManager.getIPDesc(ip);
+		}
+		if(ipdesc == null){
+			return BLANK;
+		}
+		return ipdesc.getDpManager();
+	}
+	
+	public void resetIpdesc(){
+		
+		ipdesc = null;
 	}
 
 }

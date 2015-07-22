@@ -16,8 +16,8 @@ module.factory('Paginator', function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
 					fetchFunction(this.currentOffset, pageSize + 1, name, email, role, function(data){
-						items = data.admin;
-						length = data.size;
+						items = data.second;
+						length = data.first;
 						self.totalPage = Math.ceil(length/pageSize);
 						self.endPage = self.totalPage;
 						//生成链接

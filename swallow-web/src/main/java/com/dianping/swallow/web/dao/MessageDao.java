@@ -33,7 +33,7 @@ public interface MessageDao extends Dao {
 	 * @param topicName
 	 *            topic名称
 	 */
-	boolean create(Message wsm, String topicName);
+	boolean createMessage(Message wsm, String topicName);
 
 	/**
 	 * 根据消息ID查询

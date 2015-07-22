@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.Topic;
 
 
@@ -19,48 +20,46 @@ public interface TopicService {
 	 * @param start 起始位置
 	 * @param span	偏移量
 	 */
-	Map<String, Object> loadAllTopic(int start, int span);
+	Pair<Long, List<Topic>> loadTopicPage(int start, int span);
 
 	/**
 	 * 根据消息名称，部门，申请人查询消息
 	 * @param start 起始位置
 	 * @param span  偏移量
 	 * @param name  topic名称
-	 * @param prop  申请人
-	 * @param dept  申请人部门
+	 * @param proposal  申请人
 	 */
-	Map<String, Object> loadSpecificTopic(int start, int span, String name,
-			String prop);
+	Pair<Long, List<Topic>> loadSpecificTopicPage(int start, int span, String name, String proposal);
 	
 	/**
 	 * 
 	 * @param name  topic名称
 	 */
-	Topic loadTopic(String name);
+	Topic loadTopicByName(String name);
 
 
 	/**
 	 * 编辑topic信息
 	 * @param name topic名称
-	 * @param prop 申请人
+	 * @param proposal 申请人
 	 * @param dept 申请人部门
 	 * @param time 申请时间
 	 */
-	int editTopic(String name, String prop, String time);
+	int editTopic(String name, String proposal, String time);
 
 	/**
 	 * 返回所有topic名称
-	 * @param tongXingZheng  用户名
+	 * @param username  用户名
 	 * @param isAdmin  		 是否是管理员
 	 */
-	List<String> loadAllTopicNames(String username, boolean isAdmin);
+	List<String> loadTopicNames(String username, boolean isAdmin);
 
 	/**
 	 * 
 	 * @param username  通行证
 	 * @param all       是否返回所有
 	 */
-	Map<String, String[]> getPropAndDept(String username, boolean all);
+	String[] loadTopicProposal(String username, boolean isAdmin);
 	
 	/**
 	 * 
@@ -68,9 +67,8 @@ public interface TopicService {
 	 */
 	int saveTopic(Topic topic);
 	
-	Map<String, Set<String>> loadTopicToWhiteList();
-	
 	List<String> loadTopicNames(String username);
-	
+
+	Map<String, Set<String>> loadTopicToWhiteList();
 
 }

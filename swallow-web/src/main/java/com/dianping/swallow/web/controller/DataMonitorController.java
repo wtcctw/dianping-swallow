@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,13 +13,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -54,10 +58,12 @@ public class DataMonitorController extends AbstractMonitorController {
 	public static final String Y_AXIS_TYPE_ACCUMULATION = "堆积消息数";
 
 	public static final String CAT_TYPE = "MONITOR";
-	
+
 	public static final String ENTRYS = "entry";
 
-	public static final int  ENTRYSIZE = 10;
+	public static final int ENTRYSIZE = 10;
+	
+	public static final String FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -113,31 +119,25 @@ public class DataMonitorController extends AbstractMonitorController {
 	public ModelAndView viewTopicdashboarddelay() {
 
 		subSide = "dashboarddelay";
-		
-		return new ModelAndView("monitor/consumerdashboarddelay", createViewMap());
+		Map<String, Object> map = createViewMap();
+		addTimeToModel(map);
+		return new ModelAndView("monitor/consumerdashboarddelay", map);
 	}
 
-	@RequestMapping(value = "/console/monitor/dashboard/delay/{offset}", method = RequestMethod.POST)
+	@RequestMapping(value = "/console/monitor/dashboard/delay/minute", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getConsumerIdDelayDashboard(@PathVariable int offset, int currentmin) throws Exception {
+	public List<MinuteEntry> getConsumerIdDelayDashboard(
+			 @RequestParam("date") String date) throws Exception {
 		
-		int realOffset;
-		if(currentmin == -1){
-			realOffset = 0;
-		}else{
-			Calendar calendar = Calendar.getInstance();
-			int min = calendar.get(Calendar.MINUTE);
-			if(min - currentmin < 0){
-				realOffset = min + 60 - currentmin + offset - 1;
-			}else{
-				realOffset = min - currentmin + offset - 1;
-			}
-		}
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+		String transferDate = date.replaceAll("Z", "+0800").replaceAll("\"", "");
+		Date newdate = formatter.parse(transferDate);
 		
-		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries("dashboard", realOffset, ENTRYSIZE);
-		return addTimeToReport(entrys, offset);
-		
+		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries(newdate);
+		return entrys;
+
 	}
+	
 
 	private String getFirstTopic(Set<String> topics) {
 
@@ -223,22 +223,22 @@ public class DataMonitorController extends AbstractMonitorController {
 	}
 
 	private Set<String> getConsumerIds(String consumerIds) {
-		
-		if(consumerIds == null){
+
+		if (consumerIds == null) {
 			return null;
 		}
-		
+
 		Set<String> result = new HashSet<String>();
-		String []split = consumerIds.split("\\s*,\\s*");
-		for(String consumerId : split){
-			
-			if(StringUtils.isEmpty(consumerId)){
+		String[] split = consumerIds.split("\\s*,\\s*");
+		for (String consumerId : split) {
+
+			if (StringUtils.isEmpty(consumerId)) {
 				continue;
 			}
 			result.add(consumerId.trim());
 		}
-		
-		if(logger.isInfoEnabled()){
+
+		if (logger.isInfoEnabled()) {
 			logger.info("[getConsumerIds]" + result);
 		}
 		return result;
@@ -366,13 +366,10 @@ public class DataMonitorController extends AbstractMonitorController {
 		}
 		return topic;
 	}
-	
-	private Map<String, Object> addTimeToReport(List<MinuteEntry> entry, int offset){
-		 
-		Map<String, Object> map = new HashMap<String, Object>();
-		int stepHour = offset / 60;
+
+	private Map<String, Object> addTimeToModel(Map<String, Object> map) {
+
 		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.HOUR_OF_DAY, -stepHour);
 		calendar.clear(Calendar.MINUTE);
 		calendar.clear(Calendar.SECOND);
 		String starttime = convertDateToString(calendar.getTime());
@@ -381,14 +378,13 @@ public class DataMonitorController extends AbstractMonitorController {
 		String stoptime = convertDateToString(calendar.getTime());
 		map.put("starttime", starttime);
 		map.put("stoptime", stoptime);
-		map.put(ENTRYS, entry);
-		
+
 		return map;
 	}
-	
-	private String convertDateToString(Date date){
-		
-		SimpleDateFormat sdf=new SimpleDateFormat(DefaultMessageDao.TIMEFORMAT);
+
+	private String convertDateToString(Date date) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat(DefaultMessageDao.TIMEFORMAT);
 		return sdf.format(date);
 	}
 

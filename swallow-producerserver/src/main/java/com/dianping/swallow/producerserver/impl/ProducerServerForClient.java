@@ -1,5 +1,6 @@
 package com.dianping.swallow.producerserver.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,9 +108,12 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
                   parentDomain + ":" + swallowMessage.getSourceIp());
             //将swallowMessage保存到mongodb
             try {
+            	
+               Date timeBeforeSave = new Date();
+            	
                getMessageDAO().saveMessage(topicName, swallowMessage);
                
-               producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, swallowMessage.getGeneratedTime().getTime(), System.currentTimeMillis());
+               producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, timeBeforeSave.getTime(), System.currentTimeMillis());
                
                producerServerTransaction.addData("sha1", swallowMessage.getSha1());
                producerServerTransaction.setStatus(Message.SUCCESS);
