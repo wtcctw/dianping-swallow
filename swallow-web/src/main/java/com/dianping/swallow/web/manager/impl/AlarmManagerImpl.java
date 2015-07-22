@@ -34,6 +34,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmMetaService;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.SeqGeneratorService;
 import com.dianping.swallow.web.util.GenerateIdUtil;
 
 @Service("alarmManager")
@@ -114,6 +115,11 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
+	@Autowired
+	private SeqGeneratorService seqGeneratorService;
+
+	private static final String ALARMEVENTID_CATEGORY = "alarmEventId";
+
 	private TimeZone timeZone = TimeZone.getTimeZone("GMT+8:00");
 
 	@Override
@@ -128,7 +134,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+				alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 				sendAlarmByIp(ip, alarm, alarmMeta);
 			}
@@ -149,7 +155,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+				alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 				sendAlarmByIp(ip, alarm, alarmMeta);
 			}
@@ -169,7 +175,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
-			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+			alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
@@ -193,7 +199,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+				alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 				sendAlarmByIp(masterIp, alarm, alarmMeta);
 			}
@@ -214,7 +220,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+				alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 				sendAlarmByIp(ip, alarm, alarmMeta);
 			}
@@ -234,7 +240,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
-			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+			alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
@@ -259,7 +265,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
-			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
+			alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
@@ -413,6 +419,10 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 		return isAlarm(consumerIdAlarms, key, alarmMeta);
 	}
 
+	private long getSeqGeneratorId() {
+		return seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+	}
+	
 	private void initProperties() {
 		if (env.equals("dev")) {
 			devMobiles = new HashSet<String>();
