@@ -37,15 +37,11 @@ public class AlarmController extends AbstractMenuController {
 	public Object alarmSearch(@RequestParam("receiver") String receiver, @RequestParam("startTime") String startTime,
 			@RequestParam("endTime") String endTime, @RequestParam("offset") int offset,
 			@RequestParam("limit") int limit) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date startDate = null;
-		Date endDate = null;
-		try {
-			startDate = sdf.parse(startTime);
-			endDate = sdf.parse(endTime);
-		} catch (ParseException e) {
-			logger.info("data tranform failed.", e);
+		if (receiver == null || startTime == null || endTime == null) {
+			return null;
 		}
+		Date startDate = strToDate(startTime);
+		Date endDate = strToDate(endTime);
 		List<Alarm> alarms = alarmService.findByReceiverAndTime(receiver, startDate, endDate, offset, limit);
 		long count = alarmService.countByReceiverAndTime(receiver, startDate, endDate);
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -57,6 +53,18 @@ public class AlarmController extends AbstractMenuController {
 	@Override
 	protected String getMenu() {
 		return "alarm";
+	}
+	
+	private Date strToDate(String strTime){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date result = null;
+		try {
+			result = sdf.parse(strTime);
+			return result;
+		} catch (ParseException e) {
+			logger.info("data tranform failed.", e);
+			return new Date();
+		}
 	}
 
 }

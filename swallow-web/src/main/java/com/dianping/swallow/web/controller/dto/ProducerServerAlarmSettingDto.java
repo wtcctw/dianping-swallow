@@ -18,6 +18,8 @@ public class ProducerServerAlarmSettingDto {
 	private long producervalley;
 	
 	private int producerfluctuation;
+	
+	private long fluctuationBase;
 
 	public String getServerId() {
 		return serverId;
@@ -57,6 +59,14 @@ public class ProducerServerAlarmSettingDto {
 
 	public void setProducerfluctuation(int producerfluctuation) {
 		this.producerfluctuation = producerfluctuation;
+	}
+
+	public long getFluctuationBase() {
+		return fluctuationBase;
+	}
+
+	public void setFluctuationBase(long fluctuationBase) {
+		this.fluctuationBase = fluctuationBase;
 	}
 	
 

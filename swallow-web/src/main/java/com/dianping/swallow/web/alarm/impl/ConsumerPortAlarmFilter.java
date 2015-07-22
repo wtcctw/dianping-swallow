@@ -104,7 +104,7 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 		}
 		boolean usingSlave = NetUtil.isPortOpen(slaveIp, slavePort);
 		if (!usingSlave) {
-			usingSlave = NetUtil.isPortOpen(masterIp, masterPort);
+			usingSlave = NetUtil.isPortOpen(masterIp, slavePort);
 		}
 		String key = masterIp + KEY_SPLIT + slaveIp;
 		if (!usingMaster && usingSlave) {

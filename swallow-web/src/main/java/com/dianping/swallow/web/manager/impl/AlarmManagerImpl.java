@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -113,6 +114,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
+	private TimeZone timeZone = TimeZone.getTimeZone("GMT+8:00");
+
 	@Override
 	public void producerServerAlarm(String ip, AlarmType alarmType) {
 		AlarmMeta alarmMeta = alarmMetas.get(alarmType.getNumber());
@@ -120,13 +123,14 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, ip);
-				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
+				message = StringUtils.replace(message, DATE_TEMPLATE,
+						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
 				alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-				sendAlarmByIp(ip, alarm,alarmMeta);
+				sendAlarmByIp(ip, alarm, alarmMeta);
 			}
 		}
 	}
@@ -140,7 +144,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, IP_TEMPLATE, ip);
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, ip);
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, ip);
-				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
+				message = StringUtils.replace(message, DATE_TEMPLATE,
+						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
@@ -160,7 +165,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, TOPIC_TEMPLATE, topic);
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
-				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
+				message = StringUtils.replace(message, DATE_TEMPLATE,
+						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
 			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
@@ -182,7 +188,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, IP_TEMPLATE, masterIp);
 				message = StringUtils.replace(message, MASTERIP_TEMPLATE, masterIp);
 				message = StringUtils.replace(message, SLAVEIP_TEMPLATE, slaveIp);
-				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
+				message = StringUtils.replace(message, DATE_TEMPLATE,
+						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
@@ -202,7 +209,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, IP_TEMPLATE, ip);
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
-				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
+				message = StringUtils.replace(message, DATE_TEMPLATE,
+						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
@@ -222,7 +230,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, TOPIC_TEMPLATE, topic);
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
-				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
+				message = StringUtils.replace(message, DATE_TEMPLATE,
+						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
 			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
@@ -246,7 +255,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 				message = StringUtils.replace(message, CONSUMERID_TEMPLATE, topic);
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
-				message = StringUtils.replace(message, DATE_TEMPLATE, DateFormatUtils.format(new Date(), DATE_PATTERN));
+				message = StringUtils.replace(message, DATE_TEMPLATE,
+						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
 			alarm.setNumber(alarmType.getNumber()).setEventId(GenerateIdUtil.getUniqueId()).setBody(message)
@@ -420,7 +430,7 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 					} finally {
 						in.close();
 					}
-				}else{
+				} else {
 					logger.info("[initProperties] Load {} file failed.", ALARM_RECIEVER_FILE_NAME);
 					throw new RuntimeException();
 				}

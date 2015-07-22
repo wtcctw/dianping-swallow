@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.dto.SwallowAlarmSettingDto;
-import com.dianping.swallow.web.controller.mapper.SwallowAlarmSettingMapper;
+import com.dianping.swallow.web.controller.dto.GlobalAlarmSettingDto;
+import com.dianping.swallow.web.controller.mapper.GlobalAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.GlobalAlarmSetting;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -41,9 +41,9 @@ public class GlobalAlarmSettingController extends AbstractSidebarBasedController
 	public Object producerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 		
 		List<GlobalAlarmSetting> swallowAlarmSettingList = globalAlarmSettingService.findByPage(offset, limit);
-		List<SwallowAlarmSettingDto> swallowAlarmSettingListDto = new ArrayList<SwallowAlarmSettingDto>();
+		List<GlobalAlarmSettingDto> swallowAlarmSettingListDto = new ArrayList<GlobalAlarmSettingDto>();
 		for(GlobalAlarmSetting swallowAlarmSetting : swallowAlarmSettingList){
-			swallowAlarmSettingListDto.add(SwallowAlarmSettingMapper.toSwallowAlarmSettingDto(swallowAlarmSetting));
+			swallowAlarmSettingListDto.add(GlobalAlarmSettingMapper.toSwallowAlarmSettingDto(swallowAlarmSetting));
 		}
 		return generateResponse(swallowAlarmSettingListDto);
 		
@@ -51,9 +51,9 @@ public class GlobalAlarmSettingController extends AbstractSidebarBasedController
 
 	@RequestMapping(value = "/console/setting/swallow/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public int producerserverSettingCreate(@RequestBody SwallowAlarmSettingDto dto) {
+	public int producerserverSettingCreate(@RequestBody GlobalAlarmSettingDto dto) {
 
-		GlobalAlarmSetting consumerServerAlarmSetting = SwallowAlarmSettingMapper.toSwallowAlarmSetting(dto);
+		GlobalAlarmSetting consumerServerAlarmSetting = GlobalAlarmSettingMapper.toSwallowAlarmSetting(dto);
 		boolean result = globalAlarmSettingService.update(consumerServerAlarmSetting);
 		if(!result){
 			return ResponseStatus.SUCCESS.getStatus();
@@ -74,7 +74,7 @@ public class GlobalAlarmSettingController extends AbstractSidebarBasedController
 		}
 	}
 
-	private Map<String, Object> generateResponse(List<SwallowAlarmSettingDto> swallowAlarmSettingList){
+	private Map<String, Object> generateResponse(List<GlobalAlarmSettingDto> swallowAlarmSettingList){
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("size", swallowAlarmSettingList.size());

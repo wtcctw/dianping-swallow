@@ -51,7 +51,9 @@
 					class="table table-bordered table-striped table-condensed  table-hover">
 					<tr>
 						<th style="text-align: left">序号</th>
-						<th style="text-align: left">报警类别</th>
+						<th style="text-align: left">事件ID</th>
+						<th style="text-align: left">报警编号</th>
+						<th style="text-align: left">报警级别</th>
 						<th style="text-align: left">发送方式</th>
 						<th style="text-align: left">标题</th>
 						<th style="text-align: left">内容</th>
@@ -60,6 +62,8 @@
 					</tr>
 					<tr ng-repeat="m in searchPaginator.currentPageItems">
 						<td style="text-align: left">{{$index+1}}</td>
+						<td style="text-align: left">{{m.eventId}}</td>
+						<td style="text-align: left">{{m.number}}</td>
 						<td style="text-align: left">{{m.type}}</td>
 						<td style="text-align: left">{{m.sendType}}</td>
 						<td style="text-align: left">{{m.title}}</td>

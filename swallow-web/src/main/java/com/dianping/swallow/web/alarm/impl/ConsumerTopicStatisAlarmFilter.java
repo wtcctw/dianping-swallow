@@ -147,7 +147,7 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	}
 
 	private boolean sendFluctuationAlarm(String topic, long qpx, long expectedQpx, QPSAlarmSetting qps) {
-		if (qps != null && qpx != 0L) {
+		if (qps != null && qpx != 0L && qpx > qps.getFluctuationBase() && expectedQpx > qps.getFluctuationBase()) {
 			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
 				alarmManager.consumerTopicStatisAlarm(topic, qpx, expectedQpx,
 						AlarmType.CONSUMER_TOPIC_SENDQPS_FLUCTUATION);
@@ -163,7 +163,7 @@ public class ConsumerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	}
 
 	private boolean ackFluctuationAlarm(String topic, long qpx, long expectedQpx, QPSAlarmSetting qps) {
-		if (qps != null && qpx != 0L) {
+		if (qps != null && qpx != 0L && qpx > qps.getFluctuationBase() && expectedQpx > qps.getFluctuationBase()) {
 			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
 				alarmManager.consumerTopicStatisAlarm(topic, qpx, expectedQpx,
 						AlarmType.CONSUMER_TOPIC_ACKQPS_FLUCTUATION);

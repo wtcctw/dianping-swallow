@@ -9,7 +9,7 @@ public class GlobalAlarmSetting extends BaseAlarmSetting{
 	private List<String> producerWhiteList;
 	
 	private List<String> consumerWhiteList;
-
+	
 	public List<String> getProducerWhiteList() {
 		return producerWhiteList;
 	}

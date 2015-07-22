@@ -51,6 +51,7 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
 
+	@Autowired
 	private ConsumerServerAlarmSettingService serverAlarmSettingService;
 
 	@PostConstruct
@@ -167,6 +168,9 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	private boolean sendFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx,
 			QPSAlarmSetting qps) {
 		if (qpx != 0 && expectedQpx != 0 && qps != null) {
+			if (qpx < qps.getFluctuationBase() && expectedQpx < qps.getFluctuationBase()) {
+				return true;
+			}
 			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
 				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, expectedQpx,
 						AlarmType.CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION);
@@ -183,6 +187,9 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 
 	private boolean ackFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx, QPSAlarmSetting qps) {
 		if (qpx != 0 && expectedQpx != 0 && qps != null) {
+			if (qpx < qps.getFluctuationBase() && expectedQpx < qps.getFluctuationBase()) {
+				return true;
+			}
 			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
 				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, expectedQpx,
 						AlarmType.CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION);

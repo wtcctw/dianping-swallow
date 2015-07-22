@@ -149,9 +149,11 @@ module
 							$scope.consumeridEntry.sendpeak;
 							$scope.consumeridEntry.sendvalley;
 							$scope.consumeridEntry.sendfluctuation;
+							$scope.consumeridEntry.sendFluctuationBase;
 							$scope.consumeridEntry.ackpeak;
 							$scope.consumeridEntry.ackvalley;
 							$scope.consumeridEntry.ackfluctuation;
+							$scope.consumeridEntry.ackFluctuationBase;
 
 							$scope.refreshpage = function(myForm) {
 								if ($scope.consumeridEntry.sendpeak < $scope.consumeridEntry.sendvalley
@@ -188,9 +190,11 @@ module
 								$scope.consumeridEntry.sendpeak = "";
 								$scope.consumeridEntry.sendvalley = "";
 								$scope.consumeridEntry.sendfluctuation = "";
+								$scope.consumeridEntry.sendFluctuationBase = "";
 								$scope.consumeridEntry.ackpeak = "";
 								$scope.consumeridEntry.ackvalley = "";
 								$scope.consumeridEntry.ackfluctuation = "";
+								$scope.consumeridEntry.ackFluctuationBase = "";
 							}
 
 							$scope.setModalInput = function(index) {
@@ -201,9 +205,11 @@ module
 								$scope.consumeridEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
 								$scope.consumeridEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
 								$scope.consumeridEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
+								$scope.consumeridEntry.sendFluctuationBase = $scope.searchPaginator.currentPageItems[index].sendFluctuationBase;
 								$scope.consumeridEntry.ackpeak = $scope.searchPaginator.currentPageItems[index].ackpeak;
 								$scope.consumeridEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
 								$scope.consumeridEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
+								$scope.consumeridEntry.ackFluctuationBase = $scope.searchPaginator.currentPageItems[index].ackFluctuationBase;
 							}
 
 							$rootScope.removerecord = function(cid) {

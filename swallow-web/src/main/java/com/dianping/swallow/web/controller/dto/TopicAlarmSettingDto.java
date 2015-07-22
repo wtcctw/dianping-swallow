@@ -18,6 +18,8 @@ public class TopicAlarmSettingDto {
 	
 	private int producerfluctuation;
 	
+	private long producerFluctuationBase;
+	
 	private long producerdelay;
 	
 	private long consumersendpeak;
@@ -26,11 +28,15 @@ public class TopicAlarmSettingDto {
 	
 	private int consumersendfluctuation;
 	
+	private long consumerSendFluctuationBase;
+	
 	private long consumerackpeak;
 	
 	private long consumerackvalley;
 	
 	private int consumerackfluctuation;
+	
+	private long consumerAckFluctuationBase;
 	
 	private long consumersenddelay;
 	
@@ -156,6 +162,30 @@ public class TopicAlarmSettingDto {
 
 	public void setConsumeraccumulation(long consumeraccumulation) {
 		this.consumeraccumulation = consumeraccumulation;
+	}
+
+	public long getConsumerSendFluctuationBase() {
+		return consumerSendFluctuationBase;
+	}
+
+	public void setConsumerSendFluctuationBase(long consumerSendFluctuationBase) {
+		this.consumerSendFluctuationBase = consumerSendFluctuationBase;
+	}
+
+	public long getConsumerAckFluctuationBase() {
+		return consumerAckFluctuationBase;
+	}
+
+	public void setConsumerAckFluctuationBase(long consumerAckFluctuationBase) {
+		this.consumerAckFluctuationBase = consumerAckFluctuationBase;
+	}
+
+	public long getProducerFluctuationBase() {
+		return producerFluctuationBase;
+	}
+
+	public void setProducerFluctuationBase(long producerFluctuationBase) {
+		this.producerFluctuationBase = producerFluctuationBase;
 	}
 	
 
