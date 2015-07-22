@@ -102,7 +102,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
 						topic, consumerid);
 				String ip = loadFirstElement(ips);
-				String mobile = iPDescManagerWrap.loadDpMobile(ip);
+				String mobile = iPDescManagerWrap.loadDpManager(ip);
 				String email = iPDescManagerWrap.loadEmail(ip);
 				String name = iPDescManagerWrap.loadName(ip);
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
@@ -119,18 +119,18 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 					timeSet = true;
 					logger.info(String.format("Set time %s", entryTime));
 				}
-
-				List<Long> accuList = new ArrayList<Long>(Collections.nCopies(sendListSize, 0L));
-				int accuListSize = accuList.size();
-				while (accuListSize < 2) {
-					accuList.add(0L);
-				}
+				
+				List<Long> accuList = new ArrayList<Long>();
 				if (accuStatsData != null) {
 					StatsData accuSD = accuStatsData.get(consumerid);
 					if (!isEmpty(accuSD)) {
 						accuList = accuSD.getData();
 					}
 				}
+				while (accuList.size() < 2) {
+					accuList.add(0L);
+				}
+				int accuListSize = accuList.size();
 
 				String mapKey = topic + consumerid;
 				TotalData td = totalDataMap.get(mapKey);
@@ -138,9 +138,10 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 					td = new TotalData();
 				}
 				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(entryTime)
-						.setName(name).setListSend(sendList.subList(sendListSize - 2, sendListSize))
-						.setListAck(ackList.subList(ackListSize - 2, ackListSize))
-						.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
+						.setName(name);
+				td.setListSend(sendList.subList(sendListSize - 2, sendListSize));
+				td.setListAck(ackList.subList(ackListSize - 2, ackListSize));
+				td.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
 				totalDataMap.put(mapKey, td);
 				logger.info(String.format("Generate totalData for topic %s and consumerid %s", topic, consumerid));
 			}
