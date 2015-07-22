@@ -111,12 +111,12 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				int sendListSize = sendList.size();
 				int ackListSize = ackList.size();
 				if (sendListSize < 2 || ackListSize < 2) {
-					return;
+					continue;
 				}
 				if(!timeSet){
 					entryTime = getMinuteEntryTime(senddelay.lastKey());
 					timeSet = true;
-					System.out.println("time is " + entryTime);
+					logger.info(String.format("Set time %s", entryTime));
 				}
 
 				List<Long> accuList = new ArrayList<Long>(Collections.nCopies(sendListSize, 0L));
@@ -143,6 +143,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				logger.info(String.format("Generate totalData for topic %s and consumerid %s", topic, consumerid));
 			}
 		}
+		logger.info(String.format("Generate totalData for all topic and consumerid"));
 
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			generateEntrys(entry.getValue());
