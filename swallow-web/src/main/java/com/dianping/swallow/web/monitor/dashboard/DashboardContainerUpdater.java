@@ -73,6 +73,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		if (delayeven.get()) {
 			try {
 				updateDelayInsDashboard();
+				logger.info("Update dashboard successfully");
 			} catch (Exception e) {
 				logger.error("Error when get data for all consumerid!", e);
 			} finally {
@@ -105,8 +106,11 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				String name = iPDescManagerWrap.loadName(ip);
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
 				List<Long> sendList = new ArrayList<Long>(senddelay.values());
+				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
+				List<Long> ackList = new ArrayList<Long>(ackdelay.values());
 				int sendListSize = sendList.size();
-				if (sendListSize < 2) {
+				int ackListSize = ackList.size();
+				if (sendListSize < 2 || ackListSize < 2) {
 					return;
 				}
 				if(!timeSet){
@@ -114,10 +118,10 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 					timeSet = true;
 					System.out.println("time is " + entryTime);
 				}
-				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
-				List<Long> ackList = new ArrayList<Long>(ackdelay.values());
+
 				List<Long> accuList = new ArrayList<Long>(Collections.nCopies(sendListSize, 0L));
-				while (accuList.size() < 2) {
+				int accuListSize = accuList.size();
+				while (accuListSize < 2) {
 					accuList.add(0L);
 				}
 				if (accuStatsData != null) {
@@ -127,16 +131,14 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 					}
 				}
 
-				int stopIndex = sendListSize;
-				int startIndex = stopIndex - 2;
 				TotalData td = totalDataMap.get(consumerid);
 				if (td == null) {
 					td = new TotalData();
 				}
 				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(entryTime)
-						.setName(name).setListSend(sendList.subList(startIndex, stopIndex))
-						.setListAck(ackList.subList(startIndex, stopIndex))
-						.setListAccu(accuList.subList(startIndex, stopIndex));
+						.setName(name).setListSend(sendList.subList(sendListSize - 2, sendListSize))
+						.setListAck(ackList.subList(ackListSize - 2, ackListSize))
+						.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
 				totalDataMap.put(consumerid, td);
 			}
 		}
@@ -238,7 +240,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 		for (Map.Entry<Date, MinuteEntry> entry : minuteEntryMap.entrySet()) {
 			MinuteEntry me = entry.getValue();
-			dashboardContainer.insertMinuteEntry(me);
+			boolean inserted = dashboardContainer.insertMinuteEntry(me);
+			logger.info(String.format("Insert MinuteEntry to dashboard %s", inserted ? "successfully" : "failed"));
 		}
 		
 		totalDataMap.clear();
