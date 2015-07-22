@@ -114,7 +114,6 @@ public class ConsumerIdAlarmSettingDto {
 		this.consumerId = consumerId;
 	}
 
-<<<<<<< HEAD
 	public long getSendFluctuationBase() {
 		return sendFluctuationBase;
 	}
