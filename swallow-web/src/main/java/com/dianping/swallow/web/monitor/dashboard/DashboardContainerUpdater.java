@@ -140,13 +140,15 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 						.setListAck(ackList.subList(ackListSize - 2, ackListSize))
 						.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
 				totalDataMap.put(consumerid, td);
+				logger.info(String.format("Generate totalData for topic %s and consumerid %s", topic, consumerid));
 			}
 		}
 
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			generateEntrys(entry.getValue());
 		}
-
+		logger.info("Generate entrys for all data");
+		
 		doGenerateMinuteEntrys(totalDataMap);
 	}
 

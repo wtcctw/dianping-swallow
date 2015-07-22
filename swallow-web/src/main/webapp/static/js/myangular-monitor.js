@@ -259,12 +259,13 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.clicked = [];
 	$scope.items = [];
 	$scope.table = function(parentindex, index) {
-		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry.Heap[index];
+		var size = $scope.minuteEntrys[parentindex].delayEntry.size;
+		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index];
 		
-		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].senddelay,
-		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].ackdelay, 
-		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].accu,
-		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].topic} ];
+		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index].senddelay,
+		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index].ackdelay, 
+		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index].accu,
+		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry.Heap[size - index].topic} ];
 	}
 	
 });
