@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.model.Administrator;
@@ -21,8 +20,10 @@ import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.service.UserService;
+import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author mingdongli
@@ -145,7 +146,11 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 
 	@Override
 	public int saveTopic(Topic topic) {
-		return topicDao.saveTopic(topic);
+		
+		if(StringUtils.isNotBlank(topic.getName())){
+			return topicDao.saveTopic(topic);
+		}
+		return ResponseStatus.TOPICBLANK.getStatus();
 	}
 
 	@Override

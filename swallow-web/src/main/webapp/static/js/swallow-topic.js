@@ -45,9 +45,9 @@ module.factory('Paginator', function(){
 						self.currentPageItems = items.slice(0, pageSize);
 						for(var i = 0; i < self.currentPageItems.length; ++i){
 							if(whitelist.indexOf(self.currentPageItems[i].name) != -1){
-								self.currentPageItems[i]["alarm"] = "否";
+								self.currentPageItems[i]["alarm"] = false;
 							}else{
-								self.currentPageItems[i]["alarm"] = "是";
+								self.currentPageItems[i]["alarm"] = true;
 							}
 						}
 						self.hasNextVar = items.length === pageSize + 1;
@@ -115,14 +115,15 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicprop = "";
 			$scope.topictime = "";
 			$scope.topicalarm = "";
-			$scope.setModalInput = function(name,prop,time,alarm){
+			$scope.blankprop = true;
+			$scope.setModalInput = function(name,prop,time){
 				$scope.topicname = name;
-				$("#alarmselect").val(alarm);
 				$('#topicprops').tagsinput('removeAll');
 				if(prop != null && prop.length > 0){
 					var props = prop.split(",");
 					for(var i = 0; i < props.length; ++i)
 						$('#topicprops').tagsinput('add', props[i]);
+					$scope.blankprop = false;
 				}
 				$scope.topicprop  = prop;
 				$scope.topictime = time;
@@ -132,7 +133,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 	        	$scope.topictime = $("#datetimepicker").val();
 	        	$scope.topicprop = $("#topicprops").val();
 	        	$scope.topicalarm = $("#alarmselect").val();
-	        	if($scope.topicprop.length == 0){
+	        	if($scope.topicprop.length == 0 && !$scope.blankprop){
 	        		$scope.dialog($scope.topicname, $scope.topicprop, $scope.topictime, $scope.topicalarm);
 	        	}
 	        	else{
@@ -144,22 +145,20 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 	        	}
 	        }
 			
-			$rootScope.doedit = function(topicname, topicprop, topictime, topicalarm){
-				var alarm = topicalarm == "否" ? true : false; //不报警
+			$rootScope.doedit = function(topicname, topicprop, topictime){
 				$('#myModal').modal('hide');
 				$http.post(window.contextPath + '/api/topic/edittopic', {"topic":topicname,"prop":topicprop,
-	        		"time":topictime, "alarm":alarm}).success(function(response) {
+	        		"time":topictime}).success(function(response) {
 					$scope.searchPaginator = Paginator(fetchFunction, 30, topicname , "");
 	        	});
 				return true;
 			}
 			
 			//for deal with re transmit for selected messages
-			$scope.dialog = function(topicname, topicprop, topictime, topicalarm) {
+			$scope.dialog = function(topicname, topicprop, topictime) {
 				$rootScope.topicname = topicname;
 				$rootScope.topicprop = topicprop;
 				$rootScope.topictime = topictime;
-				$rootScope.topicalarm = topicalarm;
 				ngDialog.open({
 							template : '\
 							<div class="widget-box">\
@@ -174,7 +173,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								</div>\
 								<div class="modal-footer">\
 									<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
-									<button type="button" class="btn btn-primary" ng-click="doedit(topicname,topicprop,topictime,topicalarm)&&closeThisDialog()">确定</button>\
+									<button type="button" class="btn btn-primary" ng-click="doedit(topicname,topicprop,topictime)&&closeThisDialog()">确定</button>\
 								</div>\
 							</div>\
 						</div>',
@@ -220,8 +219,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						method : 'GET',
 						url : window.contextPath + '/console/topic/propdept'
 					}).success(function(data, status, headers, config) {
-						var props = data.prop;
-						var edits = data.edit;
+						var props = data;
 						$("#searchprop").typeahead({
 							items: 16, 
 							source : props,
@@ -234,8 +232,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						//work
 						$('#topicprops').tagsinput({
 							  typeahead: {
-								  items: 16, 
-								  source: edits,
+								  items: 16,
+								  source: props,
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
@@ -244,6 +242,14 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					}).error(function(data, status, headers, config) {
 					});
 					
+			}
+			
+			$scope.changealarm = function(topic, index){
+				var id = "#alarm" + index;
+				var check = $(id).prop('checked');
+				$http.post(window.contextPath + '/api/topic/alarm', {"topic":topic,
+	        		"alarm":!check}).success(function(response) {
+	        	});
 			}
 			
 }]);
