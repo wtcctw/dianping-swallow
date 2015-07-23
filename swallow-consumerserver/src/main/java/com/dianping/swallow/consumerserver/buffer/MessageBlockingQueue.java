@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 
 	private AtomicBoolean isClosed = new AtomicBoolean(false);
 
+	private AtomicInteger checkSendMessageSize = new AtomicInteger();
 
 	protected MessageFilter messageFilter;
 	
@@ -98,6 +100,8 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		if(message != null){
 			retriveStrategy.decreaseMessageCount();
 			backupRetriveStrategy.decreaseMessageCount();
+			
+			checkSendMessageSize.incrementAndGet();
 		}
 	}
 

@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -85,6 +86,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 
 	private ConsumerCollector consumerCollector;
 
+	private AtomicInteger	  messageToSend = new AtomicInteger();
+	
 	protected final Logger ackLogger = LoggerFactory.getLogger("ackLogger");
 
 	@SuppressWarnings("deprecation")
@@ -233,7 +236,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 				break;
 			}
 		}
-
+		
+		
 		Long ackMessageId = null;
 		entry = waitAckMessages0.firstEntry();
 		
@@ -241,7 +245,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 			ackMessageId = entry.getValue().getAckId() - 1;
 		}else{
 			
-			Long queueMaxId = getQueueEmptyMaxId(isBackup);
+			Long queueMaxId = getQueueEmptyMaxId(isBackup, waitAckMessages0);
 			
 			ackMessageId = Math.max(queueMaxId == null ? 0 : queueMaxId, maxAckedMessage0 == null ? 0L : maxAckedMessage0.getAckId());
 		}
@@ -252,11 +256,18 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 	/**
 	 * 主要处理消息设置filter，同时批量没有消息的情况，移动ack位置
 	 * @param isBackup
+	 * @param waitAckMessages0 
 	 * @return
 	 */
-	private Long getQueueEmptyMaxId(boolean isBackup) {
+	private Long getQueueEmptyMaxId(boolean isBackup, ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages) {
 
-		return messageQueue.getEmptyTailMessageId(isBackup);
+		Long tailMessageId = messageQueue.getEmptyTailMessageId(isBackup);
+		
+		if(messageToSend.get() > 0 || !waitAckMessages.isEmpty()){
+			return 0L;
+		}
+		
+		return tailMessageId;
 	}
 
 	@Override
@@ -294,7 +305,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 			return false;
 		}
 
-		final SwallowMessage message = (SwallowMessage) messageQueue.poll();
+		
+		final SwallowMessage message = (SwallowMessage) poolMessage();
 		if (message == null) {
 			if (channel != null) {
 				boolean result = freeChannels.offer(channel);
@@ -333,6 +345,21 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 			}
 		});
 		return true;
+	}
+
+	/**
+	 * @return
+	 */
+	private SwallowMessage poolMessage() {
+		
+		messageToSend.incrementAndGet();
+		
+		SwallowMessage swallowMessage = messageQueue.poll();
+		
+		if(swallowMessage == null){
+			messageToSend.decrementAndGet();
+		}
+		return swallowMessage;
 	}
 
 	private ConsumerMessage createConsumerMessage(Channel channel, SwallowMessage message) throws InterruptedException {
@@ -395,6 +422,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 		} else {
 			waitAckBackupMessages.put(consumerMessage.message.getMessageId(), consumerMessage);
 		}
+		
+		messageToSend.decrementAndGet();
 	}
 
 	@Override

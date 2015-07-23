@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +22,12 @@ public abstract class AbstractLoadTest {
 
 	protected String topicName = "LoadTestTopic";
 	
+	protected String type 	  = "type";
 	
 	protected static int totalMessageCount = Integer.MAX_VALUE;
 
-    protected  AtomicInteger count = new AtomicInteger();
-    protected AtomicInteger preCount = new AtomicInteger();
+    protected  AtomicLong count = new AtomicLong();
+    protected AtomicLong preCount = new AtomicLong();
     protected long preTime;
     protected long startTime;
     
@@ -83,10 +84,17 @@ public abstract class AbstractLoadTest {
 
 	protected void exit() {
 		
+
+		doOnExit();
 		logger.info("[exit]" + "Total Message count:" + count.get());
 		logger.info("[exit]" + "Total Message Frequency:" + count.get()/((System.currentTimeMillis() - startTime)/1000));
 		scheduled.shutdown();
 		System.exit(0);
+		
+	}
+
+
+	protected void doOnExit() {
 		
 	}
 
@@ -110,7 +118,7 @@ public abstract class AbstractLoadTest {
 				try{
 					
 					long currentTime = System.currentTimeMillis();
-					int currentCount = count.get();
+					long currentCount = count.get();
 					
 					logger.info("[run]" + "current rate:" + (currentCount - preCount.get())/((currentTime - preTime)/1000));
 					logger.info("[run]" + "total rate:" + (currentCount)/((currentTime - startTime)/1000));
@@ -153,4 +161,16 @@ public abstract class AbstractLoadTest {
 	protected boolean isExit() {
 		return false;
 	}
+
+	protected void sleep(int timeMili) {
+		
+		try {
+			TimeUnit.MILLISECONDS.sleep(timeMili);
+		} catch (InterruptedException e) {
+			logger.error("[sleep]", e);
+		}
+		
+		
+	}
+
 }
