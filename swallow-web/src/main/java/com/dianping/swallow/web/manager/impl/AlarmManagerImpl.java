@@ -35,7 +35,6 @@ import com.dianping.swallow.web.service.AlarmMetaService;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.SeqGeneratorService;
-import com.dianping.swallow.web.util.GenerateIdUtil;
 
 @Service("alarmManager")
 public class AlarmManagerImpl implements AlarmManager, InitializingBean {
@@ -61,6 +60,8 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 	private final Map<Integer, AlarmMeta> alarmMetas = new ConcurrentHashMap<Integer, AlarmMeta>();
 
 	private static final String env;
+
+	private static final String DEV_ENV = "dev";
 
 	private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
@@ -324,9 +325,11 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 		if (ips == null || mobiles == null || emails == null) {
 			return;
 		}
-		if (devMobiles != null && devEmails != null) {
-			mobiles.addAll(devMobiles);
-			emails.addAll(devEmails);
+		if (env.equals(DEV_ENV)) {
+			if (devMobiles != null && devEmails != null) {
+				mobiles.addAll(devMobiles);
+				emails.addAll(devEmails);
+			}
 			return;
 		}
 		Iterator<String> iterator = ips.iterator();
@@ -422,9 +425,9 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 	private long getSeqGeneratorId() {
 		return seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
 	}
-	
+
 	private void initProperties() {
-		if (env.equals("dev")) {
+		if (env.equals(DEV_ENV)) {
 			devMobiles = new HashSet<String>();
 			devEmails = new HashSet<String>();
 			try {
@@ -440,9 +443,6 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 					} finally {
 						in.close();
 					}
-				} else {
-					logger.info("[initProperties] Load {} file failed.", ALARM_RECIEVER_FILE_NAME);
-					throw new RuntimeException();
 				}
 			} catch (Exception e) {
 				logger.info("[initProperties] Load {} file failed.", ALARM_RECIEVER_FILE_NAME);
