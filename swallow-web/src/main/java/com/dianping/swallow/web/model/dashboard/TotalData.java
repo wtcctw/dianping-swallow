@@ -26,6 +26,12 @@ public class TotalData {
 	
 	private Date time;
 	
+	private long baseSendDelaly;
+
+	private long baseAckDelaly;
+	
+	private long baseAccu;
+	
 	List<Long> listSend = new ArrayList<Long>();
 
 	List<Long> listAck = new ArrayList<Long>();
@@ -133,12 +139,40 @@ public class TotalData {
 		this.time = time;
 		return this;
 	}
+	
+	public long getBaseSendDelaly() {
+		return baseSendDelaly;
+	}
+
+	public TotalData setBaseSendDelaly(long baseSendDelaly) {
+		this.baseSendDelaly = baseSendDelaly;
+		return this;
+	}
+
+	public long getBaseAckDelaly() {
+		return baseAckDelaly;
+	}
+
+	public TotalData setBaseAckDelaly(long baseAckDelaly) {
+		this.baseAckDelaly = baseAckDelaly;
+		return this;
+	}
+
+	public long getBaseAccu() {
+		return baseAccu;
+	}
+
+	public TotalData setBaseAccu(long baseAccu) {
+		this.baseAccu = baseAccu;
+		return this;
+	}
 
 	@Override
 	public String toString() {
 		return "TotalData [server=" + server + ", topic=" + topic + ", cid=" + cid + ", email=" + email + ", dpMobile="
-				+ dpMobile + ", time=" + time + ", listSend=" + listSend + ", listAck=" + listAck + ", listAccu="
-				+ listAccu + ", entrys=" + entrys + "]";
+				+ dpMobile + ", name=" + name + ", time=" + time + ", baseSendDelaly=" + baseSendDelaly
+				+ ", baseAckDelaly=" + baseAckDelaly + ", baseAccu=" + baseAccu + ", listSend=" + listSend
+				+ ", listAck=" + listAck + ", listAccu=" + listAccu + ", entrys=" + entrys + "]";
 	}
 
 }

@@ -5,12 +5,12 @@ package com.dianping.swallow.web.model.dashboard;
  *
  *         2015年7月8日上午10:32:58
  */
-public class Entry implements Comparable<Entry>{
-	
+public class Entry implements Comparable<Entry> {
+
 	private String server;
 
 	private String topic;
-	
+
 	private String consumerId;
 
 	private String name;
@@ -20,19 +20,25 @@ public class Entry implements Comparable<Entry>{
 	private float ackdelay;
 
 	private long accu;
-	
+
 	private int senddelayAlarm;
-	
+
 	private int ackdelayAlarm;
-	
+
 	private int accuAlarm;
-	
+
+	private long baseSendDelaly;
+
+	private long baseAckDelaly;
+
+	private long baseAccu;
+
 	private Integer numAlarm;
-	
+
 	private String email;
-	
+
 	private String dpMobile;
-	
+
 	public Entry() {
 
 	}
@@ -63,7 +69,7 @@ public class Entry implements Comparable<Entry>{
 		this.consumerId = consumerId;
 		return this;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -136,12 +142,6 @@ public class Entry implements Comparable<Entry>{
 		return this;
 	}
 
-	@Override
-	public int compareTo(Entry entry) {
-
-		return this.getNumAlarm().compareTo(entry.getNumAlarm());
-	}
-	
 	public String getEmail() {
 		return email;
 	}
@@ -160,13 +160,55 @@ public class Entry implements Comparable<Entry>{
 		return this;
 	}
 
-	@Override
-	public String toString() {
-		return "Entry [server=" + server + ", topic=" + topic + ", consumerId=" + consumerId + ", senddelay="
-				+ senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu + ", senddelayAlarm=" + senddelayAlarm
-				+ ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm=" + accuAlarm + ", numAlarm=" + numAlarm
-				+ ", email=" + email + ", dpMobile=" + dpMobile + "]";
+	public long getBaseSendDelaly() {
+		return baseSendDelaly;
 	}
 
+	public Entry setBaseSendDelaly(long baseSendDelaly) {
+		this.baseSendDelaly = baseSendDelaly;
+		return this;
+	}
+
+	public long getBaseAckDelaly() {
+		return baseAckDelaly;
+	}
+
+	public Entry setBaseAckDelaly(long baseAckDelaly) {
+		this.baseAckDelaly = baseAckDelaly;
+		return this;
+	}
+
+	public long getBaseAccu() {
+		return baseAccu;
+	}
+
+	public Entry setBaseAccu(long baseAccu) {
+		this.baseAccu = baseAccu;
+		return this;
+	}
+
+	@Override
+	public int compareTo(Entry entry) {
+
+		int numAlarm = this.getNumAlarm().compareTo(entry.getNumAlarm());
+		if (numAlarm == 0) {
+			Float _f = new Float(this.senddelay / this.baseSendDelaly + this.accu / this.baseAckDelaly);
+			Float f = new Float(entry.getSenddelay() / entry.getBaseSendDelaly() + entry.getAccu()
+					/ entry.getBaseAccu());
+
+			return _f.compareTo(f);
+		} else {
+			return numAlarm;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "Entry [server=" + server + ", topic=" + topic + ", consumerId=" + consumerId + ", name=" + name
+				+ ", senddelay=" + senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu + ", senddelayAlarm="
+				+ senddelayAlarm + ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm=" + accuAlarm
+				+ ", baseSendDelaly=" + baseSendDelaly + ", baseAckDelaly=" + baseAckDelaly + ", baseAccu=" + baseAccu
+				+ ", numAlarm=" + numAlarm + ", email=" + email + ", dpMobile=" + dpMobile + "]";
+	}
 
 }

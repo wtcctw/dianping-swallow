@@ -30,6 +30,7 @@ import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.wapper.ConsumerDataRetrieverWrapper;
+import com.dianping.swallow.web.monitor.wapper.ConsumerIdAlarmSettingWrapper;
 import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
 
 /**
@@ -54,6 +55,9 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	@Autowired
 	TopicAlarmSettingServiceWrapper topicAlarmSettingServiceWrapper;
+
+	@Autowired
+	ConsumerIdAlarmSettingWrapper consumerIdAlarmSettingWrapper;
 
 	private Map<String, TotalData> totalDataMap = new ConcurrentHashMap<String, TotalData>();
 
@@ -113,12 +117,12 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				if (sendListSize < 2 || ackListSize < 2) {
 					continue;
 				}
-				if(!timeSet){
+				if (!timeSet) {
 					entryTime = getMinuteEntryTime(senddelay.lastKey());
 					timeSet = true;
 					logger.info(String.format("Set time %s", entryTime));
 				}
-				
+
 				List<Long> accuList = new ArrayList<Long>();
 				if (accuStatsData != null) {
 					StatsData accuSD = accuStatsData.get(consumerid);
@@ -136,8 +140,10 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				if (td == null) {
 					td = new TotalData();
 				}
+				ConsumerBaseAlarmSetting cbas = consumerIdAlarmSettingWrapper.loadConsumerBaseAlarmSetting(consumerid);
 				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(entryTime)
-						.setName(name);
+						.setName(name).setBaseSendDelaly(cbas.getSendDelay()).setBaseAckDelaly(cbas.getAckDelay())
+						.setBaseAccu(cbas.getAccumulation());
 				td.setListSend(sendList.subList(sendListSize - 2, sendListSize));
 				td.setListAck(ackList.subList(ackListSize - 2, ackListSize));
 				td.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
@@ -151,7 +157,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			generateEntrys(entry.getValue());
 		}
 		logger.info("Generate entrys for all data");
-		
+
 		doGenerateMinuteEntrys(totalDataMap);
 	}
 
@@ -178,7 +184,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		List<Long> accuList = totalData.getListAccu();
 		List<Entry> entrys = totalData.getEntrys();
 		int size = sendList.size();
-		
+
 		for (int i = 0; i < size; ++i) {
 			Entry e = new Entry();
 			float senddelay = sendList.get(i) / 1000;
@@ -191,14 +197,16 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			int ackAlarm = ackdelay >= consumerBaseAlarmSetting.getAckDelay() ? 1 : 0;
 			int accuAlarm = accu >= consumerBaseAlarmSetting.getAccumulation() ? 1 : 0;
 			int numAlarm = sendAlarm + ackAlarm + accuAlarm;
-			
+
 			e.setConsumerId(totalData.getCid()).setTopic(totalData.getTopic()).setSenddelay(senddelay)
 					.setAckdelay(ackdelay).setAccu(accu).setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm)
 					.setAccuAlarm(accuAlarm).setNumAlarm(numAlarm).setEmail(totalData.getEmail())
-					.setName(totalData.getName()).setDpMobile(totalData.getDpMobile());
+					.setName(totalData.getName()).setDpMobile(totalData.getDpMobile())
+					.setBaseSendDelaly(totalData.getBaseSendDelaly()).setBaseAckDelaly(totalData.getBaseAckDelaly())
+					.setAccu(totalData.getBaseAccu());
 			entrys.add(e);
 		}
-		
+
 		totalData.setEntrys(entrys);
 	}
 
@@ -207,7 +215,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		List<Long> result = new ArrayList<Long>();
 		long delay = 0;
 		int size = number.size();
-		
+
 		for (int i = 0; i < size;) {
 			delay = number.get(i++);
 			if (i < size) {
@@ -217,7 +225,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				result.add(delay);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -228,7 +236,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			TotalData td = entry.getValue();
 			List<Entry> entrys = td.getEntrys();
-			
+
 			Date time = td.getTime();
 			MinuteEntry me = minuteEntryMap.get(time);
 			if (me == null) {
@@ -237,31 +245,31 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			if (me.getTime() == null) {
 				me.setTime(time);
 			}
-			
+
 			for (int i = 0; i < entrys.size(); ++i) {
 				me.addEntry(entrys.get(i));
 				minuteEntryMap.put(time, me);
 			}
-			
+
 		}
 
 		for (Map.Entry<Date, MinuteEntry> entry : minuteEntryMap.entrySet()) {
 			MinuteEntry me = entry.getValue();
-			
+
 			MinHeap minHeap = me.getDelayEntry();
 			int size = minHeap.getSize();
 			Entry[] sorted = new Entry[size];
-			for(int i = size - 1; i >= 0; i--){
+			for (int i = size - 1; i >= 0; i--) {
 				Entry eMin = minHeap.deleteMin();
 				sorted[i] = eMin;
 			}
 			minHeap.setHeap(sorted);
 			minHeap.setSize(size);
-			
+
 			boolean inserted = dashboardContainer.insertMinuteEntry(me);
 			logger.info(String.format("Insert MinuteEntry to dashboard %s", inserted ? "successfully" : "failed"));
 		}
-		
+
 		totalDataMap.clear();
 	}
 
