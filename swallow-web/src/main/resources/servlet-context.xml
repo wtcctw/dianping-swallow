@@ -36,6 +36,7 @@
 	 	      <entry key="message/*" value="layout/layout.htm" />
 	 	      <entry key="administrator/*" value="layout/layout.htm" />
 	 	      <entry key="setting/*" value="layout/layoutsetting.htm" />
+	 	      <entry key="tool/*" value="layout/layouttool.htm" />
 	 	      <entry key="*" value="layout/layout.htm" />
 		    </map>
 		 </property>

@@ -33,7 +33,7 @@ import com.mongodb.MongoException;
  *         2015年6月16日下午3:20:59
  */
 @Controller
-public class MessageDumpController extends AbstractMenuController {
+public class MessageDumpController extends AbstractSidebarBasedController {
 
 	public static final String FILEPATH = "/data/appdatas/swalllowweb/";
 
@@ -56,7 +56,7 @@ public class MessageDumpController extends AbstractMenuController {
 	@RequestMapping(value = "/console/download")
 	public ModelAndView download(HttpServletRequest request, HttpServletResponse response) {
 
-		return new ModelAndView("message/filedownload", createViewMap());
+		return new ModelAndView("tool/filedownload", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/message/auth/dump", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -141,6 +141,20 @@ public class MessageDumpController extends AbstractMenuController {
 
 	@Override
 	protected String getMenu() {
-		return "download";
+		return "tool";
+	}
+	
+	@Override
+	protected String getSide() {
+		
+		return "tool";
+	}
+	
+	private String subSide = "download";
+
+	@Override
+	public String getSubSide() {
+		
+		return subSide;
 	}
 }

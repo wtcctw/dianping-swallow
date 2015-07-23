@@ -21,11 +21,6 @@
 					<i class="icon-cloud  align-top bigger-125 icon-on-right"></i>
 					Message管理
 				</button>
-			</a> <a href="${rc.contextPath}/console/download"
-				class="navbar-brand">
-				<button class="btn  #if(${menu}=='download')btn-purple #else btn-info#end btn-xs swallow-nav-btn">
-					<i class="icon-download align-top bigger-125 icon-on-right"></i> 下载
-				</button>
 			</a> <a href="${rc.contextPath}/console/monitor/consumer/total/delay"
 				class="navbar-brand">
 				<button
@@ -33,20 +28,20 @@
 					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>
 					监控
 				</button>
-			</a> <a href="${rc.contextPath}/console/alarm"
-				class="navbar-brand">
-				<button
-					class="btn  #if(${menu}=='alarm')btn-purple #else btn-info#end btn-xs">
-					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>
-					报警查询
-				</button>
-			</a><a href="${rc.contextPath}/console/setting"
+			</a> <a href="${rc.contextPath}/console/setting"
 				class="navbar-brand">
 				<button class="btn  #if(${menu}=='setting')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
 					id="navbar-setting" style="#if(${isadmin})display: block;#else display: none;#end">
 					<i class="icon-lock align-top bigger-125 icon-on-right"></i> 设置
 				</button>
-			</a> <a href="${rc.contextPath}/console/administrator"
+			</a> <a href="${rc.contextPath}/console/tool"
+				class="navbar-brand">
+				<button
+					class="btn  #if(${menu}=='tool')btn-purple #else btn-info#end btn-xs">
+					<i class="icon-briefcase align-top bigger-125 icon-on-right"></i>
+					工具
+				</button>
+			</a><a href="${rc.contextPath}/console/administrator"
 				class="navbar-brand">
 				<button class="btn  #if(${menu}=='admin')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
 					id="navbar-admin" style="#if(${isadmin})display: block;#else display: none;#end">

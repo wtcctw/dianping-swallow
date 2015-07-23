@@ -22,14 +22,14 @@ import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.service.AlarmService;
 
 @Controller
-public class AlarmController extends AbstractMenuController {
+public class AlarmController extends AbstractSidebarBasedController {
 
 	@Autowired
 	private AlarmService alarmService;
 
-	@RequestMapping(value = "/console/alarm")
+	@RequestMapping(value = "/console/tool")
 	public ModelAndView alarm(HttpServletRequest request, HttpServletResponse response) {
-		return new ModelAndView("alarm/index", createViewMap());
+		return new ModelAndView("tool/warnquery", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/alarm/search", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -52,7 +52,7 @@ public class AlarmController extends AbstractMenuController {
 
 	@Override
 	protected String getMenu() {
-		return "alarm";
+		return "tool";
 	}
 	
 	private Date strToDate(String strTime){
@@ -65,6 +65,20 @@ public class AlarmController extends AbstractMenuController {
 			logger.info("data tranform failed.", e);
 			return new Date();
 		}
+	}
+
+	@Override
+	protected String getSide() {
+		
+		return "tool";
+	}
+	
+	private String subSide = "warning";
+
+	@Override
+	public String getSubSide() {
+		
+		return subSide;
 	}
 
 }
