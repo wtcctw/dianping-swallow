@@ -56,6 +56,7 @@
 			<mvc:mapping path="/console/monitor/consumer/*/delay" />
 			<mvc:mapping path="/console/monitor/dashboard" />
 			<mvc:mapping path="/console/setting/*" />
+			<mvc:mapping path="/console/alarm" />
 			<mvc:mapping path="/help" />
 			<bean class="com.dianping.swallow.web.interceptor.ModelAndViewInterceptor">
 			</bean>
