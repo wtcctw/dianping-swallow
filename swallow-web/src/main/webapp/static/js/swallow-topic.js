@@ -249,11 +249,6 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				var check = $(id).prop('checked');
 				$http.post(window.contextPath + '/api/topic/alarm', {"topic":topic,
 	        		"alarm":!check}).success(function(response) {
-	        			if(check){
-	        				alert(topic + " : 添加告警成功");
-	        			}else{
-	        				alert(topic + " : 解除告警成功")
-	        			}
 	        	});
 			}
 			

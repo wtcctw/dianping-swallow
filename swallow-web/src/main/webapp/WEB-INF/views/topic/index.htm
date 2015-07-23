@@ -55,7 +55,7 @@
 						<th
 							style="text-align: left; #if(${isadmin})display: block;#else display: none;#end">操作</th>
 					</tr>
-					<tr ng-repeat="t in searchPaginator.currentPageItems"
+					<tr ng-repeat="t in searchPaginator.currentPageItems | notblank"
 						on-finish-render-filters>
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left"><a
@@ -64,7 +64,7 @@
 						<td style="text-align: left" ng-bind="t.prop"></td>
 						<td style="text-align: left" ng-bind="t.time"></td>
 						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90">是否告警:</small> <input
+								<small class="muted smaller-90"></small> <input
 								id="alarm{{$index}}" type="checkbox" ng-model="t.alarm" ng-click="changealarm(t.name, $index)"
 								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
 						</label></td>

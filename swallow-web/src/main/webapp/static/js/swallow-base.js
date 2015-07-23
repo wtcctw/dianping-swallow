@@ -109,6 +109,19 @@ module.filter('reverse', function() {
   };
 });
 
+module.filter('notblank', function() {
+	  return function(items) {
+		  if(items != null){
+			  for(var i = 0; i < items.length; ++i){
+				  if(items[i].name == ""){
+					  items.remove(i);
+				  }
+			  }
+		  }
+		  return items;
+	  };
+	});
+
 module.directive('popOver', function ($compile) {
     var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/delay?cid={{clicked.consumerId}}'>发送延迟</a></th><th><a href='/console/monitor/consumer/{{clicked.topic}}/delay?cid={{clicked.consumerId}}'>ack延迟</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/accu?consumerId={{clicked.consumerId}}'>消息堆积</th></tr><tr ng-repeat='item in items'><td>{{item.topic}}</td><td id='send'>{{item.senddelay}}</td><td id='ack'>{{item.ackdelay}}</td><td : id='accu'>{{item.accu}}</td></tr></table>";
     var getTemplate = function (contentType) {
