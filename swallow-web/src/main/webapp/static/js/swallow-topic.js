@@ -45,9 +45,9 @@ module.factory('Paginator', function(){
 						self.currentPageItems = items.slice(0, pageSize);
 						for(var i = 0; i < self.currentPageItems.length; ++i){
 							if(whitelist.indexOf(self.currentPageItems[i].name) != -1){
-								self.currentPageItems[i]["alarm"] = "否";
+								self.currentPageItems[i]["alarm"] = false;
 							}else{
-								self.currentPageItems[i]["alarm"] = "是";
+								self.currentPageItems[i]["alarm"] = true;
 							}
 						}
 						self.hasNextVar = items.length === pageSize + 1;
@@ -144,22 +144,20 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 	        	}
 	        }
 			
-			$rootScope.doedit = function(topicname, topicprop, topictime, topicalarm){
-				var alarm = topicalarm == "否" ? true : false; //不报警
+			$rootScope.doedit = function(topicname, topicprop, topictime){
 				$('#myModal').modal('hide');
 				$http.post(window.contextPath + '/api/topic/edittopic', {"topic":topicname,"prop":topicprop,
-	        		"time":topictime, "alarm":alarm}).success(function(response) {
+	        		"time":topictime}).success(function(response) {
 					$scope.searchPaginator = Paginator(fetchFunction, 30, topicname , "");
 	        	});
 				return true;
 			}
 			
 			//for deal with re transmit for selected messages
-			$scope.dialog = function(topicname, topicprop, topictime, topicalarm) {
+			$scope.dialog = function(topicname, topicprop, topictime) {
 				$rootScope.topicname = topicname;
 				$rootScope.topicprop = topicprop;
 				$rootScope.topictime = topictime;
-				$rootScope.topicalarm = topicalarm;
 				ngDialog.open({
 							template : '\
 							<div class="widget-box">\
@@ -174,7 +172,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								</div>\
 								<div class="modal-footer">\
 									<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
-									<button type="button" class="btn btn-primary" ng-click="doedit(topicname,topicprop,topictime,topicalarm)&&closeThisDialog()">确定</button>\
+									<button type="button" class="btn btn-primary" ng-click="doedit(topicname,topicprop,topictime)&&closeThisDialog()">确定</button>\
 								</div>\
 							</div>\
 						</div>',
@@ -244,6 +242,19 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					}).error(function(data, status, headers, config) {
 					});
 					
+			}
+			
+			$scope.changealarm = function(topic, index){
+				var id = "#alarm" + index;
+				var check = $(id).prop('checked');
+				$http.post(window.contextPath + '/api/topic/alarm', {"topic":topic,
+	        		"alarm":!check}).success(function(response) {
+	        			if(check){
+	        				alert(topic + " : 添加告警成功");
+	        			}else{
+	        				alert(topic + " : 解除告警成功")
+	        			}
+	        	});
 			}
 			
 }]);

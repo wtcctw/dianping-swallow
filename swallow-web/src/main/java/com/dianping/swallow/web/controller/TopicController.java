@@ -57,7 +57,7 @@ public class TopicController extends AbstractMenuController {
 
 	@Resource(name = "consumerServerAlarmSettingService")
 	private ConsumerServerAlarmSettingService consumerServerAlarmSettingService;
-	
+
 	@Resource(name = "producerServerAlarmSettingService")
 	private ProducerServerAlarmSettingService producerServerAlarmSettingService;
 
@@ -74,9 +74,9 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object fetchTopicPage(int offset, int limit, String topic, String prop, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-		
+
 		boolean isAllEmpty = StringUtil.isEmpty(topic + prop);
-		
+
 		if (isAllEmpty) {
 			String username = extractUsernameUtils.getUsername(request);
 			Set<String> adminSet = userService.loadCachedAdministratorSet();
@@ -116,8 +116,7 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
 			@RequestParam(value = "time") String time,
-			@RequestParam(value = "exec_user", required = false) String approver,
-			@RequestParam(value = "alarm", required = false) boolean alarm, HttpServletRequest request,
+			@RequestParam(value = "exec_user", required = false) String approver, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -167,8 +166,6 @@ public class TopicController extends AbstractMenuController {
 			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.SUCCESS.getMessage());
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
 					username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-			updateConsumerServerAlarmSetting(topic, alarm);
-			updateProducerServerAlarmSetting(topic, alarm);
 		} else if (result == ResponseStatus.MONGOWRITE.getStatus()) {
 			map.put(MessageRetransmitController.STATUS, ResponseStatus.MONGOWRITE.getStatus());
 			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.MONGOWRITE.getMessage());
@@ -183,6 +180,16 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		return map;
+	}
+
+	@RequestMapping(value = "/api/topic/alarm", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public void editAlarmSetting(@RequestParam(value = "topic") String topic,
+			@RequestParam(value = "alarm") boolean alarm, HttpServletRequest request, HttpServletResponse response) {
+
+		updateConsumerServerAlarmSetting(topic, alarm);
+		updateProducerServerAlarmSetting(topic, alarm);
+
 	}
 
 	private void updateConsumerServerAlarmSetting(String topic, boolean alarm) {
@@ -214,7 +221,7 @@ public class TopicController extends AbstractMenuController {
 		}
 		logger.info(String.format("Nothing need to do about topic %s concerned with ConsumerServerAlarmSetting", topic));
 	}
-	
+
 	private void updateProducerServerAlarmSetting(String topic, boolean alarm) {
 
 		ProducerServerAlarmSetting producerServerAlarmSetting = producerServerAlarmSettingService.findDefault();

@@ -8,10 +8,8 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<context:component-scan base-package="com.dianping.swallow.web"/>
-	<!-- 激活自动代理功能 -->
+
 	<aop:aspectj-autoproxy proxy-target-class="true"/>
 	
-	<!-- 用户服务对象 -->
-<!-- 	<bean id="userService" class="com.dianping.swallow.web.controller.advice.TopicAspect" /> -->
 
 </beans>
