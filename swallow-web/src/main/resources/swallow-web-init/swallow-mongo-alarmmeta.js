@@ -1,5 +1,6 @@
 db=db.getSiblingDB('swallowwebapplication');
 
+
 db.swallowwebalarmmetac.update({
 	 "metaId" : 1
 	}, {
@@ -15,8 +16,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产服务器[IP]{ip}不能访问pigeon健康监测页面，可能宕机。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 },true,false);
 
 db.swallowwebalarmmetac.update({
@@ -34,8 +35,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产服务器[IP]{ip}未发送统计数据到管理端，可能宕机。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -53,8 +54,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -72,8 +73,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -91,8 +92,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -110,8 +111,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -129,8 +130,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -148,8 +149,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -167,8 +168,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产客户端[TOPIC]{topic}存储延时{currentValue}大于阈值{expectedValue}(s)。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -186,8 +187,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[IP]{ip}未发送统计数据到管理端，可能宕机。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -205,8 +206,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}，SLAVE端口处于打开状态。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -224,8 +225,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}，MASTER SLAVE端口都处于打开状态。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -243,8 +244,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}，MASTER SLAVE端口都处于未打开状态。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -262,8 +263,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -281,8 +282,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true,  false);
 
 db.swallowwebalarmmetac.update({
@@ -300,8 +301,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -319,8 +320,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 },true,false);
 
 db.swallowwebalarmmetac.update({
@@ -338,8 +339,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -357,8 +358,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -376,8 +377,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -395,8 +396,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -415,8 +416,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -434,8 +435,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}发送延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -453,8 +454,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -473,8 +474,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -492,8 +493,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -511,8 +512,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -531,8 +532,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -551,8 +552,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -570,8 +571,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -590,8 +591,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -609,8 +610,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}消息累积{currentValue}累积大于阈值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -628,8 +629,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -648,8 +649,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -667,8 +668,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -687,8 +688,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -707,8 +708,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务未开启。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -726,8 +727,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产服务器[IP]{ip}访问pigeon健康监测页面，已经正常。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 db.swallowwebalarmmetac.update({
@@ -745,8 +746,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "生产服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -765,8 +766,8 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
@@ -785,13 +786,13 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}，MASTER SLAVE端口已正常。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
 
 
 db.swallowwebalarmmetac.update({
-	 "metaId" : 42
+	"metaId" : 42
 	},{
     "metaId" : 42,
     "type" : "CONSUMER_SERVER_SLAVESERVICE_STARTED_OK",
@@ -805,23 +806,9 @@ db.swallowwebalarmmetac.update({
     "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务已正常开启。[{date}]",
     "alarmDetail" : "",
     "sendTimeSpan" : 5,
-    "createTime" : ISODate("2015-07-16T10:47:24.826Z"),
-    "updateTime" : ISODate("2015-07-16T10:47:24.826Z")
+    "createTime" : new Date(),
+    "updateTime" : new Date()
 }, true, false);
-
-
-//跟新某个字段
-db.swallowwebalarmmetac.update({ "sendTimeSpan" : 5}, { $set: {"sendTimeSpan" : 6}}, false, true);
-
-db.swallowwebalarmmetac.update({ "isSendSwallow" : false}, { $set: {"isSendSwallow" : true}}, false, true);
-
-db.swallowwebalarmmetac.update({ "isSendBusiness" : true}, { $set: {"isSendBusiness" : false}}, false, true);
-
-
-
-
-
-
 
 
 
