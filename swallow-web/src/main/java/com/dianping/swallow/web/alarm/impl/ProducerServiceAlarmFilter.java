@@ -8,9 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
 import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 
 /**
  *
@@ -37,7 +38,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 	@Override
 	public boolean doAccept() {
@@ -46,15 +47,19 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private boolean checkService() {
 		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
-		List<String> whiteList = swallowAlarmSettingService.getProducerWhiteList();
+		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 		for (String serverIp : producerServerIps) {
 			if (StringUtils.isBlank(serverIp)) {
 				continue;
 			}
 			if (!whiteList.contains(serverIp)) {
 				String url = StringUtils.replace(PIGEON_HEALTH_URL_KEY, "{ip}", serverIp);
-				if (!httpSerivice.httpGet(url).isSuccess()) {
-					alarmManager.producerServiceAlarm(serverIp);
+				if (!httpSerivice.httpGet(url).isSuccess() && !httpSerivice.httpGet(url).isSuccess()) {
+					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_PIGEON_SERVICE);
+					lastCheckStatus.put(serverIp, false);
+				} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
+					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_PIGEON_SERVICE_OK);
+					lastCheckStatus.put(serverIp, true);
 				}
 			}
 		}

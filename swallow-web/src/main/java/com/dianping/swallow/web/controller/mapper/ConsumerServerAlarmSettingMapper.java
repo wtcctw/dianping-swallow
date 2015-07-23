@@ -28,12 +28,14 @@ public class ConsumerServerAlarmSettingMapper {
 		consumerSendQPSAlarmSetting.setPeak(dto.getConsumersendpeak());
 		consumerSendQPSAlarmSetting.setValley(dto.getConsumersendvalley());
 		consumerSendQPSAlarmSetting.setFluctuation(dto.getConsumersendfluctuation());
+		consumerSendQPSAlarmSetting.setFluctuationBase(dto.getSendFluctuationBase());
 		alarmSetting.setSenderAlarmSetting(consumerSendQPSAlarmSetting);
 
 		QPSAlarmSetting consumerAckQPSAlarmSetting = new QPSAlarmSetting();
 		consumerAckQPSAlarmSetting.setPeak(dto.getConsumerackpeak());
 		consumerAckQPSAlarmSetting.setValley(dto.getConsumerackvalley());
 		consumerAckQPSAlarmSetting.setFluctuation(dto.getConsumerackfluctuation());
+		consumerAckQPSAlarmSetting.setFluctuationBase(dto.getAckFluctuationBase());
 		alarmSetting.setAckAlarmSetting(consumerAckQPSAlarmSetting);
 
 		alarmSetting.setServerId(dto.getServerId());
@@ -60,11 +62,13 @@ public class ConsumerServerAlarmSettingMapper {
 		dto.setConsumersendpeak(sendQPSAlarmSetting.getPeak());
 		dto.setConsumersendvalley(sendQPSAlarmSetting.getValley());
 		dto.setConsumersendfluctuation(sendQPSAlarmSetting.getFluctuation());
+		dto.setSendFluctuationBase(sendQPSAlarmSetting.getFluctuationBase());
 
 		QPSAlarmSetting ackQPSAlarmSetting = alarmSetting.getAckAlarmSetting();
 		dto.setConsumerackpeak(ackQPSAlarmSetting.getPeak());
 		dto.setConsumerackvalley(ackQPSAlarmSetting.getValley());
 		dto.setConsumerackfluctuation(ackQPSAlarmSetting.getFluctuation());
+		dto.setAckFluctuationBase(ackQPSAlarmSetting.getFluctuationBase());
 
 		List<String> whiteList = alarmSetting.getTopicWhiteList();
 		dto.setWhitelist(StringUtils.join(whiteList, DELIMITOR));

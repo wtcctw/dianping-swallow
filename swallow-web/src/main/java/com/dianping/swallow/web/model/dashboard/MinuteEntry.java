@@ -1,8 +1,6 @@
 package com.dianping.swallow.web.model.dashboard;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 
 
 
@@ -13,48 +11,40 @@ import java.util.List;
  */
 public class MinuteEntry {
 
-	private String time;
+	private Date time;
 
-	List<Entry> delayEntry = new ArrayList<Entry>();
-	
-	private static final int ENTRYSIZE = 12;
+	MinHeap delayEntry;
 	
 	public MinuteEntry() {
-
+		
+		delayEntry = new MinHeap();
 	}
 
-	public String getTime() {
+	public Date getTime() {
+		
 		return time;
 	}
 
-	public MinuteEntry setTime(String time) {
+	public MinuteEntry setTime(Date time) {
+		
 		this.time = time;
 		return this;
 	}
 
-	public List<Entry> getDelayEntry() {
+	
+	public MinHeap getDelayEntry() {
 		return delayEntry;
 	}
 
-	public MinuteEntry setDelayEntry(List<Entry> delayEntry) {
+	public MinuteEntry setDelayEntry(MinHeap delayEntry) {
+		
 		this.delayEntry = delayEntry;
 		return this;
 	}
-	
-	public MinuteEntry addEntry(Entry entry){
+
+	public boolean addEntry(Entry entry){
 		
-		int entrySize = delayEntry.size();
-		if(entrySize >= ENTRYSIZE){
-			if(entry.getNumAlarm() > delayEntry.get(entrySize - 1).getNumAlarm()){
-				delayEntry.remove(entrySize - 1);
-				delayEntry.add(entry);
-				Collections.sort(delayEntry);
-			}
-			return this;
-		}
-		delayEntry.add(entry);
-		Collections.sort(delayEntry);
-		return this;
+		return delayEntry.insert(entry);
 	}
 
 }

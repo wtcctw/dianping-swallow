@@ -143,15 +143,18 @@ module
 
 							$scope.consumeridEntry = {};
 							$scope.consumeridEntry.consumerId;
+							$scope.consumeridEntry.topicName;
 							$scope.consumeridEntry.senddelay;
 							$scope.consumeridEntry.ackdelay;
 							$scope.consumeridEntry.accumulation;
 							$scope.consumeridEntry.sendpeak;
 							$scope.consumeridEntry.sendvalley;
 							$scope.consumeridEntry.sendfluctuation;
+							$scope.consumeridEntry.sendFluctuationBase;
 							$scope.consumeridEntry.ackpeak;
 							$scope.consumeridEntry.ackvalley;
 							$scope.consumeridEntry.ackfluctuation;
+							$scope.consumeridEntry.ackFluctuationBase;
 
 							$scope.refreshpage = function(myForm) {
 								if ($scope.consumeridEntry.sendpeak < $scope.consumeridEntry.sendvalley
@@ -163,18 +166,14 @@ module
 								var param = JSON
 										.stringify($scope.consumeridEntry);
 
-								$
-										.ajax({
-											type : "POST",
+								$.ajax({type : "POST",
 											url : window.contextPath
 													+ '/console/setting/consumerid/create',
 											contentType : "application/json; charset=utf-8",
 											dataType : "json",
 											data : param,
 											success : function(data) {
-												$scope.searchPaginator = Paginator(
-														fetchFunction,
-														$scope.numrecord);
+												$scope.searchPaginator = Paginator(fetchFunction,$scope.numrecord);
 											}
 
 										});
@@ -182,28 +181,34 @@ module
 
 							$scope.clearModal = function() {
 								$scope.consumeridEntry.consumerId = "";
+								$scope.consumeridEntry.topicName = "";
 								$scope.consumeridEntry.senddelay = "";
 								$scope.consumeridEntry.ackdelay = "";
 								$scope.consumeridEntry.accumulation = "";
 								$scope.consumeridEntry.sendpeak = "";
 								$scope.consumeridEntry.sendvalley = "";
 								$scope.consumeridEntry.sendfluctuation = "";
+								$scope.consumeridEntry.sendFluctuationBase = "";
 								$scope.consumeridEntry.ackpeak = "";
 								$scope.consumeridEntry.ackvalley = "";
 								$scope.consumeridEntry.ackfluctuation = "";
+								$scope.consumeridEntry.ackFluctuationBase = "";
 							}
 
 							$scope.setModalInput = function(index) {
 								$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerId;
+								$scope.consumeridEntry.topicName = $scope.searchPaginator.currentPageItems[index].topicName;
 								$scope.consumeridEntry.senddelay = $scope.searchPaginator.currentPageItems[index].senddelay;
 								$scope.consumeridEntry.ackdelay = $scope.searchPaginator.currentPageItems[index].ackdelay;
 								$scope.consumeridEntry.accumulation = $scope.searchPaginator.currentPageItems[index].accumulation;
 								$scope.consumeridEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
 								$scope.consumeridEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
 								$scope.consumeridEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
+								$scope.consumeridEntry.sendFluctuationBase = $scope.searchPaginator.currentPageItems[index].sendFluctuationBase;
 								$scope.consumeridEntry.ackpeak = $scope.searchPaginator.currentPageItems[index].ackpeak;
 								$scope.consumeridEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
 								$scope.consumeridEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
+								$scope.consumeridEntry.ackFluctuationBase = $scope.searchPaginator.currentPageItems[index].ackFluctuationBase;
 							}
 
 							$rootScope.removerecord = function(cid) {

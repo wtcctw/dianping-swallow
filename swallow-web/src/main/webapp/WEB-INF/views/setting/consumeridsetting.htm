@@ -22,12 +22,15 @@
 					<tr>
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">ConsumerId</th>
+						<th style="text-align: left">Topic</th>
 						<th style="text-align: left">发送峰值</th>
 						<th style="text-align: left">发送谷值</th>
-						<th style="text-align: left">发送波动</th>
+						<th style="text-align: left">发送波动/倍</th>
+						<th style="text-align: left">发送波动基数</th>
 						<th style="text-align: left">确认峰值</th>
 						<th style="text-align: left">确认谷值</th>
 						<th style="text-align: left">确认波动/倍</th>
+						<th style="text-align: left">确认波动基数</th>
 						<th style="text-align: left">发送延迟/s</th>
 						<th style="text-align: left">确认延迟/s</th>
 						<th style="text-align: left">消息堆积</th>
@@ -36,17 +39,22 @@
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="ad.consumerId"></td>
+						<td style="text-align: left" ng-bind="ad.topicName"></td>
 						<td style="text-align: left"
 							ng-bind="ad.sendpeak"></td>
 						<td style="text-align: left"
 							ng-bind="ad.sendvalley"></td>
 						<td style="text-align: left"
 							ng-bind="ad.sendfluctuation"></td>
+						<td style="text-align: left"
+							ng-bind="ad.sendFluctuationBase"></td>
 						<td style="text-align: left" ng-bind="ad.ackpeak"></td>
 						<td style="text-align: left"
 							ng-bind="ad.ackvalley"></td>
 						<td style="text-align: left"
 							ng-bind="ad.ackfluctuation"></td>
+						<td style="text-align: left"
+							ng-bind="ad.ackFluctuationBase"></td>
 						<td style="text-align: left" ng-bind="ad.senddelay"></td>
 						<td style="text-align: left" ng-bind="ad.ackdelay"></td>
 						<td style="text-align: left" ng-bind="ad.accumulation"></td>
@@ -94,7 +102,9 @@
 											class="col-sm-2 control-label">谷值</label><input type="text"
 											class="col-sm-2" ng-model="consumeridEntry.sendvalley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.sendfluctuation" />
+											class="col-sm-2" ng-model="consumeridEntry.sendfluctuation" /><label
+											class="col-sm-2 control-label">波动基数</label><input type="text"
+											class="col-sm-2" ng-model="consumeridEntry.sendFluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -109,7 +119,9 @@
 											class="col-sm-2 control-label">谷值</label><input type="text"
 											class="col-sm-2" ng-model="consumeridEntry.ackvalley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.ackfluctuation" />
+											class="col-sm-2" ng-model="consumeridEntry.ackfluctuation" /><label
+											class="col-sm-2 control-label">波动基数</label><input type="text"
+											class="col-sm-2" ng-model="consumeridEntry.ackFluctuationBase" />
 									</div>
 								</div>
 							</div>

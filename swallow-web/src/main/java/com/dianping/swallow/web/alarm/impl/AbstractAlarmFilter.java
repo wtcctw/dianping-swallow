@@ -1,5 +1,8 @@
 package com.dianping.swallow.web.alarm.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dianping.swallow.web.alarm.AlarmFilter;
 import com.dianping.swallow.web.alarm.AlarmFilterChain;
 import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
@@ -11,9 +14,15 @@ import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
  */
 public abstract class AbstractAlarmFilter implements AlarmFilter {
 
+	private static final Logger logger = LoggerFactory.getLogger(AbstractAlarmFilter.class);
+	
 	@Override
 	public boolean accept(AlarmFilterChain alarmFilterChain) {
-		doAccept();
+		try {
+			doAccept();
+		} catch (Exception e) {
+			logger.error("[accept] doAccept has exception. ", e);
+		}
 		return alarmFilterChain.doNext();
 	}
 

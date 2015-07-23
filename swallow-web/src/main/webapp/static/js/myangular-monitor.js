@@ -185,31 +185,67 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 			return "";
 	}
 	
+	Date.prototype.Format = function (fmt) { //author: meizz 
+	    var o = {
+	        "M+": this.getMonth() + 1, //月份 
+	        "d+": this.getDate(), //日 
+	        "h+": this.getHours(), //小时 
+	        "m+": this.getMinutes(), //分 
+	        "s+": this.getSeconds(), //秒 
+	        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+	        "S": this.getMilliseconds() //毫秒 
+	    };
+	    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+	    for (var k in o)
+	    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+	    return fmt;
+	}
+	
+	$scope.getEntry = function(delayEntry){
+		defaultSize = 12;
+		var size = delayEntry.size > defaultSize ? defaultSize : delayEntry.size;
+		var emp = delayEntry.Heap;
+		var entrys = delayEntry.Heap.slice(0, size)
+		return entrys;
+	}
+	
 	$scope.getDashboardDelay = function(index) {
 		$scope.minuteEntrys = [];
-		var offset;
-		if(!$scope.hourchange){
-			offset = $scope.currentMin - index;
+		var date = new Date();
+		if(index != -1){
+			date.setMinutes(index,59,999);
 		}else{
-			
+			date.setSeconds(59,999);
 		}
-		$http.post(
-				window.contextPath + '/console/monitor/dashboard/delay/'
-						+ offset, {"currentmin":$scope.currentMin}).success(
-				function(data) {
-					$scope.starttime = data.starttime;
-					$scope.stoptime = data.stoptime;
-					$scope.minuteEntrys = data.entry;
-					if($scope.firstaccess){
-						$scope.currentMin = Number($scope.minuteEntrys[0].time
-								.split(":")[1]);
-						$scope.firstaccess = false;
-					}
-					$scope.currentRed = index == -1 ? $scope.currentMin : Number($scope.minuteEntrys[0].time
-							.split(":")[1]);
-				});
+		date.setHours(date.getHours() + 8);
+		$http({
+			method : 'GET',
+			params : {date: date},
+			url : window.contextPath + '/console/monitor/dashboard/delay/minute'
+		}).success(function(data, status, headers, config) {
+			$scope.minuteEntrys = data;
+			var len = data.length;
+			for(var i = 0; i < len; ++i){
+				var time = $scope.minuteEntrys[i].time;
+				var date = new Date(time);
+				var hour = date.getHours(); 
+				var min = date.getMinutes();
+				var minString = min.toString();
+				minString = (minString.length == 1) ? "0"+minString : minString;
+				var timeString = hour.toString() + ":" + minString;
+				$scope.minuteEntrys[i].time = timeString;
+			}
+			if($scope.firstaccess){
+				$scope.currentMin = Number($scope.minuteEntrys[0].time
+						.split(":")[1]);
+				$scope.firstaccess = false;
+			}
+			$scope.currentRed = index == -1 ? $scope.currentMin : Number($scope.minuteEntrys[0].time
+					.split(":")[1]);
+		});
+		
 	};
-
+	
 	$scope.pages = [ "00", "01", "02", "03", "04", "05", "06", "07", "08",
 			"09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
 			"20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
@@ -221,15 +257,12 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.clicked = [];
 	$scope.items = [];
 	$scope.table = function(parentindex, index) {
-		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry[index];
+		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry.Heap[index];
 		
-		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry[index].senddelay,
-		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry[index].ackdelay, 
-		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry[index].accu,
-		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry[index].topic} ];
-//		if($('.popover').length > 0){
-//			$('.popover').attr("style", "width : 600px");
-//		}
+		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].senddelay,
+		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].ackdelay, 
+		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].accu,
+		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].topic} ];
 	}
 	
 });

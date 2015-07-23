@@ -13,9 +13,9 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.manager.AlarmManager;
-import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 import com.dianping.swallow.web.util.NetUtil;
 
 /**
@@ -36,11 +36,10 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private volatile int slavePort = 8082;
 
-	@Autowired
-	private AlarmManager alarmManager;
+	private static final String KEY_SPLIT = "&";
 
 	@Autowired
-	private IPDescManager ipDescManager;
+	private AlarmManager alarmManager;
 
 	@Autowired
 	private IPCollectorService ipCollectorService;
@@ -48,7 +47,7 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 	private ConfigCache configCache;
 
 	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -84,44 +83,56 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 		if (consumerServerMasterIps == null || consumerServerMasterIps.size() == 0 || consumerServerSlaveIps == null
 				|| consumerServerSlaveIps.size() == 0) {
 			logger.error("[checkPort] cannot find consumermaster or consumerslave ips.");
-			return true;
+			return false;
 		}
-		if (consumerServerMasterIps.size() != consumerServerSlaveIps.size()) {
-			logger.error("[checkPort] consumermaster ips is not corresponding with consumerslave ips.");
-			return true;
-		}
-		List<String> whiteList = swallowAlarmSettingService.getConsumerWhiteList();
+		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 		int index = 0;
 
 		for (String masterIp : consumerServerMasterIps) {
 			if (whiteList == null || !whiteList.contains(masterIp)) {
-				alarmPort(masterIp, consumerServerSlaveIps.get(index++));
+				alarmPort(masterIp, consumerServerSlaveIps.get(index));
 			}
+			index++;
 		}
 		return true;
 	}
 
 	private boolean alarmPort(String masterIp, String slaveIp) {
 		boolean usingMaster = NetUtil.isPortOpen(masterIp, masterPort);
+		if (!usingMaster) {
+			usingMaster = NetUtil.isPortOpen(masterIp, masterPort);
+		}
 		boolean usingSlave = NetUtil.isPortOpen(slaveIp, slavePort);
+		if (!usingSlave) {
+			usingSlave = NetUtil.isPortOpen(masterIp, slavePort);
+		}
+		String key = masterIp + KEY_SPLIT + slaveIp;
 		if (!usingMaster && usingSlave) {
-			alarmManager.consumerPortAlarm(masterIp, slaveIp, false, true);
+			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_SLAVEPORT_OPENED);
+			lastCheckStatus.put(key, false);
 			return false;
 		} else if (usingMaster && usingSlave) {
-			alarmManager.consumerPortAlarm(masterIp, slaveIp, true, true);
+			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_BOTHPORT_OPENED);
+			lastCheckStatus.put(key, false);
 			return false;
 		} else if (!usingMaster && !usingSlave) {
-			alarmManager.consumerPortAlarm(masterIp, slaveIp, false, false);
+			alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_BOTHPORT_UNOPENED);
+			lastCheckStatus.put(key, false);
 			return false;
+		} else {
+			if (lastCheckStatus.containsKey(key) && !lastCheckStatus.get(key).booleanValue()) {
+				alarmManager.consumerServerAlarm(masterIp, slaveIp, AlarmType.CONSUMER_SERVER_PORT_OPENED_OK);
+				lastCheckStatus.put(key, true);
+			}
 		}
 		return true;
 	}
-	
-	public int getMasterPort(){
+
+	public int getMasterPort() {
 		return masterPort;
 	}
-	
-	public int getSlavePort(){
+
+	public int getSlavePort() {
 		return slavePort;
 	}
 

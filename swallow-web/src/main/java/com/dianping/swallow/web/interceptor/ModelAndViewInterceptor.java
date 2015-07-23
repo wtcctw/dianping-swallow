@@ -13,7 +13,7 @@ import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
-import com.dianping.swallow.web.service.AdministratorService;
+import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.AuthenticationService;
 
 /**
@@ -32,8 +32,8 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 	@Resource(name = "authenticationService")
 	private AuthenticationService authenticationService;
 	
-	@Resource(name = "administratorService")
-	private AdministratorService administratorService;
+	@Resource(name = "userService")
+	private UserService userService;
 
 	@Autowired
 	ExtractUsernameUtils extractUsernameUtils;
@@ -81,7 +81,7 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 		modelAndView.addObject(USERNAME, username);
 		modelAndView.addObject(LOGOUTURL, logoutUrl);
 		
-		administratorService.recordVisitToAdmin(username);
+		userService.createOrUpdateUser(username);
 
 		logger.info(String
 				.format("Add [username : %s], [visittype : %d],  [logouturl : %s] to ModelAndView",

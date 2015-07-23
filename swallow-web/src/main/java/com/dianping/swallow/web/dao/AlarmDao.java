@@ -6,10 +6,10 @@ import java.util.List;
 import com.dianping.swallow.web.model.alarm.Alarm;
 
 /**
-*
-* @author qiyin
-*
-*/
+ *
+ * @author qiyin
+ *
+ */
 public interface AlarmDao extends Dao {
 
 	/**
@@ -35,9 +35,10 @@ public interface AlarmDao extends Dao {
 	 * @return
 	 */
 	public int deleteById(String id);
-	
+
 	/**
 	 * find by id
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -54,25 +55,47 @@ public interface AlarmDao extends Dao {
 	/**
 	 * find by createTime
 	 * 
-	 * @param ipDesc
+	 * @param createTime
+	 * @param offset
+	 * @param limit
 	 * @return
 	 */
 	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit);
 
 	/**
+	 * find by receiver and createTime
+	 * @param receiver
+	 * @param timeStart
+	 * @param timeEnd
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit);
+
+	/**
 	 * find count by createTime
 	 * 
-	 * @param 
+	 * @param
 	 * @return
 	 */
 	public long countByCreateTime(Date createTime);
-	
+
 	/**
 	 * find count by receiver
 	 * 
-	 * @param 
+	 * @param
 	 * @return
 	 */
 	public long countByReceiver(String receiver);
+	
+	/**
+	 * find count by receiver and createTime
+	 * @param receiver
+	 * @param timeStart
+	 * @param timeEnd
+	 * @return
+	 */
+	public long countByReceiverAndTime(String receiver, Date startTime, Date endTime);
 
 }

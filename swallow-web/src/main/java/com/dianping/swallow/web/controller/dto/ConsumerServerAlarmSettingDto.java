@@ -18,11 +18,15 @@ public class ConsumerServerAlarmSettingDto {
 	
 	private int consumersendfluctuation;
 	
+	private long sendFluctuationBase;
+	
 	private long consumerackpeak;
 	
 	private long consumerackvalley;
 	
 	private int consumerackfluctuation;
+	
+	private long ackFluctuationBase;
 
 	public String getServerId() {
 		return serverId;
@@ -86,6 +90,22 @@ public class ConsumerServerAlarmSettingDto {
 
 	public void setConsumerackfluctuation(int consumerackfluctuation) {
 		this.consumerackfluctuation = consumerackfluctuation;
+	}
+
+	public long getSendFluctuationBase() {
+		return sendFluctuationBase;
+	}
+
+	public void setSendFluctuationBase(long sendFluctuationBase) {
+		this.sendFluctuationBase = sendFluctuationBase;
+	}
+
+	public long getAckFluctuationBase() {
+		return ackFluctuationBase;
+	}
+
+	public void setAckFluctuationBase(long ackFluctuationBase) {
+		this.ackFluctuationBase = ackFluctuationBase;
 	}
 
 }

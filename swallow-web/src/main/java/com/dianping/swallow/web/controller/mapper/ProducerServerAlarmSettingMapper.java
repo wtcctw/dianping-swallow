@@ -28,6 +28,7 @@ public class ProducerServerAlarmSettingMapper {
 		producerQPSAlarmSetting.setPeak(dto.getProducerpeak());
 		producerQPSAlarmSetting.setValley(dto.getProducervalley());
 		producerQPSAlarmSetting.setFluctuation(dto.getProducerfluctuation());
+		producerQPSAlarmSetting.setFluctuationBase(dto.getFluctuationBase());
 		alarmSetting.setDefaultAlarmSetting(producerQPSAlarmSetting);
 
 		alarmSetting.setServerId(dto.getServerId());
@@ -54,6 +55,7 @@ public class ProducerServerAlarmSettingMapper {
 		dto.setProducerpeak(producerQPSAlarmSetting.getPeak());
 		dto.setProducervalley(producerQPSAlarmSetting.getValley());
 		dto.setProducerfluctuation(producerQPSAlarmSetting.getFluctuation());
+		dto.setFluctuationBase(producerQPSAlarmSetting.getFluctuationBase());
 
 		List<String> whiteList = alarmSetting.getTopicWhiteList();
 		dto.setWhitelist(StringUtils.join(whiteList, DELIMITOR));

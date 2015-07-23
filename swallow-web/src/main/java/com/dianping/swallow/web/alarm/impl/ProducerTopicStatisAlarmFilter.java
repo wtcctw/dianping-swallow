@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
@@ -89,7 +90,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 				}
 				qpsAlarm(producerBaseStatisData.getQpx(), topicStatisData.getTopicName(), qps,
 						topicStatisData.getTimeKey());
-				delayAlarm(topicStatisData.getTopicName(), producerBaseStatisData.getDelay(), delay * 1000);
+				delayAlarm(topicStatisData.getTopicName(), producerBaseStatisData.getDelay() / 1000, delay);
 			}
 		}
 		return true;
@@ -99,21 +100,22 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	private boolean qpsAlarm(long qpx, String topicName, QPSAlarmSetting qps, long timeKey) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.producerTopicStatisQpsPAlarm(topicName, qpx, qps.getPeak());
+				alarmManager.producerTopicStatisAlarm(topicName, qpx, qps.getPeak(), AlarmType.PRODUCER_TOPIC_QPS_PEAK);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.producerTopicStatisQpsVAlarm(topicName, qpx, qps.getValley());
+				alarmManager.producerTopicStatisAlarm(topicName, qpx, qps.getValley(),
+						AlarmType.PRODUCER_TOPIC_QPS_VALLEY);
 				return false;
 			}
-			fluctuationAlarm(topicName, qpx, qps.getFluctuation(), timeKey);
+			fluctuationAlarm(topicName, qpx, qps, timeKey);
 		}
 
 		return true;
 
 	}
 
-	private boolean fluctuationAlarm(String topicName, long qpx, int fluctuation, long timeKey) {
+	private boolean fluctuationAlarm(String topicName, long qpx, QPSAlarmSetting qps, long timeKey) {
 		long preDayTimeKey = getPreDayKey(timeKey);
 		List<ProducerTopicStatsData> topicStatsDatas = topicStatisDataService.findSectionData(topicName, preDayTimeKey
 				- getTimeSection(), preDayTimeKey + getTimeSection());
@@ -134,20 +136,25 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 			return true;
 		}
 		int expectedQpx = sumQpx / sampleCount;
-		if (qpx > expectedQpx && (qpx / expectedQpx) > fluctuation) {
-			alarmManager.producerTopicStatisQpsFAlarm(topicName, qpx, expectedQpx);
-			return false;
-		}
-		if (qpx < expectedQpx && (expectedQpx / qpx) > fluctuation) {
-			alarmManager.producerTopicStatisQpsFAlarm(topicName, qpx, expectedQpx);
-			return false;
+		if (qpx > qps.getFluctuationBase() && expectedQpx > qps.getFluctuationBase()) {
+			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuationBase()) {
+				alarmManager.producerTopicStatisAlarm(topicName, qpx, expectedQpx,
+						AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION);
+				return false;
+			}
+			if (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuationBase()) {
+				alarmManager.producerTopicStatisAlarm(topicName, qpx, expectedQpx,
+						AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION);
+				return false;
+			}
 		}
 		return true;
 	}
 
 	private boolean delayAlarm(String topicName, long delay, long expectDelay) {
 		if (delay > expectDelay) {
-			alarmManager.producerTopicStatisQpsDAlarm(topicName, delay, expectDelay);
+			alarmManager
+					.producerTopicStatisAlarm(topicName, delay, expectDelay, AlarmType.PRODUCER_TOPIC_MESSAGE_DELAY);
 			return false;
 		}
 		return true;

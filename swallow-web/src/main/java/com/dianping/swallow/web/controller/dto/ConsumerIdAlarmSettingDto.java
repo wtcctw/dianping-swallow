@@ -13,12 +13,16 @@ public class ConsumerIdAlarmSettingDto {
 	private long sendvalley;
 
 	private int sendfluctuation;
+	
+	private long sendFluctuationBase;
 
 	private long ackpeak;
 	
 	private long ackvalley;
 	
 	private int ackfluctuation;
+	
+	private long ackFluctuationBase;
 
 	private long senddelay;
 	
@@ -27,6 +31,8 @@ public class ConsumerIdAlarmSettingDto {
 	private long accumulation;
 	
 	private String consumerId;
+
+	private String topicName;
 
 	public long getSendpeak() {
 		return sendpeak;
@@ -107,6 +113,29 @@ public class ConsumerIdAlarmSettingDto {
 	public void setConsumerId(String consumerId) {
 		this.consumerId = consumerId;
 	}
+
+	public long getSendFluctuationBase() {
+		return sendFluctuationBase;
+	}
+
+	public void setSendFluctuationBase(long sendFluctuationBase) {
+		this.sendFluctuationBase = sendFluctuationBase;
+	}
+
+	public long getAckFluctuationBase() {
+		return ackFluctuationBase;
+	}
+
+	public void setAckFluctuationBase(long ackFluctuationBase) {
+		this.ackFluctuationBase = ackFluctuationBase;
+	}
 	
+	public String getTopicName() {
+		return topicName;
+	}
+
+	public void setTopicName(String topicName) {
+		this.topicName = topicName;
+	}
 	
 }

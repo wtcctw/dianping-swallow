@@ -2,14 +2,14 @@ package com.dianping.swallow.web.model.alarm;
 
 import java.util.List;
 
-public class SwallowAlarmSetting extends BaseAlarmSetting{
+public class GlobalAlarmSetting extends BaseAlarmSetting{
 	
 	private String swallowId;
 	
 	private List<String> producerWhiteList;
 	
 	private List<String> consumerWhiteList;
-
+	
 	public List<String> getProducerWhiteList() {
 		return producerWhiteList;
 	}

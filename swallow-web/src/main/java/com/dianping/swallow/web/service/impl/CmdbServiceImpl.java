@@ -171,11 +171,13 @@ public class CmdbServiceImpl implements CmdbService, InitializingBean {
 				} finally {
 					in.close();
 				}
-
+			} else {
+				logger.info("[initProperties] Load {} file failed.", CMDB_API_URL_FILE);
+				throw new RuntimeException();
 			}
 		} catch (Exception e) {
-			logger.info("Load " + CMDB_API_URL_FILE + " file failed.");
-			throw new RuntimeException();
+			logger.info("[initProperties] Load {} file failed.", CMDB_API_URL_FILE);
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -5,14 +5,14 @@ package com.dianping.swallow.web.controller.dto;
  * @author qiyin
  *
  */
-public class SwallowAlarmSettingDto {
+public class GlobalAlarmSettingDto {
 
 	private String swallowId;
 
 	private String producerWhiteList;
 
 	private String consumerWhiteList;
-
+	
 	public String getSwallowId() {
 		return swallowId;
 	}

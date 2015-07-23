@@ -2,7 +2,6 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.StringUtils;
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.TopicDao;
+import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AbstractSwallowService;
-import com.dianping.swallow.web.service.AdministratorService;
 import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.UserService;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
 
@@ -36,24 +37,25 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	@Autowired
 	private TopicDao topicDao;
 
-	@Resource(name = "administratorService")
-	private AdministratorService administratorService;
+	@Resource(name = "userService")
+	private UserService userService;
 
 	private Map<String, Set<String>> topicToWhiteList = new ConcurrentHashMap<String, Set<String>>();
 
 	@Override
-	public Map<String, Object> loadAllTopic(int start, int span) {
-		return topicDao.findFixedTopic(start, span);
+	public Pair<Long, List<Topic>> loadTopicPage(int start, int span) {
+		
+		return topicDao.loadTopicPage(start, span);
 	}
 
 	@Override
-	public Map<String, Object> loadSpecificTopic(int start, int span, String name, String prop) {
+	public Pair<Long, List<Topic>> loadSpecificTopicPage(int start, int span, String name, String prop) {
 
-		return topicDao.findSpecific(start, span, name, prop);
+		return topicDao.loadSpecificTopicPage(start, span, name, prop);
 	}
 
 	@Override
-	public List<String> loadAllTopicNames(String tongXingZheng, boolean isAdmin) {
+	public List<String> loadTopicNames(String proposal, boolean isAdmin) {
 
 		Map<String, Set<String>> topicToWhiteList = this.loadTopicToWhiteList();
 		if (isAdmin) {
@@ -61,7 +63,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 		} else {
 			List<String> topics = new ArrayList<String>();
 			for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
-				if (entry.getValue().contains(tongXingZheng)) {
+				if (entry.getValue().contains(proposal)) {
 					String topic = entry.getKey();
 					if (!topics.contains(topic)) {
 						topics.add(topic);
@@ -91,12 +93,12 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public Map<String, String[]> getPropAndDept(String username, boolean all) {
-		Map<String, String[]> map = new HashMap<String, String[]>();
-		Set<String> proposal = new HashSet<String>();
-		List<Topic> topics = topicDao.findAll();
+	public String[] loadTopicProposal(String username, boolean isAdmin) {
 
-		if (all) {
+		Set<String> proposal = new HashSet<String>();
+		List<Topic> topics = topicDao.LoadTopics();
+
+		if (isAdmin) {
 			for (Topic topic : topics) {
 				proposal.addAll(getPropList(topic));
 			}
@@ -110,11 +112,12 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 
 		}
 
-		map.put("prop", proposal.toArray(new String[proposal.size()]));
-		List<String> tmpList = administratorService.loadAllTypeName();
-		map.put("edit", tmpList.toArray(new String[tmpList.size()]));
-
-		return map;
+		List<Administrator> adminList = userService.loadUsers();
+		for(Administrator admin : adminList){
+			proposal.add(admin.getName());
+		}
+		
+		return proposal.toArray(new String[proposal.size()]);
 	}
 
 	private Set<String> getPropList(Topic topic) {
@@ -146,7 +149,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public Topic loadTopic(String name) {
+	public Topic loadTopicByName(String name) {
 		return topicDao.readByName(name);
 	}
 

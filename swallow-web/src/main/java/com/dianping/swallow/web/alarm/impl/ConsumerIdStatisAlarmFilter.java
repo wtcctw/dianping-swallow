@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
@@ -19,6 +20,7 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
+import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
 /**
@@ -49,6 +51,9 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	@Autowired
 	private TopicAlarmSettingService topicAlarmSettingService;
 
+	@Autowired
+	private ConsumerServerAlarmSettingService serverAlarmSettingService;
+
 	@PostConstruct
 	public void initialize() {
 		super.initialize();
@@ -78,6 +83,7 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 		if (consumerIdAlarmSetting == null) {
 			return true;
 		}
+		List<String> topicWhiteList = serverAlarmSettingService.getTopicWhiteList();
 		List<String> whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
 		ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdAlarmSetting.getConsumerAlarmSetting();
 		QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
@@ -87,6 +93,9 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 		long accumulation = consumerAlarmSetting.getAccumulation();
 		for (Map.Entry<String, List<ConsumerIdStatsData>> consumerIdStatsDataEntry : consumerIdStatsDataMap.entrySet()) {
 			String topic = consumerIdStatsDataEntry.getKey();
+			if (topicWhiteList != null && topicWhiteList.contains(topic)) {
+				continue;
+			}
 			List<ConsumerIdStatsData> consumerIdStatsDatas = consumerIdStatsDataEntry.getValue();
 			for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
 				if (whiteList == null || !whiteList.contains(consumerIdStatsData.getConsumerId())) {
@@ -113,8 +122,8 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 						}
 					}
 
-					sendDelayAlarm(topic, consumerId, consumerBaseStatsData.getSendDelay(), sendDelay * 1000);
-					ackDelayAlarm(topic, consumerId, consumerBaseStatsData.getAckDelay(), ackDelay * 1000);
+					sendDelayAlarm(topic, consumerId, consumerBaseStatsData.getSendDelay() / 1000, sendDelay);
+					ackDelayAlarm(topic, consumerId, consumerBaseStatsData.getAckDelay() / 1000, ackDelay);
 					accumulationAlarm(topic, consumerId, consumerBaseStatsData.getAccumulation(), accumulation);
 				}
 			}
@@ -125,11 +134,13 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	private boolean sendQpsAlarm(String topic, String consumerId, long qpx, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerIdStatisSQpsPAlarm(topic, consumerId, qpx, qps.getPeak());
+				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, qps.getPeak(),
+						AlarmType.CONSUMER_CONSUMERID_SENDQPS_PEAK);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerIdStatisSQpsVAlarm(topic, consumerId, qpx, qps.getValley());
+				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, qps.getValley(),
+						AlarmType.CONSUMER_CONSUMERID_SENDQPS_VALLEY);
 				return false;
 			}
 		}
@@ -140,11 +151,13 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	private boolean ackQpsAlarm(String topic, String consumerId, long qpx, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerIdStatisAQpsPAlarm(topic, consumerId, qpx, qps.getPeak());
+				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, qps.getPeak(),
+						AlarmType.CONSUMER_CONSUMERID_ACKQPS_PEAK);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerIdStatisAQpsVAlarm(topic, consumerId, qpx, qps.getValley());
+				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, qps.getValley(),
+						AlarmType.CONSUMER_CONSUMERID_ACKQPS_VALLEY);
 				return false;
 			}
 		}
@@ -155,12 +168,17 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	private boolean sendFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx,
 			QPSAlarmSetting qps) {
 		if (qpx != 0 && expectedQpx != 0 && qps != null) {
+			if (qpx < qps.getFluctuationBase() && expectedQpx < qps.getFluctuationBase()) {
+				return true;
+			}
 			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
-				alarmManager.consumerIdStatisSQpsFAlarm(topic, consumerId, qpx, expectedQpx);
+				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, expectedQpx,
+						AlarmType.CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION);
 				return false;
 			}
 			if (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuation()) {
-				alarmManager.consumerIdStatisSQpsFAlarm(topic, consumerId, qpx, expectedQpx);
+				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, expectedQpx,
+						AlarmType.CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION);
 				return false;
 			}
 		}
@@ -169,12 +187,17 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 
 	private boolean ackFluctuationAlarm(String topic, String consumerId, long qpx, long expectedQpx, QPSAlarmSetting qps) {
 		if (qpx != 0 && expectedQpx != 0 && qps != null) {
+			if (qpx < qps.getFluctuationBase() && expectedQpx < qps.getFluctuationBase()) {
+				return true;
+			}
 			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation()) {
-				alarmManager.consumerIdStatisAQpsFAlarm(topic, consumerId, qpx, expectedQpx);
+				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, expectedQpx,
+						AlarmType.CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION);
 				return false;
 			}
 			if (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuation()) {
-				alarmManager.consumerIdStatisAQpsFAlarm(topic, consumerId, qpx, expectedQpx);
+				alarmManager.consumerIdStatisAlarm(topic, consumerId, qpx, expectedQpx,
+						AlarmType.CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION);
 				return false;
 			}
 		}
@@ -217,7 +240,8 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 
 	private boolean sendDelayAlarm(String topic, String consumerId, long delay, long expectDelay) {
 		if (delay > expectDelay) {
-			alarmManager.consumerIdStatisSQpsDAlarm(topic, consumerId, delay, expectDelay);
+			alarmManager.consumerIdStatisAlarm(topic, consumerId, delay, expectDelay,
+					AlarmType.CONSUMER_CONSUMERID_SENDMESSAGE_DELAY);
 			return false;
 		}
 		return true;
@@ -225,7 +249,8 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 
 	private boolean ackDelayAlarm(String topic, String consumerId, long delay, long expectDelay) {
 		if (delay > expectDelay) {
-			alarmManager.consumerIdStatisAQpsDAlarm(topic, consumerId, delay, expectDelay);
+			alarmManager.consumerIdStatisAlarm(topic, consumerId, delay, expectDelay,
+					AlarmType.CONSUMER_CONSUMERID_ACKMESSAGE_DELAY);
 			return false;
 		}
 		return true;
@@ -233,7 +258,8 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 
 	private boolean accumulationAlarm(String topic, String consumerId, long accumulation, long expectedAccumulation) {
 		if (accumulation > expectedAccumulation) {
-			alarmManager.consumerIdStatisSAccuAlarm(topic, consumerId, accumulation, expectedAccumulation);
+			alarmManager.consumerIdStatisAlarm(topic, consumerId, accumulation, expectedAccumulation,
+					AlarmType.CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION);
 			return false;
 		}
 		return true;

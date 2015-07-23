@@ -2,6 +2,9 @@ module.factory('Paginator', function(){
 	return function(fetchFunction, pageSize,  name, prop){
 		var paginator = {
 				hasNextVar: false,
+				loadalarm : function(){
+					
+				},
 				fetch: function(page){
 					this.currentOffset = (page - 1) * pageSize;
 					this._load();
@@ -16,8 +19,9 @@ module.factory('Paginator', function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
 					fetchFunction(this.currentOffset, pageSize + 1, name, prop, function(data){
-						items = data.topic;
-						length = data.size;
+						items = data.first.second;
+						length = data.first.first;
+						whitelist = data.second;
 						self.totalPage = Math.ceil(length/pageSize);
 						self.endPage = self.totalPage;
 						//生成链接
@@ -39,6 +43,13 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
+						for(var i = 0; i < self.currentPageItems.length; ++i){
+							if(whitelist.indexOf(self.currentPageItems[i].name) != -1){
+								self.currentPageItems[i]["alarm"] = "否";
+							}else{
+								self.currentPageItems[i]["alarm"] = "是";
+							}
+						}
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -103,9 +114,10 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicname = "";
 			$scope.topicprop = "";
 			$scope.topictime = "";
-			$scope.setModalInput = function(name,prop,time){
+			$scope.topicalarm = "";
+			$scope.setModalInput = function(name,prop,time,alarm){
 				$scope.topicname = name;
-				//clear all first
+				$("#alarmselect").val(alarm);
 				$('#topicprops').tagsinput('removeAll');
 				if(prop != null && prop.length > 0){
 					var props = prop.split(",");
@@ -119,8 +131,9 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.refreshpage = function(myForm){
 	        	$scope.topictime = $("#datetimepicker").val();
 	        	$scope.topicprop = $("#topicprops").val();
+	        	$scope.topicalarm = $("#alarmselect").val();
 	        	if($scope.topicprop.length == 0){
-	        		$scope.dialog($scope.topicname, $scope.topicprop, $scope.topictime);
+	        		$scope.dialog($scope.topicname, $scope.topicprop, $scope.topictime, $scope.topicalarm);
 	        	}
 	        	else{
 	        		$('#myModal').modal('hide');
@@ -131,20 +144,22 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 	        	}
 	        }
 			
-			$rootScope.doedit = function(topicname, topicprop, topictime){
+			$rootScope.doedit = function(topicname, topicprop, topictime, topicalarm){
+				var alarm = topicalarm == "否" ? true : false; //不报警
 				$('#myModal').modal('hide');
 				$http.post(window.contextPath + '/api/topic/edittopic', {"topic":topicname,"prop":topicprop,
-	        		"time":topictime}).success(function(response) {
+	        		"time":topictime, "alarm":alarm}).success(function(response) {
 					$scope.searchPaginator = Paginator(fetchFunction, 30, topicname , "");
 	        	});
 				return true;
 			}
 			
 			//for deal with re transmit for selected messages
-			$scope.dialog = function(topicname, topicprop, topictime) {
+			$scope.dialog = function(topicname, topicprop, topictime, topicalarm) {
 				$rootScope.topicname = topicname;
 				$rootScope.topicprop = topicprop;
 				$rootScope.topictime = topictime;
+				$rootScope.topicalarm = topicalarm;
 				ngDialog.open({
 							template : '\
 							<div class="widget-box">\
@@ -159,7 +174,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								</div>\
 								<div class="modal-footer">\
 									<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
-									<button type="button" class="btn btn-primary" ng-click="doedit(topicname,topicprop,topictime)&&closeThisDialog()">确定</button>\
+									<button type="button" class="btn btn-primary" ng-click="doedit(topicname,topicprop,topictime,topicalarm)&&closeThisDialog()">确定</button>\
 								</div>\
 							</div>\
 						</div>',

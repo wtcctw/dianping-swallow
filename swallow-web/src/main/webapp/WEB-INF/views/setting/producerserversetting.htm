@@ -24,6 +24,7 @@
 						<th style="text-align: left">发送峰值</th>
 						<th style="text-align: left">发送谷值</th>
 						<th style="text-align: left">发送波动</th>
+						<th style="text-align: left">波动基数</th>
 						<th style="text-align: left">操作</th>
 					</tr>
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
@@ -33,6 +34,7 @@
 						<td style="text-align: left" ng-bind="ad.producerpeak"></td>
 						<td style="text-align: left" ng-bind="ad.producervalley"></td>
 						<td style="text-align: left" ng-bind="ad.producerfluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.fluctuationBase"></td>
 						<td style="text-align: left"><a href="#myModal"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
@@ -88,7 +90,9 @@
 											class="col-sm-2 control-label">谷值</label><input type="text"
 											class="col-sm-2" ng-model="producerserverEntry.producervalley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="producerserverEntry.producerfluctuation" />
+											class="col-sm-2" ng-model="producerserverEntry.producerfluctuation" /><label
+											class="col-sm-2 control-label">波动基数</label><input type="text"
+											class="col-sm-2" ng-model="producerserverEntry.fluctuationBase" />
 									</div>
 								</div>
 							</div>

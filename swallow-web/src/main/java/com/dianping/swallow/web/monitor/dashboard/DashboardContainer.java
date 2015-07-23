@@ -1,100 +1,104 @@
 package com.dianping.swallow.web.monitor.dashboard;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
+import java.util.TreeSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.controller.DataMonitorController;
 import com.dianping.swallow.web.model.dashboard.MinuteEntry;
-
 
 /**
  * @author mingdongli
  *
- * 2015年7月7日上午9:36:43
+ *         2015年7月7日上午9:36:43
  */
 @Component
 public class DashboardContainer {
 
 	public static final int TOTALENTRYSIZE = 70;
 
-	private Map<String, List<MinuteEntry>> dashboards = new  ConcurrentHashMap<String, List<MinuteEntry>>();
+	public static final int FETCHENTRYSIZE = 10;
 	
-	private AtomicInteger entrySize = new AtomicInteger(0);
-	
-	public boolean insertMinuteEntry(String key, MinuteEntry minuteEntry) {
-		List<MinuteEntry> minuteEntries = null;
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+
+	private Map<Date, MinuteEntry> dashboards = new LinkedHashMap<Date, MinuteEntry>() {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected boolean removeEldestEntry(@SuppressWarnings("rawtypes") Map.Entry eldest) {
+			return size() >= TOTALENTRYSIZE;
+		}
+	};
+
+	public boolean insertMinuteEntry(MinuteEntry minuteEntry) {
+
 		boolean result;
 
-		if (dashboards.containsKey(key)) {
-			minuteEntries = dashboards.get(key);
-		} else {
-			minuteEntries = new ArrayList<MinuteEntry>();
-			dashboards.put(key, minuteEntries);
-		}
-		synchronized (minuteEntries) {
-			int size = minuteEntries.size();
+		synchronized (dashboards) {
 
-			while (size >= TOTALENTRYSIZE) {
-				minuteEntries.remove(0);
-				size--;
-			}
-			result = minuteEntries.add(minuteEntry);
-			entrySize.set(minuteEntries.size());
+			MinuteEntry me = dashboards.put(minuteEntry.getTime(), minuteEntry);
+			result = me == null ? true : false;
 		}
 		return result;
 	}
 
-	public List<MinuteEntry> fetchMinuteEntries(String key, int offset, int size) {
-		if (!dashboards.containsKey(key)) {
-			return new ArrayList<MinuteEntry>();
-		}
+	public List<MinuteEntry> fetchMinuteEntries(Date stop) {
+
+		Calendar calendarstart = Calendar.getInstance();
+		calendarstart.setTime(stop);
+		calendarstart.add(Calendar.MINUTE, -11);
+		calendarstart.clear(Calendar.SECOND);
+		calendarstart.clear(Calendar.MILLISECOND);
+		Date start = calendarstart.getTime();
+		
+		logger.info(String.format("Fetch MinuteEntries from %tc to %tc", start, stop));
+		Set<Date> treeSet = new TreeSet<Date>(new Comparator<Date>() {
+
+			@Override
+			public int compare(Date d1, Date d2) {
+				int num = d2.compareTo(d1);
+				return num;
+			}
+		});
 
 		List<MinuteEntry> result = new ArrayList<MinuteEntry>();
-		List<MinuteEntry> minuteEntries = dashboards.get(key);
 
-		synchronized (minuteEntries) {
-			int actualSize = minuteEntries.size();
-
-			int restSize = actualSize - offset;
-			if(offset >= actualSize){
-				return result;
-			}else if (restSize < DataMonitorController.ENTRYSIZE) {
-				result = minuteEntries.subList(0, restSize );
-			}else{
-				for (int i = restSize - size ; i < restSize; i++) {
-					result.add(minuteEntries.get(i));
+		synchronized (dashboards) {
+			Set<Date> dates = dashboards.keySet();
+			for (Date dt : dates) {
+				if (dt.after(start) && dt.before(stop)) {
+					treeSet.add(dt);
 				}
 			}
+
+			for (Date dt : treeSet) {
+				if(result.size() >= FETCHENTRYSIZE){
+					break;
+				}
+				result.add(dashboards.get(dt));
+			}
 		}
-		return reverseList(result);
+
+		return result;
 	}
 
-	public Map<String, List<MinuteEntry>> getDashboards() {
+	public Map<Date, MinuteEntry> getDashboards() {
 		return dashboards;
 	}
 
-	public void setDashboards(Map<String, List<MinuteEntry>> dashboards) {
+	public void setDashboards(Map<Date, MinuteEntry> dashboards) {
 		this.dashboards = dashboards;
 	}
 
-	public int getEntrySize() {
-		return entrySize.get();
-	}
-	
-	private List<MinuteEntry> reverseList(List<MinuteEntry> entry){
-		
-		List<MinuteEntry> result = new ArrayList<MinuteEntry>();
-		int size = entry.size();
-		for(int i = size - 1; i >= 0; i--){
-			result.add(entry.get(i));
-		}
-		return result;
-	}
 
 }
-

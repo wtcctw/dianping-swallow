@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.dao.SwallowAlarmSettingDao;
-import com.dianping.swallow.web.model.alarm.SwallowAlarmSetting;
+import com.dianping.swallow.web.dao.GlobalAlarmSettingDao;
+import com.dianping.swallow.web.model.alarm.GlobalAlarmSetting;
 import com.mongodb.WriteResult;
 
 /**
@@ -19,10 +19,10 @@ import com.mongodb.WriteResult;
  * @author qiyin
  *
  */
-@Service("swallowAlarmSettingDao")
-public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements SwallowAlarmSettingDao {
+@Service("globalAlarmSettingDao")
+public class DefaultGlobalAlarmSettingDao extends AbstractWriteDao implements GlobalAlarmSettingDao {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultSwallowAlarmSettingDao.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultGlobalAlarmSettingDao.class);
 
 	private static final String SWALLOWALARMSETTING_COLLECTION = "swallowwebswallowalarmsettingc";
 
@@ -31,7 +31,7 @@ public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements S
 	private static final String SWALLOWID_FIELD = "swallowId";
 
 	@Override
-	public boolean insert(SwallowAlarmSetting setting) {
+	public boolean insert(GlobalAlarmSetting setting) {
 		try {
 			mongoTemplate.save(setting, SWALLOWALARMSETTING_COLLECTION);
 			return true;
@@ -42,45 +42,45 @@ public class DefaultSwallowAlarmSettingDao extends AbstractWriteDao implements S
 	}
 
 	@Override
-	public boolean update(SwallowAlarmSetting setting) {
+	public boolean update(GlobalAlarmSetting setting) {
 		return insert(setting);
 	}
 
 	@Override
 	public int deleteById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, SwallowAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
+		WriteResult result = mongoTemplate.remove(query, GlobalAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
 	public int deleteByBySwallowId(String swallowId) {
 		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(swallowId));
-		WriteResult result = mongoTemplate.remove(query, SwallowAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
+		WriteResult result = mongoTemplate.remove(query, GlobalAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
-	public SwallowAlarmSetting findById(String id) {
+	public GlobalAlarmSetting findById(String id) {
 		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		SwallowAlarmSetting swallowAlarmSetting = mongoTemplate.findOne(query, SwallowAlarmSetting.class,
+		GlobalAlarmSetting swallowAlarmSetting = mongoTemplate.findOne(query, GlobalAlarmSetting.class,
 				SWALLOWALARMSETTING_COLLECTION);
 		return swallowAlarmSetting;
 	}
 
 	@Override
-	public SwallowAlarmSetting findBySwallowId(String swallowId) {
+	public GlobalAlarmSetting findBySwallowId(String swallowId) {
 		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(swallowId));
-		SwallowAlarmSetting swallowAlarmSetting = mongoTemplate.findOne(query, SwallowAlarmSetting.class,
+		GlobalAlarmSetting swallowAlarmSetting = mongoTemplate.findOne(query, GlobalAlarmSetting.class,
 				SWALLOWALARMSETTING_COLLECTION);
 		return swallowAlarmSetting;
 	}
 
 	@Override
-	public List<SwallowAlarmSetting> findByPage(int offset, int limit) {
+	public List<GlobalAlarmSetting> findByPage(int offset, int limit) {
 		Query query = new Query();
 		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, SWALLOWID_FIELD)));
-		List<SwallowAlarmSetting> swallowAlarmSettings = mongoTemplate.find(query, SwallowAlarmSetting.class,
+		List<GlobalAlarmSetting> swallowAlarmSettings = mongoTemplate.find(query, GlobalAlarmSetting.class,
 				SWALLOWALARMSETTING_COLLECTION);
 		return swallowAlarmSettings;
 	}

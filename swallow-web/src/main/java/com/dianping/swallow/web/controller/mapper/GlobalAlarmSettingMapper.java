@@ -5,34 +5,34 @@ import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 
-import com.dianping.swallow.web.controller.dto.SwallowAlarmSettingDto;
-import com.dianping.swallow.web.model.alarm.SwallowAlarmSetting;
+import com.dianping.swallow.web.controller.dto.GlobalAlarmSettingDto;
+import com.dianping.swallow.web.model.alarm.GlobalAlarmSetting;
 
-public class SwallowAlarmSettingMapper {
+public class GlobalAlarmSettingMapper {
 
 	private static final String DELIMITOR = ",";
 
-	public static SwallowAlarmSetting toSwallowAlarmSetting(SwallowAlarmSettingDto dto) {
+	public static GlobalAlarmSetting toSwallowAlarmSetting(GlobalAlarmSettingDto dto) {
 		if (dto == null) {
 			return null;
 		}
-		SwallowAlarmSetting swallowAlarmSetting = new SwallowAlarmSetting();
-		swallowAlarmSetting.setSwallowId(dto.getSwallowId());
+		GlobalAlarmSetting globalAlarmSetting = new GlobalAlarmSetting();
+		globalAlarmSetting.setSwallowId(dto.getSwallowId());
 		String strProducerWhite = dto.getProducerWhiteList();
-		swallowAlarmSetting.setProducerWhiteList(convertToList(strProducerWhite));
+		globalAlarmSetting.setProducerWhiteList(convertToList(strProducerWhite));
 		String strConsumerWhite = dto.getConsumerWhiteList();
-		swallowAlarmSetting.setConsumerWhiteList(convertToList(strConsumerWhite));
-		return swallowAlarmSetting;
+		globalAlarmSetting.setConsumerWhiteList(convertToList(strConsumerWhite));
+		return globalAlarmSetting;
 	}
 
-	public static SwallowAlarmSettingDto toSwallowAlarmSettingDto(SwallowAlarmSetting swallowAlarmSetting) {
-		if (swallowAlarmSetting == null) {
+	public static GlobalAlarmSettingDto toSwallowAlarmSettingDto(GlobalAlarmSetting globalAlarmSetting) {
+		if (globalAlarmSetting == null) {
 			return null;
 		}
-		SwallowAlarmSettingDto dto = new SwallowAlarmSettingDto();
-		dto.setSwallowId(swallowAlarmSetting.getSwallowId());
-		dto.setProducerWhiteList(convertToStr(swallowAlarmSetting.getProducerWhiteList()));
-		dto.setConsumerWhiteList(convertToStr(swallowAlarmSetting.getConsumerWhiteList()));
+		GlobalAlarmSettingDto dto = new GlobalAlarmSettingDto();
+		dto.setSwallowId(globalAlarmSetting.getSwallowId());
+		dto.setProducerWhiteList(convertToStr(globalAlarmSetting.getProducerWhiteList()));
+		dto.setConsumerWhiteList(convertToStr(globalAlarmSetting.getConsumerWhiteList()));
 		return dto;
 	}
 

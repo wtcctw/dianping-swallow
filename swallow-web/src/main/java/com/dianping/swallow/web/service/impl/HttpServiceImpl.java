@@ -11,6 +11,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.mortbay.jetty.HttpStatus;
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.service.HttpService;
-
 
 /**
  * 
@@ -29,7 +29,7 @@ import com.dianping.swallow.web.service.HttpService;
 public class HttpServiceImpl implements HttpService {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpServiceImpl.class);
-	
+
 	private static final String UTF_8 = "UTF-8";
 
 	@Override
@@ -61,6 +61,8 @@ public class HttpServiceImpl implements HttpService {
 		HttpResult result = new HttpResult();
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
+			httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 300);
+			httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 300);
 			HttpResponse response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));

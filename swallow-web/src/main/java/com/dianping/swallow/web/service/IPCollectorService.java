@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
@@ -70,6 +71,27 @@ public interface IPCollectorService {
 	 * clear statis consumerServerIps
 	 */
 	public void clearStatisConsumerServerIps();
+	
+	/**
+	 * get producer server master ips map
+	 * 
+	 * @return
+	 */
+	public Map<String,String> getProducerServerIpsMap();
+	
+	/**
+	 * get consumer server master ips map
+	 * 
+	 * @return
+	 */
+	public Map<String,String> getConsumerServerMasterIpsMap();
+	
+	/**
+	 * get consumer server slave ips map
+	 * 
+	 * @return
+	 */
+	public Map<String,String> getConsumerServerSlaveIpsMap();
 
 	/**
 	 * topic consumerId related ip
@@ -91,7 +113,7 @@ public interface IPCollectorService {
 	 * @return
 	 */
 	public Set<String> getConsumerTopicIps(String topicName);
-
+	
 	/**
 	 * topicConsumerIdIps' key
 	 * 

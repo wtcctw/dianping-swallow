@@ -162,26 +162,15 @@ module
 							});
 
 							$scope.topicEntry = {};
-							$scope.topicEntry.topic;
-							$scope.topicEntry.whitelist;
-							$scope.topicEntry.sendpeak;
-							$scope.topicEntry.sendvalley;
-							$scope.topicEntry.sendfluctuation;
-							$scope.topicEntry.senddelay;
-							$scope.topicEntry.consumersendpeak;
-							$scope.topicEntry.consumersendvalley;
-							$scope.topicEntry.consumersendfluctuation;
-							$scope.topicEntry.consumerackpeak;
-							$scope.topicEntry.consumerackvalley;
-							$scope.topicEntry.consumerackfluctuation;
-							$scope.topicEntry.consumersenddelay;
-							$scope.topicEntry.consumerackdelay;
-							$scope.topicEntry.consumeraccumulation;
+							$scope.topicEntry.topic = "";
+							$scope.topicEntry.whitelist = "";
+							$scope.topicEntry.producerpeak = "";
+							$scope.topicEntry.producervalley = "";
+							$scope.topicEntry.producerfluctuation = "";
+							$scope.topicEntry.producerdelay = "";
 
 							$scope.refreshpage = function(myForm) {
-								if ($scope.topicEntry.sendpeak < $scope.topicEntry.sendvalley
-										|| $scope.topicEntry.consumersendpeak < $scope.topicEntry.consumersendvalley
-										|| $scope.topicEntry.consumerackpeak < $scope.topicEntry.consumerackvalley) {
+								if ($scope.topicEntry.producerpeak < $scope.topicEntry.producervalley) {
 									alert("谷值不能小于峰值");
 									return;
 								}
@@ -212,20 +201,12 @@ module
 								$scope.topicEntry.producerpeak = "";
 								$scope.topicEntry.producervalley = "";
 								$scope.topicEntry.producerfluctuation = "";
+								$scope.topicEntry.producerFluctuationBase = "";
 								$scope.topicEntry.producerdelay = "";
-								$scope.topicEntry.consumersendpeak = "";
-								$scope.topicEntry.consumersendvalley = "";
-								$scope.topicEntry.consumersendfluctuation = "";
-								$scope.topicEntry.consumerackpeak = "";
-								$scope.topicEntry.consumerackvalley = "";
-								$scope.topicEntry.consumerackfluctuation = "";
-								$scope.topicEntry.consumersenddelay = "";
-								$scope.topicEntry.consumerackdelay = "";
-								$scope.topicEntry.consumeraccumulation = "";
 							}
 
 							$scope.setModalInput = function(index) {
-								var wl = $scope.topicEntry.whitelist;
+								var wl = $scope.searchPaginator.currentPageItems[index].whitelist;
 								$('#whitelist').tagsinput('removeAll');
 								if(wl != null && wl.length > 0){
 									var list = wl.split(",");
@@ -238,15 +219,7 @@ module
 								$scope.topicEntry.producervalley = $scope.searchPaginator.currentPageItems[index].producervalley;
 								$scope.topicEntry.producerfluctuation = $scope.searchPaginator.currentPageItems[index].producerfluctuation;
 								$scope.topicEntry.producerdelay = $scope.searchPaginator.currentPageItems[index].producerdelay;
-								$scope.topicEntry.consumersendpeak = $scope.searchPaginator.currentPageItems[index].consumersendpeak;
-								$scope.topicEntry.consumersendvalley = $scope.searchPaginator.currentPageItems[index].consumersendvalley;
-								$scope.topicEntry.consumersendfluctuation = $scope.searchPaginator.currentPageItems[index].consumersendfluctuation;
-								$scope.topicEntry.consumerackpeak = $scope.searchPaginator.currentPageItems[index].consumerackpeak;
-								$scope.topicEntry.consumerackvalley = $scope.searchPaginator.currentPageItems[index].consumerackvalley;
-								$scope.topicEntry.consumerackfluctuation = $scope.searchPaginator.currentPageItems[index].consumerackfluctuation;
-								$scope.topicEntry.consumersenddelay = $scope.searchPaginator.currentPageItems[index].consumersenddelay;
-								$scope.topicEntry.consumerackdelay = $scope.searchPaginator.currentPageItems[index].consumerackdelay;
-								$scope.topicEntry.consumeraccumulation = $scope.searchPaginator.currentPageItems[index].consumeraccumulation;
+								$scope.topicEntry.producerFluctuationBase = $scope.searchPaginator.currentPageItems[index].producerFluctuationBase;
 							}
 
 							$rootScope.removerecord = function(cid) {

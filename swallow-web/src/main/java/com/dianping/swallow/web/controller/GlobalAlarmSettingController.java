@@ -17,17 +17,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.dto.SwallowAlarmSettingDto;
-import com.dianping.swallow.web.controller.mapper.SwallowAlarmSettingMapper;
-import com.dianping.swallow.web.model.alarm.SwallowAlarmSetting;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.controller.dto.GlobalAlarmSettingDto;
+import com.dianping.swallow.web.controller.mapper.GlobalAlarmSettingMapper;
+import com.dianping.swallow.web.model.alarm.GlobalAlarmSetting;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 @Controller
-public class SwallowAlarmSettingController extends AbstractSidebarBasedController {
+public class GlobalAlarmSettingController extends AbstractSidebarBasedController {
 
-	@Resource(name = "swallowAlarmSettingService")
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	@Resource(name = "globalAlarmSettingService")
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 
 	@RequestMapping(value = "/console/setting/swallow")
@@ -40,10 +40,10 @@ public class SwallowAlarmSettingController extends AbstractSidebarBasedControlle
 	@ResponseBody
 	public Object producerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
 		
-		List<SwallowAlarmSetting> swallowAlarmSettingList = swallowAlarmSettingService.findByPage(offset, limit);
-		List<SwallowAlarmSettingDto> swallowAlarmSettingListDto = new ArrayList<SwallowAlarmSettingDto>();
-		for(SwallowAlarmSetting swallowAlarmSetting : swallowAlarmSettingList){
-			swallowAlarmSettingListDto.add(SwallowAlarmSettingMapper.toSwallowAlarmSettingDto(swallowAlarmSetting));
+		List<GlobalAlarmSetting> swallowAlarmSettingList = globalAlarmSettingService.findByPage(offset, limit);
+		List<GlobalAlarmSettingDto> swallowAlarmSettingListDto = new ArrayList<GlobalAlarmSettingDto>();
+		for(GlobalAlarmSetting swallowAlarmSetting : swallowAlarmSettingList){
+			swallowAlarmSettingListDto.add(GlobalAlarmSettingMapper.toSwallowAlarmSettingDto(swallowAlarmSetting));
 		}
 		return generateResponse(swallowAlarmSettingListDto);
 		
@@ -51,10 +51,10 @@ public class SwallowAlarmSettingController extends AbstractSidebarBasedControlle
 
 	@RequestMapping(value = "/console/setting/swallow/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public int producerserverSettingCreate(@RequestBody SwallowAlarmSettingDto dto) {
+	public int producerserverSettingCreate(@RequestBody GlobalAlarmSettingDto dto) {
 
-		SwallowAlarmSetting consumerServerAlarmSetting = SwallowAlarmSettingMapper.toSwallowAlarmSetting(dto);
-		boolean result = swallowAlarmSettingService.update(consumerServerAlarmSetting);
+		GlobalAlarmSetting consumerServerAlarmSetting = GlobalAlarmSettingMapper.toSwallowAlarmSetting(dto);
+		boolean result = globalAlarmSettingService.update(consumerServerAlarmSetting);
 		if(!result){
 			return ResponseStatus.SUCCESS.getStatus();
 		}else{
@@ -66,7 +66,7 @@ public class SwallowAlarmSettingController extends AbstractSidebarBasedControlle
 	@ResponseBody
 	public int remvoeProducerserverSettingCreate(@RequestParam(value = "swallowId") String swallowId) {
 		
-		int result = swallowAlarmSettingService.deleteByBySwallowId(swallowId);
+		int result = globalAlarmSettingService.deleteByBySwallowId(swallowId);
 		if(result > 0){
 			return ResponseStatus.SUCCESS.getStatus();
 		}else{
@@ -74,7 +74,7 @@ public class SwallowAlarmSettingController extends AbstractSidebarBasedControlle
 		}
 	}
 
-	private Map<String, Object> generateResponse(List<SwallowAlarmSettingDto> swallowAlarmSettingList){
+	private Map<String, Object> generateResponse(List<GlobalAlarmSettingDto> swallowAlarmSettingList){
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("size", swallowAlarmSettingList.size());

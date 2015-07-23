@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.statis.ProducerBaseStatsData;
@@ -18,7 +19,7 @@ import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerStatisDataService;
-import com.dianping.swallow.web.service.SwallowAlarmSettingService;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 
 /**
  *
@@ -46,7 +47,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private ProducerServerAlarmSettingService serverAlarmSettingService;
 
 	@Autowired
-	private SwallowAlarmSettingService swallowAlarmSettingService;
+	private GlobalAlarmSettingService globalAlarmSettingService;
 
 	@PostConstruct
 	public void initialize() {
@@ -75,7 +76,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 			return true;
 		}
 		QPSAlarmSetting qps = serverAlarmSetting.getDefaultAlarmSetting();
-		List<String> whiteList = swallowAlarmSettingService.getProducerWhiteList();
+		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 
 		if (qps == null || serverStatisData == null || serverStatisData.getStatisDatas() == null) {
 			return true;
@@ -93,11 +94,11 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean qpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.producerServerStatisQpsPAlarm(ip, qpx, qps.getPeak());
+				alarmManager.producerServerStatisAlarm(ip, qpx, qps.getPeak(), AlarmType.PRODUCER_SERVER_QPS_PEAK);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.producerServerStatisQpsVAlarm(ip, qpx, qps.getValley());
+				alarmManager.producerServerStatisAlarm(ip, qpx, qps.getValley(), AlarmType.PRODUCER_SERVER_QPS_VALLEY);
 				return false;
 			}
 		}

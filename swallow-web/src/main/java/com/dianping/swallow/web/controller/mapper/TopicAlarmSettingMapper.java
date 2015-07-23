@@ -36,6 +36,7 @@ public class TopicAlarmSettingMapper {
 		
 		producerQPSAlarmSetting.setPeak(dto.getProducerpeak());
 		producerQPSAlarmSetting.setFluctuation(dto.getProducerfluctuation());
+		producerQPSAlarmSetting.setFluctuationBase(dto.getProducerFluctuationBase());
 		producerQPSAlarmSetting.setValley(dto.getProducervalley());
 		producerBaseAlarmSetting.setQpsAlarmSetting(producerQPSAlarmSetting);
 		producerBaseAlarmSetting.setDelay(dto.getProducerdelay());
@@ -44,12 +45,14 @@ public class TopicAlarmSettingMapper {
 		consumerSendQPSAlarmSetting.setPeak(dto.getConsumersendpeak());
 		consumerSendQPSAlarmSetting.setValley(dto.getConsumersendvalley());
 		consumerSendQPSAlarmSetting.setFluctuation(dto.getConsumersendfluctuation());
+		consumerSendQPSAlarmSetting.setFluctuationBase(dto.getConsumerSendFluctuationBase());
 		consumerBaseAlarmSetting.setSendQpsAlarmSetting(consumerSendQPSAlarmSetting);
 
 		QPSAlarmSetting consumerAckQPSAlarmSetting = new QPSAlarmSetting();
 		consumerAckQPSAlarmSetting.setPeak(dto.getConsumerackpeak());
 		consumerAckQPSAlarmSetting.setValley(dto.getConsumerackvalley());
 		consumerAckQPSAlarmSetting.setFluctuation(dto.getConsumerackfluctuation());
+		consumerAckQPSAlarmSetting.setFluctuationBase(dto.getConsumerAckFluctuationBase());
 		consumerBaseAlarmSetting.setAckQpsAlarmSetting(consumerAckQPSAlarmSetting);
 		
 		consumerBaseAlarmSetting.setAckQpsAlarmSetting(consumerAckQPSAlarmSetting);
@@ -85,11 +88,13 @@ public class TopicAlarmSettingMapper {
 		dto.setConsumersendpeak(sendQPSAlarmSetting.getPeak());
 		dto.setConsumersendvalley(sendQPSAlarmSetting.getValley());
 		dto.setConsumersendfluctuation(sendQPSAlarmSetting.getFluctuation());
+		dto.setConsumerSendFluctuationBase(sendQPSAlarmSetting.getFluctuationBase());
 		
 		QPSAlarmSetting ackQPSAlarmSetting = consumerBaseAlarmSetting.getAckQpsAlarmSetting();
 		dto.setConsumerackpeak(ackQPSAlarmSetting.getPeak());
 		dto.setConsumerackvalley(ackQPSAlarmSetting.getValley());
 		dto.setConsumerackfluctuation(ackQPSAlarmSetting.getFluctuation());
+		dto.setConsumerAckFluctuationBase(ackQPSAlarmSetting.getFluctuationBase());
 		
 		dto.setConsumersenddelay(consumerBaseAlarmSetting.getSendDelay());
 		dto.setConsumerackdelay(consumerBaseAlarmSetting.getAckDelay());
@@ -101,6 +106,7 @@ public class TopicAlarmSettingMapper {
 		dto.setProducerpeak(producerQPSAlarmSetting.getPeak());
 		dto.setProducervalley(producerQPSAlarmSetting.getValley());
 		dto.setProducerfluctuation(producerQPSAlarmSetting.getFluctuation());
+		dto.setProducerFluctuationBase(producerQPSAlarmSetting.getFluctuationBase());
 		dto.setProducerdelay(producerBaseAlarmSetting.getDelay());
 		
 		List<String> whiteList = alarmSetting.getConsumerIdWhiteList();

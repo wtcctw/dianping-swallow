@@ -118,7 +118,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.producerserverEntry.producerpeak;
 	$scope.producerserverEntry.producervalley;
 	$scope.producerserverEntry.producerfluctuation;
-	
+	$scope.producerserverEntry.fluctuationBase;
 	$scope.refreshpage = function(myForm){
 		if ($scope.producerserverEntry.producerpeak < $scope.producerserverEntry.producervalley){
 			alert("谷值不能小于峰值");
@@ -147,10 +147,11 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.producerpeak = "";
 		$scope.producerserverEntry.producervalley = "";
 		$scope.producerserverEntry.producerfluctuation = "";
+		$scope.producerserverEntry.fluctuationBase = "";
 	}
 	
 	$scope.setModalInput = function(index){
-		var wl = $scope.producerserverEntry.whitelist;
+		var wl = $scope.searchPaginator.currentPageItems[index].whitelist;
 		$('#whitelist').tagsinput('removeAll');
 		if(wl != null && wl.length > 0){
 			var list = wl.split(",");
@@ -162,6 +163,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;
 		$scope.producerserverEntry.producervalley = $scope.searchPaginator.currentPageItems[index].producervalley;
 		$scope.producerserverEntry.producerfluctuation = $scope.searchPaginator.currentPageItems[index].producerfluctuation;
+		$scope.producerserverEntry.fluctuationBase = $scope.searchPaginator.currentPageItems[index].fluctuationBase;
 	}
 	
 	$rootScope.removerecord = function(sid){

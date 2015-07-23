@@ -103,9 +103,11 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.consumersendpeak;
 	$scope.consumerserverEntry.consumersendvalley;
 	$scope.consumerserverEntry.consumersendfluctuation;
+	$scope.consumerserverEntry.sendFluctuationBase;
 	$scope.consumerserverEntry.consumerackpeak;
 	$scope.consumerserverEntry.consumerackvalley;
 	$scope.consumerserverEntry.consumerackfluctuation;
+	$scope.consumerserverEntry.ackFluctuationBase;
 	
 	$scope.refreshpage = function(myForm){
 		if ($scope.consumerserverEntry.consumersendpeak < $scope.consumerserverEntry.consumersendvalley
@@ -177,13 +179,15 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.consumersendpeak = "";
 		$scope.consumerserverEntry.consumersendvalley = "";
 		$scope.consumerserverEntry.consumersendfluctuation = "";
+		$scope.consumerserverEntry.sendFluctuationBase = "";
 		$scope.consumerserverEntry.consumerackpeak = "";
 		$scope.consumerserverEntry.consumerackvalley = "";
 		$scope.consumerserverEntry.consumerackfluctuation = "";
+		$scope.consumerserverEntry.ackFluctuationBase = "";
 	}
 	
 	$scope.setModalInput = function(index){
-		var wl = $scope.consumerserverEntry.whitelist;
+		var wl = $scope.searchPaginator.currentPageItems[index].whitelist;
 		$('#whitelist').tagsinput('removeAll');
 		if(wl != null && wl.length > 0){
 			var list = wl.split(",");
@@ -195,9 +199,11 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.consumersendpeak = $scope.searchPaginator.currentPageItems[index].consumersendpeak;
 		$scope.consumerserverEntry.consumersendvalley = $scope.searchPaginator.currentPageItems[index].consumersendvalley;
 		$scope.consumerserverEntry.consumersendfluctuation = $scope.searchPaginator.currentPageItems[index].consumersendfluctuation;
+		$scope.consumerserverEntry.sendFluctuationBase = $scope.searchPaginator.currentPageItems[index].sendFluctuationBase;
 		$scope.consumerserverEntry.consumerackpeak = $scope.searchPaginator.currentPageItems[index].consumerackpeak;
 		$scope.consumerserverEntry.consumerackvalley = $scope.searchPaginator.currentPageItems[index].consumerackvalley;
 		$scope.consumerserverEntry.consumerackfluctuation = $scope.searchPaginator.currentPageItems[index].consumerackfluctuation;
+		$scope.consumerserverEntry.ackFluctuationBase = $scope.searchPaginator.currentPageItems[index].ackFluctuationBase;
 	}
 	
 	$rootScope.removerecord = function(sid){
