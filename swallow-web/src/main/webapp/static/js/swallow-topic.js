@@ -115,14 +115,15 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicprop = "";
 			$scope.topictime = "";
 			$scope.topicalarm = "";
-			$scope.setModalInput = function(name,prop,time,alarm){
+			$scope.blankprop = true;
+			$scope.setModalInput = function(name,prop,time){
 				$scope.topicname = name;
-				$("#alarmselect").val(alarm);
 				$('#topicprops').tagsinput('removeAll');
 				if(prop != null && prop.length > 0){
 					var props = prop.split(",");
 					for(var i = 0; i < props.length; ++i)
 						$('#topicprops').tagsinput('add', props[i]);
+					$scope.blankprop = false;
 				}
 				$scope.topicprop  = prop;
 				$scope.topictime = time;
@@ -132,7 +133,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 	        	$scope.topictime = $("#datetimepicker").val();
 	        	$scope.topicprop = $("#topicprops").val();
 	        	$scope.topicalarm = $("#alarmselect").val();
-	        	if($scope.topicprop.length == 0){
+	        	if($scope.topicprop.length == 0 && !$scope.blankprop){
 	        		$scope.dialog($scope.topicname, $scope.topicprop, $scope.topictime, $scope.topicalarm);
 	        	}
 	        	else{
@@ -218,8 +219,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						method : 'GET',
 						url : window.contextPath + '/console/topic/propdept'
 					}).success(function(data, status, headers, config) {
-						var props = data.prop;
-						var edits = data.edit;
+						var props = data;
 						$("#searchprop").typeahead({
 							items: 16, 
 							source : props,
@@ -232,8 +232,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						//work
 						$('#topicprops').tagsinput({
 							  typeahead: {
-								  items: 16, 
-								  source: edits,
+								  items: 16,
+								  source: props,
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
