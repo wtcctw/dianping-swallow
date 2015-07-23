@@ -113,8 +113,8 @@ module.filter('notblank', function() {
 	  return function(items) {
 		  if(items != null){
 			  for(var i = 0; i < items.length; ++i){
-				  if(items[i].name == ""){
-					  items.remove(i);
+				  if(typeof(items[i].name) == "undefined"){
+					  items.splice(i, 1);
 				  }
 			  }
 		  }
