@@ -185,6 +185,27 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 			return "";
 	}
 	
+    $scope.boards = [
+	                        { id: 1, type: "综合大盘" },
+	                        { id: 2, type: "发送延迟大盘" },
+	                        { id: 3, type: "确认延迟大盘" },
+	                        { id: 4, type: "堆积大盘" }
+	                      ];
+	$scope.boardtype = $scope.boards[0].type;
+	
+    $scope.makeChanged = function(){
+    	if($scope.tname.length != 0){
+			var sort;
+			if(typeof($scope.searchPaginator) != "undefined"){
+				sort = $scope.searchPaginator.reverse;
+			}
+    		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, sort);
+    		if(typeof($scope.searchPaginator) != "undefined"){
+    			$scope.searchPaginator.reverse = sort;	            		
+    		}
+    	}
+    };
+	
 	Date.prototype.Format = function (fmt) { //author: meizz 
 	    var o = {
 	        "M+": this.getMonth() + 1, //月份 
@@ -225,17 +246,6 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		}).success(function(data, status, headers, config) {
 			$scope.minuteEntrys = data;
 			var len = data.length;
-//			for(var i = 0; i < len; ++i){
-//				var time = $scope.minuteEntrys[i].time;
-//				var date = new Date(time);
-//				var hour = date.getHours(); 
-//				var min = date.getMinutes();
-//				var minString = min.toString();
-//				minString = (minString.length == 1) ? "0"+minString : minString;
-//				var timeString = hour.toString() + ":" + minString;
-//				$scope.minuteEntrys[i].time = timeString;
-//			}
-			
 			var date = new Date($scope.minuteEntrys[0].time)
 			if($scope.firstaccess){
 				$scope.currentMin = date.getMinutes();

@@ -224,7 +224,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			$scope.messageId      = "";
 			$scope.tname          = "";
 			
-			$scope.suburl         = "/console/message/messagedefault";
+			$scope.suburl         = "/console/message/auth/list";
 			
 			$scope.totalmessage   = [];
 			$scope.lastpage       = 0;

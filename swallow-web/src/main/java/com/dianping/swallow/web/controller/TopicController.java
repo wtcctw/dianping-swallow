@@ -47,6 +47,8 @@ public class TopicController extends AbstractMenuController {
 
 	private static final String DELIMITOR = ",";
 
+	private static final String POSTFIX = "@dianping.com";
+
 	public static final String ALL = "all";
 
 	@Resource(name = "topicService")
@@ -135,6 +137,7 @@ public class TopicController extends AbstractMenuController {
 			} else {
 				String proposal = topicService.loadTopicByName(topic).getProp();
 				StringBuffer sb = new StringBuffer();
+				prop = checkProposalName(prop);
 				if (StringUtils.isNotEmpty(proposal)) {
 					sb.append(proposal).append(",").append(prop);
 				} else {
@@ -190,6 +193,15 @@ public class TopicController extends AbstractMenuController {
 		updateConsumerServerAlarmSetting(topic, alarm);
 		updateProducerServerAlarmSetting(topic, alarm);
 
+	}
+	
+	private String checkProposalName(String proposal){
+		
+		if(proposal.contains(POSTFIX)){
+			int index = proposal.indexOf(POSTFIX);
+			proposal = proposal.substring(0, index);
+		}
+		return proposal.trim();
 	}
 
 	private void updateConsumerServerAlarmSetting(String topic, boolean alarm) {

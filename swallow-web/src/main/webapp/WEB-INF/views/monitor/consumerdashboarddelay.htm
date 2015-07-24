@@ -22,6 +22,15 @@
 				</div>
 			</div>
 			<div class="page-content" id="container">
+				<div class="row" style="margin-bottom:10px">
+					<table>
+						<tr style="text-align: left">
+							<th><select class="selectpicker" ng-model="boardtype"
+								ng-change="onchanged()"
+								ng-options="item.type as item.type for item in boards"></select></th>
+						</tr>
+					</table>
+				</div>
 				<div>
 					<div class="row">
 						<table ng-repeat="minuteEntry in minuteEntrys"
@@ -30,14 +39,15 @@
 								<th colspan="2" class="text-danger" class="text-danger"><h6
 										ng-bind="minuteEntry.time | date : 'HH:mm'"></h6></th>
 							</tr>
-							<tr style="color:#AAAAAA">
+							<tr style="color: #AAAAAA">
 								<td style="text-align: left; width: 120px">ConsumerID</td>
 								<td style="text-align: left; width: 40px">状态</td>
 							</tr>
 							<tr ng-repeat="entry in getEntry(minuteEntry.delayEntry)"
 								ng-class="{'alert-row': entry.numAlarm>0}">
-								<td style="text-align: left; width: 120px" 
-									data-toggle="tooltip" data-html="true" data-placement="top" title="业务名 {{entry.name}} 开发: {{entry.dpMobile}}" 
+								<td style="text-align: left; width: 120px" data-toggle="tooltip"
+									data-html="true" data-placement="top"
+									title="业务名 {{entry.name}} 开发: {{entry.dpMobile}}"
 									ng-bind="entry.consumerId | limitTo : 15"></td>
 								<td style="text-align: left; width: 40px; cursor: pointer;"
 									pop-over items="items" title="统计值" clicked="clicked"

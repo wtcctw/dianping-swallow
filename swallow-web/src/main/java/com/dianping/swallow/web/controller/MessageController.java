@@ -39,7 +39,7 @@ public class MessageController extends AbstractMenuController {
 		return new ModelAndView("message/index", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/message/messagedefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/auth/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object messageDefault(int offset, int limit, String tname, String messageId, String startdt, String stopdt,
 			String basemid, boolean sort, HttpServletRequest request, HttpServletResponse response) {
