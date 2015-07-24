@@ -10,3 +10,5 @@ db.swallowwebalarmmetac.update({ "isSendBusiness" : true}, { $set: {"isSendBusin
 
 //是否发送邮件
 db.swallowwebalarmmetac.update({ "isMailMode" : false}, { $set: {"isMailMode" : true}}, false, true);
+
+
