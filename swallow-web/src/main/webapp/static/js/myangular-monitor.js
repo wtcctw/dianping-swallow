@@ -193,19 +193,6 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	                      ];
 	$scope.boardtype = $scope.boards[0].type;
 	
-    $scope.makeChanged = function(){
-    	if($scope.tname.length != 0){
-			var sort;
-			if(typeof($scope.searchPaginator) != "undefined"){
-				sort = $scope.searchPaginator.reverse;
-			}
-    		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, sort);
-    		if(typeof($scope.searchPaginator) != "undefined"){
-    			$scope.searchPaginator.reverse = sort;	            		
-    		}
-    	}
-    };
-	
 	Date.prototype.Format = function (fmt) { //author: meizz 
 	    var o = {
 	        "M+": this.getMonth() + 1, //月份 
@@ -255,6 +242,69 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		});
 		
 	};
+	
+    $scope.onchanged = function(){
+    	if($scope.boardtype == "综合大盘"){
+    		$scope.showBoard();
+    	}else if($scope.boardtype == "发送延迟大盘"){
+    		$scope.showSendDelayBoard();
+    	}else if($scope.boardtype == "确认延迟大盘"){
+    		$scope.showAckDelayBoard();
+    	}else {
+    		$scope.showAccuBoard();
+    	}
+    };
+    
+    $scope.showBoard = function(){
+    	var mesize = $scope.minuteEntrys.length;
+    	for(i = 0; i < mesize; ++i){
+    		var array = $scope.minuteEntrys[i].delayEntry.heap;
+    		array.sort(function(a, b) {
+    			var numAlarm = parseFloat(b.numAlarm) - parseFloat(a.numAlarm);
+    			if (numAlarm == 0) {
+    				var _f = b.normalizedSendDelaly +  b.normalizedAckDelaly + b.normalizedAccu;
+    				var f = a.normalizedSendDelaly + a.normalizedAckDelaly + a.normalizedAccu;
+    				return parseFloat(_f) - parseFloat(f);
+    			} else {
+    				return numAlarm;
+    			}
+    		});
+    		$scope.minuteEntrys[i].delayEntry.heap = array;
+    	}
+    }
+
+    $scope.showSendDelayBoard = function(){
+    	var mesize = $scope.minuteEntrys.length;
+    	for(i = 0; i < mesize; ++i){
+    		var array = $scope.minuteEntrys[i].delayEntry.heap;
+    		array.sort(function(a, b) {
+    			return parseFloat(b.normalizedSendDelaly) - parseFloat(a.normalizedSendDelaly);
+    		});
+    		$scope.minuteEntrys[i].delayEntry.heap = array;
+    	}
+    }
+
+    $scope.showAckDelayBoard = function(){
+    	var mesize = $scope.minuteEntrys.length;
+    	for(i = 0; i < mesize; ++i){
+    		var array = $scope.minuteEntrys[i].delayEntry.heap;
+    		array.sort(function(a, b) {
+    			return parseFloat(b.normalizedAckDelaly) - parseFloat(a.normalizedAckDelaly);
+    		});
+    		$scope.minuteEntrys[i].delayEntry.heap = array;
+    	}
+    }
+
+    $scope.showAccuBoard = function(){
+    	var mesize = $scope.minuteEntrys.length;
+    	for(i = 0; i < mesize; ++i){
+    		var array = $scope.minuteEntrys[i].delayEntry.heap;
+    		array.sort(function(a, b) {
+    			return parseFloat(b.normalizedAccu) - parseFloat(a.normalizedAccu);
+    		});
+    		$scope.minuteEntrys[i].delayEntry.heap = array;
+    	}
+    }
 	
 	$scope.pages = [ "00", "01", "02", "03", "04", "05", "06", "07", "08",
 			"09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",

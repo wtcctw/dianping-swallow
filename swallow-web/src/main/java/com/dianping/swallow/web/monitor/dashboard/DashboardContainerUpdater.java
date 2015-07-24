@@ -196,7 +196,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			
 			long baseSenddelay = consumerBaseAlarmSetting.getSendDelay();
 			long baseackdelay = consumerBaseAlarmSetting.getAckDelay();
-			long baseAccu = consumerBaseAlarmSetting.getAccumulation();
+			float baseAccu = (float)consumerBaseAlarmSetting.getAccumulation();
 			
 			int sendAlarm = senddelay >= baseSenddelay ? 1 : 0;
 			int ackAlarm = ackdelay >= baseackdelay ? 1 : 0;
