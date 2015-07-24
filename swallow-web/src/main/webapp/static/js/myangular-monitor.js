@@ -204,8 +204,8 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.getEntry = function(delayEntry){
 		defaultSize = 12;
 		var size = delayEntry.size > defaultSize ? defaultSize : delayEntry.size;
-		var emp = delayEntry.Heap;
-		var entrys = delayEntry.Heap.slice(0, size)
+		var emp = delayEntry.heap;
+		var entrys = delayEntry.heap.slice(0, size)
 		return entrys;
 	}
 	
@@ -225,23 +225,23 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		}).success(function(data, status, headers, config) {
 			$scope.minuteEntrys = data;
 			var len = data.length;
-			for(var i = 0; i < len; ++i){
-				var time = $scope.minuteEntrys[i].time;
-				var date = new Date(time);
-				var hour = date.getHours(); 
-				var min = date.getMinutes();
-				var minString = min.toString();
-				minString = (minString.length == 1) ? "0"+minString : minString;
-				var timeString = hour.toString() + ":" + minString;
-				$scope.minuteEntrys[i].time = timeString;
-			}
+//			for(var i = 0; i < len; ++i){
+//				var time = $scope.minuteEntrys[i].time;
+//				var date = new Date(time);
+//				var hour = date.getHours(); 
+//				var min = date.getMinutes();
+//				var minString = min.toString();
+//				minString = (minString.length == 1) ? "0"+minString : minString;
+//				var timeString = hour.toString() + ":" + minString;
+//				$scope.minuteEntrys[i].time = timeString;
+//			}
+			
+			var date = new Date($scope.minuteEntrys[0].time)
 			if($scope.firstaccess){
-				$scope.currentMin = Number($scope.minuteEntrys[0].time
-						.split(":")[1]);
+				$scope.currentMin = date.getMinutes();
 				$scope.firstaccess = false;
 			}
-			$scope.currentRed = index == -1 ? $scope.currentMin : Number($scope.minuteEntrys[0].time
-					.split(":")[1]);
+			$scope.currentRed = index == -1 ? $scope.currentMin : date.getMinutes();
 		});
 		
 	};
@@ -257,12 +257,12 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.clicked = [];
 	$scope.items = [];
 	$scope.table = function(parentindex, index) {
-		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry.Heap[index];
+		$scope.clicked = $scope.minuteEntrys[parentindex].delayEntry.heap[index];
 		
-		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].senddelay,
-		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].ackdelay, 
-		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].accu,
-		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry.Heap[index].topic} ];
+		$scope.items = [{ "senddelay" : $scope.minuteEntrys[parentindex].delayEntry.heap[index].senddelay,
+		                  "ackdelay"  : $scope.minuteEntrys[parentindex].delayEntry.heap[index].ackdelay, 
+		                  "accu"      : $scope.minuteEntrys[parentindex].delayEntry.heap[index].accu,
+		                  "topic"     : $scope.minuteEntrys[parentindex].delayEntry.heap[index].topic} ];
 	}
 	
 });

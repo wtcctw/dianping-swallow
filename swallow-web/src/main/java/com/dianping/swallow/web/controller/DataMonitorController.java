@@ -61,8 +61,6 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	public static final String ENTRYS = "entry";
 
-	public static final int ENTRYSIZE = 10;
-	
 	public static final String FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
 	@Autowired

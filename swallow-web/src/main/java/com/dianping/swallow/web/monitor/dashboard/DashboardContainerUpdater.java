@@ -31,6 +31,7 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.wapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
+import com.google.common.collect.Lists;
 
 /**
  * @author mingdongli
@@ -265,13 +266,18 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 			MinHeap minHeap = me.getDelayEntry();
 			int size = minHeap.getSize();
-			Entry[] sorted = new Entry[size];
+			List<Entry> sorted = new ArrayList<Entry>();
 			for (int i = size - 1; i >= 0; i--) {
 				Entry eMin = minHeap.deleteMin();
-				sorted[i] = eMin;
+				if(eMin != null){
+					sorted.add(eMin);
+				}
 			}
-			minHeap.setHeap(sorted);
-			minHeap.setSize(size);
+			List<Entry> reverseSorted = Lists.reverse(sorted);
+			int listSize = reverseSorted.size();
+			Entry[] entryArray = reverseSorted.toArray(new Entry[listSize]);
+			minHeap.setHeap(entryArray);
+			minHeap.setSize(listSize);
 
 			boolean inserted = dashboardContainer.insertMinuteEntry(me);
 			logger.info(String.format("Insert MinuteEntry to dashboard %s", inserted ? "successfully" : "failed"));

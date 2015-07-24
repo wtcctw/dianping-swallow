@@ -12,11 +12,11 @@ public class MinHeap {
 
 	private int size; // Number of elements in Heap
 	
-	private Entry[] Heap; // The Heap array
+	private Entry[] heap; // The Heap array
 
 	public MinHeap() {
 		size = 0;
-		Heap = new Entry[CAPACITY];
+		heap = new Entry[CAPACITY];
 	}
 
 	/**
@@ -24,9 +24,9 @@ public class MinHeap {
 	 */
 	public MinHeap(Entry[] array) {
 		size = array.length;
-		Heap = new Entry[array.length + 1];
+		heap = new Entry[array.length + 1];
 
-		System.arraycopy(array, 0, Heap, 1, array.length);// we do not use 0
+		System.arraycopy(array, 0, heap, 1, array.length);// we do not use 0
 															// index
 
 		buildHeap();
@@ -42,21 +42,21 @@ public class MinHeap {
 	}
 
 	private void percolatingDown(int k) {
-		Entry tmp = Heap[k];
+		Entry tmp = heap[k];
 		int child;
 
 		for (; 2 * k <= size; k = child) {
 			child = 2 * k;
 
-			if (child != size && Heap[child].compareTo(Heap[child + 1]) > 0)
+			if (child != size && heap[child].compareTo(heap[child + 1]) > 0)
 				child++;
 
-			if (tmp.compareTo(Heap[child]) > 0)
-				Heap[k] = Heap[child];
+			if (tmp.compareTo(heap[child]) > 0)
+				heap[k] = heap[child];
 			else
 				break;
 		}
-		Heap[k] = tmp;
+		heap[k] = tmp;
 	}
 
 	/**
@@ -64,19 +64,19 @@ public class MinHeap {
 	 */
 	public void HeapSort(Entry[] array) {
 		size = array.length;
-		Heap = new Entry[size + 1];
-		System.arraycopy(array, 0, Heap, 1, size);
+		heap = new Entry[size + 1];
+		System.arraycopy(array, 0, heap, 1, size);
 		buildHeap();
 
 		for (int i = size; i > 0; i--) {
-			Entry tmp = Heap[i]; // move top item to the end of the Heap array
-			Heap[i] = Heap[1];
-			Heap[1] = tmp;
+			Entry tmp = heap[i]; // move top item to the end of the Heap array
+			heap[i] = heap[1];
+			heap[1] = tmp;
 			size--;
 			percolatingDown(1);
 		}
-		for (int k = 0; k < Heap.length - 1; k++)
-			array[k] = Heap[Heap.length - 1 - k];
+		for (int k = 0; k < heap.length - 1; k++)
+			array[k] = heap[heap.length - 1 - k];
 	}
 
 	/**
@@ -85,8 +85,8 @@ public class MinHeap {
 	public Entry deleteMin() throws RuntimeException {
 		if (size == 0)
 			throw new RuntimeException();
-		Entry min = Heap[1];
-		Heap[1] = Heap[size--];
+		Entry min = heap[1];
+		heap[1] = heap[size--];
 		percolatingDown(1);
 		return min;
 	}
@@ -97,17 +97,17 @@ public class MinHeap {
 	public boolean insert(Entry x) {
 		try {
 
-			if (size == Heap.length - 1)
+			if (size == heap.length - 1)
 				doubleSize();
 
 			// Insert a new item to the end of the array
 			int pos = ++size;
 
 			// Percolate up
-			for (; pos > 1 && x.compareTo(Heap[pos / 2]) < 0; pos = pos / 2)
-				Heap[pos] = Heap[pos / 2];
+			for (; pos > 1 && x.compareTo(heap[pos / 2]) < 0; pos = pos / 2)
+				heap[pos] = heap[pos / 2];
 
-			Heap[pos] = x;
+			heap[pos] = x;
 		} catch (Exception e) {
 			return false;
 		}
@@ -115,15 +115,15 @@ public class MinHeap {
 	}
 
 	private void doubleSize() {
-		Entry[] old = Heap;
-		Heap = new Entry[Heap.length * 2];
-		System.arraycopy(old, 1, Heap, 1, size);
+		Entry[] old = heap;
+		heap = new Entry[heap.length * 2];
+		System.arraycopy(old, 1, heap, 1, size);
 	}
 
 	public String toString() {
 		String out = "";
 		for (int k = 0; k < size; k++)
-			out += Heap[k] + " ";
+			out += heap[k] + " ";
 		return out;
 	}
 
@@ -136,16 +136,12 @@ public class MinHeap {
 	}
 
 	public Entry[] getHeap() {
-		return Heap;
+		return heap;
 	}
 
 	public void setHeap(Entry[] Heap) {
 		
-		int length = Heap.length;
-		for(int i = 0; i < length; ++i){
-			this.Heap[i] = Heap[i];
-		}
-		this.Heap[length] = null;
+		this.heap = Heap;
 	}
 
 	public static void main(String[] args) {
