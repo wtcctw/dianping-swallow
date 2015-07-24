@@ -192,8 +192,8 @@ public class Entry implements Comparable<Entry> {
 
 		int numAlarm = this.getNumAlarm().compareTo(entry.getNumAlarm());
 		if (numAlarm == 0) {
-			Float _f = this.normalizedAckDelaly + this.normalizedAccu;
-			Float f = entry.getNormalizedAckDelaly() + entry.getNormalizedAccu();
+			Float _f = this.normalizedSendDelaly +  this.normalizedAckDelaly + this.normalizedAccu;
+			Float f = entry.getNormalizedSendDelaly() + entry.getNormalizedAckDelaly() + entry.getNormalizedAccu();
 
 			return _f.compareTo(f);
 		} else {

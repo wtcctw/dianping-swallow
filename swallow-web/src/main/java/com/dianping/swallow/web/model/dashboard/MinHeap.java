@@ -151,7 +151,6 @@ public class MinHeap {
 	public static void main(String[] args) {
 
 		MinHeap entrys = new MinHeap();
-		//Entry[] en = new Entry[11];
 		for (int i = 1; i < 10; ++i) {
 			Entry e = new Entry();
 			e.setNumAlarm(i);
@@ -160,12 +159,6 @@ public class MinHeap {
 		System.out.println("size is " + entrys.getSize());
 		System.out.println(entrys);
 		System.out.println("---------------------------");
-		
-//		Entry[] old = entrys.getHeap();
-//		int size = entrys.getSize();
-//		Entry[] new1 = new Entry[size];
-//		System.arraycopy(old, 1, new1, 0, size);
-//		entrys.HeapSort(new1);
 		
 		int size = entrys.getSize();
 		System.out.println("size is " + size);
@@ -180,26 +173,7 @@ public class MinHeap {
 		}
 		entrys.setHeap(sorted);
 		entrys.setSize(size);
-		//entrys.setHeap(new1);
-//		int size = entrys.getSize();
-//		Entry[] e2 = entrys.getHeap();
-//		entrys.HeapSort(entrys.getHeap());
-		System.out.println("-----------------------");
-		System.out.println(entrys.toString());
-		
-//		entrys.HeapSort(en);
-//		entrys.setHeap(en);
-//		entrys.setSize(11);
-//		for(int i = 0; i < size; ++i){
-//			System.out.println(new1[i]);
-//		}
-		//System.out.println(Arrays.toString(new1));
-//		
-		int s2 = entrys.getSize();
 
-//		System.out.println("\n");
-//		for (int k = 0; k < s2 - 1; k++)
-//			System.out.println(e2[s2 - 1 - k]);
 
 	}
 }

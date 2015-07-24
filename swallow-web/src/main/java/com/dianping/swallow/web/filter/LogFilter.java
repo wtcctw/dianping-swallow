@@ -23,32 +23,34 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 
-
 /**
  * @author mingdongli
  *
- * 2015年7月23日下午3:10:53
+ *         2015年7月23日下午3:10:53
  */
 public class LogFilter implements Filter {
 
 	private ServletContext context;
 
 	private ExtractUsernameUtils extractUsernameUtils;
-	
+
 	private List<Pattern> excludePatterns = new LinkedList<Pattern>();
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public void init(FilterConfig fConfig) throws ServletException {
-		
+
 		this.context = fConfig.getServletContext();
 		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
 		String excludeUrl = fConfig.getInitParameter("excludeURLs");
-		String[] excludeUrls = excludeUrl.split(";");
-		for(String exclude: excludeUrls){
-			Pattern excludePattern = Pattern.compile( exclude );
-			excludePatterns.add( excludePattern );
+		String[] excludeUrls = excludeUrl.split(",");
+		for (String exclude : excludeUrls) {
+			if(exclude.contains("*")){
+				exclude = exclude.replaceAll("\\*", ".\\*");
+			}
+			Pattern excludePattern = Pattern.compile(exclude);
+			excludePatterns.add(excludePattern);
 		}
 	}
 
@@ -61,8 +63,8 @@ public class LogFilter implements Filter {
 		String username = extractUsernameUtils.getUsername(req);
 
 		if (matchExcludePatterns(uri)) {
-		    chain.doFilter(request, response);
-		    return;
+			chain.doFilter(request, response);
+			return;
 		}
 		logger.info(String.format("%s request %s", username, uri));
 
@@ -73,22 +75,19 @@ public class LogFilter implements Filter {
 	public void destroy() {
 		// ignore
 	}
-	
-	  private boolean matchExcludePatterns(String uri)
-	  {
-	    Iterator<Pattern> patternIter = excludePatterns.iterator();
-	    
-	    while( patternIter.hasNext() )
-	    {
-	      Pattern p = (Pattern)patternIter.next();
-	      Matcher m = p.matcher(uri);
-	      if( m.matches() )
-	      {
-	        return false;
-	      }
-	    }
-	    
-	    return true;
-	  }
+
+	private boolean matchExcludePatterns(String uri) {
+		Iterator<Pattern> patternIter = excludePatterns.iterator();
+
+		while (patternIter.hasNext()) {
+			Pattern p = (Pattern) patternIter.next();
+			Matcher m = p.matcher(uri);
+			if (m.matches()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 }
