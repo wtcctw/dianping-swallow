@@ -6,6 +6,10 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 
@@ -15,13 +19,13 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
  *
  */
 public abstract class AbstractStatisStorager extends AbstractLifecycle {
-	
+
 	protected volatile AtomicLong dataCount = new AtomicLong();
 
 	protected static final int INIT_VALUE = 0;
 
 	protected static final long DEFAULT_VALUE = -1L;
-	
+
 	protected volatile AtomicLong lastTimeKey = new AtomicLong();
 
 	private int storagerInterval = 30;
@@ -45,12 +49,18 @@ public abstract class AbstractStatisStorager extends AbstractLifecycle {
 	}
 
 	private void startStorage() {
-		 setFuture(scheduled.scheduleAtFixedRate(new Runnable() {
+		setFuture(scheduled.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					doStorage();
+					SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doStorage");
+					catWrapper.doAction(new SwallowAction() {
+						@Override
+						public void doAction() throws SwallowException {
+							doStorage();
+						}
+					});
 				} catch (Throwable th) {
 					logger.error("[startStorage]", th);
 				} finally {

@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.alarm.impl;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,38 +49,37 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 			return true;
 		}
 
-		Set<String> statisConsumerServerIps = ipCollectorService.getStatisConsumerServerIps();
+		Map<String, Long> statisConsumerServerIps = ipCollectorService.getStatisConsumerServerIps();
 		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 		int index = 0;
 		for (String serverIp : consumerServerMasterIps) {
 			if (whiteList == null || !whiteList.contains(serverIp)) {
-				if (!statisConsumerServerIps.contains(serverIp)) {
+				if (!statisConsumerServerIps.containsKey(serverIp)) {
 					String slaveIp = consumerServerSlaveIps.get(index);
 					if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
 						alarmManager.consumerServerAlarm(serverIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER);
 						lastCheckStatus.put(serverIp, false);
-					} else {
-						if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp)) {
-							alarmManager.consumerServerAlarm(serverIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER_OK);
-							lastCheckStatus.put(serverIp, true);
-						}
+					}
+				} else {
+					if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
+						alarmManager.consumerServerAlarm(serverIp, serverIp, AlarmType.CONSUMER_SERVER_SENDER_OK);
+						lastCheckStatus.put(serverIp, true);
 					}
 				}
 			}
 			index++;
 		}
-		ipCollectorService.clearStatisConsumerServerIps();
 		return true;
 	}
 
-	private boolean checkSlaveServerSender(Set<String> statisIps, String masterIp, String slaveIp) {
+	private boolean checkSlaveServerSender(Map<String, Long> statisIps, String masterIp, String slaveIp) {
 		if (!NetUtil.isPortOpen(masterIp, consumerPortAlarmFilter.getMasterPort())) {
 			if (NetUtil.isPortOpen(slaveIp, consumerPortAlarmFilter.getSlavePort())) {
-				if (!statisIps.contains(slaveIp)) {
+				if (!statisIps.containsKey(slaveIp)) {
 					alarmManager.consumerServerAlarm(slaveIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER);
 					lastCheckStatus.put(slaveIp, false);
 				} else {
-					if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp)) {
+					if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
 						alarmManager.consumerServerAlarm(slaveIp, slaveIp, AlarmType.CONSUMER_SERVER_SENDER_OK);
 						lastCheckStatus.put(slaveIp, true);
 					}

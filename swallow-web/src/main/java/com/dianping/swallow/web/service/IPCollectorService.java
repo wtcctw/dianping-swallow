@@ -25,14 +25,14 @@ public interface IPCollectorService {
 	 * 
 	 * @param monitorData
 	 */
-	public Set<String> getStatisConsumerServerIps();
+	public Map<String, Long> getStatisConsumerServerIps();
 
 	/**
 	 * get statis producerServer ip
 	 * 
 	 * @param monitorData
 	 */
-	public Set<String> getStatisProducerServerIps();
+	public Map<String, Long> getStatisProducerServerIps();
 
 	/**
 	 * get all statis ip
@@ -61,37 +61,27 @@ public interface IPCollectorService {
 	 * @return
 	 */
 	public List<String> getConsumerServerMasterIps();
-	
-	/**
-	 * clear statis producerServerIps
-	 */
-	public void clearStatisProducerServerIps();
 
-	/**
-	 * clear statis consumerServerIps
-	 */
-	public void clearStatisConsumerServerIps();
-	
 	/**
 	 * get producer server master ips map
 	 * 
 	 * @return
 	 */
-	public Map<String,String> getProducerServerIpsMap();
-	
+	public Map<String, String> getProducerServerIpsMap();
+
 	/**
 	 * get consumer server master ips map
 	 * 
 	 * @return
 	 */
-	public Map<String,String> getConsumerServerMasterIpsMap();
-	
+	public Map<String, String> getConsumerServerMasterIpsMap();
+
 	/**
 	 * get consumer server slave ips map
 	 * 
 	 * @return
 	 */
-	public Map<String,String> getConsumerServerSlaveIpsMap();
+	public Map<String, String> getConsumerServerSlaveIpsMap();
 
 	/**
 	 * topic consumerId related ip
@@ -106,14 +96,14 @@ public interface IPCollectorService {
 	 * @return
 	 */
 	public Set<String> getProducerTopicIps(String topicName);
-	
+
 	/**
 	 * producer topic related ip
 	 * 
 	 * @return
 	 */
 	public Set<String> getConsumerTopicIps(String topicName);
-	
+
 	/**
 	 * topicConsumerIdIps' key
 	 * 

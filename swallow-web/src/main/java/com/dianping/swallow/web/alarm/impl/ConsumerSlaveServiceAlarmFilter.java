@@ -21,7 +21,7 @@ import com.dianping.swallow.web.service.IPCollectorService;
 @Service("consumerSlaveServiceAlarmFilter")
 public class ConsumerSlaveServiceAlarmFilter extends AbstractServiceAlarmFilter {
 
-	private static final String SLAVE_MONITOR_URL = "http://{ip}:8080/names";
+	private static final String SLAVE_MONITOR_URL = "http://{ip}:8089/names";
 
 	private static final String MONOGO_MONITOR_SIGN = "mongoManager";
 

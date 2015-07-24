@@ -9,13 +9,13 @@ import org.springframework.data.annotation.Id;
  * @author qiyin
  *
  */
-public class Alarm {
+public class Alarm implements Cloneable {
 
 	@Id
 	private String id;
-	
+
 	private String eventId;
-	
+
 	private int number;
 
 	private AlarmLevelType type;
@@ -101,8 +101,9 @@ public class Alarm {
 
 	@Override
 	public String toString() {
-		return "Alarm[ id = " + id + ", type = " + type + ", title = " + title + ",body = " + body + ",receiver = "
-				+ receiver + ", createTime = " + createTime + ", sourceIp = " + sourceIp + "]";
+		return "Alarm [id=" + id + ", eventId=" + eventId + ", number=" + number + ", type=" + type + ", sendType="
+				+ sendType + ", title=" + title + ", body=" + body + ", receiver=" + receiver + ", createTime="
+				+ createTime + ", sourceIp=" + sourceIp + "]";
 	}
 
 	public SendType getSendType() {
@@ -130,6 +131,24 @@ public class Alarm {
 	public Alarm setNumber(int number) {
 		this.number = number;
 		return this;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Alarm alarm = (Alarm) super.clone();
+		alarm.id = this.id;
+		alarm.eventId = this.eventId;
+		alarm.number = this.number;
+		if (this.createTime != null) {
+			alarm.createTime = new Date(this.createTime.getTime());
+		}
+		alarm.sendType = this.sendType;
+		alarm.body = this.body;
+		alarm.title = this.title;
+		alarm.type = this.type;
+		alarm.sourceIp = this.sourceIp;
+		alarm.receiver = this.receiver;
+		return alarm;
 	}
 
 }

@@ -354,16 +354,31 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 
 	private void sendAlarm(Set<String> mobiles, Set<String> emails, Alarm alarm, AlarmMeta alarmMeta) {
 		if (alarmMeta.getIsMailMode()) {
-			alarm.setSendType(SendType.MAIL);
-			alarmService.sendMail(emails, alarm);
+			try {
+				Alarm alarmMail = (Alarm) alarm.clone();
+				alarmMail.setSendType(SendType.MAIL);
+				alarmService.sendMail(emails, alarmMail);
+			} catch (CloneNotSupportedException e) {
+				logger.error("[sendAlarm]", e);
+			}
 		}
 		if (alarmMeta.getIsSmsMode()) {
-			alarm.setSendType(SendType.SMS);
-			alarmService.sendSms(mobiles, alarm);
+			try {
+				Alarm alarmSms = (Alarm) alarm.clone();
+				alarmSms.setSendType(SendType.SMS);
+				alarmService.sendSms(mobiles, alarmSms);
+			} catch (CloneNotSupportedException e) {
+				logger.error("[sendAlarm]", e);
+			}
 		}
 		if (alarmMeta.getIsWeiXinMode()) {
-			alarm.setSendType(SendType.WEIXIN);
-			alarmService.sendWeiXin(emails, alarm);
+			try {
+				Alarm alarmWeiXin = (Alarm) alarm.clone();
+				alarmWeiXin.setSendType(SendType.WEIXIN);
+				alarmService.sendWeiXin(emails, alarmWeiXin);
+			} catch (CloneNotSupportedException e) {
+				logger.error("[sendAlarm]", e);
+			}
 		}
 	}
 

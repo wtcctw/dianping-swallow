@@ -9,6 +9,8 @@ public class ConsumerMachineStatsData {
 	
 	private String ip;
 	
+	private long timeKey;
+	
 	private ConsumerBaseStatsData statisData;
 
 	public String getIp() {
@@ -25,6 +27,14 @@ public class ConsumerMachineStatsData {
 
 	public void setStatisData(ConsumerBaseStatsData statisData) {
 		this.statisData = statisData;
+	}
+
+	public long getTimeKey() {
+		return timeKey;
+	}
+
+	public void setTimeKey(long timeKey) {
+		this.timeKey = timeKey;
 	}
 
 }

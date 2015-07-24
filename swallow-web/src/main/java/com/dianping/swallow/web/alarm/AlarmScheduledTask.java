@@ -12,6 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.alarm.impl.AlarmFilterChainFactory;
@@ -69,8 +73,16 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 			@Override
 			public void run() {
 				try {
-					filterChain.reset();
-					filterChain.doNext();
+					SwallowActionWrapper catWrapper = new CatActionWrapper(filterChain.getChainName(),
+							"doAlarmerScheduled");
+					catWrapper.doAction(new SwallowAction() {
+						@Override
+						public void doAction() throws SwallowException {
+							filterChain.reset();
+							filterChain.doNext();
+						}
+					});
+
 				} catch (Throwable th) {
 					logger.error("[startAlarmer]", th);
 				} finally {
@@ -78,7 +90,7 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 				}
 			}
 
-		}, getAlarmInterval() , getAlarmInterval(), TimeUnit.SECONDS);
+		}, getAlarmInterval(), getAlarmInterval(), TimeUnit.SECONDS);
 		futures.add(new WeakReference<ScheduledFuture<?>>(future));
 	}
 

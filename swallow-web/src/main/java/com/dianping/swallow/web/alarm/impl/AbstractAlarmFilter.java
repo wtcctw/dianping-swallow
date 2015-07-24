@@ -3,6 +3,10 @@ package com.dianping.swallow.web.alarm.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarm.AlarmFilter;
 import com.dianping.swallow.web.alarm.AlarmFilterChain;
 import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
@@ -15,11 +19,18 @@ import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
 public abstract class AbstractAlarmFilter implements AlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractAlarmFilter.class);
-	
+
 	@Override
 	public boolean accept(AlarmFilterChain alarmFilterChain) {
 		try {
-			doAccept();
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAccept");
+			catWrapper.doAction(new SwallowAction() {
+				@Override
+				public void doAction() throws SwallowException {
+					doAccept();
+				}
+			});
+
 		} catch (Exception e) {
 			logger.error("[accept] doAccept has exception. ", e);
 		}
