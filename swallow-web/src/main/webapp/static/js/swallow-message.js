@@ -1,5 +1,5 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize, tname, messageId, startdt, stopdt, sort){
+	return function(fetchFunction, pageSize, topic, messageId, startdt, stopdt, sort){
 		var paginator = {
 				hasNextVar: false,
 				limit : pageSize,
@@ -37,7 +37,7 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/self.limit) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, tname, messageId, startdt, stopdt, this.basemid, sort, function(data){
+					fetchFunction(this.currentOffset, pageSize + 1, topic, messageId, startdt, stopdt, this.basemid, sort, function(data){
 						pageSize = self.limit;
 						self.basemid = "";
 						
@@ -138,7 +138,7 @@ module.factory('Paginator', function(){
 
 module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog', '$interval',
         function($rootScope, $scope, $http, Paginator, ngDialog, $interval){
-				var fetchFunction = function(offset, limit, tname, messageId, startdt, stopdt, basemid, sort, callback){
+				var fetchFunction = function(offset, limit, topic, messageId, startdt, stopdt, basemid, sort, callback){
 				var transFn = function(data){
 					return $.param(data);
 				}
@@ -147,7 +147,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 				};
 				var data = {'offset' : offset,
 										'limit': limit,
-										'tname': tname,
+										'topic': topic,
 										'messageId': messageId,
 										'startdt' : startdt,
 										'stopdt' : stopdt,
@@ -157,7 +157,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					params : {
 						offset : offset,
 						limit : limit,
-						tname: tname,
+						topic: topic,
 						messageId: messageId,
 						startdt : startdt,
 						stopdt : stopdt,
@@ -188,7 +188,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			},
 			
 			$scope.formatres = function(mid){
-				var topic = $scope.tname;
+				var topic = $scope.topic;
 				$http.get(window.contextPath + "/console/message/auth/content", {
 					params : {
 						topic:topic,
@@ -201,7 +201,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			//－－－－－－－－－－for show more options－－－－－－－－－－－
 			$scope.fullmessage    = "";
 	        $scope.showfullmessage = function(mid){
-				var topic = $scope.tname;
+				var topic = $scope.topic;
 				$http.get(window.contextPath + "/console/message/auth/content", {
 					params : {
 						topic:topic,
@@ -222,7 +222,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			},
 			
 			$scope.messageId      = "";
-			$scope.tname          = "";
+			$scope.topic          = "";
 			
 			$scope.suburl         = "/console/message/auth/list";
 			
@@ -238,7 +238,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			$scope.showornot = false;
 			$scope.showContent = function(index){
 				var mid = $scope.searchPaginator.currentPageItems[index].mid;
-				var topic = $scope.tname;
+				var topic = $scope.topic;
 				if(!$scope.showornot){
 					$http.get(window.contextPath + "/console/message/auth/content", {
 						params : {
@@ -270,7 +270,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 				if($scope.startdt.length==0  || $scope.stopdt.length == 0)
 					alert("时间不能为空!")
 				else{
-					if($scope.tname.length == 0){
+					if($scope.topic.length == 0){
 						return;
 					}
 					else{
@@ -278,7 +278,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						//setInterval(updateProgressBar,400);
 						$http.get(window.contextPath + "/console/message/auth/dump", {
 							params : {
-								topic: $scope.tname,
+								topic: $scope.topic,
 								startdt: $scope.startdt,
 								stopdt: $scope.stopdt
 							}
@@ -287,7 +287,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 								alert("error with status " + data.status);
 								return;
 							}
-							localStorage.setItem("topic", $scope.tname);
+							localStorage.setItem("topic", $scope.topic);
 							//localStorage.setItem("file", JSON.stringify(data.file)); //json for array
 							window.location.href = window.contextPath + "/console/download";
 						});
@@ -322,7 +322,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 				if($scope.startdt.length==0  || $scope.stopdt.length == 0)
 					alert("时间不能为空!")
 				else{
-					if($scope.tname.length == 0){
+					if($scope.topic.length == 0){
 						//alert("Topic不能为空!")
 					}
 					else{
@@ -330,7 +330,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						if(typeof($scope.searchPaginator) != "undefined"){
 							sort = $scope.searchPaginator.reverse;
 						}
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt,  $scope.stopdt, sort);
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt,  $scope.stopdt, sort);
 	            		if(typeof($scope.searchPaginator) != "undefined"){
 	            			$scope.searchPaginator.reverse = sort;	            		
 	            		}
@@ -342,14 +342,14 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			$scope.myKeyup = function(e){
 	            var keycode = window.event?e.keyCode:e.which;
 	            if(keycode==13){
-	            	if($scope.tname == null || $scope.tname.length == 0)
+	            	if($scope.topic == null || $scope.topic.length == 0)
 	            		alert("请先输入Topic名称");  //query with mid but without topic name
 	            	else{
 						var sort = false;
 						if(typeof($scope.searchPaginator) != "undefined"){
 							sort = $scope.searchPaginator.reverse;
 						}
-	            		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, sort);
+	            		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId ,$scope.startdt,  $scope.stopdt, sort);
 	            		if(typeof($scope.searchPaginator) != "undefined"){
 	            			$scope.searchPaginator.reverse = sort;	            		
 	            		}
@@ -359,12 +359,12 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        
 	        //invoke when topic name is not empty and recordofperpage is changed
 	        $scope.makeChanged = function(){
-	        	if($scope.tname.length != 0){
+	        	if($scope.topic.length != 0){
 					var sort;
 					if(typeof($scope.searchPaginator) != "undefined"){
 						sort = $scope.searchPaginator.reverse;
 					}
-	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId ,$scope.startdt,  $scope.stopdt, sort);
+	        		$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId ,$scope.startdt,  $scope.stopdt, sort);
             		if(typeof($scope.searchPaginator) != "undefined"){
             			$scope.searchPaginator.reverse = sort;	            		
             		}
@@ -401,12 +401,12 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 							}).success(function(data){
 								$scope.mintime = data.min;
 								$scope.maxtime = data.max;
-								$scope.tname = c;
+								$scope.topic = c;
 								var sort = false;
 								if(typeof($scope.searchPaginator) != "undefined"){
 									sort = $scope.searchPaginator.reverse;
 								}
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
 			            		if(typeof($scope.searchPaginator) != "undefined"){
 			            			$scope.searchPaginator.reverse = sort;	            		
 			            		}
@@ -417,8 +417,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 							if(typeof($scope.searchPaginator) != "undefined"){
 								sort = $scope.searchPaginator.reverse;
 							}
-							$scope.tname = c;
-							$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
+							$scope.topic = c;
+							$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
 		            		if(typeof($scope.searchPaginator) != "undefined"){
 		            			$scope.searchPaginator.reverse = sort;	            		
 		            		}
@@ -489,7 +489,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        }
 	        
 	        $scope.starttransmit = function(data){
-        			$http.post(window.contextPath + '/api/message/sendmessageid', {"mid": data,"topic":$scope.tname}).success(function(response) {
+        			$http.post(window.contextPath + '/api/message/sendmessageid', {"mid": data,"topic":$scope.topic}).success(function(response) {
         			  $("#selectnone").prop('checked', false);
         			  $("#selectall").prop('checked', false);
         			  $(".swallowcheckbox").prop('checked', false);
@@ -500,7 +500,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					  if(typeof($scope.searchPaginator) != "undefined"){
 						  sort = $scope.searchPaginator.reverse;
 					  }
-        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
+        			  $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
 	            	  if(typeof($scope.searchPaginator) != "undefined"){
 	            		  $scope.searchPaginator.reverse = sort;	            		
 	            	  }
@@ -565,7 +565,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        	if(hasproperty){
 	        		$scope.tproperty = property.substring(0,property.length-2);
 	        	}
-	        	$http.post(window.contextPath + '/api/message/sendmessage', {"content":$scope.textarea,"topic":$scope.tname,"type":$scope.ttype,"delimitor":$scope.delimitor,"property":$scope.tproperty}).success(function(response) {
+	        	$http.post(window.contextPath + '/api/message/sendmessage', {"content":$scope.textarea,"topic":$scope.topic,"type":$scope.ttype,"delimitor":$scope.delimitor,"property":$scope.tproperty}).success(function(response) {
 					$scope.textarea = "";
 					$scope.tproperty = "";
 					
@@ -576,7 +576,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 				    if(typeof($scope.searchPaginator) != "undefined"){
 					    sort = $scope.searchPaginator.reverse;
 				    }
-					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
 	            	if(typeof($scope.searchPaginator) != "undefined"){
 	            		$scope.searchPaginator.reverse = sort;	            		
 	            	}
@@ -599,17 +599,17 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			//judge if redirected from topic view
 			var tmpname = localStorage.getItem("name");
 			if(tmpname != null){
-				$scope.tname = localStorage.getItem("name");
+				$scope.topic = localStorage.getItem("name");
 				localStorage.clear();
 				$http.get(window.contextPath + "/console/message/timespan", {
 					params : {
-						topic: $scope.tname
+						topic: $scope.topic
 					}
 				}).success(function(data){
 					$scope.mintime = data.min;
 					$scope.maxtime = data.max;
 					if(data.min.length > 0){  //没有纪录就不用查询了
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, false);
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, false);
 					}
 				});
 			}
@@ -620,7 +620,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 			    if(typeof($scope.searchPaginator) != "undefined"){
 				    sort = !$scope.searchPaginator.reverse;
 			    }
-				$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.tname , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
 				if(typeof($scope.searchPaginator) != "undefined"){
 					$scope.searchPaginator.reverse = sort;
 				}

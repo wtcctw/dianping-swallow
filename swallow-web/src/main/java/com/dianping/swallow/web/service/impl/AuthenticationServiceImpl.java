@@ -24,7 +24,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 
 	private static final String MESSAGEURI = "/console/message/auth";
 
-	private static final String DOWNLOAD = "/console/download/auth/";
+	private static final String DOWNLOAD = "/console/download/auth";
 
 	private static final String ADMINURI = "/console/admin/auth";
 

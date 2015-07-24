@@ -14,7 +14,7 @@
 			<div class="input-group" style="margin-left: 20px">
 				<span class="input-group-addon">Topic名称</span> <input type="text"
 					class="form-control" placeholder="请先输入Topic 名称"
-					style="width: 200px" id="topicname" ng-model='tname' required>
+					style="width: 200px" id="topicname" ng-model='topic' required>
 				<ul class="typeahead dropdown-menu"
 					style="top: 28px; left: 0px; display: none;">
 				</ul>
@@ -128,7 +128,7 @@
 						ng-show="searchPaginator.pages.length"
 						ng-bind="searchPaginator.totalpieces" data-toggle="tooltip"
 						title="如果消息数大于100万,请使用上下页切换"></a></li>
-					<select class="selectpicker" ng-model="boardtype"
+					<select class="selectpicker" ng-model="recordofperpage"
 						ng-change="makeChanged()"
 						ng-options="item.num as item.num for item in numperpage"></select>
 
@@ -153,7 +153,7 @@
 								<label class="control-label">Topic名称 :</label>
 								<div class="controls">
 									<input type="text" name="name" class="input-xlarge"
-										ng-model="tname" required>
+										ng-model="topic" required>
 								</div>
 							</div>
 							<div class="control-group">
@@ -237,7 +237,7 @@
 								<label class="control-label">Topic名称 :</label>
 								<div class="controls">
 									<input type="text" name="name" class="input-xlarge"
-										ng-model="tname" readonly>
+										ng-model="topic" readonly>
 								</div>
 							</div>
 
@@ -281,7 +281,7 @@
 								<label class="control-label">Topic名称 :</label>
 								<div class="controls">
 									<input type="text" name="name" class="input-xlarge"
-										ng-model="tname" readonly>
+										ng-model="topic" readonly>
 								</div>
 							</div>
 

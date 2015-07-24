@@ -41,12 +41,12 @@ public class MessageController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/message/auth/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object messageDefault(int offset, int limit, String tname, String messageId, String startdt, String stopdt,
+	public Object messageDefault(int offset, int limit, String topic, String messageId, String startdt, String stopdt,
 			String basemid, boolean sort, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String username = extractUsernameUtils.getUsername(request);
 
-		map = messageService.getMessageFromSpecificTopic(offset, limit, tname, messageId, startdt, stopdt, username,
+		map = messageService.getMessageFromSpecificTopic(offset, limit, topic, messageId, startdt, stopdt, username,
 				basemid, sort);
 		return map;
 	}
