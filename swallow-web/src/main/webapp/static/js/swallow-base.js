@@ -123,7 +123,7 @@ module.filter('notblank', function() {
 	});
 
 module.directive('popOver', function ($compile) {
-    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/delay?cid={{clicked.consumerId}}'>发送延迟/s</a></th><th><a href='/console/monitor/consumer/{{clicked.topic}}/delay?cid={{clicked.consumerId}}'>ack延迟/s</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/accu?consumerId={{clicked.consumerId}}'>消息堆积</th></tr><tr ng-repeat='item in items'><td>{{item.topic}}</td><td id='send'>{{item.senddelay}}</td><td id='ack'>{{item.ackdelay}}</td><td : id='accu'>{{item.accu}}</td></tr></table>";
+    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/delay?cid={{clicked.consumerId}}'>发送延迟/s</a></th><th><a href='/console/monitor/consumer/{{clicked.topic}}/delay?cid={{clicked.consumerId}}'>ack延迟/s</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/accu?consumerId={{clicked.consumerId}}'>消息堆积</th></tr><tr ng-repeat='item in items'><td ng-bind='{{item.topic}} | limitTo : 25'></td><td id='send'>{{item.senddelay}}</td><td id='ack'>{{item.ackdelay}}</td><td : id='accu'>{{item.accu}}</td></tr></table>";
     var getTemplate = function (contentType) {
         var template = '';
         switch (contentType) {

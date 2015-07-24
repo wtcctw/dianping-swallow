@@ -34,13 +34,14 @@ public class AuthenticationFilter implements Filter {
 	private AuthenticationService authenticationService;
 
 	private ExtractUsernameUtils extractUsernameUtils;
-
+	
 	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		ServletContext context = fConfig.getServletContext();
 		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
 		this.authenticationService = ctx.getBean(AuthenticationServiceImpl.class);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
+		
 	}
 
 	@Override

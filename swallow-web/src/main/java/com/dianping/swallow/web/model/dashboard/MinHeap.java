@@ -1,7 +1,11 @@
 package com.dianping.swallow.web.model.dashboard;
 
-import java.util.*;
 
+/**
+ * @author mingdongli
+ *
+ * 2015年7月24日上午10:20:21
+ */
 public class MinHeap {
 
 	private static final int CAPACITY = 2;

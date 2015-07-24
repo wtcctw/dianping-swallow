@@ -30,7 +30,6 @@ import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.wapper.ConsumerDataRetrieverWrapper;
-import com.dianping.swallow.web.monitor.wapper.ConsumerIdAlarmSettingWrapper;
 import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
 
 /**
@@ -55,9 +54,6 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	@Autowired
 	TopicAlarmSettingServiceWrapper topicAlarmSettingServiceWrapper;
-
-	@Autowired
-	ConsumerIdAlarmSettingWrapper consumerIdAlarmSettingWrapper;
 
 	private Map<String, TotalData> totalDataMap = new ConcurrentHashMap<String, TotalData>();
 
@@ -88,7 +84,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		}
 	}
 
-	private void updateDelayInsDashboard() throws Exception {
+	private void updateDelayInsDashboard() {
 
 		boolean timeSet = false;
 		Date entryTime = null;
@@ -102,12 +98,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			for (String consumerid : consumerids) {
 				ConsumerIdStatisData result = (ConsumerIdStatisData) consumerDataRetrieverWrapper.getValue(
 						ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid);
-				Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
-						topic, consumerid);
-				String ip = loadFirstElement(ips);
-				String mobile = iPDescManagerWrap.loadDpManager(ip);
-				String email = iPDescManagerWrap.loadEmail(ip);
-				String name = iPDescManagerWrap.loadName(ip);
+
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
 				List<Long> sendList = new ArrayList<Long>(senddelay.values());
 				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
@@ -140,10 +131,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				if (td == null) {
 					td = new TotalData();
 				}
-				ConsumerBaseAlarmSetting cbas = consumerIdAlarmSettingWrapper.loadConsumerBaseAlarmSetting(consumerid);
-				td.setCid(consumerid).setTopic(topic).setDpMobile(mobile).setEmail(email).setTime(entryTime)
-						.setName(name).setBaseSendDelaly(cbas.getSendDelay()).setBaseAckDelaly(cbas.getAckDelay())
-						.setBaseAccu(cbas.getAccumulation());
+
+				td.setCid(consumerid).setTopic(topic).setTime(entryTime);
 				td.setListSend(sendList.subList(sendListSize - 2, sendListSize));
 				td.setListAck(ackList.subList(ackListSize - 2, ackListSize));
 				td.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
@@ -176,6 +165,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 	 * 产生每个Entry
 	 * 
 	 * @param totalData
+	 * @throws Exception
 	 */
 	private void doGenerateEntrys(TotalData totalData) {
 
@@ -187,23 +177,40 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 		for (int i = 0; i < size; ++i) {
 			Entry e = new Entry();
-			float senddelay = sendList.get(i) / 1000;
-			float ackdelay = ackList.get(i) / 1000;
+			float senddelay = (float) (sendList.get(i) / 1000.0);
+			float ackdelay = (float) (ackList.get(i) / 1000.0);
 			long accu = accuList.get(i);
+			String consumerid = totalData.getCid();
 			String topic = totalData.getTopic();
+			
+			Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
+					topic, consumerid);
+			String ip = loadFirstElement(ips);
+			String mobile = iPDescManagerWrap.loadDpManager(ip);
+			String email = iPDescManagerWrap.loadEmail(ip);
+			String name = iPDescManagerWrap.loadName(ip);
+			
 			ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
 					.loadConsumerBaseAlarmSetting(topic);
-			int sendAlarm = senddelay >= consumerBaseAlarmSetting.getSendDelay() ? 1 : 0;
-			int ackAlarm = ackdelay >= consumerBaseAlarmSetting.getAckDelay() ? 1 : 0;
-			int accuAlarm = accu >= consumerBaseAlarmSetting.getAccumulation() ? 1 : 0;
+			
+			long baseSenddelay = consumerBaseAlarmSetting.getSendDelay();
+			long baseackdelay = consumerBaseAlarmSetting.getAckDelay();
+			long baseAccu = consumerBaseAlarmSetting.getAccumulation();
+			
+			int sendAlarm = senddelay >= baseSenddelay ? 1 : 0;
+			int ackAlarm = ackdelay >= baseackdelay ? 1 : 0;
+			int accuAlarm = accu >= baseAccu ? 1 : 0;
 			int numAlarm = sendAlarm + ackAlarm + accuAlarm;
 
-			e.setConsumerId(totalData.getCid()).setTopic(totalData.getTopic()).setSenddelay(senddelay)
-					.setAckdelay(ackdelay).setAccu(accu).setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm)
-					.setAccuAlarm(accuAlarm).setNumAlarm(numAlarm).setEmail(totalData.getEmail())
-					.setName(totalData.getName()).setDpMobile(totalData.getDpMobile())
-					.setBaseSendDelaly(totalData.getBaseSendDelaly()).setBaseAckDelaly(totalData.getBaseAckDelaly())
-					.setAccu(totalData.getBaseAccu());
+			float normalizedSendDelay = senddelay / baseSenddelay;
+			float normalizedAckDelay = ackdelay / baseackdelay;
+			float normalizedAccu = accu / baseAccu;
+
+			e.setConsumerId(consumerid).setTopic(topic).setSenddelay(senddelay).setAckdelay(ackdelay)
+					.setAccu(accu).setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm).setAccuAlarm(accuAlarm)
+					.setNumAlarm(numAlarm).setEmail(email).setName(name)
+					.setDpMobile(mobile).setNormalizedSendDelaly(normalizedSendDelay)
+					.setNormalizedAckDelaly(normalizedAckDelay).setNormalizedAccu(normalizedAccu);
 			entrys.add(e);
 		}
 

@@ -1,6 +1,11 @@
 package com.dianping.swallow.web.filter;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -29,6 +34,8 @@ public class LogFilter implements Filter {
 	private ServletContext context;
 
 	private ExtractUsernameUtils extractUsernameUtils;
+	
+	private List<Pattern> excludePatterns = new LinkedList<Pattern>();
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -37,6 +44,12 @@ public class LogFilter implements Filter {
 		this.context = fConfig.getServletContext();
 		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
 		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
+		String excludeUrl = fConfig.getInitParameter("excludeURLs");
+		String[] excludeUrls = excludeUrl.split(";");
+		for(String exclude: excludeUrls){
+			Pattern excludePattern = Pattern.compile( exclude );
+			excludePatterns.add( excludePattern );
+		}
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
@@ -47,6 +60,10 @@ public class LogFilter implements Filter {
 		String uri = req.getRequestURI();
 		String username = extractUsernameUtils.getUsername(req);
 
+		if (matchExcludePatterns(uri)) {
+		    chain.doFilter(request, response);
+		    return;
+		}
 		logger.info(String.format("%s request %s", username, uri));
 
 		chain.doFilter(request, response);
@@ -56,5 +73,22 @@ public class LogFilter implements Filter {
 	public void destroy() {
 		// ignore
 	}
+	
+	  private boolean matchExcludePatterns(String uri)
+	  {
+	    Iterator<Pattern> patternIter = excludePatterns.iterator();
+	    
+	    while( patternIter.hasNext() )
+	    {
+	      Pattern p = (Pattern)patternIter.next();
+	      Matcher m = p.matcher(uri);
+	      if( m.matches() )
+	      {
+	        return false;
+	      }
+	    }
+	    
+	    return true;
+	  }
 
 }

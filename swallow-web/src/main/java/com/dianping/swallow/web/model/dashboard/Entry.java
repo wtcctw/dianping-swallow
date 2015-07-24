@@ -13,8 +13,6 @@ public class Entry implements Comparable<Entry> {
 
 	private String consumerId;
 
-	private String name;
-
 	private float senddelay;
 
 	private float ackdelay;
@@ -27,13 +25,15 @@ public class Entry implements Comparable<Entry> {
 
 	private int accuAlarm;
 
-	private long baseSendDelaly;
+	private Float normalizedSendDelaly;
 
-	private long baseAckDelaly;
+	private Float normalizedAckDelaly;
 
-	private long baseAccu;
+	private Float normalizedAccu;
 
 	private Integer numAlarm;
+
+	private String name;
 
 	private String email;
 
@@ -160,30 +160,30 @@ public class Entry implements Comparable<Entry> {
 		return this;
 	}
 
-	public long getBaseSendDelaly() {
-		return baseSendDelaly;
+	public Float getNormalizedSendDelaly() {
+		return normalizedSendDelaly;
 	}
 
-	public Entry setBaseSendDelaly(long baseSendDelaly) {
-		this.baseSendDelaly = baseSendDelaly;
+	public Entry setNormalizedSendDelaly(Float normalizedSendDelaly) {
+		this.normalizedSendDelaly = normalizedSendDelaly;
 		return this;
 	}
 
-	public long getBaseAckDelaly() {
-		return baseAckDelaly;
+	public Float getNormalizedAckDelaly() {
+		return normalizedAckDelaly;
 	}
 
-	public Entry setBaseAckDelaly(long baseAckDelaly) {
-		this.baseAckDelaly = baseAckDelaly;
+	public Entry setNormalizedAckDelaly(Float normalizedAckDelaly) {
+		this.normalizedAckDelaly = normalizedAckDelaly;
 		return this;
 	}
 
-	public long getBaseAccu() {
-		return baseAccu;
+	public Float getNormalizedAccu() {
+		return normalizedAccu;
 	}
 
-	public Entry setBaseAccu(long baseAccu) {
-		this.baseAccu = baseAccu;
+	public Entry setNormalizedAccu(Float normalizedAccu) {
+		this.normalizedAccu = normalizedAccu;
 		return this;
 	}
 
@@ -192,9 +192,8 @@ public class Entry implements Comparable<Entry> {
 
 		int numAlarm = this.getNumAlarm().compareTo(entry.getNumAlarm());
 		if (numAlarm == 0) {
-			Float _f = new Float(this.senddelay / this.baseSendDelaly + this.accu / this.baseAckDelaly);
-			Float f = new Float(entry.getSenddelay() / entry.getBaseSendDelaly() + entry.getAccu()
-					/ entry.getBaseAccu());
+			Float _f = this.normalizedAckDelaly + this.normalizedAccu;
+			Float f = entry.getNormalizedAckDelaly() + entry.getNormalizedAccu();
 
 			return _f.compareTo(f);
 		} else {
@@ -207,7 +206,7 @@ public class Entry implements Comparable<Entry> {
 		return "Entry [server=" + server + ", topic=" + topic + ", consumerId=" + consumerId + ", name=" + name
 				+ ", senddelay=" + senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu + ", senddelayAlarm="
 				+ senddelayAlarm + ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm=" + accuAlarm
-				+ ", baseSendDelaly=" + baseSendDelaly + ", baseAckDelaly=" + baseAckDelaly + ", baseAccu=" + baseAccu
+				+ ", baseSendDelaly=" + normalizedSendDelaly + ", baseAckDelaly=" + normalizedAckDelaly + ", baseAccu=" + normalizedAccu
 				+ ", numAlarm=" + numAlarm + ", email=" + email + ", dpMobile=" + dpMobile + "]";
 	}
 

@@ -18,19 +18,7 @@ public class TotalData {
 	
 	private String cid;
 	
-	private String email;
-	
-	private String dpMobile;
-	
-	private String name;
-	
 	private Date time;
-	
-	private long baseSendDelaly;
-
-	private long baseAckDelaly;
-	
-	private long baseAccu;
 	
 	List<Long> listSend = new ArrayList<Long>();
 
@@ -59,15 +47,6 @@ public class TotalData {
 		return this;
 	}
 	
-	public String getName() {
-		return name;
-	}
-
-	public TotalData setName(String name) {
-		this.name = name;
-		return this;
-	}
-
 	public String getTopic() {
 		return topic;
 	}
@@ -86,24 +65,6 @@ public class TotalData {
 		return this;
 	}
 	
-	public String getEmail() {
-		return email;
-	}
-
-	public TotalData setEmail(String email) {
-		this.email = email;
-		return this;
-	}
-
-	public String getDpMobile() {
-		return dpMobile;
-	}
-
-	public TotalData setDpMobile(String dpMobile) {
-		this.dpMobile = dpMobile;
-		return this;
-	}
-
 	public List<Long> getListSend() {
 		return listSend;
 	}
@@ -139,40 +100,11 @@ public class TotalData {
 		this.time = time;
 		return this;
 	}
-	
-	public long getBaseSendDelaly() {
-		return baseSendDelaly;
-	}
-
-	public TotalData setBaseSendDelaly(long baseSendDelaly) {
-		this.baseSendDelaly = baseSendDelaly;
-		return this;
-	}
-
-	public long getBaseAckDelaly() {
-		return baseAckDelaly;
-	}
-
-	public TotalData setBaseAckDelaly(long baseAckDelaly) {
-		this.baseAckDelaly = baseAckDelaly;
-		return this;
-	}
-
-	public long getBaseAccu() {
-		return baseAccu;
-	}
-
-	public TotalData setBaseAccu(long baseAccu) {
-		this.baseAccu = baseAccu;
-		return this;
-	}
 
 	@Override
 	public String toString() {
-		return "TotalData [server=" + server + ", topic=" + topic + ", cid=" + cid + ", email=" + email + ", dpMobile="
-				+ dpMobile + ", name=" + name + ", time=" + time + ", baseSendDelaly=" + baseSendDelaly
-				+ ", baseAckDelaly=" + baseAckDelaly + ", baseAccu=" + baseAccu + ", listSend=" + listSend
-				+ ", listAck=" + listAck + ", listAccu=" + listAccu + ", entrys=" + entrys + "]";
+		return "TotalData [server=" + server + ", topic=" + topic + ", cid=" + cid + ", time=" + time + ", listSend="
+				+ listSend + ", listAck=" + listAck + ", listAccu=" + listAccu + ", entrys=" + entrys + "]";
 	}
-
+	
 }
