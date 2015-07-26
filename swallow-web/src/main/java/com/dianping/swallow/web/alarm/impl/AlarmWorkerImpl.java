@@ -103,7 +103,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 	@Override
 	public void stop() {
 		isStopped = true;
-		Thread.currentThread().interrupt();
+		alarmTaskThread.interrupt();
 	}
 
 	private boolean checkStop() {

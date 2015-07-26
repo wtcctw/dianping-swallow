@@ -71,17 +71,19 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 			dataCount.incrementAndGet();
 			serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
 			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
+				logger.info("[doStorage] timeKey = " + serverStatisData.getTimeKey());
 				lastTimeKey.set(serverStatisData.getTimeKey());
+				topicStatisDatas = consumerDataWapper.getTopicStatsData(lastTimeKey.get());
+				consumerIdStatsDataMap = consumerDataWapper.getConsumerIdStatsData(lastTimeKey.get());
+				storageServerStatis();
+				storageTopicStatis();
+				storageConsumerIdStatis();
 			}
-			topicStatisDatas = consumerDataWapper.getTopicStatsData(lastTimeKey.get());
-			consumerIdStatsDataMap = consumerDataWapper.getConsumerIdStatsData(lastTimeKey.get());
-			storageServerStatis();
-			storageTopicStatis();
-			storageConsumerIdStatis();
 		}
 	}
 
 	private void storageServerStatis() {
+		logger.info("[storageServerStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageServerStatis");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
@@ -98,19 +100,22 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 	}
 
 	private void storageTopicStatis() {
+		logger.info("[storageTopicStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStatis");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
 				if (topicStatisDatas != null) {
-					for (ConsumerTopicStatsData consumerTopicStatisData : topicStatisDatas)
+					for (ConsumerTopicStatsData consumerTopicStatisData : topicStatisDatas) {
 						topicStatisDataService.insert(consumerTopicStatisData);
+					}
 				}
 			}
 		});
 	}
 
 	private void storageConsumerIdStatis() {
+		logger.info("[storageConsumerIdStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageConsumerIdStatis");
 		catWrapper.doAction(new SwallowAction() {
 			@Override

@@ -79,6 +79,7 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 	}
 
 	private void storageServerStatis() {
+		logger.info("[storageServerStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageServerStatis");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
@@ -93,13 +94,15 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 	}
 
 	private void storageTopicStatis() {
+		logger.info("[storageTopicStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStatis");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
 				if (topicStatisDatas != null) {
-					for (ProducerTopicStatsData producerTopicStatisData : topicStatisDatas)
+					for (ProducerTopicStatsData producerTopicStatisData : topicStatisDatas) {
 						topicStatisDataService.insert(producerTopicStatisData);
+					}
 				}
 			}
 		});
