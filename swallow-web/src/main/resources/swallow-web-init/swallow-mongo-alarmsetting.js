@@ -45,7 +45,7 @@ if(result == null) {
 	    },{
 	    "serverId" : "default",
 	    "topicWhiteList" : [ "x" ], 
-	    "senderAlarmSetting" : { 
+	    "sendAlarmSetting" : { 
 	        "peak" : NumberLong(1), 
 	        "valley" : NumberLong(1), 
 	        "fluctuation" : 20,
@@ -77,7 +77,7 @@ if(result == null) {
 	    },{
 	    "serverId" : "default", 
 	    "topicWhiteList" : [ "x" ], 
-	    "defaultAlarmSetting" : {
+	    "alarmSetting" : {
 	       "peak" : NumberLong(100), 
 	       "valley" : NumberLong(30), 
 	       "fluctuation" : 10,

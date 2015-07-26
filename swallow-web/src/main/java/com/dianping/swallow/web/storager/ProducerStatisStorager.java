@@ -49,6 +49,10 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 
 	private volatile ProducerServerStatsData serverStatisData;
 
+	public ProducerStatisStorager() {
+		storageType = getClass().getSimpleName();
+	}
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();

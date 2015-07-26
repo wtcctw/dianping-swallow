@@ -31,7 +31,7 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 	private static final Logger logger = LoggerFactory.getLogger(AlarmScheduledTask.class);
 
 	protected int alarmInterval = 30;
-
+	
 	private static ScheduledExecutorService scheduled = Executors
 			.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2);
 
@@ -68,8 +68,7 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 	}
 
 	private void startAlarm(final AlarmFilterChain filterChain) {
-		ScheduledFuture<?> future = scheduled.scheduleAtFixedRate(new Runnable() {
-
+		ScheduledFuture<?> future = scheduled.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
 				try {

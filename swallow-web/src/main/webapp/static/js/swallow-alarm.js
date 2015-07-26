@@ -83,57 +83,52 @@ module
 					};
 				});
 
-module.controller('AlarmController',
-		[
-				'$scope',
-				'$http',
-				'Paginator',
-				function($scope, $http, Paginator) {
-					var fetchFunction = function(offset, limit, receiver,
-							startTime, endTime, callback) {
+module.controller('AlarmController', [
+		'$scope',
+		'$http',
+		'Paginator',
+		function($scope, $http, Paginator) {
+			var fetchFunction = function(offset, limit, receiver, startTime,
+					endTime, callback) {
 
-						$http.get(window.contextPath + $scope.suburl, {
-							params : {
-								offset : offset,
-								limit : limit,
-								receiver : receiver,
-								startTime : startTime,
-								endTime : endTime
-							}
-						}).success(callback);
-					};
-
-					$scope.receiver = "";
-					$scope.startTime = "";
-					$scope.endTime = "";
-					$scope.suburl = "/console/alarm/search";
-					$scope.pageSize = 30;
-
-					$scope.query = function() {
-						$scope.startTime = $("#starttime").val();
-						$scope.endTime = $("#stoptime").val();
-						if (typeof ($scope.receiver) == "undefined"
-								|| $scope.endTime == null
-								|| $scope.receiver.length == 0) {
-							alert("请输入接收人");
-							return;
-						}
-						if (typeof ($scope.startTime) == "undefined"
-								|| $scope.endTime == null
-								|| $scope.startTime.length == 0) {
-							alert("请输入开始时间");
-							return;
-						}
-						if (typeof ($scope.endTime) == "undefined"
-								|| $scope.endTime == null
-								|| $scope.endTime.length == 0) {
-							alert("请输入结束时间");
-							return;
-						}
-
-						$scope.searchPaginator = Paginator(fetchFunction,
-								$scope.pageSize, $scope.receiver,
-								$scope.startTime, $scope.endTime);
+				$http.get(window.contextPath + $scope.suburl, {
+					params : {
+						offset : offset,
+						limit : limit,
+						receiver : receiver,
+						startTime : startTime,
+						endTime : endTime
 					}
+				}).success(callback);
+			};
 
-				} ]);
+			$scope.receiver = "";
+			$scope.startTime = "";
+			$scope.endTime = "";
+			$scope.suburl = "/console/alarm/search";
+			$scope.pageSize = 30;
+			$scope.queryCount = 0;
+			$scope.query = function() {
+				if ($scope.queryCount != 0) {
+					$scope.startTime = $("#starttime").val();
+					$scope.endTime = $("#stoptime").val();
+				}
+				$scope.queryCount = $scope.queryCount + 1;
+				console.log($scope.startTime);
+
+				if ($scope.startTime != null && $scope.endTime != null) {
+					startDate = new Date($scope.startTime);
+					endDate = new Date($scope.endTime);
+					if (endDate <= startDate) {
+						alert("结束时间不能小于开始时间");
+						return;
+					}
+				}
+
+				$scope.searchPaginator = Paginator(fetchFunction,
+						$scope.pageSize, $scope.receiver, $scope.startTime,
+						$scope.endTime);
+			}
+
+			$scope.query();
+		} ]);

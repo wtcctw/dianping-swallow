@@ -8,16 +8,16 @@ public class ConsumerServerAlarmSetting extends BaseAlarmSetting {
 	
 	private List<String> topicWhiteList;
 
-	private QPSAlarmSetting senderAlarmSetting;
+	private QPSAlarmSetting sendAlarmSetting;
 
 	private QPSAlarmSetting ackAlarmSetting;
 
-	public QPSAlarmSetting getSenderAlarmSetting() {
-		return senderAlarmSetting;
+	public QPSAlarmSetting getSendAlarmSetting() {
+		return sendAlarmSetting;
 	}
 
 	public void setSenderAlarmSetting(QPSAlarmSetting senderAlarmSetting) {
-		this.senderAlarmSetting = senderAlarmSetting;
+		this.sendAlarmSetting = senderAlarmSetting;
 	}
 
 	public QPSAlarmSetting getAckAlarmSetting() {

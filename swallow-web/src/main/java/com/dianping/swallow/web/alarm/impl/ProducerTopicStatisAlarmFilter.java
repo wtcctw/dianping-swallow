@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.alarm.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -7,11 +8,13 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
+import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.TopicEvent;
 import com.dianping.swallow.web.model.statis.ProducerBaseStatsData;
 import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
@@ -30,7 +33,7 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
 public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter implements MonitorDataListener {
 
 	@Autowired
-	private AlarmManager alarmManager;
+	private MessageManager alarmManager;
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -100,12 +103,25 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	private boolean qpsAlarm(long qpx, String topicName, QPSAlarmSetting qps, long timeKey) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.producerTopicStatisAlarm(topicName, qpx, qps.getPeak(), AlarmType.PRODUCER_TOPIC_QPS_PEAK);
+				TopicEvent topicEvent = new TopicEvent();
+				topicEvent.setTopicName(topicName);
+				topicEvent.setAlarmType(AlarmType.PRODUCER_TOPIC_QPS_PEAK);
+				topicEvent.setCurrentValue(qpx);
+				topicEvent.setExpectedValue(qps.getPeak());
+				topicEvent.setEventType(EventType.PRODUCER);
+				topicEvent.setCreateTime(new Date());
+				eventReporter.report(topicEvent);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.producerTopicStatisAlarm(topicName, qpx, qps.getValley(),
-						AlarmType.PRODUCER_TOPIC_QPS_VALLEY);
+				TopicEvent topicEvent = new TopicEvent();
+				topicEvent.setTopicName(topicName);
+				topicEvent.setAlarmType(AlarmType.PRODUCER_TOPIC_QPS_VALLEY);
+				topicEvent.setCurrentValue(qpx);
+				topicEvent.setExpectedValue(qps.getValley());
+				topicEvent.setEventType(EventType.PRODUCER);
+				topicEvent.setCreateTime(new Date());
+				eventReporter.report(topicEvent);
 				return false;
 			}
 			fluctuationAlarm(topicName, qpx, qps, timeKey);
@@ -137,14 +153,16 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 		}
 		int expectedQpx = sumQpx / sampleCount;
 		if (qpx > qps.getFluctuationBase() && expectedQpx > qps.getFluctuationBase()) {
-			if (qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuationBase()) {
-				alarmManager.producerTopicStatisAlarm(topicName, qpx, expectedQpx,
-						AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION);
-				return false;
-			}
-			if (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuationBase()) {
-				alarmManager.producerTopicStatisAlarm(topicName, qpx, expectedQpx,
-						AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION);
+			if ((qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuationBase())
+					|| (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuationBase())) {
+				TopicEvent topicEvent = new TopicEvent();
+				topicEvent.setTopicName(topicName);
+				topicEvent.setAlarmType(AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION);
+				topicEvent.setCurrentValue(qpx);
+				topicEvent.setExpectedValue(expectedQpx);
+				topicEvent.setEventType(EventType.PRODUCER);
+				topicEvent.setCreateTime(new Date());
+				eventReporter.report(topicEvent);
 				return false;
 			}
 		}
@@ -153,8 +171,14 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 
 	private boolean delayAlarm(String topicName, long delay, long expectDelay) {
 		if (delay > expectDelay) {
-			alarmManager
-					.producerTopicStatisAlarm(topicName, delay, expectDelay, AlarmType.PRODUCER_TOPIC_MESSAGE_DELAY);
+			TopicEvent topicEvent = new TopicEvent();
+			topicEvent.setTopicName(topicName);
+			topicEvent.setAlarmType(AlarmType.PRODUCER_TOPIC_MESSAGE_DELAY);
+			topicEvent.setCurrentValue(delay);
+			topicEvent.setExpectedValue(expectDelay);
+			topicEvent.setEventType(EventType.PRODUCER);
+			topicEvent.setCreateTime(new Date());
+			eventReporter.report(topicEvent);
 			return false;
 		}
 		return true;

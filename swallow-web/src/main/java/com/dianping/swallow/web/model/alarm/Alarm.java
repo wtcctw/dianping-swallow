@@ -134,8 +134,13 @@ public class Alarm implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		Alarm alarm = (Alarm) super.clone();
+	public Object clone() {
+		Alarm alarm;
+		try {
+			alarm = (Alarm) super.clone();
+		} catch (CloneNotSupportedException e) {
+			alarm = new Alarm();
+		}
 		alarm.id = this.id;
 		alarm.eventId = this.eventId;
 		alarm.number = this.number;

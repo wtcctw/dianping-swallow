@@ -21,7 +21,9 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 public abstract class AbstractStatisStorager extends AbstractLifecycle {
 
 	protected volatile AtomicLong dataCount = new AtomicLong();
-
+	
+	protected String storageType;
+	
 	protected static final int INIT_VALUE = 0;
 
 	protected static final long DEFAULT_VALUE = -1L;
@@ -54,7 +56,7 @@ public abstract class AbstractStatisStorager extends AbstractLifecycle {
 			@Override
 			public void run() {
 				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doStorage");
+					SwallowActionWrapper catWrapper = new CatActionWrapper(storageType, "doStorage");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {

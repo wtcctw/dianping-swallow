@@ -1,13 +1,16 @@
 package com.dianping.swallow.web.alarm.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 
@@ -20,13 +23,15 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 
 	@Autowired
-	private AlarmManager alarmManager;
+	private MessageManager alarmManager;
 
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
 	private GlobalAlarmSettingService globalAlarmSettingService;
+
+	private static final long SENDER_TIME_SPAN = 20;
 
 	@Override
 	public boolean doAccept() {
@@ -39,14 +44,23 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 		for (String serverIp : producerServerIps) {
 			if (whiteList == null || !whiteList.contains(serverIp)) {
-				if (!statisProducerServerIps.containsKey(serverIp)) {
-					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_SENDER);
-					lastCheckStatus.put(serverIp, false);
-				} else if (System.currentTimeMillis() - statisProducerServerIps.get(serverIp).longValue() > 30) {
-					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_SENDER);
+				if (!statisProducerServerIps.containsKey(serverIp)
+						|| System.currentTimeMillis() - statisProducerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
+					ServerEvent event = new ServerEvent();
+					event.setIp(serverIp);
+					event.setSlaveIp(serverIp);
+					event.setAlarmType(AlarmType.PRODUCER_SERVER_SENDER);
+					event.setEventType(EventType.PRODUCER);
+					event.setCreateTime(new Date());
+					eventReporter.report(event);
 					lastCheckStatus.put(serverIp, false);
 				} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_SENDER_OK);
+					ServerEvent event = new ServerEvent();
+					event.setIp(serverIp);
+					event.setSlaveIp(serverIp);
+					event.setAlarmType(AlarmType.PRODUCER_SERVER_SENDER_OK);
+					event.setEventType(EventType.PRODUCER);
+					event.setCreateTime(new Date());
 					lastCheckStatus.put(serverIp, true);
 				}
 			}

@@ -50,6 +50,10 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 	@Autowired
 	private ConsumerIdStatisDataService consumerIdStatisDataService;
 
+	public ConsumerStatisStorager() {
+		storageType = getClass().getSimpleName();
+	}
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();

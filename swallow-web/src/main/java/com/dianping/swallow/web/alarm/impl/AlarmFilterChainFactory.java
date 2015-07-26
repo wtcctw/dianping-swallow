@@ -38,9 +38,6 @@ public class AlarmFilterChainFactory implements InitializingBean {
 	@Resource(name = "consumerServerStatisAlarmFilter")
 	private AlarmFilter consumerServerStatisAlarmFilter;
 
-	@Resource(name = "consumerTopicStatisAlarmFilter")
-	private AlarmFilter consumerTopicStatisAlarmFilter;
-
 	@Resource(name = "consumerIdStatisAlarmFilter")
 	private AlarmFilter consumerIdStatisAlarmFilter;
 
@@ -78,7 +75,6 @@ public class AlarmFilterChainFactory implements InitializingBean {
 		AlarmFilterChain alarmFilterChain = new DefaultAlarmFilterChain();
 		alarmFilterChain.setChainName("ConsumerStatisFilterChain");
 		alarmFilterChain.registerFilter(consumerServerStatisAlarmFilter);
-		// alarmFilterChain.registerFilter(consumerTopicStatisAlarmFilter);
 		alarmFilterChain.registerFilter(consumerIdStatisAlarmFilter);
 		return alarmFilterChain;
 	}
