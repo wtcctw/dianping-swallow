@@ -647,6 +647,106 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 * consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。
 ![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/12.png)
 
+### Swallow 告警
+
+#### server告警
+
+1. producer server服务告警
+
+服务告警目前只检测server pigeon服务的健康检测页面和发往web端的统计数据两个方面，四种告警类型：
+
+* [1]PRODUCER_SERVER_PIGEON_SERVICE，pigeon服务故障。
+
+* [2]PRODUCER_SERVER_PIGEON_SERVICE_OK，pigeon服务故障恢复。
+
+* [3]PRODUCER_SERVER_SENDER，统计数据未发送。
+
+* [4]PRODUCER_SERVER_SENDER_OK，统计数据发送故障恢复。
+
+2. producer server统计数据告警
+
+服务告警目前只检测某台server QPS 峰值、谷值两个方面，四种告警类型：
+
+* [5]PRODUCER_SERVER_QPS_PEAK，QPS超过峰值。
+
+* [6]PRODUCER_SERVER_QPS_VALLEY，QPS低于谷值。
+
+* [8]PRODUCER_SERVER_QPS_OK，QPS恢复正常。
+
+3. consumer server服务告警
+
+服务告警目前只检测server 端口是否打开，发往web端的统计数据以及slave服务器服务是否开启三个方面，八种告警类型：
+
+* [9]CONSUMER_SERVER_SENDER，统计数据未发送。
+
+* [10]CONSUMER_SERVER_SENDER_OK，统计数据发送故障恢复。
+
+* [11]CONSUMER_SERVER_SLAVEPORT_OPENED，Master端口关闭，Slave端口打开。
+
+* [12]CONSUMER_SERVER_BOTHPORT_OPENED，Master，Slave端口都打开。
+
+* [13]CONSUMER_SERVER_BOTHPORT_UNOPENED，Master，Slave端口都未打开。
+
+* [14]CONSUMER_SERVER_PORT_OPENED_OK，Master，Slave端口恢复正常状态。
+
+* [15]CONSUMER_SERVER_SLAVESERVICE_STARTED，Slave服务未开启。
+
+* [16]CONSUMER_SERVER_SLAVESERVICE_STARTED_OK，Slave服务恢复正常。
+
+4. consumer server统计数据告警
+
+服务告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动六个方面，八种告警类型：
+
+* [17]CONSUMER_SERVER_SENDQPS_PEAK，发送QPS超过峰值。
+
+* [18]CONSUMER_SERVER_SENDQPS_VALLEY，发送QPS低于谷值。
+
+* [19]CONSUMER_SERVER_SENDQPS_FLUCTUATION，发送QPS与历史数据相比波动过大。
+
+* [20]CONSUMER_SERVER_SENDQPS_OK，发送QPS恢复正常。
+
+* [21]CONSUMER_SERVER_ACKQPS_PEAK，确认QPS超过峰值。
+
+* [22]CONSUMER_SERVER_ACKQPS_VALLEY，确认QPS低于谷值。
+
+* [23]CONSUMER_SERVER_ACKQPS_FLUCTUATION，确认QPS与历史数据相比波动过大。
+
+* [24]CONSUMER_SERVER_ACKQPS_OK，确认QPS恢复正常。
+
+#### topic告警
+
+topic告警目前只检测producer topic QPS的峰值、谷值、波动以及topic message延时四个方面，四种告警类型：
+
+* [1001]PRODUCER_TOPIC_QPS_PEAK，Topic QPS超过峰值。
+
+* [1002]PRODUCER_TOPIC_QPS_VALLEY，Topic QPS低于谷值。
+
+* [1003]PRODUCER_TOPIC_QPS_FLUCTUATION，Topic QPS与历史数据相比波动过大。
+
+* [1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message延时。
+
+#### consumerId告警
+
+服务告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动以及发送Message累积九个方面，九种告警类型：
+
+* [1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值。
+
+* [1014]CONSUMER_CONSUMERID_SENDQPS_VALLEY，ConsumerId 发送QPS低于谷值。
+
+* [1015]CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION，ConsumerId 发送QPS与历史数据相比波动过大。
+
+* [1016]CONSUMER_CONSUMERID_SENDMESSAGE_DELAY，ConsumerId 发送QPS延时。
+
+* [1017]CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION，ConsumerId message累积。
+
+* [1018]CONSUMER_CONSUMERID_ACKQPS_PEAK，ConsumerId 确认QPS超过峰值。
+
+* [1019]CONSUMER_CONSUMERID_ACKQPS_VALLEY，ConsumerId 确认QPS低于谷值。
+
+* [1020]CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION，ConsumerId 确认QPS与历史数据相比波动过大。
+
+* [1021]CONSUMER_CONSUMERID_ACKMESSAGE_DELAY，ConsumerId 确认QPS延时。
+
 ## 权限管理
 
 ### 管理员行为
