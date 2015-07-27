@@ -8,14 +8,14 @@ public class ProducerServerAlarmSetting  extends BaseAlarmSetting{
 	
 	private List<String> topicWhiteList;
 	
-	private QPSAlarmSetting defaultAlarmSetting;
+	private QPSAlarmSetting alarmSetting;
 	
-	public QPSAlarmSetting getDefaultAlarmSetting() {
-		return defaultAlarmSetting;
+	public QPSAlarmSetting getAlarmSetting() {
+		return alarmSetting;
 	}
 
-	public void setDefaultAlarmSetting(QPSAlarmSetting defaultAlarmSetting) {
-		this.defaultAlarmSetting = defaultAlarmSetting;
+	public void setAlarmSetting(QPSAlarmSetting alarmSetting) {
+		this.alarmSetting = alarmSetting;
 	}
 
 	public List<String> getTopicWhiteList() {

@@ -1,14 +1,17 @@
 package com.dianping.swallow.web.alarm.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
@@ -26,7 +29,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 	private volatile String producerServerIp;
 
 	@Autowired
-	private AlarmManager alarmManager;
+	private MessageManager alarmManager;
 
 	@Autowired
 	private HttpService httpSerivice;
@@ -55,10 +58,22 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 			if (!whiteList.contains(serverIp)) {
 				String url = StringUtils.replace(PIGEON_HEALTH_URL_KEY, "{ip}", serverIp);
 				if (!httpSerivice.httpGet(url).isSuccess() && !httpSerivice.httpGet(url).isSuccess()) {
-					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_PIGEON_SERVICE);
+					ServerEvent serverEvent = new ServerEvent();
+					serverEvent.setIp(serverIp);
+					serverEvent.setSlaveIp(serverIp);
+					serverEvent.setAlarmType(AlarmType.PRODUCER_SERVER_PIGEON_SERVICE);
+					serverEvent.setEventType(EventType.PRODUCER);
+					serverEvent.setCreateTime(new Date());
+					eventReporter.report(serverEvent);
 					lastCheckStatus.put(serverIp, false);
 				} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-					alarmManager.producerServerAlarm(serverIp, AlarmType.PRODUCER_SERVER_PIGEON_SERVICE_OK);
+					ServerEvent serverEvent = new ServerEvent();
+					serverEvent.setIp(serverIp);
+					serverEvent.setSlaveIp(serverIp);
+					serverEvent.setAlarmType(AlarmType.PRODUCER_SERVER_PIGEON_SERVICE_OK);
+					serverEvent.setEventType(EventType.PRODUCER);
+					serverEvent.setCreateTime(new Date());
+					eventReporter.report(serverEvent);
 					lastCheckStatus.put(serverIp, true);
 				}
 			}

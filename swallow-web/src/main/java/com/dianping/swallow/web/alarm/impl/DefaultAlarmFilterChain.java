@@ -15,7 +15,9 @@ public class DefaultAlarmFilterChain implements AlarmFilterChain {
 
 	private List<AlarmFilter> alarmFilters = new ArrayList<AlarmFilter>();
 
-	public int index;
+	private int index;
+	
+	private String chainName;
 
 	@Override
 	public boolean doNext() {
@@ -33,6 +35,16 @@ public class DefaultAlarmFilterChain implements AlarmFilterChain {
 	@Override
 	public void reset() {
 		index = 0;
+	}
+
+	@Override
+	public void setChainName(String chainName) {
+		this.chainName = chainName;
+	}
+
+	@Override
+	public String getChainName() {
+		return this.chainName;
 	}
 
 }

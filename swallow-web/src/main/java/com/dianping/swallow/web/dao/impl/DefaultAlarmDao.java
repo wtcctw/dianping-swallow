@@ -3,6 +3,7 @@ package com.dianping.swallow.web.dao.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -93,8 +94,24 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 
 	@Override
 	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit) {
-		Query query = new Query(Criteria.where(RECEIVER_FIELD).is(receiver).and(CREATETIME_FIELD).gte(startTime)
-				.lte(endTime));
+		Criteria criteria = null;
+		if (StringUtils.isNotBlank(receiver)) {
+			criteria = Criteria.where(RECEIVER_FIELD).is(receiver);
+		}
+		if (startTime != null && endTime != null) {
+			if (criteria != null) {
+				criteria = criteria.and(CREATETIME_FIELD).gte(startTime).lte(endTime);
+			} else {
+				criteria = Criteria.where(CREATETIME_FIELD).gte(startTime).lte(endTime);
+			}
+		} else {
+			if (criteria != null) {
+				criteria = criteria.and(CREATETIME_FIELD).lte(endTime);
+			} else {
+				criteria = Criteria.where(CREATETIME_FIELD).lte(endTime);
+			}
+		}
+		Query query = new Query(criteria);
 		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, CREATETIME_FIELD)));
 		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
 		return alarms;

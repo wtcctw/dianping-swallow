@@ -66,6 +66,7 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 			}
 
 			ProducerMachineStatsData machineStatsData = new ProducerMachineStatsData();
+			machineStatsData.setTimeKey(timeKey);
 			machineStatsData.setIp(serverIp);
 			ProducerBaseStatsData baseStatsData = new ProducerBaseStatsData();
 			baseStatsData.setDelay(0);

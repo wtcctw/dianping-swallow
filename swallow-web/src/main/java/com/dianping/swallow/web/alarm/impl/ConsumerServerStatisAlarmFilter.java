@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.alarm.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -7,10 +8,12 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
+import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.ServerStatisEvent;
 import com.dianping.swallow.web.model.statis.ConsumerBaseStatsData;
 import com.dianping.swallow.web.model.statis.ConsumerMachineStatsData;
 import com.dianping.swallow.web.model.statis.ConsumerServerStatsData;
@@ -32,7 +35,7 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private ConsumerServerStatsData serverStatisData;
 
 	@Autowired
-	private AlarmManager alarmManager;
+	private MessageManager alarmManager;
 
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
@@ -76,7 +79,7 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 			return true;
 		}
 		QPSAlarmSetting ackQps = serverAlarmSetting.getAckAlarmSetting();
-		QPSAlarmSetting sendQps = serverAlarmSetting.getSenderAlarmSetting();
+		QPSAlarmSetting sendQps = serverAlarmSetting.getSendAlarmSetting();
 		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 
 		if (serverStatisData == null || serverStatisData.getMachineStatisDatas() == null) {
@@ -98,12 +101,25 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean sendQpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerServerStatisAlarm(ip, qpx, qps.getPeak(), AlarmType.CONSUMER_SERVER_SENDQPS_PEAK);
+				ServerStatisEvent statisEvent = new ServerStatisEvent();
+				statisEvent.setAlarmType(AlarmType.CONSUMER_SERVER_SENDQPS_PEAK);
+				statisEvent.setIp(ip);
+				statisEvent.setEventType(EventType.CONSUMER);
+				statisEvent.setCurrentValue(qpx);
+				statisEvent.setExpectedValue(qps.getPeak());
+				statisEvent.setCreateTime(new Date());
+				eventReporter.report(statisEvent);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerServerStatisAlarm(ip, qpx, qps.getValley(),
-						AlarmType.CONSUMER_SERVER_SENDQPS_VALLEY);
+				ServerStatisEvent statisEvent = new ServerStatisEvent();
+				statisEvent.setAlarmType(AlarmType.CONSUMER_SERVER_SENDQPS_VALLEY);
+				statisEvent.setIp(ip);
+				statisEvent.setEventType(EventType.CONSUMER);
+				statisEvent.setCurrentValue(qpx);
+				statisEvent.setExpectedValue(qps.getValley());
+				statisEvent.setCreateTime(new Date());
+				eventReporter.report(statisEvent);
 				return false;
 			}
 		}
@@ -113,12 +129,25 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean ackQpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.consumerServerStatisAlarm(ip, qpx, qps.getPeak(), AlarmType.CONSUMER_SERVER_ACKQPS_PEAK);
+				ServerStatisEvent statisEvent = new ServerStatisEvent();
+				statisEvent.setAlarmType(AlarmType.CONSUMER_SERVER_ACKQPS_PEAK);
+				statisEvent.setIp(ip);
+				statisEvent.setEventType(EventType.CONSUMER);
+				statisEvent.setCurrentValue(qpx);
+				statisEvent.setExpectedValue(qps.getPeak());
+				statisEvent.setCreateTime(new Date());
+				eventReporter.report(statisEvent);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.consumerServerStatisAlarm(ip, qpx, qps.getValley(),
-						AlarmType.CONSUMER_SERVER_ACKQPS_VALLEY);
+				ServerStatisEvent statisEvent = new ServerStatisEvent();
+				statisEvent.setAlarmType(AlarmType.CONSUMER_SERVER_ACKQPS_VALLEY);
+				statisEvent.setIp(ip);
+				statisEvent.setEventType(EventType.CONSUMER);
+				statisEvent.setCurrentValue(qpx);
+				statisEvent.setExpectedValue(qps.getValley());
+				statisEvent.setCreateTime(new Date());
+				eventReporter.report(statisEvent);
 				return false;
 			}
 		}

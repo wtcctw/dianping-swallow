@@ -24,22 +24,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.lion.EnvZooKeeperConfig;
-import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
-import com.dianping.swallow.web.model.alarm.SendType;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
+import com.dianping.swallow.web.model.event.ConsumerIdEvent;
+import com.dianping.swallow.web.model.event.ServerEvent;
+import com.dianping.swallow.web.model.event.ServerStatisEvent;
+import com.dianping.swallow.web.model.event.TopicEvent;
 import com.dianping.swallow.web.service.AlarmMetaService;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.SeqGeneratorService;
 
-@Service("alarmManager")
-public class AlarmManagerImpl implements AlarmManager, InitializingBean {
+@Service("messageManager")
+public class MessageManagerImpl implements MessageManager, InitializingBean {
 
-	private static final Logger logger = LoggerFactory.getLogger(AlarmManagerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(MessageManagerImpl.class);
 
 	private static final String TOTAL_KEY = "total";
 
@@ -116,162 +118,156 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
-	@Autowired
-	private SeqGeneratorService seqGeneratorService;
-
-	private static final String ALARMEVENTID_CATEGORY = "alarmEventId";
-
 	private TimeZone timeZone = TimeZone.getTimeZone("GMT+8:00");
 
 	@Override
-	public void producerServerAlarm(String ip, AlarmType alarmType) {
-		AlarmMeta alarmMeta = alarmMetas.get(alarmType.getNumber());
-		if (alarmMeta != null && isProducerServerAlarm(ip, alarmMeta)) {
+	public void producerServerAlarm(ServerEvent event) {
+		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
+		if (alarmMeta != null && isProducerServerAlarm(event.getIp(), alarmMeta)) {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
-				message = StringUtils.replace(message, IP_TEMPLATE, ip);
+				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
 				message = StringUtils.replace(message, DATE_TEMPLATE,
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
+				alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-				sendAlarmByIp(ip, alarm, alarmMeta);
+				sendAlarmByIp(event.getIp(), alarm, alarmMeta);
 			}
 		}
 	}
 
 	@Override
-	public void producerServerStatisAlarm(String ip, long currentValue, long expectedValue, AlarmType alarmType) {
-		AlarmMeta alarmMeta = alarmMetas.get(alarmType.getNumber());
-		if (alarmMeta != null && isProducerServerAlarm(ip, alarmMeta)) {
+	public void producerServerStatisAlarm(ServerStatisEvent event) {
+		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
+		if (alarmMeta != null && isProducerServerAlarm(event.getIp(), alarmMeta)) {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
-				message = StringUtils.replace(message, IP_TEMPLATE, ip);
-				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
-				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
+				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
+				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
+				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
+				alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-				sendAlarmByIp(ip, alarm, alarmMeta);
+				sendAlarmByIp(event.getIp(), alarm, alarmMeta);
 			}
 		}
 	}
 
 	@Override
-	public void producerTopicStatisAlarm(String topic, long currentValue, long expectedValue, AlarmType alarmType) {
-		AlarmMeta alarmMeta = alarmMetas.get(alarmType.getNumber());
-		if (alarmMeta != null && isProducerTopicAlarm(topic, alarmMeta)) {
+	public void producerTopicStatisAlarm(TopicEvent event) {
+		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
+		if (alarmMeta != null && isProducerTopicAlarm(event.getTopicName(), alarmMeta)) {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
-				message = StringUtils.replace(message, TOPIC_TEMPLATE, topic);
-				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
-				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
+				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
+				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
+				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
-			alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
+			alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
 			} else if (alarmMeta.getIsSendBusiness()) {
-				sendAlarmByProducerTopic(topic, alarm, alarmMeta);
+				sendAlarmByProducerTopic(event.getTopicName(), alarm, alarmMeta);
 			}
 		}
 	}
 
 	@Override
-	public void consumerServerAlarm(String masterIp, String slaveIp, AlarmType alarmType) {
-		AlarmMeta alarmMeta = alarmMetas.get(alarmType.getNumber());
-		if (alarmMeta != null && isConsumerServerAlarm(masterIp, alarmMeta)) {
+	public void consumerServerAlarm(ServerEvent event) {
+		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
+		if (alarmMeta != null && isConsumerServerAlarm(event.getIp(), alarmMeta)) {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
-				message = StringUtils.replace(message, IP_TEMPLATE, masterIp);
-				message = StringUtils.replace(message, MASTERIP_TEMPLATE, masterIp);
-				message = StringUtils.replace(message, SLAVEIP_TEMPLATE, slaveIp);
+				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
+				message = StringUtils.replace(message, MASTERIP_TEMPLATE, event.getIp());
+				message = StringUtils.replace(message, SLAVEIP_TEMPLATE, event.getSlaveIp());
 				message = StringUtils.replace(message, DATE_TEMPLATE,
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
+				alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-				sendAlarmByIp(masterIp, alarm, alarmMeta);
+				sendAlarmByIp(event.getIp(), alarm, alarmMeta);
 			}
 		}
 	}
 
 	@Override
-	public void consumerServerStatisAlarm(String ip, long currentValue, long expectedValue, AlarmType alarmType) {
-		AlarmMeta alarmMeta = alarmMetas.get(alarmType.getNumber());
-		if (alarmMeta != null && isConsumerServerAlarm(ip, alarmMeta)) {
+	public void consumerServerStatisAlarm(ServerStatisEvent event) {
+		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
+		if (alarmMeta != null && isConsumerServerAlarm(event.getIp(), alarmMeta)) {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
-				message = StringUtils.replace(message, IP_TEMPLATE, ip);
-				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
-				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
+				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
+				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
+				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
+				alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-				sendAlarmByIp(ip, alarm, alarmMeta);
+				sendAlarmByIp(event.getIp(), alarm, alarmMeta);
 			}
 		}
 	}
 
 	@Override
-	public void consumerTopicStatisAlarm(String topic, long currentValue, long expectedValue, AlarmType alarmType) {
-		AlarmMeta alarmMeta = alarmMetas.get(alarmType.getNumber());
-		if (alarmMeta != null && isConsumerTopicAlarm(topic, alarmMeta)) {
+	public void consumerTopicStatisAlarm(TopicEvent event) {
+		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
+		if (alarmMeta != null && isConsumerTopicAlarm(event.getTopicName(), alarmMeta)) {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
-				message = StringUtils.replace(message, TOPIC_TEMPLATE, topic);
-				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
-				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
+				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
+				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
+				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
-			alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
+			alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
 			} else if (alarmMeta.getIsSendBusiness()) {
-				sendAlarmByConsumerTopic(topic, alarm, alarmMeta);
+				sendAlarmByConsumerTopic(event.getTopicName(), alarm, alarmMeta);
 			}
 		}
 	}
 
 	@Override
-	public void consumerIdStatisAlarm(String topic, String consumerId, long currentValue, long expectedValue,
-			AlarmType alarmType) {
-		AlarmMeta alarmMeta = alarmMetas.get(alarmType.getNumber());
-		if (alarmMeta != null && isConsumerIdAlarm(topic, consumerId, alarmMeta)) {
+	public void consumerIdStatisAlarm(ConsumerIdEvent event) {
+		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
+		if (alarmMeta != null && isConsumerIdAlarm(event.getTopicName(), event.getConsumerId(), alarmMeta)) {
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
-				message = StringUtils.replace(message, TOPIC_TEMPLATE, topic);
-				message = StringUtils.replace(message, CONSUMERID_TEMPLATE, topic);
-				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(currentValue));
-				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(expectedValue));
+				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
+				message = StringUtils.replace(message, CONSUMERID_TEMPLATE, event.getConsumerId());
+				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
+				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
 						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
 			}
 			Alarm alarm = new Alarm();
-			alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(getSeqGeneratorId())).setBody(message)
+			alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
 			} else if (alarmMeta.getIsSendBusiness()) {
-				sendAlarmByTopicAndConsumerId(topic, consumerId, alarm, alarmMeta);
+				sendAlarmByTopicAndConsumerId(event.getTopicName(), event.getConsumerId(), alarm, alarmMeta);
 			}
 		}
 
@@ -354,15 +350,15 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 
 	private void sendAlarm(Set<String> mobiles, Set<String> emails, Alarm alarm, AlarmMeta alarmMeta) {
 		if (alarmMeta.getIsMailMode()) {
-			alarm.setSendType(SendType.MAIL);
+		//	Alarm alarmMail = (Alarm) alarm.clone();
 			alarmService.sendMail(emails, alarm);
 		}
 		if (alarmMeta.getIsSmsMode()) {
-			alarm.setSendType(SendType.SMS);
+		//	Alarm alarmSms = (Alarm) alarm.clone();
 			alarmService.sendSms(mobiles, alarm);
 		}
 		if (alarmMeta.getIsWeiXinMode()) {
-			alarm.setSendType(SendType.WEIXIN);
+		//	Alarm alarmWeiXin = (Alarm) alarm.clone();
 			alarmService.sendWeiXin(emails, alarm);
 		}
 	}
@@ -422,16 +418,13 @@ public class AlarmManagerImpl implements AlarmManager, InitializingBean {
 		return isAlarm(consumerIdAlarms, key, alarmMeta);
 	}
 
-	private long getSeqGeneratorId() {
-		return seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-	}
-
 	private void initProperties() {
 		if (env.equals(DEV_ENV)) {
 			devMobiles = new HashSet<String>();
 			devEmails = new HashSet<String>();
 			try {
-				InputStream in = AlarmManagerImpl.class.getClassLoader().getResourceAsStream(ALARM_RECIEVER_FILE_NAME);
+				InputStream in = MessageManagerImpl.class.getClassLoader()
+						.getResourceAsStream(ALARM_RECIEVER_FILE_NAME);
 				if (in != null) {
 					Properties prop = new Properties();
 					try {
