@@ -64,7 +64,7 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	@Override
 	public boolean doAccept() {
 		if (dataCount.get() > 0) {
-			dataCount.incrementAndGet();
+			dataCount.decrementAndGet();
 			ConsumerServerStatsData serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
 			return serverAlarm(serverStatisData);
 		}

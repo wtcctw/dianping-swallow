@@ -148,15 +148,6 @@ public class AlarmWorkerImpl implements AlarmWorker {
 				messageManager.consumerServerAlarm((ServerEvent) event);
 				break;
 			}
-		} else if (event instanceof TopicEvent) {
-			switch (event.getEventType()) {
-			case PRODUCER:
-				messageManager.producerTopicStatisAlarm((TopicEvent) event);
-				break;
-			case CONSUMER:
-				messageManager.consumerTopicStatisAlarm((TopicEvent) event);
-				break;
-			}
 		} else if (event instanceof ConsumerIdEvent) {
 			switch (event.getEventType()) {
 			case CONSUMER:
@@ -165,7 +156,16 @@ public class AlarmWorkerImpl implements AlarmWorker {
 			default:
 				break;
 			}
-		} else {
+		}else if (event instanceof TopicEvent) {
+			switch (event.getEventType()) {
+			case PRODUCER:
+				messageManager.producerTopicStatisAlarm((TopicEvent) event);
+				break;
+			case CONSUMER:
+				messageManager.consumerTopicStatisAlarm((TopicEvent) event);
+				break;
+			}
+		}  else {
 			logger.error("unsupported event type.");
 		}
 	}

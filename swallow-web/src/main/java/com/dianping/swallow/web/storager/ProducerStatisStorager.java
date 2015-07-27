@@ -63,7 +63,7 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 	@Override
 	public void doStorage() {
 		if (dataCount.get() > 0) {
-			dataCount.incrementAndGet();
+			dataCount.decrementAndGet();
 			ProducerServerStatsData serverStatisData = producerDataWapper.getServerStatsData(lastTimeKey.get());
 			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
 				lastTimeKey.set(serverStatisData.getTimeKey());

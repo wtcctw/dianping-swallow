@@ -64,7 +64,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	@Override
 	public boolean doAccept() {
 		if (dataCount.get() > 0) {
-			dataCount.incrementAndGet();
+			dataCount.decrementAndGet();
 			List<ProducerTopicStatsData> topicStatisDatas = producerDataWapper.getTopicStatsDatas(lastTimeKey.get());
 			return topicAlarm(topicStatisDatas);
 		}
