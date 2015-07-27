@@ -43,8 +43,6 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 
-	private Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap;
-
 	@Autowired
 	private ConsumerIdStatisDataService consumerIdStatisDataService;
 
@@ -72,13 +70,14 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	public boolean doAccept() {
 		if (dataCount.get() > 0) {
 			dataCount.incrementAndGet();
-			consumerIdStatsDataMap = consumerDataWapper.getConsumerIdStatsData(lastTimeKey.get());
-			return consumerIdAlarm();
+			Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = consumerDataWapper
+					.getConsumerIdStatsData(lastTimeKey.get());
+			return consumerIdAlarm(consumerIdStatsDataMap);
 		}
 		return true;
 	}
 
-	private boolean consumerIdAlarm() {
+	private boolean consumerIdAlarm(Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap) {
 		if (consumerIdStatsDataMap == null || consumerIdStatsDataMap.size() == 0) {
 			return true;
 		}

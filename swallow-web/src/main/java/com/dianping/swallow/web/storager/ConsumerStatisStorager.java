@@ -35,12 +35,6 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 	@Autowired
 	private ConsumerDataWapper consumerDataWapper;
 
-	private volatile ConsumerServerStatsData serverStatisData;
-
-	private volatile List<ConsumerTopicStatsData> topicStatisDatas;
-
-	private volatile Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap;
-
 	@Autowired
 	private ConsumerMachineStatisDataService machineStatisDataService;
 
@@ -69,20 +63,21 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 	public void doStorage() {
 		if (dataCount.get() > 0) {
 			dataCount.incrementAndGet();
-			serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
+			ConsumerServerStatsData serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
 			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
 				logger.info("[doStorage] timeKey = " + serverStatisData.getTimeKey());
 				lastTimeKey.set(serverStatisData.getTimeKey());
-				topicStatisDatas = consumerDataWapper.getTopicStatsData(lastTimeKey.get());
-				consumerIdStatsDataMap = consumerDataWapper.getConsumerIdStatsData(lastTimeKey.get());
-				storageServerStatis();
-				storageTopicStatis();
-				storageConsumerIdStatis();
+				List<ConsumerTopicStatsData> topicStatisDatas = consumerDataWapper.getTopicStatsData(lastTimeKey.get());
+				Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = consumerDataWapper
+						.getConsumerIdStatsData(lastTimeKey.get());
+				storageServerStatis(serverStatisData);
+				storageTopicStatis(topicStatisDatas);
+				storageConsumerIdStatis(consumerIdStatsDataMap);
 			}
 		}
 	}
 
-	private void storageServerStatis() {
+	private void storageServerStatis(final ConsumerServerStatsData serverStatisData) {
 		logger.info("[storageServerStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageServerStatis");
 		catWrapper.doAction(new SwallowAction() {
@@ -99,7 +94,7 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 
 	}
 
-	private void storageTopicStatis() {
+	private void storageTopicStatis(final List<ConsumerTopicStatsData> topicStatisDatas) {
 		logger.info("[storageTopicStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStatis");
 		catWrapper.doAction(new SwallowAction() {
@@ -114,7 +109,7 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 		});
 	}
 
-	private void storageConsumerIdStatis() {
+	private void storageConsumerIdStatis(final Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap) {
 		logger.info("[storageConsumerIdStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageConsumerIdStatis");
 		catWrapper.doAction(new SwallowAction() {

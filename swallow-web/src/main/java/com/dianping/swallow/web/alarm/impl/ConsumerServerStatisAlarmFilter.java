@@ -32,8 +32,6 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 @Service("consumerServerStatisAlarmFilter")
 public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter implements MonitorDataListener {
 
-	private ConsumerServerStatsData serverStatisData;
-
 	@Autowired
 	private MessageManager alarmManager;
 
@@ -67,13 +65,13 @@ public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	public boolean doAccept() {
 		if (dataCount.get() > 0) {
 			dataCount.incrementAndGet();
-			serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
-			return serverAlarm();
+			ConsumerServerStatsData serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
+			return serverAlarm(serverStatisData);
 		}
 		return true;
 	}
 
-	public boolean serverAlarm() {
+	public boolean serverAlarm(ConsumerServerStatsData serverStatisData) {
 		ConsumerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findDefault();
 		if (serverAlarmSetting == null) {
 			return true;

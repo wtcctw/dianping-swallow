@@ -41,8 +41,6 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	@Autowired
 	private ProducerDataWapper producerDataWapper;
 
-	private List<ProducerTopicStatsData> topicStatisDatas;
-
 	@Autowired
 	private ProducerTopicStatisDataService topicStatisDataService;
 
@@ -67,13 +65,13 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 	public boolean doAccept() {
 		if (dataCount.get() > 0) {
 			dataCount.incrementAndGet();
-			topicStatisDatas = producerDataWapper.getTopicStatsDatas(lastTimeKey.get());
-			return topicAlarm();
+			List<ProducerTopicStatsData> topicStatisDatas = producerDataWapper.getTopicStatsDatas(lastTimeKey.get());
+			return topicAlarm(topicStatisDatas);
 		}
 		return true;
 	}
 
-	public boolean topicAlarm() {
+	public boolean topicAlarm(List<ProducerTopicStatsData> topicStatisDatas) {
 		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingService.findDefault();
 		if (topicAlarmSetting == null || topicAlarmSetting.getProducerAlarmSetting() == null) {
 			return true;
