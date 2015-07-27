@@ -115,7 +115,7 @@ module.controller('AlarmController', [
 				}
 				$scope.queryCount = $scope.queryCount + 1;
 				console.log($scope.startTime);
-
+				$scope.receiver = $("#receiver").val();
 				if ($scope.startTime != null && $scope.endTime != null) {
 					startDate = new Date($scope.startTime);
 					endDate = new Date($scope.endTime);
