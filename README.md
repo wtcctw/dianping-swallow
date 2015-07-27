@@ -727,7 +727,7 @@ topic告警目前只检测producer topic QPS的峰值、谷值、波动以及top
 
 #### consumerId告警
 
-服务告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动以及发送Message累积九个方面，九种告警类型：
+consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动以及发送Message累积九个方面，九种告警类型：
 
 * [1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值。
 

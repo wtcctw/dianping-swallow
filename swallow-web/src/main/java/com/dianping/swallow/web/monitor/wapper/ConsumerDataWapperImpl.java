@@ -82,7 +82,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			try {
 				baseStatsData.setSendQpx(sendQpx.get(timeKey));
 			} catch (NullPointerException e) {
-				logger.info(sendQpx.toString() + "  " + timeKey);
+				logger.info("[getServerStatsData]" + sendQpx.toString() + "  " + timeKey);
 			}
 
 			Long ackQpxValue = ackQpx.get(timeKey);
