@@ -185,7 +185,7 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 				consumerIdEvent.setConsumerId(consumerId);
 				consumerIdEvent.setAlarmType(AlarmType.CONSUMER_CONSUMERID_ACKQPS_VALLEY);
 				consumerIdEvent.setCurrentValue(qpx);
-				consumerIdEvent.setExpectedValue(qps.getPeak());
+				consumerIdEvent.setExpectedValue(qps.getValley());
 				consumerIdEvent.setEventType(EventType.CONSUMER);
 				consumerIdEvent.setCreateTime(new Date());
 				eventReporter.report(consumerIdEvent);

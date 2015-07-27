@@ -113,7 +113,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 				statisEvent.setIp(ip);
 				statisEvent.setEventType(EventType.PRODUCER);
 				statisEvent.setCurrentValue(qpx);
-				statisEvent.setExpectedValue(qps.getPeak());
+				statisEvent.setExpectedValue(qps.getValley());
 				statisEvent.setCreateTime(new Date());
 				eventReporter.report(statisEvent);
 				return false;
