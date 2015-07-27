@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,12 +62,15 @@ public class LogFilter implements Filter {
 
 		String uri = req.getRequestURI();
 		String username = extractUsernameUtils.getUsername(req);
+		@SuppressWarnings("unchecked")
+		Map<String, String[]> param = req.getParameterMap();
+		String addr = req.getRemoteAddr();
 
 		if (matchExcludePatterns(uri)) {
 			chain.doFilter(request, response);
 			return;
 		}
-		logger.info(String.format("%s request %s", username, uri));
+		logger.info(String.format("%s request %s with parameter %s from %s", username, uri, param.toString(), addr));
 
 		chain.doFilter(request, response);
 
