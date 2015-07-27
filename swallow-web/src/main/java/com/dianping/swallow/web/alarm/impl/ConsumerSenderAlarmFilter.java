@@ -37,8 +37,8 @@ public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 
 	@Autowired
 	private ConsumerPortAlarmFilter consumerPortAlarmFilter;
-	
-	private static final long SENDER_TIME_SPAN = 20;
+
+	private static final long SENDER_TIME_SPAN = 20 * 1000;
 
 	@Override
 	public boolean doAccept() {

@@ -41,7 +41,7 @@ if(result == null) {
 	print("swallowwebconsumerserveralarmsettingc load data start");
 	
 	db.swallowwebconsumerserveralarmsettingc.update({
-	    "serverId" : "defalut"
+	    "serverId" : "default"
 	    },{
 	    "serverId" : "default",
 	    "topicWhiteList" : [ "x" ], 

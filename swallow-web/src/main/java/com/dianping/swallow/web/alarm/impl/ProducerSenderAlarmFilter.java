@@ -31,7 +31,7 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 	@Autowired
 	private GlobalAlarmSettingService globalAlarmSettingService;
 
-	private static final long SENDER_TIME_SPAN = 20;
+	private static final long SENDER_TIME_SPAN = 20 * 1000;
 
 	@Override
 	public boolean doAccept() {
@@ -61,6 +61,7 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 					event.setAlarmType(AlarmType.PRODUCER_SERVER_SENDER_OK);
 					event.setEventType(EventType.PRODUCER);
 					event.setCreateTime(new Date());
+					eventReporter.report(event);
 					lastCheckStatus.put(serverIp, true);
 				}
 			}

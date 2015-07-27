@@ -297,7 +297,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	}
 
 	private void addMapData(Map<String, Long> map, String data) {
-		map.put(data,System.currentTimeMillis());
+		map.put(data, System.currentTimeMillis());
 	}
 
 	@Override
