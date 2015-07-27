@@ -45,10 +45,6 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 	@Autowired
 	private ProducerTopicStatisDataService topicStatisDataService;
 
-	private volatile List<ProducerTopicStatsData> topicStatisDatas;
-
-	private volatile ProducerServerStatsData serverStatisData;
-
 	public ProducerStatisStorager() {
 		storageType = getClass().getSimpleName();
 	}
@@ -68,17 +64,17 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 	public void doStorage() {
 		if (dataCount.get() > 0) {
 			dataCount.incrementAndGet();
-			serverStatisData = producerDataWapper.getServerStatsData(lastTimeKey.get());
+			ProducerServerStatsData serverStatisData = producerDataWapper.getServerStatsData(lastTimeKey.get());
 			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
 				lastTimeKey.set(serverStatisData.getTimeKey());
-				topicStatisDatas = producerDataWapper.getTopicStatsDatas(lastTimeKey.get());
-				storageServerStatis();
-				storageTopicStatis();
+				List<ProducerTopicStatsData> topicStatisDatas = producerDataWapper.getTopicStatsDatas(lastTimeKey.get());
+				storageServerStatis(serverStatisData);
+				storageTopicStatis(topicStatisDatas);
 			}
 		}
 	}
 
-	private void storageServerStatis() {
+	private void storageServerStatis(final ProducerServerStatsData serverStatisData) {
 		logger.info("[storageServerStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageServerStatis");
 		catWrapper.doAction(new SwallowAction() {
@@ -93,7 +89,7 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 		});
 	}
 
-	private void storageTopicStatis() {
+	private void storageTopicStatis(final List<ProducerTopicStatsData> topicStatisDatas) {
 		logger.info("[storageTopicStatis]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStatis");
 		catWrapper.doAction(new SwallowAction() {
