@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.alarm.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -7,10 +8,12 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.manager.AlarmManager;
+import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
+import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.ServerStatisEvent;
 import com.dianping.swallow.web.model.statis.ProducerBaseStatsData;
 import com.dianping.swallow.web.model.statis.ProducerMachineStatsData;
 import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
@@ -32,7 +35,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private ProducerServerStatsData serverStatisData;
 
 	@Autowired
-	private AlarmManager alarmManager;
+	private MessageManager alarmManager;
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -75,7 +78,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 		if (serverAlarmSetting == null) {
 			return true;
 		}
-		QPSAlarmSetting qps = serverAlarmSetting.getDefaultAlarmSetting();
+		QPSAlarmSetting qps = serverAlarmSetting.getAlarmSetting();
 		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 
 		if (qps == null || serverStatisData == null || serverStatisData.getStatisDatas() == null) {
@@ -94,11 +97,25 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	private boolean qpsAlarm(long qpx, String ip, QPSAlarmSetting qps) {
 		if (qps != null && qpx != 0L) {
 			if (qpx > qps.getPeak()) {
-				alarmManager.producerServerStatisAlarm(ip, qpx, qps.getPeak(), AlarmType.PRODUCER_SERVER_QPS_PEAK);
+				ServerStatisEvent statisEvent = new ServerStatisEvent();
+				statisEvent.setAlarmType(AlarmType.PRODUCER_SERVER_QPS_PEAK);
+				statisEvent.setIp(ip);
+				statisEvent.setEventType(EventType.PRODUCER);
+				statisEvent.setCurrentValue(qpx);
+				statisEvent.setExpectedValue(qps.getPeak());
+				statisEvent.setCreateTime(new Date());
+				eventReporter.report(statisEvent);
 				return false;
 			}
 			if (qpx < qps.getValley()) {
-				alarmManager.producerServerStatisAlarm(ip, qpx, qps.getValley(), AlarmType.PRODUCER_SERVER_QPS_VALLEY);
+				ServerStatisEvent statisEvent = new ServerStatisEvent();
+				statisEvent.setAlarmType(AlarmType.PRODUCER_SERVER_QPS_VALLEY);
+				statisEvent.setIp(ip);
+				statisEvent.setEventType(EventType.PRODUCER);
+				statisEvent.setCurrentValue(qpx);
+				statisEvent.setExpectedValue(qps.getValley());
+				statisEvent.setCreateTime(new Date());
+				eventReporter.report(statisEvent);
 				return false;
 			}
 		}

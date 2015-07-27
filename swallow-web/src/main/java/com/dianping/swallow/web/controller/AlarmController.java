@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,11 +38,17 @@ public class AlarmController extends AbstractSidebarBasedController {
 	public Object alarmSearch(@RequestParam("receiver") String receiver, @RequestParam("startTime") String startTime,
 			@RequestParam("endTime") String endTime, @RequestParam("offset") int offset,
 			@RequestParam("limit") int limit) {
-		if (receiver == null || startTime == null || endTime == null) {
-			return null;
+
+		Date startDate = null;
+		if (StringUtils.isNotBlank(startTime)) {
+			startDate = strToDate(startTime);
 		}
-		Date startDate = strToDate(startTime);
-		Date endDate = strToDate(endTime);
+		Date endDate = null;
+		if (StringUtils.isNotBlank(endTime)) {
+			endDate = strToDate(endTime);
+		} else {
+			endDate = new Date();
+		}
 		List<Alarm> alarms = alarmService.findByReceiverAndTime(receiver, startDate, endDate, offset, limit);
 		long count = alarmService.countByReceiverAndTime(receiver, startDate, endDate);
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -54,8 +61,8 @@ public class AlarmController extends AbstractSidebarBasedController {
 	protected String getMenu() {
 		return "tool";
 	}
-	
-	private Date strToDate(String strTime){
+
+	private Date strToDate(String strTime) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date result = null;
 		try {

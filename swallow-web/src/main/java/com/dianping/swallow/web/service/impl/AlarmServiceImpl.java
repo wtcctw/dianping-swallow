@@ -74,7 +74,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
 		params.add(new BasicNameValuePair("body", title + NEW_LINE_SIGN + alarm.getBody()));
 		boolean result = httpService.httpPost(getSmsUrl(), params).isSuccess();
-		insert(alarm.setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date()));
+		insert(alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP)
+				.setCreateTime(new Date()));
 		return result;
 	}
 
@@ -89,7 +90,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("content", alarm.getBody()));
 		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
-		insert(alarm.setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP).setCreateTime(new Date()));
+		insert(alarm.setId(null).setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP)
+				.setCreateTime(new Date()));
 		return result;
 	}
 
@@ -104,7 +106,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		params.add(new BasicNameValuePair("recipients", alarm.getReceiver()));
 		params.add(new BasicNameValuePair("body", alarm.getBody()));
 		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
-		insert(alarm.setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date()));
+		insert(alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP)
+				.setCreateTime(new Date()));
 		return result;
 	}
 

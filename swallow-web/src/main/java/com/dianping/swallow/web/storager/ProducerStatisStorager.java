@@ -6,6 +6,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.statis.ProducerMachineStatsData;
 import com.dianping.swallow.web.model.statis.ProducerServerStatsData;
 import com.dianping.swallow.web.model.statis.ProducerTopicStatsData;
@@ -45,6 +49,10 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 
 	private volatile ProducerServerStatsData serverStatisData;
 
+	public ProducerStatisStorager() {
+		storageType = getClass().getSimpleName();
+	}
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
@@ -71,18 +79,32 @@ public class ProducerStatisStorager extends AbstractStatisStorager implements Mo
 	}
 
 	private void storageServerStatis() {
-		if (serverStatisData != null) {
-			for (ProducerMachineStatsData producerMachineStatsData : serverStatisData.getStatisDatas()) {
-				machineStatisDataService.insert(producerMachineStatsData);
+		logger.info("[storageServerStatis]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageServerStatis");
+		catWrapper.doAction(new SwallowAction() {
+			@Override
+			public void doAction() throws SwallowException {
+				if (serverStatisData != null) {
+					for (ProducerMachineStatsData producerMachineStatsData : serverStatisData.getStatisDatas()) {
+						machineStatisDataService.insert(producerMachineStatsData);
+					}
+				}
 			}
-		}
+		});
 	}
 
 	private void storageTopicStatis() {
-		if (topicStatisDatas != null) {
-			for (ProducerTopicStatsData producerTopicStatisData : topicStatisDatas)
-				topicStatisDataService.insert(producerTopicStatisData);
-		}
+		logger.info("[storageTopicStatis]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStatis");
+		catWrapper.doAction(new SwallowAction() {
+			@Override
+			public void doAction() throws SwallowException {
+				if (topicStatisDatas != null) {
+					for (ProducerTopicStatsData producerTopicStatisData : topicStatisDatas) {
+						topicStatisDataService.insert(producerTopicStatisData);
+					}
+				}
+			}
+		});
 	}
-
 }

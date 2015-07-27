@@ -58,7 +58,7 @@ public class ConsumerServerAlarmSettingMapper {
 
 		ConsumerServerAlarmSettingDto dto = new ConsumerServerAlarmSettingDto();
 
-		QPSAlarmSetting sendQPSAlarmSetting = alarmSetting.getSenderAlarmSetting();
+		QPSAlarmSetting sendQPSAlarmSetting = alarmSetting.getSendAlarmSetting();
 		dto.setConsumersendpeak(sendQPSAlarmSetting.getPeak());
 		dto.setConsumersendvalley(sendQPSAlarmSetting.getValley());
 		dto.setConsumersendfluctuation(sendQPSAlarmSetting.getFluctuation());

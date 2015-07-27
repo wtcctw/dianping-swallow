@@ -16,42 +16,39 @@ import com.dianping.swallow.web.alarm.AlarmFilterChain;
 
 @Component
 public class AlarmFilterChainFactory implements InitializingBean {
-	
-	@Resource(name ="producerServiceAlarmFilter")
+
+	@Resource(name = "producerServiceAlarmFilter")
 	private AlarmFilter producerServiceAlarmFilter;
-	
-	@Resource(name ="producerSenderAlarmFilter")
+
+	@Resource(name = "producerSenderAlarmFilter")
 	private AlarmFilter producerSenderAlarmFilter;
-	
-	@Resource(name ="producerServerStatisAlarmFilter")
+
+	@Resource(name = "producerServerStatisAlarmFilter")
 	private AlarmFilter producerServerStatisAlarmFilter;
-	
-	@Resource(name ="producerTopicStatisAlarmFilter")
+
+	@Resource(name = "producerTopicStatisAlarmFilter")
 	private AlarmFilter producerTopicStatisAlarmFilter;
-	
-	@Resource(name ="consumerPortAlarmFilter")
+
+	@Resource(name = "consumerPortAlarmFilter")
 	private AlarmFilter consumerPortAlarmFilter;
-	
-	@Resource(name ="consumerSenderAlarmFilter")
+
+	@Resource(name = "consumerSenderAlarmFilter")
 	private AlarmFilter consumerSenderAlarmFilter;
-	
-	@Resource(name ="consumerServerStatisAlarmFilter")
+
+	@Resource(name = "consumerServerStatisAlarmFilter")
 	private AlarmFilter consumerServerStatisAlarmFilter;
-	
-	@Resource(name ="consumerTopicStatisAlarmFilter")
-	private AlarmFilter consumerTopicStatisAlarmFilter;
-	
-	@Resource(name ="consumerIdStatisAlarmFilter")
+
+	@Resource(name = "consumerIdStatisAlarmFilter")
 	private AlarmFilter consumerIdStatisAlarmFilter;
-	
-	@Resource(name ="consumerSlaveServiceAlarmFilter")
+
+	@Resource(name = "consumerSlaveServiceAlarmFilter")
 	private AlarmFilter consumerSlaveServiceAlarmFilter;
-	
 
 	public static AlarmFilterChainFactory chainFactoryInstance;
 
 	public AlarmFilterChain createProducerServiceFilterChain() {
 		AlarmFilterChain alarmFilterChain = new DefaultAlarmFilterChain();
+		alarmFilterChain.setChainName("ProducerServiceFilterChain");
 		alarmFilterChain.registerFilter(producerServiceAlarmFilter);
 		alarmFilterChain.registerFilter(producerSenderAlarmFilter);
 		return alarmFilterChain;
@@ -59,23 +56,25 @@ public class AlarmFilterChainFactory implements InitializingBean {
 
 	public AlarmFilterChain createProducerStatisFilterChain() {
 		AlarmFilterChain alarmFilterChain = new DefaultAlarmFilterChain();
+		alarmFilterChain.setChainName("ProducerStatisFilterChain");
 		alarmFilterChain.registerFilter(producerServerStatisAlarmFilter);
 		alarmFilterChain.registerFilter(producerTopicStatisAlarmFilter);
 		return alarmFilterChain;
 	}
-	
-	public AlarmFilterChain createConsumerServiceFilterChain(){
+
+	public AlarmFilterChain createConsumerServiceFilterChain() {
 		AlarmFilterChain alarmFilterChain = new DefaultAlarmFilterChain();
+		alarmFilterChain.setChainName("ConsumerServiceFilterChain");
 		alarmFilterChain.registerFilter(consumerPortAlarmFilter);
 		alarmFilterChain.registerFilter(consumerSenderAlarmFilter);
 		alarmFilterChain.registerFilter(consumerSlaveServiceAlarmFilter);
 		return alarmFilterChain;
 	}
-	
-	public AlarmFilterChain createConsumerStatisFilterChain(){
+
+	public AlarmFilterChain createConsumerStatisFilterChain() {
 		AlarmFilterChain alarmFilterChain = new DefaultAlarmFilterChain();
+		alarmFilterChain.setChainName("ConsumerStatisFilterChain");
 		alarmFilterChain.registerFilter(consumerServerStatisAlarmFilter);
-		//alarmFilterChain.registerFilter(consumerTopicStatisAlarmFilter);
 		alarmFilterChain.registerFilter(consumerIdStatisAlarmFilter);
 		return alarmFilterChain;
 	}

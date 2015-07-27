@@ -76,6 +76,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			}
 
 			ConsumerMachineStatsData machineStatsData = new ConsumerMachineStatsData();
+			machineStatsData.setTimeKey(timeKey);
 			machineStatsData.setIp(serverIp);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
 			baseStatsData.setSendQpx(sendQpx.get(timeKey));

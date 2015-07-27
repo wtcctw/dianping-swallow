@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -72,12 +73,12 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private Set<String> statisIps = new ConcurrentSkipListSet<String>();
 
-	private Set<String> statisConsumerServerIps = new ConcurrentSkipListSet<String>();
+	private Map<String, Long> statisConsumerServerIps = new ConcurrentHashMap<String, Long>();
 
-	private Set<String> statisProducerServerIps = new ConcurrentSkipListSet<String>();
+	private Map<String, Long> statisProducerServerIps = new ConcurrentHashMap<String, Long>();
 
 	private Object lockProducerObj = new Object();
-	
+
 	private Object lockConsumerObj = new Object();
 
 	private List<String> cmdbProducerIps = new ArrayList<String>();
@@ -93,9 +94,9 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	private List<String> lionConsumerMasterIps = new ArrayList<String>();
 
 	private Map<String, String> cmdbProducerMap = new HashMap<String, String>();
-	
+
 	private Map<String, String> cmdbConsumerSlaveMap = new HashMap<String, String>();
-	
+
 	private Map<String, String> cmdbConsumerMasterMap = new HashMap<String, String>();
 
 	@Autowired
@@ -235,7 +236,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			return;
 		}
 		addSetData(statisIps, producerMonitorData.getSwallowServerIp());
-		addSetData(statisProducerServerIps, producerMonitorData.getSwallowServerIp());
+		addMapData(statisProducerServerIps, producerMonitorData.getSwallowServerIp());
 		ProducerServerData serverData = (ProducerServerData) producerMonitorData.getServerData();
 		if (serverData == null) {
 			return;
@@ -258,7 +259,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			return;
 		}
 		addSetData(statisIps, consumerMonitorData.getSwallowServerIp());
-		addSetData(statisConsumerServerIps, consumerMonitorData.getSwallowServerIp());
+		addMapData(statisConsumerServerIps, consumerMonitorData.getSwallowServerIp());
 		ConsumerServerData serverData = (ConsumerServerData) consumerMonitorData.getServerData();
 		if (serverData == null) {
 			return;
@@ -295,14 +296,18 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		}
 	}
 
-	@Override
-	public Set<String> getStatisConsumerServerIps() {
-		return Collections.unmodifiableSet(statisConsumerServerIps);
+	private void addMapData(Map<String, Long> map, String data) {
+		map.put(data, System.currentTimeMillis());
 	}
 
 	@Override
-	public Set<String> getStatisProducerServerIps() {
-		return Collections.unmodifiableSet(statisProducerServerIps);
+	public Map<String, Long> getStatisConsumerServerIps() {
+		return Collections.unmodifiableMap(statisConsumerServerIps);
+	}
+
+	@Override
+	public Map<String, Long> getStatisProducerServerIps() {
+		return Collections.unmodifiableMap(statisProducerServerIps);
 	}
 
 	@Override
@@ -345,20 +350,20 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			return Collections.unmodifiableList(lionConsumerMasterIps);
 		}
 	}
-	
-	public Map<String,String> getProducerServerIpsMap(){
+
+	public Map<String, String> getProducerServerIpsMap() {
 		synchronized (lockProducerObj) {
 			return Collections.unmodifiableMap(cmdbProducerMap);
 		}
 	}
-	
-	public Map<String,String> getConsumerServerMasterIpsMap(){
+
+	public Map<String, String> getConsumerServerMasterIpsMap() {
 		synchronized (lockConsumerObj) {
 			return Collections.unmodifiableMap(cmdbConsumerMasterMap);
 		}
 	}
-	
-	public Map<String,String> getConsumerServerSlaveIpsMap(){
+
+	public Map<String, String> getConsumerServerSlaveIpsMap() {
 		synchronized (lockConsumerObj) {
 			return Collections.unmodifiableMap(cmdbConsumerMasterMap);
 		}
@@ -394,16 +399,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	@Override
 	public String getTopicConsumerIdKey(String topic, String consumerId) {
 		return topic + TOPIC_CONSUMERID_SPLIT + consumerId;
-	}
-
-	@Override
-	public void clearStatisProducerServerIps() {
-		statisProducerServerIps.clear();
-	}
-
-	@Override
-	public void clearStatisConsumerServerIps() {
-		statisConsumerServerIps.clear();
 	}
 
 	public int getInterval() {

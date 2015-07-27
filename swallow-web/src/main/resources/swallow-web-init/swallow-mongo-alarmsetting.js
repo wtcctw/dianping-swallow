@@ -2,6 +2,9 @@ db = db.getSiblingDB('swallowwebapplication');
 
 result = db.swallowwebconsumeridalarmsettingc.findOne();
 if(result == null) {
+
+	print("swallowwebconsumeridalarmsettingc load data start");
+	
 	db.swallowwebconsumeridalarmsettingc.update({
 	    "consumerId" : "default"
 	    },{
@@ -25,16 +28,24 @@ if(result == null) {
 	         "accumulation" : NumberLong(1) 
 	     }
 	}, true, false);
+	
+	print("swallowwebconsumeridalarmsettingc load data end");
+	
+}else{
+	print("swallowwebconsumeridalarmsettingc already exist");
 }
 
 result = db.swallowwebconsumerserveralarmsettingc.findOne();
 if(result == null) {
+	
+	print("swallowwebconsumerserveralarmsettingc load data start");
+	
 	db.swallowwebconsumerserveralarmsettingc.update({
-	    "serverId" : "defalut"
+	    "serverId" : "default"
 	    },{
 	    "serverId" : "default",
 	    "topicWhiteList" : [ "x" ], 
-	    "senderAlarmSetting" : { 
+	    "sendAlarmSetting" : { 
 	        "peak" : NumberLong(1), 
 	        "valley" : NumberLong(1), 
 	        "fluctuation" : 20,
@@ -47,28 +58,47 @@ if(result == null) {
 	        "fluctuationBase" : NumberLong(20)
 	    }
 	}, true, false);
+	
+	print("swallowwebconsumerserveralarmsettingc load data end");
+}else{
+	
+	print("swallowwebconsumerserveralarmsettingc already exist");
+	
 }
 
 
 result = db.swallowwebproducerserveralarmsettingc.findOne();
 if(result == null) {
+	
+	print("swallowwebproducerserveralarmsettingc load data start");
+	
 	db.swallowwebproducerserveralarmsettingc.update({
 	    "serverId" : "default"
 	    },{
 	    "serverId" : "default", 
 	    "topicWhiteList" : [ "x" ], 
-	    "defaultAlarmSetting" : {
+	    "alarmSetting" : {
 	       "peak" : NumberLong(100), 
 	       "valley" : NumberLong(30), 
 	       "fluctuation" : 10,
 	       "fluctuationBase" : NumberLong(10)
 	     }
 	}, true, false);
+	
+	print("swallowwebproducerserveralarmsettingc load data start");
+	
+}else{
+	
+	print("swallowwebproducerserveralarmsettingc already exist");
+	
 }
 
 
 result = db.swallowwebswallowalarmsettingc.findOne();
 if(result == null) {
+	
+	print("swallowwebswallowalarmsettingc load data start");
+	
 	db.swallowwebswallowalarmsettingc.update({
 	    "swallowId" : "default"
 	    },{
@@ -77,10 +107,19 @@ if(result == null) {
 	    "consumerWhiteList" : [ "10.128.121.229" ] 
 	}, true, false);
 
+	print("swallowwebswallowalarmsettingc load data end");
+	
+}else{
+	
+	print("swallowwebswallowalarmsettingc already exist");
+	
 }
 
 result = db.swallowwebtopicalarmsettingc.findOne();
 if(result == null) {
+	
+	print("swallowwebtopicalarmsettingc load data start");
+	
 	db.swallowwebtopicalarmsettingc.update({
 	    "topicName" : "default"
 	    }, {
@@ -113,5 +152,12 @@ if(result == null) {
 	        "accumulation" : NumberLong(10)
 	    }
 	}, true, false);
+	
+	print("swallowwebtopicalarmsettingc load data start");
+	
+}else{
+	
+	print("swallowwebtopicalarmsettingc already exist");
+	
 }
 

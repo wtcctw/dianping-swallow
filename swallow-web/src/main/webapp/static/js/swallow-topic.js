@@ -44,7 +44,7 @@ module.factory('Paginator', function(){
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
 						for(var i = 0; i < self.currentPageItems.length; ++i){
-							if(whitelist.indexOf(self.currentPageItems[i].name) != -1){
+							if(typeof(whitelist) != "undefined" && whitelist.indexOf(self.currentPageItems[i].name) != -1){
 								self.currentPageItems[i]["alarm"] = false;
 							}else{
 								self.currentPageItems[i]["alarm"] = true;

@@ -47,10 +47,7 @@ public class TopicAspect {
 			List<String> producerTopics = producerServerAlarmSettingService.findDefault().getTopicWhiteList();
 			@SuppressWarnings("unchecked")
 			Collection<String> common = CollectionUtils.intersection(consumerTopics, producerTopics);
-			if(common.isEmpty()){
-				common.add("");
-			}
-			
+
 			return new Pair<Object, Object>(object,common);
 		} catch (Throwable e) {
 			log.error("joinPoint throw exception",e);
