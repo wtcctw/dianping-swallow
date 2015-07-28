@@ -63,7 +63,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			NavigableMap<Long, Long> ackDelay = serverStatisData.getDelay(StatisType.ACK);
 			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
 					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
-				return null;
+				continue;
 			}
 			if (index == 0) {
 				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
@@ -125,7 +125,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			ConsumerTopicStatisData topicStatisData = (ConsumerTopicStatisData) consumerDataRetriever.getValue(
 					new CasKeys(TOTAL_KEY, topicName), StatisType.SEND);
 			if (topicStatisData == null) {
-				return null;
+				continue;
 			}
 			NavigableMap<Long, Long> sendQpx = topicStatisData.getQpx(StatisType.SEND);
 			NavigableMap<Long, Long> ackQpx = topicStatisData.getQpx(StatisType.ACK);
@@ -133,7 +133,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			NavigableMap<Long, Long> ackDelay = topicStatisData.getDelay(StatisType.ACK);
 			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
 					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
-				return null;
+				continue;
 			}
 			if (index == 0) {
 				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
@@ -213,7 +213,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			ConsumerIdStatisData consumerIdStatisData = (ConsumerIdStatisData) consumerDataRetriever.getValue(
 					new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
 			if (consumerIdStatisData == null) {
-				return null;
+				continue;
 			}
 			NavigableMap<Long, Long> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
 			NavigableMap<Long, Long> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
@@ -222,7 +222,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 
 			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
 					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
-				return null;
+				continue;
 			}
 			if (index == 0) {
 				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);

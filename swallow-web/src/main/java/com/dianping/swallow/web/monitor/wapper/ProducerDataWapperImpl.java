@@ -52,7 +52,7 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 					.getValue(new CasKeys(serverIp));
 			NavigableMap<Long, Long> qpx = serverStatisData.getQpx(StatisType.SAVE);
 			if (qpx == null || qpx.isEmpty()) {
-				return null;
+				continue;
 			}
 
 			if (index == 0) {
