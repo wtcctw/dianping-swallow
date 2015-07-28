@@ -613,39 +613,39 @@ product | http://swallow.dp
 1. 存储-发送延迟(swallow发出message与message存储到mongo的时间差值)
 1. 发送-ack延迟(swallow收到用户ack确认与swallow发出message的时间差值)
 
-![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/13.png)
+![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=WFWjx5Bs2rAoP52IJtVr5EUZlcySGLSarI1Daf%2byJbU%3d&docid=06faa7eb4e9f2472fb1ecfcc5eb6fb5e6)
 
 * 在搜索栏中输入所要查询的topic，系统会返回topic与每个consumer在不同时间段的延时统计结果。
-![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/8.png)
+![topic-consumer延时统计](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=TEKVBoHBTDzizVix6VdKuyGT92W7owBlgreH99w3Clc%3d&docid=0e994a4a230884aa0a8fa2f444596146b)
 
 #### 每秒消息(QPS)监控
 
 * 消息量监控从swallow服务器端统计消息发送频率(QPS)，分为三段进行统计，和上述延时分段对应。
 
 swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack频率统计每秒钟用户返回ack的消息数目。在某一时间段，如果系统一切工作正常，对应特定的consumerID，应该有消费者发送频率 = swallow发送频率 = 用户返回ack频率。如果出现不相等，请对比其他消费者是否正常，如果正常，则请查看客户端代码是否正确实现了功能。
-![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/9.png)
+![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=p15aJWl%2fIFJaWoeX3jBNX2vx46DoxTcN65Pdp6rJu0c%3d&docid=0daf0952a5f3542efa81abb4a4ff6cf41)
 
 * 如果只想查看某一端的每秒钟统计量，只需点击右侧的图例即可切换显示和隐藏。
-![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/10.png)
+![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=uFhEEqIWjn2INN1Np0kAWQDX6rJpER8uataqIn6L4l4%3d&docid=0af4789f1842f4810a259729f9372e226)
 
 #### 堆积量监控
 
 * 堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。
 
 * 如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。
-![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/14.png)
+![每秒消息](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=G%2berRFqK9mqIB4HTXRgRxMcbCn0Odgp%2fwa7Px%2byIj3o%3d&docid=009fe3ffd13fc4c55b522e1f02b3f5da5)
 
 ### Swallow Server监控
 
 #### producer server监控
 
 * producer server统计用户发送频率，即每秒钟发动到producer server的消息数目。
-![producer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/11.png)
+![producer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=Jbq4JjeZ9b%2b4MN7vJY2ZYYMitHkYI7jH88tpjV3d%2b4s%3d&docid=092d9ef4b807944f997e66fdb1f92a743)
 
 #### consumer server监控
 
 * consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。
-![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/12.png)
+![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=C5RhmEkN8Q8PaQaD4sVy1cec%2b7fkmSFNaph0e5Cghbs%3d&docid=014f1aa2503154f31879e4b422cf462ed)
 
 ## 权限管理
 
@@ -721,7 +721,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 ### Swallow Web端追踪
 
 * 从Swallow Web端[消息量监控](http://ppe.swallow.dp/console/monitor/consumer/total/qps)中查看用户返回ack频率，除以相应的时间段即可得到消费一条消息的平均时间。
-![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/15.png)
+![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=Y1h11dzdiQjOuOd7UBhTaJG4%2fObltD6WqfoySxVOTFM%3d&docid=0835cb1ed883d446f9b59c1f89fbc1843)
 
 ## 我的Consumer有延时，该怎么确认问题所在？
 * 首先观察consumer的平均消费时间是否存在异常，如果consumer的平均消费时间比正常情况高出许多，说明onMessage回调函数依赖的服务存在问题，可以考虑_最近的代码变更_，或询问_依赖的服务_是否存在故障。
@@ -754,4 +754,4 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 ### Swallow Web端追踪
 
 * 从Swallow Web端[Message管理](http://ppe.swallow.dp/console/message)中查看相关topic下的message信息，检查消息是否正确发送。
-![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/16.png)
+![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=mfGgnXyDnjxDzMW7VswO5i3Ar8qZvbXYolWzLedGsww%3d&docid=063ccff6570ed4057850b59c81a00b488)
