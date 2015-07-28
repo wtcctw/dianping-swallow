@@ -171,8 +171,8 @@ public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 		return slavePort;
 	}
 
-	public boolean isSlaveOpen(String ip){
-		if(isSlaveIps.containsKey(ip)){
+	public boolean isSlaveOpen(String ip) {
+		if (isSlaveIps.containsKey(ip)) {
 			return isSlaveIps.get(ip);
 		}
 		return false;

@@ -70,6 +70,9 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 			machineStatsData.setIp(serverIp);
 			ProducerBaseStatsData baseStatsData = new ProducerBaseStatsData();
 			baseStatsData.setDelay(0);
+			if (qpx.get(timeKey) == null) {
+				continue;
+			}
 			baseStatsData.setQpx(qpx.get(timeKey));
 			machineStatsData.setStatisData(baseStatsData);
 
@@ -116,6 +119,9 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 			NavigableMap<Long, Long> topicDelays = serverStatisData.getDelay(StatisType.SAVE);
 
 			ProducerBaseStatsData producerBaseStatisData = new ProducerBaseStatsData();
+			if (topicQpxs.get(timeKey) == null) {
+				continue;
+			}
 			producerBaseStatisData.setQpx(topicQpxs.get(timeKey));
 
 			Long delay = topicDelays.get(timeKey);

@@ -81,7 +81,9 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
 
 			logger.info("[getServerStatsData]" + serverIp + "   " + sendQpx.toString() + "  " + timeKey);
-
+			if (sendQpx.get(timeKey) == null) {
+				continue;
+			}
 			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
@@ -142,6 +144,9 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 				index++;
 			}
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
+			if (sendQpx.get(timeKey) == null) {
+				continue;
+			}
 			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 
 			Long ackQpxValue = ackQpx.get(timeKey);
@@ -229,6 +234,9 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			}
 			consumerIdStatsData.setTimeKey(timeKey);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
+			if (sendQpx.get(timeKey) == null) {
+				continue;
+			}
 			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 
 			Long ackQpxValue = ackQpx.get(timeKey);
