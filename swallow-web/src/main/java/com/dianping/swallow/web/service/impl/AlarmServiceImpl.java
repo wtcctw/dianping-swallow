@@ -106,7 +106,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		params.add(new BasicNameValuePair("recipients", alarm.getReceiver()));
 		params.add(new BasicNameValuePair("body", alarm.getBody()));
 		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
-		insert(alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP)
+		insert(alarm.setId(null).setSendType(SendType.MAIL).setSourceIp(NetUtil.IP)
 				.setCreateTime(new Date()));
 		return result;
 	}

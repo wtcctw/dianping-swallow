@@ -122,6 +122,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	@Override
 	public void producerServerAlarm(ServerEvent event) {
+		logger.info("ip " + event.getIp() + "   alarmType " + event.getAlarmType());
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isProducerServerAlarm(event.getIp(), alarmMeta)) {
 			String message = alarmMeta.getAlarmTemplate();
@@ -134,6 +135,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 				Alarm alarm = new Alarm();
 				alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
+				logger.info("ip " + event.getIp() + "   alarmType number " + event.getAlarmType().getNumber());
 				sendAlarmByIp(event.getIp(), alarm, alarmMeta);
 			}
 		}
@@ -350,15 +352,15 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	private void sendAlarm(Set<String> mobiles, Set<String> emails, Alarm alarm, AlarmMeta alarmMeta) {
 		if (alarmMeta.getIsMailMode()) {
-		//	Alarm alarmMail = (Alarm) alarm.clone();
+			// Alarm alarmMail = (Alarm) alarm.clone();
 			alarmService.sendMail(emails, alarm);
 		}
 		if (alarmMeta.getIsSmsMode()) {
-		//	Alarm alarmSms = (Alarm) alarm.clone();
+			// Alarm alarmSms = (Alarm) alarm.clone();
 			alarmService.sendSms(mobiles, alarm);
 		}
 		if (alarmMeta.getIsWeiXinMode()) {
-		//	Alarm alarmWeiXin = (Alarm) alarm.clone();
+			// Alarm alarmWeiXin = (Alarm) alarm.clone();
 			alarmService.sendWeiXin(emails, alarm);
 		}
 	}
