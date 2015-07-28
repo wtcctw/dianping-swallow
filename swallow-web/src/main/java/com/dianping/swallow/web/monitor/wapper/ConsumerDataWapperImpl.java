@@ -81,10 +81,10 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
 
 			logger.info("[getServerStatsData]" + serverIp + "   " + sendQpx.toString() + "  " + timeKey);
-			if (sendQpx.get(timeKey) == null) {
-				continue;
+			Long sendQpxValue = sendQpx.get(timeKey);
+			if (sendQpxValue != null) {
+				baseStatsData.setSendQpx(sendQpxValue);
 			}
-			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
 				baseStatsData.setAckQpx(ackQpxValue.longValue());
@@ -144,10 +144,10 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 				index++;
 			}
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			if (sendQpx.get(timeKey) == null) {
-				continue;
+			Long sendQpxValue = sendQpx.get(timeKey);
+			if (sendQpxValue != null) {
+				baseStatsData.setSendQpx(sendQpxValue);
 			}
-			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
@@ -234,10 +234,10 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			}
 			consumerIdStatsData.setTimeKey(timeKey);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			if (sendQpx.get(timeKey) == null) {
-				continue;
+			Long sendQpxVlaue = sendQpx.get(timeKey);
+			if (sendQpxVlaue != null) {
+				baseStatsData.setSendQpx(sendQpxVlaue);
 			}
-			baseStatsData.setSendQpx(sendQpx.get(timeKey));
 
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
