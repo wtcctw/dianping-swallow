@@ -99,11 +99,17 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	}
 
 	@Override
-	public Map<String, Object> loadMinAndMaxTime(String topicName) {
+	public long loadTimeOfFirstMessage(String topicName) {
 
-		Map<String, Object> map = new HashMap<String, Object>();
-		map = webMessageDao.findMinAndMaxTime(topicName);
-		return map;
+		Message msg = webMessageDao.loadFirstMessage(topicName);
+		
+		if(msg != null){
+			int seconds = msg.get_id().getTime();
+			return new Long(seconds) * 1000;
+		}else{
+			return -1;
+		}
+		
 	}
 
 	private void setSMessageProperty(Message m) {

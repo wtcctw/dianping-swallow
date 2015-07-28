@@ -23,8 +23,8 @@ module
 										this.currentOffset,
 										pageSize + 1,
 										function(data) {
-											items = data.message;
-											length = data.size;
+											items = data.second;
+											length = data.first;
 											if (length == 0) {
 												return;
 											}

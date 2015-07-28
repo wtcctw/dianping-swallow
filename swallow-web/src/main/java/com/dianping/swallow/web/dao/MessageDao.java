@@ -140,7 +140,7 @@ public interface MessageDao extends Dao {
 	 * 
 	 * @param topicName
 	 */
-	Map<String, Object> findMinAndMaxTime(String topicName);
+	Message loadFirstMessage(String topicName);
 
 	/**
 	 * 

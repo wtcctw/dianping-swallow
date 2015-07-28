@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model.dashboard;
 
+import org.springframework.data.annotation.Id;
+
 /**
  * @author mingdongli
  *
@@ -9,8 +11,10 @@ public class Entry implements Comparable<Entry> {
 
 	private String server;
 
+	@Id
 	private String topic;
 
+	@Id
 	private String consumerId;
 
 	private float senddelay;

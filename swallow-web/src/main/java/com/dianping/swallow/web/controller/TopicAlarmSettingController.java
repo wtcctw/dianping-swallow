@@ -1,9 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicAlarmSettingDto;
 import com.dianping.swallow.web.controller.mapper.TopicAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
@@ -60,7 +59,7 @@ public class TopicAlarmSettingController extends AbstractSidebarBasedController 
 		for(TopicAlarmSetting topicAlarmSetting : topicAlarmSettingList){
 			topicAlarmSettingDto.add(TopicAlarmSettingMapper.toTopicAlarmSettingDto(topicAlarmSetting));
 		}
-		return generateResponst(topicAlarmSettingDto);
+		return new Pair<Integer, List<TopicAlarmSettingDto>>(topicAlarmSettingDto.size(), topicAlarmSettingDto);
 		
 	}
 
@@ -100,14 +99,6 @@ public class TopicAlarmSettingController extends AbstractSidebarBasedController 
 		}else{
 			return new ArrayList<String>();
 		}
-	}
-
-	private Map<String, Object> generateResponst(List<TopicAlarmSettingDto> topicAlarmSettingList){
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("size", topicAlarmSettingList.size());
-		map.put("message", topicAlarmSettingList);
-		return map;
 	}
 	
 	@Override

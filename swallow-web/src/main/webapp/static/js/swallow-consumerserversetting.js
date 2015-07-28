@@ -16,8 +16,8 @@ module.factory('Paginator', function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
 					fetchFunction(this.currentOffset, pageSize + 1, function(data){
-						items = data.message;
-						length = data.size;
+						items = data.second;
+						length = data.first;
 						if(length == 0){
 							return;
 						}

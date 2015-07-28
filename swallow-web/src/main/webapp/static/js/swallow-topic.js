@@ -217,12 +217,11 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					// search topic name with specific prop
 					$http({
 						method : 'GET',
-						url : window.contextPath + '/console/topic/propdept'
+						url : window.contextPath + '/console/topic/proposal'
 					}).success(function(data, status, headers, config) {
-						var props = data;
 						$("#searchprop").typeahead({
 							items: 16, 
-							source : props,
+							source : data.first,
 							updater : function(c) {
 								$scope.prop = c;
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop);		
@@ -233,12 +232,12 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						$('#topicprops').tagsinput({
 							  typeahead: {
 								  items: 16,
-								  source: props,
+								  source: data.second,
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
-		        		$('#topicprops').typeahead().data('typeahead').source = props;
-		        		$('#searchprop').typeahead().data('typeahead').source = props;
+		        		$('#topicprops').typeahead().data('typeahead').source = data.second;
+		        		$('#searchprop').typeahead().data('typeahead').source = data.first;
 					}).error(function(data, status, headers, config) {
 					});
 					

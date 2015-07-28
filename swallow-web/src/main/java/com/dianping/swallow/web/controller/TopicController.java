@@ -104,7 +104,7 @@ public class TopicController extends AbstractMenuController {
 		return topicService.loadTopicNames(username, findAll);
 	}
 
-	@RequestMapping(value = "/console/topic/propdept", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object propName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 

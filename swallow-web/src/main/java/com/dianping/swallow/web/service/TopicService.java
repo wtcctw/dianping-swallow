@@ -59,7 +59,7 @@ public interface TopicService {
 	 * @param username  通行证
 	 * @param all       是否返回所有
 	 */
-	String[] loadTopicProposal(String username, boolean isAdmin);
+	Pair<List<String>, List<String>> loadTopicProposal(String username, boolean isAdmin);
 	
 	/**
 	 * 

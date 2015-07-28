@@ -38,7 +38,7 @@ public interface MessageService {
 	 * 
 	 * @param topicName
 	 */
-	Map<String, Object> loadMinAndMaxTime(String topicName);
+	long loadTimeOfFirstMessage(String topicName);
 
 	/**
 	 * 

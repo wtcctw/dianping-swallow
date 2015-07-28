@@ -352,39 +352,21 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	}
 
 	@Override
-	public Map<String, Object> findMinAndMaxTime(String topicName) {
+	public Message loadFirstMessage(String topicName) {
 
-		Map<String, Object> map = new HashMap<String, Object>();
-		Query query1 = new Query();
-		query1.with(new Sort(new Sort.Order(Direction.DESC, ID))).limit(1);
-		query1.fields().exclude(C);
-		List<Message> msgs = this.webMongoManager.getMessageMongoTemplate(topicName).find(query1, Message.class,
+		Query query = new Query();
+		query.with(new Sort(new Sort.Order(Direction.DESC, ID))).limit(1);
+		query.fields().exclude(C);
+		List<Message> msgs = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, Message.class,
 				MESSAGE_COLLECTION);
-		if (msgs.size() == 0) {
-			map.put("max", "");
-			map.put("min", "");
-			return map;
+		
+		if(msgs.size() != 0){
+			return msgs.get(0);
+		}else{
+			return null;
 		}
-
-		Message msg = msgs.get(0);
-		map.put("max", convertToStstring(msg.get_id()));
-
-		Query query2 = new Query();
-		query2.with(new Sort(new Sort.Order(Direction.ASC, ID))).limit(1);
-		query2.fields().exclude(C);
-		msg = this.webMongoManager.getMessageMongoTemplate(topicName).find(query2, Message.class, MESSAGE_COLLECTION)
-				.get(0);
-		map.put("min", convertToStstring(msg.get_id()));
-
-		return map;
 	}
 	
-	private String convertToStstring(BSONTimestamp ts) {
-		int seconds = ts.getTime();
-		long millions = new Long(seconds) * 1000;
-		return new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
-	}
-
 	private List<Message> getMessageFromOneSide(Long messageId, int size, DBCollection collection, boolean side, boolean sort) {
 
 		DBObject dbo;

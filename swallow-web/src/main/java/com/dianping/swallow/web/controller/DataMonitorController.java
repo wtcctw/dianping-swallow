@@ -370,20 +370,14 @@ public class DataMonitorController extends AbstractMonitorController {
 		Calendar calendar = Calendar.getInstance();
 		calendar.clear(Calendar.MINUTE);
 		calendar.clear(Calendar.SECOND);
-		String starttime = convertDateToString(calendar.getTime());
+		Date starttime = calendar.getTime();
 		calendar.add(Calendar.MINUTE, 59);
 		calendar.add(Calendar.SECOND, 59);
-		String stoptime = convertDateToString(calendar.getTime());
+		Date stoptime = calendar.getTime();
 		map.put("starttime", starttime);
 		map.put("stoptime", stoptime);
 
 		return map;
-	}
-
-	private String convertDateToString(Date date) {
-
-		SimpleDateFormat sdf = new SimpleDateFormat(DefaultMessageDao.TIMEFORMAT);
-		return sdf.format(date);
 	}
 
 	@Override

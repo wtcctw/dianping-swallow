@@ -2,9 +2,7 @@ package com.dianping.swallow.web.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ConsumerServerAlarmSettingDto;
 import com.dianping.swallow.web.controller.mapper.ConsumerServerAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
@@ -63,7 +62,7 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 		for(ConsumerServerAlarmSetting consumerAlarmSetting : consumerAlarmSettingList){
 			consumerAlarmSettingListDto.add(ConsumerServerAlarmSettingMapper.toConsumerServerAlarmSettingDto(consumerAlarmSetting));
 		}
-		return generateResponst(consumerAlarmSettingListDto);
+		return new Pair<Integer, List<ConsumerServerAlarmSettingDto>>(consumerAlarmSettingListDto.size(), consumerAlarmSettingListDto);
 		
 	}
 
@@ -97,8 +96,8 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 	@ResponseBody
 	public Collection<String> loadProducerSereverIds() {
 		
-		List<String> masterIps =  ipCollectorService.getConsumerServerMasterIps();
-		List<String> slaveIps =  ipCollectorService.getConsumerServerSlaveIps();
+		Set<String> masterIps =  ipCollectorService.getConsumerServerMasterIpsMap().keySet();
+		Set<String> slaveIps =  ipCollectorService.getConsumerServerMasterIpsMap().keySet();
 		return CollectionUtils.union(masterIps, slaveIps);
 		
 	}
@@ -116,14 +115,6 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 		}
 	}
 
-	private Map<String, Object> generateResponst(List<ConsumerServerAlarmSettingDto> topicAlarmSettingList){
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("size", topicAlarmSettingList.size());
-		map.put("message", topicAlarmSettingList);
-		return map;
-	}
-	
 	@Override
 	protected String getMenu() {
 		return "setting";

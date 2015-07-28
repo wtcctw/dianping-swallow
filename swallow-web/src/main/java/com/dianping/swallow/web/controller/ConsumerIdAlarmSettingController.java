@@ -1,9 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ConsumerIdAlarmSettingDto;
 import com.dianping.swallow.web.controller.mapper.ConsumerIdAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
@@ -57,7 +56,7 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 		for(ConsumerIdAlarmSetting consumerIdAlarmSetting : consumerIdAlarmSettingList){
 			consumerAlarmSettingListDto.add(ConsumerIdAlarmSettingMapper.toConsumerIdAlarmSettingDto(consumerIdAlarmSetting));
 		}
-		return generateResponst(consumerAlarmSettingListDto);
+		return new Pair<Integer, List<ConsumerIdAlarmSettingDto>>(consumerAlarmSettingListDto.size(), consumerAlarmSettingListDto);
 		
 	}
 
@@ -81,14 +80,6 @@ public class ConsumerIdAlarmSettingController extends AbstractSidebarBasedContro
 		}
 	}
 
-	private Map<String, Object> generateResponst(List<ConsumerIdAlarmSettingDto> consumerIdAlarmSetting){
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("size", consumerIdAlarmSetting.size());
-		map.put("message", consumerIdAlarmSetting);
-		return map;
-	}
-	
 	@Override
 	protected String getMenu() {
 		return "setting";

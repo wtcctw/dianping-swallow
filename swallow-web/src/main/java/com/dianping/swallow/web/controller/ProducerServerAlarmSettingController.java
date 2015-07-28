@@ -1,9 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ProducerServerAlarmSettingDto;
 import com.dianping.swallow.web.controller.mapper.ProducerServerAlarmSettingMapper;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
@@ -60,7 +59,7 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 		for(ProducerServerAlarmSetting producerAlarmSetting : producerAlarmSettingList){
 			producerAlarmSettingListDto.add(ProducerServerAlarmSettingMapper.toProducerServerAlarmSettingDto(producerAlarmSetting));
 		}
-		return generateResponst(producerAlarmSettingListDto);
+		return new Pair<Integer, List<ProducerServerAlarmSettingDto>>(producerAlarmSettingListDto.size(), producerAlarmSettingListDto);
 		
 	}
 
@@ -93,7 +92,8 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 	@ResponseBody
 	public List<String> loadProducerSereverIds() {
 		
-		return ipCollectorService.getProducerServerIps();
+		Set<String> hostNames = ipCollectorService.getProducerServerIpsMap().keySet();
+		return new ArrayList<String>(hostNames);
 	}
 
 	@RequestMapping(value = "/console/setting/producerserver/topics", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -108,14 +108,6 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 		}
 	}
 
-	private Map<String, Object> generateResponst(List<ProducerServerAlarmSettingDto> topicAlarmSettingList){
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("size", topicAlarmSettingList.size());
-		map.put("message", topicAlarmSettingList);
-		return map;
-	}
-	
 	@Override
 	protected String getMenu() {
 		return "setting";

@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
 import com.dianping.swallow.web.model.Message;
 import com.dianping.swallow.web.service.MessageService;
 
@@ -53,11 +56,10 @@ public class MessageController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/message/timespan", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object getMinAndMaxTime(String topic, HttpServletRequest request, HttpServletResponse response) {
+	public String getMinAndMaxTime(String topic, HttpServletRequest request, HttpServletResponse response) {
 
-		Map<String, Object> map = new HashMap<String, Object>();
-		map = messageService.loadMinAndMaxTime(topic);
-		return map;
+		long millions =  messageService.loadTimeOfFirstMessage(topic);
+		return new SimpleDateFormat(DefaultMessageDao.TIMEFORMAT).format(new Date(millions));
 	}
 
 	@RequestMapping(value = "/console/message/auth/content", method = RequestMethod.GET, produces = "application/json; charset=utf-8")

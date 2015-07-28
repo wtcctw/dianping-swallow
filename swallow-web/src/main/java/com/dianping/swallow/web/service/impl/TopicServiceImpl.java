@@ -45,7 +45,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 
 	@Override
 	public Pair<Long, List<Topic>> loadTopicPage(int start, int span) {
-		
+
 		return topicDao.loadTopicPage(start, span);
 	}
 
@@ -76,17 +76,17 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public int editTopic(String name, String prop, String time) throws MongoSocketException, MongoException{
+	public int editTopic(String name, String prop, String time) throws MongoSocketException, MongoException {
 
 		Set<String> proposal = splitProps(prop);
 		this.loadTopicToWhiteList().put(name, proposal);
 		StringBuffer sb = new StringBuffer();
 		boolean first = false;
-		for(String p : proposal){
-			if(!first){
+		for (String p : proposal) {
+			if (!first) {
 				sb.append(p);
 				first = true;
-			}else{
+			} else {
 				sb.append(",").append(p);
 			}
 		}
@@ -94,9 +94,10 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public String[] loadTopicProposal(String username, boolean isAdmin) {
+	public Pair<List<String>, List<String>> loadTopicProposal(String username, boolean isAdmin) {
 
 		Set<String> proposal = new HashSet<String>();
+		Set<String> editProposal = new HashSet<String>();
 		List<Topic> topics = topicDao.LoadTopics();
 
 		if (isAdmin) {
@@ -113,12 +114,14 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 
 		}
 
+		editProposal.addAll(proposal);
 		List<Administrator> adminList = userService.loadUsers();
-		for(Administrator admin : adminList){
-			proposal.add(admin.getName());
+		for (Administrator admin : adminList) {
+			editProposal.add(admin.getName());
 		}
-		
-		return proposal.toArray(new String[proposal.size()]);
+
+		return new Pair<List<String>, List<String>>(new ArrayList<String>(proposal),
+				new ArrayList<String>(editProposal));
 	}
 
 	private Set<String> getPropList(Topic topic) {
@@ -146,8 +149,8 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 
 	@Override
 	public int saveTopic(Topic topic) {
-		
-		if(StringUtils.isNotBlank(topic.getName())){
+
+		if (StringUtils.isNotBlank(topic.getName())) {
 			return topicDao.saveTopic(topic);
 		}
 		return ResponseStatus.TOPICBLANK.getStatus();
@@ -162,8 +165,8 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	public List<String> loadTopicNames(String username) {
 
 		List<String> topics = new ArrayList<String>();
-		for(Map.Entry<String, Set<String>> entry:topicToWhiteList.entrySet()){
-			if(entry.getValue().contains(username)){
+		for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
+			if (entry.getValue().contains(username)) {
 				topics.add(entry.getKey());
 			}
 		}

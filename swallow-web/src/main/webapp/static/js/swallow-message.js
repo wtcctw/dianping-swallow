@@ -38,6 +38,10 @@ module.factory('Paginator', function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/self.limit) + 1;
 					fetchFunction(this.currentOffset, pageSize + 1, topic, messageId, startdt, stopdt, this.basemid, sort, function(data){
+						if(typeof(data.status) != "undefined"){
+							alert("error:" + data.message);
+							return;
+						}
 						pageSize = self.limit;
 						self.basemid = "";
 						
@@ -284,7 +288,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 							}
 						}).success(function(data){
 							if(data.status != 0){
-								alert("error with status " + data.status);
+								alert("error:" + data.message);
 								return;
 							}
 							localStorage.setItem("topic", $scope.topic);
@@ -399,8 +403,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 									topic: c
 								}
 							}).success(function(data){
-								$scope.mintime = data.min;
-								$scope.maxtime = data.max;
+								$scope.mintime = data.replace(/\"/ig,"");
 								$scope.topic = c;
 								var sort = false;
 								if(typeof($scope.searchPaginator) != "undefined"){
@@ -606,9 +609,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						topic: $scope.topic
 					}
 				}).success(function(data){
-					$scope.mintime = data.min;
-					$scope.maxtime = data.max;
-					if(data.min.length > 0){  //没有纪录就不用查询了
+					$scope.mintime = data.replace(/\"/ig,"");
+					if(data > 0){  //没有纪录就不用查询了
 						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, false);
 					}
 				});
