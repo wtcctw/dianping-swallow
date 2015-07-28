@@ -123,16 +123,21 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		m.set_id(null);
 
 		String internalP = m.get_p();
-		try {
-			JSONObject json = new JSONObject(internalP);
-			String retrans = json.getString("retransmit");
-			if (retrans != null && !retrans.equals("true")) {
-				m.setRetransmit(retrans);
-			} else {
-				m.setRetransmit("");
+		
+		if(internalP == null){
+			m.setRetransmit("");
+		}else{
+			try {
+				JSONObject json = new JSONObject(internalP);
+				String retrans = json.getString("retransmit");
+				if (retrans != null && !retrans.equals("true")) {
+					m.setRetransmit(retrans);
+				} else {
+					m.setRetransmit("");
+				}
+			} catch (JSONException e) {
+				logger.info("no save_time in o_ip");
 			}
-		} catch (JSONException e) {
-			logger.info("no save_time in o_ip");
 		}
 	}
 

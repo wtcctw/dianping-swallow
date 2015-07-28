@@ -355,7 +355,7 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	public Message loadFirstMessage(String topicName) {
 
 		Query query = new Query();
-		query.with(new Sort(new Sort.Order(Direction.DESC, ID))).limit(1);
+		query.with(new Sort(new Sort.Order(Direction.ASC, ID))).limit(1);
 		query.fields().exclude(C);
 		List<Message> msgs = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, Message.class,
 				MESSAGE_COLLECTION);
