@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Resource;
 
@@ -30,9 +31,9 @@ import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.web.dao.impl.WebMongoManager;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
-import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.UserService;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
@@ -43,7 +44,7 @@ import com.mongodb.MongoClient;
 public class TopicScanner {
 
 	private static final String TOPIC_DB_NAME = "swallowwebapplication";
-	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm";
+	public static final String TIMEFORMAT = "yyyy-MM-dd HH:mm";
 
 	private static final String DELIMITOR = ",";
 	
@@ -65,6 +66,8 @@ public class TopicScanner {
 	private Map<String, Set<String>> topics = new ConcurrentHashMap<String, Set<String>>();
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	private AtomicBoolean whitelistCached = new AtomicBoolean(false);
 
 	@Scheduled(fixedDelay = 60000)
 	public void scanTopicDatabase() {
@@ -77,10 +80,16 @@ public class TopicScanner {
 		getTopicAndConsumerIds(dbs);
 		boolean isTopicDbexist = isDatabaseExist();
 
-		if (isTopicDbexist)
-			updateTopicDb(dbs);
-		else
+		if (!isTopicDbexist){
 			createTopicDb(dbs);
+			cacheTopicToWhiteList(dbs);
+			whitelistCached.compareAndSet(false, true);
+		}
+		
+		if(!whitelistCached.get()){
+			cacheTopicToWhiteList(dbs);
+			whitelistCached.compareAndSet(false, true);
+		}
 
 		// scan admin collection to add
 		scanAdminCollection();
@@ -137,35 +146,9 @@ public class TopicScanner {
 				String subStr = dbn.substring(DefaultMongoManager.MSG_PREFIX.length()).trim();
 				if (!names.contains(subStr)) { // in case add twice
 					names.add(subStr);
-					saveTopic(subStr);
+					topicService.saveTopic(getTopic(subStr, 0L));
 				}
 			}
-		}
-	}
-
-	private void updateTopicDb(List<String> dbs) {
-		for (String str : dbs) {
-			if (isTopicName(str)) {
-				String subStr = str.substring(DefaultMongoManager.MSG_PREFIX.length());
-				Topic t = topicService.loadTopicByName(subStr);
-				if (t != null) { // exists
-					updateTopicToWhiteList(subStr, t);
-				} else {
-					saveTopic(subStr);
-				}
-			}
-		}
-	}
-
-	private int saveTopic(String subStr) {
-		return topicService.saveTopic(getTopic(subStr, 0L));
-	}
-
-	private void updateTopicToWhiteList(String subStr, Topic t) {
-		if (topicService.loadTopicToWhiteList().get(subStr) == null) {
-			Set<String> lists = splitProps(t.getProp());
-			topicService.loadTopicToWhiteList().put(subStr, lists);
-			logger.info("add " + subStr + " 's whitelist " + lists);
 		}
 	}
 
@@ -227,18 +210,39 @@ public class TopicScanner {
 		return false;
 	}
 
-	private Set<String> splitProps(String props) {
-		
-		String[] prop = props.split(DELIMITOR);
-		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
-		return lists;
-	}
-
 	private Topic getTopic(String subStr, long num) {
 		Long id = System.currentTimeMillis();
 		String date = new SimpleDateFormat(TIMEFORMAT).format(new Date());
 		Topic p = new Topic();
 		p.setId(id.toString()).setName(subStr).setProp("").setTime(date).setMessageNum(num);
 		return p;
+	}
+	
+
+	private void cacheTopicToWhiteList(List<String> dbs) {
+		for (String str : dbs) {
+			if (isTopicName(str)) {
+				String subStr = str.substring(DefaultMongoManager.MSG_PREFIX.length());
+				Topic t = topicService.loadTopicByName(subStr);
+				if (t != null) { // exists
+					updateTopicToWhiteList(subStr, t);
+				}
+			}
+		}
+	}
+	
+	private void updateTopicToWhiteList(String subStr, Topic t) {
+		if (topicService.loadCachedTopicToWhiteList().get(subStr) == null) {
+			Set<String> set = splitProps(t.getProp());
+			topicService.loadCachedTopicToWhiteList().put(subStr, set);
+			logger.info("add " + subStr + " 's whitelist " + set);
+		}
+	}
+	
+	private Set<String> splitProps(String props) {
+		
+		String[] prop = props.split(DELIMITOR);
+		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
+		return lists;
 	}
 }

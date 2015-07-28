@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.dianping.lion.client.ConfigChange;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.Topic;
 
@@ -13,7 +14,7 @@ import com.dianping.swallow.web.model.Topic;
  *
  * 2015年5月20日下午2:05:57
  */
-public interface TopicService {
+public interface TopicService extends ConfigChange{
 	
 	/**
 	 * 查询出限定个数的topic
@@ -69,6 +70,6 @@ public interface TopicService {
 	
 	List<String> loadTopicNames(String username);
 
-	Map<String, Set<String>> loadTopicToWhiteList();
+	Map<String, Set<String>> loadCachedTopicToWhiteList();
 
 }

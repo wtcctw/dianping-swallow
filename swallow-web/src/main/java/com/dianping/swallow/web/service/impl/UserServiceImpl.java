@@ -147,7 +147,7 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 
 	private boolean isUser(String username) {
 
-		Collection<Set<String>> topicUsers = topicService.loadTopicToWhiteList().values();
+		Collection<Set<String>> topicUsers = topicService.loadCachedTopicToWhiteList().values();
 		for (Set<String> set : topicUsers) {
 			if (set.contains(username)) {
 				return true;
