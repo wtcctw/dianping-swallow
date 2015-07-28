@@ -749,9 +749,9 @@ consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值�
 
 如果出现延时或者累积报警，先查看是否是消息接收端处理过慢，可以借助看swallow管理平台上的监控和Cat监控。
 	例如：
-	假设是ack延时，基本是消息端接收处理消息过慢，可以通过swallow管理平台（http://swallow.dp/console/monitor/consumer/total/delay）可以查看延时监控上的曲线，查看ack延时曲线，如果过高，就能断定是消息消费端消息处理过慢。
+	假设是ack延时，基本是消息端接收处理消息过慢，可以通过swallow管理平台[延时监控](http://swallow.dp/console/monitor/consumer/total/delay/)可以查看曲线，查看ack延时曲线，如果过高，就能断定是消息消费端消息处理过慢。
 	假设是send延时或者消息累积，可能是消息处理过慢或者客户端并发过低，需要多加线程处理。通过上面的ack延时可以排除是不是消息处理过慢的问题。
-通过swallow管理平台（http://swallow.dp/console/monitor/consumer/total/qps）判断是否是客户端并发过低。一般正常情况三条曲线（用户发送、swallow发送、用户返回ack）是基本吻合；如果用户发送和用户返回ack相差较大，如果用户端有type过滤，那也算是正常现象；如果没有，则就是接收端消息处理过慢、客户端并发过低的原因。
+通过swallow管理平台[每秒消息topic](http://swallow.dp/console/monitor/consumer/total/qps)判断是否是客户端并发过低。一般正常情况三条曲线（用户发送、swallow发送、用户返回ack）是基本吻合；如果用户发送和用户返回ack相差较大，如果用户端有type过滤，那也算是正常现象；如果没有，则就是接收端消息处理过慢、客户端并发过低的原因。
 
 具体请看Cat端追踪和Swallow Web端追踪。
 
