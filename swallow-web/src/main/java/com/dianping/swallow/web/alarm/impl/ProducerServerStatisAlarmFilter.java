@@ -64,7 +64,7 @@ public class ProducerServerStatisAlarmFilter extends AbstractStatisAlarmFilter i
 	@Override
 	public boolean doAccept() {
 		if (dataCount.get() > 0) {
-			dataCount.incrementAndGet();
+			dataCount.decrementAndGet();
 			ProducerServerStatsData serverStatisData = producerDataWapper.getServerStatsData(lastTimeKey.get());
 			return serverAlarm(serverStatisData);
 		}

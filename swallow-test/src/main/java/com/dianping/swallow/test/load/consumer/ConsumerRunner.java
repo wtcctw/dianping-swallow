@@ -23,7 +23,7 @@ import com.dianping.swallow.test.load.BitMarker;
  */
 public class ConsumerRunner extends AbstractLoadTest{
 
-    private static int topicCount    = 2;
+	private static int topicCount    = 2;
     private static int consumerCount = 10;
     private static int threadPoolSize = 2;
     private static int totalMessageCount = -1;
@@ -65,9 +65,7 @@ public class ConsumerRunner extends AbstractLoadTest{
     	
 		return false;
 	}
-
-
-	@SuppressWarnings("deprecation")
+    @SuppressWarnings("deprecation")
 	private void startReceiver() {
 
         String rawConsumerId = getConsumerId();
@@ -110,8 +108,7 @@ public class ConsumerRunner extends AbstractLoadTest{
 		if(bitMarker == null){
 			bitMarker = new BitMarker();
 			messageCount.put(key, bitMarker);
-		}
-		return bitMarker;
+		}	return bitMarker;
 	}
 
 	private void count(Message msg, BitMarker bm) {

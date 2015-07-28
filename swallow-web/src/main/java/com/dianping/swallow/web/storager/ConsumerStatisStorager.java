@@ -62,7 +62,7 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 	@Override
 	public void doStorage() {
 		if (dataCount.get() > 0) {
-			dataCount.incrementAndGet();
+			dataCount.decrementAndGet();
 			ConsumerServerStatsData serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
 			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
 				logger.info("[doStorage] timeKey = " + serverStatisData.getTimeKey());

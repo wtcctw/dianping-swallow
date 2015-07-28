@@ -116,7 +116,6 @@ public class ProducerDataWapperImpl extends AbstractDataWapper implements Produc
 			NavigableMap<Long, Long> topicDelays = serverStatisData.getDelay(StatisType.SAVE);
 
 			ProducerBaseStatsData producerBaseStatisData = new ProducerBaseStatsData();
-			logger.info(String.valueOf(timeKey));
 			producerBaseStatisData.setQpx(topicQpxs.get(timeKey));
 
 			Long delay = topicDelays.get(timeKey);

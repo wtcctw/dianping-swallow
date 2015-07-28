@@ -69,7 +69,7 @@ public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter imple
 	@Override
 	public boolean doAccept() {
 		if (dataCount.get() > 0) {
-			dataCount.incrementAndGet();
+			dataCount.decrementAndGet();
 			Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = consumerDataWapper
 					.getConsumerIdStatsData(lastTimeKey.get());
 			return consumerIdAlarm(consumerIdStatsDataMap);
