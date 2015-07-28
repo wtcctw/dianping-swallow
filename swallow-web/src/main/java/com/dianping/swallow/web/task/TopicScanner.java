@@ -3,7 +3,6 @@ package com.dianping.swallow.web.task;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Resource;
 
@@ -67,8 +65,6 @@ public class TopicScanner {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private AtomicBoolean whitelistCached = new AtomicBoolean(false);
-
 	@Scheduled(fixedDelay = 60000)
 	public void scanTopicDatabase() {
 
@@ -82,13 +78,6 @@ public class TopicScanner {
 
 		if (!isTopicDbexist){
 			createTopicDb(dbs);
-			cacheTopicToWhiteList(dbs);
-			whitelistCached.compareAndSet(false, true);
-		}
-		
-		if(!whitelistCached.get()){
-			cacheTopicToWhiteList(dbs);
-			whitelistCached.compareAndSet(false, true);
 		}
 
 		// scan admin collection to add
@@ -218,31 +207,4 @@ public class TopicScanner {
 		return p;
 	}
 	
-
-	private void cacheTopicToWhiteList(List<String> dbs) {
-		for (String str : dbs) {
-			if (isTopicName(str)) {
-				String subStr = str.substring(DefaultMongoManager.MSG_PREFIX.length());
-				Topic t = topicService.loadTopicByName(subStr);
-				if (t != null) { // exists
-					updateTopicToWhiteList(subStr, t);
-				}
-			}
-		}
-	}
-	
-	private void updateTopicToWhiteList(String subStr, Topic t) {
-		if (topicService.loadCachedTopicToWhiteList().get(subStr) == null) {
-			Set<String> set = splitProps(t.getProp());
-			topicService.loadCachedTopicToWhiteList().put(subStr, set);
-			logger.info("add " + subStr + " 's whitelist " + set);
-		}
-	}
-	
-	private Set<String> splitProps(String props) {
-		
-		String[] prop = props.split(DELIMITOR);
-		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
-		return lists;
-	}
 }

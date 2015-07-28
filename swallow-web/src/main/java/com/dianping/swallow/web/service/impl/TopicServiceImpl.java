@@ -42,8 +42,6 @@ import freemarker.template.utility.StringUtil;
 @Service("topicService")
 public class TopicServiceImpl extends AbstractSwallowService implements TopicService {
 
-	private static final String DELIMITOR = ",";
-
 	private static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist";
 
 	@Autowired
@@ -51,32 +49,33 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 
 	@Resource(name = "userService")
 	private UserService userService;
-	
+
 	private ConfigCache configCache;
 
 	private Map<String, Set<String>> topicToWhiteList = new ConcurrentHashMap<String, Set<String>>();
-	
+
 	@PostConstruct
-	void initLionConfig(){
-		
+	void initLionConfig() {
+
 		try {
 			configCache = ConfigCache.getInstance();
-			configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);
+			String key = configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);
+			cacheTopicToWhiteList(splitString(key, ";"));
 			configCache.addChange(this);
 			logger.info("Init configCache successfully.");
 		} catch (LionException e) {
 			logger.error("Erroe when init lion config", e);
 		}
 	}
-	
+
 	@Override
 	public void onChange(String key, String value) {
 
 		if (key != null && key.equals(SWALLOW_TOPIC_WHITELIST_KEY)) {
 			logger.info("[onChange][" + SWALLOW_TOPIC_WHITELIST_KEY + "]" + value);
-			
+
 			String[] whitelist = StringUtil.split(value, ';');
-			
+
 			for (String wl : whitelist) {
 				if (StringUtils.isNotBlank(wl) && topicDao.readByName(wl) == null) {
 					Topic t = getTopic(wl, 0);
@@ -90,7 +89,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 					}
 				}
 			}
-		}else{
+		} else {
 			logger.info("not match");
 		}
 	}
@@ -130,8 +129,8 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	@Override
 	public int editTopic(String name, String prop, String time) throws MongoSocketException, MongoException {
 
-		Set<String> proposal = splitProps(prop);
-		this.loadCachedTopicToWhiteList().put(name, proposal);
+		Set<String> proposal = splitString(prop, ",");
+		topicToWhiteList.put(name, proposal);
 		StringBuffer sb = new StringBuffer();
 		boolean first = false;
 		for (String p : proposal) {
@@ -175,23 +174,17 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 		return new Pair<List<String>, List<String>>(new ArrayList<String>(proposal),
 				new ArrayList<String>(editProposal));
 	}
+	
+	@Override
+	public List<String> loadTopicNames(String username) {
 
-	private Set<String> getPropList(Topic topic) {
-		Set<String> props = new HashSet<String>();
-		String[] tmpprops = topic.getProp().split(DELIMITOR);
-
-		for (String tmpProp : tmpprops) {
-			if (!StringUtils.isEmpty(tmpProp)) {
-				props.add(tmpProp);
+		List<String> topics = new ArrayList<String>();
+		for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
+			if (entry.getValue().contains(username)) {
+				topics.add(entry.getKey());
 			}
 		}
-		return props;
-	}
-
-	private Set<String> splitProps(String props) {
-		String[] prop = props.split(DELIMITOR);
-		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
-		return lists;
+		return topics;
 	}
 
 	@Override
@@ -213,25 +206,55 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 		return topicDao.readByName(name);
 	}
 
-	@Override
-	public List<String> loadTopicNames(String username) {
+	private Set<String> getPropList(Topic topic) {
+		Set<String> props = new HashSet<String>();
+		String[] tmpprops = topic.getProp().split(",");
 
-		List<String> topics = new ArrayList<String>();
-		for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
-			if (entry.getValue().contains(username)) {
-				topics.add(entry.getKey());
+		for (String tmpProp : tmpprops) {
+			if (!StringUtils.isEmpty(tmpProp)) {
+				props.add(tmpProp);
 			}
 		}
-		return topics;
+		return props;
 	}
-
+	
 	private Topic getTopic(String subStr, long num) {
-		
+
 		Long id = System.currentTimeMillis();
 		String date = new SimpleDateFormat(TopicScanner.TIMEFORMAT).format(new Date());
 		Topic p = new Topic();
 		p.setId(id.toString()).setName(subStr).setProp("").setTime(date).setMessageNum(num);
 		return p;
+	}
+
+	private void cacheTopicToWhiteList(Set<String> whiteList) {
+		
+		for (String str : whiteList) {
+			Topic topic = loadTopicByName(str);
+			
+			if (topic != null) {
+				Set<String> set = splitString(topic.getProp(), ",");
+				topicToWhiteList.put(str, set);
+				logger.info(String.format("add topic %s 's proposal to whitelist %s", str, set));
+			}else{
+				topic = getTopic(str, 0L);
+				int status = saveTopic(topic);
+				
+				if(status == 0){
+					logger.info(String.format("Save topic %s to topic collection successfully.", str));
+				}else{
+					logger.info(String.format("Save topic %s to topic collection failed.", str));
+				}
+				
+			}
+			
+		}
+	}
+	
+	private Set<String> splitString(String source, String delimitor) {
+		String[] prop = source.split(delimitor);
+		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
+		return lists;
 	}
 
 }
