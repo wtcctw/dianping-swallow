@@ -70,7 +70,7 @@ public class HttpServiceImpl implements HttpService {
 			}
 		} catch (IOException e) {
 			result.setSuccess(false);
-			logger.error("http get request failed .", e);
+			logger.error("http get request failed. url=" + url, e);
 		}
 		return result;
 	}
