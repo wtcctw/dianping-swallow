@@ -27,6 +27,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.service.UserService;
@@ -121,21 +122,25 @@ public class TopicController extends AbstractMenuController {
 			@RequestParam(value = "exec_user", required = false) String approver, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		Map<String, Object> map = new HashMap<String, Object>();
 		String username = extractUsernameUtils.getUsername(request);
 
 		username = StringUtils.isEmpty(username) ? approver : username;
 
 		if (approver != null) {
 			if (!userService.loadCachedAdministratorSet().contains(approver)) {
-				map.put(MessageRetransmitController.STATUS, ResponseStatus.UNAUTHENTICATION.getStatus());
-				map.put(MessageRetransmitController.MESSAGE, ResponseStatus.UNAUTHENTICATION.getMessage());
 				logger.info(String.format(
 						"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
 						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-				return map;
+				return generateResponse(ResponseStatus.UNAUTHENTICATION);
 			} else {
-				String proposal = topicService.loadTopicByName(topic).getProp();
+				Topic t = topicService.loadTopicByName(topic);
+				if(t == null){
+					logger.info(String.format(
+							"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
+							username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+					return generateResponse(ResponseStatus.INVALIDTOPIC);
+				}
+				String proposal = t.getProp();
 				StringBuffer sb = new StringBuffer();
 				prop = checkProposalName(prop);
 				if (StringUtils.isNotEmpty(proposal)) {
@@ -165,23 +170,27 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		if (result == ResponseStatus.SUCCESS.getStatus()) {
-			map.put(MessageRetransmitController.STATUS, ResponseStatus.SUCCESS.getStatus());
-			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.SUCCESS.getMessage());
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
 					username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			return generateResponse(ResponseStatus.SUCCESS);
 		} else if (result == ResponseStatus.MONGOWRITE.getStatus()) {
-			map.put(MessageRetransmitController.STATUS, ResponseStatus.MONGOWRITE.getStatus());
-			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.MONGOWRITE.getMessage());
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.", username,
 					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			return generateResponse(ResponseStatus.MONGOWRITE);
 		} else {
-			map.put(MessageRetransmitController.STATUS, ResponseStatus.TRY_MONGOWRITE.getStatus());
-			map.put(MessageRetransmitController.MESSAGE, ResponseStatus.TRY_MONGOWRITE.getMessage());
 			logger.info(String.format(
 					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.", username,
 					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			return generateResponse(ResponseStatus.TRY_MONGOWRITE);
 		}
-
+		
+	}
+	
+	private Object generateResponse(ResponseStatus response){
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(MessageRetransmitController.STATUS, response.getStatus());
+		map.put(MessageRetransmitController.MESSAGE, response.getMessage());
 		return map;
 	}
 

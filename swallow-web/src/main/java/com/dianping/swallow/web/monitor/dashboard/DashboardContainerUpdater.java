@@ -190,6 +190,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			String mobile = iPDescManagerWrap.loadDpManager(ip);
 			String email = iPDescManagerWrap.loadEmail(ip);
 			String name = iPDescManagerWrap.loadName(ip);
+			iPDescManagerWrap.resetIpdesc();
 			
 			ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
 					.loadConsumerBaseAlarmSetting(topic);

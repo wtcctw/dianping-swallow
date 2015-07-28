@@ -105,7 +105,7 @@
 						<td style="text-align: left" ng-bind="m.ststring"></td>
 						<td style="text-align: left" ng-bind="m.gtstring"></td>
 						<td style="text-align: left" ng-bind="m.mo_id"></td>
-						<td style="text-align: left" ng-bind="m.p"></td>
+						<td style="text-align: left" ng-bind="m.p | limitTo : 100"></td>
 						<td style="text-align: left" ng-bind="m.retransmit"></td>
 						<td style="text-align: left"><a
 							ng-click="showfullmessage(m.mid)" class="edit-config-btn"
@@ -131,7 +131,6 @@
 					<select class="selectpicker" ng-model="recordofperpage"
 						ng-change="makeChanged()"
 						ng-options="item.num as item.num for item in numperpage"></select>
-
 				</ul>
 			</div>
 		</div>
