@@ -48,7 +48,7 @@
 		<env>dev</env>
 
 		<!-- dianping -->
-		<lion-client.version>0.4.8</lion-client.version>
+		<lion-client.version>0.5.1</lion-client.version>
 		<cat.version>1.3.5</cat.version>
 		<phoenix-environment.version>0.1.0</phoenix-environment.version>
 		<!-- dianping -->
