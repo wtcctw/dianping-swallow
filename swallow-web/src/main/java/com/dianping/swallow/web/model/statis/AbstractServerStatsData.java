@@ -25,4 +25,9 @@ public abstract class AbstractServerStatsData {
 		this.timeKey = timeKey;
 	}
 
+	@Override
+	public String toString() {
+		return "AbstractServerStatsData [id=" + id + ", timeKey=" + timeKey + "]";
+	}
+
 }
