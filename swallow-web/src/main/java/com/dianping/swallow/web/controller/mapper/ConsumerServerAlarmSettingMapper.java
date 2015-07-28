@@ -29,7 +29,7 @@ public class ConsumerServerAlarmSettingMapper {
 		consumerSendQPSAlarmSetting.setValley(dto.getConsumersendvalley());
 		consumerSendQPSAlarmSetting.setFluctuation(dto.getConsumersendfluctuation());
 		consumerSendQPSAlarmSetting.setFluctuationBase(dto.getSendFluctuationBase());
-		alarmSetting.setSenderAlarmSetting(consumerSendQPSAlarmSetting);
+		alarmSetting.setSendAlarmSetting(consumerSendQPSAlarmSetting);
 
 		QPSAlarmSetting consumerAckQPSAlarmSetting = new QPSAlarmSetting();
 		consumerAckQPSAlarmSetting.setPeak(dto.getConsumerackpeak());

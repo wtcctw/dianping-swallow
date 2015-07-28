@@ -16,8 +16,8 @@ public class ConsumerServerAlarmSetting extends BaseAlarmSetting {
 		return sendAlarmSetting;
 	}
 
-	public void setSenderAlarmSetting(QPSAlarmSetting senderAlarmSetting) {
-		this.sendAlarmSetting = senderAlarmSetting;
+	public void setSendAlarmSetting(QPSAlarmSetting sendAlarmSetting) {
+		this.sendAlarmSetting = sendAlarmSetting;
 	}
 
 	public QPSAlarmSetting getAckAlarmSetting() {
