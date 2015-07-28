@@ -2,10 +2,8 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -30,10 +28,10 @@ import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
-import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
@@ -131,14 +129,14 @@ public class TopicController extends AbstractMenuController {
 				logger.info(String.format(
 						"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
 						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-				return generateResponse(ResponseStatus.UNAUTHENTICATION);
+				return ResponseStatus.UNAUTHENTICATION;
 			} else {
 				Topic t = topicService.loadTopicByName(topic);
 				if(t == null){
 					logger.info(String.format(
 							"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
 							username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-					return generateResponse(ResponseStatus.INVALIDTOPIC);
+					return ResponseStatus.INVALIDTOPIC;
 				}
 				String proposal = t.getProp();
 				StringBuffer sb = new StringBuffer();
@@ -172,26 +170,18 @@ public class TopicController extends AbstractMenuController {
 		if (result == ResponseStatus.SUCCESS.getStatus()) {
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
 					username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-			return generateResponse(ResponseStatus.SUCCESS);
+			return ResponseStatus.SUCCESS;
 		} else if (result == ResponseStatus.MONGOWRITE.getStatus()) {
 			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.", username,
 					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-			return generateResponse(ResponseStatus.MONGOWRITE);
+			return ResponseStatus.MONGOWRITE;
 		} else {
 			logger.info(String.format(
 					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.", username,
 					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-			return generateResponse(ResponseStatus.TRY_MONGOWRITE);
+			return ResponseStatus.TRY_MONGOWRITE;
 		}
 		
-	}
-	
-	private Object generateResponse(ResponseStatus response){
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(MessageRetransmitController.STATUS, response.getStatus());
-		map.put(MessageRetransmitController.MESSAGE, response.getMessage());
-		return map;
 	}
 
 	@RequestMapping(value = "/api/topic/alarm", method = RequestMethod.POST, produces = "application/json; charset=utf-8")

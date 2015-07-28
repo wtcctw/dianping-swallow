@@ -1,10 +1,14 @@
 package com.dianping.swallow.web.util;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+
 /**
  * @author mingdongli
  *
  *         2015年6月12日下午5:44:19
  */
+@JsonSerialize(using = ResponseStatusSerializer.class)
 public enum ResponseStatus {
 
 	INVALIDTOPIC("no such topic", -10), TOPICBLANK("topic blank", -9), IOEXCEPTION("io exception", -8), RUNTIMEEXCEPTION(

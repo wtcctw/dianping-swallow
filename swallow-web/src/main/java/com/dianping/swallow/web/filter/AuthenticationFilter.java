@@ -58,8 +58,7 @@ public class AuthenticationFilter implements Filter {
 		if (isPassed) {
 			chain.doFilter(request, response);
 		} else {
-			sendErrorMessage(response, ResponseStatus.UNAUTHENTICATION.getStatus(),
-					ResponseStatus.UNAUTHENTICATION.getMessage(), false);
+			sendErrorMessage(response, ResponseStatus.UNAUTHENTICATION);
 			return;
 		}
 
@@ -69,14 +68,11 @@ public class AuthenticationFilter implements Filter {
 		// ignore
 	}
 
-	private void sendErrorMessage(ServletResponse response, int status, String message, boolean needSend)
+	private void sendErrorMessage(ServletResponse response, ResponseStatus rs)
 			throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put(MessageRetransmitController.STATUS, status);
-		result.put(MessageRetransmitController.MESSAGE, message);
-		if (needSend) {
-			result.put(MessageRetransmitController.SEND, 0);
-		}
+		result.put(MessageRetransmitController.STATUS, rs.getStatus() );
+		result.put(MessageRetransmitController.MESSAGE, rs.getMessage());
 
 		JSONObject json = new JSONObject(result);
 
