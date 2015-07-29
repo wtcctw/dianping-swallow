@@ -191,7 +191,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
-			} else if (alarmMeta.getIsSendBusiness()) {
+			}
+			if (alarmMeta.getIsSendBusiness()) {
 				sendAlarmByProducerTopic(event.getTopicName(), alarm, alarmMeta);
 			}
 		}
@@ -262,7 +263,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
-			} else if (alarmMeta.getIsSendBusiness()) {
+			}
+			if (alarmMeta.getIsSendBusiness()) {
 				sendAlarmByConsumerTopic(event.getTopicName(), alarm, alarmMeta);
 			}
 		}
@@ -288,7 +290,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 					.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 			if (alarmMeta.getIsSendSwallow()) {
 				sendAlarmSwallowDp(alarm, alarmMeta);
-			} else if (alarmMeta.getIsSendBusiness()) {
+			}
+			if (alarmMeta.getIsSendBusiness()) {
 				sendAlarmByTopicAndConsumerId(event.getTopicName(), event.getConsumerId(), alarm, alarmMeta);
 			}
 		}
@@ -490,6 +493,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	}
 
 	private void doAlarmMetaTask() {
+		logger.info("[doAlarmMetaTask] scheduled load alarmMeta info.");
 		List<AlarmMeta> alarmMetaTemps = alarmMetaService.findByPage(0, AlarmType.values().length);
 		if (alarmMetaTemps != null && alarmMetaTemps.size() > 0) {
 			for (AlarmMeta alarmMeta : alarmMetaTemps) {
