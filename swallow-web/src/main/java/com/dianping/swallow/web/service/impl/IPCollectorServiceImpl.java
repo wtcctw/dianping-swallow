@@ -227,7 +227,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		} else if (monitorData instanceof ConsumerMonitorData) {
 			addStatisConsumerIps((ConsumerMonitorData) monitorData);
 		} else {
-			return;
+			throw new IllegalArgumentException("unsupported MonitorData type " + monitorData.getClass().getName());
 		}
 	}
 

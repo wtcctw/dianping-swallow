@@ -150,9 +150,9 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 			return true;
 		}
 		int expectedQpx = sumQpx / sampleCount;
-		if (qpx > qps.getFluctuationBase() && expectedQpx > qps.getFluctuationBase()) {
-			if ((qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuationBase())
-					|| (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuationBase())) {
+		if (qpx > qps.getFluctuationBase() || expectedQpx > qps.getFluctuationBase()) {
+			if ((qpx > expectedQpx || (qpx / expectedQpx) > qps.getFluctuation())
+					|| (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuation())) {
 				TopicEvent topicEvent = new TopicEvent();
 				topicEvent.setTopicName(topicName);
 				topicEvent.setAlarmType(AlarmType.PRODUCER_TOPIC_QPS_FLUCTUATION);

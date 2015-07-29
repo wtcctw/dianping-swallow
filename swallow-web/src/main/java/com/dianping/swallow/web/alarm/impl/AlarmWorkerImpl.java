@@ -23,7 +23,6 @@ import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerStatisEvent;
 import com.dianping.swallow.web.model.event.TopicEvent;
-import com.dianping.swallow.web.service.SeqGeneratorService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 import com.dianping.swallow.web.util.ThreadUtils;
 
@@ -37,11 +36,6 @@ public class AlarmWorkerImpl implements AlarmWorker {
 
 	@Autowired
 	private MessageManager messageManager;
-
-	@Autowired
-	private SeqGeneratorService seqGeneratorService;
-
-	private static final String ALARMEVENTID_CATEGORY = "alarmEventId";
 
 	private static final String FACTORY_NAME = "AlarmWorker";
 
@@ -79,9 +73,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		while (!checkStop()) {
 			try {
 				Event event = eventChannel.next();
-				long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-				logger.info("[start] get nextSeq. " + event.getAlarmType());
-				event.setEventId(Long.toString(eventId));
+				logger.info("[start] get nextSeq. {}", event.getAlarmType());
 				executorService.submit(new AlarmTask(event));
 			} catch (RejectedExecutionException e) {
 				CatUtil.logException(e);

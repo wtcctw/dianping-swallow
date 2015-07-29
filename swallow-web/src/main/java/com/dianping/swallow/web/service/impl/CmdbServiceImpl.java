@@ -195,7 +195,7 @@ public class CmdbServiceImpl implements CmdbService, InitializingBean {
 		} else if (env.equals("product")) {
 			return "生产";
 		} else {
-			return "";
+			throw new IllegalArgumentException("unsupported env type " + env);
 		}
 
 	}

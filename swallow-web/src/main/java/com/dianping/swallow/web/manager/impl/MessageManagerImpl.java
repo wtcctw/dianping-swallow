@@ -37,6 +37,7 @@ import com.dianping.swallow.web.model.event.TopicEvent;
 import com.dianping.swallow.web.service.AlarmMetaService;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.SeqGeneratorService;
 
 @Service("messageManager")
 public class MessageManagerImpl implements MessageManager, InitializingBean {
@@ -117,14 +118,21 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	@Autowired
 	private IPCollectorService ipCollectorService;
+	
+	@Autowired
+	private SeqGeneratorService seqGeneratorService;
+
+	private static final String ALARMEVENTID_CATEGORY = "alarmEventId";
 
 	private TimeZone timeZone = TimeZone.getTimeZone("GMT+8:00");
 
 	@Override
 	public void producerServerAlarm(ServerEvent event) {
-		logger.info("ip " + event.getIp() + "   alarmType " + event.getAlarmType());
+		logger.info("ip {}   alarmType {}", event.getIp(), event.getAlarmType());
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isProducerServerAlarm(event.getIp(), alarmMeta)) {
+			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+			event.setEventId(Long.toString(eventId));
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
@@ -135,7 +143,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 				Alarm alarm = new Alarm();
 				alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-				logger.info("ip " + event.getIp() + "   alarmType number " + event.getAlarmType().getNumber());
+				logger.info("ip {}   alarmType number {}", event.getIp(), event.getAlarmType().getNumber());
 				sendAlarmByIp(event.getIp(), alarm, alarmMeta);
 			}
 		}
@@ -145,6 +153,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	public void producerServerStatisAlarm(ServerStatisEvent event) {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isProducerServerAlarm(event.getIp(), alarmMeta)) {
+			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+			event.setEventId(Long.toString(eventId));
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
@@ -166,6 +176,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	public void producerTopicStatisAlarm(TopicEvent event) {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isProducerTopicAlarm(event.getTopicName(), alarmMeta)) {
+			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+			event.setEventId(Long.toString(eventId));
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
@@ -189,6 +201,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	public void consumerServerAlarm(ServerEvent event) {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isConsumerServerAlarm(event.getIp(), alarmMeta)) {
+			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+			event.setEventId(Long.toString(eventId));
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
@@ -210,6 +224,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	public void consumerServerStatisAlarm(ServerStatisEvent event) {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isConsumerServerAlarm(event.getIp(), alarmMeta)) {
+			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+			event.setEventId(Long.toString(eventId));
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
@@ -231,6 +247,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	public void consumerTopicStatisAlarm(TopicEvent event) {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isConsumerTopicAlarm(event.getTopicName(), alarmMeta)) {
+			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+			event.setEventId(Long.toString(eventId));
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
@@ -254,6 +272,8 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	public void consumerIdStatisAlarm(ConsumerIdEvent event) {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isConsumerIdAlarm(event.getTopicName(), event.getConsumerId(), alarmMeta)) {
+			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+			event.setEventId(Long.toString(eventId));
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
@@ -296,6 +316,9 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	private void sendAlarmByProducerTopic(String topicName, Alarm alarm, AlarmMeta alarmMeta) {
 		Set<String> ips = ipCollectorService.getProducerTopicIps(topicName);
+		if (logger.isInfoEnabled()) {
+			logger.info("topicName " + topicName + " ips " + ips);
+		}
 		Set<String> mobiles = new HashSet<String>();
 		Set<String> emails = new HashSet<String>();
 		fillReciever(ips, mobiles, emails);
@@ -303,8 +326,10 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	}
 
 	private void sendAlarmByConsumerTopic(String topicName, Alarm alarm, AlarmMeta alarmMeta) {
-
 		Set<String> ips = ipCollectorService.getConsumerTopicIps(topicName);
+		if (logger.isInfoEnabled()) {
+			logger.info("topicName " + topicName + " ips " + ips);
+		}
 		Set<String> mobiles = new HashSet<String>();
 		Set<String> emails = new HashSet<String>();
 		fillReciever(ips, mobiles, emails);
@@ -313,6 +338,9 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	private void sendAlarmByTopicAndConsumerId(String topicName, String consumerId, Alarm alarm, AlarmMeta alarmMeta) {
 		Set<String> ips = ipCollectorService.getTopicConsumerIdIps(topicName, consumerId);
+		if (logger.isInfoEnabled()) {
+			logger.info("topicName " + topicName + " consumerId " + consumerId + " ips " + ips);
+		}
 		Set<String> mobiles = new HashSet<String>();
 		Set<String> emails = new HashSet<String>();
 		fillReciever(ips, mobiles, emails);
@@ -336,6 +364,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 			if (!StringUtils.equals(ip, TOTAL_KEY)) {
 				IPDesc ipDesc = ipDescManager.getIPDesc(ip);
 				if (ipDesc == null) {
+					logger.info("[fillReciever]cannot find {} related info from cmdb and db", ip);
 					continue;
 				}
 				String strEmail = ipDesc.getEmail();
@@ -352,15 +381,12 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	private void sendAlarm(Set<String> mobiles, Set<String> emails, Alarm alarm, AlarmMeta alarmMeta) {
 		if (alarmMeta.getIsMailMode()) {
-			// Alarm alarmMail = (Alarm) alarm.clone();
 			alarmService.sendMail(emails, alarm);
 		}
 		if (alarmMeta.getIsSmsMode()) {
-			// Alarm alarmSms = (Alarm) alarm.clone();
 			alarmService.sendSms(mobiles, alarm);
 		}
 		if (alarmMeta.getIsWeiXinMode()) {
-			// Alarm alarmWeiXin = (Alarm) alarm.clone();
 			alarmService.sendWeiXin(emails, alarm);
 		}
 	}
