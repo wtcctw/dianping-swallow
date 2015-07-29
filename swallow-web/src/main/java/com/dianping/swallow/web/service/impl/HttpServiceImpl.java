@@ -50,7 +50,7 @@ public class HttpServiceImpl implements HttpService {
 			}
 		} catch (IOException e) {
 			result.setSuccess(false);
-			logger.error("http post request failed .", e);
+			logger.error("http post request failed ." + url, e);
 		}
 		return result;
 	}

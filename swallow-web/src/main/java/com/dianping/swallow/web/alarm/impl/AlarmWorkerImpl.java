@@ -80,6 +80,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 			try {
 				Event event = eventChannel.next();
 				long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+				logger.info("[start] get nextSeq. " + event.getAlarmType());
 				event.setEventId(Long.toString(eventId));
 				executorService.submit(new AlarmTask(event));
 			} catch (RejectedExecutionException e) {
@@ -89,7 +90,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 				} catch (InterruptedException ex) {
 					// ignore
 				}
-			}catch( InterruptedException e){
+			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
 		}
@@ -156,7 +157,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 			default:
 				break;
 			}
-		}else if (event instanceof TopicEvent) {
+		} else if (event instanceof TopicEvent) {
 			switch (event.getEventType()) {
 			case PRODUCER:
 				messageManager.producerTopicStatisAlarm((TopicEvent) event);
@@ -165,7 +166,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 				messageManager.consumerTopicStatisAlarm((TopicEvent) event);
 				break;
 			}
-		}  else {
+		} else {
 			logger.error("unsupported event type.");
 		}
 	}
