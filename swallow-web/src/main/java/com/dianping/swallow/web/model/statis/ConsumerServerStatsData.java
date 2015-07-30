@@ -14,4 +14,9 @@ public class ConsumerServerStatsData extends AbstractServerStatsData{
 		this.machineStatisDatas = machineStatisDatas;
 	}
 
+	@Override
+	public String toString() {
+		return "ConsumerServerStatsData [machineStatisDatas=" + machineStatisDatas + "]";
+	}
+
 }

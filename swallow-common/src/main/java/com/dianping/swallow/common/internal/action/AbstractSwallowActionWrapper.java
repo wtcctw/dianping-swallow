@@ -1,6 +1,8 @@
 package com.dianping.swallow.common.internal.action;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * @author mengwenchao
@@ -9,6 +11,6 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractSwallowActionWrapper implements SwallowActionWrapper{
 	
-	protected Logger logger = Logger.getLogger(getClass());
+	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
 }

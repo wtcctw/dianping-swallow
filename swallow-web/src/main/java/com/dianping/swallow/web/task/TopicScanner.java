@@ -23,7 +23,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.dianping.cat.Cat;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.web.dao.impl.WebMongoManager;
@@ -104,7 +103,7 @@ public class TopicScanner {
 				String[] split = dbName.split("#");
 				if (split.length != 3) {
 					logger.warn("[getTopicAndConsumerIds][wrong ackdbname]" + dbName);
-					Cat.logError("wrong db name", new IllegalArgumentException(dbName));
+					logger.error("wrong db name", new IllegalArgumentException(dbName));
 					continue;
 				}
 				String topic = split[1];

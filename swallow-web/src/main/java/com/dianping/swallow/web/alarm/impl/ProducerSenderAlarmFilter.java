@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +21,11 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
  * @author qiyin
  *
  */
+
 @Service("producerSenderAlarmFilter")
 public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
+
+	private static final Logger logger = LoggerFactory.getLogger(ProducerSenderAlarmFilter.class);
 
 	@Autowired
 	private MessageManager alarmManager;
@@ -46,6 +51,10 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 			if (whiteList == null || !whiteList.contains(serverIp)) {
 				if (!statisProducerServerIps.containsKey(serverIp)
 						|| System.currentTimeMillis() - statisProducerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
+					if (logger.isInfoEnabled()) {
+						logger.info("serverIp :" + serverIp + "  currentTime:" + System.currentTimeMillis()
+								+ "  lastUpdateTime:" + statisProducerServerIps.get(serverIp).longValue());
+					}
 					ServerEvent event = new ServerEvent();
 					event.setIp(serverIp);
 					event.setSlaveIp(serverIp);

@@ -607,6 +607,7 @@ product | http://swallow.dp
 
 #### 延时监控
 
+<span id="webDelay"></span>
 延时监控中监控时间被分为3段
 
 1. 用户发送-存储延时(message存储到mongo与用户发出message的时间差值)
@@ -647,106 +648,115 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 * consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。
 ![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=C5RhmEkN8Q8PaQaD4sVy1cec%2b7fkmSFNaph0e5Cghbs%3d&docid=014f1aa2503154f31879e4b422cf462ed)
 
-### Swallow 告警
+## Swallow 告警
 
-#### server告警
+### server告警
 
-1. producer server服务告警
+1.	producer server服务告警
 
-服务告警目前只检测server pigeon服务的健康检测页面和发往web端的统计数据两个方面，四种告警类型：
+	服务告警目前只检测server pigeon服务的健康检测页面和发往web端的统计数据两个方面，四种告警类型：
 
-* [1]PRODUCER_SERVER_PIGEON_SERVICE，pigeon服务故障。
+	* [1]PRODUCER_SERVER_PIGEON_SERVICE，pigeon服务故障。
 
-* [2]PRODUCER_SERVER_PIGEON_SERVICE_OK，pigeon服务故障恢复。
+	* [2]PRODUCER_SERVER_PIGEON_SERVICE_OK，pigeon服务故障恢复。
 
-* [3]PRODUCER_SERVER_SENDER，统计数据未发送。
+	* [3]PRODUCER_SERVER_SENDER，统计数据未发送。
 
-* [4]PRODUCER_SERVER_SENDER_OK，统计数据发送故障恢复。
+	* [4]PRODUCER_SERVER_SENDER_OK，统计数据发送故障恢复。
 
-2. producer server统计数据告警
+2. 	producer server统计数据告警
 
-服务告警目前只检测某台server QPS 峰值、谷值两个方面，四种告警类型：
+	服务告警目前只检测某台server QPS 峰值、谷值两个方面，四种告警类型：
 
-* [5]PRODUCER_SERVER_QPS_PEAK，QPS超过峰值。
+	* [5]PRODUCER_SERVER_QPS_PEAK，QPS超过峰值。
 
-* [6]PRODUCER_SERVER_QPS_VALLEY，QPS低于谷值。
+	* [6]PRODUCER_SERVER_QPS_VALLEY，QPS低于谷值。
 
-* [8]PRODUCER_SERVER_QPS_OK，QPS恢复正常。
+	* [8]PRODUCER_SERVER_QPS_OK，QPS恢复正常。
 
-3. consumer server服务告警
+3.	consumer server服务告警
 
-服务告警目前只检测server 端口是否打开，发往web端的统计数据以及slave服务器服务是否开启三个方面，八种告警类型：
+	服务告警目前只检测server 端口是否打开，发往web端的统计数据以及slave服务器服务是否开启三个方面，八种告警类型：
 
-* [9]CONSUMER_SERVER_SENDER，统计数据未发送。
+	* [9]CONSUMER_SERVER_SENDER，统计数据未发送。
 
-* [10]CONSUMER_SERVER_SENDER_OK，统计数据发送故障恢复。
+	* [10]CONSUMER_SERVER_SENDER_OK，统计数据发送故障恢复。
 
-* [11]CONSUMER_SERVER_SLAVEPORT_OPENED，Master端口关闭，Slave端口打开。
+	* [11]CONSUMER_SERVER_SLAVEPORT_OPENED，Master端口关闭，Slave端口打开。
 
-* [12]CONSUMER_SERVER_BOTHPORT_OPENED，Master，Slave端口都打开。
+	* [12]CONSUMER_SERVER_BOTHPORT_OPENED，Master，Slave端口都打开。
 
-* [13]CONSUMER_SERVER_BOTHPORT_UNOPENED，Master，Slave端口都未打开。
+	* [13]CONSUMER_SERVER_BOTHPORT_UNOPENED，Master，Slave端口都未打开。
 
-* [14]CONSUMER_SERVER_PORT_OPENED_OK，Master，Slave端口恢复正常状态。
+	* [14]CONSUMER_SERVER_PORT_OPENED_OK，Master，Slave端口恢复正常状态。
 
-* [15]CONSUMER_SERVER_SLAVESERVICE_STARTED，Slave服务未开启。
+	* [15]CONSUMER_SERVER_SLAVESERVICE_STARTED，Slave服务未开启。
 
-* [16]CONSUMER_SERVER_SLAVESERVICE_STARTED_OK，Slave服务恢复正常。
+	* [16]CONSUMER_SERVER_SLAVESERVICE_STARTED_OK，Slave服务恢复正常。
 
-4. consumer server统计数据告警
+4. 	consumer server统计数据告警
 
-服务告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动六个方面，八种告警类型：
+	服务告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动六个方面，八种告警类型：
 
-* [17]CONSUMER_SERVER_SENDQPS_PEAK，发送QPS超过峰值。
+	* [17]CONSUMER_SERVER_SENDQPS_PEAK，发送QPS超过峰值。
 
-* [18]CONSUMER_SERVER_SENDQPS_VALLEY，发送QPS低于谷值。
+	* [18]CONSUMER_SERVER_SENDQPS_VALLEY，发送QPS低于谷值。
 
-* [19]CONSUMER_SERVER_SENDQPS_FLUCTUATION，发送QPS与历史数据相比波动过大。
+	* [19]CONSUMER_SERVER_SENDQPS_FLUCTUATION，发送QPS与历史数据相比波动过大。
 
-* [20]CONSUMER_SERVER_SENDQPS_OK，发送QPS恢复正常。
+	* [20]CONSUMER_SERVER_SENDQPS_OK，发送QPS恢复正常。
 
-* [21]CONSUMER_SERVER_ACKQPS_PEAK，确认QPS超过峰值。
+	* [21]CONSUMER_SERVER_ACKQPS_PEAK，确认QPS超过峰值。
 
-* [22]CONSUMER_SERVER_ACKQPS_VALLEY，确认QPS低于谷值。
+	* [22]CONSUMER_SERVER_ACKQPS_VALLEY，确认QPS低于谷值。
 
-* [23]CONSUMER_SERVER_ACKQPS_FLUCTUATION，确认QPS与历史数据相比波动过大。
+	* [23]CONSUMER_SERVER_ACKQPS_FLUCTUATION，确认QPS与历史数据相比波动过大。
 
-* [24]CONSUMER_SERVER_ACKQPS_OK，确认QPS恢复正常。
+	* [24]CONSUMER_SERVER_ACKQPS_OK，确认QPS恢复正常。
 
-#### topic告警
+### topic告警
 
-topic告警目前只检测producer topic QPS的峰值、谷值、波动以及topic message延时四个方面，四种告警类型：
+1. 	topic统计数据告警
 
-* [1001]PRODUCER_TOPIC_QPS_PEAK，Topic QPS超过峰值。
+	topic告警目前只检测producer topic QPS的峰值、谷值、波动以及topic message延时四个方面，四种告警类型：
 
-* [1002]PRODUCER_TOPIC_QPS_VALLEY，Topic QPS低于谷值。
+	* [1001]PRODUCER_TOPIC_QPS_PEAK，Topic QPS超过峰值。
 
-* [1003]PRODUCER_TOPIC_QPS_FLUCTUATION，Topic QPS与历史数据相比波动过大。
+	* [1002]PRODUCER_TOPIC_QPS_VALLEY，Topic QPS低于谷值。
 
-* [1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message延时。
+	* [1003]PRODUCER_TOPIC_QPS_FLUCTUATION，Topic QPS与历史数据相比波动过大。
 
-#### consumerId告警
+	* [1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message延时。
 
-consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动以及发送Message累积九个方面，九种告警类型：
+### consumerId告警
 
-* [1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值。
+1. 	consumerId 统计数据告警
 
-* [1014]CONSUMER_CONSUMERID_SENDQPS_VALLEY，ConsumerId 发送QPS低于谷值。
+	consumerId告警目前只检测某consumerId发送和确认QPS 峰值、谷值、波动以及消费累积九个方面，九种告警类型：
 
-* [1015]CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION，ConsumerId 发送QPS与历史数据相比波动过大。
+	* [1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值。
 
-* [1016]CONSUMER_CONSUMERID_SENDMESSAGE_DELAY，ConsumerId 发送QPS延时。
+	* [1014]CONSUMER_CONSUMERID_SENDQPS_VALLEY，ConsumerId 发送QPS低于谷值。
 
-* [1017]CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION，ConsumerId message累积。
+	* [1015]CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION，ConsumerId 发送QPS与历史数据相比波动过大。
 
-* [1018]CONSUMER_CONSUMERID_ACKQPS_PEAK，ConsumerId 确认QPS超过峰值。
+	* [1016]CONSUMER_CONSUMERID_SENDMESSAGE_DELAY，ConsumerId 发送QPS延时。
 
-* [1019]CONSUMER_CONSUMERID_ACKQPS_VALLEY，ConsumerId 确认QPS低于谷值。
+	* [1017]CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION，ConsumerId message累积。
 
-* [1020]CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION，ConsumerId 确认QPS与历史数据相比波动过大。
+	* [1018]CONSUMER_CONSUMERID_ACKQPS_PEAK，ConsumerId 确认QPS超过峰值。
 
-* [1021]CONSUMER_CONSUMERID_ACKMESSAGE_DELAY，ConsumerId 确认QPS延时。
+	* [1019]CONSUMER_CONSUMERID_ACKQPS_VALLEY，ConsumerId 确认QPS低于谷值。
 
+	* [1020]CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION，ConsumerId 确认QPS与历史数据相比波动过大。
+
+	* [1021]CONSUMER_CONSUMERID_ACKMESSAGE_DELAY，ConsumerId 确认QPS延时。
+
+2.	consumerId告警分析
+
+	如果出现延时或者累积报警，先查看是否是消息接收端处理过慢（并发数过低、单条消息处理过慢，异常导致onMessage处理挂起），可以借助swallow管理平台上的监控和Cat监控，参见[Swallow常见问题以及处理](#commonProblems)。
+	   
+	
 ## 权限管理
 
 ### 管理员行为
@@ -782,13 +792,17 @@ consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值�
 	* 如果业务不要求时序，可以将并发至调高，建议并发值:50，设置方法参见[consumer配置](#consumerConfig)
 1. swallow作为异步消息队列，正常情况下延时在秒级别。但是异常情况下（数据库升级等），可能会出现分钟级别的延时，如果业务对延时特别敏感，建议谨慎使用
 
+<span id="commonProblems"></span>
 # Swallow常见问题以及处理
 
+
+<span id="problemWhichConsumer"></span>
 ## 如何查找某个topic对应的consumer
 * 从[CAT](http://cat.dp)中，找到swallow项目[Swallow](http://cat.dp/cat/r/t?op=view&domain=Swallow)
 * 找到`Out:topic`(topic即你关心的topic名字)，点开，即可看到consumer信息
 
 
+<span id="problemDelay"></span>
 ## 如何查看我的消费是否有延迟、延迟多少条消息？
 
 ### Cat端追踪
@@ -806,9 +820,10 @@ consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值�
 
 ### Swallow Web端追踪
 
-* 从Swallow Web端[延时监控](http://ppe.swallow.dp/console/monitor/consumer/total/delay)中查询出topic的延时统计数据。如果消费者出现消费延时的情况，可以查看3段延时中主要哪一段导致了消费的延迟。
+* 从Swallow Web端[延时监控](http://swallow.dp/console/monitor/consumer/total/delay)中查询出topic的延时统计数据。如果消费者出现消费延时的情况，可以查看3段延时中主要哪一段导致了消费的延迟。
 * 通过查看其他消费者的发送-ack延迟是否正常，如果其他消费者消费正常，那么就需要查看客户端代码是否正确实现了功能。
 
+<span id="problemAverageDelay"></span>
 ## 如何查看我的Consumer消费一条消息的平均时间？
 
 ### Cat端追踪
@@ -820,9 +835,10 @@ consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值�
 
 ### Swallow Web端追踪
 
-* 从Swallow Web端[消息量监控](http://ppe.swallow.dp/console/monitor/consumer/total/qps)中查看用户返回ack频率，除以相应的时间段即可得到消费一条消息的平均时间。
-![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=Y1h11dzdiQjOuOd7UBhTaJG4%2fObltD6WqfoySxVOTFM%3d&docid=0835cb1ed883d446f9b59c1f89fbc1843)
+* 参见[延时监控](#webDelay)中发送-ack延时
 
+
+<span id="problemConsumerDelay"></span>
 ## 我的Consumer有延时，该怎么确认问题所在？
 * 首先观察consumer的平均消费时间是否存在异常，如果consumer的平均消费时间比正常情况高出许多，说明onMessage回调函数依赖的服务存在问题，可以考虑_最近的代码变更_，或询问_依赖的服务_是否存在故障。
 * 如果consumer的平均消费时间一直很高，说明consumer的消费线程数太少，可以考虑修改配置文件增加消费线程数，或者`扩容应用增加消费机。
@@ -833,25 +849,26 @@ consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值�
 * 首先确认consumer是否已经正确启动：
 	* 增加一些健康监测页面或其他机制以判断consumer是否正确启动。
 	* 查看自己应用日志以及/data/applogs/tomcat/catalina.out日志，确认没有影响应用正常启动的异常出现。
-* 确认topic是否有生产者在持续生产消息，可以参考[问题1](#_5)，连续查看swallow中的transaction，看是否存在数量变化，如果In:&lt;topic名称>没有变化，说明没有新的消息产生，而不是consumer堵住了。
-* 确认consumer是否在持续消费消息，可以参考[问题2](#consumer)，连续查看consumer对应项目的transaction，看MsgConsumed这个type是否数量增加，如果这个数量在增加，说明consumer消费没有堵住。
-* 其次确认是否该topic其他consumer都在消费，只有自己的consumer停止消费了。可以参考[问题1](#_5)，查看topic其他consumer的消费情况。
+* 确认topic是否有生产者在持续生产消息，连续查看swallow中的transaction，看是否存在数量变化，如果In:&lt;topic名称>没有变化，说明没有新的消息产生，而不是consumer堵住了。
+* 确认consumer是否在持续消费消息，可以[参考](#problemAverageDelay)，连续查看consumer对应项目的transaction，看MsgConsumed这个type是否数量增加，如果这个数量在增加，说明consumer消费没有堵住。
+* 其次确认是否该topic其他consumer都在消费，只有自己的consumer停止消费了。可以[参考](#problemDelay)，查看topic其他consumer的消费情况。
 	* _如果该topic其他consumer也都停止消费，且生产者正常工作，请及时联系swallow团队成员_。
 	* 如果该topic其他consumer消费正常，只有你自己的consumer消费堵住了，请查看consumer对应项目在CAT中的Problem，找到Heartbeat这个type，查询最新的线程堆栈，以确认Consumer的线程是否block在onMessage方法内，详细页面请参考下图：
 	![Producer Count In CAT](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=vFNs7GHYywskM9LsejdM0Mko3IIzn8cMPhZ77JWBSEk%3d&docid=0a6b63223125843d791b57dad311a79c0)
 	* 如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因包括但不限于死循环、等待IO、死锁、数据库操作、依赖的服务超时等情况，请仔细检查这些情况，修复并重启consumer即可。
 	* 如果consumer的线程不存在block现象，请及时联系swallow团队成员。
 
+<span id="problemProducer"></span>
 ## 如何确认我的Producer正常工作？
 
 ### Cat端追踪
 
-* 首先确认生产者是否正常启动，判别方法跟[问题4](#consumer_2)中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。
+* 首先确认生产者是否正常启动，判别方法跟前述问题中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。
 * 在CAT上观察Producer对应项目的transaction，找到MsgProduced以及MsgProduceTried这两个Type，MsgProduced的数量表示程序产生的消息数量，MsgProduceTried表示Swallow的producer client尝试发送给producer server的次数，如果这两个数量相差过大，说明存在异常。
 ![Producer Count In CAT](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=OE0h%2fxsUP%2b3CveKDt0t5w%2f8Gjc1jTKZqV0zmmmMfvNc%3d&docid=091aef7f093d24e04bee0c251551113f9)
 * 正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，此时请联系swallow团队成员。
 
 ### Swallow Web端追踪
 
-* 从Swallow Web端[Message管理](http://ppe.swallow.dp/console/message)中查看相关topic下的message信息，检查消息是否正确发送。
-![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=mfGgnXyDnjxDzMW7VswO5i3Ar8qZvbXYolWzLedGsww%3d&docid=063ccff6570ed4057850b59c81a00b488)
+* 从Swallow Web端[Message管理](http://swallow.dp/console/message)中查看相关topic下的message信息，检查消息是否正确发送。
+![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/16.png)

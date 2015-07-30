@@ -80,6 +80,7 @@
 					<excludes>
 						<exclude>**/*.properties</exclude>
 						<exclude>**/*.backup</exclude>
+						<exclude>**/*.xml</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

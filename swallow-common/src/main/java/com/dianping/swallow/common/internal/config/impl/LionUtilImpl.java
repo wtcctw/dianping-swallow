@@ -104,7 +104,7 @@ public class LionUtilImpl implements LionUtil{
 				result.append(line);
 			}
 		} catch (IOException e) {
-			logger.error("[executeGet]", e);
+			logger.error("[executeGet]" + urlAddress, e);
 			throw new IllegalStateException("io exception", e);
 		}finally{
 			if(connection != null){

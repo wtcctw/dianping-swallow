@@ -50,7 +50,7 @@ public class HttpServiceImpl implements HttpService {
 			}
 		} catch (IOException e) {
 			result.setSuccess(false);
-			logger.error("http post request failed .", e);
+			logger.error("http post request failed ." + url, e);
 		}
 		return result;
 	}
@@ -61,8 +61,8 @@ public class HttpServiceImpl implements HttpService {
 		HttpResult result = new HttpResult();
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
-			httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 300);
-			httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 300);
+			httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 1000);
+			httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 1000);
 			HttpResponse response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
@@ -70,7 +70,7 @@ public class HttpServiceImpl implements HttpService {
 			}
 		} catch (IOException e) {
 			result.setSuccess(false);
-			logger.error("http get request failed .", e);
+			logger.error("http get request failed. url=" + url, e);
 		}
 		return result;
 	}

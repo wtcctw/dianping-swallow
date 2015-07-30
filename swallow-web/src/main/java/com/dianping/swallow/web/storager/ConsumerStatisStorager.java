@@ -64,8 +64,11 @@ public class ConsumerStatisStorager extends AbstractStatisStorager implements Mo
 		if (dataCount.get() > 0) {
 			dataCount.decrementAndGet();
 			ConsumerServerStatsData serverStatisData = consumerDataWapper.getServerStatsData(lastTimeKey.get());
+			logger.info(serverStatisData.toString());
 			if (serverStatisData != null && serverStatisData.getTimeKey() != 0L) {
-				logger.info("[doStorage] timeKey = " + serverStatisData.getTimeKey());
+				if (logger.isInfoEnabled()) {
+					logger.info("[doStorage] timeKey = {}", serverStatisData.getTimeKey());
+				}
 				lastTimeKey.set(serverStatisData.getTimeKey());
 				List<ConsumerTopicStatsData> topicStatisDatas = consumerDataWapper.getTopicStatsData(lastTimeKey.get());
 				Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = consumerDataWapper

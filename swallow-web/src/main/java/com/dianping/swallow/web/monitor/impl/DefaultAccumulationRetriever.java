@@ -152,7 +152,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 					putAccumulation(topicName, consumerId);
 					TopicAccumulation topic = topics.get(topicName);
-					topic.retain(consumerIds);
+					if(topic != null){
+						topic.retain(consumerIds);
+					}
 				}
 			}
 		});

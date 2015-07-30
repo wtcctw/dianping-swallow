@@ -51,7 +51,7 @@ public class IPDescManagerImpl implements IPDescManager {
 
 	@PostConstruct
 	public void startTask() {
-		setFuture(scheduled.scheduleAtFixedRate(new Runnable() {
+		setFuture(scheduled.scheduleWithFixedDelay(new Runnable() {
 
 			@Override
 			public void run() {

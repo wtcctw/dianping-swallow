@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.util.PropertiesUtils;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.Consumer;
@@ -31,7 +32,7 @@ public class ConsumerRunner extends AbstractLoadTest{
     private Map<String, BitMarker> messageCount = new ConcurrentHashMap<String, BitMarker>(); 
     private static boolean differentConsumerId = true;
     
-    private String consumerIdPrefix = System.getProperty("consumerIdPrefix");
+    private String consumerIdPrefix = PropertiesUtils.getProperty("consumerIdPrefix", "myid");
     
     public static void main(String[] args) throws Exception {
     	

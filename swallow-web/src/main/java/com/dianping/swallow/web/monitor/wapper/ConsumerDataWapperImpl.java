@@ -63,7 +63,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			NavigableMap<Long, Long> ackDelay = serverStatisData.getDelay(StatisType.ACK);
 			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
 					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
-				return null;
+				continue;
 			}
 			if (index == 0) {
 				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
@@ -79,10 +79,13 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			machineStatsData.setTimeKey(timeKey);
 			machineStatsData.setIp(serverIp);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-
-			logger.info("[getServerStatsData]" + serverIp + "   " + sendQpx.toString() + "  " + timeKey);
-
-			baseStatsData.setSendQpx(sendQpx.get(timeKey));
+			if (logger.isInfoEnabled()) {
+				logger.info("[getServerStatsData]" + serverIp + "   " + sendQpx.toString() + "  " + timeKey);
+			}
+			Long sendQpxValue = sendQpx.get(timeKey);
+			if (sendQpxValue != null) {
+				baseStatsData.setSendQpx(sendQpxValue);
+			}
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
 				baseStatsData.setAckQpx(ackQpxValue.longValue());
@@ -123,7 +126,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			ConsumerTopicStatisData topicStatisData = (ConsumerTopicStatisData) consumerDataRetriever.getValue(
 					new CasKeys(TOTAL_KEY, topicName), StatisType.SEND);
 			if (topicStatisData == null) {
-				return null;
+				continue;
 			}
 			NavigableMap<Long, Long> sendQpx = topicStatisData.getQpx(StatisType.SEND);
 			NavigableMap<Long, Long> ackQpx = topicStatisData.getQpx(StatisType.ACK);
@@ -131,7 +134,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			NavigableMap<Long, Long> ackDelay = topicStatisData.getDelay(StatisType.ACK);
 			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
 					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
-				return null;
+				continue;
 			}
 			if (index == 0) {
 				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
@@ -142,7 +145,10 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 				index++;
 			}
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			baseStatsData.setSendQpx(sendQpx.get(timeKey));
+			Long sendQpxValue = sendQpx.get(timeKey);
+			if (sendQpxValue != null) {
+				baseStatsData.setSendQpx(sendQpxValue);
+			}
 
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
@@ -208,7 +214,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			ConsumerIdStatisData consumerIdStatisData = (ConsumerIdStatisData) consumerDataRetriever.getValue(
 					new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
 			if (consumerIdStatisData == null) {
-				return null;
+				continue;
 			}
 			NavigableMap<Long, Long> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
 			NavigableMap<Long, Long> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
@@ -217,7 +223,7 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 
 			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
 					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
-				return null;
+				continue;
 			}
 			if (index == 0) {
 				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
@@ -229,7 +235,10 @@ public class ConsumerDataWapperImpl extends AbstractDataWapper implements Consum
 			}
 			consumerIdStatsData.setTimeKey(timeKey);
 			ConsumerBaseStatsData baseStatsData = new ConsumerBaseStatsData();
-			baseStatsData.setSendQpx(sendQpx.get(timeKey));
+			Long sendQpxVlaue = sendQpx.get(timeKey);
+			if (sendQpxVlaue != null) {
+				baseStatsData.setSendQpx(sendQpxVlaue);
+			}
 
 			Long ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {

@@ -402,7 +402,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 			List<DBObject> indexDBObjects) {
 
 		if (logger.isInfoEnabled()) {
-			logger.info("[createColletcion]" + "name:" + collectionName
+			logger.info("[createColletcion]" + "db:" + db.getName() +",name:" + collectionName
 					+ ", size:" + size + ", cappedCollectionMaxDocNum:"
 					+ cappedCollectionMaxDocNum);
 		}
