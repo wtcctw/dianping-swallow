@@ -648,9 +648,9 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 * consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。
 ![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/12.png)
 
-### Swallow 告警
+## Swallow 告警
 
-#### server告警
+### server告警
 
 1.	producer server服务告警
 
@@ -714,7 +714,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 	* [24]CONSUMER_SERVER_ACKQPS_OK，确认QPS恢复正常。
 
-#### topic告警
+### topic告警
 
 1. 	topic统计数据告警
 
@@ -728,11 +728,11 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 	* [1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message延时。
 
-#### consumerId告警
+### consumerId告警
 
 1. 	consumerId 统计数据告警
 
-	consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动以及发送Message累积九个方面，九种告警类型：
+	consumerId告警目前只检测某consumerId发送和确认QPS 峰值、谷值、波动以及消费累积九个方面，九种告警类型：
 
 	* [1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值。
 

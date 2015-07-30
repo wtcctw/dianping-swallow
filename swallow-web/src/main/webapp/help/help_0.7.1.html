@@ -1113,12 +1113,12 @@ body .markdown-body
 <li><a href="#consumer-server">consumer server监控</a></li>
 </ul>
 </li>
+</ul>
+</li>
 <li><a href="#swallow_6">Swallow 告警</a><ul>
 <li><a href="#server">server告警</a></li>
 <li><a href="#topic_4">topic告警</a></li>
 <li><a href="#consumerid">consumerId告警</a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li><a href="#_21">权限管理</a><ul>
@@ -1892,8 +1892,8 @@ public static void main(String[] args) {
 <li>consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。<br />
 <img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/12.png" /></li>
 </ul>
-<h3 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 告警</h3>
-<h4 id="server"><a name="user-content-server" href="#server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server告警</h4>
+<h2 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 告警</h2>
+<h3 id="server"><a name="user-content-server" href="#server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server告警</h3>
 <ol>
 <li>
 <p>producer server服务告警</p>
@@ -1989,7 +1989,7 @@ public static void main(String[] args) {
 </ul>
 </li>
 </ol>
-<h4 id="topic_4"><a name="user-content-topic_4" href="#topic_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>topic告警</h4>
+<h3 id="topic_4"><a name="user-content-topic_4" href="#topic_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>topic告警</h3>
 <ol>
 <li>
 <p>topic统计数据告警</p>
@@ -2010,11 +2010,11 @@ public static void main(String[] args) {
 </ul>
 </li>
 </ol>
-<h4 id="consumerid"><a name="user-content-consumerid" href="#consumerid" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumerId告警</h4>
+<h3 id="consumerid"><a name="user-content-consumerid" href="#consumerid" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumerId告警</h3>
 <ol>
 <li>
 <p>consumerId 统计数据告警</p>
-<p>consumerId告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动以及发送Message累积九个方面，九种告警类型：</p>
+<p>consumerId告警目前只检测某consumerId发送和确认QPS 峰值、谷值、波动以及消费累积九个方面，九种告警类型：</p>
 <ul>
 <li>
 <p>[1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值。</p>
