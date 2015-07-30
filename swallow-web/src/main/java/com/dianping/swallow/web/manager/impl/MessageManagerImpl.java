@@ -23,7 +23,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.Alarm;
@@ -62,10 +62,6 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	private final Map<Integer, AlarmMeta> alarmMetas = new ConcurrentHashMap<Integer, AlarmMeta>();
 
-	private static final String env;
-
-	private static final String DEV_ENV = "dev";
-
 	private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
 	private static final String IP_TEMPLATE = "{ip}";
@@ -102,10 +98,6 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	@SuppressWarnings("unused")
 	private ScheduledFuture<?> future = null;
-
-	static {
-		env = EnvZooKeeperConfig.getEnv().trim();
-	}
 
 	@Autowired
 	private AlarmService alarmService;
@@ -354,7 +346,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 		if (ips == null || mobiles == null || emails == null) {
 			return;
 		}
-		if (env.equals(DEV_ENV)) {
+		if (EnvUtil.isDev()) {
 			if (devMobiles != null && devEmails != null) {
 				mobiles.addAll(devMobiles);
 				emails.addAll(devEmails);
@@ -450,7 +442,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	}
 
 	private void initProperties() {
-		if (env.equals(DEV_ENV)) {
+		if (EnvUtil.isDev()) {
 			devMobiles = new HashSet<String>();
 			devEmails = new HashSet<String>();
 			try {

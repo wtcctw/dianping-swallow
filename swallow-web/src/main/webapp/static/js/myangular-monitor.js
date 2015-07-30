@@ -85,7 +85,7 @@ module.controller('ConsumerServerQpsController', function($scope, $http) {
 module.controller('ConsumerQpsController', function($scope, $http) {
 	$http({
 		method : 'POST',
-		url : window.contextpath + '/console/monitor/topiclist/get'
+		url : window.contextPath + '/console/monitor/topiclist/get'
 	}).success(
 			function(topicList, status, headers, config) {
 
@@ -93,7 +93,7 @@ module.controller('ConsumerQpsController', function($scope, $http) {
 						{
 							source : topicList,
 							updater : function(c) {
-								window.location = window.contextpath
+								window.location = window.contextPath
 										+ "/console/monitor/consumer/" + c
 										+ "/qps";
 								return c;

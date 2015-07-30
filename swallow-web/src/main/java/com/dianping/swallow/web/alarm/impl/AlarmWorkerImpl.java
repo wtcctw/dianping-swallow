@@ -73,7 +73,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		while (!checkStop()) {
 			try {
 				Event event = eventChannel.next();
-				logger.info("[start] get nextSeq. {}", event.getAlarmType());
+				logger.info("[start] event AlarmType", event.getAlarmType());
 				executorService.submit(new AlarmTask(event));
 			} catch (RejectedExecutionException e) {
 				CatUtil.logException(e);

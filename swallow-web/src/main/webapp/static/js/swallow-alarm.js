@@ -108,6 +108,21 @@ module.controller('AlarmController', [
 			$scope.suburl = "/console/alarm/search";
 			$scope.pageSize = 30;
 			$scope.queryCount = 0;
+			console.log(window.contextPath);
+			$http({
+				method : 'GET',
+				url : window.contextPath + '/console/admin/queryvisits'
+			}).success(function(topicList, status, headers, config) {
+				$("#receiver").typeahead({
+					source : topicList,
+					updater : function(c) {
+						return c + "@dianping.com";
+					}
+				})
+			}).error(function(data, status, headers, config) {
+				app.appError("响应错误", data);
+			});
+
 			$scope.query = function() {
 				if ($scope.queryCount != 0) {
 					$scope.startTime = $("#starttime").val();

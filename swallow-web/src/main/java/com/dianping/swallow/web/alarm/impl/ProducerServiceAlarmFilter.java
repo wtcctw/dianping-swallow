@@ -55,7 +55,7 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 			if (StringUtils.isBlank(serverIp)) {
 				continue;
 			}
-			if (!whiteList.contains(serverIp)) {
+			if (whiteList == null || !whiteList.contains(serverIp)) {
 				String url = StringUtils.replace(PIGEON_HEALTH_URL_KEY, "{ip}", serverIp);
 				if (!httpSerivice.httpGet(url).isSuccess() && !httpSerivice.httpGet(url).isSuccess()) {
 					ServerEvent serverEvent = new ServerEvent();

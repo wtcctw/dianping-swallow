@@ -52,8 +52,7 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 				if (!statisProducerServerIps.containsKey(serverIp)
 						|| System.currentTimeMillis() - statisProducerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
 					if (logger.isInfoEnabled()) {
-						logger.info("serverIp :" + serverIp + "  currentTime:" + System.currentTimeMillis()
-								+ "  lastUpdateTime:" + statisProducerServerIps.get(serverIp).longValue());
+						logger.info("serverIp : {}", serverIp);
 					}
 					ServerEvent event = new ServerEvent();
 					event.setIp(serverIp);

@@ -151,7 +151,7 @@ public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter im
 		}
 		int expectedQpx = sumQpx / sampleCount;
 		if (qpx > qps.getFluctuationBase() || expectedQpx > qps.getFluctuationBase()) {
-			if ((qpx > expectedQpx || (qpx / expectedQpx) > qps.getFluctuation())
+			if ((qpx > expectedQpx && (qpx / expectedQpx) > qps.getFluctuation())
 					|| (qpx < expectedQpx && (expectedQpx / qpx) > qps.getFluctuation())) {
 				TopicEvent topicEvent = new TopicEvent();
 				topicEvent.setTopicName(topicName);
