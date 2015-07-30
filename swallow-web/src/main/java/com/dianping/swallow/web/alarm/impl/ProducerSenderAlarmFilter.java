@@ -21,6 +21,7 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
  * @author qiyin
  *
  */
+
 @Service("producerSenderAlarmFilter")
 public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 
@@ -50,8 +51,10 @@ public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 			if (whiteList == null || !whiteList.contains(serverIp)) {
 				if (!statisProducerServerIps.containsKey(serverIp)
 						|| System.currentTimeMillis() - statisProducerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
-					logger.info("serverIp :" + serverIp + "  currentTime:" + System.currentTimeMillis()
-							+ "  lastUpdateTime:" + statisProducerServerIps.get(serverIp).longValue());
+					if (logger.isInfoEnabled()) {
+						logger.info("serverIp :" + serverIp + "  currentTime:" + System.currentTimeMillis()
+								+ "  lastUpdateTime:" + statisProducerServerIps.get(serverIp).longValue());
+					}
 					ServerEvent event = new ServerEvent();
 					event.setIp(serverIp);
 					event.setSlaveIp(serverIp);
