@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.controller;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +30,6 @@ import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
 import com.dianping.swallow.web.model.dashboard.MinuteEntry;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
@@ -40,7 +38,7 @@ import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
-import com.dianping.swallow.web.monitor.dashboard.DashboardContainer;
+import com.dianping.swallow.web.service.MinuteEntryService;
 import com.dianping.swallow.web.task.TopicScanner;
 
 /**
@@ -75,8 +73,8 @@ public class DataMonitorController extends AbstractMonitorController {
 	@Autowired
 	private TopicScanner topicScanner;
 
-	@Autowired
-	private DashboardContainer dashboardContainer;
+	@Resource(name = "minuteEntryService")
+	private MinuteEntryService minuteEntryService;
 
 	@RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
 	public ModelAndView viewConsumerServerQps() {
@@ -117,25 +115,21 @@ public class DataMonitorController extends AbstractMonitorController {
 	public ModelAndView viewTopicdashboarddelay() {
 
 		subSide = "dashboarddelay";
-		Map<String, Object> map = createViewMap();
-		addTimeToModel(map);
-		return new ModelAndView("monitor/consumerdashboarddelay", map);
+		return new ModelAndView("monitor/consumerdashboarddelay", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/monitor/dashboard/delay/minute", method = RequestMethod.GET)
 	@ResponseBody
-	public List<MinuteEntry> getConsumerIdDelayDashboard(
-			 @RequestParam("date") String date) throws Exception {
-		
-		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
-		String transferDate = date.replaceAll("Z", "+0800").replaceAll("\"", "");
-		Date newdate = formatter.parse(transferDate);
-		
-		List<MinuteEntry> entrys = dashboardContainer.fetchMinuteEntries(newdate);
-		return entrys;
+	public Object getConsumerIdDelayDashboard(@RequestParam("date") String date, @RequestParam("step") int step)
+			throws Exception {
+
+		Date newdate = adjustTimeByStep(date, step);
+
+		List<MinuteEntry> entrys = minuteEntryService.loadMinuteEntryPage(newdate);
+
+		return buildResponse(entrys);
 
 	}
-	
 
 	private String getFirstTopic(Set<String> topics) {
 
@@ -212,12 +206,14 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps/get", method = RequestMethod.POST)
 	@ResponseBody
-	public List<HighChartsWrapper> getTopicQps(@PathVariable String topic) {
+	public List<HighChartsWrapper> getTopicQps(@PathVariable String topic,
+			@RequestParam(value = "cid", required = false) String consumerIds) {
 
+		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND);
 		List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND);
 
-		return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData);
+		return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData, interestConsumerIds);
 	}
 
 	private Set<String> getConsumerIds(String consumerIds) {
@@ -244,9 +240,26 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu/get", method = RequestMethod.POST)
 	@ResponseBody
-	public List<HighChartsWrapper> getTopicAccumulation(@PathVariable String topic) {
+	public List<HighChartsWrapper> getTopicAccumulation(@PathVariable String topic,
+			@RequestParam(value = "cid", required = false) String consumerIds) {
+
+		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
 		Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
+
+		if (interestConsumerIds != null) {
+
+			List<String> remove = new LinkedList<String>();
+			for (String consumerId : statsData.keySet()) {
+				if (!interestConsumerIds.contains(consumerId)) {
+					remove.add(consumerId);
+				}
+			}
+
+			for (String consumerId : remove) {
+				statsData.remove(consumerId);
+			}
+		}
 
 		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_ACCUMULATION, statsData);
 	}
@@ -267,7 +280,10 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get", method = RequestMethod.POST)
 	@ResponseBody
-	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic) throws Exception {
+	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic,
+			@RequestParam(value = "cid", required = false) String consumerIds) throws Exception {
+
+		final Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
 		SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(
 				CAT_TYPE, "getConsumerDelayMonitor");
@@ -280,7 +296,8 @@ public class DataMonitorController extends AbstractMonitorController {
 				StatsData producerData = producerDataRetriever.getSaveDelay(topic);
 				List<ConsumerDataPair> consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic);
 
-				return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay);
+				return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay,
+						interestConsumerIds);
 			}
 		});
 
@@ -328,7 +345,7 @@ public class DataMonitorController extends AbstractMonitorController {
 	}
 
 	private List<HighChartsWrapper> buildConsumerHighChartsWrapper(String topic, String yAxis, StatsData producerData,
-			List<ConsumerDataPair> consumerData) {
+			List<ConsumerDataPair> consumerData, Set<String> interestConsumerIds) {
 
 		int size = consumerData.size();
 		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
@@ -337,6 +354,9 @@ public class DataMonitorController extends AbstractMonitorController {
 
 			ConsumerDataPair dataPair = consumerData.get(i);
 			String currentConsumerId = dataPair.getConsumerId();
+			if (interestConsumerIds != null && !interestConsumerIds.contains(currentConsumerId)) {
+				continue;
+			}
 
 			List<StatsData> allStats = new LinkedList<StatsData>();
 			allStats.add(producerData);
@@ -365,19 +385,53 @@ public class DataMonitorController extends AbstractMonitorController {
 		return topic;
 	}
 
-	private Map<String, Object> addTimeToModel(Map<String, Object> map) {
+	private Object buildResponse(List<MinuteEntry> entrys) {
+
+		Map<String, Object> result = new HashMap<String, Object>();
+
+		if (!entrys.isEmpty()) {
+			Date first = entrys.get(0).getTime();
+			result = addTime(first);
+
+			result.put("entry", entrys);
+
+			return result;
+		}
+
+		return addTime(new Date());
+	}
+
+	private Map<String, Object> addTime(Date first) {
+
+		Map<String, Object> result = new HashMap<String, Object>();
 
 		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(first);
 		calendar.clear(Calendar.MINUTE);
 		calendar.clear(Calendar.SECOND);
 		Date starttime = calendar.getTime();
+
 		calendar.add(Calendar.MINUTE, 59);
 		calendar.add(Calendar.SECOND, 59);
 		Date stoptime = calendar.getTime();
-		map.put("starttime", starttime);
-		map.put("stoptime", stoptime);
 
-		return map;
+		result.put("starttime", starttime);
+		result.put("stoptime", stoptime);
+
+		return result;
+	}
+
+	private Date adjustTimeByStep(String date, int step) throws Exception {
+
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+		String transferDate = date.replaceAll("Z", "+0800").replaceAll("\"", "");
+		Date newdate = formatter.parse(transferDate);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(newdate);
+		calendar.add(Calendar.HOUR_OF_DAY, step);
+
+		return calendar.getTime();
 	}
 
 	@Override
