@@ -132,7 +132,7 @@ public class TopicController extends AbstractMenuController {
 				return ResponseStatus.UNAUTHENTICATION;
 			} else {
 				Topic t = topicService.loadTopicByName(topic);
-				if(t == null){
+				if (t == null) {
 					logger.info(String.format(
 							"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
 							username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
@@ -181,7 +181,7 @@ public class TopicController extends AbstractMenuController {
 					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 			return ResponseStatus.TRY_MONGOWRITE;
 		}
-		
+
 	}
 
 	@RequestMapping(value = "/api/topic/alarm", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
@@ -193,14 +193,19 @@ public class TopicController extends AbstractMenuController {
 		updateProducerServerAlarmSetting(topic, alarm);
 
 	}
-	
-	private String checkProposalName(String proposal){
-		
-		if(proposal.contains(POSTFIX)){
+
+	private String checkProposalName(String proposal) {
+
+		if (proposal.contains(POSTFIX)) {
 			int index = proposal.indexOf(POSTFIX);
 			proposal = proposal.substring(0, index);
 		}
-		return proposal.trim();
+		int index = proposal.indexOf("?");
+		if (index != -1) {
+			proposal = proposal + "，";
+			proposal = proposal.replaceAll("\\?", ",").replaceAll(" ", "").replaceAll("，", ",");
+		}
+		return proposal;
 	}
 
 	private void updateConsumerServerAlarmSetting(String topic, boolean alarm) {

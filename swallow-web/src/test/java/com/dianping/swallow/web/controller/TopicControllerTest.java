@@ -57,8 +57,8 @@ public class TopicControllerTest {
 		
 		try {
 			this.mockMvc.perform(post("/api/topic/edittopic")
-					.param("prop", "yapu.wang").param("topic",
-							"example2").param("time", "2015-05-12 09:46"));
+					.param("prop", "yapu.wang,mingdong.li,leon.li").param("topic",
+							"example").param("time", "2015-05-12 09:46"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -69,9 +69,9 @@ public class TopicControllerTest {
 		String encodeuser = Base64.encodeBase64String(USERNAME.getBytes());     
 		post.setRequestHeader(AUTHORIZATION, encodeuser);
 		NameValuePair[] param = {
-				new NameValuePair("prop", "yapu.wang@dianping.com"),
+				new NameValuePair("prop", "leon.li，dp.wang"),
 				new NameValuePair("time", "2015-06-12 35:35"),
-				new NameValuePair("topic", "exam"),
+				new NameValuePair("topic", "example3"),
 				new NameValuePair("exec_user", "hongjun.zhong")};
 		post.setRequestBody(param);
 		post.releaseConnection();

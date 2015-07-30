@@ -10,11 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.model.dashboard.MinuteEntry;
+import com.dianping.swallow.web.service.MinuteEntryService;
 
 /**
  * @author mingdongli
@@ -29,6 +32,9 @@ public class DashboardContainer {
 	public static final int FETCHENTRYSIZE = 10;
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	@Resource(name = "minuteEntryService")
+	private MinuteEntryService minuteEntryService;
 
 	private Map<Date, MinuteEntry> dashboards = new LinkedHashMap<Date, MinuteEntry>() {
 
@@ -36,7 +42,19 @@ public class DashboardContainer {
 
 		@Override
 		protected boolean removeEldestEntry(@SuppressWarnings("rawtypes") Map.Entry eldest) {
-			return size() >= TOTALENTRYSIZE;
+			
+			boolean isDelete =  size() >= TOTALENTRYSIZE;
+			if(isDelete){
+				MinuteEntry minuteEntry = dashboards.get(0);
+				int status = minuteEntryService.insert(minuteEntry);
+				
+				if(status == 0){
+					logger.info(String.format("Save MinuteEntry of time %tc to database successfully", minuteEntry.getTime()));
+				}else{
+					logger.info(String.format("Save MinuteEntry of time %tc to database failed", minuteEntry.getTime()));
+				}
+			}
+			return isDelete;
 		}
 	};
 
@@ -52,7 +70,7 @@ public class DashboardContainer {
 		return result;
 	}
 
-	public List<MinuteEntry> fetchMinuteEntries(Date stop) {
+	public List<MinuteEntry> loadMinuteEntries(Date stop) {
 
 		Calendar calendarstart = Calendar.getInstance();
 		calendarstart.setTime(stop);

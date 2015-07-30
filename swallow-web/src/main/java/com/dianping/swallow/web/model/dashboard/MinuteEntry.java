@@ -2,6 +2,8 @@ package com.dianping.swallow.web.model.dashboard;
 
 import java.util.Date;
 
+import org.springframework.data.annotation.Id;
+
 
 
 /**
@@ -11,6 +13,7 @@ import java.util.Date;
  */
 public class MinuteEntry {
 
+	@Id
 	private Date time;
 
 	MinHeap delayEntry;

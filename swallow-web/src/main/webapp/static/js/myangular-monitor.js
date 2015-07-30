@@ -172,10 +172,7 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.starttime = "";
 	$scope.stoptime = "";
 	$scope.currentMin = -1;  //当前分钟，第一次时设置
-	$scope.hour = 0;
-	$scope.firstaccess = true;
 	$scope.currentRed = -1;
-	$scope.hourchange = false;
 	$scope.whatClassIsIt = function(index) {
 		if (index == $scope.currentRed)
 			return "red-num"
@@ -217,7 +214,39 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		return entrys;
 	}
 	
+	$scope.setStep = function(step){
+		$scope.step = step + $scope.step;
+		if($scope.step > 0){
+			$scope.step = 0;
+		}
+		if(typeof($scope.currentRed) != "undefined"){
+			if($scope.step == 0){
+				var date = new Date();
+				var min = date.getMinutes();
+				if($scope.currentRed > min){
+					$scope.currentRed = min;
+				}
+			}
+			$scope.getDashboardDelay($scope.currentRed);
+		}
+	}
+	
+	$scope.setNow = function(){
+		$scope.step = 0;
+		$scope.getDashboardDelay(-1);
+	}
+	
+	$scope.step = 0;
+	$scope.firstindex = 0;
+	$scope.starttime = "";
+	$scope.stoptime = ""; 
+	
 	$scope.getDashboardDelay = function(index) {
+		$('.nodelay').tooltip({
+			showDelay: 0,
+			hideDelay: 0
+		});
+		
 		$scope.minuteEntrys = [];
 		var date = new Date();
 		if(index != -1){
@@ -228,17 +257,30 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		date.setHours(date.getHours() + 8);
 		$http({
 			method : 'GET',
-			params : {date: date},
+			params : {date: date,
+					step:$scope.step},
 			url : window.contextPath + '/console/monitor/dashboard/delay/minute'
 		}).success(function(data, status, headers, config) {
-			$scope.minuteEntrys = data;
-			var len = data.length;
-			var date = new Date($scope.minuteEntrys[0].time)
-			if($scope.firstaccess){
-				$scope.currentMin = date.getMinutes();
-				$scope.firstaccess = false;
+			$scope.minuteEntrys = data.entry;
+			$scope.starttime = data.starttime;
+			$scope.stoptime = data.stoptime;
+			var date;
+			if(typeof($scope.minuteEntrys) != "undefined" && $scope.minuteEntrys.length > 0){
+				date = new Date($scope.minuteEntrys[0].time)
+			}else{
+				date = new Date();
 			}
-			$scope.currentRed = index == -1 ? $scope.currentMin : date.getMinutes();
+			if(index == -1){
+				$scope.currentMin = date.getMinutes();
+				$scope.firstindex = $scope.currentMin;
+			}
+			$scope.currentRed = date.getMinutes();
+			
+			if($scope.step < 0){
+				$scope.currentMin = 60;
+			}else{
+				$scope.currentMin = $scope.firstindex;
+			}
 		});
 		
 	};

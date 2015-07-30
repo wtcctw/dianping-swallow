@@ -8,9 +8,9 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.avatar.util.IPUtils;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MessageRetransmitService;
 
@@ -65,7 +65,7 @@ public class MessageRetransmitServiceImpl extends AbstractSwallowService impleme
 		sm.setVersion(VERSION);
 		sm.setGeneratedTime(new Date());
 
-		sm.setSourceIp(IPUtils.getFirstNoLoopbackIP4Address());
+		sm.setSourceIp(IPUtil.getFirstNoLoopbackIP4Address());
 		if (sm.getInternalProperties() != null)
 			sm.getInternalProperties().put(RETRANSMIT, "true");
 		else {

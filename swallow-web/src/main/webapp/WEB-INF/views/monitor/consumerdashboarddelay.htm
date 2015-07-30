@@ -10,7 +10,28 @@
 					}
 				</script>
 				<span class="text-danger title">【报表时间】</span><span
-					class="text-success">${starttime} to ${stoptime}</span>
+					class="text-success">{{starttime | date : 'yyyy-MM-dd HH:mm:ss'}} to {{stoptime | date : 'yyyy-MM-dd HH:mm:ss'}}</span>
+					<div class="nav-search nav" id="nav-search">
+			<span class="text-danger switch"></span>
+			
+					&nbsp;[ <a href="#" ng-click="setStep(-168)">-7d</a> ]
+				
+					&nbsp;[ <a href="#" ng-click="setStep(-24)">-1d</a> ]
+				
+					&nbsp;[ <a href="#" ng-click="setStep(-2)">-2h</a> ]
+				
+					&nbsp;[ <a href="#" ng-click="setStep(-1)">-1h</a> ]
+				
+					&nbsp;[ <a href="#" ng-click="setStep(1)">+1h</a> ]
+				
+					&nbsp;[ <a href="#" ng-click="setStep(2)">+2h</a> ]
+				
+					&nbsp;[ <a href="#" ng-click="setStep(24)">+1d</a> ]
+				
+					&nbsp;[ <a href="#" ng-click="setStep(168)">+7d</a> ]
+				
+				&nbsp;[ <a href="#" ng-click="setNow()">now</a> ]&nbsp;
+		</div><!-- /.nav-search -->
 			</div>
 			<div class="report">
 				<div class="text-center">
@@ -46,7 +67,7 @@
 							<tr ng-repeat="entry in getEntry(minuteEntry.delayEntry)"
 								ng-class="{'alert-row': entry.numAlarm>0}">
 								<td style="text-align: left; width: 120px" data-toggle="tooltip"
-									data-html="true" data-placement="top"
+									data-html="true" data-placement="top" class="nodelay"
 									title="业务名 {{entry.name}} 开发: {{entry.dpMobile}}"
 									ng-bind="entry.consumerId | limitTo : 15"></td>
 								<td style="text-align: left; width: 40px; cursor: pointer;"

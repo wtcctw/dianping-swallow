@@ -610,7 +610,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					}
 				}).success(function(data){
 					$scope.mintime = data.replace(/\"/ig,"");
-					if(data > 0){  //没有纪录就不用查询了
+					if(data.length > 0){  //没有纪录就不用查询了
 						$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, false);
 					}
 				});

@@ -1,9 +1,9 @@
 package com.dianping.swallow.web.dao;
 
+import java.util.Date;
 import java.util.List;
 
-import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.model.dashboard.Entry;
+import com.dianping.swallow.web.model.dashboard.MinuteEntry;
 
 
 /**
@@ -11,32 +11,21 @@ import com.dianping.swallow.web.model.dashboard.Entry;
  *
  * 2015年7月27日下午4:19:40
  */
-public interface EntryDao extends Dao {
-
-	/**
-	 * 
-	 * @param entryDao
-	 */
-	boolean insert(Entry entry);
-
-	/**
-	 * 
-	 * @param topic
-	 */
-	Pair<Integer, List<EntryDao>> findByTopic(String topic);
+public interface MinuteEntryDao extends Dao {
 	
 	/**
 	 * 
-	 * @param cid
+	 * @param entry
 	 */
-	Pair<Integer, List<EntryDao>> findByConsumerId(String cid);
+	int insert(MinuteEntry entry);
+
 
 	/**
 	 * 
-	 * @param offset
-	 * @param limit
+	 * @param start  起始时间
+	 * @param limit  文档数
 	 */
-	Pair<Integer, List<EntryDao>> loadEntryPage(int offset, int limit);
+	List<MinuteEntry> loadMinuteEntryPage(Date start, int limit);
 
 }
 
