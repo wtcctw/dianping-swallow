@@ -125,8 +125,8 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 			value.cleanEmpty();
 			
 			if(value.isEmpty()){
-				if(logger.isInfoEnabled()){
-					logger.info("[clean]" + key);
+				if(logger.isDebugEnabled()){
+					logger.debug("[clean]" + key);
 				}
 				map.remove(key);
 			}
