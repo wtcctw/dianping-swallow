@@ -34,8 +34,7 @@ import com.dianping.swallow.consumerserver.worker.ConsumerWorker;
 
 public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSlaveComponent{
 
-    private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance()
-            .getAckIdUpdateIntervalSecond() * 1000;
+    private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance().getAckIdUpdateIntervalMili();
     
     private final long                        MESSAGE_SEND_NONE_INTERVAL = ConfigManager.getInstance().getMessageSendNoneInterval();
 

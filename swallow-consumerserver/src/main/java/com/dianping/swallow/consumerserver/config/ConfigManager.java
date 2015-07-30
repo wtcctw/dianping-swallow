@@ -20,7 +20,7 @@ public final class ConfigManager extends AbstractConfig{
    private int                  maxClientThreadCount            = 100;
    private int                  masterPort                      = 8081;
    private int                  slavePort                       = 8082;
-   private int                  ackIdUpdateIntervalSecond       = 1;
+   private int                  ackIdUpdateIntervalMili       	= 100;
    
    private int                  messageSendThreadPoolSize       = 1;
    private int 					maxRetriverTaskCountPerConsumer = 3;
@@ -99,10 +99,6 @@ public final class ConfigManager extends AbstractConfig{
     */
    public int getHeartbeatUpdateInterval() {
       return heartbeatUpdateInterval;
-   }
-
-   public int getAckIdUpdateIntervalSecond() {
-      return ackIdUpdateIntervalSecond;
    }
 
    public int getSeqRatio() {
@@ -184,6 +180,10 @@ public final class ConfigManager extends AbstractConfig{
 
 	public void setSlave(boolean isSlave) {
 		this.isSlave = isSlave;
+	}
+
+	public int getAckIdUpdateIntervalMili() {
+		return ackIdUpdateIntervalMili;
 	}
 
 }
