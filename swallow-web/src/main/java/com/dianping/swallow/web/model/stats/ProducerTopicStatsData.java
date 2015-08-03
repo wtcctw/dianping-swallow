@@ -30,24 +30,12 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 		this.topicName = topicName;
 	}
 
-	public boolean checkQps(long expectQps, long baseQps, long preQps, int flu) {
-		if (!checkQpsPeak(expectQps)) {
-			return false;
-		}
-		if (!checkQpsValley(expectQps)) {
-			return false;
-		}
-		if (!checkQpsFlu(baseQps, preQps, flu)) {
-			return false;
-		}
-		return true;
-	}
-
 	public boolean checkQpsPeak(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() > expectQps) {
-				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName).setCurrentValue(this.getQps())
-						.setExpectedValue(expectQps).setStatisType(StatisType.SENDQPS_PEAK).setCreateTime(new Date())
+				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName)
+						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
+						.setStatisType(StatisType.SENDQPS_PEAK).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
 				return false;
 			}
@@ -58,8 +46,9 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	public boolean checkQpsValley(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() < expectQps) {
-				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName).setCurrentValue(this.getQps())
-						.setExpectedValue(expectQps).setStatisType(StatisType.SENDQPS_VALLEY).setCreateTime(new Date())
+				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName)
+						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
+						.setStatisType(StatisType.SENDQPS_VALLEY).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
 				return false;
 			}
@@ -87,13 +76,14 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	}
 
 	public boolean checkDelay(long expectDelay) {
-		if (this.getDelay() != 0L) {
-			if (this.getDelay() > expectDelay) {
-				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName).setCurrentValue(this.getDelay())
-						.setExpectedValue(expectDelay).setStatisType(StatisType.SENDDELAY).setCreateTime(new Date())
-						.setEventType(EventType.PRODUCER));
-				return false;
-			}
+		if (this.getDelay() == 0L || expectDelay == 0L) {
+			return true;
+		}
+		if ((this.getDelay() / 1000) > expectDelay) {
+			eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName)
+					.setCurrentValue(this.getDelay()).setExpectedValue(expectDelay).setStatisType(StatisType.SENDDELAY)
+					.setCreateTime(new Date()).setEventType(EventType.PRODUCER));
+			return false;
 		}
 		return true;
 	}

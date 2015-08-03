@@ -45,17 +45,16 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return "ConsumerIdStatsData [topicName=" + topicName + ", consumerId=" + consumerId + "]";
 	}
 
-	public boolean checkSendQps(long expectQps, long baseQps, long preQps, int flu) {
-		if (!checkQpsPeak(getSendQps(), expectQps, StatisType.SENDQPS_PEAK)) {
-			return false;
-		}
-		if (!checkQpsValley(getSendQps(), expectQps, StatisType.SENDQPS_VALLEY)) {
-			return false;
-		}
-		if (!checkQpsFlu(getSendQps(), baseQps, preQps, flu, StatisType.SENDQPS_FLU)) {
-			return false;
-		}
-		return true;
+	public boolean checkSendQpsPeak(long expectQps) {
+		return checkQpsPeak(getSendQps(), expectQps, StatisType.SENDQPS_PEAK);
+	}
+
+	public boolean checkSendQpsValley(long expectQps) {
+		return checkQpsValley(getSendQps(), expectQps, StatisType.SENDQPS_VALLEY);
+	}
+
+	public boolean checkSendQpsFlu(long baseQps, long preQps, int flu) {
+		return checkQpsFlu(getSendQps(), baseQps, preQps, flu, StatisType.SENDQPS_FLU);
 	}
 
 	public boolean checkSendDelay(long expectDelay) {
@@ -66,24 +65,23 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return checkAccu(getAccumulation(), expectAccu, StatisType.SENDACCU);
 	}
 
-	public boolean checkAckQps(long expectQps, long baseQps, long preQps, int flu) {
-		if (!checkQpsPeak(getAckQps(), expectQps, StatisType.ACKQPS_PEAK)) {
-			return false;
-		}
-		if (!checkQpsValley(getAckQps(), expectQps, StatisType.ACKQPS_VALLEY)) {
-			return false;
-		}
-		if (!checkQpsFlu(getAckQps(), baseQps, preQps, flu, StatisType.ACKQPS_FLU)) {
-			return false;
-		}
-		return true;
+	public boolean checkAckQpsPeak(long expectQps) {
+		return checkQpsPeak(getAckQps(), expectQps, StatisType.ACKQPS_PEAK);
+	}
+
+	public boolean checkAckQpsValley(long expectQps) {
+		return checkQpsValley(getAckQps(), expectQps, StatisType.ACKQPS_VALLEY);
+	}
+
+	public boolean checkAckQpsFlu(long baseQps, long preQps, int flu) {
+		return checkQpsFlu(getAckQps(), baseQps, preQps, flu, StatisType.ACKQPS_FLU);
 	}
 
 	public boolean checkAckDelay(long expectDelay) {
 		return checkDelay(getAckDelay(), expectDelay, StatisType.ACKDELAY);
 	}
 
-	private boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
+	public boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps > expectQps) {
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
@@ -95,7 +93,7 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
+	public boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps < expectQps) {
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
@@ -107,7 +105,7 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkQpsFlu(long qps, long baseQps, long preQps, int flu, StatisType statisType) {
+	public boolean checkQpsFlu(long qps, long baseQps, long preQps, int flu, StatisType statisType) {
 		if (qps == 0L || preQps == 0L) {
 			return true;
 		}
@@ -126,9 +124,9 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkDelay(long delay, long expectDelay, StatisType statisType) {
-		if (delay != 0L) {
-			if (delay > expectDelay) {
+	public boolean checkDelay(long delay, long expectDelay, StatisType statisType) {
+		if (delay != 0L && expectDelay != 0L) {
+			if ((delay / 1000) > expectDelay) {
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
 						.setTopicName(topicName).setCurrentValue(delay).setExpectedValue(expectDelay)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
@@ -138,8 +136,8 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkAccu(long accu, long expectAccu, StatisType statisType) {
-		if (accu != 0L) {
+	public boolean checkAccu(long accu, long expectAccu, StatisType statisType) {
+		if (accu != 0L && expectAccu != 0L) {
 			if (accu > expectAccu) {
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
 						.setTopicName(topicName).setCurrentValue(accu).setExpectedValue(expectAccu)

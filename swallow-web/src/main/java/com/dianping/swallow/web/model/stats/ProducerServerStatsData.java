@@ -30,16 +30,6 @@ public class ProducerServerStatsData extends ProducerStatsData {
 		this.ip = ip;
 	}
 
-	public boolean checkQps(long expectQps) {
-		if (!checkQpsPeak(expectQps)) {
-			return false;
-		}
-		if (!checkQpsValley(expectQps)) {
-			return false;
-		}
-		return true;
-	}
-
 	public boolean checkQpsPeak(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() > expectQps) {

@@ -30,27 +30,23 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 		this.ip = ip;
 	}
 
-	public boolean checkSendQps(long expectQps) {
-		if (!checkQpsPeak(this.getSendQps(), expectQps, StatisType.SENDQPS_PEAK)) {
-			return false;
-		}
-		if (!checkQpsValley(this.getSendQps(), expectQps, StatisType.SENDQPS_VALLEY)) {
-			return false;
-		}
-		return true;
+	public boolean checkSendQpsPeak(long expectQps) {
+		return checkQpsPeak(this.getSendQps(), expectQps, StatisType.SENDQPS_PEAK);
 	}
 
-	public boolean checkAckQps(long expectQps) {
-		if (!checkQpsPeak(this.getAckQps(), expectQps, StatisType.ACKQPS_PEAK)) {
-			return false;
-		}
-		if (!checkQpsValley(this.getAckQps(), expectQps, StatisType.ACKQPS_VALLEY)) {
-			return false;
-		}
-		return true;
+	public boolean checkSendQpsValley(long expectQps){
+		return checkQpsValley(this.getSendQps(), expectQps, StatisType.SENDQPS_VALLEY);
 	}
 
-	private boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
+	public boolean checkAckQpsPeak(long expectQps) {
+		return checkQpsPeak(this.getAckQps(), expectQps, StatisType.ACKQPS_PEAK);
+	}
+
+	public boolean checkAckQpsValley(long expectQps) {
+		return checkQpsValley(this.getAckQps(), expectQps, StatisType.ACKQPS_VALLEY);
+	}
+
+	public boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps > expectQps) {
 				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
@@ -62,7 +58,7 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
+	public boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps < expectQps) {
 				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)

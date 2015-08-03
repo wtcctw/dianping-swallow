@@ -16,19 +16,21 @@ import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStat
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerTopicStatisData;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
+import com.dianping.swallow.web.model.stats.StatsDataFactory;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午3:23:48
+ *         2015年8月3日 下午3:23:48
  */
 @Service("producerStatsDataWapper")
 public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper implements ProducerStatsDataWapper {
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
-	
+
 	@Override
 	public List<ProducerServerStatsData> getServerStatsDatas(long timeKey) {
 		Set<String> serverKeys = producerDataRetriever.getKeys(new CasKeys());
@@ -61,7 +63,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				index++;
 			}
 
-			ProducerServerStatsData serverStatsData = new ProducerServerStatsData();
+			ProducerServerStatsData serverStatsData = StatsDataFactory.getInstance().createProducerServerStatsData();
 			serverStatsData.setTimeKey(timeKey);
 			serverStatsData.setIp(serverIp);
 			serverStatsData.setDelay(0);
@@ -86,12 +88,10 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		List<ProducerTopicStatsData> producerTopicStatsDatas = new ArrayList<ProducerTopicStatsData>();
 		int index = 0;
 		while (iterator.hasNext()) {
-			ProducerTopicStatsData producerTopicStatisData = new ProducerTopicStatsData();
 			String topicName = String.valueOf(iterator.next());
 			if (StringUtils.equals(topicName, TOTAL_KEY)) {
 				continue;
 			}
-			producerTopicStatisData.setTopicName(topicName);
 			ProducerTopicStatisData serverStatisData = (ProducerTopicStatisData) producerDataRetriever
 					.getValue(new CasKeys(TOTAL_KEY, topicName));
 			NavigableMap<Long, Long> topicQpxs = serverStatisData.getQpx(StatisType.SAVE);
@@ -106,20 +106,21 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				timeKey = tempKey.longValue();
 				index++;
 			}
-
-			producerTopicStatisData.setTimeKey(timeKey);
+			ProducerTopicStatsData producerTopicStatsData = StatsDataFactory.getInstance().createTopicStatsData();
+			producerTopicStatsData.setTopicName(topicName);
+			producerTopicStatsData.setTimeKey(timeKey);
 
 			NavigableMap<Long, Long> topicDelays = serverStatisData.getDelay(StatisType.SAVE);
 
 			Long topicQpxValue = topicQpxs.get(timeKey);
 			if (topicQpxValue != null) {
-				producerTopicStatisData.setQps(topicQpxValue);
+				producerTopicStatsData.setQps(topicQpxValue);
 			}
 			Long delay = topicDelays.get(timeKey);
 			if (delay != null) {
-				producerTopicStatisData.setDelay(delay.longValue());
+				producerTopicStatsData.setDelay(delay.longValue());
 			}
-			producerTopicStatsDatas.add(producerTopicStatisData);
+			producerTopicStatsDatas.add(producerTopicStatsData);
 		}
 		return producerTopicStatsDatas;
 	}

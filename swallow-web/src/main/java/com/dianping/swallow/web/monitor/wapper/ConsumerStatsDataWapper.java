@@ -25,14 +25,14 @@ public interface ConsumerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	Map<String, List<ConsumerIdStatsData>> getConsumerIdStatsData(long timeKey);
+	Map<String, List<ConsumerIdStatsData>> getConsumerIdStatsDatas(long timeKey);
 
 	/**
 	 * get one topic related consumerId statis data at timekey point
 	 * @param timeKey
 	 * @return
 	 */
-	List<ConsumerIdStatsData> getConsumerIdStatsData(String topicName, long timeKey);
+	List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey);
 	
 	/**
 	 * get consumerId related ip

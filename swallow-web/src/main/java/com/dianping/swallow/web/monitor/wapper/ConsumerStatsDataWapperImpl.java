@@ -19,6 +19,7 @@ import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisDa
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
+import com.dianping.swallow.web.model.stats.StatsDataFactory;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 
@@ -70,7 +71,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				index++;
 			}
 
-			ConsumerServerStatsData serverStatsData = new ConsumerServerStatsData();
+			ConsumerServerStatsData serverStatsData = StatsDataFactory.getInstance().createConsumerServerStatsData();
 			serverStatsData.setTimeKey(timeKey);
 			serverStatsData.setIp(serverIp);
 			Long sendQpxValue = sendQpx.get(timeKey);
@@ -98,7 +99,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public Map<String, List<ConsumerIdStatsData>> getConsumerIdStatsData(long timeKey) {
+	public Map<String, List<ConsumerIdStatsData>> getConsumerIdStatsDatas(long timeKey) {
 		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
 		if (topicKeys == null) {
 			return null;
@@ -110,7 +111,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (StringUtils.equals(topicName, TOTAL_KEY)) {
 				continue;
 			}
-			List<ConsumerIdStatsData> consumerIdStatsDatas = getConsumerIdStatsData(topicName, timeKey);
+			List<ConsumerIdStatsData> consumerIdStatsDatas = getConsumerIdStatsDatas(topicName, timeKey);
 			if (consumerIdStatsDatas == null) {
 				continue;
 			}
@@ -120,7 +121,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public List<ConsumerIdStatsData> getConsumerIdStatsData(String topicName, long timeKey) {
+	public List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey) {
 		Set<String> consumerIdKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
 		if (consumerIdKeys == null) {
 			return null;
@@ -133,7 +134,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (StringUtils.equals(consumerId, TOTAL_KEY)) {
 				continue;
 			}
-			ConsumerIdStatsData consumerIdStatsData = new ConsumerIdStatsData();
+			ConsumerIdStatsData consumerIdStatsData = StatsDataFactory.getInstance().createConsumerIdStatsData();
 			consumerIdStatsData.setConsumerId(consumerId);
 			consumerIdStatsData.setTopicName(topicName);
 			ConsumerIdStatisData consumerIdStatisData = (ConsumerIdStatisData) consumerDataRetriever.getValue(

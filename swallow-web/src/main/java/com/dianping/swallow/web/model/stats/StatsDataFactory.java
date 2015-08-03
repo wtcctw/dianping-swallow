@@ -7,14 +7,14 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.alarm.EventReporter;
 
 @Service
-public class StatisDataFactory implements InitializingBean {
+public class StatsDataFactory implements InitializingBean {
 
-	private static StatisDataFactory instance;
+	private static StatsDataFactory instance;
 
 	@Autowired
 	private EventReporter eventReporter;
 
-	public static StatisDataFactory getInstance() {
+	public static StatsDataFactory getInstance() {
 		return instance;
 	}
 
