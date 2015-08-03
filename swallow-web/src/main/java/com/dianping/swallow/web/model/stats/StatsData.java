@@ -1,26 +1,25 @@
 package com.dianping.swallow.web.model.stats;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import com.dianping.swallow.web.alarm.EventReporter;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年7月31日 下午3:57:09
+ *         2015年7月31日 下午3:57:09
  */
 public abstract class StatsData {
-	
+
 	@Id
 	private String id;
-	
+
 	@Indexed
 	private long timeKey;
-	
-	@Autowired
+
 	@Transient
 	protected EventReporter eventReporter;
 
@@ -40,9 +39,13 @@ public abstract class StatsData {
 		this.timeKey = timeKey;
 	}
 
+	public void setEventReporter(EventReporter eventReporter) {
+		this.eventReporter = eventReporter;
+	}
+
 	@Override
 	public String toString() {
 		return "StatsData [id=" + id + ", timeKey=" + timeKey + "]";
 	}
-	
+
 }

@@ -10,6 +10,12 @@ import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.util.DateUtil;
 
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月3日 上午11:13:54
+ */
 public class TopicEvent extends StatisEvent {
 
 	private static final Map<String, Long> lastAlarms = new ConcurrentHashMap<String, Long>();

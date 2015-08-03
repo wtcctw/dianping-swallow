@@ -9,6 +9,12 @@ import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.SeqGeneratorService;
 
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月3日 上午11:13:05
+ */
 @Service
 public class EventFactory implements InitializingBean {
 

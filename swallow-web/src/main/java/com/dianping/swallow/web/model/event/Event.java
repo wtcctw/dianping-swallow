@@ -30,6 +30,7 @@ import com.dianping.swallow.web.service.SeqGeneratorService;
  * 
  * @author qiyin
  *
+ * 2015年8月3日 上午11:12:56
  */
 public abstract class Event {
 

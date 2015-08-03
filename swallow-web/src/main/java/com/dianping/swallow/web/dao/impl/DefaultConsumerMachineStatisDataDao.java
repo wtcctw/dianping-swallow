@@ -72,8 +72,7 @@ public class DefaultConsumerMachineStatisDataDao extends AbstractWriteDao implem
 
 	@Override
 	public List<ConsumerMachineStatsData> findSectionData(String ip, long startKey, long endKey) {
-		Query query = new Query(Criteria.where(IP_FIELD).is(ip).and(TIMEKEY_FIELD).gte(startKey).and(TIMEKEY_FIELD)
-				.lte(endKey));
+		Query query = new Query(Criteria.where(IP_FIELD).is(ip).and(TIMEKEY_FIELD).gte(startKey).lte(endKey));
 		List<ConsumerMachineStatsData> serverStatisDatas = mongoTemplate.find(query, ConsumerMachineStatsData.class,
 				CONSUMERMACHINESTATICDATA_COLLECTION);
 		return serverStatisDatas;

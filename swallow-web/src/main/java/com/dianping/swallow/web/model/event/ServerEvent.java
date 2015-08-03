@@ -13,6 +13,12 @@ import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.util.DateUtil;
 
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月3日 上午11:13:23
+ */
 @Service
 @Scope("prototype")
 public class ServerEvent extends Event {

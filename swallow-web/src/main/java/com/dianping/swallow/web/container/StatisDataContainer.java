@@ -13,6 +13,12 @@ import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
 import com.dianping.swallow.web.common.Pair;
 
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月3日 上午11:34:00
+ */
 @Service("statisDataContainer")
 public class StatisDataContainer implements InitializingBean {
 

@@ -1,5 +1,11 @@
 package com.dianping.swallow.web.model.event;
 
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月3日 上午11:13:41
+ */
 public abstract class StatisEvent extends Event {
 
 	private long currentValue;
