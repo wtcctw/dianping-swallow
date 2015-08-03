@@ -1,8 +1,10 @@
 package com.dianping.swallow.web.dao;
 
-import java.util.Map;
+import java.util.List;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.MessageDump;
+import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
 
 
@@ -13,23 +15,21 @@ import com.mongodb.MongoException;
  */
 public interface MessageDumpDao extends Dao{
 	
-	void dropCol();
-
-	long countMessageDump();
-	
-	int saveMessageDump(MessageDump mdump);
-	
-	int removeMessageDump(String filename) throws MongoException;
+	long count();
 	
 	int updateMessageDumpStatus(String filename, boolean finished, String desc) throws MongoException;
-	
-	Map<String, Object> loadAllMessageDumps();
+
+	int removeMessageDump(String filename) throws MongoException;
+
+	ResponseStatus saveMessageDump(MessageDump mdump);
 	
 	MessageDump loadUnfinishedMessageDump(String topic);
 
-	Map<String, Object> loadMessageDumps(int offset, int limit);
-
 	MessageDump loadMessageDump(String filename);
 
-	Map<String, Object> loadSpecifitMessageDump(int offset, int limit, String topic);
+	Pair<Long, List<MessageDump>> loadAllMessageDumps();
+
+	Pair<Long, List<MessageDump>> loadMessageDumpPage(int offset, int limit);
+
+	Pair<Long, List<MessageDump>> loadMessageDumpPageByTopic(int offset, int limit, String topic);
 }

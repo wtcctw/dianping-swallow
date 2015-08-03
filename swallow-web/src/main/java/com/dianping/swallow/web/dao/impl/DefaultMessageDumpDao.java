@@ -1,9 +1,7 @@
 package com.dianping.swallow.web.dao.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -12,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.MessageDumpDao;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -30,38 +29,40 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	private static final String MESSAGEDUMP_COLLECTION = "swallowwebmessagedumpc";
 
 	private static final String TOPIC = "topic";
-	public static final String SIZE = "size";
-	public static final String MESSAGE = "message";
 	private static final String FILENAME = "filename";
 	private static final String FINISHED = "finished";
 	private static final String DESC = "desc";
 	private static final String TIME = "time";
 
 	@Override
-	public int saveMessageDump(MessageDump mdump) {
+	public ResponseStatus saveMessageDump(MessageDump mdump) {
+		
 		try {
 			mongoTemplate.save(mdump, MESSAGEDUMP_COLLECTION);
-			return ResponseStatus.SUCCESS.getStatus();
+			return ResponseStatus.SUCCESS;
 		} catch (MongoSocketException e) {
 			logger.error(e.getMessage(), e);
-			return ResponseStatus.TRY_MONGOWRITE.getStatus();
+			return ResponseStatus.TRY_MONGOWRITE;
 		} catch (MongoException e) {
 			logger.error("Error when save message dump " + mdump, e);
 		}
-		return ResponseStatus.MONGOWRITE.getStatus();
+		return ResponseStatus.MONGOWRITE;
 	}
 
 	@Override
-	public Map<String, Object> loadMessageDumps(int offset, int limit) {
+	public Pair<Long, List<MessageDump>> loadMessageDumpPage(int offset, int limit) {
+		
 		Query query = new Query();
+		
 		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, TOPIC)));
 		List<MessageDump> messageDumpList = mongoTemplate.find(query, MessageDump.class, MESSAGEDUMP_COLLECTION);
-		Long messageDumpSize = this.countMessageDump();
-		return getResponse(messageDumpSize, messageDumpList);
+		
+		Long messageDumpSize = this.count();
+		return new Pair<Long, List<MessageDump>>(messageDumpSize, messageDumpList);
 	}
 
 	@Override
-	public Map<String, Object> loadSpecifitMessageDump(int offset, int limit, String topic) {
+	public Pair<Long, List<MessageDump>> loadMessageDumpPageByTopic(int offset, int limit, String topic) {
 		List<MessageDump> messageDumpList = new ArrayList<MessageDump>();
 
 		String[] topics = topic.split(",");
@@ -75,34 +76,20 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 		query1.addCriteria(Criteria.where(TOPIC).exists(true)
 				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
 
-		//Query query2 = query1;
-
 		query1.skip(offset)
 				.limit(limit)
 				.with(new Sort(new Sort.Order(Direction.DESC, FINISHED), new Sort.Order(Direction.ASC, TOPIC),
 						new Sort.Order(Direction.DESC, TIME)));
 		messageDumpList = mongoTemplate.find(query1, MessageDump.class, MESSAGEDUMP_COLLECTION);
 		Long messageDumpSize = mongoTemplate.count(query1, MESSAGEDUMP_COLLECTION);
-		return getResponse(messageDumpSize, messageDumpList);
+		
+		return new Pair<Long, List<MessageDump>>(messageDumpSize, messageDumpList);
 	}
 
 	@Override
-	public long countMessageDump() {
+	public long count() {
 		Query query = new Query();
 		return mongoTemplate.count(query, MESSAGEDUMP_COLLECTION);
-	}
-
-	private Map<String, Object> getResponse(Long messageDumpSize, List<MessageDump> messageDumpList) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(SIZE, messageDumpSize);
-		map.put(MESSAGE, messageDumpList);
-		return map;
-	}
-
-	@Override
-	public void dropCol() {
-
-		mongoTemplate.dropCollection(MESSAGEDUMP_COLLECTION);
 	}
 
 	@Override
@@ -135,11 +122,11 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	}
 
 	@Override
-	public Map<String, Object> loadAllMessageDumps() {
+	public Pair<Long, List<MessageDump>> loadAllMessageDumps() {
 
 		List<MessageDump> messageDumpList = mongoTemplate.findAll(MessageDump.class, MESSAGEDUMP_COLLECTION);
 		Long size = (long) messageDumpList.size();
-		return getResponse(size, messageDumpList);
+		return new Pair<Long, List<MessageDump>>(size, messageDumpList);
 	}
 
 	@Override

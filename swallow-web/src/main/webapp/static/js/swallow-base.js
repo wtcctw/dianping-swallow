@@ -1,6 +1,6 @@
 //var module = angular.module('SwallowModule', ['ngResource','isteven-multi-select']);
 //Your app's root module...
-var module = angular.module('SwallowModule', ['ngResource', 'ngDialog'], function($httpProvider) {
+var module = angular.module('SwallowModule', ['ngResource', 'ngDialog', 'mgcrea.ngStrap'], function($httpProvider) {
   // Use x-www-form-urlencoded Content-Type
   $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 
@@ -122,51 +122,4 @@ module.filter('notblank', function() {
 	  };
 	});
 
-module.directive('popOver', function ($compile) {
-    var itemsTemplate = "<table><tr><th>topic</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/delay?cid={{clicked.consumerId}}'>发送延迟/s</a></th><th><a href='/console/monitor/consumer/{{clicked.topic}}/delay?cid={{clicked.consumerId}}'>ack延迟/s</th><th><a href='/console/monitor/consumer/{{clicked.topic}}/accu?consumerId={{clicked.consumerId}}'>消息堆积</th></tr><tr ng-repeat='item in items'><td ng-bind='item.topic | limitTo : 25'></td><td id='send'>{{item.senddelay}}</td><td id='ack'>{{item.ackdelay}}</td><td : id='accu'>{{item.accu}}</td></tr></table>";
-    var getTemplate = function (contentType) {
-        var template = '';
-        switch (contentType) {
-            case 'items':
-                template = itemsTemplate;
-                break;
-        }
-        return template;
-    }
-    return {
-        restrict: "A",
-        transclude: true,
-        template: "<span ng-transclude></span>",
-        link: function (scope, element, attrs) {
-            var popOverContent;
-            if (scope.items) {
-                var html = getTemplate("items");
-                popOverContent = $compile(html)(scope);                    
-            }
-            scope.$watch('clicked', function(clicked){
-                if(clicked.senddelayAlarm > 0){
-                    $('#send').css('color', 'red');
-                }
-                if(clicked.ackdelayAlarm > 0){
-                    $('#ack').css('color', 'red');
-                }
-                if(clicked.accuAlarm > 0){
-                    $('#accu').css('color', 'red');
-                }
-            });
-            var options = {
-                content: popOverContent,
-                placement: "bottom",
-                html: true,
-                title: scope.title
-            };
-            $(element).popover(options);
-        },
-        scope: {
-            items: '=',
-            clicked: '=',
-            title: '@'
-        }
-    };
-});
 

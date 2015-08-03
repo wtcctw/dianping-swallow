@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.monitor.dashboard;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -27,12 +26,12 @@ import com.dianping.swallow.web.service.MinuteEntryService;
 @Component
 public class DashboardContainer {
 
-	public static final int TOTALENTRYSIZE = 70;
+	public static final int TOTALENTRYSIZE = 69;
 
 	public static final int FETCHENTRYSIZE = 10;
-	
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	@Resource(name = "minuteEntryService")
 	private MinuteEntryService minuteEntryService;
 
@@ -42,19 +41,8 @@ public class DashboardContainer {
 
 		@Override
 		protected boolean removeEldestEntry(@SuppressWarnings("rawtypes") Map.Entry eldest) {
-			
-			boolean isDelete =  size() >= TOTALENTRYSIZE;
-			if(isDelete){
-				MinuteEntry minuteEntry = dashboards.get(0);
-				int status = minuteEntryService.insert(minuteEntry);
-				
-				if(status == 0){
-					logger.info(String.format("Save MinuteEntry of time %tc to database successfully", minuteEntry.getTime()));
-				}else{
-					logger.info(String.format("Save MinuteEntry of time %tc to database failed", minuteEntry.getTime()));
-				}
-			}
-			return isDelete;
+
+			return size() >= TOTALENTRYSIZE;
 		}
 	};
 
@@ -66,20 +54,30 @@ public class DashboardContainer {
 
 			MinuteEntry me = dashboards.put(minuteEntry.getTime(), minuteEntry);
 			result = me == null ? true : false;
+			
+			if(result){
+				int status = minuteEntryService.insert(minuteEntry);
+
+				Date date = minuteEntry.getTime();
+				if (status == 0) {
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Save MinuteEntry of time %tc to database successfully", date));
+					}
+				} else {
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Save MinuteEntry of time %tc to database failed", date));
+					}
+				}
+			}
 		}
 		return result;
 	}
 
-	public List<MinuteEntry> loadMinuteEntries(Date stop) {
-
-		Calendar calendarstart = Calendar.getInstance();
-		calendarstart.setTime(stop);
-		calendarstart.add(Calendar.MINUTE, -11);
-		calendarstart.clear(Calendar.SECOND);
-		calendarstart.clear(Calendar.MILLISECOND);
-		Date start = calendarstart.getTime();
+	public List<MinuteEntry> loadMinuteEntries(Date start, Date stop) {
 		
-		logger.info(String.format("Fetch MinuteEntries from %tc to %tc", start, stop));
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Fetch MinuteEntries from %tc to %tc", start, stop));
+		}
 		Set<Date> treeSet = new TreeSet<Date>(new Comparator<Date>() {
 
 			@Override
@@ -100,7 +98,7 @@ public class DashboardContainer {
 			}
 
 			for (Date dt : treeSet) {
-				if(result.size() >= FETCHENTRYSIZE){
+				if (result.size() >= FETCHENTRYSIZE) {
 					break;
 				}
 				result.add(dashboards.get(dt));
@@ -117,6 +115,5 @@ public class DashboardContainer {
 	public void setDashboards(Map<Date, MinuteEntry> dashboards) {
 		this.dashboards = dashboards;
 	}
-
 
 }

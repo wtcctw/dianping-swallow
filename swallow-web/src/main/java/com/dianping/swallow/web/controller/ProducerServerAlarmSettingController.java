@@ -69,6 +69,7 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 
 		ProducerServerAlarmSetting consumerServerAlarmSetting = ProducerServerAlarmSettingMapper.toProducerServerAlarmSetting(dto);
 		boolean result = producerServerAlarmSettingService.update(consumerServerAlarmSetting);
+		
 		if(!result){
 			return ResponseStatus.SUCCESS.getStatus();
 		}else{
@@ -81,6 +82,7 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 	public int remvoeProducerserverSettingCreate(@RequestParam(value = "serverId") String serverId) {
 		
 		int result = producerServerAlarmSettingService.deleteByServerId(serverId);
+		
 		if(result > 0){
 			return ResponseStatus.SUCCESS.getStatus();
 		}else{
@@ -101,6 +103,7 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 	public List<String> loadProducerSereverTopics(@RequestParam(value = "serverId") String serverId) {
 		
 		Set<String> topics =  consumerDataRetrieverWrapper.getKey(serverId);
+		
 		if(topics != null){
 			return new ArrayList<String>(topics);
 		}else{

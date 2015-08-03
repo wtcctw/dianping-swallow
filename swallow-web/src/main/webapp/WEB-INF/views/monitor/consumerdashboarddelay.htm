@@ -8,30 +8,23 @@
 						ace.settings.check('breadcrumbs', 'fixed')
 					} catch (e) {
 					}
+
 				</script>
 				<span class="text-danger title">【报表时间】</span><span
 					class="text-success">{{starttime | date : 'yyyy-MM-dd HH:mm:ss'}} to {{stoptime | date : 'yyyy-MM-dd HH:mm:ss'}}</span>
-					<div class="nav-search nav" id="nav-search">
-			<span class="text-danger switch"></span>
-			
-					&nbsp;[ <a href="#" ng-click="setStep(-168)">-7d</a> ]
-				
-					&nbsp;[ <a href="#" ng-click="setStep(-24)">-1d</a> ]
-				
-					&nbsp;[ <a href="#" ng-click="setStep(-2)">-2h</a> ]
-				
-					&nbsp;[ <a href="#" ng-click="setStep(-1)">-1h</a> ]
-				
-					&nbsp;[ <a href="#" ng-click="setStep(1)">+1h</a> ]
-				
-					&nbsp;[ <a href="#" ng-click="setStep(2)">+2h</a> ]
-				
-					&nbsp;[ <a href="#" ng-click="setStep(24)">+1d</a> ]
-				
-					&nbsp;[ <a href="#" ng-click="setStep(168)">+7d</a> ]
-				
-				&nbsp;[ <a href="#" ng-click="setNow()">now</a> ]&nbsp;
-		</div><!-- /.nav-search -->
+				<div class="nav-search nav" id="nav-search">
+					<span class="text-danger switch"></span> &nbsp;[ <a href="#"
+						ng-click="setStep(-168)">-7d</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(-24)">-1d</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(-2)">-2h</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(-1)">-1h</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(1)">+1h</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(2)">+2h</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(24)">+1d</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(168)">+7d</a> ] &nbsp;[ <a href="#"
+						ng-click="setNow()">now</a> ]&nbsp;
+				</div>
+				<!-- /.nav-search -->
 			</div>
 			<div class="report">
 				<div class="text-center">
@@ -43,7 +36,7 @@
 				</div>
 			</div>
 			<div class="page-content" id="container">
-				<div class="row" style="margin-bottom:10px;height:30px;">
+				<div class="row" style="margin-bottom: 10px; height: 30px;">
 					<table>
 						<tr style="text-align: left">
 							<th><select class="selectpicker" ng-model="boardtype"
@@ -60,25 +53,25 @@
 								<th colspan="2" class="text-danger" class="text-danger"><h6
 										ng-bind="minuteEntry.time | date : 'HH:mm'"></h6></th>
 							</tr>
-							<tr style="color: #AAAAAA">
-								<td style="text-align: left; width: 120px">ConsumerID</td>
-								<td style="text-align: left; width: 40px">状态</td>
+							<tr>
+								<th style="text-align: left; width: 120px">ConsumerID</th>
+								<th style="text-align: left; width: 40px">状态</th>
 							</tr>
 							<tr ng-repeat="entry in getEntry(minuteEntry.delayEntry)"
-								ng-class="{'alert-row': entry.numAlarm>0}">
-								<td style="text-align: left; width: 120px" data-toggle="tooltip"
-									data-html="true" data-placement="top" class="nodelay"
-									title="业务名 {{entry.name}} 开发: {{entry.dpMobile}}"
-									ng-bind="entry.consumerId | limitTo : 15"></td>
-								<td style="text-align: left; width: 40px; cursor: pointer;"
-									pop-over items="items" title="统计值" clicked="clicked"
-									id="{{$parent.$index}}{{$index}}"
-									ng-click="table($parent.$index,$index)"
-									ng-bind="entry.numAlarm > 0 ? '异常' : '正常' "></td>
+								ng-class="{'alert-row': entry.numAlarm>0}" >
+								<td style="text-align: left; width: 120px; cursor: pointer;"><a style="color:#000000" href data-animation="am-flip-x"
+									 data-title="业务名: {{entry.name}} 开发: {{entry.dpMobile}}" bs-tooltip ng-bind="entry.consumerId | limitTo : 15"></a></td>
+								<td style="text-align: left; width: 40px; cursor: pointer;">
+									<a href="#" rel="clickover" data-placement="top" data-html="true"
+									title="{{entry.topic}}" data-html="true"
+									data-content="<table><tr><th><a href='/console/monitor/consumer/{{entry.topic}}/qps?cid={{entry.consumerId}}'>发送延迟/s&nbsp;&nbsp;</a></th><th><a href='/console/monitor/consumer/{{entry.topic}}/qps?cid={{entry.consumerId}}'>ack延迟/s&nbsp;&nbsp;</th><th><a href='/console/monitor/consumer/{{entry.topic}}/accu?cid={{entry.consumerId}}'>消息堆积</th></tr><tr><td>{{entry.senddelay}}</td><td>{{entry.ackdelay}}</td><td>{{entry.accu}}</td></tr></table>"
+									data-auto-close="1"  bs-popover
+									ng-bind="entry.numAlarm > 0 ? '异常' : '正常' "
+									></a>
+								</td>
 							</tr>
 						</table>
 					</div>
-
 				</div>
 			</div>
 		</div>

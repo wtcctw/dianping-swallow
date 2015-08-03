@@ -23,6 +23,7 @@ public interface MinuteEntryService {
 	/**
 	 * 
 	 * @param start 起始时间
+	 * @param stop 结束时间
 	 */
-	List<MinuteEntry> loadMinuteEntryPage(Date start);
+	List<MinuteEntry> loadMinuteEntryPage(Date start, Date stop);
 }

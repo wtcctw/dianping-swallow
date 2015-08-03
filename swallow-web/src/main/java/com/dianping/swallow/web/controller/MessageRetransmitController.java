@@ -53,7 +53,9 @@ public class MessageRetransmitController extends AbstractController {
 					ResponseStatus.UNAUTHENTICATION.getMessage());
 		}
 		if (StringUtils.isEmpty(param)) {
-			logger.info(String.format("mid is empty"));
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("mid is empty"));
+			}
 			return generateResponse(ResponseStatus.EMPTYCONTENT.getStatus(), ResponseStatus.EMPTYCONTENT.getMessage());
 		}
 		boolean successornot = false;
@@ -73,9 +75,13 @@ public class MessageRetransmitController extends AbstractController {
 			}
 
 			if (successornot) {
-				logger.info(String.format("retransmit messages with mid: %s successfully.", mid));
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("retransmit messages with mid: %s successfully.", mid));
+				}
 			} else {
-				logger.info(String.format("retransmit messages with mid: %s failed.", mid));
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("retransmit messages with mid: %s failed.", mid));
+				}
 				return generateResponse(ResponseStatus.MONGOWRITE.getStatus(), ResponseStatus.MONGOWRITE.getMessage());
 			}
 		}
@@ -105,11 +111,13 @@ public class MessageRetransmitController extends AbstractController {
 		String topicType = type.trim();
 		String topicProperty = property.trim();
 		String textarea = text.trim();
-		if(StringUtils.isEmpty(delimitor)){
+		if (StringUtils.isEmpty(delimitor)) {
 			delimitor = DEFAULT_DELIMITOR;
 		}
 		if (StringUtils.isEmpty(textarea)) {
-			logger.info(String.format("Content is empty"));
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Content is empty"));
+			}
 			return generateResponse(ResponseStatus.EMPTYCONTENT.getStatus(), ResponseStatus.EMPTYCONTENT.getMessage());
 		}
 
@@ -127,7 +135,9 @@ public class MessageRetransmitController extends AbstractController {
 			producerTransaction.complete();
 		}
 
-		logger.info(String.format("Send all message of %s successfully", topicName));
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Send all message of %s successfully", topicName));
+		}
 		return generateResponse(ResponseStatus.SUCCESS.getStatus(), ResponseStatus.SUCCESS.getMessage());
 	}
 

@@ -23,9 +23,10 @@ public interface MinuteEntryDao extends Dao {
 	/**
 	 * 
 	 * @param start  起始时间
+	 * @param stop   结束时间
 	 * @param limit  文档数
 	 */
-	List<MinuteEntry> loadMinuteEntryPage(Date start, int limit);
+	List<MinuteEntry> loadMinuteEntryPage(Date start, Date stop, int limit);
 
 }
 

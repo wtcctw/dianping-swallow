@@ -123,9 +123,11 @@ public class DataMonitorController extends AbstractMonitorController {
 	public Object getConsumerIdDelayDashboard(@RequestParam("date") String date, @RequestParam("step") int step)
 			throws Exception {
 
-		Date newdate = adjustTimeByStep(date, step);
+		Date stop = adjustTimeByStep(date, step);
+		
+		Date start = calStartTime(stop);
 
-		List<MinuteEntry> entrys = minuteEntryService.loadMinuteEntryPage(newdate);
+		List<MinuteEntry> entrys = minuteEntryService.loadMinuteEntryPage(start, stop);
 
 		return buildResponse(entrys);
 
@@ -433,6 +435,18 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		return calendar.getTime();
 	}
+	
+	private Date calStartTime(Date stop){
+		
+		Calendar calendarstart = Calendar.getInstance();
+		calendarstart.setTime(stop);
+		calendarstart.add(Calendar.MINUTE, -11);
+		calendarstart.clear(Calendar.SECOND);
+		calendarstart.clear(Calendar.MILLISECOND);
+		Date start = calendarstart.getTime();
+		
+		return start;
+	} 
 
 	@Override
 	protected String getSide() {

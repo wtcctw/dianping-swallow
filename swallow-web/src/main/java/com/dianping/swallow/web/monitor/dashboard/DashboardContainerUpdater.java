@@ -74,9 +74,10 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		if (delayeven.get()) {
 			try {
 				updateDelayInsDashboard();
-				logger.info("Update dashboard successfully");
 			} catch (Exception e) {
-				logger.error("Error when get data for all consumerid!", e);
+				if (logger.isErrorEnabled()) {
+					logger.error("Error when get data for all consumerid!", e);
+				}
 			} finally {
 				delayeven.compareAndSet(true, false);
 			}
@@ -112,7 +113,9 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				if (!timeSet) {
 					entryTime = getMinuteEntryTime(senddelay.lastKey());
 					timeSet = true;
-					logger.info(String.format("Set time %s", entryTime));
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Generage MinuteEntry for time %tc", entryTime));
+					}
 				}
 
 				List<Long> accuList = new ArrayList<Long>();
@@ -138,15 +141,21 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				td.setListAck(ackList.subList(ackListSize - 2, ackListSize));
 				td.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
 				totalDataMap.put(mapKey, td);
-				logger.info(String.format("Generate totalData for topic %s and consumerid %s", topic, consumerid));
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("Generate totalData for topic %s and consumerid %s", topic, consumerid));
+				}
 			}
 		}
-		logger.info(String.format("Generate totalData for all topic and consumerid"));
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Generate totalData for all topic and consumerid"));
+		}
 
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			generateEntrys(entry.getValue());
 		}
-		logger.info("Generate entrys for all data");
+		if (logger.isInfoEnabled()) {
+			logger.info("Generate entrys for all data");
+		}
 
 		doGenerateMinuteEntrys(totalDataMap);
 	}
@@ -183,7 +192,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			long accu = accuList.get(i);
 			String consumerid = totalData.getCid();
 			String topic = totalData.getTopic();
-			
+
 			Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
 					topic, consumerid);
 			String ip = loadFirstElement(ips);
@@ -191,14 +200,14 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			String email = iPDescManagerWrap.loadEmail(ip);
 			String name = iPDescManagerWrap.loadName(ip);
 			iPDescManagerWrap.resetIpdesc();
-			
+
 			ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
 					.loadConsumerBaseAlarmSetting(topic);
-			
+
 			long baseSenddelay = consumerBaseAlarmSetting.getSendDelay();
 			long baseackdelay = consumerBaseAlarmSetting.getAckDelay();
-			float baseAccu = (float)consumerBaseAlarmSetting.getAccumulation();
-			
+			float baseAccu = (float) consumerBaseAlarmSetting.getAccumulation();
+
 			int sendAlarm = senddelay >= baseSenddelay ? 1 : 0;
 			int ackAlarm = ackdelay >= baseackdelay ? 1 : 0;
 			int accuAlarm = accu >= baseAccu ? 1 : 0;
@@ -208,11 +217,11 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			float normalizedAckDelay = ackdelay / baseackdelay;
 			float normalizedAccu = accu / baseAccu;
 
-			e.setConsumerId(consumerid).setTopic(topic).setSenddelay(senddelay).setAckdelay(ackdelay)
-					.setAccu(accu).setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm).setAccuAlarm(accuAlarm)
-					.setNumAlarm(numAlarm).setEmail(email).setName(name)
-					.setDpMobile(mobile).setNormalizedSendDelaly(normalizedSendDelay)
-					.setNormalizedAckDelaly(normalizedAckDelay).setNormalizedAccu(normalizedAccu);
+			e.setConsumerId(consumerid).setTopic(topic).setSenddelay(senddelay).setAckdelay(ackdelay).setAccu(accu)
+					.setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm).setAccuAlarm(accuAlarm)
+					.setNumAlarm(numAlarm).setEmail(email).setName(name).setDpMobile(mobile)
+					.setNormalizedSendDelaly(normalizedSendDelay).setNormalizedAckDelaly(normalizedAckDelay)
+					.setNormalizedAccu(normalizedAccu);
 			entrys.add(e);
 		}
 
@@ -270,7 +279,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			List<Entry> sorted = new ArrayList<Entry>();
 			for (int i = size - 1; i >= 0; i--) {
 				Entry eMin = minHeap.deleteMin();
-				if(eMin != null){
+				if (eMin != null) {
 					sorted.add(eMin);
 				}
 			}
@@ -281,7 +290,9 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			minHeap.setSize(listSize);
 
 			boolean inserted = dashboardContainer.insertMinuteEntry(me);
-			logger.info(String.format("Insert MinuteEntry to dashboard %s", inserted ? "successfully" : "failed"));
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Insert MinuteEntry to dashboard %s", inserted ? "successfully" : "failed"));
+			}
 		}
 
 		totalDataMap.clear();

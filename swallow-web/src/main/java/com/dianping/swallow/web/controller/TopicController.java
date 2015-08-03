@@ -126,16 +126,20 @@ public class TopicController extends AbstractMenuController {
 
 		if (approver != null) {
 			if (!userService.loadCachedAdministratorSet().contains(approver)) {
-				logger.info(String.format(
-						"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
-						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format(
+							"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
+							username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+				}
 				return ResponseStatus.UNAUTHENTICATION;
 			} else {
 				Topic t = topicService.loadTopicByName(topic);
 				if (t == null) {
-					logger.info(String.format(
-							"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
-							username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format(
+								"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
+								username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+					}
 					return ResponseStatus.INVALIDTOPIC;
 				}
 				String proposal = t.getProp();
@@ -168,17 +172,23 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		if (result == ResponseStatus.SUCCESS.getStatus()) {
-			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
-					username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
+						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			}
 			return ResponseStatus.SUCCESS;
 		} else if (result == ResponseStatus.MONGOWRITE.getStatus()) {
-			logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.", username,
-					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.",
+						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			}
 			return ResponseStatus.MONGOWRITE;
 		} else {
-			logger.info(String.format(
-					"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.", username,
-					topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format(
+						"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
+						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+			}
 			return ResponseStatus.TRY_MONGOWRITE;
 		}
 
@@ -220,16 +230,20 @@ public class TopicController extends AbstractMenuController {
 				if (!topics.contains(topic)) {
 					topics.add(topic);
 					updated = consumerServerAlarmSettingService.update(consumerServerAlarmSetting);
-					logger.info(String.format("Add topic %s to whitelist of ConsumerServerAlarmSetting %s", topic,
-							updated ? "successfully" : "failed"));
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Add topic %s to whitelist of ConsumerServerAlarmSetting %s", topic,
+								updated ? "successfully" : "failed"));
+					}
 					return;
 				}
 			} else {
 				if (topics.contains(topic)) {
 					topics.remove(topic);
 					updated = consumerServerAlarmSettingService.update(consumerServerAlarmSetting);
-					logger.info(String.format("Remove topic %s from wihtelist of ConsumerServerAlarmSetting %s", topic,
-							updated ? "successfully" : "failed"));
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Remove topic %s from wihtelist of ConsumerServerAlarmSetting %s",
+								topic, updated ? "successfully" : "failed"));
+					}
 					return;
 				}
 			}
@@ -250,16 +264,20 @@ public class TopicController extends AbstractMenuController {
 				if (!topics.contains(topic)) {
 					topics.add(topic);
 					updated = producerServerAlarmSettingService.update(producerServerAlarmSetting);
-					logger.info(String.format("Add topic %s to whitelist of ProducerServerAlarmSetting %s", topic,
-							updated ? "successfully" : "failed"));
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Add topic %s to whitelist of ProducerServerAlarmSetting %s", topic,
+								updated ? "successfully" : "failed"));
+					}
 					return;
 				}
 			} else {
 				if (topics.contains(topic)) {
 					topics.remove(topic);
 					updated = producerServerAlarmSettingService.update(producerServerAlarmSetting);
-					logger.info(String.format("Remove topic %s from wihtelist of ProducerServerAlarmSetting %s", topic,
-							updated ? "successfully" : "failed"));
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Remove topic %s from wihtelist of ProducerServerAlarmSetting %s",
+								topic, updated ? "successfully" : "failed"));
+					}
 					return;
 				}
 			}

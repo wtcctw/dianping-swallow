@@ -41,10 +41,10 @@ public class DefaultMinuteEntryDao extends AbstractWriteDao implements MinuteEnt
 	}
 
 	@Override
-	public List<MinuteEntry> loadMinuteEntryPage(Date start, int limit) {
+	public List<MinuteEntry> loadMinuteEntryPage(Date start, Date stop, int limit) {
 
 		Query query = new Query();
-		Criteria criteria = Criteria.where(TIME).gte(start);
+		Criteria criteria = Criteria.where(TIME).lt(stop).gt(start);
 		query.addCriteria(criteria);
 		
 		query.limit(limit).with(new Sort(new Sort.Order(Direction.DESC, TIME)));
