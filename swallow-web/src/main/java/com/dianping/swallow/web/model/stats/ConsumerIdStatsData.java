@@ -46,48 +46,48 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	}
 
 	public boolean checkSendQps(long expectQps, long baseQps, long preQps, int flu) {
-		if (!checkQpsPeak(expectQps, StatisType.SENDQPS_PEAK)) {
+		if (!checkQpsPeak(getSendQps(), expectQps, StatisType.SENDQPS_PEAK)) {
 			return false;
 		}
-		if (!checkQpsValley(expectQps, StatisType.SENDQPS_VALLEY)) {
+		if (!checkQpsValley(getSendQps(), expectQps, StatisType.SENDQPS_VALLEY)) {
 			return false;
 		}
-		if (!checkQpsFlu(baseQps, preQps, flu, StatisType.SENDQPS_FLU)) {
+		if (!checkQpsFlu(getSendQps(), baseQps, preQps, flu, StatisType.SENDQPS_FLU)) {
 			return false;
 		}
 		return true;
 	}
 
 	public boolean checkSendDelay(long expectDelay) {
-		return checkDelay(expectDelay, StatisType.SENDDELAY);
+		return checkDelay(getSendDelay(), expectDelay, StatisType.SENDDELAY);
 	}
 
 	public boolean checkSendAccu(long expectAccu) {
-		return checkAccu(expectAccu, StatisType.SENDACCU);
+		return checkAccu(getAccumulation(), expectAccu, StatisType.SENDACCU);
 	}
 
 	public boolean checkAckQps(long expectQps, long baseQps, long preQps, int flu) {
-		if (!checkQpsPeak(expectQps, StatisType.ACKQPS_PEAK)) {
+		if (!checkQpsPeak(getAckQps(), expectQps, StatisType.ACKQPS_PEAK)) {
 			return false;
 		}
-		if (!checkQpsValley(expectQps, StatisType.ACKQPS_VALLEY)) {
+		if (!checkQpsValley(getAckQps(), expectQps, StatisType.ACKQPS_VALLEY)) {
 			return false;
 		}
-		if (!checkQpsFlu(baseQps, preQps, flu, StatisType.ACKQPS_FLU)) {
+		if (!checkQpsFlu(getAckQps(), baseQps, preQps, flu, StatisType.ACKQPS_FLU)) {
 			return false;
 		}
 		return true;
 	}
 
 	public boolean checkAckDelay(long expectDelay) {
-		return checkDelay(expectDelay, StatisType.ACKDELAY);
+		return checkDelay(getAckDelay(), expectDelay, StatisType.ACKDELAY);
 	}
 
-	private boolean checkQpsPeak(long expectQps, StatisType statisType) {
-		if (this.getSendQps() != 0L) {
-			if (this.getSendQps() > expectQps) {
+	private boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
+		if (qps != 0L) {
+			if (qps > expectQps) {
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
-						.setTopicName(topicName).setCurrentValue(this.getSendQps()).setExpectedValue(expectQps)
+						.setTopicName(topicName).setCurrentValue(qps).setExpectedValue(expectQps)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 			}
@@ -95,11 +95,11 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkQpsValley(long expectQps, StatisType statisType) {
-		if (this.getSendQps() != 0L) {
-			if (this.getSendQps() < expectQps) {
+	private boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
+		if (qps != 0L) {
+			if (qps < expectQps) {
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
-						.setTopicName(topicName).setCurrentValue(this.getSendQps()).setExpectedValue(expectQps)
+						.setTopicName(topicName).setCurrentValue(qps).setExpectedValue(expectQps)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 			}
@@ -107,18 +107,17 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkQpsFlu(long baseQps, long preQps, int flu, StatisType statisType) {
-		if (this.getSendQps() == 0L || preQps == 0L) {
+	private boolean checkQpsFlu(long qps, long baseQps, long preQps, int flu, StatisType statisType) {
+		if (qps == 0L || preQps == 0L) {
 			return true;
 		}
 
-		if (getSendQps() > baseQps || preQps > baseQps) {
+		if (qps > baseQps || preQps > baseQps) {
 
-			if ((getSendQps() >= preQps && (getSendQps() / preQps > flu))
-					|| (getSendQps() < preQps && (preQps / getSendQps() > flu))) {
+			if ((qps >= preQps && (qps / preQps > flu)) || (qps < preQps && (preQps / qps > flu))) {
 
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
-						.setTopicName(topicName).setCurrentValue(this.getSendQps()).setExpectedValue(preQps)
+						.setTopicName(topicName).setCurrentValue(qps).setExpectedValue(preQps)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 
@@ -127,11 +126,11 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkDelay(long expectDelay, StatisType statisType) {
-		if (this.getSendDelay() != 0L) {
-			if (this.getSendDelay() > expectDelay) {
+	private boolean checkDelay(long delay, long expectDelay, StatisType statisType) {
+		if (delay != 0L) {
+			if (delay > expectDelay) {
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
-						.setTopicName(topicName).setCurrentValue(this.getSendDelay()).setExpectedValue(expectDelay)
+						.setTopicName(topicName).setCurrentValue(delay).setExpectedValue(expectDelay)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 			}
@@ -139,11 +138,11 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkAccu(long expectAccu, StatisType statisType) {
-		if (this.getSendDelay() != 0L) {
-			if (this.getAccumulation() > expectAccu) {
+	private boolean checkAccu(long accu, long expectAccu, StatisType statisType) {
+		if (accu != 0L) {
+			if (accu > expectAccu) {
 				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
-						.setTopicName(topicName).setCurrentValue(this.getAccumulation()).setExpectedValue(expectAccu)
+						.setTopicName(topicName).setCurrentValue(accu).setExpectedValue(expectAccu)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 			}

@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.dao.stats;
+package com.dianping.swallow.web.service.stats;
 
 import java.util.List;
 
@@ -8,10 +8,10 @@ import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午2:38:13
+ * 2015年8月3日 下午2:39:51
  */
-public interface ProducerServerStatsDataDao {
-
+public interface ProducerServerStatsDataService {
+	
 	public boolean insert(ProducerServerStatsData serverStatsData);
 
 	public boolean update(ProducerServerStatsData serverStatsData);

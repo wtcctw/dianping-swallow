@@ -6,11 +6,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.stats.ProducerTopicStatsDataDao;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.mongodb.WriteResult;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年8月3日 下午2:38:59
+ */
+@Service("producerTopicStatsDataDao")
 public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implements ProducerTopicStatsDataDao {
 
 	private static final String TOPICSTATSDATA_COLLECTION = "producertopicstatsdata";

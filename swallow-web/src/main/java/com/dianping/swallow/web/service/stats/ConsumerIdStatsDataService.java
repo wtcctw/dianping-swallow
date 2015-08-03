@@ -1,19 +1,20 @@
-package com.dianping.swallow.web.dao.stats;
+package com.dianping.swallow.web.service.stats;
 
 import java.util.List;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午2:38:27
+ *         2015年8月3日 下午2:40:22
  */
-public interface ConsumerIdStatsDataDao {
+public interface ConsumerIdStatsDataService {
 	
 	public boolean insert(ConsumerIdStatsData consumerIdStatsData);
 
-	public boolean update(ConsumerIdStatsData consumerIdstatsData);
+	public boolean update(ConsumerIdStatsData consumerIdStatsData);
 
 	public int deleteById(String id);
 
@@ -30,5 +31,4 @@ public interface ConsumerIdStatsDataDao {
 	public List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
 
 	List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey);
-
 }

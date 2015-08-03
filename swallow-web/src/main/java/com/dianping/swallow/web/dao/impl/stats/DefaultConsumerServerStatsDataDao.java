@@ -4,11 +4,18 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.stats.ConsumerServerStatsDataDao;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.mongodb.WriteResult;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月3日 下午2:38:46
+ */
+@Service("consumerServerStatsDataDao")
 public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implements ConsumerServerStatsDataDao {
 
 	private static final String CONSUMERSERVERSTATSDATA_COLLECTION = "consumerserverstatsdata";

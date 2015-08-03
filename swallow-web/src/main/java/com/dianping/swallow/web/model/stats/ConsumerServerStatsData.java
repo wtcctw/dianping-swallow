@@ -31,30 +31,30 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 	}
 
 	public boolean checkSendQps(long expectQps) {
-		if (!checkQpsPeak(expectQps, StatisType.SENDQPS_PEAK)) {
+		if (!checkQpsPeak(this.getSendQps(), expectQps, StatisType.SENDQPS_PEAK)) {
 			return false;
 		}
-		if (!checkQpsValley(expectQps, StatisType.SENDQPS_VALLEY)) {
+		if (!checkQpsValley(this.getSendQps(), expectQps, StatisType.SENDQPS_VALLEY)) {
 			return false;
 		}
 		return true;
 	}
 
 	public boolean checkAckQps(long expectQps) {
-		if (!checkQpsPeak(expectQps, StatisType.ACKQPS_PEAK)) {
+		if (!checkQpsPeak(this.getAckQps(), expectQps, StatisType.ACKQPS_PEAK)) {
 			return false;
 		}
-		if (!checkQpsValley(expectQps, StatisType.ACKQPS_VALLEY)) {
+		if (!checkQpsValley(this.getAckQps(), expectQps, StatisType.ACKQPS_VALLEY)) {
 			return false;
 		}
 		return true;
 	}
 
-	private boolean checkQpsPeak(long expectQps, StatisType statisType) {
-		if (this.getSendQps() != 0L) {
-			if (this.getSendQps() > expectQps) {
+	private boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
+		if (qps != 0L) {
+			if (qps > expectQps) {
 				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
-						.setCurrentValue(this.getSendQps()).setExpectedValue(expectQps).setStatisType(statisType)
+						.setCurrentValue(qps).setExpectedValue(expectQps).setStatisType(statisType)
 						.setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 			}
@@ -62,11 +62,11 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	private boolean checkQpsValley(long expectQps, StatisType statisType) {
-		if (this.getSendQps() != 0L) {
-			if (this.getSendQps() < expectQps) {
+	private boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
+		if (qps != 0L) {
+			if (qps < expectQps) {
 				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
-						.setCurrentValue(this.getSendQps()).setExpectedValue(expectQps).setStatisType(statisType)
+						.setCurrentValue(qps).setExpectedValue(expectQps).setStatisType(statisType)
 						.setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 			}

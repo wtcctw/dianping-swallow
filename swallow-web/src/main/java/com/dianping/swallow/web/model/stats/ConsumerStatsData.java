@@ -37,7 +37,7 @@ public abstract class ConsumerStatsData extends StatsData {
 		return ackQps;
 	}
 
-	public void setAckQpx(long ackQpx) {
+	public void setAckQps(long ackQpx) {
 		this.ackQps = ackQpx;
 	}
 
