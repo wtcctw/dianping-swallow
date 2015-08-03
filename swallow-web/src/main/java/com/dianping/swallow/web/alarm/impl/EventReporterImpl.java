@@ -14,7 +14,7 @@ import com.dianping.swallow.web.model.event.Event;
 public class EventReporterImpl implements EventReporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventReporterImpl.class);
-
+	
 	@Autowired
 	private EventChannel eventChannel;
 

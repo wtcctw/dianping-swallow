@@ -40,7 +40,7 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 			mongoTemplate.save(alarm, ALARM_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save topic " + alarm, e);
+			logger.error("Error when save alarm " + alarm, e);
 		}
 		return false;
 	}

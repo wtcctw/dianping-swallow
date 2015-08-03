@@ -39,6 +39,12 @@ import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.SeqGeneratorService;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年7月31日 上午11:11:58
+ */
 @Service("messageManager")
 public class MessageManagerImpl implements MessageManager, InitializingBean {
 
@@ -110,13 +116,13 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 
 	@Autowired
 	private IPCollectorService ipCollectorService;
-	
+
 	@Autowired
 	private SeqGeneratorService seqGeneratorService;
 
 	private static final String ALARMEVENTID_CATEGORY = "alarmEventId";
 
-	private TimeZone timeZone = TimeZone.getTimeZone("GMT+8:00");
+	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("GMT+8:00");
 
 	@Override
 	public void producerServerAlarm(ServerEvent event) {
@@ -129,7 +135,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
 				message = StringUtils.replace(message, DATE_TEMPLATE,
-						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
+						DateFormatUtils.format(new Date(), DATE_PATTERN, TIMEZONE));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
@@ -153,7 +159,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
-						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
+						DateFormatUtils.format(new Date(), DATE_PATTERN, TIMEZONE));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
@@ -176,7 +182,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
-						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
+						DateFormatUtils.format(new Date(), DATE_PATTERN, TIMEZONE));
 			}
 			Alarm alarm = new Alarm();
 			alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
@@ -202,7 +208,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 				message = StringUtils.replace(message, MASTERIP_TEMPLATE, event.getIp());
 				message = StringUtils.replace(message, SLAVEIP_TEMPLATE, event.getSlaveIp());
 				message = StringUtils.replace(message, DATE_TEMPLATE,
-						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
+						DateFormatUtils.format(new Date(), DATE_PATTERN, TIMEZONE));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
@@ -225,7 +231,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
-						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
+						DateFormatUtils.format(new Date(), DATE_PATTERN, TIMEZONE));
 			}
 			if (alarmMeta.getIsSendSwallow()) {
 				Alarm alarm = new Alarm();
@@ -248,7 +254,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
-						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
+						DateFormatUtils.format(new Date(), DATE_PATTERN, TIMEZONE));
 			}
 			Alarm alarm = new Alarm();
 			alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
@@ -275,7 +281,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 				message = StringUtils.replace(message, CURRENTVALUE_TEMPLATE, Long.toString(event.getCurrentValue()));
 				message = StringUtils.replace(message, EXPECTEDVALUE_TEMPLATE, Long.toString(event.getExpectedValue()));
 				message = StringUtils.replace(message, DATE_TEMPLATE,
-						DateFormatUtils.format(new Date(), DATE_PATTERN, timeZone));
+						DateFormatUtils.format(new Date(), DATE_PATTERN, TIMEZONE));
 			}
 			Alarm alarm = new Alarm();
 			alarm.setNumber(event.getAlarmType().getNumber()).setEventId(event.getEventId()).setBody(message)
@@ -442,28 +448,28 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	}
 
 	private void initProperties() {
-		if (EnvUtil.isDev()) {
-			devMobiles = new HashSet<String>();
-			devEmails = new HashSet<String>();
-			try {
-				InputStream in = MessageManagerImpl.class.getClassLoader()
-						.getResourceAsStream(ALARM_RECIEVER_FILE_NAME);
-				if (in != null) {
-					Properties prop = new Properties();
-					try {
-						prop.load(in);
-						String strMobile = StringUtils.trim(prop.getProperty(MOBILE_KEY));
-						addElement(devMobiles, strMobile);
-						String strEmail = StringUtils.trim(prop.getProperty(EMAIL_KEY));
-						addElement(devEmails, strEmail);
-					} finally {
-						in.close();
-					}
+		if (!EnvUtil.isDev()) {
+			return;
+		}
+		devMobiles = new HashSet<String>();
+		devEmails = new HashSet<String>();
+		try {
+			InputStream in = MessageManagerImpl.class.getClassLoader().getResourceAsStream(ALARM_RECIEVER_FILE_NAME);
+			if (in != null) {
+				Properties prop = new Properties();
+				try {
+					prop.load(in);
+					String strMobile = StringUtils.trim(prop.getProperty(MOBILE_KEY));
+					addElement(devMobiles, strMobile);
+					String strEmail = StringUtils.trim(prop.getProperty(EMAIL_KEY));
+					addElement(devEmails, strEmail);
+				} finally {
+					in.close();
 				}
-			} catch (Exception e) {
-				logger.info("[initProperties] Load {} file failed.", ALARM_RECIEVER_FILE_NAME);
-				throw new RuntimeException(e);
 			}
+		} catch (Exception e) {
+			logger.info("[initProperties] Load {} file failed.", ALARM_RECIEVER_FILE_NAME);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -474,6 +480,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 			public void run() {
 				try {
 					doAlarmMetaTask();
+					logger.info("[doAlarmMetaTask] scheduled load alarmMeta info.");
 				} catch (Throwable th) {
 					logger.error("[startTask]", th);
 				} finally {
@@ -485,7 +492,6 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 	}
 
 	private void doAlarmMetaTask() {
-		logger.info("[doAlarmMetaTask] scheduled load alarmMeta info.");
 		List<AlarmMeta> alarmMetaTemps = alarmMetaService.findByPage(0, AlarmType.values().length);
 		if (alarmMetaTemps != null && alarmMetaTemps.size() > 0) {
 			for (AlarmMeta alarmMeta : alarmMetaTemps) {

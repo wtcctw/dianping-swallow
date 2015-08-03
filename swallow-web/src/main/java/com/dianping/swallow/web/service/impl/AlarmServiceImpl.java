@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
+import com.dianping.swallow.web.model.alarm.ResultType;
 import com.dianping.swallow.web.model.alarm.SendType;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
@@ -74,8 +75,11 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
 		params.add(new BasicNameValuePair("body", title + NEW_LINE_SIGN + alarm.getBody()));
 		boolean result = httpService.httpPost(getSmsUrl(), params).isSuccess();
-		insert(alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP)
-				.setCreateTime(new Date()));
+		if (!result) {
+			result = httpService.httpPost(getSmsUrl(), params).isSuccess();
+		}
+		insert(alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date())
+				.setResultType(ResultType.FAILED_NET));
 		return result;
 	}
 
@@ -90,8 +94,11 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("content", alarm.getBody()));
 		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
-		insert(alarm.setId(null).setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP)
-				.setCreateTime(new Date()));
+		if (!result) {
+			result = httpService.httpPost(getSmsUrl(), params).isSuccess();
+		}
+		insert(alarm.setId(null).setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP).setCreateTime(new Date())
+				.setResultType(ResultType.FAILED_NET));
 		return result;
 	}
 
@@ -106,8 +113,11 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		params.add(new BasicNameValuePair("recipients", alarm.getReceiver()));
 		params.add(new BasicNameValuePair("body", alarm.getBody()));
 		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
-		insert(alarm.setId(null).setSendType(SendType.MAIL).setSourceIp(NetUtil.IP)
-				.setCreateTime(new Date()));
+		if (!result) {
+			result = httpService.httpPost(getSmsUrl(), params).isSuccess();
+		}
+		insert(alarm.setId(null).setSendType(SendType.MAIL).setSourceIp(NetUtil.IP).setCreateTime(new Date())
+				.setResultType(ResultType.FAILED_NET));
 		return result;
 	}
 
@@ -232,6 +242,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+
 		initProperties();
 	}
 

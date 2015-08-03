@@ -18,16 +18,16 @@ db.swallowwebalarmmetac.update({ "isMailMode" : false, "metaId" : {$gte : 1 ,  $
 db.swallowwebalarmmetac.update({ "isMailMode" : false, "metaId" : {$gt : 1000 }}, { $set: {"isMailMode" : true } }, false, true);
 
 
-db.swallowwebalarmmetac.update({ "isSendBusiness" : true}, { $set: {"isSendBusiness" : false } }, false, true);
+db.swallowwebalarmmetac.update({ "isSendBusiness" : true }, { $set: {"isSendBusiness" : false } }, false, true);
 
-db.swallowwebalarmmetac.update({ "isSendSwallow" : true}, { $set: {"isSendSwallow" : false } }, false, true);
+db.swallowwebalarmmetac.update({ "isSendSwallow" : true }, { $set: {"isSendSwallow" : false } }, false, true);
 
 db.swallowwebalarmmetac.update({ "isSendSwallow" : false, "metaId" : {$gte : 1 ,  $lt: 1000}}, { $set: {"isSendSwallow" : true } }, false, true);
 
 
 
-db.swallowwebalarmmetac.update({ "isSmsMode" : true}, { $set: {"isSmsMode" : false } }, false, true);
+db.swallowwebalarmmetac.update({ "isSmsMode" : true }, { $set: {"isSmsMode" : false } }, false, true);
 
-db.swallowwebalarmmetac.update({ "isWeiXinMode" : true}, { $set: {"isWeiXinMode" : false } }, false, true);
+db.swallowwebalarmmetac.update({ "isWeiXinMode" : true }, { $set: {"isWeiXinMode" : false } }, false, true);
 
-db.swallowwebalarmmetac.update({ "isMailMode" : false}, { $set: {"isMailMode" : true } }, false, true);
+db.swallowwebalarmmetac.update({ "isMailMode" : false }, { $set: {"isMailMode" : true } }, false, true);

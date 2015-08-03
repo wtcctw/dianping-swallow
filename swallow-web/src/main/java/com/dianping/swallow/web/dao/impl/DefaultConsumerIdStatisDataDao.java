@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -108,7 +110,8 @@ public class DefaultConsumerIdStatisDataDao extends AbstractWriteDao implements 
 	@Override
 	public List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId)
-				.and(TIMEKEY_FIELD).gte(startKey).lte(endKey));
+				.and(TIMEKEY_FIELD).gte(startKey).lte(endKey)).with(new Sort(new Sort.Order(Direction.ASC,
+				TIMEKEY_FIELD)));
 		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
 				CONSUMERIDTATISDATA_COLLECTION);
 		return statisDatas;

@@ -1,0 +1,7 @@
+package com.dianping.swallow.web.model.event;
+
+public enum ServerType {
+
+	SERVER_SENDER, SERVER_SENDER_OK, PIGEON_SERVICE, PIGEON_SERVICE_OK, SLAVEPORT_OPENED, BOTHPORT_OPENED, BOTHPORT_UNOPENED, PORT_OPENED_OK
+
+}
