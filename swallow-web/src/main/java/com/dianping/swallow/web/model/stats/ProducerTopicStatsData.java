@@ -2,15 +2,13 @@ package com.dianping.swallow.web.model.stats;
 
 import java.util.Date;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.StatisType;
-import com.dianping.swallow.web.model.event.TopicEvent;
 
 /**
  * 
@@ -18,12 +16,10 @@ import com.dianping.swallow.web.model.event.TopicEvent;
  *
  *         2015年7月31日 下午3:57:04
  */
-@Service
-@Scope("prototype")
 @Document(collection = "ProducerTopicStatsData")
 @CompoundIndexes({ @CompoundIndex(name = "timeKey_topicName_index", def = "{'timeKey': 1, 'topicName': -1}") })
 public class ProducerTopicStatsData extends ProducerStatsData {
-	
+
 	private String topicName;
 
 	public String getTopicName() {
@@ -50,7 +46,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	public boolean checkQpsPeak(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() > expectQps) {
-				eventReporter.report(new TopicEvent().setTopicName(topicName).setCurrentValue(this.getQps())
+				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName).setCurrentValue(this.getQps())
 						.setExpectedValue(expectQps).setStatisType(StatisType.SENDQPS_PEAK).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
 				return false;
@@ -62,7 +58,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	public boolean checkQpsValley(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() < expectQps) {
-				eventReporter.report(new TopicEvent().setTopicName(topicName).setCurrentValue(this.getQps())
+				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName).setCurrentValue(this.getQps())
 						.setExpectedValue(expectQps).setStatisType(StatisType.SENDQPS_VALLEY).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
 				return false;
@@ -80,9 +76,9 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 
 			if ((getQps() >= preQps && (getQps() / preQps > flu)) || (getQps() < preQps && (preQps / getQps() > flu))) {
 
-				eventReporter.report(new TopicEvent().setTopicName(topicName).setCurrentValue(this.getQps())
-						.setExpectedValue(preQps).setStatisType(StatisType.SENDQPS_FLU).setCreateTime(new Date())
-						.setEventType(EventType.PRODUCER));
+				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName)
+						.setCurrentValue(this.getQps()).setExpectedValue(preQps).setStatisType(StatisType.SENDQPS_FLU)
+						.setCreateTime(new Date()).setEventType(EventType.PRODUCER));
 				return false;
 
 			}
@@ -93,7 +89,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	public boolean checkDelay(long expectDelay) {
 		if (this.getDelay() != 0L) {
 			if (this.getDelay() > expectDelay) {
-				eventReporter.report(new TopicEvent().setTopicName(topicName).setCurrentValue(this.getDelay())
+				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName).setCurrentValue(this.getDelay())
 						.setExpectedValue(expectDelay).setStatisType(StatisType.SENDDELAY).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
 				return false;

@@ -5,15 +5,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.util.DateUtil;
 
-@Service
-@Scope("prototype")
 public class ConsumerIdEvent extends TopicEvent {
 
 	private static final Map<String, Long> lastAlarms = new ConcurrentHashMap<String, Long>();

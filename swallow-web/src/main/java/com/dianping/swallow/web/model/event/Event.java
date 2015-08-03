@@ -12,7 +12,6 @@ import java.util.Set;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.container.AlarmMetaContainer;
@@ -58,16 +57,12 @@ public abstract class Event {
 		initProperties();
 	}
 
-	@Autowired
 	private AlarmService alarmService;
 
-	@Autowired
 	private IPDescManager ipDescManager;
 
-	@Autowired
 	protected IPCollectorService ipCollectorService;
 
-	@Autowired
 	private SeqGeneratorService seqGeneratorService;
 
 	private String eventId;
@@ -112,6 +107,22 @@ public abstract class Event {
 	public Event setEventType(EventType eventType) {
 		this.eventType = eventType;
 		return this;
+	}
+
+	public void setAlarmService(AlarmService alarmService) {
+		this.alarmService = alarmService;
+	}
+
+	public void setIPDescManager(IPDescManager ipDescManager) {
+		this.ipDescManager = ipDescManager;
+	}
+
+	public void setIPCollectorService(IPCollectorService ipCollectorService) {
+		this.ipCollectorService = ipCollectorService;
+	}
+
+	public void setSeqGeneratorService(SeqGeneratorService seqGeneratorService) {
+		this.seqGeneratorService = seqGeneratorService;
 	}
 
 	@Override

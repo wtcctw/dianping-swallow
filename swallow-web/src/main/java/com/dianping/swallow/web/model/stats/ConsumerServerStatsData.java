@@ -2,14 +2,12 @@ package com.dianping.swallow.web.model.stats;
 
 import java.util.Date;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
-import com.dianping.swallow.web.model.event.ServerStatisEvent;
 import com.dianping.swallow.web.model.event.StatisType;
 
 /**
@@ -18,8 +16,6 @@ import com.dianping.swallow.web.model.event.StatisType;
  *
  *         2015年7月31日 下午3:56:39
  */
-@Service
-@Scope("prototype")
 @Document(collection = "ConsumerServerStatsData")
 @CompoundIndexes({ @CompoundIndex(name = "timeKey_ip_index", def = "{'timeKey': 1, 'ip': -1}") })
 public class ConsumerServerStatsData extends ConsumerStatsData {
@@ -57,9 +53,9 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 	private boolean checkQpsPeak(long expectQps, StatisType statisType) {
 		if (this.getSendQps() != 0L) {
 			if (this.getSendQps() > expectQps) {
-				eventReporter.report(new ServerStatisEvent().setIp(ip).setCurrentValue(this.getSendQps())
-						.setExpectedValue(expectQps).setStatisType(statisType).setCreateTime(new Date())
-						.setEventType(EventType.CONSUMER));
+				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
+						.setCurrentValue(this.getSendQps()).setExpectedValue(expectQps).setStatisType(statisType)
+						.setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 			}
 		}
@@ -69,9 +65,9 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 	private boolean checkQpsValley(long expectQps, StatisType statisType) {
 		if (this.getSendQps() != 0L) {
 			if (this.getSendQps() < expectQps) {
-				eventReporter.report(new ServerStatisEvent().setIp(ip).setCurrentValue(this.getSendQps())
-						.setExpectedValue(expectQps).setStatisType(statisType).setCreateTime(new Date())
-						.setEventType(EventType.CONSUMER));
+				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
+						.setCurrentValue(this.getSendQps()).setExpectedValue(expectQps).setStatisType(statisType)
+						.setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
 			}
 		}
