@@ -82,9 +82,12 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 				if (StringUtils.isNotBlank(wl) && topicDao.readByName(wl) == null) {
 					Topic t = getTopic(wl, 0);
 					try {
-						saveTopic(t);
-						if (logger.isInfoEnabled()) {
-							logger.error(String.format("Save topic %s to database", wl));
+						int status = saveTopic(t);
+						if (logger.isInfoEnabled() && status == 0) {
+							logger.info(String.format("Save topic %s to database", wl));
+						}else if(logger.isErrorEnabled() && status != 0){
+							logger.error(String.format("Save topic %s to database fail with status %d", wl, status));
+							continue;
 						}
 						topicToWhiteList.put(wl, new HashSet<String>());
 						if (logger.isInfoEnabled()) {
