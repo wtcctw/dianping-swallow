@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
-import com.dianping.swallow.web.alarm.EventReporter;
+import com.dianping.swallow.web.alarmer.EventReporter;
 
 /**
  * 

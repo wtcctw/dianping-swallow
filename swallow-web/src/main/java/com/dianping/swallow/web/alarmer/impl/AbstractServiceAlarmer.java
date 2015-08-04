@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.dianping.swallow.web.alarm.EventReporter;
+import com.dianping.swallow.web.alarmer.EventReporter;
 
 /**
  * 

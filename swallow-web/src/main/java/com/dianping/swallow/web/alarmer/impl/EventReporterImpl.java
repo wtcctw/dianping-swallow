@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.util.CatUtil;
-import com.dianping.swallow.web.alarm.EventChannel;
-import com.dianping.swallow.web.alarm.EventReporter;
+import com.dianping.swallow.web.alarmer.EventChannel;
+import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.model.event.Event;
 /**
  * 

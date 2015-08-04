@@ -16,8 +16,8 @@ import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
+import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
-import com.dianping.swallow.web.service.stats.ConsumerServerStatsDataService;
 
 @Component
 public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {

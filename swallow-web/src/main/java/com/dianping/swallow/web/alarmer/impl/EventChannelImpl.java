@@ -4,7 +4,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.alarm.EventChannel;
+import com.dianping.swallow.web.alarmer.EventChannel;
 import com.dianping.swallow.web.model.event.Event;
 
 /**

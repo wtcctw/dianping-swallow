@@ -4,7 +4,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.web.alarm.EventReporter;
+import com.dianping.swallow.web.alarmer.EventReporter;
 
 @Service
 public class StatsDataFactory implements InitializingBean {

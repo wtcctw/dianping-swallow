@@ -14,8 +14,8 @@ import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
-import com.dianping.swallow.web.service.stats.ProducerServerStatsDataService;
-import com.dianping.swallow.web.service.stats.ProducerTopicStatsDataService;
+import com.dianping.swallow.web.service.ProducerServerStatsDataService;
+import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 
 /**
  * 

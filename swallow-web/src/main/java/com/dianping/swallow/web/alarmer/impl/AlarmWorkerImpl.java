@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.util.CatUtil;
 import com.dianping.swallow.common.internal.util.CommonUtils;
-import com.dianping.swallow.web.alarm.AlarmWorker;
-import com.dianping.swallow.web.alarm.EventChannel;
+import com.dianping.swallow.web.alarmer.AlarmWorker;
+import com.dianping.swallow.web.alarmer.EventChannel;
 import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
@@ -117,7 +117,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		public void run() {
 			try {
 				event.alarm();
-				logger.info("[run] {} .", event.getClass().getSimpleName());
+				logger.info("[run] {}.", event.getClass().getSimpleName());
 			} catch (Exception e) {
 				logger.error("[run] alarm event failed . ", e);
 			}

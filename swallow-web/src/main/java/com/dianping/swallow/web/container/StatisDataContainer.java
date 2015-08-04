@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
-import com.dianping.swallow.web.service.ConsumerIdStatisDataService;
-import com.dianping.swallow.web.service.ProducerTopicStatisDataService;
+import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
+import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 import com.dianping.swallow.web.common.Pair;
 
 /**
@@ -27,10 +27,10 @@ public class StatisDataContainer implements InitializingBean {
 	private static StatisDataContainer instance;
 
 	@Autowired
-	private ConsumerIdStatisDataService consumerIdStatisDataService;
+	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@Autowired
-	private ProducerTopicStatisDataService topicStatisDataService;
+	private ProducerTopicStatsDataService topicStatsDataService;
 
 	private Map<Long, Map<String, ConsumerIdStatsData>> consumerIdStatisDatas = new LinkedHashMap<Long, Map<String, ConsumerIdStatsData>>() {
 		
