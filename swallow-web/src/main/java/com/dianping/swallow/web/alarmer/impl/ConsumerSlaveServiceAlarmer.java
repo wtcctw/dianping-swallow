@@ -1,7 +1,9 @@
 package com.dianping.swallow.web.alarmer.impl;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,25 +18,50 @@ import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
-import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 
 @Component
 public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 
-	private static final String SLAVE_MONITOR_URL = "http://{ip}:8080/names";
+	private static final String SLAVE_MONITOR_URL_KEY = "slaveMonitorUrl";
+
+	private String slaveMonitorUrl = "http://{ip}:8080/names";
 
 	private static final String MONOGO_MONITOR_SIGN = "mongoManager";
-
-	@Autowired
-	private HttpService httpSerivice;
 
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
 	private GlobalAlarmSettingService globalAlarmSettingService;
+
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		initProperties();
+	}
+
+	private void initProperties() {
+		try {
+			InputStream in = ProducerServiceAlarmer.class.getClassLoader().getResourceAsStream(SERVER_CHECK_URL_FILE);
+			if (in != null) {
+				Properties prop = new Properties();
+				try {
+					prop.load(in);
+					slaveMonitorUrl = StringUtils.trim(prop.getProperty(SLAVE_MONITOR_URL_KEY));
+				} finally {
+					in.close();
+				}
+			} else {
+				logger.info("[initProperties] Load {} file failed.", SERVER_CHECK_URL_FILE);
+				throw new RuntimeException();
+			}
+		} catch (Exception e) {
+			logger.info("[initProperties] Load {} file failed.", SERVER_CHECK_URL_FILE);
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Override
 	public void doAlarm() {
@@ -55,12 +82,8 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 		}
 		for (String slaveIp : consumerServerSlaveIps) {
 			if (whiteList == null || !whiteList.contains(slaveIp)) {
-				String url = StringUtils.replace(SLAVE_MONITOR_URL, "{ip}", slaveIp);
-				HttpResult result = httpSerivice.httpGet(url);
-				if (!result.isSuccess()) {
-					result = httpSerivice.httpGet(url);
-				}
-
+				String url = StringUtils.replace(slaveMonitorUrl, "{ip}", slaveIp);
+				HttpResult result = checkUrl(url);
 				if (!result.isSuccess() || !result.getResponseBody().contains(MONOGO_MONITOR_SIGN)) {
 					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
 					serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE)

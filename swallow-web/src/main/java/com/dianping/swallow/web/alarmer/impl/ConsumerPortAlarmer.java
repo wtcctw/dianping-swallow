@@ -102,14 +102,8 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 	}
 
 	private boolean alarmPort(String masterIp, String slaveIp) {
-		boolean usingMaster = NetUtil.isPortOpen(masterIp, masterPort);
-		if (!usingMaster) {
-			usingMaster = NetUtil.isPortOpen(masterIp, masterPort);
-		}
-		boolean usingSlave = NetUtil.isPortOpen(slaveIp, slavePort);
-		if (!usingSlave) {
-			usingSlave = NetUtil.isPortOpen(masterIp, slavePort);
-		}
+		boolean usingMaster = checkPort(masterIp, masterPort);
+		boolean usingSlave = checkPort(slaveIp, slavePort);
 		String key = masterIp + KEY_SPLIT + slaveIp;
 		if (!usingMaster && usingSlave) {
 			isSlaveIps.put(masterIp, true);
@@ -162,6 +156,19 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 			return isSlaveIps.get(ip);
 		}
 		return false;
+	}
+
+	private boolean checkPort(String ip, int port) {
+		boolean usingPort = NetUtil.isPortOpen(ip, port);
+		if (!usingPort) {
+			threadSleep();
+			usingPort = NetUtil.isPortOpen(ip, port);
+		}
+		if (!usingPort) {
+			threadSleep();
+			usingPort = NetUtil.isPortOpen(ip, port);
+		}
+		return usingPort;
 	}
 
 }

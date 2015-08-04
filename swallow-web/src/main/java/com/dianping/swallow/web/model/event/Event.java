@@ -156,6 +156,7 @@ public abstract class Event {
 					return;
 				}
 				long eventId = getNextSeq();
+				logger.info("[sendMessage] eventId {}", eventId);
 				Alarm alarm = new Alarm();
 				alarm.setNumber(alarmType.getNumber()).setEventId(eventId)
 						.setBody(getMessage(alarmMeta.getAlarmTemplate())).setRelated(getRelated())
@@ -207,6 +208,7 @@ public abstract class Event {
 	}
 
 	private void sendAlarm(Set<String> mobiles, Set<String> emails, Alarm alarm, AlarmMeta alarmMeta) {
+		logger.info("[sendAlarm] eventId {}. ", alarm.getEventId());
 		if (alarmMeta.getIsMailMode()) {
 			alarmService.sendMail(emails, alarm);
 		}

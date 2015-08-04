@@ -126,7 +126,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
 		boolean result = sendWeiXin(alarm.getReceiver(), title, alarm.getBody());
-		insert(alarm.setResultType(ResultType.FAILED_NET));
+		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED_NET;
+		insert(alarm.setResultType(resultType));
 		return result;
 	}
 
@@ -139,12 +140,13 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
 		boolean result = sendMail(alarm.getReceiver(), title, alarm.getBody());
-		insert(alarm.setResultType(ResultType.FAILED_NET));
+		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED_NET;
+		insert(alarm.setResultType(resultType));
 		return result;
 	}
 
 	public boolean sendSms(Set<String> mobiles, Alarm alarm) {
-		if (mobiles != null) {
+		if (mobiles != null && mobiles.size() > 0) {
 			Iterator<String> iterator = mobiles.iterator();
 			while (iterator.hasNext()) {
 				String mobile = iterator.next();
@@ -159,7 +161,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	}
 
 	public boolean sendMail(Set<String> emails, Alarm alarm) {
-		if (emails != null) {
+		if (emails != null && emails.size() > 0) {
 			Iterator<String> iterator = emails.iterator();
 			while (iterator.hasNext()) {
 				String email = iterator.next();
@@ -174,7 +176,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	}
 
 	public boolean sendWeiXin(Set<String> emails, Alarm alarm) {
-		if (emails != null) {
+		if (emails != null && emails.size() > 0) {
 			Iterator<String> iterator = emails.iterator();
 			while (iterator.hasNext()) {
 				String email = iterator.next();
