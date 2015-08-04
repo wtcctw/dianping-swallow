@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.alarm.EventChannel;
 import com.dianping.swallow.web.model.event.Event;
 
-@Component
+//@Component
 public class EventChannelImpl implements EventChannel {
 
 	private BlockingQueue<Event> eventBuffer;

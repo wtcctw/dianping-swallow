@@ -8,13 +8,14 @@ import org.codehaus.plexus.util.StringUtils;
 
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 上午11:13:54
+ *         2015年8月3日 上午11:13:54
  */
 public class TopicEvent extends StatisEvent {
 
@@ -63,6 +64,7 @@ public class TopicEvent extends StatisEvent {
 			default:
 				break;
 			}
+			break;
 		case PRODUCER:
 			switch (getStatisType()) {
 			case SENDQPS_PEAK:
@@ -84,7 +86,7 @@ public class TopicEvent extends StatisEvent {
 	}
 
 	@Override
-	public String createMessage(String template) {
+	public String getMessage(String template) {
 		String message = template;
 		if (StringUtils.isNotBlank(message)) {
 			message = StringUtils.replace(message, AlarmMeta.TOPIC_TEMPLATE, getTopicName());
@@ -96,7 +98,7 @@ public class TopicEvent extends StatisEvent {
 	}
 
 	@Override
-	public String createRelatedInfo() {
+	public String getRelated() {
 		return topicName;
 	}
 
@@ -113,6 +115,17 @@ public class TopicEvent extends StatisEvent {
 			return ipCollectorService.getProducerTopicIps(topicName);
 		case CONSUMER:
 			return ipCollectorService.getConsumerTopicIps(topicName);
+		}
+		return null;
+	}
+
+	@Override
+	public RelatedType getRelatedType() {
+		switch (getEventType()) {
+		case PRODUCER:
+			return RelatedType.P_TOPIC;
+		case CONSUMER:
+			return RelatedType.C_TOPIC;
 		}
 		return null;
 	}

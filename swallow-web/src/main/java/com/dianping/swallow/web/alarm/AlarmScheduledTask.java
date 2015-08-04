@@ -25,7 +25,7 @@ import com.dianping.swallow.web.alarm.impl.AlarmFilterChainFactory;
  * @author qiyin
  *
  */
-@Component
+//@Component
 public class AlarmScheduledTask extends AbstractLifecycle {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmScheduledTask.class);
@@ -52,11 +52,11 @@ public class AlarmScheduledTask extends AbstractLifecycle {
 
 	@Override
 	public void doStart() throws Exception {
-		super.doStart();
-		startAlarm(producerServiceFilterChain);
-		startAlarm(producerStatisFilterChain);
-		startAlarm(consumerServiceFilterChain);
-		startAlarm(consumerStatisFilterChain);
+//		super.doStart();
+//		startAlarm(producerServiceFilterChain);
+//		startAlarm(producerStatisFilterChain);
+//		startAlarm(consumerServiceFilterChain);
+//		startAlarm(consumerStatisFilterChain);
 	}
 
 	private void createChain() {

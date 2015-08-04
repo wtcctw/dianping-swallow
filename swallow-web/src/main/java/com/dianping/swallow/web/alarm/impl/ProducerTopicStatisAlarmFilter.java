@@ -29,7 +29,7 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
  * @author qiyin
  *
  */
-@Service("producerTopicStatisAlarmFilter")
+//@Service("producerTopicStatisAlarmFilter")
 public class ProducerTopicStatisAlarmFilter extends AbstractStatisAlarmFilter implements MonitorDataListener {
 
 	@Autowired

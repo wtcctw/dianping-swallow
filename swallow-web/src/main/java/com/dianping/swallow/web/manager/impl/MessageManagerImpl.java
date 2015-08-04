@@ -130,7 +130,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isProducerServerAlarm(event.getIp(), alarmMeta)) {
 			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-			event.setEventId(Long.toString(eventId));
+			event.setEventId(eventId);
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
@@ -152,7 +152,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isProducerServerAlarm(event.getIp(), alarmMeta)) {
 			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-			event.setEventId(Long.toString(eventId));
+			event.setEventId(eventId);
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
@@ -175,7 +175,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isProducerTopicAlarm(event.getTopicName(), alarmMeta)) {
 			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-			event.setEventId(Long.toString(eventId));
+			event.setEventId(eventId);
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
@@ -201,7 +201,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isConsumerServerAlarm(event.getIp(), alarmMeta)) {
 			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-			event.setEventId(Long.toString(eventId));
+			event.setEventId(eventId);
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
@@ -224,7 +224,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isConsumerServerAlarm(event.getIp(), alarmMeta)) {
 			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-			event.setEventId(Long.toString(eventId));
+			event.setEventId(eventId);
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, IP_TEMPLATE, event.getIp());
@@ -247,7 +247,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isConsumerTopicAlarm(event.getTopicName(), alarmMeta)) {
 			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-			event.setEventId(Long.toString(eventId));
+			event.setEventId(eventId);
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
@@ -273,7 +273,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 		AlarmMeta alarmMeta = alarmMetas.get(event.getAlarmType().getNumber());
 		if (alarmMeta != null && isConsumerIdAlarm(event.getTopicName(), event.getConsumerId(), alarmMeta)) {
 			long eventId = seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
-			event.setEventId(Long.toString(eventId));
+			event.setEventId(eventId);
 			String message = alarmMeta.getAlarmTemplate();
 			if (StringUtils.isNotBlank(message)) {
 				message = StringUtils.replace(message, TOPIC_TEMPLATE, event.getTopicName());
@@ -365,7 +365,7 @@ public class MessageManagerImpl implements MessageManager, InitializingBean {
 			if (!StringUtils.equals(ip, TOTAL_KEY)) {
 				IPDesc ipDesc = ipDescManager.getIPDesc(ip);
 				if (ipDesc == null) {
-					logger.info("[fillReciever]cannot find {} related info from cmdb and db", ip);
+					logger.info("[fillReciever] cannot find {} related info from cmdb and db", ip);
 					continue;
 				}
 				String strEmail = ipDesc.getEmail();

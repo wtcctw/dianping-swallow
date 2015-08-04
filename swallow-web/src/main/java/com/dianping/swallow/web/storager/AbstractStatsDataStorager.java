@@ -16,6 +16,12 @@ import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月4日 下午1:22:31
+ */
 public abstract class AbstractStatsDataStorager extends AbstractLifecycle {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 

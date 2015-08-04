@@ -14,7 +14,7 @@ public class Alarm implements Cloneable {
 	@Id
 	private String id;
 
-	private String eventId;
+	private long eventId;
 
 	private int number;
 
@@ -26,10 +26,12 @@ public class Alarm implements Cloneable {
 
 	private String body;
 
-	private String relatedInfo;
+	private String related;
+
+	private RelatedType relatedType;
 
 	private String receiver;
-	
+
 	private ResultType resultType;
 
 	private Date createTime;
@@ -112,11 +114,11 @@ public class Alarm implements Cloneable {
 		return this;
 	}
 
-	public String getEventId() {
+	public long getEventId() {
 		return eventId;
 	}
 
-	public Alarm setEventId(String eventId) {
+	public Alarm setEventId(long eventId) {
 		this.eventId = eventId;
 		return this;
 	}
@@ -130,12 +132,12 @@ public class Alarm implements Cloneable {
 		return this;
 	}
 
-	public String getRelatedInfo() {
-		return relatedInfo;
+	public String getRelated() {
+		return related;
 	}
 
-	public Alarm setRelatedInfo(String relatedInfo) {
-		this.relatedInfo = relatedInfo;
+	public Alarm setRelated(String related) {
+		this.related = related;
 		return this;
 	}
 
@@ -147,14 +149,14 @@ public class Alarm implements Cloneable {
 		this.resultType = resultType;
 		return this;
 	}
-	
-	
-	@Override
-	public String toString() {
-		return "Alarm [id=" + id + ", eventId=" + eventId + ", number=" + number + ", type=" + type + ", sendType="
-				+ sendType + ", title=" + title + ", body=" + body + ", relatedInfo=" + relatedInfo + ", receiver="
-				+ receiver + ", resultType=" + resultType + ", createTime=" + createTime + ", sourceIp=" + sourceIp
-				+ "]";
+
+	public RelatedType getRelatedType() {
+		return relatedType;
+	}
+
+	public Alarm setRelatedType(RelatedType relatedType) {
+		this.relatedType = relatedType;
+		return this;
 	}
 
 	@Override

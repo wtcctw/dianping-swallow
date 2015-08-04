@@ -8,6 +8,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
@@ -76,7 +77,7 @@ public class ConsumerIdEvent extends TopicEvent {
 	}
 
 	@Override
-	public String createMessage(String template) {
+	public String getMessage(String template) {
 		String message = template;
 		if (StringUtils.isNotBlank(message)) {
 			message = StringUtils.replace(message, AlarmMeta.TOPIC_TEMPLATE, getTopicName());
@@ -89,7 +90,7 @@ public class ConsumerIdEvent extends TopicEvent {
 	}
 
 	@Override
-	public String createRelatedInfo() {
+	public String getRelated() {
 		return getTopicName() + KEY_SPLIT + consumerId;
 	}
 
@@ -102,5 +103,16 @@ public class ConsumerIdEvent extends TopicEvent {
 	@Override
 	public Set<String> getRelatedIps() {
 		return ipCollectorService.getTopicConsumerIdIps(getTopicName(), consumerId);
+	}
+	
+	@Override
+	public RelatedType getRelatedType() {
+		switch (getEventType()) {
+		case CONSUMER:
+			return RelatedType.C_CONSUMERID;
+		default:
+			break;
+		}
+		return null;
 	}
 }

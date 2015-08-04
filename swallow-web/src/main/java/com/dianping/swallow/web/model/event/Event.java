@@ -20,7 +20,7 @@ import com.dianping.swallow.web.manager.impl.MessageManagerImpl;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
-import com.dianping.swallow.web.model.alarm.ResultType;
+import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
@@ -30,7 +30,7 @@ import com.dianping.swallow.web.service.SeqGeneratorService;
  * 
  * @author qiyin
  *
- * 2015年8月3日 上午11:12:56
+ *         2015年8月3日 上午11:12:56
  */
 public abstract class Event {
 
@@ -66,7 +66,7 @@ public abstract class Event {
 
 	private SeqGeneratorService seqGeneratorService;
 
-	private String eventId;
+	private long eventId;
 
 	private Date createTime;
 
@@ -83,11 +83,11 @@ public abstract class Event {
 		return this;
 	}
 
-	public String getEventId() {
+	public long getEventId() {
 		return eventId;
 	}
 
-	public Event setEventId(String eventId) {
+	public Event setEventId(long eventId) {
 		this.eventId = eventId;
 		return this;
 	}
@@ -134,32 +134,45 @@ public abstract class Event {
 
 	public abstract void alarm();
 
-	public abstract String createMessage(String template);
+	public abstract String getMessage(String template);
 
-	public abstract String createRelatedInfo();
+	public abstract String getRelated();
+
+	public abstract RelatedType getRelatedType();
 
 	public abstract boolean isSendAlarm(AlarmType alarmType, int timeSpan);
 
 	public abstract Set<String> getRelatedIps();
 
 	public void sendMessage(AlarmType alarmType) {
+		logger.error("[sendMessage] AlarmType {}. ", alarmType);
 		AlarmMeta alarmMeta = AlarmMetaContainer.getInstance().getAlarmMeta(alarmType.getNumber());
-		if (alarmMeta != null && isSendAlarm(alarmType, alarmMeta.getSendTimeSpan())) {
-			long eventId = getNextSeq();
-			String message = createMessage(alarmMeta.getAlarmTemplate());
-			String relatedInfo = createRelatedInfo();
-			Alarm alarm = new Alarm();
-			alarm.setNumber(alarmType.getNumber()).setEventId(Long.toString(eventId)).setBody(message)
-					.setRelatedInfo(relatedInfo).setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-			Set<String> mobiles = new HashSet<String>();
-			Set<String> emails = new HashSet<String>();
-			if (alarmMeta.getIsSendSwallow()) {
-				fillReciever(getSwallowIps(), mobiles, emails);
+		if (alarmMeta != null) {
+			if (isSendAlarm(alarmType, alarmMeta.getSendTimeSpan())) {
+				if (!(alarmMeta.getIsMailMode() || alarmMeta.getIsSmsMode() || alarmMeta.getIsWeiXinMode())
+						|| !(alarmMeta.getIsSendBusiness() || alarmMeta.getIsSendSwallow())) {
+					logger.error("[sendMessage] as alarmMeta, no need to send message.metaId {}.",
+							alarmType.getNumber());
+					return;
+				}
+				long eventId = getNextSeq();
+				Alarm alarm = new Alarm();
+				alarm.setNumber(alarmType.getNumber()).setEventId(eventId)
+						.setBody(getMessage(alarmMeta.getAlarmTemplate())).setRelated(getRelated())
+						.setRelatedType(getRelatedType()).setTitle(alarmMeta.getAlarmTitle())
+						.setType(alarmMeta.getLevelType());
+				Set<String> mobiles = new HashSet<String>();
+				Set<String> emails = new HashSet<String>();
+				if (alarmMeta.getIsSendSwallow()) {
+					fillReciever(getSwallowIps(), mobiles, emails);
+				}
+				if (alarmMeta.getIsSendBusiness()) {
+					fillReciever(getRelatedIps(), mobiles, emails);
+				}
+				sendAlarm(mobiles, emails, alarm, alarmMeta);
 			}
-			if (alarmMeta.getIsSendBusiness()) {
-				fillReciever(getRelatedIps(), mobiles, emails);
-			}
-			sendAlarm(mobiles, emails, alarm, alarmMeta);
+		} else {
+			logger.error("[sendMessage] cannot find related alarmMeta. metaId {}. ", alarmType.getNumber());
 		}
 	}
 
@@ -194,9 +207,6 @@ public abstract class Event {
 	}
 
 	private void sendAlarm(Set<String> mobiles, Set<String> emails, Alarm alarm, AlarmMeta alarmMeta) {
-		if ((mobiles == null || mobiles.isEmpty()) && (emails == null || mobiles.isEmpty())) {
-			alarmService.insert(alarm.setResultType(ResultType.FAILED_NOPERSON));
-		}
 		if (alarmMeta.getIsMailMode()) {
 			alarmService.sendMail(emails, alarm);
 		}

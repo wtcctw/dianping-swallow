@@ -32,6 +32,8 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 
 	private static final String CREATETIME_FIELD = "createTime";
 
+	private static final String EVENTID_FIELD = "eventId";
+
 	private static final String ID_FIELD = "id";
 
 	@Override
@@ -112,7 +114,7 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 			}
 		}
 		Query query = new Query(criteria);
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, CREATETIME_FIELD)));
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, EVENTID_FIELD)));
 		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
 		return alarms;
 	}

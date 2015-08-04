@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.manager.MessageManager;
-import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
@@ -21,21 +20,16 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
  * @author qiyin
  *
  */
-@Service("producerServiceAlarmFilter")
+//@Service("producerServiceAlarmFilter")
 public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private static final String PIGEON_HEALTH_URL_KEY = "http://{ip}:4080/stats.json";
-
-	private volatile String producerServerIp;
 
 	@Autowired
 	private MessageManager alarmManager;
 
 	@Autowired
 	private HttpService httpSerivice;
-
-	@Autowired
-	private IPDescManager ipDescManager;
 
 	@Autowired
 	private IPCollectorService ipCollectorService;
@@ -79,14 +73,6 @@ public class ProducerServiceAlarmFilter extends AbstractServiceAlarmFilter {
 			}
 		}
 		return true;
-	}
-
-	public String getProducerServerIp() {
-		return producerServerIp;
-	}
-
-	public void setProducerServerIp(String producerServerIp) {
-		this.producerServerIp = producerServerIp;
 	}
 
 }

@@ -26,7 +26,7 @@ import com.dianping.swallow.web.util.ThreadUtils;
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午6:06:26
+ *         2015年8月3日 下午6:06:26
  */
 @Component
 public class AlarmWorkerImpl implements AlarmWorker {
@@ -75,7 +75,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		while (!checkStop()) {
 			try {
 				Event event = eventChannel.next();
-				logger.info("[start] event AlarmType", event.getAlarmType());
+				logger.info("[start] {}. ", event.getClass().getSimpleName());
 				executorService.submit(new AlarmTask(event));
 			} catch (RejectedExecutionException e) {
 				CatUtil.logException(e);
@@ -117,6 +117,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		public void run() {
 			try {
 				event.alarm();
+				logger.info("[run] {} .", event.getClass().getSimpleName());
 			} catch (Exception e) {
 				logger.error("[run] alarm event failed . ", e);
 			}

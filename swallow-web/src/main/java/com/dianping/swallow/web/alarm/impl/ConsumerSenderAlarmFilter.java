@@ -21,7 +21,7 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
  * @author qiyin
  *
  */
-@Service("consumerSenderAlarmFilter")
+//@Service("consumerSenderAlarmFilter")
 public class ConsumerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerSenderAlarmFilter.class);

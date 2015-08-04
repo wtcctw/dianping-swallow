@@ -1,20 +1,79 @@
 package com.dianping.swallow.web.alarmer.impl;
 
+import java.util.Date;
+import java.util.List;
+
+import org.codehaus.plexus.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.model.event.EventFactory;
+import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.ServerEvent;
+import com.dianping.swallow.web.model.event.ServerType;
+import com.dianping.swallow.web.service.GlobalAlarmSettingService;
+import com.dianping.swallow.web.service.HttpService;
+import com.dianping.swallow.web.service.IPCollectorService;
 
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午6:07:08
+ *         2015年8月3日 下午6:07:08
  */
 @Component
 public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 
+	private static final String PIGEON_HEALTH_URL_KEY = "http://{ip}:4080/stats.json";
+
+	@Autowired
+	private HttpService httpSerivice;
+
+	@Autowired
+	private IPCollectorService ipCollectorService;
+
+	@Autowired
+	private GlobalAlarmSettingService globalAlarmSettingService;
+
 	@Override
 	public void doAlarm() {
-		// TODO Auto-generated method stub
-
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+		catWrapper.doAction(new SwallowAction() {
+			@Override
+			public void doAction() throws SwallowException {
+				checkService();
+			}
+		});
 	}
 
+	private boolean checkService() {
+		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
+		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
+		for (String serverIp : producerServerIps) {
+			if (StringUtils.isBlank(serverIp)) {
+				continue;
+			}
+			if (whiteList == null || !whiteList.contains(serverIp)) {
+				String url = StringUtils.replace(PIGEON_HEALTH_URL_KEY, "{ip}", serverIp);
+				if (!httpSerivice.httpGet(url).isSuccess() && !httpSerivice.httpGet(url).isSuccess()) {
+					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE)
+							.setEventType(EventType.PRODUCER).setCreateTime(new Date());
+					eventReporter.report(serverEvent);
+					lastCheckStatus.put(serverIp, false);
+				} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
+					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE_OK)
+							.setEventType(EventType.PRODUCER).setCreateTime(new Date());
+					eventReporter.report(serverEvent);
+					lastCheckStatus.put(serverIp, true);
+				}
+			}
+		}
+		return true;
+	}
 }

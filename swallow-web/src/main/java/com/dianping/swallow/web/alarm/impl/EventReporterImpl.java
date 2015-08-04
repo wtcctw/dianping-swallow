@@ -10,7 +10,7 @@ import com.dianping.swallow.web.alarm.EventChannel;
 import com.dianping.swallow.web.alarm.EventReporter;
 import com.dianping.swallow.web.model.event.Event;
 
-@Component
+//@Component
 public class EventReporterImpl implements EventReporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventReporterImpl.class);

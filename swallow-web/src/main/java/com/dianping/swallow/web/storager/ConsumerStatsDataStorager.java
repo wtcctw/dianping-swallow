@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -16,7 +17,13 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.stats.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.stats.ConsumerServerStatsDataService;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月4日 下午1:22:31
+ */
+@Component
 public class ConsumerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
 
 	@Autowired

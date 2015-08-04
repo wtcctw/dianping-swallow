@@ -5,6 +5,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 
@@ -15,6 +18,8 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
  * 2015年8月3日 下午6:06:07
  */
 public abstract class AbstractAlarmer extends AbstractLifecycle {
+	
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private int alarmInterval = 30;
 

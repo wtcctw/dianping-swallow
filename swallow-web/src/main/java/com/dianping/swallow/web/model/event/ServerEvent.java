@@ -6,21 +6,18 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
+import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 上午11:13:23
+ *         2015年8月3日 上午11:13:23
  */
-@Service
-@Scope("prototype")
 public class ServerEvent extends Event {
 
 	private static final Map<String, Long> lastAlarms = new ConcurrentHashMap<String, Long>();
@@ -86,9 +83,16 @@ public class ServerEvent extends Event {
 			case PORT_OPENED_OK:
 				sendMessage(AlarmType.CONSUMER_SERVER_PORT_OPENED_OK);
 				break;
+			case SLAVE_SERVICE:
+				sendMessage(AlarmType.CONSUMER_SERVER_SLAVESERVICE_STARTED);
+				break;
+			case SLAVE_SERVICE_OK:
+				sendMessage(AlarmType.CONSUMER_SERVER_SLAVESERVICE_STARTED_OK);
+				break;
 			default:
 				break;
 			}
+			break;
 		case PRODUCER:
 			switch (getServerType()) {
 			case SERVER_SENDER:
@@ -110,7 +114,7 @@ public class ServerEvent extends Event {
 	}
 
 	@Override
-	public String createMessage(String template) {
+	public String getMessage(String template) {
 		String message = template;
 		if (StringUtils.isNotBlank(message)) {
 			message = StringUtils.replace(message, AlarmMeta.IP_TEMPLATE, getIp());
@@ -122,7 +126,7 @@ public class ServerEvent extends Event {
 	}
 
 	@Override
-	public String createRelatedInfo() {
+	public String getRelated() {
 		return ip;
 	}
 
@@ -139,4 +143,14 @@ public class ServerEvent extends Event {
 		return ips;
 	}
 
+	@Override
+	public RelatedType getRelatedType() {
+		switch (getEventType()) {
+		case PRODUCER:
+			return RelatedType.P_SERVER_IP;
+		case CONSUMER:
+			return RelatedType.C_SERVER_IP;
+		}
+		return null;
+	}
 }

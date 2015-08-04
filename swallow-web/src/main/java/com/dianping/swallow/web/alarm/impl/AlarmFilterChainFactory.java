@@ -14,7 +14,7 @@ import com.dianping.swallow.web.alarm.AlarmFilterChain;
  *
  */
 
-@Component
+//@Component
 public class AlarmFilterChainFactory implements InitializingBean {
 
 	@Resource(name = "producerServiceAlarmFilter")

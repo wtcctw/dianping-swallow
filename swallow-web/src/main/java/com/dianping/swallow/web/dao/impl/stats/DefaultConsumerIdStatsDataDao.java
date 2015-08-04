@@ -20,7 +20,7 @@ import com.mongodb.WriteResult;
 @Service("consumerIdStatsDataDao")
 public class DefaultConsumerIdStatsDataDao extends AbstractStatsDao implements ConsumerIdStatsDataDao {
 
-	private static final String CONSUMERIDSTATSDATA_COLLECTION = "consumeridstatsdata";
+	private static final String CONSUMERIDSTATSDATA_COLLECTION = "ConsumerIdStatsData";
 
 	private static final String TIMEKEY_FIELD = "timeKey";
 

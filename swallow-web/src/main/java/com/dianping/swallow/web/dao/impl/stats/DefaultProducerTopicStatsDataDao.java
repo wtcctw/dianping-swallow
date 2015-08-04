@@ -21,7 +21,7 @@ import com.mongodb.WriteResult;
 @Service("producerTopicStatsDataDao")
 public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implements ProducerTopicStatsDataDao {
 
-	private static final String TOPICSTATSDATA_COLLECTION = "producertopicstatsdata";
+	private static final String TOPICSTATSDATA_COLLECTION = "ProducerTopicStatsData";
 
 	private static final String TIMEKEY_FIELD = "timeKey";
 

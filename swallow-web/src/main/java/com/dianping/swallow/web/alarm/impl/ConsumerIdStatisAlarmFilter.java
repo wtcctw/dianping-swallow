@@ -31,7 +31,7 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
  * @author qiyin
  *
  */
-@Service("consumerIdStatisAlarmFilter")
+//@Service("consumerIdStatisAlarmFilter")
 public class ConsumerIdStatisAlarmFilter extends AbstractStatisAlarmFilter implements MonitorDataListener {
 
 	@Autowired

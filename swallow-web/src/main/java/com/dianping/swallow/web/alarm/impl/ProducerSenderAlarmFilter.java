@@ -22,7 +22,7 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
  *
  */
 
-@Service("producerSenderAlarmFilter")
+//@Service("producerSenderAlarmFilter")
 public class ProducerSenderAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProducerSenderAlarmFilter.class);

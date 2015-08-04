@@ -28,7 +28,7 @@ import com.dianping.swallow.web.util.NetUtil;
  * @author qiyin
  *
  */
-@Service("consumerPortAlarmFilter")
+//@Service("consumerPortAlarmFilter")
 public class ConsumerPortAlarmFilter extends AbstractServiceAlarmFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerPortAlarmFilter.class);

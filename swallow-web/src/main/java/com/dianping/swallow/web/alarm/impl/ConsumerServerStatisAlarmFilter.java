@@ -29,7 +29,7 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
  * @author qiyin
  *
  */
-@Service("consumerServerStatisAlarmFilter")
+//@Service("consumerServerStatisAlarmFilter")
 public class ConsumerServerStatisAlarmFilter extends AbstractStatisAlarmFilter implements MonitorDataListener {
 
 	@Autowired

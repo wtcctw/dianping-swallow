@@ -66,58 +66,80 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	}
 
 	@Override
-	public boolean sendSms(Alarm alarm) {
-		if (StringUtils.isBlank(alarm.getReceiver())) {
-			return true;
-		}
+	public boolean sendSms(String mobile, String title, String body) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("mobile", alarm.getReceiver()));
-		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		params.add(new BasicNameValuePair("body", title + NEW_LINE_SIGN + alarm.getBody()));
+		params.add(new BasicNameValuePair("mobile", mobile));
+		params.add(new BasicNameValuePair("body", title + NEW_LINE_SIGN + body));
 		boolean result = httpService.httpPost(getSmsUrl(), params).isSuccess();
 		if (!result) {
 			result = httpService.httpPost(getSmsUrl(), params).isSuccess();
 		}
-		insert(alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date())
-				.setResultType(ResultType.FAILED_NET));
+		return result;
+	}
+
+	@Override
+	public boolean sendWeiXin(String email, String title, String content) {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("email", email));
+		params.add(new BasicNameValuePair("title", title));
+		params.add(new BasicNameValuePair("content", content));
+		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
+		if (!result) {
+			result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
+		}
+		return result;
+	}
+
+	@Override
+	public boolean sendMail(String email, String title, String content) {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("title", title));
+		params.add(new BasicNameValuePair("recipients", email));
+		params.add(new BasicNameValuePair("body", content));
+		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
+		if (!result) {
+			result = httpService.httpPost(getMailUrl(), params).isSuccess();
+		}
+		return result;
+	}
+
+	@Override
+	public boolean sendSms(Alarm alarm) {
+		alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date());
+		if (StringUtils.isBlank(alarm.getReceiver())) {
+			insert(alarm.setResultType(ResultType.FAILED_NOPERSON));
+			return false;
+		}
+		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
+		boolean result = sendSms(alarm.getReceiver(), title, alarm.getBody());
+		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED_NET;
+		insert(alarm.setResultType(resultType));
 		return result;
 	}
 
 	@Override
 	public boolean sendWeiXin(Alarm alarm) {
+		alarm.setId(null).setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP).setCreateTime(new Date());
 		if (StringUtils.isBlank(alarm.getReceiver())) {
-			return true;
+			insert(alarm.setResultType(ResultType.FAILED_NOPERSON));
+			return false;
 		}
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("email", alarm.getReceiver()));
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		params.add(new BasicNameValuePair("title", title));
-		params.add(new BasicNameValuePair("content", alarm.getBody()));
-		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
-		if (!result) {
-			result = httpService.httpPost(getSmsUrl(), params).isSuccess();
-		}
-		insert(alarm.setId(null).setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP).setCreateTime(new Date())
-				.setResultType(ResultType.FAILED_NET));
+		boolean result = sendWeiXin(alarm.getReceiver(), title, alarm.getBody());
+		insert(alarm.setResultType(ResultType.FAILED_NET));
 		return result;
 	}
 
 	@Override
 	public boolean sendMail(Alarm alarm) {
+		alarm.setId(null).setSendType(SendType.MAIL).setSourceIp(NetUtil.IP).setCreateTime(new Date());
 		if (StringUtils.isBlank(alarm.getReceiver())) {
-			return true;
+			insert(alarm.setResultType(ResultType.FAILED_NOPERSON));
+			return false;
 		}
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		params.add(new BasicNameValuePair("title", title));
-		params.add(new BasicNameValuePair("recipients", alarm.getReceiver()));
-		params.add(new BasicNameValuePair("body", alarm.getBody()));
-		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
-		if (!result) {
-			result = httpService.httpPost(getSmsUrl(), params).isSuccess();
-		}
-		insert(alarm.setId(null).setSendType(SendType.MAIL).setSourceIp(NetUtil.IP).setCreateTime(new Date())
-				.setResultType(ResultType.FAILED_NET));
+		boolean result = sendMail(alarm.getReceiver(), title, alarm.getBody());
+		insert(alarm.setResultType(ResultType.FAILED_NET));
 		return result;
 	}
 
@@ -129,6 +151,9 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 				alarm.setReceiver(mobile);
 				sendSms(alarm);
 			}
+		} else {
+			alarm.setReceiver(StringUtils.EMPTY);
+			sendSms(alarm);
 		}
 		return true;
 	}
@@ -141,6 +166,9 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 				alarm.setReceiver(email);
 				sendMail(alarm);
 			}
+		} else {
+			alarm.setReceiver(StringUtils.EMPTY);
+			sendMail(alarm);
 		}
 		return true;
 	}
@@ -153,6 +181,9 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 				alarm.setReceiver(email);
 				sendWeiXin(alarm);
 			}
+		} else {
+			alarm.setReceiver(StringUtils.EMPTY);
+			sendWeiXin(alarm);
 		}
 		return true;
 	}

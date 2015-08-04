@@ -26,7 +26,7 @@ import com.dianping.swallow.web.model.event.TopicEvent;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 import com.dianping.swallow.web.util.ThreadUtils;
 
-@Component
+//@Component
 public class AlarmWorkerImpl implements AlarmWorker {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmWorkerImpl.class);

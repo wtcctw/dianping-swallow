@@ -3,6 +3,7 @@ package com.dianping.swallow.web.storager;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -16,6 +17,13 @@ import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.stats.ProducerServerStatsDataService;
 import com.dianping.swallow.web.service.stats.ProducerTopicStatsDataService;
 
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月4日 下午1:22:31
+ */
+@Component
 public class ProducerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
 
 	@Autowired
