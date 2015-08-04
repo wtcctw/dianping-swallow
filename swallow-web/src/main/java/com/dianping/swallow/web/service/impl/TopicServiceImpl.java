@@ -72,7 +72,9 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	public void onChange(String key, String value) {
 
 		if (key != null && key.equals(SWALLOW_TOPIC_WHITELIST_KEY)) {
-			logger.info("[onChange][" + SWALLOW_TOPIC_WHITELIST_KEY + "]" + value);
+			if (logger.isInfoEnabled()) {
+				logger.info("[onChange][" + SWALLOW_TOPIC_WHITELIST_KEY + "]" + value);
+			}
 
 			String[] whitelist = StringUtil.split(value, ';');
 
@@ -81,16 +83,24 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 					Topic t = getTopic(wl, 0);
 					try {
 						saveTopic(t);
-						logger.error(String.format("Save topic %s to database", wl));
+						if (logger.isInfoEnabled()) {
+							logger.error(String.format("Save topic %s to database", wl));
+						}
 						topicToWhiteList.put(wl, new HashSet<String>());
-						logger.info(String.format("Add topic %s to whitelist with empty proposal", wl));
+						if (logger.isInfoEnabled()) {
+							logger.info(String.format("Add topic %s to whitelist with empty proposal", wl));
+						}
 					} catch (Exception e) {
-						logger.error("Error when save topic to db", e);
+						if (logger.isInfoEnabled()) {
+							logger.error("Error when save topic to db", e);
+						}
 					}
 				}
 			}
 		} else {
-			logger.info("not match");
+			if (logger.isInfoEnabled()) {
+				logger.info("not match");
+			}
 		}
 	}
 
@@ -174,7 +184,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 		return new Pair<List<String>, List<String>>(new ArrayList<String>(proposal),
 				new ArrayList<String>(editProposal));
 	}
-	
+
 	@Override
 	public List<String> loadTopicNames(String username) {
 
@@ -217,7 +227,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 		}
 		return props;
 	}
-	
+
 	private Topic getTopic(String subStr, long num) {
 
 		Long id = System.currentTimeMillis();
@@ -228,29 +238,35 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	private void cacheTopicToWhiteList(Set<String> whiteList) {
-		
+
 		for (String str : whiteList) {
 			Topic topic = loadTopicByName(str);
-			
+
 			if (topic != null) {
 				Set<String> set = splitString(topic.getProp(), ",");
 				topicToWhiteList.put(str, set);
-				logger.info(String.format("add topic %s 's proposal to whitelist %s", str, set));
-			}else{
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("add topic %s 's proposal to whitelist %s", str, set));
+				}
+			} else {
 				topic = getTopic(str, 0L);
 				int status = saveTopic(topic);
-				
-				if(status == 0){
-					logger.info(String.format("Save topic %s to topic collection successfully.", str));
-				}else{
-					logger.info(String.format("Save topic %s to topic collection failed.", str));
+
+				if (status == 0) {
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Save topic %s to topic collection successfully.", str));
+					}
+				} else {
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("Save topic %s to topic collection failed.", str));
+					}
 				}
-				
+
 			}
-			
+
 		}
 	}
-	
+
 	private Set<String> splitString(String source, String delimitor) {
 		String[] prop = source.split(delimitor);
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));

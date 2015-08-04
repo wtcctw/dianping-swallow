@@ -75,6 +75,7 @@ module.directive('onFinishRenderFilters', function ($timeout) {
     };
 });
 
+
 //module.directive('onFinishLoadFilters', function ($timeout) {
 //    return {
 //        restrict: 'A',
