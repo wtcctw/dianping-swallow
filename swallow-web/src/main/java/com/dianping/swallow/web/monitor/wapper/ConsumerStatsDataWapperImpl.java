@@ -37,7 +37,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
-	
+
 	@Autowired
 	private StatsDataFactory statsDataFactory;
 
@@ -57,6 +57,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			}
 			ConsumerServerStatisData serverStatisData = (ConsumerServerStatisData) consumerDataRetriever.getValue(
 					new CasKeys(serverIp), StatisType.SEND);
+			if (serverStatisData == null) {
+				continue;
+			}
 			NavigableMap<Long, Long> sendQpx = serverStatisData.getQpx(StatisType.SEND);
 			NavigableMap<Long, Long> ackQpx = serverStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = serverStatisData.getDelay(StatisType.SEND);

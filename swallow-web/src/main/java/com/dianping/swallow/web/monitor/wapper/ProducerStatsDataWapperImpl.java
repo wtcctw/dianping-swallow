@@ -52,6 +52,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
 			ProducerServerStatisData serverStatisData = (ProducerServerStatisData) producerDataRetriever
 					.getValue(new CasKeys(serverIp));
+			if (serverStatisData == null) {
+				continue;
+			}
 			NavigableMap<Long, Long> qpx = serverStatisData.getQpx(StatisType.SAVE);
 			if (qpx == null || qpx.isEmpty()) {
 				continue;
@@ -97,6 +100,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			}
 			ProducerTopicStatisData serverStatisData = (ProducerTopicStatisData) producerDataRetriever
 					.getValue(new CasKeys(TOTAL_KEY, topicName));
+			if (serverStatisData == null) {
+				continue;
+			}
 			NavigableMap<Long, Long> topicQpxs = serverStatisData.getQpx(StatisType.SAVE);
 			if (topicQpxs == null || topicQpxs.isEmpty()) {
 				continue;
