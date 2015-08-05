@@ -15,9 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * 
  * @author qiyin
  *
+ * 2015年8月1日 下午11:20:20
  */
 public class NetUtil {
 

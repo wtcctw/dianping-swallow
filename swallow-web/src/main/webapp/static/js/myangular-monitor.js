@@ -77,18 +77,22 @@ module.controller('ConsumerServerQpsController', function($scope, $http) {
 module.controller('ConsumerQpsController', function($scope, $http) {
 	$http({
 		method : 'POST',
-		url : window.contextpath + '/console/monitor/topiclist/get'
-	}).success(function(topicList, status, headers, config) {
-		
-		$("#consumer-div").typeahead({
-			source : topicList,
-			updater : function(c) {
-				window.location = window.contextpath + "/console/monitor/consumer/"+c+"/qps";
-				return c;
-			}
-		})
-	}).error(function(data, status, headers, config) {
-		 app.appError("响应错误", data);
+		url : window.contextPath + '/console/monitor/topiclist/get'
+	}).success(
+			function(topicList, status, headers, config) {
+
+				$("#consumer-div").typeahead(
+						{
+							source : topicList,
+							updater : function(c) {
+								window.location = window.contextPath
+										+ "/console/monitor/consumer/" + c
+										+ "/qps";
+								return c;
+							}
+						})
+			}).error(function(data, status, headers, config) {
+		app.appError("响应错误", data);
 	});
 
 	$scope.getConsumerQps = function(topicName){

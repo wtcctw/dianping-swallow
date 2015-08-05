@@ -2,8 +2,37 @@ package com.dianping.swallow.web.model.alarm;
 
 import java.util.Date;
 
-public class AlarmMeta {
+import org.springframework.data.annotation.Transient;
 
+public class AlarmMeta {
+	
+	@Transient
+	public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
+	@Transient
+	public static final String IP_TEMPLATE = "{ip}";
+
+	@Transient
+	public static final String DATE_TEMPLATE = "{date}";
+
+	@Transient
+	public static final String CURRENTVALUE_TEMPLATE = "{currentValue}";
+
+	@Transient
+	public static final String EXPECTEDVALUE_TEMPLATE = "{expectedValue}";
+
+	@Transient
+	public static final String MASTERIP_TEMPLATE = "{masterIp}";
+
+	@Transient
+	public static final String SLAVEIP_TEMPLATE = "{slaveIp}";
+
+	@Transient
+	public static final String TOPIC_TEMPLATE = "{topic}";
+
+	@Transient
+	public static final String CONSUMERID_TEMPLATE = "{consumerId}";
+	
 	private String id;
 
 	private int metaId;

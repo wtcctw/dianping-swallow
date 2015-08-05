@@ -12,8 +12,37 @@ import com.dianping.swallow.web.model.alarm.Alarm;
  * 
  */
 public interface AlarmService {
+
+	/**
+	 *  send sms
+	 * @param mobile
+	 * @param title
+	 * @param body
+	 * @return
+	 */
+	public boolean sendSms(String mobile, String title, String body);
+
+	/**
+	 *  send weiXin
+	 * @param email
+	 * @param title
+	 * @param content
+	 * @return
+	 */
+	public boolean sendWeiXin(String email, String title, String content);
+
+	/**
+	 *  send mail
+	 * @param email
+	 * @param title
+	 * @param content
+	 * @return
+	 */
+	public boolean sendMail(String email, String title, String content);
+
 	/**
 	 * send sms
+	 * 
 	 * @param alarm
 	 * @return
 	 */
@@ -35,7 +64,7 @@ public interface AlarmService {
 	 * @return
 	 */
 	public boolean sendMail(Set<String> emails, Alarm alarm);
-	
+
 	/**
 	 * sms alarm
 	 * 
@@ -112,6 +141,7 @@ public interface AlarmService {
 
 	/**
 	 * find by receiver and createTime
+	 * 
 	 * @param receiver
 	 * @param timeStart
 	 * @param timeEnd
@@ -136,9 +166,10 @@ public interface AlarmService {
 	 * @return
 	 */
 	public long countByReceiver(String receiver);
-	
+
 	/**
 	 * find count by receiver and createTime
+	 * 
 	 * @param receiver
 	 * @param timeStart
 	 * @param timeEnd
