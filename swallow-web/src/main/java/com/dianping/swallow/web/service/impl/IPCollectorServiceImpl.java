@@ -34,8 +34,8 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.web.model.cmdb.EnvDevice;
-import com.dianping.swallow.web.monitor.wapper.ConsumerDataWapper;
-import com.dianping.swallow.web.monitor.wapper.ProducerDataWapper;
+import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
+import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.IPCollectorService;
 
@@ -103,10 +103,10 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	private CmdbService cmdbService;
 
 	@Autowired
-	private ProducerDataWapper producerDataWapper;
+	private ProducerStatsDataWapper producerStatsDataWapper;
 
 	@Autowired
-	private ConsumerDataWapper consumerDataWapper;
+	private ConsumerStatsDataWapper consumerStatsDataWapper;
 
 	private int interval = 120;// 秒
 
@@ -371,7 +371,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	@Override
 	public Set<String> getTopicConsumerIdIps(String topicName, String consumerId) {
-		Set<String> consumerIdIps = consumerDataWapper.getConsumerIdIps(topicName, consumerId);
+		Set<String> consumerIdIps = consumerStatsDataWapper.getConsumerIdIps(topicName, consumerId);
 		if (consumerIdIps != null) {
 			consumerIdIps.remove(TOTAL_KEY);
 		}
@@ -380,7 +380,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	@Override
 	public Set<String> getProducerTopicIps(String topicName) {
-		Set<String> topicIps = producerDataWapper.getTopicIps(topicName);
+		Set<String> topicIps = producerStatsDataWapper.getTopicIps(topicName);
 		if (topicIps != null) {
 			topicIps.remove(TOTAL_KEY);
 		}
@@ -389,7 +389,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	@Override
 	public Set<String> getConsumerTopicIps(String topicName) {
-		Set<String> topicIps = consumerDataWapper.getTopicIps(topicName);
+		Set<String> topicIps = consumerStatsDataWapper.getTopicIps(topicName);
 		if (topicIps != null) {
 			topicIps.remove(TOTAL_KEY);
 		}

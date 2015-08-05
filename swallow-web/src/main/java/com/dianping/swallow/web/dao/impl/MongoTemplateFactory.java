@@ -42,6 +42,9 @@ public class MongoTemplateFactory {
 
 	@Value("${swallow.web.mongodbname.topic}")
 	private String topicMongoDbName;
+	
+	@Value("${swallow.web.mongodbname.alarmstats}")
+	private String alarmStatsMongoDbName;
 
 	public static final String SWALLOW_STATS_MONGO_URL_KEY = "swallow.mongourl";
 
@@ -81,7 +84,12 @@ public class MongoTemplateFactory {
 		
 		return statisMongoTemplate;
 	}
-
+	
+	@Bean(name = "alarmStatsMongoTemplate")
+	public MongoTemplate getAlarmStatisMongoTemplate() {
+		return new MongoTemplate(new SimMongoDbFactory(mongo, alarmStatsMongoDbName));
+	}
+	
 	private synchronized void createCappedCollection(MongoTemplate mongoTemplate, String collectionName, long size, long max) {
 		
 		if(!mongoTemplate.collectionExists(collectionName)){			
@@ -145,5 +153,5 @@ public class MongoTemplateFactory {
 		template.setWriteConcern(WriteConcern.SAFE);
 
 	}
-
+	
 }

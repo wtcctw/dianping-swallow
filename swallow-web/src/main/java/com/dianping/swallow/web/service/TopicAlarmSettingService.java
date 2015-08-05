@@ -28,6 +28,5 @@ public interface TopicAlarmSettingService {
 	public List<String> getConsumerIdWhiteList();
 	
 	public List<TopicAlarmSetting> findByPage(int offset, int limit);
-
 	
 }

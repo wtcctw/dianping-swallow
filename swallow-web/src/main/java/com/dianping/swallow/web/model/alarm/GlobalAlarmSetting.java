@@ -2,6 +2,12 @@ package com.dianping.swallow.web.model.alarm;
 
 import java.util.List;
 
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月5日 上午10:46:05
+ */
 public class GlobalAlarmSetting extends BaseAlarmSetting{
 	
 	private String swallowId;
