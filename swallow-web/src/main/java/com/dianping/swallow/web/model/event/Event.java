@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.container.AlarmMetaContainer;
 import com.dianping.swallow.web.manager.IPDescManager;
-import com.dianping.swallow.web.manager.impl.MessageManagerImpl;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
@@ -279,7 +278,7 @@ public abstract class Event {
 		devMobiles = new HashSet<String>();
 		devEmails = new HashSet<String>();
 		try {
-			InputStream in = MessageManagerImpl.class.getClassLoader().getResourceAsStream(ALARM_RECIEVER_FILE_NAME);
+			InputStream in = Event.class.getClassLoader().getResourceAsStream(ALARM_RECIEVER_FILE_NAME);
 			if (in != null) {
 				Properties prop = new Properties();
 				try {
