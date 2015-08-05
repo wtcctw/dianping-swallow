@@ -17,7 +17,6 @@ import com.dianping.swallow.common.internal.util.CatUtil;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.alarmer.AlarmWorker;
 import com.dianping.swallow.web.alarmer.EventChannel;
-import com.dianping.swallow.web.manager.MessageManager;
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 import com.dianping.swallow.web.util.ThreadUtils;
@@ -35,9 +34,6 @@ public class AlarmWorkerImpl implements AlarmWorker {
 
 	@Autowired
 	private EventChannel eventChannel;
-
-	@Autowired
-	private MessageManager messageManager;
 
 	private static final String FACTORY_NAME = "AlarmWorker";
 
