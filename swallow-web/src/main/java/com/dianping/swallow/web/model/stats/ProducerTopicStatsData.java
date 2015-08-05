@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.StatisType;
 
@@ -33,7 +32,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	public boolean checkQpsPeak(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() > expectQps) {
-				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName)
+				eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName)
 						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
 						.setStatisType(StatisType.SENDQPS_PEAK).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
@@ -46,7 +45,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	public boolean checkQpsValley(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() < expectQps) {
-				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName)
+				eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName)
 						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
 						.setStatisType(StatisType.SENDQPS_VALLEY).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
@@ -65,7 +64,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 
 			if ((getQps() >= preQps && (getQps() / preQps > flu)) || (getQps() < preQps && (preQps / getQps() > flu))) {
 
-				eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName)
+				eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName)
 						.setCurrentValue(this.getQps()).setExpectedValue(preQps).setStatisType(StatisType.SENDQPS_FLU)
 						.setCreateTime(new Date()).setEventType(EventType.PRODUCER));
 				return false;
@@ -80,7 +79,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 			return true;
 		}
 		if ((this.getDelay() / 1000) > expectDelay) {
-			eventReporter.report(EventFactory.getInstance().createTopicEvent().setTopicName(topicName)
+			eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName)
 					.setCurrentValue(this.getDelay()).setExpectedValue(expectDelay).setStatisType(StatisType.SENDDELAY)
 					.setCreateTime(new Date()).setEventType(EventType.PRODUCER));
 			return false;

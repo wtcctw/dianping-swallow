@@ -15,7 +15,6 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -107,7 +106,7 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 		String key = masterIp + KEY_SPLIT + slaveIp;
 		if (!usingMaster && usingSlave) {
 			isSlaveIps.put(masterIp, true);
-			ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+			ServerEvent serverEvent = eventFactory.createServerEvent();
 			serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVEPORT_OPENED)
 					.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 			eventReporter.report(serverEvent);
@@ -115,7 +114,7 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 			return false;
 		} else if (usingMaster && usingSlave) {
 			isSlaveIps.put(masterIp, false);
-			ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+			ServerEvent serverEvent = eventFactory.createServerEvent();
 			serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(ServerType.BOTHPORT_OPENED)
 					.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 			eventReporter.report(serverEvent);
@@ -123,7 +122,7 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 			return false;
 		} else if (!usingMaster && !usingSlave) {
 			isSlaveIps.put(masterIp, false);
-			ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+			ServerEvent serverEvent = eventFactory.createServerEvent();
 			serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(ServerType.BOTHPORT_UNOPENED)
 					.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 			eventReporter.report(serverEvent);
@@ -133,7 +132,7 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 		} else {
 			isSlaveIps.put(masterIp, false);
 			if (lastCheckStatus.containsKey(key) && !lastCheckStatus.get(key).booleanValue()) {
-				ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+				ServerEvent serverEvent = eventFactory.createServerEvent();
 				serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(ServerType.PORT_OPENED_OK)
 						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 				eventReporter.report(serverEvent);

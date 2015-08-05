@@ -52,7 +52,7 @@ public abstract class AbstractAlarmer extends AbstractLifecycle {
 					doAlarm();
 
 				} catch (Throwable th) {
-					logger.error("[startAlarmer]", th);
+					logger.error("[startAlarm]", th);
 				} finally {
 
 				}

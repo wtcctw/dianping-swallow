@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.StatisType;
 
@@ -33,7 +32,7 @@ public class ProducerServerStatsData extends ProducerStatsData {
 	public boolean checkQpsPeak(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() > expectQps) {
-				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
+				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip)
 						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
 						.setStatisType(StatisType.SENDQPS_PEAK).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
@@ -46,7 +45,7 @@ public class ProducerServerStatsData extends ProducerStatsData {
 	public boolean checkQpsValley(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() < expectQps) {
-				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
+				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip)
 						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
 						.setStatisType(StatisType.SENDQPS_VALLEY).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));

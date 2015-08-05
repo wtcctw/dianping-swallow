@@ -11,7 +11,6 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -57,13 +56,13 @@ public class ProducerSenderAlarmer extends AbstractServiceAlarmer {
 					if (logger.isInfoEnabled()) {
 						logger.info("serverIp : {}", serverIp);
 					}
-					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+					ServerEvent serverEvent = eventFactory.createServerEvent();
 					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER)
 							.setEventType(EventType.PRODUCER).setCreateTime(new Date());
 					eventReporter.report(serverEvent);
 					lastCheckStatus.put(serverIp, false);
 				} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+					ServerEvent serverEvent = eventFactory.createServerEvent();
 					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER_OK)
 							.setEventType(EventType.PRODUCER).setCreateTime(new Date());
 					eventReporter.report(serverEvent);

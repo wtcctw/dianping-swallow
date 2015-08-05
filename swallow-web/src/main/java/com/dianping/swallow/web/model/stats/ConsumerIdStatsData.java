@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.web.model.event.EventFactory;
+import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.StatisType;
 
@@ -84,9 +84,10 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	public boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps > expectQps) {
-				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
-						.setTopicName(topicName).setCurrentValue(qps).setExpectedValue(expectQps)
-						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
+				Event event = eventFactory.createConsumerIdEvent().setConsumerId(consumerId).setTopicName(topicName)
+						.setCurrentValue(qps).setExpectedValue(expectQps).setStatisType(statisType)
+						.setCreateTime(new Date()).setEventType(EventType.CONSUMER);
+				eventReporter.report(event);
 				return false;
 			}
 		}
@@ -96,7 +97,7 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	public boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps < expectQps) {
-				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
+				eventReporter.report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId)
 						.setTopicName(topicName).setCurrentValue(qps).setExpectedValue(expectQps)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
@@ -114,7 +115,7 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 
 			if ((qps >= preQps && (qps / preQps > flu)) || (qps < preQps && (preQps / qps > flu))) {
 
-				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
+				eventReporter.report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId)
 						.setTopicName(topicName).setCurrentValue(qps).setExpectedValue(preQps)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
@@ -127,7 +128,7 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	public boolean checkDelay(long delay, long expectDelay, StatisType statisType) {
 		if (delay != 0L && expectDelay != 0L) {
 			if ((delay / 1000) > expectDelay) {
-				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
+				eventReporter.report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId)
 						.setTopicName(topicName).setCurrentValue(delay).setExpectedValue(expectDelay)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
@@ -139,7 +140,7 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	public boolean checkAccu(long accu, long expectAccu, StatisType statisType) {
 		if (accu != 0L && expectAccu != 0L) {
 			if (accu > expectAccu) {
-				eventReporter.report(EventFactory.getInstance().createConsumerIdEvent().setConsumerId(consumerId)
+				eventReporter.report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId)
 						.setTopicName(topicName).setCurrentValue(accu).setExpectedValue(expectAccu)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;

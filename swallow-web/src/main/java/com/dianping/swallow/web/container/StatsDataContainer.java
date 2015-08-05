@@ -1,5 +1,5 @@
 package com.dianping.swallow.web.container;
 
-public interface AlarmSettingContainer {
+public interface StatsDataContainer {
 
 }

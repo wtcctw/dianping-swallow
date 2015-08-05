@@ -11,7 +11,6 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -66,7 +65,7 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 						|| System.currentTimeMillis() - statisConsumerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
 					String slaveIp = consumerServerSlaveIps.get(index);
 					if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
-						ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+						ServerEvent serverEvent = eventFactory.createServerEvent();
 						serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER)
 								.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 						eventReporter.report(serverEvent);
@@ -74,7 +73,7 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 					}
 				} else {
 					if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-						ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+						ServerEvent serverEvent = eventFactory.createServerEvent();
 						serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER_OK)
 								.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 						eventReporter.report(serverEvent);
@@ -90,14 +89,14 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	private boolean checkSlaveServerSender(Map<String, Long> statisIps, String masterIp, String slaveIp) {
 		if (consumerPortAlarmer.isSlaveOpen(masterIp)) {
 			if (!statisIps.containsKey(slaveIp)) {
-				ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+				ServerEvent serverEvent = eventFactory.createServerEvent();
 				serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER_OK)
 						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 				eventReporter.report(serverEvent);
 				lastCheckStatus.put(slaveIp, false);
 			} else {
 				if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
-					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+					ServerEvent serverEvent = eventFactory.createServerEvent();
 					serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER_OK)
 							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 					eventReporter.report(serverEvent);

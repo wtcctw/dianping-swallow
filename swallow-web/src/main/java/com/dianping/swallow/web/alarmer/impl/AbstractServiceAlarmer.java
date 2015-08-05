@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
+import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 
@@ -27,6 +28,9 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 
 	@Autowired
 	protected EventReporter eventReporter;
+	
+	@Autowired
+	protected EventFactory eventFactory;
 
 	protected void threadSleep() {
 		try {

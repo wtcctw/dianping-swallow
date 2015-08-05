@@ -1,50 +1,47 @@
 package com.dianping.swallow.web.model.stats;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
+import com.dianping.swallow.web.model.event.EventFactory;
 
-@Service
-public class StatsDataFactory implements InitializingBean {
-
-	private static StatsDataFactory instance;
+@Service("statsDataFactory")
+public class StatsDataFactory {
 
 	@Autowired
 	private EventReporter eventReporter;
-
-	public static StatsDataFactory getInstance() {
-		return instance;
-	}
+	
+	@Autowired
+	private EventFactory eventFactory;
 
 	public ProducerTopicStatsData createTopicStatsData() {
 		ProducerTopicStatsData topicStatsData = new ProducerTopicStatsData();
-		topicStatsData.setEventReporter(eventReporter);
+		setComponent(topicStatsData);
 		return topicStatsData;
 	}
 
 	public ProducerServerStatsData createProducerServerStatsData() {
 		ProducerServerStatsData serverStatsData = new ProducerServerStatsData();
-		serverStatsData.setEventReporter(eventReporter);
+		setComponent(serverStatsData);
 		return serverStatsData;
 	}
 
 	public ConsumerServerStatsData createConsumerServerStatsData() {
 		ConsumerServerStatsData serverStatsData = new ConsumerServerStatsData();
-		serverStatsData.setEventReporter(eventReporter);
+		setComponent(serverStatsData);
 		return serverStatsData;
 	}
 
 	public ConsumerIdStatsData createConsumerIdStatsData() {
 		ConsumerIdStatsData consumerIdStatsData = new ConsumerIdStatsData();
-		consumerIdStatsData.setEventReporter(eventReporter);
+		setComponent(consumerIdStatsData);
 		return consumerIdStatsData;
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		instance = this;
+	private void setComponent(StatsData statsData) {
+		statsData.setEventReporter(eventReporter);
+		statsData.setEventFactory(eventFactory);
 	}
 
 }

@@ -3,7 +3,6 @@ package com.dianping.swallow.web.container;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +19,9 @@ import com.dianping.swallow.web.common.Pair;
  * 2015年8月3日 上午11:34:00
  */
 @Service("statisDataContainer")
-public class StatisDataContainer implements InitializingBean {
+public class StatsDataContainerImpl implements StatsDataContainer {
 
 	private static final int TOTALSIZE = 120;
-
-	private static StatisDataContainer instance;
 
 	@Autowired
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
@@ -64,15 +61,6 @@ public class StatisDataContainer implements InitializingBean {
 		long result = 0L;
 
 		return result;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		instance = this;
-	}
-
-	public static StatisDataContainer getInstance() {
-		return instance;
 	}
 
 }

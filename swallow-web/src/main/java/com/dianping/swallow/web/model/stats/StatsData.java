@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
+import com.dianping.swallow.web.model.event.EventFactory;
 
 /**
  * 
@@ -22,6 +23,9 @@ public abstract class StatsData {
 
 	@Transient
 	protected EventReporter eventReporter;
+
+	@Transient
+	protected EventFactory eventFactory;
 
 	public String getId() {
 		return id;
@@ -41,6 +45,10 @@ public abstract class StatsData {
 
 	public void setEventReporter(EventReporter eventReporter) {
 		this.eventReporter = eventReporter;
+	}
+
+	public void setEventFactory(EventFactory eventFactory) {
+		this.eventFactory = eventFactory;
 	}
 
 	@Override

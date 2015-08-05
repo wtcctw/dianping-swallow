@@ -13,7 +13,6 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -93,13 +92,13 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 				String url = StringUtils.replace(pigeonHealthUrl, "{ip}", serverIp);
 				HttpResult result = checkUrl(url);
 				if (!result.isSuccess()) {
-					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+					ServerEvent serverEvent = eventFactory.createServerEvent();
 					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE)
 							.setEventType(EventType.PRODUCER).setCreateTime(new Date());
 					eventReporter.report(serverEvent);
 					lastCheckStatus.put(serverIp, false);
 				} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+					ServerEvent serverEvent = eventFactory.createServerEvent();
 					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE_OK)
 							.setEventType(EventType.PRODUCER).setCreateTime(new Date());
 					eventReporter.report(serverEvent);

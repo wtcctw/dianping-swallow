@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.StatisType;
 
@@ -49,7 +48,7 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 	public boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps > expectQps) {
-				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
+				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip)
 						.setCurrentValue(qps).setExpectedValue(expectQps).setStatisType(statisType)
 						.setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;
@@ -61,7 +60,7 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 	public boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps < expectQps) {
-				eventReporter.report(EventFactory.getInstance().createServerStatisEvent().setIp(ip)
+				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip)
 						.setCurrentValue(qps).setExpectedValue(expectQps).setStatisType(statisType)
 						.setCreateTime(new Date()).setEventType(EventType.CONSUMER));
 				return false;

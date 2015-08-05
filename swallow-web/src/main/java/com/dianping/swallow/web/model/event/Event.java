@@ -61,11 +61,13 @@ public abstract class Event {
 	private AlarmService alarmService;
 
 	private IPDescManager ipDescManager;
+	
+	private AlarmMetaContainer alarmMetaContainer;
 
 	protected IPCollectorService ipCollectorService;
 
 	private SeqGeneratorService seqGeneratorService;
-
+	
 	private long eventId;
 
 	private Date createTime;
@@ -114,6 +116,10 @@ public abstract class Event {
 		this.alarmService = alarmService;
 	}
 
+	public void setAlarmMetaContainer(AlarmMetaContainer alarmMetaContainer) {
+		this.alarmMetaContainer = alarmMetaContainer;
+	}
+	
 	public void setIPDescManager(IPDescManager ipDescManager) {
 		this.ipDescManager = ipDescManager;
 	}
@@ -146,7 +152,7 @@ public abstract class Event {
 
 	public void sendMessage(AlarmType alarmType) {
 		logger.error("[sendMessage] AlarmType {}. ", alarmType);
-		AlarmMeta alarmMeta = AlarmMetaContainer.getInstance().getAlarmMeta(alarmType.getNumber());
+		AlarmMeta alarmMeta = alarmMetaContainer.getAlarmMeta(alarmType.getNumber());
 		if (alarmMeta != null) {
 			if (isSendAlarm(alarmType, alarmMeta.getSendTimeSpan())) {
 				if (!(alarmMeta.getIsMailMode() || alarmMeta.getIsSmsMode() || alarmMeta.getIsWeiXinMode())

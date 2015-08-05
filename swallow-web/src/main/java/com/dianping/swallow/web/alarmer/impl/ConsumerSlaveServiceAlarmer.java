@@ -13,7 +13,6 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -85,14 +84,14 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 				String url = StringUtils.replace(slaveMonitorUrl, "{ip}", slaveIp);
 				HttpResult result = checkUrl(url);
 				if (!result.isSuccess() || !result.getResponseBody().contains(MONOGO_MONITOR_SIGN)) {
-					ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+					ServerEvent serverEvent = eventFactory.createServerEvent();
 					serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE)
 							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 					eventReporter.report(serverEvent);
 					lastCheckStatus.put(slaveIp, false);
 				} else {
 					if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
-						ServerEvent serverEvent = EventFactory.getInstance().createServerEvent();
+						ServerEvent serverEvent = eventFactory.createServerEvent();
 						serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE_OK)
 								.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 						eventReporter.report(serverEvent);

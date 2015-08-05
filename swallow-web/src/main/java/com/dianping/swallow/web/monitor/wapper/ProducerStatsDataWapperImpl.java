@@ -31,6 +31,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 
+	@Autowired
+	private StatsDataFactory statsDataFactory;
+
 	@Override
 	public List<ProducerServerStatsData> getServerStatsDatas(long timeKey) {
 		Set<String> serverKeys = producerDataRetriever.getKeys(new CasKeys());
@@ -63,7 +66,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				index++;
 			}
 
-			ProducerServerStatsData serverStatsData = StatsDataFactory.getInstance().createProducerServerStatsData();
+			ProducerServerStatsData serverStatsData = statsDataFactory.createProducerServerStatsData();
 			serverStatsData.setTimeKey(timeKey);
 			serverStatsData.setIp(serverIp);
 			serverStatsData.setDelay(0);
@@ -106,7 +109,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				timeKey = tempKey.longValue();
 				index++;
 			}
-			ProducerTopicStatsData producerTopicStatsData = StatsDataFactory.getInstance().createTopicStatsData();
+			ProducerTopicStatsData producerTopicStatsData = statsDataFactory.createTopicStatsData();
 			producerTopicStatsData.setTopicName(topicName);
 			producerTopicStatsData.setTimeKey(timeKey);
 

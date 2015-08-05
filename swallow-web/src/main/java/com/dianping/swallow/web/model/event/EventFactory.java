@@ -1,9 +1,9 @@
 package com.dianping.swallow.web.model.event;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.container.AlarmMetaContainer;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
@@ -13,12 +13,10 @@ import com.dianping.swallow.web.service.SeqGeneratorService;
  * 
  * @author qiyin
  *
- * 2015年8月3日 上午11:13:05
+ *         2015年8月3日 上午11:13:05
  */
-@Service
-public class EventFactory implements InitializingBean {
-
-	private static EventFactory instance;
+@Service("eventFactory")
+public class EventFactory {
 
 	@Autowired
 	private AlarmService alarmService;
@@ -27,24 +25,19 @@ public class EventFactory implements InitializingBean {
 	private IPDescManager ipDescManager;
 
 	@Autowired
+	private AlarmMetaContainer alarmMetaContainer;
+
+	@Autowired
 	protected IPCollectorService ipCollectorService;
 
 	@Autowired
 	private SeqGeneratorService seqGeneratorService;
 
-	public static EventFactory getInstance() {
-		return instance;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		instance = this;
-	}
-
 	private void setComponent(Event event) {
-		event.setIPCollectorService(ipCollectorService);
-		event.setIPDescManager(ipDescManager);
 		event.setAlarmService(alarmService);
+		event.setIPDescManager(ipDescManager);
+		event.setAlarmMetaContainer(alarmMetaContainer);
+		event.setIPCollectorService(ipCollectorService);
 		event.setSeqGeneratorService(seqGeneratorService);
 	}
 

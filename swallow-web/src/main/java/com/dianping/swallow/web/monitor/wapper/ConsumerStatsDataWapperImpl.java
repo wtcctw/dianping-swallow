@@ -37,6 +37,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
+	
+	@Autowired
+	private StatsDataFactory statsDataFactory;
 
 	@Override
 	public List<ConsumerServerStatsData> getServerStatsDatas(long timeKey) {
@@ -71,7 +74,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				index++;
 			}
 
-			ConsumerServerStatsData serverStatsData = StatsDataFactory.getInstance().createConsumerServerStatsData();
+			ConsumerServerStatsData serverStatsData = statsDataFactory.createConsumerServerStatsData();
 			serverStatsData.setTimeKey(timeKey);
 			serverStatsData.setIp(serverIp);
 			Long sendQpxValue = sendQpx.get(timeKey);
@@ -134,7 +137,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (StringUtils.equals(consumerId, TOTAL_KEY)) {
 				continue;
 			}
-			ConsumerIdStatsData consumerIdStatsData = StatsDataFactory.getInstance().createConsumerIdStatsData();
+			ConsumerIdStatsData consumerIdStatsData = statsDataFactory.createConsumerIdStatsData();
 			consumerIdStatsData.setConsumerId(consumerId);
 			consumerIdStatsData.setTopicName(topicName);
 			ConsumerIdStatisData consumerIdStatisData = (ConsumerIdStatisData) consumerDataRetriever.getValue(
