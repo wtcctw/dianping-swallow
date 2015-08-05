@@ -31,7 +31,7 @@ public class AlarmMetaContainerImpl implements InitializingBean, AlarmMetaContai
 
 	private static final Map<Integer, AlarmMeta> alarmMetas = new ConcurrentHashMap<Integer, AlarmMeta>();
 
-	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor();
+	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor();
 
 	private int interval = 120;// 秒
 

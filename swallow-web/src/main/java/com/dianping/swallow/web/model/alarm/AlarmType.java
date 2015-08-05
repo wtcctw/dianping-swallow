@@ -4,6 +4,7 @@ package com.dianping.swallow.web.model.alarm;
  * 
  * @author qiyin
  *
+ * 2015年8月5日 上午10:45:54
  */
 public enum AlarmType {
 

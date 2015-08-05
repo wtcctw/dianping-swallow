@@ -1,6 +1,11 @@
 package com.dianping.swallow.web.model.alarm;
 
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月5日 上午10:46:16
+ */
 public class ConsumerIdAlarmSetting extends BaseAlarmSetting {
 	
 	private String consumerId;

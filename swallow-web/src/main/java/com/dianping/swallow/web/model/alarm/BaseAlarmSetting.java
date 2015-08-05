@@ -3,7 +3,12 @@ package com.dianping.swallow.web.model.alarm;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月5日 上午10:46:21
+ */
 public class BaseAlarmSetting {
 	
 	@Id

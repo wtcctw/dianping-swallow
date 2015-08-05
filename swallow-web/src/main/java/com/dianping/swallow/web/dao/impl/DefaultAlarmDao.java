@@ -26,7 +26,7 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultAlarmDao.class);
 
-	private static final String ALARM_COLLECTION = "swallowwebalarmc";
+	private static final String ALARM_COLLECTION = "swallowwebalarminfoc";
 
 	private static final String RECEIVER_FIELD = "receiver";
 
@@ -114,10 +114,7 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 			}
 		}
 		Query query = new Query(criteria);
-		query.skip(offset)
-				.limit(limit)
-				.with(new Sort(new Sort.Order(Direction.DESC, CREATETIME_FIELD), new Sort.Order(Direction.DESC,
-						EVENTID_FIELD)));
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, EVENTID_FIELD)));
 		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
 		return alarms;
 	}

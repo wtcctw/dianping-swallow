@@ -46,10 +46,6 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 			threadSleep();
 			result = httpSerivice.httpGet(url);
 		}
-		if (!result.isSuccess()) {
-			threadSleep();
-			result = httpSerivice.httpGet(url);
-		}
 		return result;
 	}
 

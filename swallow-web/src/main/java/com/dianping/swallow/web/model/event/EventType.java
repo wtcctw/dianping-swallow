@@ -7,8 +7,14 @@ package com.dianping.swallow.web.model.event;
  * 2015年8月3日 上午11:13:13
  */
 public enum EventType {
-	
-	PRODUCER, CONSUMER;
+	/**
+	 * 
+	 */
+	PRODUCER, 
+	/**
+	 * 
+	 */
+	CONSUMER;
 
 	public boolean isProducerType() {
 		return this == PRODUCER;

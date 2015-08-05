@@ -163,10 +163,6 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 			threadSleep();
 			usingPort = NetUtil.isPortOpen(ip, port);
 		}
-		if (!usingPort) {
-			threadSleep();
-			usingPort = NetUtil.isPortOpen(ip, port);
-		}
 		return usingPort;
 	}
 

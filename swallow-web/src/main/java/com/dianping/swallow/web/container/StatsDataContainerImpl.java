@@ -18,7 +18,7 @@ import com.dianping.swallow.web.common.Pair;
  *
  * 2015年8月3日 上午11:34:00
  */
-@Service("statisDataContainer")
+//@Component("statisDataContainer")
 public class StatsDataContainerImpl implements StatsDataContainer {
 
 	private static final int TOTALSIZE = 120;

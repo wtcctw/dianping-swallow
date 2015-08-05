@@ -69,8 +69,9 @@ public class AlarmWorkerImpl implements AlarmWorker {
 	@Override
 	public void start() {
 		while (!checkStop()) {
+			Event event = null;
 			try {
-				Event event = eventChannel.next();
+				event = eventChannel.next();
 				logger.info("[start] {}. ", event.getClass().getSimpleName());
 				executorService.submit(new AlarmTask(event));
 			} catch (RejectedExecutionException e) {
@@ -80,6 +81,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 				} catch (InterruptedException ex) {
 					// ignore
 				}
+				logger.error("[start] lost event {}. ", event.toString());
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
