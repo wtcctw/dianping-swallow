@@ -44,6 +44,7 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 		String type = "type";
 		Set<String> filters = new HashSet<String>();
 		filters.add(type);
+		@SuppressWarnings("unused")
 		Consumer consumer = addListener(topic, getConsumerId(), filters);
 		
 		sendMessage(10, topic, type);

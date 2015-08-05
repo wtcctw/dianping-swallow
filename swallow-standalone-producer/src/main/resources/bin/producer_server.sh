@@ -73,7 +73,6 @@ mysleep 12
 
 
 SuccessLog="Producer service for client is ready"
-log `date`
 checkLog "$SuccessLog" $STD_OUT
 
 
