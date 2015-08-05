@@ -55,6 +55,7 @@
 							<th style="text-align: left">报警编号</th>
 							<th style="text-align: left">报警级别</th>
 							<th style="text-align: left">发送方式</th>
+							<th style="text-align: left">发送结果</th>
 							<th style="text-align: left">标题</th>
 							<th style="text-align: left">内容</th>
 							<th style="text-align: left">接收者</th>
@@ -66,11 +67,12 @@
 							<td style="text-align: left">{{m.number}}</td>
 							<td style="text-align: left">{{m.type}}</td>
 							<td style="text-align: left">{{m.sendType}}</td>
+							<td style="text-align: left">{{m.resultType}}</td>
 							<td style="text-align: left">{{m.title}}</td>
 							<td style="text-align: left">{{m.body}}</td>
 							<td style="text-align: left">{{m.receiver}}</td>
 							<td style="text-align: left">{{m.createTime |
-								date:'yyyy-MM-dd hh:mm:ss'}}</td>
+								date:'yyyy-MM-dd HH:mm:ss'}}</td>
 					</table>
 
 					<ul style="margin-top: 20px;" class="pagination">

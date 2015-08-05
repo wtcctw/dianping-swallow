@@ -14,6 +14,10 @@ public enum ResultType {
 	/**
 	 * 
 	 */
+	FAILED,
+	/**
+	 * 
+	 */
 	FAILED_NET,
 	/**
 	 * 
