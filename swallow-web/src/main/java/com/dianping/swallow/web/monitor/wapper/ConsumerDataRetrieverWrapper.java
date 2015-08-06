@@ -3,6 +3,8 @@ package com.dianping.swallow.web.monitor.wapper;
 import java.util.Collections;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,8 @@ public class ConsumerDataRetrieverWrapper {
 	
 	public static final String TOTAL = "total";
 	
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	
 	public Set<String> getKey(String ... keys){
 		
 		return consumerDataRetriever.getKeys(new CasKeys(keys));
@@ -37,6 +41,9 @@ public class ConsumerDataRetrieverWrapper {
 	public Set<String> getKeyWithoutTotal(String ... keys){
 		
 		Set<String> set = consumerDataRetriever.getKeys(new CasKeys(keys));
+		if(logger.isInfoEnabled()){
+			logger.info(String.format("Load keys %s without total of %s", set.toString(), keys.toString()));
+		}
 		
 		if(set != null){
 			removeTotal(set);
