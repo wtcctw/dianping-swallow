@@ -55,7 +55,7 @@ public class CatTest extends AbstractTest{
 	@Test
 	public void testException() throws InterruptedException{
 		
-		for(int i=0; i < 50;i++){
+		for(int i=0; i < 5;i++){
 			
 			logger.error("message", new SwallowAlertException("exception message"));
 			TimeUnit.SECONDS.sleep(1);

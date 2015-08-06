@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,9 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
+import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.dashboard.Entry;
 import com.dianping.swallow.web.model.dashboard.MinHeap;
 import com.dianping.swallow.web.model.dashboard.MinuteEntry;
@@ -47,8 +50,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 	@Autowired
 	private DashboardContainer dashboardContainer;
 
-	@Autowired
-	IPDescManagerWrapper iPDescManagerWrap;
+	@Resource(name = "ipDescManager")
+	private IPDescManager ipDescManager;
 
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
@@ -195,11 +198,17 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 			Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
 					topic, consumerid);
+			
 			String ip = loadFirstElement(ips);
-			String mobile = iPDescManagerWrap.loadDpManager(ip);
-			String email = iPDescManagerWrap.loadEmail(ip);
-			String name = iPDescManagerWrap.loadName(ip);
-			iPDescManagerWrap.resetIpdesc();
+			IPDesc iPDesc = ipDescManager.getIPDesc(ip);
+			String mobile = "Blank";
+			String email = "Blank";
+			String name = "Black";
+			if(iPDesc != null){
+				mobile = iPDesc.getDpMobile();
+				email = iPDesc.getEmail();
+				name = iPDesc.getName();
+			}
 
 			ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
 					.loadConsumerBaseAlarmSetting(topic);

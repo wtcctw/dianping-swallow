@@ -148,13 +148,14 @@ module.controller('ConsumerDelayController', function($scope, $http) {
 	};
 });
 
-module.controller('ConsumerDashboardController', function($scope, $http, $timeout) {
+module.controller('ConsumerDashboardController', function($scope, $http) {
 	$("#sidebar").addClass("responsive menu-min");
 
 	$scope.starttime = "";
 	$scope.stoptime = "";
 	$scope.currentMin = -1; // 当前分钟，第一次时设置
 	$scope.currentRed = -1;
+	
 	$scope.whatClassIsIt = function(index) {
 		if (index == $scope.currentRed)
 			return "red-num"
@@ -246,7 +247,11 @@ module.controller('ConsumerDashboardController', function($scope, $http, $timeou
 						$scope.currentRed = date.getMinutes();
 					} else {
 						date = new Date();
-						$scope.currentRed = index;
+						if(index != -1){
+							$scope.currentRed = index;
+						}else{
+							$scope.currentRed = date.getMinutes();
+						}
 					}
 					if (index == -1) {
 						$scope.currentMin = date.getMinutes();
