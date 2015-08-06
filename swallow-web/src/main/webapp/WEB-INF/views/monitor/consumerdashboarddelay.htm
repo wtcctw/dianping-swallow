@@ -24,7 +24,6 @@
 						ng-click="setStep(168)">+7d</a> ] &nbsp;[ <a href="#"
 						ng-click="setNow()">now</a> ]&nbsp;
 				</div>
-				<!-- /.nav-search -->
 			</div>
 			<div class="report">
 				<div class="text-center">
@@ -59,10 +58,10 @@
 							</tr>
 							<tr ng-repeat="entry in getEntry(minuteEntry.delayEntry)"
 								ng-class="{'alert-row': entry.numAlarm>0}" >
-								<td style="text-align: left; width: 120px; cursor: pointer;"><a style="color:#000000" href data-animation="am-flip-x"
-									 data-title="业务名: {{entry.name}} 开发: {{entry.dpMobile}}" bs-tooltip ng-bind="entry.consumerId | limitTo : 15"></a></td>
+								<td style="text-align: left; width: 120px; cursor: pointer;"><a href style="color:#000000" data-placement="top" 
+									 data-content="业务名: {{entry.name}} 开发: {{entry.dpMobile}}" data-trigger="hover" bs-popover ng-bind="entry.consumerId | limitTo : 15"></a></td>
 								<td style="text-align: left; width: 40px; cursor: pointer;">
-									<a href="#" rel="clickover" data-placement="top"
+									<a href="#" data-placement="top"
 									title="{{entry.topic}}" data-html="true"
 									data-content="<table><tr><th><a href='/console/monitor/consumer/{{entry.topic}}/qps?cid={{entry.consumerId}}'>发送延迟/s&nbsp;&nbsp;</a></th><th><a href='/console/monitor/consumer/{{entry.topic}}/qps?cid={{entry.consumerId}}'>ack延迟/s&nbsp;&nbsp;</th><th><a href='/console/monitor/consumer/{{entry.topic}}/accu?cid={{entry.consumerId}}'>消息堆积</th></tr><tr><td>{{entry.senddelay}}</td><td>{{entry.ackdelay}}</td><td>{{entry.accu}}</td></tr></table>"
 									data-auto-close="1"  bs-popover 

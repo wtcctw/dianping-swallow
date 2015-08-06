@@ -57,7 +57,7 @@
 			<mvc:mapping path="/console/monitor/dashboard" />
 			<mvc:mapping path="/console/setting/*" />
 			<mvc:mapping path="/console/tool" />
-			<mvc:mapping path="/help" />
+			<mvc:mapping path="/help/" />
 			<bean class="com.dianping.swallow.web.interceptor.ModelAndViewInterceptor">
 			</bean>
 		</mvc:interceptor>
