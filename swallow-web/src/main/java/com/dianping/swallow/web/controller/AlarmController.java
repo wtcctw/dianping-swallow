@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.service.AlarmService;
+import com.dianping.swallow.web.util.DateUtil;
 
 @Controller
 public class AlarmController extends AbstractSidebarBasedController {
@@ -41,11 +40,11 @@ public class AlarmController extends AbstractSidebarBasedController {
 
 		Date startDate = null;
 		if (StringUtils.isNotBlank(startTime)) {
-			startDate = strToDate(startTime);
+			startDate = DateUtil.convertStrToDate(startTime);
 		}
 		Date endDate = null;
 		if (StringUtils.isNotBlank(endTime)) {
-			endDate = strToDate(endTime);
+			endDate = DateUtil.convertStrToDate(endTime);
 		} else {
 			endDate = new Date();
 		}
@@ -62,25 +61,13 @@ public class AlarmController extends AbstractSidebarBasedController {
 		return "tool";
 	}
 
-	private Date strToDate(String strTime) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date result = null;
-		try {
-			result = sdf.parse(strTime);
-			return result;
-		} catch (ParseException e) {
-			logger.info("data tranform failed.", e);
-			return new Date();
-		}
-	}
-
 	@Override
 	protected String getSide() {
 		
 		return "tool";
 	}
 	
-	private String subSide = "alarm";
+	private static String subSide = "alarmming";
 
 	@Override
 	public String getSubSide() {

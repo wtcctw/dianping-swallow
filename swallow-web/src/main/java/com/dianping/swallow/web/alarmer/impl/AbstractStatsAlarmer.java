@@ -2,13 +2,14 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
 
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午6:06:20
+ *         2015年8月3日 下午6:06:20
  */
 public abstract class AbstractStatsAlarmer extends AbstractAlarmer {
 
@@ -25,8 +26,8 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer {
 		dataCount.set(INIT_VALUE);
 		lastTimeKey.set(DEFAULT_VALUE);
 	}
-	
-	protected static final long TIME_SECTION = 5 * 60 / 5;
+
+	protected static final long TIME_SECTION = 5 * 60 / AbstractCollector.SEND_INTERVAL;
 
 	protected static long getPreDayKey(long timeKey) {
 		return timeKey - AbstractRetriever.getKey(24 * 60 * 60 * 1000).longValue();
@@ -35,5 +36,5 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer {
 	protected static final long getTimeSection() {
 		return TIME_SECTION;
 	}
-	
+
 }

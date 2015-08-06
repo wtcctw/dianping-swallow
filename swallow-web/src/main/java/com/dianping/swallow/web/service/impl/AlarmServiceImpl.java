@@ -21,6 +21,7 @@ import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.ResultType;
+import com.dianping.swallow.web.model.alarm.SendInfo;
 import com.dianping.swallow.web.model.alarm.SendType;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
@@ -106,44 +107,47 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	}
 
 	@Override
-	public boolean sendSms(Alarm alarm) {
-		alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date());
-		if (StringUtils.isBlank(alarm.getReceiver())) {
-			insert(alarm.setResultType(ResultType.FAILED).setReceiver(NOPERSON_RECEIVER));
+	public boolean sendSms(Alarm alarm, String receiver) {
+		alarm.setId(null).setSourceIp(NetUtil.IP).setCreateTime(new Date());
+		if (StringUtils.isBlank(receiver)) {
+			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED)
+					.setSendType(SendType.SMS));
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		boolean result = sendSms(alarm.getReceiver(), title, alarm.getBody());
+		boolean result = sendSms(receiver, title, alarm.getBody());
 		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
-		insert(alarm.setResultType(resultType));
+		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.SMS));
 		return result;
 	}
 
 	@Override
-	public boolean sendWeiXin(Alarm alarm) {
-		alarm.setId(null).setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP).setCreateTime(new Date());
-		if (StringUtils.isBlank(alarm.getReceiver())) {
-			insert(alarm.setResultType(ResultType.FAILED).setReceiver(NOPERSON_RECEIVER));
+	public boolean sendWeiXin(Alarm alarm, String receiver) {
+		alarm.setId(null).setSourceIp(NetUtil.IP).setCreateTime(new Date());
+		if (StringUtils.isBlank(receiver)) {
+			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED)
+					.setSendType(SendType.WEIXIN));
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		boolean result = sendWeiXin(alarm.getReceiver(), title, alarm.getBody());
+		boolean result = sendWeiXin(receiver, title, alarm.getBody());
 		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
-		insert(alarm.setResultType(resultType));
+		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.WEIXIN));
 		return result;
 	}
 
 	@Override
-	public boolean sendMail(Alarm alarm) {
-		alarm.setId(null).setSendType(SendType.MAIL).setSourceIp(NetUtil.IP).setCreateTime(new Date());
-		if (StringUtils.isBlank(alarm.getReceiver())) {
-			insert(alarm.setResultType(ResultType.FAILED).setReceiver(NOPERSON_RECEIVER));
+	public boolean sendMail(Alarm alarm, String receiver) {
+		alarm.setId(null).setSourceIp(NetUtil.IP).setCreateTime(new Date());
+		if (StringUtils.isBlank(receiver)) {
+			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED)
+					.setSendType(SendType.MAIL));
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		boolean result = sendMail(alarm.getReceiver(), title, alarm.getBody());
+		boolean result = sendMail(receiver, title, alarm.getBody());
 		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
-		insert(alarm.setResultType(resultType));
+		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.WEIXIN));
 		return result;
 	}
 
@@ -152,12 +156,10 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 			Iterator<String> iterator = mobiles.iterator();
 			while (iterator.hasNext()) {
 				String mobile = iterator.next();
-				alarm.setReceiver(mobile);
-				sendSms(alarm);
+				sendSms(alarm, mobile);
 			}
 		} else {
-			alarm.setReceiver(StringUtils.EMPTY);
-			sendSms(alarm);
+			sendSms(alarm, StringUtils.EMPTY);
 		}
 		return true;
 	}
@@ -167,12 +169,10 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 			Iterator<String> iterator = emails.iterator();
 			while (iterator.hasNext()) {
 				String email = iterator.next();
-				alarm.setReceiver(email);
-				sendMail(alarm);
+				sendMail(alarm, email);
 			}
 		} else {
-			alarm.setReceiver(StringUtils.EMPTY);
-			sendMail(alarm);
+			sendMail(alarm, StringUtils.EMPTY);
 		}
 		return true;
 	}
@@ -182,12 +182,10 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 			Iterator<String> iterator = emails.iterator();
 			while (iterator.hasNext()) {
 				String email = iterator.next();
-				alarm.setReceiver(email);
-				sendWeiXin(alarm);
+				sendWeiXin(alarm, email);
 			}
 		} else {
-			alarm.setReceiver(StringUtils.EMPTY);
-			sendWeiXin(alarm);
+			sendWeiXin(alarm, StringUtils.EMPTY);
 		}
 		return true;
 	}

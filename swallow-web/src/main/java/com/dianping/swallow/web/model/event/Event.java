@@ -60,13 +60,13 @@ public abstract class Event {
 	private AlarmService alarmService;
 
 	private IPDescManager ipDescManager;
-	
+
 	private AlarmMetaContainer alarmMetaContainer;
 
 	protected IPCollectorService ipCollectorService;
 
 	private SeqGeneratorService seqGeneratorService;
-	
+
 	private long eventId;
 
 	private Date createTime;
@@ -118,7 +118,7 @@ public abstract class Event {
 	public void setAlarmMetaContainer(AlarmMetaContainer alarmMetaContainer) {
 		this.alarmMetaContainer = alarmMetaContainer;
 	}
-	
+
 	public void setIPDescManager(IPDescManager ipDescManager) {
 		this.ipDescManager = ipDescManager;
 	}
@@ -223,6 +223,7 @@ public abstract class Event {
 		if (alarmMeta.getIsWeiXinMode()) {
 			alarmService.sendWeiXin(emails, alarm);
 		}
+		alarmService.insert(alarm);
 	}
 
 	private void fillReciever(Set<String> ips, Set<String> mobiles, Set<String> emails) {
