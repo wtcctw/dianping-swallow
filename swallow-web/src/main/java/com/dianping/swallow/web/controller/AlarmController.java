@@ -30,7 +30,7 @@ public class AlarmController extends AbstractSidebarBasedController {
 
 	@RequestMapping(value = "/console/tool")
 	public ModelAndView alarm(HttpServletRequest request, HttpServletResponse response) {
-		return new ModelAndView("tool/warnquery", createViewMap());
+		return new ModelAndView("tool/alarmquery", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/alarm/search", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -80,7 +80,7 @@ public class AlarmController extends AbstractSidebarBasedController {
 		return "tool";
 	}
 	
-	private String subSide = "warning";
+	private String subSide = "alarm";
 
 	@Override
 	public String getSubSide() {

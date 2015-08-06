@@ -43,6 +43,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	private static final String WEIXIN_KEY = "weiXin";
 	private static final String SMS_KEY = "sms";
 
+	private static final String NOPERSON_RECEIVER = "NOPERSON";
+
 	private static final String env = "[" + EnvZooKeeperConfig.getEnv().trim() + "]";
 
 	private static final String LEFT_BRACKET = "[";
@@ -107,12 +109,12 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	public boolean sendSms(Alarm alarm) {
 		alarm.setId(null).setSendType(SendType.SMS).setSourceIp(NetUtil.IP).setCreateTime(new Date());
 		if (StringUtils.isBlank(alarm.getReceiver())) {
-			insert(alarm.setResultType(ResultType.FAILED_NOPERSON));
+			insert(alarm.setResultType(ResultType.FAILED).setReceiver(NOPERSON_RECEIVER));
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
 		boolean result = sendSms(alarm.getReceiver(), title, alarm.getBody());
-		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED_NET;
+		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
 		insert(alarm.setResultType(resultType));
 		return result;
 	}
@@ -121,12 +123,12 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	public boolean sendWeiXin(Alarm alarm) {
 		alarm.setId(null).setSendType(SendType.WEIXIN).setSourceIp(NetUtil.IP).setCreateTime(new Date());
 		if (StringUtils.isBlank(alarm.getReceiver())) {
-			insert(alarm.setResultType(ResultType.FAILED_NOPERSON));
+			insert(alarm.setResultType(ResultType.FAILED).setReceiver(NOPERSON_RECEIVER));
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
 		boolean result = sendWeiXin(alarm.getReceiver(), title, alarm.getBody());
-		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED_NET;
+		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
 		insert(alarm.setResultType(resultType));
 		return result;
 	}
@@ -135,12 +137,12 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	public boolean sendMail(Alarm alarm) {
 		alarm.setId(null).setSendType(SendType.MAIL).setSourceIp(NetUtil.IP).setCreateTime(new Date());
 		if (StringUtils.isBlank(alarm.getReceiver())) {
-			insert(alarm.setResultType(ResultType.FAILED_NOPERSON));
+			insert(alarm.setResultType(ResultType.FAILED).setReceiver(NOPERSON_RECEIVER));
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
 		boolean result = sendMail(alarm.getReceiver(), title, alarm.getBody());
-		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED_NET;
+		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
 		insert(alarm.setResultType(resultType));
 		return result;
 	}
