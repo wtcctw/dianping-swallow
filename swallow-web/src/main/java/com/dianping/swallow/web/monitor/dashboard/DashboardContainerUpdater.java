@@ -203,7 +203,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			IPDesc iPDesc = ipDescManager.getIPDesc(ip);
 			String mobile = "Blank";
 			String email = "Blank";
-			String name = "Black";
+			String name = "Blank";
 			if(iPDesc != null){
 				mobile = iPDesc.getDpMobile();
 				email = iPDesc.getEmail();

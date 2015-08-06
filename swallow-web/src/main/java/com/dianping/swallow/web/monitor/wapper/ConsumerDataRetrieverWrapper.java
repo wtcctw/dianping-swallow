@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor.wapper;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,14 @@ public class ConsumerDataRetrieverWrapper {
 	public Set<String> getKeyWithoutTotal(String ... keys){
 		
 		Set<String> set = consumerDataRetriever.getKeys(new CasKeys(keys));
-		removeTotal(set);
-		return set;
+		
+		if(set != null){
+			removeTotal(set);
+			return set;
+		}else{
+			return Collections.emptySet();
+		}
+		
 	}
 	
 	public void registerListener(DashboardContainerUpdater dashboardContainerUpdater){
