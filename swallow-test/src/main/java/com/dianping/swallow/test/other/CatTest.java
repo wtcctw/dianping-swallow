@@ -23,7 +23,7 @@ public class CatTest extends AbstractTest {
 	public void testLogError() {
 
 		
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 5; i++) {
 			
 			newTransaction(i);
 			Cat.logError(new Exception("log error"));

@@ -126,8 +126,9 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	}
 
 	public boolean checkDelay(long delay, long expectDelay, StatisType statisType) {
+		delay = delay / 1000;
 		if (delay != 0L && expectDelay != 0L) {
-			if ((delay / 1000) > expectDelay) {
+			if ((delay) > expectDelay) {
 				eventReporter.report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId)
 						.setTopicName(topicName).setCurrentValue(delay).setExpectedValue(expectDelay)
 						.setStatisType(statisType).setCreateTime(new Date()).setEventType(EventType.CONSUMER));

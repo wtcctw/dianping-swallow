@@ -27,6 +27,11 @@
 		<priority value ="WARN"/>
 	</logger>
 	
+	<logger name="com.dianping.swallow.consumer.internal.task.DefaultConsumerTask" additivity="true">
+		<priority value ="WARN"/>
+	</logger>
+	
+	
 	<logger name="com.dianping.swallow.test.other.LogTest" additivity="false">
 		<priority value ="INFO"/>
 		<appender-ref ref="fileAppender" />
