@@ -1,0 +1,29 @@
+<script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>
+<script src="js/ztree_toc.js"></script>
+
+<link rel="stylesheet" href="css/zTreeStyle/zTreeStyle.css"
+	type="text/css" />
+<script type="text/javascript">
+<!--
+	$(document).ready(function() {
+		$('#tree').ztree_toc({
+			debug : false,
+			is_auto_number : true,
+			documment_selector : '.markdown-body',
+			ztreeStyle : {
+				width : '320px',
+				height : '100%',
+				overflow : 'auto',
+				position : 'fixed',
+				'z-index' : 2147483647,
+				border : '0px none',
+				left : '0px',
+				top : '0px'
+			}
+		});
+	});
+//-->
+</script>
+
+
