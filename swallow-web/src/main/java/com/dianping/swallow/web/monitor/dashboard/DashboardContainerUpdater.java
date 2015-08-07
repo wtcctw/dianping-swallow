@@ -198,12 +198,15 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 			Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
 					topic, consumerid);
+			if(logger.isInfoEnabled()){
+				logger.info(String.format("Load ips %s of topic %s and consumerid %s", ips.toString(), topic, consumerid));
+			}
 			
 			String ip = loadFirstElement(ips);
 			IPDesc iPDesc = ipDescManager.getIPDesc(ip);
 			String mobile = "Blank";
 			String email = "Blank";
-			String name = "Black";
+			String name = "Blank";
 			if(iPDesc != null){
 				mobile = iPDesc.getDpMobile();
 				email = iPDesc.getEmail();
@@ -321,7 +324,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		return sendData == null || sendData.getArrayData() == null || sendData.getArrayData().length == 0;
 	}
 
-	private String loadFirstElement(Set<String> set) {
+	private static String loadFirstElement(Set<String> set) {
 
 		Iterator<String> it = set.iterator();
 		while (it.hasNext()) {
@@ -329,5 +332,5 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		}
 		return "";
 	}
-
+	
 }

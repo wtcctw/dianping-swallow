@@ -75,13 +75,14 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	}
 
 	public boolean checkDelay(long expectDelay) {
-		if (this.getDelay() == 0L || expectDelay == 0L) {
+		long delay = this.getDelay() / 1000;
+		if (delay == 0L || expectDelay == 0L) {
 			return true;
 		}
-		if ((this.getDelay() / 1000) > expectDelay) {
-			eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName)
-					.setCurrentValue(this.getDelay()).setExpectedValue(expectDelay).setStatisType(StatisType.SENDDELAY)
-					.setCreateTime(new Date()).setEventType(EventType.PRODUCER));
+		if (delay > expectDelay) {
+			eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName).setCurrentValue(delay)
+					.setExpectedValue(expectDelay).setStatisType(StatisType.SENDDELAY).setCreateTime(new Date())
+					.setEventType(EventType.PRODUCER));
 			return false;
 		}
 		return true;
