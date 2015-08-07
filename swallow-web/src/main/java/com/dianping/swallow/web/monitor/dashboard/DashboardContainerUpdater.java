@@ -107,13 +107,13 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
 				List<Long> sendList = new ArrayList<Long>();
 				if(senddelay != null){
-					sendList = (List<Long>) senddelay.values();
+					sendList = new ArrayList<Long>(senddelay.values());
 				}
 				
 				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
 				List<Long> ackList = new ArrayList<Long>();
 				if(ackdelay != null){
-					ackList = (List<Long>) ackdelay.values();
+					ackList = new ArrayList<Long>( ackdelay.values() );
 				}
 				
 				int sendListSize = sendList.size();
