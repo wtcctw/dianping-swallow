@@ -105,15 +105,21 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 						ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid);
 
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
-				List<Long> sendList = new ArrayList<Long>();
+				List<Long> sendList;
+				
 				if(senddelay != null){
 					sendList = new ArrayList<Long>(senddelay.values());
+				}else{
+					sendList = new ArrayList<Long>();
 				}
 				
 				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
-				List<Long> ackList = new ArrayList<Long>();
+				List<Long> ackList;
+				
 				if(ackdelay != null){
 					ackList = new ArrayList<Long>( ackdelay.values() );
+				}else{
+					ackList = new ArrayList<Long>();
 				}
 				
 				int sendListSize = sendList.size();
