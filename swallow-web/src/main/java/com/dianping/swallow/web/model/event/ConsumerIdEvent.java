@@ -91,7 +91,12 @@ public class ConsumerIdEvent extends TopicEvent {
 
 	@Override
 	public String getRelated() {
-		return getTopicName() + KEY_SPLIT + consumerId;
+		return getTopicName();
+	}
+
+	@Override
+	protected String getSubRelated() {
+		return consumerId;
 	}
 
 	@Override
@@ -104,7 +109,7 @@ public class ConsumerIdEvent extends TopicEvent {
 	public Set<String> getRelatedIps() {
 		return ipCollectorService.getTopicConsumerIdIps(getTopicName(), consumerId);
 	}
-	
+
 	@Override
 	public RelatedType getRelatedType() {
 		switch (getEventType()) {

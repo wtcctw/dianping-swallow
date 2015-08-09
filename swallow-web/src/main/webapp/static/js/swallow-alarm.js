@@ -3,7 +3,7 @@ module
 				'Paginator',
 				function() {
 					return function(fetchFunction, pageSize, receiver,
-							startTime, endTime) {
+							startTime, endTime, relatedType, relatedInfo) {
 						var paginator = {
 							hasNextVar : false,
 							fetch : function(page) {
@@ -26,6 +26,8 @@ module
 										receiver,
 										startTime,
 										endTime,
+										relatedType,
+										relatedInfo,
 										function(data) {
 											items = data.entitys;
 											length = data.size;
@@ -83,67 +85,156 @@ module
 					};
 				});
 
-module.controller('AlarmController', [
-		'$scope',
-		'$http',
-		'Paginator',
-		function($scope, $http, Paginator) {
-			var fetchFunction = function(offset, limit, receiver, startTime,
-					endTime, callback) {
+module
+		.controller(
+				'AlarmController',
+				[
+						'$scope',
+						'$http',
+						'Paginator',
+						function($scope, $http, Paginator) {
+							var fetchFunction = function(offset, limit,
+									receiver, startTime, endTime, relatedType,
+									relatedInfo, callback) {
+								$scope.searchEntity = {
+									offset : offset,
+									limit : limit,
+									receiver : receiver,
+									relatedType : relatedType,
+									relatedInfo : relatedInfo,
+									startTime : startTime,
+									endTime : endTime
+								};
+								console.log($scope.searchEntity);
+								$http.post(window.contextPath + $scope.suburl,
+										$scope.searchEntity).success(callback);
+								// $.ajax({
+								// type : "POST",
+								// url : window.contextPath + $scope.suburl,
+								// dataType : "json",
+								// contentType : "application/json",
+								// data : JSON.stringify($scope.searchEntity),
+								// success : callback
+								// });
+							};
 
-				$http.get(window.contextPath + $scope.suburl, {
-					params : {
-						offset : offset,
-						limit : limit,
-						receiver : receiver,
-						startTime : startTime,
-						endTime : endTime
-					}
-				}).success(callback);
-			};
+							$scope.receiver = "";
+							$scope.relatedInfo = "";
+							$scope.relatedType = "";
+							$scope.startTime = "";
+							$scope.endTime = "";
+							$scope.suburl = "/console/alarm/search";
+							$scope.pageSize = 30;
+							$scope.queryCount = 0;
+							console.log(window.contextPath);
+							$http(
+									{
+										method : 'GET',
+										url : window.contextPath
+												+ '/console/admin/queryvisits'
+									})
+									.success(
+											function(topicList, status,
+													headers, config) {
+												$("#receiver")
+														.typeahead(
+																{
+																	source : topicList,
+																	updater : function(
+																			c) {
+																		return c
+																				+ "@dianping.com";
+																	}
+																})
+											}).error(
+											function(data, status, headers,
+													config) {
+												app.appError("响应错误", data);
+											});
 
-			$scope.receiver = "";
-			$scope.startTime = "";
-			$scope.endTime = "";
-			$scope.suburl = "/console/alarm/search";
-			$scope.pageSize = 30;
-			$scope.queryCount = 0;
-			console.log(window.contextPath);
-			$http({
-				method : 'GET',
-				url : window.contextPath + '/console/admin/queryvisits'
-			}).success(function(topicList, status, headers, config) {
-				$("#receiver").typeahead({
-					source : topicList,
-					updater : function(c) {
-						return c + "@dianping.com";
-					}
-				})
-			}).error(function(data, status, headers, config) {
-				app.appError("响应错误", data);
-			});
+							$http(
+									{
+										method : 'GET',
+										url : window.contextPath
+												+ '/console/alarm/query/ip'
+									}).success(
+									function(datas, status, headers, config) {
+										$scope.ips = datas;
+									}).error(
+									function(datas, status, headers, config) {
+										console.log("ips读取错误");
+									});
+							$http(
+									{
+										method : 'GET',
+										url : window.contextPath
+												+ '/console/topic/namelist'
+									}).success(
+									function(datas, status, headers, config) {
+										$scope.topicnames = datas;
+									}).error(
+									function(datas, status, headers, config) {
+										console.log("topicname读取错误");
+									});
+							$http(
+									{
+										method : 'GET',
+										url : window.contextPath
+												+ '/console/alarm/query/consumerid'
+									}).success(
+									function(datas, status, headers, config) {
+										$scope.consumerids = datas;
+									}).error(
+									function(datas, status, headers, config) {
+										console.log("consumerid读取错误");
+									});
+							$("#relatedInfo").typeahead({
+								updater : function(c) {
+									return c;
+								}
+							});
+							$("#relatedType")
+									.change(
+											function() {
+												var selectValue = $(
+														"#relatedType").val();
+												if (selectValue == "IP") {
+													$scope.relatedDatas = $scope.ips;
+												} else if (selectValue == "TOPIC") {
+													$scope.relatedDatas = $scope.topicnames;
+												} else if (selectValue == "CONSUMERID") {
+													$scope.relatedDatas = $scope.consumerids;
+												} else {
+													$scope.relatedDatas = [];
+												}
+												$("#relatedInfo").data(
+														'typeahead').source = $scope.relatedDatas;
+											});
+							$scope.query = function() {
+								if ($scope.queryCount != 0) {
+									$scope.startTime = $("#starttime").val();
+									$scope.endTime = $("#stoptime").val();
+								}
+								$scope.queryCount = $scope.queryCount + 1;
+								$scope.receiver = $("#receiver").val();
+								$scope.relatedType = $("#relatedType").val();
+								$scope.relatedInfo = $("#relatedInfo").val();
+								if ($scope.startTime != null
+										&& $scope.endTime != null) {
+									startDate = new Date($scope.startTime);
+									endDate = new Date($scope.endTime);
+									if (endDate <= startDate) {
+										alert("结束时间不能小于开始时间");
+										return;
+									}
+								}
 
-			$scope.query = function() {
-				if ($scope.queryCount != 0) {
-					$scope.startTime = $("#starttime").val();
-					$scope.endTime = $("#stoptime").val();
-				}
-				$scope.queryCount = $scope.queryCount + 1;
-				console.log($scope.startTime);
-				$scope.receiver = $("#receiver").val();
-				if ($scope.startTime != null && $scope.endTime != null) {
-					startDate = new Date($scope.startTime);
-					endDate = new Date($scope.endTime);
-					if (endDate <= startDate) {
-						alert("结束时间不能小于开始时间");
-						return;
-					}
-				}
+								$scope.searchPaginator = Paginator(
+										fetchFunction, $scope.pageSize,
+										$scope.receiver, $scope.startTime,
+										$scope.endTime, $scope.relatedType,
+										$scope.relatedInfo);
+							}
 
-				$scope.searchPaginator = Paginator(fetchFunction,
-						$scope.pageSize, $scope.receiver, $scope.startTime,
-						$scope.endTime);
-			}
-
-			$scope.query();
-		} ]);
+							$scope.query();
+						} ]);

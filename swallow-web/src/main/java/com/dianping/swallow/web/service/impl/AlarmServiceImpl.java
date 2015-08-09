@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.ResultType;
@@ -230,26 +231,6 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		return alarmDao.findById(id);
 	}
 
-	@Override
-	public List<Alarm> findByReceiver(String receiver, int offset, int limit) {
-		return alarmDao.findByReceiver(receiver, offset, limit);
-	}
-
-	@Override
-	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit) {
-		return alarmDao.findByCreateTime(createTime, offset, limit);
-	}
-
-	@Override
-	public long countByCreateTime(Date createTime) {
-		return alarmDao.countByCreateTime(createTime);
-	}
-
-	@Override
-	public long countByReceiver(String receiver) {
-		return alarmDao.countByReceiver(receiver);
-	}
-
 	private void initProperties() {
 		try {
 			InputStream in = AlarmServiceImpl.class.getClassLoader().getResourceAsStream(AlARM_URL_FILE);
@@ -275,18 +256,24 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-
 		initProperties();
 	}
 
 	@Override
-	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit) {
-		return alarmDao.findByReceiverAndTime(receiver, startTime, endTime, offset, limit);
+	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime,
+			int offset, int limit) {
+		return alarmDao.findByPage(receiver, related, startTime, endTime, offset, limit);
 	}
 
 	@Override
-	public long countByReceiverAndTime(String receiver, Date startTime, Date endTime) {
-		return alarmDao.countByReceiverAndTime(receiver, startTime, endTime);
+	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
+			Date endTime, int offset, int limit) {
+		return alarmDao.findByPage(receiver, related, subRelated, startTime, endTime, offset, limit);
+	}
+
+	@Override
+	public Alarm findByEventId(long eventId) {
+		return alarmDao.findByEventId(eventId);
 	}
 
 }

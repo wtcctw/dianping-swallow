@@ -228,4 +228,39 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		}
 	}
 
+	@Override
+	public List<String> getConusmerIdInfos() {
+		List<String> consumerIdInfos = new ArrayList<String>();
+		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+		if (topicKeys != null) {
+			Iterator<String> iterator = topicKeys.iterator();
+			while (iterator.hasNext()) {
+				String topicName = iterator.next();
+				if (StringUtils.isNotBlank(topicName)) {
+					List<String> partConsumerIds = getConsumerIdsByTopic(topicName);
+					if (partConsumerIds == null) {
+						continue;
+					}
+					consumerIdInfos.addAll(partConsumerIds);
+				}
+			}
+		}
+		return consumerIdInfos;
+	}
+
+	private List<String> getConsumerIdsByTopic(String topicName) {
+		Set<String> consumerIds = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName), StatisType.SEND);
+		List<String> consumerIdInfos = null;
+		if (consumerIds != null) {
+			consumerIdInfos = new ArrayList<String>();
+			Iterator<String> iterator = consumerIds.iterator();
+			while (iterator.hasNext()) {
+				String consumerId = iterator.next();
+				if (StringUtils.isNotBlank(consumerId)) {
+					consumerIdInfos.add(consumerId + " " + topicName);
+				}
+			}
+		}
+		return consumerIdInfos;
+	}
 }

@@ -1,0 +1,132 @@
+<div class="main-content">
+	<div class="report">
+		<div class="breadcrumbs" id="breadcrumbs">
+			<script type="text/javascript">
+				try {
+					ace.settings.check('breadcrumbs', 'fixed')
+				} catch (e) {
+				}
+			</script>
+			<ul class="breadcrumb">
+				<li class="active">告警详情</li>
+			</ul>
+			<!-- end  breadcrumbs-->
+		</div>
+
+		<div class="breadcrumbs" id="message-retransmit"
+			style="display: none;">
+			<script type="text/javascript">
+				try {
+					ace.settings.check('breadcrumbs', 'fixed')
+				} catch (e) {
+				}
+			</script>
+		</div>
+
+		<!-- page-content -->
+		<div class="page-content" style="background-color: #f9f9f9;">
+			<div class="col-xs-12">
+				<!-- PAGE CONTENT BEGINS -->
+				<form class="form-horizontal" role="form">
+					<div class="form-group"></div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 告警ID: </label>
+						<div class="col-sm-9">
+							<label class="ol-xs-10 col-sm-12 control-label"
+								style="text-align: left;" for="form-field-1">
+								${entity.eventId} </label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 告警编号: </label>
+						<div class="col-sm-9">
+							<label class="ol-xs-10 col-sm-12 control-label"
+								style="text-align: left;" for="form-field-1">
+								${entity.number} </label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 告警级别: </label>
+						<div class="col-sm-9">
+							<label class="ol-xs-10 col-sm-12 control-label"
+								style="text-align: left;" for="form-field-1">
+								${entity.type} </label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 相关信息: </label>
+						<div class="col-sm-9">
+							<label class="ol-xs-10 col-sm-12 control-label"
+								style="text-align: left;" for="form-field-1">
+								${entity.eventId} </label>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 标题: </label>
+						<div class="col-sm-9">
+							<label class="ol-xs-10 col-sm-12 control-label"
+								style="text-align: left;" for="form-field-1">
+								${entity.title} </label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 内容: </label>
+						<div class="col-sm-9">
+							<label class="ol-xs-10 col-sm-12 control-label"
+								style="text-align: left;" for="form-field-1">
+								${entity.body} </label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 发送结果: </label>
+						<div class="col-sm-9">
+							#foreach($sendInfo in ${entity.sendInfos})
+							<div class="col-sm-12" style="padding-left:0px;">
+								<label class="ol-xs-10 col-sm-3 control-label"
+									style="text-align: left;" for="form-field-1">
+									${sendInfo.receiver} </label> <label
+									class="ol-xs-10 col-sm-3 control-label"
+									style="text-align: left;" for="form-field-1">
+									${sendInfo.sendType} </label> <label
+									class="ol-xs-10 col-sm-3 control-label"
+									style="text-align: left;" for="form-field-1">
+									${sendInfo.resultType} </label>
+							</div>
+							#end
+						</div>
+
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 时间: </label>
+						<div class="col-sm-9">
+							<label class="ol-xs-10 col-sm-12 control-label"
+								style="text-align: left;" for="form-field-1">
+								$!dateTool.format("yyyy-MM-dd HH:mm:ss", $!entity.createTime)</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" style="padding-right: 10px;"
+							for="form-field-1"> 来源: </label>
+						<div class="col-sm-9">
+							<label class="ol-xs-10 col-sm-12 control-label"
+								style="text-align: left;" for="form-field-1">
+								${entity.sourceIp} </label>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<!--end page-header  -->
+		</div>
+		<!-- end page-content -->
+	</div>
+</div>

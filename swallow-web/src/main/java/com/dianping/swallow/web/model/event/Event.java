@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,6 +143,10 @@ public abstract class Event {
 
 	public abstract String getRelated();
 
+	protected String getSubRelated() {
+		return StringUtils.EMPTY;
+	}
+
 	public abstract RelatedType getRelatedType();
 
 	public abstract boolean isSendAlarm(AlarmType alarmType, int timeSpan);
@@ -165,8 +169,8 @@ public abstract class Event {
 				Alarm alarm = new Alarm();
 				alarm.setNumber(alarmType.getNumber()).setEventId(eventId)
 						.setBody(getMessage(alarmMeta.getAlarmTemplate())).setRelated(getRelated())
-						.setRelatedType(getRelatedType()).setTitle(alarmMeta.getAlarmTitle())
-						.setType(alarmMeta.getLevelType());
+						.setSubRelated(getSubRelated()).setRelatedType(getRelatedType())
+						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 				Set<String> mobiles = new HashSet<String>();
 				Set<String> emails = new HashSet<String>();
 				if (alarmMeta.getIsSendSwallow()) {

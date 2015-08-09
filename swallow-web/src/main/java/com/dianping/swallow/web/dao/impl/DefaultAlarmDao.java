@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.mongodb.WriteResult;
@@ -35,6 +36,10 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 	private static final String EVENTID_FIELD = "eventId";
 
 	private static final String ID_FIELD = "id";
+
+	private static final String RELATED_FIELD = "related";
+
+	private static final String SUBRELATED_FIELD = "subRelated";
 
 	@Override
 	public boolean insert(Alarm alarm) {
@@ -67,38 +72,21 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 	}
 
 	@Override
-	public List<Alarm> findByReceiver(String receiver, int offset, int limit) {
-		Query query = new Query(Criteria.where(RECEIVER_FIELD).is(receiver));
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, CREATETIME_FIELD)));
-		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
-		return alarms;
-	}
-
-	@Override
-	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit) {
-		Query query = new Query(Criteria.where(CREATETIME_FIELD).gte(createTime));
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, CREATETIME_FIELD)));
-		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
-		return alarms;
-	}
-
-	@Override
-	public long countByCreateTime(Date createTime) {
-		Query query = new Query(Criteria.where(CREATETIME_FIELD).gte(createTime));
-		return mongoTemplate.count(query, ALARM_COLLECTION);
-	}
-
-	@Override
-	public long countByReceiver(String receiver) {
-		Query queryCount = new Query(Criteria.where(RECEIVER_FIELD).is(receiver));
-		return mongoTemplate.count(queryCount, ALARM_COLLECTION);
-	}
-
-	@Override
-	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit) {
+	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime,
+			int offset, int limit) {
+		if (endTime == null) {
+			endTime = new Date();
+		}
 		Criteria criteria = null;
 		if (StringUtils.isNotBlank(receiver)) {
 			criteria = Criteria.where(RECEIVER_FIELD).is(receiver);
+		}
+		if (StringUtils.isNotBlank(related)) {
+			if (criteria != null) {
+				criteria = criteria.and(RELATED_FIELD).is(related);
+			} else {
+				criteria = Criteria.where(RELATED_FIELD).is(related);
+			}
 		}
 		if (startTime != null && endTime != null) {
 			if (criteria != null) {
@@ -114,16 +102,68 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 			}
 		}
 		Query query = new Query(criteria);
+		Query queryCount = new Query(criteria);
 		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, EVENTID_FIELD)));
 		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
-		return alarms;
+		long count = mongoTemplate.count(queryCount, ALARM_COLLECTION);
+		Pair<List<Alarm>, Long> result = new Pair<List<Alarm>, Long>();
+		result.setFirst(alarms);
+		result.setSecond(count);
+		return result;
 	}
 
 	@Override
-	public long countByReceiverAndTime(String receiver, Date startTime, Date endTime) {
-		Query queryCount = new Query(Criteria.where(RECEIVER_FIELD).is(receiver).and(CREATETIME_FIELD).gte(startTime)
-				.lte(endTime));
-		return mongoTemplate.count(queryCount, ALARM_COLLECTION);
+	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
+			Date endTime, int offset, int limit) {
+		if (endTime == null) {
+			endTime = new Date();
+		}
+		Criteria criteria = null;
+		if (StringUtils.isNotBlank(receiver)) {
+			criteria = Criteria.where(RECEIVER_FIELD).is(receiver);
+		}
+		if (StringUtils.isNotBlank(related)) {
+			if (criteria != null) {
+				criteria = criteria.and(RELATED_FIELD).is(related);
+			} else {
+				criteria = Criteria.where(RELATED_FIELD).is(related);
+			}
+		}
+		if (StringUtils.isNotBlank(subRelated)) {
+			if (criteria != null) {
+				criteria = criteria.and(SUBRELATED_FIELD).is(subRelated);
+			} else {
+				criteria = Criteria.where(SUBRELATED_FIELD).is(subRelated);
+			}
+		}
+		if (startTime != null && endTime != null) {
+			if (criteria != null) {
+				criteria = criteria.and(CREATETIME_FIELD).gte(startTime).lte(endTime);
+			} else {
+				criteria = Criteria.where(CREATETIME_FIELD).gte(startTime).lte(endTime);
+			}
+		} else {
+			if (criteria != null) {
+				criteria = criteria.and(CREATETIME_FIELD).lte(endTime);
+			} else {
+				criteria = Criteria.where(CREATETIME_FIELD).lte(endTime);
+			}
+		}
+		Query query = new Query(criteria);
+		Query queryCount = new Query(criteria);
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, EVENTID_FIELD)));
+		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
+		long count = mongoTemplate.count(queryCount, ALARM_COLLECTION);
+		Pair<List<Alarm>, Long> result = new Pair<List<Alarm>, Long>();
+		result.setFirst(alarms);
+		result.setSecond(count);
+		return result;
 	}
 
+	@Override
+	public Alarm findByEventId(long eventId) {
+		Query query = new Query(Criteria.where(EVENTID_FIELD).is(eventId));
+		Alarm alarm = mongoTemplate.findOne(query, Alarm.class, ALARM_COLLECTION);
+		return alarm;
+	}
 }

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.alarm.Alarm;
 
 /**
@@ -125,59 +126,39 @@ public interface AlarmService {
 	 * @return
 	 */
 	public Alarm findById(String id);
-
+	
 	/**
-	 * find by receiver
-	 * 
-	 * @param Alarm
-	 * @return
-	 */
-	public List<Alarm> findByReceiver(String receiver, int offset, int limit);
-
-	/**
-	 * find by id
-	 * 
-	 * @param ipDesc
-	 * @return
-	 */
-	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit);
-
-	/**
-	 * find by receiver and createTime
-	 * 
+	 * find by page
 	 * @param receiver
-	 * @param timeStart
-	 * @param timeEnd
+	 * @param related
+	 * @param subRelated
+	 * @param startTime
+	 * @param endTime
 	 * @param offset
 	 * @param limit
 	 * @return
 	 */
-	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit);
-
+	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime,
+			Date endTime, int offset, int limit);
+	
 	/**
-	 * find count by createTime
-	 * 
-	 * @param
-	 * @return
-	 */
-	public long countByCreateTime(Date createTime);
-
-	/**
-	 * find count by receiver
-	 * 
-	 * @param
-	 * @return
-	 */
-	public long countByReceiver(String receiver);
-
-	/**
-	 * find count by receiver and createTime
-	 * 
+	 * find by page
 	 * @param receiver
-	 * @param timeStart
-	 * @param timeEnd
+	 * @param related
+	 * @param subRelated
+	 * @param startTime
+	 * @param endTime
+	 * @param offset
+	 * @param limit
 	 * @return
 	 */
-	public long countByReceiverAndTime(String receiver, Date startTime, Date endTime);
+	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
+			Date endTime, int offset, int limit);
 
+	/**
+	 * find by eventId
+	 * @param eventId
+	 * @return
+	 */
+	public Alarm findByEventId(long eventId);
 }

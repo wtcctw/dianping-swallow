@@ -27,6 +27,8 @@ public class Alarm implements Cloneable {
 	private String body;
 
 	private String related;
+	
+	private String subRelated;
 
 	private RelatedType relatedType;
 
@@ -130,6 +132,16 @@ public class Alarm implements Cloneable {
 		return this;
 	}
 
+	public String getSubRelated() {
+		return subRelated;
+	}
+
+	public Alarm setSubRelated(String subRelated) {
+		this.subRelated = subRelated;
+		return this;
+	}
+
+	
 	public List<SendInfo> getSendInfos() {
 		return sendInfos;
 	}
