@@ -56,6 +56,14 @@ public class AlarmMeta {
 	private String alarmTemplate;
 	
 	private String alarmDetail;
+	
+	private int timeSpanBase;
+	
+	private int maxTimeSpan;
+	
+	private int daySpanRatio;
+	
+	private int nightSpanRatio;
 
 	private int sendTimeSpan;
 
@@ -190,6 +198,38 @@ public class AlarmMeta {
 				+ ", isSendSwallow=" + isSendSwallow + ", isSendBusiness=" + isSendBusiness + ", alarmTemplate="
 				+ alarmTemplate + ", sendTimeSpan=" + sendTimeSpan + ", createTime=" + createTime + ", updateTime="
 				+ updateTime + "]";
+	}
+
+	public int getTimeSpanBase() {
+		return timeSpanBase;
+	}
+
+	public void setTimeSpanBase(int timeSpanBase) {
+		this.timeSpanBase = timeSpanBase;
+	}
+
+	public int getMaxTimeSpan() {
+		return maxTimeSpan;
+	}
+
+	public void setMaxTimeSpan(int maxTimeSpan) {
+		this.maxTimeSpan = maxTimeSpan;
+	}
+
+	public int getDaySpanRatio() {
+		return daySpanRatio;
+	}
+
+	public void setDaySpanRatio(int daySpanRatio) {
+		this.daySpanRatio = daySpanRatio;
+	}
+
+	public int getNightSpanRatio() {
+		return nightSpanRatio;
+	}
+
+	public void setNightSpanRatio(int nightSpanRatio) {
+		this.nightSpanRatio = nightSpanRatio;
 	}
 
 }

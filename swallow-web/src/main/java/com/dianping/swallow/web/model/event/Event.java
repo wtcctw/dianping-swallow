@@ -154,7 +154,7 @@ public abstract class Event {
 	public abstract Set<String> getRelatedIps();
 
 	public void sendMessage(AlarmType alarmType) {
-		logger.error("[sendMessage] AlarmType {}. ", alarmType);
+		logger.info("[sendMessage] AlarmType {}. ", alarmType);
 		AlarmMeta alarmMeta = alarmMetaContainer.getAlarmMeta(alarmType.getNumber());
 		if (alarmMeta != null) {
 			if (isSendAlarm(alarmType, alarmMeta.getSendTimeSpan())) {

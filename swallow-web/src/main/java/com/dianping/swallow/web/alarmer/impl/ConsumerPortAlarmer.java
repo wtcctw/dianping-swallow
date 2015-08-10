@@ -127,7 +127,6 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 					.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 			eventReporter.report(serverEvent);
 			lastCheckStatus.put(key, false);
-			eventReporter.report(serverEvent);
 			return false;
 		} else {
 			isSlaveIps.put(masterIp, false);

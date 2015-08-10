@@ -66,13 +66,11 @@ public class AlarmController extends AbstractSidebarBasedController {
 			endDate = new Date();
 		}
 		Pair<List<Alarm>, Long> results = null;
-		if (alarmSearchDto.getRelatedType().isConsumerId()) {
-			if (StringUtils.isNotBlank(alarmSearchDto.getRelatedInfo())) {
-				String relateds[] = alarmSearchDto.getRelatedInfo().split(" ");
-				if (relateds.length == 2) {
-					results = alarmService.findByPage(alarmSearchDto.getReceiver(), relateds[1], relateds[0],
-							startDate, endDate, alarmSearchDto.getOffset(), alarmSearchDto.getLimit());
-				}
+		if (alarmSearchDto.getRelatedType().isConsumerId() && StringUtils.isNotBlank(alarmSearchDto.getRelatedInfo())) {
+			String relateds[] = alarmSearchDto.getRelatedInfo().split(" ");
+			if (relateds.length == 2) {
+				results = alarmService.findByPage(alarmSearchDto.getReceiver(), relateds[1], relateds[0], startDate,
+						endDate, alarmSearchDto.getOffset(), alarmSearchDto.getLimit());
 			}
 		} else {
 			results = alarmService.findByPage(alarmSearchDto.getReceiver(), alarmSearchDto.getRelatedInfo(), startDate,
