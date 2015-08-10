@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  *         2015年8月1日 下午11:20:13
  */
 public class DateUtil {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
 
 	private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("GMT+8:00");
@@ -42,9 +42,9 @@ public class DateUtil {
 			return new Date();
 		}
 	}
-	
-	public static int getCurrentHour(){
-		return Calendar.HOUR_OF_DAY;
+
+	public static int getCurrentHour() {
+		return Calendar.getInstance(DEFAULT_TIMEZONE).get(Calendar.HOUR_OF_DAY);
 	}
-	
+
 }

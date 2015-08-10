@@ -54,6 +54,8 @@ public abstract class Event {
 
 	private static final String ALARM_RECIEVER_FILE_NAME = "swallow-alarm-reciever.properties";
 
+	private static final long timeUnit = 60 * 1000;
+
 	static {
 		initProperties();
 	}
@@ -190,15 +192,16 @@ public abstract class Event {
 	protected boolean isAlarm(Map<String, AlarmRecord> alarms, String key, AlarmMeta alarmMeta) {
 		AlarmRecord alarmRecord = new AlarmRecord().setCheckAlarmTime(System.currentTimeMillis());
 		if (alarms.containsKey(key)) {
+
 			AlarmRecord lastAlarmRecord = alarms.get(key);
 			long dAlarmValue = System.currentTimeMillis() - lastAlarmRecord.getLastAlarmTime();
 			long dCheckValue = System.currentTimeMillis() - lastAlarmRecord.getCheckAlarmTime();
-			int spanRetio = getSpanRatio(alarmMeta);
-			final int unitTime = 60 * 1000;
-			if (0 < dCheckValue && dCheckValue < unitTime) {
+			int spanRetio = getSpanRatio(alarmMeta.getDaySpanRatio(), alarmMeta.getNightSpanRatio());
+
+			if (0 < dCheckValue && dCheckValue < timeUnit) {
 				long currentTimeSpan = (spanRetio * lastAlarmRecord.getAlarmCount() + alarmMeta.getTimeSpanBase())
-						* unitTime;
-				long maxTimeSpan = alarmMeta.getMaxTimeSpan() * unitTime;
+						* timeUnit;
+				long maxTimeSpan = alarmMeta.getMaxTimeSpan() * timeUnit;
 				long timeSpan = currentTimeSpan > maxTimeSpan ? maxTimeSpan : currentTimeSpan;
 
 				if (dAlarmValue > timeSpan) {
@@ -212,24 +215,26 @@ public abstract class Event {
 					alarms.put(key, alarmRecord);
 					return false;
 				}
+
 			} else {
 				alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
 				alarms.put(key, alarmRecord);
 				return true;
 			}
 		} else {
+
 			alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
 			alarms.put(key, alarmRecord);
 			return true;
 		}
 	}
 
-	private int getSpanRatio(AlarmMeta alarmMeta) {
+	protected int getSpanRatio(int daySpanRatio, int nightSpanRatio) {
 		int hour = DateUtil.getCurrentHour();
 		if (7 < hour && hour < 18) {
-			return alarmMeta.getDaySpanRatio();
+			return daySpanRatio;
 		} else {
-			return alarmMeta.getNightSpanRatio();
+			return nightSpanRatio;
 		}
 	}
 
