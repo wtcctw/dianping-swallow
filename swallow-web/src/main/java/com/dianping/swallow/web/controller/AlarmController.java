@@ -84,7 +84,7 @@ public class AlarmController extends AbstractSidebarBasedController {
 		return result;
 	}
 
-	@RequestMapping(value = "/console/alarm/{eventId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/console/alarm/detail/{eventId}", method = RequestMethod.GET)
 	public ModelAndView alarmDetail(@PathVariable long eventId) {
 		Map<String, Object> paras = super.createViewMap();
 		paras.put("entity", alarmService.findByEventId(eventId));

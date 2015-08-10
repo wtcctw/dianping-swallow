@@ -77,7 +77,7 @@
 						</tr>
 						<tr ng-repeat="m in searchPaginator.currentPageItems">
 							<td style="text-align: left">{{$index+1}}</td>
-							<td style="text-align: left"><a ng-href='/console/alarm/{{m.eventId}}'>{{m.eventId}}</a></td>
+							<td style="text-align: left"><a ng-href='/console/alarm/detail/{{m.eventId}}'>{{m.eventId}}</a></td>
 							<td style="text-align: left"><a ng-href="#">{{m.number}}</a></td>
 							<td style="text-align: left"><a ng-href='{{m.relatedUrl}}'>{{m.related}}</a></td>
 							<td style="text-align: left">{{m.title}}</td>

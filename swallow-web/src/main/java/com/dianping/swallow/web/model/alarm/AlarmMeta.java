@@ -5,7 +5,7 @@ import java.util.Date;
 import org.springframework.data.annotation.Transient;
 
 public class AlarmMeta {
-	
+
 	@Transient
 	public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
@@ -32,7 +32,7 @@ public class AlarmMeta {
 
 	@Transient
 	public static final String CONSUMERID_TEMPLATE = "{consumerId}";
-	
+
 	private String id;
 
 	private int metaId;
@@ -54,15 +54,15 @@ public class AlarmMeta {
 	private String alarmTitle;
 
 	private String alarmTemplate;
-	
+
 	private String alarmDetail;
-	
+
 	private int timeSpanBase;
-	
+
 	private int maxTimeSpan;
-	
+
 	private int daySpanRatio;
-	
+
 	private int nightSpanRatio;
 
 	private int sendTimeSpan;
@@ -142,7 +142,7 @@ public class AlarmMeta {
 	public void setIsSendBusiness(boolean isSendBusiness) {
 		this.isSendBusiness = isSendBusiness;
 	}
-	
+
 	public String getAlarmTitle() {
 		return alarmTitle;
 	}
@@ -158,7 +158,7 @@ public class AlarmMeta {
 	public void setAlarmTemplate(String alarmTemplate) {
 		this.alarmTemplate = alarmTemplate;
 	}
-	
+
 	public String getAlarmDetail() {
 		return alarmDetail;
 	}

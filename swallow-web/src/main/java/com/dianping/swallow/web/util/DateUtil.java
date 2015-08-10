@@ -2,6 +2,7 @@ package com.dianping.swallow.web.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -41,4 +42,9 @@ public class DateUtil {
 			return new Date();
 		}
 	}
+	
+	public static int getCurrentHour(){
+		return Calendar.HOUR_OF_DAY;
+	}
+	
 }

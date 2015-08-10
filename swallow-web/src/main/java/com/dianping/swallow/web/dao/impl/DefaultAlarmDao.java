@@ -27,7 +27,7 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultAlarmDao.class);
 
-	private static final String ALARM_COLLECTION = "swallowwebalarmtestc";
+	private static final String ALARM_COLLECTION = "swallowwebalarmdatac";
 
 	private static final String RECEIVER_FIELD = "receiver";
 

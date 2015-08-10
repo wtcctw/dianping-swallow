@@ -20,7 +20,7 @@ import com.dianping.swallow.web.util.DateUtil;
  */
 public class ServerEvent extends Event {
 
-	private static final Map<String, Long> lastAlarms = new ConcurrentHashMap<String, Long>();
+	private static final Map<String, AlarmRecord> lastAlarms = new ConcurrentHashMap<String, AlarmRecord>();
 
 	private String ip;
 
@@ -131,9 +131,9 @@ public class ServerEvent extends Event {
 	}
 
 	@Override
-	public boolean isSendAlarm(AlarmType alarmType, int timeSpan) {
+	public boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta) {
 		String key = ip + KEY_SPLIT + alarmType.getNumber();
-		return isAlarm(lastAlarms, key, timeSpan);
+		return isAlarm(lastAlarms, key, alarmMeta);
 	}
 
 	@Override

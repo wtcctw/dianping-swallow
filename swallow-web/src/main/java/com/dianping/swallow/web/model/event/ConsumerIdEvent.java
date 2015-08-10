@@ -19,7 +19,7 @@ import com.dianping.swallow.web.util.DateUtil;
  */
 public class ConsumerIdEvent extends TopicEvent {
 
-	private static final Map<String, Long> lastAlarms = new ConcurrentHashMap<String, Long>();
+	private static final Map<String, AlarmRecord> lastAlarms = new ConcurrentHashMap<String, AlarmRecord>();
 
 	private String consumerId;
 
@@ -100,9 +100,9 @@ public class ConsumerIdEvent extends TopicEvent {
 	}
 
 	@Override
-	public boolean isSendAlarm(AlarmType alarmType, int timeSpan) {
+	public boolean isSendAlarm(AlarmType alarmType,AlarmMeta alarmMeta) {
 		String key = getTopicName() + KEY_SPLIT + getConsumerId() + KEY_SPLIT + alarmType.getNumber();
-		return isAlarm(lastAlarms, key, timeSpan);
+		return isAlarm(lastAlarms, key, alarmMeta);
 	}
 
 	@Override
