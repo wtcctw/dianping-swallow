@@ -257,6 +257,10 @@ body{
     left: 190px;
 }
 
+.sidebar.menu-min~.footer .footer-inner {
+    left: 43px;
+}
+
 .footer .footer-inner {
     text-align: center;
     position: absolute;
