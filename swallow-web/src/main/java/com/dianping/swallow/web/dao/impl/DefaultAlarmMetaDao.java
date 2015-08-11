@@ -28,7 +28,7 @@ public class DefaultAlarmMetaDao extends AbstractWriteDao implements AlarmMetaDa
 	@Override
 	public boolean insert(AlarmMeta alarmMeta) {
 		try {
-			mongoTemplate.save(alarmMeta);
+			mongoTemplate.save(alarmMeta,ALARMMETA_COLLECTION);
 			return true;
 		} catch (Exception e) {
 			logger.error("Error when save swallow alarm setting " + alarmMeta, e);

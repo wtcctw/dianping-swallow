@@ -72,22 +72,23 @@
 							<th>相关信息</th>
 							<th>标题</th>
 							<th>内容</th>
-							<th>收件人 | 发送方式 | 发送结果</th>
+							<th>收件人|发送方式|发送结果</th>
 							<th>时间</th>
 						</tr>
 						<tr ng-repeat="m in searchPaginator.currentPageItems">
 							<td style="text-align: left">{{$index+1}}</td>
-							<td style="text-align: left"><a ng-href='/console/alarm/detail/{{m.eventId}}'>{{m.eventId}}</a></td>
+							<td style="text-align: left"><a
+								ng-href='/console/alarm/detail/{{m.eventId}}'>{{m.eventId}}</a></td>
 							<td style="text-align: left"><a ng-href="#">{{m.number}}</a></td>
 							<td style="text-align: left"><a ng-href='{{m.relatedUrl}}'>{{m.related}}</a></td>
 							<td style="text-align: left">{{m.title}}</td>
-							<td style="text-align: left">{{m.body|cut:true:50:'...'}}</td>
+							<td style="text-align: left">{{m.body|cut:true:30:'...'}}</td>
 							<td style="text-align: left">
-								<table>
-									<tr ng-repeat="s in m.sendInfos" ng-hide="!$first">
-										<td style="border-top: 0px;">{{s.receiver}}</td>
-										<td style="border-top: 0px;">{{s.sendType}}</td>
-										<td style="border-top: 0px;">{{s.resultType}}...</td>
+								<table style="margin: 0; padding: 0;">
+									<tr ng-repeat="s in m.sendInfos" ng-hide="!$first" style="margin: 0; padding: 0;">
+										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.receiver}}&nbsp;</td>
+										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.sendType}}&nbsp;</td>
+										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.resultType}}...</td>
 									</tr>
 								</table>
 							</td>

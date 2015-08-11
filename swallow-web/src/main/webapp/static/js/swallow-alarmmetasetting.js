@@ -154,20 +154,21 @@ module
 							}
 
 							$rootScope.removerecord = function(cid) {
+								console.log(cid);
 								$http
 										.get(
 												window.contextPath
 														+ "/console/setting/alarmmeta/remove",
 												{
 													params : {
-														cid : cid
+														metaId : cid
 													}
 												})
 										.success(
 												function(data) {
 													$scope.searchPaginator = Paginator(
 															fetchFunction,
-															$scope.numrecord);
+															$scope.pageSize);
 												});
 								return true;
 							}

@@ -95,7 +95,8 @@
 								class="col-xs-3 control-label control-label no-padding-right">告警级别</label>
 							<div class="col-xs-8">
 								<select class="col-xs-12" ng-model="alarmMetaEntity.levelType"
-									name="levelType" ng-options="o as o for o in leveltypes" required>
+									name="levelType" ng-options="o as o for o in leveltypes"
+									required>
 								</select>
 							</div>
 						</div>
@@ -166,8 +167,8 @@
 								class="col-xs-3 control-label control-label no-padding-right">详情</label>
 							<div class="col-xs-8">
 								<input type="text" class="form-control"
-									ng-model="alarmMetaEntity.alarmDetail" name="alarmDetail"
-									required> </input>
+									ng-model="alarmMetaEntity.alarmDetail" name="alarmDetail">
+								</input>
 							</div>
 						</div>
 						<div class="col-xs-12 form-group">
