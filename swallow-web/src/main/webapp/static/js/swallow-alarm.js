@@ -108,14 +108,6 @@ module
 								console.log($scope.searchEntity);
 								$http.post(window.contextPath + $scope.suburl,
 										$scope.searchEntity).success(callback);
-								// $.ajax({
-								// type : "POST",
-								// url : window.contextPath + $scope.suburl,
-								// dataType : "json",
-								// contentType : "application/json",
-								// data : JSON.stringify($scope.searchEntity),
-								// success : callback
-								// });
 							};
 
 							$scope.receiver = "";
