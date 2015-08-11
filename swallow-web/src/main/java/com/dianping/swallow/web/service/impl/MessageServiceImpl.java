@@ -34,7 +34,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 
 	private static final String PRE_MSG = "msg#";
 	private static final String MESSAGE = "message";
-	private static final String GZIP = "H4sIAAAAAAAAA";
+	public static final String GZIP = "H4sIAAAAAAAAA";
 
 	@Autowired
 	private MessageDao webMessageDao;
@@ -141,7 +141,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		}
 	}
 
-	private void isZipped(Message m) {
+	public void isZipped(Message m) {
 		String content = m.getC();
 		if (StringUtils.isNotEmpty(content) && m.getC().startsWith(GZIP)) {
 			try {
