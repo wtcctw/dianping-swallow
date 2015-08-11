@@ -10,8 +10,8 @@
 				}
 			</script>
 
-			<a class="pull-right" href="#myModal" ng-click="clearModal()"
-				data-toggle="modal"><i class="icon-plus"></i>新增setting</a>
+			<a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
+				data-toggle="modal"><i class="icon-plus"></i></a>
 		</div>
 		<div class="page-content" id="container">
 			<div class="row">
@@ -32,7 +32,7 @@
 					</tr>
 					<tr ng-repeat="e in searchPaginator.currentPageItems">
 						<td style="text-align: left">{{$index+1}}</td>
-						<td style="text-align: left"><a ng-href='/console/alarm/detail/{{e.metaId}}'>{{e.type}}</a></td>
+						<td style="text-align: left"><a ng-href='/console/setting/alarmmeta/detail/{{e.metaId}}'>{{e.type}}</a></td>
 						<td style="text-align: left">{{e.levelType}}</td>
 						<td style="text-align: left">{{e.isSmsMode}}</td>
 						<td style="text-align: left">{{e.isWeiXinMode}}</td>

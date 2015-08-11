@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,6 +37,13 @@ public class AlarmMetaController extends AbstractSidebarBasedController {
 		result.put("size", alarmMetas.size());
 		result.put("entitys", alarmMetas);
 		return result;
+	}
+	
+	@RequestMapping(value = "/console/setting/alarmmeta/detail/{metaId}", method = RequestMethod.GET)
+	public ModelAndView alarmDetail(@PathVariable int metaId) {
+		Map<String, Object> paras = super.createViewMap();
+		paras.put("entity", alarmMetaService.findByMetaId(metaId));
+		return new ModelAndView("setting/alarmmetadetail", paras);
 	}
 
 	@Override
