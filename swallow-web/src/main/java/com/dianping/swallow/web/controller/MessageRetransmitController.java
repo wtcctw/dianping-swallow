@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.internal.util.IPUtil;
+import com.dianping.swallow.web.controller.dto.SendMessageDto;
 import com.dianping.swallow.web.service.MessageRetransmitService;
 import com.dianping.swallow.web.task.AuthenticationStringGenerator;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -43,27 +45,26 @@ public class MessageRetransmitController extends AbstractController {
 
 	@RequestMapping(value = "/api/message/sendmessageid", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object retransmitapi(@RequestParam(value = "mid") String param, @RequestParam("topic") String topic,
-			@RequestParam(value = "authentication", required = false) String authentication,
-			HttpServletRequest request, HttpServletResponse response) {
+	public Object retransmitapi(@RequestBody SendMessageDto sendMessageDto, HttpServletRequest request,
+			HttpServletResponse response) {
 
-		if (StringUtils.isNotBlank(authentication)
-				&& !authenticationStringGenerator.loadAuthenticationString().equals(authentication)) {
+		if (StringUtils.isNotBlank(sendMessageDto.getAuthentication())
+				&& !authenticationStringGenerator.loadAuthenticationString().equals(sendMessageDto.getAuthentication())) {
 			return generateResponse(ResponseStatus.UNAUTHENTICATION.getStatus(),
 					ResponseStatus.UNAUTHENTICATION.getMessage());
 		}
-		if (StringUtils.isEmpty(param)) {
+		if (StringUtils.isEmpty(sendMessageDto.getMid())) {
 			if (logger.isInfoEnabled()) {
 				logger.info(String.format("mid is empty"));
 			}
 			return generateResponse(ResponseStatus.EMPTYCONTENT.getStatus(), ResponseStatus.EMPTYCONTENT.getMessage());
 		}
 		boolean successornot = false;
-		String topicName = topic.trim();
-		String[] mids = param.split(",");
+		String topicName = sendMessageDto.getTopic();
+		String[] mids = sendMessageDto.getMid().split(",");
 		for (String mid : mids) {
 			Transaction producerTransaction = Cat.getProducer().newTransaction("MsgRetransmit",
-					topic + ":" + IPUtil.getFirstNoLoopbackIP4Address());
+					topicName + ":" + IPUtil.getFirstNoLoopbackIP4Address());
 			try {
 				successornot = messageRetransmitService.doRetransmit(topicName, Long.parseLong(mid));
 				producerTransaction.setStatus(Message.SUCCESS);

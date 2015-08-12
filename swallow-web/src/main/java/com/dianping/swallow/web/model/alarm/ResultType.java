@@ -18,7 +18,11 @@ public enum ResultType {
 	/**
 	 * 
 	 */
-	FAILED_TIMEOUT("超时"),
+	FAILED_CONNECTION_TIMEOUT("链接超时"),
+	/**
+	 * 
+	 */
+	FAILED_SOCKET_TIMEOUT("SOCKET超时"),
 	/**
 	 * 
 	 */
@@ -26,7 +30,7 @@ public enum ResultType {
 	/**
 	 * 
 	 */
-	FAILED_UNKNOWNHOST("未知主机"),
+	FAILED_HOST_UNKNOWN("未知主机"),
 	/**
 	 * 
 	 */
