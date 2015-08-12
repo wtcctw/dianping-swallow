@@ -22,6 +22,7 @@ import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.web.controller.dto.SendMessageDto;
+import com.dianping.swallow.web.controller.dto.SendMessageIDDto;
 import com.dianping.swallow.web.service.MessageRetransmitService;
 import com.dianping.swallow.web.task.AuthenticationStringGenerator;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -45,7 +46,7 @@ public class MessageRetransmitController extends AbstractController {
 
 	@RequestMapping(value = "/api/message/sendmessageid", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object retransmitapi(@RequestBody SendMessageDto sendMessageDto, HttpServletRequest request,
+	public Object retransmitapi(@RequestBody SendMessageIDDto sendMessageDto, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		if (StringUtils.isNotBlank(sendMessageDto.getAuthentication())
@@ -92,19 +93,16 @@ public class MessageRetransmitController extends AbstractController {
 
 	@RequestMapping(value = "/api/message/sendmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object sendOneMessages(@RequestParam(value = "topic") String topic,
-			@RequestParam(value = "content") String text, @RequestParam(value = "type") String type,
-			@RequestParam(value = "delimitor", required = false) String delimitor,
-			@RequestParam(value = "property") String property,
-			@RequestParam(value = "authentication", required = false) String authentication,
-			HttpServletRequest request, HttpServletResponse response) {
+	public Object sendOneMessages(@RequestBody SendMessageDto sendMessageDto, HttpServletRequest request,
+			HttpServletResponse response) {
 
-		if (StringUtils.isNotBlank(authentication)
-				&& !authenticationStringGenerator.loadAuthenticationString().equals(authentication)) {
+		if (StringUtils.isNotBlank(sendMessageDto.getAuthentication())
+				&& !authenticationStringGenerator.loadAuthenticationString().equals(sendMessageDto.getAuthentication())) {
 			return generateResponse(ResponseStatus.UNAUTHENTICATION.getStatus(),
 					ResponseStatus.UNAUTHENTICATION.getMessage());
 		}
-		return doSendMessage(topic, text, type, delimitor, property);
+		return doSendMessage(sendMessageDto.getTopic(), sendMessageDto.getContent(), sendMessageDto.getType(),
+				sendMessageDto.getDelimitor(), sendMessageDto.getProperty());
 	}
 
 	private Object doSendMessage(String topic, String text, String type, String delimitor, String property) {

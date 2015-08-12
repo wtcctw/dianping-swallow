@@ -492,8 +492,10 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        }
 	        
 	        $scope.starttransmit = function(data){
-			$scope.entity = {mid: data ,
-					topic:$scope.topic};
+			$scope.entity = {
+					mid: data ,
+					topic:$scope.topic
+			};
 			console.log($scope.entity);
 	        	$http.post(window.contextPath + '/api/message/sendmessageid', 
 					  JSON.stringify($scope.entity)).success(function(response) {

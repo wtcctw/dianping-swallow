@@ -2,10 +2,16 @@ package com.dianping.swallow.web.controller.dto;
 
 public class SendMessageDto {
 
-	private String mid;
-	
 	private String topic;
-	
+
+	private String content;
+
+	private String type;
+
+	private String delimitor;
+
+	private String property;
+
 	private String authentication;
 
 	public String getTopic() {
@@ -16,17 +22,42 @@ public class SendMessageDto {
 		this.topic = topic;
 	}
 
-	public String getMid() {
-		return mid;
+	public String getContent() {
+		return content;
 	}
 
-	public void setMid(String mid) {
-		this.mid = mid;
-	}
-	
 	@Override
 	public String toString() {
-		return "SendMessageDto [mid=" + mid + ", topic=" + topic + "]";
+		return "SendMessageDto [topic=" + topic + ", content=" + content + ", type=" + type + ", delimitor="
+				+ delimitor + ", property=" + property + ", authentication=" + authentication + "]";
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getDelimitor() {
+		return delimitor;
+	}
+
+	public void setDelimitor(String delimitor) {
+		this.delimitor = delimitor;
+	}
+
+	public String getProperty() {
+		return property;
+	}
+
+	public void setProperty(String property) {
+		this.property = property;
 	}
 
 	public String getAuthentication() {
