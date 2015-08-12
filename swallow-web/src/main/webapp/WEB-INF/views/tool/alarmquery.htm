@@ -78,8 +78,8 @@
 						<tr ng-repeat="m in searchPaginator.currentPageItems">
 							<td style="text-align: left">{{$index+1}}</td>
 							<td style="text-align: left"><a
-								ng-href='/console/alarm/detail/{{m.eventId}}'>{{m.eventId}}</a></td>
-							<td style="text-align: left"><a ng-href="#">{{m.number}}</a></td>
+								ng-href='${rc.contextPath}/console/alarm/detail/{{m.eventId}}'>{{m.eventId}}</a></td>
+							<td style="text-align: left"><a ng-href='${rc.contextPath}/console/setting/alarmmeta/detail/{{m.number}}'>{{m.number}}</a></td>
 							<td style="text-align: left"><a ng-href='{{m.relatedUrl}}'>{{m.related}}</a></td>
 							<td style="text-align: left">{{m.title}}</td>
 							<td style="text-align: left">{{m.body|cut:true:30:'...'}}</td>
@@ -87,8 +87,7 @@
 								<table style="margin: 0; padding: 0;">
 									<tr ng-repeat="s in m.sendInfos" ng-hide="!$first" style="margin: 0; padding: 0;">
 										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.receiver}}&nbsp;</td>
-										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.sendType}}&nbsp;</td>
-										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.resultType}}...</td>
+										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.sendType}}...</td>
 									</tr>
 								</table>
 							</td>
