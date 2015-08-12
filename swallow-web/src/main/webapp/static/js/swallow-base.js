@@ -2,7 +2,8 @@
 //Your app's root module...
 var module = angular.module('SwallowModule', ['ngResource', 'ngDialog', 'mgcrea.ngStrap'], function($httpProvider) {
   // Use x-www-form-urlencoded Content-Type
-  $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+//	  $httpProvider.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
+//	  $httpProvider.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
 
   /**
    * The workhorse; converts an object to x-www-form-urlencoded serialization.
@@ -41,25 +42,20 @@ var module = angular.module('SwallowModule', ['ngResource', 'ngDialog', 'mgcrea.
   };
 
   // Override $http service's default transformRequest
-  $httpProvider.defaults.transformRequest = [function(data) {
-    return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
-  }];
+//  $httpProvider.defaults.transformRequest = [function(data) {
+//    return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
+//  }];
 });
 
-module.config(function($locationProvider, $resourceProvider) {
-	// configure html5 to get links working on jsfiddle
-	$locationProvider.html5Mode(true);
-});
+//module.config(function($locationProvider, $resourceProvider) {
+//	// configure html5 to get links working on jsfiddle
+//	$locationProvider.html5Mode(true);
+//});
 
 module.filter('strreplace', function() {
     return function(input) {
         return input.replace(/\\/g, "")
     };
-});
-
-module.config(function($locationProvider, $resourceProvider) {
-	// configure html5 to get links working on jsfiddle
-	$locationProvider.html5Mode(true);
 });
 
 module.directive('onFinishRenderFilters', function ($timeout) {
@@ -120,6 +116,26 @@ module.filter('notblank', function() {
 			  }
 		  }
 		  return items;
+	  };
+	});
+
+module.filter('cut', function () {
+	  return function (value, wordwise, max, tail) {
+	    if (!value) return '';
+
+	    max = parseInt(max, 10);
+	    if (!max) return value;
+	    if (value.length <= max) return value;
+
+	    value = value.substr(0, max);
+	    if (wordwise) {
+	      var lastspace = value.lastIndexOf(' ');
+	      if (lastspace != -1) {
+	        value = value.substr(0, lastspace);
+	      }
+	    }
+
+	    return value + (tail || ' …');
 	  };
 	});
 

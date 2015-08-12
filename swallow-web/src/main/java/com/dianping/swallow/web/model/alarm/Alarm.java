@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.model.alarm;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
@@ -20,19 +22,17 @@ public class Alarm implements Cloneable {
 
 	private AlarmLevelType type;
 
-	private SendType sendType;
-
 	private String title;
 
 	private String body;
 
 	private String related;
+	
+	private String subRelated;
 
 	private RelatedType relatedType;
 
-	private String receiver;
-
-	private ResultType resultType;
+	private List<SendInfo> sendInfos;
 
 	private Date createTime;
 
@@ -78,15 +78,6 @@ public class Alarm implements Cloneable {
 		return this;
 	}
 
-	public String getReceiver() {
-		return receiver;
-	}
-
-	public Alarm setReceiver(String receiver) {
-		this.receiver = receiver;
-		return this;
-	}
-
 	public Date getCreateTime() {
 		return createTime;
 	}
@@ -102,15 +93,6 @@ public class Alarm implements Cloneable {
 
 	public Alarm setSourceIp(String sourceIp) {
 		this.sourceIp = sourceIp;
-		return this;
-	}
-
-	public SendType getSendType() {
-		return sendType;
-	}
-
-	public Alarm setSendType(SendType sendType) {
-		this.sendType = sendType;
 		return this;
 	}
 
@@ -141,15 +123,6 @@ public class Alarm implements Cloneable {
 		return this;
 	}
 
-	public ResultType getResultType() {
-		return resultType;
-	}
-
-	public Alarm setResultType(ResultType resultType) {
-		this.resultType = resultType;
-		return this;
-	}
-
 	public RelatedType getRelatedType() {
 		return relatedType;
 	}
@@ -159,27 +132,33 @@ public class Alarm implements Cloneable {
 		return this;
 	}
 
-	@Override
-	public Object clone() {
-		Alarm alarm;
-		try {
-			alarm = (Alarm) super.clone();
-		} catch (CloneNotSupportedException e) {
-			alarm = new Alarm();
+	public String getSubRelated() {
+		return subRelated;
+	}
+
+	public Alarm setSubRelated(String subRelated) {
+		this.subRelated = subRelated;
+		return this;
+	}
+
+	
+	public List<SendInfo> getSendInfos() {
+		return sendInfos;
+	}
+
+	public void setSendInfos(List<SendInfo> sendInfos) {
+		this.sendInfos = sendInfos;
+	}
+
+	public void addSendInfo(SendInfo sendInfo) {
+		if (this.sendInfos == null) {
+			synchronized (this) {
+				if (this.sendInfos == null) {
+					this.sendInfos = new ArrayList<SendInfo>();
+				}
+			}
 		}
-		alarm.id = this.id;
-		alarm.eventId = this.eventId;
-		alarm.number = this.number;
-		if (this.createTime != null) {
-			alarm.createTime = new Date(this.createTime.getTime());
-		}
-		alarm.sendType = this.sendType;
-		alarm.body = this.body;
-		alarm.title = this.title;
-		alarm.type = this.type;
-		alarm.sourceIp = this.sourceIp;
-		alarm.receiver = this.receiver;
-		return alarm;
+		this.sendInfos.add(sendInfo);
 	}
 
 }

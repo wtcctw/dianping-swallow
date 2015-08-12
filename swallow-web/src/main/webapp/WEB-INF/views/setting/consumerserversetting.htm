@@ -1,17 +1,19 @@
-<div class="main-container-inner"
-	ng-controller="ConsumerServerSettingController"
+<div class="main-content" ng-controller="ConsumerServerSettingController"
 	id="ConsumerServerSettingController">
-	<div class="main-content">
 		<div class="breadcrumbs" id="breadcrumbs">
+		<script type="text/javascript"
+				src="${rc.contextPath}/static/js/swallow-consumerserversetting.js"></script>
 			<script type="text/javascript">
 				try {
 					ace.settings.check('breadcrumbs', 'fixed')
 				} catch (e) {
 				}
 			</script>
-
-			<a class="pull-right" href="#myModal" ng-click="clearModal()"
-				data-toggle="modal"><i class="icon-plus"></i>新增setting</a>
+			<ul class="breadcrumb">
+				<li class="active">consumer server设置</li>
+			</ul>
+			<a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
+				data-toggle="modal"><i class="icon-plus"></i></a>
 		</div>
 		<div class="page-content" id="container">
 			<div class="row">
@@ -137,7 +139,4 @@
 		</div>
 		<!-- /.modal -->
 	</div>
-
-</div>
-
 

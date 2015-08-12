@@ -118,7 +118,6 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			ProducerTopicStatsData producerTopicStatsData = statsDataFactory.createTopicStatsData();
 			producerTopicStatsData.setTopicName(topicName);
 			producerTopicStatsData.setTimeKey(timeKey);
-
 			NavigableMap<Long, Long> topicDelays = serverStatisData.getDelay(StatisType.SAVE);
 
 			Long topicQpxValue = topicQpxs.get(timeKey);

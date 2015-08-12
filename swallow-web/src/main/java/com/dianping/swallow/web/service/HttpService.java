@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 
+import com.dianping.swallow.web.model.alarm.ResultType;
+
 /**
  * 
  * http api
@@ -40,6 +42,8 @@ public interface HttpService {
 	public static class HttpResult {
 
 		private boolean isSuccess;
+		
+		private ResultType resultType;
 
 		private String responseBody;
 
@@ -50,6 +54,14 @@ public interface HttpService {
 		public void setSuccess(boolean isSuccess) {
 			this.isSuccess = isSuccess;
 		}
+		
+		public ResultType getResultType() {
+			return resultType;
+		}
+
+		public void setResultType(ResultType resultType) {
+			this.resultType = resultType;
+		}
 
 		public String getResponseBody() {
 			return responseBody;
@@ -58,6 +70,7 @@ public interface HttpService {
 		public void setResponseBody(String responseBody) {
 			this.responseBody = responseBody;
 		}
+
 	}
 
 }

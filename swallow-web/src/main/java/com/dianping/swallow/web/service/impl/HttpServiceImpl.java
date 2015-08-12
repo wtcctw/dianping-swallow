@@ -39,7 +39,7 @@ public class HttpServiceImpl implements HttpService {
 		try {
 			httpPost.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 		} catch (UnsupportedEncodingException e) {
-			logger.error("http post param encoded failed", e);
+			logger.error("http post param encoded failed. ", e);
 		}
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
@@ -50,7 +50,7 @@ public class HttpServiceImpl implements HttpService {
 			}
 		} catch (IOException e) {
 			result.setSuccess(false);
-			logger.error("http post request failed ." + url, e);
+			logger.error("http post request failed. " + url, e);
 		}
 		return result;
 	}

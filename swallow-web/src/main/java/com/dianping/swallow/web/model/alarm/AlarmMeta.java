@@ -5,7 +5,7 @@ import java.util.Date;
 import org.springframework.data.annotation.Transient;
 
 public class AlarmMeta {
-	
+
 	@Transient
 	public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
@@ -32,7 +32,7 @@ public class AlarmMeta {
 
 	@Transient
 	public static final String CONSUMERID_TEMPLATE = "{consumerId}";
-	
+
 	private String id;
 
 	private int metaId;
@@ -54,8 +54,16 @@ public class AlarmMeta {
 	private String alarmTitle;
 
 	private String alarmTemplate;
-	
+
 	private String alarmDetail;
+
+	private int timeSpanBase;
+
+	private int maxTimeSpan;
+
+	private int daySpanRatio;
+
+	private int nightSpanRatio;
 
 	private int sendTimeSpan;
 
@@ -134,7 +142,7 @@ public class AlarmMeta {
 	public void setIsSendBusiness(boolean isSendBusiness) {
 		this.isSendBusiness = isSendBusiness;
 	}
-	
+
 	public String getAlarmTitle() {
 		return alarmTitle;
 	}
@@ -150,7 +158,7 @@ public class AlarmMeta {
 	public void setAlarmTemplate(String alarmTemplate) {
 		this.alarmTemplate = alarmTemplate;
 	}
-	
+
 	public String getAlarmDetail() {
 		return alarmDetail;
 	}
@@ -190,6 +198,38 @@ public class AlarmMeta {
 				+ ", isSendSwallow=" + isSendSwallow + ", isSendBusiness=" + isSendBusiness + ", alarmTemplate="
 				+ alarmTemplate + ", sendTimeSpan=" + sendTimeSpan + ", createTime=" + createTime + ", updateTime="
 				+ updateTime + "]";
+	}
+
+	public int getTimeSpanBase() {
+		return timeSpanBase;
+	}
+
+	public void setTimeSpanBase(int timeSpanBase) {
+		this.timeSpanBase = timeSpanBase;
+	}
+
+	public int getMaxTimeSpan() {
+		return maxTimeSpan;
+	}
+
+	public void setMaxTimeSpan(int maxTimeSpan) {
+		this.maxTimeSpan = maxTimeSpan;
+	}
+
+	public int getDaySpanRatio() {
+		return daySpanRatio;
+	}
+
+	public void setDaySpanRatio(int daySpanRatio) {
+		this.daySpanRatio = daySpanRatio;
+	}
+
+	public int getNightSpanRatio() {
+		return nightSpanRatio;
+	}
+
+	public void setNightSpanRatio(int nightSpanRatio) {
+		this.nightSpanRatio = nightSpanRatio;
 	}
 
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +24,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.SeqGeneratorService;
+import com.dianping.swallow.web.util.DateUtil;
 
 /**
  * 
@@ -53,6 +54,8 @@ public abstract class Event {
 
 	private static final String ALARM_RECIEVER_FILE_NAME = "swallow-alarm-reciever.properties";
 
+	private static final long timeUnit = 60 * 1000;
+
 	static {
 		initProperties();
 	}
@@ -60,13 +63,13 @@ public abstract class Event {
 	private AlarmService alarmService;
 
 	private IPDescManager ipDescManager;
-	
+
 	private AlarmMetaContainer alarmMetaContainer;
 
 	protected IPCollectorService ipCollectorService;
 
 	private SeqGeneratorService seqGeneratorService;
-	
+
 	private long eventId;
 
 	private Date createTime;
@@ -118,7 +121,7 @@ public abstract class Event {
 	public void setAlarmMetaContainer(AlarmMetaContainer alarmMetaContainer) {
 		this.alarmMetaContainer = alarmMetaContainer;
 	}
-	
+
 	public void setIPDescManager(IPDescManager ipDescManager) {
 		this.ipDescManager = ipDescManager;
 	}
@@ -143,17 +146,21 @@ public abstract class Event {
 
 	public abstract String getRelated();
 
+	protected String getSubRelated() {
+		return StringUtils.EMPTY;
+	}
+
 	public abstract RelatedType getRelatedType();
 
-	public abstract boolean isSendAlarm(AlarmType alarmType, int timeSpan);
+	public abstract boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta);
 
 	public abstract Set<String> getRelatedIps();
 
 	public void sendMessage(AlarmType alarmType) {
-		logger.error("[sendMessage] AlarmType {}. ", alarmType);
+		logger.info("[sendMessage] AlarmType {}. ", alarmType);
 		AlarmMeta alarmMeta = alarmMetaContainer.getAlarmMeta(alarmType.getNumber());
 		if (alarmMeta != null) {
-			if (isSendAlarm(alarmType, alarmMeta.getSendTimeSpan())) {
+			if (isSendAlarm(alarmType, alarmMeta)) {
 				if (!(alarmMeta.getIsMailMode() || alarmMeta.getIsSmsMode() || alarmMeta.getIsWeiXinMode())
 						|| !(alarmMeta.getIsSendBusiness() || alarmMeta.getIsSendSwallow())) {
 					logger.error("[sendMessage] as alarmMeta, no need to send message.metaId {}.",
@@ -165,8 +172,8 @@ public abstract class Event {
 				Alarm alarm = new Alarm();
 				alarm.setNumber(alarmType.getNumber()).setEventId(eventId)
 						.setBody(getMessage(alarmMeta.getAlarmTemplate())).setRelated(getRelated())
-						.setRelatedType(getRelatedType()).setTitle(alarmMeta.getAlarmTitle())
-						.setType(alarmMeta.getLevelType());
+						.setSubRelated(getSubRelated()).setRelatedType(getRelatedType())
+						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
 				Set<String> mobiles = new HashSet<String>();
 				Set<String> emails = new HashSet<String>();
 				if (alarmMeta.getIsSendSwallow()) {
@@ -182,19 +189,52 @@ public abstract class Event {
 		}
 	}
 
-	protected boolean isAlarm(Map<String, Long> alarms, String key, int timeSpan) {
-		long dValue = 0;
+	protected boolean isAlarm(Map<String, AlarmRecord> alarms, String key, AlarmMeta alarmMeta) {
+		AlarmRecord alarmRecord = new AlarmRecord().setCheckAlarmTime(System.currentTimeMillis());
 		if (alarms.containsKey(key)) {
-			dValue = System.currentTimeMillis() - alarms.get(key).longValue();
-			if (dValue > timeSpan * 60 * 1000) {
-				alarms.put(key, System.currentTimeMillis());
-				return true;
+
+			AlarmRecord lastAlarmRecord = alarms.get(key);
+			long dAlarmValue = System.currentTimeMillis() - lastAlarmRecord.getLastAlarmTime();
+			long dCheckValue = System.currentTimeMillis() - lastAlarmRecord.getCheckAlarmTime();
+			int spanRetio = getSpanRatio(alarmMeta.getDaySpanRatio(), alarmMeta.getNightSpanRatio());
+
+			if (0 < dCheckValue && dCheckValue < timeUnit) {
+				long currentTimeSpan = (spanRetio * lastAlarmRecord.getAlarmCount() + alarmMeta.getTimeSpanBase())
+						* timeUnit;
+				long maxTimeSpan = alarmMeta.getMaxTimeSpan() * timeUnit;
+				long timeSpan = currentTimeSpan > maxTimeSpan ? maxTimeSpan : currentTimeSpan;
+
+				if (dAlarmValue > timeSpan) {
+					alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount() + 1).setLastAlarmTime(
+							System.currentTimeMillis());
+					alarms.put(key, alarmRecord);
+					return true;
+				} else {
+					alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount()).setLastAlarmTime(
+							lastAlarmRecord.getLastAlarmTime());
+					alarms.put(key, alarmRecord);
+					return false;
+				}
+
 			} else {
-				return false;
+				alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
+				alarms.put(key, alarmRecord);
+				return true;
 			}
 		} else {
-			alarms.put(key, System.currentTimeMillis());
+
+			alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
+			alarms.put(key, alarmRecord);
 			return true;
+		}
+	}
+
+	protected int getSpanRatio(int daySpanRatio, int nightSpanRatio) {
+		int hour = DateUtil.getCurrentHour();
+		if (7 < hour && hour < 18) {
+			return daySpanRatio;
+		} else {
+			return nightSpanRatio;
 		}
 	}
 
@@ -223,6 +263,7 @@ public abstract class Event {
 		if (alarmMeta.getIsWeiXinMode()) {
 			alarmService.sendWeiXin(emails, alarm);
 		}
+		alarmService.insert(alarm);
 	}
 
 	private void fillReciever(Set<String> ips, Set<String> mobiles, Set<String> emails) {

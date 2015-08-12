@@ -6,15 +6,17 @@ import java.util.Set;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午3:19:36
+ *         2015年8月3日 下午3:19:36
  */
 public interface ConsumerStatsDataWapper {
 	/**
 	 * get all server statis data at timekey point
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
@@ -22,6 +24,7 @@ public interface ConsumerStatsDataWapper {
 
 	/**
 	 * get all consumerId statis data at timekey point
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
@@ -29,13 +32,15 @@ public interface ConsumerStatsDataWapper {
 
 	/**
 	 * get one topic related consumerId statis data at timekey point
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
 	List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey);
-	
+
 	/**
 	 * get consumerId related ip
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
@@ -43,8 +48,14 @@ public interface ConsumerStatsDataWapper {
 
 	/**
 	 * get topic related ip
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
 	Set<String> getTopicIps(String topicName);
+	/**
+	 * get ConsumerId
+	 * @return
+	 */
+	List<String> getConusmerIdInfos();
 }
