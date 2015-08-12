@@ -105,7 +105,7 @@ public class AlarmMetaController extends AbstractSidebarBasedController {
 
 	@Override
 	protected String getSide() {
-		return "setting";
+		return "metasetting";
 	}
 
 	@Override

@@ -20,6 +20,7 @@
 			<table
 				class="table table-bordered table-striped  table-condensed table-hover">
 				<tr>
+					<td style="text-align: left"><input type="checkbox" id="check-all"></input></td>
 					<th style="text-align: left">序号</th>
 					<th style="text-align: left">类型</th>
 					<th style="text-align: left">短信</th>
@@ -32,6 +33,7 @@
 					<th style="text-align: left">操作</th>
 				</tr>
 				<tr ng-repeat="e in searchPaginator.currentPageItems">
+					<td style="text-align: left"><input type="checkbox" name="check-list" value="{{e.metaId}}"></input></td>
 					<td style="text-align: left">{{$index+1}}</td>
 					<td style="text-align: left"><a
 						ng-href='/console/setting/alarmmeta/detail/{{e.metaId}}'>{{e.type}}</a></td>

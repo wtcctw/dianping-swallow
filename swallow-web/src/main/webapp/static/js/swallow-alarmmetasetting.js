@@ -107,7 +107,6 @@ module
 							$scope.queryCount = 0;
 
 							$scope.query = function() {
-
 								$scope.searchPaginator = Paginator(
 										fetchFunction, $scope.pageSize);
 							}
@@ -226,5 +225,9 @@ module
 										console.log("leveltypes读取错误");
 									});
 							$scope.booleans = [ false, true ];
+							$("#check-all").click(function(){
+								$("input[name='check-list']").prop("checked",this.checked); 
+							    //$("input[name='check-list']").attr("checked",$(this).attr("checked"));
+							});
 
 						} ]);

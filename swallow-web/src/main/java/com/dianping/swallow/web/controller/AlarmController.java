@@ -115,10 +115,10 @@ public class AlarmController extends AbstractSidebarBasedController {
 	@Override
 	protected String getSide() {
 
-		return "tool";
+		return "alarm";
 	}
 
-	private static String subSide = "alarmming";
+	private static String subSide = "alarmquery";
 
 	@Override
 	public String getSubSide() {

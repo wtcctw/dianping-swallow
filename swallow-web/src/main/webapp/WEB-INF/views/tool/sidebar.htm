@@ -8,24 +8,24 @@
 		}
 	</script>
 	<ul class="nav nav-list">
-		<li class="#if($menu == 'tool') open #end"><a href="#"
+		<li class="#if($side == 'alarm') open #end"><a href="#"
 			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
 				class="menu-text">告警</span> <b class="arrow icon-angle-down"></b>
 		</a>
 			<ul class="submenu" style="display: block;">
-				<li class="#if($subside == 'alarmming') active #end"><a
+				<li class="#if($subside == 'alarmquery') active #end"><a
 					href="${contextPath}/console/tool"> <i class="icon-globe"></i>
 						告警查询
 				</a></li>
 			</ul></li>
 	</ul>
 	<ul class="nav nav-list">
-		<li class="#if($menu == 'tool') open #end"><a href="#"
+		<li class="#if($side == 'download') open #end"><a href="#"
 			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
 				class="menu-text">下载</span> <b class="arrow icon-angle-down"></b>
 		</a>
 			<ul class="submenu" style="display: block;">
-				<li class="#if($subside == 'download') active #end"><a
+				<li class="#if($subside == 'messagedownload') active #end"><a
 					href="${contextPath}/console/download"> <i class="icon-globe"></i>
 						消息下载
 				</a></li>
