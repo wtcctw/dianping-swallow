@@ -12,30 +12,32 @@
             http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
 
 	<bean
-        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:swallow-web.properties</value>
-            </list>
-        </property>
-    </bean>
-
-	<bean class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager"/>
-
-    <bean id="messageDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
-        <property name="mongoManager" >
-			<ref local="mongoManager"/>
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:swallow-web.properties</value>
+			</list>
 		</property>
 	</bean>
 
-    <bean id="mongoManager"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
+	<bean
+		class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager" />
+
+	<bean id="messageDAO"
+		class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
+		<property name="mongoManager">
+			<ref local="mongoManager" />
+		</property>
+	</bean>
+
+	<bean id="mongoManager"
+		class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
 		<constructor-arg value="web" index="0" />
-        <property name="swallowConfig" ref="swallowConfig"/>
-    </bean>
-    
-	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
+		<property name="swallowConfig" ref="swallowConfig" />
+	</bean>
+
+	<bean id="swallowConfig"
+		class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl" />
 
 	<context:component-scan base-package="com.dianping.swallow.web" />
 	<context:annotation-config />
@@ -64,6 +66,17 @@
 			</bean>
 		</mvc:interceptor>
 	</mvc:interceptors>
+	<!--用户信息接口配置 -->
+	<bean id="baUserService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
+		init-method="init">
+		<property name="serviceName"
+			value="http://service.dianping.com/ba/base/organizationalstructure/UserService_1.0.0" />
+		<property name="iface"
+			value="com.dianping.ba.base.organizationalstructure.api.user.UserService" />
+		<property name="serialize" value="hessian" />
+		<property name="callMethod" value="sync" />
+		<property name="timeout" value="5000" />
+	</bean>
 
 	<import resource="applicationContext-utils.xml" />
 	<import resource="applicationContext-mongo.xml" />
