@@ -42,14 +42,14 @@ var module = angular.module('SwallowModule', ['ngResource', 'ngDialog', 'mgcrea.
   };
 
   // Override $http service's default transformRequest
-  $httpProvider.defaults.transformRequest = [function(data) {
-    return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
-  }];
+//  $httpProvider.defaults.transformRequest = [function(data) {
+//    return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
+//  }];
 });
 
 module.config(function($locationProvider, $resourceProvider) {
 	// configure html5 to get links working on jsfiddle
-	$locationProvider.html5Mode(true);
+//	$locationProvider.html5Mode(true);
 });
 
 module.filter('strreplace', function() {
