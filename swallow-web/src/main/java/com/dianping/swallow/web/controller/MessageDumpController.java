@@ -138,10 +138,10 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 	@Override
 	protected String getSide() {
 
-		return "tool";
+		return "download";
 	}
 
-	private String subSide = "download";
+	private String subSide = "messagedownload";
 
 	@Override
 	public String getSubSide() {

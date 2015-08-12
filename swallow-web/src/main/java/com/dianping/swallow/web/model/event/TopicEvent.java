@@ -19,7 +19,7 @@ import com.dianping.swallow.web.util.DateUtil;
  */
 public class TopicEvent extends StatisEvent {
 
-	private static final Map<String, Long> lastAlarms = new ConcurrentHashMap<String, Long>();
+	private static final Map<String, AlarmRecord> lastAlarms = new ConcurrentHashMap<String, AlarmRecord>();
 
 	private String topicName;
 
@@ -103,9 +103,9 @@ public class TopicEvent extends StatisEvent {
 	}
 
 	@Override
-	public boolean isSendAlarm(AlarmType alarmType, int timeSpan) {
+	public boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta) {
 		String key = topicName + KEY_SPLIT + alarmType.getNumber();
-		return isAlarm(lastAlarms, key, timeSpan);
+		return isAlarm(lastAlarms, key, alarmMeta);
 	}
 
 	@Override

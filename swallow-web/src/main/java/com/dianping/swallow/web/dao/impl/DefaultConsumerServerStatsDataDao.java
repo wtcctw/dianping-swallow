@@ -25,7 +25,7 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 	private static final String ID_FIELD = "id";
 
 	private static final String IP_FIELD = "ip";
-
+	
 	@Override
 	public boolean insert(ConsumerServerStatsData serverStatsData) {
 		try {

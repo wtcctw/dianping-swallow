@@ -51,7 +51,8 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	public boolean checkSender() {
 		List<String> consumerServerMasterIps = ipCollectorService.getConsumerServerMasterIps();
 		List<String> consumerServerSlaveIps = ipCollectorService.getConsumerServerMasterIps();
-		if (consumerServerMasterIps == null || consumerServerMasterIps.size() == 0) {
+		if (consumerServerMasterIps == null || consumerServerMasterIps.size() == 0 || consumerServerSlaveIps == null
+				|| consumerServerSlaveIps.size() == 0) {
 			logger.error("[checkSender] cannot find consumer server master ips.");
 			return true;
 		}

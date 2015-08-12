@@ -11,11 +11,12 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.dao.ConsumerIdStatsDataDao;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.mongodb.WriteResult;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午2:38:41
+ *         2015年8月3日 下午2:38:41
  */
 @Service("consumerIdStatsDataDao")
 public class DefaultConsumerIdStatsDataDao extends AbstractStatsDao implements ConsumerIdStatsDataDao {

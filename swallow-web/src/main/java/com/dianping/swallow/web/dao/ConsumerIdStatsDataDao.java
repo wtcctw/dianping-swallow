@@ -3,14 +3,15 @@ package com.dianping.swallow.web.dao;
 import java.util.List;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午2:38:27
+ *         2015年8月3日 下午2:38:27
  */
 public interface ConsumerIdStatsDataDao {
-	
+
 	public boolean insert(ConsumerIdStatsData consumerIdStatsData);
 
 	public boolean update(ConsumerIdStatsData consumerIdstatsData);

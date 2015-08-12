@@ -2,7 +2,7 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +33,14 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 		TopicAlarmSetting topicAlarmSetting = null;
 		if (StringUtils.isNotBlank(setting.getTopicName())) {
 			topicAlarmSetting = findByTopicName(setting.getTopicName());
+			if (topicAlarmSetting == null) {
+				return insert(setting);
+			} else {
+				setting.setId(topicAlarmSetting.getId());
+				return topicAlarmSettingDao.update(setting);
+			}
 		}
-		if (topicAlarmSetting == null) {
-			return insert(setting);
-		} else {
-			setting.setId(topicAlarmSetting.getId());
-			return topicAlarmSettingDao.update(setting);
-		}
+		return false;
 	}
 
 	@Override

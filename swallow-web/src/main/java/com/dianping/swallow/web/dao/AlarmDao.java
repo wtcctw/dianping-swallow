@@ -3,6 +3,7 @@ package com.dianping.swallow.web.dao;
 import java.util.Date;
 import java.util.List;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.alarm.Alarm;
 
 /**
@@ -45,57 +46,37 @@ public interface AlarmDao extends Dao {
 	public Alarm findById(String id);
 
 	/**
-	 * find by receiver
+	 * find by receiver related and time
 	 * 
-	 * @param Alarm
-	 * @return
-	 */
-	public List<Alarm> findByReceiver(String receiver, int offset, int limit);
-
-	/**
-	 * find by createTime
-	 * 
-	 * @param createTime
+	 * @param receiver
+	 * @param related
+	 * @param startTime
+	 * @param endTime
 	 * @param offset
 	 * @param limit
 	 * @return
 	 */
-	public List<Alarm> findByCreateTime(Date createTime, int offset, int limit);
+	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime,
+			int offset, int limit);
 
 	/**
-	 * find by receiver and createTime
+	 * find by receiver related and time
+	 * 
 	 * @param receiver
-	 * @param timeStart
-	 * @param timeEnd
+	 * @param related
+	 * @param startTime
+	 * @param endTime
 	 * @param offset
 	 * @param limit
 	 * @return
 	 */
-	public List<Alarm> findByReceiverAndTime(String receiver, Date startTime, Date endTime, int offset, int limit);
+	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
+			Date endTime, int offset, int limit);
 
 	/**
-	 * find count by createTime
-	 * 
-	 * @param
+	 * find by eventId
+	 * @param eventId
 	 * @return
 	 */
-	public long countByCreateTime(Date createTime);
-
-	/**
-	 * find count by receiver
-	 * 
-	 * @param
-	 * @return
-	 */
-	public long countByReceiver(String receiver);
-	
-	/**
-	 * find count by receiver and createTime
-	 * @param receiver
-	 * @param timeStart
-	 * @param timeEnd
-	 * @return
-	 */
-	public long countByReceiverAndTime(String receiver, Date startTime, Date endTime);
-
+	public Alarm findByEventId(long eventId);
 }
