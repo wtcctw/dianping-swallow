@@ -231,10 +231,8 @@ public enum AlarmType {
 	/**
 	 * consumer consumerid statis data ack delay type
 	 */
-	CONSUMER_CONSUMERID_ACKMESSAGE_DELAY(1021),
+	CONSUMER_CONSUMERID_ACKMESSAGE_DELAY(1021);
 	
-	TEST_TEST(1022);
-
 	private int number;
 
 	private AlarmType() {
