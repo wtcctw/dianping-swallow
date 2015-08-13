@@ -1,0 +1,126 @@
+<div class="main-content">
+	<div class="report">
+		<div class="breadcrumbs" id="breadcrumbs">
+			<script type="text/javascript">
+				try {
+					ace.settings.check('breadcrumbs', 'fixed')
+				} catch (e) {
+				}
+			</script>
+			<ul class="breadcrumb">
+				<li class="active">告警配置详情</li>
+			</ul>
+			<!-- end  breadcrumbs-->
+		</div>
+
+		<div class="breadcrumbs" id="message-retransmit"
+			style="display: none;">
+			<script type="text/javascript">
+				try {
+					ace.settings.check('breadcrumbs', 'fixed')
+				} catch (e) {
+				}
+			</script>
+		</div>
+
+		<!-- page-content -->
+		<div class="page-content">
+			<div>
+				<div class="row row-detail">
+					<!-- PAGE CONTENT BEGINS -->
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							信息ID: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.metaId} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							告警类型: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.type} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							告警级别: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.levelType} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							是否发送短信: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.isSmsMode} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							是否发送微信: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.isWeiXinMode} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							是否发送邮件: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.isMailMode} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							是否发送Swallow组: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.isSendSwallow} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							是否发送业务组: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.isSendBusiness} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">
+							标题: </label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.alarmTitle} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">模版:
+						</label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.alarmTemplate} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">详情:
+						</label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> #if(${entity.alarmDetail}) ${entity.alarmDetail} #else "" #end </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">间隔基数:
+						</label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.timeSpanBase} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">间隔上限:
+						</label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.maxTimeSpan} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">白天系数:
+						</label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.daySpanRatio} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">夜晚系数:
+						</label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> ${entity.nightSpanRatio} </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">创建时间:
+						</label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> $!dateTool.format("yyyy-MM-dd
+							HH:mm:ss", $!entity.createTime) </label>
+					</div>
+					<div class="col-md-12">
+						<label class="col-sm-2 row-detail-label" for="form-field-1">更新时间:
+						</label> <label class="col-sm-10" style="text-align: left;"
+							for="form-field-1"> $!dateTool.format("yyyy-MM-dd
+							HH:mm:ss", $!entity.updateTime) </label>
+					</div>
+				</div>
+
+			</div>
+
+			<!--end page-header  -->
+		</div>
+		<!-- end page-content -->
+	</div>
+</div>

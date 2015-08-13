@@ -22,6 +22,7 @@ import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -29,20 +30,23 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
  *
  *         2015年8月3日 上午11:34:10
  */
-//@Component
+// @Component
 public class AlarmSettingContainerImpl implements AlarmSettingContainer, InitializingBean {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(AlarmSettingContainerImpl.class);
-	
+
 	private int interval = 120;// 秒
 
 	private int delay = 5;
 
 	@SuppressWarnings("unused")
 	private ScheduledFuture<?> future = null;
-	
-	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor();
-	
+
+	private static final String FACTORY_NAME = "AlarmSettingTask";
+
+	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
+			.getThreadFactory(FACTORY_NAME));
+
 	@Autowired
 	private GlobalAlarmSettingService globalAlarmSettingService;
 
@@ -57,7 +61,7 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 
 	@Autowired
 	private ConsumerIdAlarmSettingService consumerIdAlarmSettingService;
-	
+
 	private volatile GlobalAlarmSetting globalAlarmSetting;
 
 	private Map<String, ProducerServerAlarmSetting> pServerAlarmSettings = new ConcurrentHashMap<String, ProducerServerAlarmSetting>();
@@ -68,19 +72,18 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 
 	private Map<String, ConsumerIdAlarmSetting> consumerIdAlarmSettings = new ConcurrentHashMap<String, ConsumerIdAlarmSetting>();
 
-	public void initSettingData(){
+	public void initSettingData() {
 		globalAlarmSetting = globalAlarmSettingService.findDefault();
 	}
 
 	private void initGlobalSettingData() {
 		globalAlarmSetting = globalAlarmSettingService.findDefault();
 	}
-	
-	private void initPServerSettingData(){
-		
+
+	private void initPServerSettingData() {
+
 	}
 
-	
 	private void scheduleAlarmMetaTask() {
 		future = scheduled.scheduleAtFixedRate(new Runnable() {
 			@Override
@@ -96,11 +99,11 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 
 		}, delay, interval, TimeUnit.SECONDS);
 	}
-	
-	private void doLoadSettingDataTask(){
+
+	private void doLoadSettingDataTask() {
 		logger.info("[doAlarmMetaTask] scheduled load setting data.");
 	}
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 

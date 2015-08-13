@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor.impl;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableMap;
@@ -107,7 +108,12 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 		return timeMili / AbstractCollector.SEND_INTERVAL / 1000;
 	}
-	
+
+	public static Date getDate(long timeKey) {
+
+		return new Date(timeKey * 1000 * AbstractCollector.SEND_INTERVAL);
+	}
+
 	@Override
 	public int getKeepInMemoryHour() {
 		return keepInMemoryHour;
@@ -194,5 +200,5 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getSampleIntervalTime());
 	}
-	
+
 }

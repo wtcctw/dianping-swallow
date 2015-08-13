@@ -9,14 +9,17 @@ import java.util.Date;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.commons.lang.StringUtils;
 import org.bson.types.BSONTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.controller.MessageDumpController;
 import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
 import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.MessageService;
+import com.dianping.swallow.web.service.impl.MessageServiceImpl;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
@@ -118,6 +121,17 @@ public class DumpMessageTask implements Runnable {
 		int iterator = 0;
         while (cursor.hasNext()) {
         	DBObject dbo = cursor.next();
+        	String content = (String) dbo.get("c");
+        	if(StringUtils.isNotBlank(content) && content.startsWith(MessageServiceImpl.GZIP)){
+        		try {
+					content = ZipUtil.unzip(content);
+					dbo.put("c", content);
+				} catch (IOException e) {
+					if(logger.isErrorEnabled()){
+						logger.error("Error when unzip message content.", e);
+					}
+				}
+        	}
         	try {
 				writer.append(dbo.toString());
 				writer.newLine();

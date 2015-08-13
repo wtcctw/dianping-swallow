@@ -10,18 +10,44 @@ public enum ResultType {
 	/**
 	 * 
 	 */
-	SUCCESS,
+	SUCCESS("成功"),
 	/**
 	 * 
 	 */
-	FAILED,
+	FAILED("失败"),
 	/**
 	 * 
 	 */
-	FAILED_NET,
+	FAILED_CONNECTION_TIMEOUT("链接超时"),
 	/**
 	 * 
 	 */
-	FAILED_NOPERSON
+	FAILED_SOCKET_TIMEOUT("SOCKET超时"),
+	/**
+	 * 
+	 */
+	FAILED_CONNECT("链接问题"),
+	/**
+	 * 
+	 */
+	FAILED_HOST_UNKNOWN("未知主机"),
+	/**
+	 * 
+	 */
+	FAILED_NOPERSON("无收件人");
+
+	private ResultType(String desc) {
+		this.desc = desc;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
+
+	private String desc;
 
 }

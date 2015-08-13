@@ -1,4 +1,6 @@
-<div class="sidebar" id="sidebar">
+<div class="sidebar responsive menu-min" id="sidebar"
+	data-sidebar="true" data-sidebar-scroll="true"
+	data-sidebar-hover="true" style="float: left">
 	<script type="text/javascript">
 		try {
 			ace.settings.check('sidebar', 'fixed')
@@ -6,14 +8,14 @@
 		}
 	</script>
 	<ul class="nav nav-list">
-		<li class="#if($menu == 'setting') open #end"><a href="#"
+		<li class="#if($side == 'warn') open #end"><a href="#"
 			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
-				class="menu-text">报警设置</span> <b class="arrow icon-angle-down"></b>
+				class="menu-text">告警参数设置</span> <b class="arrow icon-angle-down"></b>
 		</a>
 			<ul class="submenu" style="display: block;">
 				<li class="#if($subside == 'swallow') active #end"><a
 					href="${contextPath}/console/setting/swallow"> <i
-						class="icon-globe"></i> 全局配置
+						class="icon-globe"></i> 全局设置
 				</a></li>
 				<li class="#if($subside == 'producer') active #end"><a
 					href="${contextPath}/console/setting/producerserver"> <i
@@ -31,10 +33,20 @@
 					href="${contextPath}/console/setting/consumerid"> <i
 						class="icon-globe"></i> consumerid设置
 				</a></li>
-			</ul>
-			</li>
+			</ul></li>
 	</ul>
-
+	<ul class="nav nav-list">
+		<li class="#if($side == 'metasetting') open #end"><a href="#"
+			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
+				class="menu-text">告警元信息配置</span> <b class="arrow icon-angle-down"></b>
+		</a>
+			<ul class="submenu" style="display: block;">
+				<li class="#if($subside == 'alarmmeta') active #end"><a
+					href="${contextPath}/console/setting/alarmmeta"> <i
+						class="icon-globe"></i> 信息配置
+				</a></li>
+			</ul></li>
+	</ul>
 	<!-- /.nav-list -->
 
 	<div class="sidebar-collapse" id="sidebar-collapse">

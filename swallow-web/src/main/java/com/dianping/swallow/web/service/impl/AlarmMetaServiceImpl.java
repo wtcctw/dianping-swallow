@@ -8,13 +8,18 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.dao.AlarmMetaDao;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.service.AlarmMetaService;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月12日 下午6:21:45
+ */
 @Service("alarmMetaService")
-public class AlarmMetaServiceImpl implements AlarmMetaService{
+public class AlarmMetaServiceImpl implements AlarmMetaService {
 
 	@Autowired
 	private AlarmMetaDao alarmMetaDao;
-	
+
 	@Override
 	public boolean insert(AlarmMeta alarmMeta) {
 		return alarmMetaDao.insert(alarmMeta);
@@ -22,7 +27,14 @@ public class AlarmMetaServiceImpl implements AlarmMetaService{
 
 	@Override
 	public boolean update(AlarmMeta alarmMeta) {
-		return alarmMetaDao.update(alarmMeta);
+		AlarmMeta tempAlarmMeta = null;
+		tempAlarmMeta = findByMetaId(alarmMeta.getMetaId());
+		if (tempAlarmMeta == null) {
+			return insert(alarmMeta);
+		} else {
+			alarmMeta.setId(tempAlarmMeta.getId());
+			return alarmMetaDao.update(alarmMeta);
+		}
 	}
 
 	@Override

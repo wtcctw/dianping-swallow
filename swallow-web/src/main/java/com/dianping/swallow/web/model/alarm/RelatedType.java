@@ -14,7 +14,11 @@ public enum RelatedType {
 	/**
 	 * 
 	 */
-	P_TOPIC, P_IP,
+	P_TOPIC,
+	/**
+	 * 
+	 */
+	P_IP,
 	/**
 	 * 
 	 */
@@ -30,6 +34,33 @@ public enum RelatedType {
 	/**
 	 * 
 	 */
-	C_IP
+	C_IP;
 
+	public boolean isCConsumerId() {
+		return this == C_CONSUMERID;
+	}
+
+	public boolean isCIp() {
+		return this == C_IP;
+	}
+
+	public boolean isCTopic() {
+		return this == C_TOPIC;
+	}
+
+	public boolean isCServerIp() {
+		return this == C_SERVER_IP;
+	}
+
+	public boolean isPIp() {
+		return this == P_IP;
+	}
+
+	public boolean isPTopic() {
+		return this == P_TOPIC;
+	}
+
+	public boolean isPServerIp() {
+		return this == P_SERVER_IP;
+	}
 }

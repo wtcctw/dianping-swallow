@@ -105,9 +105,11 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 						ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid);
 
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
-				List<Long> sendList = new ArrayList<Long>(senddelay.values());
+				List<Long> sendList = extractListFromMap(senddelay);
+				
 				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
-				List<Long> ackList = new ArrayList<Long>(ackdelay.values());
+				List<Long> ackList = extractListFromMap(ackdelay);
+				
 				int sendListSize = sendList.size();
 				int ackListSize = ackList.size();
 				if (sendListSize < 2 || ackListSize < 2) {
@@ -331,6 +333,19 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			return it.next();
 		}
 		return "";
+	}
+	
+	private List<Long> extractListFromMap( NavigableMap<Long, Long> map ){
+		
+		List<Long> list;
+		
+		if(map != null){
+			list = new ArrayList<Long>(map.values());
+		}else{
+			list = new ArrayList<Long>();
+		}
+		
+		return list;
 	}
 	
 }

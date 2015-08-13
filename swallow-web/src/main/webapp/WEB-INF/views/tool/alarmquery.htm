@@ -13,19 +13,35 @@
 
 			<form class="bs-example bs-example-form" role="form">
 				<div class="input-group" style="margin-left: 20px">
-					<span class="input-group-addon">接收人</span> <input type="text"
-						class="form-control" placeholder="消息接收人" style="width: 200px"
-						id="receiver" ng-model='receiver' required>
+					<span class="input-group-addon" style="opacity: 0; padding: 0;"></span>接收人
+					<input type="text" class="form-control" placeholder="消息接收人"
+						style="width: 160px; height: 30px;" id="receiver"
+						ng-model='receiver' required>
 					<ul class="typeahead dropdown-menu"
 						style="top: 28px; left: 0px; display: none;">
 					</ul>
-
-					<span class="input-group-addon" style="opacity: 0;"></span> 时间 <input
+					<span class="input-group-addon" style="opacity: 0; padding: 0;"></span>
+					相关信息 <select class="chosen-select form-control" data-placeholder="相关项"
+						ng-model="relatedType" id="relatedType"
+						style="width: 100px; height: 30px;">
+						<option value="EMPTY"></option>
+						<option value="IP">IP</option>
+						<option value="TOPIC">TOPIC</option>
+						<option value="CONSUMERID">CONSUMERID</option>
+					</select> <input class="form-control" type="text" placeholder="相关信息内容"
+						ng-model="relatedInfo" id="relatedInfo"
+						style="width: 160px; height: 30px;">
+					<ul class="typeahead dropdown-menu"
+						style="top: 28px; left: 0px; display: none;">
+					</ul>
+					<span class="input-group-addon" style="opacity: 0; padding: 0;"></span>
+					时间 <input class="form-control" style="width: 160px; height: 30px;"
 						type="text" placeholder="开始时间..." ng-model="startTime"
-						id="starttime"> <input type="text" placeholder="结束时间..."
-						ng-model="endTime" id="stoptime">
-					<button type="button" class="btn btn-success btn-swallow-ok"
-						id="summittime" ng-click="query()">查询</button>
+						id="starttime"> <input class="form-control" type="text"
+						placeholder="结束时间..." ng-model="endTime" id="stoptime"
+						style="width: 160px; height: 30px;">
+					<button type="button" class="btn btn-success" id="summittime"
+						ng-click="query()">查询</button>
 				</div>
 			</form>
 
@@ -50,29 +66,34 @@
 					<table
 						class="table table-bordered table-striped table-condensed  table-hover">
 						<tr>
-							<th style="text-align: left">序号</th>
-							<th style="text-align: left">事件ID</th>
-							<th style="text-align: left">报警编号</th>
-							<th style="text-align: left">报警级别</th>
-							<th style="text-align: left">发送方式</th>
-							<th style="text-align: left">发送结果</th>
-							<th style="text-align: left">标题</th>
-							<th style="text-align: left">内容</th>
-							<th style="text-align: left">接收者</th>
-							<th style="text-align: left">时间</th>
+							<th>序号</th>
+							<th>事件ID</th>
+							<th>编号</th>
+							<th>相关信息</th>
+							<th>标题</th>
+							<th>内容</th>
+							<th>收件人|发送方式|发送结果</th>
+							<th>时间</th>
 						</tr>
 						<tr ng-repeat="m in searchPaginator.currentPageItems">
 							<td style="text-align: left">{{$index+1}}</td>
-							<td style="text-align: left">{{m.eventId}}</td>
-							<td style="text-align: left">{{m.number}}</td>
-							<td style="text-align: left">{{m.type}}</td>
-							<td style="text-align: left">{{m.sendType}}</td>
-							<td style="text-align: left">{{m.resultType}}</td>
+							<td style="text-align: left"><a
+								ng-href='${rc.contextPath}/console/alarm/detail/{{m.eventId}}'>{{m.eventId}}</a></td>
+							<td style="text-align: left"><a ng-href='${rc.contextPath}/console/setting/alarmmeta/detail/{{m.number}}'>{{m.number}}</a></td>
+							<td style="text-align: left"><a ng-href='{{m.relatedUrl}}'>{{m.related}}</a></td>
 							<td style="text-align: left">{{m.title}}</td>
-							<td style="text-align: left">{{m.body}}</td>
-							<td style="text-align: left">{{m.receiver}}</td>
+							<td style="text-align: left">{{m.body|cut:true:30:'...'}}</td>
+							<td style="text-align: left">
+								<table style="margin: 0; padding: 0;">
+									<tr ng-repeat="s in m.sendInfos" ng-hide="!$first" style="margin: 0; padding: 0;">
+										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.receiver}}&nbsp;</td>
+										<td style="border-top: 0px;margin: 0; padding: 0;">{{s.sendType}}...</td>
+									</tr>
+								</table>
+							</td>
 							<td style="text-align: left">{{m.createTime |
 								date:'yyyy-MM-dd HH:mm:ss'}}</td>
+						</tr>
 					</table>
 
 					<ul style="margin-top: 20px;" class="pagination">

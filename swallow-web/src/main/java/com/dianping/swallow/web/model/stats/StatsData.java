@@ -20,7 +20,7 @@ public abstract class StatsData {
 
 	@Indexed
 	private long timeKey;
-
+	
 	@Transient
 	protected EventReporter eventReporter;
 

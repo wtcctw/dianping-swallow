@@ -138,18 +138,38 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 	        	}
 	        	else{
 	        		$('#myModal').modal('hide');
-		        	$http.post(window.contextPath + '/api/topic/edittopic', {"topic":$scope.topicname,"prop":$scope.topicprop,
-		        		"time":$scope.topictime}).success(function(response) {
-						$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" );
+	        		var param = new Object();
+	    			param.topic = $scope.topicname;
+	    			param.prop = $scope.topicprop;
+	    			param.time = $scope.topictime;
+		        	
+		        	$.ajax({
+		        	    type: "POST",
+		        	    url: window.contextPath + '/api/topic/edittopic',
+		        	    dataType: "json",
+		        	    data: param,
+		        	    success: function(data) {
+		        	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" );
+		        	    }
 		        	});
 	        	}
 	        }
 			
 			$rootScope.doedit = function(topicname, topicprop, topictime){
 				$('#myModal').modal('hide');
-				$http.post(window.contextPath + '/api/topic/edittopic', {"topic":topicname,"prop":topicprop,
-	        		"time":topictime}).success(function(response) {
-					$scope.searchPaginator = Paginator(fetchFunction, 30, topicname , "");
+        		var param = new Object();
+    			param.topic = $scope.topicname;
+    			param.prop = $scope.topicprop;
+    			param.time = $scope.topictime;
+	        	$.ajax({
+	        	    type: "POST",
+	        	    url: window.contextPath + '/api/topic/edittopic',
+	        	    dataType: "json",
+	        	    data: param,
+	        	    success: function(data) {
+	        	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, topicname , "");
+	        	    }
+
 	        	});
 				return true;
 			}
@@ -246,8 +266,10 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.changealarm = function(topic, index){
 				var id = "#alarm" + index;
 				var check = $(id).prop('checked');
-				$http.post(window.contextPath + '/api/topic/alarm', {"topic":topic,
-	        		"alarm":!check}).success(function(response) {
+				var entity = new Object();
+				entity.topic = topic;
+				entity.alarm = !check;
+				$http.post(window.contextPath + '/api/topic/alarm', entity).success(function(response) {
 	        	});
 			}
 			

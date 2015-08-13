@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html  lang="en">
- <script>  
+<html lang="en">
+<script>
 	window.contextpath = "${rc.contextPath}";
 	window.contextPath = window.contextpath;
 </script>
@@ -9,11 +9,8 @@
 
 <body class="navbar-fixed" ng-app='SwallowModule'>
 	#parse("common/navbar.htm")
-	<div class="main-container-inner" >
-		#parse("common/baseJs.htm")
-		#parse("setting/js.htm")
-		#parse("setting/sidebar.htm") $screen_content</div>
-	
-    </script>
-</body>  
+	<div class="main-container">#parse("common/baseJs.htm")
+		#parse("setting/sidebar.htm") $screen_content
+		#parse("common/sub-footer.htm")</div>
+</body>
 </html>

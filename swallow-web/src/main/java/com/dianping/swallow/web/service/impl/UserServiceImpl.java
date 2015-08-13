@@ -48,12 +48,7 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 		Long totalNumOfTopic = administratorDao.countAdministrator();
 		List<Administrator> administratorList = administratorDao.findFixedAdministrator(offset, limit);
 		
-		return buildResponse(administratorList, totalNumOfTopic);
-	}
-
-	private Pair<Long, List<Administrator>> buildResponse(List<Administrator> administratorList, Long adminSize) {
-
-		return new Pair<Long, List<Administrator>>(adminSize, administratorList);
+		return new Pair<Long, List<Administrator>>(totalNumOfTopic, administratorList);
 	}
 
 	@Override
@@ -83,16 +78,11 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 			return true;
 		}
 	}
-
-//	@Override
-//	public List<String> loadAllTypeName() {
-//		List<String> adminLists = new ArrayList<String>();
-//		List<Administrator> admins = administratorDao.findAll();
-//		for (int i = 0; i < admins.size(); ++i) {
-//			adminLists.add(admins.get(i).getName());
-//		}
-//		return adminLists;
-//	}
+	
+	@Override
+	public List<Administrator> loadUsers() {
+		return administratorDao.findAll();
+	}
 
 	@Override
 	public boolean updateUser(String name, int auth) {
@@ -134,18 +124,18 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 			}
 		}
 
-		return switchUserAndVisitor(username);
+		return switchTopicOwnerAndVisitor(username);
 	}
 
-	private boolean switchUserAndVisitor(String username) {
-		if (isUser(username)) {
+	private boolean switchTopicOwnerAndVisitor(String username) {
+		if (isTopicOwner(username)) {
 			return this.updateUser(username, AuthenticationService.USER);
 		} else {
 			return this.updateUser(username, AuthenticationService.VISITOR);
 		}
 	}
 
-	private boolean isUser(String username) {
+	private boolean isTopicOwner(String username) {
 
 		Collection<Set<String>> topicUsers = topicService.loadCachedTopicToWhiteList().values();
 		for (Set<String> set : topicUsers) {
@@ -154,11 +144,6 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public List<Administrator> loadUsers() {
-		return administratorDao.findAll();
 	}
 
 }
