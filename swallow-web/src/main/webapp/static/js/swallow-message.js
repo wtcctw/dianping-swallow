@@ -492,13 +492,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        }
 	        
 	        $scope.starttransmit = function(data){
-			$scope.entity = {
+			var messageIdEntity = {
 					mid: data ,
 					topic:$scope.topic
 			};
 			console.log($scope.entity);
 	        	$http.post(window.contextPath + '/api/message/sendmessageid', 
-					  JSON.stringify($scope.entity)).success(function(response) {
+					  messageIdEntity).success(function(response) {
         			  $("#selectnone").prop('checked', false);
         			  $("#selectall").prop('checked', false);
         			  $(".swallowcheckbox").prop('checked', false);
@@ -574,7 +574,14 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        	if(hasproperty){
 	        		$scope.tproperty = property.substring(0,property.length-2);
 	        	}
-	        	$http.post(window.contextPath + '/api/message/sendmessage', {"content":$scope.textarea,"topic":$scope.topic,"type":$scope.ttype,"delimitor":$scope.delimitor,"property":$scope.tproperty}).success(function(response) {
+	        	var messageEntity ={
+					content:$scope.textarea,
+					topic:$scope.topic,
+					type:$scope.ttype,
+					delimitor:$scope.delimitor,
+					property:$scope.tproperty
+				};
+	        	$http.post(window.contextPath + '/api/message/sendmessage', messageEntity).success(function(response) {
 					$scope.textarea = "";
 					$scope.tproperty = "";
 					
