@@ -2,6 +2,9 @@ package com.dianping.swallow.web.service.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -10,6 +13,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
@@ -18,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.web.model.alarm.ResultType;
 import com.dianping.swallow.web.service.HttpService;
 
 /**
@@ -48,9 +53,26 @@ public class HttpServiceImpl implements HttpService {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
 				result.setSuccess(true);
 			}
+		} catch (UnknownHostException e) {
+			result.setSuccess(false);
+			result.setResultType(ResultType.FAILED_HOST_UNKNOWN);
+			logger.error("http post request failed. url = {}", url, e);
+		} catch (ConnectTimeoutException e) {
+			result.setSuccess(false);
+			result.setResultType(ResultType.FAILED_CONNECTION_TIMEOUT);
+			logger.error("http post request failed. url = {}", url, e);
+		} catch (ConnectException e) {
+			result.setSuccess(false);
+			result.setResultType(ResultType.FAILED_CONNECT);
+			logger.error("http post request failed. url = {}", url, e);
+		} catch (SocketTimeoutException e) {
+			result.setSuccess(false);
+			result.setResultType(ResultType.FAILED_SOCKET_TIMEOUT);
+			logger.error("http post request failed. url = {}", url, e);
 		} catch (IOException e) {
 			result.setSuccess(false);
-			logger.error("http post request failed. " + url, e);
+			result.setResultType(ResultType.FAILED);
+			logger.error("http post request failed. url = {}", url, e);
 		}
 		return result;
 	}
@@ -68,11 +90,27 @@ public class HttpServiceImpl implements HttpService {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
 				result.setSuccess(true);
 			}
+		} catch (UnknownHostException e) {
+			result.setSuccess(false);
+			result.setResultType(ResultType.FAILED_HOST_UNKNOWN);
+			logger.error("http get request failed. url = {}", url, e);
+		} catch (ConnectTimeoutException e) {
+			result.setSuccess(false);
+			result.setResultType(ResultType.FAILED_CONNECTION_TIMEOUT);
+			logger.error("http get request failed. url = {}", url, e);
+		} catch (ConnectException e) {
+			result.setSuccess(false);
+			result.setResultType(ResultType.FAILED_CONNECT);
+			logger.error("http get request failed. url = {}", url, e);
+		} catch (SocketTimeoutException e) {
+			result.setSuccess(false);
+			result.setResultType(ResultType.FAILED_SOCKET_TIMEOUT);
+			logger.error("http get request failed. url = {}", url, e);
 		} catch (IOException e) {
 			result.setSuccess(false);
-			logger.error("http get request failed. url=" + url, e);
+			result.setResultType(ResultType.FAILED);
+			logger.error("http get request failed. url = {}", url, e);
 		}
 		return result;
 	}
-
 }

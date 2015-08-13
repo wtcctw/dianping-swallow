@@ -49,7 +49,7 @@ public class ProducerSenderAlarmer extends AbstractServiceAlarmer {
 		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
 		Map<String, Long> statisProducerServerIps = ipCollectorService.getStatisProducerServerIps();
 		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
-		if(producerServerIps==null){
+		if (producerServerIps == null) {
 			logger.error("[checkSender] cannot find producerserver ips.");
 		}
 		for (String serverIp : producerServerIps) {

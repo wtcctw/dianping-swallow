@@ -492,7 +492,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        }
 	        
 	        $scope.starttransmit = function(data){
-        			$http.post(window.contextPath + '/api/message/sendmessageid', {"mid": data,"topic":$scope.topic}).success(function(response) {
+			$scope.entity = {
+					mid: data ,
+					topic:$scope.topic
+			};
+			console.log($scope.entity);
+	        	$http.post(window.contextPath + '/api/message/sendmessageid', 
+					  JSON.stringify($scope.entity)).success(function(response) {
         			  $("#selectnone").prop('checked', false);
         			  $("#selectall").prop('checked', false);
         			  $(".swallowcheckbox").prop('checked', false);

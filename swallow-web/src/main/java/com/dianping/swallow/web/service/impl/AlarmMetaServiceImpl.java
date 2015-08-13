@@ -8,7 +8,12 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.dao.AlarmMetaDao;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.service.AlarmMetaService;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月12日 下午6:21:45
+ */
 @Service("alarmMetaService")
 public class AlarmMetaServiceImpl implements AlarmMetaService {
 

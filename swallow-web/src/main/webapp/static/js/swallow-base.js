@@ -47,10 +47,10 @@ var module = angular.module('SwallowModule', ['ngResource', 'ngDialog', 'mgcrea.
 //  }];
 });
 
-//module.config(function($locationProvider, $resourceProvider) {
-//	// configure html5 to get links working on jsfiddle
+module.config(function($locationProvider, $resourceProvider) {
+	// configure html5 to get links working on jsfiddle
 //	$locationProvider.html5Mode(true);
-//});
+});
 
 module.filter('strreplace', function() {
     return function(input) {

@@ -339,7 +339,10 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		if (cmdbProducerIps != null && !cmdbProducerIps.isEmpty()) {
 			return Collections.unmodifiableList(cmdbProducerIps);
 		}
-		return Collections.unmodifiableList(lionProducerIps);
+		if (lionProducerIps != null) {
+			return Collections.unmodifiableList(lionProducerIps);
+		}
+		return null;
 	}
 
 	@Override
@@ -347,7 +350,10 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		if (cmdbConsumerSlaveIps != null && !cmdbConsumerSlaveIps.isEmpty()) {
 			return Collections.unmodifiableList(cmdbConsumerSlaveIps);
 		}
-		return Collections.unmodifiableList(lionConsumerSlaveIps);
+		if (lionConsumerSlaveIps != null) {
+			return Collections.unmodifiableList(lionConsumerSlaveIps);
+		}
+		return null;
 	}
 
 	@Override
@@ -355,22 +361,34 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		if (cmdbConsumerMasterIps != null && !cmdbConsumerMasterIps.isEmpty()) {
 			return Collections.unmodifiableList(cmdbConsumerMasterIps);
 		}
-		return Collections.unmodifiableList(lionConsumerMasterIps);
+		if (lionConsumerMasterIps != null) {
+			return Collections.unmodifiableList(lionConsumerMasterIps);
+		}
+		return null;
 	}
 
 	@Override
 	public Map<String, String> getProducerServerIpsMap() {
-		return Collections.unmodifiableMap(cmdbProducerMap);
+		if (cmdbProducerMap != null) {
+			return Collections.unmodifiableMap(cmdbProducerMap);
+		}
+		return null;
 	}
 
 	@Override
 	public Map<String, String> getConsumerServerMasterIpsMap() {
-		return Collections.unmodifiableMap(cmdbConsumerMasterMap);
+		if (cmdbConsumerMasterMap != null) {
+			return Collections.unmodifiableMap(cmdbConsumerMasterMap);
+		}
+		return null;
 	}
 
 	@Override
 	public Map<String, String> getConsumerServerSlaveIpsMap() {
-		return Collections.unmodifiableMap(cmdbConsumerSlaveMap);
+		if (cmdbConsumerSlaveMap != null) {
+			return Collections.unmodifiableMap(cmdbConsumerSlaveMap);
+		}
+		return null;
 	}
 
 	@Override
