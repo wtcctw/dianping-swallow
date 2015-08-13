@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.MinuteEntryDao;
-import com.dianping.swallow.web.model.dashboard.MinuteEntry;
-import com.dianping.swallow.web.monitor.dashboard.DashboardContainer;
+import com.dianping.swallow.web.dashboard.DashboardContainer;
+import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MinuteEntryService;
 

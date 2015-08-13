@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.monitor.dashboard;
+package com.dianping.swallow.web.dashboard;
 
 import javax.annotation.Resource;
 

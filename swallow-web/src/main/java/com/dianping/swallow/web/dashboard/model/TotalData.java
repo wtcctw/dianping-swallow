@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.model.dashboard;
+package com.dianping.swallow.web.dashboard.model;
 
 import java.util.ArrayList;
 import java.util.Date;

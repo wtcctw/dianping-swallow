@@ -30,7 +30,7 @@ import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.web.model.dashboard.MinuteEntry;
+import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;

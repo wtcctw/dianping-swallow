@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.monitor.dashboard;
+package com.dianping.swallow.web.dashboard;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.model.dashboard.MinuteEntry;
+import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.service.MinuteEntryService;
 
 /**

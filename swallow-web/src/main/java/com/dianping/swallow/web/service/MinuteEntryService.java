@@ -3,8 +3,7 @@ package com.dianping.swallow.web.service;
 import java.util.Date;
 import java.util.List;
 
-
-import com.dianping.swallow.web.model.dashboard.MinuteEntry;
+import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.monitor.dashboard;
+package com.dianping.swallow.web.dashboard;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,17 +22,17 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
+import com.dianping.swallow.web.dashboard.model.Entry;
+import com.dianping.swallow.web.dashboard.model.MinHeap;
+import com.dianping.swallow.web.dashboard.model.MinuteEntry;
+import com.dianping.swallow.web.dashboard.model.TotalData;
+import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
-import com.dianping.swallow.web.model.dashboard.Entry;
-import com.dianping.swallow.web.model.dashboard.MinHeap;
-import com.dianping.swallow.web.model.dashboard.MinuteEntry;
-import com.dianping.swallow.web.model.dashboard.TotalData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
-import com.dianping.swallow.web.monitor.wapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
 import com.google.common.collect.Lists;
 

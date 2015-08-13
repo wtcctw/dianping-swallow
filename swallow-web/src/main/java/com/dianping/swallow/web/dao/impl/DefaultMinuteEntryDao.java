@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.dao.MinuteEntryDao;
-import com.dianping.swallow.web.model.dashboard.MinuteEntry;
+import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
