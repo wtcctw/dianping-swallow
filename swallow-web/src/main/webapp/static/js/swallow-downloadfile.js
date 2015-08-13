@@ -115,7 +115,7 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 			items: 16, 
 			source : topicNameList,
 			updater : function(c) {
-				$scope.topic = c
+				$scope.topic = c;
 				$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topic);
 				return c;
 			}
@@ -132,17 +132,18 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 				topic: $scope.topic
 			}
 		}).success(function(data){
-			for(var i = 0; i < data.message.length; ++i){
-				if(data.message[i].finished){
-					data.message[i].finished = "已导出";
+			var message = data.second;
+			for(var i = 0; i < message.length; ++i){
+				if(message[i].finished){
+					message[i].finished = "已导出";
 				}else{
-					data.message[i].finished = "导出中";
+					message[i].finished = "导出中";
 				}
 			}
-			$scope.searchPaginator.currentPageItems = data.message;
+			$scope.searchPaginator.currentPageItems = message;
 			var concel = true;
-			for(var i=0;i<data.message.length;i++){
-				if(data.message[i].finished == "导出中"){
+			for(var i=0;i<message.length;i++){
+				if(message[i].finished == "导出中"){
 					concel = false;
 					break;
 				}

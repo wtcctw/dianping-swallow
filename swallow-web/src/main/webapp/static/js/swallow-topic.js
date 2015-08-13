@@ -266,8 +266,10 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.changealarm = function(topic, index){
 				var id = "#alarm" + index;
 				var check = $(id).prop('checked');
-				$http.post(window.contextPath + '/api/topic/alarm', {"topic":topic,
-	        		"alarm":!check}).success(function(response) {
+				var entity = new Object();
+				entity.topic = topic;
+				entity.alarm = !check;
+				$http.post(window.contextPath + '/api/topic/alarm', entity).success(function(response) {
 	        	});
 			}
 			

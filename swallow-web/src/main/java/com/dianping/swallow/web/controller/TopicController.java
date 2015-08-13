@@ -15,6 +15,7 @@ import jodd.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
+import com.dianping.swallow.web.controller.dto.TopicAlarmDto;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
@@ -196,9 +198,10 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/api/topic/alarm", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void editAlarmSetting(@RequestParam(value = "topic") String topic,
-			@RequestParam(value = "alarm") boolean alarm, HttpServletRequest request, HttpServletResponse response) {
+	public void editAlarmSetting(@RequestBody TopicAlarmDto topicAlarmDto, HttpServletRequest request, HttpServletResponse response) {
 
+		String topic = topicAlarmDto.getTopic();
+		boolean alarm = topicAlarmDto.isAlarm();
 		updateConsumerServerAlarmSetting(topic, alarm);
 		updateProducerServerAlarmSetting(topic, alarm);
 
