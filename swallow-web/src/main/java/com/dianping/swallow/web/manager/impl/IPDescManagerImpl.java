@@ -25,6 +25,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.IPDescService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -37,12 +38,14 @@ public class IPDescManagerImpl implements IPDescManager {
 	private static final Logger logger = LoggerFactory.getLogger(IPDescManagerImpl.class);
 
 	private static final String COMMA_SPLIT = ",";
+	
+	private static final String FACTORY_NAME = "IPDescManager";
 
 	private int interval = 60;// 分钟
 
 	private int delay = 10;
 
-	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor();
+	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	private ScheduledFuture<?> future = null;
 
@@ -65,6 +68,7 @@ public class IPDescManagerImpl implements IPDescManager {
 			@Override
 			public void run() {
 				try {
+					logger.info("[startTask] scheduled task running.");
 					doTask();
 				} catch (Throwable th) {
 					logger.error("[startTask]", th);
