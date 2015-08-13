@@ -29,7 +29,7 @@ public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
 
 	private static final String ALARM_COLLECTION = "swallowwebalarmdatac";
 
-	private static final String RECEIVER_FIELD = "receiver";
+	private static final String RECEIVER_FIELD = "sendInfos.receiver";
 
 	private static final String CREATETIME_FIELD = "createTime";
 
