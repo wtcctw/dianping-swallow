@@ -115,7 +115,7 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 			items: 16, 
 			source : topicNameList,
 			updater : function(c) {
-				$scope.topic = c
+				$scope.topic = c;
 				$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topic);
 				return c;
 			}
