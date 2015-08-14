@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
+import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
 /**
  * @author mingdongli
@@ -50,12 +52,17 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	@Autowired
 	TopicAlarmSettingServiceWrapper topicAlarmSettingServiceWrapper;
+	
+	@Resource(name = "topicAlarmSettingService")
+	private TopicAlarmSettingService topicAlarmSettingService;
 
 	private Map<String, TotalData> totalDataMap = new ConcurrentHashMap<String, TotalData>();
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
+	
+	private List<String> whiteList = new ArrayList<String>();
 
 	@PostConstruct
 	void updateDashboardContainer() {
@@ -85,6 +92,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 		boolean timeSet = false;
 		Date entryTime = null;
+		whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
 		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL);
 
 		for (String topic : topics) {
@@ -194,8 +202,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 					.loadConsumerBaseAlarmSetting(topic);
 			
 			e.setConsumerId(consumerid).setTopic(topic).setSenddelay(senddelay).setAckdelay(ackdelay).setAccu(accu);
-
-			e.setAlert(consumerBaseAlarmSetting);
+			
+			e.setAlert(consumerBaseAlarmSetting, whiteList.contains(consumerid));
 
 			entrys.add(e);
 		}

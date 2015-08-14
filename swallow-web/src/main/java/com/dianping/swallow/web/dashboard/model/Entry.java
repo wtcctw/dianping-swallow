@@ -46,23 +46,34 @@ public class Entry {
 
 	}
 	
-	public void setAlert(ConsumerBaseAlarmSetting consumerBaseAlarmSetting){
+	public void setAlert(ConsumerBaseAlarmSetting consumerBaseAlarmSetting, boolean whiteList){
 		
-		long baseSenddelay = consumerBaseAlarmSetting.getSendDelay();
-		long baseackdelay = consumerBaseAlarmSetting.getAckDelay();
-		float baseAccu = (float) consumerBaseAlarmSetting.getAccumulation();
-
-		this.senddelayAlarm = this.senddelay >= baseSenddelay ? 1 : 0;
-		this.ackdelayAlarm = this.ackdelay >= baseackdelay ? 1 : 0;
-		this.accuAlarm = this.accu >= baseAccu ? 1 : 0;
-		this.numAlarm = this.senddelayAlarm + this.ackdelayAlarm + this.accuAlarm;
-
-		this.normalizedSendDelay = this.senddelay / baseSenddelay;
-		this.normalizedAckDelay = this.ackdelay / baseackdelay;
-		this.normalizedAccu = this.accu / baseAccu;
+		if(!whiteList){
+			
+			long baseSenddelay = consumerBaseAlarmSetting.getSendDelay();
+			long baseackdelay = consumerBaseAlarmSetting.getAckDelay();
+			float baseAccu = (float) consumerBaseAlarmSetting.getAccumulation();
+			
+			this.senddelayAlarm = this.senddelay >= baseSenddelay ? 1 : 0;
+			this.ackdelayAlarm = this.ackdelay >= baseackdelay ? 1 : 0;
+			this.accuAlarm = this.accu >= baseAccu ? 1 : 0;
+			this.numAlarm = this.senddelayAlarm + this.ackdelayAlarm + this.accuAlarm;
+			
+			this.normalizedSendDelay = this.senddelay / baseSenddelay;
+			this.normalizedAckDelay = this.ackdelay / baseackdelay;
+			this.normalizedAccu = this.accu / baseAccu;
+		}else{
+			this.senddelayAlarm = 0;
+			this.ackdelayAlarm = 0;
+			this.accuAlarm = 0;
+			this.numAlarm = 0;
+			this.normalizedSendDelay = this.senddelay;
+			this.normalizedAckDelay = this.ackdelay;
+			this.normalizedAccu = (float) this.accu;
+		}
 
 	}
-
+	
 	public String getServer() {
 		return server;
 	}

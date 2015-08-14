@@ -15,10 +15,17 @@ public class SendComparator implements Comparator<Entry>{
 	@Override
 	public int compare(Entry e1, Entry e2) {
 		
-		Float _f = e1.getNormalizedSendDelay();
-		Float f = e2.getNormalizedSendDelay();
-
-		return  _f.compareTo(f);
+		int senddelay1 = e1.getSenddelayAlarm();
+		int senddelay2 = e2.getSenddelayAlarm();
+		
+		if(senddelay1 == senddelay2){
+			Float _f = e1.getNormalizedSendDelay();
+			Float f = e2.getNormalizedSendDelay();
+			
+			return  _f.compareTo(f);
+		}else{
+			return senddelay1 - senddelay2;
+		}
 	}
 
 }
