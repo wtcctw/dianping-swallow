@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -16,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  *         2015年8月13日上午11:47:30
  */
-public class FixSizedPriorityQueue implements Cloneable{
+public class FixSizedPriorityQueue {
 
 	private PriorityBlockingQueue<Entry> queue;
 	
@@ -57,7 +56,6 @@ public class FixSizedPriorityQueue implements Cloneable{
 		return queue;
 	}
 
-	@JsonIgnore
 	public Comparator<Entry> getComparator() {
 		return comparator;
 	}
@@ -75,9 +73,4 @@ public class FixSizedPriorityQueue implements Cloneable{
 		this.time = time;
 	}
 
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
-	
 }

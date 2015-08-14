@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 2015年7月7日上午9:36:34
  */
 @Document(collection = "Dashboard")
-public class MinuteEntry implements Cloneable {
+public class MinuteEntry {
 	
 	@Indexed
 	private Date time;
@@ -84,11 +84,6 @@ public class MinuteEntry implements Cloneable {
 		}else{
 			return accuList;
 		}
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
 	}
 
 }
