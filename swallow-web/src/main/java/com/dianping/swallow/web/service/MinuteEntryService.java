@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.dianping.swallow.web.dashboard.model.MinuteEntry;
+import com.dianping.swallow.web.dashboard.model.ResultEntry;
 
 
 /**
@@ -24,5 +25,5 @@ public interface MinuteEntryService {
 	 * @param start 起始时间
 	 * @param stop 结束时间
 	 */
-	List<MinuteEntry> loadMinuteEntryPage(Date start, Date stop);
+	List<ResultEntry> loadMinuteEntryPage(Date start, Date stop, String type);
 }

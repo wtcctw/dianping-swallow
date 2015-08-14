@@ -21,7 +21,7 @@ import com.dianping.swallow.web.util.ResponseStatus;
 @Component
 public class DefaultMinuteEntryDao extends AbstractWriteDao implements MinuteEntryDao {
 
-	private static final String MinuteEntry_COLLECTION = "swallowwebdashboardc";
+	private static final String MinuteEntry_COLLECTION = "Dashboard";
 
 	private static final String TIME = "time";
 
@@ -32,8 +32,9 @@ public class DefaultMinuteEntryDao extends AbstractWriteDao implements MinuteEnt
 
 			mongoTemplate.insert(entry, MinuteEntry_COLLECTION);
 		} catch (Exception e) {
-
-			logger.info(String.format("Error when save %s", entry));
+			if(logger.isErrorEnabled()){
+				logger.error("Error when save entry.", e);
+			}
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 

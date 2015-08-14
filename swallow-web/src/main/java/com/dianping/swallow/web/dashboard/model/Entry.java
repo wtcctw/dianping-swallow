@@ -1,12 +1,14 @@
 package com.dianping.swallow.web.dashboard.model;
 
+import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
+
 
 /**
  * @author mingdongli
  *
  *         2015年7月8日上午10:32:58
  */
-public class Entry implements Comparable<Entry> {
+public class Entry {
 
 	private String server;
 
@@ -26,9 +28,9 @@ public class Entry implements Comparable<Entry> {
 
 	private int accuAlarm;
 
-	private Float normalizedSendDelaly;
+	private Float normalizedSendDelay;
 
-	private Float normalizedAckDelaly;
+	private Float normalizedAckDelay;
 
 	private Float normalizedAccu;
 
@@ -41,6 +43,23 @@ public class Entry implements Comparable<Entry> {
 	private String dpMobile;
 
 	public Entry() {
+
+	}
+	
+	public void setAlert(ConsumerBaseAlarmSetting consumerBaseAlarmSetting){
+		
+		long baseSenddelay = consumerBaseAlarmSetting.getSendDelay();
+		long baseackdelay = consumerBaseAlarmSetting.getAckDelay();
+		float baseAccu = (float) consumerBaseAlarmSetting.getAccumulation();
+
+		this.senddelayAlarm = this.senddelay >= baseSenddelay ? 1 : 0;
+		this.ackdelayAlarm = this.ackdelay >= baseackdelay ? 1 : 0;
+		this.accuAlarm = this.accu >= baseAccu ? 1 : 0;
+		this.numAlarm = this.senddelayAlarm + this.ackdelayAlarm + this.accuAlarm;
+
+		this.normalizedSendDelay = this.senddelay / baseSenddelay;
+		this.normalizedAckDelay = this.ackdelay / baseackdelay;
+		this.normalizedAccu = this.accu / baseAccu;
 
 	}
 
@@ -161,21 +180,21 @@ public class Entry implements Comparable<Entry> {
 		return this;
 	}
 
-	public Float getNormalizedSendDelaly() {
-		return normalizedSendDelaly;
+	public Float getNormalizedSendDelay() {
+		return normalizedSendDelay;
 	}
 
-	public Entry setNormalizedSendDelaly(Float normalizedSendDelaly) {
-		this.normalizedSendDelaly = normalizedSendDelaly;
+	public Entry setNormalizedSendDelay(Float normalizedSendDelay) {
+		this.normalizedSendDelay = normalizedSendDelay;
 		return this;
 	}
 
-	public Float getNormalizedAckDelaly() {
-		return normalizedAckDelaly;
+	public Float getNormalizedAckDelay() {
+		return normalizedAckDelay;
 	}
 
-	public Entry setNormalizedAckDelaly(Float normalizedAckDelaly) {
-		this.normalizedAckDelaly = normalizedAckDelaly;
+	public Entry setNormalizedAckDelay(Float normalizedAckDelay) {
+		this.normalizedAckDelay = normalizedAckDelay;
 		return this;
 	}
 
@@ -189,26 +208,13 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	@Override
-	public int compareTo(Entry entry) {
-
-		int numAlarm = this.getNumAlarm().compareTo(entry.getNumAlarm());
-		if (numAlarm == 0) {
-			Float _f = this.normalizedSendDelaly +  this.normalizedAckDelaly + this.normalizedAccu;
-			Float f = entry.getNormalizedSendDelaly() + entry.getNormalizedAckDelaly() + entry.getNormalizedAccu();
-
-			return _f.compareTo(f);
-		} else {
-			return numAlarm;
-		}
-	}
-
-	@Override
 	public String toString() {
-		return "Entry [server=" + server + ", topic=" + topic + ", consumerId=" + consumerId + ", name=" + name
-				+ ", senddelay=" + senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu + ", senddelayAlarm="
-				+ senddelayAlarm + ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm=" + accuAlarm
-				+ ", baseSendDelaly=" + normalizedSendDelaly + ", baseAckDelaly=" + normalizedAckDelaly + ", baseAccu=" + normalizedAccu
-				+ ", numAlarm=" + numAlarm + ", email=" + email + ", dpMobile=" + dpMobile + "]";
+		return "Entry [server=" + server + ", topic=" + topic + ", consumerId=" + consumerId + ", senddelay="
+				+ senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu + ", senddelayAlarm=" + senddelayAlarm
+				+ ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm=" + accuAlarm + ", normalizedSendDelaly="
+				+ normalizedSendDelay + ", normalizedAckDelaly=" + normalizedAckDelay + ", normalizedAccu="
+				+ normalizedAccu + ", numAlarm=" + numAlarm + ", name=" + name + ", email=" + email + ", dpMobile="
+				+ dpMobile + "]";
 	}
 
 }

@@ -30,7 +30,7 @@ import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.web.dashboard.model.MinuteEntry;
+import com.dianping.swallow.web.dashboard.model.ResultEntry;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
@@ -120,16 +120,16 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@RequestMapping(value = "/console/monitor/dashboard/delay/minute", method = RequestMethod.GET)
 	@ResponseBody
-	public Object getConsumerIdDelayDashboard(@RequestParam("date") String date, @RequestParam("step") int step)
-			throws Exception {
+	public Object getConsumerIdDelayDashboard(@RequestParam("date") String date, @RequestParam("step") int step,
+			@RequestParam("type") String type) throws Exception {
 
 		Date stop = adjustTimeByStep(date, step);
-		
+
 		Date start = calStartTime(stop);
 
-		List<MinuteEntry> entrys = minuteEntryService.loadMinuteEntryPage(start, stop);
+		List<ResultEntry> entrys = minuteEntryService.loadMinuteEntryPage(start, stop, type);
 
-		return buildResponse(entrys);
+		return buildResponse(entrys, type.trim());
 
 	}
 
@@ -387,7 +387,7 @@ public class DataMonitorController extends AbstractMonitorController {
 		return topic;
 	}
 
-	private Object buildResponse(List<MinuteEntry> entrys) {
+	private Object buildResponse(List<ResultEntry> entrys, String type) {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
@@ -435,18 +435,18 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		return calendar.getTime();
 	}
-	
-	private Date calStartTime(Date stop){
-		
+
+	private Date calStartTime(Date stop) {
+
 		Calendar calendarstart = Calendar.getInstance();
 		calendarstart.setTime(stop);
 		calendarstart.add(Calendar.MINUTE, -11);
 		calendarstart.clear(Calendar.SECOND);
 		calendarstart.clear(Calendar.MILLISECOND);
 		Date start = calendarstart.getTime();
-		
+
 		return start;
-	} 
+	}
 
 	@Override
 	protected String getSide() {

@@ -178,16 +178,22 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		id : 4,
 		type : "堆积大盘"
 	} ];
+	$scope.boardsmap = {
+			"综合大盘":"comprehensive",
+			"发送延迟大盘":"senddelay",
+			"确认延迟大盘":"ackdelay",
+			"堆积大盘":"accu"
+	}
 	$scope.boardtype = $scope.boards[0].type;
 
-	$scope.getEntry = function(delayEntry) {
-		defaultSize = 12;
-		var size = delayEntry.size > defaultSize ? defaultSize
-				: delayEntry.size;
-		var emp = delayEntry.heap;
-		var entrys = delayEntry.heap.slice(0, size)
-		return entrys;
-	}
+//	$scope.getEntry = function(delayEntry) {
+//		defaultSize = 12;
+//		var size = delayEntry.size > defaultSize ? defaultSize
+//				: delayEntry.size;
+//		var emp = delayEntry.heap;
+//		var entrys = delayEntry.heap.slice(0, size)
+//		return entrys;
+//	}
 
 	$scope.setStep = function(step) {
 		$scope.step = step + $scope.step;
@@ -215,9 +221,10 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.firstindex = 0;
 	$scope.starttime = "";
 	$scope.stoptime = "";
+	$scope.requestindex = 0;
 
-	$scope.getDashboardDelay = function(index) {
-
+		$scope.getDashboardDelay = function(index) {
+		$scope.requestindex = index;
 		$scope.minuteEntrys = [];
 		var date = new Date();
 		if (index != -1) {
@@ -231,7 +238,8 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 					method : 'GET',
 					params : {
 						date : date,
-						step : $scope.step
+						step : $scope.step,
+						type : $scope.boardsmap[$scope.boardtype]
 					},
 					url : window.contextPath
 							+ '/console/monitor/dashboard/delay/minute'
@@ -268,15 +276,7 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	};
 
 	$scope.onchanged = function() {
-		if ($scope.boardtype == "综合大盘") {
-			$scope.showBoard();
-		} else if ($scope.boardtype == "发送延迟大盘") {
-			$scope.showSendDelayBoard();
-		} else if ($scope.boardtype == "确认延迟大盘") {
-			$scope.showAckDelayBoard();
-		} else {
-			$scope.showAccuBoard();
-		}
+		$scope.getDashboardDelay($scope.requestindex);
 	};
 
 	$scope.showBoard = function() {

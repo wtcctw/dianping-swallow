@@ -3,7 +3,6 @@ package com.dianping.swallow.web.dashboard;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +21,15 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.dashboard.model.Entry;
-import com.dianping.swallow.web.dashboard.model.MinHeap;
+import com.dianping.swallow.web.dashboard.model.FixSizedPriorityQueueContainer;
 import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.dashboard.model.TotalData;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
-import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
-import com.google.common.collect.Lists;
 
 /**
  * @author mingdongli
@@ -49,9 +44,6 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	@Autowired
 	private DashboardContainer dashboardContainer;
-
-	@Resource(name = "ipDescManager")
-	private IPDescManager ipDescManager;
 
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
@@ -135,7 +127,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 				}
 				int accuListSize = accuList.size();
 
-				String mapKey = topic + consumerid;
+				String mapKey = topic + "." + consumerid;
 				TotalData td = totalDataMap.get(mapKey);
 				if (td == null) {
 					td = new TotalData();
@@ -198,44 +190,13 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			String consumerid = totalData.getCid();
 			String topic = totalData.getTopic();
 
-			Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
-					topic, consumerid);
-			if(logger.isInfoEnabled()){
-				logger.info(String.format("Load ips %s of topic %s and consumerid %s", ips.toString(), topic, consumerid));
-			}
-			
-			String ip = loadFirstElement(ips);
-			IPDesc iPDesc = ipDescManager.getIPDesc(ip);
-			String mobile = "Blank";
-			String email = "Blank";
-			String name = "Blank";
-			if(iPDesc != null){
-				mobile = iPDesc.getDpMobile();
-				email = iPDesc.getEmail();
-				name = iPDesc.getName();
-			}
-
 			ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
 					.loadConsumerBaseAlarmSetting(topic);
+			
+			e.setConsumerId(consumerid).setTopic(topic).setSenddelay(senddelay).setAckdelay(ackdelay).setAccu(accu);
 
-			long baseSenddelay = consumerBaseAlarmSetting.getSendDelay();
-			long baseackdelay = consumerBaseAlarmSetting.getAckDelay();
-			float baseAccu = (float) consumerBaseAlarmSetting.getAccumulation();
+			e.setAlert(consumerBaseAlarmSetting);
 
-			int sendAlarm = senddelay >= baseSenddelay ? 1 : 0;
-			int ackAlarm = ackdelay >= baseackdelay ? 1 : 0;
-			int accuAlarm = accu >= baseAccu ? 1 : 0;
-			int numAlarm = sendAlarm + ackAlarm + accuAlarm;
-
-			float normalizedSendDelay = senddelay / baseSenddelay;
-			float normalizedAckDelay = ackdelay / baseackdelay;
-			float normalizedAccu = accu / baseAccu;
-
-			e.setConsumerId(consumerid).setTopic(topic).setSenddelay(senddelay).setAckdelay(ackdelay).setAccu(accu)
-					.setSenddelayAlarm(sendAlarm).setAckdelayAlarm(ackAlarm).setAccuAlarm(accuAlarm)
-					.setNumAlarm(numAlarm).setEmail(email).setName(name).setDpMobile(mobile)
-					.setNormalizedSendDelaly(normalizedSendDelay).setNormalizedAckDelaly(normalizedAckDelay)
-					.setNormalizedAccu(normalizedAccu);
 			entrys.add(e);
 		}
 
@@ -263,16 +224,16 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	private void doGenerateMinuteEntrys(Map<String, TotalData> map) {
 
-		Map<Date, MinuteEntry> minuteEntryMap = new LinkedHashMap<Date, MinuteEntry>();
+		Map<Date, FixSizedPriorityQueueContainer> minuteEntryMap = new LinkedHashMap<Date, FixSizedPriorityQueueContainer>();
 
 		for (Map.Entry<String, TotalData> entry : totalDataMap.entrySet()) {
 			TotalData td = entry.getValue();
 			List<Entry> entrys = td.getEntrys();
 
 			Date time = td.getTime();
-			MinuteEntry me = minuteEntryMap.get(time);
+			FixSizedPriorityQueueContainer me = minuteEntryMap.get(time);
 			if (me == null) {
-				me = new MinuteEntry();
+				me = new FixSizedPriorityQueueContainer();
 			}
 			if (me.getTime() == null) {
 				me.setTime(time);
@@ -285,23 +246,14 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 		}
 
-		for (Map.Entry<Date, MinuteEntry> entry : minuteEntryMap.entrySet()) {
-			MinuteEntry me = entry.getValue();
-
-			MinHeap minHeap = me.getDelayEntry();
-			int size = minHeap.getSize();
-			List<Entry> sorted = new ArrayList<Entry>();
-			for (int i = size - 1; i >= 0; i--) {
-				Entry eMin = minHeap.deleteMin();
-				if (eMin != null) {
-					sorted.add(eMin);
-				}
-			}
-			List<Entry> reverseSorted = Lists.reverse(sorted);
-			int listSize = reverseSorted.size();
-			Entry[] entryArray = reverseSorted.toArray(new Entry[listSize]);
-			minHeap.setHeap(entryArray);
-			minHeap.setSize(listSize);
+		for (Map.Entry<Date, FixSizedPriorityQueueContainer> entry : minuteEntryMap.entrySet()) {
+			FixSizedPriorityQueueContainer fspqc = entry.getValue();
+			MinuteEntry me = new MinuteEntry();
+			me.setTime(fspqc.getTime());
+			me.setComprehensiveList(fspqc.getComprehensivePriorityQueue().sortedList());
+			me.setSendList(fspqc.getSendPriorityQueue().sortedList());
+			me.setAckList(fspqc.getAckPriorityQueue().sortedList());
+			me.setAccuList(fspqc.getAccuPriorityQueue().sortedList());
 
 			boolean inserted = dashboardContainer.insertMinuteEntry(me);
 			if (logger.isInfoEnabled()) {
@@ -326,15 +278,6 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		return sendData == null || sendData.getArrayData() == null || sendData.getArrayData().length == 0;
 	}
 
-	private static String loadFirstElement(Set<String> set) {
-
-		Iterator<String> it = set.iterator();
-		while (it.hasNext()) {
-			return it.next();
-		}
-		return "";
-	}
-	
 	private List<Long> extractListFromMap( NavigableMap<Long, Long> map ){
 		
 		List<Long> list;
