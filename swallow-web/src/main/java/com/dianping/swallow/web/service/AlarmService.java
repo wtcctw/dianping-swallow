@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.alarm.Alarm;
+import com.dianping.swallow.web.model.alarm.ResultType;
 
 /**
  *
@@ -22,7 +23,7 @@ public interface AlarmService {
 	 * @param body
 	 * @return
 	 */
-	public boolean sendSms(String mobile, String title, String body);
+	public ResultType sendSms(String mobile, String title, String body);
 
 	/**
 	 * send weiXin
@@ -32,7 +33,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendWeiXin(String email, String title, String content);
+	public ResultType sendWeiXin(String email, String title, String content);
 
 	/**
 	 * send mail
@@ -42,7 +43,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendMail(String email, String title, String content);
+	public ResultType sendMail(String email, String title, String content);
 
 	/**
 	 * send sms

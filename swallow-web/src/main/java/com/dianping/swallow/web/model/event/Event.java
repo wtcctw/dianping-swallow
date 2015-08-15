@@ -196,11 +196,10 @@ public abstract class Event {
 			AlarmRecord lastAlarmRecord = alarms.get(key);
 			long dAlarmValue = System.currentTimeMillis() - lastAlarmRecord.getLastAlarmTime();
 			long dCheckValue = System.currentTimeMillis() - lastAlarmRecord.getCheckAlarmTime();
-			int spanRetio = getSpanRatio(alarmMeta.getDaySpanRatio(), alarmMeta.getNightSpanRatio());
+			int spanBase = getTimeSpan(alarmMeta.getDaySpanBase(), alarmMeta.getNightSpanBase());
 
 			if (0 < dCheckValue && dCheckValue < timeUnit) {
-				long currentTimeSpan = (spanRetio * lastAlarmRecord.getAlarmCount() + alarmMeta.getTimeSpanBase())
-						* timeUnit;
+				long currentTimeSpan = spanBase * lastAlarmRecord.getAlarmCount() * timeUnit;
 				long maxTimeSpan = alarmMeta.getMaxTimeSpan() * timeUnit;
 				long timeSpan = currentTimeSpan > maxTimeSpan ? maxTimeSpan : currentTimeSpan;
 
@@ -217,9 +216,12 @@ public abstract class Event {
 				}
 
 			} else {
-				alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
-				alarms.put(key, alarmRecord);
-				return true;
+				if (dAlarmValue > spanBase) {
+					alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
+					alarms.put(key, alarmRecord);
+					return true;
+				}
+				return false;
 			}
 		} else {
 
@@ -229,7 +231,7 @@ public abstract class Event {
 		}
 	}
 
-	protected int getSpanRatio(int daySpanRatio, int nightSpanRatio) {
+	protected int getTimeSpan(int daySpanRatio, int nightSpanRatio) {
 		int hour = DateUtil.getCurrentHour();
 		if (7 < hour && hour < 18) {
 			return daySpanRatio;

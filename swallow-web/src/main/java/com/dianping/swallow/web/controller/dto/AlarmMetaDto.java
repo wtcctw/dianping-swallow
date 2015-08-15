@@ -35,13 +35,11 @@ public class AlarmMetaDto {
 
 	private String alarmDetail;
 
-	private int timeSpanBase;
-
 	private int maxTimeSpan;
 
-	private int daySpanRatio;
+	private int daySpanBase;
 
-	private int nightSpanRatio;
+	private int nightSpanBase;
 
 	private Date createTime;
 
@@ -153,14 +151,6 @@ public class AlarmMetaDto {
 		this.updateTime = updateTime;
 	}
 	
-	public int getTimeSpanBase() {
-		return timeSpanBase;
-	}
-
-	public void setTimeSpanBase(int timeSpanBase) {
-		this.timeSpanBase = timeSpanBase;
-	}
-
 	public int getMaxTimeSpan() {
 		return maxTimeSpan;
 	}
@@ -168,29 +158,29 @@ public class AlarmMetaDto {
 	public void setMaxTimeSpan(int maxTimeSpan) {
 		this.maxTimeSpan = maxTimeSpan;
 	}
-
-	public int getDaySpanRatio() {
-		return daySpanRatio;
-	}
-
-	public void setDaySpanRatio(int daySpanRatio) {
-		this.daySpanRatio = daySpanRatio;
-	}
-
-	public int getNightSpanRatio() {
-		return nightSpanRatio;
-	}
-
-	public void setNightSpanRatio(int nightSpanRatio) {
-		this.nightSpanRatio = nightSpanRatio;
-	}
-
+	
 	public boolean getIsUpdate() {
 		return isUpdate;
 	}
 
 	public void setIsUpdate(boolean isUpdate) {
 		this.isUpdate = isUpdate;
+	}
+
+	public int getDaySpanBase() {
+		return daySpanBase;
+	}
+
+	public void setDaySpanBase(int daySpanBase) {
+		this.daySpanBase = daySpanBase;
+	}
+
+	public int getNightSpanBase() {
+		return nightSpanBase;
+	}
+
+	public void setNightSpanBase(int nightSpanBase) {
+		this.nightSpanBase = nightSpanBase;
 	}
 
 }

@@ -25,10 +25,9 @@ public class AlarmMetaMapper {
 		alarmMeta.setAlarmTitle(alarmMetaDto.getAlarmTitle());
 		alarmMeta.setAlarmTemplate(alarmMetaDto.getAlarmTemplate());
 		alarmMeta.setAlarmDetail(alarmMetaDto.getAlarmDetail());
-		alarmMeta.setTimeSpanBase(alarmMetaDto.getTimeSpanBase());
 		alarmMeta.setMaxTimeSpan(alarmMetaDto.getMaxTimeSpan());
-		alarmMeta.setDaySpanRatio(alarmMetaDto.getDaySpanRatio());
-		alarmMeta.setNightSpanRatio(alarmMetaDto.getNightSpanRatio());
+		alarmMeta.setDaySpanBase(alarmMetaDto.getDaySpanBase());
+		alarmMeta.setNightSpanBase(alarmMetaDto.getNightSpanBase());
 		alarmMeta.setCreateTime(alarmMetaDto.getCreateTime());
 		alarmMeta.setUpdateTime(alarmMetaDto.getUpdateTime());
 		return alarmMeta;
