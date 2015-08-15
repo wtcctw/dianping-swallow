@@ -1,8 +1,6 @@
 package com.dianping.swallow.web.dashboard.model;
 
 
-import java.util.Date;
-
 import com.dianping.swallow.web.dashboard.Comparator.AccuComparator;
 import com.dianping.swallow.web.dashboard.Comparator.AckComparator;
 import com.dianping.swallow.web.dashboard.Comparator.ConprehensiveComparator;
@@ -18,8 +16,6 @@ public class FixSizedPriorityQueueContainer {
 	
 	private static final int ENTRY_SIZE = 12;
 	
-	private Date time; 
-
 	private FixSizedPriorityQueue comprehensivePriorityQueue =  new FixSizedPriorityQueue(ENTRY_SIZE , new ConprehensiveComparator() );
 
 	private FixSizedPriorityQueue sendPriorityQueue =  new FixSizedPriorityQueue(ENTRY_SIZE , new SendComparator() );
@@ -72,14 +68,6 @@ public class FixSizedPriorityQueueContainer {
 
 	public void setAccuPriorityQueue(FixSizedPriorityQueue accuPriorityQueue) {
 		this.accuPriorityQueue = accuPriorityQueue;
-	}
-
-	public Date getTime() {
-		return time;
-	}
-
-	public void setTime(Date time) {
-		this.time = time;
 	}
 	
 }
