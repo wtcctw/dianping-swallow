@@ -2,25 +2,17 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.MinuteEntryDao;
 import com.dianping.swallow.web.dashboard.DashboardContainer;
 import com.dianping.swallow.web.dashboard.model.DashboardEnum;
-import com.dianping.swallow.web.dashboard.model.Entry;
 import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.dashboard.model.ResultEntry;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
-import com.dianping.swallow.web.manager.IPDescManager;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MinuteEntryService;
 
@@ -42,9 +34,6 @@ public class MinuteEntryServiceImpl extends AbstractSwallowService implements Mi
 
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
-
-	@Resource(name = "ipDescManager")
-	private IPDescManager ipDescManager;
 
 	@Override
 	public int insert(MinuteEntry entry) {
@@ -88,52 +77,13 @@ public class MinuteEntryServiceImpl extends AbstractSwallowService implements Mi
 		for (MinuteEntry me : entrys) {
 			DashboardEnum dashboardEnum = DashboardEnum.findByType(type);
 			List<com.dianping.swallow.web.dashboard.model.Entry> list = me.getListByType(dashboardEnum);
-			for (Entry e : list) {
-				if (StringUtils.isBlank(e.getDpMobile()) || StringUtils.isBlank(e.getEmail())
-						|| StringUtils.isBlank(e.getName())){
-					setCmdpInfo(e);
-				}
-			}
 			ResultEntry re = new ResultEntry();
 			re.setResult(list);
 			re.setTime(me.getTime());
 			entryList.add(re);
 		}
+
 		return entryList;
-	}
-
-	private void setCmdpInfo(Entry entry) {
-
-		String topic = entry.getTopic();
-		String consumerid = entry.getConsumerId();
-
-		Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL, topic,
-				consumerid);
-		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Load ips %s of topic %s and consumerid %s", ips.toString(), topic, consumerid));
-		}
-
-		String ip = loadFirstElement(ips);
-		IPDesc iPDesc = ipDescManager.getIPDesc(ip);
-		String mobile = "Blank";
-		String email = "Blank";
-		String name = "Blank";
-		if (iPDesc != null) {
-			mobile = iPDesc.getDpMobile();
-			email = iPDesc.getEmail();
-			name = iPDesc.getName();
-		}
-
-		entry.setEmail(email).setName(name).setDpMobile(mobile);
-	}
-
-	private static String loadFirstElement(Set<String> set) {
-
-		Iterator<String> it = set.iterator();
-		while (it.hasNext()) {
-			return it.next();
-		}
-		return "";
 	}
 
 }

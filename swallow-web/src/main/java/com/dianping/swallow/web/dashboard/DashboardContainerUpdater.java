@@ -3,6 +3,7 @@ package com.dianping.swallow.web.dashboard;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -13,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,9 @@ import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.dashboard.model.TotalData;
 import com.dianping.swallow.web.dashboard.model.TotalDataKey;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
+import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
@@ -52,6 +56,9 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	@Autowired
 	TopicAlarmSettingServiceWrapper topicAlarmSettingServiceWrapper;
+	
+	@Resource(name = "ipDescManager")
+	private IPDescManager ipDescManager;
 
 	@Resource(name = "topicAlarmSettingService")
 	private TopicAlarmSettingService topicAlarmSettingService;
@@ -168,10 +175,10 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		MinuteEntry me = new MinuteEntry();
 
 		me.setTime(entryTime);
-		me.setComprehensiveList(pqContainer.getComprehensivePriorityQueue().sortedList());
-		me.setSendList(pqContainer.getSendPriorityQueue().sortedList());
-		me.setAckList(pqContainer.getAckPriorityQueue().sortedList());
-		me.setAccuList(pqContainer.getAccuPriorityQueue().sortedList());
+		me.setComprehensiveList( setCmdpInfo(pqContainer.getComprehensivePriorityQueue().sortedList()) );
+		me.setSendList( setCmdpInfo(pqContainer.getSendPriorityQueue().sortedList()));
+		me.setAckList( setCmdpInfo(pqContainer.getAckPriorityQueue().sortedList()));
+		me.setAccuList( setCmdpInfo(pqContainer.getAccuPriorityQueue().sortedList()));
 
 		boolean inserted = dashboardContainer.insertMinuteEntry(me);
 		if (logger.isInfoEnabled()) {
@@ -272,6 +279,55 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 		}
 
 		return list;
+	}
+	
+	private List<Entry> setCmdpInfo(List<Entry> list){
+		
+		List<Entry> result = new ArrayList<Entry>();
+		
+		for (Entry e : list) {
+			if (StringUtils.isBlank(e.getDpMobile()) || StringUtils.isBlank(e.getEmail())
+					|| StringUtils.isBlank(e.getName())){
+				doSetCmdpInfo(e);
+			}
+			result.add(e);
+		}
+		
+		return result;
+	}
+	
+	private void doSetCmdpInfo(Entry entry) {
+
+		String topic = entry.getTopic();
+		String consumerid = entry.getConsumerId();
+
+		Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL, topic,
+				consumerid);
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Load ips %s of topic %s and consumerid %s", ips.toString(), topic, consumerid));
+		}
+
+		String ip = loadFirstElement(ips);
+		IPDesc iPDesc = ipDescManager.getIPDesc(ip);
+		String mobile = "Blank";
+		String email = "Blank";
+		String name = "Blank";
+		if (iPDesc != null) {
+			mobile = iPDesc.getDpMobile();
+			email = iPDesc.getEmail();
+			name = iPDesc.getName();
+		}
+
+		entry.setEmail(email).setName(name).setDpMobile(mobile);
+	}
+	
+	private static String loadFirstElement(Set<String> set) {
+
+		Iterator<String> it = set.iterator();
+		while (it.hasNext()) {
+			return it.next();
+		}
+		return "";
 	}
 
 }
