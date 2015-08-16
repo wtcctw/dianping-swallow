@@ -40,24 +40,28 @@
 					<td style="text-align: left"><label> <input
 							name="switch-field-1" class="ace ace-switch btn-rotate"
 							ng-model="e.isSmsMode" type="checkbox"> <span class="lbl">
-							
-							</span>
+
+						</span>
 					</label></td>
 					<td style="text-align: left"><label> <input
 							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isWeiXinMode" type="checkbox"> <span class="lbl"></span>
+							ng-model="e.isWeiXinMode" type="checkbox"> <span
+							class="lbl"></span>
 					</label></td>
 					<td style="text-align: left"><label> <input
 							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isMailMode" type="checkbox"> <span class="lbl"></span>
+							ng-model="e.isMailMode" type="checkbox"> <span
+							class="lbl"></span>
 					</label></td>
 					<td style="text-align: left"><label> <input
 							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isSendSwallow" type="checkbox"> <span class="lbl"></span>
+							ng-model="e.isSendSwallow" type="checkbox"> <span
+							class="lbl"></span>
 					</label></td>
 					<td style="text-align: left"><label> <input
 							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isSendBusiness" type="checkbox"> <span class="lbl"></span>
+							ng-model="e.isSendBusiness" type="checkbox"> <span
+							class="lbl"></span>
 					</label></td>
 					<td style="text-align: left">{{e.alarmTitle}}</td>
 					<td style="text-align: left"><a href="#myModal"
@@ -97,131 +101,141 @@
 					<h4 class="modal-title" id="myModalLabel">编辑告警元信息</h4>
 				</div>
 				<div class="modal-body">
-					<form method="post" class="form-horizontal" name="myForm"
-						ng-submit="refreshpage(myForm)">
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">告警类型</label>
-							<div class="col-xs-8">
-								<select class="col-xs-12" ng-model="alarmMetaEntity.type"
-									name="type" ng-options="o as o for o in types" required>
-								</select>
+					<form method="post"
+						class="form-horizontal bs-example bs-example-form" role="form"
+						name="myForm" ng-submit="refreshpage(myForm)">
+						<div class="input-group">
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">告警类型</label>
+								<div class="col-xs-9">
+									<select class="col-xs-12" ng-model="alarmMetaEntity.type"
+										name="type" ng-options="o as o for o in types" required>
+									</select>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">告警级别</label>
+								<div class="col-xs-9">
+									<select class="col-xs-12" ng-model="alarmMetaEntity.levelType"
+										name="levelType" ng-options="o as o for o in leveltypes"
+										required>
+									</select>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">发送短信</label>
+								<div class="col-xs-3">
+									<select class="col-xs-12" ng-model="alarmMetaEntity.isSmsMode"
+										name="isSmsMode" ng-options="o as o for o in booleans"
+										required>
+									</select>
+								</div>
+								<label class="col-xs-3 control-label control-label ">发送微信</label>
+								<div class="col-xs-3">
+									<select class="col-xs-12" name="isWeiXinMode"
+										ng-model="alarmMetaEntity.isWeiXinMode"
+										ng-options="o as o for o in booleans" required>
+									</select>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">发送邮件</label>
+								<div class="col-xs-3">
+									<select class="col-xs-12" name="isMailMode"
+										ng-model="alarmMetaEntity.isMailMode"
+										ng-options="o as o for o in booleans" required>
+									</select>
+								</div>
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">发送Swallow组</label>
+								<div class="col-xs-3">
+									<select class="col-xs-12" name="isSendSwallow"
+										ng-model="alarmMetaEntity.isSendSwallow"
+										ng-options="o as o for o in booleans" required>
+									</select>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">发送业务组</label>
+								<div class="col-xs-9">
+									<select class="col-xs-12" name="isSendBusiness"
+										ng-model="alarmMetaEntity.isSendBusiness"
+										ng-options="o as o for o in booleans" required>
+									</select>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">标题</label>
+								<div class="col-xs-9">
+									<input type="text" class="form-control"
+										ng-model="alarmMetaEntity.alarmTitle" name="alarmTitle"
+										required> </input>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">模版</label>
+								<div class="col-xs-9">
+									<textarea class="form-control" rows="2" type="text"
+										ng-model="alarmMetaEntity.alarmTemplate" name="alarmTemplate"
+										required></textarea>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">详情</label>
+								<div class="col-xs-9">
+									<textarea class="form-control" rows="2" type="text"
+										ng-model="alarmMetaEntity.alarmDetail" name="alarmDetail"
+										required></textarea>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">白天间隔基数</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control input-tooltip"
+										data-toggle="tooltip"
+										title="同类型告警的白天告警时间间隔基数。范围(上午7点-下午6点)，单位(min)"
+									ng-model="
+										alarmMetaEntity.daySpanBase" name="daySpanRatio" required>
+									</input>
+								</div>
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">夜晚间隔基数</label>
+								<div class="col-xs-3">
+									<input type="text" class="form-control input-tooltip"
+										data-toggle="tooltip" title="同类型告警的夜间告警时间间隔基数。范围(下午6点-上午7点)，单位(min)"
+										ng-model="alarmMetaEntity.nightSpanBase" name="nightSpanRatio"
+										required> </input>
+								</div>
+							</div>
+							<div class="col-xs-12 form-group">
+								<label
+									class="col-xs-3 control-label control-label no-padding-right">间隔上限</label>
+								<div class="col-xs-9">
+									<input type="text" class="form-control input-tooltip"
+										data-toggle="tooltip" title="同类型告警的两次告警时间间隔的最大值。单位(min)"
+										ng-model="alarmMetaEntity.maxTimeSpan" name="maxTimeSpan"
+										required> </input>
+								</div>
+							</div>
+							<div class="control-group"
+								style="margin-top: 20px; text-align: center;">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+									<button type="submit" class="btn btn-success">提交</button>
+								</div>
 							</div>
 						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">告警级别</label>
-							<div class="col-xs-8">
-								<select class="col-xs-12" ng-model="alarmMetaEntity.levelType"
-									name="levelType" ng-options="o as o for o in leveltypes"
-									required>
-								</select>
-							</div>
-						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">发送短信</label>
-							<div class="col-xs-3">
-								<select class="col-xs-12" ng-model="alarmMetaEntity.isSmsMode"
-									name="isSmsMode" ng-options="o as o for o in booleans" required>
-								</select>
-							</div>
-							<label class="col-xs-3 control-label control-label ">发送微信</label>
-							<div class="col-xs-3">
-								<select class="col-xs-12" name="isWeiXinMode"
-									ng-model="alarmMetaEntity.isWeiXinMode"
-									ng-options="o as o for o in booleans" required>
-								</select>
-							</div>
-						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">发送邮件</label>
-							<div class="col-xs-3">
-								<select class="col-xs-12" name="isMailMode"
-									ng-model="alarmMetaEntity.isMailMode"
-									ng-options="o as o for o in booleans" required>
-								</select>
-							</div>
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">发送Swallow组</label>
-							<div class="col-xs-3">
-								<select class="col-xs-12" name="isSendSwallow"
-									ng-model="alarmMetaEntity.isSendSwallow"
-									ng-options="o as o for o in booleans" required>
-								</select>
-							</div>
-						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">发送业务组</label>
-							<div class="col-xs-8">
-								<select class="col-xs-12" name="isSendBusiness"
-									ng-model="alarmMetaEntity.isSendBusiness"
-									ng-options="o as o for o in booleans" required>
-								</select>
-							</div>
-						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">标题</label>
-							<div class="col-xs-8">
-								<input type="text" class="form-control"
-									ng-model="alarmMetaEntity.alarmTitle" name="alarmTitle"
-									required> </input>
-							</div>
-						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">模版</label>
-							<div class="col-xs-8">
-								<input type="text" class="form-control"
-									ng-model="alarmMetaEntity.alarmTemplate" name="alarmTemplate"
-									required> </input>
-							</div>
-						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">详情</label>
-							<div class="col-xs-8">
-								<input type="text" class="form-control"
-									ng-model="alarmMetaEntity.alarmDetail" name="alarmDetail">
-								</input>
-							</div>
-						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">白天间隔基数</label>
-							<div class="col-xs-3">
-								<input type="text" class="form-control"
-									ng-model="alarmMetaEntity.daySpanBase" name="daySpanRatio"
-									required> </input>
-							</div>
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">夜晚间隔基数</label>
-							<div class="col-xs-3">
-								<input type="text" class="form-control"
-									ng-model="alarmMetaEntity.nightSpanBase" name="nightSpanRatio"
-									required> </input>
-							</div>
-						</div>
-						<div class="col-xs-12 form-group">
-							<label
-								class="col-xs-3 control-label control-label no-padding-right">间隔上限</label>
-							<div class="col-xs-8">
-								<input type="text" class="form-control"
-									ng-model="alarmMetaEntity.maxTimeSpan" name="maxTimeSpan"
-									required> </input>
-							</div>
-						</div>
-						<div class="control-group"
-							style="margin-top: 20px; text-align: center;">
-							<div class="controls">
-								<button type="button" class="btn btn-default"
-									data-dismiss="modal">关闭</button>
-								<button type="submit" class="btn btn-success">提交</button>
-							</div>
-						</div>
+
 					</form>
 				</div>
 
