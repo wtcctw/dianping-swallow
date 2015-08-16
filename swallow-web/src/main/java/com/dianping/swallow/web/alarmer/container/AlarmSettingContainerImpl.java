@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.container;
+package com.dianping.swallow.web.alarmer.container;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

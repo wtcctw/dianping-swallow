@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.util.EnvUtil;
-import com.dianping.swallow.web.container.AlarmMetaContainer;
+import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
