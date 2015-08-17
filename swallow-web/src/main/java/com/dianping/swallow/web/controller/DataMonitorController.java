@@ -79,22 +79,19 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
 	public ModelAndView viewConsumerServerQps() {
 
-		subSide = "consumerserverqps";
-		return new ModelAndView("monitor/consumerserverqps", createViewMap());
+		return new ModelAndView("monitor/consumerserverqps", createViewMap("server", "consumerserverqps"));
 	}
 
 	@RequestMapping(value = "/console/monitor/producerserver/qps", method = RequestMethod.GET)
 	public ModelAndView viewProducerServerQps() {
 
-		subSide = "producerserverqps";
-		return new ModelAndView("monitor/producerserverqps", createViewMap());
+		return new ModelAndView("monitor/producerserverqps", createViewMap("server", "producerserverqps"));
 	}
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
 	public ModelAndView viewTopicQps(@PathVariable String topic) {
 
-		subSide = "consumerqps";
-		return new ModelAndView("monitor/consumerqps", createViewMap());
+		return new ModelAndView("monitor/consumerqps", createViewMap("topic", "consumerqps"));
 	}
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu", method = RequestMethod.GET)
@@ -108,14 +105,13 @@ public class DataMonitorController extends AbstractMonitorController {
 				return new ModelAndView("redirect:/console/monitor/consumer/" + firstTopic + "/accu", createViewMap());
 			}
 		}
-		return new ModelAndView("monitor/consumeraccu", createViewMap());
+		return new ModelAndView("monitor/consumeraccu", createViewMap("topic", "consumeraccu"));
 	}
 
 	@RequestMapping(value = "/console/monitor/dashboard", method = RequestMethod.GET)
 	public ModelAndView viewTopicdashboarddelay() {
 
-		subSide = "dashboarddelay";
-		return new ModelAndView("monitor/consumerdashboarddelay", createViewMap());
+		return new ModelAndView("monitor/consumerdashboarddelay", createViewMap("dashboard","dashboarddelay"));
 	}
 
 	@RequestMapping(value = "/console/monitor/dashboard/delay/minute", method = RequestMethod.GET)
@@ -124,7 +120,7 @@ public class DataMonitorController extends AbstractMonitorController {
 			throws Exception {
 
 		Date stop = adjustTimeByStep(date, step);
-		
+
 		Date start = calStartTime(stop);
 
 		List<MinuteEntry> entrys = minuteEntryService.loadMinuteEntryPage(start, stop);
@@ -145,7 +141,7 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/producer/{topic}/savedelay", method = RequestMethod.GET)
 	public ModelAndView viewProducerDelayMonitor(@PathVariable String topic) throws IOException {
 
-		Map<String, Object> map = createViewMap();
+		Map<String, Object> map = createViewMap("topic","delay");
 		return new ModelAndView("monitor/producerdelay", map);
 
 	}
@@ -153,8 +149,7 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay", method = RequestMethod.GET)
 	public ModelAndView viewConsumerDelayMonitor(@PathVariable String topic) throws IOException {
 
-		subSide = "delay";
-		Map<String, Object> map = createViewMap();
+		Map<String, Object> map = createViewMap("topic","delay");
 		return new ModelAndView("monitor/consumerdelay", map);
 	}
 
@@ -435,18 +430,18 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		return calendar.getTime();
 	}
-	
-	private Date calStartTime(Date stop){
-		
+
+	private Date calStartTime(Date stop) {
+
 		Calendar calendarstart = Calendar.getInstance();
 		calendarstart.setTime(stop);
 		calendarstart.add(Calendar.MINUTE, -11);
 		calendarstart.clear(Calendar.SECOND);
 		calendarstart.clear(Calendar.MILLISECOND);
 		Date start = calendarstart.getTime();
-		
+
 		return start;
-	} 
+	}
 
 	@Override
 	protected String getSide() {

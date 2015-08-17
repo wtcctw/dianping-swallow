@@ -26,52 +26,52 @@
 					<th>短信
 						<div class="" style="padding:0;margin:0; float: right; height: 20px;">
 							<div style="height: 10px; line-height:5px; float: left; ">
-								<a href = "#" ng-click="batchUpdate('SMS', true)"> <i class=" icon-caret-up"></i>
+								<a href = "#" ng-click="batchUpdate('SMS', true)"> <i class=" icon-ok"></i>
 								</a>
 							</div>
 							<div style="height: 10px; line-height:5px; ">
-								<a href = "#" ng-click="batchUpdate('SMS', false)"> <i class="icon-caret-down"></i>
+								<a href = "#" ng-click="batchUpdate('SMS', false)"> <i class="icon-remove"></i>
 								</a>
 							</div>
 						</div>
 					</th>
 					<th>微信<div class="" style="padding:0;margin:0; float: right; height: 20px;">
 							<div style="height: 10px; line-height:5px; float: left; ">
-								<a href = "#" ng-click="batchUpdate('WEIXIN', true)"> <i class=" icon-caret-up"></i>
+								<a href = "#" ng-click="batchUpdate('WEIXIN', true)"> <i class=" icon-ok"></i>
 								</a>
 							</div>
 							<div style="height: 10px; line-height:5px; ">
-								<a href = "#" ng-click="batchUpdate('WEIXIN', false)"> <i class="icon-caret-down"></i>
+								<a href = "#" ng-click="batchUpdate('WEIXIN', false)"> <i class="icon-remove"></i>
 								</a>
 							</div>
 						</div></th>
 					<th>邮件<div class="" style="padding:0;margin:0; float: right; height: 20px;">
 							<div style="height: 10px; line-height:5px; float: left; ">
-								<a href = "#" ng-click="batchUpdate('MAIL', true)"> <i class=" icon-caret-up"></i>
+								<a href = "#" ng-click="batchUpdate('MAIL', true)"> <i class=" icon-ok"></i>
 								</a>
 							</div>
 							<div style="height: 10px; line-height:5px; ">
-								<a href = "#" ng-click="batchUpdate('MAIL', false)"> <i class="icon-caret-down"></i>
+								<a href = "#" ng-click="batchUpdate('MAIL', false)"> <i class="icon-remove"></i>
 								</a>
 							</div>
 						</div></th>
 					<th>系统组<div class="" style="padding:0;margin:0; float: right; height: 20px;">
 							<div style="height: 10px; line-height:5px; float: left; ">
-								<a href = "#" ng-click="batchUpdate('SWALLOW', true)"> <i class=" icon-caret-up"></i>
+								<a href = "#" ng-click="batchUpdate('SWALLOW', true)"> <i class=" icon-ok"></i>
 								</a>
 							</div>
 							<div style="height: 10px; line-height:5px; ">
-								<a href = "#" ng-click="batchUpdate('SWALLOW', false)"> <i class="icon-caret-down"></i>
+								<a href = "#" ng-click="batchUpdate('SWALLOW', false)"> <i class="icon-remove"></i>
 								</a>
 							</div>
 						</div></th>
 					<th>业务组<div class="" style="padding:0;margin:0; float: right; height: 20px;">
 							<div style="height: 10px; line-height:5px; float: left; ">
-								<a href = "#" ng-click="batchUpdate('BUSINESS', true)"> <i class=" icon-caret-up"></i>
+								<a href = "#" ng-click="batchUpdate('BUSINESS', true)"> <i class=" icon-ok"></i>
 								</a>
 							</div>
 							<div style="height: 10px; line-height:5px; ">
-								<a href = "#" ng-click="batchUpdate('BUSINESS', false)"> <i class="icon-caret-down"></i>
+								<a href = "#" ng-click="batchUpdate('BUSINESS', false)"> <i class="icon-remove"></i>
 								</a>
 							</div>
 						</div></th>
@@ -86,35 +86,35 @@
 						ng-href='${rc.contextPath}/console/setting/alarmmeta/detail/{{e.metaId}}'>{{e.type}}</a></td>
 					<td style="text-align: left"><span class="sticker"> <span
 							class="label arrowed-in"
-							ng-class="{'label-success' : e.isSmsMode== true}"> <i
+							ng-class="{'label-success' : e.isSmsMode== true,'label-danger' : e.isSmsMode== false}"> <i
 								class="bigger-110"
 								ng-class="{'icon-ok' : e.isSmsMode== true,'icon-remove' : e.isSmsMode== false}"></i>
 						</span>
 					</span></td>
 					<td style="text-align: left"><span class="sticker"> <span
 							class="label arrowed-in"
-							ng-class="{'label-success' : e.isWeiXinMode== true}"> <i
+							ng-class="{'label-success' : e.isWeiXinMode== true,'label-danger' : e.isWeiXinMode== false}"> <i
 								class="bigger-110"
 								ng-class="{'icon-ok' : e.isWeiXinMode== true,'icon-remove' : e.isWeiXinMode== false}"></i>
 						</span>
 					</span></td>
 					<td style="text-align: left"><span class="sticker"> <span
 							class="label arrowed-in"
-							ng-class="{'label-success' : e.isMailMode== true}"> <i
+							ng-class="{'label-success' : e.isMailMode== true,'label-danger' : e.isMailMode== false}"> <i
 								class="bigger-110"
 								ng-class="{'icon-ok' : e.isMailMode== true,'icon-remove' : e.isMailMode== false}"></i>
 						</span>
 					</span></td>
 					<td style="text-align: left"><span class="sticker"> <span
 							class="label arrowed-in"
-							ng-class="{'label-success' : e.isSendSwallow== true}"> <i
+							ng-class="{'label-success' : e.isSendSwallow== true,'label-danger' : e.isSendSwallow== false}"> <i
 								class="bigger-110"
 								ng-class="{'icon-ok' : e.isSendSwallow== true,'icon-remove' : e.isSendSwallow== false}"></i>
 						</span>
 					</span></td>
 					<td style="text-align: left"><span class="sticker"> <span
 							class="label arrowed-in"
-							ng-class="{'label-success' : e.isSendBusiness== true}"> <i
+							ng-class="{'label-success' : e.isSendBusiness== true,'label-danger' : e.isSendBusiness== false}"> <i
 								class="bigger-110"
 								ng-class="{'icon-ok' : e.isSendBusiness== true,'icon-remove' : e.isSendBusiness== false}"></i>
 						</span>
