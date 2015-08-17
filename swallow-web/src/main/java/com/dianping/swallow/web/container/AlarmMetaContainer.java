@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.alarmer.container;
+package com.dianping.swallow.web.container;
 
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 /**

@@ -1,5 +1,0 @@
-package com.dianping.swallow.web.alarmer.container;
-
-public interface StatsDataContainer {
-
-}

@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.alarmer.container;
+package com.dianping.swallow.web.container;
 
 import java.util.List;
 import java.util.Map;
