@@ -5,26 +5,28 @@ import java.util.List;
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 
 /**
- *
+ * 
  * @author qiyin
  *
+ *         2015年8月17日 下午5:31:34
  */
 public interface ConsumerIdAlarmSettingDao {
 
-	public boolean insert(ConsumerIdAlarmSetting setting);
+	boolean insert(ConsumerIdAlarmSetting setting);
 
-	public boolean update(ConsumerIdAlarmSetting setting);
+	boolean update(ConsumerIdAlarmSetting setting);
 
-	public int deleteById(String id);
+	int deleteById(String id);
 
-	public int deleteByConsumerId(String consumerId);
+	int deleteByConsumerId(String consumerId);
 
-	public ConsumerIdAlarmSetting findById(String id);
+	ConsumerIdAlarmSetting findById(String id);
 
-	public ConsumerIdAlarmSetting findByTopicNameAndConsumerId(String topicName, String consumerId);
-	
-	public List<ConsumerIdAlarmSetting> findByConsumerId(String consumerId);
-	
-	public List<ConsumerIdAlarmSetting> findByPage(int offset, int limit);
+	ConsumerIdAlarmSetting findByTopicNameAndConsumerId(String topicName, String consumerId);
 
+	List<ConsumerIdAlarmSetting> findByConsumerId(String consumerId);
+
+	List<ConsumerIdAlarmSetting> findByPage(int offset, int limit);
+
+	long count();
 }

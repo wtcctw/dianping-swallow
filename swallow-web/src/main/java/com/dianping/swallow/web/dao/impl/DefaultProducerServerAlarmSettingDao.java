@@ -88,4 +88,10 @@ public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao imple
 		return serverAlarmSettings;
 	}
 
+	@Override
+	public long count() {
+		Query query = new Query();
+		return mongoTemplate.count(query, PRODUCERSERVERALARMSETTING_COLLECTION);
+	}
+
 }

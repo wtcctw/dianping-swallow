@@ -81,5 +81,10 @@ public class ConsumerIdAlarmSettingServiceImpl implements ConsumerIdAlarmSetting
 	public List<ConsumerIdAlarmSetting> findByConsumerId(String consumerId) {
 		return consumerIdAlarmSettingDao.findByConsumerId(consumerId);
 	}
+	
+	@Override
+	public long count() {
+		return consumerIdAlarmSettingDao.count();
+	}
 
 }

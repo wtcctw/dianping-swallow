@@ -8,8 +8,9 @@ import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
 /**
  * 
- * @author qi.yin
+ * @author qiyin
  *
+ *         2015年8月17日 下午5:42:18
  */
 public interface IPCollectorService {
 
@@ -18,91 +19,91 @@ public interface IPCollectorService {
 	 * 
 	 * @param monitorData
 	 */
-	public void addStatisIps(MonitorData monitorData);
+	void addStatisIps(MonitorData monitorData);
 
 	/**
 	 * get statis consumerServer ip
 	 * 
 	 * @param monitorData
 	 */
-	public Map<String, Long> getStatisConsumerServerIps();
+	Map<String, Long> getStatisConsumerServerIps();
 
 	/**
 	 * get statis producerServer ip
 	 * 
 	 * @param monitorData
 	 */
-	public Map<String, Long> getStatisProducerServerIps();
+	Map<String, Long> getStatisProducerServerIps();
 
 	/**
 	 * get all statis ip
 	 * 
 	 * @param monitorData
 	 */
-	public Set<String> getStatisIps();
+	Set<String> getStatisIps();
 
 	/**
 	 * get producer server ips
 	 * 
 	 * @return
 	 */
-	public List<String> getProducerServerIps();
+	List<String> getProducerServerIps();
 
 	/**
 	 * get consumer server slave ips
 	 * 
 	 * @return
 	 */
-	public List<String> getConsumerServerSlaveIps();
+	List<String> getConsumerServerSlaveIps();
 
 	/**
 	 * get consumer server master ips
 	 * 
 	 * @return
 	 */
-	public List<String> getConsumerServerMasterIps();
+	List<String> getConsumerServerMasterIps();
 
 	/**
 	 * get producer server master ips map
 	 * 
 	 * @return
 	 */
-	public Map<String, String> getProducerServerIpsMap();
+	Map<String, String> getProducerServerIpsMap();
 
 	/**
 	 * get consumer server master ips map
 	 * 
 	 * @return
 	 */
-	public Map<String, String> getConsumerServerMasterIpsMap();
+	Map<String, String> getConsumerServerMasterIpsMap();
 
 	/**
 	 * get consumer server slave ips map
 	 * 
 	 * @return
 	 */
-	public Map<String, String> getConsumerServerSlaveIpsMap();
+	Map<String, String> getConsumerServerSlaveIpsMap();
 
 	/**
 	 * topic consumerId related ip
 	 * 
 	 * @return
 	 */
-	public Set<String> getTopicConsumerIdIps(String topicName, String consumerId);
+	Set<String> getTopicConsumerIdIps(String topicName, String consumerId);
 
 	/**
 	 * producer topic related ip
 	 * 
 	 * @return
 	 */
-	public Set<String> getProducerTopicIps(String topicName);
+	Set<String> getProducerTopicIps(String topicName);
 
 	/**
 	 * producer topic related ip
 	 * 
 	 * @return
 	 */
-	public Set<String> getConsumerTopicIps(String topicName);
+	Set<String> getConsumerTopicIps(String topicName);
 
 	/**
 	 * topicConsumerIdIps' key
@@ -111,6 +112,6 @@ public interface IPCollectorService {
 	 * @param consumerId
 	 * @return
 	 */
-	public String getTopicConsumerIdKey(String topic, String consumerId);
+	String getTopicConsumerIdKey(String topic, String consumerId);
 
 }

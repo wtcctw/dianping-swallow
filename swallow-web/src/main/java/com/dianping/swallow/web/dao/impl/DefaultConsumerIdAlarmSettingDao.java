@@ -98,4 +98,10 @@ public class DefaultConsumerIdAlarmSettingDao extends AbstractWriteDao implement
 		return consumerIdAlarmSettings;
 	}
 
+	@Override
+	public long count() {
+		Query query = new Query();
+		return mongoTemplate.count(query, CONSUMERIDALARMSETTING_COLLECTION);
+	}
+
 }

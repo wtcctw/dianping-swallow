@@ -8,20 +8,20 @@ import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午2:38:13
+ *         2015年8月3日 下午2:38:13
  */
 public interface ProducerServerStatsDataDao {
 
-	public boolean insert(ProducerServerStatsData serverStatsData);
+	boolean insert(ProducerServerStatsData serverStatsData);
 
-	public boolean update(ProducerServerStatsData serverStatsData);
+	boolean update(ProducerServerStatsData serverStatsData);
 
-	public int deleteById(String id);
+	int deleteById(String id);
 
-	public ProducerServerStatsData findById(String id);
+	ProducerServerStatsData findById(String id);
 
-	public ProducerServerStatsData findByTimeKey(String ip, long timeKey);
+	ProducerServerStatsData findByTimeKey(String ip, long timeKey);
 
-	public List<ProducerServerStatsData> findSectionData(String ip, long startKey, long endKey);
-	
+	List<ProducerServerStatsData> findSectionData(String ip, long startKey, long endKey);
+
 }

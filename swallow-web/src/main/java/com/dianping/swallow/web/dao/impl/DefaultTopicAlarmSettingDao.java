@@ -86,4 +86,10 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 		return topicAlarmSettings;
 	}
 
+	@Override
+	public long count() {
+		Query query = new Query();
+		return mongoTemplate.count(query, TOPICSALARMSETTING_COLLECTION);
+	}
+
 }
