@@ -224,13 +224,45 @@ module
 										console.log("leveltypes读取错误");
 									});
 							$scope.booleans = [ false, true ];
-							$("#check-all").click(function(){
-								$("input[name='check-list']").prop("checked",this.checked); 
-							});
-							
+							$("#check-all").click(
+									function() {
+										$("input[name='check-list']").prop(
+												"checked", this.checked);
+									});
+
 							$('.input-tooltip').tooltip({
-								showDelay: 0,
-								hideDelay: 0
+								showDelay : 0,
+								hideDelay : 0
 							});
+
+							$scope.batchUpdate = function(updateType, isTrue) {
+								var metaIds = [];
+								$("input[name='check-list']:checked").each(
+										function(i) {
+											metaIds.push($(this).val());
+										});
+								if (metaIds.length <= 0) {
+									alert("请选择要更新的行。");
+									return;
+								}
+								$("input[name='check-list']")
+								var updateEntity = {
+									metaIds : metaIds,
+									updateType : updateType,
+									isOpen : isTrue
+								};
+								console.log(updateEntity);
+								$http
+										.post(
+												window.contextPath
+														+ '/console/setting/alarmmeta/batchupdate',
+												updateEntity)
+										.success(
+												function(data) {
+													$scope.searchPaginator = Paginator(
+															fetchFunction,
+															$scope.pageSize);
+												});
+							}
 
 						} ]);

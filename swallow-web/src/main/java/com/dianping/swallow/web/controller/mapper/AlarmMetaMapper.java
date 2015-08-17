@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller.mapper;
 
 
+import com.dianping.swallow.web.controller.dto.AlarmMetaBatchDto.UpdateType;
 import com.dianping.swallow.web.controller.dto.AlarmMetaDto;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 
@@ -31,6 +32,26 @@ public class AlarmMetaMapper {
 		alarmMeta.setCreateTime(alarmMetaDto.getCreateTime());
 		alarmMeta.setUpdateTime(alarmMetaDto.getUpdateTime());
 		return alarmMeta;
+	}
+	
+	public static void update(UpdateType updateType,AlarmMeta alarmMeta,boolean isOpen){
+		switch(updateType){
+		case SMS:
+			alarmMeta.setIsSmsMode(isOpen);
+			break;
+		case WEIXIN:
+			alarmMeta.setIsWeiXinMode(isOpen);
+			break;
+		case MAIL:
+			alarmMeta.setIsMailMode(isOpen);
+			break;
+		case SWALLOW:
+			alarmMeta.setIsSendSwallow(isOpen);
+			break;
+		case BUSINESS:
+			alarmMeta.setIsSendBusiness(isOpen);
+			break;
+		}
 	}
 
 }

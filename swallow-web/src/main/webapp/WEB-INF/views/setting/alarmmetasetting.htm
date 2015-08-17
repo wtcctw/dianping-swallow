@@ -23,11 +23,58 @@
 					<td><input type="checkbox" id="check-all"></input></td>
 					<th>编号</th>
 					<th>类型</th>
-					<th>短信</th>
-					<th>微信</th>
-					<th>邮件</th>
-					<th>swallow组</th>
-					<th>业务组</th>
+					<th>短信
+						<div class="" style="padding:0;margin:0; float: right; height: 20px;">
+							<div style="height: 10px; line-height:5px; float: left; ">
+								<a href = "#" ng-click="batchUpdate('SMS', true)"> <i class=" icon-caret-up"></i>
+								</a>
+							</div>
+							<div style="height: 10px; line-height:5px; ">
+								<a href = "#" ng-click="batchUpdate('SMS', false)"> <i class="icon-caret-down"></i>
+								</a>
+							</div>
+						</div>
+					</th>
+					<th>微信<div class="" style="padding:0;margin:0; float: right; height: 20px;">
+							<div style="height: 10px; line-height:5px; float: left; ">
+								<a href = "#" ng-click="batchUpdate('WEIXIN', true)"> <i class=" icon-caret-up"></i>
+								</a>
+							</div>
+							<div style="height: 10px; line-height:5px; ">
+								<a href = "#" ng-click="batchUpdate('WEIXIN', false)"> <i class="icon-caret-down"></i>
+								</a>
+							</div>
+						</div></th>
+					<th>邮件<div class="" style="padding:0;margin:0; float: right; height: 20px;">
+							<div style="height: 10px; line-height:5px; float: left; ">
+								<a href = "#" ng-click="batchUpdate('MAIL', true)"> <i class=" icon-caret-up"></i>
+								</a>
+							</div>
+							<div style="height: 10px; line-height:5px; ">
+								<a href = "#" ng-click="batchUpdate('MAIL', false)"> <i class="icon-caret-down"></i>
+								</a>
+							</div>
+						</div></th>
+					<th>系统组<div class="" style="padding:0;margin:0; float: right; height: 20px;">
+							<div style="height: 10px; line-height:5px; float: left; ">
+								<a href = "#" ng-click="batchUpdate('SWALLOW', true)"> <i class=" icon-caret-up"></i>
+								</a>
+							</div>
+							<div style="height: 10px; line-height:5px; ">
+								<a href = "#" ng-click="batchUpdate('SWALLOW', false)"> <i class="icon-caret-down"></i>
+								</a>
+							</div>
+						</div></th>
+					<th>业务组<div class="" style="padding:0;margin:0; float: right; height: 20px;">
+							<div style="height: 10px; line-height:5px; float: left; ">
+								<a href = "#" ng-click="batchUpdate('BUSINESS', true)"> <i class=" icon-caret-up"></i>
+								</a>
+							</div>
+							<div style="height: 10px; line-height:5px; ">
+								<a href = "#" ng-click="batchUpdate('BUSINESS', false)"> <i class="icon-caret-down"></i>
+								</a>
+							</div>
+						</div></th>
 					<th>标题</th>
 					<th>操作</th>
 				</tr>
@@ -37,32 +84,41 @@
 					<td style="text-align: left">{{e.metaId}}</td>
 					<td style="text-align: left"><a
 						ng-href='${rc.contextPath}/console/setting/alarmmeta/detail/{{e.metaId}}'>{{e.type}}</a></td>
-					<td style="text-align: left"><label> <input
-							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isSmsMode" type="checkbox"> <span class="lbl">
-
+					<td style="text-align: left"><span class="sticker"> <span
+							class="label arrowed-in"
+							ng-class="{'label-success' : e.isSmsMode== true}"> <i
+								class="bigger-110"
+								ng-class="{'icon-ok' : e.isSmsMode== true,'icon-remove' : e.isSmsMode== false}"></i>
 						</span>
-					</label></td>
-					<td style="text-align: left"><label> <input
-							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isWeiXinMode" type="checkbox"> <span
-							class="lbl"></span>
-					</label></td>
-					<td style="text-align: left"><label> <input
-							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isMailMode" type="checkbox"> <span
-							class="lbl"></span>
-					</label></td>
-					<td style="text-align: left"><label> <input
-							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isSendSwallow" type="checkbox"> <span
-							class="lbl"></span>
-					</label></td>
-					<td style="text-align: left"><label> <input
-							name="switch-field-1" class="ace ace-switch btn-rotate"
-							ng-model="e.isSendBusiness" type="checkbox"> <span
-							class="lbl"></span>
-					</label></td>
+					</span></td>
+					<td style="text-align: left"><span class="sticker"> <span
+							class="label arrowed-in"
+							ng-class="{'label-success' : e.isWeiXinMode== true}"> <i
+								class="bigger-110"
+								ng-class="{'icon-ok' : e.isWeiXinMode== true,'icon-remove' : e.isWeiXinMode== false}"></i>
+						</span>
+					</span></td>
+					<td style="text-align: left"><span class="sticker"> <span
+							class="label arrowed-in"
+							ng-class="{'label-success' : e.isMailMode== true}"> <i
+								class="bigger-110"
+								ng-class="{'icon-ok' : e.isMailMode== true,'icon-remove' : e.isMailMode== false}"></i>
+						</span>
+					</span></td>
+					<td style="text-align: left"><span class="sticker"> <span
+							class="label arrowed-in"
+							ng-class="{'label-success' : e.isSendSwallow== true}"> <i
+								class="bigger-110"
+								ng-class="{'icon-ok' : e.isSendSwallow== true,'icon-remove' : e.isSendSwallow== false}"></i>
+						</span>
+					</span></td>
+					<td style="text-align: left"><span class="sticker"> <span
+							class="label arrowed-in"
+							ng-class="{'label-success' : e.isSendBusiness== true}"> <i
+								class="bigger-110"
+								ng-class="{'icon-ok' : e.isSendBusiness== true,'icon-remove' : e.isSendBusiness== false}"></i>
+						</span>
+					</span></td>
 					<td style="text-align: left">{{e.alarmTitle}}</td>
 					<td style="text-align: left"><a href="#myModal"
 						ng-click="setModalInput($index);" data-toggle="modal"
@@ -203,15 +259,16 @@
 									<input type="text" class="form-control input-tooltip"
 										data-toggle="tooltip"
 										title="同类型告警的白天告警时间间隔基数。范围(上午7点-下午6点)，单位(min)"
-									ng-model="
-										alarmMetaEntity.daySpanBase" name="daySpanRatio" required>
-									</input>
+										ng-model="
+										alarmMetaEntity.daySpanBase"
+										name="daySpanRatio" required> </input>
 								</div>
 								<label
 									class="col-xs-3 control-label control-label no-padding-right">夜晚间隔基数</label>
 								<div class="col-xs-3">
 									<input type="text" class="form-control input-tooltip"
-										data-toggle="tooltip" title="同类型告警的夜间告警时间间隔基数。范围(下午6点-上午7点)，单位(min)"
+										data-toggle="tooltip"
+										title="同类型告警的夜间告警时间间隔基数。范围(下午6点-上午7点)，单位(min)"
 										ng-model="alarmMetaEntity.nightSpanBase" name="nightSpanRatio"
 										required> </input>
 								</div>
