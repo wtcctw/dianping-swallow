@@ -1,44 +1,26 @@
 package com.dianping.swallow.web.controller.dto;
 
+import java.util.Date;
+
 
 /**
  * @author mingdongli
  *
  * 2015年8月17日下午7:47:27
  */
-public class MessageQueryDto {
-	
-	private int offset;
-
-	private int limit;
+public class MessageQueryDto extends BaseDto{
 	
 	private String topic;
 	
 	private String messageId;
 	
-	private String startdt;
+	private Date startdt;
 	
-	private String stopdt;
+	private Date stopdt;
 	
 	private String basemid;
 	
 	private boolean sort;
-
-	public int getOffset() {
-		return offset;
-	}
-
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
-
-	public int getLimit() {
-		return limit;
-	}
-
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
 
 	public String getTopic() {
 		return topic;
@@ -56,19 +38,19 @@ public class MessageQueryDto {
 		this.messageId = messageId;
 	}
 
-	public String getStartdt() {
+	public Date getStartdt() {
 		return startdt;
 	}
 
-	public void setStartdt(String startdt) {
+	public void setStartdt(Date startdt) {
 		this.startdt = startdt;
 	}
 
-	public String getStopdt() {
+	public Date getStopdt() {
 		return stopdt;
 	}
 
-	public void setStopdt(String stopdt) {
+	public void setStopdt(Date stopdt) {
 		this.stopdt = stopdt;
 	}
 

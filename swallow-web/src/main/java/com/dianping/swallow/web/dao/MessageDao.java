@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.dao;
 
+import java.util.Date;
 import java.util.Map;
 
 import com.dianping.swallow.web.controller.dto.MessageQueryDto;
@@ -139,6 +140,6 @@ public interface MessageDao extends Dao {
 	 * @param filename
 	 *            保存文件名
 	 */
-	Map<String, Object> exportMessages(String topicName, String startdt, String stopdt);
+	Map<String, Object> exportMessages(String topicName, Date startdt, Date stopdt);
 
 }

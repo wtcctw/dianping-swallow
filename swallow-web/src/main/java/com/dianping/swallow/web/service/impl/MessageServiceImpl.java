@@ -3,6 +3,7 @@ package com.dianping.swallow.web.service.impl;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,12 +56,12 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 				mid = 0;
 			}
 		}
-		String startdt = messageQueryDto.getStartdt();
-		String stopdt = messageQueryDto.getStopdt();
+		Date startdt = messageQueryDto.getStartdt();
+		Date stopdt = messageQueryDto.getStopdt();
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
-		if (mid < 0 && (startdt + stopdt).isEmpty()) {
+		if (mid < 0 && (startdt == null && stopdt == null) ) {
 			sizeAndMessage = webMessageDao.findByTopicname(messageQueryDto);
-		} else if (StringUtils.isEmpty(startdt)) {
+		} else if (startdt == null) {
 			sizeAndMessage = webMessageDao.findSpecific(messageQueryDto, mid);
 		} else if (mid < 0) {
 			sizeAndMessage = webMessageDao.findByTime(messageQueryDto);
@@ -170,7 +171,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	}
 
 	@Override
-	public Map<String, Object> exportMessage(String topicName, String startdt, String stopdt) {
+	public Map<String, Object> exportMessage(String topicName, Date startdt, Date stopdt) {
 
 		return webMessageDao.exportMessages(topicName, startdt, stopdt);
 	}

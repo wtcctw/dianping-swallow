@@ -43,8 +43,12 @@ module.factory('Paginator', function(){
 					entity.limit = pageSize + 1;
 					entity.topic = topic;
 					entity.messageId = messageId;
-					entity.startdt = startdt;
-					entity.stopdt = stopdt;
+					if(startdt.length > 0){
+						entity.startdt = new Date(startdt);
+					}
+					if(stopdt.length > 0){
+						entity.stopdt = new Date(stopdt);
+					}
 					entity.basemid = this.basemid;
 					entity.sort = sort;
 					
@@ -269,8 +273,8 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 						$http.get(window.contextPath + "/console/message/auth/dump", {
 							params : {
 								topic: $scope.topic,
-								startdt: $scope.startdt,
-								stopdt: $scope.stopdt
+								startdt: new Date($scope.startdt),
+								stopdt: new Date($scope.stopdt)
 							}
 						}).success(function(data){
 							if(data.status != 0){
@@ -278,7 +282,6 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 								return;
 							}
 							localStorage.setItem("topic", $scope.topic);
-							//localStorage.setItem("file", JSON.stringify(data.file)); //json for array
 							window.location.href = window.contextPath + "/console/download";
 						});
 					}

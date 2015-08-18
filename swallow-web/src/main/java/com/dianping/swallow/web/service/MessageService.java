@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service;
 
+import java.util.Date;
 import java.util.Map;
 
 import com.dianping.swallow.web.controller.dto.MessageQueryDto;
@@ -46,6 +47,6 @@ public interface MessageService {
 	 * @param startdt   开始时间
 	 * @param stopdt    结束时间
 	 */
-	Map<String, Object> exportMessage(String topicName, String startdt, String stopdt);
+	Map<String, Object> exportMessage(String topicName, Date startdt, Date stopdt);
 	
 }

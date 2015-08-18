@@ -3,6 +3,7 @@ package com.dianping.swallow.web.dao;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
@@ -17,7 +18,7 @@ public interface MessageDumpDao extends Dao{
 	
 	long count();
 	
-	int updateMessageDumpStatus(String filename, boolean finished, String desc) throws MongoException;
+	int updateMessageDump(MessageDump mdump) throws MongoException;
 
 	int removeMessageDump(String filename) throws MongoException;
 
@@ -31,5 +32,5 @@ public interface MessageDumpDao extends Dao{
 
 	Pair<Long, List<MessageDump>> loadMessageDumpPage(int offset, int limit);
 
-	Pair<Long, List<MessageDump>> loadMessageDumpPageByTopic(int offset, int limit, String topic);
+	Pair<Long, List<MessageDump>> loadMessageDumpPageByTopic(TopicQueryDto topicQueryDto);
 }

@@ -2,8 +2,15 @@ module.factory('Paginator', function(){
 	return function(fetchFunction, pageSize, entity){
 		var paginator = {
 				hasNextVar: false,
-				loadalarm : function(){
-					
+				handleResult: function(object){
+					var whitelist = object.whitelist;
+					for(var i = 0; i < this.currentPageItems.length; ++i){
+						if(typeof(whitelist) != "undefined" && whitelist.indexOf(this.currentPageItems[i].name) != -1){
+							this.currentPageItems[i]["alarm"] = false;
+						}else{
+							this.currentPageItems[i]["alarm"] = true;
+						}
+					}
 				},
 				fetch: function(page){
 					this.currentOffset = (page - 1) * pageSize;
@@ -23,7 +30,7 @@ module.factory('Paginator', function(){
 					fetchFunction( entity, function(data){
 						items = data.first.second;
 						length = data.first.first;
-						whitelist = data.second;
+						var whitelist = data.second;
 						self.totalPage = Math.ceil(length/pageSize);
 						self.endPage = self.totalPage;
 						//生成链接
@@ -45,13 +52,11 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
-						for(var i = 0; i < self.currentPageItems.length; ++i){
-							if(typeof(whitelist) != "undefined" && whitelist.indexOf(self.currentPageItems[i].name) != -1){
-								self.currentPageItems[i]["alarm"] = false;
-							}else{
-								self.currentPageItems[i]["alarm"] = true;
-							}
-						}
+						
+						var object = new Object();
+						object.whitelist = whitelist;
+						self.handleResult(object);
+						
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},

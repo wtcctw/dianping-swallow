@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.MessageDumpDao;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -26,7 +27,7 @@ import com.mongodb.WriteResult;
 @Component
 public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDumpDao {
 
-	private static final String MESSAGEDUMP_COLLECTION = "swallowwebmessagedumpc";
+	private static final String MESSAGEDUMP_COLLECTION = "MESSAGE_DUMP";
 
 	private static final String TOPIC = "topic";
 	private static final String FILENAME = "filename";
@@ -62,8 +63,11 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	}
 
 	@Override
-	public Pair<Long, List<MessageDump>> loadMessageDumpPageByTopic(int offset, int limit, String topic) {
+	public Pair<Long, List<MessageDump>> loadMessageDumpPageByTopic(TopicQueryDto topicQueryDto) {
 		List<MessageDump> messageDumpList = new ArrayList<MessageDump>();
+		String topic = topicQueryDto.getTopic();
+		int offset = topicQueryDto.getOffset();
+		int limit = topicQueryDto.getLimit();
 
 		String[] topics = topic.split(",");
 
@@ -100,13 +104,13 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	}
 
 	@Override
-	public int updateMessageDumpStatus(String filename, boolean finished, String desc) throws MongoException {
+	public int updateMessageDump(MessageDump mdump) throws MongoException {
 
-		Query query = new Query(Criteria.where(FILENAME).is(filename));
+		Query query = new Query(Criteria.where(FILENAME).is(mdump.getFilename()));
 
 		Update update = new Update();
-		update.set(FINISHED, finished);
-		update.set(DESC, desc);
+		update.set(FINISHED, mdump.isFinished());
+		update.set(DESC, mdump.getDesc());
 
 		WriteResult wr = mongoTemplate.upsert(query, update, MESSAGEDUMP_COLLECTION);
 		return wr.getN();

@@ -21,7 +21,7 @@ import com.dianping.swallow.web.util.ResponseStatus;
 @Component
 public class DefaultMinuteEntryDao extends AbstractWriteDao implements MinuteEntryDao {
 
-	private static final String MinuteEntry_COLLECTION = "Dashboard";
+	private static final String MINUTEENTRY_COLLECTION = "Dashboard";
 
 	private static final String TIME = "time";
 
@@ -30,7 +30,7 @@ public class DefaultMinuteEntryDao extends AbstractWriteDao implements MinuteEnt
 
 		try {
 
-			mongoTemplate.insert(entry, MinuteEntry_COLLECTION);
+			mongoTemplate.insert(entry, MINUTEENTRY_COLLECTION);
 		} catch (Exception e) {
 			if(logger.isErrorEnabled()){
 				logger.error("Error when save entry.", e);
@@ -50,7 +50,7 @@ public class DefaultMinuteEntryDao extends AbstractWriteDao implements MinuteEnt
 		
 		query.limit(limit).with(new Sort(new Sort.Order(Direction.DESC, TIME)));
 
-		List<MinuteEntry> minuteEntryList = mongoTemplate.find(query, MinuteEntry.class, MinuteEntry_COLLECTION);
+		List<MinuteEntry> minuteEntryList = mongoTemplate.find(query, MinuteEntry.class, MINUTEENTRY_COLLECTION);
 		
 		return minuteEntryList;
 	}
