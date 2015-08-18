@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.controller.dto.MessageQueryDto;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.model.MessageDump;
@@ -59,11 +60,15 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 		return new ModelAndView("tool/filedownload", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/message/auth/dump", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/auth/dump", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object dumpMessageByTime(String topic, Date startdt, Date stopdt, HttpServletRequest request,
+	public Object dumpMessageByTime(@RequestBody MessageQueryDto messageQueryDto, HttpServletRequest request,
 			HttpServletResponse response) {
 
+		String topic = messageQueryDto.getTopic();
+		Date startdt = messageQueryDto.getStartdt();
+		Date stopdt = messageQueryDto.getStopdt();
+		
 		String post = new SimpleDateFormat("yyyyMMddHHmmss'.gz'").format(new Date());
 		StringBuffer sb = new StringBuffer();
 		String filename = sb.append(topic).append("_").append(post).toString();

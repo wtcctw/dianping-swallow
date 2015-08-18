@@ -269,14 +269,11 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					}
 					else{
 						
-						//setInterval(updateProgressBar,400);
-						$http.get(window.contextPath + "/console/message/auth/dump", {
-							params : {
-								topic: $scope.topic,
-								startdt: new Date($scope.startdt),
-								stopdt: new Date($scope.stopdt)
-							}
-						}).success(function(data){
+						var entity = new Object();
+						entity.topic = $scope.topic;
+						entity.startdt = d1;
+						entity.stopdt = d2;
+						$http.post(window.contextPath + "/console/message/auth/dump", entity).success(function(data){
 							if(data.status != 0){
 								alert("error:" + data.message);
 								return;
