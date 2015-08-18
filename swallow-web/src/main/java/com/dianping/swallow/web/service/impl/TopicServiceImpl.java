@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
@@ -108,15 +109,15 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public Pair<Long, List<Topic>> loadTopicPage(int start, int span) {
+	public Pair<Long, List<Topic>> loadTopicPage(TopicQueryDto topicQueryDto) {
 
-		return topicDao.loadTopicPage(start, span);
+		return topicDao.loadTopicPage(topicQueryDto);
 	}
 
 	@Override
-	public Pair<Long, List<Topic>> loadSpecificTopicPage(int start, int span, String name, String prop) {
+	public Pair<Long, List<Topic>> loadSpecificTopicPage(TopicQueryDto topicQueryDto) {
 
-		return topicDao.loadSpecificTopicPage(start, span, name, prop);
+		return topicDao.loadSpecificTopicPage(topicQueryDto);
 	}
 
 	@Override

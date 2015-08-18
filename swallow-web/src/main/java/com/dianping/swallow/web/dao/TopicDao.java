@@ -3,6 +3,7 @@ package com.dianping.swallow.web.dao;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.model.Topic;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
@@ -57,7 +58,7 @@ public interface TopicDao extends Dao {
 	 * @param offset
 	 * @param limit
 	 */
-	Pair<Long, List<Topic>> loadTopicPage(int offset, int limit);
+	Pair<Long, List<Topic>> loadTopicPage(TopicQueryDto topicQueryDto);
 	
 	/**
 	 * 在限定条件下查询特定的topic
@@ -66,6 +67,6 @@ public interface TopicDao extends Dao {
 	 * @param name    topic名称
 	 * @param prop    申请人
 	 */
-	Pair<Long, List<Topic>> loadSpecificTopicPage(int offset, int limit, String name, String prop);
+	Pair<Long, List<Topic>> loadSpecificTopicPage(TopicQueryDto topicQueryDto);
 	
  }

@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -67,17 +68,22 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 	}
 
 	@Override
-	public Pair<Long, List<Topic>> loadTopicPage(int offset, int limit) {
+	public Pair<Long, List<Topic>> loadTopicPage(TopicQueryDto topicQueryDto) {
 		
 		Query query = new Query();
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, "name")));
+		query.skip(topicQueryDto.getOffset()).limit(topicQueryDto.getLimit()).with(new Sort(new Sort.Order(Direction.ASC, "name")));
 		List<Topic> topicList = mongoTemplate.find(query, Topic.class, TOPIC_COLLECTION);
 		Long topicSize = this.count();
 		return getResponse(topicSize, topicList);
 	}
 
 	@Override
-	public Pair<Long, List<Topic>> loadSpecificTopicPage(int offset, int limit, String name, String prop) {
+	public Pair<Long, List<Topic>> loadSpecificTopicPage(TopicQueryDto topicQueryDto) {
+		
+		String name = topicQueryDto.getTopic();
+		String prop = topicQueryDto.getProp();
+		int offset = topicQueryDto.getOffset();
+		int limit = topicQueryDto.getLimit();
 		
 		List<Topic> topicList = new ArrayList<Topic>();
 		String namer = name.isEmpty() ? ".*" : name;

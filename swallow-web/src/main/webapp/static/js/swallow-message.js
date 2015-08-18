@@ -37,7 +37,18 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/self.limit) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, topic, messageId, startdt, stopdt, this.basemid, sort, function(data){
+					
+					var entity = new Object();
+					entity.offset = this.currentOffset;
+					entity.limit = pageSize + 1;
+					entity.topic = topic;
+					entity.messageId = messageId;
+					entity.startdt = startdt;
+					entity.stopdt = stopdt;
+					entity.basemid = this.basemid;
+					entity.sort = sort;
+					
+					fetchFunction(entity, function(data){
 						if(typeof(data.status) != "undefined"){
 							alert("error:" + data.message);
 							return;
@@ -142,33 +153,8 @@ module.factory('Paginator', function(){
 
 module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog', '$interval',
         function($rootScope, $scope, $http, Paginator, ngDialog, $interval){
-				var fetchFunction = function(offset, limit, topic, messageId, startdt, stopdt, basemid, sort, callback){
-				var transFn = function(data){
-					return $.param(data);
-				}
-				var postConfig = {
-					transformRequest: transFn
-				};
-				var data = {'offset' : offset,
-										'limit': limit,
-										'topic': topic,
-										'messageId': messageId,
-										'startdt' : startdt,
-										'stopdt' : stopdt,
-										'basemid' : basemid,
-										'sort' : sort};
-				$http.get(window.contextPath + $scope.suburl, {
-					params : {
-						offset : offset,
-						limit : limit,
-						topic: topic,
-						messageId: messageId,
-						startdt : startdt,
-						stopdt : stopdt,
-						basemid : basemid,
-						sort : sort
-					}
-				}).success(callback);
+				var fetchFunction = function(entity, callback){
+				$http.post(window.contextPath + $scope.suburl, entity).success(callback);
 			};
 			
 			//－－－－－－－－－－for show content which click on 点击展开－－－－－－－－－－－		

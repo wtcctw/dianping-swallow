@@ -2,6 +2,7 @@ package com.dianping.swallow.web.service;
 
 import java.util.Map;
 
+import com.dianping.swallow.web.controller.dto.MessageQueryDto;
 import com.dianping.swallow.web.model.Message;
 
 /**
@@ -23,8 +24,7 @@ public interface MessageService {
 	 * @param username   用户名
 	 * @param baseMid    基准消息ID
 	 */
-	Map<String, Object> getMessageFromSpecificTopic(int start, int span, String tname, String messageId,
-			String startdt, String stopdt, String username, String baseMid, boolean sort);
+	Map<String, Object> getMessageFromSpecificTopic(MessageQueryDto messageQueryDto);
 
 	/**
 	 * 查询指定消息ID的消息内容

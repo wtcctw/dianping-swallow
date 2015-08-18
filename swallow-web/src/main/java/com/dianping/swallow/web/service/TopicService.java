@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.model.Topic;
 
 
@@ -21,7 +22,7 @@ public interface TopicService extends ConfigChange{
 	 * @param start 起始位置
 	 * @param span	偏移量
 	 */
-	Pair<Long, List<Topic>> loadTopicPage(int start, int span);
+	Pair<Long, List<Topic>> loadTopicPage(TopicQueryDto topicQueryDto);
 
 	/**
 	 * 根据消息名称，部门，申请人查询消息
@@ -30,7 +31,7 @@ public interface TopicService extends ConfigChange{
 	 * @param name  topic名称
 	 * @param proposal  申请人
 	 */
-	Pair<Long, List<Topic>> loadSpecificTopicPage(int start, int span, String name, String proposal);
+	Pair<Long, List<Topic>> loadSpecificTopicPage(TopicQueryDto topicQueryDto);
 	
 	/**
 	 * 
