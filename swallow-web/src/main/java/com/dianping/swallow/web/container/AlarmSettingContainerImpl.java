@@ -1,16 +1,19 @@
 package com.dianping.swallow.web.container;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
@@ -30,7 +33,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *
  *         2015年8月3日 上午11:34:10
  */
-// @Component
+//@Component("alarmSettingContainer")
 public class AlarmSettingContainerImpl implements AlarmSettingContainer, InitializingBean {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmSettingContainerImpl.class);
@@ -41,7 +44,7 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 
 	private static final String DEFAULT_DEFAULT_RECORD = DEFAULT_RECORD + KEY_SPLIT + DEFAULT_RECORD;
 
-	private int interval = 120;// 秒
+	private int interval = 300;// 秒
 
 	private int delay = 5;
 
@@ -68,39 +71,101 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 	@Autowired
 	private ConsumerIdAlarmSettingService consumerIdAlarmSettingService;
 
-	private Map<String, GlobalAlarmSetting> globalAlarmSettings = new ConcurrentHashMap<String, GlobalAlarmSetting>();
+	private volatile Map<String, GlobalAlarmSetting> globalAlarmSettings = null;
 
-	private Map<String, ProducerServerAlarmSetting> pServerAlarmSettings = new ConcurrentHashMap<String, ProducerServerAlarmSetting>();
+	private volatile Map<String, ProducerServerAlarmSetting> pServerAlarmSettings = null;
 
-	private Map<String, ConsumerServerAlarmSetting> cServerAlarmSettings = new ConcurrentHashMap<String, ConsumerServerAlarmSetting>();
+	private volatile Map<String, ConsumerServerAlarmSetting> cServerAlarmSettings = null;
 
-	private Map<String, TopicAlarmSetting> topicAlarmSettings = new ConcurrentHashMap<String, TopicAlarmSetting>();
+	private volatile Map<String, TopicAlarmSetting> topicAlarmSettings = null;
 
-	private Map<String, ConsumerIdAlarmSetting> consumerIdAlarmSettings = new ConcurrentHashMap<String, ConsumerIdAlarmSetting>();
+	private volatile Map<String, ConsumerIdAlarmSetting> consumerIdAlarmSettings = null;
 
-	public void findSettingData() {
-		
+	public void findAlarmSettingData() {
+		findGlobalSettingData();
+		findPServerSettingData();
+		findCServerSettingData();
+		findTopicSettingData();
+		findConsumerIdSettingData();
 	}
 
 	private void findGlobalSettingData() {
+		long count = globalAlarmSettingService.count();
+		List<GlobalAlarmSetting> globalAlarmSettingList = globalAlarmSettingService.findByPage(0, (int) count);
+		Map<String, GlobalAlarmSetting> tempGlobalAlarmSettings = new HashMap<String, GlobalAlarmSetting>();
+		if (globalAlarmSettingList != null) {
+			for (GlobalAlarmSetting globalAlarmSetting : globalAlarmSettingList) {
+				if (StringUtils.isNotBlank(globalAlarmSetting.getSwallowId())) {
+					tempGlobalAlarmSettings.put(globalAlarmSetting.getSwallowId(), globalAlarmSetting);
+				}
+			}
+		}
+		this.globalAlarmSettings = tempGlobalAlarmSettings;
+
 	}
 
 	private void findPServerSettingData() {
+		long count = pServerAlarmSettingService.count();
+		List<ProducerServerAlarmSetting> pServerAlarmSettingList = pServerAlarmSettingService
+				.findByPage(0, (int) count);
+		Map<String, ProducerServerAlarmSetting> tempServerAlarmSettings = new HashMap<String, ProducerServerAlarmSetting>();
+		if (pServerAlarmSettingList != null) {
+			for (ProducerServerAlarmSetting pServerAlarmSetting : pServerAlarmSettingList) {
+				if (StringUtils.isNotBlank(pServerAlarmSetting.getServerId())) {
+					tempServerAlarmSettings.put(pServerAlarmSetting.getServerId(), pServerAlarmSetting);
+				}
+			}
+		}
+		pServerAlarmSettings = tempServerAlarmSettings;
+	}
 
+	private void findCServerSettingData() {
+		long count = cServerAlarmSettingService.count();
+		List<ConsumerServerAlarmSetting> cServerAlarmSettingList = cServerAlarmSettingService
+				.findByPage(0, (int) count);
+		Map<String, ConsumerServerAlarmSetting> tempServerAlarmSettings = new HashMap<String, ConsumerServerAlarmSetting>();
+		if (cServerAlarmSettingList != null) {
+			for (ConsumerServerAlarmSetting cServerAlarmSetting : cServerAlarmSettingList) {
+				if (StringUtils.isNotBlank(cServerAlarmSetting.getServerId())) {
+					tempServerAlarmSettings.put(cServerAlarmSetting.getServerId(), cServerAlarmSetting);
+				}
+			}
+		}
+		cServerAlarmSettings = tempServerAlarmSettings;
 	}
-	
-	private void findCServerSettingData(){
-		
+
+	private void findTopicSettingData() {
+		long count = topicAlarmSettingService.count();
+		List<TopicAlarmSetting> topicAlarmSettingList = topicAlarmSettingService.findByPage(0, (int) count);
+		Map<String, TopicAlarmSetting> tempTopicAlarmSettings = new HashMap<String, TopicAlarmSetting>();
+		if (topicAlarmSettingList != null) {
+			for (TopicAlarmSetting topicAlarmSetting : topicAlarmSettingList) {
+				if (StringUtils.isNotBlank(topicAlarmSetting.getTopicName())) {
+					tempTopicAlarmSettings.put(topicAlarmSetting.getTopicName(), topicAlarmSetting);
+				}
+			}
+		}
+		topicAlarmSettings = tempTopicAlarmSettings;
 	}
-	
-	private void findTopicSettingData(){
-		
+
+	private void findConsumerIdSettingData() {
+		long count = consumerIdAlarmSettingService.count();
+		List<ConsumerIdAlarmSetting> consumerIdAlarmSettingList = consumerIdAlarmSettingService.findByPage(0,
+				(int) count);
+		Map<String, ConsumerIdAlarmSetting> tempConsumerIdAlarmSettings = new HashMap<String, ConsumerIdAlarmSetting>();
+		if (consumerIdAlarmSettingList != null) {
+			for (ConsumerIdAlarmSetting consumerIdAlarmSetting : consumerIdAlarmSettingList) {
+				if (StringUtils.isNotBlank(consumerIdAlarmSetting.getTopicName())
+						|| StringUtils.isNotBlank(consumerIdAlarmSetting.getConsumerId())) {
+					String key = consumerIdAlarmSetting.getTopicName() + "KEY_SPLIT"
+							+ consumerIdAlarmSetting.getConsumerId();
+					tempConsumerIdAlarmSettings.put(key, consumerIdAlarmSetting);
+				}
+			}
+		}
+		consumerIdAlarmSettings = tempConsumerIdAlarmSettings;
 	}
-	
-	private void findConsumerIdSettingData(){
-		
-	}
-	
+
 	private void scheduleAlarmMetaTask() {
 		future = scheduled.scheduleAtFixedRate(new Runnable() {
 			@Override
@@ -119,19 +184,21 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 
 	private void doLoadSettingDataTask() {
 		logger.info("[doAlarmMetaTask] scheduled load setting data.");
+		findAlarmSettingData();
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		findSettingData();
+		scheduleAlarmMetaTask();
 	}
 
 	@Override
 	public GlobalAlarmSetting findGlobalAlarmSetting(String globalId) {
-		if (globalAlarmSettings.containsKey(globalId)) {
+		if (StringUtils.isBlank(globalId)) {
+			return globalAlarmSettings.get(DEFAULT_RECORD);
+		} else if (globalAlarmSettings.containsKey(globalId)) {
 			return globalAlarmSettings.get(globalId);
-		}
-		if (globalAlarmSettings.containsKey(DEFAULT_RECORD)) {
+		} else if (globalAlarmSettings.containsKey(DEFAULT_RECORD)) {
 			return globalAlarmSettings.get(DEFAULT_RECORD);
 		}
 		return null;
@@ -139,10 +206,11 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 
 	@Override
 	public ProducerServerAlarmSetting findProducerServerAlarmSetting(String serverId) {
-		if (pServerAlarmSettings.containsKey(serverId)) {
+		if (StringUtils.isBlank(serverId)) {
+			return pServerAlarmSettings.get(DEFAULT_RECORD);
+		} else if (pServerAlarmSettings.containsKey(serverId)) {
 			return pServerAlarmSettings.get(serverId);
-		}
-		if (pServerAlarmSettings.containsKey(DEFAULT_RECORD)) {
+		} else if (pServerAlarmSettings.containsKey(DEFAULT_RECORD)) {
 			return pServerAlarmSettings.get(DEFAULT_RECORD);
 		}
 		return null;
@@ -150,30 +218,34 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 
 	@Override
 	public ConsumerServerAlarmSetting findConsumerServerAlarmSetting(String serverId) {
-		if (cServerAlarmSettings.containsKey(serverId)) {
+		if (StringUtils.isBlank(serverId)) {
+			return cServerAlarmSettings.get(DEFAULT_RECORD);
+		} else if (cServerAlarmSettings.containsKey(serverId)) {
 			return cServerAlarmSettings.get(serverId);
-		} else {
-			if (cServerAlarmSettings.containsKey(DEFAULT_RECORD)) {
-				return cServerAlarmSettings.get(DEFAULT_RECORD);
-			}
+		} else if (cServerAlarmSettings.containsKey(DEFAULT_RECORD)) {
+			return cServerAlarmSettings.get(DEFAULT_RECORD);
 		}
 		return null;
 	}
 
 	@Override
 	public TopicAlarmSetting findTopicAlarmSetting(String topicName) {
-		if (topicAlarmSettings.containsKey(topicName)) {
+		if (StringUtils.isBlank(topicName)) {
+			return topicAlarmSettings.get(DEFAULT_RECORD);
+		} else if (topicAlarmSettings.containsKey(topicName)) {
 			return topicAlarmSettings.get(topicName);
-		} else {
-			if (topicAlarmSettings.containsKey(DEFAULT_RECORD)) {
-				return topicAlarmSettings.get(DEFAULT_RECORD);
-			}
+		} else if (topicAlarmSettings.containsKey(DEFAULT_RECORD)) {
+			return topicAlarmSettings.get(DEFAULT_RECORD);
 		}
+
 		return null;
 	}
 
 	@Override
 	public ConsumerIdAlarmSetting findConsumerIdAlarmSetting(String topicName, String consumerId) {
+		if (StringUtils.isBlank(topicName) && StringUtils.isBlank(consumerId)) {
+			return consumerIdAlarmSettings.get(DEFAULT_DEFAULT_RECORD);
+		}
 		String key = topicName + "KEY_SPLIT" + consumerId;
 		if (consumerIdAlarmSettings.containsKey(key)) {
 			return consumerIdAlarmSettings.get(key);

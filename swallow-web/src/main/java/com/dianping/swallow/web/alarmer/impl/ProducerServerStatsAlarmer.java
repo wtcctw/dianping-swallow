@@ -2,6 +2,7 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -81,6 +82,9 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 		QPSAlarmSetting qps = serverAlarmSetting.getAlarmSetting();
 		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 		for (ProducerServerStatsData serverStatsData : serverStatsDatas) {
+			if (StringUtils.equals(TOTAL_KEY, serverStatsData.getIp())) {
+				continue;
+			}
 			if (whiteList == null || (!whiteList.contains(serverStatsData.getIp()))) {
 				qpsAlarm(serverStatsData, qps);
 			}
