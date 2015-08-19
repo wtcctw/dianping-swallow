@@ -1,76 +1,93 @@
-function renderGraph(url, divName,  http){
-		http({
-			method : 'POST',
-			url : window.contextpath + url + location.search
-		}).success(function(data, status, headers, config) {
-			
-				var parent = $('#' + divName);
-				var count = 0;
-				data.forEach(function(item){
-					count++;
-					var childdiv=$('<div></div>'); 
-					childdiv.appendTo(parent);
-					$(function () {
-						childdiv.highcharts({
-				            title: {
-				                text: item.title,
-				                x: 0 //center
-				            },
-				            subtitle: {
-				                text: item.subTitle,
-				                x: 0
-				            },
-				            xAxis: {
-				                type: 'datetime'
-				            },
-				            yAxis: {
-				                title: {
-				                    text: item.yAxisTitle
-				                },
-				                plotLines: [{
-				                    value: 0,
-				                    width: 10,
-				                    color: '#808080'
-				                }]
-				            },
-				            tooltip: {
-				                valueSuffix: ''
-				            },
-				            legend: {
-				                layout: 'vertical',
-				                align: 'right',
-				                verticalAlign: 'middle',
-				                borderWidth: 0
-				            },
-				            plotOptions: {
-				                series: {
-				                    pointStart: item.plotOption.series.pointStart + 8*3600*1000,
-				                    pointInterval: item.plotOption.series.pointInterval // one day
-				                }
-				            },
-				            series: item.series
-				        });
-				    });
-				});
-		}).error(function(data, status, headers, config) {
-			
-			alert("响应错误" + data);
-//			app.appError("响应错误", data);
-		});	
+function renderGraph(url, divName, http) {
+	http({
+		method : 'POST',
+		url : window.contextpath + url + location.search
+	})
+			.success(
+					function(data, status, headers, config) {
+
+						var parent = $('#' + divName);
+						parent.empty();
+						var count = 0;
+						data
+								.forEach(function(item) {
+									count++;
+									var childdiv = $('<div></div>');
+									childdiv.appendTo(parent);
+									$(function() {
+										childdiv
+												.highcharts({
+													title : {
+														text : item.title,
+														x : 0
+													// center
+													},
+													subtitle : {
+														text : item.subTitle,
+														x : 0
+													},
+													xAxis : {
+														type : 'datetime'
+													},
+													yAxis : {
+														title : {
+															text : item.yAxisTitle
+														},
+														plotLines : [ {
+															value : 0,
+															width : 10,
+															color : '#808080'
+														} ]
+													},
+													tooltip : {
+														valueSuffix : ''
+													},
+													legend : {
+														layout : 'vertical',
+														align : 'right',
+														verticalAlign : 'middle',
+														borderWidth : 0
+													},
+													plotOptions : {
+														series : {
+															pointStart : item.plotOption.series.pointStart + 8 * 3600 * 1000,
+															pointInterval : item.plotOption.series.pointInterval
+														// one day
+														}
+													},
+													series : item.series
+												});
+									});
+								});
+					}).error(function(data, status, headers, config) {
+
+				alert("响应错误" + data);
+				// app.appError("响应错误", data);
+			});
 }
 
 module.controller('ProducerServerQpsController', function($scope, $http) {
 
-	$scope.getProducerServerQps = function(){
-		renderGraph("/console/monitor/producerserver/qps/get", "container", $http);
+	$scope.getProducerServerQps = function() {
+		renderGraph("/console/monitor/producerserver/qps/get", "container",
+				$http);
 	};
+	$scope.startTime = "";
+	$scope.endTime = "";
+	$scope.queryServerQps = function() {
+		$scope.startTime = $("#starttime").val();
+		$scope.endTime = $("#stoptime").val();
+		renderGraph("/console/monitor/producerserver/qps/get/"
+				+ $scope.startTime + "/" + $scope.endTime, "container", $http);
+	}
 
 });
 
 module.controller('ConsumerServerQpsController', function($scope, $http) {
 
-	$scope.getConsumerServerQps = function(){
-		renderGraph("/console/monitor/consumerserver/qps/get", "container", $http);
+	$scope.getConsumerServerQps = function() {
+		renderGraph("/console/monitor/consumerserver/qps/get", "container",
+				$http);
 	};
 });
 
@@ -95,8 +112,9 @@ module.controller('ConsumerQpsController', function($scope, $http) {
 		app.appError("响应错误", data);
 	});
 
-	$scope.getConsumerQps = function(topicName){
-		renderGraph("/console/monitor/consumer/"+topicName+"/qps/get", "container", $http);
+	$scope.getConsumerQps = function(topicName) {
+		renderGraph("/console/monitor/consumer/" + topicName + "/qps/get",
+				"container", $http);
 	};
 });
 
@@ -105,21 +123,26 @@ module.controller('ConsumerAccuController', function($scope, $http) {
 	$http({
 		method : 'POST',
 		url : window.contextpath + '/console/monitor/topiclist/get'
-		}).success(function(topicList, status, headers, config) {
-				
-				$("#consumer-div").typeahead({
-					source : topicList,
-					updater : function(c) {
-						window.location = window.contextpath + "/console/monitor/consumer/"+c+"/accu";
-						return c;
-					}
-				})
+	}).success(
+			function(topicList, status, headers, config) {
+
+				$("#consumer-div").typeahead(
+						{
+							source : topicList,
+							updater : function(c) {
+								window.location = window.contextpath
+										+ "/console/monitor/consumer/" + c
+										+ "/accu";
+								return c;
+							}
+						})
 			}).error(function(data, status, headers, config) {
-				 app.appError("响应错误", data);
+		app.appError("响应错误", data);
 	});
 
-	$scope.getAccu = function(topicName){
-		renderGraph("/console/monitor/consumer/"+topicName+"/accu/get", "container", $http);
+	$scope.getAccu = function(topicName) {
+		renderGraph("/console/monitor/consumer/" + topicName + "/accu/get",
+				"container", $http);
 	};
 });
 
@@ -129,17 +152,21 @@ module.controller('ConsumerDelayController', function($scope, $http) {
 	$http({
 		method : 'POST',
 		url : window.contextpath + '/console/monitor/topiclist/get'
-		}).success(function(topicList, status, headers, config) {
-				
-				$("#consumer-div").typeahead({
-					source : topicList,
-					updater : function(c) {
-						window.location = window.contextpath + "/console/monitor/consumer/"+c+"/delay";
-						return c;
-					}
-				})
+	}).success(
+			function(topicList, status, headers, config) {
+
+				$("#consumer-div").typeahead(
+						{
+							source : topicList,
+							updater : function(c) {
+								window.location = window.contextpath
+										+ "/console/monitor/consumer/" + c
+										+ "/delay";
+								return c;
+							}
+						})
 			}).error(function(data, status, headers, config) {
-				 app.appError("响应错误", data);
+		app.appError("响应错误", data);
 	});
 
 	$scope.getDelay = function(topicName) {
@@ -155,7 +182,7 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.stoptime = "";
 	$scope.currentMin = -1; // 当前分钟，第一次时设置
 	$scope.currentRed = -1;
-	
+
 	$scope.whatClassIsIt = function(index) {
 		if (index == $scope.currentRed)
 			return "red-num"
@@ -247,9 +274,9 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 						$scope.currentRed = date.getMinutes();
 					} else {
 						date = new Date();
-						if(index != -1){
+						if (index != -1) {
 							$scope.currentRed = index;
-						}else{
+						} else {
 							$scope.currentRed = date.getMinutes();
 						}
 					}

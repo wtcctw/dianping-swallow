@@ -15,8 +15,8 @@ import com.dianping.swallow.web.model.event.StatisType;
  *
  *         2015年7月31日 下午3:56:39
  */
-@Document(collection = "ConsumerServerStatsData")
-@CompoundIndexes({ @CompoundIndex(name = "timeKey_ip_index", def = "{'timeKey': 1, 'ip': -1}") })
+@Document(collection = "CONSUMER_SERVER_STATS_DATA")
+@CompoundIndexes({ @CompoundIndex(name = "IX_TIMEKEY_IP", def = "{'timeKey': 1, 'ip': -1}") })
 public class ConsumerServerStatsData extends ConsumerStatsData {
 
 	private String ip;

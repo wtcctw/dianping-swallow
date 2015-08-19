@@ -25,7 +25,7 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultTopicAlarmSettingDao.class);
 
-	private static final String TOPICSALARMSETTING_COLLECTION = "swallowwebtopicalarmsettingc";
+	private static final String TOPICSALARMSETTING_COLLECTION = "TOPIC_ALARM_SETTING";
 
 	private static final String ID_FIELD = "id";
 

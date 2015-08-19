@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
  */
 public abstract class AbstractMonitorDao extends AbstractDao{
 	
-	@Resource( name = "statisMongoTemplate")
+	@Resource( name = "statsMongoTemplate")
 	protected MongoTemplate mongoTemplate; 
 	
 

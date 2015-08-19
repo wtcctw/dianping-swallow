@@ -22,7 +22,7 @@ import com.mongodb.WriteResult;
 public class DefaultAdministratorDao extends AbstractWriteDao implements
 		AdministratorDao {
 
-	private static final String ADMINISTRATOR_COLLECTION = "swallowwebadminc";
+	private static final String ADMINISTRATOR_COLLECTION = "ADMIN";
 	private static final String NAME = "name";
 	private static final String ROLE = "role";
 	private static final String DATE = "date";

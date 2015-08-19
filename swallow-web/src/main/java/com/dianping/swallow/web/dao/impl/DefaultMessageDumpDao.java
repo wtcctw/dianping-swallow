@@ -26,7 +26,7 @@ import com.mongodb.WriteResult;
 @Component
 public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDumpDao {
 
-	private static final String MESSAGEDUMP_COLLECTION = "swallowwebmessagedumpc";
+	private static final String MESSAGEDUMP_COLLECTION = "MESSAGE_DUMP";
 
 	private static final String TOPIC = "topic";
 	private static final String FILENAME = "filename";

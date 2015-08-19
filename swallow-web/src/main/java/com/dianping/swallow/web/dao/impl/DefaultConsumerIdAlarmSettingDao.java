@@ -25,7 +25,7 @@ public class DefaultConsumerIdAlarmSettingDao extends AbstractWriteDao implement
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultConsumerIdAlarmSettingDao.class);
 
-	private static final String CONSUMERIDALARMSETTING_COLLECTION = "swallowwebconsumeridalarmsettingc";
+	private static final String CONSUMERIDALARMSETTING_COLLECTION = "CONSUMERID_ALARM_SETTING";
 
 	private static final String ID_FIELD = "id";
 

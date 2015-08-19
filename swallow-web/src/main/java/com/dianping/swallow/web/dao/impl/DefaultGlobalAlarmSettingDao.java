@@ -24,7 +24,7 @@ public class DefaultGlobalAlarmSettingDao extends AbstractWriteDao implements Gl
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultGlobalAlarmSettingDao.class);
 
-	private static final String SWALLOWALARMSETTING_COLLECTION = "swallowwebswallowalarmsettingc";
+	private static final String SWALLOWALARMSETTING_COLLECTION = "GLOBAL_ALARM_SETTING";
 
 	private static final String ID_FIELD = "id";
 

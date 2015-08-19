@@ -25,7 +25,7 @@ public class DefaultProducerServerAlarmSettingDao extends AbstractWriteDao imple
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultProducerServerAlarmSettingDao.class);
 
-	private static final String PRODUCERSERVERALARMSETTING_COLLECTION = "swallowwebproducerserveralarmsettingc";
+	private static final String PRODUCERSERVERALARMSETTING_COLLECTION = "PRODUCER_SERVER_ALARM_SETTING";
 
 	private static final String ID_FIELD = "id";
 

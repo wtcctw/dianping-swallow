@@ -24,7 +24,7 @@ import com.mongodb.MongoSocketException;
 @Component
 public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 
-	private static final String TOPIC_COLLECTION = "swallowwebtopicc";
+	private static final String TOPIC_COLLECTION = "TOPIC";
 
 	private static final String NAME = "name";
 	

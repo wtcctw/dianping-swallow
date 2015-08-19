@@ -21,7 +21,7 @@ import com.dianping.swallow.web.util.ResponseStatus;
 @Component
 public class DefaultMinuteEntryDao extends AbstractWriteDao implements MinuteEntryDao {
 
-	private static final String MinuteEntry_COLLECTION = "swallowwebdashboardc";
+	private static final String MinuteEntry_COLLECTION = "DASHBOARD";
 
 	private static final String TIME = "time";
 
