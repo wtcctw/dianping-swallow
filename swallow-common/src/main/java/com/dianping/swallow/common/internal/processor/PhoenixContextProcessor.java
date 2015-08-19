@@ -34,7 +34,9 @@ public class PhoenixContextProcessor extends AbstractProcessor{
                 internalProperties.put(PhoenixContext.GUID, guid);
             }
         } catch (ClassNotFoundException e1) {
-            logger.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
+        	if(logger.isDebugEnabled()){
+        		logger.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
+        	}
         }
 		
 	}
@@ -59,8 +61,8 @@ public class PhoenixContextProcessor extends AbstractProcessor{
                     PhoenixContext.getInstance().setGuid(guid);
                 }
             } catch (ClassNotFoundException e1) {
-            	if(logger.isInfoEnabled()){
-            		logger.info("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
+            	if(logger.isDebugEnabled()){
+            		logger.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
             	}
             }
         }
@@ -72,8 +74,8 @@ public class PhoenixContextProcessor extends AbstractProcessor{
             Class.forName("com.dianping.phoenix.environment.PhoenixContext");
             PhoenixContext.getInstance().clear();
         } catch (Exception e1) {
-        	if(logger.isInfoEnabled()){
-        		logger.info("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.", e1);
+        	if(logger.isDebugEnabled()){
+        		logger.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.", e1);
         	}
         }
 	}
