@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.monitor.dashboard;
+package com.dianping.swallow.web.dashboard;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.model.dashboard.MinuteEntry;
+import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.service.MinuteEntryService;
 
 /**
@@ -26,7 +26,7 @@ import com.dianping.swallow.web.service.MinuteEntryService;
 @Component
 public class DashboardContainer {
 
-	public static final int TOTALENTRYSIZE = 69;
+	public static final int TOTALENTRYSIZE = 10;
 
 	public static final int FETCHENTRYSIZE = 10;
 
@@ -35,7 +35,7 @@ public class DashboardContainer {
 	@Resource(name = "minuteEntryService")
 	private MinuteEntryService minuteEntryService;
 
-	private Map<Date, MinuteEntry> dashboards = new LinkedHashMap<Date, MinuteEntry>() {
+	private Map<Date, MinuteEntry> dashboard = new LinkedHashMap<Date, MinuteEntry>() {
 
 		private static final long serialVersionUID = 1L;
 
@@ -45,14 +45,14 @@ public class DashboardContainer {
 			return size() >= TOTALENTRYSIZE;
 		}
 	};
-
+	
 	public boolean insertMinuteEntry(MinuteEntry minuteEntry) {
 
 		boolean result;
 
-		synchronized (dashboards) {
+		synchronized (dashboard) {
 
-			MinuteEntry me = dashboards.put(minuteEntry.getTime(), minuteEntry);
+			MinuteEntry me = dashboard.put(minuteEntry.getTime(), minuteEntry);
 			result = me == null ? true : false;
 			
 			if(result){
@@ -89,8 +89,8 @@ public class DashboardContainer {
 
 		List<MinuteEntry> result = new ArrayList<MinuteEntry>();
 
-		synchronized (dashboards) {
-			Set<Date> dates = dashboards.keySet();
+		synchronized (dashboard) {
+			Set<Date> dates = dashboard.keySet();
 			for (Date dt : dates) {
 				if (dt.after(start) && dt.before(stop)) {
 					treeSet.add(dt);
@@ -101,7 +101,7 @@ public class DashboardContainer {
 				if (result.size() >= FETCHENTRYSIZE) {
 					break;
 				}
-				result.add(dashboards.get(dt));
+				result.add(dashboard.get(dt));
 			}
 		}
 
@@ -109,11 +109,11 @@ public class DashboardContainer {
 	}
 
 	public Map<Date, MinuteEntry> getDashboards() {
-		return dashboards;
+		return dashboard;
 	}
 
 	public void setDashboards(Map<Date, MinuteEntry> dashboards) {
-		this.dashboards = dashboards;
+		this.dashboard = dashboards;
 	}
 
 }

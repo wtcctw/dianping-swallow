@@ -288,7 +288,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             	if(logger.isDebugEnabled()){
             		logger.debug("[onMessage]" + msg);
             	}
-            	
+            	doOnMessage(msg);
             	int result = count.incrementAndGet();
             	if(result % 100 == 0 ){
             		if(logger.isInfoEnabled()){
@@ -331,6 +331,9 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		sleep((int) (Math.ceil((double)messageCount/1000) * 5000));
 	}
 
+	protected void doOnMessage(Message msg) {
+		
+	}
 
 
 }

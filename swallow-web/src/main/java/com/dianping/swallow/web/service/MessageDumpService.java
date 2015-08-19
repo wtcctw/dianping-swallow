@@ -3,6 +3,7 @@ package com.dianping.swallow.web.service;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
@@ -14,40 +15,21 @@ import com.mongodb.MongoException;
  */
 public interface MessageDumpService {
 
-	/**
-	 * 
-	 * @param start 开始
-	 * @param span  偏移量
-	 * @param topic topic名称
-	 */
-	Pair<Long, List<MessageDump>> loadDumpMessagePage(int start, int span, String topic);
+	Pair<Long, List<MessageDump>> loadDumpMessagePage(TopicQueryDto topicQueryDto);
 
-	/**
-	 * 
-	 * @param topic topic名称
-	 */
-	MessageDump loadUnfinishedDumpMessage(String topic);
-
-	/**
-	 * 
-	 * @param filename 文件名称
-	 */
 	MessageDump loadDumpMessage(String filename);
 
-	Pair<Long, List<MessageDump>> loadAllDumpMessage();
-
-	/**
-	 * 
-	 * @param filename  文件名称
-	 * @throws MongoException
-	 */
 	int removeDumpMessage(String filename) throws MongoException;
 
-	int updateDumpMessage(String filename, boolean finished, int totalcount, int size, String firsttime, String lasttime);
+	int updateDumpMessage(MessageDump messageDump);
 
-	ResponseStatus saveDumpMessage(String topic, String name, String startdt, String stopdt, String filename, boolean finished);
+	ResponseStatus saveDumpMessage(MessageDump messageDump);
 
-	ResponseStatus execDumpMessageTask(String topic, String startdt, String stopdt, String filename, String username);
+	ResponseStatus execDumpMessageTask(MessageDump messageDump);
 	
 	void execBlockingDumpMessageTask(String topic);
+
+	MessageDump loadUnfinishedDumpMessage(String topic);
+
+	Pair<Long, List<MessageDump>> loadAllDumpMessage();
 }

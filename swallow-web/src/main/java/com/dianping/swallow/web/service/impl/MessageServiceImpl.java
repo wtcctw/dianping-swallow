@@ -3,11 +3,10 @@ package com.dianping.swallow.web.service.impl;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.ZipUtil;
+import com.dianping.swallow.web.controller.dto.MessageQueryDto;
 import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Message;
 import com.dianping.swallow.web.service.AbstractSwallowService;
@@ -32,7 +32,6 @@ import com.dianping.swallow.web.service.MessageService;
 @Service("messageService")
 public class MessageServiceImpl extends AbstractSwallowService implements MessageService {
 
-	private static final String PRE_MSG = "msg#";
 	private static final String MESSAGE = "message";
 	public static final String GZIP = "H4sIAAAAAAAAA";
 
@@ -42,55 +41,37 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	@Resource(name = "messageDumpService")
 	private MessageDumpService messageDumpService;
 
-	public Map<String, Object> getMessageFromSpecificTopic(int start, int span, String tname, String messageId,
-			String startdt, String stopdt, String username, String baseMid, boolean sort) {
-		String dbn = PRE_MSG + tname;
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getMessageFromSpecificTopic(MessageQueryDto messageQueryDto) {
+		
 		long mid = -1;
+		String messageId = messageQueryDto.getMessageId();
 		if (!messageId.isEmpty()) { // messageId is not empty
-			if (isIP(messageId)) { // query based on IP
-				return getByIp(dbn, start, span, messageId, username);
-			} else {
-				try {
-					mid = Long.parseLong(messageId.trim());
-				} catch (NumberFormatException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Error when parse " + messageId.trim() + " to Long.", e);
-					}
-					mid = 0;
+			try {
+				mid = Long.parseLong(messageId.trim());
+			} catch (NumberFormatException e) {
+				if (logger.isErrorEnabled()) {
+					logger.error("Error when parse " + messageId.trim() + " to Long.", e);
 				}
+				mid = 0;
 			}
 		}
-		return getResults(dbn, start, span, mid, startdt, stopdt, username, baseMid, sort);
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> getByIp(String dbn, int start, int span, String ip, String username) {
-
-		String subStr = dbn.substring(PRE_MSG.length());
+		Date startdt = messageQueryDto.getStartdt();
+		Date stopdt = messageQueryDto.getStopdt();
 		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
-		sizeAndMessage = webMessageDao.findByIp(start, span, ip, subStr);
-		beforeResponse((List<Message>) sizeAndMessage.get(MESSAGE));
-		return sizeAndMessage;
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<String, Object> getResults(String dbn, int start, int span, long mid, String startdt, String stopdt,
-			String username, String baseMid, boolean sort) {
-
-		String subStr = dbn.substring(PRE_MSG.length());
-		Map<String, Object> sizeAndMessage = new HashMap<String, Object>();
-		if (mid < 0 && (startdt + stopdt).isEmpty()) {
-			sizeAndMessage = webMessageDao.findByTopicname(start, span, subStr, baseMid, sort);
-		} else if (StringUtils.isEmpty(startdt)) {
-			sizeAndMessage = webMessageDao.findSpecific(start, span, mid, subStr, sort);
+		if (mid < 0 && (startdt == null && stopdt == null) ) {
+			sizeAndMessage = webMessageDao.findByTopicname(messageQueryDto);
+		} else if (startdt == null) {
+			sizeAndMessage = webMessageDao.findSpecific(messageQueryDto, mid);
 		} else if (mid < 0) {
-			sizeAndMessage = webMessageDao.findByTime(start, span, startdt, stopdt, subStr, baseMid, sort);
+			sizeAndMessage = webMessageDao.findByTime(messageQueryDto);
 		} else {
-			sizeAndMessage = webMessageDao.findByTimeAndId(start, span, mid, startdt, stopdt, subStr);
+			sizeAndMessage = webMessageDao.findByTimeAndId(messageQueryDto, mid);
 		}
 
 		beforeResponse((List<Message>) sizeAndMessage.get(MESSAGE));
 		return sizeAndMessage;
+
 	}
 
 	private void beforeResponse(List<Message> messageList) {
@@ -154,12 +135,6 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		}
 	}
 
-	private boolean isIP(String str) {
-		String regex = "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}";
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(str);
-		return m.find();
-	}
 
 	@SuppressWarnings("unchecked")
 	public Message getMessageContent(String topic, String mid) {
@@ -167,7 +142,12 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 		List<Message> messageList = new ArrayList<Message>();
 
 		long messageId = Long.parseLong(mid);
-		messageList = (List<Message>) webMessageDao.findSpecific(0, 1, messageId, topic, false).get(MESSAGE);
+		MessageQueryDto messageQueryDto = new MessageQueryDto();
+		messageQueryDto.setOffset(0);
+		messageQueryDto.setLimit(1);
+		messageQueryDto.setTopic(topic);
+		messageQueryDto.setSort(false);
+		messageList = (List<Message>) webMessageDao.findSpecific(messageQueryDto, messageId).get(MESSAGE);
 		Message m = messageList.get(0);
 		isZipped(m);
 		prettyDisplay(m);
@@ -191,7 +171,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	}
 
 	@Override
-	public Map<String, Object> exportMessage(String topicName, String startdt, String stopdt) {
+	public Map<String, Object> exportMessage(String topicName, Date startdt, Date stopdt) {
 
 		return webMessageDao.exportMessages(topicName, startdt, stopdt);
 	}

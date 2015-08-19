@@ -13,8 +13,16 @@ import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
+import com.dianping.swallow.consumerserver.worker.impl.ConsumerConfigChanged;
+import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerImpl;
 
+/**
+ * @author mengwenchao
+ *
+ * 2015年8月17日 下午3:37:55
+ */
 public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMessage> implements CloseableBlockingQueue<SwallowMessage> {
 
 	private static final long serialVersionUID = -633276713494338593L;
@@ -204,4 +212,25 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		
 		return null;
 	}
+
+	@Override
+	public void update(Observable observable, Object args) {
+		
+		if(!(observable instanceof ConsumerWorkerImpl)){
+			throw new IllegalArgumentException("observable not supported!" + observable.getClass());
+		}
+		
+		ConsumerConfigChanged changed = (ConsumerConfigChanged) args;
+		
+		switch (changed.getConsumerConfigChangeType()) {
+		
+			case MESSAGE_FILTER:
+				this.messageFilter = changed.getNewMessageFilter();
+				break;
+			default:
+				throw new IllegalArgumentException("type not supported!" + changed.getConsumerConfigChangeType());
+		}
+		
+	}
+
 }

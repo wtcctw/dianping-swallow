@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,24 +12,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.TopicDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.service.UserService;
-import com.dianping.swallow.web.task.TopicScanner;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
-
-import org.apache.commons.lang.StringUtils;
 
 import freemarker.template.utility.StringUtil;
 
@@ -108,15 +106,15 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public Pair<Long, List<Topic>> loadTopicPage(int start, int span) {
+	public Pair<Long, List<Topic>> loadTopicPage(TopicQueryDto topicQueryDto) {
 
-		return topicDao.loadTopicPage(start, span);
+		return topicDao.loadTopicPage(topicQueryDto);
 	}
 
 	@Override
-	public Pair<Long, List<Topic>> loadSpecificTopicPage(int start, int span, String name, String prop) {
+	public Pair<Long, List<Topic>> loadSpecificTopicPage(TopicQueryDto topicQueryDto) {
 
-		return topicDao.loadSpecificTopicPage(start, span, name, prop);
+		return topicDao.loadSpecificTopicPage(topicQueryDto);
 	}
 
 	@Override
@@ -140,7 +138,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	}
 
 	@Override
-	public int editTopic(String name, String prop, String time) throws MongoSocketException, MongoException {
+	public int editTopic(String name, String prop, Date time) throws MongoSocketException, MongoException {
 
 		Set<String> proposal = splitString(prop, ",");
 		topicToWhiteList.put(name, proposal);
@@ -234,9 +232,8 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 	private Topic getTopic(String subStr, long num) {
 
 		Long id = System.currentTimeMillis();
-		String date = new SimpleDateFormat(TopicScanner.TIMEFORMAT).format(new Date());
 		Topic p = new Topic();
-		p.setId(id.toString()).setName(subStr).setProp("").setTime(date).setMessageNum(num);
+		p.setId(id.toString()).setName(subStr).setProp("").setTime(new Date()).setMessageNum(num);
 		return p;
 	}
 
@@ -259,6 +256,7 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 					if (logger.isInfoEnabled()) {
 						logger.info(String.format("Save topic %s to topic collection successfully.", str));
 					}
+					topicToWhiteList.put(str, new HashSet<String>());
 				} else {
 					if (logger.isInfoEnabled()) {
 						logger.info(String.format("Save topic %s to topic collection failed.", str));

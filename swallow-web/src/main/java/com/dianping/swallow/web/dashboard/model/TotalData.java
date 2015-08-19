@@ -1,7 +1,6 @@
-package com.dianping.swallow.web.model.dashboard;
+package com.dianping.swallow.web.dashboard.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -14,29 +13,11 @@ public class TotalData {
 	
 	private String server;
 	
-	private String topic;
-	
-	private String cid;
-	
-	private Date time;
-	
 	List<Long> listSend = new ArrayList<Long>();
 
 	List<Long> listAck = new ArrayList<Long>();
 	
 	List<Long> listAccu = new ArrayList<Long>();
-	
-	List<Entry> entrys = new ArrayList<Entry>();
-	
-	public List<Entry> getEntrys() {
-		
-		return entrys;
-	}
-
-	public TotalData setEntrys(List<Entry> entrys) {
-		this.entrys = entrys;
-		return this;
-	}
 	
 	public String getServer() {
 		return server;
@@ -44,24 +25,6 @@ public class TotalData {
 
 	public TotalData setServer(String server) {
 		this.server = server;
-		return this;
-	}
-	
-	public String getTopic() {
-		return topic;
-	}
-
-	public TotalData setTopic(String topic) {
-		this.topic = topic;
-		return this;
-	}
-
-	public String getCid() {
-		return cid;
-	}
-
-	public TotalData setCid(String cid) {
-		this.cid = cid;
 		return this;
 	}
 	
@@ -92,19 +55,10 @@ public class TotalData {
 		return this;
 	}
 
-	public Date getTime() {
-		return time;
-	}
-
-	public TotalData setTime(Date time) {
-		this.time = time;
-		return this;
-	}
-
 	@Override
 	public String toString() {
-		return "TotalData [server=" + server + ", topic=" + topic + ", cid=" + cid + ", time=" + time + ", listSend="
-				+ listSend + ", listAck=" + listAck + ", listAccu=" + listAccu + ", entrys=" + entrys + "]";
+		return "TotalData [server=" + server + ", listSend=" + listSend + ", listAck=" + listAck + ", listAccu="
+				+ listAccu + "]";
 	}
-	
+
 }

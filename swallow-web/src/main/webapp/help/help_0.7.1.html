@@ -1047,12 +1047,7 @@ body .markdown-body
 </li>
 <li><a href="#_7">代码示例</a><ul>
 <li><a href="#maven">添加maven依赖</a></li>
-<li><a href="#spring">在Spring中配置使用</a><ul>
-<li><a href="#springapplicationcontext-producerxmlbean">Spring配置文件applicationContext-producer.xml配置相关bean</a></li>
-<li><a href="#springbean">使用Spring中配置的bean发送消息</a></li>
-</ul>
-</li>
-<li><a href="#_8">生产者端纯代码实现</a></li>
+<li><a href="#_8">生产者端代码实现</a></li>
 </ul>
 </li>
 </ul>
@@ -1065,12 +1060,8 @@ body .markdown-body
 </li>
 <li><a href="#_11">代码示例</a><ul>
 <li><a href="#maven-poxxml">Maven pox.xml中添加依赖</a></li>
-<li><a href="#spring_1">Spring中配置实现</a><ul>
-<li><a href="#springapplicationcontext-consumerxmlbean">Spring配置文件applicationContext-consumer.xml配置相关bean</a></li>
-<li><a href="#spring_2">Spring代码</a></li>
-</ul>
-</li>
-<li><a href="#_12">消费者端纯代码实现</a></li>
+<li><a href="#messagelistener">消费者实现MessageListener接口</a></li>
+<li><a href="#_12">消费者端代码实现</a></li>
 </ul>
 </li>
 </ul>
@@ -1080,21 +1071,20 @@ body .markdown-body
 <li><a href="#swallow-web">Swallow Web使用说明</a><ul>
 <li><a href="#topic_1">Topic查询</a><ul>
 <li><a href="#topic_2">根据Topic名称查询</a></li>
-<li><a href="#_13">根据申请人和申请人部门查询</a></li>
 </ul>
 </li>
 <li><a href="#message">Message查询与重发</a><ul>
 <li><a href="#topicmessage">查询Topic下所有Message</a></li>
 <li><a href="#message-id">根据Message ID精确查询</a></li>
-<li><a href="#_14">根据保存时间精确查询</a></li>
-<li><a href="#_15">导出消息</a></li>
+<li><a href="#_13">根据保存时间精确查询</a></li>
+<li><a href="#_14">导出消息</a></li>
 <li><a href="#message_1">Message重发</a><ul>
 <li><a href="#webmessage">web端重发已保存的message</a></li>
 <li><a href="#apimessage">通过api重发已保存的message</a></li>
-<li><a href="#_16">使用示范</a></li>
+<li><a href="#_15">使用示范</a></li>
 <li><a href="#message_2">重发自定义message</a></li>
 <li><a href="#apimessage_1">通过api重发自定义的message</a></li>
-<li><a href="#_17">使用示范</a></li>
+<li><a href="#_16">使用示范</a></li>
 </ul>
 </li>
 <li><a href="#swallow_5">查看Swallow消息</a></li>
@@ -1102,10 +1092,10 @@ body .markdown-body
 </li>
 <li><a href="#topicswallow-server">Topic监控和Swallow Server监控</a><ul>
 <li><a href="#topic_3">Topic监控</a><ul>
-<li><a href="#_18">基础概念</a></li>
-<li><a href="#_19">延时监控</a></li>
+<li><a href="#_17">基础概念</a></li>
+<li><a href="#_18">延时监控</a></li>
 <li><a href="#qps">每秒消息(QPS)监控</a></li>
-<li><a href="#_20">堆积量监控</a></li>
+<li><a href="#_19">堆积量监控</a></li>
 </ul>
 </li>
 <li><a href="#swallow-server">Swallow Server监控</a><ul>
@@ -1121,19 +1111,24 @@ body .markdown-body
 <li><a href="#consumerid">consumerId告警</a></li>
 </ul>
 </li>
-<li><a href="#_21">权限管理</a><ul>
-<li><a href="#_22">管理员行为</a></li>
-<li><a href="#_23">用户行为</a></li>
+<li><a href="#swallow_7">Swallow 大盘</a><ul>
+<li><a href="#_20">综合大盘</a></li>
+<li><a href="#_21">发送延迟,确认延迟和堆积大盘</a></li>
+</ul>
+</li>
+<li><a href="#_22">权限管理</a><ul>
+<li><a href="#_23">管理员行为</a></li>
+<li><a href="#_24">用户行为</a></li>
 <li><a href="#visitor">Visitor行为</a></li>
-<li><a href="#_24">权限提升</a></li>
+<li><a href="#_25">权限提升</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#swallow_7">Swallow使用注意事项</a></li>
-<li><a href="#swallow_8">Swallow常见问题以及处理</a><ul>
+<li><a href="#swallow_8">Swallow使用注意事项</a></li>
+<li><a href="#swallow_9">Swallow常见问题以及处理</a><ul>
 <li><a href="#topicconsumer">如何查找某个topic对应的consumer</a></li>
-<li><a href="#_25">如何查看我的消费是否有延迟、延迟多少条消息？</a><ul>
+<li><a href="#_26">如何查看我的消费是否有延迟、延迟多少条消息？</a><ul>
 <li><a href="#cat">Cat端追踪</a></li>
 <li><a href="#swallow-web_1">Swallow Web端追踪</a></li>
 </ul>
@@ -1260,6 +1255,7 @@ body .markdown-body
 <ul>
 <li>请确保content对象的类型具有默认构造方法。<br></li>
 <li>尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。</li>
+<li>sendMessage消息发送失败会抛出SendFailedException异常，可能的原因包括：网络、数据库及FileQueue故障.</li>
 </ul>
 </li>
 </ul>
@@ -1334,54 +1330,7 @@ body .markdown-body
      &lt;version&gt;${pigeon.version}&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
-<h4 id="spring"><a name="user-content-spring" href="#spring" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>在Spring中配置使用</h4>
-<ul>
-<li>swallow-producerclient的版本可以在<a href="http://mvn.dianpingoa.com/webapp/home.html">mvn repo</a>查询所有的发行版本。</li>
-</ul>
-<h5 id="springapplicationcontext-producerxmlbean"><a name="user-content-springapplicationcontext-producerxmlbean" href="#springapplicationcontext-producerxmlbean" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Spring配置文件applicationContext-producer.xml配置相关bean</h5>
-<pre><code>&lt;bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" /&gt;
-
-&lt;bean id="producerClient" factory-bean="producerFactory" factory-method="createProducer"&gt;
-    &lt;constructor-arg&gt;
-        &lt;ref bean="destination" /&gt;
-    &lt;/constructor-arg&gt;
-    &lt;constructor-arg&gt;
-        &lt;ref bean="producerConfig" /&gt;
-    &lt;/constructor-arg&gt;
-&lt;/bean&gt;
-
-&lt;bean id="destination" class="com.dianping.swallow.common.message.Destination" factory-method="topic"&gt;
-    &lt;constructor-arg value="example" /&gt;
-&lt;/bean&gt;
-
-&lt;bean id="producerConfig" class="com.dianping.swallow.producer.ProducerConfig"&gt;
-    &lt;property name="mode" value="SYNC_MODE" /&gt;
-    &lt;property name="syncRetryTimes" value="0" /&gt;
-    &lt;property name="zipped" value="false" /&gt;
-    &lt;property name="threadPoolSize" value="5" /&gt;
-    &lt;property name="sendMsgLeftLastSession" value="false" /&gt;
-&lt;/bean&gt;
-</code></pre>
-<h5 id="springbean"><a name="user-content-springbean" href="#springbean" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用Spring中配置的bean发送消息</h5>
-<pre><code>import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import com.dianping.swallow.common.producer.exceptions.SendFailedException;
-import com.dianping.swallow.producer.Producer;
-
-public class ProducerSpring {
-    public static void main(String[] args) {
-    ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-producer.xml" });
-    Producer producer = (Producer) ctx.getBean("producerClient");
-        try {
-            System.out.println(producer.sendMessage("Hello world.") + "hello");
-        } catch (SendFailedException e) {
-            e.printStackTrace();
-        }
-    }   
-}
-</code></pre>
-<h4 id="_8"><a name="user-content-_8" href="#_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>生产者端纯代码实现</h4>
-<p>纯代码实现与使用Spring配置bean有一样的效果。</p>
+<h4 id="_8"><a name="user-content-_8" href="#_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>生产者端代码实现</h4>
 <pre><code>public class SyncProducerExample {
     public static void main(String[] args) throws Exception {
         producerConfig config = new ProducerConfig(); 
@@ -1394,9 +1343,12 @@ public class ProducerSpring {
         Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config); 
         for (int i = 0; i &lt; 10; i++) {
             String msg = "消息-" + i;
-            p.sendMessage(msg); 
-            System.out.println("Sended msg:" + msg);
-            Thread.sleep(500);
+            try{
+                p.sendMessage(msg); 
+                System.out.println("Sended msg:" + msg);
+            }catch(SendFailedException e){
+                System.out.println("Catch exception then do what you want to do.");
+            }
         }
     }
 }
@@ -1510,39 +1462,8 @@ public class ProducerSpring {
 <ul>
 <li>swallow-consumerclient的版本可以在<a href="http://mvn.dianpingoa.com/webapp/home.html">mvn repo</a>查询所有的发行版本。</li>
 </ul>
-<h4 id="spring_1"><a name="user-content-spring_1" href="#spring_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Spring中配置实现</h4>
-<h5 id="springapplicationcontext-consumerxmlbean"><a name="user-content-springapplicationcontext-consumerxmlbean" href="#springapplicationcontext-consumerxmlbean" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Spring配置文件applicationContext-consumer.xml配置相关bean</h5>
-<pre><code>&lt;!-- 消费者工厂类 --&gt;
-&lt;bean id="consumerFactory" class="com.dianping.swallow.consumer.impl.ConsumerFactoryImpl" factory-method="getInstance" /&gt;
-&lt;!-- 消费者配置类 --&gt;
-&lt;bean id="consumerConfig" class="com.dianping.swallow.consumer.ConsumerConfig"&gt;
-&lt;/bean&gt;
-&lt;!-- 消息的目的地(即Topic) --&gt;
-&lt;bean id="dest" class="com.dianping.swallow.common.message.Destination" factory-method="topic"&gt;
-    &lt;constructor-arg&gt;
-        &lt;value&gt;example&lt;/value&gt;  
-    &lt;/constructor-arg&gt;
-&lt;/bean&gt;
-&lt;!-- MessageListener为您实现的消息事件监听器，负责处理接收到的消息 --&gt;
-&lt;bean id="messageListener" class="com.dianping.swallow.example.consumer.spring.listener.MessageListenerImpl" /&gt;
-&lt;!-- 消费者 --&gt;
-&lt;bean id="consumerClient" factory-bean="consumerFactory" factory-method="createConsumer" init-method="start" destroy-method="close"&gt;
-    &lt;constructor-arg&gt;
-        &lt;ref bean="dest" /&gt;
-    &lt;/constructor-arg&gt;
-    &lt;constructor-arg&gt;
-        &lt;value&gt;xx&lt;/value&gt;   
-    &lt;/constructor-arg&gt;
-    &lt;constructor-arg&gt;
-        &lt;ref bean="consumerConfig" /&gt;
-    &lt;/constructor-arg&gt;
-    &lt;property name="listener"&gt;
-        &lt;ref local="messageListener" /&gt;
-    &lt;/property&gt;
-&lt;/bean&gt;
-</code></pre>
-<p>消息目的地的值example为消息种类，必须是在服务器白名单中的消息种类才能够连接服务器，否则会拒绝连接。如何申请参加<a href="#topic">申请Topic</a> <br />
-messageListener要自己实现<code>com.dianping.swallow.consumer.MessageListener</code>接口。下面列出MessageListenerImpl的实现供参考。</p>
+<h4 id="messagelistener"><a name="user-content-messagelistener" href="#messagelistener" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消费者实现MessageListener接口</h4>
+<p>messageListener要自己实现<code>com.dianping.swallow.consumer.MessageListener</code>接口。下面列出MessageListenerImpl的实现供参考。</p>
 <pre><code>package com.dianping.swallow.example.consumer.spring.listener;
 
 import com.dianping.swallow.common.message.Message;
@@ -1557,29 +1478,13 @@ public class MessageListenerImpl implements MessageListener {
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Sleep interrupted.");
         }
     }
 }
 </code></pre>
-<h5 id="spring_2"><a name="user-content-spring_2" href="#spring_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Spring代码</h5>
-<pre><code>package com.dianping.swallow.example.consumer.spring;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import com.dianping.swallow.consumer.Consumer;
-
-public class TestConsumer {
-
-    public static void main(String[] args) throws InterruptedException {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-consumer.xml" });
-        final Consumer consumerClient = (Consumer) ctx.getBean("consumerClient");  
-        consumerClient.start();
-    }
-}
-</code></pre>
-<h4 id="_12"><a name="user-content-_12" href="#_12" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消费者端纯代码实现</h4>
+<h4 id="_12"><a name="user-content-_12" href="#_12" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消费者端代码实现</h4>
+<p>消息目的地的值example为消息种类，必须是在服务器白名单中的消息种类才能够连接服务器，否则会拒绝连接。如何申请参加<a href="#topic">申请Topic</a> </p>
 <pre><code>public class DurableConsumerExample {
     public static void main(String[] args) {
         ConsumerConfig config = new ConsumerConfig();  
@@ -1596,6 +1501,9 @@ public class TestConsumer {
     }
 }
 </code></pre>
+<ul>
+<li>createConsumer函数接收3个参数,其中第二个参数表示consumerId.对于默认的消费类型DURABLE_AT_LEAST_ONCE,必需提供一个consumerId;如果消费类型为NON_DURABLE,则不需要设置consumerId.这里的&rdquo;myId&rdquo;即为消费者的consumerId.</li>
+</ul>
 <h1 id="swallow-web"><a name="user-content-swallow-web" href="#swallow-web" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web使用说明</h1>
 <p>各环境地址:</p>
 <ul>
@@ -1614,12 +1522,8 @@ public class TestConsumer {
 <p>在左侧搜索栏里输入所要查询的topic名称，系统会提示可以搜索到的与用户关联的topic，如果提示没有返回任何内容，则说明用户没有权限查询任何topic。</p>
 </li>
 <li>
-<p>对于每个topic，管理员首先需要添加至少一名topic的申请人，授权其访问topic的权限，得到相应权限的申请人可以根据需要添加或者删除其他topic关联人。</p>
+<p>对于每个topic，默认情况下除了管理员,其他人是没有权限查看topic下的message.如果有相应的需求,可以通过<a href="http://workflow.dp/wfe/start/119">workflow</a>申请相关topic的权限.</p>
 </li>
-</ul>
-<h3 id="_13"><a name="user-content-_13" href="#_13" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据申请人和申请人部门查询</h3>
-<ul>
-<li>在右侧搜索栏中输入申请人或者申请人部门，系统会返回相关的提示，如果没有提示信息，则说明没有相关的查询结果。</li>
 </ul>
 <h2 id="message"><a name="user-content-message" href="#message" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Message查询与重发</h2>
 <h3 id="topicmessage"><a name="user-content-topicmessage" href="#topicmessage" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>查询Topic下所有Message</h3>
@@ -1630,11 +1534,11 @@ public class TestConsumer {
 <ul>
 <li>topic确定的前提下，在右侧搜索栏中输入message ID可精确查询相应message。</li>
 </ul>
-<h3 id="_14"><a name="user-content-_14" href="#_14" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据保存时间精确查询</h3>
+<h3 id="_13"><a name="user-content-_13" href="#_13" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据保存时间精确查询</h3>
 <ul>
 <li>topic确定的前提下，选择开始时间和结束时间可以查询出特定时间段发送的所有message。尽量缩小查找的时间段，减轻查询的时间开销。</li>
 </ul>
-<h3 id="_15"><a name="user-content-_15" href="#_15" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>导出消息</h3>
+<h3 id="_14"><a name="user-content-_14" href="#_14" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>导出消息</h3>
 <ul>
 <li>
 <p>根据时间查询的消息可以导出到文件并且下载到本地。消息导出后页面会自动跳转到下载页，点击链接即可下载文件。如果导出的数据量很大，则需要一定的时间等待任务执行完成。</p>
@@ -1738,7 +1642,7 @@ public class TestConsumer {
 </tr>
 </tbody>
 </table>
-<h4 id="_16"><a name="user-content-_16" href="#_16" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用示范</h4>
+<h4 id="_15"><a name="user-content-_15" href="#_15" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用示范</h4>
 <pre><code>import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.apache.commons.httpclient.HttpClient;
@@ -1760,8 +1664,8 @@ public static void main(String[] args) {
     try {
         ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
         host = configCache.getProperty("swallow.web.sso.url");
-    } catch (LionException e1) {
-        e1.printStackTrace();
+    } catch (LionException e) {
+        logger.error("Error when using lion.", e);
     }
     String url = host + "/api/message/sendmessageid";
     HttpClient httpClient = new HttpClient();
@@ -1775,10 +1679,10 @@ public static void main(String[] args) {
             System.out.println(json.getInt("status"));
             System.out.println(json.getString("message"));
         } catch (JSONException e) {
-            e.printStackTrace();
+            logger.error("Error when parse json", e);
         }
     } catch (IOException e) {
-        e.printStackTrace();
+        logger.error("Error when execute http request.", e);
     }
 }
 </code></pre>
@@ -1814,7 +1718,7 @@ public static void main(String[] args) {
 <p>返回值为json字符串，包含2个键值对，status(状态码)，message(状态码对应的消息)，与通过api重发已保存的message返回值意义一致。</p>
 </li>
 </ul>
-<h4 id="_17"><a name="user-content-_17" href="#_17" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用示范</h4>
+<h4 id="_16"><a name="user-content-_16" href="#_16" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用示范</h4>
 <pre><code>private HttpMethod postMethod(String url) throws IOException{
     PostMethod post = new PostMethod(url);
     String contents = "test group message api with type and property, No 1";
@@ -1847,8 +1751,8 @@ public static void main(String[] args) {
 </ul>
 <h2 id="topicswallow-server"><a name="user-content-topicswallow-server" href="#topicswallow-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic监控和Swallow Server监控</h2>
 <h3 id="topic_3"><a name="user-content-topic_3" href="#topic_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic监控</h3>
-<h4 id="_18"><a name="user-content-_18" href="#_18" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基础概念</h4>
-<h4 id="_19"><a name="user-content-_19" href="#_19" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>延时监控</h4>
+<h4 id="_17"><a name="user-content-_17" href="#_17" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基础概念</h4>
+<h4 id="_18"><a name="user-content-_18" href="#_18" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>延时监控</h4>
 <p><span id="webDelay"></span><br />
 延时监控中监控时间被分为3段</p>
 <ol>
@@ -1871,7 +1775,7 @@ public static void main(String[] args) {
 <li>如果只想查看某一端的每秒钟统计量，只需点击右侧的图例即可切换显示和隐藏。<br />
 <img alt="每秒消息" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=uFhEEqIWjn2INN1Np0kAWQDX6rJpER8uataqIn6L4l4%3d&amp;docid=0af4789f1842f4810a259729f9372e226" /></li>
 </ul>
-<h4 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>堆积量监控</h4>
+<h4 id="_19"><a name="user-content-_19" href="#_19" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>堆积量监控</h4>
 <ul>
 <li>
 <p>堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。</p>
@@ -2050,15 +1954,25 @@ public static void main(String[] args) {
 <p>如果出现延时或者累积报警，先查看是否是消息接收端处理过慢（并发数过低、单条消息处理过慢，异常导致onMessage处理挂起），可以借助swallow管理平台上的监控和Cat监控，参见<a href="#commonProblems">Swallow常见问题以及处理</a>。</p>
 </li>
 </ol>
-<h2 id="_21"><a name="user-content-_21" href="#_21" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限管理</h2>
-<h3 id="_22"><a name="user-content-_22" href="#_22" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>管理员行为</h3>
+<h2 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 大盘</h2>
+<h3 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>综合大盘</h3>
+<ul>
+<li>综合大盘会显示消费者发送延迟,消费者确认延迟和消息堆积的综合统计数据.超过默认阈值的统计项会被标红.大盘会根据一分钟的统计量生成最终结果.<br />
+<img alt="综合大盘" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=G%2fDYymV%2fCzo54UW3ewdoKhnpvBDwtWMT3TGTh8jeVr0%3d&amp;docid=08978bd2fd3284d008831ca1d9e506435" /></li>
+</ul>
+<h3 id="_21"><a name="user-content-_21" href="#_21" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>发送延迟,确认延迟和堆积大盘</h3>
+<ul>
+<li>发送延迟大盘根据发送延迟统计量生成相应的大盘;确认延迟大盘根据确认延迟统计量生成相应的大盘;堆积大盘根据消息堆积量生成相应的大盘.</li>
+</ul>
+<h2 id="_22"><a name="user-content-_22" href="#_22" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限管理</h2>
+<h3 id="_23"><a name="user-content-_23" href="#_23" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>管理员行为</h3>
 <ul>
 <li>添加删除管理员名单的权限</li>
 <li>编辑topic关联人员名单</li>
 <li>查看访问swallow web的来访者信息</li>
 <li>查看、重发消息</li>
 </ul>
-<h3 id="_23"><a name="user-content-_23" href="#_23" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>用户行为</h3>
+<h3 id="_24"><a name="user-content-_24" href="#_24" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>用户行为</h3>
 <ul>
 <li>每个用户管理一个或者多个topic，可以查看、重发相应的topic的消息</li>
 </ul>
@@ -2066,12 +1980,12 @@ public static void main(String[] args) {
 <ul>
 <li>Visitor表示没有关联任何topic,无法访问任何topic及其message的人员，只可以查看监控性能。</li>
 </ul>
-<h3 id="_24"><a name="user-content-_24" href="#_24" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限提升</h3>
+<h3 id="_25"><a name="user-content-_25" href="#_25" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限提升</h3>
 <ul>
 <li>用户和Visitor如需提升权限，请联系对应的业务运维</li>
 </ul>
 <p><span id="takeAttention"></span></p>
-<h1 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用注意事项</h1>
+<h1 id="swallow_8"><a name="user-content-swallow_8" href="#swallow_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用注意事项</h1>
 <p>以下是业务在swallow的过程中遇到的一些常见问题，希望大家仔细阅读，避免类似的问题发生</p>
 <ol>
 <li>swallow保证消息不丢，所以针对特定一条消息，可能会重复发送。<ul>
@@ -2085,7 +1999,7 @@ public static void main(String[] args) {
 <li>swallow作为异步消息队列，正常情况下延时在秒级别。但是异常情况下（数据库升级等），可能会出现分钟级别的延时，如果业务对延时特别敏感，建议谨慎使用</li>
 </ol>
 <p><span id="commonProblems"></span></p>
-<h1 id="swallow_8"><a name="user-content-swallow_8" href="#swallow_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
+<h1 id="swallow_9"><a name="user-content-swallow_9" href="#swallow_9" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
 <p><span id="problemWhichConsumer"></span></p>
 <h2 id="topicconsumer"><a name="user-content-topicconsumer" href="#topicconsumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查找某个topic对应的consumer</h2>
 <ul>
@@ -2093,7 +2007,7 @@ public static void main(String[] args) {
 <li>找到<code>Out:topic</code>(topic即你关心的topic名字)，点开，即可看到consumer信息</li>
 </ul>
 <p><span id="problemDelay"></span></p>
-<h2 id="_25"><a name="user-content-_25" href="#_25" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查看我的消费是否有延迟、延迟多少条消息？</h2>
+<h2 id="_26"><a name="user-content-_26" href="#_26" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查看我的消费是否有延迟、延迟多少条消息？</h2>
 <h3 id="cat"><a name="user-content-cat" href="#cat" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cat端追踪</h3>
 <ul>
 <li>从<a href="http://cat.dp/">CAT</a>中查看Swallow项目的Transaction，可以获得相应的信息（<a href="http://cat.dp/cat/r/t?op=view&amp;ampdomain=Swallow">传送门</a>）。</li>
@@ -2163,7 +2077,7 @@ public static void main(String[] args) {
 <h3 id="swallow-web_3"><a name="user-content-swallow-web_3" href="#swallow-web_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
 <ul>
 <li>从Swallow Web端<a href="http://swallow.dp/console/message">Message管理</a>中查看相关topic下的message信息，检查消息是否正确发送。<br />
-<img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/16.png" /></li>
+<img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=mfGgnXyDnjxDzMW7VswO5i3Ar8qZvbXYolWzLedGsww%3d&amp;docid=063ccff6570ed4057850b59c81a00b488" /></li>
 </ul></article></body></html>
 <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>

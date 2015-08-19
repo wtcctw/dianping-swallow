@@ -1030,16 +1030,11 @@ body .markdown-body
 </ul>
 </li>
 <li><a href="#070">0.7.0</a><ul>
-<li><a href="#_2">客户端增加心跳</a></li>
-<li><a href="#_3">增加消息接收接口</a></li>
-</ul>
-</li>
-<li><a href="#070_1">0.7.0</a><ul>
 <li><a href="#client">client</a><ul>
 <li><a href="#consumer">consumer客户端增加心跳</a></li>
 <li><a href="#consumer_1">consumer增加接收消息接口</a></li>
-<li><a href="#_4">增加超时监测</a></li>
-<li><a href="#_5">升级依赖的中间件版本</a></li>
+<li><a href="#_2">增加超时监测</a></li>
+<li><a href="#_3">升级依赖的中间件版本</a></li>
 </ul>
 </li>
 </ul>
@@ -1050,40 +1045,17 @@ body .markdown-body
 <h3 id="heartbeat"><a name="user-content-heartbeat" href="#heartbeat" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>heartbeat线程命名</h3>
 <h3 id="_1"><a name="user-content-_1" href="#_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>客户端日志格式调整</h3>
 <h3 id="devlion"><a name="user-content-devlion" href="#devlion" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>非dev环境默认使用lion配置</h3>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</p>
 <h1 id="070"><a name="user-content-070" href="#070" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>0.7.0</h1>
-<h3 id="_2"><a name="user-content-_2" href="#_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>客户端增加心跳</h3>
-<h3 id="_3"><a name="user-content-_3" href="#_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>增加消息接收接口</h3>
-<pre><code>``com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener``
-用户实现此接口的话，如果``onMessage``抛出异常，即进行重试。
-</code></pre>
-<p>=======</p>
-<h1 id="070_1"><a name="user-content-070_1" href="#070_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>0.7.0</h1>
 <h2 id="client"><a name="user-content-client" href="#client" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>client</h2>
 <h3 id="consumer"><a name="user-content-consumer" href="#consumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumer客户端增加心跳</h3>
 <h3 id="consumer_1"><a name="user-content-consumer_1" href="#consumer_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumer增加接收消息接口</h3>
 <pre><code>增加接口:``com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener``，户实现此接口的话，如果``onMessage``抛出异常，即进行重试。
+在旧的接口``com.dianping.swallow.consumer.MessageListener``中，只有在抛出``BackoutMessageException``异常时才会重试。
 </code></pre>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>test<br />
-    在旧的接口<code>com.dianping.swallow.consumer.MessageListener</code>中，只有在抛出<code>BackoutMessageException</code>异常时才会重试。</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-<h3 id="_4"><a name="user-content-_4" href="#_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>增加超时监测</h3>
+<h3 id="_2"><a name="user-content-_2" href="#_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>增加超时监测</h3>
 <pre><code>当用户``onMessage``内的业务逻辑运行时间过长的话，在cat中显示超时Transaction信息
 </code></pre>
-<h3 id="_5"><a name="user-content-_5" href="#_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>升级依赖的中间件版本</h3></article></body></html>
+<h3 id="_3"><a name="user-content-_3" href="#_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>升级依赖的中间件版本</h3></article></body></html>
 <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>
 <script src="js/ztree_toc.js"></script>

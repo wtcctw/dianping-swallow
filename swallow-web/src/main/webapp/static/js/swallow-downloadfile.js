@@ -1,10 +1,19 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize, topic){
+	return function(fetchFunction, pageSize, entity){
 		var paginator = {
 				hasNextVar: false,
 				fetch: function(page){
 					this.currentOffset = (page - 1) * pageSize;
 					this._load();
+				},
+				handleResult: function(object){
+					for(var i = 0; i < this.currentPageItems.length; ++i){
+						if(this.currentPageItems[i].finished){
+							this.currentPageItems[i].finished = "已导出";
+						}else{
+							this.currentPageItems[i].finished = "导出中";
+						}
+					}
 				},
 				next: function(){
 					if(this.hasNextVar){
@@ -15,7 +24,9 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, topic, function(data){
+					entity.offset = this.currentOffset;
+					entity.limit = pageSize + 1;
+					fetchFunction(entity, function(data){
 						items = data.second;
 						length = data.first;
 						if(length == 0){
@@ -42,13 +53,7 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
-						for(var i = 0; i < self.currentPageItems.length; ++i){
-							if(self.currentPageItems[i].finished){
-								self.currentPageItems[i].finished = "已导出";
-							}else{
-								self.currentPageItems[i].finished = "导出中";
-							}
-						}
+						self.handleResult(new Object());
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -82,29 +87,16 @@ module.factory('Paginator', function(){
 
 module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog','$interval',
                 function($rootScope, $scope, $http, Paginator, ngDialog,$interval){
-	var fetchFunction = function(offset, limit, name, callback){
-		var transFn = function(data){
-			return $.param(data);
-		}
-		var postConfig = {
-				transformRequest: transFn
-		};
-		var data = {'offset' : offset,
-								'limit': limit,
-								'topic': name};
-		$http.get(window.contextPath + $scope.suburl, {
-			params : {
-				offset : offset,
-				limit : limit,
-				topic: name
-			}
-		}).success(callback);
+	var fetchFunction = function(entity, callback){
+		$http.post(window.contextPath + $scope.suburl, entity).success(callback);
 	};
 	
 	$scope.topic = "";
 	
 	$scope.suburl = "/console/download/filename";
 	$scope.topicnum = 30;
+	$scope.entity = new Object();
+	$scope.entity.topic = "";
 	
 	$http({
 		method : 'GET',
@@ -116,7 +108,8 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 			source : topicNameList,
 			updater : function(c) {
 				$scope.topic = c;
-				$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topic);
+				$scope.entity.topic = $scope.topic;
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.entity);
 				return c;
 			}
 		})
@@ -125,13 +118,7 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 	
 	$scope.updatefilestatus = function() {
 		
-		$http.get(window.contextPath + $scope.suburl, {
-			params : {
-				offset : 0,
-				limit : 30,
-				topic: $scope.topic
-			}
-		}).success(function(data){
+		$http.post(window.contextPath + $scope.suburl, $scope.entity).success(function(data){
 			var message = data.second;
 			for(var i = 0; i < message.length; ++i){
 				if(message[i].finished){
@@ -188,7 +175,8 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 				filename: filename
 			}
 		}).success(function(data){
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topic);
+			$scope.entity.topic = $scope.topic;
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.entity);
 		});
 		return true;
 	}
@@ -197,10 +185,12 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 	if(tmptopic != undefined){
 		$scope.topic = tmptopic;
 		localStorage.clear("topic");
-		$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topic);
+		$scope.entity.topic = $scope.topic;
+		$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.entity);
 		$scope.Timer = $interval( function(){ $scope.updatefilestatus(); }, 3000);
 	}else{
-		$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topic);
+		$scope.entity.topic = $scope.topic;
+		$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.entity);
 		$scope.Timer = $interval( function(){ $scope.updatefilestatus(); }, 3000);
 	}
 
