@@ -210,7 +210,7 @@ print("ProducerTopicStatsData export to PRODUCER_TOPIC_STATS_DATA start");
 var srcData = srcDb.ProducerTopicStatsData.find();
 destData = destDb.PRODUCER_TOPIC_STATS_DATA.findOne();
 if (srcData != null && destData == null) {
-	 db.createCollection('PRODUCER_SERVER_STATS_DATA', {'capped' : true, 'size' : 236870912000, 'max' :5000000000 }); 
+	 db.createCollection('PRODUCER_SERVER_STATS_DATA', {'capped' : true, 'size' : 214748364800, 'max' :5000000000 }); 
 	 db.PRODUCER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1},{"name":"IX_TIMEKEY_TOPICNAME"});
 	while (srcData.hasNext()) {
 		var temp = srcData.next();
@@ -242,7 +242,7 @@ print("ConsumerIdStatsData export to CONSUMERID_STATS_DATA start");
 var srcData = srcDb.ConsumerIdStatsData.find();
 destData = destDb.CONSUMERID_STATS_DATA.findOne();
 if (srcData != null && destData == null) {
-	 db.createCollection('CONSUMERID_STATS_DATA', {'capped' : true, 'size' : 536870912000, 'max' :10000000000 }); 
+	 db.createCollection('CONSUMERID_STATS_DATA', {'capped' : true, 'size' : 322122547200, 'max' :10000000000 }); 
 	 db.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1, 'consumerId': -1}, {"name":"IX_TIMEKEY_TOPICNAME_CONSUMERID"});
 	while (srcData.hasNext()) {
 		var temp = srcData.next();
