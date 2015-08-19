@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
@@ -41,7 +42,7 @@ public interface TopicDao extends Dao {
 	 * @param dept  申请人部门
 	 * @param time  申请时间
 	 */
-	int updateTopic(String name, String prop, String time) throws MongoSocketException, MongoException;
+	int updateTopic(String name, String prop, Date time) throws MongoSocketException, MongoException;
 
 	/**
 	 * 查询所有纪录 

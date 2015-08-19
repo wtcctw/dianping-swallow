@@ -1,7 +1,17 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize,  name, email, role){
+	return function(fetchFunction, pageSize, entity){
 		var paginator = {
 				hasNextVar: false,
+				handleResult: function(object){
+					for(var i = 0; i < this.currentPageItems.length; ++i){
+						if(this.currentPageItems[i].role == "ADMINISTRATOR")
+							this.currentPageItems[i].role = "Administrator";
+						else if(this.currentPageItems[i].role == "USER")
+							this.currentPageItems[i].role = "User";
+						else
+							this.currentPageItems[i].role = "Visitor";
+					}
+				},
 				fetch: function(page){
 					this.currentOffset = (page - 1) * pageSize;
 					this._load();
@@ -15,7 +25,9 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, name, email, role, function(data){
+					entity.offset = this.currentOffset;
+					entity.limit = pageSize + 1;
+					fetchFunction(entity, function(data){
 						items = data.second;
 						length = data.first;
 						self.totalPage = Math.ceil(length/pageSize);
@@ -39,14 +51,7 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
-						for(var i = 0; i < self.currentPageItems.length; ++i){
-							if(self.currentPageItems[i].role == 0)
-								self.currentPageItems[i].role = "Administrator";
-							else if(self.currentPageItems[i].role == 3)
-								self.currentPageItems[i].role = "User";
-							else
-								self.currentPageItems[i].role = "Visitor";
-						}
+						self.handleResult(new Object());
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -81,44 +86,34 @@ module.factory('Paginator', function(){
 module.controller('AdministratorController', ['$rootScope','$scope', '$http','Paginator', 'ngDialog',
         function($rootScope, $scope, $http, Paginator, ngDialog){
 	
-	var fetchFunction = function(offset, limit, name, email, role, callback){
-		var transFn = function(data){
-			return $.param(data);
-		}
-		var postConfig = {
-				transformRequest: transFn
-		};
-		var data = {'offset' : offset,
-								'limit': limit,
-								'name': name,
-								'role': role};
-			$http.get(window.contextPath + $scope.suburl, {
-				params : {
-					offset : offset,
-					limit : limit,
-					name: name,
-					role: role
-				}
-			}).success(callback);
-		};
+	var fetchFunction = function(entity,callback){
+		$http.post(window.contextPath + $scope.suburl, entity).success(callback);
+	};
 		$scope.name = "";
-		$scope.email = "";
 		$scope.role = "";
 		$scope.adminnum = 30;
 		
-		$scope.suburl = "/console/admin/auth/admindefault";
+		$scope.suburl = "/console/admin/auth/userlist";
 	
 		//edit admin and save it in database
 		$scope.adminrole = "";
 		$scope.adminname = "";
+		
+		$scope.entity = new Object();
+		$scope.entity.name = $scope.name;
+		$scope.entity.role = $scope.role;
+		
 		$scope.refreshpage = function(myForm){
         	$('#myModal').modal('hide');
         	//for selected item, use jquery to get value
         	$scope.adminrole = $("#roleselect").val();
-        	$http.post(window.contextPath + '/console/admin/auth/createadmin', {"name":$scope.adminname, 
-        		"role":$scope.adminrole})
+    		$scope.entity.name = $scope.adminname;
+    		$scope.entity.role = $scope.adminrole;
+        	$http.post(window.contextPath + '/console/admin/auth/createadmin', $scope.entity)
         		.success(function(response) {
-        			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
+            		$scope.entity.name = $scope.name;
+            		$scope.entity.role = $scope.role;
+        			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.entity);
         	});
         }
 		
@@ -126,7 +121,9 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 		$rootScope.removerecord = function(name){
 			$http.post(window.contextPath + '/console/admin/auth/removeadmin', {"name":name})
         		.success(function(response) {
-        			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
+            		$scope.entity.name = $scope.name;
+            		$scope.entity.role = $scope.role;
+        			$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.entity);
         	});
 			return true;
 		}
@@ -145,7 +142,7 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 		}
 		
 		//add below to control access
-		$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.name , $scope.role);
+		$scope.searchPaginator = Paginator(fetchFunction, $scope.adminnum, $scope.entity);
 		
 		$http({
 			method : 'GET',

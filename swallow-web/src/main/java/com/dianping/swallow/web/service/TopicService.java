@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +48,7 @@ public interface TopicService extends ConfigChange{
 	 * @param dept 申请人部门
 	 * @param time 申请时间
 	 */
-	int editTopic(String name, String proposal, String time);
+	int editTopic(String name, String proposal, Date time);
 
 	/**
 	 * 返回所有topic名称

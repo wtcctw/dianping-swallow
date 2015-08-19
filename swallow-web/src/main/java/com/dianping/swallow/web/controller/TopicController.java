@@ -2,6 +2,7 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -163,7 +164,7 @@ public class TopicController extends AbstractMenuController {
 		Transaction producerTransaction = Cat.getProducer().newTransaction("TopicEdit", topic + ":" + username);
 
 		try {
-			result = topicService.editTopic(topic, prop, time);
+			result = topicService.editTopic(topic, prop, new Date());
 			producerTransaction.setStatus(Message.SUCCESS);
 		} catch (MongoSocketException e) {
 			producerTransaction.setStatus(e);

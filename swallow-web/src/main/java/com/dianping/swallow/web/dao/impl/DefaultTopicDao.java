@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -25,7 +26,7 @@ import com.mongodb.MongoSocketException;
 @Component
 public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 
-	private static final String TOPIC_COLLECTION = "swallowwebtopicc";
+	private static final String TOPIC_COLLECTION = "TOPIC";
 
 	private static final String NAME = "name";
 	
@@ -47,7 +48,7 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 	}
 
 	@Override
-	public int updateTopic(String name, String prop, String time) throws MongoSocketException, MongoException{
+	public int updateTopic(String name, String prop, Date time) throws MongoSocketException, MongoException{
 		
 		Topic topic = readByName(name);
 		topic.setProp(prop).setTime(time);

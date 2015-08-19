@@ -18,6 +18,8 @@ public class ConsumerIdResource extends BaseResource{
 	@Indexed
 	private String topic;
 	
+	private boolean alarm;
+	
 	private ConsumerBaseAlarmSetting consumerAlarmSetting;
 
 	public String getConsumerId() {
@@ -36,6 +38,14 @@ public class ConsumerIdResource extends BaseResource{
 		this.topic = topic;
 	}
 
+	public boolean isAlarm() {
+		return alarm;
+	}
+
+	public void setAlarm(boolean alarm) {
+		this.alarm = alarm;
+	}
+
 	public ConsumerBaseAlarmSetting getConsumerAlarmSetting() {
 		return consumerAlarmSetting;
 	}
@@ -46,8 +56,8 @@ public class ConsumerIdResource extends BaseResource{
 
 	@Override
 	public String toString() {
-		return "ConsumerIdResource [consumerId=" + consumerId + ", topic=" + topic + ", consumerAlarmSetting="
-				+ consumerAlarmSetting + ", toString()=" + super.toString() + "]";
+		return "ConsumerIdResource [consumerId=" + consumerId + ", topic=" + topic + ", alarm=" + alarm
+				+ ", consumerAlarmSetting=" + consumerAlarmSetting + ", toString()=" + super.toString() + "]";
 	}
 
 }

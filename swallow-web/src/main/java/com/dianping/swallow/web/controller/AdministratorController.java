@@ -7,20 +7,21 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jodd.util.StringUtil;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.controller.dto.BaseDto;
+import com.dianping.swallow.web.controller.dto.UserQueryDto;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.model.Administrator;
-import com.dianping.swallow.web.service.AuthenticationService;
+import com.dianping.swallow.web.model.UserType;
 import com.dianping.swallow.web.service.UserService;
 
 /**
@@ -29,9 +30,6 @@ import com.dianping.swallow.web.service.UserService;
 @Controller
 public class AdministratorController extends AbstractMenuController {
 
-	private static final String ADMINISTRATOR = "Administrator";
-	private static final String USER = "User";
-
 	@Resource(name = "userService")
 	private UserService userService;
 
@@ -39,82 +37,60 @@ public class AdministratorController extends AbstractMenuController {
 	ExtractUsernameUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/administrator")
-	public ModelAndView allApps(HttpServletRequest request,
-			HttpServletResponse response) {
-		
+	public ModelAndView allApps(HttpServletRequest request, HttpServletResponse response) {
+
 		return new ModelAndView("admin/index", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/admin/auth/admindefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/admin/auth/userlist", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object adminDefault(int offset, int limit, String name, String role,
-			HttpServletRequest request, HttpServletResponse response) {
+	public Object adminDefault(@RequestBody UserQueryDto userQueryDto) {
 
-
-		return userService.loadUserPage(offset, limit);
+		return userService.loadUserPage(new BaseDto(userQueryDto.getOffset(), userQueryDto.getLimit()));
 	}
 
 	@RequestMapping(value = "/console/admin/auth/createadmin", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void createAdmin(@RequestParam(value = "name") String name,
-			@RequestParam(value = "role") String role,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void createAdmin(@RequestBody UserQueryDto userQueryDto) {
 
-		int auth = convertRole(role);
-		if(userService.createUser(name, auth)){
+		String name = userQueryDto.getName();
+		UserType tpye = UserType.findByType(userQueryDto.getRole().trim());
+		if (userService.createUser(name, tpye)) {
 			logger.info(String.format("Create %s in administrator list successfully", name));
-		}
-		else{
+		} else {
 			logger.info(String.format("Create %s in administrator list failed", name));
 		}
 	}
 
 	@RequestMapping(value = "/console/admin/auth/removeadmin", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public void removeAdmin(@RequestParam(value = "name") String name,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void removeAdmin(@RequestParam(value = "name") String name) {
 
-		if(userService.removeUser(name)){
+		if (userService.removeUser(name)) {
 			logger.info(String.format("Remove %s from administrator list successfully", name));
-		}
-		else{
+		} else {
 			logger.info(String.format("Remove %s from administrator list failed", name));
 		}
 	}
 
 	@RequestMapping(value = "/console/admin/queryvisits", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object queryAllVisits(HttpServletRequest request,
-			HttpServletResponse response) {
+	public Object queryAllVisits(HttpServletRequest request, HttpServletResponse response) {
 
 		List<Administrator> adminList = userService.loadUsers();
 		List<String> users = new ArrayList<String>();
-		for(Administrator admin : adminList){
+		for (Administrator admin : adminList) {
 			String name = admin.getName();
-			if(StringUtils.isNotBlank(name) && !users.contains(name)){
+			if (StringUtils.isNotBlank(name) && !users.contains(name)) {
 				users.add(name);
 			}
 		}
 		return users;
 	}
 
-	private int convertRole(String role) {
-
-		int auth = -1;
-		if (!StringUtil.isEmpty(role)) {
-			if (ADMINISTRATOR.equals(role.trim()))
-				auth = AuthenticationService.ADMINI;
-			else if (USER.equals(role.trim()))
-				auth = AuthenticationService.USER;
-			else
-				auth = AuthenticationService.VISITOR;
-		}
-		return auth;
-	}
-
 	@Override
 	protected String getMenu() {
-		
+
 		return "admin";
 	}
 
