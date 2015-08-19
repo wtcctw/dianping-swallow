@@ -39,7 +39,7 @@ import com.mongodb.MongoClient;
 @Component
 public class TopicScanner {
 
-	private static final String TOPIC_DB_NAME = "swallowwebapplication";
+	private static final String TOPIC_DB_NAME = "swallowweb";
 	
 	public static final String TIMEFORMAT = "yyyy-MM-dd HH:mm";
 
@@ -54,7 +54,7 @@ public class TopicScanner {
 	@Resource(name = "topicService")
 	private TopicService topicService;
 
-	@Resource(name = "topicMongoTemplate")
+	@Resource(name = "webMongoTemplate")
 	private MongoTemplate mongoTemplate;
 
 	@Autowired
