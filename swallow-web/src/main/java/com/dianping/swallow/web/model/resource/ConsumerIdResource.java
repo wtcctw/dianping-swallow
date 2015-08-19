@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model.resource;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 
@@ -10,6 +11,7 @@ import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
  *
  * 2015年8月10日下午3:23:20
  */
+@Document(collection = "CONSUMERID_RESOURCE")
 public class ConsumerIdResource extends BaseResource{
 	
 	@Indexed

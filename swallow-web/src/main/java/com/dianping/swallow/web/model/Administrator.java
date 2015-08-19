@@ -4,12 +4,14 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author mingdongli
  *
  *         2015年4月22日 上午12:05:51
  */
+@Document(collection = "USER")
 public class Administrator {
 	@Id
 	private String id;
