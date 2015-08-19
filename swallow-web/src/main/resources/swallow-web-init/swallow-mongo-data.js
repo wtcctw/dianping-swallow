@@ -19,20 +19,27 @@ if (srcData != null && destData == null) {
 }
 print("swallowwebalarmmetac export to ALARM_META end");
 
-// ADMIN
-print("swallowwebadminc export to ADMIN start");
+// USER
+print("swallowwebadminc export to USER start");
 var srcData = srcDb.swallowwebadminc.find();
-destData = destDb.ADMIN.findOne();
+destData = destDb.USER.findOne();
 if (srcData != null && destData == null) {
 	while (srcData.hasNext()) {
 		var temp = srcData.next();
+		if(temp.role == 0){
+			temp.role="ADMINISTRATOR";
+		}else if(temp.role == 3){
+			temp.role="USER";
+		}else{
+			temp.role="VISITOR";
+		}
 		temp.date = new Date(Date.parse(temp.date.replace(/-/g, "/")));
-		destDb.ADMIN.insert(temp);
+		destDb.USER.insert(temp);
 	}
 } else {
-	print("swallowwebadminc no data or ADMIN already exsits");
+	print("swallowwebadminc no data or USER already exsits");
 }
-print("swallowwebadminc export to ADMIN end");
+print("swallowwebadminc export to USER end");
 
 // GLOBAL_ALARM_SETTING
 print("swallowwebswallowalarmsettingc export to GLOBAL_ALARM_SETTING start");
@@ -183,6 +190,20 @@ if (srcData != null && destData == null) {
 }
 print("swallowwebalarmdatac export to ALARM end");
 
+// DASHBOARD_STATS_DATA
+print("swallowwebdashboardc export to DASHBOARD_STATS_DATA start");
+var srcData = srcDb.swallowwebdashboardc.find();
+destData = destDb.DASHBOARD_STATS_DATA.findOne();
+if (srcData != null && destData == null) {
+	while (srcData.hasNext()) {
+		var temp = srcData.next();
+		destDb.DASHBOARD_STATS_DATA.insert(temp);
+	}
+} else {
+	print("swallowwebdashboardc no data or DASHBOARD_STATS_DATA already exsits");
+}
+print("swallowwebdashboardc export to DASHBOARD_STATS_DATA end");
+
 // swallowwebapplication ====> swallowstatsdata
 
 srcDb = db.getSiblingDB('swallowalarmstats');
@@ -254,18 +275,5 @@ if (srcData != null && destData == null) {
 print("ConsumerIdStatsData export to CONSUMERID_STATS_DATA end");
 
 
-// DashboardStatsData
-print("swallowwebdashboardc export to DashboardStatsData start");
-var srcData = srcDb.swallowwebdashboardc.find();
-destData = destDb.DashboardStatsData.findOne();
-if (srcData != null && destData == null) {
-	while (srcData.hasNext()) {
-		var temp = srcData.next();
-		destDb.DashboardStatsData.insert(temp);
-	}
-} else {
-	print("swallowwebdashboardc no data or DashboardStatsData already exsits");
-}
-print("swallowwebdashboardc export to DashboardStatsData end");
 
 print("swallowwebapplication export to swallowweb end");
