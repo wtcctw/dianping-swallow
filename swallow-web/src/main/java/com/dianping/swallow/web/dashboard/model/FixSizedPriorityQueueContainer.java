@@ -1,10 +1,10 @@
 package com.dianping.swallow.web.dashboard.model;
 
 
-import com.dianping.swallow.web.dashboard.Comparator.AccuComparator;
-import com.dianping.swallow.web.dashboard.Comparator.AckComparator;
-import com.dianping.swallow.web.dashboard.Comparator.ConprehensiveComparator;
-import com.dianping.swallow.web.dashboard.Comparator.SendComparator;
+import com.dianping.swallow.web.dashboard.comparator.AccuComparator;
+import com.dianping.swallow.web.dashboard.comparator.AckComparator;
+import com.dianping.swallow.web.dashboard.comparator.ConprehensiveComparator;
+import com.dianping.swallow.web.dashboard.comparator.SendComparator;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.dashboard.Comparator;
+package com.dianping.swallow.web.dashboard.comparator;
 
 import java.util.Comparator;
 

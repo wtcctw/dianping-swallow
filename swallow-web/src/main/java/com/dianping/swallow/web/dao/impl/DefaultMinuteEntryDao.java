@@ -19,9 +19,9 @@ import com.dianping.swallow.web.util.ResponseStatus;
  *         2015年7月29日上午10:03:34
  */
 @Component
-public class DefaultMinuteEntryDao extends AbstractWriteDao implements MinuteEntryDao {
+public class DefaultMinuteEntryDao extends AbstractStatsDao implements MinuteEntryDao {
 
-	private static final String MINUTEENTRY_COLLECTION = "MINUTE_ENTRY";
+	private static final String MINUTEENTRY_COLLECTION = "DASHBOARD_STATS_DATA";
 
 	private static final String TIME = "time";
 

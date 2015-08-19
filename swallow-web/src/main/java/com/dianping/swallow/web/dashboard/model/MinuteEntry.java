@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  *
  * 2015年7月7日上午9:36:34
  */
-@Document(collection = "Dashboard")
+@Document(collection = "DASHBOARD_STATS_DATA")
 public class MinuteEntry {
 	
 	@Indexed

@@ -12,10 +12,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.swallow.web.dashboard.Comparator.AccuComparator;
-import com.dianping.swallow.web.dashboard.Comparator.AckComparator;
-import com.dianping.swallow.web.dashboard.Comparator.ConprehensiveComparator;
-import com.dianping.swallow.web.dashboard.Comparator.SendComparator;
+import com.dianping.swallow.web.dashboard.comparator.AccuComparator;
+import com.dianping.swallow.web.dashboard.comparator.AckComparator;
+import com.dianping.swallow.web.dashboard.comparator.ConprehensiveComparator;
+import com.dianping.swallow.web.dashboard.comparator.SendComparator;
 import com.dianping.swallow.web.dashboard.model.Entry;
 import com.dianping.swallow.web.dashboard.model.FixSizedPriorityQueue;
 
