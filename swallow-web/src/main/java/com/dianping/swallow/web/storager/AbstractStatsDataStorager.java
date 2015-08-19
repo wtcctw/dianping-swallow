@@ -15,19 +15,23 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
  * @author qiyin
  *
- * 2015年8月4日 下午1:22:31
+ *         2015年8月4日 下午1:22:31
  */
 public abstract class AbstractStatsDataStorager extends AbstractLifecycle {
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected volatile AtomicLong dataCount = new AtomicLong();
 
 	protected String storagerName;
+
+	private static final String FACTORY_NAME = "StatsStorager";
 
 	protected static final int INIT_VALUE = 0;
 
@@ -37,7 +41,8 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle {
 
 	private int storagerInterval = 30;
 
-	private static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT);
+	private static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
+			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	private ScheduledFuture<?> future = null;
 

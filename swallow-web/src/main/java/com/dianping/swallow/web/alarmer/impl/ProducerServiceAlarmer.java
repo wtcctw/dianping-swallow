@@ -86,6 +86,7 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 		if (producerServerIps == null) {
 			logger.error("[checkService] cannot find producerserver ips.");
+			return false;
 		}
 		for (String serverIp : producerServerIps) {
 			if (StringUtils.isBlank(serverIp)) {

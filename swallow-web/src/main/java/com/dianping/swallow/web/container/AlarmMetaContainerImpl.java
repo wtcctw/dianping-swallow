@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.AlarmMetaService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -30,8 +31,10 @@ public class AlarmMetaContainerImpl implements InitializingBean, AlarmMetaContai
 	private static final Logger logger = LoggerFactory.getLogger(AlarmMetaContainerImpl.class);
 
 	private static final Map<Integer, AlarmMeta> alarmMetas = new ConcurrentHashMap<Integer, AlarmMeta>();
-
-	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor();
+	
+	private static final String FACTORY_NAME = "AlarmMetaTask";
+	
+	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	private int interval = 120;// 秒
 

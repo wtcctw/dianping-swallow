@@ -27,8 +27,8 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatReceiver;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatReceiver;
 import com.dianping.swallow.common.internal.heartbeat.NoHeartBeatListener;
-import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.observer.impl.AbstractObservableLifecycle;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.MongoUtils;
@@ -46,7 +46,7 @@ import com.dianping.swallow.consumerserver.worker.ConsumerWorker;
  * 
  * @author kezhu.wu
  */
-public final class ConsumerWorkerImpl extends AbstractLifecycle implements ConsumerWorker, NoHeartBeatListener {
+public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implements ConsumerWorker, NoHeartBeatListener {
 
 	/** 允许"最小的空洞waitAckMessage"存活的时间的阈值,单位秒，默认5分钟 */
 	private final long WAIT_ACK_EXPIRED = ConfigManager.getInstance().getWaitAckExpiredSecond() * 1000;
@@ -85,6 +85,8 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 	private HeartBeatReceiver heartBeatReceiver;
 
 	private ConsumerCollector consumerCollector;
+	
+	private long startMessageId;
 
 	private AtomicInteger	  messageToSend = new AtomicInteger();
 	
@@ -92,7 +94,7 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 
 	@SuppressWarnings("deprecation")
 	public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager,
-			MessageFilter messageFilter, ConsumerAuthController consumerAuthController,
+			ConsumerAuthController consumerAuthController,
 			ConsumerThreadPoolManager consumerThreadPoolManager, long startMessageId,
 			ConsumerCollector consumerCollector) {
 
@@ -100,10 +102,10 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 		this.ackDao = workerManager.getAckDAO();
 		this.messageDao = workerManager.getMessageDAO();
 		this.swallowBuffer = workerManager.getSwallowBuffer();
-		this.messageFilter = messageFilter;
 		this.consumerThreadPoolManager = consumerThreadPoolManager;
 		this.consumerAuthController = consumerAuthController;
 		this.consumerCollector = consumerCollector;
+		this.startMessageId = startMessageId;
 
 		// consumerInfo的type不允许AT_MOST模式，遇到则修改成AT_LEAST模式（因为AT_MOST会导致ack插入比较频繁，所以不用它）
 		if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_MOST_ONCE) {
@@ -115,7 +117,15 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 		this.ackExecutor = this.consumerThreadPoolManager.getServiceHandlerThreadPool();
 		this.sendMessageExecutor = this.consumerThreadPoolManager.getSendMessageThreadPool();
 
-		// 创建消息缓冲QUEUE
+		heartBeatReceiver = new DefaultHeartBeatReceiver(consumerThreadPoolManager.getScheduledThreadPool(), this);
+		
+	}
+
+	
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+
 		long messageIdOfTailMessage = (startMessageId != -1 ? startMessageId : getMaxMessageId(false));
 		long messageIdOfTailBackupMessage = -1;
 		if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
@@ -127,10 +137,10 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 		}
 		messageQueue = swallowBuffer.createMessageQueue(this.consumerInfo, messageIdOfTailMessage,
 				messageIdOfTailBackupMessage, this.messageFilter);
-		heartBeatReceiver = new DefaultHeartBeatReceiver(consumerThreadPoolManager.getScheduledThreadPool(), this);
 
+		addObserver(messageQueue);
 	}
-
+	
 	@Override
 	public void handleAck(final Channel channel, final long ackId, final ACKHandlerType type) {
 
@@ -347,9 +357,6 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 		return true;
 	}
 
-	/**
-	 * @return
-	 */
 	private SwallowMessage poolMessage() {
 		
 		messageToSend.incrementAndGet();
@@ -427,7 +434,10 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 	}
 
 	@Override
-	public void handleGreet(final Channel channel, final int clientThreadCount) {
+	public void handleGreet(final Channel channel, final int clientThreadCount, MessageFilter messageFilter) {
+		
+		setMessageFilter(messageFilter);
+		
 		ackExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -443,16 +453,51 @@ public final class ConsumerWorkerImpl extends AbstractLifecycle implements Consu
 
 	@Override
 	public void dispose() {
+		
 		consumerCollector.removeConsumer(consumerInfo);
 		messageQueue.close();
 		heartBeatReceiver.cancelCheck();
+		
+		for(Channel channel : connectedChannels.keySet()){
+			if(channel != null){
+				try{
+					if(logger.isInfoEnabled()){
+						logger.info("[dispose]" + channel);
+					}
+					channel.close();
+				}catch(Exception e){
+					logger.error("[dispose]" + channel, e);
+				}
+			}
+		}
 	}
 
+	
+	private void setMessageFilter(MessageFilter newFilter){
+		
+		MessageFilter oldFilter = this.messageFilter;
+		if(oldFilter == newFilter){
+			return;
+		}
+		
+		if(oldFilter != null && !oldFilter.equals(messageFilter)){
+			return;
+		}
+		
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[setMessageFilter][messagefilterChanged]" + oldFilter + "," + newFilter);
+		}
+		this.messageFilter = newFilter;
+		
+		updateObservers(new ConsumerConfigChanged(oldFilter, newFilter));
+	}
 	/**
 	 * @param consumerId
 	 *            consumerId为null时使用非backup队列
 	 */
 	private long getMaxMessageId(boolean isBakcup) {
+		
 		Long maxMessageId = null;
 		String topicName = consumerInfo.getDest().getName();
 
