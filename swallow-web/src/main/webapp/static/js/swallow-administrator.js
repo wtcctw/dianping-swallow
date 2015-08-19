@@ -119,7 +119,8 @@ module.controller('AdministratorController', ['$rootScope','$scope', '$http','Pa
 		
 		//delete admin
 		$rootScope.removerecord = function(name){
-			$http.post(window.contextPath + '/console/admin/auth/removeadmin', {"name":name})
+    		$scope.entity.name = name;
+			$http.post(window.contextPath + '/console/admin/auth/removeadmin', $scope.entity)
         		.success(function(response) {
             		$scope.entity.name = $scope.name;
             		$scope.entity.role = $scope.role;

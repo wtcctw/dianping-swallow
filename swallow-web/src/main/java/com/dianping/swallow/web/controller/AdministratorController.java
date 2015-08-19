@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -42,14 +41,14 @@ public class AdministratorController extends AbstractMenuController {
 		return new ModelAndView("admin/index", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/admin/auth/userlist", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/admin/auth/userlist", method = RequestMethod.POST)
 	@ResponseBody
 	public Object adminDefault(@RequestBody UserQueryDto userQueryDto) {
 
 		return userService.loadUserPage(new BaseDto(userQueryDto.getOffset(), userQueryDto.getLimit()));
 	}
 
-	@RequestMapping(value = "/console/admin/auth/createadmin", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/admin/auth/createadmin", method = RequestMethod.POST)
 	@ResponseBody
 	public void createAdmin(@RequestBody UserQueryDto userQueryDto) {
 
@@ -62,10 +61,11 @@ public class AdministratorController extends AbstractMenuController {
 		}
 	}
 
-	@RequestMapping(value = "/console/admin/auth/removeadmin", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/admin/auth/removeadmin", method = RequestMethod.POST)
 	@ResponseBody
-	public void removeAdmin(@RequestParam(value = "name") String name) {
+	public void removeAdmin(@RequestBody UserQueryDto userQueryDto) {
 
+		String name = userQueryDto.getName();
 		if (userService.removeUser(name)) {
 			logger.info(String.format("Remove %s from administrator list successfully", name));
 		} else {
@@ -73,7 +73,7 @@ public class AdministratorController extends AbstractMenuController {
 		}
 	}
 
-	@RequestMapping(value = "/console/admin/queryvisits", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/admin/queryvisits", method = RequestMethod.GET)
 	@ResponseBody
 	public Object queryAllVisits(HttpServletRequest request, HttpServletResponse response) {
 
