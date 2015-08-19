@@ -51,6 +51,7 @@ public class HttpServiceImpl implements HttpService {
 			HttpResponse response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
+				result.setResultType(ResultType.SUCCESS);
 				result.setSuccess(true);
 			}
 		} catch (UnknownHostException e) {
@@ -88,6 +89,7 @@ public class HttpServiceImpl implements HttpService {
 			HttpResponse response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
+				result.setResultType(ResultType.SUCCESS);
 				result.setSuccess(true);
 			}
 		} catch (UnknownHostException e) {

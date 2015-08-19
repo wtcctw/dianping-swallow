@@ -82,5 +82,10 @@ public class TopicAlarmSettingServiceImpl implements TopicAlarmSettingService {
 	public List<TopicAlarmSetting> findByPage(int offset, int limit) {
 		return topicAlarmSettingDao.findByPage(offset, limit);
 	}
+	
+	@Override
+	public long count() {
+		return topicAlarmSettingDao.count();
+	}
 
 }

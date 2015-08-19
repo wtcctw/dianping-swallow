@@ -40,11 +40,11 @@ public class MongoTemplateFactory {
 	@Value("${swallow.web.mongodbname.stats}")
 	private String statsMongoDbName;
 
-	@Value("${swallow.web.mongodbname.topic}")
-	private String topicMongoDbName;
+	@Value("${swallow.web.mongodbname.web}")
+	private String webMongoDbName;
 	
-	@Value("${swallow.web.mongodbname.alarmstats}")
-	private String alarmStatsMongoDbName;
+	@Value("${swallow.web.mongodbname.statsdata}")
+	private String statsDataMongoDbName;
 
 	public static final String SWALLOW_STATS_MONGO_URL_KEY = "swallow.mongourl";
 
@@ -70,7 +70,7 @@ public class MongoTemplateFactory {
 		}
 	}
 
-	@Bean(name = "statisMongoTemplate")
+	@Bean(name = "statsMongoTemplate")
 	public MongoTemplate getStatisMongoTemplate() {
 
 		MongoTemplate statisMongoTemplate = createMongoTemplate(statsMongoDbName);
@@ -85,9 +85,10 @@ public class MongoTemplateFactory {
 		return statisMongoTemplate;
 	}
 	
-	@Bean(name = "alarmStatsMongoTemplate")
+	@Bean(name = "statsDataMongoTemplate")
 	public MongoTemplate getAlarmStatisMongoTemplate() {
-		return new MongoTemplate(new SimMongoDbFactory(mongo, alarmStatsMongoDbName));
+		
+		return new MongoTemplate(new SimMongoDbFactory(mongo, statsDataMongoDbName));
 	}
 	
 	private synchronized void createCappedCollection(MongoTemplate mongoTemplate, String collectionName, long size, long max) {
@@ -115,10 +116,10 @@ public class MongoTemplateFactory {
 		return options;
 	}
 
-	@Bean(name = "topicMongoTemplate")
+	@Bean(name = "webMongoTemplate")
 	public MongoTemplate getTopicMongoTemplate() {
 
-		return new MongoTemplate(new SimMongoDbFactory(mongo, topicMongoDbName));
+		return new MongoTemplate(new SimMongoDbFactory(mongo, webMongoDbName));
 	}
 
 	private MongoTemplate createMongoTemplate(String mongoDbName) {

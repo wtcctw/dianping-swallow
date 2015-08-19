@@ -8,27 +8,29 @@ import com.dianping.swallow.web.model.alarm.GlobalAlarmSetting;
  * 
  * @author qiyin
  *
+ *         2015年8月17日 下午5:43:19
  */
 public interface GlobalAlarmSettingService {
-	
-	public boolean insert(GlobalAlarmSetting setting);
 
-	public boolean update(GlobalAlarmSetting setting);
+	boolean insert(GlobalAlarmSetting setting);
 
-	public int deleteById(String id);
-	
-	public int deleteByBySwallowId(String swallowId);
+	boolean update(GlobalAlarmSetting setting);
 
-	public GlobalAlarmSetting findById(String id);
+	int deleteById(String id);
 
-	public List<String> getProducerWhiteList();
-	
-	public List<String> getConsumerWhiteList();
-	
-	public GlobalAlarmSetting findBySwallowId(String swallowId);
-	
-	public GlobalAlarmSetting findDefault();
-	
-	public List<GlobalAlarmSetting> findByPage(int offset, int limit);
+	int deleteByBySwallowId(String globalId);
 
+	GlobalAlarmSetting findById(String id);
+
+	List<String> getProducerWhiteList();
+
+	List<String> getConsumerWhiteList();
+
+	GlobalAlarmSetting findByGlobalId(String globalId);
+
+	GlobalAlarmSetting findDefault();
+
+	List<GlobalAlarmSetting> findByPage(int offset, int limit);
+
+	long count();
 }

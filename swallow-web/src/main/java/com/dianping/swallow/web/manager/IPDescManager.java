@@ -6,15 +6,16 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
  * 
  * @author qiyin
  *
+ *         2015年8月17日 下午5:52:44
  */
-
 public interface IPDescManager {
-	
+
 	/**
 	 * get ipdesc from cmdb or db
+	 * 
 	 * @param ip
 	 * @return
 	 */
-	public IPDesc getIPDesc(String ip);
+	IPDesc getIPDesc(String ip);
 
 }

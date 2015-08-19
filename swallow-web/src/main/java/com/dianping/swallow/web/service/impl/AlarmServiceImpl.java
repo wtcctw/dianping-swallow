@@ -70,39 +70,39 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	}
 
 	@Override
-	public boolean sendSms(String mobile, String title, String body) {
+	public ResultType sendSms(String mobile, String title, String body) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("mobile", mobile));
 		params.add(new BasicNameValuePair("body", title + NEW_LINE_SIGN + body));
-		boolean result = httpService.httpPost(getSmsUrl(), params).isSuccess();
-		if (!result) {
-			result = httpService.httpPost(getSmsUrl(), params).isSuccess();
+		ResultType result = httpService.httpPost(getSmsUrl(), params).getResultType();
+		if (!result.isSuccess()) {
+			result = httpService.httpPost(getSmsUrl(), params).getResultType();
 		}
 		return result;
 	}
 
 	@Override
-	public boolean sendWeiXin(String email, String title, String content) {
+	public ResultType sendWeiXin(String email, String title, String content) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("email", email));
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("content", content));
-		boolean result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
-		if (!result) {
-			result = httpService.httpPost(getWeiXinUrl(), params).isSuccess();
+		ResultType result = httpService.httpPost(getWeiXinUrl(), params).getResultType();
+		if (!result.isSuccess()) {
+			result = httpService.httpPost(getWeiXinUrl(), params).getResultType();
 		}
 		return result;
 	}
 
 	@Override
-	public boolean sendMail(String email, String title, String content) {
+	public ResultType sendMail(String email, String title, String content) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("title", title));
 		params.add(new BasicNameValuePair("recipients", email));
 		params.add(new BasicNameValuePair("body", content));
-		boolean result = httpService.httpPost(getMailUrl(), params).isSuccess();
-		if (!result) {
-			result = httpService.httpPost(getMailUrl(), params).isSuccess();
+		ResultType result = httpService.httpPost(getMailUrl(), params).getResultType();
+		if (!result.isSuccess()) {
+			result = httpService.httpPost(getMailUrl(), params).getResultType();
 		}
 		return result;
 	}
@@ -111,15 +111,14 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	public boolean sendSms(Alarm alarm, String receiver) {
 		alarm.setId(null).setSourceIp(NetUtil.IP).setCreateTime(new Date());
 		if (StringUtils.isBlank(receiver)) {
-			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED)
+			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED_NOPERSON)
 					.setSendType(SendType.SMS));
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		boolean result = sendSms(receiver, title, alarm.getBody());
-		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
+		ResultType resultType = sendSms(receiver, title, alarm.getBody());
 		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.SMS));
-		return result;
+		return resultType.isSuccess();
 	}
 
 	@Override
@@ -131,10 +130,9 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		boolean result = sendWeiXin(receiver, title, alarm.getBody());
-		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
+		ResultType resultType = sendWeiXin(receiver, title, alarm.getBody());
 		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.WEIXIN));
-		return result;
+		return resultType.isSuccess();
 	}
 
 	@Override
@@ -146,10 +144,9 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 			return false;
 		}
 		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
-		boolean result = sendMail(receiver, title, alarm.getBody());
-		ResultType resultType = result ? ResultType.SUCCESS : ResultType.FAILED;
+		ResultType resultType = sendMail(receiver, title, alarm.getBody());
 		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.MAIL));
-		return result;
+		return resultType.isSuccess();
 	}
 
 	public boolean sendSms(Set<String> mobiles, Alarm alarm) {

@@ -1,32 +1,34 @@
 package com.dianping.swallow.web.service;
 
-
 import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 
 /**
-*
-* @author qiyin
-*
-*/
+ * 
+ * @author qiyin
+ *
+ *         2015年8月17日 下午5:46:32
+ */
 public interface ConsumerIdAlarmSettingService {
 
-	public boolean insert(ConsumerIdAlarmSetting setting);
+	boolean insert(ConsumerIdAlarmSetting setting);
 
-	public boolean update(ConsumerIdAlarmSetting setting);
+	boolean update(ConsumerIdAlarmSetting setting);
 
-	public int deleteById(String id);
-	
-	public int deleteByConsumerId(String consumerId);
+	int deleteById(String id);
 
-	public ConsumerIdAlarmSetting findById(String id);
+	int deleteByConsumerId(String consumerId);
 
-	public List<ConsumerIdAlarmSetting> findByConsumerId(String consumerId);
-	
-	public ConsumerIdAlarmSetting findDefault();
-	
-	public List<ConsumerIdAlarmSetting> findByPage(int offset, int limit);
-	
-	public ConsumerIdAlarmSetting findByTopicNameAndConsumerId(String topicName, String consumerId);
+	ConsumerIdAlarmSetting findById(String id);
+
+	List<ConsumerIdAlarmSetting> findByConsumerId(String consumerId);
+
+	ConsumerIdAlarmSetting findDefault();
+
+	List<ConsumerIdAlarmSetting> findByPage(int offset, int limit);
+
+	ConsumerIdAlarmSetting findByTopicNameAndConsumerId(String topicName, String consumerId);
+
+	long count();
 }

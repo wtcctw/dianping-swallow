@@ -18,7 +18,7 @@ import com.dianping.swallow.web.service.GlobalAlarmSettingService;
 @Service("globalAlarmSettingService")
 public class GlobalAlarmSettingServiceImpl implements GlobalAlarmSettingService {
 
-	private static final String DEFAULT_SWALLOWID = "default";
+	private static final String DEFAULT_GLOBALID = "default";
 
 	@Autowired
 	private GlobalAlarmSettingDao globalAlarmSettingDao;
@@ -32,7 +32,7 @@ public class GlobalAlarmSettingServiceImpl implements GlobalAlarmSettingService 
 	public boolean update(GlobalAlarmSetting setting) {
 		GlobalAlarmSetting swallowAlarmSetting = null;
 		if (StringUtils.isNotBlank(setting.getSwallowId())) {
-			swallowAlarmSetting = findBySwallowId(setting.getSwallowId());
+			swallowAlarmSetting = findByGlobalId(setting.getSwallowId());
 		}
 		if (swallowAlarmSetting == null) {
 			return insert(setting);
@@ -48,8 +48,8 @@ public class GlobalAlarmSettingServiceImpl implements GlobalAlarmSettingService 
 	}
 
 	@Override
-	public int deleteByBySwallowId(String swallowId) {
-		return globalAlarmSettingDao.deleteByBySwallowId(swallowId);
+	public int deleteByBySwallowId(String globalId) {
+		return globalAlarmSettingDao.deleteByGlobalId(globalId);
 	}
 
 	@Override
@@ -77,18 +77,22 @@ public class GlobalAlarmSettingServiceImpl implements GlobalAlarmSettingService 
 
 	@Override
 	public GlobalAlarmSetting findDefault() {
-		GlobalAlarmSetting swallowAlarmSetting = globalAlarmSettingDao.findBySwallowId(DEFAULT_SWALLOWID);
+		GlobalAlarmSetting swallowAlarmSetting = globalAlarmSettingDao.findByGlobalId(DEFAULT_GLOBALID);
 		return swallowAlarmSetting;
 	}
 
 	@Override
-	public GlobalAlarmSetting findBySwallowId(String swallowId) {
-		return globalAlarmSettingDao.findBySwallowId(swallowId);
+	public GlobalAlarmSetting findByGlobalId(String globalId) {
+		return globalAlarmSettingDao.findByGlobalId(globalId);
 	}
 
 	@Override
 	public List<GlobalAlarmSetting> findByPage(int offset, int limit) {
 		return globalAlarmSettingDao.findByPage(offset, limit);
 	}
-
+	
+	@Override
+	public long count() {
+		return globalAlarmSettingDao.count();
+	}
 }

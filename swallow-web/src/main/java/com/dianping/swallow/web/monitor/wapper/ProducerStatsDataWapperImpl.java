@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,10 +44,6 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String serverIp = iterator.next();
-
-			if (StringUtils.equals(serverIp, TOTAL_KEY)) {
-				continue;
-			}
 
 			ProducerServerStatisData serverStatisData = (ProducerServerStatisData) producerDataRetriever
 					.getValue(new CasKeys(serverIp));
@@ -95,9 +90,6 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String topicName = String.valueOf(iterator.next());
-			if (StringUtils.equals(topicName, TOTAL_KEY)) {
-				continue;
-			}
 			ProducerTopicStatisData serverStatisData = (ProducerTopicStatisData) producerDataRetriever
 					.getValue(new CasKeys(TOTAL_KEY, topicName));
 			if (serverStatisData == null) {

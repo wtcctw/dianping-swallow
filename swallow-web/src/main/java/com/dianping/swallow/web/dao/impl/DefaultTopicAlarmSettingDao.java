@@ -25,7 +25,7 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultTopicAlarmSettingDao.class);
 
-	private static final String TOPICSALARMSETTING_COLLECTION = "swallowwebtopicalarmsettingc";
+	private static final String TOPICSALARMSETTING_COLLECTION = "TOPIC_ALARM_SETTING";
 
 	private static final String ID_FIELD = "id";
 
@@ -84,6 +84,12 @@ public class DefaultTopicAlarmSettingDao extends AbstractWriteDao implements Top
 		List<TopicAlarmSetting> topicAlarmSettings = mongoTemplate.find(query, TopicAlarmSetting.class,
 				TOPICSALARMSETTING_COLLECTION);
 		return topicAlarmSettings;
+	}
+
+	@Override
+	public long count() {
+		Query query = new Query();
+		return mongoTemplate.count(query, TOPICSALARMSETTING_COLLECTION);
 	}
 
 }

@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
  */
 public abstract class AbstractWriteDao extends AbstractDao{
 	
-	@Resource( name = "topicMongoTemplate")
+	@Resource( name = "webMongoTemplate")
 	protected MongoTemplate 						mongoTemplate;
 
 }

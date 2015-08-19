@@ -5,28 +5,30 @@ import java.util.List;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 
 /**
-*
-* @author qiyin
-*
-*/
+ * 
+ * @author qiyin
+ *
+ *         2015年8月17日 下午5:44:09
+ */
 public interface ConsumerServerAlarmSettingService {
-	
-	public boolean insert(ConsumerServerAlarmSetting setting);
 
-	public boolean update(ConsumerServerAlarmSetting setting);
+	boolean insert(ConsumerServerAlarmSetting setting);
 
-	public int deleteById(String id);
-	
-	public int deleteByServerId(String serverId);
+	boolean update(ConsumerServerAlarmSetting setting);
 
-	public ConsumerServerAlarmSetting findById(String id);
+	int deleteById(String id);
 
-	public List<String> getTopicWhiteList();
-	
-	public ConsumerServerAlarmSetting findByServerId(String serverId);
+	int deleteByServerId(String serverId);
 
-	public ConsumerServerAlarmSetting findDefault();
+	ConsumerServerAlarmSetting findById(String id);
+
+	List<String> getTopicWhiteList();
+
+	ConsumerServerAlarmSetting findByServerId(String serverId);
+
+	ConsumerServerAlarmSetting findDefault();
+
+	List<ConsumerServerAlarmSetting> findByPage(int offset, int limit);
 	
-	public List<ConsumerServerAlarmSetting> findByPage(int offset, int limit);
-	
+	long count();
 }

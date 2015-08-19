@@ -21,11 +21,9 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器服务告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}不能访问pigeon健康监测页面，可能宕机。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -44,11 +42,9 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器服务告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}访问pigeon健康监测页面，已经正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -68,11 +64,9 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器SENDER告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}未发送统计数据到管理端，可能宕机。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -91,11 +85,9 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器SENDER告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -114,11 +106,9 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器QPS告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -137,11 +127,9 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器QPS告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -160,11 +148,9 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器QPS告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -183,11 +169,9 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器QPS告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}[QPS]正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -206,11 +190,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器SENDER告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}未发送统计数据到管理端，可能宕机。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -229,11 +211,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器SENDER告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -253,11 +233,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器PORT告警",
 	    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}端口关闭状态，[SLAVE IP]{slaveIp}端口处于打开状态。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -276,11 +254,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器PORT告警",
 	    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}端口都处于打开状态。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -299,11 +275,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器PORT告警",
 	    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}端口都处于关闭状态。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -323,11 +297,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器PORT告警",
 	    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}，端口已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -348,11 +320,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器SLAVE服务告警",
 	    "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务未开启。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -372,11 +342,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器SLAVE服务告警",
 	    "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务已正常开启。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -396,11 +364,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器发送QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -419,11 +385,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器发送QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true,  false);
@@ -442,11 +406,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器发送QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -465,11 +427,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器发送QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -488,11 +448,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器确认QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	  	"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	},true,false);
@@ -511,11 +469,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器确认QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -534,11 +490,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器确认QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -557,11 +511,9 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器确认QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -581,11 +533,9 @@ if(result != null) {
 	    "alarmTitle" : "生产端TOPIC QPS告警",
 	    "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -604,11 +554,9 @@ if(result != null) {
 	    "alarmTitle" : "生产端TOPIC QPS告警",
 	    "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -627,11 +575,9 @@ if(result != null) {
 	    "alarmTitle" : "生产端TOPIC QPS告警",
 	    "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -650,11 +596,9 @@ if(result != null) {
 	    "alarmTitle" : "生产端TOPIC存储延时告警",
 	    "alarmTemplate" : "生产客户端[TOPIC]{topic}存储延时{currentValue}大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -674,11 +618,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -697,11 +639,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -721,11 +661,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -744,11 +682,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC发送延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}发送延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -767,11 +703,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -791,11 +725,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -814,11 +746,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -837,11 +767,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC确认延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -861,11 +789,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -885,11 +811,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -908,11 +832,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -932,11 +854,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端发送延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -955,11 +875,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端消息累积告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}消息累积{currentValue}累积大于阈值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -978,11 +896,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -1002,11 +918,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -1025,11 +939,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -1049,11 +961,9 @@ if(result != null) {
 	    "alarmTitle" : "消费端确认延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 5,
+	    "nightSpanBase" : 10,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);

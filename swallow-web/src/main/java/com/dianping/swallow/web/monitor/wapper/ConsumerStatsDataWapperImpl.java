@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,9 +52,6 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String serverIp = iterator.next();
-			if (StringUtils.equals(serverIp, TOTAL_KEY)) {
-				continue;
-			}
 			ConsumerServerStatisData serverStatisData = (ConsumerServerStatisData) consumerDataRetriever.getValue(
 					new CasKeys(serverIp), StatisType.SEND);
 			if (serverStatisData == null) {
@@ -114,9 +111,6 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = new HashMap<String, List<ConsumerIdStatsData>>();
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
-			if (StringUtils.equals(topicName, TOTAL_KEY)) {
-				continue;
-			}
 			List<ConsumerIdStatsData> consumerIdStatsDatas = getConsumerIdStatsDatas(topicName, timeKey);
 			if (consumerIdStatsDatas == null) {
 				continue;
@@ -137,9 +131,6 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String consumerId = iterator.next();
-			if (StringUtils.equals(consumerId, TOTAL_KEY)) {
-				continue;
-			}
 			ConsumerIdStatsData consumerIdStatsData = statsDataFactory.createConsumerIdStatsData();
 			consumerIdStatsData.setConsumerId(consumerId);
 			consumerIdStatsData.setTopicName(topicName);
