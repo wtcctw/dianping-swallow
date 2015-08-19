@@ -25,7 +25,7 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultConsumerServerAlarmSettingDao.class);
 
-	private static final String CONSUMERSERVERALARMSETTING_COLLECTION = "swallowwebconsumerserveralarmsettingc";
+	private static final String CONSUMERSERVERALARMSETTING_COLLECTION = "CONSUMER_SERVER_ALARM_SETTING";
 
 	private static final String ID_FIELD = "id";
 
@@ -54,7 +54,7 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 				CONSUMERSERVERALARMSETTING_COLLECTION);
 		return result.getN();
 	}
-	
+
 	@Override
 	public int deleteByServerId(String serverId) {
 		Query query = new Query(Criteria.where(SERVERID_FIELD).is(serverId));
@@ -86,5 +86,11 @@ public class DefaultConsumerServerAlarmSettingDao extends AbstractWriteDao imple
 		List<ConsumerServerAlarmSetting> serverAlarmSettings = mongoTemplate.find(query,
 				ConsumerServerAlarmSetting.class, CONSUMERSERVERALARMSETTING_COLLECTION);
 		return serverAlarmSettings;
+	}
+
+	@Override
+	public long count() {
+		Query query = new Query();
+		return mongoTemplate.count(query, CONSUMERSERVERALARMSETTING_COLLECTION);
 	}
 }

@@ -57,15 +57,11 @@ public class AlarmMeta {
 
 	private String alarmDetail;
 
-	private int timeSpanBase;
-
 	private int maxTimeSpan;
 
-	private int daySpanRatio;
-
-	private int nightSpanRatio;
-
-	private int sendTimeSpan;
+	private int daySpanBase;
+	
+	private int nightSpanBase;
 
 	private Date createTime;
 
@@ -183,31 +179,6 @@ public class AlarmMeta {
 		this.updateTime = updateTime;
 	}
 
-	public int getSendTimeSpan() {
-		return sendTimeSpan;
-	}
-
-	public void setSendTimeSpan(int sendTimeSpan) {
-		this.sendTimeSpan = sendTimeSpan;
-	}
-
-	@Override
-	public String toString() {
-		return "AlarmMeta [id=" + id + ", metaId=" + metaId + ", type=" + type + ", levelType=" + levelType
-				+ ", isSmsMode=" + isSmsMode + ", isWeiXinMode=" + isWeiXinMode + ", isMailMode=" + isMailMode
-				+ ", isSendSwallow=" + isSendSwallow + ", isSendBusiness=" + isSendBusiness + ", alarmTemplate="
-				+ alarmTemplate + ", sendTimeSpan=" + sendTimeSpan + ", createTime=" + createTime + ", updateTime="
-				+ updateTime + "]";
-	}
-
-	public int getTimeSpanBase() {
-		return timeSpanBase;
-	}
-
-	public void setTimeSpanBase(int timeSpanBase) {
-		this.timeSpanBase = timeSpanBase;
-	}
-
 	public int getMaxTimeSpan() {
 		return maxTimeSpan;
 	}
@@ -216,20 +187,32 @@ public class AlarmMeta {
 		this.maxTimeSpan = maxTimeSpan;
 	}
 
-	public int getDaySpanRatio() {
-		return daySpanRatio;
+	public int getDaySpanBase() {
+		return daySpanBase;
 	}
 
-	public void setDaySpanRatio(int daySpanRatio) {
-		this.daySpanRatio = daySpanRatio;
+	public void setDaySpanBase(int daySpanBase) {
+		this.daySpanBase = daySpanBase;
 	}
 
-	public int getNightSpanRatio() {
-		return nightSpanRatio;
+	public int getNightSpanBase() {
+		return nightSpanBase;
 	}
 
-	public void setNightSpanRatio(int nightSpanRatio) {
-		this.nightSpanRatio = nightSpanRatio;
+	public void setNightSpanBase(int nightSpanBase) {
+		this.nightSpanBase = nightSpanBase;
 	}
+
+	@Override
+	public String toString() {
+		return "AlarmMeta [id=" + id + ", metaId=" + metaId + ", type=" + type + ", levelType=" + levelType
+				+ ", isSmsMode=" + isSmsMode + ", isWeiXinMode=" + isWeiXinMode + ", isMailMode=" + isMailMode
+				+ ", isSendSwallow=" + isSendSwallow + ", isSendBusiness=" + isSendBusiness + ", alarmTitle="
+				+ alarmTitle + ", alarmTemplate=" + alarmTemplate + ", alarmDetail=" + alarmDetail + ", maxTimeSpan="
+				+ maxTimeSpan + ", daySpanBase=" + daySpanBase + ", nightSpanBase=" + nightSpanBase + ", createTime="
+				+ createTime + ", updateTime=" + updateTime + "]";
+	}
+	
+	
 
 }

@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 
 import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.model.alarm.AlarmLevelType;
@@ -42,11 +41,9 @@ public class ServerEventTest extends MockTest {
 		alarmMeta
 				.setAlarmTemplate("消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]");
 		alarmMeta.setAlarmDetail("");
-		alarmMeta.setTimeSpanBase(5);
 		alarmMeta.setMaxTimeSpan(120);
-		alarmMeta.setDaySpanRatio(5);
-		alarmMeta.setNightSpanRatio(10);
-		alarmMeta.setSendTimeSpan(5);
+		alarmMeta.setDaySpanBase(10);
+		alarmMeta.setNightSpanBase(15);
 		alarmMeta.setCreateTime(new Date());
 		alarmMeta.setUpdateTime(new Date());
 

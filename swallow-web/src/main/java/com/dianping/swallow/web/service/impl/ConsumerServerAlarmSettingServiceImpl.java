@@ -82,4 +82,9 @@ public class ConsumerServerAlarmSettingServiceImpl implements ConsumerServerAlar
 		return consumerServerAlarmSettingDao.findByPage(offset, limit);
 	}
 
+	@Override
+	public long count() {
+		return consumerServerAlarmSettingDao.count();
+	}
+	
 }

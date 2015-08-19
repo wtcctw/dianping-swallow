@@ -2,6 +2,7 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午6:07:16
+ *         2015年8月3日 下午6:07:16
  */
 @Component
 public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {
@@ -86,6 +87,9 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements M
 		long delay = producerAlarmSetting.getDelay();
 		List<String> whiteList = serverAlarmSettingService.getTopicWhiteList();
 		for (ProducerTopicStatsData topicStatsData : topicStatsDatas) {
+			if (StringUtils.equals(TOTAL_KEY, topicStatsData.getTopicName())) {
+				continue;
+			}
 			if (whiteList == null || !whiteList.contains(topicStatsData.getTopicName())) {
 				qpsAlarm(topicStatsData, qps);
 				topicStatsData.checkDelay(delay);

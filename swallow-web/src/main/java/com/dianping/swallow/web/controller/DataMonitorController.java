@@ -16,6 +16,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +28,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
-import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.dashboard.model.ResultEntry;
@@ -40,6 +40,7 @@ import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
 import com.dianping.swallow.web.service.MinuteEntryService;
 import com.dianping.swallow.web.task.TopicScanner;
+import com.dianping.swallow.web.util.DateUtil;
 
 /**
  * @author mengwenchao
@@ -79,28 +80,23 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
 	public ModelAndView viewConsumerServerQps() {
 
-		subSide = "consumerserverqps";
-		return new ModelAndView("monitor/consumerserverqps", createViewMap());
+		return new ModelAndView("monitor/consumerserverqps", createViewMap("server", "consumerserverqps"));
 	}
 
 	@RequestMapping(value = "/console/monitor/producerserver/qps", method = RequestMethod.GET)
 	public ModelAndView viewProducerServerQps() {
 
-		subSide = "producerserverqps";
-		return new ModelAndView("monitor/producerserverqps", createViewMap());
+		return new ModelAndView("monitor/producerserverqps", createViewMap("server", "producerserverqps"));
 	}
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
 	public ModelAndView viewTopicQps(@PathVariable String topic) {
 
-		subSide = "consumerqps";
-		return new ModelAndView("monitor/consumerqps", createViewMap());
+		return new ModelAndView("monitor/consumerqps", createViewMap("topic", "consumerqps"));
 	}
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu", method = RequestMethod.GET)
 	public ModelAndView viewTopicAccumulation(@PathVariable String topic) {
-
-		subSide = "consumeraccu";
 
 		if (topic.equals(MonitorData.TOTAL_KEY)) {
 			String firstTopic = getFirstTopic(accumulationRetriever.getTopics());
@@ -108,14 +104,13 @@ public class DataMonitorController extends AbstractMonitorController {
 				return new ModelAndView("redirect:/console/monitor/consumer/" + firstTopic + "/accu", createViewMap());
 			}
 		}
-		return new ModelAndView("monitor/consumeraccu", createViewMap());
+		return new ModelAndView("monitor/consumeraccu", createViewMap("topic", "consumeraccu"));
 	}
 
 	@RequestMapping(value = "/console/monitor/dashboard", method = RequestMethod.GET)
 	public ModelAndView viewTopicdashboarddelay() {
 
-		subSide = "dashboarddelay";
-		return new ModelAndView("monitor/consumerdashboarddelay", createViewMap());
+		return new ModelAndView("monitor/consumerdashboarddelay", createViewMap("dashboard", "dashboarddelay"));
 	}
 
 	@RequestMapping(value = "/console/monitor/dashboard/delay/minute", method = RequestMethod.GET)
@@ -145,7 +140,7 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/producer/{topic}/savedelay", method = RequestMethod.GET)
 	public ModelAndView viewProducerDelayMonitor(@PathVariable String topic) throws IOException {
 
-		Map<String, Object> map = createViewMap();
+		Map<String, Object> map = createViewMap("topic", "delay");
 		return new ModelAndView("monitor/producerdelay", map);
 
 	}
@@ -153,8 +148,7 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay", method = RequestMethod.GET)
 	public ModelAndView viewConsumerDelayMonitor(@PathVariable String topic) throws IOException {
 
-		subSide = "delay";
-		Map<String, Object> map = createViewMap();
+		Map<String, Object> map = createViewMap("topic", "delay");
 		return new ModelAndView("monitor/consumerdelay", map);
 	}
 
@@ -190,7 +184,7 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/consumerserver/qps/get", method = RequestMethod.POST)
 	@ResponseBody
 	public List<HighChartsWrapper> getConsumerServerQps() {
-		subSide = "consumerserverqps";
+
 		Map<String, ConsumerDataPair> serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND);
 
 		return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
@@ -200,9 +194,26 @@ public class DataMonitorController extends AbstractMonitorController {
 	@ResponseBody
 	public List<HighChartsWrapper> getProducerServerQps() {
 
-		subSide = "producerserverqps";
 		Map<String, StatsData> serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND);
 
+		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+	}
+
+	@RequestMapping(value = "/console/monitor/producerserver/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
+	@ResponseBody
+	public List<HighChartsWrapper> getProducerServerQps(@PathVariable String startTime, @PathVariable String endTime) {
+		Date startDate = null;
+		if (StringUtils.isNotBlank(startTime)) {
+			startDate = DateUtil.convertStrToDate(startTime);
+		}
+		Date endDate = null;
+		if (StringUtils.isNotBlank(endTime)) {
+			endDate = DateUtil.convertStrToDate(endTime);
+		} else {
+			endDate = new Date();
+		}
+		Map<String, StatsData> serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND, startDate.getTime(),
+				endDate.getTime());
 		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
 	}
 

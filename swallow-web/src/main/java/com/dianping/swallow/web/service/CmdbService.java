@@ -9,6 +9,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
  * 
  * @author qiyin
  *
+ *         2015年8月17日 下午5:47:09
  */
 public interface CmdbService {
 
@@ -18,7 +19,7 @@ public interface CmdbService {
 	 * @param ip
 	 * @return
 	 */
-	public IPDesc getIpDesc(String ip);
+	IPDesc getIpDesc(String ip);
 
 	/**
 	 * get ipDesc model by ip
@@ -26,6 +27,6 @@ public interface CmdbService {
 	 * @param ip
 	 * @return
 	 */
-	public List<EnvDevice> getEnvDevices(String project);
+	List<EnvDevice> getEnvDevices(String project);
 
 }

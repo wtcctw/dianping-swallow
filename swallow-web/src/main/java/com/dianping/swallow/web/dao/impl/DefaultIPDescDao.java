@@ -22,7 +22,7 @@ public class DefaultIPDescDao extends AbstractWriteDao implements IPDescDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultIPDescDao.class);
 
-	private static final String IPDESC_COLLECTION = "swallowwebipdescc";
+	private static final String IPDESC_COLLECTION = "IP_DESC";
 
 	private static final String IP_FIELD = "ip";
 

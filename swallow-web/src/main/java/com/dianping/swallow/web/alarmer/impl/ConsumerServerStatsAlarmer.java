@@ -2,6 +2,7 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -78,6 +79,9 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 		QPSAlarmSetting ackQps = serverAlarmSetting.getAckAlarmSetting();
 		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 		for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
+			if (StringUtils.equals(TOTAL_KEY, serverStatsData.getIp())) {
+				continue;
+			}
 			if (whiteList == null || (!whiteList.contains(serverStatsData.getIp()))) {
 				qpsSendAlarm(serverStatsData, sendQps);
 				qpsAckAlarm(serverStatsData, ackQps);

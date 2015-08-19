@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.storager;
+package com.dianping.swallow.web.alarmer.storager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

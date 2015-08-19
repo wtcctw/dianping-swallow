@@ -84,24 +84,19 @@
 							for="form-field-1"> #if(${entity.alarmDetail}) ${entity.alarmDetail} #else "" #end </label>
 					</div>
 					<div class="col-md-12">
-						<label class="col-sm-2 row-detail-label" for="form-field-1">间隔基数:
-						</label> <label class="col-sm-10" style="text-align: left;"
-							for="form-field-1"> ${entity.timeSpanBase} </label>
-					</div>
-					<div class="col-md-12">
 						<label class="col-sm-2 row-detail-label" for="form-field-1">间隔上限:
 						</label> <label class="col-sm-10" style="text-align: left;"
 							for="form-field-1"> ${entity.maxTimeSpan} </label>
 					</div>
 					<div class="col-md-12">
-						<label class="col-sm-2 row-detail-label" for="form-field-1">白天系数:
+						<label class="col-sm-2 row-detail-label" for="form-field-1">白天间隔基数:
 						</label> <label class="col-sm-10" style="text-align: left;"
-							for="form-field-1"> ${entity.daySpanRatio} </label>
+							for="form-field-1"> ${entity.daySpanBase} </label>
 					</div>
 					<div class="col-md-12">
-						<label class="col-sm-2 row-detail-label" for="form-field-1">夜晚系数:
+						<label class="col-sm-2 row-detail-label" for="form-field-1">夜晚间隔基数:
 						</label> <label class="col-sm-10" style="text-align: left;"
-							for="form-field-1"> ${entity.nightSpanRatio} </label>
+							for="form-field-1"> ${entity.nightSpanBase} </label>
 					</div>
 					<div class="col-md-12">
 						<label class="col-sm-2 row-detail-label" for="form-field-1">创建时间:

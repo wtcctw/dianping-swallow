@@ -46,5 +46,10 @@ public class DateUtil {
 	public static int getCurrentHour() {
 		return Calendar.getInstance(DEFAULT_TIMEZONE).get(Calendar.HOUR_OF_DAY);
 	}
+	
+	public static long ConvertToTimestamp(Date dateTime){
+		return dateTime.getTime();
+	}
+
 
 }

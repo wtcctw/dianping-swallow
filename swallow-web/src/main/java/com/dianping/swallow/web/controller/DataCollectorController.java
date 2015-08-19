@@ -63,7 +63,7 @@ public class DataCollectorController extends AbstractController{
 			public void doAction() throws SwallowException {
 				producerDataRetriever.add(producerMonitorData);
 				ipCollectorService.addStatisIps(producerMonitorData);
-				producerMonitorDataDao.saveProducerMonotorData(producerMonitorData);
+				//producerMonitorDataDao.saveProducerMonotorData(producerMonitorData);
 			}
 		});
 		
@@ -84,7 +84,7 @@ public class DataCollectorController extends AbstractController{
 				
 				consumerDataRetriever.add(consumerMonitorData);
 				ipCollectorService.addStatisIps(consumerMonitorData);
-				consumerMonitorDataDao.saveConsumerMonotorData(consumerMonitorData);
+				//consumerMonitorDataDao.saveConsumerMonotorData(consumerMonitorData);
 			}
 		});
 

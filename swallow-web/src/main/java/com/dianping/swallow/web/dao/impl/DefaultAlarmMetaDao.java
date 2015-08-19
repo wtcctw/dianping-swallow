@@ -19,7 +19,7 @@ public class DefaultAlarmMetaDao extends AbstractWriteDao implements AlarmMetaDa
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultAlarmMetaDao.class);
 
-	private static final String ALARMMETA_COLLECTION = "swallowwebalarmmetac";
+	private static final String ALARMMETA_COLLECTION = "ALARM_META";
 
 	private static final String ID_FIELD = "id";
 

@@ -130,8 +130,21 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			String strConsumerMasterServerIp = configCache.getProperty(CONSUMER_SERVER_MASTER_IPLIST_KEY);
 			String strConsumerSlaveServerIp = configCache.getProperty(CONSUMER_SERVER_SLAVE_IPLIST_KEY);
 			lionProducerIps = convertToList(strProducerServerIp);
+			if (StringUtils.isNotBlank(strProducerServerIp) && lionProducerIps != null) {
+				logger.info("[initLionConfig] strProducerIp= {}, producerIps= {}", strProducerServerIp, lionProducerIps);
+			}
 			lionConsumerMasterIps = convertToList(strConsumerMasterServerIp);
+			if (StringUtils.isNotBlank(strConsumerMasterServerIp) && lionConsumerMasterIps != null) {
+				logger.info("[initLionConfig] strConsumerMasterIp= {}, consumerMasterIps= {}",
+						strConsumerMasterServerIp, lionConsumerMasterIps);
+			}
+
 			lionConsumerSlaveIps = convertToList(strConsumerSlaveServerIp);
+			if (StringUtils.isNotBlank(strConsumerSlaveServerIp) && lionConsumerSlaveIps != null) {
+				logger.info("[initLionConfig] strConsumerSlaveIp= {}, consumerSlaveIps= {}", strConsumerSlaveServerIp,
+						lionConsumerSlaveIps);
+			}
+
 			configCache.addChange(new ConfigChange() {
 				@Override
 				public void onChange(String key, String value) {
@@ -142,6 +155,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 					} else if (key.equals(CONSUMER_SERVER_SLAVE_IPLIST_KEY)) {
 						lionConsumerSlaveIps = convertToList(value);
 					}
+					logger.info("[initLionConfig] onChange key= {}, value= {}", key, value);
 				}
 
 			});
@@ -173,9 +187,10 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			@Override
 			public void run() {
 				try {
-					doTask();
+					doCmdbIpTask();
+					logger.info("[scheduleCmdbDataTask] scheduled.");
 				} catch (Throwable th) {
-					logger.error("[startTask]", th);
+					logger.error("[scheduleCmdbDataTask]", th);
 				} finally {
 
 				}
@@ -184,7 +199,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		}, getDelay(), getInterval(), TimeUnit.SECONDS));
 	}
 
-	private void doTask() {
+	private void doCmdbIpTask() {
 		List<EnvDevice> producerEnvDevices = cmdbService.getEnvDevices(SWALLOW_PRODUCER_NAME);
 		List<EnvDevice> consumerSlaveEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_SLAVE_NAME);
 		List<EnvDevice> consumerMasterEnvDevices = cmdbService.getEnvDevices(SWALLOW_CONSUMER_MASTER_NAME);
@@ -197,6 +212,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			}
 			this.cmdbProducerIps = producerIps;
 			this.cmdbProducerMap = producerIpsMap;
+			logger.info("[doCmdbIpTask] cmdbProducerIps= {}, cmdbProducerMap= {}", cmdbProducerIps, cmdbProducerMap);
 		}
 		if (consumerMasterEnvDevices != null && consumerSlaveEnvDevices != null) {
 			List<String> consumerMasterIps = new ArrayList<String>();
@@ -212,9 +228,15 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 						consumerMasterIpsMap.put(envMasterDevice.getHostName(), envMasterDevice.getIp());
 						consumerSlaveIpsMap.put(envSlaveDevice.getHostName(), envSlaveDevice.getIp());
 						this.cmdbConsumerMasterIps = consumerMasterIps;
-						this.cmdbConsumerSlaveIps = consumerSlaveIps;
 						this.cmdbConsumerMasterMap = consumerMasterIpsMap;
+						logger.info("[doCmdbIpTask] cmdbConsumerMasterIps= {}, cmdbConsumerMasterMap= {}",
+								cmdbConsumerMasterIps, cmdbConsumerMasterMap);
+
+						this.cmdbConsumerSlaveIps = consumerSlaveIps;
 						this.cmdbConsumerSlaveMap = consumerSlaveIpsMap;
+
+						logger.info("[doCmdbIpTask] cmdbConsumerSlaveIps= {}, cmdbConsumerSlaveMap= {}",
+								cmdbConsumerSlaveIps, cmdbConsumerSlaveMap);
 					}
 				}
 			}

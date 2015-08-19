@@ -6,8 +6,9 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 
 /**
  * 
- * @author qi.yin
+ * @author qiyin
  *
+ *         2015年8月17日 下午5:35:53
  */
 public interface IPDescDao extends Dao {
 
@@ -17,7 +18,7 @@ public interface IPDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public boolean insert(IPDesc ipDesc);
+	boolean insert(IPDesc ipDesc);
 
 	/**
 	 * update
@@ -25,7 +26,7 @@ public interface IPDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public boolean update(IPDesc ipDesc);
+	boolean update(IPDesc ipDesc);
 
 	/**
 	 * delete by id
@@ -33,7 +34,7 @@ public interface IPDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public int deleteById(String id);
+	int deleteById(String id);
 
 	/**
 	 * delete by ip
@@ -41,7 +42,7 @@ public interface IPDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public int deleteByIp(String id);
+	int deleteByIp(String id);
 
 	/**
 	 * find by ip
@@ -49,7 +50,7 @@ public interface IPDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public IPDesc findByIp(String ip);
+	IPDesc findByIp(String ip);
 
 	/**
 	 * find by id
@@ -57,7 +58,7 @@ public interface IPDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public IPDesc findById(String id);
+	IPDesc findById(String id);
 
 	/**
 	 * find all
@@ -65,6 +66,6 @@ public interface IPDescDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public List<IPDesc> findAll();
+	List<IPDesc> findAll();
 
 }

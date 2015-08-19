@@ -14,6 +14,8 @@ import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
 public abstract class AbstractStatsAlarmer extends AbstractAlarmer {
 
 	protected volatile AtomicLong dataCount = new AtomicLong();
+	
+	protected static final String TOTAL_KEY = "total";
 
 	protected static final int INIT_VALUE = 0;
 	protected static final long DEFAULT_VALUE = -1L;

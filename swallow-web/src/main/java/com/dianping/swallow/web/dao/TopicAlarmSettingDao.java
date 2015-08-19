@@ -5,24 +5,26 @@ import java.util.List;
 import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
 
 /**
- *
+ * 
  * @author qiyin
  *
+ *         2015年8月17日 下午5:39:12
  */
 public interface TopicAlarmSettingDao {
 
-	public boolean insert(TopicAlarmSetting setting);
+	boolean insert(TopicAlarmSetting setting);
 
-	public boolean update(TopicAlarmSetting setting);
+	boolean update(TopicAlarmSetting setting);
 
-	public int deleteById(String id);
+	int deleteById(String id);
 
-	public int deleteByTopicName(String topicName);
+	int deleteByTopicName(String topicName);
 
-	public TopicAlarmSetting findById(String id);
+	TopicAlarmSetting findById(String id);
 
-	public TopicAlarmSetting findByTopicName(String topicName);
+	TopicAlarmSetting findByTopicName(String topicName);
 
-	public List<TopicAlarmSetting> findByPage(int offset, int limit);
+	List<TopicAlarmSetting> findByPage(int offset, int limit);
 
+	long count();
 }

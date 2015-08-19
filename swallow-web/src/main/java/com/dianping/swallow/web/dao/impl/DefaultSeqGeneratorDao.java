@@ -15,7 +15,7 @@ import com.mongodb.MongoException;
 @Service("seqGeneratorDao")
 public class DefaultSeqGeneratorDao extends AbstractWriteDao implements SeqGeneratorDao {
 
-	private static final String SEQGENERATOR_COLLECTION = "swallowwebseqgeneratorc";
+	private static final String SEQGENERATOR_COLLECTION = "SEQ_GENERATOR";
 
 	private final static String CATEGORY_FIELD = "category";
 	private static final String SEQ_FIELD = "id";
