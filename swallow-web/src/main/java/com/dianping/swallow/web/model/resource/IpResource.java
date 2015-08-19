@@ -1,0 +1,52 @@
+package com.dianping.swallow.web.model.resource;
+
+import org.springframework.data.mongodb.core.index.Indexed;
+
+import com.dianping.swallow.web.model.cmdb.IPDesc;
+
+
+/**
+ * @author mingdongli
+ *
+ * 2015年8月10日下午3:36:34
+ */
+public class IpResource extends BaseResource{
+
+	@Indexed
+	private String ip;
+	
+	private IpType ipType;
+	
+	private IPDesc iPDesc;
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public IpType getIpType() {
+		return ipType;
+	}
+
+	public void setIpType(IpType ipType) {
+		this.ipType = ipType;
+	}
+
+	public IPDesc getiPDesc() {
+		return iPDesc;
+	}
+
+	public void setiPDesc(IPDesc iPDesc) {
+		this.iPDesc = iPDesc;
+	}
+
+	@Override
+	public String toString() {
+		return "IpResource [ip=" + ip + ", ipType=" + ipType + ", iPDesc=" + iPDesc + ", toString()="
+				+ super.toString() + "]";
+	}
+	
+}

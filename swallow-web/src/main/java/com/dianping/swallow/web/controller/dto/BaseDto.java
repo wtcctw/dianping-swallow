@@ -11,6 +11,15 @@ public class BaseDto {
 	private int offset;
 
 	private int limit;
+	
+	public BaseDto(){
+		
+	}
+	
+	public BaseDto(int offset, int limit){
+		this.offset = offset;
+		this.limit = limit;
+	}
 
 	public int getOffset() {
 		return offset;

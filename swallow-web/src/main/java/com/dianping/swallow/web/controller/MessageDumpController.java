@@ -2,7 +2,6 @@ package com.dianping.swallow.web.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -40,8 +39,6 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 
 	public static final String FILEPATH = "/data/appdatas/swalllowweb/";
 	
-	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
-
 	@Resource(name = "topicService")
 	private TopicService topicService;
 
@@ -87,9 +84,6 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 		String username = extractUsernameUtils.getUsername(request);
 
 		MessageDump messageDump = new MessageDump();
-//		DateFormat fmt =new SimpleDateFormat(TIMEFORMAT);
-//		Date dateStart = fmt.parse(startdt);
-//		Date dateStop = fmt.parse(stopdt);
 		
 		messageDump.setTopic(topic).setStartdt(startdt).setStopdt(stopdt).setFilename(filename).setName(username)
 				.setFinished(false);
