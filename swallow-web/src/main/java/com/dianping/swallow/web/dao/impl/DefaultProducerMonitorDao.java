@@ -10,25 +10,27 @@ import com.dianping.swallow.web.dao.ProducerMonitorDao;
 /**
  * @author mengwenchao
  *
- * 2015年4月17日 下午4:09:14
+ *         2015年4月17日 下午4:09:14
  */
 @Component
-public class DefaultProducerMonitorDao extends AbstractMonitorDao implements ProducerMonitorDao{
+public class DefaultProducerMonitorDao extends AbstractMonitorDao implements ProducerMonitorDao {
+
+	public static final String PRODUCER_MONITOR_COLLECTION_NAME = "PRODUCER_MONITOR_DATA";
 	
 	@Override
 	public void saveProducerMonotorData(ProducerMonitorData producerMonitorData) {
-		
-		mongoTemplate.save(producerMonitorData);
+
+		mongoTemplate.save(producerMonitorData, PRODUCER_MONITOR_COLLECTION_NAME);
 	}
 
 	@Override
 	public void saveProducerMonotorData(List<ProducerMonitorData> producerMonitorDatas) {
-		
-		for(ProducerMonitorData producerMonitorData : producerMonitorDatas){
+
+		for (ProducerMonitorData producerMonitorData : producerMonitorDatas) {
 			saveProducerMonotorData(producerMonitorData);
-			
+
 		}
-		
+
 	}
 
 }

@@ -95,9 +95,18 @@ public class AlarmController extends AbstractSidebarBasedController {
 	@ResponseBody
 	public Object searchServerIps() {
 		List<String> serverIps = new ArrayList<String>();
-		serverIps.addAll(ipCollectorService.getConsumerServerMasterIps());
-		serverIps.addAll(ipCollectorService.getConsumerServerSlaveIps());
-		serverIps.addAll(ipCollectorService.getProducerServerIps());
+		List<String> tempIps = ipCollectorService.getConsumerServerMasterIps();
+		if (tempIps != null) {
+			serverIps.addAll(tempIps);
+		}
+		tempIps = ipCollectorService.getConsumerServerSlaveIps();
+		if (tempIps != null) {
+			serverIps.addAll(tempIps);
+		}
+		tempIps = ipCollectorService.getProducerServerIps();
+		if (tempIps != null) {
+			serverIps.addAll(tempIps);
+		}
 		return serverIps;
 	}
 
