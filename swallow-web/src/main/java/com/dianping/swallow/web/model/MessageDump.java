@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 
 
@@ -12,13 +14,21 @@ public class MessageDump {
 	
 	@Id
 	private String _id;
+	
 	private String topic;
+	
 	private String name;
-	private String time;
-	private String startdt;
-	private String stopdt;
+	
+	private Date time;
+	
+	private Date startdt;
+	
+	private Date stopdt;
+	
 	private String filename;
+	
 	private boolean finished;
+	
 	private String desc;
 	
 	public MessageDump(){
@@ -52,33 +62,33 @@ public class MessageDump {
 		return this;
 	}
 	
-	public String getTime() {
+	public Date getTime() {
 		return time;
 	}
-	
-	public MessageDump setTime(String time) {
+
+	public MessageDump setTime(Date time) {
 		this.time = time;
 		return this;
 	}
-	
-	public String getStartdt() {
+
+	public Date getStartdt() {
 		return startdt;
 	}
-	
-	public MessageDump setStartdt(String startdt) {
+
+	public MessageDump setStartdt(Date startdt) {
 		this.startdt = startdt;
 		return this;
 	}
-	
-	public String getStopdt() {
+
+	public Date getStopdt() {
 		return stopdt;
 	}
-	
-	public MessageDump setStopdt(String stopdt) {
+
+	public MessageDump setStopdt(Date stopdt) {
 		this.stopdt = stopdt;
 		return this;
 	}
-	
+
 	public String getFilename() {
 		return filename;
 	}
@@ -112,5 +122,6 @@ public class MessageDump {
 				+ startdt + ", stopdt=" + stopdt + ", filename=" + filename + ", finished=" + finished + ", desc="
 				+ desc + "]";
 	}
+
 
 }

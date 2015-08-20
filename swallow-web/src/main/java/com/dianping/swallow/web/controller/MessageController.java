@@ -12,11 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.controller.dto.MessageQueryDto;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
 import com.dianping.swallow.web.model.Message;
@@ -42,15 +44,12 @@ public class MessageController extends AbstractMenuController {
 		return new ModelAndView("message/index", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/message/auth/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/auth/list", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object messageDefault(int offset, int limit, String topic, String messageId, String startdt, String stopdt,
-			String basemid, boolean sort, HttpServletRequest request, HttpServletResponse response) {
+	public Object messageDefault(@RequestBody MessageQueryDto messageQueryDto, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		String username = extractUsernameUtils.getUsername(request);
-
-		map = messageService.getMessageFromSpecificTopic(offset, limit, topic, messageId, startdt, stopdt, username,
-				basemid, sort);
+		
+		map = messageService.getMessageFromSpecificTopic(messageQueryDto);
 		return map;
 	}
 

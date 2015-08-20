@@ -3,7 +3,6 @@ package com.dianping.swallow.web.service.impl;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.MessageDumpController;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.MessageDumpDao;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.AbstractSwallowService;
@@ -40,9 +40,6 @@ import com.mongodb.MongoException;
 public class MessageDumpServiceImpl extends AbstractSwallowService implements MessageDumpService,
 		ApplicationListener<ContextRefreshedEvent> {
 
-	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
-	private static final String DELIMITOR = "|";
-
 	@Autowired
 	private MessageDumpDao messageDumpDao;
 
@@ -54,22 +51,17 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 	Map<String, LinkedBlockingQueue<Runnable>> tasks = new ConcurrentHashMap<String, LinkedBlockingQueue<Runnable>>();
 
 	@Override
-	public Pair<Long, List<MessageDump>> loadDumpMessagePage(int start, int span, String topic) {
+	public Pair<Long, List<MessageDump>> loadDumpMessagePage(TopicQueryDto topicQueryDto) {
 
-		return messageDumpDao.loadMessageDumpPageByTopic(start, span, topic);
+		return messageDumpDao.loadMessageDumpPageByTopic(topicQueryDto);
 	}
 
 	@Override
-	public ResponseStatus saveDumpMessage(String topic, String name, String startdt, String stopdt, String filename,
-			boolean finished) {
-
-		MessageDump md = new MessageDump();
+	public ResponseStatus saveDumpMessage(MessageDump md) {
 
 		Long id = System.currentTimeMillis();
 
-		String date = new SimpleDateFormat(TIMEFORMAT).format(new Date());
-		md.set_id(id.toString()).setTopic(topic).setName(name).setTime(date).setStartdt(startdt).setStopdt(stopdt)
-				.setFilename(filename).setFinished(finished).setDesc("");
+		md.set_id(id.toString()).setTime(new Date()).setDesc("");
 		
 		return messageDumpDao.saveMessageDump(md);
 
@@ -82,13 +74,9 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 	}
 
 	@Override
-	public int updateDumpMessage(String filename, boolean finished, int count, int size, String firsttime,
-			String laststring) {
+	public int updateDumpMessage(MessageDump messageDump) {
 
-		StringBuffer sb = new StringBuffer();
-		sb.append(size).append(DELIMITOR).append(count).append(DELIMITOR).append(firsttime).append(DELIMITOR)
-				.append(laststring);
-		return messageDumpDao.updateMessageDumpStatus(filename, finished, sb.toString());
+		return messageDumpDao.updateMessageDump(messageDump);
 	}
 
 	@Override
@@ -110,10 +98,13 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 	}
 
 	@Override
-	public ResponseStatus execDumpMessageTask(String topic, String startdt, String stopdt, String filename,
-			String username) {
+	public ResponseStatus execDumpMessageTask(MessageDump messageDump) {
 
 		DumpMessageTask fileDownloadTask = new DumpMessageTask();
+		String topic = messageDump.getTopic();
+		Date startdt = messageDump.getStartdt();
+		Date stopdt = messageDump.getStopdt();
+		String filename = messageDump.getFilename();
 		fileDownloadTask.setTopic(topic).setStartdt(startdt).setStopdt(stopdt).setFilename(filename)
 				.setMessageService(messageService).setMessageDumpService(this);
 
@@ -132,10 +123,10 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 					logger.error("LinkedBlockingQueue's size is 5, no space for extra task", e);
 				}
 			}
-			saveDumpMessage(topic, username, startdt, stopdt, filename, false);
+			saveDumpMessage(messageDump);
 			tasks.put(topic, lbq);
 		} else {
-			saveDumpMessage(topic, username, startdt, stopdt, filename, false);
+			saveDumpMessage(messageDump);
 			exec.submit(fileDownloadTask);
 			if (logger.isInfoEnabled()) {
 				logger.info(String.format("Start download task for %s to export messages from %s to %s", topic,
@@ -187,7 +178,7 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 					String topic = md.getTopic();
 					String filename = md.getFilename();
 					removeDumpMessage(filename);
-					execDumpMessageTask(topic, md.getStartdt(), md.getStopdt(), filename, md.getName());
+					execDumpMessageTask(md);
 
 					if (logger.isInfoEnabled()) {
 						logger.info(String.format("Start export message of %s to file %s", topic, f));

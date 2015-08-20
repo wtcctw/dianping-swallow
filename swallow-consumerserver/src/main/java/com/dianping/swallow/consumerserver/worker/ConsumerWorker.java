@@ -3,6 +3,7 @@ package com.dianping.swallow.consumerserver.worker;
 import org.jboss.netty.channel.Channel;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
+import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 
@@ -16,12 +17,12 @@ public interface ConsumerWorker extends Lifecycle{
 	boolean  sendMessage();
 
    /**
-    * 处理greet信息
-    * 
-    * @param channel
-    * @param clientThreadCount consumer处理消息的线程池线程数
-    */
-   void handleGreet(Channel channel, int clientThreadCount);
+     * 处理greet信息
+	 * @param channel
+	 * @param clientThreadCount
+	 * @param messageFilter
+	 */
+	void handleGreet(Channel channel, int clientThreadCount, MessageFilter messageFilter);
 
    /**
     * 处理ack信息

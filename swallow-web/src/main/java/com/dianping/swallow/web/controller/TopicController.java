@@ -2,6 +2,7 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,7 @@ import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.web.controller.dto.TopicAlarmDto;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
@@ -73,24 +75,25 @@ public class TopicController extends AbstractMenuController {
 		return new ModelAndView("topic/index", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/topic/topicdefault", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/topic/topiclist", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object fetchTopicPage(int offset, int limit, String topic, String prop, HttpServletRequest request,
+	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
-
-		boolean isAllEmpty = StringUtil.isEmpty(topic + prop);
+		
+		boolean isAllEmpty = StringUtil.isEmpty(topicQueryDto.getTopic() + topicQueryDto.getProp());
 
 		if (isAllEmpty) {
 			String username = extractUsernameUtils.getUsername(request);
 			Set<String> adminSet = userService.loadCachedAdministratorSet();
 			boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 			if (findAll) {
-				return topicService.loadTopicPage(offset, limit);
+				return topicService.loadTopicPage(topicQueryDto);
 			} else {
-				return topicService.loadSpecificTopicPage(offset, limit, topic, username);
+				topicQueryDto.setProp(username);
+				return topicService.loadSpecificTopicPage(topicQueryDto);
 			}
 		} else {
-			return topicService.loadSpecificTopicPage(offset, limit, topic, prop);
+			return topicService.loadSpecificTopicPage(topicQueryDto);
 		}
 
 	}
@@ -161,7 +164,7 @@ public class TopicController extends AbstractMenuController {
 		Transaction producerTransaction = Cat.getProducer().newTransaction("TopicEdit", topic + ":" + username);
 
 		try {
-			result = topicService.editTopic(topic, prop, time);
+			result = topicService.editTopic(topic, prop, new Date());
 			producerTransaction.setStatus(Message.SUCCESS);
 		} catch (MongoSocketException e) {
 			producerTransaction.setStatus(e);

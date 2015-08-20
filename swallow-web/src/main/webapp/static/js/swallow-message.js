@@ -37,7 +37,22 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/self.limit) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, topic, messageId, startdt, stopdt, this.basemid, sort, function(data){
+					
+					var entity = new Object();
+					entity.offset = this.currentOffset;
+					entity.limit = pageSize + 1;
+					entity.topic = topic;
+					entity.messageId = messageId;
+					if(startdt.length > 0){
+						entity.startdt = new Date(startdt);
+					}
+					if(stopdt.length > 0){
+						entity.stopdt = new Date(stopdt);
+					}
+					entity.basemid = this.basemid;
+					entity.sort = sort;
+					
+					fetchFunction(entity, function(data){
 						if(typeof(data.status) != "undefined"){
 							alert("error:" + data.message);
 							return;
@@ -142,33 +157,8 @@ module.factory('Paginator', function(){
 
 module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog', '$interval',
         function($rootScope, $scope, $http, Paginator, ngDialog, $interval){
-				var fetchFunction = function(offset, limit, topic, messageId, startdt, stopdt, basemid, sort, callback){
-				var transFn = function(data){
-					return $.param(data);
-				}
-				var postConfig = {
-					transformRequest: transFn
-				};
-				var data = {'offset' : offset,
-										'limit': limit,
-										'topic': topic,
-										'messageId': messageId,
-										'startdt' : startdt,
-										'stopdt' : stopdt,
-										'basemid' : basemid,
-										'sort' : sort};
-				$http.get(window.contextPath + $scope.suburl, {
-					params : {
-						offset : offset,
-						limit : limit,
-						topic: topic,
-						messageId: messageId,
-						startdt : startdt,
-						stopdt : stopdt,
-						basemid : basemid,
-						sort : sort
-					}
-				}).success(callback);
+				var fetchFunction = function(entity, callback){
+				$http.post(window.contextPath + $scope.suburl, entity).success(callback);
 			};
 			
 			//－－－－－－－－－－for show content which click on 点击展开－－－－－－－－－－－		
@@ -279,20 +269,16 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					}
 					else{
 						
-						//setInterval(updateProgressBar,400);
-						$http.get(window.contextPath + "/console/message/auth/dump", {
-							params : {
-								topic: $scope.topic,
-								startdt: $scope.startdt,
-								stopdt: $scope.stopdt
-							}
-						}).success(function(data){
+						var entity = new Object();
+						entity.topic = $scope.topic;
+						entity.startdt = d1;
+						entity.stopdt = d2;
+						$http.post(window.contextPath + "/console/message/auth/dump", entity).success(function(data){
 							if(data.status != 0){
 								alert("error:" + data.message);
 								return;
 							}
 							localStorage.setItem("topic", $scope.topic);
-							//localStorage.setItem("file", JSON.stringify(data.file)); //json for array
 							window.location.href = window.contextPath + "/console/download";
 						});
 					}

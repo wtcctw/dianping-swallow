@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.task;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,7 +27,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.web.dao.impl.WebMongoManager;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.Topic;
-import com.dianping.swallow.web.service.AuthenticationService;
+import com.dianping.swallow.web.model.UserType;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.service.UserService;
 import com.mongodb.Mongo;
@@ -40,7 +39,8 @@ import com.mongodb.MongoClient;
 @Component
 public class TopicScanner {
 
-	private static final String TOPIC_DB_NAME = "swallowwebapplication";
+	private static final String TOPIC_DB_NAME = "swallowweb";
+	
 	public static final String TIMEFORMAT = "yyyy-MM-dd HH:mm";
 
 	private static final String DELIMITOR = ",";
@@ -54,7 +54,7 @@ public class TopicScanner {
 	@Resource(name = "topicService")
 	private TopicService topicService;
 
-	@Resource(name = "topicMongoTemplate")
+	@Resource(name = "webMongoTemplate")
 	private MongoTemplate mongoTemplate;
 
 	@Autowired
@@ -162,12 +162,11 @@ public class TopicScanner {
 
 	private void scanAdminCollection() {
 		List<Administrator> aList = userService.loadUsers();
-		int role = -1;
 		if (!aList.isEmpty()) {
 			for (Administrator list : aList) {
-				role = list.getRole();
+				UserType role = list.getRole();
 				String name = list.getName();
-				if (role == AuthenticationService.ADMINI) {
+				if (role.equals(UserType.ADMINISTRATOR)) {
 					if (userService.loadCachedAdministratorSet().add(name)) {
 						logger.info("admiSet add " + name);
 					}
@@ -177,7 +176,7 @@ public class TopicScanner {
 			String[] admins = loadDefaultAdminFromConf();
 			for (String admin : admins) {
 				userService.loadCachedAdministratorSet().add(admin);
-				userService.createUser(admin, AuthenticationService.ADMINI);
+				userService.createUser(admin, UserType.ADMINISTRATOR);
 				logger.info("admiSet add admin " + admin);
 			}
 		}
@@ -200,9 +199,8 @@ public class TopicScanner {
 
 	private Topic getTopic(String subStr, long num) {
 		Long id = System.currentTimeMillis();
-		String date = new SimpleDateFormat(TIMEFORMAT).format(new Date());
 		Topic p = new Topic();
-		p.setId(id.toString()).setName(subStr).setProp("").setTime(date).setMessageNum(num);
+		p.setId(id.toString()).setName(subStr).setProp("").setTime(new Date()).setMessageNum(num);
 		return p;
 	}
 	

@@ -2,7 +2,14 @@ package com.dianping.swallow.consumerserver.buffer;
 
 import java.util.Queue;
 
-public interface CloseableBlockingQueue<E> extends Queue<E> {
+import com.dianping.swallow.common.internal.observer.Observer;
+
+/**
+ * @author mengwenchao
+ *
+ * 2015年8月17日 下午3:46:58
+ */
+public interface CloseableBlockingQueue<E> extends Queue<E>, Observer {
 
    /**
     * 关闭BlockingQueue占用的资源

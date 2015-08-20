@@ -50,9 +50,9 @@
 							<td style="text-align: left" ng-bind="$index+1"></td>
 							<td style="text-align: left" ng-bind="t.topic"></a></td>
 							<td style="text-align: left" ng-bind="t.name"></td>
-							<td style="text-align: left" ng-bind="t.time"></td>
-							<td style="text-align: left" ng-bind="t.startdt"></td>
-							<td style="text-align: left" ng-bind="t.stopdt"></td>
+							<td style="text-align: left" ng-bind="t.time | date : 'yyyy-MM-dd HH:mm:ss'"></td>
+							<td style="text-align: left" ng-bind="t.startdt | date : 'yyyy-MM-dd HH:mm:ss'"></td>
+							<td style="text-align: left" ng-bind="t.stopdt | date : 'yyyy-MM-dd HH:mm:ss'"></td>
 							<td style="text-align: left" ng-bind="t.filename"></td>
 							<td style="text-align: left" ng-bind="t.desc"></td>
 							<td style="text-align: left" ng-bind="t.finished"></td>

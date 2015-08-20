@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -15,17 +17,16 @@ public class Administrator {
 	@Indexed
 	private String name;
 
-	private int role;
+	private UserType role;
 
-	private String date;
+	private Date date;
 
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public Administrator setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
-		return this;
 	}
 
 	public String getName() {
@@ -37,11 +38,11 @@ public class Administrator {
 		return this;
 	}
 
-	public int getRole() {
+	public UserType getRole() {
 		return role;
 	}
 
-	public Administrator setRole(int role) {
+	public Administrator setRole(UserType role) {
 		this.role = role;
 		return this;
 	}
@@ -57,8 +58,7 @@ public class Administrator {
 
 	@Override
 	public String toString() {
-		return "Administrator [id=" + id + ", name=" + name + ", role=" + role
-				+ ", date=" + date + "]";
+		return "Administrator [id=" + id + ", name=" + name + ", role=" + role + ", date=" + date + "]";
 	}
 
 }

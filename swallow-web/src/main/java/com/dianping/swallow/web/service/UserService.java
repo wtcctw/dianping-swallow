@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.model.Administrator;
+import com.dianping.swallow.web.model.UserType;
 
 /**
  * @author mingdongli
@@ -18,7 +20,7 @@ public interface UserService {
 	 * @param offset  起始位置
 	 * @param limit	  偏移量
 	 */
-	Pair<Long, List<Administrator>> loadUserPage(int offset, int limit);
+	Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto);
 	
 
 	/**
@@ -30,9 +32,8 @@ public interface UserService {
 	/**
 	 * 创建用户
 	 * @param username  用户通行证  
-	 * @param auth  用户级别， 0 － 管理员，3 － 用户， 10 － 访问者
 	 */
-	boolean createUser(String username, int auth);
+	boolean createUser(String username, UserType auth);
 	
 	/**
 	 * 根据通行证删除用户
@@ -46,7 +47,7 @@ public interface UserService {
 	 * @param name   用户名
 	 * @param auth	 角色
 	 */
-	boolean updateUser(String name, int auth);
+	boolean updateUser(String name, UserType auth);
 
 	List<Administrator> loadUsers();
 	

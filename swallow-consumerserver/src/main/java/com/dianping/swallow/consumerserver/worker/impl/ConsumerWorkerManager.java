@@ -32,6 +32,11 @@ import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorker;
 
+/**
+ * @author mengwenchao
+ *
+ * 2015年8月17日 下午5:09:21
+ */
 public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSlaveComponent{
 
     private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance().getAckIdUpdateIntervalMili();
@@ -94,7 +99,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
             channel.close();
         } else {
         	synchronized (consumerInfo2ConsumerWorker) {
-                findOrCreateConsumerWorker(consumerInfo, messageFilter, startMessageId).handleGreet(channel, clientThreadCount);
+                findOrCreateConsumerWorker(consumerInfo, startMessageId).handleGreet(channel, clientThreadCount, messageFilter);
 			}
         }
     }
@@ -162,7 +167,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         return consumerInfo2ConsumerWorker;
     }
 
-    private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo, MessageFilter messageFilter, long startMessageId) {
+    private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo, long startMessageId) {
         ConsumerWorker worker = findConsumerWorker(consumerInfo);
         
         if(logger.isInfoEnabled()){
@@ -179,9 +184,16 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         	if(logger.isInfoEnabled()){
         		logger.info("[findOrCreateConsumerWorker][create ConsumerWorkerImpl]" + consumerInfo);
         	}
+        	
             synchronized (consumerInfo.getConsumerId().intern()) {
+            	
                 if ((worker = findConsumerWorker(consumerInfo)) == null) {
-                    worker = new ConsumerWorkerImpl(consumerInfo, this, messageFilter, consumerAuthController, consumerThreadPoolManager, startMessageId, consumerCollector);
+                    worker = new ConsumerWorkerImpl(consumerInfo, this, consumerAuthController, consumerThreadPoolManager, startMessageId, consumerCollector);
+                    try {
+						worker.initialize();
+					} catch (Exception e) {
+						logger.error("[findOrCreateConsumerWorker][init error]", e);
+					}
                     consumerInfo2ConsumerWorker.put(consumerInfo, worker);
                 }
             }

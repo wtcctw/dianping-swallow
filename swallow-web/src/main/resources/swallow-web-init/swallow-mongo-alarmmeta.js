@@ -1,13 +1,13 @@
-db = db.getSiblingDB('swallowwebapplication');
-result = db.swallowwebalarmmetac.findOne();
+db = db.getSiblingDB('swallowweb');
+result = db.ALARM_META.findOne();
 
 if(result != null) {
-	print("swallowwebalarmmetac already exist");
+	print("ALARM_META already exist");
 }else{
 
-	print("swallowwebalarmmetac load data start");
+	print("ALARM_META load data start");
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1
 		}, {
 	    "metaId" : 1,
@@ -28,7 +28,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 2
 		},{
 	    "metaId" : 2,
@@ -50,7 +50,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 3
 		}, {
 	    "metaId" : 3,
@@ -71,7 +71,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 4
 		},{
 	    "metaId" : 4,
@@ -92,7 +92,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 5
 		}, {
 	    "metaId" : 5,
@@ -113,7 +113,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 6
 		}, {
 	    "metaId" : 6,
@@ -134,7 +134,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 7
 		}, {
 	    "metaId" : 7,
@@ -155,7 +155,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 8
 		}, {
 	    "metaId" : 8,
@@ -176,7 +176,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 9
 		}, {
 	    "metaId" : 9,
@@ -197,7 +197,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 10
 		},{
 	    "metaId" : 10,
@@ -219,7 +219,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 11
 		}, {
 	    "metaId" : 11,
@@ -240,7 +240,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 12
 		}, {
 	    "metaId" : 12,
@@ -261,7 +261,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 13
 		}, {
 	    "metaId" : 13,
@@ -283,7 +283,7 @@ if(result != null) {
 	}, true, false);
 	
 
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 14
 		},{
 	    "metaId" : 14,
@@ -306,7 +306,7 @@ if(result != null) {
 	
 	
 
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 15
 		},{
 	    "metaId" : 15,
@@ -328,7 +328,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		"metaId" : 16
 		},{
 	    "metaId" : 16,
@@ -350,7 +350,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 17
 		}, {
 	    "metaId" : 17,
@@ -371,7 +371,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 18
 		}, {
 	    "metaId" : 18,
@@ -392,7 +392,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true,  false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 19
 		}, {
 	    "metaId" : 19,
@@ -413,7 +413,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 20
 		}, {
 	    "metaId" : 20,
@@ -434,7 +434,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 21
 		}, {
 	    "metaId" : 21,
@@ -455,7 +455,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	},true,false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 22
 		}, {
 	    "metaId" : 22,
@@ -476,7 +476,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 23
 		}, {
 	    "metaId" : 23,
@@ -497,7 +497,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 24
 		}, {
 	    "metaId" : 24,
@@ -519,7 +519,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1001
 		}, {
 	    "metaId" : 1001,
@@ -540,7 +540,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1002
 		}, {
 	    "metaId" : 1002,
@@ -561,7 +561,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1003
 		}, {
 	    "metaId" : 1003,
@@ -582,7 +582,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1004
 		}, {
 	    "metaId" : 1004,
@@ -604,7 +604,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1005
 		}, {
 	    "metaId" : 1005,
@@ -625,7 +625,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1006
 		}, {
 	    "metaId" : 1006,
@@ -647,7 +647,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1007
 		}, {
 	    "metaId" : 1007,
@@ -668,7 +668,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1008
 		}, {
 	    "metaId" : 1008,
@@ -689,7 +689,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1009
 		}, {
 	    "metaId" : 1009,
@@ -711,7 +711,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1010
 		}, {
 	    "metaId" : 1010,
@@ -732,7 +732,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1011
 		}, {
 	    "metaId" : 1011,
@@ -753,7 +753,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1012
 		},{
 	    "metaId" : 1012,
@@ -775,7 +775,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1013
 		},{
 	    "metaId" : 1013,
@@ -797,7 +797,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1014
 		},{
 	    "metaId" : 1014,
@@ -818,7 +818,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1015
 		},{
 	    "metaId" : 1015,
@@ -840,7 +840,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1016
 		},{
 	    "metaId" : 1016,
@@ -861,7 +861,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1017
 		},{
 	    "metaId" : 1017,
@@ -882,7 +882,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1018
 		},{
 	    "metaId" : 1018,
@@ -904,7 +904,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1019
 		},{
 	    "metaId" : 1019,
@@ -925,7 +925,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1020
 		},{
 	    "metaId" : 1020,
@@ -947,7 +947,7 @@ if(result != null) {
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1021
 		},{
 	    "metaId" : 1021,
@@ -968,7 +968,7 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	print("swallowwebalarmmetac load data end");
+	print("ALARM_META load data end");
 
 }
 

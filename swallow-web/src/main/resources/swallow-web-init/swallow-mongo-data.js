@@ -19,20 +19,27 @@ if (srcData != null && destData == null) {
 }
 print("swallowwebalarmmetac export to ALARM_META end");
 
-// ADMIN
-print("swallowwebadminc export to ADMIN start");
+// USER
+print("swallowwebadminc export to USER start");
 var srcData = srcDb.swallowwebadminc.find();
-destData = destDb.ADMIN.findOne();
+destData = destDb.USER.findOne();
 if (srcData != null && destData == null) {
 	while (srcData.hasNext()) {
 		var temp = srcData.next();
+		if(temp.role == 0){
+			temp.role="ADMINISTRATOR";
+		}else if(temp.role == 3){
+			temp.role="USER";
+		}else{
+			temp.role="VISITOR";
+		}
 		temp.date = new Date(Date.parse(temp.date.replace(/-/g, "/")));
-		destDb.ADMIN.insert(temp);
+		destDb.USER.insert(temp);
 	}
 } else {
-	print("swallowwebadminc no data or ADMIN already exsits");
+	print("swallowwebadminc no data or USER already exsits");
 }
-print("swallowwebadminc export to ADMIN end");
+print("swallowwebadminc export to USER end");
 
 // GLOBAL_ALARM_SETTING
 print("swallowwebswallowalarmsettingc export to GLOBAL_ALARM_SETTING start");
@@ -183,19 +190,52 @@ if (srcData != null && destData == null) {
 }
 print("swallowwebalarmdatac export to ALARM end");
 
+// DASHBOARD_STATS_DATA
+print("swallowwebdashboardc export to DASHBOARD_STATS_DATA start");
+var srcData = srcDb.swallowwebdashboardc.find();
+destData = destDb.DASHBOARD_STATS_DATA.findOne();
+if (srcData != null && destData == null) {
+	while (srcData.hasNext()) {
+		var temp = srcData.next();
+		destDb.DASHBOARD_STATS_DATA.insert(temp);
+	}
+} else {
+	print("swallowwebdashboardc no data or DASHBOARD_STATS_DATA already exsits");
+}
+print("swallowwebdashboardc export to DASHBOARD_STATS_DATA end");
+
 // swallowwebapplication ====> swallowstatsdata
 
 srcDb = db.getSiblingDB('swallowalarmstats');
 
 destDb = db.getSiblingDB('swallowstatsdata');
 
+destDb.copyDatabase('swallowalarmstats', 'swallowstatsdata'); 
+
+destDb.ProducerServerStatsData.renameCollection('PRODUCER_SERVER_STATS_DATA');
+destDb.PRODUCER_SERVER_STATS_DATA.dropIndex('timeKey_ip_index');
+destDb.PRODUCER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'ip': -1},{"name":"IX_TIMEKEY_IP"});
+ 
+destDb.ProducerTopicStatsData.renameCollection('PRODUCER_TOPIC_STATS_DATA');
+destDb.PRODUCER_TOPIC_STATS_DATA.dropIndex('timeKey_topicName_index');
+destDb.PRODUCER_TOPIC_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1},{"name":"IX_TIMEKEY_TOPICNAME"});
+
+destDb.ConsumerServerStatsData.renameCollection('CONSUMER_SERVER_STATS_DATA');
+destDb.CONSUMER_SERVER_STATS_DATA.dropIndex('timeKey_ip_index');
+destDb.CONSUMER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'ip': -1},{"name":"IX_TIMEKEY_IP"});
+
+destDb.ConsumerIdStatsData.renameCollection('CONSUMERID_STATS_DATA');
+destDb.CONSUMERID_STATS_DATA.dropIndex('timeKey_topicName_consumerId_index');
+destDb.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1, 'consumerId': -1}, {"name":"IX_TIMEKEY_TOPICNAME_CONSUMERID"});
+
+
 // PRODUCER_SERVER_STATS_DATA
 print("ProducerServerStatsData export to PRODUCER_SERVER_STATS_DATA start");
 var srcData = srcDb.ProducerServerStatsData.find();
 destData = destDb.PRODUCER_SERVER_STATS_DATA.findOne();
 if (srcData != null && destData == null) {
-	 db.createCollection('PRODUCER_SERVER_STATS_DATA', {'capped' : true, 'size' : 1073741824, 'max' :12960000 }); 
-	 db.PRODUCER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'ip': -1},{"name":"IX_TIMEKEY_IP"});
+	 destDb.createCollection('PRODUCER_SERVER_STATS_DATA', {'capped' : true, 'size' : 1073741824, 'max' :12960000 }); 
+	 destDb.PRODUCER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'ip': -1},{"name":"IX_TIMEKEY_IP"});
 	while (srcData.hasNext()) {
 		var temp = srcData.next();
 		destDb.PRODUCER_SERVER_STATS_DATA.insert(temp);
@@ -210,8 +250,8 @@ print("ProducerTopicStatsData export to PRODUCER_TOPIC_STATS_DATA start");
 var srcData = srcDb.ProducerTopicStatsData.find();
 destData = destDb.PRODUCER_TOPIC_STATS_DATA.findOne();
 if (srcData != null && destData == null) {
-	 db.createCollection('PRODUCER_SERVER_STATS_DATA', {'capped' : true, 'size' : 214748364800, 'max' :5000000000 }); 
-	 db.PRODUCER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1},{"name":"IX_TIMEKEY_TOPICNAME"});
+	 destDb.createCollection('PRODUCER_SERVER_STATS_DATA', {'capped' : true, 'size' : 214748364800, 'max' :5000000000 }); 
+	 destDb.PRODUCER_TOPIC_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1},{"name":"IX_TIMEKEY_TOPICNAME"});
 	while (srcData.hasNext()) {
 		var temp = srcData.next();
 		destDb.PRODUCER_TOPIC_STATS_DATA.insert(temp);
@@ -226,8 +266,8 @@ print("ConsumerServerStatsData export to CONSUMER_SERVER_STATS_DATA start");
 var srcData = srcDb.ConsumerServerStatsData.find();
 destData = destDb.CONSUMER_SERVER_STATS_DATA.findOne();
 if (srcData != null && destData == null) {
-	 db.createCollection('PRODUCER_SERVER_STATS_DATA', {'capped' : true, 'size' : 1073741824, 'max' :12960000 }); 
-	 db.PRODUCER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'ip': -1},{"name":"IX_TIMEKEY_IP"});
+	 destDb.createCollection('CONSUMER_SERVER_STATS_DATA', {'capped' : true, 'size' : 1073741824, 'max' :12960000 }); 
+	 destDb.CONSUMER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'ip': -1},{"name":"IX_TIMEKEY_IP"});
 	while (srcData.hasNext()) {
 		var temp = srcData.next();
 		destDb.CONSUMER_SERVER_STATS_DATA.insert(temp);
@@ -242,8 +282,8 @@ print("ConsumerIdStatsData export to CONSUMERID_STATS_DATA start");
 var srcData = srcDb.ConsumerIdStatsData.find();
 destData = destDb.CONSUMERID_STATS_DATA.findOne();
 if (srcData != null && destData == null) {
-	 db.createCollection('CONSUMERID_STATS_DATA', {'capped' : true, 'size' : 322122547200, 'max' :10000000000 }); 
-	 db.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1, 'consumerId': -1}, {"name":"IX_TIMEKEY_TOPICNAME_CONSUMERID"});
+	 destDb.createCollection('CONSUMERID_STATS_DATA', {'capped' : true, 'size' : 322122547200, 'max' :10000000000 }); 
+	 destDb.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1, 'consumerId': -1}, {"name":"IX_TIMEKEY_TOPICNAME_CONSUMERID"});
 	while (srcData.hasNext()) {
 		var temp = srcData.next();
 		destDb.CONSUMERID_STATS_DATA.insert(temp);
@@ -254,18 +294,5 @@ if (srcData != null && destData == null) {
 print("ConsumerIdStatsData export to CONSUMERID_STATS_DATA end");
 
 
-// DashboardStatsData
-print("swallowwebdashboardc export to DashboardStatsData start");
-var srcData = srcDb.swallowwebdashboardc.find();
-destData = destDb.DashboardStatsData.findOne();
-if (srcData != null && destData == null) {
-	while (srcData.hasNext()) {
-		var temp = srcData.next();
-		destDb.DashboardStatsData.insert(temp);
-	}
-} else {
-	print("swallowwebdashboardc no data or DashboardStatsData already exsits");
-}
-print("swallowwebdashboardc export to DashboardStatsData end");
 
 print("swallowwebapplication export to swallowweb end");

@@ -13,12 +13,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.controller.dto.MessageQueryDto;
+import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.service.UserService;
@@ -34,7 +38,7 @@ import com.mongodb.MongoException;
 public class MessageDumpController extends AbstractSidebarBasedController {
 
 	public static final String FILEPATH = "/data/appdatas/swalllowweb/";
-
+	
 	@Resource(name = "topicService")
 	private TopicService topicService;
 
@@ -53,11 +57,15 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 		return new ModelAndView("tool/filedownload", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/message/auth/dump", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/auth/dump", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object dumpMessageByTime(String topic, String startdt, String stopdt, HttpServletRequest request,
+	public Object dumpMessageByTime(@RequestBody MessageQueryDto messageQueryDto, HttpServletRequest request,
 			HttpServletResponse response) {
 
+		String topic = messageQueryDto.getTopic();
+		Date startdt = messageQueryDto.getStartdt();
+		Date stopdt = messageQueryDto.getStopdt();
+		
 		String post = new SimpleDateFormat("yyyyMMddHHmmss'.gz'").format(new Date());
 		StringBuffer sb = new StringBuffer();
 		String filename = sb.append(topic).append("_").append(post).toString();
@@ -75,15 +83,21 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 
 		String username = extractUsernameUtils.getUsername(request);
 
-		return messageDumpService.execDumpMessageTask(topic, startdt, stopdt, filename, username);
+		MessageDump messageDump = new MessageDump();
+		
+		messageDump.setTopic(topic).setStartdt(startdt).setStopdt(stopdt).setFilename(filename).setName(username)
+				.setFinished(false);
+
+		return messageDumpService.execDumpMessageTask(messageDump);
 	}
 
-	@RequestMapping(value = "/console/download/filename", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/download/filename", method = RequestMethod.POST)
 	@ResponseBody
-	public Object loadFilename(int offset, int limit, String topic, HttpServletRequest request,
+	public Object loadFilename(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		String username = extractUsernameUtils.getUsername(request);
+		String topic = topicQueryDto.getTopic();
 		if (StringUtils.isNotEmpty(topic)) {
 			;
 		} else if (userService.loadCachedAdministratorSet().contains(username)) {
@@ -96,7 +110,7 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 				topic = StringUtils.join(t, ",");
 			}
 		}
-		return messageDumpService.loadDumpMessagePage(offset, limit, topic);
+		return messageDumpService.loadDumpMessagePage(topicQueryDto);
 
 	}
 

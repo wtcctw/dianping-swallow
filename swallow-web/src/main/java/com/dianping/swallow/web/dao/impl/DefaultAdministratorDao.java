@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.mongodb.WriteResult;
@@ -22,16 +23,20 @@ import com.mongodb.WriteResult;
 public class DefaultAdministratorDao extends AbstractWriteDao implements
 		AdministratorDao {
 
-	private static final String ADMINISTRATOR_COLLECTION = "ADMIN";
+	private static final String USER_COLLECTION = "USER";
+	
+	
 	private static final String NAME = "name";
+	
 	private static final String ROLE = "role";
+	
 	private static final String DATE = "date";
 
 	@Override
 	public Administrator readByName(String name) {
 		Query query = new Query(Criteria.where(NAME).is(name));
 		return mongoTemplate.findOne(query, Administrator.class,
-				ADMINISTRATOR_COLLECTION);
+				USER_COLLECTION);
 	}
 
 	@Override
@@ -40,7 +45,7 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements
 			if(StringUtils.isBlank(a.getName())){
 				return false;
 			}
-			mongoTemplate.insert(a, ADMINISTRATOR_COLLECTION);
+			mongoTemplate.insert(a, USER_COLLECTION);
 			return true;
 		} catch (Exception e) {
 			logger.error("Error when save " + a, e);
@@ -54,7 +59,7 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements
 			if(StringUtils.isBlank(a.getName())){
 				return false;
 			}
-			mongoTemplate.save(a, ADMINISTRATOR_COLLECTION);
+			mongoTemplate.save(a, USER_COLLECTION);
 			return true;
 		} catch (Exception e) {
 			logger.error("Error when save " + a, e);
@@ -66,37 +71,37 @@ public class DefaultAdministratorDao extends AbstractWriteDao implements
 	public int deleteByName(String name) {
 		Query query = new Query(Criteria.where(NAME).is(name));
 		WriteResult result = mongoTemplate.remove(query, Administrator.class,
-				ADMINISTRATOR_COLLECTION);
+				USER_COLLECTION);
 		return result.getN();
 	}
 
 	@Override
 	public void dropCol() {
-		mongoTemplate.dropCollection(ADMINISTRATOR_COLLECTION);
+		mongoTemplate.dropCollection(USER_COLLECTION);
 	}
 
 	@Override
 	public List<Administrator> findAll() {
 		return mongoTemplate.findAll(Administrator.class,
-				ADMINISTRATOR_COLLECTION);
+				USER_COLLECTION);
 	}
 
 	@Override
 	public long countAdministrator() {
 		Query query = new Query();
-		return mongoTemplate.count(query, ADMINISTRATOR_COLLECTION);
+		return mongoTemplate.count(query, USER_COLLECTION);
 	}
 
 	@Override
-	public List<Administrator> findFixedAdministrator(int offset, int limit) {
+	public List<Administrator> findFixedAdministrator(BaseDto baseDto) {
 		Query query = new Query();
-		query.skip(offset)
-				.limit(limit)
+		query.skip(baseDto.getOffset())
+				.limit(baseDto.getLimit())
 				.with(new Sort(new Sort.Order(Direction.ASC, ROLE),
 						new Sort.Order(Direction.DESC, DATE))); // 根据role and
 																// date字段排序
 		return mongoTemplate.find(query, Administrator.class,
-				ADMINISTRATOR_COLLECTION);
+				USER_COLLECTION);
 	}
 
 }
