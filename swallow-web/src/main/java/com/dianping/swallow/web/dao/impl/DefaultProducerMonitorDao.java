@@ -15,7 +15,7 @@ import com.dianping.swallow.web.dao.ProducerMonitorDao;
 @Component
 public class DefaultProducerMonitorDao extends AbstractMonitorDao implements ProducerMonitorDao {
 
-	public static final String PRODUCER_MONITOR_COLLECTION_NAME = "PRODUCER_MONITOR_DATA";
+	public static final String PRODUCER_MONITOR_COLLECTION_NAME = "ProducerMonitorData";
 	
 	@Override
 	public void saveProducerMonotorData(ProducerMonitorData producerMonitorData) {
