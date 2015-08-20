@@ -15,7 +15,7 @@ import com.dianping.swallow.web.dao.ConsumerMonitorDao;
 @Component
 public class DefaultConsumerMonitorDao extends AbstractMonitorDao implements ConsumerMonitorDao{
 	
-	public static final String CONSUMER_MONITOR_COLLECTION_NAME = "CONSUMER_MONITOR_DATA";
+	public static final String CONSUMER_MONITOR_COLLECTION_NAME = "ConsumerMonitorData";
 	
 
 	@Override

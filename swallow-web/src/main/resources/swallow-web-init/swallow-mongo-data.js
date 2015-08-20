@@ -210,7 +210,7 @@ srcDb = db.getSiblingDB('swallowalarmstats');
 
 destDb = db.getSiblingDB('swallowstatsdata');
 
-destDb.copyDatabase('swallowalarmstats', 'swallowstatsdata'); 
+db.copyDatabase('swallowalarmstats', 'swallowstatsdata'); 
 
 destDb.ProducerServerStatsData.renameCollection('PRODUCER_SERVER_STATS_DATA');
 destDb.PRODUCER_SERVER_STATS_DATA.dropIndex('timeKey_ip_index');
