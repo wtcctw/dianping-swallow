@@ -120,6 +120,10 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 		
 		$http.post(window.contextPath + $scope.suburl, $scope.entity).success(function(data){
 			var message = data.second;
+			if(typeof(message) == "undefined"){
+				$interval.cancel($scope.Timer);
+				return;
+			}
 			for(var i = 0; i < message.length; ++i){
 				if(message[i].finished){
 					message[i].finished = "已导出";

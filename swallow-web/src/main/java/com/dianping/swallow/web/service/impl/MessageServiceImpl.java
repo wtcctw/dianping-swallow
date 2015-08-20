@@ -158,6 +158,9 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	private void prettyDisplay(Message m) {
 		m.setGtstring(m.getGt());
 		String internalP = m.get_p();
+		if(internalP == null){
+			return;
+		}
 		JSONObject json;
 		try {
 			json = new JSONObject(internalP);
