@@ -22,8 +22,8 @@ if(result != null) {
 	    "alarmTemplate" : "生产服务器[IP]{ip}不能访问pigeon健康监测页面，可能宕机。[{date}]",
 	    "alarmDetail" : "",
 	    "maxTimeSpan" : 120,
-	    "daySpanBase" : 5,
-	    "nightSpanBase" : 10,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -43,8 +43,8 @@ if(result != null) {
 	    "alarmTemplate" : "生产服务器[IP]{ip}访问pigeon健康监测页面，已经正常。[{date}]",
 	    "alarmDetail" : "",
 	    "maxTimeSpan" : 120,
-	    "daySpanBase" : 5,
-	    "nightSpanBase" : 10,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
@@ -65,8 +65,8 @@ if(result != null) {
 	    "alarmTemplate" : "生产服务器[IP]{ip}未发送统计数据到管理端，可能宕机。[{date}]",
 	    "alarmDetail" : "",
 	    "maxTimeSpan" : 120,
-	    "daySpanBase" : 5,
-	    "nightSpanBase" : 10,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
