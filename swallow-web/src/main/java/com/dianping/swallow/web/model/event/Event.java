@@ -216,7 +216,7 @@ public abstract class Event {
 				}
 
 			} else {
-				if (dAlarmValue > spanBase) {
+				if (dAlarmValue > spanBase * timeUnit) {
 					alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
 					alarms.put(key, alarmRecord);
 					return true;
