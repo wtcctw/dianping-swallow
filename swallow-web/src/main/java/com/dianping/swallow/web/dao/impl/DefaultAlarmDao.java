@@ -23,11 +23,11 @@ import com.mongodb.WriteResult;
  *
  */
 @Service("alarmDao")
-public class DefaultAlarmDao extends AbstractWriteDao implements AlarmDao {
+public class DefaultAlarmDao extends AbstractStatsDao implements AlarmDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultAlarmDao.class);
 
-	private static final String ALARM_COLLECTION = "swallowwebalarmdatac";
+	private static final String ALARM_COLLECTION = "ALARM";
 
 	private static final String RECEIVER_FIELD = "sendInfos.receiver";
 

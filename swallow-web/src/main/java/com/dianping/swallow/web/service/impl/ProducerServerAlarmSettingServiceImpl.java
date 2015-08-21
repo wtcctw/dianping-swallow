@@ -81,5 +81,10 @@ public class ProducerServerAlarmSettingServiceImpl implements ProducerServerAlar
 	public List<ProducerServerAlarmSetting> findByPage(int offset, int limit) {
 		return producerServerAlarmSettingDao.findByPage(offset, limit);
 	}
+	
+	@Override
+	public long count() {
+		return producerServerAlarmSettingDao.count();
+	}
 
 }

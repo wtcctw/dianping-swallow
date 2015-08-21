@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -14,10 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.model.Administrator;
+import com.dianping.swallow.web.model.UserType;
 import com.dianping.swallow.web.service.AbstractSwallowService;
-import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.service.UserService;
 
@@ -28,8 +28,6 @@ import com.dianping.swallow.web.service.UserService;
  */
 @Service("userService")
 public class UserServiceImpl extends AbstractSwallowService implements UserService {
-
-	private static final String TIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	@Value("${swallow.web.admin.defaultadmin}")
 	private String defaultAdmin;
@@ -43,18 +41,18 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	private Set<String> adminSet = new HashSet<String>();
 
 	@Override
-	public Pair<Long, List<Administrator>> loadUserPage(int offset, int limit) {
+	public Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto) {
 
 		Long totalNumOfTopic = administratorDao.countAdministrator();
-		List<Administrator> administratorList = administratorDao.findFixedAdministrator(offset, limit);
+		List<Administrator> administratorList = administratorDao.findFixedAdministrator(baseDto);
 		
 		return new Pair<Long, List<Administrator>>(totalNumOfTopic, administratorList);
 	}
 
 	@Override
-	public boolean createUser(String name, int auth) {
+	public boolean createUser(String name, UserType auth) {
 
-		if (auth == 0) {
+		if (auth.equals(UserType.ADMINISTRATOR)) {
 			this.loadCachedAdministratorSet().add(name); // create, need add in adminSet in
 											// memory
 			logger.info(String.format("Add administrator %s to admin list.", name));
@@ -85,26 +83,25 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	}
 
 	@Override
-	public boolean updateUser(String name, int auth) {
+	public boolean updateUser(String name, UserType auth) {
 		Administrator admin = administratorDao.readByName(name);
 		if (admin == null) {
 			return doneCreateAdmin(name, auth);
 		} else {
-			admin.setName(name).setRole(auth).setDate(new SimpleDateFormat(TIMEFORMAT).format(new Date()));
+			admin.setName(name).setRole(auth).setDate(new Date());
 			return administratorDao.saveAdministrator(admin);
 		}
 	}
 
-	private boolean doneCreateAdmin(String name, int auth) {
+	private boolean doneCreateAdmin(String name, UserType auth) {
 
 		Administrator admin = buildAdministrator(name, auth);
 		return administratorDao.createAdministrator(admin);
 	}
 
-	private Administrator buildAdministrator(String name, int role) {
+	private Administrator buildAdministrator(String name, UserType role) {
 		Administrator admin = new Administrator();
-		String date = new SimpleDateFormat(TIMEFORMAT).format(new Date());
-		admin.setName(name).setRole(role).setDate(date);
+		admin.setName(name).setRole(role).setDate(new Date());
 		return admin;
 	}
 
@@ -118,8 +115,8 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	public boolean createOrUpdateUser(String username) {
 		Administrator admin = administratorDao.readByName(username);
 		if (admin != null) {
-			int role = admin.getRole();
-			if (role == 0) {
+			UserType role = admin.getRole();
+			if (role.equals(UserType.ADMINISTRATOR)) {
 				return updateUser(username, role);
 			}
 		}
@@ -129,9 +126,9 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 
 	private boolean switchTopicOwnerAndVisitor(String username) {
 		if (isTopicOwner(username)) {
-			return this.updateUser(username, AuthenticationService.USER);
+			return this.updateUser(username, UserType.USER);
 		} else {
-			return this.updateUser(username, AuthenticationService.VISITOR);
+			return this.updateUser(username, UserType.VISITOR);
 		}
 	}
 

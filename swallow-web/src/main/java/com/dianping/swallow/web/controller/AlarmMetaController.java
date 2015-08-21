@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.controller.dto.AlarmMetaBatchDto;
 import com.dianping.swallow.web.controller.dto.AlarmMetaDto;
 import com.dianping.swallow.web.controller.mapper.AlarmMetaMapper;
 import com.dianping.swallow.web.model.alarm.AlarmLevelType;
@@ -101,6 +102,23 @@ public class AlarmMetaController extends AbstractSidebarBasedController {
 	@ResponseBody
 	public Object fingLevelTypes(HttpServletRequest request, HttpServletResponse response) {
 		return AlarmLevelType.values();
+	}
+
+	@RequestMapping(value = "/console/setting/alarmmeta/batchupdate", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public boolean batchUpdate(@RequestBody AlarmMetaBatchDto alarmMetaBatchDto) {
+		List<Integer> metaIds = alarmMetaBatchDto.getMetaIds();
+		if (metaIds == null) {
+			return false;
+		}
+		for (int metaId : metaIds) {
+			AlarmMeta alarmMeta = alarmMetaService.findByMetaId(metaId);
+			if (alarmMeta != null) {
+				AlarmMetaMapper.update(alarmMetaBatchDto.getUpdateType(),alarmMeta,alarmMetaBatchDto.getIsOpen());
+				alarmMetaService.update(alarmMeta);
+			}
+		}
+		return true;
 	}
 
 	@Override

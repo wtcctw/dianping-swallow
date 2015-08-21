@@ -1,11 +1,11 @@
-db = db.getSiblingDB('swallowwebapplication');
+db = db.getSiblingDB('swallowweb');
 
-result = db.swallowwebconsumeridalarmsettingc.findOne();
+result = db.CONSUMERID_ALARM_SETTING.findOne();
 if(result == null) {
 
-	print("swallowwebconsumeridalarmsettingc load data start");
+	print("CONSUMERID_ALARM_SETTING load data start");
 	
-	db.swallowwebconsumeridalarmsettingc.update({
+	db.CONSUMERID_ALARM_SETTING.update({
 	    "consumerId" : "default"
 	    },{
 	    "consumerId" : "default",
@@ -29,18 +29,18 @@ if(result == null) {
 	     }
 	}, true, false);
 	
-	print("swallowwebconsumeridalarmsettingc load data end");
+	print("CONSUMERID_ALARM_SETTING load data end");
 	
 }else{
-	print("swallowwebconsumeridalarmsettingc already exist");
+	print("CONSUMERID_ALARM_SETTING already exist");
 }
 
-result = db.swallowwebconsumerserveralarmsettingc.findOne();
+result = db.CONSUMER_SERVER_ALARM_SETTING.findOne();
 if(result == null) {
 	
-	print("swallowwebconsumerserveralarmsettingc load data start");
+	print("CONSUMER_SERVER_ALARM_SETTING load data start");
 	
-	db.swallowwebconsumerserveralarmsettingc.update({
+	db.CONSUMER_SERVER_ALARM_SETTING.update({
 	    "serverId" : "default"
 	    },{
 	    "serverId" : "default",
@@ -59,20 +59,20 @@ if(result == null) {
 	    }
 	}, true, false);
 	
-	print("swallowwebconsumerserveralarmsettingc load data end");
+	print("CONSUMER_SERVER_ALARM_SETTING load data end");
 }else{
 	
-	print("swallowwebconsumerserveralarmsettingc already exist");
+	print("CONSUMER_SERVER_ALARM_SETTING already exist");
 	
 }
 
 
-result = db.swallowwebproducerserveralarmsettingc.findOne();
+result = db.PRODUCER_SERVER_ALARM_SETTING.findOne();
 if(result == null) {
 	
-	print("swallowwebproducerserveralarmsettingc load data start");
+	print("PRODUCER_SERVER_ALARM_SETTING load data start");
 	
-	db.swallowwebproducerserveralarmsettingc.update({
+	db.PRODUCER_SERVER_ALARM_SETTING.update({
 	    "serverId" : "default"
 	    },{
 	    "serverId" : "default", 
@@ -85,21 +85,21 @@ if(result == null) {
 	     }
 	}, true, false);
 	
-	print("swallowwebproducerserveralarmsettingc load data start");
+	print("PRODUCER_SERVER_ALARM_SETTING load data start");
 	
 }else{
 	
-	print("swallowwebproducerserveralarmsettingc already exist");
+	print("PRODUCER_SERVER_ALARM_SETTING already exist");
 	
 }
 
 
-result = db.swallowwebswallowalarmsettingc.findOne();
+result = db.GLOBAL_ALARM_SETTING.findOne();
 if(result == null) {
 	
-	print("swallowwebswallowalarmsettingc load data start");
+	print("GLOBAL_ALARM_SETTING load data start");
 	
-	db.swallowwebswallowalarmsettingc.update({
+	db.GLOBAL_ALARM_SETTING.update({
 	    "swallowId" : "default"
 	    },{
 	    "swallowId" : "default", 
@@ -107,20 +107,20 @@ if(result == null) {
 	    "consumerWhiteList" : [ "10.128.121.229" ] 
 	}, true, false);
 
-	print("swallowwebswallowalarmsettingc load data end");
+	print("GLOBAL_ALARM_SETTING load data end");
 	
 }else{
 	
-	print("swallowwebswallowalarmsettingc already exist");
+	print("GLOBAL_ALARM_SETTING already exist");
 	
 }
 
-result = db.swallowwebtopicalarmsettingc.findOne();
+result = db.TOPIC_ALARM_SETTING.findOne();
 if(result == null) {
 	
-	print("swallowwebtopicalarmsettingc load data start");
+	print("TOPIC_ALARM_SETTING load data start");
 	
-	db.swallowwebtopicalarmsettingc.update({
+	db.TOPIC_ALARM_SETTING.update({
 	    "topicName" : "default"
 	    }, {
 	    "topicName" : "default", 
@@ -153,11 +153,11 @@ if(result == null) {
 	    }
 	}, true, false);
 	
-	print("swallowwebtopicalarmsettingc load data start");
+	print("TOPIC_ALARM_SETTING load data start");
 	
 }else{
 	
-	print("swallowwebtopicalarmsettingc already exist");
+	print("TOPIC_ALARM_SETTING already exist");
 	
 }
 

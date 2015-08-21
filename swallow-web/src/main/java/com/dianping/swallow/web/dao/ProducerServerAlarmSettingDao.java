@@ -5,23 +5,26 @@ import java.util.List;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 
 /**
-*
-* @author qiyin
-*
-*/
+ * 
+ * @author qiyin
+ *
+ *         2015年8月17日 下午5:36:51
+ */
 public interface ProducerServerAlarmSettingDao {
 
-	public boolean insert(ProducerServerAlarmSetting setting);
+	boolean insert(ProducerServerAlarmSetting setting);
 
-	public boolean update(ProducerServerAlarmSetting setting);
+	boolean update(ProducerServerAlarmSetting setting);
 
-	public int deleteById(String id);
+	int deleteById(String id);
+
+	int deleteByServerId(String serverId);
+
+	ProducerServerAlarmSetting findById(String id);
+
+	ProducerServerAlarmSetting findByServerId(String serverId);
+
+	List<ProducerServerAlarmSetting> findByPage(int offset, int limit);
 	
-	public int deleteByServerId(String serverId);
-
-	public ProducerServerAlarmSetting findById(String id);
-	
-	public ProducerServerAlarmSetting findByServerId(String serverId);
-
-	public List<ProducerServerAlarmSetting> findByPage(int offset, int limit);
+	long count();
 }

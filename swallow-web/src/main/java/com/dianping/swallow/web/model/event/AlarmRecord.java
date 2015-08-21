@@ -32,10 +32,6 @@ public class AlarmRecord {
 		return this;
 	}
 
-	public boolean isFirstTime(long lastTimeSpan) {
-		return (System.currentTimeMillis() - lastAlarmTime) > lastTimeSpan;
-	}
-
 	public long getCheckAlarmTime() {
 		return checkAlarmTime;
 	}

@@ -1,8 +1,6 @@
 package com.dianping.swallow.web.dao.impl;
 
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.web.controller.dto.MessageQueryDto;
 import com.dianping.swallow.web.dao.MessageDao;
 import com.dianping.swallow.web.model.Message;
 import com.google.common.collect.Lists;
@@ -113,7 +112,13 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	}
 
 	@Override
-	public Map<String, Object> findByTopicname(int offset, int limit, String topicName, String baseMid, boolean sort) {
+	public Map<String, Object> findByTopicname(MessageQueryDto messageQueryDto) {
+		
+		String topicName = messageQueryDto.getTopic();
+		String baseMid = messageQueryDto.getBasemid();
+		boolean sort = messageQueryDto.isSort();
+		int offset = messageQueryDto.getOffset();
+		int limit = messageQueryDto.getLimit();
 		List<Message> messageList = new ArrayList<Message>();
 		Query query = new Query();
 		if(!sort){
@@ -142,15 +147,20 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	}
 
 	@Override
-	public Map<String, Object> findSpecific(int offset, int limit, long mid, String topicName, boolean sort) {
+	public Map<String, Object> findSpecific(MessageQueryDto messageQueryDto, long mid) {
 		if (mid == 0) {
-			return findSpecificWithoutId(offset, limit, topicName, sort);
+			return findSpecificWithoutId(messageQueryDto);
 		} else
-			return findSpecificWithId(offset, limit, mid, topicName);
+			return findSpecificWithId(messageQueryDto, mid);
 
 	}
 
-	private Map<String, Object> findSpecificWithoutId(int offset, int limit, String topicName, boolean sort) {
+	private Map<String, Object> findSpecificWithoutId(MessageQueryDto messageQueryDto) {
+		
+		String topicName = messageQueryDto.getTopic();
+		boolean sort = messageQueryDto.isSort();
+		int offset = messageQueryDto.getOffset();
+		int limit = messageQueryDto.getLimit();
 		Query query = new Query();
 		if(!sort){
 			query.with(new Sort(new Sort.Order(Direction.DESC, ID)));
@@ -167,38 +177,23 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 		return getResponse(messageList, this.count(topicName));
 	}
 
-	@Override
-	public Map<String, Object> findByIp(int offset, int limit, String ip, String topicName) {
-		List<Message> messageList = new ArrayList<Message>();
-		Query query1 = new Query(Criteria.where(SI).is(ip));
-		query1.skip(offset).limit(limit);
-		query1.fields().exclude(C);
-		query1.with(new Sort(new Sort.Order(Direction.DESC, ID)));
-		messageList = this.webMongoManager.getMessageMongoTemplate(topicName).find(query1, Message.class,
-				MESSAGE_COLLECTION);
-		Query query2 = new Query(Criteria.where(SI).is(ip));
-		long size = this.webMongoManager.getMessageMongoTemplate(topicName).count(query2, MESSAGE_COLLECTION);
-		return getResponse(messageList, size);
-	}
 
 	@Override
-	public Map<String, Object> findByTime(int offset, int limit, String startdt, String stopdt, String topicName,
-			String baseMid, boolean sort) {
+	public Map<String, Object> findByTime(MessageQueryDto messageQueryDto) {
 
+		String topicName = messageQueryDto.getTopic();
+		String baseMid = messageQueryDto.getBasemid();
+		boolean sort = messageQueryDto.isSort();
+		int offset = messageQueryDto.getOffset();
+		int limit = messageQueryDto.getLimit();
+		Date startdt = messageQueryDto.getStartdt();
+		Date stopdt = messageQueryDto.getStopdt();
 		List<Message> list = new ArrayList<Message>();
+		
 		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(topicName).getCollection(
 				MESSAGE_COLLECTION);
-		SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
-		Long startlong = null;
-		Long stoplong = null;
-		try {
-			startlong = MongoUtils.getLongByDate(sdf.parse(startdt));
-			stoplong = MongoUtils.getLongByDate(sdf.parse(stopdt));
-		} catch (ParseException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Error when parse date to Long.", e);
-			}
-		}
+		Long startlong = MongoUtils.getLongByDate(startdt);
+		Long stoplong = MongoUtils.getLongByDate(stopdt);
 		DBObject query = BasicDBObjectBuilder
 				.start()
 				.add(ID,
@@ -217,16 +212,10 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 		if (StringUtils.isNotEmpty(baseMid)) {
 			long time = 0;
 			if (baseMid.contains(":")) {
-				try {
-					if(!baseMid.startsWith("-")){
-						time = MongoUtils.getLongByDate(sdf.parse(startdt));
-					}else{
-						time = -MongoUtils.getLongByDate(sdf.parse(stopdt));
-					}
-				} catch (ParseException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Error when parse date to Long.", e);
-					}
+				if(!baseMid.startsWith("-")){
+					time = startlong;
+				}else{
+					time = -stoplong;
 				}
 			} else {
 				time = Long.parseLong(baseMid);
@@ -262,8 +251,13 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> findByTimeAndId(int offset, int limit, long mid, String startdt, String stopdt,
-			String topicName) {
+	public Map<String, Object> findByTimeAndId(MessageQueryDto messageQueryDto, long mid) {
+		
+		String topicName = messageQueryDto.getTopic();
+		int offset = messageQueryDto.getOffset();
+		int limit = messageQueryDto.getLimit();
+		Date startdt = messageQueryDto.getStartdt();
+		Date stopdt = messageQueryDto.getStopdt();
 		List<Message> list = new ArrayList<Message>();
 		Query query = new Query();
 		if (mid == 0) {
@@ -272,20 +266,11 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 			list = this.webMongoManager.getMessageMongoTemplate(topicName).find(query, Message.class,
 					MESSAGE_COLLECTION);
 		} else {
-			list = (List<Message>) findSpecificWithId(offset, limit, mid, topicName).get(MESSAGE);
+			list = (List<Message>) findSpecificWithId(messageQueryDto, mid).get(MESSAGE);
 		}
-		SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
 
-		Long startlong = null;
-		Long stoplong = null;
-		try {
-			startlong = MongoUtils.getLongByDate(sdf.parse(startdt));
-			stoplong = MongoUtils.getLongByDate(sdf.parse(stopdt));
-		} catch (ParseException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Error when parse date to Long.", e);
-			}
-		}
+		Long startlong = MongoUtils.getLongByDate(startdt);
+		Long stoplong = MongoUtils.getLongByDate(stopdt);
 		for (int i = 0; i < list.size(); ++i) {
 			if (!(mid > startlong && mid < stoplong))
 				list.remove(i);
@@ -320,7 +305,8 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 		swallowMessage.setSi((String) result.get(SI));
 	}
 
-	private Map<String, Object> findSpecificWithId(int offset, int limit, long mid, String topicName) {
+	private Map<String, Object> findSpecificWithId(MessageQueryDto messageQueryDto, long mid) {
+		String topicName = messageQueryDto.getTopic();
 		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(topicName).getCollection(
 				MESSAGE_COLLECTION);
 		DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(mid)).get();
@@ -409,23 +395,12 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	}
 
 	@Override
-	public Map<String, Object> exportMessages(String topicName, String startdt, String stopdt) {
+	public Map<String, Object> exportMessages(String topicName, Date startdt, Date stopdt) {
 		int maxSize = 1000000;
 		Map<String, Object> map = new HashMap<String, Object>();
-		List<DBObject> dboList = new ArrayList<DBObject>();
 		DBCollection collection = this.webMongoManager.getMessageMongoTemplate(topicName).getCollection(MESSAGE_COLLECTION);
-		SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMAT);
-		Long startlong = null;
-		Long stoplong = null;
-		try {
-			startlong = MongoUtils.getLongByDate(sdf.parse(startdt));
-			stoplong = MongoUtils.getLongByDate(sdf.parse(stopdt));
-		} catch (ParseException e) {
-			logger.error("Error when parse date to Long.", e);
-			map.put("message", dboList);
-			map.put("size", 0);
-			return map;
-		}
+		Long startlong = MongoUtils.getLongByDate(startdt);
+		Long stoplong = MongoUtils.getLongByDate(stopdt);
 		DBObject query = BasicDBObjectBuilder
 				.start()
 				.add(ID,

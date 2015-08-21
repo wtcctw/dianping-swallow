@@ -301,3 +301,12 @@ a:active {
 	margin-left: auto;
 	margin-right: auto;
 }
+
+input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
+	content: "\2261";
+}
+
+.breadcrumb-ul {
+	float: left;
+	margin-top: 8px;
+}

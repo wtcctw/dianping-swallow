@@ -50,4 +50,7 @@ public enum ResultType {
 
 	private String desc;
 
+	public boolean isSuccess() {
+		return this == SUCCESS;
+	}
 }

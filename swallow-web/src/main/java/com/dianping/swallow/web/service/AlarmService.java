@@ -6,11 +6,13 @@ import java.util.Set;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.alarm.Alarm;
+import com.dianping.swallow.web.model.alarm.ResultType;
 
 /**
- *
- * @author qiyin
  * 
+ * @author qiyin
+ *
+ *         2015年8月17日 下午5:47:21
  */
 public interface AlarmService {
 
@@ -22,7 +24,7 @@ public interface AlarmService {
 	 * @param body
 	 * @return
 	 */
-	public boolean sendSms(String mobile, String title, String body);
+	ResultType sendSms(String mobile, String title, String body);
 
 	/**
 	 * send weiXin
@@ -32,7 +34,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendWeiXin(String email, String title, String content);
+	ResultType sendWeiXin(String email, String title, String content);
 
 	/**
 	 * send mail
@@ -42,7 +44,7 @@ public interface AlarmService {
 	 * @param content
 	 * @return
 	 */
-	public boolean sendMail(String email, String title, String content);
+	ResultType sendMail(String email, String title, String content);
 
 	/**
 	 * send sms
@@ -50,7 +52,7 @@ public interface AlarmService {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean sendSms(Alarm alarm, String receiver);
+	boolean sendSms(Alarm alarm, String receiver);
 
 	/**
 	 * weiXin alarm
@@ -58,7 +60,7 @@ public interface AlarmService {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean sendWeiXin(Alarm alarm, String receiver);
+	boolean sendWeiXin(Alarm alarm, String receiver);
 
 	/**
 	 * mail alarm
@@ -67,7 +69,7 @@ public interface AlarmService {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean sendMail(Set<String> emails, Alarm alarm);
+	boolean sendMail(Set<String> emails, Alarm alarm);
 
 	/**
 	 * sms alarm
@@ -76,7 +78,7 @@ public interface AlarmService {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean sendSms(Set<String> mobiles, Alarm alarm);
+	boolean sendSms(Set<String> mobiles, Alarm alarm);
 
 	/**
 	 * weiXin alarm
@@ -85,7 +87,7 @@ public interface AlarmService {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean sendWeiXin(Set<String> emails, Alarm alarm);
+	boolean sendWeiXin(Set<String> emails, Alarm alarm);
 
 	/**
 	 * mail alarm
@@ -93,7 +95,7 @@ public interface AlarmService {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean sendMail(Alarm alarm, String receiver);
+	boolean sendMail(Alarm alarm, String receiver);
 
 	/**
 	 * insert
@@ -101,7 +103,7 @@ public interface AlarmService {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean insert(Alarm alarm);
+	boolean insert(Alarm alarm);
 
 	/**
 	 * update
@@ -109,7 +111,7 @@ public interface AlarmService {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean update(Alarm alarm);
+	boolean update(Alarm alarm);
 
 	/**
 	 * delete by id
@@ -117,7 +119,7 @@ public interface AlarmService {
 	 * @param ipDesc
 	 * @return
 	 */
-	public int deleteById(String id);
+	int deleteById(String id);
 
 	/**
 	 * find by id
@@ -125,10 +127,11 @@ public interface AlarmService {
 	 * @param id
 	 * @return
 	 */
-	public Alarm findById(String id);
-	
+	Alarm findById(String id);
+
 	/**
 	 * find by page
+	 * 
 	 * @param receiver
 	 * @param related
 	 * @param subRelated
@@ -138,11 +141,12 @@ public interface AlarmService {
 	 * @param limit
 	 * @return
 	 */
-	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime,
-			Date endTime, int offset, int limit);
-	
+	Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime, int offset,
+			int limit);
+
 	/**
 	 * find by page
+	 * 
 	 * @param receiver
 	 * @param related
 	 * @param subRelated
@@ -152,13 +156,14 @@ public interface AlarmService {
 	 * @param limit
 	 * @return
 	 */
-	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
+	Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
 			Date endTime, int offset, int limit);
 
 	/**
 	 * find by eventId
+	 * 
 	 * @param eventId
 	 * @return
 	 */
-	public Alarm findByEventId(long eventId);
+	Alarm findByEventId(long eventId);
 }

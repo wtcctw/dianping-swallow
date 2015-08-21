@@ -24,7 +24,7 @@ public class DefaultGlobalAlarmSettingDao extends AbstractWriteDao implements Gl
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultGlobalAlarmSettingDao.class);
 
-	private static final String SWALLOWALARMSETTING_COLLECTION = "swallowwebswallowalarmsettingc";
+	private static final String SWALLOWALARMSETTING_COLLECTION = "GLOBAL_ALARM_SETTING";
 
 	private static final String ID_FIELD = "id";
 
@@ -54,8 +54,8 @@ public class DefaultGlobalAlarmSettingDao extends AbstractWriteDao implements Gl
 	}
 
 	@Override
-	public int deleteByBySwallowId(String swallowId) {
-		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(swallowId));
+	public int deleteByGlobalId(String globalId) {
+		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(globalId));
 		WriteResult result = mongoTemplate.remove(query, GlobalAlarmSetting.class, SWALLOWALARMSETTING_COLLECTION);
 		return result.getN();
 	}
@@ -69,8 +69,8 @@ public class DefaultGlobalAlarmSettingDao extends AbstractWriteDao implements Gl
 	}
 
 	@Override
-	public GlobalAlarmSetting findBySwallowId(String swallowId) {
-		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(swallowId));
+	public GlobalAlarmSetting findByGlobalId(String globalId) {
+		Query query = new Query(Criteria.where(SWALLOWID_FIELD).is(globalId));
 		GlobalAlarmSetting swallowAlarmSetting = mongoTemplate.findOne(query, GlobalAlarmSetting.class,
 				SWALLOWALARMSETTING_COLLECTION);
 		return swallowAlarmSetting;
@@ -83,6 +83,12 @@ public class DefaultGlobalAlarmSettingDao extends AbstractWriteDao implements Gl
 		List<GlobalAlarmSetting> swallowAlarmSettings = mongoTemplate.find(query, GlobalAlarmSetting.class,
 				SWALLOWALARMSETTING_COLLECTION);
 		return swallowAlarmSettings;
+	}
+
+	@Override
+	public long count() {
+		Query query = new Query();
+		return mongoTemplate.count(query, SWALLOWALARMSETTING_COLLECTION);
 	}
 
 }

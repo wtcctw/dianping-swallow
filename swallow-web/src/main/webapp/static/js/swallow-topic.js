@@ -1,9 +1,16 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize,  name, prop){
+	return function(fetchFunction, pageSize, entity){
 		var paginator = {
 				hasNextVar: false,
-				loadalarm : function(){
-					
+				handleResult: function(object){
+					var whitelist = object.whitelist;
+					for(var i = 0; i < this.currentPageItems.length; ++i){
+						if(typeof(whitelist) != "undefined" && whitelist.indexOf(this.currentPageItems[i].name) != -1){
+							this.currentPageItems[i]["alarm"] = false;
+						}else{
+							this.currentPageItems[i]["alarm"] = true;
+						}
+					}
 				},
 				fetch: function(page){
 					this.currentOffset = (page - 1) * pageSize;
@@ -18,10 +25,12 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, name, prop, function(data){
+					entity.offset = this.currentOffset;
+					entity.limit = pageSize + 1;
+					fetchFunction( entity, function(data){
 						items = data.first.second;
 						length = data.first.first;
-						whitelist = data.second;
+						var whitelist = data.second;
 						self.totalPage = Math.ceil(length/pageSize);
 						self.endPage = self.totalPage;
 						//生成链接
@@ -43,13 +52,11 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
-						for(var i = 0; i < self.currentPageItems.length; ++i){
-							if(typeof(whitelist) != "undefined" && whitelist.indexOf(self.currentPageItems[i].name) != -1){
-								self.currentPageItems[i]["alarm"] = false;
-							}else{
-								self.currentPageItems[i]["alarm"] = true;
-							}
-						}
+						
+						var object = new Object();
+						object.whitelist = whitelist;
+						self.handleResult(object);
+						
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -83,30 +90,19 @@ module.factory('Paginator', function(){
 
 module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog',
         function($rootScope, $scope, $http, Paginator, ngDialog){
-				var fetchFunction = function(offset, limit, name, prop, callback){
-				var transFn = function(data){
-					return $.param(data);
-				}
-				var postConfig = {
-						transformRequest: transFn
-				};
-				var data = {'offset' : offset,
-										'limit': limit,
-										'topic': name,
-										'prop': prop};
-				$http.get(window.contextPath + $scope.suburl, {
-					params : {
-						offset : offset,
-						limit : limit,
-						topic: name,
-						prop: prop
-					}
-				}).success(callback);
+				var fetchFunction = function(entity, callback){
+//				var entity = new Object();
+//				entity.offset = offset;
+//				entity.limit = limit;
+//				entity.topic = name;
+//				entity.prop = prop;
+				
+				$http.post(window.contextPath + $scope.suburl, entity).success(callback);
 			};
 			$scope.name = "";
 			$scope.prop = "";
 			
-			$scope.suburl = "/console/topic/topicdefault";
+			$scope.suburl = "/console/topic/topiclist";
 			$scope.topicnum = 30;
 
 			
@@ -149,7 +145,9 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 		        	    dataType: "json",
 		        	    data: param,
 		        	    success: function(data) {
-		        	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.topicname , "" );
+		        			$scope.query.topic = $scope.topicname;
+		        			$scope.query.prop = "";
+		        	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query );
 		        	    }
 		        	});
 	        	}
@@ -167,7 +165,9 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 	        	    dataType: "json",
 	        	    data: param,
 	        	    success: function(data) {
-	        	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, topicname , "");
+	        	    	$scope.query.topic = $scope.topicname;
+	        	    	$scope.query.prop = "";
+	        	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 	        	    }
 
 	        	});
@@ -207,7 +207,10 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			}
 			
 			//发送默认请求
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop);
+			$scope.query = new Object();
+			$scope.query.topic = $scope.name;
+			$scope.query.prop = $scope.prop;
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 			
 			//如果topic列表返回空，则不会执行initpage
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
@@ -226,8 +229,10 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							items: 16, 
 							source : topicNameList,
 							updater : function(c) {
-								$scope.name = c
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop);		
+								$scope.name = c;
+								$scope.query.topic = $scope.name;
+								$scope.query.prop = $scope.prop;
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
 								return c;
 							}
 						})
@@ -244,7 +249,9 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							source : data.first,
 							updater : function(c) {
 								$scope.prop = c;
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.name , $scope.prop);		
+								$scope.query.topic = $scope.name;
+								$scope.query.prop = $scope.prop;
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
 								return c;
 							}
 						})

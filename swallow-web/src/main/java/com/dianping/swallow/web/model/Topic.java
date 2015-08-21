@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 
 /**
@@ -9,12 +11,15 @@ import org.springframework.data.annotation.Id;
  */
 public class Topic {
 
-	// id will be used for storing MongoDB _id
 	@Id
 	private String id;
+	
 	private String name;
+	
 	private String prop;
-	private String time;
+	
+	private Date time;
+	
 	private long messageNum;
 
 	public Topic() {
@@ -47,11 +52,11 @@ public class Topic {
 		return this;
 	}
 
-	public String getTime() {
+	public Date getTime() {
 		return time;
 	}
 
-	public Topic setTime(String time) {
+	public Topic setTime(Date time) {
 		this.time = time;
 		return this;
 	}

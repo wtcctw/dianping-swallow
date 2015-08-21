@@ -36,7 +36,7 @@
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="ad.name"></td>
-						<td style="text-align: left" ng-bind="ad.date"></td>
+						<td style="text-align: left" ng-bind="ad.date | date : 'yyyy-MM-dd HH:mm:ss'"></td>
 						<td style="text-align: left" ng-bind="ad.role"></td>
 						<td style="text-align: left"><a href="#myModal"
 							ng-click="setModalInput(ad.name, ad.role);" data-toggle="modal"

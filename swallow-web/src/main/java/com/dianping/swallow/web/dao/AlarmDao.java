@@ -7,9 +7,10 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.alarm.Alarm;
 
 /**
- *
+ * 
  * @author qiyin
  *
+ *         2015年8月17日 下午5:32:52
  */
 public interface AlarmDao extends Dao {
 
@@ -19,7 +20,7 @@ public interface AlarmDao extends Dao {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean insert(Alarm alarm);
+	boolean insert(Alarm alarm);
 
 	/**
 	 * update
@@ -27,7 +28,7 @@ public interface AlarmDao extends Dao {
 	 * @param alarm
 	 * @return
 	 */
-	public boolean update(Alarm alarm);
+	boolean update(Alarm alarm);
 
 	/**
 	 * delete by id
@@ -35,7 +36,7 @@ public interface AlarmDao extends Dao {
 	 * @param ipDesc
 	 * @return
 	 */
-	public int deleteById(String id);
+	int deleteById(String id);
 
 	/**
 	 * find by id
@@ -43,7 +44,7 @@ public interface AlarmDao extends Dao {
 	 * @param id
 	 * @return
 	 */
-	public Alarm findById(String id);
+	Alarm findById(String id);
 
 	/**
 	 * find by receiver related and time
@@ -56,8 +57,8 @@ public interface AlarmDao extends Dao {
 	 * @param limit
 	 * @return
 	 */
-	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime,
-			int offset, int limit);
+	Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime, int offset,
+			int limit);
 
 	/**
 	 * find by receiver related and time
@@ -70,13 +71,14 @@ public interface AlarmDao extends Dao {
 	 * @param limit
 	 * @return
 	 */
-	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
+	Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
 			Date endTime, int offset, int limit);
 
 	/**
 	 * find by eventId
+	 * 
 	 * @param eventId
 	 * @return
 	 */
-	public Alarm findByEventId(long eventId);
+	Alarm findByEventId(long eventId);
 }

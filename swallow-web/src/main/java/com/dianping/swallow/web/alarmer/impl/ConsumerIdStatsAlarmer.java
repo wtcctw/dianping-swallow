@@ -3,6 +3,7 @@ package com.dianping.swallow.web.alarmer.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -90,11 +91,17 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements Moni
 		long accumulation = consumerAlarmSetting.getAccumulation();
 		for (Map.Entry<String, List<ConsumerIdStatsData>> consumerIdStatsDataEntry : consumerIdStatsDataMap.entrySet()) {
 			String topicName = consumerIdStatsDataEntry.getKey();
+			if (StringUtils.equals(TOTAL_KEY, topicName)) {
+				continue;
+			}
 			if (topicWhiteList != null && topicWhiteList.contains(topicName)) {
 				continue;
 			}
 			List<ConsumerIdStatsData> consumerIdStatsDatas = consumerIdStatsDataEntry.getValue();
 			for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
+				if (StringUtils.equals(TOTAL_KEY, consumerIdStatsData.getConsumerId())) {
+					continue;
+				}
 				if (whiteList == null || !whiteList.contains(consumerIdStatsData.getConsumerId())) {
 					String consumerId = consumerIdStatsData.getConsumerId();
 					boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);

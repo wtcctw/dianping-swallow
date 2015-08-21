@@ -56,7 +56,7 @@
 								<th style="text-align: left; width: 120px">ConsumerID</th>
 								<th style="text-align: left; width: 40px">状态</th>
 							</tr>
-							<tr ng-repeat="entry in getEntry(minuteEntry.delayEntry)"
+							<tr ng-repeat="entry in minuteEntry.result"
 								ng-class="{'alert-row': entry.numAlarm>0}" >
 								<td style="text-align: left; width: 120px; cursor: pointer;"><a href style="color:#000000" data-placement="top" 
 									 data-content="业务名: {{entry.name}} 开发: {{entry.dpMobile}}" data-trigger="hover" bs-popover ng-bind="entry.consumerId | limitTo : 15"></a></td>

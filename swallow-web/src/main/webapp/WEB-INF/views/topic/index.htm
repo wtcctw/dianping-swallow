@@ -63,7 +63,7 @@
 							ng-href="${rc.contextPath}/console/message"
 							ng-click="setTopicName(t.name)" ng-bind="t.name"></a></td>
 						<td style="text-align: left" ng-bind="t.prop"></td>
-						<td style="text-align: left" ng-bind="t.time"></td>
+						<td style="text-align: left" ng-bind="t.time | date : 'yyyy-MM-dd HH:mm:ss'"></td>
 						#if(${isadmin})
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input

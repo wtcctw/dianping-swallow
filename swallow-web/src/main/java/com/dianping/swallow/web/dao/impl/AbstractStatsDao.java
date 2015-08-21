@@ -13,7 +13,7 @@ import com.dianping.swallow.web.dao.impl.AbstractDao;
  */
 public class AbstractStatsDao extends AbstractDao {
 
-	@Resource(name = "alarmStatsMongoTemplate")
+	@Resource(name = "statsDataMongoTemplate")
 	protected MongoTemplate mongoTemplate;
 
 }

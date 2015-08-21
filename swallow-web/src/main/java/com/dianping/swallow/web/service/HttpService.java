@@ -8,10 +8,9 @@ import com.dianping.swallow.web.model.alarm.ResultType;
 
 /**
  * 
- * http api
- * 
  * @author qiyin
  *
+ *         2015年8月17日 下午5:43:08
  */
 public interface HttpService {
 
@@ -22,7 +21,7 @@ public interface HttpService {
 	 * @param params
 	 * @return json
 	 */
-	public HttpResult httpPost(String url, List<NameValuePair> params);
+	HttpResult httpPost(String url, List<NameValuePair> params);
 
 	/**
 	 * http get request
@@ -30,7 +29,7 @@ public interface HttpService {
 	 * @param url
 	 * @return json
 	 */
-	public HttpResult httpGet(String url);
+	HttpResult httpGet(String url);
 
 	/**
 	 * 
@@ -42,7 +41,7 @@ public interface HttpService {
 	public static class HttpResult {
 
 		private boolean isSuccess;
-		
+
 		private ResultType resultType;
 
 		private String responseBody;
@@ -54,7 +53,7 @@ public interface HttpService {
 		public void setSuccess(boolean isSuccess) {
 			this.isSuccess = isSuccess;
 		}
-		
+
 		public ResultType getResultType() {
 			return resultType;
 		}

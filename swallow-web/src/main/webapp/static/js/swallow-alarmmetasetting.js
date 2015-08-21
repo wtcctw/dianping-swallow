@@ -144,10 +144,9 @@ module
 								$scope.alarmMetaEntity.alarmTitle = $scope.searchPaginator.currentPageItems[index].alarmTitle;
 								$scope.alarmMetaEntity.alarmTemplate = $scope.searchPaginator.currentPageItems[index].alarmTemplate;
 								$scope.alarmMetaEntity.alarmDetail = $scope.searchPaginator.currentPageItems[index].alarmDetail;
-								$scope.alarmMetaEntity.timeSpanBase = $scope.searchPaginator.currentPageItems[index].timeSpanBase;
 								$scope.alarmMetaEntity.maxTimeSpan = $scope.searchPaginator.currentPageItems[index].maxTimeSpan;
-								$scope.alarmMetaEntity.daySpanRatio = $scope.searchPaginator.currentPageItems[index].daySpanRatio;
-								$scope.alarmMetaEntity.nightSpanRatio = $scope.searchPaginator.currentPageItems[index].nightSpanRatio;
+								$scope.alarmMetaEntity.daySpanBase = $scope.searchPaginator.currentPageItems[index].daySpanBase;
+								$scope.alarmMetaEntity.nightSpanBase = $scope.searchPaginator.currentPageItems[index].nightSpanBase;
 								$scope.alarmMetaEntity.createTime = $scope.searchPaginator.currentPageItems[index].createTime;
 								$scope.alarmMetaEntity.isUpdate = true;
 							}
@@ -225,9 +224,45 @@ module
 										console.log("leveltypes读取错误");
 									});
 							$scope.booleans = [ false, true ];
-							$("#check-all").click(function(){
-								$("input[name='check-list']").prop("checked",this.checked); 
-							    //$("input[name='check-list']").attr("checked",$(this).attr("checked"));
+							$("#check-all").click(
+									function() {
+										$("input[name='check-list']").prop(
+												"checked", this.checked);
+									});
+
+							$('.input-tooltip').tooltip({
+								showDelay : 0,
+								hideDelay : 0
 							});
+
+							$scope.batchUpdate = function(updateType, isTrue) {
+								var metaIds = [];
+								$("input[name='check-list']:checked").each(
+										function(i) {
+											metaIds.push($(this).val());
+										});
+								if (metaIds.length <= 0) {
+									alert("请选择要更新的行。");
+									return;
+								}
+								$("input[name='check-list']")
+								var updateEntity = {
+									metaIds : metaIds,
+									updateType : updateType,
+									isOpen : isTrue
+								};
+								console.log(updateEntity);
+								$http
+										.post(
+												window.contextPath
+														+ '/console/setting/alarmmeta/batchupdate',
+												updateEntity)
+										.success(
+												function(data) {
+													$scope.searchPaginator = Paginator(
+															fetchFunction,
+															$scope.pageSize);
+												});
+							}
 
 						} ]);

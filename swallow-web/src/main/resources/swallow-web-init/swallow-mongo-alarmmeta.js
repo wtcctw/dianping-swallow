@@ -1,13 +1,13 @@
-db = db.getSiblingDB('swallowwebapplication');
-result = db.swallowwebalarmmetac.findOne();
+db = db.getSiblingDB('swallowweb');
+result = db.ALARM_META.findOne();
 
 if(result != null) {
-	print("swallowwebalarmmetac already exist");
+	print("ALARM_META already exist");
 }else{
 
-	print("swallowwebalarmmetac load data start");
+	print("ALARM_META load data start");
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1
 		}, {
 	    "metaId" : 1,
@@ -21,16 +21,14 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器服务告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}不能访问pigeon健康监测页面，可能宕机。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 2
 		},{
 	    "metaId" : 2,
@@ -44,17 +42,15 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器服务告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}访问pigeon健康监测页面，已经正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 3
 		}, {
 	    "metaId" : 3,
@@ -68,16 +64,14 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器SENDER告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}未发送统计数据到管理端，可能宕机。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 4
 		},{
 	    "metaId" : 4,
@@ -91,16 +85,14 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器SENDER告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 5
 		}, {
 	    "metaId" : 5,
@@ -114,16 +106,14 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器QPS告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 6
 		}, {
 	    "metaId" : 6,
@@ -137,16 +127,14 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器QPS告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 7
 		}, {
 	    "metaId" : 7,
@@ -160,16 +148,14 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器QPS告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 8
 		}, {
 	    "metaId" : 8,
@@ -183,16 +169,14 @@ if(result != null) {
 	    "alarmTitle" : "生产服务器QPS告警",
 	    "alarmTemplate" : "生产服务器[IP]{ip}[QPS]正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 9
 		}, {
 	    "metaId" : 9,
@@ -206,16 +190,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器SENDER告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}未发送统计数据到管理端，可能宕机。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 10
 		},{
 	    "metaId" : 10,
@@ -229,17 +211,15 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器SENDER告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送统计数据到管理端，已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 11
 		}, {
 	    "metaId" : 11,
@@ -253,16 +233,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器PORT告警",
 	    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}端口关闭状态，[SLAVE IP]{slaveIp}端口处于打开状态。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 12
 		}, {
 	    "metaId" : 12,
@@ -276,16 +254,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器PORT告警",
 	    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}端口都处于打开状态。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 13
 		}, {
 	    "metaId" : 13,
@@ -299,17 +275,15 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器PORT告警",
 	    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}端口都处于关闭状态。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 14
 		},{
 	    "metaId" : 14,
@@ -323,18 +297,16 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器PORT告警",
 	    "alarmTemplate" : "消费服务器[MASTER IP]{masterIp}[SLAVE IP]{slaveIp}，端口已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
 
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 15
 		},{
 	    "metaId" : 15,
@@ -348,17 +320,15 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器SLAVE服务告警",
 	    "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务未开启。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		"metaId" : 16
 		},{
 	    "metaId" : 16,
@@ -372,17 +342,15 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器SLAVE服务告警",
 	    "alarmTemplate" : "消费服务器[SLAVE IP]{ip}服务已正常开启。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 17
 		}, {
 	    "metaId" : 17,
@@ -396,16 +364,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器发送QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 18
 		}, {
 	    "metaId" : 18,
@@ -419,16 +385,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器发送QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true,  false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 19
 		}, {
 	    "metaId" : 19,
@@ -442,16 +406,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器发送QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 20
 		}, {
 	    "metaId" : 20,
@@ -465,16 +427,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器发送QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}发送[QPS]已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 21
 		}, {
 	    "metaId" : 21,
@@ -488,16 +448,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器确认QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	  	"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	},true,false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 22
 		}, {
 	    "metaId" : 22,
@@ -511,16 +469,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器确认QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 23
 		}, {
 	    "metaId" : 23,
@@ -534,16 +490,14 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器确认QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
 	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 24
 		}, {
 	    "metaId" : 24,
@@ -557,17 +511,15 @@ if(result != null) {
 	    "alarmTitle" : "消费服务器确认QPS告警",
 	    "alarmTemplate" : "消费服务器[IP]{ip}确认[QPS]已正常。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1001
 		}, {
 	    "metaId" : 1001,
@@ -581,16 +533,14 @@ if(result != null) {
 	    "alarmTitle" : "生产端TOPIC QPS告警",
 	    "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1002
 		}, {
 	    "metaId" : 1002,
@@ -604,16 +554,14 @@ if(result != null) {
 	    "alarmTitle" : "生产端TOPIC QPS告警",
 	    "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1003
 		}, {
 	    "metaId" : 1003,
@@ -627,16 +575,14 @@ if(result != null) {
 	    "alarmTitle" : "生产端TOPIC QPS告警",
 	    "alarmTemplate" : "生产客户端[TOPIC]{topic}[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1004
 		}, {
 	    "metaId" : 1004,
@@ -650,17 +596,15 @@ if(result != null) {
 	    "alarmTitle" : "生产端TOPIC存储延时告警",
 	    "alarmTemplate" : "生产客户端[TOPIC]{topic}存储延时{currentValue}大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1005
 		}, {
 	    "metaId" : 1005,
@@ -674,16 +618,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1006
 		}, {
 	    "metaId" : 1006,
@@ -697,17 +639,15 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1007
 		}, {
 	    "metaId" : 1007,
@@ -721,16 +661,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1008
 		}, {
 	    "metaId" : 1008,
@@ -744,16 +682,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC发送延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}发送延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1009
 		}, {
 	    "metaId" : 1009,
@@ -767,17 +703,15 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1010
 		}, {
 	    "metaId" : 1010,
@@ -791,16 +725,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1011
 		}, {
 	    "metaId" : 1011,
@@ -814,16 +746,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1012
 		},{
 	    "metaId" : 1012,
@@ -837,17 +767,15 @@ if(result != null) {
 	    "alarmTitle" : "消费端TOPIC确认延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1013
 		},{
 	    "metaId" : 1013,
@@ -861,17 +789,15 @@ if(result != null) {
 	    "alarmTitle" : "消费端发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1014
 		},{
 	    "metaId" : 1014,
@@ -885,16 +811,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1015
 		},{
 	    "metaId" : 1015,
@@ -908,17 +832,15 @@ if(result != null) {
 	    "alarmTitle" : "消费端发送QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1016
 		},{
 	    "metaId" : 1016,
@@ -932,16 +854,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端发送延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}发送延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1017
 		},{
 	    "metaId" : 1017,
@@ -955,16 +875,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端消息累积告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}消息累积{currentValue}累积大于阈值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1018
 		},{
 	    "metaId" : 1018,
@@ -978,17 +896,15 @@ if(result != null) {
 	    "alarmTitle" : "消费端确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}高于峰值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1019
 		},{
 	    "metaId" : 1019,
@@ -1002,16 +918,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}低于谷值{expectedValue}。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1020
 		},{
 	    "metaId" : 1020,
@@ -1025,17 +939,15 @@ if(result != null) {
 	    "alarmTitle" : "消费端确认QPS告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认[QPS]{currentValue}与历史同期值{expectedValue}波动较大。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
 	
-	db.swallowwebalarmmetac.update({
+	db.ALARM_META.update({
 		 "metaId" : 1021
 		},{
 	    "metaId" : 1021,
@@ -1049,16 +961,14 @@ if(result != null) {
 	    "alarmTitle" : "消费端确认延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
 	    "alarmDetail" : "",
-	    "timeSpanBase" : 5,
-	    "maxTimeSpan" : 120,
-	    "daySpanRatio" : 5,
-	    "nightSpanRatio" : 10,
-	    "sendTimeSpan" : 5,
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
 	
-	print("swallowwebalarmmetac load data end");
+	print("ALARM_META load data end");
 
 }
 

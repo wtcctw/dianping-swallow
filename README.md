@@ -108,6 +108,7 @@
  
  	* 请确保content对象的类型具有默认构造方法。<br>
  	* 尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。
+ 	* sendMessage消息发送失败会抛出SendFailedException异常，可能的原因包括：网络、数据库及FileQueue故障.
  
 <table class= "table table-bordered table-striped table-condensed">
    <tr>
@@ -180,56 +181,9 @@
 	     <version>${pigeon.version}</version>
 	</dependency>
 
-#### 在Spring中配置使用
-* swallow-producerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。
 
-##### Spring配置文件applicationContext-producer.xml配置相关bean
+#### 生产者端代码实现
 
-	<bean id="producerFactory" class="com.dianping.swallow.producer.impl.ProducerFactoryImpl" factory-method="getInstance" />
-
-	<bean id="producerClient" factory-bean="producerFactory" factory-method="createProducer">
-	    <constructor-arg>
-	        <ref bean="destination" />
-	    </constructor-arg>
-	    <constructor-arg>
-	        <ref bean="producerConfig" />
-	    </constructor-arg>
-	</bean>
-
-	<bean id="destination" class="com.dianping.swallow.common.message.Destination" factory-method="topic">
-	    <constructor-arg value="example" />
-	</bean>
-
-	<bean id="producerConfig" class="com.dianping.swallow.producer.ProducerConfig">
-	    <property name="mode" value="SYNC_MODE" />
-	    <property name="syncRetryTimes" value="0" />
-	    <property name="zipped" value="false" />
-	    <property name="threadPoolSize" value="5" />
-	    <property name="sendMsgLeftLastSession" value="false" />
-	</bean>
-
-##### 使用Spring中配置的bean发送消息
-
-	import org.springframework.context.ApplicationContext;
-	import org.springframework.context.support.ClassPathXmlApplicationContext;
-	import com.dianping.swallow.common.producer.exceptions.SendFailedException;
-	import com.dianping.swallow.producer.Producer;
-
-	public class ProducerSpring {
-	    public static void main(String[] args) {
-	    ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-producer.xml" });
-	    Producer producer = (Producer) ctx.getBean("producerClient");
-	        try {
-	            System.out.println(producer.sendMessage("Hello world.") + "hello");
-	        } catch (SendFailedException e) {
-	            e.printStackTrace();
-	        }
-	    }   
-	}
-
-#### 生产者端纯代码实现
-
-纯代码实现与使用Spring配置bean有一样的效果。
 
 	public class SyncProducerExample {
 		public static void main(String[] args) throws Exception {
@@ -243,9 +197,12 @@
 			Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config); 
 			for (int i = 0; i < 10; i++) {
 				String msg = "消息-" + i;
-				p.sendMessage(msg); 
-				System.out.println("Sended msg:" + msg);
-				Thread.sleep(500);
+				try{
+					p.sendMessage(msg); 
+					System.out.println("Sended msg:" + msg);
+				}catch(SendFailedException e){
+					System.out.println("Catch exception then do what you want to do.");
+				}
 			}
 		}
 	}
@@ -326,39 +283,8 @@ longTaskAlertTime | 5000
 
 * swallow-consumerclient的版本可以在[mvn repo](http://mvn.dianpingoa.com/webapp/home.html)查询所有的发行版本。
 
-#### Spring中配置实现
-##### Spring配置文件applicationContext-consumer.xml配置相关bean
+#### 消费者实现MessageListener接口
 
-	<!-- 消费者工厂类 -->
-	<bean id="consumerFactory" class="com.dianping.swallow.consumer.impl.ConsumerFactoryImpl" factory-method="getInstance" />
-	<!-- 消费者配置类 -->
-	<bean id="consumerConfig" class="com.dianping.swallow.consumer.ConsumerConfig">
-	</bean>
-	<!-- 消息的目的地(即Topic) -->
-	<bean id="dest" class="com.dianping.swallow.common.message.Destination" factory-method="topic">
-	    <constructor-arg>
-	        <value>example</value>  
-	    </constructor-arg>
-	</bean>
-	<!-- MessageListener为您实现的消息事件监听器，负责处理接收到的消息 -->
-	<bean id="messageListener" class="com.dianping.swallow.example.consumer.spring.listener.MessageListenerImpl" />
-	<!-- 消费者 -->
-	<bean id="consumerClient" factory-bean="consumerFactory" factory-method="createConsumer" init-method="start" destroy-method="close">
-	    <constructor-arg>
-	        <ref bean="dest" />
-	    </constructor-arg>
-	    <constructor-arg>
-	        <value>xx</value>   
-	    </constructor-arg>
-	    <constructor-arg>
-	        <ref bean="consumerConfig" />
-	    </constructor-arg>
-	    <property name="listener">
-	        <ref local="messageListener" />
-	    </property>
-	</bean>
-
-消息目的地的值example为消息种类，必须是在服务器白名单中的消息种类才能够连接服务器，否则会拒绝连接。如何申请参加[申请Topic](#topic) 
 messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``接口。下面列出MessageListenerImpl的实现供参考。
 
 	package com.dianping.swallow.example.consumer.spring.listener;
@@ -375,31 +301,14 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.error("Sleep interrupted.");
 			}
 		}
 	}
 
-##### Spring代码
 
-
-	package com.dianping.swallow.example.consumer.spring;
-
-	import org.springframework.context.ApplicationContext;
-	import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-	import com.dianping.swallow.consumer.Consumer;
-
-	public class TestConsumer {
-
-		public static void main(String[] args) throws InterruptedException {
-			ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-consumer.xml" });
-			final Consumer consumerClient = (Consumer) ctx.getBean("consumerClient");  
-			consumerClient.start();
-		}
-	}
-
-#### 消费者端纯代码实现
+#### 消费者端代码实现
+消息目的地的值example为消息种类，必须是在服务器白名单中的消息种类才能够连接服务器，否则会拒绝连接。如何申请参加[申请Topic](#topic) 
 
 	public class DurableConsumerExample {
 	    public static void main(String[] args) {
@@ -416,6 +325,8 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 	        c.start();  //(5)
 	    }
 	}
+
+* createConsumer函数接收3个参数,其中第二个参数表示consumerId.对于默认的消费类型DURABLE_AT_LEAST_ONCE,必需提供一个consumerId;如果消费类型为NON_DURABLE,则不需要设置consumerId.这里的"myId"即为消费者的consumerId.
 
 # Swallow Web使用说明
 
@@ -435,11 +346,8 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 * 在左侧搜索栏里输入所要查询的topic名称，系统会提示可以搜索到的与用户关联的topic，如果提示没有返回任何内容，则说明用户没有权限查询任何topic。
 
-* 对于每个topic，管理员首先需要添加至少一名topic的申请人，授权其访问topic的权限，得到相应权限的申请人可以根据需要添加或者删除其他topic关联人。
+* 对于每个topic，默认情况下除了管理员,其他人是没有权限查看topic下的message.如果有相应的需求,可以通过[workflow](http://workflow.dp/wfe/start/119)申请相关topic的权限.
 
-### 根据申请人和申请人部门查询
-
-* 在右侧搜索栏中输入申请人或者申请人部门，系统会返回相关的提示，如果没有提示信息，则说明没有相关的查询结果。
 
 ## Message查询与重发
 
@@ -526,8 +434,8 @@ product | http://swallow.dp
 		try {
 			ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 			host = configCache.getProperty("swallow.web.sso.url");
-		} catch (LionException e1) {
-			e1.printStackTrace();
+		} catch (LionException e) {
+			logger.error("Error when using lion.", e);
 		}
 		String url = host + "/api/message/sendmessageid";
 		HttpClient httpClient = new HttpClient();
@@ -541,10 +449,10 @@ product | http://swallow.dp
 				System.out.println(json.getInt("status"));
 				System.out.println(json.getString("message"));
 			} catch (JSONException e) {
-				e.printStackTrace();
+				logger.error("Error when parse json", e);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error when execute http request.", e);
 		}
 	}
 
@@ -755,6 +663,18 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 2.	consumerId告警分析
 
 	如果出现延时或者累积报警，先查看是否是消息接收端处理过慢（并发数过低、单条消息处理过慢，异常导致onMessage处理挂起），可以借助swallow管理平台上的监控和Cat监控，参见[Swallow常见问题以及处理](#commonProblems)。
+
+
+## Swallow 大盘
+
+### 综合大盘
+
+* 综合大盘会显示消费者发送延迟,消费者确认延迟和消息堆积的综合统计数据.超过默认阈值的统计项会被标红.大盘会根据一分钟的统计量生成最终结果.
+![综合大盘](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=G%2fDYymV%2fCzo54UW3ewdoKhnpvBDwtWMT3TGTh8jeVr0%3d&docid=08978bd2fd3284d008831ca1d9e506435)
+
+### 发送延迟,确认延迟和堆积大盘
+
+* 发送延迟大盘根据发送延迟统计量生成相应的大盘;确认延迟大盘根据确认延迟统计量生成相应的大盘;堆积大盘根据消息堆积量生成相应的大盘.
 	   
 	
 ## 权限管理
@@ -871,4 +791,4 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 ### Swallow Web端追踪
 
 * 从Swallow Web端[Message管理](http://swallow.dp/console/message)中查看相关topic下的message信息，检查消息是否正确发送。
-![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/Documents/swallow/img/16.png)
+![consumer server监控](https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=mfGgnXyDnjxDzMW7VswO5i3Ar8qZvbXYolWzLedGsww%3d&docid=063ccff6570ed4057850b59c81a00b488)

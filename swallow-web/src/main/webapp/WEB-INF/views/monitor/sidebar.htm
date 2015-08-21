@@ -8,7 +8,7 @@
 		}
 	</script>
 	<ul class="nav nav-list">
-		<li class="#if($menu == 'delay') open #end"><a href="#"
+		<li class="#if($side == 'topic') open #end"><a href="#"
 			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
 				class="menu-text">topic监控</span> <b class="arrow icon-angle-down"></b>
 		</a>
@@ -17,7 +17,7 @@
 					href="${contextPath}/console/monitor/consumer/total/delay"> <i
 						class="icon-globe"></i> 延时监控
 				</a></li>
-				<li class="#if($subside == 'qps') active #end"><a
+				<li class="#if($subside == 'consumerqps') active #end"><a
 					href="${contextPath}/console/monitor/consumer/total/qps"> <i
 						class="icon-globe"></i> 每秒消息(topic)
 				</a></li>
@@ -28,7 +28,7 @@
 			</ul></li>
 	</ul>
 	<ul class="nav nav-list">
-		<li class="#if($menu == 'delay') open #end"><a href="#"
+		<li class="#if($side == 'server') open #end"><a href="#"
 			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
 				class="menu-text">swallow server监控</span> <b
 				class="arrow icon-angle-down"></b></a>
@@ -44,7 +44,7 @@
 			</ul></li>
 	</ul>
 	<ul class="nav nav-list">
-		<li class="#if($menu == 'delay') open #end" id="dashboardid"><a
+		<li class="#if($side == 'dashboard') open #end" id="dashboardid"><a
 			href="#" class="dropdown-toggle"> <i class="icon-desktop"></i> <span
 				class="menu-text">监控大盘</span> <b class="arrow icon-angle-down"></b></a>
 			<ul class="submenu" style="display: block;">
