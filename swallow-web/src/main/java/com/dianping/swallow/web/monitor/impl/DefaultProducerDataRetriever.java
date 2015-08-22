@@ -37,7 +37,7 @@ public class DefaultProducerDataRetriever
 
 	@Autowired
 	private ProducerMonitorDao producerMonitorDao;
-
+	
 	@Override
 	public StatsData getSaveDelay(String topic, long start, long end) {
 
@@ -60,9 +60,9 @@ public class DefaultProducerDataRetriever
 	@Override
 	public Map<String, StatsData> getServerQpx(QPX qpx, long start, long end) {
 
-		if (dataExistInMemory(start, end)) {
-			return getServerQpxInMemory(qpx, StatisType.SAVE, start, end);
-		}
+//		if (dataExistInMemory(start, end)) {
+//			return getServerQpxInMemory(qpx, StatisType.SAVE, start, end);
+//		}
 
 		return getServerQpxInDb(qpx, StatisType.SAVE, start, end);
 	}

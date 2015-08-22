@@ -73,5 +73,12 @@ public class DefaultProducerServerStatsDataDao extends AbstractStatsDao implemen
 				PRODUCERSERVERSTATSDATA_COLLECTION);
 		return serverStatisDatas;
 	}
-
+	
+	@Override
+	public List<ProducerServerStatsData> findSectionData(long startKey, long endKey){
+		Query query = new Query(Criteria.where(TIMEKEY_FIELD).gte(startKey).lte(endKey));
+		List<ProducerServerStatsData> serverStatisDatas = mongoTemplate.find(query, ProducerServerStatsData.class,
+				PRODUCERSERVERSTATSDATA_COLLECTION);
+		return serverStatisDatas;
+	}
 }
