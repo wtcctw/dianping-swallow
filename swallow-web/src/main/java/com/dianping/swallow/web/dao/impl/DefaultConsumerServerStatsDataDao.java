@@ -2,6 +2,8 @@ package com.dianping.swallow.web.dao.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -9,11 +11,12 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.dao.ConsumerServerStatsDataDao;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.mongodb.WriteResult;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午2:38:46
+ *         2015年8月3日 下午2:38:46
  */
 @Service("consumerServerStatsDataDao")
 public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implements ConsumerServerStatsDataDao {
@@ -25,7 +28,7 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 	private static final String ID_FIELD = "id";
 
 	private static final String IP_FIELD = "ip";
-	
+
 	@Override
 	public boolean insert(ConsumerServerStatsData serverStatsData) {
 		try {
@@ -69,6 +72,15 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 	@Override
 	public List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey) {
 		Query query = new Query(Criteria.where(IP_FIELD).is(ip).and(TIMEKEY_FIELD).gte(startKey).lte(endKey));
+		List<ConsumerServerStatsData> serverStatisDatas = mongoTemplate.find(query, ConsumerServerStatsData.class,
+				CONSUMERSERVERSTATSDATA_COLLECTION);
+		return serverStatisDatas;
+	}
+
+	@Override
+	public List<ConsumerServerStatsData> findSectionData(long startKey, long endKey) {
+		Query query = new Query(Criteria.where(TIMEKEY_FIELD).gte(startKey).lte(endKey)).with(new Sort(new Sort.Order(
+				Direction.ASC, TIMEKEY_FIELD)));
 		List<ConsumerServerStatsData> serverStatisDatas = mongoTemplate.find(query, ConsumerServerStatsData.class,
 				CONSUMERSERVERSTATSDATA_COLLECTION);
 		return serverStatisDatas;

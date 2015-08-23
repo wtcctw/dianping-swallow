@@ -11,7 +11,7 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
@@ -47,23 +47,11 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 	private List<MonitorDataListener> statisListeners = new ArrayList<MonitorDataListener>();
 
-	private static final String TOTAL_KEY = "total";
+	protected static final String TOTAL_KEY = "total";
 
 	protected AbstractAllData<M, T, S, V> statis;
 
 	private int intervalCount;
-
-	@Autowired
-	private ProducerServerStatsDataService pServerStatsDataService;
-
-	@Autowired
-	private ProducerTopicStatsDataService pTopicStatsDataService;
-
-	@Autowired
-	private ConsumerServerStatsDataService cServerStatsDataService;
-
-	@Autowired
-	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@PostConstruct
 	public void postAbstractMonitorDataStats() {
@@ -119,30 +107,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 		return getQpxInMemory(topic, type, start, end);
 	}
-
-	protected Map<String, StatsData> getServerQpxInDb(QPX qpx, StatisType type, long start, long end) {
-		Map<String, StatsData> result = new HashMap<String, StatsData>();
-
-		long startTimeKey = getCeilingTime(start);
-		long endTimeKey = getCeilingTime(end);
-		Map<String, NavigableMap<Long, Long>> statsDataMaps = pServerStatsDataService.findSectionQpsData(startTimeKey,
-				endTimeKey);
-
-		for (Map.Entry<String, NavigableMap<Long, Long>> statsDataMap : statsDataMaps.entrySet()) {
-			String serverIp = statsDataMap.getKey();
-
-			if (StringUtils.equals(TOTAL_KEY, serverIp)) {
-				continue;
-			}
-
-			NavigableMap<Long, Long> statsData = statsDataMap.getValue();
-			statsData = fillStatsData(statsData, startTimeKey, endTimeKey);
-			result.put(serverIp, createStatsData(createServerQpxDesc(serverIp, type), statsData, start, end));
-
-		}
-		return result;
-	}
-
+	
 	protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
 
 		return getDelayInMemory(topic, type, start, end);
@@ -160,7 +125,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 		return createStatsData(createQpxDesc(topic, type), rawData, start, end);
 	}
-
+	
 	protected Map<String, StatsData> getServerQpxInMemory(QPX qpx, StatisType type, long start, long end) {
 
 		Map<String, StatsData> result = new HashMap<String, StatsData>();
@@ -258,7 +223,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	}
 
 	// 补齐数据
-	private NavigableMap<Long, Long> fillStatsData(NavigableMap<Long, Long> statsDatas, long startTimeKey,
+	protected NavigableMap<Long, Long> fillStatsData(NavigableMap<Long, Long> statsDatas, long startTimeKey,
 			long endTimeKey) {
 		if (statsDatas == null) {
 			statsDatas = new TreeMap<Long, Long>();
@@ -279,20 +244,12 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 				statsDatas.put(tempStartKey, 0L);
 			}
 
-			Long lastTimeKey = 0L;
-			int loopCount = 0;
-			
-			for (Entry<Long, Long> statsData : statsDatas.entrySet()) {
-				if (loopCount == 0) {
-					lastTimeKey = statsData.getKey();
-					loopCount++;
-					continue;
+			tempStartKey += getSampleIntervalCount();
+			while (tempStartKey < tempEndKey) {
+				if (!statsDatas.containsKey(tempStartKey)) {
+					statsDatas.put(tempStartKey, 0L);
 				}
-				while (statsData.getKey() - lastTimeKey > getSampleIntervalCount()) {
-					lastTimeKey += getSampleIntervalCount();
-					statsDatas.put(lastTimeKey, 0L);
-				}
-				lastTimeKey = statsData.getKey();
+				tempStartKey += getSampleIntervalCount();
 			}
 
 			while (tempEndKey < endTimeKey) {

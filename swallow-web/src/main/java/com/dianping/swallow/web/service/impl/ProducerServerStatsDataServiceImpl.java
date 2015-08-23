@@ -68,6 +68,7 @@ public class ProducerServerStatsDataServiceImpl implements ProducerServerStatsDa
 					serverStatsDataMaps.put(serverStatsData.getIp(), serverStatsDataMap);
 				} else {
 					NavigableMap<Long, Long> serverStatsDataMap = new TreeMap<Long, Long>();
+					serverStatsDataMap.put(serverStatsData.getTimeKey(), serverStatsData.getQps());
 					serverStatsDataMaps.put(serverStatsData.getIp(), serverStatsDataMap);
 				}
 			}

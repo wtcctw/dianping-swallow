@@ -1,8 +1,11 @@
 package com.dianping.swallow.web.monitor.impl;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +24,8 @@ import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.service.ProducerServerStatsDataService;
+import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 
 /**
  * @author mengwenchao
@@ -34,10 +39,16 @@ public class DefaultProducerDataRetriever
 		implements ProducerDataRetriever {
 
 	public static final String CAT_TYPE = "DefaultProducerDataRetriever";
+	
+	@Autowired
+	private ProducerServerStatsDataService pServerStatsDataService;
+
+	@Autowired
+	private ProducerTopicStatsDataService pTopicStatsDataService;
 
 	@Autowired
 	private ProducerMonitorDao producerMonitorDao;
-	
+
 	@Override
 	public StatsData getSaveDelay(String topic, long start, long end) {
 
@@ -60,11 +71,34 @@ public class DefaultProducerDataRetriever
 	@Override
 	public Map<String, StatsData> getServerQpx(QPX qpx, long start, long end) {
 
-//		if (dataExistInMemory(start, end)) {
-//			return getServerQpxInMemory(qpx, StatisType.SAVE, start, end);
-//		}
+		if (dataExistInMemory(start, end)) {
+			return getServerQpxInMemory(qpx, StatisType.SAVE, start, end);
+		}
 
 		return getServerQpxInDb(qpx, StatisType.SAVE, start, end);
+	}
+	
+	protected Map<String, StatsData> getServerQpxInDb(QPX qpx, StatisType type, long start, long end) {
+		Map<String, StatsData> result = new HashMap<String, StatsData>();
+
+		long startTimeKey = getCeilingTime(start);
+		long endTimeKey = getCeilingTime(end);
+		Map<String, NavigableMap<Long, Long>> statsDataMaps = pServerStatsDataService.findSectionQpsData(startTimeKey,
+				endTimeKey);
+
+		for (Map.Entry<String, NavigableMap<Long, Long>> statsDataMap : statsDataMaps.entrySet()) {
+			String serverIp = statsDataMap.getKey();
+
+			if (StringUtils.equals(TOTAL_KEY, serverIp)) {
+				continue;
+			}
+
+			NavigableMap<Long, Long> statsData = statsDataMap.getValue();
+			statsData = fillStatsData(statsData, startTimeKey, endTimeKey);
+			result.put(serverIp, createStatsData(createServerQpxDesc(serverIp, type), statsData, start, end));
+
+		}
+		return result;
 	}
 
 	@Override
