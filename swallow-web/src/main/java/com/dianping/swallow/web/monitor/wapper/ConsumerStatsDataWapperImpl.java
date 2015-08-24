@@ -17,8 +17,10 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.ConsumerTopicStatisData;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
@@ -194,6 +196,55 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			return accumulation.longValue();
 		}
 		return 0L;
+	}
+
+	@Override
+	public ConsumerTopicStatsData getTotalTopicStatsData(long timeKey) {
+		ConsumerTopicStatsData consumerTopicStatsData = statsDataFactory.createConsumerTopicStatsData();
+		consumerTopicStatsData.setTopicName(TOTAL_KEY);
+		ConsumerTopicStatisData consumerIdStatisData = (ConsumerTopicStatisData) consumerDataRetriever.getValue(
+				new CasKeys(TOTAL_KEY, TOTAL_KEY), StatisType.SEND);
+		if (consumerIdStatisData == null) {
+			return null;
+		}
+		NavigableMap<Long, Long> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
+		NavigableMap<Long, Long> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
+		NavigableMap<Long, Long> sendDelay = consumerIdStatisData.getDelay(StatisType.SEND);
+		NavigableMap<Long, Long> ackDelay = consumerIdStatisData.getDelay(StatisType.ACK);
+
+		if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
+				|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+			return null;
+		}
+		Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+		if (tempKey == null) {
+			return null;
+		}
+		timeKey = tempKey.longValue();
+		consumerTopicStatsData.setTimeKey(timeKey);
+		Long sendQpxVlaue = sendQpx.get(timeKey);
+		if (sendQpxVlaue != null) {
+			consumerTopicStatsData.setSendQps(sendQpxVlaue);
+		}
+
+		Long ackQpxValue = ackQpx.get(timeKey);
+		if (ackQpxValue != null) {
+			consumerTopicStatsData.setAckQps(ackQpxValue.longValue());
+		}
+
+		Long sendDelayValue = sendDelay.get(timeKey);
+		if (sendDelayValue != null) {
+			consumerTopicStatsData.setSendDelay(sendDelayValue.longValue());
+		}
+
+		Long ackDelayValue = ackDelay.get(timeKey);
+		if (ackDelayValue != null) {
+			consumerTopicStatsData.setAckDelay(ackDelayValue.longValue());
+		}
+
+		consumerTopicStatsData.setAccumulation(0L);
+
+		return consumerTopicStatsData;
 	}
 
 	@Override

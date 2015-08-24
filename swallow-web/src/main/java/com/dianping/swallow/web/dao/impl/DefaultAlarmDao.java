@@ -72,86 +72,44 @@ public class DefaultAlarmDao extends AbstractStatsDao implements AlarmDao {
 	}
 
 	@Override
-	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime,
-			int offset, int limit) {
-		if (endTime == null) {
-			endTime = new Date();
+	public Pair<List<Alarm>, Long> findByPage(AlarmParam alarmParam) {
+		if (alarmParam.getEndTime() == null) {
+			alarmParam.setEndTime(new Date());
 		}
 		Criteria criteria = null;
-		if (StringUtils.isNotBlank(receiver)) {
-			criteria = Criteria.where(RECEIVER_FIELD).is(receiver);
+		if (StringUtils.isNotBlank(alarmParam.getReceiver())) {
+			criteria = Criteria.where(RECEIVER_FIELD).is(alarmParam.getReceiver());
 		}
-		if (StringUtils.isNotBlank(related)) {
+		if (StringUtils.isNotBlank(alarmParam.getRelated())) {
 			if (criteria != null) {
-				criteria = criteria.and(RELATED_FIELD).is(related);
+				criteria = criteria.and(RELATED_FIELD).is(alarmParam.getRelated());
 			} else {
-				criteria = Criteria.where(RELATED_FIELD).is(related);
+				criteria = Criteria.where(RELATED_FIELD).is(alarmParam.getRelated());
 			}
 		}
-		if (startTime != null && endTime != null) {
+		if (StringUtils.isNotBlank(alarmParam.getSubRelated())) {
 			if (criteria != null) {
-				criteria = criteria.and(CREATETIME_FIELD).gte(startTime).lte(endTime);
+				criteria = criteria.and(SUBRELATED_FIELD).is(alarmParam.getSubRelated());
 			} else {
-				criteria = Criteria.where(CREATETIME_FIELD).gte(startTime).lte(endTime);
+				criteria = Criteria.where(SUBRELATED_FIELD).is(alarmParam.getSubRelated());
+			}
+		}
+		if (alarmParam.getStartTime() != null && alarmParam.getEndTime() != null) {
+			if (criteria != null) {
+				criteria = criteria.and(CREATETIME_FIELD).gte(alarmParam.getStartTime()).lte(alarmParam.getEndTime());
+			} else {
+				criteria = Criteria.where(CREATETIME_FIELD).gte(alarmParam.getStartTime()).lte(alarmParam.getEndTime());
 			}
 		} else {
 			if (criteria != null) {
-				criteria = criteria.and(CREATETIME_FIELD).lte(endTime);
+				criteria = criteria.and(CREATETIME_FIELD).lte(alarmParam.getEndTime());
 			} else {
-				criteria = Criteria.where(CREATETIME_FIELD).lte(endTime);
+				criteria = Criteria.where(CREATETIME_FIELD).lte(alarmParam.getEndTime());
 			}
 		}
 		Query query = new Query(criteria);
 		Query queryCount = new Query(criteria);
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, EVENTID_FIELD)));
-		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
-		long count = mongoTemplate.count(queryCount, ALARM_COLLECTION);
-		Pair<List<Alarm>, Long> result = new Pair<List<Alarm>, Long>();
-		result.setFirst(alarms);
-		result.setSecond(count);
-		return result;
-	}
-
-	@Override
-	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
-			Date endTime, int offset, int limit) {
-		if (endTime == null) {
-			endTime = new Date();
-		}
-		Criteria criteria = null;
-		if (StringUtils.isNotBlank(receiver)) {
-			criteria = Criteria.where(RECEIVER_FIELD).is(receiver);
-		}
-		if (StringUtils.isNotBlank(related)) {
-			if (criteria != null) {
-				criteria = criteria.and(RELATED_FIELD).is(related);
-			} else {
-				criteria = Criteria.where(RELATED_FIELD).is(related);
-			}
-		}
-		if (StringUtils.isNotBlank(subRelated)) {
-			if (criteria != null) {
-				criteria = criteria.and(SUBRELATED_FIELD).is(subRelated);
-			} else {
-				criteria = Criteria.where(SUBRELATED_FIELD).is(subRelated);
-			}
-		}
-		if (startTime != null && endTime != null) {
-			if (criteria != null) {
-				criteria = criteria.and(CREATETIME_FIELD).gte(startTime).lte(endTime);
-			} else {
-				criteria = Criteria.where(CREATETIME_FIELD).gte(startTime).lte(endTime);
-			}
-		} else {
-			if (criteria != null) {
-				criteria = criteria.and(CREATETIME_FIELD).lte(endTime);
-			} else {
-				criteria = Criteria.where(CREATETIME_FIELD).lte(endTime);
-			}
-		}
-		Query query = new Query(criteria);
-		Query queryCount = new Query(criteria);
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, EVENTID_FIELD)));
+		query.skip(alarmParam.getOffset()).limit(alarmParam.getLimit()).with(new Sort(new Sort.Order(Direction.DESC, EVENTID_FIELD)));
 		List<Alarm> alarms = mongoTemplate.find(query, Alarm.class, ALARM_COLLECTION);
 		long count = mongoTemplate.count(queryCount, ALARM_COLLECTION);
 		Pair<List<Alarm>, Long> result = new Pair<List<Alarm>, Long>();

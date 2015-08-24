@@ -309,4 +309,14 @@ input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
 .breadcrumb-ul {
 	float: left;
 	margin-top: 8px;
+	max-width: 27%;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.row-table-td {
+	max-width: 150px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }

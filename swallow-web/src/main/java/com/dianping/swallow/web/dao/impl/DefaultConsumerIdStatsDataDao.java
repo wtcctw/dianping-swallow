@@ -113,4 +113,13 @@ public class DefaultConsumerIdStatsDataDao extends AbstractStatsDao implements C
 		return statisDatas;
 	}
 
+	@Override
+	public List<ConsumerIdStatsData> findSectionData(String topicName, long startKey, long endKey) {
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)
+				.lte(endKey)).with(new Sort(new Sort.Order(Direction.ASC, TIMEKEY_FIELD)));
+		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
+				CONSUMERIDSTATSDATA_COLLECTION);
+		return statisDatas;
+	}
+
 }

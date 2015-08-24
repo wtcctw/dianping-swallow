@@ -7,12 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -32,10 +28,6 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
-import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
-import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
-import com.dianping.swallow.web.service.ProducerServerStatsDataService;
-import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 
 /**
  * @author mengwenchao
@@ -107,7 +99,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 		return getQpxInMemory(topic, type, start, end);
 	}
-	
+
 	protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
 
 		return getDelayInMemory(topic, type, start, end);
@@ -125,7 +117,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 		return createStatsData(createQpxDesc(topic, type), rawData, start, end);
 	}
-	
+
 	protected Map<String, StatsData> getServerQpxInMemory(QPX qpx, StatisType type, long start, long end) {
 
 		Map<String, StatsData> result = new HashMap<String, StatsData>();
@@ -222,42 +214,4 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		return getValue(keys, null);
 	}
 
-	// 补齐数据
-	protected NavigableMap<Long, Long> fillStatsData(NavigableMap<Long, Long> statsDatas, long startTimeKey,
-			long endTimeKey) {
-		if (statsDatas == null) {
-			statsDatas = new TreeMap<Long, Long>();
-		}
-
-		if (statsDatas.isEmpty()) {
-			Long firstKey = startTimeKey;
-			Long endKey = endTimeKey;
-			while (firstKey < endKey) {
-				statsDatas.put(firstKey, 0L);
-				firstKey += getSampleIntervalCount();
-			}
-		} else {
-			Long tempStartKey = statsDatas.firstKey();
-			Long tempEndKey = statsDatas.lastKey();
-			while (startTimeKey < tempStartKey) {
-				tempStartKey -= getSampleIntervalCount();
-				statsDatas.put(tempStartKey, 0L);
-			}
-
-			tempStartKey += getSampleIntervalCount();
-			while (tempStartKey < tempEndKey) {
-				if (!statsDatas.containsKey(tempStartKey)) {
-					statsDatas.put(tempStartKey, 0L);
-				}
-				tempStartKey += getSampleIntervalCount();
-			}
-
-			while (tempEndKey < endTimeKey) {
-				tempEndKey += getSampleIntervalCount();
-				statsDatas.put(tempEndKey, 0L);
-			}
-		}
-
-		return statsDatas;
-	}
 }

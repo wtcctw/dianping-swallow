@@ -26,9 +26,9 @@ public interface ConsumerServerStatsDataService {
 
 	List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 
-	Map<String, QpsStatsDataPair> findSectionQpsData(long startKey, long endKey);
+	Map<String, StatsDataMapPair> findSectionQpsData(long startKey, long endKey);
 
-	public static class QpsStatsDataPair {
+	public static class StatsDataMapPair {
 		
 		private NavigableMap<Long, Long> sendStatsData;
 		

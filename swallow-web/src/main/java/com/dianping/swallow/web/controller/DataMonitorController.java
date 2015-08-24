@@ -62,6 +62,8 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	public static final String FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
+	private static final long maxSearchTimeSpan = 3 * 60 * 60 * 1000;
+
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 
@@ -190,6 +192,18 @@ public class DataMonitorController extends AbstractMonitorController {
 		return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
 	}
 
+	@RequestMapping(value = "/console/monitor/consumerserver/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
+	@ResponseBody
+	public List<HighChartsWrapper> getConsumerServerQps(@PathVariable String startTime, @PathVariable String endTime) {
+		Map<String, ConsumerDataPair> serverQpx = null;
+		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+			return getConsumerServerQps();
+		}
+		SearchTime searchTime = getSearchTime(startTime, endTime);
+		serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
+		return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+	}
+
 	@RequestMapping(value = "/console/monitor/producerserver/qps/get", method = RequestMethod.POST)
 	@ResponseBody
 	public List<HighChartsWrapper> getProducerServerQps() {
@@ -202,18 +216,13 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/producerserver/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
 	@ResponseBody
 	public List<HighChartsWrapper> getProducerServerQps(@PathVariable String startTime, @PathVariable String endTime) {
-		Date startDate = null;
-		if (StringUtils.isNotBlank(startTime)) {
-			startDate = DateUtil.convertStrToDate(startTime);
+		Map<String, StatsData> serverQpx = null;
+		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+			return getProducerServerQps();
 		}
-		Date endDate = null;
-		if (StringUtils.isNotBlank(endTime)) {
-			endDate = DateUtil.convertStrToDate(endTime);
-		} else {
-			endDate = new Date();
-		}
-		Map<String, StatsData> serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND, startDate.getTime(),
-				endDate.getTime());
+		SearchTime searchTime = getSearchTime(startTime, endTime);
+		serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
+
 		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
 	}
 
@@ -225,6 +234,27 @@ public class DataMonitorController extends AbstractMonitorController {
 		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND);
 		List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND);
+
+		return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData, interestConsumerIds);
+	}
+
+	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
+	@ResponseBody
+	public List<HighChartsWrapper> getTopicQps(@PathVariable String topic,
+			@RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
+			@PathVariable String endTime) {
+
+		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+			return getTopicQps(topic, consumerIds);
+		}
+
+		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
+
+		SearchTime searchTime = getSearchTime(startTime, endTime);
+		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND, searchTime.getStartTime(),
+				searchTime.getEndTime());
+		List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND,
+				searchTime.getStartTime(), searchTime.getEndTime());
 
 		return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData, interestConsumerIds);
 	}
@@ -277,6 +307,40 @@ public class DataMonitorController extends AbstractMonitorController {
 		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_ACCUMULATION, statsData);
 	}
 
+	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu/get/{startTime}/{endTime}", method = RequestMethod.POST)
+	@ResponseBody
+	public List<HighChartsWrapper> getTopicAccumulation(@PathVariable String topic,
+			@RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
+			@PathVariable String endTime) {
+
+		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+			return getTopicAccumulation(topic, consumerIds);
+		}
+
+		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
+
+		final SearchTime searchTime = getSearchTime(startTime, endTime);
+
+		Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic,
+				searchTime.getStartTime(), searchTime.getEndTime());
+
+		if (interestConsumerIds != null) {
+
+			List<String> remove = new LinkedList<String>();
+			for (String consumerId : statsData.keySet()) {
+				if (!interestConsumerIds.contains(consumerId)) {
+					remove.add(consumerId);
+				}
+			}
+
+			for (String consumerId : remove) {
+				statsData.remove(consumerId);
+			}
+		}
+
+		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_ACCUMULATION, statsData);
+	}
+
 	@RequestMapping(value = "/console/monitor/topiclist/get", method = RequestMethod.POST)
 	@ResponseBody
 	public Set<String> getProducerDelayMonitor() throws IOException {
@@ -308,6 +372,40 @@ public class DataMonitorController extends AbstractMonitorController {
 
 				StatsData producerData = producerDataRetriever.getSaveDelay(topic);
 				List<ConsumerDataPair> consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic);
+
+				return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay,
+						interestConsumerIds);
+			}
+		});
+
+	}
+
+	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get/{startTime}/{endTime}", method = RequestMethod.POST)
+	@ResponseBody
+	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic,
+			@RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
+			@PathVariable String endTime) throws Exception {
+
+		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+			return getConsumerDelayMonitor(topic, consumerIds);
+		}
+
+		final Set<String> interestConsumerIds = getConsumerIds(consumerIds);
+
+		final SearchTime searchTime = getSearchTime(startTime, endTime);
+
+		SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(
+				CAT_TYPE, "getConsumerDelayMonitor");
+
+		return wrapper.doCallable(new Callable<List<HighChartsWrapper>>() {
+
+			@Override
+			public List<HighChartsWrapper> call() throws Exception {
+
+				StatsData producerData = producerDataRetriever.getSaveDelay(topic, searchTime.getStartTime(),
+						searchTime.getEndTime());
+				List<ConsumerDataPair> consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic,
+						searchTime.getStartTime(), searchTime.getEndTime());
 
 				return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay,
 						interestConsumerIds);
@@ -398,6 +496,35 @@ public class DataMonitorController extends AbstractMonitorController {
 		return topic;
 	}
 
+	private SearchTime getSearchTime(String startTime, String endTime) {
+		SearchTime searchTime = new SearchTime();
+
+		if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+
+			searchTime.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
+			searchTime.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
+
+			if (searchTime.getEndTime() - searchTime.getStartTime() > maxSearchTimeSpan) {
+				searchTime.setEndTime(searchTime.getStartTime() + maxSearchTimeSpan);
+			}
+
+		} else {
+
+			if (StringUtils.isBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+
+				searchTime.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
+				searchTime.setEndTime(searchTime.getStartTime() + maxSearchTimeSpan);
+
+			} else if (StringUtils.isNotBlank(startTime) && StringUtils.isBlank(endTime)) {
+
+				searchTime.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
+				searchTime.setStartTime(searchTime.getEndTime() - maxSearchTimeSpan);
+
+			}
+		}
+		return searchTime;
+	}
+
 	private Object buildResponse(List<ResultEntry> entrys, String type) {
 
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -460,7 +587,7 @@ public class DataMonitorController extends AbstractMonitorController {
 	}
 
 	@Override
-	protected String getSide() {
+	public String getSide() {
 		return "delay";
 	}
 
@@ -469,6 +596,30 @@ public class DataMonitorController extends AbstractMonitorController {
 	@Override
 	public String getSubSide() {
 		return subSide;
+	}
+
+	private static class SearchTime {
+
+		private long startTime;
+
+		private long endTime;
+
+		public long getStartTime() {
+			return startTime;
+		}
+
+		public void setStartTime(long startTime) {
+			this.startTime = startTime;
+		}
+
+		public long getEndTime() {
+			return endTime;
+		}
+
+		public void setEndTime(long endTime) {
+			this.endTime = endTime;
+		}
+
 	}
 
 }

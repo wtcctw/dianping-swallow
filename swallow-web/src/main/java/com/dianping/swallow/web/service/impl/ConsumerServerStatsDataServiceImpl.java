@@ -56,23 +56,23 @@ public class ConsumerServerStatsDataServiceImpl implements ConsumerServerStatsDa
 	}
 
 	@Override
-	public Map<String, QpsStatsDataPair> findSectionQpsData(long startKey, long endKey) {
+	public Map<String, StatsDataMapPair> findSectionQpsData(long startKey, long endKey) {
 		List<ConsumerServerStatsData> serverStatsDatas = consumerServerStatsDataDao.findSectionData(startKey, endKey);
-		Map<String, QpsStatsDataPair> serverStatsDataMaps = null;
+		Map<String, StatsDataMapPair> serverStatsDataMaps = null;
 
 		if (serverStatsDatas != null) {
-			serverStatsDataMaps = new HashMap<String, QpsStatsDataPair>();
+			serverStatsDataMaps = new HashMap<String, StatsDataMapPair>();
 
 			for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
 				
 				if (serverStatsDataMaps.containsKey(serverStatsData.getIp())) {
 					
-					QpsStatsDataPair statsDataResult = serverStatsDataMaps.get(serverStatsData.getIp());
+					StatsDataMapPair statsDataResult = serverStatsDataMaps.get(serverStatsData.getIp());
 					statsDataResult.getSendStatsData().put(serverStatsData.getTimeKey(), serverStatsData.getSendQps());
 					statsDataResult.getAckStatsData().put(serverStatsData.getTimeKey(), serverStatsData.getAckQps());
 					serverStatsDataMaps.put(serverStatsData.getIp(), statsDataResult);
 				} else {
-					QpsStatsDataPair statsDataResult = new QpsStatsDataPair();
+					StatsDataMapPair statsDataResult = new StatsDataMapPair();
 					NavigableMap<Long, Long> sendStatsData = new TreeMap<Long, Long>();
 					sendStatsData.put(serverStatsData.getTimeKey(), serverStatsData.getSendQps());
 					NavigableMap<Long, Long> ackStatsData = new TreeMap<Long, Long>();

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -146,6 +147,10 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return getSampleIntervalTime() / AbstractCollector.SEND_INTERVAL;
 	}
 
+	private int getStorageIntervalCount() {
+		return DEFAULT_INTERVAL / AbstractCollector.SEND_INTERVAL;
+	}
+
 	@Override
 	public Set<String> getTopics() {
 
@@ -199,6 +204,61 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 	protected StatsData createStatsData(StatsDataDesc desc, NavigableMap<Long, Long> rawData, long start, long end) {
 
 		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getSampleIntervalTime());
+	}
+
+	// 补齐数据
+	protected NavigableMap<Long, Long> fillStatsData(NavigableMap<Long, Long> statsDatas, long startTimeKey,
+			long endTimeKey) {
+		if (statsDatas == null) {
+			statsDatas = new TreeMap<Long, Long>();
+		}
+
+		if (statsDatas.isEmpty()) {
+			Long firstKey = startTimeKey;
+			Long endKey = endTimeKey;
+			while (firstKey < endKey) {
+				statsDatas.put(firstKey, 0L);
+				firstKey += getStorageIntervalCount();
+			}
+		} else {
+			long tempStartKey = statsDatas.firstKey();
+			long tempEndKey = statsDatas.lastKey();
+			long tempKey = tempStartKey;
+			while (startTimeKey < tempKey) {
+				tempKey -= getStorageIntervalCount();
+				if (!statsDatas.containsKey(tempKey)) {
+					statsDatas.put(tempKey, 0L);
+				}
+			}
+
+			tempKey = tempStartKey;
+			while (tempKey < tempEndKey) {
+				if (!statsDatas.containsKey(tempKey)) {
+					Long higherKey = statsDatas.higherKey(tempKey);
+					if (higherKey != null) {
+						long pointKey = higherKey.longValue();
+						while (pointKey - tempKey > getStorageIntervalCount()) {
+							statsDatas.put(tempKey, 0L);
+							tempKey += getStorageIntervalCount();
+						}
+						tempKey = pointKey;
+						continue;
+					}
+
+				}
+				tempKey += getStorageIntervalCount();
+			}
+
+			tempKey = tempEndKey;
+			while (tempKey < endTimeKey) {
+				tempKey += getStorageIntervalCount();
+				if (!statsDatas.containsKey(tempKey)) {
+					statsDatas.put(tempKey, 0L);
+				}
+			}
+		}
+
+		return statsDatas;
 	}
 
 }

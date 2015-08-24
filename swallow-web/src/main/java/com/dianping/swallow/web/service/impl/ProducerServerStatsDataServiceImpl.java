@@ -59,14 +59,20 @@ public class ProducerServerStatsDataServiceImpl implements ProducerServerStatsDa
 	public Map<String, NavigableMap<Long, Long>> findSectionQpsData(long startKey, long endKey) {
 		List<ProducerServerStatsData> serverStatsDatas = producerServerStatsDataDao.findSectionData(startKey, endKey);
 		Map<String, NavigableMap<Long, Long>> serverStatsDataMaps = null;
+		
 		if (serverStatsDatas != null) {
+			
 			serverStatsDataMaps = new HashMap<String, NavigableMap<Long, Long>>();
 			for (ProducerServerStatsData serverStatsData : serverStatsDatas) {
+				
 				if (serverStatsDataMaps.containsKey(serverStatsData.getIp())) {
+					
 					NavigableMap<Long, Long> serverStatsDataMap = serverStatsDataMaps.get(serverStatsData.getIp());
 					serverStatsDataMap.put(serverStatsData.getTimeKey(), serverStatsData.getQps());
 					serverStatsDataMaps.put(serverStatsData.getIp(), serverStatsDataMap);
+					
 				} else {
+					
 					NavigableMap<Long, Long> serverStatsDataMap = new TreeMap<Long, Long>();
 					serverStatsDataMap.put(serverStatsData.getTimeKey(), serverStatsData.getQps());
 					serverStatsDataMaps.put(serverStatsData.getIp(), serverStatsDataMap);

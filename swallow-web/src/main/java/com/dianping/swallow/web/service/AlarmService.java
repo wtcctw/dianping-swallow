@@ -1,10 +1,10 @@
 package com.dianping.swallow.web.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.dao.AlarmDao.AlarmParam;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.ResultType;
 
@@ -141,23 +141,7 @@ public interface AlarmService {
 	 * @param limit
 	 * @return
 	 */
-	Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime, int offset,
-			int limit);
-
-	/**
-	 * find by page
-	 * 
-	 * @param receiver
-	 * @param related
-	 * @param subRelated
-	 * @param startTime
-	 * @param endTime
-	 * @param offset
-	 * @param limit
-	 * @return
-	 */
-	Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
-			Date endTime, int offset, int limit);
+	Pair<List<Alarm>, Long> findByPage(AlarmParam alarmParam);
 
 	/**
 	 * find by eventId

@@ -1,8 +1,11 @@
 package com.dianping.swallow.web.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsDataMapPair;
 
 /**
  * 
@@ -31,4 +34,12 @@ public interface ConsumerIdStatsDataService {
 	List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
 
 	List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey);
+
+	List<ConsumerIdStatsData> findSectionData(String topicName, long startKey, long endKey);
+
+	Map<String, StatsDataMapPair> findSectionQpsData(String topicName, long startKey, long endKey);
+
+	Map<String, StatsDataMapPair> findSectionDelayData(String topicName, long startKey, long endKey);
+
+	Map<String, NavigableMap<Long, Long>> findSectionAccuData(String topicName, long startKey, long endKey);
 }

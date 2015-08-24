@@ -35,7 +35,7 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 			mongoTemplate.save(serverStatsData, CONSUMERSERVERSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save consumer machine statis dao " + serverStatsData, e);
+			logger.error("Error when save consumer server statis dao " + serverStatsData, e);
 		}
 		return false;
 	}

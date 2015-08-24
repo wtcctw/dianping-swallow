@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.AlarmDao;
+import com.dianping.swallow.web.dao.AlarmDao.AlarmParam;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.ResultType;
 import com.dianping.swallow.web.model.alarm.SendInfo;
@@ -256,16 +257,10 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		initProperties();
 	}
 
+	
 	@Override
-	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, Date startTime, Date endTime,
-			int offset, int limit) {
-		return alarmDao.findByPage(receiver, related, startTime, endTime, offset, limit);
-	}
-
-	@Override
-	public Pair<List<Alarm>, Long> findByPage(String receiver, String related, String subRelated, Date startTime,
-			Date endTime, int offset, int limit) {
-		return alarmDao.findByPage(receiver, related, subRelated, startTime, endTime, offset, limit);
+	public Pair<List<Alarm>, Long> findByPage(AlarmParam alarmParam) {
+		return alarmDao.findByPage(alarmParam);
 	}
 
 	@Override

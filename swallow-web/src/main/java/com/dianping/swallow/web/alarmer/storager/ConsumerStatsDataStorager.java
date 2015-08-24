@@ -12,16 +12,19 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
+import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月4日 下午1:22:31
+ *         2015年8月4日 下午1:22:31
  */
 @Component
 public class ConsumerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
@@ -34,6 +37,9 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 
 	@Autowired
 	private ConsumerServerStatsDataService serverStatsDataService;
+
+	@Autowired
+	private ConsumerTopicStatsDataService topicStatsDataService;
 
 	@Autowired
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
@@ -60,7 +66,9 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 				.getServerStatsDatas(lastTimeKey.get());
 		Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = consumerStatsDataWapper
 				.getConsumerIdStatsDatas(lastTimeKey.get());
+		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
 		storageServerStatis(serverStatisDatas);
+		storageTopicStatis(topicStatsData);
 		storageConsumerIdStatis(consumerIdStatsDataMap);
 	}
 
@@ -77,6 +85,21 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 					lastTimeKey.set(serverStatsData.getTimeKey());
 					serverStatsDataService.insert(serverStatsData);
 				}
+			}
+		});
+
+	}
+
+	private void storageTopicStatis(final ConsumerTopicStatsData topicStatsData) {
+		logger.info("[storageTopicStatis]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStats");
+		catWrapper.doAction(new SwallowAction() {
+			@Override
+			public void doAction() throws SwallowException {
+				if (topicStatsData == null) {
+					return;
+				}
+				topicStatsDataService.insert(topicStatsData);
 			}
 		});
 

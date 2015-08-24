@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.service;
 
 import java.util.List;
+import java.util.NavigableMap;
 
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 
@@ -23,4 +24,8 @@ public interface ProducerTopicStatsDataService {
 	List<ProducerTopicStatsData> findByTopic(String topicName);
 
 	List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
+
+	NavigableMap<Long, Long> findSectionQpsData(String topicName, long startKey, long endKey);
+	
+	NavigableMap<Long, Long> findSectionDelayData(String topicName, long startKey, long endKey);
 }

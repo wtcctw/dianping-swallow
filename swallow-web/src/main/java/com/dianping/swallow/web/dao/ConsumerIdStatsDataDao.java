@@ -32,4 +32,5 @@ public interface ConsumerIdStatsDataDao {
 
 	List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey);
 
+	List<ConsumerIdStatsData> findSectionData(String topicName, long startKey, long endKey);
 }

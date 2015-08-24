@@ -32,6 +32,7 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.config.WebConfig;
 import com.dianping.swallow.web.config.impl.DefaultWebConfig;
 import com.dianping.swallow.web.monitor.AccumulationListener;
@@ -39,6 +40,7 @@ import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 
 /**
  * @author mengwenchao
@@ -66,6 +68,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	private ConsumerDataRetriever consumerDataRetriever;
 
 	private ExecutorService executors;
+
+	@Autowired
+	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -152,7 +157,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 					putAccumulation(topicName, consumerId);
 					TopicAccumulation topic = topics.get(topicName);
-					if(topic != null){
+					if (topic != null) {
 						topic.retain(consumerIds);
 					}
 				}
@@ -212,14 +217,31 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	}
 
 	private Map<String, StatsData> getAccumulationForAllConsumerIdInDb(String topic, long start, long end) {
-		return getAccumulationForAllConsumerIdInMemory(topic, start, end);
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+		Map<String, NavigableMap<Long, Long>> accuStatsDatas = consumerIdStatsDataService.findSectionAccuData(topic,
+				startKey, endKey);
+		Map<String, StatsData> result = new HashMap<String, StatsData>();
+		if (accuStatsDatas != null && !accuStatsDatas.isEmpty()) {
+			for (Map.Entry<String, NavigableMap<Long, Long>> accuStatsData : accuStatsDatas.entrySet()) {
+				String consumerId = accuStatsData.getKey();
+				if (MonitorData.TOTAL_KEY.equals(consumerId)) {
+					continue;
+				}
+				StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
+				NavigableMap<Long, Long> accuRawData = accuStatsData.getValue();
+				accuRawData = fillStatsData(accuRawData, startKey, endKey);
+				result.put(consumerId, createStatsData(desc, accuRawData, start, end));
+			}
+		}
+		return result;
 	}
 
 	private Map<String, StatsData> getAccumulationForAllConsumerIdInMemory(String topic, long start, long end) {
 
 		Map<String, StatsData> result = new HashMap<String, StatsData>();
 		TopicAccumulation topicAccumulation = topics.get(topic);
-		if(topicAccumulation == null){
+		if (topicAccumulation == null) {
 			return result;
 		}
 		for (Entry<String, ConsumerIdAccumulation> entry : topicAccumulation.consumers.entrySet()) {

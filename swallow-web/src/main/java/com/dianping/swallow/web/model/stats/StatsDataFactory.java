@@ -38,6 +38,12 @@ public class StatsDataFactory {
 		setComponent(consumerIdStatsData);
 		return consumerIdStatsData;
 	}
+	
+	public ConsumerTopicStatsData createConsumerTopicStatsData(){
+		ConsumerTopicStatsData consumerTopicStatsData = new ConsumerTopicStatsData();
+		setComponent(consumerTopicStatsData);
+		return consumerTopicStatsData;
+	}
 
 	private void setComponent(StatsData statsData) {
 		statsData.setEventReporter(eventReporter);

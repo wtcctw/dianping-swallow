@@ -161,9 +161,9 @@ public class IPDescManagerImpl implements IPDescManager {
 			Set<String> opEmails = getEmailsByStrMobile(strOpMobile);
 
 			if (StringUtils.isNotBlank(ipDesc.getOpEmail())) {
-				ipDesc.setEmail(ipDesc.getOpEmail() + COMMA_SPLIT + convertSetToEmail(opEmails));
+				ipDesc.setOpEmail(ipDesc.getOpEmail() + COMMA_SPLIT + convertSetToEmail(opEmails));
 			} else {
-				ipDesc.setEmail(convertSetToEmail(opEmails));
+				ipDesc.setOpEmail(convertSetToEmail(opEmails));
 			}
 		} catch (Exception e) {
 			logger.error("[addEmail]", e);

@@ -39,7 +39,7 @@ public class DefaultProducerDataRetriever
 		implements ProducerDataRetriever {
 
 	public static final String CAT_TYPE = "DefaultProducerDataRetriever";
-	
+
 	@Autowired
 	private ProducerServerStatsDataService pServerStatsDataService;
 
@@ -58,6 +58,17 @@ public class DefaultProducerDataRetriever
 
 		return getDelayInDb(topic, StatisType.SAVE, start, end);
 	}
+	
+	@Override
+	protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
+		
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+		
+		NavigableMap<Long, Long> rawData = pTopicStatsDataService.findSectionDelayData(topic, startKey, endKey);
+		rawData = fillStatsData(rawData, startKey, endKey);
+		return createStatsData(createQpxDesc(topic, StatisType.SAVE), rawData, start, end);
+	}
 
 	@Override
 	public StatsData getQpx(String topic, QPX qpx, long start, long end) {
@@ -69,6 +80,16 @@ public class DefaultProducerDataRetriever
 	}
 
 	@Override
+	protected StatsData getQpxInDb(String topic, StatisType type, long start, long end) {
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+		
+		NavigableMap<Long, Long> rawData = pTopicStatsDataService.findSectionQpsData(topic, startKey, endKey);
+		rawData = fillStatsData(rawData, startKey, endKey);
+		return createStatsData(createQpxDesc(topic, type), rawData, start, end);
+	}
+
+	@Override
 	public Map<String, StatsData> getServerQpx(QPX qpx, long start, long end) {
 
 		if (dataExistInMemory(start, end)) {
@@ -77,14 +98,14 @@ public class DefaultProducerDataRetriever
 
 		return getServerQpxInDb(qpx, StatisType.SAVE, start, end);
 	}
-	
+
 	protected Map<String, StatsData> getServerQpxInDb(QPX qpx, StatisType type, long start, long end) {
 		Map<String, StatsData> result = new HashMap<String, StatsData>();
 
-		long startTimeKey = getCeilingTime(start);
-		long endTimeKey = getCeilingTime(end);
-		Map<String, NavigableMap<Long, Long>> statsDataMaps = pServerStatsDataService.findSectionQpsData(startTimeKey,
-				endTimeKey);
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+		Map<String, NavigableMap<Long, Long>> statsDataMaps = pServerStatsDataService.findSectionQpsData(startKey,
+				endKey);
 
 		for (Map.Entry<String, NavigableMap<Long, Long>> statsDataMap : statsDataMaps.entrySet()) {
 			String serverIp = statsDataMap.getKey();
@@ -94,7 +115,7 @@ public class DefaultProducerDataRetriever
 			}
 
 			NavigableMap<Long, Long> statsData = statsDataMap.getValue();
-			statsData = fillStatsData(statsData, startTimeKey, endTimeKey);
+			statsData = fillStatsData(statsData, startKey, endKey);
 			result.put(serverIp, createStatsData(createServerQpxDesc(serverIp, type), statsData, start, end));
 
 		}

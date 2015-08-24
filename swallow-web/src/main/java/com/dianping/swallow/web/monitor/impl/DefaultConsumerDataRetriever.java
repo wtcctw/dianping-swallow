@@ -27,7 +27,8 @@ import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
-import com.dianping.swallow.web.service.ConsumerServerStatsDataService.QpsStatsDataPair;
+import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsDataMapPair;
+import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
 
 /**
  * @author mengwenchao
@@ -46,66 +47,164 @@ public class DefaultConsumerDataRetriever
 	private ConsumerServerStatsDataService cServerStatsDataService;
 
 	@Autowired
+	private ConsumerTopicStatsDataService cTopicStatsDataService;
+
+	@Autowired
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@Override
 	public List<ConsumerDataPair> getDelayForAllConsumerId(String topic, long start, long end) {
 
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-
-		Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND,
-				false);
-		Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK,
-				false);
-
+		Map<String, NavigableMap<Long, Long>> sendDelays = null;
+		Map<String, NavigableMap<Long, Long>> ackDelays = null;
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
 
-		if (sendDelays != null) {
+		if (dataExistInMemory(start, end)) {
+			sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, false);
+			ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, false);
+			if (sendDelays != null) {
 
-			for (Entry<String, NavigableMap<Long, Long>> entry : sendDelays.entrySet()) {
+				for (Entry<String, NavigableMap<Long, Long>> entry : sendDelays.entrySet()) {
 
-				String consumerId = entry.getKey();
-				NavigableMap<Long, Long> send = entry.getValue();
-				NavigableMap<Long, Long> ack = ackDelays.get(consumerId);
+					String consumerId = entry.getKey();
+					NavigableMap<Long, Long> send = entry.getValue();
+					NavigableMap<Long, Long> ack = ackDelays.get(consumerId);
 
-				StatsData sendStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND),
-						send, start, end);
-				StatsData ackStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK),
-						ack, start, end);
-				result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
+					StatsData sendStatis = createStatsData(
+							createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), send, start, end);
+					StatsData ackStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK),
+							ack, start, end);
+					result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
+				}
+			}
+		} else {
+			Map<String, StatsDataMapPair> statsDataResults = getTopicDelayInDb(topic, start, end);
+			long startKey = getKey(start);
+			long endKey = getKey(end);
+			boolean isTotal = false;
+			if (MonitorData.TOTAL_KEY.equals(topic)) {
+				isTotal = true;
+			}
+			if (statsDataResults != null && !statsDataResults.isEmpty()) {
+				for (Map.Entry<String, StatsDataMapPair> statsDataResult : statsDataResults.entrySet()) {
+					if (!isTotal && MonitorData.TOTAL_KEY.equals(statsDataResult.getKey())) {
+						continue;
+					}
+					StatsDataMapPair statsDataMapPair = statsDataResult.getValue();
+					NavigableMap<Long, Long> sendRawData = null;
+					NavigableMap<Long, Long> ackRawData = null;
+					if (statsDataMapPair != null) {
+						sendRawData = statsDataMapPair.getSendStatsData();
+						ackRawData = statsDataMapPair.getSendStatsData();
+					}
+					sendRawData = fillStatsData(sendRawData, startKey, endKey);
+					StatsData sendStatis = createStatsData(
+							createConsumerIdQpxDesc(topic, statsDataResult.getKey(), StatisType.SEND), sendRawData,
+							start, end);
+					ackRawData = fillStatsData(ackRawData, startKey, endKey);
+					StatsData ackStatis = createStatsData(
+							createConsumerIdQpxDesc(topic, statsDataResult.getKey(), StatisType.ACK), ackRawData,
+							start, end);
+					result.add(new ConsumerDataPair(statsDataResult.getKey(), sendStatis, ackStatis));
+				}
 			}
 		}
 
 		return result;
 	}
 
+	protected Map<String, StatsDataMapPair> getTopicDelayInDb(String topic, long start, long end) {
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+		Map<String, StatsDataMapPair> statsDataResults = null;
+		if (MonitorData.TOTAL_KEY.equals(topic)) {
+			StatsDataMapPair statsDataResult = cTopicStatsDataService.findSectionDelayData(MonitorData.TOTAL_KEY,
+					startKey, endKey);
+			statsDataResults = new HashMap<String, StatsDataMapPair>();
+			statsDataResults.put(topic, statsDataResult);
+		} else {
+			statsDataResults = consumerIdStatsDataService.findSectionQpsData(topic, startKey, endKey);
+		}
+		return statsDataResults;
+	}
+
 	@Override
 	public List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, long start, long end) {
 
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-
-		Map<String, NavigableMap<Long, Long>> sendQpxs = retriever
-				.getQpxForAllConsumerId(topic, StatisType.SEND, false);
-		Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
-
+		Map<String, NavigableMap<Long, Long>> sendQpxs = null;
+		Map<String, NavigableMap<Long, Long>> ackQpxs = null;
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
 
-		if (sendQpxs != null) {
-			for (Entry<String, NavigableMap<Long, Long>> entry : sendQpxs.entrySet()) {
+		if (dataExistInMemory(start, end)) {
+			sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
+			ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
+			if (sendQpxs != null) {
+				for (Entry<String, NavigableMap<Long, Long>> entry : sendQpxs.entrySet()) {
 
-				String consumerId = entry.getKey();
-				NavigableMap<Long, Long> send = entry.getValue();
-				NavigableMap<Long, Long> ack = ackQpxs.get(consumerId);
+					String consumerId = entry.getKey();
+					NavigableMap<Long, Long> send = entry.getValue();
+					NavigableMap<Long, Long> ack = ackQpxs.get(consumerId);
 
-				StatsData sendStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND),
-						send, start, end);
-				StatsData ackStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK), ack,
-						start, end);
+					StatsData sendStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND),
+							send, start, end);
+					StatsData ackStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK),
+							ack, start, end);
 
-				result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
+					result.add(new ConsumerDataPair(consumerId, sendStatis, ackStatis));
+				}
+			}
+		} else {
+			Map<String, StatsDataMapPair> statsDataResults = getTopicQpxInDb(topic, qpx, start, end);
+			long startKey = getKey(start);
+			long endKey = getKey(end);
+			boolean isTotal = false;
+			if (MonitorData.TOTAL_KEY.equals(topic)) {
+				isTotal = true;
+			}
+			if (statsDataResults != null && !statsDataResults.isEmpty()) {
+				for (Map.Entry<String, StatsDataMapPair> statsDataResult : statsDataResults.entrySet()) {
+					if (!isTotal && MonitorData.TOTAL_KEY.equals(statsDataResult.getKey())) {
+						continue;
+					}
+					StatsDataMapPair statsDataMapPair = statsDataResult.getValue();
+					NavigableMap<Long, Long> sendRawData = null;
+					NavigableMap<Long, Long> ackRawData = null;
+					if (statsDataMapPair != null) {
+						sendRawData = statsDataMapPair.getSendStatsData();
+						ackRawData = statsDataMapPair.getSendStatsData();
+					}
+					sendRawData = fillStatsData(sendRawData, startKey, endKey);
+					StatsData sendStatis = createStatsData(
+							createConsumerIdQpxDesc(topic, statsDataResult.getKey(), StatisType.SEND), sendRawData,
+							start, end);
+
+					ackRawData = fillStatsData(ackRawData, startKey, endKey);
+					StatsData ackStatis = createStatsData(
+							createConsumerIdQpxDesc(topic, statsDataResult.getKey(), StatisType.ACK), ackRawData,
+							start, end);
+					result.add(new ConsumerDataPair(statsDataResult.getKey(), sendStatis, ackStatis));
+				}
 			}
 		}
+
 		return result;
+	}
+
+	protected Map<String, StatsDataMapPair> getTopicQpxInDb(String topic, QPX qpx, long start, long end) {
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+		Map<String, StatsDataMapPair> statsDataResults = null;
+		if (MonitorData.TOTAL_KEY.equals(topic)) {
+			StatsDataMapPair statsDataResult = cTopicStatsDataService.findSectionQpsData(MonitorData.TOTAL_KEY,
+					startKey, endKey);
+			statsDataResults = new HashMap<String, StatsDataMapPair>();
+			statsDataResults.put(topic, statsDataResult);
+		} else {
+			statsDataResults = consumerIdStatsDataService.findSectionQpsData(topic, startKey, endKey);
+		}
+		return statsDataResults;
 	}
 
 	@Override
@@ -140,23 +239,26 @@ public class DefaultConsumerDataRetriever
 		StatsDataPair statsDataPair = new StatsDataPair();
 		Map<String, StatsData> sendStatsDatas = new HashMap<String, StatsData>();
 		Map<String, StatsData> ackStatsDatas = new HashMap<String, StatsData>();
-		long startTimeKey = getCeilingTime(start);
-		long endTimeKey = getCeilingTime(end);
-		Map<String, QpsStatsDataPair> statsDataPairMaps = cServerStatsDataService.findSectionQpsData(startTimeKey,
-				endTimeKey);
+		long startKey = getCeilingTime(start);
+		long endKey = getCeilingTime(end);
+		Map<String, StatsDataMapPair> statsDataPairMaps = cServerStatsDataService.findSectionQpsData(startKey, endKey);
 
-		for (Map.Entry<String, QpsStatsDataPair> qpsStatsDataMap : statsDataPairMaps.entrySet()) {
+		for (Map.Entry<String, StatsDataMapPair> qpsStatsDataMap : statsDataPairMaps.entrySet()) {
 			String serverIp = qpsStatsDataMap.getKey();
 
 			if (StringUtils.equals(TOTAL_KEY, serverIp)) {
 				continue;
 			}
 
-			QpsStatsDataPair qpsStatsDataPair = qpsStatsDataMap.getValue();
-			NavigableMap<Long, Long> sendStatsData = qpsStatsDataPair.getSendStatsData();
-			sendStatsData = fillStatsData(sendStatsData, startTimeKey, endTimeKey);
-			NavigableMap<Long, Long> ackStatsData = qpsStatsDataPair.getAckStatsData();
-			ackStatsData = fillStatsData(ackStatsData, startTimeKey, endTimeKey);
+			StatsDataMapPair statsDataMapPair = qpsStatsDataMap.getValue();
+			NavigableMap<Long, Long> sendStatsData = null;
+			NavigableMap<Long, Long> ackStatsData = null;
+			if (statsDataMapPair != null) {
+				sendStatsData = statsDataMapPair.getSendStatsData();
+				ackStatsData = statsDataMapPair.getSendStatsData();
+			}
+			sendStatsData = fillStatsData(sendStatsData, startKey, endKey);
+			ackStatsData = fillStatsData(ackStatsData, startKey, endKey);
 			sendStatsDatas.put(serverIp,
 					createStatsData(createServerQpxDesc(serverIp, StatisType.SEND), sendStatsData, start, end));
 
