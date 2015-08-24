@@ -50,6 +50,7 @@
 			<mvc:mapping path="/console/administrator" />
 			<mvc:mapping path="/console/download" />
 			<mvc:mapping path="/console/setting" />
+			<mvc:mapping path="/console/server" />
 			<mvc:mapping path="/console/monitor/consumerserver/qps" />
 			<mvc:mapping path="/console/monitor/producerserver/qps" />
 			<mvc:mapping path="/console/monitor/consumer/*/qps" />
@@ -58,6 +59,7 @@
 			<mvc:mapping path="/console/monitor/consumer/*/delay" />
 			<mvc:mapping path="/console/monitor/dashboard" />
 			<mvc:mapping path="/console/setting/*" />
+			<mvc:mapping path="/console/server/*" />
 			<mvc:mapping path="/console/setting/alarmmeta/detail/*" />
 			<mvc:mapping path="/console/tool" />
 			<mvc:mapping path="/console/alarm/detail/*" />

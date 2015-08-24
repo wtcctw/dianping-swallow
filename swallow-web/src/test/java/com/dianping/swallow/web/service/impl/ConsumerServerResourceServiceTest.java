@@ -64,6 +64,13 @@ public class ConsumerServerResourceServiceTest {
 		consumerServerResource.setHostname("localhost");
 		consumerServerResource.setAlarm(Boolean.TRUE);
 		
+		List<String> topicWhiteList = new ArrayList<String>();
+		topicWhiteList.add("consumeri-01");
+		topicWhiteList.add("consumeri-02");
+		topicWhiteList.add("consumeri-03");
+		
+		consumerServerResource.setTopicWhiteList(topicWhiteList);
+		
 		return consumerServerResource;
 		
 	}
@@ -98,10 +105,10 @@ public class ConsumerServerResourceServiceTest {
 		System.out.println(consumerServer3.toString());
 		Assert.assertNotNull(consumerServer3);
 		
-		int delete = consumerServerResourceService.remove("default");
+		int delete = consumerServerResourceService.remove("127.0.0.1");
 		Assert.assertEquals(delete, 1);
 		
-		delete = consumerServerResourceService.remove("127.0.0.1");
+		delete = consumerServerResourceService.remove("default");
 		Assert.assertEquals(delete, 1);
 	}
 

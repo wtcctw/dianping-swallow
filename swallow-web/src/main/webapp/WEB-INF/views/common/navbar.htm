@@ -11,7 +11,17 @@
 			<a href="" class="navbar-brand"> <small> <i
 					class="icon-gift"></i> Swallow管理中心
 			</small>
-			</a> <a href="${rc.contextPath}/console/topic" class="navbar-brand">
+			</a>
+			#if(${isadmin})
+			<a href="${rc.contextPath}/console/server"
+				class="navbar-brand">
+				<button class="btn  #if(${menu}=='server')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
+					id="navbar-setting" >
+					<i class="icon-certificate align-top bigger-125 icon-on-right"></i> Server管理
+				</button>
+			</a>
+			#end
+			 <a href="${rc.contextPath}/console/topic" class="navbar-brand">
 				<button class="btn #if(${menu}=='topic')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
 					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
 					Topic管理

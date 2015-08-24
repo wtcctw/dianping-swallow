@@ -1,5 +1,5 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize){
+	return function(fetchFunction, pageSize, entity){
 		var paginator = {
 				hasNextVar: false,
 				fetch: function(page){
@@ -15,7 +15,9 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, function(data){
+					entity.offset = this.currentOffset;
+					entity.limit = pageSize + 1;
+					fetchFunction(entity, function(data){
 						items = data.second;
 						length = data.first;
 						if(length == 0){
@@ -75,39 +77,30 @@ module.factory('Paginator', function(){
 
 module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog','$interval',
                 function($rootScope, $scope, $http, Paginator, ngDialog,$interval){
-	var fetchFunction = function(offset, limit, callback){
-		var transFn = function(data){
-			return $.param(data);
-		}
-		var postConfig = {
-				transformRequest: transFn
-		};
-		var data = {'offset' : offset,
-								'limit': limit};
-		$http.get(window.contextPath + $scope.suburl, {
-			params : {
-				offset : offset,
-				limit : limit
-			}
-		}).success(callback);
+	var fetchFunction = function(entity, callback){
+		$http.post(window.contextPath + $scope.suburl, entity).success(callback);
 	};
 	
-	$scope.suburl = "/console/setting/consumerserver/list";
+	$scope.suburl = "/console/server/consumer/list";
 	$scope.numrecord = 30;
 	
-	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
+	$scope.entity = new Object();
+	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
 	
 	$scope.consumerserverEntry = {};
-	$scope.consumerserverEntry.serverId;
-	$scope.consumerserverEntry.whitelist;
-	$scope.consumerserverEntry.consumersendpeak;
-	$scope.consumerserverEntry.consumersendvalley;
-	$scope.consumerserverEntry.consumersendfluctuation;
-	$scope.consumerserverEntry.sendFluctuationBase;
-	$scope.consumerserverEntry.consumerackpeak;
-	$scope.consumerserverEntry.consumerackvalley;
-	$scope.consumerserverEntry.consumerackfluctuation;
-	$scope.consumerserverEntry.ackFluctuationBase;
+	$scope.consumerserverEntry.id = null;
+	$scope.consumerserverEntry.ip = "";
+	$scope.consumerserverEntry.hostname = "";
+	$scope.consumerserverEntry.alarm = false;
+	$scope.consumerserverEntry.whitelist = "";
+	$scope.consumerserverEntry.sendpeak = "";
+	$scope.consumerserverEntry.sendvalley = "";
+	$scope.consumerserverEntry.sendfluctuation = "";
+	$scope.consumerserverEntry.sendfluctuationBase = "";
+	$scope.consumerserverEntry.ackpeak = "";
+	$scope.consumerserverEntry.ackvalley = "";
+	$scope.consumerserverEntry.ackfluctuation = "";
+	$scope.consumerserverEntry.ackfluctuationBase = "";
 	
 	$scope.refreshpage = function(myForm){
 		if ($scope.consumerserverEntry.consumersendpeak < $scope.consumerserverEntry.consumersendvalley
@@ -119,30 +112,37 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.consumerserverEntry);
     	
-    	$.ajax({
-    	    type: "POST",
-    	    url: window.contextPath + '/console/setting/consumerserver/create',
-    	    contentType: "application/json; charset=utf-8",
-    	    dataType: "json",
-    	    data: param,
-    	    success: function(data) {
-    	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
-    	    }
-
+		$http.post(window.contextPath + '/console/server/consumer/create', $scope.consumerserverEntry).success(function(response) {
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
     	});
     }
 	
+	//for whitelist
 	$http({
 		method : 'GET',
-		url : window.contextPath + '/console/setting/consumerserver/serverids'
+		url : window.contextPath + '/console/topic/namelist'
+	}).success(function(data, status, headers, config) {
+		$('#whitelist').tagsinput({
+			  typeahead: {
+				  items: 16, 
+				  source: data,
+				  displayText: function(item){ return item;}  //necessary
+			  }
+		});
+	}).error(function(data, status, headers, config) {
+	});
+	
+	$http({
+		method : 'GET',
+		url : window.contextPath + '/console/server/consumerserverids'
 	}).success(function(data, status, headers, config) {
 		var topicNameList = data;
 		$("#serverId").typeahead({
 			items: 16, 
 			source : topicNameList,
 			updater : function(c) {
-				$scope.consumerserverEntry.serverId = c;
-				$scope.loadtopics($scope.consumerserverEntry.serverId);
+				$scope.consumerserverEntry.ip = c;
+				$scope.loadtopics($scope.consumerserverEntry.ip);
 				return c;
 			}
 		})
@@ -155,7 +155,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 					method : 'GET',
 					params : { serverId: serverid},
 					url : window.contextPath
-					+ '/console/setting/consumerserver/topics'
+					+ '/console/server/consumer/topics'
 				}).success(
 						function(data, status, headers, config) {
 							$('#whitelist').tagsinput({
@@ -174,16 +174,19 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.clearModal = function(){
-		$scope.consumerserverEntry.serverId = "";
+		$scope.consumerserverEntry.id = null;
+		$scope.consumerserverEntry.ip = "";
+		$scope.consumerserverEntry.hostname = "";
+		$scope.consumerserverEntry.alarm = false;
 		$scope.consumerserverEntry.whitelist = "";
-		$scope.consumerserverEntry.consumersendpeak = "";
-		$scope.consumerserverEntry.consumersendvalley = "";
-		$scope.consumerserverEntry.consumersendfluctuation = "";
-		$scope.consumerserverEntry.sendFluctuationBase = "";
-		$scope.consumerserverEntry.consumerackpeak = "";
-		$scope.consumerserverEntry.consumerackvalley = "";
-		$scope.consumerserverEntry.consumerackfluctuation = "";
-		$scope.consumerserverEntry.ackFluctuationBase = "";
+		$scope.consumerserverEntry.sendpeak = "";
+		$scope.consumerserverEntry.sendvalley = "";
+		$scope.consumerserverEntry.sendfluctuation = "";
+		$scope.consumerserverEntry.sendfluctuationBase = "";
+		$scope.consumerserverEntry.ackpeak = "";
+		$scope.consumerserverEntry.ackvalley = "";
+		$scope.consumerserverEntry.ackfluctuation = "";
+		$scope.consumerserverEntry.ackfluctuationBase = "";
 	}
 	
 	$scope.setModalInput = function(index){
@@ -194,25 +197,29 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 			for(var i = 0; i < list.length; ++i)
 				$('#whitelist').tagsinput('add', list[i]);
 		}
-		$scope.consumerserverEntry.serverId = $scope.searchPaginator.currentPageItems[index].serverId;
+		$scope.consumerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
+		$scope.consumerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
+		$scope.consumerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
+		$scope.consumerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
 		$scope.consumerserverEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
-		$scope.consumerserverEntry.consumersendpeak = $scope.searchPaginator.currentPageItems[index].consumersendpeak;
-		$scope.consumerserverEntry.consumersendvalley = $scope.searchPaginator.currentPageItems[index].consumersendvalley;
-		$scope.consumerserverEntry.consumersendfluctuation = $scope.searchPaginator.currentPageItems[index].consumersendfluctuation;
-		$scope.consumerserverEntry.sendFluctuationBase = $scope.searchPaginator.currentPageItems[index].sendFluctuationBase;
-		$scope.consumerserverEntry.consumerackpeak = $scope.searchPaginator.currentPageItems[index].consumerackpeak;
-		$scope.consumerserverEntry.consumerackvalley = $scope.searchPaginator.currentPageItems[index].consumerackvalley;
-		$scope.consumerserverEntry.consumerackfluctuation = $scope.searchPaginator.currentPageItems[index].consumerackfluctuation;
-		$scope.consumerserverEntry.ackFluctuationBase = $scope.searchPaginator.currentPageItems[index].ackFluctuationBase;
+		$scope.consumerserverEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
+		$scope.consumerserverEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
+		$scope.consumerserverEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
+		$scope.consumerserverEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
+		$scope.consumerserverEntry.ackpeak = $scope.searchPaginator.currentPageItems[index].ackpeak;
+		$scope.consumerserverEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
+		$scope.consumerserverEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
+		$scope.consumerserverEntry.ackfluctuationBase = $scope.searchPaginator.currentPageItems[index].ackfluctuationBase;
+		
 	}
 	
 	$rootScope.removerecord = function(sid){
-		$http.get(window.contextPath + "/console/setting/consumerserver/remove", {
+		$http.get(window.contextPath + "/console/server/consumer/remove", {
 			params : {
 				serverId : sid
 			}
 		}).success(function(data){
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
 		});
 		return true;
 	}

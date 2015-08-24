@@ -1,15 +1,9 @@
 package com.dianping.swallow.web.controller.dto;
 
-
-/**
- * @author mingdongli
- *
- * 2015年8月18日上午9:32:13
- */
 public class BaseDto {
 	
 	private int offset;
-
+	
 	private int limit;
 	
 	public BaseDto(){

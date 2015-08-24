@@ -1,5 +1,5 @@
 module.factory('Paginator', function(){
-	return function(fetchFunction, pageSize){
+	return function(fetchFunction, pageSize, entity){
 		var paginator = {
 				hasNextVar: false,
 				fetch: function(page){
@@ -15,7 +15,9 @@ module.factory('Paginator', function(){
 				_load: function(){
 					var self = this;  //must use  self
 					self.currentPage = Math.floor(self.currentOffset/pageSize) + 1;
-					fetchFunction(this.currentOffset, pageSize + 1, function(data){
+					entity.offset = this.currentOffset;
+					entity.limit = pageSize + 1;
+					fetchFunction(entity, function(data){
 						items = data.second;
 						length = data.first;
 						if(length == 0){
@@ -75,34 +77,22 @@ module.factory('Paginator', function(){
 
 module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog','$interval',
                 function($rootScope, $scope, $http, Paginator, ngDialog,$interval){
-	var fetchFunction = function(offset, limit, callback){
-		var transFn = function(data){
-			return $.param(data);
-		}
-		var postConfig = {
-				transformRequest: transFn
-		};
-		var data = {'offset' : offset,
-								'limit': limit};
-		$http.get(window.contextPath + $scope.suburl, {
-			params : {
-				offset : offset,
-				limit : limit
-			}
-		}).success(callback);
+	var fetchFunction = function(entity, callback){
+		$http.post(window.contextPath + $scope.suburl, entity).success(callback);
 	};
 	
-	$scope.suburl = "/console/setting/producerserver/list";
+	$scope.suburl = "/console/server/producer/list";
 	$scope.numrecord = 30;
 	
-	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
+	$scope.entity = new Object();
+	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity );
 	
 	//for whitelist
 	$http({
 		method : 'GET',
 		url : window.contextPath + '/console/topic/namelist'
 	}).success(function(data, status, headers, config) {
-		$('#topicprops').tagsinput({
+		$('#whitelist').tagsinput({
 			  typeahead: {
 				  items: 16, 
 				  source: data,
@@ -113,12 +103,15 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	});
 	
 	$scope.producerserverEntry = {};
-	$scope.producerserverEntry.serverId;
+	$scope.producerserverEntry.ip;
+	$scope.producerserverEntry.hostname;
+	$scope.producerserverEntry.alarm;
 	$scope.producerserverEntry.whitelist;
 	$scope.producerserverEntry.producerpeak;
 	$scope.producerserverEntry.producervalley;
 	$scope.producerserverEntry.producerfluctuation;
 	$scope.producerserverEntry.fluctuationBase;
+	
 	$scope.refreshpage = function(myForm){
 		if ($scope.producerserverEntry.producerpeak < $scope.producerserverEntry.producervalley){
 			alert("谷值不能小于峰值");
@@ -127,22 +120,18 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.whitelist = $("#whitelist").val();
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.producerserverEntry);
-    	
-    	$.ajax({
-    	    type: "POST",
-    	    url: window.contextPath + '/console/setting/producerserver/create',
-    	    contentType: "application/json; charset=utf-8",
-    	    dataType: "json",
-    	    data: param,
-    	    success: function(data) {
-    	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
-    	    }
-
+		
+		$http.post(window.contextPath + '/console/server/producer/create', $scope.producerserverEntry).success(function(response) {
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
     	});
+    	
     }
 	
 	$scope.clearModal = function(){
-		$scope.producerserverEntry.serverId = "";
+		$scope.producerserverEntry.id = null;
+		$scope.producerserverEntry.ip = "";
+		$scope.producerserverEntry.hostname = "";
+		$scope.producerserverEntry.alarm = false;
 		$scope.producerserverEntry.whitelist = "";
 		$scope.producerserverEntry.producerpeak = "";
 		$scope.producerserverEntry.producervalley = "";
@@ -158,7 +147,10 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 			for(var i = 0; i < list.length; ++i)
 				$('#whitelist').tagsinput('add', list[i]);
 		}
-		$scope.producerserverEntry.serverId = $scope.searchPaginator.currentPageItems[index].serverId;
+		$scope.producerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
+		$scope.producerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
+		$scope.producerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
+		$scope.producerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
 		$scope.producerserverEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
 		$scope.producerserverEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;
 		$scope.producerserverEntry.producervalley = $scope.searchPaginator.currentPageItems[index].producervalley;
@@ -167,27 +159,27 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$rootScope.removerecord = function(sid){
-		$http.get(window.contextPath + "/console/setting/producerserver/remove", {
+		$http.get(window.contextPath + "/console/server/producer/remove", {
 			params : {
 				serverId : sid
 			}
 		}).success(function(data){
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord);
+			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
 		});
 		return true;
 	}
 	
 	$http({
 		method : 'GET',
-		url : window.contextPath + '/console/setting/producerserver/serverids'
+		url : window.contextPath + '/console/server/producerserverids'
 	}).success(function(data, status, headers, config) {
 		var topicNameList = data;
 		$("#serverId").typeahead({
 			items: 16, 
 			source : topicNameList,
 			updater : function(c) {
-				$scope.producerserverEntry.serverId = c;
-				$scope.loadtopics($scope.producerserverEntry.serverId);
+				$scope.producerserverEntry.ip = c;
+				$scope.loadtopics($scope.producerserverEntry.ip);
 				return c;
 			}
 		})

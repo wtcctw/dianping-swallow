@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.ConsumerServerAlarmSettingDto;
-import com.dianping.swallow.web.controller.mapper.ConsumerServerAlarmSettingMapper;
+import com.dianping.swallow.web.controller.dto.ConsumerServerResourceDto;
+import com.dianping.swallow.web.controller.mapper.ConsumerServerResourceMapper;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
 import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
@@ -53,31 +53,31 @@ public class ConsumerServerAlarmSettingController extends AbstractSidebarBasedCo
 		return new ModelAndView("setting/consumerserversetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/consumerserver/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public Object consumerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
-		
-		List<ConsumerServerAlarmSetting> consumerAlarmSettingList = consumerServerAlarmSettingService.findByPage(offset, limit);
-		List<ConsumerServerAlarmSettingDto> consumerAlarmSettingListDto = new ArrayList<ConsumerServerAlarmSettingDto>();
-		for(ConsumerServerAlarmSetting consumerAlarmSetting : consumerAlarmSettingList){
-			consumerAlarmSettingListDto.add(ConsumerServerAlarmSettingMapper.toConsumerServerAlarmSettingDto(consumerAlarmSetting));
-		}
-		return new Pair<Integer, List<ConsumerServerAlarmSettingDto>>(consumerAlarmSettingListDto.size(), consumerAlarmSettingListDto);
-		
-	}
+//	@RequestMapping(value = "/console/setting/consumerserver/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+//	@ResponseBody
+//	public Object consumerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
+//		
+//		List<ConsumerServerAlarmSetting> consumerAlarmSettingList = consumerServerAlarmSettingService.findByPage(offset, limit);
+//		List<ConsumerServerResourceDto> consumerAlarmSettingListDto = new ArrayList<ConsumerServerResourceDto>();
+//		for(ConsumerServerAlarmSetting consumerAlarmSetting : consumerAlarmSettingList){
+//			consumerAlarmSettingListDto.add(ConsumerServerResourceMapper.toConsumerServerAlarmSettingDto(consumerAlarmSetting));
+//		}
+//		return new Pair<Integer, List<ConsumerServerResourceDto>>(consumerAlarmSettingListDto.size(), consumerAlarmSettingListDto);
+//		
+//	}
 
-	@RequestMapping(value = "/console/setting/consumerserver/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public int consumerserverSettingCreate(@RequestBody ConsumerServerAlarmSettingDto dto) {
-
-		ConsumerServerAlarmSetting consumerServerAlarmSetting = ConsumerServerAlarmSettingMapper.toConsumerServerAlarmSetting(dto);
-		boolean result = consumerServerAlarmSettingService.update(consumerServerAlarmSetting);
-		if(!result){
-			return ResponseStatus.SUCCESS.getStatus();
-		}else{
-			return ResponseStatus.MONGOWRITE.getStatus();
-		}
-	}
+//	@RequestMapping(value = "/console/setting/consumerserver/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+//	@ResponseBody
+//	public int consumerserverSettingCreate(@RequestBody ConsumerServerResourceDto dto) {
+//
+//		ConsumerServerAlarmSetting consumerServerAlarmSetting = ConsumerServerResourceMapper.toConsumerServerAlarmSetting(dto);
+//		boolean result = consumerServerAlarmSettingService.update(consumerServerAlarmSetting);
+//		if(!result){
+//			return ResponseStatus.SUCCESS.getStatus();
+//		}else{
+//			return ResponseStatus.MONGOWRITE.getStatus();
+//		}
+//	}
 
 	@RequestMapping(value = "/console/setting/consumerserver/remove", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody

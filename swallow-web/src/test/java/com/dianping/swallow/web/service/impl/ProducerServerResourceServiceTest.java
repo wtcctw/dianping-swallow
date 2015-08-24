@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -52,6 +54,13 @@ public class ProducerServerResourceServiceTest {
 		producerServerResource.setIp("127.0.0.1");
 		producerServerResource.setHostname("localhost");
 		
+		List<String> topicWhiteList = new ArrayList<String>();
+		topicWhiteList.add("consumeri-01");
+		topicWhiteList.add("consumeri-02");
+		topicWhiteList.add("consumeri-03");
+		
+		producerServerResource.setTopicWhiteList(topicWhiteList);
+		
 		return producerServerResource;
 		
 	}
@@ -81,10 +90,11 @@ public class ProducerServerResourceServiceTest {
 		System.out.println(producerServer3.toString());
 		Assert.assertNotNull(producerServer3);
 		
-		int delete = producerServerResourceService.remove("default");
-		Assert.assertEquals(delete, 1);
 		
-		delete = producerServerResourceService.remove("127.0.0.1");
+		int delete = producerServerResourceService.remove("127.0.0.1");
+		Assert.assertEquals(delete, 1);
+
+		delete = producerServerResourceService.remove("default");
 		Assert.assertEquals(delete, 1);
 		
 		

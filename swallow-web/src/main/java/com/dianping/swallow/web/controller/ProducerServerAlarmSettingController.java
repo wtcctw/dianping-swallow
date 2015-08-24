@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.ProducerServerAlarmSettingDto;
-import com.dianping.swallow.web.controller.mapper.ProducerServerAlarmSettingMapper;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.service.IPCollectorService;
@@ -50,32 +48,32 @@ public class ProducerServerAlarmSettingController extends AbstractSidebarBasedCo
 		return new ModelAndView("setting/producerserversetting", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/setting/producerserver/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public Object producerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
-		
-		List<ProducerServerAlarmSetting> producerAlarmSettingList = producerServerAlarmSettingService.findByPage(offset, limit);
-		List<ProducerServerAlarmSettingDto> producerAlarmSettingListDto = new ArrayList<ProducerServerAlarmSettingDto>();
-		for(ProducerServerAlarmSetting producerAlarmSetting : producerAlarmSettingList){
-			producerAlarmSettingListDto.add(ProducerServerAlarmSettingMapper.toProducerServerAlarmSettingDto(producerAlarmSetting));
-		}
-		return new Pair<Integer, List<ProducerServerAlarmSettingDto>>(producerAlarmSettingListDto.size(), producerAlarmSettingListDto);
-		
-	}
+//	@RequestMapping(value = "/console/setting/producerserver/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+//	@ResponseBody
+//	public Object producerserverSettingList(int offset, int limit, HttpServletRequest request, HttpServletResponse response) {
+//		
+//		List<ProducerServerAlarmSetting> producerAlarmSettingList = producerServerAlarmSettingService.findByPage(offset, limit);
+//		List<ProducerServerAlarmSettingDto> producerAlarmSettingListDto = new ArrayList<ProducerServerAlarmSettingDto>();
+//		for(ProducerServerAlarmSetting producerAlarmSetting : producerAlarmSettingList){
+//			producerAlarmSettingListDto.add(ProducerServerAlarmSettingMapper.toProducerServerAlarmSettingDto(producerAlarmSetting));
+//		}
+//		return new Pair<Integer, List<ProducerServerAlarmSettingDto>>(producerAlarmSettingListDto.size(), producerAlarmSettingListDto);
+//		
+//	}
 
-	@RequestMapping(value = "/console/setting/producerserver/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public int producerserverSettingCreate(@RequestBody ProducerServerAlarmSettingDto dto) {
-
-		ProducerServerAlarmSetting consumerServerAlarmSetting = ProducerServerAlarmSettingMapper.toProducerServerAlarmSetting(dto);
-		boolean result = producerServerAlarmSettingService.update(consumerServerAlarmSetting);
-		
-		if(!result){
-			return ResponseStatus.SUCCESS.getStatus();
-		}else{
-			return ResponseStatus.MONGOWRITE.getStatus();
-		}
-	}
+//	@RequestMapping(value = "/console/setting/producerserver/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+//	@ResponseBody
+//	public int producerserverSettingCreate(@RequestBody ProducerServerAlarmSettingDto dto) {
+//
+//		ProducerServerAlarmSetting consumerServerAlarmSetting = ProducerServerAlarmSettingMapper.toProducerServerAlarmSetting(dto);
+//		boolean result = producerServerAlarmSettingService.update(consumerServerAlarmSetting);
+//		
+//		if(!result){
+//			return ResponseStatus.SUCCESS.getStatus();
+//		}else{
+//			return ResponseStatus.MONGOWRITE.getStatus();
+//		}
+//	}
 
 	@RequestMapping(value = "/console/setting/producerserver/remove", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody

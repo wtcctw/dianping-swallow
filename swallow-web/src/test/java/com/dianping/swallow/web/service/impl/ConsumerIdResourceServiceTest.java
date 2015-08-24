@@ -97,7 +97,7 @@ public class ConsumerIdResourceServiceTest {
 		result = consumerIdResourceService.insert(consumerIdResource1);
 		Assert.assertTrue(result);
 		
-		Pair<Long, List<ConsumerIdResource>> pages = consumerIdResourceService.findConsumerIdResourcePage(new BaseDto(0, 31));
+		Pair<Long, List<ConsumerIdResource>> pages = consumerIdResourceService.findConsumerIdResourcePage(new  BaseDto(0, 31));
 		Assert.assertNotNull(pages);
 		long size = pages.getFirst();
 		Assert.assertEquals(size, 2L);
