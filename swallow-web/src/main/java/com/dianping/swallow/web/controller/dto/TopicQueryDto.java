@@ -12,6 +12,10 @@ public class TopicQueryDto extends BaseDto{
 	
 	private String prop;
 	
+	private String producerServer;
+	
+	private String consumerIp;
+	
 	public TopicQueryDto(){
 		
 	}
@@ -41,6 +45,21 @@ public class TopicQueryDto extends BaseDto{
 	public void setProp(String prop) {
 		this.prop = prop;
 	}
-	
+
+	public String getProducerServer() {
+		return producerServer;
+	}
+
+	public void setProducerServer(String producerServer) {
+		this.producerServer = producerServer;
+	}
+
+	public String getConsumerIp() {
+		return consumerIp;
+	}
+
+	public void setConsumerIp(String consumerIp) {
+		this.consumerIp = consumerIp;
+	}
 	
 }

@@ -28,9 +28,8 @@ module.factory('Paginator', function(){
 					entity.offset = this.currentOffset;
 					entity.limit = pageSize + 1;
 					fetchFunction( entity, function(data){
-						items = data.first.second;
-						length = data.first.first;
-						var whitelist = data.second;
+						items = data.second;
+						length = data.first;
 						self.totalPage = Math.ceil(length/pageSize);
 						self.endPage = self.totalPage;
 						//生成链接
@@ -54,7 +53,6 @@ module.factory('Paginator', function(){
 						self.currentPageItems = items.slice(0, pageSize);
 						
 						var object = new Object();
-						object.whitelist = whitelist;
 						self.handleResult(object);
 						
 						self.hasNextVar = items.length === pageSize + 1;
@@ -91,18 +89,13 @@ module.factory('Paginator', function(){
 module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginator', 'ngDialog',
         function($rootScope, $scope, $http, Paginator, ngDialog){
 				var fetchFunction = function(entity, callback){
-//				var entity = new Object();
-//				entity.offset = offset;
-//				entity.limit = limit;
-//				entity.topic = name;
-//				entity.prop = prop;
 				
 				$http.post(window.contextPath + $scope.suburl, entity).success(callback);
-			};
+		};
 			$scope.name = "";
 			$scope.prop = "";
 			
-			$scope.suburl = "/console/topic/topiclist";
+			$scope.suburl = "/console/topic/list";
 			$scope.topicnum = 30;
 
 			
@@ -112,22 +105,81 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topictime = "";
 			$scope.topicalarm = "";
 			$scope.blankprop = true;
-			$scope.setModalInput = function(name,prop,time){
-				$scope.topicname = name;
-				$('#topicprops').tagsinput('removeAll');
-				if(prop != null && prop.length > 0){
-					var props = prop.split(",");
-					for(var i = 0; i < props.length; ++i)
-						$('#topicprops').tagsinput('add', props[i]);
-					$scope.blankprop = false;
+			
+			$scope.topicEntry = {};
+			$scope.topicEntry.name;
+			$scope.topicEntry.prop;
+			$scope.topicEntry.producerAlarm;
+			$scope.topicEntry.consumerAlarm;
+			$scope.topicEntry.consumerIdWhiteList;
+			$scope.topicEntry.producerServer;
+			$scope.topicEntry.sendpeak;
+			$scope.topicEntry.sendvalley;
+			$scope.topicEntry.sendfluctuation;
+			$scope.topicEntry.sendfluctuationBase;
+			$scope.topicEntry.delay;
+			
+			$scope.setModalInput = function(index){
+				if(typeof($scope.searchPaginator.currentPageItems[index].consumerIdWhiteList) != "undefined"){
+					var wl = $scope.searchPaginator.currentPageItems[index].consumerIdWhiteList;
+					$('#whitelist').tagsinput('removeAll');
+					if(wl != null && wl.length > 0){
+						var list = wl.split(",");
+						for(var i = 0; i < list.length; ++i)
+							$('#whitelist').tagsinput('add', list[i]);
+					}
 				}
-				$scope.topicprop  = prop;
-				$scope.topictime = time;
+				
+				if(typeof($scope.searchPaginator.currentPageItems[index].prop) != "undefined"){
+					var prop = $scope.searchPaginator.currentPageItems[index].prop;
+					$('#prop').tagsinput('removeAll');
+					if(prop != null && prop.length > 0){
+						var list = prop.split(",");
+						for(var i = 0; i < list.length; ++i)
+							$('#prop').tagsinput('add', list[i]);
+					}
+				}
+				
+				if(typeof($scope.searchPaginator.currentPageItems[index].producerServer) != "undefined"){
+					var producerServer = $scope.searchPaginator.currentPageItems[index].producerServer;
+					$('#producerServer').tagsinput('removeAll');
+					if(producerServer != null && producerServer.length > 0){
+						var list = producerServer.split(",");
+						for(var i = 0; i < list.length; ++i)
+							$('#producerServer').tagsinput('add', list[i]);
+					}
+				}
+				
+				$scope.topicEntry.id = $scope.searchPaginator.currentPageItems[index].id;
+				$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].name;
+				$scope.topicEntry.producerAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarm;
+				$scope.topicEntry.consumerAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarm;
+				$scope.topicEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
+				$scope.topicEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
+				$scope.topicEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
+				$scope.topicEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
+				$scope.topicEntry.delay = $scope.searchPaginator.currentPageItems[index].delay;
 			}
 			
 			$scope.refreshpage = function(myForm){
+				if ($scope.topicEntry.sendpeak < $scope.topicEntry.sendvalley){
+					alert("谷值不能小于峰值");
+					return;
+				}
+				$scope.topicEntry.consumerIdWhiteList = $("#whitelist").val();
+				$scope.topicEntry.prop = $("#prop").val();
+				$scope.topicEntry.producerServer = $("#producerServer").val();
+				$('#myModal').modal('hide');
+				var param = JSON.stringify($scope.topicEntry);
+				
+				$http.post(window.contextPath + '/console/topic/update', $scope.topicEntry).success(function(response) {
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
+		    	});
+		    	
+		    }
+			
+/*			$scope.refreshpage = function(myForm){
 	        	$scope.topictime = $("#datetimepicker").val();
-	        	$scope.topicprop = $("#topicprops").val();
 	        	$scope.topicalarm = $("#alarmselect").val();
 	        	if($scope.topicprop.length == 0 && !$scope.blankprop){
 	        		$scope.dialog($scope.topicname, $scope.topicprop, $scope.topictime, $scope.topicalarm);
@@ -151,7 +203,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 		        	    }
 		        	});
 	        	}
-	        }
+	        }*/
 			
 			$rootScope.doedit = function(topicname, topicprop, topictime){
 				$('#myModal').modal('hide');

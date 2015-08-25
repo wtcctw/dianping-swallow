@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -26,14 +27,17 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicAlarmDto;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
+import com.dianping.swallow.web.controller.dto.TopicResourceDto;
+import com.dianping.swallow.web.controller.mapper.ProducerServerResourceMapper;
+import com.dianping.swallow.web.controller.mapper.TopicResourceMapper;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.model.Topic;
-import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
-import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
-import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
-import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
+import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.resource.TopicResource;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.TopicService;
 import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -60,11 +64,8 @@ public class TopicController extends AbstractMenuController {
 	@Resource(name = "userService")
 	private UserService userService;
 
-	@Resource(name = "consumerServerAlarmSettingService")
-	private ConsumerServerAlarmSettingService consumerServerAlarmSettingService;
-
-	@Resource(name = "producerServerAlarmSettingService")
-	private ProducerServerAlarmSettingService producerServerAlarmSettingService;
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
 
 	@Autowired
 	private ExtractUsernameUtils extractUsernameUtils;
@@ -75,30 +76,38 @@ public class TopicController extends AbstractMenuController {
 		return new ModelAndView("topic/index", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/topic/topiclist", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/topic/list", method = RequestMethod.POST)
 	@ResponseBody
 	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
 		
-		boolean isAllEmpty = StringUtil.isEmpty(topicQueryDto.getTopic() + topicQueryDto.getProp());
+		List<TopicResourceDto> result = new ArrayList<TopicResourceDto>();
+		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
+		
+		boolean isTopicEmpry = StringUtil.isEmpty(topicQueryDto.getTopic());
 
-		if (isAllEmpty) {
+		if (isTopicEmpry) {
 			String username = extractUsernameUtils.getUsername(request);
 			Set<String> adminSet = userService.loadCachedAdministratorSet();
 			boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 			if (findAll) {
-				return topicService.loadTopicPage(topicQueryDto);
+				pair =  topicResourceService.findTopicResourcePage(topicQueryDto);
 			} else {
 				topicQueryDto.setProp(username);
-				return topicService.loadSpecificTopicPage(topicQueryDto);
+				pair = topicResourceService.findTopicResourcePage(topicQueryDto);
 			}
 		} else {
-			return topicService.loadSpecificTopicPage(topicQueryDto);
+			pair = topicResourceService.findTopicResourcePage(topicQueryDto);
 		}
-
+		
+		for (TopicResource topicResource : pair.getSecond()) {
+			result.add(TopicResourceMapper
+					.toTopicResourceDto(topicResource));
+		}
+		return new Pair<Long, List<TopicResourceDto>>(pair.getFirst(), result);
 	}
 
-	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
 	@ResponseBody
 	public List<String> topicName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
@@ -108,7 +117,7 @@ public class TopicController extends AbstractMenuController {
 		return topicService.loadTopicNames(username, findAll);
 	}
 
-	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET)
 	@ResponseBody
 	public Object propName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
@@ -116,6 +125,20 @@ public class TopicController extends AbstractMenuController {
 		Set<String> adminSet = userService.loadCachedAdministratorSet();
 		boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 		return topicService.loadTopicProposal(username, findAll);
+	}
+	
+	@RequestMapping(value = "/console/topic/update", method = RequestMethod.POST)
+	@ResponseBody
+	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto) throws UnknownHostException {
+		
+		TopicResource topicResource = TopicResourceMapper.toTopicResource(topicResourceDto);
+		boolean result = topicResourceService.update(topicResource);
+
+		if (!result) {
+			return ResponseStatus.SUCCESS.getStatus();
+		} else {
+			return ResponseStatus.MONGOWRITE.getStatus();
+		}
 	}
 
 	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
@@ -205,8 +228,6 @@ public class TopicController extends AbstractMenuController {
 
 		String topic = topicAlarmDto.getTopic();
 		boolean alarm = topicAlarmDto.isAlarm();
-		updateConsumerServerAlarmSetting(topic, alarm);
-		updateProducerServerAlarmSetting(topic, alarm);
 
 	}
 
@@ -224,73 +245,6 @@ public class TopicController extends AbstractMenuController {
 		return proposal;
 	}
 
-	private void updateConsumerServerAlarmSetting(String topic, boolean alarm) {
-
-		ConsumerServerAlarmSetting consumerServerAlarmSetting = consumerServerAlarmSettingService.findDefault();
-
-		if (consumerServerAlarmSetting != null) {
-			List<String> topics = consumerServerAlarmSetting.getTopicWhiteList();
-			boolean updated = false;
-
-			if (alarm) {
-				if (!topics.contains(topic)) {
-					topics.add(topic);
-					updated = consumerServerAlarmSettingService.update(consumerServerAlarmSetting);
-					if (logger.isInfoEnabled()) {
-						logger.info(String.format("Add topic %s to whitelist of ConsumerServerAlarmSetting %s", topic,
-								updated ? "successfully" : "failed"));
-					}
-					return;
-				}
-			} else {
-				if (topics.contains(topic)) {
-					topics.remove(topic);
-					updated = consumerServerAlarmSettingService.update(consumerServerAlarmSetting);
-					if (logger.isInfoEnabled()) {
-						logger.info(String.format("Remove topic %s from wihtelist of ConsumerServerAlarmSetting %s",
-								topic, updated ? "successfully" : "failed"));
-					}
-					return;
-				}
-			}
-
-		}
-		logger.info(String.format("Nothing need to do about topic %s concerned with ConsumerServerAlarmSetting", topic));
-	}
-
-	private void updateProducerServerAlarmSetting(String topic, boolean alarm) {
-
-		ProducerServerAlarmSetting producerServerAlarmSetting = producerServerAlarmSettingService.findDefault();
-
-		if (producerServerAlarmSetting != null) {
-			List<String> topics = producerServerAlarmSetting.getTopicWhiteList();
-			boolean updated = false;
-
-			if (alarm) {
-				if (!topics.contains(topic)) {
-					topics.add(topic);
-					updated = producerServerAlarmSettingService.update(producerServerAlarmSetting);
-					if (logger.isInfoEnabled()) {
-						logger.info(String.format("Add topic %s to whitelist of ProducerServerAlarmSetting %s", topic,
-								updated ? "successfully" : "failed"));
-					}
-					return;
-				}
-			} else {
-				if (topics.contains(topic)) {
-					topics.remove(topic);
-					updated = producerServerAlarmSettingService.update(producerServerAlarmSetting);
-					if (logger.isInfoEnabled()) {
-						logger.info(String.format("Remove topic %s from wihtelist of ProducerServerAlarmSetting %s",
-								topic, updated ? "successfully" : "failed"));
-					}
-					return;
-				}
-			}
-
-		}
-		logger.info(String.format("Nothing need to do about topic %s concerned with ProducerServerAlarmSetting", topic));
-	}
 
 	private Set<String> splitProps(String props) {
 		String[] prop = props.split(DELIMITOR);

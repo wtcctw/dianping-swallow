@@ -21,6 +21,8 @@ public interface TopicResourceService {
 	int remove(String topic);
 
 	TopicResource findByTopic(String topic);
+	
+	Pair<Long, List<TopicResource>> findByServer(TopicQueryDto topicQueryDto);
 
 	TopicResource findDefault();
 	

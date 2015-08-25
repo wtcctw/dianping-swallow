@@ -33,6 +33,8 @@
 		      <entry key="monitor/*" value="layout/layoutmonitor.htm" />
 		      <entry key="download/*" value="layout/layoutdownload.htm" />
 	 	      <entry key="topic/*" value="layout/layout.htm" />
+	 	      <entry key="consumerid/*" value="layout/layout.htm" />
+	 	      <entry key="ip/*" value="layout/layout.htm" />
 	 	      <entry key="message/*" value="layout/layout.htm" />
 	 	      <entry key="administrator/*" value="layout/layout.htm" />
 	 	      <entry key="setting/*" value="layout/layoutsetting.htm" />

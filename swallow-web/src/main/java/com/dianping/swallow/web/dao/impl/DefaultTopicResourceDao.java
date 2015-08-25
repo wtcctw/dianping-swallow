@@ -26,6 +26,8 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	private static final String TOPIC = "name";
 
 	private static final String ID = "id";
+	
+	private static final String PEODUCERSERVER = "producerServer";
 
 	private static final String DEFAULT = "default";
 
@@ -104,6 +106,24 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 		
 		long size = this.count();
 		return new Pair<Long, List<TopicResource>>(size, topicResource);
+	}
+	
+	@Override
+	public Pair<Long, List<TopicResource>> findByServer(TopicQueryDto  topicQueryDto){
+		
+		int offset = topicQueryDto.getOffset();
+		int limit = topicQueryDto.getLimit();
+		String producerServer = topicQueryDto.getProducerServer();
+		Query query = new Query(Criteria.where(PEODUCERSERVER).is(producerServer));
+		
+		Long size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
+		
+		query.skip(offset).limit(limit);
+		List<TopicResource> topicResource = mongoTemplate.find(query, TopicResource.class,
+				TOPICRESOURCE_COLLECTION);
+
+		return new Pair<Long, List<TopicResource>>(size, topicResource);
+		
 	}
 
 }

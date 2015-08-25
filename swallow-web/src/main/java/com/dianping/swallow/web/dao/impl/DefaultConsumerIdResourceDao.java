@@ -11,6 +11,7 @@ import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.TopicResource;
 import com.mongodb.WriteResult;
 
 
@@ -27,6 +28,8 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	private static final String CONSUMERID = "consumerId";
 
 	private static final String TOPIC = "topic";
+	
+	private static final String CONSUMERIP = "consumerIp";
 
 	private static final String DEFAULT = "default";
 
@@ -124,6 +127,24 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 				CONSUMERIDRESOURCE_COLLECTION);
 		Long size = this.count();
 		return new Pair<Long, List<ConsumerIdResource>>(size, consumerIdResources);
+	}
+	
+	@Override
+	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(TopicQueryDto  topicQueryDto){
+		
+		int offset = topicQueryDto.getOffset();
+		int limit = topicQueryDto.getLimit();
+		String consumerIp = topicQueryDto.getConsumerIp();
+		Query query = new Query(Criteria.where(CONSUMERIP).is(consumerIp));
+		
+		Long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
+		
+		query.skip(offset).limit(limit);
+		List<ConsumerIdResource> consumerIdResource = mongoTemplate.find(query, ConsumerIdResource.class,
+				CONSUMERIDRESOURCE_COLLECTION);
+
+		return new Pair<Long, List<ConsumerIdResource>>(size, consumerIdResource);
+		
 	}
 
 }

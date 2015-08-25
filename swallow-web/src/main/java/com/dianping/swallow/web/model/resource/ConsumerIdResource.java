@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model.resource;
 
+import java.util.List;
+
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,6 +23,8 @@ public class ConsumerIdResource extends BaseResource{
 	private String topic;
 	
 	private boolean alarm;
+	
+	private List<String> consumerIp;
 	
 	private ConsumerBaseAlarmSetting consumerAlarmSetting;
 
@@ -47,6 +51,14 @@ public class ConsumerIdResource extends BaseResource{
 	public void setAlarm(boolean alarm) {
 		this.alarm = alarm;
 	}
+	
+	public List<String> getConsumerIp() {
+		return consumerIp;
+	}
+
+	public void setConsumerIp(List<String> consumerIp) {
+		this.consumerIp = consumerIp;
+	}
 
 	public ConsumerBaseAlarmSetting getConsumerAlarmSetting() {
 		return consumerAlarmSetting;
@@ -58,8 +70,10 @@ public class ConsumerIdResource extends BaseResource{
 
 	@Override
 	public String toString() {
-		return "ConsumerIdResource [consumerId=" + consumerId + ", topic=" + topic + ", alarm=" + alarm
-				+ ", consumerAlarmSetting=" + consumerAlarmSetting + ", toString()=" + super.toString() + "]";
+		return "ConsumerIdResource [consumerId=" + consumerId + ", topic="
+				+ topic + ", alarm=" + alarm + ", consumerIp=" + consumerIp
+				+ ", consumerAlarmSetting=" + consumerAlarmSetting
+				+ ", toString()=" + super.toString() + "]";
 	}
 
 }

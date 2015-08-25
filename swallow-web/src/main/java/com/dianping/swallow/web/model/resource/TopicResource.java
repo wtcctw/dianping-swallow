@@ -26,6 +26,8 @@ public class TopicResource extends BaseResource{
 	private boolean consumerAlarm;
 	
 	private List<String> consumerIdWhiteList;
+	
+	private List<String> producerServer;
 
 	private ProducerBaseAlarmSetting producerAlarmSetting;
 	
@@ -68,6 +70,14 @@ public class TopicResource extends BaseResource{
 	public void setConsumerIdWhiteList(List<String> consumerIdWhiteList) {
 		this.consumerIdWhiteList = consumerIdWhiteList;
 	}
+	
+	public List<String> getProducerServer() {
+		return producerServer;
+	}
+
+	public void setProducerServer(List<String> producerServer) {
+		this.producerServer = producerServer;
+	}
 
 	public ProducerBaseAlarmSetting getProducerAlarmSetting() {
 		return producerAlarmSetting;
@@ -79,9 +89,12 @@ public class TopicResource extends BaseResource{
 
 	@Override
 	public String toString() {
-		return "TopicResource [name=" + name + ", prop=" + prop + ", producerAlarm=" + producerAlarm
-				+ ", consumerAlarm=" + consumerAlarm + ", consumerIdWhiteList=" + consumerIdWhiteList
-				+ ", producerAlarmSetting=" + producerAlarmSetting + ", toString()=" + super.toString() + "]";
+		return "TopicResource [name=" + name + ", prop=" + prop
+				+ ", producerAlarm=" + producerAlarm + ", consumerAlarm="
+				+ consumerAlarm + ", consumerIdWhiteList="
+				+ consumerIdWhiteList + ", producerServer=" + producerServer
+				+ ", producerAlarmSetting=" + producerAlarmSetting
+				+ ", toString()=" + super.toString() + "]";
 	}
-	
+
 }

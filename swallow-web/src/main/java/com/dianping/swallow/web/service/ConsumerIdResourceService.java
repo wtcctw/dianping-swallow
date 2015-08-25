@@ -24,6 +24,8 @@ public interface ConsumerIdResourceService {
 	List<ConsumerIdResource> findByConsumerId(String consumerid);
 
 	Pair<Long, List<ConsumerIdResource>> findByTopic(TopicQueryDto topicQueryDto);
+	
+	 Pair<Long, List<ConsumerIdResource>> findByConsumerIp(TopicQueryDto  topicQueryDto);
 
 	ConsumerIdResource find(String topic, String consumerid);
 

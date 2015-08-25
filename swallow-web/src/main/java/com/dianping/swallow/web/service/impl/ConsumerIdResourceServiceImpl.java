@@ -72,5 +72,11 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 
 		return consumerIdResourceDao.findConsumerIdResourcePage(baseDto);
 	}
+	
+	@Override
+	public  Pair<Long, List<ConsumerIdResource>> findByConsumerIp(TopicQueryDto  topicQueryDto){
+		
+		return consumerIdResourceDao.findByConsumerIp(topicQueryDto);
+	}
 
 }

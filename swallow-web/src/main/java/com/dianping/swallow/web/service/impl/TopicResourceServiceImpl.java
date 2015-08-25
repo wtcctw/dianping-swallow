@@ -59,5 +59,11 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 		return topicResourceDao.findTopicResourcePage(topicQueryDto);
 	}
+	
+	@Override
+	public Pair<Long, List<TopicResource>> findByServer(TopicQueryDto topicQueryDto){
+		
+		return topicResourceDao.findByServer(topicQueryDto);
+	}
 
 }

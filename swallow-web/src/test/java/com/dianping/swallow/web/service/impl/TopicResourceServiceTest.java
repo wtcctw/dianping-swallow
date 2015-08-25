@@ -64,7 +64,13 @@ public class TopicResourceServiceTest {
 		comsumerids.add("consumeri-02");
 		comsumerids.add("consumeri-03");
 		
+		List<String> producerServer = new ArrayList<String>();
+		producerServer.add("1.0.0.1");
+		producerServer.add("1.0.0.2");
+		producerServer.add("1.0.0.3");
+		
 		topicResource.setConsumerIdWhiteList(comsumerids);
+		topicResource.setProducerServer(producerServer);
 		
 		return topicResource;
 		
@@ -94,13 +100,14 @@ public class TopicResourceServiceTest {
 		System.out.println(producerServer3.toString());
 		Assert.assertNotNull(producerServer3);
 		
-		int delete = topicResourceService.remove("default");
+		int delete = topicResourceService.remove("example2");
+		System.out.println("delete is " + delete);
+		Assert.assertEquals(delete, 1);
+
+		delete = topicResourceService.remove("default");
 		System.out.println("delete is " + delete);
 		Assert.assertEquals(delete, 1);
 		
-		delete = topicResourceService.remove("example2");
-		System.out.println("delete is " + delete);
-		Assert.assertEquals(delete, 1);
 	}
 
 }

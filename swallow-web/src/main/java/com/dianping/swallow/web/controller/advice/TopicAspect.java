@@ -35,7 +35,7 @@ public class TopicAspect {
 
 	private final static Log log = LogFactory.getLog(TopicAspect.class);
 	
-	@Pointcut("execution(* com.dianping.swallow.web.controller.TopicController.fetchTopicPage(..))")
+	@Pointcut("execution(* com.dianping.swallow.web.controller.TopicController.fetchTopicPage1(..))")
 	public void aspect(){	}
 	
 	@Around("aspect()")
