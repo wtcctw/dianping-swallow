@@ -7,8 +7,9 @@ import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import junit.framework.Assert;
 
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;

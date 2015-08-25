@@ -37,7 +37,9 @@ public class TopicConfigTest {
 		
 		JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
 		TopicConfig config = jsonBinder.fromJson("{}", TopicConfig.class);
-		System.out.println(config);
+		Assert.assertEquals(new TopicConfig(), config);
+		config = jsonBinder.fromJson(null, TopicConfig.class);
+		Assert.assertNull(config);
 	}
 	
 	@Test

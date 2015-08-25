@@ -139,21 +139,37 @@ public abstract class AbstractBootStrap {
 
 	protected void closeNettyRelatedResource() {
 		try {
-			logger.info("MessageServerHandler.getChannelGroup().unbind()-started");
+			if(logger.isInfoEnabled()){
+				logger.info("MessageServerHandler.getChannelGroup().unbind()-started");
+			}
 			MessageServerHandler.getChannelGroup().unbind().await();
-			logger.info("MessageServerHandler.getChannelGroup().unbind()-finished");
+			if(logger.isInfoEnabled()){
+				logger.info("MessageServerHandler.getChannelGroup().unbind()-finished");
+			}
 
-			logger.info("MessageServerHandler.getChannelGroup().close()-started");
+			if(logger.isInfoEnabled()){
+				logger.info("MessageServerHandler.getChannelGroup().close()-started");
+			}
 			MessageServerHandler.getChannelGroup().close().await();
-			logger.info("MessageServerHandler.getChannelGroup().close()-finished");
+			if(logger.isInfoEnabled()){
+				logger.info("MessageServerHandler.getChannelGroup().close()-finished");
+			}
 
-			logger.info("MessageServerHandler.getChannelGroup().clear()-started");
+			if(logger.isInfoEnabled()){
+				logger.info("MessageServerHandler.getChannelGroup().clear()-started");
+			}
 			MessageServerHandler.getChannelGroup().clear();
-			logger.info("MessageServerHandler.getChannelGroup().clear()-finished");
+			if(logger.isInfoEnabled()){
+				logger.info("MessageServerHandler.getChannelGroup().clear()-finished");
+			}
 
-			logger.info("bootstrap.releaseExternalResources()-started");
+			if(logger.isInfoEnabled()){
+				logger.info("bootstrap.releaseExternalResources()-started");
+			}
 			bootstrap.releaseExternalResources();
-			logger.info("bootstrap.releaseExternalResources()-finished");
+			if(logger.isInfoEnabled()){
+				logger.info("bootstrap.releaseExternalResources()-finished");
+			}
 		} catch (InterruptedException e) {
 			logger.error("Interrupted when closeNettyRelatedResource()", e);
 			Thread.currentThread().interrupt();

@@ -28,6 +28,11 @@ import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.util.ConsumerUtil;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager;
 
+/**
+ * @author mengwenchao
+ *
+ * 2015年8月21日 上午11:59:26
+ */
 public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(MessageServerHandler.class);

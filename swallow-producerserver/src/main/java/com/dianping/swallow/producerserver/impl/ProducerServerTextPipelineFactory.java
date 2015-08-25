@@ -10,15 +10,21 @@ import com.dianping.swallow.common.internal.codec.JsonDecoder;
 import com.dianping.swallow.common.internal.codec.JsonEncoder;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
+import com.dianping.swallow.common.server.monitor.collector.ProducerCollector;
 
 public class ProducerServerTextPipelineFactory implements ChannelPipelineFactory {
+	
    private MessageDAO     messageDAO;
    private TopicWhiteList topicWhiteList;
+   private ProducerCollector producerCollector;
 
-   public ProducerServerTextPipelineFactory(MessageDAO messageDAO, TopicWhiteList topicWhiteList) {
+   public ProducerServerTextPipelineFactory(MessageDAO messageDAO, TopicWhiteList topicWhiteList, ProducerCollector producerCollector) {
+	   
       this.messageDAO = messageDAO;
       this.topicWhiteList = topicWhiteList;
+      this.producerCollector = producerCollector;
    }
+   
 
    @Override
    public ChannelPipeline getPipeline() {
@@ -30,7 +36,7 @@ public class ProducerServerTextPipelineFactory implements ChannelPipelineFactory
       pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
       pipeline.addLast("jsonEncoder", new JsonEncoder(TextACK.class));
 
-      pipeline.addLast("handler", new ProducerServerTextHandler(messageDAO, topicWhiteList));
+      pipeline.addLast("handler", new ProducerServerTextHandler(messageDAO, topicWhiteList, producerCollector));
 
       return pipeline;
    }

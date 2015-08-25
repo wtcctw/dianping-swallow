@@ -91,6 +91,6 @@ public class ConsumerThread extends Thread {
    }
 
 	private String getDesc() {
-		return consumerImpl.toString();
+		return consumerImpl.toString() + "@" + toString();
 	}
 }

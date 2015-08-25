@@ -41,8 +41,7 @@
 
 
     <bean id="producerServerForClient"
-        class="com.dianping.swallow.producerserver.impl.ProducerServerForClient"
-        init-method="start">
+        class="com.dianping.swallow.producerserver.impl.ProducerServerForClient">
         <property name="autoSelectPort">
         	<value>${swallow.producerserver.autoselectport}</value>
         </property>
@@ -52,8 +51,7 @@
     </bean>
 
     <bean id="producerServerForText"
-        class="com.dianping.swallow.producerserver.impl.ProducerServerForText"
-        init-method="start">
+        class="com.dianping.swallow.producerserver.impl.ProducerServerForText">
         <property name="port">
         	<value>${swallow.producerserverfortext.port}</value>
         </property>

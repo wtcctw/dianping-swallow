@@ -8,6 +8,9 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -15,15 +18,28 @@ import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.internal.util.SHAUtil;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
+import com.dianping.swallow.common.server.monitor.collector.ProducerCollector;
 
-public class ProducerServerTextHandler extends AbstractProducerServer {
+public class ProducerServerTextHandler extends SimpleChannelUpstreamHandler {
     //TextHandler状态代码
     public static final int     OK                 = 250;
     public static final int     INVALID_TOPIC_NAME = 251;
     public static final int     SAVE_FAILED        = 252;
 
-    public ProducerServerTextHandler(MessageDAO messageDAO, TopicWhiteList topicWhiteList) {
-    	super(messageDAO, topicWhiteList);
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private MessageDAO messageDao;
+    
+    private TopicWhiteList topicWhiteList;
+    
+    private ProducerCollector producerCollector;
+    
+    
+    public ProducerServerTextHandler(MessageDAO messageDAO, TopicWhiteList topicWhiteList, ProducerCollector producerCollector) {
+    	
+    	this.messageDao = messageDAO;
+    	this.topicWhiteList = topicWhiteList;
+    	this.producerCollector = producerCollector;
     }
 
     @Override
@@ -69,7 +85,7 @@ public class ProducerServerTextHandler extends AbstractProducerServer {
             } else {
                 //调用DAO层将SwallowMessage存入DB
                 try {
-                    messageDAO.saveMessage(topicName, swallowMessage);
+                    messageDao.saveMessage(topicName, swallowMessage);
                     producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, swallowMessage.getGeneratedTime().getTime(), System.currentTimeMillis());                    
                     textAck.setInfo(swallowMessage.getSha1());
                 } catch (Exception e1) {
