@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor.impl;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerD
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.OrderEntity;
+import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
@@ -53,13 +56,102 @@ public class DefaultConsumerDataRetriever
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@Override
+	public ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size, long start, long end) {
+		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+		OrderStatsData sendStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SEND), start, end);
+		OrderStatsData ackStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.ACK), start, end);
+		ConsumerOrderDataPair orderDataResult = new ConsumerOrderDataPair(sendStatsData, ackStatsData);
+		if (dataExistInMemory(start, end)) {
+			Set<String> topics = retriever.getTopics(false);
+			if (topics == null) {
+				return null;
+			}
+			Iterator<String> iterator = topics.iterator();
+			while (iterator.hasNext()) {
+				String topicName = iterator.next();
+				Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topicName,
+						StatisType.SEND, false);
+				Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topicName,
+						StatisType.ACK, false);
+				if (sendDelays != null) {
+					for (Map.Entry<String, NavigableMap<Long, Long>> sendDelay : sendDelays.entrySet()) {
+						sendStatsData.add(new OrderEntity(topicName, sendDelay.getKey(), getSumStatsData(
+								sendDelay.getValue(), fromKey, toKey)));
+					}
+				}
+
+				if (ackDelays != null) {
+					for (Map.Entry<String, NavigableMap<Long, Long>> ackDelay : ackDelays.entrySet()) {
+						ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getSumStatsData(
+								ackDelay.getValue(), fromKey, toKey)));
+					}
+				}
+
+			}
+		}
+		return orderDataResult;
+	}
+
+	@Override
+	public ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size) {
+		return getDelayOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
+	public ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size, long start, long end) {
+		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+		OrderStatsData sendStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SEND), start, end);
+		OrderStatsData ackStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.ACK), start, end);
+		ConsumerOrderDataPair orderDataResult = new ConsumerOrderDataPair(sendStatsData, ackStatsData);
+		if (dataExistInMemory(start, end)) {
+			Set<String> topics = retriever.getTopics(false);
+			if (topics == null) {
+				return null;
+			}
+			Iterator<String> iterator = topics.iterator();
+			while (iterator.hasNext()) {
+				String topicName = iterator.next();
+				Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
+						StatisType.SEND, false);
+				Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
+						StatisType.ACK, false);
+				if (sendQpxs != null) {
+					for (Map.Entry<String, NavigableMap<Long, Long>> sendQpx : sendQpxs.entrySet()) {
+						sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getSumStatsData(
+								sendQpx.getValue(), fromKey, toKey)));
+					}
+				}
+
+				if (ackQpxs != null) {
+					for (Map.Entry<String, NavigableMap<Long, Long>> ackQpx : ackQpxs.entrySet()) {
+						ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getSumStatsData(ackQpx.getValue(),
+								fromKey, toKey)));
+					}
+				}
+
+			}
+		}
+		return orderDataResult;
+	}
+
+	@Override
+	public ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size) {
+		return getQpxOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
 	public List<ConsumerDataPair> getDelayForAllConsumerId(String topic, long start, long end) {
 
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		Map<String, NavigableMap<Long, Long>> sendDelays = null;
 		Map<String, NavigableMap<Long, Long>> ackDelays = null;
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
-
+		long startKey = getKey(start);
+		long endKey = getKey(end);
 		if (dataExistInMemory(start, end)) {
 			sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, false);
 			ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, false);
@@ -70,7 +162,11 @@ public class DefaultConsumerDataRetriever
 					String consumerId = entry.getKey();
 					NavigableMap<Long, Long> send = entry.getValue();
 					NavigableMap<Long, Long> ack = ackDelays.get(consumerId);
-
+					if (send == null) {
+						continue;
+					}
+					send = send.subMap(startKey, true, endKey, true);
+					ack = ack.subMap(startKey, true, endKey, true);
 					StatsData sendStatis = createStatsData(
 							createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), send, start, end);
 					StatsData ackStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK),
@@ -80,8 +176,6 @@ public class DefaultConsumerDataRetriever
 			}
 		} else {
 			Map<String, StatsDataMapPair> statsDataResults = getTopicDelayInDb(topic, start, end);
-			long startKey = getKey(start);
-			long endKey = getKey(end);
 			boolean isTotal = false;
 			if (MonitorData.TOTAL_KEY.equals(topic)) {
 				isTotal = true;
@@ -136,7 +230,8 @@ public class DefaultConsumerDataRetriever
 		Map<String, NavigableMap<Long, Long>> sendQpxs = null;
 		Map<String, NavigableMap<Long, Long>> ackQpxs = null;
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
-
+		long startKey = getKey(start);
+		long endKey = getKey(end);
 		if (dataExistInMemory(start, end)) {
 			sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
 			ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
@@ -146,7 +241,11 @@ public class DefaultConsumerDataRetriever
 					String consumerId = entry.getKey();
 					NavigableMap<Long, Long> send = entry.getValue();
 					NavigableMap<Long, Long> ack = ackQpxs.get(consumerId);
-
+					if (send == null) {
+						continue;
+					}
+					send = send.subMap(startKey, true, endKey, true);
+					ack = ack.subMap(startKey, true, endKey, true);
 					StatsData sendStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND),
 							send, start, end);
 					StatsData ackStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK),
@@ -157,8 +256,6 @@ public class DefaultConsumerDataRetriever
 			}
 		} else {
 			Map<String, StatsDataMapPair> statsDataResults = getTopicQpxInDb(topic, qpx, start, end);
-			long startKey = getKey(start);
-			long endKey = getKey(end);
 			boolean isTotal = false;
 			if (MonitorData.TOTAL_KEY.equals(topic)) {
 				isTotal = true;

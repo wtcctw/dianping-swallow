@@ -1,8 +1,10 @@
 package com.dianping.swallow.web.monitor.impl;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +23,8 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
+import com.dianping.swallow.web.monitor.OrderEntity;
+import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
@@ -50,6 +54,74 @@ public class DefaultProducerDataRetriever
 	private ProducerMonitorDao producerMonitorDao;
 
 	@Override
+	public OrderStatsData getDelayOrder(int size, long start, long end) {
+		if (dataExistInMemory(start, end)) {
+			return getDelayOrderInMemory(size, StatisType.SAVE, start, end);
+		}
+		return getDelayOrderInDb(size, StatisType.SAVE, start, end);
+	}
+
+	protected OrderStatsData getDelayOrderInMemory(int size, StatisType type, long start, long end) {
+		Set<String> topics = statis.getTopics(false);
+		if (topics == null) {
+			return null;
+		}
+		OrderStatsData orderResults = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, type), start, end);
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+		Iterator<String> iterator = topics.iterator();
+		while (iterator.hasNext()) {
+			String topicName = iterator.next();
+			NavigableMap<Long, Long> rawDatas = statis.getDelayForTopic(topicName, type);
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
+		}
+		return orderResults;
+	}
+
+	protected OrderStatsData getDelayOrderInDb(int size, StatisType type, long start, long end) {
+		return getDelayOrderInMemory(size, type, start, end);
+	}
+
+	@Override
+	public OrderStatsData getDelayOrder(int size) {
+		return getDelayOrder(size, getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
+	public OrderStatsData getQpxOrder(int size, long start, long end) {
+		if (dataExistInMemory(start, end)) {
+			return getQpxOrderInMemory(size, StatisType.SAVE, start, end);
+		}
+		return getDelayOrderInDb(size, StatisType.SAVE, start, end);
+	}
+
+	protected OrderStatsData getQpxOrderInMemory(int size, StatisType type, long start, long end) {
+		Set<String> topics = statis.getTopics(false);
+		if (topics == null) {
+			return null;
+		}
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+		OrderStatsData orderResults = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, type), start, end);
+		Iterator<String> iterator = topics.iterator();
+		while (iterator.hasNext()) {
+			String topicName = iterator.next();
+			NavigableMap<Long, Long> rawDatas = statis.getQpxForTopic(topicName, type);
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
+		}
+		return orderResults;
+	}
+
+	protected OrderStatsData getQpxOrderInDb(int size, StatisType type, long start, long end) {
+		return getQpxOrderInMemory(size, type, start, end);
+	}
+
+	@Override
+	public OrderStatsData getQpxOrder(int size) {
+		return getQpxOrder(size, getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
 	public StatsData getSaveDelay(String topic, long start, long end) {
 
 		if (dataExistInMemory(start, end)) {
@@ -58,13 +130,13 @@ public class DefaultProducerDataRetriever
 
 		return getDelayInDb(topic, StatisType.SAVE, start, end);
 	}
-	
+
 	@Override
 	protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
-		
+
 		long startKey = getKey(start);
 		long endKey = getKey(end);
-		
+
 		NavigableMap<Long, Long> rawData = pTopicStatsDataService.findSectionDelayData(topic, startKey, endKey);
 		rawData = fillStatsData(rawData, startKey, endKey);
 		return createStatsData(createQpxDesc(topic, StatisType.SAVE), rawData, start, end);
@@ -83,7 +155,7 @@ public class DefaultProducerDataRetriever
 	protected StatsData getQpxInDb(String topic, StatisType type, long start, long end) {
 		long startKey = getKey(start);
 		long endKey = getKey(end);
-		
+
 		NavigableMap<Long, Long> rawData = pTopicStatsDataService.findSectionQpsData(topic, startKey, endKey);
 		rawData = fillStatsData(rawData, startKey, endKey);
 		return createStatsData(createQpxDesc(topic, type), rawData, start, end);

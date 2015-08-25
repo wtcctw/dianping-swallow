@@ -3,6 +3,7 @@ package com.dianping.swallow.web.monitor.impl;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -35,6 +36,8 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 	protected final int BUILD_TIMES_AGEO = 15000;// 每次构建时，构建此时间(ms)以前的数据
 
 	private static final String FACTORY_NAME = "DataRetriever";
+	
+	protected static final String TOTAL_KEY = "total";
 
 	@Value("${swallow.web.monitor.keepinmemory}")
 	public int keepInMemoryHour = 3;// 保存最新小时
@@ -269,6 +272,17 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		}
 
 		return statsDatas;
+	}
+	
+	protected long getSumStatsData(NavigableMap<Long, Long> rawDatas, long fromKey, long toKey) {
+		long sumData = 0;
+		if (rawDatas != null) {
+			rawDatas = rawDatas.subMap(fromKey, true, toKey, true);
+			for (Map.Entry<Long, Long> rowData : rawDatas.entrySet()) {
+				sumData += rowData.getValue().floatValue();
+			}
+		}
+		return sumData;
 	}
 
 }

@@ -39,8 +39,6 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 	private List<MonitorDataListener> statisListeners = new ArrayList<MonitorDataListener>();
 
-	protected static final String TOTAL_KEY = "total";
-
 	protected AbstractAllData<M, T, S, V> statis;
 
 	private int intervalCount;
@@ -108,13 +106,18 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	protected StatsData getDelayInMemory(String topic, StatisType type, long start, long end) {
 
 		NavigableMap<Long, Long> rawData = statis.getDelayForTopic(topic, type);
+		if (rawData != null) {
+			rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+		}
 		return createStatsData(createDelayDesc(topic, type), rawData, start, end);
 	}
 
 	protected StatsData getQpxInMemory(String topic, StatisType type, long start, long end) {
 
 		NavigableMap<Long, Long> rawData = statis.getQpxForTopic(topic, type);
-
+		if (rawData != null) {
+			rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+		}
 		return createStatsData(createQpxDesc(topic, type), rawData, start, end);
 	}
 
@@ -128,7 +131,9 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 			String serverIp = entry.getKey();
 			NavigableMap<Long, Long> serverQpx = entry.getValue();
-			serverQpx = serverQpx.subMap(getCeilingTime(start), true, getCeilingTime(end), true);
+			if (serverQpx != null) {
+				serverQpx = serverQpx.subMap(getKey(start), true, getKey(end), true);
+			}
 			result.put(serverIp, createStatsData(createServerQpxDesc(serverIp, type), serverQpx, start, end));
 		}
 

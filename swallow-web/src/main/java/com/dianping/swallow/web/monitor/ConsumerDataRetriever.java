@@ -12,6 +12,14 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
  *         2015年4月21日 上午10:38:07
  */
 public interface ConsumerDataRetriever extends MonitorDataRetriever {
+	
+	ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size, long start, long end);
+	
+	ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size);
+	
+	ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size, long start, long end);
+	
+	ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size);
 
 	List<ConsumerDataPair> getDelayForAllConsumerId(String topic, long start, long end);
 
@@ -49,6 +57,38 @@ public interface ConsumerDataRetriever extends MonitorDataRetriever {
 
 		public StatsData getAckData() {
 			return ackData;
+		}
+	}
+
+	public static class ConsumerOrderDataPair {
+
+		private OrderStatsData sendStatsData;
+
+		private OrderStatsData ackStatsData;
+
+		public ConsumerOrderDataPair() {
+
+		}
+
+		public ConsumerOrderDataPair(OrderStatsData sendStatsData, OrderStatsData ackStatsData) {
+			this.sendStatsData = sendStatsData;
+			this.ackStatsData = ackStatsData;
+		}
+
+		public OrderStatsData getSendStatsData() {
+			return sendStatsData;
+		}
+
+		public void setSendStatsData(OrderStatsData sendStatsData) {
+			this.sendStatsData = sendStatsData;
+		}
+
+		public OrderStatsData getAckStatsData() {
+			return ackStatsData;
+		}
+
+		public void setAckStatsData(OrderStatsData ackStatsData) {
+			this.ackStatsData = ackStatsData;
 		}
 	}
 

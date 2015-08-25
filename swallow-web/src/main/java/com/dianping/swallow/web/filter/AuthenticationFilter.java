@@ -52,7 +52,6 @@ public class AuthenticationFilter implements Filter {
 		String uri = req.getRequestURI();
 		String username = extractUsernameUtils.getUsername(req);
 		String topicname = req.getParameter("topic");
-
 		boolean isPassed = authenticationService.isValid(username, topicname, uri);
 
 		if (isPassed) {

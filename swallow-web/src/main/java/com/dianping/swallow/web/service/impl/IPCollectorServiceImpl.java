@@ -41,6 +41,7 @@ import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -67,6 +68,8 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	private static final String TOTAL_KEY = "total";
 
 	private static final String TOPIC_CONSUMERID_SPLIT = "&";
+
+	private static final String FACTORY_NAME = "IpCollector";
 
 	private static final String IP_SPLIT = ",";
 
@@ -111,7 +114,8 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private int delay = 5;
 
-	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor();
+	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
+			.getThreadFactory(FACTORY_NAME));
 
 	private ScheduledFuture<?> future = null;
 

@@ -34,6 +34,8 @@ import com.dianping.swallow.web.dashboard.model.ResultEntry;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerOrderDataPair;
+import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
@@ -199,7 +201,8 @@ public class DataMonitorController extends AbstractMonitorController {
 		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
 			return getConsumerServerQps();
 		}
-		SearchTime searchTime = getSearchTime(startTime, endTime);
+		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
+
 		serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
 		return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
 	}
@@ -220,7 +223,7 @@ public class DataMonitorController extends AbstractMonitorController {
 		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
 			return getProducerServerQps();
 		}
-		SearchTime searchTime = getSearchTime(startTime, endTime);
+		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
 		serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
 
 		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
@@ -250,7 +253,7 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		SearchTime searchTime = getSearchTime(startTime, endTime);
+		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
 		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND, searchTime.getStartTime(),
 				searchTime.getEndTime());
 		List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND,
@@ -319,7 +322,7 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		final SearchTime searchTime = getSearchTime(startTime, endTime);
+		final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
 
 		Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic,
 				searchTime.getStartTime(), searchTime.getEndTime());
@@ -392,7 +395,7 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		final Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		final SearchTime searchTime = getSearchTime(startTime, endTime);
+		final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
 
 		SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(
 				CAT_TYPE, "getConsumerDelayMonitor");
@@ -412,6 +415,39 @@ public class DataMonitorController extends AbstractMonitorController {
 			}
 		});
 
+	}
+
+	@RequestMapping(value = "/console/monitor/consumer/total/delay/order/get/{size}", method = RequestMethod.POST)
+	@ResponseBody
+	public Object getConsumerDelayOrderMonitor(@PathVariable final int size) throws Exception {
+		OrderStatsData saveDelayStatsData = producerDataRetriever.getDelayOrder(size);
+		ConsumerOrderDataPair consumerDelayOrderData = consumerDataRetriever.getDelayOrderForAllConsumerId(size);
+		OrderStatsDataResult result = new OrderStatsDataResult();
+		result.add(saveDelayStatsData);
+		result.add(consumerDelayOrderData.getSendStatsData());
+		result.add(consumerDelayOrderData.getAckStatsData());
+		return result;
+	}
+
+	@RequestMapping(value = "/console/monitor/consumer/total/accu/order/get/{size}", method = RequestMethod.POST)
+	@ResponseBody
+	public Object getConsumerAccuOrderMonitor(@PathVariable final int size) throws Exception {
+		OrderStatsData accuStatsData = accumulationRetriever.getAccuOrderForAllConsumerId(size);
+		OrderStatsDataResult result = new OrderStatsDataResult();
+		result.add(accuStatsData);
+		return result;
+	}
+
+	@RequestMapping(value = "/console/monitor/consumer/total/qpx/order/get/{size}", method = RequestMethod.POST)
+	@ResponseBody
+	public Object getConsumerQpxOrderMonitor(@PathVariable final int size) throws Exception {
+		OrderStatsData saveQpxStatsData = producerDataRetriever.getQpxOrder(size);
+		ConsumerOrderDataPair consumerQpxOrderData = consumerDataRetriever.getQpxOrderForAllConsumerId(size);
+		OrderStatsDataResult result = new OrderStatsDataResult();
+		result.add(saveQpxStatsData);
+		result.add(consumerQpxOrderData.getSendStatsData());
+		result.add(consumerQpxOrderData.getAckStatsData());
+		return result;
 	}
 
 	private List<HighChartsWrapper> buildStatsHighChartsWrapper(String yAxis, Map<String, StatsData> stats) {
@@ -496,35 +532,6 @@ public class DataMonitorController extends AbstractMonitorController {
 		return topic;
 	}
 
-	private SearchTime getSearchTime(String startTime, String endTime) {
-		SearchTime searchTime = new SearchTime();
-
-		if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
-
-			searchTime.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
-			searchTime.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
-
-			if (searchTime.getEndTime() - searchTime.getStartTime() > maxSearchTimeSpan) {
-				searchTime.setEndTime(searchTime.getStartTime() + maxSearchTimeSpan);
-			}
-
-		} else {
-
-			if (StringUtils.isBlank(startTime) && StringUtils.isNotBlank(endTime)) {
-
-				searchTime.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
-				searchTime.setEndTime(searchTime.getStartTime() + maxSearchTimeSpan);
-
-			} else if (StringUtils.isNotBlank(startTime) && StringUtils.isBlank(endTime)) {
-
-				searchTime.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
-				searchTime.setStartTime(searchTime.getEndTime() - maxSearchTimeSpan);
-
-			}
-		}
-		return searchTime;
-	}
-
 	private Object buildResponse(List<ResultEntry> entrys, String type) {
 
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -598,6 +605,20 @@ public class DataMonitorController extends AbstractMonitorController {
 		return subSide;
 	}
 
+	public static class OrderStatsDataResult {
+
+		List<OrderStatsData> orderStatsDatas = null;
+
+		public OrderStatsDataResult() {
+			orderStatsDatas = new ArrayList<OrderStatsData>();
+		}
+
+		public void add(OrderStatsData statsData) {
+			orderStatsDatas.add(statsData);
+		}
+
+	}
+
 	private static class SearchTime {
 
 		private long startTime;
@@ -618,6 +639,34 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		public void setEndTime(long endTime) {
 			this.endTime = endTime;
+		}
+
+		public SearchTime getSearchTime(String startTime, String endTime) {
+
+			if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+
+				this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
+				this.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
+
+				if (this.getEndTime() - this.getStartTime() > maxSearchTimeSpan) {
+					this.setEndTime(this.getStartTime() + maxSearchTimeSpan);
+				}
+
+			} else {
+
+				if (StringUtils.isBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+
+					this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
+					this.setEndTime(this.getStartTime() + maxSearchTimeSpan);
+
+				} else if (StringUtils.isNotBlank(startTime) && StringUtils.isBlank(endTime)) {
+
+					this.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
+					this.setStartTime(this.getEndTime() - maxSearchTimeSpan);
+
+				}
+			}
+			return this;
 		}
 
 	}

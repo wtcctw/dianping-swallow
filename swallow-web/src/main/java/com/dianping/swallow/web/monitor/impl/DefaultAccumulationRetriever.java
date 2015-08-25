@@ -38,6 +38,8 @@ import com.dianping.swallow.web.config.impl.DefaultWebConfig;
 import com.dianping.swallow.web.monitor.AccumulationListener;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.OrderEntity;
+import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
@@ -206,6 +208,39 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	}
 
 	@Override
+	public OrderStatsData getAccuOrderForAllConsumerId(int size) {
+		return getAccuOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
+	public OrderStatsData getAccuOrderForAllConsumerId(int size, long start, long end) {
+		if (dataExistInMemory(start, end)) {
+			return getAccuOrderForAllConsumerIdInMemory(size, start, end);
+		}
+		return null;
+	}
+
+	protected OrderStatsData getAccuOrderForAllConsumerIdInMemory(int size, long start, long end) {
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+
+		OrderStatsData orderResults = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY,
+				StatisDetailType.ACCUMULATION), start, end);
+
+		for (Map.Entry<String, TopicAccumulation> topicAccumulation : topics.entrySet()) {
+			String topicName = topicAccumulation.getKey();
+			Map<String, ConsumerIdAccumulation> consumerIdAccus = topicAccumulation.getValue().consumers();
+			for (Map.Entry<String, ConsumerIdAccumulation> consumerIdAccu : consumerIdAccus.entrySet()) {
+				NavigableMap<Long, Long> rawDatas = consumerIdAccu.getValue()
+						.getAccumulations(getSampleIntervalCount());
+				orderResults.add(new OrderEntity(topicName, consumerIdAccu.getKey(), getSumStatsData(rawDatas, fromKey,
+						toKey)));
+			}
+		}
+		return orderResults;
+	}
+
+	@Override
 	public Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end) {
 
 		if (dataExistInMemory(start, end)) {
@@ -252,9 +287,10 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			ConsumerIdAccumulation consumerIdAccumulation = entry.getValue();
 
 			StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
-			result.put(
-					consumerId,
-					createStatsData(desc, consumerIdAccumulation.getAccumulations(getSampleIntervalCount()), start, end));
+
+			NavigableMap<Long, Long> rawData = consumerIdAccumulation.getAccumulations(getSampleIntervalCount());
+			rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+			result.put(consumerId, createStatsData(desc, rawData, start, end));
 		}
 
 		return result;
