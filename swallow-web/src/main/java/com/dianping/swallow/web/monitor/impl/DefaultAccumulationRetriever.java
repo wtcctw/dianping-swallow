@@ -231,7 +231,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 				StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
 				NavigableMap<Long, Long> accuRawData = accuStatsData.getValue();
 				accuRawData = fillStatsData(accuRawData, startKey, endKey);
-				result.put(consumerId, createStatsData(desc, accuRawData, start, end));
+				StatsData statsData = new StatsData(desc, getValue(accuRawData), getStartTime(accuRawData, start, end),
+						getStorageIntervalTime());
+				result.put(consumerId, statsData);
 			}
 		}
 		return result;

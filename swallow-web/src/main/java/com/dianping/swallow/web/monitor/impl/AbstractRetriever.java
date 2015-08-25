@@ -21,6 +21,7 @@ import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.web.monitor.Retriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mengwenchao
@@ -33,12 +34,15 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 	protected final int BUILD_TIMES_AGEO = 15000;// 每次构建时，构建此时间(ms)以前的数据
 
+	private static final String FACTORY_NAME = "DataRetriever";
+
 	@Value("${swallow.web.monitor.keepinmemory}")
 	public int keepInMemoryHour = 3;// 保存最新小时
 
 	public static int keepInMemoryCount;
 
-	protected ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT);
+	protected ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
+			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	protected long lastBuildTime = System.currentTimeMillis(), current = System.currentTimeMillis();
 
@@ -143,11 +147,15 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return DEFAULT_INTERVAL;
 	}
 
+	protected int getStorageIntervalTime() {
+		return DEFAULT_INTERVAL;
+	}
+
 	protected int getSampleIntervalCount() {
 		return getSampleIntervalTime() / AbstractCollector.SEND_INTERVAL;
 	}
 
-	private int getStorageIntervalCount() {
+	protected int getStorageIntervalCount() {
 		return DEFAULT_INTERVAL / AbstractCollector.SEND_INTERVAL;
 	}
 
@@ -224,11 +232,12 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 			long tempStartKey = statsDatas.firstKey();
 			long tempEndKey = statsDatas.lastKey();
 			long tempKey = tempStartKey;
+			tempKey -= getStorageIntervalCount();
 			while (startTimeKey < tempKey) {
-				tempKey -= getStorageIntervalCount();
 				if (!statsDatas.containsKey(tempKey)) {
 					statsDatas.put(tempKey, 0L);
 				}
+				tempKey -= getStorageIntervalCount();
 			}
 
 			tempKey = tempStartKey;
@@ -250,11 +259,12 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 			}
 
 			tempKey = tempEndKey;
+			tempKey += getStorageIntervalCount();
 			while (tempKey < endTimeKey) {
-				tempKey += getStorageIntervalCount();
 				if (!statsDatas.containsKey(tempKey)) {
 					statsDatas.put(tempKey, 0L);
 				}
+				tempKey += getStorageIntervalCount();
 			}
 		}
 

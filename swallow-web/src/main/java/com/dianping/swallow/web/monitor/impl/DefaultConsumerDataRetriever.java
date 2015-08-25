@@ -100,11 +100,11 @@ public class DefaultConsumerDataRetriever
 					}
 					sendRawData = fillStatsData(sendRawData, startKey, endKey);
 					StatsData sendStatis = createStatsData(
-							createConsumerIdQpxDesc(topic, statsDataResult.getKey(), StatisType.SEND), sendRawData,
+							createConsumerIdDelayDesc(topic, statsDataResult.getKey(), StatisType.SEND), sendRawData,
 							start, end);
 					ackRawData = fillStatsData(ackRawData, startKey, endKey);
 					StatsData ackStatis = createStatsData(
-							createConsumerIdQpxDesc(topic, statsDataResult.getKey(), StatisType.ACK), ackRawData,
+							createConsumerIdDelayDesc(topic, statsDataResult.getKey(), StatisType.ACK), ackRawData,
 							start, end);
 					result.add(new ConsumerDataPair(statsDataResult.getKey(), sendStatis, ackStatis));
 				}
