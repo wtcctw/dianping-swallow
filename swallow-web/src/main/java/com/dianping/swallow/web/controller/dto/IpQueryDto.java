@@ -18,20 +18,6 @@ public class IpQueryDto extends BaseDto{
 		
 	}
 	
-	public IpQueryDto(String ip){
-		this(ip, null);
-	}
-	
-	public IpQueryDto(IpType ipType){
-		this(null, ipType);
-	}
-	
-	public IpQueryDto(String ip, IpType ipType){
-		super();
-		this.ip = ip;
-		this.ipType = ipType;
-	}
-
 	public String getIp() {
 		return ip;
 	}

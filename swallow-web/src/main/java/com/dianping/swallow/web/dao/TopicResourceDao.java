@@ -30,5 +30,7 @@ public interface TopicResourceDao extends Dao{
 
 	TopicResource findDefault();
 	
+	List<TopicResource> findAll();
+	
 	Pair<Long, List<TopicResource>> findTopicResourcePage(TopicQueryDto topicQueryDto);
 }

@@ -6,7 +6,17 @@ package com.dianping.swallow.web.controller.dto;
  *
  * 2015年7月15日下午2:56:03
  */
-public class ConsumerIdAlarmSettingDto {
+public class ConsumerIdResourceDto {
+	
+	private String id;
+	
+	private String consumerId;
+
+	private String topic;
+	
+	private boolean alarm;
+	
+	private String consumerIp;
 	
 	private long sendpeak;
 	
@@ -14,7 +24,7 @@ public class ConsumerIdAlarmSettingDto {
 
 	private int sendfluctuation;
 	
-	private long sendFluctuationBase;
+	private long sendfluctuationBase;
 
 	private long ackpeak;
 	
@@ -22,17 +32,53 @@ public class ConsumerIdAlarmSettingDto {
 	
 	private int ackfluctuation;
 	
-	private long ackFluctuationBase;
+	private long ackfluctuationBase;
 
 	private long senddelay;
 	
 	private long ackdelay;
 	
 	private long accumulation;
-	
-	private String consumerId;
 
-	private String topicName;
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getConsumerId() {
+		return consumerId;
+	}
+
+	public void setConsumerId(String consumerId) {
+		this.consumerId = consumerId;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	public boolean isAlarm() {
+		return alarm;
+	}
+
+	public void setAlarm(boolean alarm) {
+		this.alarm = alarm;
+	}
+
+	public String getConsumerIp() {
+		return consumerIp;
+	}
+
+	public void setConsumerIp(String consumerIp) {
+		this.consumerIp = consumerIp;
+	}
 
 	public long getSendpeak() {
 		return sendpeak;
@@ -56,6 +102,14 @@ public class ConsumerIdAlarmSettingDto {
 
 	public void setSendfluctuation(int sendfluctuation) {
 		this.sendfluctuation = sendfluctuation;
+	}
+
+	public long getSendfluctuationBase() {
+		return sendfluctuationBase;
+	}
+
+	public void setSendfluctuationBase(long sendfluctuationBase) {
+		this.sendfluctuationBase = sendfluctuationBase;
 	}
 
 	public long getAckpeak() {
@@ -82,6 +136,14 @@ public class ConsumerIdAlarmSettingDto {
 		this.ackfluctuation = ackfluctuation;
 	}
 
+	public long getAckfluctuationBase() {
+		return ackfluctuationBase;
+	}
+
+	public void setAckfluctuationBase(long ackfluctuationBase) {
+		this.ackfluctuationBase = ackfluctuationBase;
+	}
+
 	public long getSenddelay() {
 		return senddelay;
 	}
@@ -104,38 +166,6 @@ public class ConsumerIdAlarmSettingDto {
 
 	public void setAccumulation(long accumulation) {
 		this.accumulation = accumulation;
-	}
-
-	public String getConsumerId() {
-		return consumerId;
-	}
-
-	public void setConsumerId(String consumerId) {
-		this.consumerId = consumerId;
-	}
-
-	public long getSendFluctuationBase() {
-		return sendFluctuationBase;
-	}
-
-	public void setSendFluctuationBase(long sendFluctuationBase) {
-		this.sendFluctuationBase = sendFluctuationBase;
-	}
-
-	public long getAckFluctuationBase() {
-		return ackFluctuationBase;
-	}
-
-	public void setAckFluctuationBase(long ackFluctuationBase) {
-		this.ackFluctuationBase = ackFluctuationBase;
-	}
-	
-	public String getTopicName() {
-		return topicName;
-	}
-
-	public void setTopicName(String topicName) {
-		this.topicName = topicName;
 	}
 	
 }

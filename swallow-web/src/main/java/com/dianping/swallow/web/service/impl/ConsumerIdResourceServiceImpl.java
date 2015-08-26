@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.BaseDto;
+import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
@@ -50,15 +51,21 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByTopic(TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdQueryDto consumerIdQueryDto) {
 
-		return consumerIdResourceDao.findByTopic(topicQueryDto);
+		return consumerIdResourceDao.findByTopic(consumerIdQueryDto);
 	}
 
 	@Override
 	public ConsumerIdResource find(String topic, String consumerid) {
 
 		return consumerIdResourceDao.find(topic, consumerid);
+	}
+	
+	@Override
+	public List<ConsumerIdResource> findAll(String ...fields ){
+		
+		return consumerIdResourceDao.findAll(fields);
 	}
 
 	@Override
@@ -68,15 +75,15 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(BaseDto baseDto) {
+	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdQueryDto consumerIdQueryDto) {
 
-		return consumerIdResourceDao.findConsumerIdResourcePage(baseDto);
+		return consumerIdResourceDao.findConsumerIdResourcePage(consumerIdQueryDto);
 	}
 	
 	@Override
-	public  Pair<Long, List<ConsumerIdResource>> findByConsumerIp(TopicQueryDto  topicQueryDto){
+	public  Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdQueryDto consumerIdQueryDto){
 		
-		return consumerIdResourceDao.findByConsumerIp(topicQueryDto);
+		return consumerIdResourceDao.findByConsumerIp(consumerIdQueryDto);
 	}
 
 }

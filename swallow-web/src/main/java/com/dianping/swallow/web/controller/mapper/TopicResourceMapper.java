@@ -31,32 +31,33 @@ public class TopicResourceMapper {
 		
 		topicResource.setProducerAlarmSetting(producerBaseAlarmSetting);
 		
-		List<String> list = new ArrayList<String>();
-
+		List<String> idList = new ArrayList<String>();
 		String whiteList = dto.getConsumerIdWhiteList();
+		
 		if (StringUtils.isNotBlank(whiteList)) {
 			String[] whiteLists = whiteList.split(DELIMITOR);
 			for (String wl : whiteLists) {
-				if (!list.contains(wl)) {
-					list.add(wl);
+				if (!idList.contains(wl)) {
+					idList.add(wl);
 				}
 			}
 		}
 		
-		topicResource.setConsumerIdWhiteList(list);
-		list.clear();
+		topicResource.setConsumerIdWhiteList(idList);
 		
+		List<String> producerList = new ArrayList<String>();
 		whiteList = dto.getProducerServer();
+		
 		if (StringUtils.isNotBlank(whiteList)) {
 			String[] whiteLists = whiteList.split(DELIMITOR);
 			for (String wl : whiteLists) {
-				if (!list.contains(wl)) {
-					list.add(wl);
+				if (!producerList.contains(wl)) {
+					producerList.add(wl);
 				}
 			}
 		}
 		
-		topicResource.setProducerServer(list);
+		topicResource.setProducerServer(producerList);
 		
 		topicResource.setConsumerAlarm(dto.isConsumerAlarm());
 		topicResource.setProducerAlarm(dto.isProducerAlarm());

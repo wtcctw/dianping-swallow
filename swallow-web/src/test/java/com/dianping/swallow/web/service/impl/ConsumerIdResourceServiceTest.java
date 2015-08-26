@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -14,8 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
-import com.dianping.swallow.web.controller.dto.TopicQueryDto;
+import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
@@ -64,8 +64,13 @@ public class ConsumerIdResourceServiceTest {
 		consumerIdResource.setTopic("example");
 		consumerIdResource.setConsumerId("consumerid-0");
 		
-		consumerIdResource.setTopic("example");
-		consumerIdResource.setConsumerId("consumerid-0");
+		List<String> consumerip = new ArrayList<String>();
+		consumerip.add("1.0.0.1");
+		consumerip.add("1.0.0.2");
+		consumerip.add("1.0.0.3");
+		
+		consumerIdResource.setConsumerIp(consumerip);
+		consumerIdResource.setAlarm(Boolean.TRUE);
 		
 		return consumerIdResource;
 		
@@ -78,7 +83,11 @@ public class ConsumerIdResourceServiceTest {
 		boolean result = consumerIdResourceService.insert(consumerIdResource);
 		Assert.assertTrue(result);
 		
-		Pair<Long, List<ConsumerIdResource>> consumerIdResources = consumerIdResourceService.findByTopic(new TopicQueryDto("example"));
+		ConsumerIdQueryDto consumerIdQueryDto = new ConsumerIdQueryDto();
+		consumerIdQueryDto.setTopic("example");
+		consumerIdQueryDto.setOffset(0);
+		consumerIdQueryDto.setLimit(31);
+		Pair<Long, List<ConsumerIdResource>> consumerIdResources = consumerIdResourceService.findByTopic(consumerIdQueryDto);
 		Assert.assertNotNull(consumerIdResources);
 		Assert.assertEquals(consumerIdResources.getFirst(), new Long(1));
 		
@@ -97,19 +106,20 @@ public class ConsumerIdResourceServiceTest {
 		result = consumerIdResourceService.insert(consumerIdResource1);
 		Assert.assertTrue(result);
 		
-		Pair<Long, List<ConsumerIdResource>> pages = consumerIdResourceService.findConsumerIdResourcePage(new  BaseDto(0, 31));
+		Pair<Long, List<ConsumerIdResource>> pages = consumerIdResourceService.findConsumerIdResourcePage(consumerIdQueryDto);
 		Assert.assertNotNull(pages);
 		long size = pages.getFirst();
 		Assert.assertEquals(size, 2L);
 		
 		consumerIdResource1 = consumerIdResourceService.findDefault();
 		Assert.assertNotNull(consumerIdResource1);
+
+		int n = consumerIdResourceService.remove("lmdtest", "consumerid-1");
+		Assert.assertEquals(n, 1);
 		
-		int n = consumerIdResourceService.remove("example", "default");
+		n = consumerIdResourceService.remove("example", "default");
 		Assert.assertEquals(n, 1);
 
-		n = consumerIdResourceService.remove("lmdtest", "consumerid-1");
-		Assert.assertEquals(n, 1);
 	}
 
 }

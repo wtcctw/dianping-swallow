@@ -2,6 +2,8 @@ package com.dianping.swallow.web.dao.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -92,6 +94,14 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 				TOPICRESOURCE_COLLECTION);
 		return topicResource;
 	}
+	
+	@Override
+	public List<TopicResource> findAll(){
+		
+		List<TopicResource> topicResource = mongoTemplate.findAll(TopicResource.class,
+				TOPICRESOURCE_COLLECTION);
+		return topicResource;
+	}
 
 	@Override
 	public Pair<Long, List<TopicResource>> findTopicResourcePage(TopicQueryDto topicQueryDto) {
@@ -100,7 +110,7 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 		int offset = topicQueryDto.getOffset();
 		int limit = topicQueryDto.getLimit();
 		
-		query.skip(offset).limit(limit);
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, TOPIC)));
 		List<TopicResource> topicResource = mongoTemplate.find(query, TopicResource.class,
 				TOPICRESOURCE_COLLECTION);
 		

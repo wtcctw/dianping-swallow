@@ -599,9 +599,9 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 
 	        
 			//judge if redirected from topic view
-			var tmpname = localStorage.getItem("name");
+			var tmpname = localStorage.getItem("topic");
 			if(tmpname != null){
-				$scope.topic = localStorage.getItem("name");
+				$scope.topic = localStorage.getItem("topic");
 				localStorage.clear();
 				$http.get(window.contextPath + "/console/message/timespan", {
 					params : {

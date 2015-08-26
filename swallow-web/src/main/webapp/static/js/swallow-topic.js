@@ -128,6 +128,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						for(var i = 0; i < list.length; ++i)
 							$('#whitelist').tagsinput('add', list[i]);
 					}
+				}else{
+					$('#whitelist').tagsinput('removeAll');
 				}
 				
 				if(typeof($scope.searchPaginator.currentPageItems[index].prop) != "undefined"){
@@ -138,6 +140,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						for(var i = 0; i < list.length; ++i)
 							$('#prop').tagsinput('add', list[i]);
 					}
+				}else{
+					$('#prop').tagsinput('removeAll');
 				}
 				
 				if(typeof($scope.searchPaginator.currentPageItems[index].producerServer) != "undefined"){
@@ -148,10 +152,12 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						for(var i = 0; i < list.length; ++i)
 							$('#producerServer').tagsinput('add', list[i]);
 					}
+				}else{
+					$('#producerServer').tagsinput('removeAll');
 				}
 				
 				$scope.topicEntry.id = $scope.searchPaginator.currentPageItems[index].id;
-				$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].name;
+				$scope.topicEntry.name = $scope.searchPaginator.currentPageItems[index].name;
 				$scope.topicEntry.producerAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarm;
 				$scope.topicEntry.consumerAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarm;
 				$scope.topicEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
@@ -163,7 +169,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			
 			$scope.refreshpage = function(myForm){
 				if ($scope.topicEntry.sendpeak < $scope.topicEntry.sendvalley){
-					alert("谷值不能小于峰值");
+					alert("峰值不能小于谷值");
 					return;
 				}
 				$scope.topicEntry.consumerIdWhiteList = $("#whitelist").val();
@@ -173,7 +179,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				var param = JSON.stringify($scope.topicEntry);
 				
 				$http.post(window.contextPath + '/console/topic/update', $scope.topicEntry).success(function(response) {
-					$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
+					$scope.query.topic = $scope.topicEntry.name;
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 		    	});
 		    	
 		    }
@@ -254,8 +261,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				});
 			};
 						
-			$scope.setTopicName = function(name){
-				localStorage.setItem("name", name);
+			$scope.setTopicName = function(topic){
+				localStorage.setItem("topic", topic);
 			}
 			
 			//发送默认请求
@@ -296,39 +303,50 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						method : 'GET',
 						url : window.contextPath + '/console/topic/proposal'
 					}).success(function(data, status, headers, config) {
-						$("#searchprop").typeahead({
-							items: 16, 
-							source : data.first,
-							updater : function(c) {
-								$scope.prop = c;
-								$scope.query.topic = $scope.name;
-								$scope.query.prop = $scope.prop;
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
-								return c;
-							}
-						})
+//						$("#searchprop").typeahead({
+//							items: 16, 
+//							source : data.first,
+//							updater : function(c) {
+//								$scope.prop = c;
+//								$scope.query.topic = $scope.name;
+//								$scope.query.prop = $scope.prop;
+//								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
+//								return c;
+//							}
+//						})
 						//work
-						$('#topicprops').tagsinput({
+						$('#prop').tagsinput({
 							  typeahead: {
 								  items: 16,
-								  source: data.second,
+								  source: data,
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
-		        		$('#topicprops').typeahead().data('typeahead').source = data.second;
-		        		$('#searchprop').typeahead().data('typeahead').source = data.first;
+		        		$('#prop').typeahead().data('typeahead').source = data.second;
+		        		//$('#searchprop').typeahead().data('typeahead').source = data.first;
 					}).error(function(data, status, headers, config) {
 					});
 					
 			}
 			
-			$scope.changealarm = function(topic, index){
-				var id = "#alarm" + index;
+			$scope.changeproduceralarm = function(topic, index){
+				var id = "#palarm" + index;
 				var check = $(id).prop('checked');
-				var entity = new Object();
-				entity.topic = topic;
-				entity.alarm = !check;
-				$http.post(window.contextPath + '/api/topic/alarm', entity).success(function(response) {
+
+				$http.get(window.contextPath + '/console/topic/producer/alarm', {
+					params : {
+						topic : topic,
+						alarm: check } }).success(function(response) {
+	        	});
+			}
+			
+			$scope.changeconsumeralarm = function(topic, index){
+				var id = "#calarm" + index;
+				var check = $(id).prop('checked');
+				$http.get(window.contextPath + '/console/topic/consumer/alarm', {
+					params : {
+						topic : topic,
+						alarm: check } }).success(function(response) {
 	        	});
 			}
 			

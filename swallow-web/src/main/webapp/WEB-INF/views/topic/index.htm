@@ -49,6 +49,7 @@
 					<tr>
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">Topic名称</th>
+						<th style="text-align: left">访问者白名单</th>
 						<th style="text-align: left">ConsumerId白名单</th>
 						<th style="text-align: left">生产者IP</th>
 						<th style="text-align: left">生产发送峰值</th>
@@ -56,29 +57,36 @@
 						<th style="text-align: left">生产发送波动</th>
 						<th style="text-align: left">生产发送波动基数</th>
 						<th style="text-align: left">生产发送延迟/s</th>
-						<th style="text-align: left">访问者白名单</th>
 						<th style="text-align: left">发送告警</th>
 						<th style="text-align: left">接收告警</th>
 						#if(${isadmin})
 						<th style="text-align: left;">操作</th>
 						#end 
 					</tr>
-					<tr ng-repeat="t in searchPaginator.currentPageItems | notblank"
+					<tr ng-repeat="t in searchPaginator.currentPageItems "
 						on-finish-render-filters>
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left"><a
-							ng-href="${rc.contextPath}/console/message"
+							ng-href="${rc.contextPath}/console/consumerid"
 							ng-click="setTopicName(t.name)" ng-bind="t.name"></a></td>
 						<td style="text-align: left" ng-bind="t.prop"></td>
 						<td style="text-align: left" ng-bind="t.consumerIdWhiteList"></td>
+						<td style="text-align: left" ng-bind="t.producerServer"></td>
 						<td style="text-align: left" ng-bind="t.sendpeak"></td>
 						<td style="text-align: left" ng-bind="t.sendvalley"></td>
 						<td style="text-align: left" ng-bind="t.sendfluctuation"></td>
 						<td style="text-align: left" ng-bind="t.sendfluctuationBase"></td>
 						<td style="text-align: left" ng-bind="t.delay"></td>
-						<td style="text-align: left" ng-bind="t.consumerIdWhiteList"></td>
-						<td style="text-align: left" ng-bind="t.producerAlarm"></td>
-						<td style="text-align: left" ng-bind="t.consumerAlarm"></td>
+						<td style="text-align: left"><label class="pull-left inline">
+								<small class="muted smaller-90"></small> <input
+								id="palarm{{$index}}" type="checkbox" ng-model="t.producerAlarm" ng-click="changeproduceralarm(t.name, $index)"
+								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
+						</label></td>
+						<td style="text-align: left"><label class="pull-left inline">
+								<small class="muted smaller-90"></small> <input
+								id="calarm{{$index}}" type="checkbox" ng-model="t.consumerAlarm" ng-click="changeconsumeralarm(t.name, $index)"
+								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
+						</label></td>
 						#if(${isadmin})
 						<td
 							style="text-align: left;"><a
@@ -122,7 +130,7 @@
 							<div class="form-group"
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>Topic</b></label> <input
-									type="text" class="form-control" ng-model="topicEntry.topic"
+									type="text" class="form-control" ng-model="topicEntry.name"
 									id="topic" data-provide="typeahead" autocomplete="off" required>
 								</input>
 							</div>
@@ -156,24 +164,6 @@
 						</div>
 						
 						<div class="control-group">
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-								<label class="control-label"><b>发送告警</b></label> <input
-									type="text" class="form-control"
-									ng-model="topicEntry.producerAlarm" id="producerAlarm"
-									 autocomplete="off"> 
-							</div>
-						</div>
-						<div class="control-group">
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-								<label class="control-label"><b>接收告警</b></label> <input
-									type="text" class="form-control"
-									ng-model="topicEntry.consumerAlarm" id="consumerAlarm"
-									 autocomplete="off"> 
-							</div>
-						</div>
-						<div class="control-group">
 							<label class="control-label"><b>发送端设置</b></label>
 							<div class="form-group"
 								style="margin-right: 39px; margin-left: 40px;">
@@ -196,7 +186,7 @@
 								<div class="col-sm-12">
 									<label class="col-sm-2 control-label">发送</label> <input
 										class="col-sm-2" type="text"
-										ng-model="topicEntry.senddelay" />
+										ng-model="topicEntry.delay" />
 								</div>
 							</div>
 						</div>

@@ -18,7 +18,7 @@ import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.UserType;
 import com.dianping.swallow.web.service.AbstractSwallowService;
-import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.UserService;
 
 /**
@@ -35,8 +35,8 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	@Autowired
 	private AdministratorDao administratorDao;
 
-	@Resource(name = "topicService")
-	private TopicService topicService;
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
 
 	private Set<String> adminSet = new HashSet<String>();
 
@@ -134,7 +134,7 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 
 	private boolean isTopicOwner(String username) {
 
-		Collection<Set<String>> topicUsers = topicService.loadCachedTopicToWhiteList().values();
+		Collection<Set<String>> topicUsers = topicResourceService.loadCachedTopicToWhiteList().values();
 		for (Set<String> set : topicUsers) {
 			if (set.contains(username)) {
 				return true;

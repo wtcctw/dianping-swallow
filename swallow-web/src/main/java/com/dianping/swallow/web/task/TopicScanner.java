@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +25,9 @@ import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.web.dao.impl.WebMongoManager;
 import com.dianping.swallow.web.model.Administrator;
-import com.dianping.swallow.web.model.Topic;
 import com.dianping.swallow.web.model.UserType;
-import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.model.resource.TopicResource;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.UserService;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
@@ -51,8 +50,8 @@ public class TopicScanner {
 	@Resource(name = "userService")
 	private UserService userService;
 
-	@Resource(name = "topicService")
-	private TopicService topicService;
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
 
 	@Resource(name = "webMongoTemplate")
 	private MongoTemplate mongoTemplate;
@@ -134,7 +133,8 @@ public class TopicScanner {
 				String subStr = dbn.substring(DefaultMongoManager.MSG_PREFIX.length()).trim();
 				if (!names.contains(subStr)) { // in case add twice
 					names.add(subStr);
-					topicService.saveTopic(getTopic(subStr, 0L));
+					TopicResource topicResource = topicResourceService.buildTopicResource(subStr);
+					topicResourceService.insert(topicResource);
 				}
 			}
 		}
@@ -197,11 +197,6 @@ public class TopicScanner {
 		return false;
 	}
 
-	private Topic getTopic(String subStr, long num) {
-		Long id = System.currentTimeMillis();
-		Topic p = new Topic();
-		p.setId(id.toString()).setName(subStr).setProp("").setTime(new Date()).setMessageNum(num);
-		return p;
-	}
+
 	
 }

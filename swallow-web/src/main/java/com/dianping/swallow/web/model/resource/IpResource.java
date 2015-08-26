@@ -21,6 +21,8 @@ public class IpResource extends BaseResource{
 	
 	private boolean alarm;
 	
+	private String consumerId;
+	
 	private IPDesc iPDesc;
 
 	public String getIp() {
@@ -54,10 +56,19 @@ public class IpResource extends BaseResource{
 	public void setiPDesc(IPDesc iPDesc) {
 		this.iPDesc = iPDesc;
 	}
+	
+	public String getConsumerId() {
+		return consumerId;
+	}
+
+	public void setConsumerId(String consumerId) {
+		this.consumerId = consumerId;
+	}
 
 	@Override
 	public String toString() {
-		return "IpResource [ip=" + ip + ", ipType=" + ipType + ", alarm=" + alarm + ", iPDesc=" + iPDesc
+		return "IpResource [ip=" + ip + ", ipType=" + ipType + ", alarm="
+				+ alarm + ", iPDesc=" + iPDesc + ", consumerId=" + consumerId
 				+ ", toString()=" + super.toString() + "]";
 	}
 

@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -7,11 +8,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
-import com.dianping.swallow.web.controller.dto.TopicQueryDto;
+import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
-import com.dianping.swallow.web.model.resource.TopicResource;
 import com.mongodb.WriteResult;
 
 
@@ -79,11 +78,11 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByTopic(TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdQueryDto consumerIdQueryDto) {
 		
-		String topic = topicQueryDto.getTopic();
-		int offset = topicQueryDto.getOffset();
-		int limit = topicQueryDto.getLimit();
+		String topic = consumerIdQueryDto.getTopic();
+		int offset = consumerIdQueryDto.getOffset();
+		int limit = consumerIdQueryDto.getLimit();
 		
 		Query query = new Query(Criteria.where(TOPIC).is(topic));
 		
@@ -105,6 +104,26 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 		
 		return consumerIdResource;
 	}
+	
+	@Override
+	public List<ConsumerIdResource> findAll(String ...fields ){
+		
+		List<ConsumerIdResource> consumerIdResources = new ArrayList<ConsumerIdResource>();
+		
+		if(fields.length == 0){
+			consumerIdResources = mongoTemplate.findAll(ConsumerIdResource.class,
+				CONSUMERIDRESOURCE_COLLECTION);
+		}else{
+			Query query = new Query();
+			for(String field : fields){
+				query.fields().include(field);
+			}
+			consumerIdResources = mongoTemplate.find(query, ConsumerIdResource.class,
+				CONSUMERIDRESOURCE_COLLECTION);
+		}
+
+		return consumerIdResources;
+	}
 
 	@Override
 	public ConsumerIdResource findDefault() {
@@ -116,11 +135,11 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(BaseDto baseDto) {
+	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdQueryDto consumerIdQueryDto) {
 
 		Query query = new Query();
-		int offset = baseDto.getOffset();
-		int limit = baseDto.getLimit();
+		int offset = consumerIdQueryDto.getOffset();
+		int limit = consumerIdQueryDto.getLimit();
 		
 		query.skip(offset).limit(limit);
 		List<ConsumerIdResource> consumerIdResources = mongoTemplate.find(query, ConsumerIdResource.class,
@@ -130,11 +149,11 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	}
 	
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(TopicQueryDto  topicQueryDto){
+	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdQueryDto consumerIdQueryDto){
 		
-		int offset = topicQueryDto.getOffset();
-		int limit = topicQueryDto.getLimit();
-		String consumerIp = topicQueryDto.getConsumerIp();
+		int offset = consumerIdQueryDto.getOffset();
+		int limit = consumerIdQueryDto.getLimit();
+		String consumerIp = consumerIdQueryDto.getConsumerIp();
 		Query query = new Query(Criteria.where(CONSUMERIP).is(consumerIp));
 		
 		Long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
