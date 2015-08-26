@@ -25,6 +25,7 @@ public class DefaultThreadExceptionHandler{
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
 				
+				e.printStackTrace();
 				logger.error("uncaught exception in thread:" + t, e);
 				
 			}

@@ -1,25 +1,26 @@
 package com.dianping.swallow.consumer.internal;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
-import com.dianping.swallow.common.internal.codec.JsonDecoder;
-import com.dianping.swallow.common.internal.codec.JsonEncoder;
+import com.dianping.swallow.common.internal.codec.JsonCoder;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
@@ -63,7 +64,8 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
 	private final String consumerIP = IPUtil.getFirstNoLoopbackIP4Address();
 
-	private ClientBootstrap bootstrap;
+	private Bootstrap bootstrap;
+	private EventLoopGroup group;
 
 	private ExecutorService service;
 
@@ -134,19 +136,22 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 	private void startListener() {
 		final MessageClientHandler handler = new MessageClientHandler(this, processor, taskChecker,
 				createRetryWrapper(), this);
-		bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
-				Executors.newCachedThreadPool()));
-		bootstrap.setOption("keepAlive", true);
-		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+		
+		bootstrap = new Bootstrap();
+        group = new NioEventLoopGroup();
+		
+		bootstrap.group(group)
+		.channel(NioSocketChannel.class)
+		.handler(new ChannelInitializer<Channel>() {
+
 			@Override
-			public ChannelPipeline getPipeline() throws Exception {
-				ChannelPipeline pipeline = Channels.pipeline();
+			protected void initChannel(Channel ch) throws Exception {
+				
+				ChannelPipeline pipeline = ch.pipeline();
 				pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-				pipeline.addLast("jsonDecoder", new JsonDecoder(PktMessage.class));
 				pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
-				pipeline.addLast("jsonEncoder", new JsonEncoder(PktConsumerMessage.class));
+				pipeline.addLast("jsonDecoder", new JsonCoder(PktConsumerMessage.class, PktMessage.class));
 				pipeline.addLast("handler", handler);
-				return pipeline;
 			}
 		});
 		// 启动连接master的线程
@@ -209,9 +214,10 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 	}
 
 	private void closeListerner() {
+		
 		masterConsumerThread.interrupt();
 		slaveConsumerThread.interrupt();
-		bootstrap.releaseExternalResources();
+		group.shutdownGracefully();
 	}
 
 	public void submit(Runnable task) {

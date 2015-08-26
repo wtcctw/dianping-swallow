@@ -3,6 +3,7 @@ package com.dianping.swallow.consumerserver.buffer;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
@@ -12,7 +13,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.jboss.netty.channel.Channel;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -102,8 +102,8 @@ public class ConsumerWorkerImplTest extends AbstractTest {
     @Before
     public void mockChannel() {
         channel = mock(Channel.class);
-        when(channel.getRemoteAddress()).thenReturn(new InetSocketAddress(IP, 8081));
-        when(channel.isConnected()).thenReturn(true);
+        when(channel.remoteAddress()).thenReturn(new InetSocketAddress(IP, 8081));
+        when(channel.isActive()).thenReturn(true);
         when(channel.write(argThat(new Matcher<Object>() {
             @Override
             public void describeTo(Description arg0) {

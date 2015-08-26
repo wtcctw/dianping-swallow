@@ -4,20 +4,15 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import junit.framework.Assert;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelEvent;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Matchers;
 
@@ -25,21 +20,46 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.SHAUtil;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
+import com.dianping.swallow.common.server.monitor.collector.DefaultProducerCollector;
 
 public class ProducerServerForTextTest {
+	
+	private String topicName = "UnitTest";
+	
     @Test
-    public void testProducerServerForText() {
+    public void testProducerServerForText() throws Exception {
+    	
+    	
         //构造mock的文本对象
         final TextObject textObj = new TextObject();
         textObj.setACK(true);
         textObj.setContent("This is a Mock Text content.");
-        textObj.setTopic("UnitTest");
+        textObj.setTopic(topicName);
 
         SocketAddress socketAddress = new InetSocketAddress("127.0.0.1", 8000);
 
-        //构造Channel
-        Channel channel = mock(Channel.class);
-        //Matchers.anyObject()
+        MessageDAO messageDAO = mock(MessageDAO.class);
+        Channel channel = mockChannel(socketAddress, textObj);
+        ChannelHandlerContext ctx = mockChannelHandlerContext(socketAddress, channel);
+        TopicWhiteList whiteList = new TopicWhiteList();
+        whiteList.addTopic(topicName);
+        
+        
+        ProducerServerTextHandler producerServerTextHandler = new ProducerServerTextHandler(messageDAO, whiteList, new DefaultProducerCollector());
+
+        //测试发送消息
+        producerServerTextHandler.channelRead(ctx, textObj);
+
+        doThrow(new RuntimeException()).when(messageDAO).saveMessage(Matchers.anyString(), (SwallowMessage) Matchers.anyObject());
+        producerServerTextHandler.channelRead(ctx, textObj);
+
+        new ProducerServerForText().start();
+    }
+
+	private Channel mockChannel(SocketAddress socketAddress, final TextObject textObj) {
+		
+		Channel channel = mock(Channel.class);
+        when(channel.remoteAddress()).thenReturn(socketAddress);
         when(channel.write(argThat(new Matcher<TextACK>() {
             @Override
             public void describeTo(Description arg0) {
@@ -75,42 +95,16 @@ public class ProducerServerForTextTest {
 				
 			}
         }))).thenReturn(null);
-        when(channel.getRemoteAddress()).thenReturn(socketAddress);
+        return channel;
+	}
 
-        //构造MessageEvent对象，用以调用messageReceived方法
-        MessageEvent messageEvent = mock(MessageEvent.class);
-        when(messageEvent.getMessage()).thenReturn(textObj);
-        when(messageEvent.getRemoteAddress()).thenReturn(socketAddress);
-        when(messageEvent.getChannel()).thenReturn(channel);
+	private ChannelHandlerContext mockChannelHandlerContext(SocketAddress socketAddress, Channel channel) {
+		
+		ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
+		
+		when(ctx.channel()).thenReturn(channel);
+		
+		return ctx;
+	}
 
-        //构造MessageDAO的mock对象，用以初始化ProducerServerTextHandler
-        MessageDAO messageDAO = mock(MessageDAO.class);
-
-        //利用以上变量，构造ProducerServerTextHandler对象
-        ProducerServerTextHandler producerServerTextHandler = new ProducerServerTextHandler(messageDAO, new TopicWhiteList());
-
-        //测试发送消息
-        producerServerTextHandler.messageReceived(null, messageEvent);
-
-        textObj.setTopic("H:ello");
-        producerServerTextHandler.messageReceived(null, messageEvent);
-
-        doThrow(new RuntimeException()).when(messageDAO).saveMessage(Matchers.anyString(), (SwallowMessage) Matchers.anyObject());
-        producerServerTextHandler.messageReceived(null, messageEvent);
-
-        ChannelEvent e = mock(ChannelStateEvent.class);
-        ExceptionEvent e2 = mock(ExceptionEvent.class);
-        ChannelHandlerContext ctx = mock(ChannelHandlerContext.class);
-        producerServerTextHandler.handleUpstream(ctx, e);
-        producerServerTextHandler.exceptionCaught(ctx, e2);
-
-        new ProducerServerForText().start();
-    }
-
-    @Test
-    public void testProducerServerTextPipelineFactory() {
-        MessageDAO messageDAO = mock(MessageDAO.class);
-        ProducerServerTextPipelineFactory pstp = new ProducerServerTextPipelineFactory(messageDAO, null);
-        System.out.println(pstp.getPipeline().toString());
-    }
 }

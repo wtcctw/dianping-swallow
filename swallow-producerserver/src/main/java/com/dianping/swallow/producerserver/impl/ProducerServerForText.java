@@ -1,12 +1,19 @@
 package com.dianping.swallow.producerserver.impl;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+
 import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
 
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-
+import com.dianping.swallow.common.internal.codec.JsonCoder;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 
 /**
@@ -22,6 +29,11 @@ public class ProducerServerForText extends AbstractProducerServer {
 	private MessageDAO messageDAO;
 
 	private TopicWhiteList topicWhiteList;
+	
+	private NioEventLoopGroup bossGroup;
+	
+	private NioEventLoopGroup workerGroup;
+	
 
 	public ProducerServerForText() {
 	}
@@ -31,11 +43,32 @@ public class ProducerServerForText extends AbstractProducerServer {
 
 		super.doStart();
 
-		ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
-				Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
-		bootstrap.setPipelineFactory(new ProducerServerTextPipelineFactory(messageDAO, topicWhiteList,
-				producerCollector));
-		bootstrap.bind(new InetSocketAddress(getPort()));
+		ServerBootstrap bootstrap = new ServerBootstrap();
+		
+		bossGroup = new NioEventLoopGroup(1, new MQThreadFactory("SWALLOW_SERVER_BOSS"));
+		workerGroup = new NioEventLoopGroup(1, new MQThreadFactory("SWALLOW_SERVER_WORKER"));
+		
+		bootstrap.group(bossGroup, workerGroup)
+		.channel(NioServerSocketChannel.class)
+		.childHandler(new ChannelInitializer<Channel>() {
+
+			@Override
+			protected void initChannel(Channel ch) throws Exception {
+
+			      ChannelPipeline pipeline = ch.pipeline();
+
+			      pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+			      pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
+			      
+			      pipeline.addLast("jsonDecoder", new JsonCoder(TextACK.class, TextObject.class));
+
+			      pipeline.addLast("handler", new ProducerServerTextHandler(messageDAO, topicWhiteList, producerCollector));
+
+
+			}
+		});
+		
+		bootstrap.bind(new InetSocketAddress(getPort())).sync();
 
 		if (logger.isInfoEnabled()) {
 			logger.info("[Initialize netty sucessfully, Producer service for text is ready.]");
@@ -46,6 +79,12 @@ public class ProducerServerForText extends AbstractProducerServer {
 	protected void doStop() throws Exception {
 		super.doStop();
 		
+		if(bossGroup != null){
+			bossGroup.shutdownGracefully();
+		}
+		if(workerGroup != null){
+			workerGroup.shutdownGracefully();
+		}
 		
 	}
 

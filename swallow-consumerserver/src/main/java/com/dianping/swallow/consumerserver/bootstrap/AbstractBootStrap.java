@@ -1,26 +1,25 @@
 package com.dianping.swallow.consumerserver.bootstrap;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Executors;
 
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.jboss.netty.util.ThreadNameDeterminer;
-import org.jboss.netty.util.ThreadRenamingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.dianping.swallow.common.internal.codec.JsonDecoder;
-import com.dianping.swallow.common.internal.codec.JsonEncoder;
+import com.dianping.swallow.common.internal.codec.JsonCoder;
 import com.dianping.swallow.common.internal.lifecycle.MasterSlaveComponent;
 import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
@@ -52,46 +51,51 @@ public abstract class AbstractBootStrap {
     protected ConsumerAuthController consumerAuthController;
     protected Heartbeater heartbeater; 
     
+    private EventLoopGroup bossGroup, workerGroup; 
+    
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	static{
 		   SwallowHelper.initialize();
 	}
 
-	protected ServerBootstrap startNetty(int port) {
+	protected ServerBootstrap startNetty(int port){
 
 		if(logger.isInfoEnabled()){
 	    	  logger.info("[startNetty][begin]" + port);
 	    }
 
-		ThreadRenamingRunnable.setThreadNameDeterminer(ThreadNameDeterminer.CURRENT);
+		ServerBootstrap bootstrap = new ServerBootstrap();
+		bossGroup = new NioEventLoopGroup(1, new MQThreadFactory("Swallow-Netty-Boss-"));
+		workerGroup = new NioEventLoopGroup(1, new MQThreadFactory("Swallow-Netty-Worker-"));
+		
+		bootstrap.group(bossGroup, workerGroup)
+		.channel(NioServerSocketChannel.class)
+		.childHandler(new ChannelInitializer<Channel>() {
 
-		ServerBootstrap bootstrap = new ServerBootstrap(
-				new NioServerSocketChannelFactory(
-						Executors.newCachedThreadPool(new MQThreadFactory("Swallow-Netty-Boss-")), 
-						Executors.newCachedThreadPool(new MQThreadFactory("Swallow-Netty-Server-"))));
-
-		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 			@Override
-			public ChannelPipeline getPipeline() {
+			protected void initChannel(Channel ch) throws Exception {
+				
+				ChannelPipeline pipeline = ch.pipeline();
 				MessageServerHandler handler = new MessageServerHandler(
 						consumerWorkerManager, topicWhiteList,
 						consumerAuthController);
-				ChannelPipeline pipeline = Channels.pipeline();
+				
 				pipeline.addLast("frameDecoder",
 						new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0,
 								4, 0, 4));
-				pipeline.addLast("jsonDecoder", new JsonDecoder(
-						PktConsumerMessage.class));
 				pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
-				pipeline.addLast("jsonEncoder", new JsonEncoder(
-						PktMessage.class));
+				pipeline.addLast("jsonDecoder", new JsonCoder(PktMessage.class, PktConsumerMessage.class));
+				
 				pipeline.addLast("handler", handler);
-				return pipeline;
 			}
 		});
 
-		bootstrap.bind(new InetSocketAddress(port));
+		try {
+			bootstrap.bind(new InetSocketAddress(port)).sync();
+		} catch (InterruptedException e) {
+			logger.error("[startNetty]", e);
+		}
 
 		if(logger.isInfoEnabled()){
 	    	  logger.info("[startNetty][Server started at port]" + port);
@@ -138,42 +142,18 @@ public abstract class AbstractBootStrap {
 	}
 
 	protected void closeNettyRelatedResource() {
-		try {
-			if(logger.isInfoEnabled()){
-				logger.info("MessageServerHandler.getChannelGroup().unbind()-started");
-			}
-			MessageServerHandler.getChannelGroup().unbind().await();
-			if(logger.isInfoEnabled()){
-				logger.info("MessageServerHandler.getChannelGroup().unbind()-finished");
-			}
-
-			if(logger.isInfoEnabled()){
-				logger.info("MessageServerHandler.getChannelGroup().close()-started");
-			}
-			MessageServerHandler.getChannelGroup().close().await();
-			if(logger.isInfoEnabled()){
-				logger.info("MessageServerHandler.getChannelGroup().close()-finished");
-			}
-
-			if(logger.isInfoEnabled()){
-				logger.info("MessageServerHandler.getChannelGroup().clear()-started");
-			}
-			MessageServerHandler.getChannelGroup().clear();
-			if(logger.isInfoEnabled()){
-				logger.info("MessageServerHandler.getChannelGroup().clear()-finished");
-			}
-
-			if(logger.isInfoEnabled()){
-				logger.info("bootstrap.releaseExternalResources()-started");
-			}
-			bootstrap.releaseExternalResources();
-			if(logger.isInfoEnabled()){
-				logger.info("bootstrap.releaseExternalResources()-finished");
-			}
-		} catch (InterruptedException e) {
-			logger.error("Interrupted when closeNettyRelatedResource()", e);
-			Thread.currentThread().interrupt();
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[closeNettyRelatedResource]");
 		}
+		
+		if(bossGroup != null){
+			bossGroup.shutdownGracefully();
+		}
+		if(workerGroup != null){
+			workerGroup.shutdownGracefully();
+		}
+			
 	}
 
 	protected void createShutdownHook() {

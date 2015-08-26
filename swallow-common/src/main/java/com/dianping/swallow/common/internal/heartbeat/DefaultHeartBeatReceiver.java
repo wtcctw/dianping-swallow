@@ -1,5 +1,9 @@
 package com.dianping.swallow.common.internal.heartbeat;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
@@ -9,9 +13,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable, Ch
 		Deque<HeartBeat> beats = heartBeats.get(channel);
 		
 		if(beats == null){
-			channel.getCloseFuture().addListener(this);
+			channel.closeFuture().addListener(this);
 			beats = new LinkedList<HeartBeat>();
 			heartBeats.put(channel, beats);
 		}
@@ -99,9 +100,10 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable, Ch
 
 	@Override
 	public void operationComplete(ChannelFuture future) throws Exception {
+		
 		if(logger.isInfoEnabled()){
-			logger.info("[operationComplete][channel close, remove channel]" + future.getChannel());
+			logger.info("[operationComplete][channel close, remove channel]" + future.channel());
 		}
-		remove(future.getChannel());
+		remove(future.channel());
 	}
 }

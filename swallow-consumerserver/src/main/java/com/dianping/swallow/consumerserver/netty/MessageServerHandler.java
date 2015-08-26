@@ -1,16 +1,11 @@
 package com.dianping.swallow.consumerserver.netty;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+
 import java.net.InetSocketAddress;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelEvent;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +28,9 @@ import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager;
  *
  * 2015年8月21日 上午11:59:26
  */
-public class MessageServerHandler extends SimpleChannelUpstreamHandler {
+public class MessageServerHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(MessageServerHandler.class);
-
-	private static ChannelGroup channelGroup = new DefaultChannelGroup();
 
 	private ConsumerWorkerManager workerManager;
 
@@ -56,30 +49,28 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 		this.workerManager = workerManager;
 		this.topicWhiteList = topicWhiteList;
 		this.consumerAuthController = consumerAuthController;
-		if (logger.isInfoEnabled()) {
-			logger.info("Inited MessageServerHandler.");
-		}
 	}
 
 	@Override
-	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
 		if (logger.isInfoEnabled()) {
-			logger.info(e.getChannel() + " connected!");
+			logger.info("[channelActive]" + ctx.channel());
 		}
-		channelGroup.add(e.getChannel());
 	}
+	
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-		final Channel channel = e.getChannel();
-		if (!(e.getMessage() instanceof PktConsumerMessage)) {
+		Channel channel = ctx.channel();
+		
+		if (!(msg instanceof PktConsumerMessage)) {
 			logger.warn("the received message is not PktConsumerMessage");
 			return;
 		}
 
-		PktConsumerMessage consumerPacket = (PktConsumerMessage) e.getMessage();
-
+		PktConsumerMessage consumerPacket = (PktConsumerMessage) msg;
 		
 		if (ConsumerMessageType.GREET.equals(consumerPacket.getType()) || PacketType.CONSUMER_GREET.equals(consumerPacket.getPacketType())) {//兼容老版本
 			handleGreet(channel, consumerPacket);
@@ -173,7 +164,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 			return;
 		}
 		// 验证该消费者是否被合法
-		boolean isAuth = consumerAuthController.isValid(consumerInfo, ((InetSocketAddress) channel.getRemoteAddress())
+		boolean isAuth = consumerAuthController.isValid(consumerInfo, ((InetSocketAddress) channel.remoteAddress())
 				.getAddress().getHostAddress());
 		if (!isAuth) {
 			if (logger.isInfoEnabled()) {
@@ -202,44 +193,36 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
 	}
 
+	
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-		removeChannel(e);
-		logger.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel())
-				+ " ExceptionCaught, channel will be close.", e.getCause());
-		e.getChannel().close();
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		
+		Channel channel = ctx.channel();
 
-	}
+		removeChannel(channel);
+		
+		logger.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel) + " ExceptionCaught, channel will be close.", cause);
+		channel.close();
 
+	};
+	
 	@Override
-	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		removeChannel(e);
-		super.channelDisconnected(ctx, e);
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+
+		Channel channel = ctx.channel();
+		removeChannel(channel);
+		
 		if (logger.isInfoEnabled()) {
-			logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " Disconnected!");
+			logger.info("[channelInactive]" + ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel));
 		}
+
 	}
 
-	@Override
-	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		removeChannel(e);
-		e.getChannel().close();
-		super.channelClosed(ctx, e);
-		if (logger.isInfoEnabled()) {
-			logger.info(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, e.getChannel()) + " Channel closed.");
-		}
-	}
-
-	private void removeChannel(ChannelEvent e) {
-		channelGroup.remove(e.getChannel());
+	private void removeChannel(Channel channel) {
+		
 		if (consumerInfo != null) {// consumerInfo可能为null(比如未收到消息前，messageReceived未被调用，则consumerInfo未被初始化)
-			Channel channel = e.getChannel();
 			workerManager.handleChannelDisconnect(channel, consumerInfo);
 		}
-	}
-
-	public static ChannelGroup getChannelGroup() {
-		return channelGroup;
 	}
 
 }
