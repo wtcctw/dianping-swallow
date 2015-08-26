@@ -24,7 +24,6 @@ public class IpResourceMapper {
 		ipResource.setiPDesc(iPDesc);
 		ipResource.setId(dto.getId());
 		ipResource.setAlarm(dto.isAlarm());
-		ipResource.setConsumerId(dto.getConsumerId());
 		ipResource.setIp(dto.getIp());
 		ipResource.setIpType(dto.getIpType());
 
@@ -50,7 +49,6 @@ public class IpResourceMapper {
 		
 		dto.setId(ipResource.getId());
 		dto.setAlarm(ipResource.isAlarm());
-		dto.setConsumerId(ipResource.getConsumerId());
 		dto.setIp(ipResource.getIp());
 		dto.setIpType(ipResource.getIpType());
 		
