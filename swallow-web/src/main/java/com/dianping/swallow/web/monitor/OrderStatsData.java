@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -80,6 +81,8 @@ public class OrderStatsData {
 
 	public List<OrderEntity> getDataResults() {
 		List<OrderEntity> orderEntitys = new ArrayList<OrderEntity>(datas);
+		//Collections.sort(orderEntitys);
+		Collections.reverse(orderEntitys);
 		return orderEntitys;
 	}
 

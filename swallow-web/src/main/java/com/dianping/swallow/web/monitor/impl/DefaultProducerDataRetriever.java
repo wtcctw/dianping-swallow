@@ -72,6 +72,9 @@ public class DefaultProducerDataRetriever
 		Iterator<String> iterator = topics.iterator();
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
+			if (TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
 			NavigableMap<Long, Long> rawDatas = statis.getDelayForTopic(topicName, type);
 			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
 		}
@@ -106,6 +109,9 @@ public class DefaultProducerDataRetriever
 		Iterator<String> iterator = topics.iterator();
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
+			if (TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
 			NavigableMap<Long, Long> rawDatas = statis.getQpxForTopic(topicName, type);
 			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
 		}

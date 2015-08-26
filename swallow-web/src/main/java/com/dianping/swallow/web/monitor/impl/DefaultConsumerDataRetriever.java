@@ -71,12 +71,18 @@ public class DefaultConsumerDataRetriever
 			Iterator<String> iterator = topics.iterator();
 			while (iterator.hasNext()) {
 				String topicName = iterator.next();
+				if (TOTAL_KEY.equals(topicName)) {
+					continue;
+				}
 				Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topicName,
 						StatisType.SEND, false);
 				Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topicName,
 						StatisType.ACK, false);
 				if (sendDelays != null) {
 					for (Map.Entry<String, NavigableMap<Long, Long>> sendDelay : sendDelays.entrySet()) {
+						if (TOTAL_KEY.equals(sendDelay.getKey())) {
+							continue;
+						}
 						sendStatsData.add(new OrderEntity(topicName, sendDelay.getKey(), getSumStatsData(
 								sendDelay.getValue(), fromKey, toKey)));
 					}
@@ -84,6 +90,9 @@ public class DefaultConsumerDataRetriever
 
 				if (ackDelays != null) {
 					for (Map.Entry<String, NavigableMap<Long, Long>> ackDelay : ackDelays.entrySet()) {
+						if (TOTAL_KEY.equals(ackDelay.getKey())) {
+							continue;
+						}
 						ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getSumStatsData(
 								ackDelay.getValue(), fromKey, toKey)));
 					}
@@ -115,12 +124,18 @@ public class DefaultConsumerDataRetriever
 			Iterator<String> iterator = topics.iterator();
 			while (iterator.hasNext()) {
 				String topicName = iterator.next();
+				if (TOTAL_KEY.equals(topicName)) {
+					continue;
+				}
 				Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
 						StatisType.SEND, false);
 				Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
 						StatisType.ACK, false);
 				if (sendQpxs != null) {
 					for (Map.Entry<String, NavigableMap<Long, Long>> sendQpx : sendQpxs.entrySet()) {
+						if (TOTAL_KEY.equals(sendQpx.getKey())) {
+							continue;
+						}
 						sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getSumStatsData(
 								sendQpx.getValue(), fromKey, toKey)));
 					}
@@ -128,6 +143,9 @@ public class DefaultConsumerDataRetriever
 
 				if (ackQpxs != null) {
 					for (Map.Entry<String, NavigableMap<Long, Long>> ackQpx : ackQpxs.entrySet()) {
+						if (TOTAL_KEY.equals(ackQpx.getKey())) {
+							continue;
+						}
 						ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getSumStatsData(ackQpx.getValue(),
 								fromKey, toKey)));
 					}

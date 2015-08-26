@@ -3,7 +3,15 @@
  		<div class="page-header">
  			
 		</div>
-		<div class="page-content" id="container"></div>	
+		<div class="page-content" >
+			<div id="container"></div>
+			#if(${isadmin}&&${topic}=='total')
+			<div id="orderlist" class="orderlist" >
+				<hr/>
+				#parse("monitor/orderlist.htm")
+			</div>
+			#end
+		</div>	
   
   </div>
 

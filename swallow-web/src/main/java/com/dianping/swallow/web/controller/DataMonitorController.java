@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,9 +101,8 @@ public class DataMonitorController extends AbstractMonitorController {
 	}
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu", method = RequestMethod.GET)
-	public ModelAndView viewTopicAccumulation(@PathVariable String topic) {
-
-		if (topic.equals(MonitorData.TOTAL_KEY)) {
+	public ModelAndView viewTopicAccumulation(@PathVariable String topic, HttpServletRequest request) {
+		if (topic.equals(MonitorData.TOTAL_KEY) && request.getAttribute("isAdmin") == null) {
 			String firstTopic = getFirstTopic(accumulationRetriever.getTopics());
 			if (!firstTopic.equals(MonitorData.TOTAL_KEY)) {
 				return new ModelAndView("redirect:/console/monitor/consumer/" + firstTopic + "/accu", createViewMap());
@@ -417,7 +417,7 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	}
 
-	@RequestMapping(value = "/console/monitor/consumer/total/delay/order/get/{size}", method = RequestMethod.POST)
+	@RequestMapping(value = "/console/monitor/consumer/total/delay/order/get/{size}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getConsumerDelayOrderMonitor(@PathVariable final int size) throws Exception {
 		OrderStatsData saveDelayStatsData = producerDataRetriever.getDelayOrder(size);
@@ -429,7 +429,7 @@ public class DataMonitorController extends AbstractMonitorController {
 		return result;
 	}
 
-	@RequestMapping(value = "/console/monitor/consumer/total/accu/order/get/{size}", method = RequestMethod.POST)
+	@RequestMapping(value = "/console/monitor/consumer/total/accu/order/get/{size}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getConsumerAccuOrderMonitor(@PathVariable final int size) throws Exception {
 		OrderStatsData accuStatsData = accumulationRetriever.getAccuOrderForAllConsumerId(size);
@@ -438,7 +438,7 @@ public class DataMonitorController extends AbstractMonitorController {
 		return result;
 	}
 
-	@RequestMapping(value = "/console/monitor/consumer/total/qpx/order/get/{size}", method = RequestMethod.POST)
+	@RequestMapping(value = "/console/monitor/consumer/total/qpx/order/get/{size}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getConsumerQpxOrderMonitor(@PathVariable final int size) throws Exception {
 		OrderStatsData saveQpxStatsData = producerDataRetriever.getQpxOrder(size);

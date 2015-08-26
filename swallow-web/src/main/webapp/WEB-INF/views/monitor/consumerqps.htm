@@ -3,7 +3,14 @@
 	id="ConsumerQpsController">
 	#parse("monitor/breadcrumb.htm")
 	<div class="page-header"></div>
-	<div class="page-content" id="container"></div>
+	<div class="page-content">
+		<div id="container"></div>
+		#if(${isadmin}&&${topic}=='total')
+		<div id="orderlist" class="orderlist" ng-hide="IsShowOrderQps">
+		<hr/>
+		#parse("monitor/orderlist.htm")</div>
+		#end
+	</div>
 
 </div>
 
