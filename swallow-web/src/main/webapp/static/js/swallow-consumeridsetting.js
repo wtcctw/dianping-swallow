@@ -235,7 +235,7 @@ module
 										method : 'GET',
 										url : window.contextPath + '/console/topic/namelist'
 									}).success(function(data, status, headers, config) {
-										var topicNameList = data;
+										var topicNameList = data.first;
 										$("#searchtopic").typeahead({
 											items: 16, 
 											source : topicNameList,

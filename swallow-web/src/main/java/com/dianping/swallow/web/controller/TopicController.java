@@ -80,10 +80,11 @@ public class TopicController extends AbstractMenuController {
 		List<TopicResourceDto> result = new ArrayList<TopicResourceDto>();
 		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
 		String topic = topicQueryDto.getTopic();
+		String producerIp = topicQueryDto.getProducerServer();
 
-		boolean isTopicEmpry = StringUtil.isEmpty(topic);
+		boolean isAllEmpry = StringUtil.isBlank(topic + producerIp);
 
-		if (isTopicEmpry) {
+		if (isAllEmpry) {
 			String username = extractUsernameUtils.getUsername(request);
 			Set<String> adminSet = userService.loadCachedAdministratorSet();
 			boolean findAll = adminSet.contains(username)
@@ -97,9 +98,22 @@ public class TopicController extends AbstractMenuController {
 						.findTopicResourcePage(topicQueryDto);
 			}
 		} else {
-			TopicResource resource = topicResourceService.findByTopic(topic);
-			result.add(TopicResourceMapper.toTopicResourceDto(resource));
-			return new Pair<Long, List<TopicResourceDto>>(1L, result);
+			if(StringUtil.isBlank(producerIp)){
+				TopicResource resource = topicResourceService.findByTopic(topic);
+				result.add(TopicResourceMapper.toTopicResourceDto(resource));
+				return new Pair<Long, List<TopicResourceDto>>(1L, result);
+			}else if(StringUtil.isBlank(topic)){
+				pair = topicResourceService.findByServer(topicQueryDto);
+			}else{
+				TopicResource resource = topicResourceService.findByTopic(topic);
+				List<String> ips = resource.getProducerServer();
+				if(ips.contains(producerIp)){
+					result.add(TopicResourceMapper.toTopicResourceDto(resource));
+					return new Pair<Long, List<TopicResourceDto>>(1L, result);
+				}else{
+					return new Pair<Long, List<TopicResourceDto>>(0L, result);
+				}
+			}
 		}
 
 		for (TopicResource topicResource : pair.getSecond()) {
@@ -110,17 +124,27 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> topicName(HttpServletRequest request,
+	public Object topicName(HttpServletRequest request,
 			HttpServletResponse response) throws UnknownHostException {
 
 		String username = extractUsernameUtils.getUsername(request);
 		Set<String> adminSet = userService.loadCachedAdministratorSet();
+		Set<String> producerIp = new HashSet<String>();
 		boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 
 		Map<String, Set<String>> topicToWhiteList = topicResourceService
 				.loadCachedTopicToWhiteList();
 		if (findAll) {
-			return new ArrayList<String>(topicToWhiteList.keySet());
+			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
+			List<TopicResource> topicResources = topicResourceService.findAll();
+			List<String> tmpips;
+			for(TopicResource topicResource : topicResources){
+				tmpips = topicResource.getProducerServer();
+				if(tmpips != null){
+					producerIp.addAll(tmpips);
+				}
+			}
+			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
 		} else {
 			List<String> topics = new ArrayList<String>();
 			for (Map.Entry<String, Set<String>> entry : topicToWhiteList
@@ -132,7 +156,14 @@ public class TopicController extends AbstractMenuController {
 					}
 				}
 			}
-			return topics;
+			
+			for(String topic : topics){
+				List<String> tmpips = topicResourceService.findByTopic(topic).getProducerServer();
+				if(tmpips != null){
+					producerIp.addAll(tmpips);
+				}
+			}
+			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
 		}
 	}
 

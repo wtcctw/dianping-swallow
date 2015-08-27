@@ -8,8 +8,8 @@ package com.dianping.swallow.web.model.resource;
  */
 public enum IpType {
 	
-	PRODUCERIP("生产者"),
-	CONSUMERIP("消费者");
+	PRODUCERIP("PRODUCER"),
+	CONSUMERIP("CONSUMER");
 	
 	private String type;
 	
@@ -27,6 +27,15 @@ public enum IpType {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public static IpType findByType(String type) {
+		for (IpType ipType : values()) {
+			if (type.equals(ipType.getType())) {
+				return ipType;
+			}
+		}
+		throw new RuntimeException("Error type : " + type);
 	}
 	
 	@Override

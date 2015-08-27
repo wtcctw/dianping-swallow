@@ -2,17 +2,7 @@ module.factory('Paginator', function(){
 	return function(fetchFunction, pageSize, entity){
 		var paginator = {
 				hasNextVar: false,
-				handleResult: function(object){
-					var whitelist = object.whitelist;
-					for(var i = 0; i < this.currentPageItems.length; ++i){
-						if(typeof(whitelist) != "undefined" && whitelist.indexOf(this.currentPageItems[i].name) != -1){
-							this.currentPageItems[i]["alarm"] = false;
-						}else{
-							this.currentPageItems[i]["alarm"] = true;
-						}
-					}
-				},
-				fetch: function(page){
+					fetch: function(page){
 					this.currentOffset = (page - 1) * pageSize;
 					this._load();
 				},
@@ -51,10 +41,6 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
-						
-						var object = new Object();
-						self.handleResult(object);
-						
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -93,18 +79,10 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$http.post(window.contextPath + $scope.suburl, entity).success(callback);
 		};
 			$scope.name = "";
-			$scope.prop = "";
+			$scope.searchip = "";
 			
 			$scope.suburl = "/console/topic/list";
 			$scope.topicnum = 30;
-
-			
-			//for modal
-			$scope.topicname = "";
-			$scope.topicprop = "";
-			$scope.topictime = "";
-			$scope.topicalarm = "";
-			$scope.blankprop = true;
 			
 			$scope.topicEntry = {};
 			$scope.topicEntry.name;
@@ -182,85 +160,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					$scope.query.topic = $scope.topicEntry.name;
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 		    	});
-		    	
 		    }
 			
-/*			$scope.refreshpage = function(myForm){
-	        	$scope.topictime = $("#datetimepicker").val();
-	        	$scope.topicalarm = $("#alarmselect").val();
-	        	if($scope.topicprop.length == 0 && !$scope.blankprop){
-	        		$scope.dialog($scope.topicname, $scope.topicprop, $scope.topictime, $scope.topicalarm);
-	        	}
-	        	else{
-	        		$('#myModal').modal('hide');
-	        		var param = new Object();
-	    			param.topic = $scope.topicname;
-	    			param.prop = $scope.topicprop;
-	    			param.time = $scope.topictime;
-		        	
-		        	$.ajax({
-		        	    type: "POST",
-		        	    url: window.contextPath + '/api/topic/edittopic',
-		        	    dataType: "json",
-		        	    data: param,
-		        	    success: function(data) {
-		        			$scope.query.topic = $scope.topicname;
-		        			$scope.query.prop = "";
-		        	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query );
-		        	    }
-		        	});
-	        	}
-	        }*/
-			
-			$rootScope.doedit = function(topicname, topicprop, topictime){
-				$('#myModal').modal('hide');
-        		var param = new Object();
-    			param.topic = $scope.topicname;
-    			param.prop = $scope.topicprop;
-    			param.time = $scope.topictime;
-	        	$.ajax({
-	        	    type: "POST",
-	        	    url: window.contextPath + '/api/topic/edittopic',
-	        	    dataType: "json",
-	        	    data: param,
-	        	    success: function(data) {
-	        	    	$scope.query.topic = $scope.topicname;
-	        	    	$scope.query.prop = "";
-	        	    	$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
-	        	    }
-
-	        	});
-				return true;
-			}
-			
-			//for deal with re transmit for selected messages
-			$scope.dialog = function(topicname, topicprop, topictime) {
-				$rootScope.topicname = topicname;
-				$rootScope.topicprop = topicprop;
-				$rootScope.topictime = topictime;
-				ngDialog.open({
-							template : '\
-							<div class="widget-box">\
-							<div class="widget-header">\
-								<h4 class="widget-title">警告</h4>\
-							</div>\
-							<div class="widget-body">\
-								<div class="widget-main">\
-									<p class="alert alert-info">\
-										您确认要清空消息申请人么？\
-									</p>\
-								</div>\
-								<div class="modal-footer">\
-									<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
-									<button type="button" class="btn btn-primary" ng-click="doedit(topicname,topicprop,topictime)&&closeThisDialog()">确定</button>\
-								</div>\
-							</div>\
-						</div>',
-						plain : true,
-						className : 'ngdialog-theme-default'
-				});
-			};
-						
 			$scope.setTopicName = function(topic){
 				localStorage.setItem("topic", topic);
 			}
@@ -268,7 +169,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			//发送默认请求
 			$scope.query = new Object();
 			$scope.query.topic = $scope.name;
-			$scope.query.prop = $scope.prop;
+			$scope.query.producerServer = $scope.searchip;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 			
 			//如果topic列表返回空，则不会执行initpage
@@ -283,47 +184,29 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						method : 'GET',
 						url : window.contextPath + '/console/topic/namelist'
 					}).success(function(data, status, headers, config) {
-						var topicNameList = data;
+						var topicNameList = data.first;
+						var producerip = data.second;
 						$("#searchname").typeahead({
 							items: 16, 
 							source : topicNameList,
 							updater : function(c) {
 								$scope.name = c;
 								$scope.query.topic = $scope.name;
-								$scope.query.prop = $scope.prop;
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
 								return c;
 							}
 						})
-					}).error(function(data, status, headers, config) {
-					});
-					
-					// search topic name with specific prop
-					$http({
-						method : 'GET',
-						url : window.contextPath + '/console/topic/proposal'
-					}).success(function(data, status, headers, config) {
-//						$("#searchprop").typeahead({
-//							items: 16, 
-//							source : data.first,
-//							updater : function(c) {
-//								$scope.prop = c;
-//								$scope.query.topic = $scope.name;
-//								$scope.query.prop = $scope.prop;
-//								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
-//								return c;
-//							}
-//						})
-						//work
-						$('#prop').tagsinput({
-							  typeahead: {
-								  items: 16,
-								  source: data,
-								  displayText: function(item){ return item;}  //necessary
-							  }
-						});
-		        		$('#prop').typeahead().data('typeahead').source = data.second;
-		        		//$('#searchprop').typeahead().data('typeahead').source = data.first;
+						
+						$("#searchip").typeahead({
+							items: 16, 
+							source : producerip,
+							updater : function(c) {
+								$scope.searchip = c;
+								$scope.query.producerServer = $scope.searchip;
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
+								return c;
+							}
+						})
 					}).error(function(data, status, headers, config) {
 					});
 					

@@ -10,16 +10,16 @@
 			}
 		</script>
 
-<!-- 		<form class="bs-example bs-example-form-local" role="form">
+ 		<form class="bs-example bs-example-form-local" role="form">
 			<div class="input-group input-group-local">
 				<span class="input-group-addon">生产者</span> <input type="text"
 					class="form-control" placeholder="生产者IP..." style="width: 150px"
-					id="pip" ng-model='pip'>
+					id="searchip" ng-model="searchip">
 				<ul class="typeahead dropdown-menu"
 					style="top: 28px; left: 0px; display: none;">
 				</ul>
 			</div>
-		</form> -->
+		</form> 
 
 		<!-- #nav-search -->
 		<div class="nav-search nav-search-local" id="nav-search">
@@ -71,7 +71,8 @@
 							ng-click="setTopicName(t.name)" ng-bind="t.name"></a></td>
 						<td style="text-align: left" ng-bind="t.prop"></td>
 						<td style="text-align: left" ng-bind="t.consumerIdWhiteList"></td>
-						<td style="text-align: left" ng-bind="t.producerServer"></td>
+						<td style="text-align: left" ><a ng-href="${rc.contextPath}/console/ip"
+							ng-click="setIp(t.producerServer)"  ng-bind="t.producerServer | limitTo : 15 "></a></td>
 						<td style="text-align: left" ng-bind="t.sendpeak"></td>
 						<td style="text-align: left" ng-bind="t.sendvalley"></td>
 						<td style="text-align: left" ng-bind="t.sendfluctuation"></td>

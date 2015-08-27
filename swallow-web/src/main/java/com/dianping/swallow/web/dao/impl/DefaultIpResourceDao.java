@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.dao.IpResourceDao;
 import com.dianping.swallow.web.model.resource.IpResource;
@@ -82,6 +81,23 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 
 		return new Pair<Long, List<IpResource>>(size, ipResources);
 	}
+	
+	@Override
+	public Pair<Long, List<IpResource>> find(IpQueryDto ipQueryDto) {
+
+		String ip = ipQueryDto.getIp();
+		String ipType = ipQueryDto.getIpType();
+		int offset = ipQueryDto.getOffset();
+		int limit = ipQueryDto.getLimit();
+		
+		Query query = new Query(Criteria.where(IP).is(ip).andOperator(Criteria.where(IPTYPE).is(ipType)));
+		long size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
+		
+		query.skip(offset).limit(limit);
+		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
+		
+		return new Pair<Long, List<IpResource>>(size, ipResources);
+	}
 
 	@Override
 	public IpResource findDefault() {
@@ -92,11 +108,11 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findIpResourcePage(BaseDto baseDto) {
+	public Pair<Long, List<IpResource>> findIpResourcePage(IpQueryDto ipQueryDto) {
 
 		Query query = new Query();
-		int offset = baseDto.getOffset();
-		int limit = baseDto.getLimit();
+		int offset = ipQueryDto.getOffset();
+		int limit = ipQueryDto.getLimit();
 		
 		query.skip(offset).limit(limit);
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class,

@@ -7,6 +7,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jodd.util.StringUtil;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,12 +17,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
-import com.dianping.swallow.web.controller.dto.ServerResourceDto;
-import com.dianping.swallow.web.controller.mapper.ProducerServerResourceMapper;
-import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.controller.dto.IpQueryDto;
+import com.dianping.swallow.web.controller.dto.IpResourceDto;
+import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
+import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.IpResourceService;
-import com.dianping.swallow.web.service.UserService;
 
 @Controller
 public class IPController extends AbstractMenuController{
@@ -34,21 +35,38 @@ public class IPController extends AbstractMenuController{
 		return new ModelAndView("ip/index", createViewMap());
 	}
 	
-//	@RequestMapping(value = "/console/ip/producer/list", method = RequestMethod.POST)
-//	@ResponseBody
-//	public Object producerserverSettingList(@RequestBody BaseDto baseDto) {
-//
-//		Pair<Long, List<ProducerServerResource>> pair = producerServerResourceService
-//				.findProducerServerResourcePage(baseDto);
-//		List<ServerResourceDto> producerServerResourceDto = new ArrayList<ServerResourceDto>();
-//		for (ProducerServerResource producerServerResource : pair.getSecond()) {
-//			producerServerResourceDto.add(ProducerServerResourceMapper
-//					.toProducerServerResourceDto(producerServerResource));
-//		}
-//		return new Pair<Long, List<ServerResourceDto>>(pair.getFirst(),
-//				producerServerResourceDto);
-//
-//	}
+	@RequestMapping(value = "/console/ip/list", method = RequestMethod.POST)
+	@ResponseBody
+	public Object producerserverSettingList(@RequestBody IpQueryDto ipQueryDto) {
+
+		String ip = ipQueryDto.getIp();
+		String ipType = ipQueryDto.getIpType();
+		
+		Pair<Long, List<IpResource>> pair = null;
+		
+		Boolean isAllBlank = StringUtil.isAllBlank(ip, ipType);
+		if(isAllBlank){
+			pair = ipResourceService.findIpResourcePage(ipQueryDto);
+		}else{
+			if(StringUtil.isBlank(ipType)){
+				List<IpResource> ipResources = ipResourceService.findByIp(ip);
+				long size = ipResources.size();
+				pair = new  Pair<Long, List<IpResource>>(size, ipResources);
+			}else if(StringUtil.isBlank(ipType)){
+				pair = ipResourceService.findByIpType(ipQueryDto);
+			}else{
+				pair = ipResourceService.find(ipQueryDto);
+			}
+		}
+		
+		List<IpResourceDto> ipResourceDto = new ArrayList<IpResourceDto>();
+		for (IpResource ipResource : pair.getSecond()) {
+			ipResourceDto.add(IpResourceMapper.toIpResourceDto(ipResource));
+		}
+		return new Pair<Long, List<IpResourceDto>>(pair.getFirst(),
+				ipResourceDto);
+
+	}
 	
 	@Override
 	protected String getMenu() {

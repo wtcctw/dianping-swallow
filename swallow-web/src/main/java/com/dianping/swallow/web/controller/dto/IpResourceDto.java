@@ -14,7 +14,7 @@ public class IpResourceDto {
 	
 	private boolean alarm;
 	
-	private String name;
+	private String application;
 
 	private String email;
 
@@ -64,12 +64,12 @@ public class IpResourceDto {
 		this.alarm = alarm;
 	}
 
-	public String getName() {
-		return name;
+	public String getApplication() {
+		return application;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setApplication(String application) {
+		this.application = application;
 	}
 
 	public String getEmail() {

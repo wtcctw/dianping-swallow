@@ -54,6 +54,12 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 
 		return ipResourceDao.findByIpType(ipQueryDto);
 	}
+	
+	@Override
+	public Pair<Long, List<IpResource>> find(IpQueryDto ipQueryDto) {
+
+		return ipResourceDao.findByIpType(ipQueryDto);
+	}
 
 	@Override
 	public IpResource findDefault() {
@@ -62,9 +68,9 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findIpResourcePage(BaseDto baseDto) {
+	public Pair<Long, List<IpResource>> findIpResourcePage(IpQueryDto ipQueryDto) {
 
-		return ipResourceDao.findIpResourcePage(baseDto);
+		return ipResourceDao.findIpResourcePage(ipQueryDto);
 	}
 
 }

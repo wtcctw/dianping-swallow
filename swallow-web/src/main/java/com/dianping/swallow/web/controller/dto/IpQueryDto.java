@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.controller.dto;
 
-import com.dianping.swallow.web.model.resource.IpType;
-
 
 /**
  * @author mingdongli
@@ -12,7 +10,7 @@ public class IpQueryDto extends BaseDto{
 	
 	private String ip;
 	
-	private IpType ipType;
+	private String ipType;
 	
 	public IpQueryDto(){
 		
@@ -26,11 +24,11 @@ public class IpQueryDto extends BaseDto{
 		this.ip = ip;
 	}
 
-	public IpType getIpType() {
+	public String getIpType() {
 		return ipType;
 	}
 
-	public void setIpType(IpType ipType) {
+	public void setIpType(String ipType) {
 		this.ipType = ipType;
 	}
 	

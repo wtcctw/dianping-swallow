@@ -16,7 +16,7 @@ public class IpResourceMapper {
 		iPDesc.setDpMobile(dto.getDpMobile());
 		iPDesc.setEmail(dto.getEmail());
 		iPDesc.setIp(dto.getIp());
-		iPDesc.setName(dto.getName());
+		iPDesc.setName(dto.getApplication());
 		iPDesc.setOpEmail(dto.getOpEmail());
 		iPDesc.setOpManager(dto.getOpManager());
 		iPDesc.setOpMobile(dto.getOpMobile());
@@ -42,7 +42,7 @@ public class IpResourceMapper {
 		dto.setDpMobile(iPDesc.getDpMobile());
 		dto.setEmail(iPDesc.getEmail());
 		dto.setIp(iPDesc.getIp());
-		dto.setName(iPDesc.getName());
+		dto.setApplication(iPDesc.getName());
 		dto.setOpEmail(iPDesc.getOpEmail());
 		dto.setOpManager(iPDesc.getOpManager());
 		dto.setOpMobile(iPDesc.getOpMobile());

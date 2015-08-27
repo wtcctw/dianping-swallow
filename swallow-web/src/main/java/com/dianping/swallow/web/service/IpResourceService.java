@@ -24,8 +24,10 @@ public interface IpResourceService {
 	List<IpResource> findByIp(String ip);
 
 	Pair<Long, List<IpResource>> findByIpType(IpQueryDto ipQueryDto);
+	
+	Pair<Long, List<IpResource>> find(IpQueryDto ipQueryDto);
 
 	IpResource findDefault();
 	
-	Pair<Long, List<IpResource>> findIpResourcePage(BaseDto baseDto);
+	Pair<Long, List<IpResource>> findIpResourcePage(IpQueryDto baseDto);
 }

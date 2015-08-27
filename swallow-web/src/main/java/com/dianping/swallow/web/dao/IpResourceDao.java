@@ -3,7 +3,6 @@ package com.dianping.swallow.web.dao;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.model.resource.IpResource;
 
@@ -26,8 +25,10 @@ public interface IpResourceDao extends Dao{
 	List<IpResource> findByIp(String ip);
 
 	Pair<Long, List<IpResource>> findByIpType(IpQueryDto ipQueryDto);
+	
+	Pair<Long, List<IpResource>> find(IpQueryDto ipQueryDto);
 
 	IpResource findDefault();
 	
-	Pair<Long, List<IpResource>> findIpResourcePage(BaseDto baseDto);
+	Pair<Long, List<IpResource>> findIpResourcePage(IpQueryDto ipQueryDto);
 }

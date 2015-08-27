@@ -74,7 +74,9 @@ public class IpResourceServiceTest {
 		Assert.assertTrue(result);
 
 		Pair<Long, List<IpResource>> pair = new Pair<Long, List<IpResource>>();
-		pair = ipResourceService.findByIpType(new IpQueryDto(IpType.PRODUCERIP));
+		IpQueryDto ipQueryDto = new IpQueryDto();
+		ipQueryDto.setIpType(IpType.PRODUCERIP.toString());
+		pair = ipResourceService.findByIpType(ipQueryDto);
 		Assert.assertNotNull(pair);
 		Assert.assertEquals(pair.getFirst(), new Long(1));
 
