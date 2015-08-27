@@ -54,11 +54,23 @@ public class DefaultProducerDataRetriever
 	private ProducerMonitorDao producerMonitorDao;
 
 	@Override
-	public OrderStatsData getDelayOrder(int size, long start, long end) {
-		if (dataExistInMemory(start, end)) {
-			return getDelayOrderInMemory(size, StatisType.SAVE, start, end);
+	public boolean dataExistInMemory(long start, long end) {
+		NavigableMap<Long, Long> qpxStatsData = statis.getQpx(StatisType.SAVE);
+		if (qpxStatsData == null) {
+			return false;
 		}
-		return getDelayOrderInDb(size, StatisType.SAVE, start, end);
+		Long firstKey = statis.getQpx(StatisType.SAVE).firstKey();
+		if (firstKey != null) {
+			if (getKey(start) >= firstKey.longValue()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public OrderStatsData getDelayOrder(int size, long start, long end) {
+		return getDelayOrderInMemory(size, StatisType.SAVE, start, end);
 	}
 
 	protected OrderStatsData getDelayOrderInMemory(int size, StatisType type, long start, long end) {
@@ -81,10 +93,6 @@ public class DefaultProducerDataRetriever
 		return orderResults;
 	}
 
-	protected OrderStatsData getDelayOrderInDb(int size, StatisType type, long start, long end) {
-		return getDelayOrderInMemory(size, type, start, end);
-	}
-
 	@Override
 	public OrderStatsData getDelayOrder(int size) {
 		return getDelayOrder(size, getDefaultStart(), getDefaultEnd());
@@ -92,10 +100,7 @@ public class DefaultProducerDataRetriever
 
 	@Override
 	public OrderStatsData getQpxOrder(int size, long start, long end) {
-		if (dataExistInMemory(start, end)) {
-			return getQpxOrderInMemory(size, StatisType.SAVE, start, end);
-		}
-		return getDelayOrderInDb(size, StatisType.SAVE, start, end);
+		return getQpxOrderInMemory(size, StatisType.SAVE, start, end);
 	}
 
 	protected OrderStatsData getQpxOrderInMemory(int size, StatisType type, long start, long end) {
@@ -118,14 +123,11 @@ public class DefaultProducerDataRetriever
 		return orderResults;
 	}
 
-	protected OrderStatsData getQpxOrderInDb(int size, StatisType type, long start, long end) {
-		return getQpxOrderInMemory(size, type, start, end);
-	}
-
 	@Override
 	public OrderStatsData getQpxOrder(int size) {
 		return getQpxOrder(size, getDefaultStart(), getDefaultEnd());
 	}
+
 
 	@Override
 	public StatsData getSaveDelay(String topic, long start, long end) {

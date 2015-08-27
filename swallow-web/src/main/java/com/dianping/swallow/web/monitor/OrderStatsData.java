@@ -46,8 +46,16 @@ public class OrderStatsData {
 		this.end = end;
 	}
 
-	public void add(OrderEntity entity) {
-		this.datas.add(entity);
+	public synchronized void add(OrderEntity entity) {
+		if (this.datas.size() < this.capacity) {
+			this.datas.add(entity);
+		} else {
+			OrderEntity o = this.datas.peek();
+			if (entity.getSumData() > o.getSumData()) {
+				this.datas.poll();
+				this.datas.add(entity);
+			}
+		}
 	}
 
 	public StatsDataDesc getInfo() {
@@ -81,7 +89,7 @@ public class OrderStatsData {
 
 	public List<OrderEntity> getDataResults() {
 		List<OrderEntity> orderEntitys = new ArrayList<OrderEntity>(datas);
-		//Collections.sort(orderEntitys);
+		// Collections.sort(orderEntitys);
 		Collections.reverse(orderEntitys);
 		return orderEntitys;
 	}

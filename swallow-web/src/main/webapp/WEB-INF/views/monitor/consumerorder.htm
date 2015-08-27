@@ -1,0 +1,57 @@
+
+<div class="main-content" ng-controller="ConsumerOrderController"
+	id="ConsumerOrderController">
+	<div class="breadcrumbs" id="breadcrumbs">
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
+		<ul class="breadcrumb breadcrumb-ul">
+			<li class="active">当前topic：${topic}</li>
+		</ul>
+		<!-- .breadcrumb -->
+		<div class="input-group" style="margin-left: 20px">
+			<span class="input-group-addon" style="opacity: 0; padding: 0;"></span>
+			top n <input type="text" class="form-control"
+				style="width: 160px; height: 30px;" placeholder="top n"
+				id="resultCount" ng-model='resultCount' /> <span
+				class="input-group-addon" style="opacity: 0; padding: 0;"></span> 时间
+			<input class="form-control" style="width: 160px; height: 30px;"
+				type="text" placeholder="开始时间..." ng-model="startTime"
+				id="starttime"> <input class="form-control" type="text"
+				placeholder="结束时间..." ng-model="endTime" id="stoptime"
+				style="width: 160px; height: 30px;">
+			<button type="button" class="btn btn-success" id="summittime"
+				ng-click="queryByTime('${topic}')">查询</button>
+		</div>
+	</div>
+
+	<div class="page-header"></div>
+	<div class="page-content">
+		<div>
+			<div class="row row-div-table" >
+
+				<table
+					class="table table-small table-bordered table-striped  table-condensed table-hover"
+					ng-repeat="item in orderDatas">
+					<tr class="table-smalll-tr">
+						<th class="text-primary table-smalll-td" colspan="2">{{item.info.desc}}排序</th>
+					</tr>
+					<tr class="table-smalll-tr">
+						<th class="text-danger table-smalll-td" colspan="2">{{item.start|date:'yyyy-MM-dd
+							HH:mm:ss'}}-{{ item.end|date:'yyyy-MM-dd HH:mm:ss'}}</th>
+					</tr>
+					<tr ng-repeat="subItem in item.dataResults">
+						<td class="table-smalll-td table-smalll-td-consumerId"><a
+							ng-href='{{showRelatedUrl(subItem.topicName, subItem.consumerId)}}'>
+								{{showRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
+						<td class="table-smalll-td">{{subItem.sumData}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</div>

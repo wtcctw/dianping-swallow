@@ -39,6 +39,7 @@ import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerOrderDataP
 import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
+import com.dianping.swallow.web.monitor.StatsDataOrderable;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
 import com.dianping.swallow.web.service.MinuteEntryService;
@@ -75,6 +76,9 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
+	
+	@Autowired
+	private StatsDataOrderable statsDataOrderable;
 
 	@Autowired
 	private TopicScanner topicScanner;
@@ -102,10 +106,11 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu", method = RequestMethod.GET)
 	public ModelAndView viewTopicAccumulation(@PathVariable String topic, HttpServletRequest request) {
-		if (topic.equals(MonitorData.TOTAL_KEY) && request.getAttribute("isAdmin") == null) {
+		if (topic.equals(MonitorData.TOTAL_KEY)) {
 			String firstTopic = getFirstTopic(accumulationRetriever.getTopics());
 			if (!firstTopic.equals(MonitorData.TOTAL_KEY)) {
-				return new ModelAndView("redirect:/console/monitor/consumer/" + firstTopic + "/accu", createViewMap());
+				return new ModelAndView("redirect:/console/monitor/consumer/" + firstTopic + "/accu", createViewMap(
+						"topic", "consumeraccu"));
 			}
 		}
 		return new ModelAndView("monitor/consumeraccu", createViewMap("topic", "consumeraccu"));
@@ -154,6 +159,12 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		Map<String, Object> map = createViewMap("topic", "delay");
 		return new ModelAndView("monitor/consumerdelay", map);
+	}
+
+	@RequestMapping(value = "/console/monitor/consumer/{topic}/order", method = RequestMethod.GET)
+	public ModelAndView viewConsumerOrder(@PathVariable String topic) {
+
+		return new ModelAndView("monitor/consumerorder", createViewMap("topic", "consumerorder"));
 	}
 
 	@RequestMapping(value = "/console/monitor/consumer/debug/{server}", method = RequestMethod.GET)
@@ -417,6 +428,12 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	}
 
+	@RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}", method = RequestMethod.GET)
+	@ResponseBody
+	public Object getConsumerOrderMonitor(@PathVariable final int size) throws Exception {
+		return statsDataOrderable.getOrderStatsData(size);
+	}
+	
 	@RequestMapping(value = "/console/monitor/consumer/total/delay/order/get/{size}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getConsumerDelayOrderMonitor(@PathVariable final int size) throws Exception {

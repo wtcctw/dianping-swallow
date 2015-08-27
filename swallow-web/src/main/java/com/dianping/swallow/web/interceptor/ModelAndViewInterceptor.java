@@ -44,11 +44,6 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler) throws Exception {
-		String username = extractUsernameUtils.getUsername(request);
-		int visittype = authenticationService.checkVisitType(username);
-		if (visittype == AuthenticationService.ADMINI){
-			request.setAttribute("isAdmin", true);
-		}
 		return true;
 	}
 

@@ -56,6 +56,23 @@ public class DefaultConsumerDataRetriever
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@Override
+	public boolean dataExistInMemory(long start, long end) {
+		NavigableMap<Long, Long> qpxStatsData = statis.getQpx(StatisType.SEND);
+
+		if (qpxStatsData == null) {
+			return false;
+		}
+
+		Long firstKey = statis.getQpx(StatisType.SEND).firstKey();
+		if (firstKey != null) {
+			if (getKey(start) >= firstKey.longValue()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size, long start, long end) {
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		long fromKey = getKey(start);
@@ -63,42 +80,40 @@ public class DefaultConsumerDataRetriever
 		OrderStatsData sendStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SEND), start, end);
 		OrderStatsData ackStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.ACK), start, end);
 		ConsumerOrderDataPair orderDataResult = new ConsumerOrderDataPair(sendStatsData, ackStatsData);
-		if (dataExistInMemory(start, end)) {
-			Set<String> topics = retriever.getTopics(false);
-			if (topics == null) {
-				return null;
+		Set<String> topics = retriever.getTopics(false);
+		if (topics == null) {
+			return null;
+		}
+		Iterator<String> iterator = topics.iterator();
+		while (iterator.hasNext()) {
+			String topicName = iterator.next();
+			if (TOTAL_KEY.equals(topicName)) {
+				continue;
 			}
-			Iterator<String> iterator = topics.iterator();
-			while (iterator.hasNext()) {
-				String topicName = iterator.next();
-				if (TOTAL_KEY.equals(topicName)) {
-					continue;
-				}
-				Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topicName,
-						StatisType.SEND, false);
-				Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topicName,
-						StatisType.ACK, false);
-				if (sendDelays != null) {
-					for (Map.Entry<String, NavigableMap<Long, Long>> sendDelay : sendDelays.entrySet()) {
-						if (TOTAL_KEY.equals(sendDelay.getKey())) {
-							continue;
-						}
-						sendStatsData.add(new OrderEntity(topicName, sendDelay.getKey(), getSumStatsData(
-								sendDelay.getValue(), fromKey, toKey)));
+			Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topicName,
+					StatisType.SEND, false);
+			Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topicName,
+					StatisType.ACK, false);
+			if (sendDelays != null) {
+				for (Map.Entry<String, NavigableMap<Long, Long>> sendDelay : sendDelays.entrySet()) {
+					if (TOTAL_KEY.equals(sendDelay.getKey())) {
+						continue;
 					}
+					sendStatsData.add(new OrderEntity(topicName, sendDelay.getKey(), getSumStatsData(
+							sendDelay.getValue(), fromKey, toKey)));
 				}
-
-				if (ackDelays != null) {
-					for (Map.Entry<String, NavigableMap<Long, Long>> ackDelay : ackDelays.entrySet()) {
-						if (TOTAL_KEY.equals(ackDelay.getKey())) {
-							continue;
-						}
-						ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getSumStatsData(
-								ackDelay.getValue(), fromKey, toKey)));
-					}
-				}
-
 			}
+
+			if (ackDelays != null) {
+				for (Map.Entry<String, NavigableMap<Long, Long>> ackDelay : ackDelays.entrySet()) {
+					if (TOTAL_KEY.equals(ackDelay.getKey())) {
+						continue;
+					}
+					ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getSumStatsData(ackDelay.getValue(),
+							fromKey, toKey)));
+				}
+			}
+
 		}
 		return orderDataResult;
 	}
@@ -116,43 +131,42 @@ public class DefaultConsumerDataRetriever
 		OrderStatsData sendStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SEND), start, end);
 		OrderStatsData ackStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.ACK), start, end);
 		ConsumerOrderDataPair orderDataResult = new ConsumerOrderDataPair(sendStatsData, ackStatsData);
-		if (dataExistInMemory(start, end)) {
-			Set<String> topics = retriever.getTopics(false);
-			if (topics == null) {
-				return null;
-			}
-			Iterator<String> iterator = topics.iterator();
-			while (iterator.hasNext()) {
-				String topicName = iterator.next();
-				if (TOTAL_KEY.equals(topicName)) {
-					continue;
-				}
-				Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
-						StatisType.SEND, false);
-				Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
-						StatisType.ACK, false);
-				if (sendQpxs != null) {
-					for (Map.Entry<String, NavigableMap<Long, Long>> sendQpx : sendQpxs.entrySet()) {
-						if (TOTAL_KEY.equals(sendQpx.getKey())) {
-							continue;
-						}
-						sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getSumStatsData(
-								sendQpx.getValue(), fromKey, toKey)));
-					}
-				}
-
-				if (ackQpxs != null) {
-					for (Map.Entry<String, NavigableMap<Long, Long>> ackQpx : ackQpxs.entrySet()) {
-						if (TOTAL_KEY.equals(ackQpx.getKey())) {
-							continue;
-						}
-						ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getSumStatsData(ackQpx.getValue(),
-								fromKey, toKey)));
-					}
-				}
-
-			}
+		Set<String> topics = retriever.getTopics(false);
+		if (topics == null) {
+			return null;
 		}
+		Iterator<String> iterator = topics.iterator();
+		while (iterator.hasNext()) {
+			String topicName = iterator.next();
+			if (TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
+			Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
+					StatisType.SEND, false);
+			Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topicName, StatisType.ACK,
+					false);
+			if (sendQpxs != null) {
+				for (Map.Entry<String, NavigableMap<Long, Long>> sendQpx : sendQpxs.entrySet()) {
+					if (TOTAL_KEY.equals(sendQpx.getKey())) {
+						continue;
+					}
+					sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getSumStatsData(sendQpx.getValue(),
+							fromKey, toKey)));
+				}
+			}
+
+			if (ackQpxs != null) {
+				for (Map.Entry<String, NavigableMap<Long, Long>> ackQpx : ackQpxs.entrySet()) {
+					if (TOTAL_KEY.equals(ackQpx.getKey())) {
+						continue;
+					}
+					ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getSumStatsData(ackQpx.getValue(),
+							fromKey, toKey)));
+				}
+			}
+
+		}
+
 		return orderDataResult;
 	}
 

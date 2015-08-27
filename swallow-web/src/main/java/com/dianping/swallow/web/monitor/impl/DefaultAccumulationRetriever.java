@@ -214,10 +214,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 	@Override
 	public OrderStatsData getAccuOrderForAllConsumerId(int size, long start, long end) {
-		if (dataExistInMemory(start, end)) {
-			return getAccuOrderForAllConsumerIdInMemory(size, start, end);
-		}
-		return null;
+		return getAccuOrderForAllConsumerIdInMemory(size, start, end);
 	}
 
 	protected OrderStatsData getAccuOrderForAllConsumerIdInMemory(int size, long start, long end) {
@@ -240,6 +237,11 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		return orderResults;
 	}
 
+	@Override
+	public boolean dataExistInMemory(long start, long end) {
+		return consumerDataRetriever.dataExistInMemory(start, end);
+	}
+	
 	@Override
 	public Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end) {
 
@@ -466,6 +468,6 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		if (consumerIdAccumulation == null) {
 			return null;
 		}
-		return consumerIdAccumulation.getAccumulations(getSampleIntervalCount());
+		return consumerIdAccumulation.getAccumulations(getStorageIntervalCount());
 	}
 }

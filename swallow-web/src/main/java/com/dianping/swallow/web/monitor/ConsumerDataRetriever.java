@@ -13,6 +13,8 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
  */
 public interface ConsumerDataRetriever extends MonitorDataRetriever {
 	
+	boolean dataExistInMemory(long start, long end);
+	
 	ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size, long start, long end);
 	
 	ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size);
