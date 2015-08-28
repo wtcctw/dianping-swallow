@@ -3,6 +3,7 @@ package com.dianping.swallow.web.model.resource;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 
@@ -12,6 +13,7 @@ import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
  *
  * 2015年8月10日下午2:52:07
  */
+@Document(collection = "TOPIC_RESOURCE")
 public class TopicResource extends BaseResource{
 	
 	@Indexed

@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model.resource;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 
@@ -10,6 +11,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
  *
  * 2015年8月10日下午3:36:34
  */
+@Document(collection = "IP_RESOURCE")
 public class IpResource extends BaseResource{
 
 	@Indexed
