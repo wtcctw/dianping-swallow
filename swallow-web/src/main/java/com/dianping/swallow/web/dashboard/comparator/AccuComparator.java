@@ -19,13 +19,16 @@ public class AccuComparator implements Comparator<Entry>{
 		int accu2 = e2.getAccuAlarm();
 		
 		if(accu1 == accu2){
-			
 			Float _f = e1.getNormalizedAccu();
 			Float f = e2.getNormalizedAccu();
 			
 			return  _f.compareTo(f);
 		}else{
-			return accu1 - accu2;
+			Integer _i = new Integer(accu1);
+			Integer i = new Integer(accu2);
+			
+			return _i.compareTo(i);
+			
 		}
 		
 	}

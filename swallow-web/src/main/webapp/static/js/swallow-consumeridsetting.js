@@ -111,6 +111,11 @@ module
 								$scope.topic = localStorage.getItem("topic");
 								localStorage.clear();
 							}
+//							var tmpip = localStorage.getItem("ip");
+//							if(tmpname != null){
+//								$scope.topic = localStorage.getItem("ip");
+//								localStorage.clear();
+//							}
 							$scope.query = new Object();
 							$scope.query.topic = $scope.topic;
 							$scope.query.consumerId = $scope.consumerId;

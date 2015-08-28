@@ -19,13 +19,15 @@ public class AckComparator implements Comparator<Entry>{
 		int ackdelay2 = e2.getAckdelayAlarm();
 		
 		if(ackdelay1 == ackdelay2){
-			
 			Float _f = e1.getNormalizedAckDelay();
 			Float f = e2.getNormalizedAckDelay();
 			
 			return  _f.compareTo(f);
 		}else{
-			return ackdelay1 - ackdelay2;
+			Integer _i = new Integer(ackdelay1);
+			Integer i = new Integer(ackdelay2);
+			
+			return _i.compareTo(i);
 		}
 		
 	}

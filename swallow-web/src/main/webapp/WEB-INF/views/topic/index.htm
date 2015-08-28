@@ -26,8 +26,8 @@
 			<form class="form-search">
 				<span class="input-icon"> <input type="text"
 					placeholder="查找topic ..." style="width: 220px"
-					class="nav-search-input" name="a" id="searchname"
-					autocomplete="off" ng-model='name'>
+					class="nav-search-input" id="searchtopic"
+					autocomplete="off" ng-model='topic'>
 					<ul class="typeahead dropdown-menu"
 						style="top: 28px; left: 0px; display: none;">
 					</ul> <i class="icon-search nav-search-icon"></i>
@@ -67,8 +67,8 @@
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left"><a
 							ng-href="${rc.contextPath}/console/consumerid"
-							ng-click="setTopicName(t.name)" ng-bind="t.name"></a></td>
-						<td style="text-align: left" ng-bind="t.prop"></td>
+							ng-click="setTopic(t.topic)" ng-bind="t.topic"></a></td>
+						<td style="text-align: left" ng-bind="t.administrator"></td>
 						<td style="text-align: left" ><a ng-href="${rc.contextPath}/console/ip"
 							ng-click="setIps(t.producerServer)"  ng-bind="t.producerServer | limitTo : 15 "></a></td>
 						<td style="text-align: left" ng-bind="t.sendpeak"></td>
@@ -129,7 +129,7 @@
 							<div class="form-group"
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>Topic</b></label> <input
-									type="text" class="form-control" ng-model="topicEntry.name"
+									type="text" class="form-control" ng-model="topicEntry.topic"
 									id="topic" data-provide="typeahead" autocomplete="off" required>
 								</input>
 							</div>
@@ -139,7 +139,7 @@
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>访问者白名单</b></label> <input
 									type="text" class="form-control"
-									ng-model="topicEntry.prop" id="prop"
+									ng-model="topicEntry.administrator" id="administrator"
 									data-provide="typeahead" autocomplete="off"> </input>
 							</div>
 						</div>

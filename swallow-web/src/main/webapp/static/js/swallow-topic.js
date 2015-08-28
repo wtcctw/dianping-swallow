@@ -78,15 +78,15 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				
 				$http.post(window.contextPath + $scope.suburl, entity).success(callback);
 		};
-			$scope.name = "";
+			$scope.topic = "";
 			$scope.searchip = "";
 			
 			$scope.suburl = "/console/topic/list";
 			$scope.topicnum = 30;
 			
 			$scope.topicEntry = {};
-			$scope.topicEntry.name;
-			$scope.topicEntry.prop;
+			$scope.topicEntry.topic;
+			$scope.topicEntry.administrator;
 			$scope.topicEntry.producerAlarm;
 			$scope.topicEntry.consumerAlarm;
 			$scope.topicEntry.whiteList;
@@ -98,16 +98,16 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicEntry.delay;
 			
 			$scope.setModalInput = function(index){
-				if(typeof($scope.searchPaginator.currentPageItems[index].prop) != "undefined"){
-					var prop = $scope.searchPaginator.currentPageItems[index].prop;
-					$('#prop').tagsinput('removeAll');
-					if(prop != null && prop.length > 0){
-						var list = prop.split(",");
+				if(typeof($scope.searchPaginator.currentPageItems[index].administrator) != "undefined"){
+					var administrator = $scope.searchPaginator.currentPageItems[index].administrator;
+					$('#administrator').tagsinput('removeAll');
+					if(administrator != null && administrator.length > 0){
+						var list = administrator.split(",");
 						for(var i = 0; i < list.length; ++i)
-							$('#prop').tagsinput('add', list[i]);
+							$('#administrator').tagsinput('add', list[i]);
 					}
 				}else{
-					$('#prop').tagsinput('removeAll');
+					$('#administrator').tagsinput('removeAll');
 				}
 				
 				if(typeof($scope.searchPaginator.currentPageItems[index].producerServer) != "undefined"){
@@ -123,7 +123,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				}
 				
 				$scope.topicEntry.id = $scope.searchPaginator.currentPageItems[index].id;
-				$scope.topicEntry.name = $scope.searchPaginator.currentPageItems[index].name;
+				$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
 				$scope.topicEntry.producerAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarm;
 				$scope.topicEntry.consumerAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarm;
 				$scope.topicEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
@@ -138,14 +138,13 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					alert("峰值不能小于谷值");
 					return;
 				}
-				$scope.topicEntry.consumerIdWhiteList = $("#whitelist").val();
-				$scope.topicEntry.prop = $("#prop").val();
+				$scope.topicEntry.administrator = $("#administrator").val();
 				$scope.topicEntry.producerServer = $("#producerServer").val();
 				$('#myModal').modal('hide');
 				var param = JSON.stringify($scope.topicEntry);
 				
 				$http.post(window.contextPath + '/console/topic/update', $scope.topicEntry).success(function(response) {
-					$scope.query.topic = $scope.topicEntry.name;
+					$scope.query.topic = $scope.topicEntry.topic;
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 		    	});
 		    }
@@ -153,10 +152,13 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.setIps = function(ip){
 				localStorage.setItem("ip", ip);
 			}
+			$scope.setTopic = function(topic){
+				localStorage.setItem("topic", topic);
+			}
 			
 			//发送默认请求
 			$scope.query = new Object();
-			$scope.query.topic = $scope.name;
+			$scope.query.topic = $scope.topic;
 			$scope.query.producerServer = $scope.searchip;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 			
@@ -174,7 +176,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					}).success(function(data, status, headers, config) {
 						var topicNameList = data.first;
 						var producerip = data.second;
-						$("#searchname").typeahead({
+						$("#searchtopic").typeahead({
 							items: 16, 
 							source : topicNameList,
 							updater : function(c) {
@@ -195,6 +197,22 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								return c;
 							}
 						})
+					}).error(function(data, status, headers, config) {
+					});
+				 
+					$http({
+						method : 'GET',
+						url : window.contextPath + '/console/topic/administrator'
+					}).success(function(data, status, headers, config) {
+						//work
+						$('#administrator').tagsinput({
+							  typeahead: {
+								  items: 16,
+								  source: data,
+								  displayText: function(item){ return item;}  //necessary
+							  }
+						});
+		        		$('#administrator').typeahead().data('typeahead').source = data;
 					}).error(function(data, status, headers, config) {
 					});
 					

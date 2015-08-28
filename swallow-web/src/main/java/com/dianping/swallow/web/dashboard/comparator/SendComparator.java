@@ -24,7 +24,10 @@ public class SendComparator implements Comparator<Entry>{
 			
 			return  _f.compareTo(f);
 		}else{
-			return senddelay1 - senddelay2;
+			Integer _i = new Integer(senddelay1);
+			Integer i = new Integer(senddelay2);
+			
+			return _i.compareTo(i);
 		}
 	}
 

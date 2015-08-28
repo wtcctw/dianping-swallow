@@ -44,7 +44,7 @@ public class MessageController extends AbstractMenuController {
 		return new ModelAndView("message/index", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/message/auth/list", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/auth/list", method = RequestMethod.POST)
 	@ResponseBody
 	public Object messageDefault(@RequestBody MessageQueryDto messageQueryDto, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -53,7 +53,7 @@ public class MessageController extends AbstractMenuController {
 		return map;
 	}
 
-	@RequestMapping(value = "/console/message/timespan", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/timespan", method = RequestMethod.GET)
 	@ResponseBody
 	public String getMinAndMaxTime(String topic, HttpServletRequest request, HttpServletResponse response) {
 
@@ -61,7 +61,7 @@ public class MessageController extends AbstractMenuController {
 		return new SimpleDateFormat(DefaultMessageDao.TIMEFORMAT).format(new Date(millions));
 	}
 
-	@RequestMapping(value = "/console/message/auth/content", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/auth/content", method = RequestMethod.GET)
 	@ResponseBody
 	public Message showMessageContent(String topic, String mid, HttpServletRequest request, HttpServletResponse response)
 			throws UnknownHostException {

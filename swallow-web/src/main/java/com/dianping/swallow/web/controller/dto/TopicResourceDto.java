@@ -5,9 +5,9 @@ public class TopicResourceDto {
 	
 	private String id;
 
-	private String name;
+	private String topic;
 	
-	private String prop;
+	private String administrator;
 	
 	private boolean producerAlarm;
 
@@ -33,20 +33,20 @@ public class TopicResourceDto {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
-	public String getProp() {
-		return prop;
+	public String getAdministrator() {
+		return administrator;
 	}
 
-	public void setProp(String prop) {
-		this.prop = prop;
+	public void setAdministrator(String administrator) {
+		this.administrator = administrator;
 	}
 
 	public boolean isProducerAlarm() {

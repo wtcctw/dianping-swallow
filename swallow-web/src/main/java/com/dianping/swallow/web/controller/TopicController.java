@@ -82,7 +82,7 @@ public class TopicController extends AbstractMenuController {
 		String topic = topicQueryDto.getTopic();
 		String producerIp = topicQueryDto.getProducerServer();
 
-		boolean isAllEmpry = StringUtil.isBlank(topic + producerIp);
+		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp);
 
 		if (isAllEmpry) {
 			String username = extractUsernameUtils.getUsername(request);
@@ -347,6 +347,30 @@ public class TopicController extends AbstractMenuController {
 						.format("Update consumer alarm of %s to %b fail", topic, alarm));
 			}
 		}
+	}
+	
+	@RequestMapping(value = "/console/topic/administrator", method = RequestMethod.GET)
+	@ResponseBody
+	public Object loadAdministrators() {
+		
+		Set<String> administrators = new HashSet<String>();
+
+		List<Administrator> adminList = userService.loadUsers();
+		
+		for(Administrator administrator : adminList){
+			administrators.add(administrator.getName());
+		}
+		
+		List<TopicResource> topicResources = topicResourceService.findAll();
+		for(TopicResource topicResource : topicResources){
+			String whiteListString = topicResource.getAdministrator();
+			String[] whiteList = whiteListString.split(DELIMITOR);
+			for(String wl : whiteList){
+				administrators.add(wl);
+			}
+		}
+		
+		return administrators;
 	}
 
 	private String checkProposalName(String proposal) {

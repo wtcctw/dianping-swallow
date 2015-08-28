@@ -48,8 +48,8 @@ public class TopicResourceMapper {
 		topicResource.setConsumerAlarm(dto.isConsumerAlarm());
 		topicResource.setProducerAlarm(dto.isProducerAlarm());
 		topicResource.setId(dto.getId());
-		topicResource.setTopic(dto.getName());
-		topicResource.setAdministrator(dto.getProp());
+		topicResource.setTopic(dto.getTopic());
+		topicResource.setAdministrator(dto.getAdministrator());
 
 		return topicResource;
 		
@@ -70,8 +70,8 @@ public class TopicResourceMapper {
 		topicResourceDto.setConsumerAlarm(topicResource.isConsumerAlarm());
 		topicResourceDto.setProducerAlarm(topicResource.isProducerAlarm());
 		topicResourceDto.setId(topicResource.getId());
-		topicResourceDto.setName(topicResource.getTopic());
-		topicResourceDto.setProp(topicResource.getAdministrator());
+		topicResourceDto.setTopic(topicResource.getTopic());
+		topicResourceDto.setAdministrator(topicResource.getAdministrator());
 		
 		List<String> list = topicResource.getProducerIps();
 		topicResourceDto.setProducerServer(StringUtils.join(list, DELIMITOR));

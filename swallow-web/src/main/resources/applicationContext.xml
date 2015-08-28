@@ -61,9 +61,8 @@
 			<mvc:mapping path="/console/monitor/consumer/*/delay" />
 			<mvc:mapping path="/console/monitor/dashboard" />
 			<mvc:mapping path="/console/setting/*" />
-			<mvc:mapping path="/console/server/*" />
-			<mvc:mapping path="/console/consumerid/*" />
-			<mvc:mapping path="/console/ip/*" />
+			<mvc:mapping path="/console/server/producer" />
+			<mvc:mapping path="/console/server/consumer" />
 			<mvc:mapping path="/console/setting/alarmmeta/detail/*" />
 			<mvc:mapping path="/console/tool" />
 			<mvc:mapping path="/console/alarm/detail/*" />

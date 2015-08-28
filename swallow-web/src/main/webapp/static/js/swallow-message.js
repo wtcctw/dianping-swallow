@@ -378,7 +378,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 				method : 'GET',
 				url : window.contextPath + '/console/topic/namelist'
 			}).success(function(data, status, headers, config) {
-				var topicNameList = data;
+				var topicNameList = data.first;
 				$("#topicname").typeahead({
 					items: 16, 
 					source : topicNameList,
