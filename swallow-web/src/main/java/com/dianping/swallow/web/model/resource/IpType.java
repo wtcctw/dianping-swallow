@@ -8,8 +8,8 @@ package com.dianping.swallow.web.model.resource;
  */
 public enum IpType {
 	
-	PRODUCERIP("PRODUCER"),
-	CONSUMERIP("CONSUMER");
+	PRODUCER("PRODUCER"),
+	CONSUMER("CONSUMER");
 	
 	private String type;
 	
@@ -41,5 +41,9 @@ public enum IpType {
 	@Override
 	public String toString() {
 		return type;
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(IpType.findByType("PRODUCER"));
 	}
 }

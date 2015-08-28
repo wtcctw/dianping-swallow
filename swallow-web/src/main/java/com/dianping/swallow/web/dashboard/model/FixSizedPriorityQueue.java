@@ -33,7 +33,7 @@ public class FixSizedPriorityQueue {
 		this.queue = new PriorityBlockingQueue<Entry>(maxSize, comparator);
 	}
 
-	public void add(Entry e) {
+	public synchronized void add(Entry e) {
 		if (queue.size() < maxSize) {
 			queue.add(e);
 		} else {

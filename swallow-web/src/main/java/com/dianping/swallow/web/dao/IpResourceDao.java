@@ -22,11 +22,13 @@ public interface IpResourceDao extends Dao{
 	
 	long count();
 
-	List<IpResource> findByIp(String ip);
+	IpResource findByIp(String ... ips);
 
 	Pair<Long, List<IpResource>> findByIpType(IpQueryDto ipQueryDto);
 	
-	Pair<Long, List<IpResource>> find(IpQueryDto ipQueryDto);
+	IpResource find(IpQueryDto ipQueryDto);
+	
+	List<IpResource> findAll(String ... fields);
 
 	IpResource findDefault();
 	

@@ -54,8 +54,8 @@ public class TopicResourceServiceTest {
 		
 		topicResource.setCreateTime(new Date());
 		topicResource.setUpdateTime(new Date());
-		topicResource.setName("example");
-		topicResource.setProp("mingdong.li");
+		topicResource.setTopic("example");
+		topicResource.setAdministrator("mingdong.li");
 		topicResource.setConsumerAlarm(Boolean.FALSE);
 		topicResource.setProducerAlarm(Boolean.TRUE);
 		
@@ -69,8 +69,7 @@ public class TopicResourceServiceTest {
 		producerServer.add("1.0.0.2");
 		producerServer.add("1.0.0.3");
 		
-		topicResource.setConsumerIdWhiteList(comsumerids);
-		topicResource.setProducerServer(producerServer);
+		topicResource.setProducerIps(producerServer);
 		
 		return topicResource;
 		
@@ -88,12 +87,12 @@ public class TopicResourceServiceTest {
 		System.out.println(producerServer1.toString());
 		Assert.assertNotNull(producerServer1);
 		
-		producerServer1.setName("example2");
+		producerServer1.setTopic("example2");
 		result = topicResourceService.update(producerServer1);
 		Assert.assertTrue(result);
 		
 		TopicResource defaultTopicResource = createTopicResource();
-		defaultTopicResource.setName("default");
+		defaultTopicResource.setTopic("default");
 		result = topicResourceService.insert(defaultTopicResource);
 		Assert.assertTrue(result);
 		TopicResource producerServer3 = topicResourceService.findByTopic("default");

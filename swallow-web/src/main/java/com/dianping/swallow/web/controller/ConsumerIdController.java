@@ -28,20 +28,26 @@ import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
+
+/**
+ * @author mingdongli
+ *
+ * 2015年8月27日下午3:33:36
+ */
 @Controller
-public class ConsumerIdController extends AbstractMenuController{
-	
+public class ConsumerIdController extends AbstractMenuController {
+
 	private static final String CONSUMERID = "consumerId";
-	
+
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
-	
+
 	@RequestMapping(value = "/console/consumerid")
 	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
 
 		return new ModelAndView("consumerid/index", createViewMap());
 	}
-	
+
 	@RequestMapping(value = "/console/consumerid/list", method = RequestMethod.POST)
 	@ResponseBody
 	public Object comsumeridResourceList(@RequestBody ConsumerIdQueryDto ConsumerIdQueryDto) {
@@ -51,38 +57,37 @@ public class ConsumerIdController extends AbstractMenuController{
 		Pair<Long, List<ConsumerIdResource>> pair = new Pair<Long, List<ConsumerIdResource>>();
 		List<ConsumerIdResource> result = new ArrayList<ConsumerIdResource>();
 		List<ConsumerIdResourceDto> resultDto = new ArrayList<ConsumerIdResourceDto>();
-		
+
 		boolean isBlank = StringUtil.isBlank(topic + consumerId);
-		
-		if(isBlank){
+
+		if (isBlank) {
 			pair = consumerIdResourceService.findConsumerIdResourcePage(ConsumerIdQueryDto);
-		}else{
-			if(StringUtil.isBlank(topic)){
+		} else {
+			if (StringUtil.isBlank(topic)) {
 				result = consumerIdResourceService.findByConsumerId(consumerId);
 				long size = result.size();
 				pair.setFirst(size);
 				pair.setSecond(result);
-			}else if(StringUtil.isBlank(consumerId)){
+			} else if (StringUtil.isBlank(consumerId)) {
 				pair = consumerIdResourceService.findByTopic(ConsumerIdQueryDto);
-			}else{
+			} else {
 				ConsumerIdResource consumerIdResource = consumerIdResourceService.find(topic, consumerId);
 				result.add(consumerIdResource);
 				pair.setFirst(1L);
 				pair.setSecond(result);
 			}
 		}
-		
-		for(ConsumerIdResource consumerIdResource : pair.getSecond()){
+
+		for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
 			resultDto.add(ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource));
 		}
 		return new Pair<Long, List<ConsumerIdResourceDto>>(pair.getFirst(), resultDto);
-		
+
 	}
-	
+
 	@RequestMapping(value = "/console/consumerid/update", method = RequestMethod.POST)
 	@ResponseBody
-	public Object updateTopic(@RequestBody ConsumerIdResourceDto consumerIdResourceDto)
-			throws UnknownHostException {
+	public Object updateTopic(@RequestBody ConsumerIdResourceDto consumerIdResourceDto) throws UnknownHostException {
 
 		ConsumerIdResource consumerIdResource = ConsumerIdResourceMapper.toConsumerIdResource(consumerIdResourceDto);
 		boolean result = consumerIdResourceService.update(consumerIdResource);
@@ -93,58 +98,56 @@ public class ConsumerIdController extends AbstractMenuController{
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/consumerid/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public void editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm, @RequestParam String consumerId, 
-			HttpServletRequest request, HttpServletResponse response) {
+	public void editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
+			@RequestParam String consumerId, HttpServletRequest request, HttpServletResponse response) {
 
 		ConsumerIdResource consumerIdResource = consumerIdResourceService.find(topic, consumerId);
 		consumerIdResource.setAlarm(alarm);
-		boolean result  = consumerIdResourceService.update(consumerIdResource);
-		
+		boolean result = consumerIdResourceService.update(consumerIdResource);
+
 		if (result) {
 			if (logger.isInfoEnabled()) {
-				logger.info(String
-						.format("Update alarm of %s to %b successfully", topic, alarm));
+				logger.info(String.format("Update alarm of %s to %b successfully", topic, alarm));
 			}
 		} else {
 			if (logger.isInfoEnabled()) {
-				logger.info(String
-						.format("Update alarm of %s to %b fail", topic, alarm));
+				logger.info(String.format("Update alarm of %s to %b fail", topic, alarm));
 			}
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/consumerid/remove", method = RequestMethod.GET)
 	@ResponseBody
-	public int remvoeComsumerid(@RequestParam(value = "consumerId") String consumerId, @RequestParam(value = "topic") String topic ) {
-		
+	public int remvoeComsumerid(@RequestParam(value = "consumerId") String consumerId,
+			@RequestParam(value = "topic") String topic) {
+
 		int result = consumerIdResourceService.remove(topic, consumerId);
-		if(result > 0){
+		if (result > 0) {
 			return ResponseStatus.SUCCESS.getStatus();
-		}else{
+		} else {
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/consumerid/allconsumerid", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadCmsumerid( ) {
-		
+	public List<String> loadCmsumerid() {
+
 		Set<String> consumerids = new HashSet<String>();
 		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID);
-		
-		for(ConsumerIdResource consumerIdResource : consumerIdResources){
+
+		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 			String cid = consumerIdResource.getConsumerId();
-			if(!consumerids.contains(cid)){
+			if (!consumerids.contains(cid)) {
 				consumerids.add(cid);
 			}
 		}
-		
+
 		return new ArrayList<String>(consumerids);
 	}
-	
 
 	@Override
 	protected String getMenu() {

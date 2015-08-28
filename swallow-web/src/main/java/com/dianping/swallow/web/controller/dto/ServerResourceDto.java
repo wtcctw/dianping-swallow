@@ -16,8 +16,6 @@ public class ServerResourceDto {
 	
 	private boolean alarm;
 	
-	private String whitelist;
-	
 	private long sendpeak;
 	
 	private long sendvalley;
@@ -56,14 +54,6 @@ public class ServerResourceDto {
 
 	public void setAlarm(boolean alarm) {
 		this.alarm = alarm;
-	}
-
-	public String getWhitelist() {
-		return whitelist;
-	}
-
-	public void setWhitelist(String whitelist) {
-		this.whitelist = whitelist;
 	}
 
 	public long getSendpeak() {

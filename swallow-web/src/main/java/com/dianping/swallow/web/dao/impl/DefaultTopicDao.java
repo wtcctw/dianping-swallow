@@ -28,14 +28,14 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 
 	private static final String TOPIC_COLLECTION = "TOPIC";
 
-	private static final String NAME = "name";
+	private static final String TOPIC = "topic";
 	
-	private static final String PROP = "prop";
+	private static final String ADMINISTRATOR = "administrator";
 
 	@Override
 	public Topic readByName(String name) {
 		
-		Query query = new Query(Criteria.where(NAME).is(name));
+		Query query = new Query(Criteria.where(TOPIC).is(name));
 		return mongoTemplate.findOne(query, Topic.class, TOPIC_COLLECTION);
 	}
 
@@ -89,7 +89,7 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 		List<Topic> topicList = new ArrayList<Topic>();
 		String namer = name.isEmpty() ? ".*" : name;
 		String propr = prop.isEmpty() ? ".*" : prop;
-		Query query1 = new Query(Criteria.where(NAME).regex("^" + namer).and(PROP).regex(propr));
+		Query query1 = new Query(Criteria.where(TOPIC).regex("^" + namer).and(ADMINISTRATOR).regex(propr));
 		
 		Query query2 = query1;
 		query1.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, "name")));
@@ -101,7 +101,7 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 	@Override
 	public Topic readByProp(String prop) {
 		
-		Query query = new Query(Criteria.where(PROP).regex(".*" + prop + ".*"));
+		Query query = new Query(Criteria.where(ADMINISTRATOR).regex(".*" + prop + ".*"));
 		Topic topic = mongoTemplate.findOne(query, Topic.class, TOPIC_COLLECTION);
 		return topic;
 

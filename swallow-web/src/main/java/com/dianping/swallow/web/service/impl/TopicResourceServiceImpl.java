@@ -172,7 +172,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 		TopicResource topicResource = this.findByTopic(str);
 
 		if (topicResource != null) {
-			Set<String> set = splitString(topicResource.getProp(), ",");
+			Set<String> set = splitString(topicResource.getAdministrator(), ",");
 			topicToWhiteList.put(str, set);
 			if (logger.isInfoEnabled()) {
 				logger.info(String.format(
@@ -211,10 +211,10 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 
 		Long id = System.currentTimeMillis();
 		TopicResource topicResource = new TopicResource();
-		topicResource.setProp("");
+		topicResource.setAdministrator("");;
 		topicResource.setConsumerAlarm(Boolean.TRUE);
 		topicResource.setProducerAlarm(Boolean.TRUE);
-		topicResource.setName(topic);
+		topicResource.setTopic(topic);
 		topicResource.setCreateTime(new Date());
 		topicResource.setId(id.toString());
 		QPSAlarmSetting qPSAlarmSetting = new QPSAlarmSetting();

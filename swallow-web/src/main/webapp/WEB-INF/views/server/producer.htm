@@ -23,7 +23,6 @@
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">ServerId</th>
 						<th style="text-align: left">主机名</th>
-						<th style="text-align: left">Topic白名单</th>
 						<th style="text-align: left">告警</th>
 						<th style="text-align: left">发送峰值</th>
 						<th style="text-align: left">发送谷值</th>
@@ -35,7 +34,6 @@
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="ad.ip"></td>
 						<td style="text-align: left" ng-bind="ad.hostname"></td>
-						<td style="text-align: left" ng-bind="ad.whitelist"></td>
 						<td style="text-align: left" ng-bind="ad.alarm"></td>
 						<td style="text-align: left" ng-bind="ad.sendpeak"></td>
 						<td style="text-align: left" ng-bind="ad.sendvalley"></td>
@@ -91,15 +89,6 @@
 									<label class="control-label"><b>告警</b></label> <input
 										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
 										ng-model="producerserverEntry.alarm" id="alarm">
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>Topic白名单</b></label> <input
-										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
-										ng-model="producerserverEntry.whitelist" id="whitelist">
 									</input>
 								</div>
 							</div>

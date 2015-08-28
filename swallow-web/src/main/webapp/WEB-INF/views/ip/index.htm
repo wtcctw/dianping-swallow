@@ -1,5 +1,5 @@
 <div class="main-content main-content-local" style="opacity: 1.0;"
-	ng-controller="TopicController">
+	ng-controller="IpResourceController">
 	<div class="breadcrumbs" id="breadcrumbs">
 		<script type="text/javascript"
 			src="${rc.contextPath}/static/js/swallow-ipresource.js"></script>
@@ -10,11 +10,11 @@
 			}
 		</script>
 
- 	<form class="bs-example bs-example-form-local" role="form">
+		<form class="bs-example bs-example-form-local" role="form">
 			<div class="input-group input-group-local">
-				<span class="input-group-addon">生产者</span> <input type="text"
-					class="form-control" placeholder="生产者IP..." style="width: 150px"
-					id="searchiptype" ng-model=''>
+				<span class="input-group-addon">业务</span> <input type="text"
+					class="form-control" placeholder="业务名..." style="width: 150px"
+					id="searchapplication" ng-model='searchapplication'>
 				<ul class="typeahead dropdown-menu"
 					style="top: 28px; left: 0px; display: none;">
 				</ul>
@@ -26,8 +26,8 @@
 			<form class="form-search">
 				<span class="input-icon"> <input type="text"
 					placeholder="查找ip ..." style="width: 220px"
-					class="nav-search-input"  id="searchip"
-					autocomplete="off" ng-model='searchip'>
+					class="nav-search-input" id="searchip" autocomplete="off"
+					ng-model='searchip'>
 					<ul class="typeahead dropdown-menu"
 						style="top: 28px; left: 0px; display: none;">
 					</ul> <i class="icon-search nav-search-icon"></i>
@@ -49,7 +49,6 @@
 					<tr>
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">IP</th>
-						<th style="text-align: left">IP类型</th>
 						<th style="text-align: left">业务名</th>
 						<th style="text-align: left">开发邮箱</th>
 						<th style="text-align: left">开发电话</th>
@@ -63,10 +62,7 @@
 					<tr ng-repeat="t in searchPaginator.currentPageItems "
 						on-finish-render-filters>
 						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left"><a
-							ng-href="${rc.contextPath}/console/consumerid"
-							ng-click="setTopicName(t.name)" ng-bind="t.ip"></a></td>
-						<td style="text-align: left" ng-bind="t.ipType"></td>
+						<td style="text-align: left" ng-bind="t.ip"></td>
 						<td style="text-align: left" ng-bind="t.application"></td>
 						<td style="text-align: left" ng-bind="t.email"></td>
 						<td style="text-align: left" ng-bind="t.dpManager"></td>
@@ -76,17 +72,15 @@
 						<td style="text-align: left" ng-bind="t.opMobile"></td>
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
-								id="alarm{{$index}}" type="checkbox" ng-model="t.alarm" ng-click="changealarm(t.ip, t.ipType, $index)"
+								id="alarm{{$index}}" type="checkbox" ng-model="t.alarm"
+								ng-click="changealarm(t.ip, $index)"
 								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
-						#if(${isadmin})
-						<td
-							style="text-align: left;"><a
-							href="#myModal"
-							ng-click="setModalInput($index);"
-							data-toggle="modal" class="edit-config-btn"><i
-								class="icon-edit" rel="tooltip" data-original-title="编辑配置值"></i></a></td>
-						#end
+						</label></td> #if(${isadmin})
+						<td style="text-align: left;"><a href="#myModal"
+							ng-click="setModalInput($index);" data-toggle="modal"
+							class="edit-config-btn"><i class="icon-edit" rel="tooltip"
+								data-original-title="编辑配置值"></i></a></td> #end
+					</tr>
 				</table>
 
 				<ul style="margin-top: 20px;" class="pagination">
@@ -105,96 +99,97 @@
 			<!--end row  -->
 		</div>
 
-	<!-- 模态框（Modal） -->
-	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-		aria-labelledby="myModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"
-						aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">配置Topic</h4>
-				</div>
-				<div class="modal-body">
-					<form method="post" class="form-horizontal" name="myForm"
-						ng-submit="refreshpage(myForm)">
-						<div class="control-group">
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-								<label class="control-label"><b>Topic</b></label> <input
-									type="text" class="form-control" ng-model="topicEntry.name"
-									id="topic" data-provide="typeahead" autocomplete="off" required>
-								</input>
-							</div>
-						</div>
-						<div class="control-group">
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-								<label class="control-label"><b>ConsumerId白名单</b></label> <input
-									type="text" class="form-control"
-									ng-model="topicEntry.consumerIdWhiteList" id="whitelist"
-									data-provide="typeahead" autocomplete="off"> </input>
-							</div>
-						</div>
-						<div class="control-group">
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-								<label class="control-label"><b>访问者白名单</b></label> <input
-									type="text" class="form-control"
-									ng-model="topicEntry.prop" id="prop"
-									data-provide="typeahead" autocomplete="off"> </input>
-							</div>
-						</div>
-						<div class="control-group">
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-								<label class="control-label"><b>生产者IP</b></label> <input
-									type="text" class="form-control"
-									ng-model="topicEntry.producerServer" id="producerServer"
-									data-provide="typeahead" autocomplete="off"> </input>
-							</div>
-						</div>
-						
-						<div class="control-group">
-							<label class="control-label"><b>发送端设置</b></label>
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 40px;">
-								<label class="control-label">发送QPS</label>
-								<div class="col-sm-12">
-									<label class="col-sm-2 control-label">峰值</label> <input
-										class="col-sm-2" type="text"
-										ng-model="topicEntry.sendpeak" /> <label
-										class="col-sm-2 control-label">谷值</label><input type="text"
-										class="col-sm-2" ng-model="topicEntry.sendvalley" /> <label
-										class="col-sm-2 control-label">波动</label><input type="text"
-										class="col-sm-2" ng-model="topicEntry.sendfluctuation" /><label
-										class="col-sm-2 control-label">波动基数</label><input type="text"
-										class="col-sm-2" ng-model="topicEntry.sendfluctuationBase" />
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">配置IP</h4>
+					</div>
+					<div class="modal-body">
+						<form method="post" class="form-horizontal" name="myForm"
+							ng-submit="refreshpage(myForm)">
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>IP</b></label> <input
+										type="text" class="form-control" ng-model="ipEntry.ip" id="ip"
+										required> </input>
 								</div>
 							</div>
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 40px;">
-								<label class="control-label">延迟</label>
-								<div class="col-sm-12">
-									<label class="col-sm-2 control-label">发送</label> <input
-										class="col-sm-2" type="text"
-										ng-model="topicEntry.delay" />
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>业务名</b></label> <input
+										type="text" class="form-control"
+										ng-model="ipEntry.application" id="application">
+									</input>
 								</div>
 							</div>
-						</div>
-						<div class="control-group" style="margin-top: 40px">
-							<div class="controls">
-								<button type="button" class="btn btn-default"
-									data-dismiss="modal">关闭</button>
-								<button type="submit" class="btn btn-success">提交</button>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>开发邮箱</b></label> <input
+										type="text" class="form-control" ng-model="ipEntry.email"
+										id="email"> </input>
+								</div>
 							</div>
-						</div>
-					</form>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>开发电话</b></label> <input
+										type="text" class="form-control" ng-model="ipEntry.dpMobile"
+										id="dpMobile"> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>开发姓名</b></label> <input
+										type="text" class="form-control" ng-model="ipEntry.dpManager"
+										id="dpManager"> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>运维邮箱</b></label> <input
+										type="text" class="form-control" ng-model="ipEntry.opEmail"
+										id="opEmail"> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>运维电话</b></label> <input
+										type="text" class="form-control" ng-model="ipEntry.opMobile"
+										id="opMobile"> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>运维姓名</b></label> <input
+										type="text" class="form-control" ng-model="ipEntry.opManager"
+										id="opManager"> </input>
+								</div>
+							</div>
+							<div class="control-group" style="margin-top: 40px">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+									<button type="submit" class="btn btn-success">提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
 				</div>
 			</div>
+			<!-- /.modal-content -->
 		</div>
-		<!-- /.modal-content -->
-	</div>
 
 		<!--end page-header  -->
 	</div>

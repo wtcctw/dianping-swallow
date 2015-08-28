@@ -17,7 +17,6 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.IpResource;
-import com.dianping.swallow.web.model.resource.IpType;
 import com.dianping.swallow.web.service.IpResourceService;
 
 /**
@@ -45,11 +44,13 @@ public class IpResourceServiceTest {
 		iPDesc.setCreateTime(new Date());
 		iPDesc.setEmail("lmdyyh@163.com");
 		iPDesc.setDpMobile("18795858599");
+		iPDesc.setOpEmail("jiaxin.fan@dianping.com");
+		iPDesc.setName("tuangou");
 
 		ipResource.setiPDesc(iPDesc);
 
 		ipResource.setIp("10.1.0.10");
-		ipResource.setIpType(IpType.CONSUMERIP);
+		ipResource.setAlarm(Boolean.TRUE);
 
 		return ipResource;
 
@@ -62,20 +63,17 @@ public class IpResourceServiceTest {
 		boolean result = ipResourceService.insert(ipResource);
 		Assert.assertTrue(result);
 
-		List<IpResource> ipResources = ipResourceService.findByIp("10.1.0.10");
-		Assert.assertNotNull(ipResources);
-		Assert.assertEquals(ipResources.size(), 1);
+		ipResource = ipResourceService.findByIp("10.1.0.10");
+		Assert.assertNotNull(ipResource);
 
-		ipResource = ipResources.get(0);
 		ipResource.setIp("127.0.0.1");
-		ipResource.setIpType(IpType.PRODUCERIP);
 
 		result = ipResourceService.update(ipResource);
 		Assert.assertTrue(result);
 
 		Pair<Long, List<IpResource>> pair = new Pair<Long, List<IpResource>>();
 		IpQueryDto ipQueryDto = new IpQueryDto();
-		ipQueryDto.setIpType(IpType.PRODUCERIP.toString());
+		ipQueryDto.setApplication("tuangou");
 		pair = ipResourceService.findByIpType(ipQueryDto);
 		Assert.assertNotNull(pair);
 		Assert.assertEquals(pair.getFirst(), new Long(1));

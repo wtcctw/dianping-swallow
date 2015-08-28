@@ -17,8 +17,6 @@ public class IpResource extends BaseResource{
 	@Indexed
 	private String ip;
 	
-	private IpType ipType;
-	
 	private boolean alarm;
 	
 	private IPDesc iPDesc;
@@ -31,14 +29,6 @@ public class IpResource extends BaseResource{
 		this.ip = ip;
 	}
 
-	public IpType getIpType() {
-		return ipType;
-	}
-
-	public void setIpType(IpType ipType) {
-		this.ipType = ipType;
-	}
-	
 	public boolean isAlarm() {
 		return alarm;
 	}
@@ -57,9 +47,8 @@ public class IpResource extends BaseResource{
 
 	@Override
 	public String toString() {
-		return "IpResource [ip=" + ip + ", ipType=" + ipType + ", alarm="
-				+ alarm + ", iPDesc=" + iPDesc + ", toString()="
-				+ super.toString() + "]";
+		return "IpResource [ip=" + ip + ", alarm=" + alarm + ", iPDesc=" + iPDesc + ", toString()=" + super.toString()
+				+ "]";
 	}
 
 }

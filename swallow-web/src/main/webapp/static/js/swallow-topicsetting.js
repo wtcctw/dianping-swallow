@@ -82,8 +82,7 @@ module
 					};
 				});
 
-module
-		.controller(
+module.controller(
 				'TopicSettingController',
 				[
 						'$rootScope',
@@ -163,7 +162,6 @@ module
 
 							$scope.topicEntry = {};
 							$scope.topicEntry.topic = "";
-							$scope.topicEntry.whitelist = "";
 							$scope.topicEntry.producerpeak = "";
 							$scope.topicEntry.producervalley = "";
 							$scope.topicEntry.producerfluctuation = "";
@@ -174,7 +172,6 @@ module
 									alert("谷值不能小于峰值");
 									return;
 								}
-								$scope.topicEntry.whitelist = $("#whitelist").val();
 								$('#myModal').modal('hide');
 								var param = JSON.stringify($scope.topicEntry);
 
@@ -197,7 +194,6 @@ module
 
 							$scope.clearModal = function() {
 								$scope.topicEntry.topic = "";
-								$scope.topicEntry.whitelist = "";
 								$scope.topicEntry.producerpeak = "";
 								$scope.topicEntry.producervalley = "";
 								$scope.topicEntry.producerfluctuation = "";
@@ -206,15 +202,7 @@ module
 							}
 
 							$scope.setModalInput = function(index) {
-								var wl = $scope.searchPaginator.currentPageItems[index].whitelist;
-								$('#whitelist').tagsinput('removeAll');
-								if(wl != null && wl.length > 0){
-									var list = wl.split(",");
-									for(var i = 0; i < list.length; ++i)
-										$('#whitelist').tagsinput('add', list[i]);
-								}
 								$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
-								$scope.topicEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
 								$scope.topicEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;
 								$scope.topicEntry.producervalley = $scope.searchPaginator.currentPageItems[index].producervalley;
 								$scope.topicEntry.producerfluctuation = $scope.searchPaginator.currentPageItems[index].producerfluctuation;
@@ -223,9 +211,7 @@ module
 							}
 
 							$rootScope.removerecord = function(cid) {
-								$http
-										.get(
-												window.contextPath
+								$http.get(window.contextPath
 														+ "/console/setting/topic/remove",
 												{
 													params : {

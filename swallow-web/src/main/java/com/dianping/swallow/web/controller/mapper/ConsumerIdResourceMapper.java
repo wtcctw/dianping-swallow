@@ -64,7 +64,7 @@ public class ConsumerIdResourceMapper {
 			}
 		}
 		
-		consumerIdResource.setConsumerIp(idList);
+		consumerIdResource.setConsumerIps(idList);
 		
 		return consumerIdResource;
 	}
@@ -95,7 +95,7 @@ public class ConsumerIdResourceMapper {
 		dto.setId(consumerIdResource.getId());
 		dto.setAlarm(consumerIdResource.isAlarm());
 		
-		List<String> list = consumerIdResource.getConsumerIp();
+		List<String> list = consumerIdResource.getConsumerIps();
 		dto.setConsumerIp(StringUtils.join(list, DELIMITOR));
 		
 		return dto;

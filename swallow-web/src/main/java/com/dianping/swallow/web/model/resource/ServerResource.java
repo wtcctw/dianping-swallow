@@ -10,7 +10,7 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
  *
  * 2015年8月10日下午4:58:04
  */
-public class ServerResource extends BaseResource{
+public abstract class ServerResource extends BaseResource{
 
 	private String ip;
 	

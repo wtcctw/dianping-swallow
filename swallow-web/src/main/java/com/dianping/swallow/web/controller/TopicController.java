@@ -106,7 +106,7 @@ public class TopicController extends AbstractMenuController {
 				pair = topicResourceService.findByServer(topicQueryDto);
 			}else{
 				TopicResource resource = topicResourceService.findByTopic(topic);
-				List<String> ips = resource.getProducerServer();
+				List<String> ips = resource.getProducerIps();
 				if(ips.contains(producerIp)){
 					result.add(TopicResourceMapper.toTopicResourceDto(resource));
 					return new Pair<Long, List<TopicResourceDto>>(1L, result);
@@ -139,7 +139,7 @@ public class TopicController extends AbstractMenuController {
 			List<TopicResource> topicResources = topicResourceService.findAll();
 			List<String> tmpips;
 			for(TopicResource topicResource : topicResources){
-				tmpips = topicResource.getProducerServer();
+				tmpips = topicResource.getProducerIps();
 				if(tmpips != null){
 					producerIp.addAll(tmpips);
 				}
@@ -158,7 +158,7 @@ public class TopicController extends AbstractMenuController {
 			}
 			
 			for(String topic : topics){
-				List<String> tmpips = topicResourceService.findByTopic(topic).getProducerServer();
+				List<String> tmpips = topicResourceService.findByTopic(topic).getProducerIps();
 				if(tmpips != null){
 					producerIp.addAll(tmpips);
 				}
@@ -253,7 +253,7 @@ public class TopicController extends AbstractMenuController {
 					}
 					return ResponseStatus.INVALIDTOPIC;
 				}
-				String proposal = topicResource.getProp();
+				String proposal = topicResource.getAdministrator();
 				StringBuffer sb = new StringBuffer();
 				prop = checkProposalName(prop);
 				if (StringUtils.isNotEmpty(proposal)) {
@@ -271,7 +271,7 @@ public class TopicController extends AbstractMenuController {
 				"TopicEdit", topic + ":" + username);
 
 		try {
-			topicResource.setProp(prop);
+			topicResource.setAdministrator(prop);;
 			topicResource.setUpdateTime(new Date());
 			result = topicResourceService.update(topicResource);
 			producerTransaction.setStatus(Message.SUCCESS);
@@ -373,7 +373,7 @@ public class TopicController extends AbstractMenuController {
 
 	private Set<String> getPropList(TopicResource topicResource) {
 		Set<String> props = new HashSet<String>();
-		String[] tmpprops = topicResource.getProp().split(",");
+		String[] tmpprops = topicResource.getAdministrator().split(",");
 
 		for (String tmpProp : tmpprops) {
 			if (!StringUtils.isEmpty(tmpProp)) {

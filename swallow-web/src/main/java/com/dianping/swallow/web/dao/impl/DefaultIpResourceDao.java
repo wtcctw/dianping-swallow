@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -24,7 +25,7 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 
 	private static final String IP = "ip";
 
-	private static final String IPTYPE = "ipType";
+	private static final String APPLICATION = "iPDesc.name";
 
 	private static final String DEFAULT = "default";
 
@@ -64,18 +65,26 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 
 	@Override
-	public List<IpResource> findByIp(String ip) {
+	public IpResource findByIp(String ... ips) {
 
-		Query query = new Query(Criteria.where(IP).is(ip));
-		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
+		List<Criteria> criterias = new ArrayList<Criteria>();
+		for (String ip : ips) {
+			criterias.add(Criteria.where(IP).is(ip));
+		}
 
-		return ipResources;
+		Query query = new Query();
+		query.addCriteria(Criteria.where(IP).exists(true)
+				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
+		
+		IpResource ipResource = mongoTemplate.findOne(query, IpResource.class, IPRESOURCE_COLLECTION);
+
+		return ipResource;
 	}
 
 	@Override
 	public Pair<Long, List<IpResource>> findByIpType(IpQueryDto ipQueryDto) {
 
-		Query query = new Query(Criteria.where(IPTYPE).is(ipQueryDto.getIpType()));
+		Query query = new Query(Criteria.where(APPLICATION).is(ipQueryDto.getApplication()));
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
 		long size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
 
@@ -83,20 +92,35 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 	
 	@Override
-	public Pair<Long, List<IpResource>> find(IpQueryDto ipQueryDto) {
+	public IpResource find(IpQueryDto ipQueryDto) {
 
 		String ip = ipQueryDto.getIp();
-		String ipType = ipQueryDto.getIpType();
-		int offset = ipQueryDto.getOffset();
-		int limit = ipQueryDto.getLimit();
+		String application = ipQueryDto.getApplication();
 		
-		Query query = new Query(Criteria.where(IP).is(ip).andOperator(Criteria.where(IPTYPE).is(ipType)));
-		long size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
+		Query query = new Query(Criteria.where(IP).is(ip).andOperator(Criteria.where(APPLICATION).is(application)));
+		IpResource ipResource = mongoTemplate.findOne(query, IpResource.class, IPRESOURCE_COLLECTION);
 		
-		query.skip(offset).limit(limit);
-		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
+		return ipResource;
+	}
+
+	@Override
+	public List<IpResource> findAll(String ... fields) {
 		
-		return new Pair<Long, List<IpResource>>(size, ipResources);
+		List<IpResource> ipResources = new ArrayList<IpResource>();
+		
+		if(fields.length == 0){
+			ipResources = mongoTemplate.findAll(IpResource.class,
+					IPRESOURCE_COLLECTION);
+		}else{
+			Query query = new Query();
+			for(String field : fields){
+				query.fields().include(field);
+			}
+			ipResources = mongoTemplate.find(query, IpResource.class,
+					IPRESOURCE_COLLECTION);
+		}
+
+		return ipResources;
 	}
 
 	@Override

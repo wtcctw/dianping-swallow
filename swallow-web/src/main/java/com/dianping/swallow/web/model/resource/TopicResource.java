@@ -17,34 +17,40 @@ import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 public class TopicResource extends BaseResource{
 	
 	@Indexed
-	private String name;
+	private String topic;
 	
-	private String prop;
+	private String administrator;
 	
 	private boolean producerAlarm;
 
 	private boolean consumerAlarm;
 	
-	private List<String> consumerIdWhiteList;
-	
-	private List<String> producerServer;
+	private List<String> producerIps;
 
 	private ProducerBaseAlarmSetting producerAlarmSetting;
-	
-	public String getName() {
-		return name;
+
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
-	public String getProp() {
-		return prop;
+	public String getAdministrator() {
+		return administrator;
 	}
 
-	public void setProp(String prop) {
-		this.prop = prop;
+	public void setAdministrator(String administrator) {
+		this.administrator = administrator;
+	}
+
+	public List<String> getProducerIps() {
+		return producerIps;
+	}
+
+	public void setProducerIps(List<String> producerIps) {
+		this.producerIps = producerIps;
 	}
 
 	public boolean isProducerAlarm() {
@@ -63,22 +69,6 @@ public class TopicResource extends BaseResource{
 		this.consumerAlarm = consumerAlarm;
 	}
 
-	public List<String> getConsumerIdWhiteList() {
-		return consumerIdWhiteList;
-	}
-
-	public void setConsumerIdWhiteList(List<String> consumerIdWhiteList) {
-		this.consumerIdWhiteList = consumerIdWhiteList;
-	}
-	
-	public List<String> getProducerServer() {
-		return producerServer;
-	}
-
-	public void setProducerServer(List<String> producerServer) {
-		this.producerServer = producerServer;
-	}
-
 	public ProducerBaseAlarmSetting getProducerAlarmSetting() {
 		return producerAlarmSetting;
 	}
@@ -89,12 +79,9 @@ public class TopicResource extends BaseResource{
 
 	@Override
 	public String toString() {
-		return "TopicResource [name=" + name + ", prop=" + prop
-				+ ", producerAlarm=" + producerAlarm + ", consumerAlarm="
-				+ consumerAlarm + ", consumerIdWhiteList="
-				+ consumerIdWhiteList + ", producerServer=" + producerServer
-				+ ", producerAlarmSetting=" + producerAlarmSetting
-				+ ", toString()=" + super.toString() + "]";
+		return "TopicResource [topic=" + topic + ", administrator=" + administrator + ", producerAlarm="
+				+ producerAlarm + ", consumerAlarm=" + consumerAlarm + ", producerIps=" + producerIps
+				+ ", producerAlarmSetting=" + producerAlarmSetting + ", toString()=" + super.toString() + "]";
 	}
 
 }

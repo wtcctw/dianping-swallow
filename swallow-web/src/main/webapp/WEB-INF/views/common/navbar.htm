@@ -17,29 +17,29 @@
 				class="navbar-brand">
 				<button class="btn  #if(${menu}=='server')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
 					id="navbar-setting" >
-					<i class="icon-certificate align-top bigger-125 icon-on-right"></i> Server管理
+					<i class="icon-certificate align-top bigger-125 icon-on-right"></i> Server
 				</button>
 			</a>
 			#end
 			 <a href="${rc.contextPath}/console/topic" class="navbar-brand">
 				<button class="btn #if(${menu}=='topic')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
 					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
-					Topic管理
+					Topic
 				</button>
 			</a> <a href="${rc.contextPath}/console/consumerid" class="navbar-brand">
 				<button class="btn #if(${menu}=='consumerid')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
 					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
-					ConsumerId管理
+					消费ID
 				</button>
 			</a> <a href="${rc.contextPath}/console/ip" class="navbar-brand">
 				<button class="btn #if(${menu}=='ip')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
 					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
-					IP管理
+					IP
 				</button>
 			</a> <a href="${rc.contextPath}/console/message" class="navbar-brand">
 				<button class="btn  #if(${menu}=='message')btn-purple #else btn-info#end btn-xs swallow-nav-btn">
 					<i class="icon-cloud  align-top bigger-125 icon-on-right"></i>
-					Message管理
+					Message
 				</button>
 			</a> <a href="${rc.contextPath}/console/monitor/consumer/total/delay"
 				class="navbar-brand">
@@ -57,13 +57,13 @@
 				</button>
 			</a>
 			#if(${isadmin})
-			<a href="${rc.contextPath}/console/setting"
+			<!-- <a href="${rc.contextPath}/console/setting"
 				class="navbar-brand">
 				<button class="btn  #if(${menu}=='setting')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
 					id="navbar-setting" >
 					<i class="icon-lock align-top bigger-125 icon-on-right"></i> 设置
 				</button>
-			</a> <a href="${rc.contextPath}/console/administrator"
+			</a>  --><a href="${rc.contextPath}/console/administrator"
 				class="navbar-brand">
 				<button class="btn  #if(${menu}=='admin')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
 					id="navbar-admin">

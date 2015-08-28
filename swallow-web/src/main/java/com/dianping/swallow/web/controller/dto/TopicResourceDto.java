@@ -13,8 +13,6 @@ public class TopicResourceDto {
 
 	private boolean consumerAlarm;
 	
-	private String consumerIdWhiteList;
-	
 	private String producerServer;
 
 	private long sendpeak;
@@ -65,14 +63,6 @@ public class TopicResourceDto {
 
 	public void setConsumerAlarm(boolean consumerAlarm) {
 		this.consumerAlarm = consumerAlarm;
-	}
-
-	public String getConsumerIdWhiteList() {
-		return consumerIdWhiteList;
-	}
-
-	public void setConsumerIdWhiteList(String consumerIdWhiteList) {
-		this.consumerIdWhiteList = consumerIdWhiteList;
 	}
 
 	public String getProducerServer() {

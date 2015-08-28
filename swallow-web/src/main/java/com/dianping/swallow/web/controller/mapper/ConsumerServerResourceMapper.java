@@ -1,10 +1,5 @@
 package com.dianping.swallow.web.controller.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.dianping.swallow.web.controller.dto.ConsumerServerResourceDto;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
@@ -16,13 +11,9 @@ import com.dianping.swallow.web.model.resource.ConsumerServerResource;
  */
 public class ConsumerServerResourceMapper {
 
-	private static final String DELIMITOR = ",";
-
 	public static ConsumerServerResource toConsumerResourceSetting(ConsumerServerResourceDto dto) {
 
 		ConsumerServerResource consumerServerResource = new ConsumerServerResource();
-
-		List<String> topicWhiteList = new ArrayList<String>();
 
 		QPSAlarmSetting sendQPSAlarmSetting = new QPSAlarmSetting();
 		sendQPSAlarmSetting.setPeak(dto.getSendpeak());
@@ -43,17 +34,6 @@ public class ConsumerServerResourceMapper {
 		consumerServerResource.setAlarm(dto.isAlarm());
 		consumerServerResource.setHostname(dto.getHostname());
 
-		String whiteList = dto.getWhitelist();
-		if (StringUtils.isNotBlank(whiteList)) {
-			String[] whiteLists = whiteList.split(DELIMITOR);
-			for (String wl : whiteLists) {
-				if (!topicWhiteList.contains(wl)) {
-					topicWhiteList.add(wl);
-				}
-			}
-		}
-		consumerServerResource.setTopicWhiteList(topicWhiteList);
-
 		return consumerServerResource;
 	}
 
@@ -72,9 +52,6 @@ public class ConsumerServerResourceMapper {
 		dto.setAckvalley(ackQPSAlarmSetting.getValley());
 		dto.setAckfluctuation(ackQPSAlarmSetting.getFluctuation());
 		dto.setAckfluctuationBase(ackQPSAlarmSetting.getFluctuationBase());
-
-		List<String> whiteList = consumerServerResourceDto.getTopicWhiteList();
-		dto.setWhitelist(StringUtils.join(whiteList, DELIMITOR));
 		
 		dto.setId(consumerServerResourceDto.getId());
 		dto.setIp(consumerServerResourceDto.getIp());

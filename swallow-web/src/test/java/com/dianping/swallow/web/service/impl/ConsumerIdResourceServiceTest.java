@@ -69,7 +69,7 @@ public class ConsumerIdResourceServiceTest {
 		consumerip.add("1.0.0.2");
 		consumerip.add("1.0.0.3");
 		
-		consumerIdResource.setConsumerIp(consumerip);
+		consumerIdResource.setConsumerIps(consumerip);
 		consumerIdResource.setAlarm(Boolean.TRUE);
 		
 		return consumerIdResource;

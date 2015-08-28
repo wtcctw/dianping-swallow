@@ -106,7 +106,6 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.producerserverEntry.ip;
 	$scope.producerserverEntry.hostname;
 	$scope.producerserverEntry.alarm;
-	$scope.producerserverEntry.whitelist;
 	$scope.producerserverEntry.producerpeak;
 	$scope.producerserverEntry.producervalley;
 	$scope.producerserverEntry.producerfluctuation;
@@ -117,7 +116,6 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 			alert("谷值不能小于峰值");
 			return;
 		}
-		$scope.producerserverEntry.whitelist = $("#whitelist").val();
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.producerserverEntry);
 		
@@ -132,7 +130,6 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.ip = "";
 		$scope.producerserverEntry.hostname = "";
 		$scope.producerserverEntry.alarm = false;
-		$scope.producerserverEntry.whitelist = "";
 		$scope.producerserverEntry.producerpeak = "";
 		$scope.producerserverEntry.producervalley = "";
 		$scope.producerserverEntry.producerfluctuation = "";
@@ -140,18 +137,10 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
-		var wl = $scope.searchPaginator.currentPageItems[index].whitelist;
-		$('#whitelist').tagsinput('removeAll');
-		if(wl != null && wl.length > 0){
-			var list = wl.split(",");
-			for(var i = 0; i < list.length; ++i)
-				$('#whitelist').tagsinput('add', list[i]);
-		}
 		$scope.producerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.producerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.producerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
 		$scope.producerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
-		$scope.producerserverEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
 		$scope.producerserverEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;
 		$scope.producerserverEntry.producervalley = $scope.searchPaginator.currentPageItems[index].producervalley;
 		$scope.producerserverEntry.producerfluctuation = $scope.searchPaginator.currentPageItems[index].producerfluctuation;

@@ -31,22 +31,8 @@ public class TopicResourceMapper {
 		
 		topicResource.setProducerAlarmSetting(producerBaseAlarmSetting);
 		
-		List<String> idList = new ArrayList<String>();
-		String whiteList = dto.getConsumerIdWhiteList();
-		
-		if (StringUtils.isNotBlank(whiteList)) {
-			String[] whiteLists = whiteList.split(DELIMITOR);
-			for (String wl : whiteLists) {
-				if (!idList.contains(wl)) {
-					idList.add(wl);
-				}
-			}
-		}
-		
-		topicResource.setConsumerIdWhiteList(idList);
-		
 		List<String> producerList = new ArrayList<String>();
-		whiteList = dto.getProducerServer();
+		String whiteList = dto.getProducerServer();
 		
 		if (StringUtils.isNotBlank(whiteList)) {
 			String[] whiteLists = whiteList.split(DELIMITOR);
@@ -57,13 +43,13 @@ public class TopicResourceMapper {
 			}
 		}
 		
-		topicResource.setProducerServer(producerList);
+		topicResource.setProducerIps(producerList);
 		
 		topicResource.setConsumerAlarm(dto.isConsumerAlarm());
 		topicResource.setProducerAlarm(dto.isProducerAlarm());
 		topicResource.setId(dto.getId());
-		topicResource.setName(dto.getName());
-		topicResource.setProp(dto.getProp());
+		topicResource.setTopic(dto.getName());
+		topicResource.setAdministrator(dto.getProp());
 
 		return topicResource;
 		
@@ -84,13 +70,10 @@ public class TopicResourceMapper {
 		topicResourceDto.setConsumerAlarm(topicResource.isConsumerAlarm());
 		topicResourceDto.setProducerAlarm(topicResource.isProducerAlarm());
 		topicResourceDto.setId(topicResource.getId());
-		topicResourceDto.setName(topicResource.getName());
-		topicResourceDto.setProp(topicResource.getProp());
+		topicResourceDto.setName(topicResource.getTopic());
+		topicResourceDto.setProp(topicResource.getAdministrator());
 		
-		List<String> list = topicResource.getConsumerIdWhiteList();
-		topicResourceDto.setConsumerIdWhiteList(StringUtils.join(list, DELIMITOR));
-		
-		list = topicResource.getProducerServer();
+		List<String> list = topicResource.getProducerIps();
 		topicResourceDto.setProducerServer(StringUtils.join(list, DELIMITOR));
 		
 		return topicResourceDto;

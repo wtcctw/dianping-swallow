@@ -10,16 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
-import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.util.ResponseStatus;

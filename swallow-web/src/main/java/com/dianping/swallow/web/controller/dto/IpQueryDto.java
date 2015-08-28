@@ -10,7 +10,7 @@ public class IpQueryDto extends BaseDto{
 	
 	private String ip;
 	
-	private String ipType;
+	private String application;
 	
 	public IpQueryDto(){
 		
@@ -24,12 +24,12 @@ public class IpQueryDto extends BaseDto{
 		this.ip = ip;
 	}
 
-	public String getIpType() {
-		return ipType;
+	public String getApplication() {
+		return application;
 	}
 
-	public void setIpType(String ipType) {
-		this.ipType = ipType;
+	public void setApplication(String application) {
+		this.application = application;
 	}
 	
 }

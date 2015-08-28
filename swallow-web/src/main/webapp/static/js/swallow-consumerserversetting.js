@@ -92,7 +92,6 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.ip = "";
 	$scope.consumerserverEntry.hostname = "";
 	$scope.consumerserverEntry.alarm = false;
-	$scope.consumerserverEntry.whitelist = "";
 	$scope.consumerserverEntry.sendpeak = "";
 	$scope.consumerserverEntry.sendvalley = "";
 	$scope.consumerserverEntry.sendfluctuation = "";
@@ -108,7 +107,6 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 			alert("谷值不能小于峰值");
 			return;
 		}
-		$scope.consumerserverEntry.whitelist = $("#whitelist").val();
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.consumerserverEntry);
     	
@@ -178,7 +176,6 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ip = "";
 		$scope.consumerserverEntry.hostname = "";
 		$scope.consumerserverEntry.alarm = false;
-		$scope.consumerserverEntry.whitelist = "";
 		$scope.consumerserverEntry.sendpeak = "";
 		$scope.consumerserverEntry.sendvalley = "";
 		$scope.consumerserverEntry.sendfluctuation = "";
@@ -190,18 +187,10 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
-		var wl = $scope.searchPaginator.currentPageItems[index].whitelist;
-		$('#whitelist').tagsinput('removeAll');
-		if(wl != null && wl.length > 0){
-			var list = wl.split(",");
-			for(var i = 0; i < list.length; ++i)
-				$('#whitelist').tagsinput('add', list[i]);
-		}
 		$scope.consumerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.consumerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.consumerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
 		$scope.consumerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
-		$scope.consumerserverEntry.whitelist = $scope.searchPaginator.currentPageItems[index].whitelist;
 		$scope.consumerserverEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
 		$scope.consumerserverEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
 		$scope.consumerserverEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;

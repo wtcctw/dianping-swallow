@@ -89,7 +89,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicEntry.prop;
 			$scope.topicEntry.producerAlarm;
 			$scope.topicEntry.consumerAlarm;
-			$scope.topicEntry.consumerIdWhiteList;
+			$scope.topicEntry.whiteList;
 			$scope.topicEntry.producerServer;
 			$scope.topicEntry.sendpeak;
 			$scope.topicEntry.sendvalley;
@@ -98,18 +98,6 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicEntry.delay;
 			
 			$scope.setModalInput = function(index){
-				if(typeof($scope.searchPaginator.currentPageItems[index].consumerIdWhiteList) != "undefined"){
-					var wl = $scope.searchPaginator.currentPageItems[index].consumerIdWhiteList;
-					$('#whitelist').tagsinput('removeAll');
-					if(wl != null && wl.length > 0){
-						var list = wl.split(",");
-						for(var i = 0; i < list.length; ++i)
-							$('#whitelist').tagsinput('add', list[i]);
-					}
-				}else{
-					$('#whitelist').tagsinput('removeAll');
-				}
-				
 				if(typeof($scope.searchPaginator.currentPageItems[index].prop) != "undefined"){
 					var prop = $scope.searchPaginator.currentPageItems[index].prop;
 					$('#prop').tagsinput('removeAll');
@@ -162,8 +150,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 		    	});
 		    }
 			
-			$scope.setTopicName = function(topic){
-				localStorage.setItem("topic", topic);
+			$scope.setIps = function(ip){
+				localStorage.setItem("ip", ip);
 			}
 			
 			//发送默认请求

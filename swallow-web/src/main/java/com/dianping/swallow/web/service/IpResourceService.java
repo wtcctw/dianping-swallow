@@ -3,7 +3,6 @@ package com.dianping.swallow.web.service;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.model.resource.IpResource;
 
@@ -21,11 +20,13 @@ public interface IpResourceService {
 	
 	int remove(String ip);
 	
-	List<IpResource> findByIp(String ip);
+	IpResource findByIp(String ... ips);
 
 	Pair<Long, List<IpResource>> findByIpType(IpQueryDto ipQueryDto);
 	
-	Pair<Long, List<IpResource>> find(IpQueryDto ipQueryDto);
+	IpResource find(IpQueryDto ipQueryDto);
+	
+	List<IpResource> findAll(String ... fields);
 
 	IpResource findDefault();
 	

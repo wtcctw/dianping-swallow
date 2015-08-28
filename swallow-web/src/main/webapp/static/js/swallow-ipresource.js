@@ -82,67 +82,58 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 			$scope.numrecord = 30;
 			
 			$scope.searchip = "";
-			$scope.searchiptype = "";
+			$scope.searchapplication = "";
 			
-			$scope.ipResourceEntry = {};
-			$scope.ipResourceEntry.ip;
-			$scope.ipResourceEntry.ipType;
-			$scope.ipResourceEntry.alarm;
-			$scope.ipResourceEntry.application;
-			$scope.ipResourceEntry.email;
-			$scope.ipResourceEntry.opManager;
-			$scope.ipResourceEntry.opMobile;
-			$scope.ipResourceEntry.opEmail;
-			$scope.ipResourceEntry.dpManager;
-			$scope.ipResourceEntry.dpMobile;
+			$scope.ipEntry = {};
+			$scope.ipEntry.ip;
+			$scope.ipEntry.alarm;
+			$scope.ipEntry.application;
+			$scope.ipEntry.email;
+			$scope.ipEntry.opManager;
+			$scope.ipEntry.opMobile;
+			$scope.ipEntry.opEmail;
+			$scope.ipEntry.dpManager;
+			$scope.ipEntry.dpMobile;
 			
 			$scope.setModalInput = function(index){
 				
-				$scope.ipResourceEntry.id = $scope.searchPaginator.currentPageItems[index].id;
-				$scope.ipResourceEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
-				$scope.ipResourceEntry.ipType = $scope.searchPaginator.currentPageItems[index].ipType;
-				$scope.ipResourceEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
-				$scope.ipResourceEntry.application = $scope.searchPaginator.currentPageItems[index].application;
-				$scope.ipResourceEntry.email = $scope.searchPaginator.currentPageItems[index].email;
-				$scope.ipResourceEntry.opManager = $scope.searchPaginator.currentPageItems[index].opManager;
-				$scope.ipResourceEntry.opMobile = $scope.searchPaginator.currentPageItems[index].opMobile;
-				$scope.ipResourceEntry.opEmail = $scope.searchPaginator.currentPageItems[index].opEmail;
-				$scope.ipResourceEntry.dpManager = $scope.searchPaginator.currentPageItems[index].dpManager;
-				$scope.ipResourceEntry.dpMobile = $scope.searchPaginator.currentPageItems[index].dpMobile;
+				$scope.ipEntry.id = $scope.searchPaginator.currentPageItems[index].id;
+				$scope.ipEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
+				$scope.ipEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
+				$scope.ipEntry.application = $scope.searchPaginator.currentPageItems[index].application;
+				$scope.ipEntry.email = $scope.searchPaginator.currentPageItems[index].email;
+				$scope.ipEntry.opManager = $scope.searchPaginator.currentPageItems[index].opManager;
+				$scope.ipEntry.opMobile = $scope.searchPaginator.currentPageItems[index].opMobile;
+				$scope.ipEntry.opEmail = $scope.searchPaginator.currentPageItems[index].opEmail;
+				$scope.ipEntry.dpManager = $scope.searchPaginator.currentPageItems[index].dpManager;
+				$scope.ipEntry.dpMobile = $scope.searchPaginator.currentPageItems[index].dpMobile;
 			}
 			
 			$scope.refreshpage = function(myForm){
-				if ($scope.ipResourceEntry.sendpeak < $scope.ipResourceEntry.sendvalley){
+				if ($scope.ipEntry.sendpeak < $scope.ipEntry.sendvalley){
 					alert("峰值不能小于谷值");
 					return;
 				}
-				$scope.ipResourceEntry.consumerIdWhiteList = $("#whitelist").val();
-				$scope.ipResourceEntry.prop = $("#prop").val();
-				$scope.ipResourceEntry.producerServer = $("#producerServer").val();
 				$('#myModal').modal('hide');
-				var param = JSON.stringify($scope.ipResourceEntry);
+				var param = JSON.stringify($scope.ipEntry);
 				
-				$http.post(window.contextPath + '/console/ip/update', $scope.ipResourceEntry).success(function(response) {
-					$scope.query.ip = $scope.ipResourceEntry.ip;
-					$scope.query.ipType = $scope.ipResourceEntry.ipType;
+				$http.post(window.contextPath + '/console/ip/update', $scope.ipEntry).success(function(response) {
+					$scope.query.ip = $scope.ipEntry.ip;
+					$scope.query.application = $scope.ipEntry.application;
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 		    	});
 		    	
 		    }
 						
-			$scope.setTopicName = function(topic){
-				localStorage.setItem("topic", topic);
-			}
 			var tmpip = localStorage.getItem("ip");
 			if(tmpip != null){
 				$scope.searchip = tmpip;
-				$scope.searchiptype = localStorage.getItem("ipType");
 				localStorage.clear();
 			}
 			//发送默认请求
 			$scope.query = new Object();
 			$scope.query.ip = $scope.searchip;
-			$scope.query.ipType = $scope.searchiptype;
+			$scope.query.application = $scope.searchapplication;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 			
 			//如果topic列表返回空，则不会执行initpage
@@ -155,74 +146,35 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 		          //下面是在table render完成后执行的js
 				 $http({
 						method : 'GET',
-						url : window.contextPath + '/console/ip/iplist'
+						url : window.contextPath + '/console/ip/allip'
 					}).success(function(data, status, headers, config) {
-						var topicNameList = data;
-						$("#searchname").typeahead({
+						var ips = data;
+						$("#searchip").typeahead({
 							items: 16, 
-							source : topicNameList,
+							source : ips,
 							updater : function(c) {
-								$scope.name = c;
-								$scope.query.topic = $scope.name;
-								$scope.query.prop = $scope.prop;
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
+								$scope.searchip = c;
+								$scope.query.ip = $scope.searchip;
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 								return c;
 							}
 						})
 					}).error(function(data, status, headers, config) {
 					});
 					
-					// search topic name with specific prop
-					$http({
-						method : 'GET',
-						url : window.contextPath + '/console/topic/proposal'
-					}).success(function(data, status, headers, config) {
-//						$("#searchprop").typeahead({
-//							items: 16, 
-//							source : data.first,
-//							updater : function(c) {
-//								$scope.prop = c;
-//								$scope.query.topic = $scope.name;
-//								$scope.query.prop = $scope.prop;
-//								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
-//								return c;
-//							}
-//						})
-						//work
-						$('#prop').tagsinput({
-							  typeahead: {
-								  items: 16,
-								  source: data,
-								  displayText: function(item){ return item;}  //necessary
-							  }
-						});
-		        		$('#prop').typeahead().data('typeahead').source = data.second;
-		        		//$('#searchprop').typeahead().data('typeahead').source = data.first;
-					}).error(function(data, status, headers, config) {
-					});
-					
 			}
 			
-			$scope.changeproduceralarm = function(topic, index){
-				var id = "#palarm" + index;
+			$scope.changeproduceralarm = function(ip, index){
+				var id = "#alarm" + index;
 				var check = $(id).prop('checked');
 
-				$http.get(window.contextPath + '/console/topic/producer/alarm', {
+				$http.get(window.contextPath + '/console/ip/alarm', {
 					params : {
-						topic : topic,
+						ip : ip,
 						alarm: check } }).success(function(response) {
 	        	});
 			}
 			
-			$scope.changeconsumeralarm = function(topic, index){
-				var id = "#calarm" + index;
-				var check = $(id).prop('checked');
-				$http.get(window.contextPath + '/console/topic/consumer/alarm', {
-					params : {
-						topic : topic,
-						alarm: check } }).success(function(response) {
-	        	});
-			}
 			
 }]);
 

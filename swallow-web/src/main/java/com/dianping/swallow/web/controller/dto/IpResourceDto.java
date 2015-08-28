@@ -2,18 +2,21 @@ package com.dianping.swallow.web.controller.dto;
 
 import java.util.Date;
 
-import com.dianping.swallow.web.model.resource.IpType;
-
+/**
+ * @author mingdongli
+ *
+ *         2015年8月27日下午4:11:02
+ */
 public class IpResourceDto {
-	
+
 	private String id;
-	
+
 	private String ip;
-	
-	private IpType ipType;
-	
+
+	private String ipType;
+
 	private boolean alarm;
-	
+
 	private String application;
 
 	private String email;
@@ -48,11 +51,11 @@ public class IpResourceDto {
 		this.ip = ip;
 	}
 
-	public IpType getIpType() {
+	public String getIpType() {
 		return ipType;
 	}
 
-	public void setIpType(IpType ipType) {
+	public void setIpType(String ipType) {
 		this.ipType = ipType;
 	}
 

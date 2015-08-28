@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.dao.IpResourceDao;
 import com.dianping.swallow.web.model.resource.IpResource;
@@ -44,9 +43,9 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 
 	@Override
-	public List<IpResource> findByIp(String ip) {
+	public IpResource findByIp(String ... ips) {
 
-		return ipResourceDao.findByIp(ip);
+		return ipResourceDao.findByIp(ips);
 	}
 
 	@Override
@@ -56,9 +55,15 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 	
 	@Override
-	public Pair<Long, List<IpResource>> find(IpQueryDto ipQueryDto) {
+	public IpResource find(IpQueryDto ipQueryDto) {
 
-		return ipResourceDao.findByIpType(ipQueryDto);
+		return ipResourceDao.find(ipQueryDto);
+	}
+
+	@Override
+	public List<IpResource> findAll(String ... fields) {
+		
+		return ipResourceDao.findAll(fields);
 	}
 
 	@Override
