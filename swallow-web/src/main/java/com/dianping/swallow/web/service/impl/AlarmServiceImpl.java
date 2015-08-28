@@ -125,7 +125,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	public boolean sendWeiXin(Alarm alarm, String receiver) {
 		alarm.setId(null).setSourceIp(NetUtil.IP).setCreateTime(new Date());
 		if (StringUtils.isBlank(receiver)) {
-			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED)
+			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED_NOPERSON)
 					.setSendType(SendType.WEIXIN));
 			return false;
 		}
@@ -139,7 +139,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	public boolean sendMail(Alarm alarm, String receiver) {
 		alarm.setId(null).setSourceIp(NetUtil.IP).setCreateTime(new Date());
 		if (StringUtils.isBlank(receiver)) {
-			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED)
+			alarm.addSendInfo(new SendInfo().setReceiver(NOPERSON_RECEIVER).setResultType(ResultType.FAILED_NOPERSON)
 					.setSendType(SendType.MAIL));
 			return false;
 		}

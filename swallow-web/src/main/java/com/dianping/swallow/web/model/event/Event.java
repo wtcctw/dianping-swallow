@@ -216,12 +216,17 @@ public abstract class Event {
 				}
 
 			} else {
-				if (dAlarmValue > spanBase) {
-					alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
+				if (dAlarmValue > spanBase * timeUnit) {
+					alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount() + 1).setLastAlarmTime(
+							System.currentTimeMillis());
 					alarms.put(key, alarmRecord);
 					return true;
+				} else {
+					alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount()).setLastAlarmTime(
+							lastAlarmRecord.getLastAlarmTime());
+					alarms.put(key, alarmRecord);
+					return false;
 				}
-				return false;
 			}
 		} else {
 
