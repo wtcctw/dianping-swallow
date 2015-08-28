@@ -125,14 +125,20 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 		    	
 		    }
 						
-			var tmpip = localStorage.getItem("ip");
-			if(tmpip != null){
-				$scope.searchip = tmpip;
-				localStorage.clear();
-			}
 			//发送默认请求
 			$scope.query = new Object();
-			$scope.query.ip = $scope.searchip;
+			var tmpip = localStorage.getItem("ip");
+			if(tmpip != null){
+				
+				if(tmpip.indexOf(',') == -1){
+					$scope.searchip = tmpip;
+					$scope.query.ip = tmpip;
+				}else{
+					$scope.query.ip = tmpip;
+					$scope.searchip = "";
+				}
+				localStorage.clear();
+			}
 			$scope.query.application = $scope.searchapplication;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 			

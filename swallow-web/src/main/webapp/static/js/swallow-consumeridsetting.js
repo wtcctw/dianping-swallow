@@ -272,6 +272,10 @@ module
 									});
 							}
 							
+							$scope.setIp = function(ip){
+								localStorage.setItem("ip", ip);
+							}
+							
 							$scope.changealarm = function( consumerid, topic, index){
 								var id = "#alarm" + index;
 								var check = $(id).prop('checked');

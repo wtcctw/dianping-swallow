@@ -63,7 +63,8 @@ public class IPController extends AbstractMenuController {
 		} else {
 			
 			if (StringUtil.isBlank(application)) {
-				IpResource ipResource = ipResourceService.findByIp(ip);
+				String[] ips = ip.split(",");
+				IpResource ipResource = ipResourceService.findByIp(ips);
 				ipResources.add(ipResource);
 				pair = new Pair<Long, List<IpResource>>(1L, ipResources);
 			} else if (StringUtil.isBlank(ip)) {

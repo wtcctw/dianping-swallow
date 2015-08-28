@@ -239,33 +239,33 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 
 	private void cacheTopicToWhiteList(Set<String> whiteList) {
 
-		for (String str : whiteList) {
-			Topic topic = loadTopicByName(str);
-
-			if (topic != null) {
-				Set<String> set = splitString(topic.getProp(), ",");
-				topicToWhiteList.put(str, set);
-				if (logger.isInfoEnabled()) {
-					logger.info(String.format("add topic %s 's proposal to whitelist %s", str, set));
-				}
-			} else {
-				topic = getTopic(str, 0L);
-				int status = saveTopic(topic);
-
-				if (status == 0) {
-					if (logger.isInfoEnabled()) {
-						logger.info(String.format("Save topic %s to topic collection successfully.", str));
-					}
-					topicToWhiteList.put(str, new HashSet<String>());
-				} else {
-					if (logger.isInfoEnabled()) {
-						logger.info(String.format("Save topic %s to topic collection failed.", str));
-					}
-				}
-
-			}
-
-		}
+//		for (String str : whiteList) {
+//			Topic topic = loadTopicByName(str);
+//
+//			if (topic != null) {
+//				Set<String> set = splitString(topic.getProp(), ",");
+//				topicToWhiteList.put(str, set);
+//				if (logger.isInfoEnabled()) {
+//					logger.info(String.format("add topic %s 's proposal to whitelist %s", str, set));
+//				}
+//			} else {
+//				topic = getTopic(str, 0L);
+//				int status = saveTopic(topic);
+//
+//				if (status == 0) {
+//					if (logger.isInfoEnabled()) {
+//						logger.info(String.format("Save topic %s to topic collection successfully.", str));
+//					}
+//					topicToWhiteList.put(str, new HashSet<String>());
+//				} else {
+//					if (logger.isInfoEnabled()) {
+//						logger.info(String.format("Save topic %s to topic collection failed.", str));
+//					}
+//				}
+//
+//			}
+//
+//		}
 	}
 
 	private Set<String> splitString(String source, String delimitor) {
