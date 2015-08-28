@@ -16,8 +16,8 @@ public interface AckDAO {
    /**
     * 添加一条topicName，consumerId，messageId记录
     */
-   void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp, boolean isBackup);
+   void add(String topicName, String consumerId, Long messageId, String desc, boolean isBackup);
 
-   void add(String topicName, String consumerId, Long messageId, String sourceConsumerIp);
+   void add(String topicName, String consumerId, Long messageId, String desc);
 
 }
