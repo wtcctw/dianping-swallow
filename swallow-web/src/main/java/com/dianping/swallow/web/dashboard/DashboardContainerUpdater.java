@@ -69,7 +69,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
 
-	private List<String> whiteList = new ArrayList<String>();
+	private List<String> whiteList;
 
 	@PostConstruct
 	void updateDashboardContainer() {
@@ -99,7 +99,8 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 		boolean timeSet = false;
 		Date entryTime = null;
-		whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
+		List<String> tmpWhiteList = topicAlarmSettingService.getConsumerIdWhiteList();
+		whiteList = tmpWhiteList != null ? tmpWhiteList : new ArrayList<String>();
 		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL);
 
 		for (String topic : topics) {
