@@ -28,6 +28,7 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 	private static final String ISVISITOR = "isvisitor";
 	private static final String ISUSER = "isuser";
 	private static final String LOGOUTURL = "logouturl";
+	private static final String INVISIABLE = "invisiable";
 
 	@Resource(name = "authenticationService")
 	private AuthenticationService authenticationService;
@@ -64,8 +65,12 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 		String username = extractUsernameUtils.getUsername(request);
 		
 		int visittype = authenticationService.checkVisitType(username);
+		boolean administrator = request.getAttribute("administrator") == null ? Boolean.FALSE : Boolean.TRUE;
+		if(administrator){
+			username = "administrator";
+		}
 		
-		if (visittype == AuthenticationService.ADMINI) {
+		if (visittype == AuthenticationService.ADMINI || administrator) {
 			modelAndView.addObject(ISADMIN, true);
 			modelAndView.addObject(ISUSER, false);
 			modelAndView.addObject(ISVISITOR, false);
@@ -80,6 +85,7 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 		}
 		modelAndView.addObject(USERNAME, username);
 		modelAndView.addObject(LOGOUTURL, logoutUrl);
+		modelAndView.addObject(INVISIABLE, !administrator);
 		
 		userService.createOrUpdateUser(username);
 

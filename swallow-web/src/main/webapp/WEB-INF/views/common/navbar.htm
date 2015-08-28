@@ -78,6 +78,7 @@
 			<ul class="nav nav-pills" style="margin-top: 4px">
 				<li><a href="${rc.contextPath}/help"
 					style="background: white">帮助</a></li>
+				#if(${invisiable})
 				<li class="dropdown all-camera-dropdown"><a
 					class="dropdown-toggle" data-toggle="dropdown" href="#"
 					style="background: white">欢迎 ${username}<b class="caret"></b>
@@ -85,6 +86,7 @@
 					<ul class="dropdown-menu">
 						<li><a ng-href="${logouturl}">登出</a></li>
 					</ul></li>
+				#end
 			</ul>
 
 		</div>
