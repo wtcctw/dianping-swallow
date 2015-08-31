@@ -102,7 +102,7 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 		method : 'GET',
 		url : window.contextPath + '/console/topic/namelist'
 	}).success(function(data, status, headers, config) {
-		var topicNameList = data;
+		var topicNameList = data.first;
 		$("#searchname").typeahead({
 			items: 16, 
 			source : topicNameList,

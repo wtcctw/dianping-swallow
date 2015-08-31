@@ -188,7 +188,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 					
 			}
 			
-			$scope.changeproduceralarm = function(ip, index){
+			$scope.changealarm = function(ip, index){
 				var id = "#alarm" + index;
 				var check = $(id).prop('checked');
 

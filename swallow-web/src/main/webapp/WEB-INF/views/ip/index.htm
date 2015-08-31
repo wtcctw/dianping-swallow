@@ -65,8 +65,8 @@
 						<td style="text-align: left" ng-bind="t.ip"></td>
 						<td style="text-align: left" ng-bind="t.application | limitTo : 25"></td>
 						<td style="text-align: left" ng-bind="t.email | limitTo : 25"></td>
-						<td style="text-align: left" ng-bind="t.dpManager | limitTo : 25"></td>
 						<td style="text-align: left" ng-bind="t.dpMobile | limitTo : 25"></td>
+						<td style="text-align: left" ng-bind="t.dpManager | limitTo : 25"></td>
 						<td style="text-align: left" ng-bind="t.opEmail | limitTo : 25"></td>
 						<td style="text-align: left" ng-bind="t.opManager | limitTo : 25"></td>
 						<td style="text-align: left" ng-bind="t.opMobile | limitTo : 25"></td>
@@ -75,11 +75,11 @@
 								id="alarm{{$index}}" type="checkbox" ng-model="t.alarm"
 								ng-click="changealarm(t.ip, $index)"
 								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td> #if(${isadmin})
+						</label></td>
 						<td style="text-align: left;"><a href="#myModal"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit" rel="tooltip"
-								data-original-title="编辑配置值"></i></a></td> #end
+								data-original-title="编辑配置值"></i></a></td>
 					</tr>
 				</table>
 

@@ -146,9 +146,11 @@ public class IPController extends AbstractMenuController {
 	public void editIpAlarm(@RequestParam String ip, @RequestParam boolean alarm, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		IpQueryDto ipQueryDto = new IpQueryDto();
-		ipQueryDto.setIp(ip);
-		IpResource ipResource = ipResourceService.find(ipQueryDto);
+		List<IpResource> ipResources = ipResourceService.findByIp(ip);
+		if(ipResources == null){
+			throw new RuntimeException(String.format("Record of %s not found.", ip));
+		}
+		IpResource ipResource = ipResources.get(0);
 		ipResource.setAlarm(alarm);
 		boolean result = ipResourceService.update(ipResource);
 

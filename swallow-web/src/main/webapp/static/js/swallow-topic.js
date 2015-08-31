@@ -212,7 +212,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
-		        		$('#administrator').typeahead().data('typeahead').source = data;
+		        		//$('#administrator').typeahead().data('typeahead').source = data;
 					}).error(function(data, status, headers, config) {
 					});
 					
@@ -227,7 +227,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 									  displayText: function(item){ return item;}  //necessary
 								  }
 							});
-			        		$('#producerServer').typeahead().data('typeahead').source = data;
+			        		//$('#producerServer').typeahead().data('typeahead').source = data;
 						}).error(function(data, status, headers, config) {
 						});
 					
