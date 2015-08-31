@@ -304,7 +304,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 		Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL, topic,
 				consumerid);
-		if (logger.isInfoEnabled()) {
+		if (logger.isInfoEnabled() && ips != null) {
 			logger.info(String.format("Load ips %s of topic %s and consumerid %s", ips.toString(), topic, consumerid));
 		}
 

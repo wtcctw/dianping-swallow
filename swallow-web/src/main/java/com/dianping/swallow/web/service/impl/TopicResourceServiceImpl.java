@@ -34,8 +34,7 @@ import freemarker.template.utility.StringUtil;
  *         2015年8月10日下午7:34:53
  */
 @Service("topicResourceService")
-public class TopicResourceServiceImpl extends AbstractSwallowService implements
-		TopicResourceService {
+public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService {
 
 	private static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist";
 
@@ -60,10 +59,10 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 			for (String wl : whiltlist) {
 				cacheTopicToWhiteList(wl);
 			}
-			
+
 			value = configCache.getProperty(SWALLOW_CONSUMER_SERVER_URI);
 			topicToConsumerServer = parseServerURIString(value);
-			
+
 			configCache.addChange(this);
 			logger.info("Init configCache successfully.");
 		} catch (LionException e) {
@@ -76,32 +75,25 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 
 		if (key != null && key.equals(SWALLOW_TOPIC_WHITELIST_KEY)) {
 			if (logger.isInfoEnabled()) {
-				logger.info("[onChange][" + SWALLOW_TOPIC_WHITELIST_KEY + "]"
-						+ value);
+				logger.info("[onChange][" + SWALLOW_TOPIC_WHITELIST_KEY + "]" + value);
 			}
 
 			String[] whitelist = StringUtil.split(value, ';');
 
 			for (String wl : whitelist) {
-				if (StringUtils.isNotBlank(wl)
-						&& topicResourceDao.findByTopic(wl) == null) {
+				if (StringUtils.isNotBlank(wl) && topicResourceDao.findByTopic(wl) == null) {
 					TopicResource topicResource = buildTopicResource(wl);
 					try {
 						boolean status = this.insert(topicResource);
 						if (logger.isInfoEnabled() && status) {
-							logger.info(String.format(
-									"Save topic %s to database", wl));
+							logger.info(String.format("Save topic %s to database", wl));
 						} else if (logger.isErrorEnabled() && !status) {
-							logger.error(String
-									.format("Save topic %s to database fail with status %d",
-											wl, status));
+							logger.error(String.format("Save topic %s to database fail with status %d", wl, status));
 							continue;
 						}
 						topicToWhiteList.put(wl, new HashSet<String>());
 						if (logger.isInfoEnabled()) {
-							logger.info(String
-									.format("Add topic %s to whitelist with empty proposal",
-											wl));
+							logger.info(String.format("Add topic %s to whitelist with empty proposal", wl));
 						}
 					} catch (Exception e) {
 						if (logger.isInfoEnabled()) {
@@ -110,9 +102,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 					}
 				}
 			}
-		} else if (key != null && key.equals(SWALLOW_CONSUMER_SERVER_URI)){
+		} else if (key != null && key.equals(SWALLOW_CONSUMER_SERVER_URI)) {
 			topicToConsumerServer = parseServerURIString(value);
-		}else {
+		} else {
 			if (logger.isInfoEnabled()) {
 				logger.info("not match");
 			}
@@ -145,13 +137,13 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 
 	@Override
 	public TopicResource findByTopic(String topic) {
-		
+
 		return topicResourceDao.findByTopic(topic);
 	}
-	
+
 	@Override
-	public Pair<Long, List<TopicResource>> find(TopicQueryDto topicQueryDto){
-		
+	public Pair<Long, List<TopicResource>> find(TopicQueryDto topicQueryDto) {
+
 		return topicResourceDao.find(topicQueryDto);
 	}
 
@@ -162,8 +154,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findTopicResourcePage(
-			TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<TopicResource>> findTopicResourcePage(TopicQueryDto topicQueryDto) {
 
 		return topicResourceDao.findTopicResourcePage(topicQueryDto);
 	}
@@ -175,8 +166,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findByServer(
-			TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<TopicResource>> findByServer(TopicQueryDto topicQueryDto) {
 
 		return topicResourceDao.findByServer(topicQueryDto);
 	}
@@ -189,7 +179,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 
 	@Override
 	public Map<String, Set<String>> loadCachedTopicToConsumerServer() {
-		
+
 		return this.topicToConsumerServer;
 	}
 
@@ -198,13 +188,12 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 		if (StringUtils.isBlank(str)) {
 			return;
 		}
-		TopicResource topicResource = this.findByTopic(str);
+		TopicResource topicResource = findByTopic(str);
 		if (topicResource != null) {
 			Set<String> set = splitString(topicResource.getAdministrator(), ",");
 			topicToWhiteList.put(str, set);
 			if (logger.isInfoEnabled()) {
-				logger.info(String.format(
-						"add topic %s 's proposal to whitelist %s", str, set));
+				logger.info(String.format("add topic %s 's proposal to whitelist %s", str, set));
 			}
 		} else {
 			topicResource = buildTopicResource(str);
@@ -212,15 +201,12 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 
 			if (status) {
 				if (logger.isInfoEnabled()) {
-					logger.info(String.format(
-							"Save topic %s to topic collection successfully.",
-							str));
+					logger.info(String.format("Save topic %s to topic collection successfully.", str));
 				}
 				topicToWhiteList.put(str, new HashSet<String>());
 			} else {
 				if (logger.isInfoEnabled()) {
-					logger.info(String.format(
-							"Save topic %s to topic collection failed.", str));
+					logger.info(String.format("Save topic %s to topic collection failed.", str));
 				}
 			}
 
@@ -239,7 +225,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 
 		Long id = System.currentTimeMillis();
 		TopicResource topicResource = new TopicResource();
-		topicResource.setAdministrator("");;
+		topicResource.setAdministrator("");
+		;
 		topicResource.setConsumerAlarm(Boolean.TRUE);
 		topicResource.setProducerAlarm(Boolean.TRUE);
 		topicResource.setTopic(topic);
@@ -251,43 +238,42 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements
 		topicResource.setProducerAlarmSetting(producerBaseAlarmSetting);
 		return topicResource;
 	}
-	
-	private Map<String, Set<String>> parseServerURIString(String value) {
-		
-	    Map<String, Set<String>> result = new HashMap<String, Set<String>>();
-	    
-	    for (String topicNamesToURI : value.split("\\s*;\\s*")) {
-	    	
-	    	if(StringUtils.isEmpty(topicNamesToURI)){
-	    		continue;
-	    	}
-	    	
-	    	String[] splits = topicNamesToURI.split("=");
-	    	if(splits.length != 2){
-	    		logger.error("[parseServerURIString][wrong config]" + topicNamesToURI);
-	    		continue;
-	    	}
-	    	String consumerServerURI = splits[1].trim();
-	    	String[] ipAddrs = consumerServerURI.split(",");
-	    	Set<String> ips = new HashSet<String>();
-	    	for(String ipAddr : ipAddrs){
-	    		String[] ipPort = ipAddr.split(":");
-	    		if(ipPort.length != 2){
-	    			logger.error("[parseConsumerServerURIString][wrong config]" + topicNamesToURI);
-	    			continue;
-	    		}
-	    		ips.add(ipPort[0]);
-	    	}
-	    	
-	    	String topicNameStr = splits[0].trim();
-	    	result.put(topicNameStr, ips);
-	    }
-	    
-	    if(logger.isInfoEnabled()){
-	    	logger.info("[parseConsumerServerURIString][parse]" + value);
-	    }
-	    return result;
-	}
 
+	private Map<String, Set<String>> parseServerURIString(String value) {
+
+		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+
+		for (String topicNamesToURI : value.split("\\s*;\\s*")) {
+
+			if (StringUtils.isEmpty(topicNamesToURI)) {
+				continue;
+			}
+
+			String[] splits = topicNamesToURI.split("=");
+			if (splits.length != 2) {
+				logger.error("[parseServerURIString][wrong config]" + topicNamesToURI);
+				continue;
+			}
+			String consumerServerURI = splits[1].trim();
+			String[] ipAddrs = consumerServerURI.split(",");
+			Set<String> ips = new HashSet<String>();
+			for (String ipAddr : ipAddrs) {
+				String[] ipPort = ipAddr.split(":");
+				if (ipPort.length != 2) {
+					logger.error("[parseConsumerServerURIString][wrong config]" + topicNamesToURI);
+					continue;
+				}
+				ips.add(ipPort[0]);
+			}
+
+			String topicNameStr = splits[0].trim();
+			result.put(topicNameStr, ips);
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("[parseConsumerServerURIString][parse]" + value);
+		}
+		return result;
+	}
 
 }

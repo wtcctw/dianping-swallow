@@ -16,7 +16,7 @@ import com.dianping.swallow.web.model.Topic;
  *
  * 2015年5月20日下午2:05:57
  */
-public interface TopicService extends ConfigChange{
+public interface TopicService{
 	
 	/**
 	 * 查询出限定个数的topic

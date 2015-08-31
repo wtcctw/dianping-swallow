@@ -59,14 +59,13 @@ public class TopicServiceImpl extends AbstractSwallowService implements TopicSer
 			configCache = ConfigCache.getInstance();
 			String key = configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);
 			cacheTopicToWhiteList(splitString(key, ";"));
-			configCache.addChange(this);
+			//configCache.addChange(this);
 			logger.info("Init configCache successfully.");
 		} catch (LionException e) {
 			logger.error("Erroe when init lion config", e);
 		}
 	}
 
-	@Override
 	public void onChange(String key, String value) {
 
 		if (key != null && key.equals(SWALLOW_TOPIC_WHITELIST_KEY)) {

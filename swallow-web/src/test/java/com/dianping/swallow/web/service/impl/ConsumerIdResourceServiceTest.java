@@ -61,8 +61,8 @@ public class ConsumerIdResourceServiceTest {
 		
 		consumerIdResource.setConsumerAlarmSetting(consumerBaseAlarmSetting);
 		consumerIdResource.setCreateTime(new Date());
-		consumerIdResource.setTopic("example");
-		consumerIdResource.setConsumerId("consumerid-0");
+		consumerIdResource.setTopic("total");
+		consumerIdResource.setConsumerId("default");
 		
 		List<String> consumerip = new ArrayList<String>();
 		consumerip.add("1.0.0.1");

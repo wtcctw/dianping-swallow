@@ -12,6 +12,7 @@ import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.dashboard.DashboardContainerUpdater;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.MonitorDataListener;
 
 /**
  * @author mingdongli
@@ -59,9 +60,9 @@ public class ConsumerDataRetrieverWrapper {
 
 	}
 
-	public void registerListener(DashboardContainerUpdater dashboardContainerUpdater) {
+	public void registerListener(MonitorDataListener monitorDataListener) {
 
-		consumerDataRetriever.registerListener(dashboardContainerUpdater);
+		consumerDataRetriever.registerListener(monitorDataListener);
 	}
 
 	private void removeTotal(Set<String> set) {

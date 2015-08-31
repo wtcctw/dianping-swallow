@@ -5,6 +5,7 @@ import java.util.List;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.monitor.MonitorDataListener;
 
 
 /**
@@ -12,7 +13,7 @@ import com.dianping.swallow.web.model.resource.ConsumerIdResource;
  *
  * 2015年8月11日上午10:29:38
  */
-public interface ConsumerIdResourceService {
+public interface ConsumerIdResourceService extends MonitorDataListener{
 
 	boolean insert(ConsumerIdResource consumerIdResource);
 
