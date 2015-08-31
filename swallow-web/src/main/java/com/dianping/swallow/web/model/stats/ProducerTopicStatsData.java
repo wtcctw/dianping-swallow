@@ -21,12 +21,32 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 
 	private String topicName;
 
+	private long totalQps;
+
+	private long totalDelay;
+
 	public String getTopicName() {
 		return topicName;
 	}
 
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
+	}
+
+	public long getTotalQps() {
+		return totalQps;
+	}
+
+	public void setTotalQps(long totalQps) {
+		this.totalQps = totalQps;
+	}
+
+	public long getTotalDelay() {
+		return totalDelay;
+	}
+
+	public void setTotalDelay(long totalDelay) {
+		this.totalDelay = totalDelay;
 	}
 
 	public boolean checkQpsPeak(long expectQps) {
@@ -86,6 +106,22 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 			return false;
 		}
 		return true;
+	}
+
+	public void setTotalStatsDatas(ProducerTopicStatsData lastStatsData) {
+		if (lastStatsData != null) {
+			this.totalQps = lastStatsData.getTotalQps() + this.getQps();
+			this.totalDelay = lastStatsData.getTotalDelay() + this.getDelay();
+		} else {
+			this.totalQps = this.getQps();
+			this.totalDelay = this.getDelay();
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "ProducerTopicStatsData [topicName=" + topicName + ", totalQps=" + totalQps + ", totalDelay="
+				+ totalDelay + "]";
 	}
 
 }

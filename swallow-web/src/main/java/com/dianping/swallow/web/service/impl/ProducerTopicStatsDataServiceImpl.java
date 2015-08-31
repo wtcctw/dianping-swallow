@@ -47,6 +47,11 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 	public List<ProducerTopicStatsData> findByTopic(String topicName) {
 		return producerTopicStatsDataDao.findByTopic(topicName);
 	}
+	
+	@Override
+	public List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit){
+		return producerTopicStatsDataDao.findByTopic(topicName, offset, limit);
+	}
 
 	@Override
 	public List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {

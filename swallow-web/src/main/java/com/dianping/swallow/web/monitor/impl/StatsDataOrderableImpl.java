@@ -7,15 +7,12 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.dao.ConsumerIdReStatsDataDao;
-import com.dianping.swallow.web.dao.ProducerTopicReStatsDataDao;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsDataOrderable;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerOrderDataPair;
-import com.dianping.swallow.web.monitor.model.ProducerTopicReStatsData;
 
 @Component
 public class StatsDataOrderableImpl implements StatsDataOrderable {
@@ -28,12 +25,6 @@ public class StatsDataOrderableImpl implements StatsDataOrderable {
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
-
-	@Autowired
-	private ProducerTopicReStatsDataDao topicReStatsDataDao;
-
-	@Autowired
-	private ConsumerIdReStatsDataDao consumerIdReStatsDataDao;
 
 	@Override
 	public List<OrderStatsData> getOrderStatsData(int size) {
@@ -82,15 +73,6 @@ public class StatsDataOrderableImpl implements StatsDataOrderable {
 				- TimeUnit.MILLISECONDS.convert(producerDataRetriever.getKeepInMemoryHour(), TimeUnit.HOURS);
 	}
 
-	private List<OrderStatsData> getProducerStatsData(int size, long start, long end) {
-		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-		long fromKey = AbstractRetriever.getKey(start);
-		long toKey = AbstractRetriever.getKey(end);
-		List<ProducerTopicReStatsData> topicReStatsDatas = topicReStatsDataDao.findByTimeKey(fromKey, toKey);
-		for (ProducerTopicReStatsData topicReStatsData : topicReStatsDatas) {
-			
-		}
-		return orderStatsDatas;
-	}
+	
 
 }

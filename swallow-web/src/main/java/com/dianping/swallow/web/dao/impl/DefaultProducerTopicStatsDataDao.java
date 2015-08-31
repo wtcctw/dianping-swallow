@@ -69,12 +69,36 @@ public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implement
 	}
 
 	@Override
+	public List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit) {
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, TIMEKEY_FIELD)));
+		List<ProducerTopicStatsData> topicStatsDatas = mongoTemplate.find(query, ProducerTopicStatsData.class,
+				TOPICSTATSDATA_COLLECTION);
+		return topicStatsDatas;
+	}
+
+	@Override
 	public List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)
 				.lte(endKey)).with(new Sort(new Sort.Order(Direction.ASC, TIMEKEY_FIELD)));
 		List<ProducerTopicStatsData> topicStatsDatas = mongoTemplate.find(query, ProducerTopicStatsData.class,
 				TOPICSTATSDATA_COLLECTION);
 		return topicStatsDatas;
+	}
+
+	@Override
+	public ProducerTopicStatsData findOneByTopicAndTime(String topicName, long timeKey, boolean isGt) {
+		Criteria criteria = Criteria.where(TOPICNAME_FIELD).is(topicName);
+		if (isGt) {
+			criteria.and(TIMEKEY_FIELD).gte(timeKey);
+		} else {
+			criteria.and(TIMEKEY_FIELD).lte(timeKey);
+		}
+		Query query = new Query(criteria);
+		query.skip(0).limit(1).with(new Sort(new Sort.Order(isGt ? Direction.ASC : Direction.DESC, TIMEKEY_FIELD)));
+		ProducerTopicStatsData statsData = mongoTemplate.findOne(query, ProducerTopicStatsData.class,
+				TOPICSTATSDATA_COLLECTION);
+		return statsData;
 	}
 
 }

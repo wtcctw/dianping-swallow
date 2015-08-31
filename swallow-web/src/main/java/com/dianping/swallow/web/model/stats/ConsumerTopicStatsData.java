@@ -22,5 +22,10 @@ public class ConsumerTopicStatsData extends ConsumerStatsData {
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
 	}
+
+	@Override
+	public String toString() {
+		return "ConsumerTopicStatsData [topicName=" + topicName + "]";
+	}
 	
 }

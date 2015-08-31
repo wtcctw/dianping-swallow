@@ -67,6 +67,11 @@ public class ConsumerIdStatsDataServiceImpl implements ConsumerIdStatsDataServic
 	}
 
 	@Override
+	public List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit) {
+		return consumerIdStatsDataDao.findByTopicAndConsumerId(topicName, consumerId, offset, limit);
+	}
+
+	@Override
 	public List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId) {
 		return consumerIdStatsDataDao.findByTopicAndTimeAndConsumerId(topicName, timeKey, consumerId);
 	}

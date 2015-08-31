@@ -1,11 +1,9 @@
 package com.dianping.swallow.web.monitor.wapper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -104,22 +102,22 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public Map<String, List<ConsumerIdStatsData>> getConsumerIdStatsDatas(long timeKey) {
+	public List<ConsumerIdStatsData> getConsumerIdStatsDatas(long timeKey) {
 		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
 		if (topicKeys == null) {
 			return null;
 		}
 		Iterator<String> iterator = topicKeys.iterator();
-		Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = new HashMap<String, List<ConsumerIdStatsData>>();
+		List<ConsumerIdStatsData> consumerIdStatsDataResults = new ArrayList<ConsumerIdStatsData>();
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
 			List<ConsumerIdStatsData> consumerIdStatsDatas = getConsumerIdStatsDatas(topicName, timeKey);
 			if (consumerIdStatsDatas == null) {
 				continue;
 			}
-			consumerIdStatsDataMap.put(topicName, consumerIdStatsDatas);
+			consumerIdStatsDataResults.addAll(consumerIdStatsDatas);
 		}
-		return consumerIdStatsDataMap;
+		return consumerIdStatsDataResults;
 	}
 
 	@Override

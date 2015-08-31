@@ -95,12 +95,38 @@ public class DefaultConsumerIdStatsDataDao extends AbstractStatsDao implements C
 	}
 
 	@Override
+	public List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit) {
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId));
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, TIMEKEY_FIELD)));
+		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
+				CONSUMERIDSTATSDATA_COLLECTION);
+		return statisDatas;
+	}
+
+	@Override
 	public List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).is(timeKey)
 				.and(CONSUMERID_FIELD).is(consumerId));
 		List<ConsumerIdStatsData> statisDatas = mongoTemplate.find(query, ConsumerIdStatsData.class,
 				CONSUMERIDSTATSDATA_COLLECTION);
 		return statisDatas;
+	}
+
+	@Override
+	public ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId,
+			boolean isGt) {
+
+		Criteria criteria = Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId);
+		if (isGt) {
+			criteria.and(TIMEKEY_FIELD).gte(timeKey);
+		} else {
+			criteria.and(TIMEKEY_FIELD).lte(timeKey);
+		}
+		Query query = new Query(criteria);
+		query.skip(0).limit(1).with(new Sort(new Sort.Order(isGt ? Direction.ASC : Direction.DESC, TIMEKEY_FIELD)));
+		ConsumerIdStatsData statsData = mongoTemplate.findOne(query, ConsumerIdStatsData.class,
+				CONSUMERIDSTATSDATA_COLLECTION);
+		return statsData;
 	}
 
 	@Override

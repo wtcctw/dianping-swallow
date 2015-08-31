@@ -30,6 +30,8 @@ public interface ConsumerIdStatsDataService {
 	List<ConsumerIdStatsData> findByTopicAndTime(String topicName, long timeKey);
 
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId);
+	
+	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit);
 
 	List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
 

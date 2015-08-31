@@ -21,7 +21,7 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
  * 
  * @author qiyin
  *
- * 2015年8月4日 下午1:22:31
+ *         2015年8月4日 下午1:22:31
  */
 @Component
 public class ProducerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
@@ -69,8 +69,11 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager impleme
 			@Override
 			public void doAction() throws SwallowException {
 				if (serverStatsDatas != null) {
+					boolean isFirstTime = true;
 					for (ProducerServerStatsData serverStatsData : serverStatsDatas) {
-						lastTimeKey.set(serverStatsData.getTimeKey());
+						if (isFirstTime) {
+							lastTimeKey.set(serverStatsData.getTimeKey());
+						}
 						serverStatsDataService.insert(serverStatsData);
 					}
 				}

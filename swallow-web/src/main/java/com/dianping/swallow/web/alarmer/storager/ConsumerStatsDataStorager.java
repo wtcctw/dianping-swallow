@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.alarmer.storager;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -64,12 +63,12 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 		dataCount.decrementAndGet();
 		List<ConsumerServerStatsData> serverStatisDatas = consumerStatsDataWapper
 				.getServerStatsDatas(lastTimeKey.get());
-		Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = consumerStatsDataWapper
-				.getConsumerIdStatsDatas(lastTimeKey.get());
+		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(lastTimeKey
+				.get());
 		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
 		storageServerStatis(serverStatisDatas);
 		storageTopicStatis(topicStatsData);
-		storageConsumerIdStatis(consumerIdStatsDataMap);
+		storageConsumerIdStatis(consumerIdStatsDatas);
 	}
 
 	private void storageServerStatis(final List<ConsumerServerStatsData> serverStatsDatas) {
@@ -81,8 +80,11 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 				if (serverStatsDatas == null) {
 					return;
 				}
+				boolean isFirstTime = true;
 				for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
-					lastTimeKey.set(serverStatsData.getTimeKey());
+					if (isFirstTime) {
+						lastTimeKey.set(serverStatsData.getTimeKey());
+					}
 					serverStatsDataService.insert(serverStatsData);
 				}
 			}
@@ -105,25 +107,20 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 
 	}
 
-	private void storageConsumerIdStatis(final Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap) {
+	private void storageConsumerIdStatis(final List<ConsumerIdStatsData> consumerIdStatsDatas) {
 		logger.info("[storageConsumerIdStats]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageConsumerIdStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				if (consumerIdStatsDataMap == null) {
+				if (consumerIdStatsDatas == null) {
 					return;
 				}
-				for (Map.Entry<String, List<ConsumerIdStatsData>> consumerIdStatsDataEntry : consumerIdStatsDataMap
-						.entrySet()) {
-					List<ConsumerIdStatsData> consumerIdStatsDatas = consumerIdStatsDataEntry.getValue();
-					if (consumerIdStatsDatas == null) {
-						continue;
-					}
-					for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
-						consumerIdStatsDataService.insert(consumerIdStatsData);
-					}
+
+				for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
+					consumerIdStatsDataService.insert(consumerIdStatsData);
 				}
+
 			}
 		});
 	}
