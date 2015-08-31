@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -14,6 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 
 /**
@@ -60,6 +62,12 @@ public class ProducerServerResourceServiceTest {
 	public void test() {
 		
 		/*--------------------------------Producer---------------------------------*/
+		List<ServerResource> resources = producerServerResourceService.findAll();
+		for(ServerResource sr : resources){
+			ProducerServerResource producerServerResource = (ProducerServerResource)sr;
+			String ip = producerServerResource.getIp();
+			System.out.println("ip is " + ip);
+		}
 		ProducerServerResource producerServerResource = createProducerServerResource();
 		boolean result = producerServerResourceService.insert(producerServerResource);
 		Assert.assertTrue(result);

@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.dao.ProducerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 
@@ -64,6 +64,12 @@ public class ProducerServerResourceServiceImpl extends AbstractSwallowService im
 	public Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(int offset, int limit) {
 
 		return producerServerResourceDao.findProducerServerResourcePage(offset, limit);
+	}
+	
+	@Override
+	public List<ServerResource> findAll(){
+		
+		return producerServerResourceDao.findAll();
 	}
 
 }

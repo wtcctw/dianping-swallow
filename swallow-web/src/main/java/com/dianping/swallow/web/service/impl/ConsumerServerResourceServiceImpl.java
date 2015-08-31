@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ServerResource;
@@ -65,6 +64,12 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	public ServerResource findDefault() {
 
 		return consumerServerResourceDao.findDefault();
+	}
+
+	@Override
+	public List<ServerResource> findAll() {
+
+		return consumerServerResourceDao.findAll();
 	}
 
 }

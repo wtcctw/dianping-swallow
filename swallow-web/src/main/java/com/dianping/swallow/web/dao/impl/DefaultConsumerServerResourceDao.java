@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.model.resource.ServerResource;
 import com.mongodb.WriteResult;
 
 /**
@@ -28,7 +29,7 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 			mongoTemplate.save(consumerServerResource, CONSUMERSERVERRESOURCE_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			if(logger.isErrorEnabled()){
+			if (logger.isErrorEnabled()) {
 				logger.error("[insert] error when save producer server stats data " + consumerServerResource, e);
 			}
 		}
@@ -49,10 +50,10 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 				CONSUMERSERVERRESOURCE_COLLECTION);
 		return result.getN();
 	}
-	
+
 	@Override
-	public long count(){
-		
+	public long count() {
+
 		Query query = new Query();
 		return mongoTemplate.count(query, CONSUMERSERVERRESOURCE_COLLECTION);
 	}
@@ -88,12 +89,18 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 	public Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(int offset, int limit) {
 
 		Query query = new Query();
-				
+
 		query.skip(offset).limit(limit);
 		List<ConsumerServerResource> consumerServerResources = mongoTemplate.find(query, ConsumerServerResource.class,
 				CONSUMERSERVERRESOURCE_COLLECTION);
 		Long size = this.count();
 		return new Pair<Long, List<ConsumerServerResource>>(size, consumerServerResources);
+	}
+
+	@Override
+	public List<ServerResource> findAll() {
+
+		return mongoTemplate.findAll(ServerResource.class, CONSUMERSERVERRESOURCE_COLLECTION);
 	}
 
 }

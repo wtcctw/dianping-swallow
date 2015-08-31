@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +22,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.dashboard.model.Entry;
@@ -36,6 +43,7 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
 import com.dianping.swallow.web.service.TopicAlarmSettingService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mingdongli
@@ -43,7 +51,9 @@ import com.dianping.swallow.web.service.TopicAlarmSettingService;
  *         2015年7月7日上午9:36:49
  */
 @Component
-public class DashboardContainerUpdater implements MonitorDataListener {
+public class DashboardContainerUpdater implements MonitorDataListener, Runnable {
+	
+	private static final String FACTORY_NAME = "Dashboard";
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
@@ -65,6 +75,9 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 	private Map<TotalDataKey, TotalData> totalDataMap = new ConcurrentHashMap<TotalDataKey, TotalData>();
 
+	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
+			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
@@ -82,7 +95,7 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 
 		if (delayeven.get()) {
 			try {
-				updateDelayInsDashboard();
+				scheduled.submit(this);
 			} catch (Exception e) {
 				if (logger.isErrorEnabled()) {
 					logger.error("Error when get data for all consumerid!", e);
@@ -329,6 +342,25 @@ public class DashboardContainerUpdater implements MonitorDataListener {
 			return it.next();
 		}
 		return "";
+	}
+
+	@Override
+	public void run() {
+		
+		try {
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doCollector");
+			catWrapper.doAction(new SwallowAction() {
+				@Override
+				public void doAction() throws SwallowException {
+					updateDelayInsDashboard();
+				}
+			});
+		} catch (Throwable th) {
+			logger.error("[startConsumerIdResourceCollector]", th);
+		} finally {
+
+		}
+		
 	}
 
 }
