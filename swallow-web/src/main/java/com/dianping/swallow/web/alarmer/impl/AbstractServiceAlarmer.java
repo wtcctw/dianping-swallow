@@ -24,7 +24,7 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	protected static String SERVER_CHECK_URL_FILE = "server-check-url.properties";
 
 	@Autowired
-	private HttpService httpSerivice;
+	private HttpService httpService;
 
 	@Autowired
 	protected EventReporter eventReporter;
@@ -41,10 +41,10 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	}
 
 	protected HttpResult checkUrl(String url) {
-		HttpResult result = httpSerivice.httpGet(url);
+		HttpResult result = httpService.httpGet(url);
 		if (!result.isSuccess()) {
 			threadSleep();
-			result = httpSerivice.httpGet(url);
+			result = httpService.httpGet(url);
 		}
 		return result;
 	}
