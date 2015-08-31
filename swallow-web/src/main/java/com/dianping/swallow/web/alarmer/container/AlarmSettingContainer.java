@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.container;
+package com.dianping.swallow.web.alarmer.container;
 
 import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;

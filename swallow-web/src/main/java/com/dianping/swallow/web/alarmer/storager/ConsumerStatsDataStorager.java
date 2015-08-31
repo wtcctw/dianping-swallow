@@ -9,6 +9,7 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.StatsDataContainer;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
@@ -29,6 +30,9 @@ import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
 public class ConsumerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
 
 	@Autowired
+	private StatsDataContainer statsDataContainer;
+	
+	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 
 	@Autowired
@@ -42,7 +46,7 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 
 	@Autowired
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
-
+	
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
@@ -61,12 +65,12 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 			return;
 		}
 		dataCount.decrementAndGet();
-		List<ConsumerServerStatsData> serverStatisDatas = consumerStatsDataWapper
+		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper
 				.getServerStatsDatas(lastTimeKey.get());
 		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(lastTimeKey
 				.get());
 		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
-		storageServerStatis(serverStatisDatas);
+		storageServerStatis(serverStatsDatas);
 		storageTopicStatis(topicStatsData);
 		storageConsumerIdStatis(consumerIdStatsDatas);
 	}
@@ -116,7 +120,9 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 				if (consumerIdStatsDatas == null) {
 					return;
 				}
-
+				
+				statsDataContainer.setConsumerIdTotalRatio(consumerIdStatsDatas);
+				
 				for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
 					consumerIdStatsDataService.insert(consumerIdStatsData);
 				}

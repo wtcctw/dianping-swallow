@@ -45,7 +45,7 @@ public class IPDescManagerImpl implements IPDescManager {
 
 	private static final String FACTORY_NAME = "IPDescManager";
 
-	private int interval = 60;// 分钟
+	private int interval = 120;// 分钟
 
 	private int delay = 10;
 

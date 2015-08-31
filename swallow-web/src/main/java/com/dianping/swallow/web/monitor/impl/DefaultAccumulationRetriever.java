@@ -102,7 +102,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		});
 
 		// 通知监听者
-		doNotify();
+		doChangeNotify();
 	}
 
 	protected void buildAllAccumulations() {
@@ -453,7 +453,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		accumulationListeners.add(listener);
 	}
 
-	protected void doNotify() {
+	protected void doChangeNotify() {
 		for (AccumulationListener accumulationListener : accumulationListeners) {
 			accumulationListener.achieveAccumulation();
 		}

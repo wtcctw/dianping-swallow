@@ -9,6 +9,7 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.StatsDataContainer;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
@@ -26,6 +27,9 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 @Component
 public class ProducerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
 
+	@Autowired
+	private StatsDataContainer statsDataContainer;
+	
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 
@@ -57,9 +61,9 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager impleme
 		}
 		dataCount.decrementAndGet();
 		List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(lastTimeKey.get());
-		List<ProducerTopicStatsData> topicStatisDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey.get());
+		List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey.get());
 		storageServerStatis(serverStatsDatas);
-		storageTopicStatis(topicStatisDatas);
+		storageTopicStatis(topicStatsDatas);
 	}
 
 	private void storageServerStatis(final List<ProducerServerStatsData> serverStatsDatas) {
@@ -81,14 +85,17 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager impleme
 		});
 	}
 
-	private void storageTopicStatis(final List<ProducerTopicStatsData> topicStatisDatas) {
+	private void storageTopicStatis(final List<ProducerTopicStatsData> topicStatsDatas) {
 		logger.info("[storageTopicStats]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				if (topicStatisDatas != null) {
-					for (ProducerTopicStatsData producerTopicStatisData : topicStatisDatas) {
+				if (topicStatsDatas != null) {
+					
+					statsDataContainer.setProducerTopicTotalRatio(topicStatsDatas);
+					
+					for (ProducerTopicStatsData producerTopicStatisData : topicStatsDatas) {
 						topicStatsDataService.insert(producerTopicStatisData);
 					}
 				}

@@ -75,7 +75,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 			}
 		});
 		// 通知监听者
-		doNotify();
+		doChangeNotify();
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		statisListeners.add(statisListener);
 	}
 
-	protected void doNotify() {
+	protected void doChangeNotify() {
 
 		for (MonitorDataListener statisListener : statisListeners) {
 			statisListener.achieveMonitorData();

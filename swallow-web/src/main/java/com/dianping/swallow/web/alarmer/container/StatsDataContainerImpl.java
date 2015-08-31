@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
@@ -19,6 +20,7 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
  *
  *         2015年8月27日 下午8:03:27
  */
+@Component("statsDataContainer")
 public class StatsDataContainerImpl implements StatsDataContainer {
 
 	private static final Logger logger = LoggerFactory.getLogger(StatsDataContainerImpl.class);
