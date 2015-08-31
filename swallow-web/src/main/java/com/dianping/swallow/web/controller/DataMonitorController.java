@@ -76,7 +76,7 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
-	
+
 	@Autowired
 	private StatsDataOrderable statsDataOrderable;
 
@@ -428,12 +428,23 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	}
 
-	@RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}", method = RequestMethod.GET)
+	@RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}", method = RequestMethod.POST)
 	@ResponseBody
 	public Object getConsumerOrderMonitor(@PathVariable final int size) throws Exception {
 		return statsDataOrderable.getOrderStatsData(size);
 	}
-	
+
+	@RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}/{startTime}/{endTime}", method = RequestMethod.POST)
+	@ResponseBody
+	public Object getConsumerOrderMonitor(@PathVariable final int size, @PathVariable String startTime,
+			@PathVariable String endTime) throws Exception {
+		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+			return getConsumerOrderMonitor(size);
+		}
+		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
+		return statsDataOrderable.getOrderStatsData(size, searchTime.getStartTime(), searchTime.getEndTime());
+	}
+
 	@RequestMapping(value = "/console/monitor/consumer/total/delay/order/get/{size}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object getConsumerDelayOrderMonitor(@PathVariable final int size) throws Exception {

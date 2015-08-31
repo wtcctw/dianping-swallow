@@ -56,7 +56,7 @@ public class DefaultProducerDataRetriever
 	@Override
 	public boolean dataExistInMemory(long start, long end) {
 		NavigableMap<Long, Long> qpxStatsData = statis.getQpx(StatisType.SAVE);
-		if (qpxStatsData == null) {
+		if (qpxStatsData == null || qpxStatsData.isEmpty()) {
 			return false;
 		}
 		Long firstKey = statis.getQpx(StatisType.SAVE).firstKey();
@@ -127,7 +127,6 @@ public class DefaultProducerDataRetriever
 	public OrderStatsData getQpxOrder(int size) {
 		return getQpxOrder(size, getDefaultStart(), getDefaultEnd());
 	}
-
 
 	@Override
 	public StatsData getSaveDelay(String topic, long start, long end) {

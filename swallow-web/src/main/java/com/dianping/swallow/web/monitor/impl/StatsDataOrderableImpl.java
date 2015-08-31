@@ -7,13 +7,23 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsDataOrderable;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerOrderDataPair;
+import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
+import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年8月31日 上午10:01:10
+ */
 @Component
 public class StatsDataOrderableImpl implements StatsDataOrderable {
 
@@ -26,6 +36,12 @@ public class StatsDataOrderableImpl implements StatsDataOrderable {
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
 
+	@Autowired
+	private ConsumerIdStatsDataService consumerIdStatsDataService;
+
+	@Autowired
+	private ProducerTopicStatsDataService pTopicStatsDataService;
+
 	@Override
 	public List<OrderStatsData> getOrderStatsData(int size) {
 		return getOrderStatsData(size, getDefaultStart(), getDefaultEnd());
@@ -36,12 +52,15 @@ public class StatsDataOrderableImpl implements StatsDataOrderable {
 		if (consumerDataRetriever.dataExistInMemory(start, end)) {
 			return getOrderStatsDataInMemory(size, start, end);
 		} else {
-			return getOrderStatsDataInDb(size, start, end);
+			return getOrderStatsDataInMemory(size, start, end);
 		}
 	}
 
 	private List<OrderStatsData> getOrderStatsDataInDb(int size, long start, long end) {
 		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+		long startKey = AbstractRetriever.getKey(start);
+		long endKey = AbstractRetriever.getKey(end);
+		
 		return orderStatsDatas;
 	}
 
@@ -51,7 +70,7 @@ public class StatsDataOrderableImpl implements StatsDataOrderable {
 		OrderStatsData qpxOrderData = producerDataRetriever.getQpxOrder(size, start, end);
 		ConsumerOrderDataPair delayOrderDataPair = consumerDataRetriever
 				.getDelayOrderForAllConsumerId(size, start, end);
-		ConsumerOrderDataPair qpxOrderDataPair = consumerDataRetriever.getDelayOrderForAllConsumerId(size, start, end);
+		ConsumerOrderDataPair qpxOrderDataPair = consumerDataRetriever.getQpxOrderForAllConsumerId(size, start, end);
 		OrderStatsData accuOrderData = accumulationRetriever.getAccuOrderForAllConsumerId(size, start, end);
 		orderStatsDatas.add(delayOrderData);
 		orderStatsDatas.add(delayOrderDataPair.getSendStatsData());
@@ -73,6 +92,48 @@ public class StatsDataOrderableImpl implements StatsDataOrderable {
 				- TimeUnit.MILLISECONDS.convert(producerDataRetriever.getKeepInMemoryHour(), TimeUnit.HOURS);
 	}
 
-	
+	private ConsumerIdStatsData getPreConsumerIdStatsData(String topicName, String consumerId, long timeKey) {
+		ConsumerIdStatsData consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(
+				topicName, timeKey, consumerId, false);
+		if (consumerIdStatsData != null) {
+			return consumerIdStatsData;
+		}
+		return new ConsumerIdStatsData();
+	}
+
+	private ConsumerIdStatsData getPostConsumerIdStatsData(String topicName, String consumerId, long timeKey) {
+		ConsumerIdStatsData consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(
+				topicName, timeKey, consumerId, true);
+		if (consumerIdStatsData != null) {
+			return consumerIdStatsData;
+		}
+		consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(topicName, timeKey,
+				consumerId, false);
+		if (consumerIdStatsData != null) {
+			return consumerIdStatsData;
+		}
+		return new ConsumerIdStatsData();
+	}
+
+	private ProducerTopicStatsData getPrePTopicStatsData(String topicName, long timeKey) {
+		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService
+				.findOneByTopicAndTime(topicName, timeKey, false);
+		if (pTopicStatsData != null) {
+			return pTopicStatsData;
+		}
+		return new ProducerTopicStatsData();
+	}
+
+	private ProducerTopicStatsData getPostPTopicStatsData(String topicName, long timeKey) {
+		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, timeKey, true);
+		if (pTopicStatsData != null) {
+			return pTopicStatsData;
+		}
+		pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, timeKey, false);
+		if (pTopicStatsData != null) {
+			return pTopicStatsData;
+		}
+		return new ProducerTopicStatsData();
+	}
 
 }

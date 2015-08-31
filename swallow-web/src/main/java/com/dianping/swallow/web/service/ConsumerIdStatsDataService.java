@@ -44,4 +44,6 @@ public interface ConsumerIdStatsDataService {
 	Map<String, StatsDataMapPair> findSectionDelayData(String topicName, long startKey, long endKey);
 
 	Map<String, NavigableMap<Long, Long>> findSectionAccuData(String topicName, long startKey, long endKey);
+	
+	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId, boolean isGt);
 }

@@ -30,4 +30,7 @@ public interface ProducerTopicStatsDataService {
 	NavigableMap<Long, Long> findSectionQpsData(String topicName, long startKey, long endKey);
 	
 	NavigableMap<Long, Long> findSectionDelayData(String topicName, long startKey, long endKey);
+	
+	ProducerTopicStatsData findOneByTopicAndTime(String topicName, long timeKey, boolean isGt);
+	
 }

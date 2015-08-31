@@ -59,7 +59,7 @@ public class DefaultConsumerDataRetriever
 	public boolean dataExistInMemory(long start, long end) {
 		NavigableMap<Long, Long> qpxStatsData = statis.getQpx(StatisType.SEND);
 
-		if (qpxStatsData == null) {
+		if (qpxStatsData == null || qpxStatsData.isEmpty()) {
 			return false;
 		}
 

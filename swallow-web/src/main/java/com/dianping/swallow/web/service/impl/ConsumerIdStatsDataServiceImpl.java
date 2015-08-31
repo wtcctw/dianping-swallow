@@ -170,4 +170,10 @@ public class ConsumerIdStatsDataServiceImpl implements ConsumerIdStatsDataServic
 		return consumerIdStatsDataMaps;
 	}
 
+	@Override
+	public ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId,
+			boolean isGt) {
+		return consumerIdStatsDataDao.findOneByTopicAndTimeAndConsumerId(topicName, timeKey, consumerId, isGt);
+	}
+
 }

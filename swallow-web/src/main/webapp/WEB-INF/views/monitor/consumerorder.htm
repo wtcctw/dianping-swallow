@@ -45,7 +45,7 @@
 					</tr>
 					<tr ng-repeat="subItem in item.dataResults">
 						<td class="table-smalll-td table-smalll-td-consumerId"><a
-							ng-href='{{showRelatedUrl(subItem.topicName, subItem.consumerId)}}'>
+							ng-href='{{showRelatedUrl(item.info.dt, subItem.topicName, subItem.consumerId)}}'>
 								{{showRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
 						<td class="table-smalll-td">{{subItem.sumData}}</td>
 					</tr>

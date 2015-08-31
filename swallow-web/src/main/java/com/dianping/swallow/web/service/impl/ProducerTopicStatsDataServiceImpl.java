@@ -86,4 +86,9 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 		return topicStatsDataMap;
 	}
 
+	@Override
+	public ProducerTopicStatsData findOneByTopicAndTime(String topicName, long timeKey, boolean isGt) {
+		return producerTopicStatsDataDao.findOneByTopicAndTime(topicName, timeKey, isGt);
+	}
+
 }
