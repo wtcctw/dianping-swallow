@@ -89,26 +89,11 @@ public class TopicController extends AbstractMenuController {
 			if (findAll) {
 				pair = topicResourceService.findTopicResourcePage(topicQueryDto);
 			} else {
-				topicQueryDto.setProp(username);
+				topicQueryDto.setProposal(username);
 				pair = topicResourceService.findTopicResourcePage(topicQueryDto);
 			}
 		} else {
-			if (StringUtil.isBlank(producerIp)) {
-				TopicResource resource = topicResourceService.findByTopic(topic);
-				result.add(TopicResourceMapper.toTopicResourceDto(resource));
-				return new Pair<Long, List<TopicResourceDto>>(1L, result);
-			} else if (StringUtil.isBlank(topic)) {
-				pair = topicResourceService.findByServer(topicQueryDto);
-			} else {
-				TopicResource resource = topicResourceService.findByTopic(topic);
-				List<String> ips = resource.getProducerIps();
-				if (ips.contains(producerIp)) {
-					result.add(TopicResourceMapper.toTopicResourceDto(resource));
-					return new Pair<Long, List<TopicResourceDto>>(1L, result);
-				} else {
-					return new Pair<Long, List<TopicResourceDto>>(0L, result);
-				}
-			}
+			pair = topicResourceService.find(topicQueryDto);
 		}
 
 		for (TopicResource topicResource : pair.getSecond()) {

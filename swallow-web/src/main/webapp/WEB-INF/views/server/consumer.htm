@@ -36,7 +36,8 @@
 					</tr>
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
 						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left" ng-bind="ad.ip"></td>
+						<td style="text-align: left"><a style="cursor:pointer;"
+							ng-click="setConsumerIps(ad.ip)" ng-bind="ad.ip"></a></td>
 						<td style="text-align: left" ng-bind="ad.hostname"></td>
 						<td style="text-align: left" ng-bind="ad.alarm"></td>
 						<td style="text-align: left" ng-bind="ad.sendpeak"></td>

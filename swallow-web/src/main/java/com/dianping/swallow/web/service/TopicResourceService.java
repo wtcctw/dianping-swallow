@@ -23,9 +23,13 @@ public interface TopicResourceService extends ConfigChange{
 
 	int remove(String topic);
 
+	Pair<Long, List<TopicResource>> findByTopics(TopicQueryDto topicQueryDto);
+
 	TopicResource findByTopic(String topic);
 	
 	Pair<Long, List<TopicResource>> findByServer(TopicQueryDto topicQueryDto);
+
+	Pair<Long, List<TopicResource>> find(TopicQueryDto topicQueryDto);
 
 	TopicResource findDefault();
 	
@@ -34,6 +38,8 @@ public interface TopicResourceService extends ConfigChange{
 	Pair<Long, List<TopicResource>> findTopicResourcePage(TopicQueryDto topicQueryDto);
 	
 	Map<String, Set<String>> loadCachedTopicToWhiteList();
+
+	Map<String, Set<String>> loadCachedTopicToConsumerServer();
 	
 	TopicResource buildTopicResource(String topic);
 }

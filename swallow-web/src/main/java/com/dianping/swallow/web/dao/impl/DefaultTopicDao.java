@@ -82,7 +82,7 @@ public class DefaultTopicDao extends AbstractWriteDao implements TopicDao {
 	public Pair<Long, List<Topic>> loadSpecificTopicPage(TopicQueryDto topicQueryDto) {
 		
 		String name = topicQueryDto.getTopic();
-		String prop = topicQueryDto.getProp();
+		String prop = topicQueryDto.getProposal();
 		int offset = topicQueryDto.getOffset();
 		int limit = topicQueryDto.getLimit();
 		

@@ -158,6 +158,11 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			
 			//发送默认请求
 			$scope.query = new Object();
+			var tmptopic = localStorage.getItem("topic");
+			if(tmptopic != null){
+				$scope.topic = tmptopic;
+				localStorage.clear();
+			}
 			$scope.query.topic = $scope.topic;
 			$scope.query.producerServer = $scope.searchip;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);

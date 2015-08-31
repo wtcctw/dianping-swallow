@@ -3,6 +3,7 @@ package com.dianping.swallow.web.controller;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -31,6 +32,7 @@ import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 @Controller
@@ -44,6 +46,9 @@ public class ServerController extends AbstractSidebarBasedController {
 
 	@Resource(name = "ipCollectorService")
 	private IPCollectorService ipCollectorService;
+	
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
 
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
@@ -192,6 +197,28 @@ public class ServerController extends AbstractSidebarBasedController {
 		Set<String> masterIps =  ipCollectorService.getConsumerServerMasterIpsMap().keySet();
 		Set<String> slaveIps =  ipCollectorService.getConsumerServerMasterIpsMap().keySet();
 		return CollectionUtils.union(masterIps, slaveIps);
+	}
+	
+	@RequestMapping(value = "/console/server/consumer/get/topics", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String>  loadConsumerSereverTopics(@RequestParam String ip) {
+
+		List<String> result = new ArrayList<String>();
+		Map<String, Set<String>> topicToConsumerServer = topicResourceService.loadCachedTopicToConsumerServer();
+		
+		if(topicToConsumerServer == null){
+			return result;
+		}else{
+			for(Map.Entry<String, Set<String>> entry : topicToConsumerServer.entrySet()){
+				Set<String> servers = entry.getValue();
+				String topic = entry.getKey();
+				if(servers != null && servers.contains(ip) && !result.contains(topic)){
+					result.add(topic);
+				}			
+			}
+		}
+		
+		return result;
 	}
 
 	@Override

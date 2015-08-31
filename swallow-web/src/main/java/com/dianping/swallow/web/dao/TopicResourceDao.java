@@ -22,8 +22,12 @@ public interface TopicResourceDao extends Dao{
 	
 	long count();
 
+	Pair<Long, List<TopicResource>> find(TopicQueryDto topicQueryDto);
+
 	Pair<Long, List<TopicResource>> findByServer(TopicQueryDto topicQueryDto);
 	
+	Pair<Long, List<TopicResource>> findByTopics(TopicQueryDto topicQueryDto);
+
 	TopicResource findByTopic(String topic);
 
 	TopicResource findById(String id);

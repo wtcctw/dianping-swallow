@@ -10,7 +10,7 @@ public class TopicQueryDto extends BaseDto{
 
 	private String topic;
 	
-	private String prop;
+	private String proposal;
 	
 	private String producerServer;
 	
@@ -25,7 +25,7 @@ public class TopicQueryDto extends BaseDto{
 	public TopicQueryDto(String topic, String prop){
 		
 		this.topic = topic;
-		this.prop = prop;
+		this.proposal = prop;
 	}
 
 	public String getTopic() {
@@ -36,12 +36,12 @@ public class TopicQueryDto extends BaseDto{
 		this.topic = topic;
 	}
 
-	public String getProp() {
-		return prop;
+	public String getProposal() {
+		return proposal;
 	}
 
-	public void setProp(String prop) {
-		this.prop = prop;
+	public void setProposal(String proposal) {
+		this.proposal = proposal;
 	}
 
 	public String getProducerServer() {

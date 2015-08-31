@@ -202,6 +202,21 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		
 	}
 	
+	$scope.setConsumerIps = function(ip){
+		$http.get(window.contextPath + "/console/server/consumer/get/topics",{
+			params : {
+				ip : ip
+			}
+		}).success(function(data){
+			var size = data.length;
+			if(size > 0){
+				var topic = data.join(",");
+				localStorage.setItem("topic", topic);
+				window.location = window.contextPath + "/console/topic";
+			}
+		});
+	}
+	
 	$rootScope.removerecord = function(sid){
 		$http.get(window.contextPath + "/console/server/consumer/remove", {
 			params : {

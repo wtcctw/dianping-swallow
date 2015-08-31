@@ -51,6 +51,7 @@
 						<th style="text-align: left">Topic名称</th>
 						<th style="text-align: left">访问者白名单</th>
 						<th style="text-align: left">生产者IP</th>
+						<th style="text-align: left">消费ID配置</th>
 						<th style="text-align: left">告警配置</th>
 						#if(${isadmin})
 						<th style="text-align: left">发送告警</th>
@@ -62,11 +63,14 @@
 						on-finish-render-filters>
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left"><a
-							ng-href="${rc.contextPath}/console/consumerid"
+							ng-href="${rc.contextPath}/console/message"
 							ng-click="setTopic(t.topic)" ng-bind="t.topic"></a></td>
 						<td style="text-align: left" ng-bind="t.administrator"></td>
 						<td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
 							ng-click="setIps(t.producerServer)"  ng-bind="t.producerServer | limitTo : 25 "></a></td>
+						<td style="text-align: left" ><a
+							ng-href="${rc.contextPath}/console/consumerid"
+							ng-click="setTopic(t.topic)">详情</a></td>
 						<td style="text-align: left" ><a href="#myModal"
 							ng-click="setModalInput($index);"
 							data-toggle="modal" >详情</a></td>
