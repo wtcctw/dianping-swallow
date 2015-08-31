@@ -88,8 +88,10 @@ public class OrderStatsData {
 	}
 
 	public List<OrderEntity> getDataResults() {
-		List<OrderEntity> orderEntitys = new ArrayList<OrderEntity>(datas);
-		// Collections.sort(orderEntitys);
+		List<OrderEntity> orderEntitys = new ArrayList<OrderEntity>(datas.size());
+		for(OrderEntity entity :datas){
+			orderEntitys.add(entity);
+		}
 		Collections.reverse(orderEntitys);
 		return orderEntitys;
 	}

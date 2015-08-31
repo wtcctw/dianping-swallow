@@ -20,7 +20,6 @@ public class PriorityBlockingQueueTest {
 		queues.add(11);
 		
 		List<Integer> list =new ArrayList<Integer>(queues);
-		
 		System.out.println(list);
 		Collections.reverse(list);
 		System.out.println(list);

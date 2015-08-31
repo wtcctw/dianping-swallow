@@ -34,9 +34,9 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月3日 上午11:34:10
  */
 //@Component("alarmSettingContainer")
-public class AlarmSettingContainerImpl implements AlarmSettingContainer, InitializingBean {
+public class AlarmResourceContainerImpl implements AlarmResourceContainer, InitializingBean {
 
-	private static final Logger logger = LoggerFactory.getLogger(AlarmSettingContainerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(AlarmResourceContainerImpl.class);
 
 	private static final String DEFAULT_RECORD = "default";
 
@@ -51,7 +51,7 @@ public class AlarmSettingContainerImpl implements AlarmSettingContainer, Initial
 	@SuppressWarnings("unused")
 	private ScheduledFuture<?> future = null;
 
-	private static final String FACTORY_NAME = "AlarmSettingTask";
+	private static final String FACTORY_NAME = "AlarmResourceTask";
 
 	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
 			.getThreadFactory(FACTORY_NAME));

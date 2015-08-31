@@ -12,7 +12,7 @@ import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
  *
  *         2015年8月17日 下午5:49:38
  */
-public interface AlarmSettingContainer {
+public interface AlarmResourceContainer {
 
 	GlobalAlarmSetting findGlobalAlarmSetting(String globalId);
 
