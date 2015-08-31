@@ -3,7 +3,6 @@ package com.dianping.swallow.web.service;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 
 
@@ -20,5 +19,5 @@ public interface ProducerServerResourceService extends ServerResourceService{
 	
 	int remove(String ip);
 	
-	Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(BaseDto baseDto);
+	Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(int offset, int limit);
 }

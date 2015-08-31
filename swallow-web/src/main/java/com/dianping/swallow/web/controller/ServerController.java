@@ -40,13 +40,13 @@ public class ServerController extends AbstractSidebarBasedController {
 
 	@Resource(name = "producerServerResourceService")
 	private ProducerServerResourceService producerServerResourceService;
-	
+
 	@Resource(name = "consumerServerResourceService")
 	private ConsumerServerResourceService consumerServerResourceService;
 
 	@Resource(name = "ipCollectorService")
 	private IPCollectorService ipCollectorService;
-	
+
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
 
@@ -54,46 +54,42 @@ public class ServerController extends AbstractSidebarBasedController {
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
 	@RequestMapping(value = "/console/server")
-	public ModelAndView serverSetting(HttpServletRequest request,
-			HttpServletResponse response) {
+	public ModelAndView serverSetting(HttpServletRequest request, HttpServletResponse response) {
 
 		subSide = "producer";
 		return new ModelAndView("server/producer", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/server/producer")
-	public ModelAndView producerServerSetting(HttpServletRequest request,
-			HttpServletResponse response) {
+	public ModelAndView producerServerSetting(HttpServletRequest request, HttpServletResponse response) {
 
 		subSide = "producer";
 		return new ModelAndView("server/producer", createViewMap());
 	}
-	
+
 	@RequestMapping(value = "/console/server/producer/list", method = RequestMethod.POST)
 	@ResponseBody
 	public Object producerserverSettingList(@RequestBody BaseDto baseDto) {
 
-		Pair<Long, List<ProducerServerResource>> pair = producerServerResourceService
-				.findProducerServerResourcePage(baseDto);
+		int offset = baseDto.getOffset();
+		int limit = baseDto.getLimit();
+		Pair<Long, List<ProducerServerResource>> pair = producerServerResourceService.findProducerServerResourcePage(
+				offset, limit);
 		List<ServerResourceDto> producerServerResourceDto = new ArrayList<ServerResourceDto>();
 		for (ProducerServerResource producerServerResource : pair.getSecond()) {
 			producerServerResourceDto.add(ProducerServerResourceMapper
 					.toProducerServerResourceDto(producerServerResource));
 		}
-		return new Pair<Long, List<ServerResourceDto>>(pair.getFirst(),
-				producerServerResourceDto);
+		return new Pair<Long, List<ServerResourceDto>>(pair.getFirst(), producerServerResourceDto);
 
 	}
 
 	@RequestMapping(value = "/console/server/producer/create", method = RequestMethod.POST)
 	@ResponseBody
-	public int producerServerResourceCreate(
-			@RequestBody ServerResourceDto dto) {
+	public int producerServerResourceCreate(@RequestBody ServerResourceDto dto) {
 
-		ProducerServerResource producerServerResource = ProducerServerResourceMapper
-				.toProducerServerResource(dto);
-		boolean result = producerServerResourceService
-				.update(producerServerResource);
+		ProducerServerResource producerServerResource = ProducerServerResourceMapper.toProducerServerResource(dto);
+		boolean result = producerServerResourceService.update(producerServerResource);
 
 		if (!result) {
 			return ResponseStatus.SUCCESS.getStatus();
@@ -104,8 +100,7 @@ public class ServerController extends AbstractSidebarBasedController {
 
 	@RequestMapping(value = "/console/server/producer/remove", method = RequestMethod.GET)
 	@ResponseBody
-	public int remvoeProducerserverResource(
-			@RequestParam(value = "serverId") String serverId) {
+	public int remvoeProducerserverResource(@RequestParam(value = "serverId") String serverId) {
 
 		int result = producerServerResourceService.remove(serverId);
 
@@ -120,15 +115,13 @@ public class ServerController extends AbstractSidebarBasedController {
 	@ResponseBody
 	public List<String> loadProducerSereverIds() {
 
-		Set<String> hostNames = ipCollectorService.getProducerServerIpsMap()
-				.keySet();
+		Set<String> hostNames = ipCollectorService.getProducerServerIpsMap().keySet();
 		return new ArrayList<String>(hostNames);
 	}
 
 	@RequestMapping(value = "/console/server/producertopics", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadProducerSereverTopics(
-			@RequestParam(value = "serverId") String serverId) {
+	public List<String> loadProducerSereverTopics(@RequestParam(value = "serverId") String serverId) {
 
 		Set<String> topics = consumerDataRetrieverWrapper.getKey(serverId);
 
@@ -138,32 +131,34 @@ public class ServerController extends AbstractSidebarBasedController {
 			return new ArrayList<String>();
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/server/consumer")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
 
 		subSide = "consumer";
 		return new ModelAndView("server/consumer", createViewMap());
 	}
-	
+
 	@RequestMapping(value = "/console/server/consumer/list", method = RequestMethod.POST)
 	@ResponseBody
 	public Object consumerserverSettingList(@RequestBody BaseDto baseDto) {
 
-		Pair<Long, List<ConsumerServerResource>> pair = consumerServerResourceService.findConsumerServerResourcePage(baseDto);
+		int offset = baseDto.getOffset();
+		int limit = baseDto.getLimit();
+		Pair<Long, List<ConsumerServerResource>> pair = consumerServerResourceService
+				.findConsumerServerResourcePage(offset, limit);
 		List<ConsumerServerResourceDto> consumerServerResourceDto = new ArrayList<ConsumerServerResourceDto>();
 		for (ConsumerServerResource consumerServerResource : pair.getSecond()) {
-			consumerServerResourceDto.add(ConsumerServerResourceMapper.toConsumerServerResourceDto(consumerServerResource));
+			consumerServerResourceDto.add(ConsumerServerResourceMapper
+					.toConsumerServerResourceDto(consumerServerResource));
 		}
-		return new Pair<Long, List<ConsumerServerResourceDto>>(pair.getFirst(),
-				consumerServerResourceDto);
+		return new Pair<Long, List<ConsumerServerResourceDto>>(pair.getFirst(), consumerServerResourceDto);
 
 	}
-	
+
 	@RequestMapping(value = "/console/server/consumer/create", method = RequestMethod.POST)
 	@ResponseBody
-	public int ConsumerServerResourceCreate(
-			@RequestBody ConsumerServerResourceDto dto) {
+	public int ConsumerServerResourceCreate(@RequestBody ConsumerServerResourceDto dto) {
 
 		ConsumerServerResource consumerServerResource = ConsumerServerResourceMapper.toConsumerResourceSetting(dto);
 		boolean result = consumerServerResourceService.update(consumerServerResource);
@@ -174,11 +169,10 @@ public class ServerController extends AbstractSidebarBasedController {
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/server/consumer/remove", method = RequestMethod.GET)
 	@ResponseBody
-	public int remvoeConsumerserverResource(
-			@RequestParam(value = "serverId") String serverId) {
+	public int remvoeConsumerserverResource(@RequestParam(value = "serverId") String serverId) {
 
 		int result = consumerServerResourceService.remove(serverId);
 
@@ -188,36 +182,36 @@ public class ServerController extends AbstractSidebarBasedController {
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/console/server/consumerserverids", method = RequestMethod.GET)
 	@ResponseBody
-	public Collection<String>  loadConsumerSereverIds() {
+	public Collection<String> loadConsumerSereverIds() {
 
-		Set<String> masterIps =  ipCollectorService.getConsumerServerMasterIpsMap().keySet();
-		Set<String> slaveIps =  ipCollectorService.getConsumerServerMasterIpsMap().keySet();
+		Set<String> masterIps = ipCollectorService.getConsumerServerMasterIpsMap().keySet();
+		Set<String> slaveIps = ipCollectorService.getConsumerServerMasterIpsMap().keySet();
 		return CollectionUtils.union(masterIps, slaveIps);
 	}
-	
+
 	@RequestMapping(value = "/console/server/consumer/get/topics", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String>  loadConsumerSereverTopics(@RequestParam String ip) {
+	public List<String> loadConsumerSereverTopics(@RequestParam String ip) {
 
 		List<String> result = new ArrayList<String>();
 		Map<String, Set<String>> topicToConsumerServer = topicResourceService.loadCachedTopicToConsumerServer();
-		
-		if(topicToConsumerServer == null){
+
+		if (topicToConsumerServer == null) {
 			return result;
-		}else{
-			for(Map.Entry<String, Set<String>> entry : topicToConsumerServer.entrySet()){
+		} else {
+			for (Map.Entry<String, Set<String>> entry : topicToConsumerServer.entrySet()) {
 				Set<String> servers = entry.getValue();
 				String topic = entry.getKey();
-				if(servers != null && servers.contains(ip) && !result.contains(topic)){
+				if (servers != null && servers.contains(ip) && !result.contains(topic)) {
 					result.add(topic);
-				}			
+				}
 			}
 		}
-		
+
 		return result;
 	}
 

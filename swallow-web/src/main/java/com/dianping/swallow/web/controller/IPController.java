@@ -56,13 +56,15 @@ public class IPController extends AbstractMenuController {
 
 		Pair<Long, List<IpResource>> pair = null;
 		List<IpResource> ipResources = new ArrayList<IpResource>();
+		int offset = ipQueryDto.getOffset();
+		int limit = ipQueryDto.getLimit();
 		String ip = ipQueryDto.getIp();
 		String application = ipQueryDto.getApplication();
 
 		Boolean isAllBlank = StringUtil.isAllBlank(ip, application);
 
 		if (isAllBlank) {
-			pair = ipResourceService.findIpResourcePage(ipQueryDto);
+			pair = ipResourceService.findIpResourcePage(offset, limit);
 		} else {
 
 			if (StringUtil.isBlank(application)) {
@@ -71,7 +73,7 @@ public class IPController extends AbstractMenuController {
 				long size = ipResources.size();
 				pair = new Pair<Long, List<IpResource>>(size, ipResources);
 			} else if (StringUtil.isBlank(ip)) {
-				pair = ipResourceService.findByApplication(ipQueryDto);
+				pair = ipResourceService.findByApplication(offset, limit, application);
 			} else {
 				IpResource ipResource = ipResourceService.find(ipQueryDto);
 				ipResources.add(ipResource);

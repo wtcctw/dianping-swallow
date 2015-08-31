@@ -3,7 +3,6 @@ package com.dianping.swallow.web.dao;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.model.resource.TopicResource;
 
 
@@ -22,11 +21,11 @@ public interface TopicResourceDao extends Dao{
 	
 	long count();
 
-	Pair<Long, List<TopicResource>> find(TopicQueryDto topicQueryDto);
+	Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerI);
 
-	Pair<Long, List<TopicResource>> findByServer(TopicQueryDto topicQueryDto);
+	Pair<Long, List<TopicResource>> findByServer(int offset, int limit, String producerIp);
 	
-	Pair<Long, List<TopicResource>> findByTopics(TopicQueryDto topicQueryDto);
+	Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String ... topics);
 
 	TopicResource findByTopic(String topic);
 
@@ -36,5 +35,5 @@ public interface TopicResourceDao extends Dao{
 	
 	List<TopicResource> findAll();
 	
-	Pair<Long, List<TopicResource>> findTopicResourcePage(TopicQueryDto topicQueryDto);
+	Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limti);
 }

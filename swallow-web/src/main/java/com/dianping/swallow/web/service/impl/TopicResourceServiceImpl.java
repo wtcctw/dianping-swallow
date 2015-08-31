@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.TopicResourceDao;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
@@ -130,9 +129,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findByTopics(TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String ... topics) {
 
-		return topicResourceDao.findByTopics(topicQueryDto);
+		return topicResourceDao.findByTopics(offset, limit, topics);
 	}
 
 	@Override
@@ -142,9 +141,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> find(TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp) {
 
-		return topicResourceDao.find(topicQueryDto);
+		return topicResourceDao.find(offset, limit, topic, producerIp);
 	}
 
 	@Override
@@ -154,9 +153,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findTopicResourcePage(TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limit) {
 
-		return topicResourceDao.findTopicResourcePage(topicQueryDto);
+		return topicResourceDao.findTopicResourcePage(offset, limit);
 	}
 
 	@Override
@@ -166,9 +165,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findByServer(TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<TopicResource>> findByServer(int offset, int limit, String producerIp) {
 
-		return topicResourceDao.findByServer(topicQueryDto);
+		return topicResourceDao.findByServer(offset, limit, producerIp);
 	}
 
 	@Override

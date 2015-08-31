@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.AuthenticationService;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.UserService;
-import com.dianping.swallow.web.service.TopicService;
 
 /**
  * @author mingdongli 2015年5月12日 上午11:42:49
@@ -38,8 +38,8 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 	@Resource(name = "userService")
 	private UserService userService;
 
-	@Resource(name = "topicService")
-	private TopicService topicService;
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
 
 	@PostConstruct
 	private void addAllToAdmin() {
@@ -61,7 +61,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 		} else if (loadAdminSet.contains(ALL) && !uri.startsWith(ADMINURI) && !uri.startsWith(SETTINGURI)) {
 			return true;
 		} else if (uri.startsWith(MESSAGEURI) || uri.startsWith(DOWNLOAD)) {
-			if (StringUtils.isNotBlank(topic) && topicService.loadCachedTopicToWhiteList().get(topic).contains(username)) {
+			if (StringUtils.isNotBlank(topic) && topicResourceService.loadCachedTopicToWhiteList().get(topic).contains(username)) {
 				return true;
 			} else {
 				return false;
@@ -77,7 +77,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 		if (userService.loadCachedAdministratorSet().contains(username)) {
 			return AuthenticationService.ADMINI;
 		} else {
-			Collection<Set<String>> topicUsers = topicService.loadCachedTopicToWhiteList().values();
+			Collection<Set<String>> topicUsers = topicResourceService.loadCachedTopicToWhiteList().values();
 			for (Set<String> set : topicUsers) {
 				if (set.contains(username)) {
 					return AuthenticationService.USER;

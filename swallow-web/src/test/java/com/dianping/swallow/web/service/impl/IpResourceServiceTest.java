@@ -14,7 +14,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.IpResourceService;
@@ -72,9 +71,7 @@ public class IpResourceServiceTest {
 		Assert.assertTrue(result);
 
 		Pair<Long, List<IpResource>> pair = new Pair<Long, List<IpResource>>();
-		IpQueryDto ipQueryDto = new IpQueryDto();
-		ipQueryDto.setApplication("tuangou");
-		pair = ipResourceService.findByApplication(ipQueryDto);
+		pair = ipResourceService.findByApplication(0, 31, "tuangou");
 		Assert.assertNotNull(pair);
 		Assert.assertEquals(pair.getFirst(), new Long(1));
 

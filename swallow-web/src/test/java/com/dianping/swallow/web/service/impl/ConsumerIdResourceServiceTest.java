@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
+import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
@@ -83,7 +83,7 @@ public class ConsumerIdResourceServiceTest {
 		boolean result = consumerIdResourceService.insert(consumerIdResource);
 		Assert.assertTrue(result);
 		
-		ConsumerIdQueryDto consumerIdQueryDto = new ConsumerIdQueryDto();
+		ConsumerIdParam consumerIdQueryDto = new ConsumerIdParam();
 		consumerIdQueryDto.setTopic("example");
 		consumerIdQueryDto.setOffset(0);
 		consumerIdQueryDto.setLimit(31);

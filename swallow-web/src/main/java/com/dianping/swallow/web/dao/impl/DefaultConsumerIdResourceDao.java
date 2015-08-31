@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.mongodb.WriteResult;
@@ -79,11 +78,11 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdQueryDto consumerIdQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam) {
 
-		String topic = consumerIdQueryDto.getTopic();
-		int offset = consumerIdQueryDto.getOffset();
-		int limit = consumerIdQueryDto.getLimit();
+		String topic = consumerIdParam.getTopic();
+		int offset = consumerIdParam.getOffset();
+		int limit = consumerIdParam.getLimit();
 
 		Query query = new Query(Criteria.where(TOPIC).is(topic));
 
@@ -97,11 +96,11 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> find(ConsumerIdQueryDto consumerIdQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam consumerIdParam) {
 
-		String topic = consumerIdQueryDto.getTopic();
-		String consumerId = consumerIdQueryDto.getConsumerId();
-		String consumerIp = consumerIdQueryDto.getConsumerIp();
+		String topic = consumerIdParam.getTopic();
+		String consumerId = consumerIdParam.getConsumerId();
+		String consumerIp = consumerIdParam.getConsumerIp();
 
 		Query query = new Query();
 
@@ -118,8 +117,8 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 		List<ConsumerIdResource> consumerIdResource = mongoTemplate.find(query, ConsumerIdResource.class,
 				CONSUMERIDRESOURCE_COLLECTION);
 
-		int offset = consumerIdQueryDto.getOffset();
-		int limit = consumerIdQueryDto.getLimit();
+		int offset = consumerIdParam.getOffset();
+		int limit = consumerIdParam.getLimit();
 
 		query.skip(offset).limit(limit);
 		long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
@@ -148,18 +147,18 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	@Override
 	public ConsumerIdResource findDefault() {
 
-		Query query = new Query(Criteria.where(CONSUMERID).is(DEFAULT));
+		Query query = new Query(Criteria.where(CONSUMERID).is(DEFAULT).andOperator(Criteria.where(TOPIC).is(DEFAULT)));
 		ConsumerIdResource consumerIdResource = mongoTemplate.findOne(query, ConsumerIdResource.class,
 				CONSUMERIDRESOURCE_COLLECTION);
 		return consumerIdResource;
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdQueryDto consumerIdQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam) {
 
 		Query query = new Query();
-		int offset = consumerIdQueryDto.getOffset();
-		int limit = consumerIdQueryDto.getLimit();
+		int offset = consumerIdParam.getOffset();
+		int limit = consumerIdParam.getLimit();
 
 		query.skip(offset).limit(limit);
 		List<ConsumerIdResource> consumerIdResources = mongoTemplate.find(query, ConsumerIdResource.class,
@@ -169,11 +168,11 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdQueryDto consumerIdQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam consumerIdParam) {
 
-		int offset = consumerIdQueryDto.getOffset();
-		int limit = consumerIdQueryDto.getLimit();
-		String consumerIp = consumerIdQueryDto.getConsumerIp();
+		int offset = consumerIdParam.getOffset();
+		int limit = consumerIdParam.getLimit();
+		String consumerIp = consumerIdParam.getConsumerIp();
 		Query query = new Query(Criteria.where(CONSUMERIPS).is(consumerIp));
 
 		Long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);

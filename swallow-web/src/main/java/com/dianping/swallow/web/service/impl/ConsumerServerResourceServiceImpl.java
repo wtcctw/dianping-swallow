@@ -44,9 +44,9 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(BaseDto baseDto) {
+	public Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(int offset, int limit) {
 
-		return consumerServerResourceDao.findConsumerServerResourcePage(baseDto);
+		return consumerServerResourceDao.findConsumerServerResourcePage(offset, limit);
 	}
 
 	@Override

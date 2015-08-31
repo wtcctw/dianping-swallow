@@ -3,7 +3,7 @@ package com.dianping.swallow.web.service;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
+import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 
@@ -23,15 +23,16 @@ public interface ConsumerIdResourceService extends MonitorDataListener{
 	
 	List<ConsumerIdResource> findByConsumerId(String consumerid);
 
-	Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdQueryDto consumerIdQueryDto);
+	Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam);
 	
-	Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdQueryDto  consumerIdQueryDto);
+	Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam  consumerIdParam);
 
-	Pair<Long, List<ConsumerIdResource>> find(ConsumerIdQueryDto  consumerIdQueryDto);
+	Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam  consumerIdParam);
 	
 	List<ConsumerIdResource> findAll(String ...fields );
 
 	ConsumerIdResource findDefault();
 	
-	Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdQueryDto consumerIdQueryDto);
+	Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam);
+	
 }

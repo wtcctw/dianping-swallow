@@ -81,11 +81,13 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findByApplication(IpQueryDto ipQueryDto) {
+	public Pair<Long, List<IpResource>> findByApplication(int offset, int limit, String application) {
 
-		Query query = new Query(Criteria.where(APPLICATION).is(ipQueryDto.getApplication()));
-		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
+		Query query = new Query(Criteria.where(APPLICATION).is(application));
 		long size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
+
+		query.skip(offset).limit(limit);
+		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
 
 		return new Pair<Long, List<IpResource>>(size, ipResources);
 	}
@@ -131,11 +133,9 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findIpResourcePage(IpQueryDto ipQueryDto) {
+	public Pair<Long, List<IpResource>> findIpResourcePage(int offset, int limit) {
 
 		Query query = new Query();
-		int offset = ipQueryDto.getOffset();
-		int limit = ipQueryDto.getLimit();
 		
 		query.skip(offset).limit(limit);
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class,

@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.dao.ProducerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.mongodb.WriteResult;
@@ -70,11 +69,9 @@ public class DefaultProducerServerResourceDao extends AbstractWriteDao implement
 	}
 
 	@Override
-	public Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(BaseDto baseDto) {
+	public Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(int offset, int limit) {
 
 		Query query = new Query();
-		int offset = baseDto.getOffset();
-		int limit = baseDto.getLimit();
 		
 		query.skip(offset).limit(limit);
 		List<ProducerServerResource> producerServerResources = mongoTemplate.find(query, ProducerServerResource.class,

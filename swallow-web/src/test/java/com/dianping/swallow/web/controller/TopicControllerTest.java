@@ -1,18 +1,14 @@
 package com.dianping.swallow.web.controller;
 
-import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
 import java.io.IOException;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,13 +19,20 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.apache.commons.codec.binary.Base64;
 
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
-import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.TopicResourceService;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+
+/**
+ * @author mingdongli
+ *
+ * 2015年8月31日下午6:39:21
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:applicationContext.xml" })
 @WebAppConfiguration
@@ -43,8 +46,8 @@ public class TopicControllerTest {
 
 	private MockMvc mockMvc;
 
-	@Resource(name = "topicService")
-	private TopicService topicService;
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
 
 	@Before
 	public void setUp() throws Exception {

@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
+import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
@@ -67,15 +67,15 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdQueryDto consumerIdQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam) {
 
-		return consumerIdResourceDao.findByTopic(consumerIdQueryDto);
+		return consumerIdResourceDao.findByTopic(consumerIdParam);
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> find(ConsumerIdQueryDto consumerIdQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam consumerIdParam) {
 
-		return consumerIdResourceDao.find(consumerIdQueryDto);
+		return consumerIdResourceDao.find(consumerIdParam);
 	}
 
 	@Override
@@ -91,15 +91,15 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdQueryDto consumerIdQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam) {
 
-		return consumerIdResourceDao.findConsumerIdResourcePage(consumerIdQueryDto);
+		return consumerIdResourceDao.findConsumerIdResourcePage(consumerIdParam);
 	}
 
 	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdQueryDto consumerIdQueryDto) {
+	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam consumerIdParam) {
 
-		return consumerIdResourceDao.findByConsumerIp(consumerIdQueryDto);
+		return consumerIdResourceDao.findByConsumerIp(consumerIdParam);
 	}
 
 	@Override
@@ -131,10 +131,10 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 				Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL,
 						topic, cid);
 				if(valid(topic, cid)){
-					ConsumerIdQueryDto consumerIdQueryDto = new ConsumerIdQueryDto();
-					consumerIdQueryDto.setConsumerId(cid);
-					consumerIdQueryDto.setTopic(topic);
-					Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceDao.find(consumerIdQueryDto);
+					ConsumerIdParam consumerIdParam = new ConsumerIdParam();
+					consumerIdParam.setConsumerId(cid);
+					consumerIdParam.setTopic(topic);
+					Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceDao.find(consumerIdParam);
 					
 					if(pair.getFirst() == 0){
 						ConsumerIdResource consumerIdResource = buildConsumerIdResource(topic, cid, ips);
