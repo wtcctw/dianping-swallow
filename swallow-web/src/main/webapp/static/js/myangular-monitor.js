@@ -9,6 +9,10 @@ function renderGraph(url, divName, http) {
 						var parent = $('#' + divName);
 						parent.empty();
 						var count = 0;
+						if (data.length == 0) {
+							return;
+						}
+						console.log(data);
 						data
 								.forEach(function(item) {
 									count++;
@@ -77,9 +81,30 @@ module.controller('ProducerServerQpsController', function($scope, $http) {
 	$scope.queryServerQps = function() {
 		$scope.startTime = $("#starttime").val();
 		$scope.endTime = $("#stoptime").val();
+		if ($scope.startTime != null && $scope.endTime != null) {
+			if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
+				renderGraph("/console/monitor/producerserver/qps/get", "container",
+				$http);
+				return;
+			}else if($scope.startTime.length == 0 && $scope.endTime.length > 0){
+				alert("开始时间不能为空");
+				return;
+			}else if($scope.startTime.length > 0 && $scope.endTime.length == 0){
+				$scope.endTime = new Date().format("yyyy-MM-dd HH:mm:ss");
+			}else if($scope.startTime.length > 0 && $scope.endTime.length > 0){
+				console.log($scope.startTime.length);
+				startDate = new Date($scope.startTime);
+				endDate = new Date($scope.endTime);
+				if (endDate <= startDate) {
+					alert("结束时间不能小于开始时间");
+					return;
+				}
+			}
+		}
+
 		renderGraph("/console/monitor/producerserver/qps/get/"
 				+ $scope.startTime + "/" + $scope.endTime, "container", $http);
-	}
+	};
 
 });
 
@@ -88,6 +113,35 @@ module.controller('ConsumerServerQpsController', function($scope, $http) {
 	$scope.getConsumerServerQps = function() {
 		renderGraph("/console/monitor/consumerserver/qps/get", "container",
 				$http);
+	};
+	$scope.startTime = "";
+	$scope.endTime = "";
+	$scope.queryServerQps = function() {
+		$scope.startTime = $("#starttime").val();
+		$scope.endTime = $("#stoptime").val();
+		if ($scope.startTime != null && $scope.endTime != null) {
+			if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
+				renderGraph("/console/monitor/consumerserver/qps/get", "container",
+				$http);
+				return;
+			}else if($scope.startTime.length == 0 && $scope.endTime.length > 0){
+				alert("开始时间不能为空");
+				return;
+			}else if($scope.startTime.length > 0 && $scope.endTime.length == 0){
+				$scope.endTime = new Date().format("yyyy-MM-dd HH:mm:ss");
+			}else if($scope.startTime.length > 0 && $scope.endTime.length > 0){
+				console.log($scope.startTime.length);
+				startDate = new Date($scope.startTime);
+				endDate = new Date($scope.endTime);
+				if (endDate <= startDate) {
+					alert("结束时间不能小于开始时间");
+					return;
+				}
+			}
+		}
+		
+		renderGraph("/console/monitor/consumerserver/qps/get/"
+				+ $scope.startTime + "/" + $scope.endTime, "container", $http);
 	};
 });
 
@@ -115,6 +169,35 @@ module.controller('ConsumerQpsController', function($scope, $http) {
 	$scope.getConsumerQps = function(topicName) {
 		renderGraph("/console/monitor/consumer/" + topicName + "/qps/get",
 				"container", $http);
+	};
+	
+	$scope.startTime = "";
+	$scope.endTime = "";
+	$scope.queryByTime = function(topicName) {
+		$scope.startTime = $("#starttime").val();
+		$scope.endTime = $("#stoptime").val();
+		if ($scope.startTime != null && $scope.endTime != null) {
+			if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
+				renderGraph("/console/monitor/consumer/" + topicName + "/qps/get/", "container",
+				$http);
+				return;
+			}else if($scope.startTime.length == 0 && $scope.endTime.length > 0){
+				alert("开始时间不能为空");
+				return;
+			}else if($scope.startTime.length > 0 && $scope.endTime.length == 0){
+				$scope.endTime = new Date().format("yyyy-MM-dd HH:mm:ss");
+			}else if($scope.startTime.length > 0 && $scope.endTime.length > 0){
+				startDate = new Date($scope.startTime);
+				endDate = new Date($scope.endTime);
+				if (endDate <= startDate) {
+					alert("结束时间不能小于开始时间");
+					return;
+				}
+			}
+		}
+		
+		renderGraph("/console/monitor/consumer/" + topicName + "/qps/get/"
+				+ $scope.startTime + "/" + $scope.endTime, "container", $http);
 	};
 });
 
@@ -144,6 +227,35 @@ module.controller('ConsumerAccuController', function($scope, $http) {
 		renderGraph("/console/monitor/consumer/" + topicName + "/accu/get",
 				"container", $http);
 	};
+	
+	$scope.startTime = "";
+	$scope.endTime = "";
+	$scope.queryByTime = function(topicName) {
+		$scope.startTime = $("#starttime").val();
+		$scope.endTime = $("#stoptime").val();
+		if ($scope.startTime != null && $scope.endTime != null) {
+			if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
+				renderGraph("/console/monitor/consumer/" + topicName + "/accu/get", "container",
+				$http);
+				return;
+			}else if($scope.startTime.length == 0 && $scope.endTime.length > 0){
+				alert("开始时间不能为空");
+				return;
+			}else if($scope.startTime.length > 0 && $scope.endTime.length == 0){
+				$scope.endTime = new Date().format("yyyy-MM-dd HH:mm:ss");
+			}else if($scope.startTime.length > 0 && $scope.endTime.length > 0){
+				console.log($scope.startTime.length);
+				startDate = new Date($scope.startTime);
+				endDate = new Date($scope.endTime);
+				if (endDate <= startDate) {
+					alert("结束时间不能小于开始时间");
+					return;
+				}
+			}
+		}
+		renderGraph("/console/monitor/consumer/" + topicName + "/accu/get/"
+				+ $scope.startTime + "/" + $scope.endTime, "container", $http);
+	}
 });
 
 module.controller('ConsumerDelayController', function($scope, $http) {
@@ -173,7 +285,131 @@ module.controller('ConsumerDelayController', function($scope, $http) {
 		renderGraph('/console/monitor/consumer/' + topicName + '/delay/get',
 				"container", $http);
 	};
+	
+	$scope.startTime = "";
+	$scope.endTime = "";
+	$scope.queryByTime = function(topicName) {
+		$scope.startTime = $("#starttime").val();
+		$scope.endTime = $("#stoptime").val();
+		if ($scope.startTime != null && $scope.endTime != null) {
+			if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
+				renderGraph("/console/monitor/consumer/" + topicName + "/delay/get/", "container",
+				$http);
+				return;
+			}else if($scope.startTime.length == 0 && $scope.endTime.length > 0){
+				alert("开始时间不能为空");
+				return;
+			}else if($scope.startTime.length > 0 && $scope.endTime.length == 0){
+				$scope.endTime = new Date().format("yyyy-MM-dd HH:mm:ss");
+			}else if($scope.startTime.length > 0 && $scope.endTime.length > 0){
+				console.log($scope.startTime.length);
+				startDate = new Date($scope.startTime);
+				endDate = new Date($scope.endTime);
+				if (endDate <= startDate) {
+					alert("结束时间不能小于开始时间");
+					return;
+				}
+			}
+		}
+		
+		renderGraph("/console/monitor/consumer/" + topicName + "/delay/get/"
+				+ $scope.startTime + "/" + $scope.endTime, "container", $http);
+	};
 });
+
+module.controller('ConsumerOrderController', function($scope, $http) {
+
+	$scope.resultCount = 1;
+	$scope.queryOrderList = function(topicName) {
+		if($scope.resultCount == null||$scope.resultCount.length == 0){
+			$scope.resultCount = 10;
+		}
+		$http({
+				method : 'POST',
+				url : window.contextPath + '/console/monitor/consumer/total/order/get/' + $scope.resultCount
+			  }).success(function(datas, status, headers, config) {
+					$scope.orderDatas = datas;
+					$scope.IsShowOrderQps = true;
+			   }).error(function(datas, status, headers, config) {
+					console.log("orderQpxs读取错误");
+					$scope.orderDatas = [];
+					$scope.IsShowOrderQps = false;
+			   });
+		
+	};
+	
+	$scope.getOrder = function(topicName) {
+		$scope.queryOrderList('total');
+	};
+	
+	$scope.showRelatedInfo = function(topic, consumerId){
+		if(consumerId == null || consumerId == 'undefined' || consumerId.length == 0){
+			return topic;
+		}
+		return consumerId;
+	};
+	$scope.showRelatedUrl = function(type, topicName, consumerId){
+		if(consumerId == null || consumerId == 'undefined' || consumerId.length == 0){
+			switch(type){
+			case "SAVE_DELAY":
+			case "ACK_DELAY":
+			case "SEND_DELAY":
+				return window.contextPath + '/console/monitor/consumer/' + topicName + '/delay';
+			case "SAVE_QPX":
+			case "ACK_QPX":
+			case "SEND_QPX":
+				return window.contextPath + '/console/monitor/consumer/' + topicName + '/qps';
+			case "ACCUMULATION":
+				return window.contextPath + '/console/monitor/consumer/' + topicName + '/accu';
+			}
+		}
+		switch(type){
+			case "SAVE_DELAY":
+			case "ACK_DELAY":
+			case "SEND_DELAY":
+				return window.contextPath + '/console/monitor/consumer/' + topicName + '/delay?cid=' + consumerId;
+			case "SAVE_QPX":
+			case "ACK_QPX":
+			case "SEND_QPX":
+				return window.contextPath + '/console/monitor/consumer/' + topicName + '/qps?cid=' + consumerId;
+			case "ACCUMULATION":
+				return window.contextPath + '/console/monitor/consumer/' + topicName + '/accu?cid=' + consumerId;
+			}
+	};
+	$scope.startTime = "";
+	$scope.endTime = "";
+	$scope.queryByTime = function(topicName) {
+		$scope.startTime = $("#starttime").val();
+		$scope.endTime = $("#stoptime").val();
+		$scope.orderDatas = [];
+		$scope.IsShowOrderQps = false;
+		if($scope.resultCount == null||$scope.resultCount.length == 0){
+				$scope.resultCount = 10;
+		}
+		if ($scope.startTime != null && $scope.endTime != null) {
+			if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
+				renderGraph("/console/monitor/consumer/" + topicName + "/order/get/" + $scope.resultCount, "container",
+				$http);
+				return;
+			}else if($scope.startTime.length == 0 && $scope.endTime.length > 0){
+				alert("开始时间不能为空");
+				return;
+			}else if($scope.startTime.length > 0 && $scope.endTime.length == 0){
+				$scope.endTime = new Date().format("yyyy-MM-dd HH:mm:ss");
+			}else if($scope.startTime.length > 0 && $scope.endTime.length > 0){
+				startDate = new Date($scope.startTime);
+				endDate = new Date($scope.endTime);
+				if (endDate <= startDate) {
+					alert("结束时间不能小于开始时间");
+					return;
+				}
+			}
+		}
+		renderGraph("/console/monitor/consumer/" + topicName + "/order/get/" + $scope.resultCount + "/"
+				+ $scope.startTime + "/" + $scope.endTime, "container", $http);
+	};
+});
+
 
 module.controller('ConsumerDashboardController', function($scope, $http) {
 	$("#sidebar").addClass("responsive menu-min");
@@ -206,21 +442,21 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 		type : "堆积大盘"
 	} ];
 	$scope.boardsmap = {
-			"综合大盘":"comprehensive",
-			"发送延迟大盘":"senddelay",
-			"确认延迟大盘":"ackdelay",
-			"堆积大盘":"accu"
+		"综合大盘" : "comprehensive",
+		"发送延迟大盘" : "senddelay",
+		"确认延迟大盘" : "ackdelay",
+		"堆积大盘" : "accu"
 	}
 	$scope.boardtype = $scope.boards[0].type;
 
-//	$scope.getEntry = function(delayEntry) {
-//		defaultSize = 12;
-//		var size = delayEntry.size > defaultSize ? defaultSize
-//				: delayEntry.size;
-//		var emp = delayEntry.heap;
-//		var entrys = delayEntry.heap.slice(0, size)
-//		return entrys;
-//	}
+	// $scope.getEntry = function(delayEntry) {
+	// defaultSize = 12;
+	// var size = delayEntry.size > defaultSize ? defaultSize
+	// : delayEntry.size;
+	// var emp = delayEntry.heap;
+	// var entrys = delayEntry.heap.slice(0, size)
+	// return entrys;
+	// }
 
 	$scope.setStep = function(step) {
 		$scope.step = step + $scope.step;
@@ -250,7 +486,7 @@ module.controller('ConsumerDashboardController', function($scope, $http) {
 	$scope.stoptime = "";
 	$scope.requestindex = 0;
 
-		$scope.getDashboardDelay = function(index) {
+	$scope.getDashboardDelay = function(index) {
 		$scope.requestindex = index;
 		$scope.minuteEntrys = [];
 		var date = new Date();

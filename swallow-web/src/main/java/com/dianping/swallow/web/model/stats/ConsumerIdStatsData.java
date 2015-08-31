@@ -24,6 +24,16 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 
 	private String consumerId;
 
+	private long totalSendQps;
+
+	private long totalSendDelay;
+
+	private long totalAckQps;
+
+	private long totalAckDelay;
+
+	private long totalAccumulation;
+
 	public String getTopicName() {
 		return topicName;
 	}
@@ -40,9 +50,44 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		this.consumerId = consumerId;
 	}
 
-	@Override
-	public String toString() {
-		return "ConsumerIdStatsData [topicName=" + topicName + ", consumerId=" + consumerId + "]";
+	public long getTotalSendQps() {
+		return totalSendQps;
+	}
+
+	public void setTotalSendQps(long totalSendQps) {
+		this.totalSendQps = totalSendQps;
+	}
+
+	public long getTotalSendDelay() {
+		return totalSendDelay;
+	}
+
+	public void setTotalSendDelay(long totalSendDelay) {
+		this.totalSendDelay = totalSendDelay;
+	}
+
+	public long getTotalAckQps() {
+		return totalAckQps;
+	}
+
+	public void setTotalAckQps(long totalAckQps) {
+		this.totalAckQps = totalAckQps;
+	}
+
+	public long getTotalAckDelay() {
+		return totalAckDelay;
+	}
+
+	public void setTotalAckDelay(long totalAckDelay) {
+		this.totalAckDelay = totalAckDelay;
+	}
+
+	public long getTotalAccumulation() {
+		return totalAccumulation;
+	}
+
+	public void setTotalAccumulation(long totalAccumulation) {
+		this.totalAccumulation = totalAccumulation;
 	}
 
 	public boolean checkSendQpsPeak(long expectQps) {
@@ -148,6 +193,33 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 			}
 		}
 		return true;
+	}
+
+	public String generateKey() {
+		return topicName + "&" + consumerId;
+	}
+
+	public void setTotalStatsDatas(ConsumerIdStatsData lastStatsData) {
+		if (lastStatsData != null) {
+			this.totalSendDelay = lastStatsData.getTotalSendDelay() + getSendDelay();
+			this.totalSendQps = lastStatsData.getTotalSendQps() + getSendQps();
+			this.totalAckDelay = lastStatsData.getTotalAckDelay() + getAckDelay();
+			this.totalAckQps = lastStatsData.getTotalAckQps() + getAckQps();
+			this.totalAccumulation = lastStatsData.getTotalAccumulation() + getAccumulation();
+		} else {
+			this.totalSendDelay = getSendDelay();
+			this.totalSendQps = getSendQps();
+			this.totalAckDelay = getAckDelay();
+			this.totalAckQps = getAckQps();
+			this.totalAccumulation = getAccumulation();
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "ConsumerIdStatsData [topicName=" + topicName + ", consumerId=" + consumerId + ", totalSendQps="
+				+ totalSendQps + ", totalSendDelay=" + totalSendDelay + ", totalAckQps=" + totalAckQps
+				+ ", totalAckDelay=" + totalAckDelay + ", totalAccumulation=" + totalAccumulation + "]";
 	}
 
 }

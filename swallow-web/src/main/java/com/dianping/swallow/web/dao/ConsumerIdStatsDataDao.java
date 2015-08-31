@@ -28,8 +28,13 @@ public interface ConsumerIdStatsDataDao {
 
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId);
 
+	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit);
+
 	List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
+
+	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId, boolean isGt);
 
 	List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey);
 
+	List<ConsumerIdStatsData> findSectionData(String topicName, long startKey, long endKey);
 }

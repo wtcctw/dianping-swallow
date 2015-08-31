@@ -24,4 +24,5 @@ public interface ProducerServerStatsDataDao {
 
 	List<ProducerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 
+	List<ProducerServerStatsData> findSectionData(long startKey, long endKey);
 }

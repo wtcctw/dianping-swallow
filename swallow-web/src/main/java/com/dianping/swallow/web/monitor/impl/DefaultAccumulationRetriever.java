@@ -32,13 +32,17 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.config.WebConfig;
 import com.dianping.swallow.web.config.impl.DefaultWebConfig;
 import com.dianping.swallow.web.monitor.AccumulationListener;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.OrderEntity;
+import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 
 /**
  * @author mengwenchao
@@ -66,6 +70,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	private ConsumerDataRetriever consumerDataRetriever;
 
 	private ExecutorService executors;
+
+	@Autowired
+	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -95,7 +102,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		});
 
 		// 通知监听者
-		doNotify();
+		doChangeNotify();
 	}
 
 	protected void buildAllAccumulations() {
@@ -152,7 +159,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 					putAccumulation(topicName, consumerId);
 					TopicAccumulation topic = topics.get(topicName);
-					if(topic != null){
+					if (topic != null) {
 						topic.retain(consumerIds);
 					}
 				}
@@ -201,6 +208,41 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	}
 
 	@Override
+	public OrderStatsData getAccuOrderForAllConsumerId(int size) {
+		return getAccuOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
+	public OrderStatsData getAccuOrderForAllConsumerId(int size, long start, long end) {
+		return getAccuOrderForAllConsumerIdInMemory(size, start, end);
+	}
+
+	protected OrderStatsData getAccuOrderForAllConsumerIdInMemory(int size, long start, long end) {
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+
+		OrderStatsData orderResults = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY,
+				StatisDetailType.ACCUMULATION), start, end);
+
+		for (Map.Entry<String, TopicAccumulation> topicAccumulation : topics.entrySet()) {
+			String topicName = topicAccumulation.getKey();
+			Map<String, ConsumerIdAccumulation> consumerIdAccus = topicAccumulation.getValue().consumers();
+			for (Map.Entry<String, ConsumerIdAccumulation> consumerIdAccu : consumerIdAccus.entrySet()) {
+				NavigableMap<Long, Long> rawDatas = consumerIdAccu.getValue()
+						.getAccumulations(getSampleIntervalCount());
+				orderResults.add(new OrderEntity(topicName, consumerIdAccu.getKey(), getSumStatsData(rawDatas, fromKey,
+						toKey)));
+			}
+		}
+		return orderResults;
+	}
+
+	@Override
+	public boolean dataExistInMemory(long start, long end) {
+		return consumerDataRetriever.dataExistInMemory(start, end);
+	}
+	
+	@Override
 	public Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end) {
 
 		if (dataExistInMemory(start, end)) {
@@ -212,14 +254,33 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	}
 
 	private Map<String, StatsData> getAccumulationForAllConsumerIdInDb(String topic, long start, long end) {
-		return getAccumulationForAllConsumerIdInMemory(topic, start, end);
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+		Map<String, NavigableMap<Long, Long>> accuStatsDatas = consumerIdStatsDataService.findSectionAccuData(topic,
+				startKey, endKey);
+		Map<String, StatsData> result = new HashMap<String, StatsData>();
+		if (accuStatsDatas != null && !accuStatsDatas.isEmpty()) {
+			for (Map.Entry<String, NavigableMap<Long, Long>> accuStatsData : accuStatsDatas.entrySet()) {
+				String consumerId = accuStatsData.getKey();
+				if (MonitorData.TOTAL_KEY.equals(consumerId)) {
+					continue;
+				}
+				StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
+				NavigableMap<Long, Long> accuRawData = accuStatsData.getValue();
+				accuRawData = fillStatsData(accuRawData, startKey, endKey);
+				StatsData statsData = new StatsData(desc, getValue(accuRawData), getStartTime(accuRawData, start, end),
+						getStorageIntervalTime());
+				result.put(consumerId, statsData);
+			}
+		}
+		return result;
 	}
 
 	private Map<String, StatsData> getAccumulationForAllConsumerIdInMemory(String topic, long start, long end) {
 
 		Map<String, StatsData> result = new HashMap<String, StatsData>();
 		TopicAccumulation topicAccumulation = topics.get(topic);
-		if(topicAccumulation == null){
+		if (topicAccumulation == null) {
 			return result;
 		}
 		for (Entry<String, ConsumerIdAccumulation> entry : topicAccumulation.consumers.entrySet()) {
@@ -228,9 +289,10 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			ConsumerIdAccumulation consumerIdAccumulation = entry.getValue();
 
 			StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
-			result.put(
-					consumerId,
-					createStatsData(desc, consumerIdAccumulation.getAccumulations(getSampleIntervalCount()), start, end));
+
+			NavigableMap<Long, Long> rawData = consumerIdAccumulation.getAccumulations(getSampleIntervalCount());
+			rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+			result.put(consumerId, createStatsData(desc, rawData, start, end));
 		}
 
 		return result;
@@ -391,7 +453,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		accumulationListeners.add(listener);
 	}
 
-	protected void doNotify() {
+	protected void doChangeNotify() {
 		for (AccumulationListener accumulationListener : accumulationListeners) {
 			accumulationListener.achieveAccumulation();
 		}
@@ -406,6 +468,6 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		if (consumerIdAccumulation == null) {
 			return null;
 		}
-		return consumerIdAccumulation.getAccumulations(getSampleIntervalCount());
+		return consumerIdAccumulation.getAccumulations(getStorageIntervalCount());
 	}
 }

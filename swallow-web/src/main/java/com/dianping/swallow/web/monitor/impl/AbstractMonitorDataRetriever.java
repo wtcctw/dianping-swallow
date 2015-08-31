@@ -75,7 +75,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 			}
 		});
 		// 通知监听者
-		doNotify();
+		doChangeNotify();
 	}
 
 	@Override
@@ -98,11 +98,6 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		return getQpxInMemory(topic, type, start, end);
 	}
 
-	protected Map<String, StatsData> getServerQpxInDb(QPX qpx, StatisType save, long start, long end) {
-
-		return getServerQpxInMemory(qpx, save, start, end);
-	}
-
 	protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
 
 		return getDelayInMemory(topic, type, start, end);
@@ -111,13 +106,18 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	protected StatsData getDelayInMemory(String topic, StatisType type, long start, long end) {
 
 		NavigableMap<Long, Long> rawData = statis.getDelayForTopic(topic, type);
+		if (rawData != null) {
+			rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+		}
 		return createStatsData(createDelayDesc(topic, type), rawData, start, end);
 	}
 
 	protected StatsData getQpxInMemory(String topic, StatisType type, long start, long end) {
 
 		NavigableMap<Long, Long> rawData = statis.getQpxForTopic(topic, type);
-
+		if (rawData != null) {
+			rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+		}
 		return createStatsData(createQpxDesc(topic, type), rawData, start, end);
 	}
 
@@ -131,7 +131,9 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 			String serverIp = entry.getKey();
 			NavigableMap<Long, Long> serverQpx = entry.getValue();
-
+			if (serverQpx != null) {
+				serverQpx = serverQpx.subMap(getKey(start), true, getKey(end), true);
+			}
 			result.put(serverIp, createStatsData(createServerQpxDesc(serverIp, type), serverQpx, start, end));
 		}
 
@@ -182,8 +184,8 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		statisListeners.add(statisListener);
 	}
 
-	protected void doNotify() {
-		
+	protected void doChangeNotify() {
+
 		for (MonitorDataListener statisListener : statisListeners) {
 			statisListener.achieveMonitorData();
 		}
@@ -216,4 +218,5 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	public Object getValue(CasKeys keys) {
 		return getValue(keys, null);
 	}
+
 }

@@ -19,5 +19,8 @@ public interface AccumulationRetriever extends Retriever{
 	void registerListener(AccumulationListener listener);
 	
 	NavigableMap<Long, Long> getConsumerIdAccumulation(String topic, String consumerId);
+	
+	OrderStatsData getAccuOrderForAllConsumerId(int size, long start, long end);
 
+	OrderStatsData getAccuOrderForAllConsumerId(int size);
 }

@@ -20,6 +20,10 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.ba.base.organizationalstructure.api.user.UserService;
 import com.dianping.ba.base.organizationalstructure.api.user.dto.UserProfileDto;
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.CmdbService;
@@ -38,14 +42,15 @@ public class IPDescManagerImpl implements IPDescManager {
 	private static final Logger logger = LoggerFactory.getLogger(IPDescManagerImpl.class);
 
 	private static final String COMMA_SPLIT = ",";
-	
+
 	private static final String FACTORY_NAME = "IPDescManager";
 
-	private int interval = 60;// 分钟
+	private int interval = 120;// 分钟
 
 	private int delay = 10;
 
-	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
+			.getThreadFactory(FACTORY_NAME));
 
 	private ScheduledFuture<?> future = null;
 
@@ -69,7 +74,13 @@ public class IPDescManagerImpl implements IPDescManager {
 			public void run() {
 				try {
 					logger.info("[startTask] scheduled task running.");
-					doTask();
+					SwallowActionWrapper catWrapper = new CatActionWrapper("IPDescManagerImpl", "doIpDescTask");
+					catWrapper.doAction(new SwallowAction() {
+						@Override
+						public void doAction() throws SwallowException {
+							doIpDescTask();
+						}
+					});
 				} catch (Throwable th) {
 					logger.error("[startTask]", th);
 				} finally {
@@ -80,7 +91,7 @@ public class IPDescManagerImpl implements IPDescManager {
 		}, getDelay(), getInterval(), TimeUnit.MINUTES));
 	}
 
-	private void doTask() {
+	private void doIpDescTask() {
 		Set<String> ips = ipCollectorService.getStatisIps();
 		if (ips != null && ips.size() > 0) {
 			Iterator<String> iterator = ips.iterator();
@@ -139,7 +150,7 @@ public class IPDescManagerImpl implements IPDescManager {
 			}
 			String strDpMobile = ipDesc.getDpMobile();
 			Set<String> dpEmails = getEmailsByStrMobile(strDpMobile);
-			
+
 			if (StringUtils.isNotBlank(ipDesc.getEmail())) {
 				ipDesc.setEmail(ipDesc.getEmail() + COMMA_SPLIT + convertSetToEmail(dpEmails));
 			} else {
@@ -150,9 +161,9 @@ public class IPDescManagerImpl implements IPDescManager {
 			Set<String> opEmails = getEmailsByStrMobile(strOpMobile);
 
 			if (StringUtils.isNotBlank(ipDesc.getOpEmail())) {
-				ipDesc.setEmail(ipDesc.getOpEmail() + COMMA_SPLIT + convertSetToEmail(opEmails));
+				ipDesc.setOpEmail(ipDesc.getOpEmail() + COMMA_SPLIT + convertSetToEmail(opEmails));
 			} else {
-				ipDesc.setEmail(convertSetToEmail(opEmails));
+				ipDesc.setOpEmail(convertSetToEmail(opEmails));
 			}
 		} catch (Exception e) {
 			logger.error("[addEmail]", e);

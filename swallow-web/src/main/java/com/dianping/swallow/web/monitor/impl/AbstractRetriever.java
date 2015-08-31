@@ -3,9 +3,11 @@ package com.dianping.swallow.web.monitor.impl;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -20,6 +22,7 @@ import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.web.monitor.Retriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mengwenchao
@@ -32,12 +35,17 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 	protected final int BUILD_TIMES_AGEO = 15000;// 每次构建时，构建此时间(ms)以前的数据
 
+	private static final String FACTORY_NAME = "DataRetriever";
+	
+	protected static final String TOTAL_KEY = "total";
+
 	@Value("${swallow.web.monitor.keepinmemory}")
 	public int keepInMemoryHour = 3;// 保存最新小时
 
 	public static int keepInMemoryCount;
 
-	protected ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT);
+	protected ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
+			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	protected long lastBuildTime = System.currentTimeMillis(), current = System.currentTimeMillis();
 
@@ -142,8 +150,16 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return DEFAULT_INTERVAL;
 	}
 
+	protected int getStorageIntervalTime() {
+		return DEFAULT_INTERVAL;
+	}
+
 	protected int getSampleIntervalCount() {
 		return getSampleIntervalTime() / AbstractCollector.SEND_INTERVAL;
+	}
+
+	protected int getStorageIntervalCount() {
+		return DEFAULT_INTERVAL / AbstractCollector.SEND_INTERVAL;
 	}
 
 	@Override
@@ -199,6 +215,74 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 	protected StatsData createStatsData(StatsDataDesc desc, NavigableMap<Long, Long> rawData, long start, long end) {
 
 		return new StatsData(desc, getValue(rawData), getStartTime(rawData, start, end), getSampleIntervalTime());
+	}
+
+	// 补齐数据
+	protected NavigableMap<Long, Long> fillStatsData(NavigableMap<Long, Long> statsDatas, long startTimeKey,
+			long endTimeKey) {
+		if (statsDatas == null) {
+			statsDatas = new TreeMap<Long, Long>();
+		}
+
+		if (statsDatas.isEmpty()) {
+			Long firstKey = startTimeKey;
+			Long endKey = endTimeKey;
+			while (firstKey < endKey) {
+				statsDatas.put(firstKey, 0L);
+				firstKey += getStorageIntervalCount();
+			}
+		} else {
+			long tempStartKey = statsDatas.firstKey();
+			long tempEndKey = statsDatas.lastKey();
+			long tempKey = tempStartKey;
+			tempKey -= getStorageIntervalCount();
+			while (startTimeKey < tempKey) {
+				if (!statsDatas.containsKey(tempKey)) {
+					statsDatas.put(tempKey, 0L);
+				}
+				tempKey -= getStorageIntervalCount();
+			}
+
+			tempKey = tempStartKey;
+			while (tempKey < tempEndKey) {
+				if (!statsDatas.containsKey(tempKey)) {
+					Long higherKey = statsDatas.higherKey(tempKey);
+					if (higherKey != null) {
+						long pointKey = higherKey.longValue();
+						while (pointKey - tempKey > getStorageIntervalCount()) {
+							statsDatas.put(tempKey, 0L);
+							tempKey += getStorageIntervalCount();
+						}
+						tempKey = pointKey;
+						continue;
+					}
+
+				}
+				tempKey += getStorageIntervalCount();
+			}
+
+			tempKey = tempEndKey;
+			tempKey += getStorageIntervalCount();
+			while (tempKey < endTimeKey) {
+				if (!statsDatas.containsKey(tempKey)) {
+					statsDatas.put(tempKey, 0L);
+				}
+				tempKey += getStorageIntervalCount();
+			}
+		}
+
+		return statsDatas;
+	}
+	
+	protected long getSumStatsData(NavigableMap<Long, Long> rawDatas, long fromKey, long toKey) {
+		long sumData = 0;
+		if (rawDatas != null) {
+			rawDatas = rawDatas.subMap(fromKey, true, toKey, true);
+			for (Map.Entry<Long, Long> rowData : rawDatas.entrySet()) {
+				sumData += rowData.getValue().floatValue();
+			}
+		}
+		return sumData;
 	}
 
 }

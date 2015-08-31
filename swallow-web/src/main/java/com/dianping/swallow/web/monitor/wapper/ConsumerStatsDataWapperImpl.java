@@ -1,11 +1,9 @@
 package com.dianping.swallow.web.monitor.wapper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -17,8 +15,10 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.ConsumerTopicStatisData;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
@@ -102,22 +102,22 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public Map<String, List<ConsumerIdStatsData>> getConsumerIdStatsDatas(long timeKey) {
+	public List<ConsumerIdStatsData> getConsumerIdStatsDatas(long timeKey) {
 		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
 		if (topicKeys == null) {
 			return null;
 		}
 		Iterator<String> iterator = topicKeys.iterator();
-		Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = new HashMap<String, List<ConsumerIdStatsData>>();
+		List<ConsumerIdStatsData> consumerIdStatsDataResults = new ArrayList<ConsumerIdStatsData>();
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
 			List<ConsumerIdStatsData> consumerIdStatsDatas = getConsumerIdStatsDatas(topicName, timeKey);
 			if (consumerIdStatsDatas == null) {
 				continue;
 			}
-			consumerIdStatsDataMap.put(topicName, consumerIdStatsDatas);
+			consumerIdStatsDataResults.addAll(consumerIdStatsDatas);
 		}
-		return consumerIdStatsDataMap;
+		return consumerIdStatsDataResults;
 	}
 
 	@Override
@@ -194,6 +194,55 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			return accumulation.longValue();
 		}
 		return 0L;
+	}
+
+	@Override
+	public ConsumerTopicStatsData getTotalTopicStatsData(long timeKey) {
+		ConsumerTopicStatsData consumerTopicStatsData = statsDataFactory.createConsumerTopicStatsData();
+		consumerTopicStatsData.setTopicName(TOTAL_KEY);
+		ConsumerTopicStatisData consumerIdStatisData = (ConsumerTopicStatisData) consumerDataRetriever.getValue(
+				new CasKeys(TOTAL_KEY, TOTAL_KEY), StatisType.SEND);
+		if (consumerIdStatisData == null) {
+			return null;
+		}
+		NavigableMap<Long, Long> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
+		NavigableMap<Long, Long> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
+		NavigableMap<Long, Long> sendDelay = consumerIdStatisData.getDelay(StatisType.SEND);
+		NavigableMap<Long, Long> ackDelay = consumerIdStatisData.getDelay(StatisType.ACK);
+
+		if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
+				|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+			return null;
+		}
+		Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+		if (tempKey == null) {
+			return null;
+		}
+		timeKey = tempKey.longValue();
+		consumerTopicStatsData.setTimeKey(timeKey);
+		Long sendQpxVlaue = sendQpx.get(timeKey);
+		if (sendQpxVlaue != null) {
+			consumerTopicStatsData.setSendQps(sendQpxVlaue);
+		}
+
+		Long ackQpxValue = ackQpx.get(timeKey);
+		if (ackQpxValue != null) {
+			consumerTopicStatsData.setAckQps(ackQpxValue.longValue());
+		}
+
+		Long sendDelayValue = sendDelay.get(timeKey);
+		if (sendDelayValue != null) {
+			consumerTopicStatsData.setSendDelay(sendDelayValue.longValue());
+		}
+
+		Long ackDelayValue = ackDelay.get(timeKey);
+		if (ackDelayValue != null) {
+			consumerTopicStatsData.setAckDelay(ackDelayValue.longValue());
+		}
+
+		consumerTopicStatsData.setAccumulation(0L);
+
+		return consumerTopicStatsData;
 	}
 
 	@Override

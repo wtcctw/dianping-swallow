@@ -22,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.AlarmSearchDto;
 import com.dianping.swallow.web.controller.mapper.AlarmMapper;
+import com.dianping.swallow.web.dao.AlarmDao.AlarmParam;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.AlarmService;
@@ -66,15 +67,16 @@ public class AlarmController extends AbstractSidebarBasedController {
 			endDate = new Date();
 		}
 		Pair<List<Alarm>, Long> results = null;
+		AlarmParam alarmParam = new AlarmParam();
+		alarmParam.setStartTime(startDate).setEndTime(endDate).setLimit(alarmSearchDto.getLimit())
+				.setOffset(alarmSearchDto.getOffset()).setReceiver(alarmSearchDto.getReceiver());
 		if (alarmSearchDto.getRelatedType().isConsumerId() && StringUtils.isNotBlank(alarmSearchDto.getRelatedInfo())) {
 			String relateds[] = alarmSearchDto.getRelatedInfo().split(" ");
 			if (relateds.length == 2) {
-				results = alarmService.findByPage(alarmSearchDto.getReceiver(), relateds[1], relateds[0], startDate,
-						endDate, alarmSearchDto.getOffset(), alarmSearchDto.getLimit());
+				results = alarmService.findByPage(alarmParam.setRelated(relateds[1]).setSubRelated(relateds[0]));
 			}
 		} else {
-			results = alarmService.findByPage(alarmSearchDto.getReceiver(), alarmSearchDto.getRelatedInfo(), startDate,
-					endDate, alarmSearchDto.getOffset(), alarmSearchDto.getLimit());
+			results = alarmService.findByPage(alarmParam.setRelated(alarmSearchDto.getRelatedInfo()));
 		}
 		Map<String, Object> result = new HashMap<String, Object>();
 		if (results != null) {

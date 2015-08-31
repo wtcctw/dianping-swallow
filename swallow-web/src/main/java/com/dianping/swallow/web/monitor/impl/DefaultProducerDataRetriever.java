@@ -1,8 +1,13 @@
 package com.dianping.swallow.web.monitor.impl;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +23,13 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
+import com.dianping.swallow.web.monitor.OrderEntity;
+import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.service.ProducerServerStatsDataService;
+import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 
 /**
  * @author mengwenchao
@@ -36,7 +45,88 @@ public class DefaultProducerDataRetriever
 	public static final String CAT_TYPE = "DefaultProducerDataRetriever";
 
 	@Autowired
+	private ProducerServerStatsDataService pServerStatsDataService;
+
+	@Autowired
+	private ProducerTopicStatsDataService pTopicStatsDataService;
+
+	@Autowired
 	private ProducerMonitorDao producerMonitorDao;
+
+	@Override
+	public boolean dataExistInMemory(long start, long end) {
+		NavigableMap<Long, Long> qpxStatsData = statis.getQpx(StatisType.SAVE);
+		if (qpxStatsData == null || qpxStatsData.isEmpty()) {
+			return false;
+		}
+		Long firstKey = statis.getQpx(StatisType.SAVE).firstKey();
+		if (firstKey != null) {
+			if (getKey(start) >= firstKey.longValue()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public OrderStatsData getDelayOrder(int size, long start, long end) {
+		return getDelayOrderInMemory(size, StatisType.SAVE, start, end);
+	}
+
+	protected OrderStatsData getDelayOrderInMemory(int size, StatisType type, long start, long end) {
+		Set<String> topics = statis.getTopics(false);
+		if (topics == null) {
+			return null;
+		}
+		OrderStatsData orderResults = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, type), start, end);
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+		Iterator<String> iterator = topics.iterator();
+		while (iterator.hasNext()) {
+			String topicName = iterator.next();
+			if (TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
+			NavigableMap<Long, Long> rawDatas = statis.getDelayForTopic(topicName, type);
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
+		}
+		return orderResults;
+	}
+
+	@Override
+	public OrderStatsData getDelayOrder(int size) {
+		return getDelayOrder(size, getDefaultStart(), getDefaultEnd());
+	}
+
+	@Override
+	public OrderStatsData getQpxOrder(int size, long start, long end) {
+		return getQpxOrderInMemory(size, StatisType.SAVE, start, end);
+	}
+
+	protected OrderStatsData getQpxOrderInMemory(int size, StatisType type, long start, long end) {
+		Set<String> topics = statis.getTopics(false);
+		if (topics == null) {
+			return null;
+		}
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+		OrderStatsData orderResults = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, type), start, end);
+		Iterator<String> iterator = topics.iterator();
+		while (iterator.hasNext()) {
+			String topicName = iterator.next();
+			if (TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
+			NavigableMap<Long, Long> rawDatas = statis.getQpxForTopic(topicName, type);
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
+		}
+		return orderResults;
+	}
+
+	@Override
+	public OrderStatsData getQpxOrder(int size) {
+		return getQpxOrder(size, getDefaultStart(), getDefaultEnd());
+	}
 
 	@Override
 	public StatsData getSaveDelay(String topic, long start, long end) {
@@ -49,12 +139,33 @@ public class DefaultProducerDataRetriever
 	}
 
 	@Override
+	protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
+
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+
+		NavigableMap<Long, Long> rawData = pTopicStatsDataService.findSectionDelayData(topic, startKey, endKey);
+		rawData = fillStatsData(rawData, startKey, endKey);
+		return createStatsData(createQpxDesc(topic, StatisType.SAVE), rawData, start, end);
+	}
+
+	@Override
 	public StatsData getQpx(String topic, QPX qpx, long start, long end) {
 
 		if (dataExistInMemory(start, end)) {
 			return getQpxInMemory(topic, StatisType.SAVE, start, end);
 		}
 		return getQpxInDb(topic, StatisType.SAVE, start, end);
+	}
+
+	@Override
+	protected StatsData getQpxInDb(String topic, StatisType type, long start, long end) {
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+
+		NavigableMap<Long, Long> rawData = pTopicStatsDataService.findSectionQpsData(topic, startKey, endKey);
+		rawData = fillStatsData(rawData, startKey, endKey);
+		return createStatsData(createQpxDesc(topic, type), rawData, start, end);
 	}
 
 	@Override
@@ -65,6 +176,29 @@ public class DefaultProducerDataRetriever
 		}
 
 		return getServerQpxInDb(qpx, StatisType.SAVE, start, end);
+	}
+
+	protected Map<String, StatsData> getServerQpxInDb(QPX qpx, StatisType type, long start, long end) {
+		Map<String, StatsData> result = new HashMap<String, StatsData>();
+
+		long startKey = getKey(start);
+		long endKey = getKey(end);
+		Map<String, NavigableMap<Long, Long>> statsDataMaps = pServerStatsDataService.findSectionQpsData(startKey,
+				endKey);
+
+		for (Map.Entry<String, NavigableMap<Long, Long>> statsDataMap : statsDataMaps.entrySet()) {
+			String serverIp = statsDataMap.getKey();
+
+			if (StringUtils.equals(TOTAL_KEY, serverIp)) {
+				continue;
+			}
+
+			NavigableMap<Long, Long> statsData = statsDataMap.getValue();
+			statsData = fillStatsData(statsData, startKey, endKey);
+			result.put(serverIp, createStatsData(createServerQpxDesc(serverIp, type), statsData, start, end));
+
+		}
+		return result;
 	}
 
 	@Override

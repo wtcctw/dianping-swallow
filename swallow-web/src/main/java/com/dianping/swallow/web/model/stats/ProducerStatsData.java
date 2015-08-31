@@ -1,9 +1,10 @@
 package com.dianping.swallow.web.model.stats;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年7月31日 下午3:56:58
+ *         2015年7月31日 下午3:56:58
  */
 public abstract class ProducerStatsData extends StatsData {
 
@@ -29,7 +30,8 @@ public abstract class ProducerStatsData extends StatsData {
 
 	@Override
 	public String toString() {
-		return "ProducerStatsData [qpx=" + qps + ", delay=" + delay + "]";
+		return "ProducerStatsData [qps=" + qps + ", delay=" + delay + "]";
 	}
 
+	
 }

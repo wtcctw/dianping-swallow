@@ -1,20 +1,21 @@
 package com.dianping.swallow.web.model.stats;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年7月31日 下午3:56:45
+ *         2015年7月31日 下午3:56:45
  */
 public abstract class ConsumerStatsData extends StatsData {
-	
+
 	private long sendQps;
-	
+
 	private long sendDelay;
-	
+
 	private long ackQps;
-	
+
 	private long ackDelay;
-	
+
 	private long accumulation;
 
 	public long getSendQps() {
@@ -56,5 +57,11 @@ public abstract class ConsumerStatsData extends StatsData {
 	public void setAccumulation(long accumulation) {
 		this.accumulation = accumulation;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "ConsumerStatsData [sendQps=" + sendQps + ", sendDelay=" + sendDelay + ", ackQps=" + ackQps
+				+ ", ackDelay=" + ackDelay + ", accumulation=" + accumulation + "]";
+	}
+
 }

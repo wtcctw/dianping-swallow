@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.alarmer.storager;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,22 +9,29 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.StatsDataContainer;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
+import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月4日 下午1:22:31
+ *         2015年8月4日 下午1:22:31
  */
 @Component
 public class ConsumerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
 
+	@Autowired
+	private StatsDataContainer statsDataContainer;
+	
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 
@@ -36,8 +42,11 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 	private ConsumerServerStatsDataService serverStatsDataService;
 
 	@Autowired
-	private ConsumerIdStatsDataService consumerIdStatsDataService;
+	private ConsumerTopicStatsDataService topicStatsDataService;
 
+	@Autowired
+	private ConsumerIdStatsDataService consumerIdStatsDataService;
+	
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
@@ -56,12 +65,14 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 			return;
 		}
 		dataCount.decrementAndGet();
-		List<ConsumerServerStatsData> serverStatisDatas = consumerStatsDataWapper
+		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper
 				.getServerStatsDatas(lastTimeKey.get());
-		Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = consumerStatsDataWapper
-				.getConsumerIdStatsDatas(lastTimeKey.get());
-		storageServerStatis(serverStatisDatas);
-		storageConsumerIdStatis(consumerIdStatsDataMap);
+		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(lastTimeKey
+				.get());
+		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
+		storageServerStatis(serverStatsDatas);
+		storageTopicStatis(topicStatsData);
+		storageConsumerIdStatis(consumerIdStatsDatas);
 	}
 
 	private void storageServerStatis(final List<ConsumerServerStatsData> serverStatsDatas) {
@@ -73,8 +84,11 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 				if (serverStatsDatas == null) {
 					return;
 				}
+				boolean isFirstTime = true;
 				for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
-					lastTimeKey.set(serverStatsData.getTimeKey());
+					if (isFirstTime) {
+						lastTimeKey.set(serverStatsData.getTimeKey());
+					}
 					serverStatsDataService.insert(serverStatsData);
 				}
 			}
@@ -82,25 +96,37 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 
 	}
 
-	private void storageConsumerIdStatis(final Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap) {
+	private void storageTopicStatis(final ConsumerTopicStatsData topicStatsData) {
+		logger.info("[storageTopicStatis]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStats");
+		catWrapper.doAction(new SwallowAction() {
+			@Override
+			public void doAction() throws SwallowException {
+				if (topicStatsData == null) {
+					return;
+				}
+				topicStatsDataService.insert(topicStatsData);
+			}
+		});
+
+	}
+
+	private void storageConsumerIdStatis(final List<ConsumerIdStatsData> consumerIdStatsDatas) {
 		logger.info("[storageConsumerIdStats]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageConsumerIdStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				if (consumerIdStatsDataMap == null) {
+				if (consumerIdStatsDatas == null) {
 					return;
 				}
-				for (Map.Entry<String, List<ConsumerIdStatsData>> consumerIdStatsDataEntry : consumerIdStatsDataMap
-						.entrySet()) {
-					List<ConsumerIdStatsData> consumerIdStatsDatas = consumerIdStatsDataEntry.getValue();
-					if (consumerIdStatsDatas == null) {
-						continue;
-					}
-					for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
-						consumerIdStatsDataService.insert(consumerIdStatsData);
-					}
+				
+				statsDataContainer.setConsumerIdTotalRatio(consumerIdStatsDatas);
+				
+				for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
+					consumerIdStatsDataService.insert(consumerIdStatsData);
 				}
+
 			}
 		});
 	}

@@ -1,11 +1,11 @@
 package com.dianping.swallow.web.monitor.wapper;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 
 /**
  * 
@@ -21,6 +21,13 @@ public interface ConsumerStatsDataWapper {
 	 * @return
 	 */
 	List<ConsumerServerStatsData> getServerStatsDatas(long timeKey);
+	
+	/**
+	 * get total topic statis data at timekey point
+	 * @param timeKey
+	 * @return
+	 */
+	ConsumerTopicStatsData getTotalTopicStatsData(long timeKey);
 
 	/**
 	 * get all consumerId statis data at timekey point
@@ -28,7 +35,7 @@ public interface ConsumerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	Map<String, List<ConsumerIdStatsData>> getConsumerIdStatsDatas(long timeKey);
+	List<ConsumerIdStatsData> getConsumerIdStatsDatas(long timeKey);
 
 	/**
 	 * get one topic related consumerId statis data at timekey point

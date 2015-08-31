@@ -7,19 +7,29 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
 /**
  * @author mengwenchao
  *
- * 2015年4月21日 上午10:38:07
+ *         2015年4月21日 上午10:38:07
  */
-public interface ProducerDataRetriever extends MonitorDataRetriever{
+public interface ProducerDataRetriever extends MonitorDataRetriever {
 	
+	boolean dataExistInMemory(long start, long end);
+
 	StatsData getSaveDelay(String topic, long start, long end);
 
 	StatsData getSaveDelay(String topic) throws Exception;
 
 	StatsData getQpx(String topic, QPX qpx, long start, long end);
-	
+
 	StatsData getQpx(String topic, QPX qpx);
 
 	Map<String, StatsData> getServerQpx(QPX qpx, long start, long end);
 
 	Map<String, StatsData> getServerQpx(QPX qpx);
+
+	OrderStatsData getDelayOrder(int size, long start, long end);
+
+	OrderStatsData getDelayOrder(int size);
+
+	OrderStatsData getQpxOrder(int size, long start, long end);
+
+	OrderStatsData getQpxOrder(int size);
 }

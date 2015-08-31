@@ -22,6 +22,10 @@ public interface ProducerTopicStatsDataDao {
 
 	List<ProducerTopicStatsData> findByTopic(String topicName);
 
+	ProducerTopicStatsData findOneByTopicAndTime(String topicName, long timeKey, boolean isGt);
+
+	List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit);
+
 	List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
 
 }

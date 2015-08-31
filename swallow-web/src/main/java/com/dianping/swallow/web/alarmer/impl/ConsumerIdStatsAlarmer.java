@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,19 +61,19 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements Moni
 			return;
 		}
 		dataCount.decrementAndGet();
-		final Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap = consumerStatsDataWapper
+		final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper
 				.getConsumerIdStatsDatas(lastTimeKey.get());
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				consumerIdAlarm(consumerIdStatsDataMap);
+				consumerIdAlarm(consumerIdStatsDatas);
 			}
 		});
 	}
 
-	private void consumerIdAlarm(Map<String, List<ConsumerIdStatsData>> consumerIdStatsDataMap) {
-		if (consumerIdStatsDataMap == null || consumerIdStatsDataMap.size() == 0) {
+	private void consumerIdAlarm(List<ConsumerIdStatsData> consumerIdStatsDatas) {
+		if (consumerIdStatsDatas == null || consumerIdStatsDatas.size() == 0) {
 			return;
 		}
 		ConsumerIdAlarmSetting consumerIdAlarmSetting = consumerIdAlarmSettingService.findDefault();
@@ -89,35 +88,35 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements Moni
 		long sendDelay = consumerAlarmSetting.getSendDelay();
 		long ackDelay = consumerAlarmSetting.getAckDelay();
 		long accumulation = consumerAlarmSetting.getAccumulation();
-		for (Map.Entry<String, List<ConsumerIdStatsData>> consumerIdStatsDataEntry : consumerIdStatsDataMap.entrySet()) {
-			String topicName = consumerIdStatsDataEntry.getKey();
+
+		for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
+			String topicName = consumerIdStatsData.getTopicName();
+			String consumerId = consumerIdStatsData.getConsumerId();
 			if (StringUtils.equals(TOTAL_KEY, topicName)) {
 				continue;
 			}
 			if (topicWhiteList != null && topicWhiteList.contains(topicName)) {
 				continue;
 			}
-			List<ConsumerIdStatsData> consumerIdStatsDatas = consumerIdStatsDataEntry.getValue();
-			for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
-				if (StringUtils.equals(TOTAL_KEY, consumerIdStatsData.getConsumerId())) {
-					continue;
+			if (StringUtils.equals(TOTAL_KEY, consumerId)) {
+				continue;
+			}
+			if (whiteList == null || !whiteList.contains(consumerId)) {
+
+				boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);
+				boolean isAckQps = ackSendAlarm(consumerIdStatsData, ackQps);
+				if (isSendQps && isAckQps) {
+					long timeKey = consumerIdStatsData.getTimeKey();
+					Pair<Long, Long> preResult = getExpectedQps(topicName, consumerId, timeKey);
+					sendQpsFluAlarm(consumerIdStatsData, preResult.getFirst(), sendQps);
+					ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
 				}
-				if (whiteList == null || !whiteList.contains(consumerIdStatsData.getConsumerId())) {
-					String consumerId = consumerIdStatsData.getConsumerId();
-					boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);
-					boolean isAckQps = ackSendAlarm(consumerIdStatsData, ackQps);
-					if (isSendQps && isAckQps) {
-						long timeKey = consumerIdStatsData.getTimeKey();
-						Pair<Long, Long> preResult = getExpectedQps(topicName, consumerId, timeKey);
-						sendQpsFluAlarm(consumerIdStatsData, preResult.getFirst(), sendQps);
-						ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
-					}
-					sendDelayAlarm(consumerIdStatsData, sendDelay);
-					sendAccuAlarm(consumerIdStatsData, accumulation);
-					ackDelayAlarm(consumerIdStatsData, ackDelay);
-				}
+				sendDelayAlarm(consumerIdStatsData, sendDelay);
+				sendAccuAlarm(consumerIdStatsData, accumulation);
+				ackDelayAlarm(consumerIdStatsData, ackDelay);
 			}
 		}
+
 	}
 
 	private boolean sendQpsAlarm(ConsumerIdStatsData consumerIdStatsData, QPSAlarmSetting qps) {
