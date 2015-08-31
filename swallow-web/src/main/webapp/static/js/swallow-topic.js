@@ -133,14 +133,15 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.delay = $scope.searchPaginator.currentPageItems[index].delay;
 			}
 			
-			$scope.refreshpage = function(myForm){
+			$scope.refreshpage = function(myForm, index){
 				if ($scope.topicEntry.sendpeak < $scope.topicEntry.sendvalley){
 					alert("峰值不能小于谷值");
 					return;
 				}
 				$scope.topicEntry.administrator = $("#administrator").val();
 				$scope.topicEntry.producerServer = $("#producerServer").val();
-				$('#myModal').modal('hide');
+				var id = "#myModal" + index;
+				$(id).modal('hide');
 				var param = JSON.stringify($scope.topicEntry);
 				
 				$http.post(window.contextPath + '/console/topic/update', $scope.topicEntry).success(function(response) {
