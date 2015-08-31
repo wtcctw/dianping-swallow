@@ -63,13 +63,13 @@
 						on-finish-render-filters>
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="t.ip"></td>
-						<td style="text-align: left" ng-bind="t.application"></td>
-						<td style="text-align: left" ng-bind="t.email"></td>
-						<td style="text-align: left" ng-bind="t.dpManager"></td>
-						<td style="text-align: left" ng-bind="t.dpMobile"></td>
-						<td style="text-align: left" ng-bind="t.opEmail"></td>
-						<td style="text-align: left" ng-bind="t.opManager"></td>
-						<td style="text-align: left" ng-bind="t.opMobile"></td>
+						<td style="text-align: left" ng-bind="t.application | limitTo : 25"></td>
+						<td style="text-align: left" ng-bind="t.email | limitTo : 25"></td>
+						<td style="text-align: left" ng-bind="t.dpManager | limitTo : 25"></td>
+						<td style="text-align: left" ng-bind="t.dpMobile | limitTo : 25"></td>
+						<td style="text-align: left" ng-bind="t.opEmail | limitTo : 25"></td>
+						<td style="text-align: left" ng-bind="t.opManager | limitTo : 25"></td>
+						<td style="text-align: left" ng-bind="t.opMobile | limitTo : 25"></td>
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
 								id="alarm{{$index}}" type="checkbox" ng-model="t.alarm"

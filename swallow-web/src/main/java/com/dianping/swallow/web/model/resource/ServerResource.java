@@ -1,9 +1,5 @@
 package com.dianping.swallow.web.model.resource;
 
-import java.util.List;
-
-import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
-
 
 /**
  * @author mingdongli
@@ -18,10 +14,6 @@ public abstract class ServerResource extends BaseResource{
 	
 	private boolean alarm;
 	
-	private List<String> topicWhiteList;
-	
-	private QPSAlarmSetting sendAlarmSetting;
-
 	public String getIp() {
 		return ip;
 	}
@@ -38,14 +30,6 @@ public abstract class ServerResource extends BaseResource{
 		this.hostname = hostname;
 	}
 	
-	public List<String> getTopicWhiteList() {
-		return topicWhiteList;
-	}
-
-	public void setTopicWhiteList(List<String> topicWhiteList) {
-		this.topicWhiteList = topicWhiteList;
-	}
-	
 	public boolean isAlarm() {
 		return alarm;
 	}
@@ -53,19 +37,11 @@ public abstract class ServerResource extends BaseResource{
 	public void setAlarm(boolean alarm) {
 		this.alarm = alarm;
 	}
-	
-	public QPSAlarmSetting getSendAlarmSetting() {
-		return sendAlarmSetting;
-	}
-
-	public void setSendAlarmSetting(QPSAlarmSetting sendAlarmSetting) {
-		this.sendAlarmSetting = sendAlarmSetting;
-	}
 
 	@Override
 	public String toString() {
-		return "ServerResource [ip=" + ip + ", hostname=" + hostname + ", alarm=" + alarm + ", topicWhiteList="
-				+ topicWhiteList + ", sendAlarmSetting=" + sendAlarmSetting + ", toString()=" + super.toString() + "]";
+		return "ServerResource [ip=" + ip + ", hostname=" + hostname + ", alarm=" + alarm + ", toString()="
+				+ super.toString() + "]";
 	}
-
+	
 }

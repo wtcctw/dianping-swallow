@@ -10,8 +10,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jodd.util.StringUtil;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +37,8 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	private static final String CONSUMERID = "consumerId";
 
+	private static final String CONSUMERIP = "consumerIps";
+
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
 
@@ -50,33 +50,11 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/consumerid/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object comsumeridResourceList(@RequestBody ConsumerIdQueryDto ConsumerIdQueryDto) {
+	public Object comsumeridResourceList(@RequestBody ConsumerIdQueryDto consumerIdQueryDto) {
 
-		String topic = ConsumerIdQueryDto.getTopic();
-		String consumerId = ConsumerIdQueryDto.getConsumerId();
-		Pair<Long, List<ConsumerIdResource>> pair = new Pair<Long, List<ConsumerIdResource>>();
-		List<ConsumerIdResource> result = new ArrayList<ConsumerIdResource>();
 		List<ConsumerIdResourceDto> resultDto = new ArrayList<ConsumerIdResourceDto>();
 
-		boolean isBlank = StringUtil.isBlank(topic + consumerId);
-
-		if (isBlank) {
-			pair = consumerIdResourceService.findConsumerIdResourcePage(ConsumerIdQueryDto);
-		} else {
-			if (StringUtil.isBlank(topic)) {
-				result = consumerIdResourceService.findByConsumerId(consumerId);
-				long size = result.size();
-				pair.setFirst(size);
-				pair.setSecond(result);
-			} else if (StringUtil.isBlank(consumerId)) {
-				pair = consumerIdResourceService.findByTopic(ConsumerIdQueryDto);
-			} else {
-				ConsumerIdResource consumerIdResource = consumerIdResourceService.find(topic, consumerId);
-				result.add(consumerIdResource);
-				pair.setFirst(1L);
-				pair.setSecond(result);
-			}
-		}
+		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdQueryDto);
 
 		for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
 			resultDto.add(ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource));
@@ -104,17 +82,24 @@ public class ConsumerIdController extends AbstractMenuController {
 	public void editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
 			@RequestParam String consumerId, HttpServletRequest request, HttpServletResponse response) {
 
-		ConsumerIdResource consumerIdResource = consumerIdResourceService.find(topic, consumerId);
-		consumerIdResource.setAlarm(alarm);
-		boolean result = consumerIdResourceService.update(consumerIdResource);
-
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update alarm of %s to %b successfully", topic, alarm));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update alarm of %s to %b fail", topic, alarm));
+		ConsumerIdQueryDto consumerIdQueryDto = new ConsumerIdQueryDto();
+		consumerIdQueryDto.setTopic(topic);
+		consumerIdQueryDto.setConsumerId(consumerId);
+		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdQueryDto);
+		List<ConsumerIdResource> consumerIdResourceList = pair.getSecond();
+		if(consumerIdResourceList != null && !consumerIdResourceList.isEmpty()){
+			ConsumerIdResource consumerIdResource = consumerIdResourceList.get(0);
+			consumerIdResource.setAlarm(alarm);
+			boolean result = consumerIdResourceService.update(consumerIdResource);
+			
+			if (result) {
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("Update alarm of %s to %b successfully", topic, alarm));
+				}
+			} else {
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("Update alarm of %s to %b fail", topic, alarm));
+				}
 			}
 		}
 	}
@@ -147,6 +132,23 @@ public class ConsumerIdController extends AbstractMenuController {
 		}
 
 		return new ArrayList<String>(consumerids);
+	}
+	
+	@RequestMapping(value = "/console/consumerid/ips", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> loadConsumerIps() {
+
+		Set<String> consumerips = new HashSet<String>();
+		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERIP);
+
+		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
+			List<String> cips = consumerIdResource.getConsumerIps();
+			if ( !cips.isEmpty()) {
+				consumerips.addAll(cips);
+			}
+		}
+
+		return new ArrayList<String>(consumerips);
 	}
 
 	@Override

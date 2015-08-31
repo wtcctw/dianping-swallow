@@ -20,9 +20,9 @@ public interface IpResourceService {
 	
 	int remove(String ip);
 	
-	IpResource findByIp(String ... ips);
+	List<IpResource> findByIp(String ... ips);
 
-	Pair<Long, List<IpResource>> findByIpType(IpQueryDto ipQueryDto);
+	Pair<Long, List<IpResource>> findByApplication(IpQueryDto ipQueryDto);
 	
 	IpResource find(IpQueryDto ipQueryDto);
 	

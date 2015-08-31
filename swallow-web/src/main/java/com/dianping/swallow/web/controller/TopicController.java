@@ -65,17 +65,15 @@ public class TopicController extends AbstractMenuController {
 	private ExtractUsernameUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/topic")
-	public ModelAndView topicView(HttpServletRequest request,
-			HttpServletResponse response) {
+	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
 
 		return new ModelAndView("topic/index", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/topic/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto,
-			HttpServletRequest request, HttpServletResponse response)
-			throws UnknownHostException {
+	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
+			HttpServletResponse response) throws UnknownHostException {
 
 		List<TopicResourceDto> result = new ArrayList<TopicResourceDto>();
 		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
@@ -87,30 +85,27 @@ public class TopicController extends AbstractMenuController {
 		if (isAllEmpry) {
 			String username = extractUsernameUtils.getUsername(request);
 			Set<String> adminSet = userService.loadCachedAdministratorSet();
-			boolean findAll = adminSet.contains(username)
-					|| adminSet.contains(ALL);
+			boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 			if (findAll) {
-				pair = topicResourceService
-						.findTopicResourcePage(topicQueryDto);
+				pair = topicResourceService.findTopicResourcePage(topicQueryDto);
 			} else {
 				topicQueryDto.setProp(username);
-				pair = topicResourceService
-						.findTopicResourcePage(topicQueryDto);
+				pair = topicResourceService.findTopicResourcePage(topicQueryDto);
 			}
 		} else {
-			if(StringUtil.isBlank(producerIp)){
+			if (StringUtil.isBlank(producerIp)) {
 				TopicResource resource = topicResourceService.findByTopic(topic);
 				result.add(TopicResourceMapper.toTopicResourceDto(resource));
 				return new Pair<Long, List<TopicResourceDto>>(1L, result);
-			}else if(StringUtil.isBlank(topic)){
+			} else if (StringUtil.isBlank(topic)) {
 				pair = topicResourceService.findByServer(topicQueryDto);
-			}else{
+			} else {
 				TopicResource resource = topicResourceService.findByTopic(topic);
 				List<String> ips = resource.getProducerIps();
-				if(ips.contains(producerIp)){
+				if (ips.contains(producerIp)) {
 					result.add(TopicResourceMapper.toTopicResourceDto(resource));
 					return new Pair<Long, List<TopicResourceDto>>(1L, result);
-				}else{
+				} else {
 					return new Pair<Long, List<TopicResourceDto>>(0L, result);
 				}
 			}
@@ -124,31 +119,28 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
 	@ResponseBody
-	public Object topicName(HttpServletRequest request,
-			HttpServletResponse response) throws UnknownHostException {
+	public Object topicName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
 		String username = extractUsernameUtils.getUsername(request);
 		Set<String> adminSet = userService.loadCachedAdministratorSet();
 		Set<String> producerIp = new HashSet<String>();
 		boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 
-		Map<String, Set<String>> topicToWhiteList = topicResourceService
-				.loadCachedTopicToWhiteList();
+		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
 		if (findAll) {
 			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
 			List<TopicResource> topicResources = topicResourceService.findAll();
 			List<String> tmpips;
-			for(TopicResource topicResource : topicResources){
+			for (TopicResource topicResource : topicResources) {
 				tmpips = topicResource.getProducerIps();
-				if(tmpips != null){
+				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}
 			}
 			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
 		} else {
 			List<String> topics = new ArrayList<String>();
-			for (Map.Entry<String, Set<String>> entry : topicToWhiteList
-					.entrySet()) {
+			for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
 				if (entry.getValue().contains(username)) {
 					String topic = entry.getKey();
 					if (!topics.contains(topic)) {
@@ -156,10 +148,10 @@ public class TopicController extends AbstractMenuController {
 					}
 				}
 			}
-			
-			for(String topic : topics){
+
+			for (String topic : topics) {
 				List<String> tmpips = topicResourceService.findByTopic(topic).getProducerIps();
-				if(tmpips != null){
+				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}
 			}
@@ -169,8 +161,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET)
 	@ResponseBody
-	public Object propName(HttpServletRequest request,
-			HttpServletResponse response) throws UnknownHostException {
+	public Object propName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
 		String username = extractUsernameUtils.getUsername(request);
 		Set<String> adminSet = userService.loadCachedAdministratorSet();
@@ -203,11 +194,9 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/update", method = RequestMethod.POST)
 	@ResponseBody
-	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto)
-			throws UnknownHostException {
+	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto) throws UnknownHostException {
 
-		TopicResource topicResource = TopicResourceMapper
-				.toTopicResource(topicResourceDto);
+		TopicResource topicResource = TopicResourceMapper.toTopicResource(topicResourceDto);
 		boolean result = topicResourceService.update(topicResource);
 
 		if (result) {
@@ -219,12 +208,10 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public Object editTopic(
-			@RequestParam(value = "topic") String topic,
-			@RequestParam(value = "prop") String prop,
+	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
 			@RequestParam(value = "time") String time,
-			@RequestParam(value = "exec_user", required = false) String approver,
-			HttpServletRequest request, HttpServletResponse response) {
+			@RequestParam(value = "exec_user", required = false) String approver, HttpServletRequest request,
+			HttpServletResponse response) {
 
 		String username = extractUsernameUtils.getUsername(request);
 		TopicResource topicResource = null;
@@ -234,22 +221,18 @@ public class TopicController extends AbstractMenuController {
 		if (approver != null) {
 			if (!userService.loadCachedAdministratorSet().contains(approver)) {
 				if (logger.isInfoEnabled()) {
-					logger.info(String
-							.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
-									username, topic, prop,
-									splitProps(prop.trim()).toString(),
-									time.toString()));
+					logger.info(String.format(
+							"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
+							username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 				}
 				return ResponseStatus.UNAUTHENTICATION;
 			} else {
 				topicResource = topicResourceService.findByTopic(topic);
 				if (topicResource == null) {
 					if (logger.isInfoEnabled()) {
-						logger.info(String
-								.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
-										username, topic, prop,
-										splitProps(prop.trim()).toString(),
-										time.toString()));
+						logger.info(String.format(
+								"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
+								username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 					}
 					return ResponseStatus.INVALIDTOPIC;
 				}
@@ -267,11 +250,11 @@ public class TopicController extends AbstractMenuController {
 
 		boolean result = false;
 
-		Transaction producerTransaction = Cat.getProducer().newTransaction(
-				"TopicEdit", topic + ":" + username);
+		Transaction producerTransaction = Cat.getProducer().newTransaction("TopicEdit", topic + ":" + username);
 
 		try {
-			topicResource.setAdministrator(prop);;
+			topicResource.setAdministrator(prop);
+			;
 			topicResource.setUpdateTime(new Date());
 			result = topicResourceService.update(topicResource);
 			producerTransaction.setStatus(Message.SUCCESS);
@@ -287,18 +270,15 @@ public class TopicController extends AbstractMenuController {
 
 		if (result) {
 			if (logger.isInfoEnabled()) {
-				logger.info(String
-						.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
-								username, topic, prop, splitProps(prop.trim())
-										.toString(), time.toString()));
+				logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
+						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 			}
 			return ResponseStatus.SUCCESS;
 		} else {
 			if (logger.isInfoEnabled()) {
-				logger.info(String
-						.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
-								username, topic, prop, splitProps(prop.trim())
-										.toString(), time.toString()));
+				logger.info(String.format(
+						"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
+						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
 			}
 			return ResponseStatus.MONGOWRITE;
 		}
@@ -307,69 +287,65 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/producer/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public void editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm, 
+	public void editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
 			HttpServletRequest request, HttpServletResponse response) {
 
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
 		topicResource.setProducerAlarm(alarm);
-		boolean result  = topicResourceService.update(topicResource);
-		
+		boolean result = topicResourceService.update(topicResource);
+
 		if (result) {
 			if (logger.isInfoEnabled()) {
-				logger.info(String
-						.format("Update producer alarm of %s to %b successfully", topic, alarm));
+				logger.info(String.format("Update producer alarm of %s to %b successfully", topic, alarm));
 			}
 		} else {
 			if (logger.isInfoEnabled()) {
-				logger.info(String
-						.format("Update producer alarm of %s to %b fail", topic, alarm));
+				logger.info(String.format("Update producer alarm of %s to %b fail", topic, alarm));
 			}
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/topic/consumer/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public void editConsumerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm, 
+	public void editConsumerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
 			HttpServletRequest request, HttpServletResponse response) {
 
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
 		topicResource.setConsumerAlarm(alarm);
-		boolean result  = topicResourceService.update(topicResource);
-		
+		boolean result = topicResourceService.update(topicResource);
+
 		if (result) {
 			if (logger.isInfoEnabled()) {
-				logger.info(String
-						.format("Update consumer alarm of %s to %b successfully", topic, alarm));
+				logger.info(String.format("Update consumer alarm of %s to %b successfully", topic, alarm));
 			}
 		} else {
 			if (logger.isInfoEnabled()) {
-				logger.info(String
-						.format("Update consumer alarm of %s to %b fail", topic, alarm));
+				logger.info(String.format("Update consumer alarm of %s to %b fail", topic, alarm));
 			}
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/topic/administrator", method = RequestMethod.GET)
 	@ResponseBody
 	public Object loadAdministrators() {
-		
+
 		Set<String> administrators = new HashSet<String>();
 
 		List<Administrator> adminList = userService.loadUsers();
-		
-		for(Administrator administrator : adminList){
+
+		for (Administrator administrator : adminList) {
 			administrators.add(administrator.getName());
 		}
-		
+
 		List<TopicResource> topicResources = topicResourceService.findAll();
-		for(TopicResource topicResource : topicResources){
+		for (TopicResource topicResource : topicResources) {
 			String whiteListString = topicResource.getAdministrator();
 			String[] whiteList = whiteListString.split(DELIMITOR);
-			for(String wl : whiteList){
+			for (String wl : whiteList) {
 				administrators.add(wl);
 			}
 		}
-		
+
 		return administrators;
 	}
 
@@ -382,8 +358,7 @@ public class TopicController extends AbstractMenuController {
 		int index = proposal.indexOf("?");
 		if (index != -1) {
 			proposal = proposal + "，";
-			proposal = proposal.replaceAll("\\?", ",").replaceAll(" ", "")
-					.replaceAll("，", ",");
+			proposal = proposal.replaceAll("\\?", ",").replaceAll(" ", "").replaceAll("，", ",");
 		}
 		return proposal;
 	}

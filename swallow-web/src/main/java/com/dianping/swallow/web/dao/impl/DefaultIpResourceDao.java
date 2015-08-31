@@ -65,7 +65,7 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 
 	@Override
-	public IpResource findByIp(String ... ips) {
+	public List<IpResource> findByIp(String ... ips) {
 
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		for (String ip : ips) {
@@ -76,13 +76,12 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 		query.addCriteria(Criteria.where(IP).exists(true)
 				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
 		
-		IpResource ipResource = mongoTemplate.findOne(query, IpResource.class, IPRESOURCE_COLLECTION);
-
-		return ipResource;
+		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
+		return ipResources;
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findByIpType(IpQueryDto ipQueryDto) {
+	public Pair<Long, List<IpResource>> findByApplication(IpQueryDto ipQueryDto) {
 
 		Query query = new Query(Criteria.where(APPLICATION).is(ipQueryDto.getApplication()));
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);

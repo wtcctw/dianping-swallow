@@ -28,12 +28,12 @@
 				</button>
 			</a> <a href="${rc.contextPath}/console/consumerid" class="navbar-brand">
 				<button class="btn #if(${menu}=='consumerid')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
-					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
+					<i class="icon-tasks align-top bigger-125 icon-on-right"></i>
 					消费ID
 				</button>
 			</a> <a href="${rc.contextPath}/console/ip" class="navbar-brand">
 				<button class="btn #if(${menu}=='ip')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
-					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
+					<i class="icon-list-alt align-top bigger-125 icon-on-right"></i>
 					IP
 				</button>
 			</a> <a href="${rc.contextPath}/console/message" class="navbar-brand">
@@ -57,13 +57,7 @@
 				</button>
 			</a>
 			#if(${isadmin})
-			<!-- <a href="${rc.contextPath}/console/setting"
-				class="navbar-brand">
-				<button class="btn  #if(${menu}=='setting')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
-					id="navbar-setting" >
-					<i class="icon-lock align-top bigger-125 icon-on-right"></i> 设置
-				</button>
-			</a>  --><a href="${rc.contextPath}/console/administrator"
+			<a href="${rc.contextPath}/console/administrator"
 				class="navbar-brand">
 				<button class="btn  #if(${menu}=='admin')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
 					id="navbar-admin">
@@ -90,7 +84,6 @@
 			</ul>
 
 		</div>
-
 
 		<!-- /.navbar-header -->
 	</div>

@@ -216,6 +216,21 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					}).error(function(data, status, headers, config) {
 					});
 					
+					 $http({
+							method : 'GET',
+							url : window.contextPath + '/console/ip/allip'
+						}).success(function(data, status, headers, config) {
+							$('#producerServer').tagsinput({
+								  typeahead: {
+									  items: 16,
+									  source: data,
+									  displayText: function(item){ return item;}  //necessary
+								  }
+							});
+			        		$('#producerServer').typeahead().data('typeahead').source = data;
+						}).error(function(data, status, headers, config) {
+						});
+					
 			}
 			
 			$scope.changeproduceralarm = function(topic, index){

@@ -10,7 +10,17 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
  */
 public class ConsumerServerResource extends ServerResource{
 	
+	private QPSAlarmSetting sendAlarmSetting;
+	
 	private QPSAlarmSetting ackAlarmSetting;
+
+	public QPSAlarmSetting getSendAlarmSetting() {
+		return sendAlarmSetting;
+	}
+
+	public void setSendAlarmSetting(QPSAlarmSetting sendAlarmSetting) {
+		this.sendAlarmSetting = sendAlarmSetting;
+	}
 
 	public QPSAlarmSetting getAckAlarmSetting() {
 		return ackAlarmSetting;
@@ -22,7 +32,8 @@ public class ConsumerServerResource extends ServerResource{
 
 	@Override
 	public String toString() {
-		return "ConsumerServerResource [ackAlarmSetting=" + ackAlarmSetting + ", toString()=" + super.toString() + "]";
+		return "ConsumerServerResource [sendAlarmSetting=" + sendAlarmSetting + ", ackAlarmSetting=" + ackAlarmSetting
+				+ ", toString()=" + super.toString() + "]";
 	}
 
 }

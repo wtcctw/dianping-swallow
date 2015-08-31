@@ -43,15 +43,15 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 
 	@Override
-	public IpResource findByIp(String ... ips) {
+	public List<IpResource> findByIp(String ... ips) {
 
 		return ipResourceDao.findByIp(ips);
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findByIpType(IpQueryDto ipQueryDto) {
+	public Pair<Long, List<IpResource>> findByApplication(IpQueryDto ipQueryDto) {
 
-		return ipResourceDao.findByIpType(ipQueryDto);
+		return ipResourceDao.findByApplication(ipQueryDto);
 	}
 	
 	@Override

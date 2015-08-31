@@ -28,7 +28,7 @@ public interface ConsumerIdResourceDao extends Dao{
 	
 	 Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdQueryDto consumerIdQueryDto);
 
-	ConsumerIdResource find(String topic, String consumerid);
+	 Pair<Long, List<ConsumerIdResource>> find(ConsumerIdQueryDto  consumerIdQueryDto);
 	
 	List<ConsumerIdResource> findAll(String ...fields );
 

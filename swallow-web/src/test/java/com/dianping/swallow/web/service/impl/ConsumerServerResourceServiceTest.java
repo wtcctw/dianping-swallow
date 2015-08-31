@@ -1,8 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -64,13 +62,6 @@ public class ConsumerServerResourceServiceTest {
 		consumerServerResource.setHostname("localhost");
 		consumerServerResource.setAlarm(Boolean.TRUE);
 		
-		List<String> topicWhiteList = new ArrayList<String>();
-		topicWhiteList.add("consumeri-01");
-		topicWhiteList.add("consumeri-02");
-		topicWhiteList.add("consumeri-03");
-		
-		consumerServerResource.setTopicWhiteList(topicWhiteList);
-		
 		return consumerServerResource;
 		
 	}
@@ -80,11 +71,6 @@ public class ConsumerServerResourceServiceTest {
 		
 		/*--------------------------------Consumer---------------------------------*/
 		ConsumerServerResource consumerServerResource = createConsumerServerResource();
-		List<String> topics = new ArrayList<String>();
-		topics.add("lmdtest");
-		topics.add("swallowlmd");
-		topics.add("example");
-		consumerServerResource.setTopicWhiteList(topics);
 		boolean result = consumerServerResourceService.insert(consumerServerResource);
 		Assert.assertTrue(result);
 		consumerServerResource.setHostname("10.128.30.19");

@@ -1,8 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -50,17 +48,10 @@ public class ProducerServerResourceServiceTest {
 		producerServerResource.setCreateTime(new Date());
 		producerServerResource.setUpdateTime(new Date());
 		
-		producerServerResource.setSendAlarmSetting(qPSAlarmSetting);
+		producerServerResource.setSaveAlarmSetting(qPSAlarmSetting);
 		producerServerResource.setIp("127.0.0.1");
 		producerServerResource.setHostname("localhost");
-		
-		List<String> topicWhiteList = new ArrayList<String>();
-		topicWhiteList.add("consumeri-01");
-		topicWhiteList.add("consumeri-02");
-		topicWhiteList.add("consumeri-03");
-		
-		producerServerResource.setTopicWhiteList(topicWhiteList);
-		
+
 		return producerServerResource;
 		
 	}

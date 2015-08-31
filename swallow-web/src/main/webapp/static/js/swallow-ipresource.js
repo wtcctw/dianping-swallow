@@ -166,6 +166,24 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 							}
 						})
 					}).error(function(data, status, headers, config) {
+				});
+				 
+				 $http({
+						method : 'GET',
+						url : window.contextPath + '/console/ip/application'
+					}).success(function(data, status, headers, config) {
+						var apps = data;
+						$("#searchapplication").typeahead({
+							items: 16, 
+							source : apps,
+							updater : function(c) {
+								$scope.searchapplication = c;
+								$scope.query.application = $scope.searchapplication;
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
+								return c;
+							}
+						})
+					}).error(function(data, status, headers, config) {
 					});
 					
 			}

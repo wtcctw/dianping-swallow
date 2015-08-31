@@ -63,8 +63,8 @@ public class IpResourceServiceTest {
 		boolean result = ipResourceService.insert(ipResource);
 		Assert.assertTrue(result);
 
-		ipResource = ipResourceService.findByIp("10.1.0.10");
-		Assert.assertNotNull(ipResource);
+		List<IpResource> ipResources = ipResourceService.findByIp("10.1.0.10");
+		Assert.assertNotNull(ipResources);
 
 		ipResource.setIp("127.0.0.1");
 
@@ -74,7 +74,7 @@ public class IpResourceServiceTest {
 		Pair<Long, List<IpResource>> pair = new Pair<Long, List<IpResource>>();
 		IpQueryDto ipQueryDto = new IpQueryDto();
 		ipQueryDto.setApplication("tuangou");
-		pair = ipResourceService.findByIpType(ipQueryDto);
+		pair = ipResourceService.findByApplication(ipQueryDto);
 		Assert.assertNotNull(pair);
 		Assert.assertEquals(pair.getFirst(), new Long(1));
 

@@ -52,6 +52,7 @@ public class ServerController extends AbstractSidebarBasedController {
 	public ModelAndView serverSetting(HttpServletRequest request,
 			HttpServletResponse response) {
 
+		subSide = "producer";
 		return new ModelAndView("server/producer", createViewMap());
 	}
 

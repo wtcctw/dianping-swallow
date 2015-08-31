@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
-import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
@@ -57,9 +55,9 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	}
 
 	@Override
-	public ConsumerIdResource find(String topic, String consumerid) {
+	public Pair<Long, List<ConsumerIdResource>> find(ConsumerIdQueryDto  consumerIdQueryDto) {
 
-		return consumerIdResourceDao.find(topic, consumerid);
+		return consumerIdResourceDao.find(consumerIdQueryDto);
 	}
 	
 	@Override

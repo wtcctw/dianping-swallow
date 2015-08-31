@@ -98,7 +98,9 @@ public class ConsumerIdResourceServiceTest {
 		result = consumerIdResourceService.update(consumerIdResource);
 		Assert.assertTrue(result);
 		
-		consumerIdResource = consumerIdResourceService.find("lmdtest", "consumerid-1");
+		consumerIdQueryDto.setTopic("lmdtest");
+		consumerIdQueryDto.setConsumerId("consumerid-1");
+		consumerIdResource = consumerIdResourceService.find(consumerIdQueryDto).getSecond().get(0);
 		Assert.assertNotNull(consumerIdResource);
 		
 		ConsumerIdResource consumerIdResource1 = createConsumerIdResource();

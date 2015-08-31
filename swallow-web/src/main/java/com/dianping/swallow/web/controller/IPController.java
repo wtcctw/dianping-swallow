@@ -24,6 +24,7 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.controller.dto.IpResourceDto;
 import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
+import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.IpResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -35,8 +36,10 @@ import com.dianping.swallow.web.util.ResponseStatus;
  */
 @Controller
 public class IPController extends AbstractMenuController {
-	
+
 	private static final String IP = "ip";
+
+	private static final String APPLICATION = "iPDesc.name";
 
 	@Resource(name = "ipResourceService")
 	private IpResourceService ipResourceService;
@@ -57,36 +60,36 @@ public class IPController extends AbstractMenuController {
 		String application = ipQueryDto.getApplication();
 
 		Boolean isAllBlank = StringUtil.isAllBlank(ip, application);
-		
+
 		if (isAllBlank) {
 			pair = ipResourceService.findIpResourcePage(ipQueryDto);
 		} else {
-			
+
 			if (StringUtil.isBlank(application)) {
 				String[] ips = ip.split(",");
-				IpResource ipResource = ipResourceService.findByIp(ips);
-				ipResources.add(ipResource);
-				pair = new Pair<Long, List<IpResource>>(1L, ipResources);
+				ipResources = ipResourceService.findByIp(ips);
+				long size = ipResources.size();
+				pair = new Pair<Long, List<IpResource>>(size, ipResources);
 			} else if (StringUtil.isBlank(ip)) {
-				pair = ipResourceService.findByIpType(ipQueryDto);
+				pair = ipResourceService.findByApplication(ipQueryDto);
 			} else {
 				IpResource ipResource = ipResourceService.find(ipQueryDto);
 				ipResources.add(ipResource);
 				pair = new Pair<Long, List<IpResource>>(1L, ipResources);
 			}
-			
+
 		}
 
 		List<IpResourceDto> ipResourceDto = new ArrayList<IpResourceDto>();
-		
+
 		for (IpResource ipResource : pair.getSecond()) {
 			ipResourceDto.add(IpResourceMapper.toIpResourceDto(ipResource));
 		}
-		
+
 		return new Pair<Long, List<IpResourceDto>>(pair.getFirst(), ipResourceDto);
 
 	}
-	
+
 	@RequestMapping(value = "/console/ip/update", method = RequestMethod.POST)
 	@ResponseBody
 	public Object updateIp(@RequestBody IpResourceDto IpResourceDto) throws UnknownHostException {
@@ -100,7 +103,7 @@ public class IPController extends AbstractMenuController {
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/ip/allip", method = RequestMethod.GET)
 	@ResponseBody
 	public List<String> loadCmsumerid() {
@@ -117,11 +120,31 @@ public class IPController extends AbstractMenuController {
 
 		return new ArrayList<String>(ips);
 	}
-	
+
+	@RequestMapping(value = "/console/ip/application", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> loadApplication() {
+
+		Set<String> apps = new HashSet<String>();
+		List<IpResource> ipResources = ipResourceService.findAll(APPLICATION);
+
+		for (IpResource ipResource : ipResources) {
+			IPDesc iPDesc = ipResource.getiPDesc();
+			if (iPDesc != null) {
+				String app = iPDesc.getName();
+				if (StringUtil.isNotBlank(app) && !apps.contains(app)) {
+					apps.add(app);
+				}
+			}
+		}
+
+		return new ArrayList<String>(apps);
+	}
+
 	@RequestMapping(value = "/console/ip/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public void editIpAlarm(@RequestParam String ip,
-			@RequestParam boolean alarm, HttpServletRequest request, HttpServletResponse response) {
+	public void editIpAlarm(@RequestParam String ip, @RequestParam boolean alarm, HttpServletRequest request,
+			HttpServletResponse response) {
 
 		IpQueryDto ipQueryDto = new IpQueryDto();
 		ipQueryDto.setIp(ip);

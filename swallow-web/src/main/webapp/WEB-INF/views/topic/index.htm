@@ -51,14 +51,10 @@
 						<th style="text-align: left">Topic名称</th>
 						<th style="text-align: left">访问者白名单</th>
 						<th style="text-align: left">生产者IP</th>
-						<th style="text-align: left">生产发送峰值</th>
-						<th style="text-align: left">生产发送谷值</th>
-						<th style="text-align: left">生产发送波动</th>
-						<th style="text-align: left">生产发送波动基数</th>
-						<th style="text-align: left">生产发送延迟/s</th>
+						<th style="text-align: left">告警配置</th>
+						#if(${isadmin})
 						<th style="text-align: left">发送告警</th>
 						<th style="text-align: left">接收告警</th>
-						#if(${isadmin})
 						<th style="text-align: left;">操作</th>
 						#end 
 					</tr>
@@ -69,13 +65,12 @@
 							ng-href="${rc.contextPath}/console/consumerid"
 							ng-click="setTopic(t.topic)" ng-bind="t.topic"></a></td>
 						<td style="text-align: left" ng-bind="t.administrator"></td>
-						<td style="text-align: left" ><a ng-href="${rc.contextPath}/console/ip"
-							ng-click="setIps(t.producerServer)"  ng-bind="t.producerServer | limitTo : 15 "></a></td>
-						<td style="text-align: left" ng-bind="t.sendpeak"></td>
-						<td style="text-align: left" ng-bind="t.sendvalley"></td>
-						<td style="text-align: left" ng-bind="t.sendfluctuation"></td>
-						<td style="text-align: left" ng-bind="t.sendfluctuationBase"></td>
-						<td style="text-align: left" ng-bind="t.delay"></td>
+						<td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
+							ng-click="setIps(t.producerServer)"  ng-bind="t.producerServer | limitTo : 25 "></a></td>
+						<td style="text-align: left" ><a href="#myModal"
+							ng-click="setModalInput($index);"
+							data-toggle="modal" >详情</a></td>
+						#if(${isadmin})
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
 								id="palarm{{$index}}" type="checkbox" ng-model="t.producerAlarm" ng-click="changeproduceralarm(t.name, $index)"
@@ -86,7 +81,6 @@
 								id="calarm{{$index}}" type="checkbox" ng-model="t.consumerAlarm" ng-click="changeconsumeralarm(t.name, $index)"
 								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
 						</label></td>
-						#if(${isadmin})
 						<td
 							style="text-align: left;"><a
 							href="#myModal"
@@ -134,6 +128,7 @@
 								</input>
 							</div>
 						</div>
+						#if(${isadmin})
 						<div class="control-group">
 							<div class="form-group"
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
@@ -152,6 +147,7 @@
 									data-provide="typeahead" autocomplete="off"> </input>
 							</div>
 						</div>
+						#end
 						
 						<div class="control-group">
 							<label class="control-label"><b>发送端设置</b></label>

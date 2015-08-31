@@ -18,7 +18,7 @@ public class ProducerServerResourceMapper {
 		producerQPSAlarmSetting.setFluctuation(dto.getSendfluctuation());
 		producerQPSAlarmSetting.setFluctuationBase(dto.getSendfluctuationBase());
 		
-		producerServerResource.setSendAlarmSetting(producerQPSAlarmSetting);
+		producerServerResource.setSaveAlarmSetting(producerQPSAlarmSetting);
 
 		producerServerResource.setId(dto.getId());
 		producerServerResource.setIp(dto.getIp());
@@ -32,7 +32,7 @@ public class ProducerServerResourceMapper {
 
 		ServerResourceDto dto = new ServerResourceDto();
 
-		QPSAlarmSetting producerQPSAlarmSetting = producerServerResource.getSendAlarmSetting();
+		QPSAlarmSetting producerQPSAlarmSetting = producerServerResource.getSaveAlarmSetting();
 		dto.setSendpeak(producerQPSAlarmSetting.getPeak());
 		dto.setSendvalley(producerQPSAlarmSetting.getValley());
 		dto.setSendfluctuation(producerQPSAlarmSetting.getFluctuation());

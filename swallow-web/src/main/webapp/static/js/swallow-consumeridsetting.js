@@ -111,11 +111,7 @@ module
 								$scope.topic = localStorage.getItem("topic");
 								localStorage.clear();
 							}
-//							var tmpip = localStorage.getItem("ip");
-//							if(tmpname != null){
-//								$scope.topic = localStorage.getItem("ip");
-//								localStorage.clear();
-//							}
+
 							$scope.query = new Object();
 							$scope.query.topic = $scope.topic;
 							$scope.query.consumerId = $scope.consumerId;
@@ -123,27 +119,6 @@ module
 							
 							$scope.searchPaginator = Paginator(fetchFunction,
 									$scope.numrecord, $scope.query);
-
-							// for whitelist
-//							$http(
-//									{
-//										method : 'GET',
-//										url : window.contextPath
-//												+ '/console/topic/namelist'
-//									}).success(
-//									function(data, status, headers, config) {
-//										$('#topicprops').tagsinput({
-//											typeahead : {
-//												items : 16,
-//												source : data,
-//												displayText : function(item) {
-//													return item;
-//												} // necessary
-//											}
-//										});
-//									}).error(
-//									function(data, status, headers, config) {
-//									});
 
 							$scope.consumeridEntry = {};
 							$scope.consumeridEntry.consumerId;
@@ -162,14 +137,15 @@ module
 							$scope.consumeridEntry.ackfluctuation;
 							$scope.consumeridEntry.ackfluctuationBase;
 
-							$scope.refreshpage = function(myForm) {
+							$scope.refreshpage = function(myForm, num) {
 								if ($scope.consumeridEntry.sendpeak < $scope.consumeridEntry.sendvalley
 										|| $scope.consumeridEntry.ackpeak < $scope.consumeridEntry.ackvalley) {
 									alert("谷值不能小于峰值");
 									return;
 								}
 								$scope.consumeridEntry.consumerIp = $("#consumerIp").val();
-								$('#myModal').modal('hide');
+								var id = "#myModal" + num;
+								$(id).modal('hide');
 								var param = JSON
 										.stringify($scope.consumeridEntry);
 								
@@ -252,8 +228,8 @@ module
 											}
 										})
 									}).error(function(data, status, headers, config) {
-									});
-								 
+								});
+										
 								 $http({
 										method : 'GET',
 										url : window.contextPath + '/console/consumerid/allconsumerid'
@@ -269,7 +245,41 @@ module
 											}
 										})
 									}).error(function(data, status, headers, config) {
-									});
+								});
+								 
+								 $http({
+										method : 'GET',
+										url : window.contextPath + '/console/consumerid/ips'
+									}).success(function(data, status, headers, config) {
+										
+										$("#searchconsumerip").typeahead({
+											items: 16, 
+											source : data,
+											updater : function(c) {
+												$scope.consumerIp = c;
+												$scope.query.consumerIp = $scope.consumerIp;
+												$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
+												return c;
+											}
+										})
+										
+									}).error(function(data, status, headers, config) {
+								});
+								 
+								 $http({
+										method : 'GET',
+										url : window.contextPath + '/console/ip/allip'
+									}).success(function(data, status, headers, config) {
+										$("#consumerIp").tagsinput({
+											  typeahead: {
+												  items: 16,
+												  source: data,
+												  displayText: function(item){ return item;}  //necessary
+											  }
+										});
+										$('#consumerIp').typeahead().data('typeahead').source = data;
+									}).error(function(data, status, headers, config) {
+								});
 							}
 							
 							$scope.setIp = function(ip){
