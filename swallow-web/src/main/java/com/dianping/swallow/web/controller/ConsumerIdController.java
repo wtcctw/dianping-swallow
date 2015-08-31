@@ -22,6 +22,7 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
 import com.dianping.swallow.web.controller.dto.ConsumerIdResourceDto;
 import com.dianping.swallow.web.controller.mapper.ConsumerIdResourceMapper;
+import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -54,7 +55,13 @@ public class ConsumerIdController extends AbstractMenuController {
 
 		List<ConsumerIdResourceDto> resultDto = new ArrayList<ConsumerIdResourceDto>();
 
-		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdQueryDto);
+		ConsumerIdParam consumerIdParam = new ConsumerIdParam();
+		consumerIdParam.setLimit(consumerIdQueryDto.getLimit());
+		consumerIdParam.setOffset(consumerIdQueryDto.getOffset());
+		consumerIdParam.setTopic(consumerIdQueryDto.getTopic());
+		consumerIdParam.setConsumerId(consumerIdQueryDto.getConsumerId());
+		consumerIdParam.setConsumerIp(consumerIdQueryDto.getConsumerIp());
+		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
 
 		for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
 			resultDto.add(ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource));
@@ -82,10 +89,10 @@ public class ConsumerIdController extends AbstractMenuController {
 	public void editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
 			@RequestParam String consumerId, HttpServletRequest request, HttpServletResponse response) {
 
-		ConsumerIdQueryDto consumerIdQueryDto = new ConsumerIdQueryDto();
-		consumerIdQueryDto.setTopic(topic);
-		consumerIdQueryDto.setConsumerId(consumerId);
-		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdQueryDto);
+		ConsumerIdParam consumerIdParam = new ConsumerIdParam();
+		consumerIdParam.setTopic(topic);
+		consumerIdParam.setConsumerId(consumerId);
+		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
 		List<ConsumerIdResource> consumerIdResourceList = pair.getSecond();
 		if(consumerIdResourceList != null && !consumerIdResourceList.isEmpty()){
 			ConsumerIdResource consumerIdResource = consumerIdResourceList.get(0);

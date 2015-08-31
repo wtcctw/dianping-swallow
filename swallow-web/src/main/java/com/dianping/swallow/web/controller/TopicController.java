@@ -79,6 +79,8 @@ public class TopicController extends AbstractMenuController {
 		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
 		String topic = topicQueryDto.getTopic();
 		String producerIp = topicQueryDto.getProducerServer();
+		int offset = topicQueryDto.getOffset();
+		int limit = topicQueryDto.getLimit();
 
 		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp);
 
@@ -87,13 +89,13 @@ public class TopicController extends AbstractMenuController {
 			Set<String> adminSet = userService.loadCachedAdministratorSet();
 			boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 			if (findAll) {
-				pair = topicResourceService.findTopicResourcePage(topicQueryDto);
+				pair = topicResourceService.findTopicResourcePage(offset, limit);
 			} else {
 				topicQueryDto.setProposal(username);
-				pair = topicResourceService.findTopicResourcePage(topicQueryDto);
+				pair = topicResourceService.findTopicResourcePage(offset, limit);
 			}
 		} else {
-			pair = topicResourceService.find(topicQueryDto);
+			pair = topicResourceService.find(offset, limit, topic, producerIp);
 		}
 
 		for (TopicResource topicResource : pair.getSecond()) {

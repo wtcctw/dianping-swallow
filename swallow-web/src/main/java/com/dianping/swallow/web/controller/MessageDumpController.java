@@ -3,8 +3,11 @@ package com.dianping.swallow.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +27,7 @@ import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.MessageDumpService;
-import com.dianping.swallow.web.service.TopicService;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
@@ -39,8 +42,8 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 
 	public static final String FILEPATH = "/data/appdatas/swalllowweb/";
 	
-	@Resource(name = "topicService")
-	private TopicService topicService;
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
 
 	@Resource(name = "userService")
 	private UserService userService;
@@ -103,7 +106,7 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 		} else if (userService.loadCachedAdministratorSet().contains(username)) {
 			return messageDumpService.loadAllDumpMessage();
 		} else {
-			List<String> t = topicService.loadTopicNames(username);
+			List<String> t = loadTopicNames(username);
 			if (t == null || t.size() == 0) {
 				topic = "";
 			} else {
@@ -142,6 +145,18 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 			return file.delete();
 		}
 		return false;
+	}
+	
+	private List<String> loadTopicNames(String username) {
+
+		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
+		List<String> topics = new ArrayList<String>();
+		for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
+			if (entry.getValue().contains(username)) {
+				topics.add(entry.getKey());
+			}
+		}
+		return topics;
 	}
 
 	@Override

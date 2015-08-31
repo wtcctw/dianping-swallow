@@ -49,9 +49,9 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findByApplication(IpQueryDto ipQueryDto) {
+	public Pair<Long, List<IpResource>> findByApplication(int offset, int limit, String application) {
 
-		return ipResourceDao.findByApplication(ipQueryDto);
+		return ipResourceDao.findByApplication(offset, limit, application);
 	}
 	
 	@Override
@@ -73,9 +73,9 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findIpResourcePage(IpQueryDto ipQueryDto) {
+	public Pair<Long, List<IpResource>> findIpResourcePage(int offset, int limit) {
 
-		return ipResourceDao.findIpResourcePage(ipQueryDto);
+		return ipResourceDao.findIpResourcePage(offset, limit);
 	}
 
 }

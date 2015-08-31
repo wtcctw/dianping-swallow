@@ -22,7 +22,7 @@ public interface IpResourceService {
 	
 	List<IpResource> findByIp(String ... ips);
 
-	Pair<Long, List<IpResource>> findByApplication(IpQueryDto ipQueryDto);
+	Pair<Long, List<IpResource>> findByApplication(int offset, int limit, String application);
 	
 	IpResource find(IpQueryDto ipQueryDto);
 	
@@ -30,5 +30,5 @@ public interface IpResourceService {
 
 	IpResource findDefault();
 	
-	Pair<Long, List<IpResource>> findIpResourcePage(IpQueryDto baseDto);
+	Pair<Long, List<IpResource>> findIpResourcePage(int offset, int limit);
 }

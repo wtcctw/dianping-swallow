@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.TopicResourceDao;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.mongodb.WriteResult;
@@ -79,10 +78,7 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> find(TopicQueryDto topicQueryDto) {
-
-		String topic = topicQueryDto.getTopic();
-		String producerIp = topicQueryDto.getProducerServer();
+	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp) {
 
 		Query query = new Query();
 
@@ -106,9 +102,6 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 
 		List<TopicResource> topicResources = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
 
-		int offset = topicQueryDto.getOffset();
-		int limit = topicQueryDto.getLimit();
-
 		query.skip(offset).limit(limit);
 		long size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
 
@@ -117,12 +110,7 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findByTopics(TopicQueryDto topicQueryDto) {
-
-		int offset = topicQueryDto.getOffset();
-		int limit = topicQueryDto.getLimit();
-		String topic = topicQueryDto.getTopic();
-		String[] topics = topic.split(",");
+	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String ... topics) {
 
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		for (String t : topics) {
@@ -164,11 +152,9 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findTopicResourcePage(TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limit) {
 
 		Query query = new Query();
-		int offset = topicQueryDto.getOffset();
-		int limit = topicQueryDto.getLimit();
 
 		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, TOPIC)));
 		List<TopicResource> topicResource = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
@@ -178,12 +164,9 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findByServer(TopicQueryDto topicQueryDto) {
+	public Pair<Long, List<TopicResource>> findByServer(int offset, int limit, String producerIp) {
 
-		int offset = topicQueryDto.getOffset();
-		int limit = topicQueryDto.getLimit();
-		String producerServer = topicQueryDto.getProducerServer();
-		Query query = new Query(Criteria.where(PEODUCERIPS).is(producerServer));
+		Query query = new Query(Criteria.where(PEODUCERIPS).is(producerIp));
 
 		Long size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
 

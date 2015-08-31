@@ -61,9 +61,9 @@ public class ProducerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(BaseDto baseDto) {
+	public Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(int offset, int limit) {
 
-		return producerServerResourceDao.findProducerServerResourcePage(baseDto);
+		return producerServerResourceDao.findProducerServerResourcePage(offset, limit);
 	}
 
 }

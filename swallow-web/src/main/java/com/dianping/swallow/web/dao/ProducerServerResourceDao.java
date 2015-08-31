@@ -3,7 +3,6 @@ package com.dianping.swallow.web.dao;
 import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 
 
@@ -28,6 +27,6 @@ public interface ProducerServerResourceDao extends ServerResourceDao{
 
 	ProducerServerResource findDefault();
 	
-	Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(BaseDto baseDto);
+	Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(int offset, int limit);
 
 }
