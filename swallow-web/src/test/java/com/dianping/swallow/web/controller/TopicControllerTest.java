@@ -1,10 +1,11 @@
 package com.dianping.swallow.web.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 import java.io.IOException;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.NameValuePair;
@@ -24,8 +25,6 @@ import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.service.TopicResourceService;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 
 /**
@@ -69,10 +68,8 @@ public class TopicControllerTest {
 	
 	private static HttpMethod postMethod(String url) throws IOException {
 		PostMethod post = new PostMethod(url);
-		String encodeuser = Base64.encodeBase64String(USERNAME.getBytes());     
-		post.setRequestHeader(AUTHORIZATION, encodeuser);
 		NameValuePair[] param = {
-				new NameValuePair("prop", "leon.li，dp.wang"),
+				new NameValuePair("prop", "leon.li,mingdong.li"),
 				new NameValuePair("time", "2015-06-12 35:35"),
 				new NameValuePair("topic", "example3"),
 				new NameValuePair("exec_user", "hongjun.zhong")};
