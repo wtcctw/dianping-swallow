@@ -46,9 +46,9 @@ public class Entry {
 
 	}
 	
-	public void setAlert(ConsumerBaseAlarmSetting consumerBaseAlarmSetting, boolean whiteList){
+	public void setAlert(ConsumerBaseAlarmSetting consumerBaseAlarmSetting, boolean alarm){
 		
-		if(!whiteList){
+		if(alarm && consumerBaseAlarmSetting != null){
 			
 			long baseSenddelay = consumerBaseAlarmSetting.getSendDelay();
 			long baseackdelay = consumerBaseAlarmSetting.getAckDelay();

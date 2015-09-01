@@ -65,6 +65,9 @@ public class ProducerServerResourceServiceTest {
 		List<ServerResource> resources = producerServerResourceService.findAll();
 		for(ServerResource sr : resources){
 			ProducerServerResource producerServerResource = (ProducerServerResource)sr;
+			QPSAlarmSetting qPSAlarmSetting = producerServerResource.getSaveAlarmSetting();
+			System.out.println("fluctuation is " + qPSAlarmSetting.getFluctuation());
+			System.out.println("peak is " + qPSAlarmSetting.getPeak());
 			String ip = producerServerResource.getIp();
 			System.out.println("ip is " + ip);
 		}

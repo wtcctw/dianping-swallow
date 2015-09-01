@@ -29,6 +29,7 @@ import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.dashboard.model.Entry;
 import com.dianping.swallow.web.dashboard.model.FixSizedPriorityQueueContainer;
 import com.dianping.swallow.web.dashboard.model.MinuteEntry;
@@ -38,11 +39,11 @@ import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.manager.IPDescManager;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
+import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
-import com.dianping.swallow.web.monitor.wapper.TopicAlarmSettingServiceWrapper;
-import com.dianping.swallow.web.service.TopicAlarmSettingService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
@@ -64,14 +65,11 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
-	@Autowired
-	TopicAlarmSettingServiceWrapper topicAlarmSettingServiceWrapper;
-	
 	@Resource(name = "ipDescManager")
 	private IPDescManager ipDescManager;
 
-	@Resource(name = "topicAlarmSettingService")
-	private TopicAlarmSettingService topicAlarmSettingService;
+	@Resource(name = "alarmResourceContainer")
+	private AlarmResourceContainer alarmResourceContainer;
 
 	private Map<TotalDataKey, TotalData> totalDataMap = new ConcurrentHashMap<TotalDataKey, TotalData>();
 
@@ -81,8 +79,6 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
-
-	private List<String> whiteList;
 
 	@PostConstruct
 	void updateDashboardContainer() {
@@ -112,8 +108,6 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 
 		boolean timeSet = false;
 		Date entryTime = null;
-		List<String> tmpWhiteList = topicAlarmSettingService.getConsumerIdWhiteList();
-		whiteList = tmpWhiteList != null ? tmpWhiteList : new ArrayList<String>();
 		Set<String> topics = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL);
 
 		for (String topic : topics) {
@@ -237,13 +231,27 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 		String consumerid = totalDataKey.getConsumerId();
 		String topic = totalDataKey.getTopic();
 
-		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = topicAlarmSettingServiceWrapper
-				.loadConsumerBaseAlarmSetting(topic);
+		boolean alarm = true;
+		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = null;
+		TopicResource topicResource = alarmResourceContainer.findTopicResource(topic);
+		
+		if(topicResource != null){
+			if(topicResource.isConsumerAlarm()){
+				ConsumerIdResource consumerIdResource = alarmResourceContainer.findConsumerIdResource(topic, consumerid);
+				if(consumerIdResource != null){
+					alarm = consumerIdResource.isAlarm();
+					consumerIdResource.getConsumerAlarmSetting();
+				}
+			}else{
+				alarm = false;
+			}
+		}
+		
 		Entry e = new Entry();
 
 		e.setConsumerId(consumerid).setTopic(topic).setSenddelay(senddelay).setAckdelay(ackdelay).setAccu(accu);
 
-		e.setAlert(consumerBaseAlarmSetting, whiteList.contains(consumerid));
+		e.setAlert(consumerBaseAlarmSetting, alarm);
 		
 		return e;
 			
