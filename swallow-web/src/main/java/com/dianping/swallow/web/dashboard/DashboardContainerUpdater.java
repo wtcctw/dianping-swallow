@@ -36,7 +36,7 @@ import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.dashboard.model.TotalData;
 import com.dianping.swallow.web.dashboard.model.TotalDataKey;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
-import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.manager.IPResourceManager;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
@@ -66,7 +66,7 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
 	@Resource(name = "ipDescManager")
-	private IPDescManager ipDescManager;
+	private IPResourceManager ipDescManager;
 
 	@Resource(name = "alarmResourceContainer")
 	private AlarmResourceContainer alarmResourceContainer;

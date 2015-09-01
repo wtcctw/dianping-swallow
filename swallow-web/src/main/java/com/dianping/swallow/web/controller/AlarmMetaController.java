@@ -33,7 +33,7 @@ public class AlarmMetaController extends AbstractSidebarBasedController {
 	@Autowired
 	private AlarmMetaService alarmMetaService;
 
-	@RequestMapping(value = "/console/setting/alarmmeta")
+	@RequestMapping(value = "/console/setting")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
 		return new ModelAndView("setting/alarmmetasetting", createViewMap());
 	}

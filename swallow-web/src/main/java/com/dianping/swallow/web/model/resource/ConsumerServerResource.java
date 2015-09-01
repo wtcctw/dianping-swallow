@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model.resource;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 
 
@@ -8,6 +10,7 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
  *
  * 2015年8月10日下午2:44:55
  */
+@Document(collection = "CONSUMER_SERVER_RESOURCE")
 public class ConsumerServerResource extends ServerResource{
 	
 	private QPSAlarmSetting sendAlarmSetting;
