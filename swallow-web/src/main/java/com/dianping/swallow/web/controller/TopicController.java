@@ -197,7 +197,7 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
 			@RequestParam(value = "time") String time,
-			@RequestParam(value = "exec_user", required = false) String approver, HttpServletRequest request,
+			@RequestParam(value = "exec_user") String approver, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		String username = extractUsernameUtils.getUsername(request);
@@ -241,7 +241,6 @@ public class TopicController extends AbstractMenuController {
 
 		try {
 			topicResource.setAdministrator(prop);
-			;
 			topicResource.setUpdateTime(new Date());
 			result = topicResourceService.update(topicResource);
 			producerTransaction.setStatus(Message.SUCCESS);

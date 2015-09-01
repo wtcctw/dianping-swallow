@@ -4,7 +4,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.manager.IPResourceManager;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 
 
@@ -21,7 +21,7 @@ public class IPDescManagerWrapper {
 	private IPDesc ipdesc;
 	
 	@Resource(name = "ipDescManager")
-	private IPDescManager ipDescManager;
+	private IPResourceManager ipDescManager;
 	
 	
 	public String loadDpMobile(String ip){

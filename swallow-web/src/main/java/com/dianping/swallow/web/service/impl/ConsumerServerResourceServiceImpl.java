@@ -67,7 +67,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public List<ServerResource> findAll() {
+	public List<ConsumerServerResource> findAll() {
 
 		return consumerServerResourceDao.findAll();
 	}

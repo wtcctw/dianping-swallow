@@ -24,11 +24,12 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.manager.IPResourceManager;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
+import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.IPDescService;
+import com.dianping.swallow.web.service.IpResourceService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
@@ -37,9 +38,9 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *
  */
 @Service("ipDescManager")
-public class IPDescManagerImpl implements IPDescManager {
+public class IPResourceManagerImpl implements IPResourceManager {
 
-	private static final Logger logger = LoggerFactory.getLogger(IPDescManagerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(IPResourceManagerImpl.class);
 
 	private static final String COMMA_SPLIT = ",";
 
@@ -54,8 +55,11 @@ public class IPDescManagerImpl implements IPDescManager {
 
 	private ScheduledFuture<?> future = null;
 
+	// @Autowired
+	// /private IPDescService ipDescService;
+
 	@Autowired
-	private IPDescService ipDescService;
+	private IpResourceService ipResourceService;
 
 	@Autowired
 	private CmdbService cmdbService;
@@ -99,17 +103,28 @@ public class IPDescManagerImpl implements IPDescManager {
 				String ip = iterator.next();
 				IPDesc ipDesc = cmdbService.getIpDesc(ip);
 				if (ipDesc != null) {
-					IPDesc ipDescDB = ipDescService.findByIp(ip);
-					if (ipDescDB == null) {
+					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
+					if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
 						ipDesc.setCreateTime(new Date());
 						ipDesc.setUpdateTime(new Date());
 						addEmail(ipDesc);
-						ipDescService.insert(ipDesc);
+						IpResource ipResource = new IpResource();
+						ipResource.setIp(ipDesc.getIp());
+						ipResource.setCreateTime(new Date());
+						ipResource.setUpdateTime(new Date());
+						ipResource.setiPDesc(ipDesc);
+						ipResourceService.insert(ipResource);
 					} else {
-						ipDesc.setId(ipDescDB.getId());
+						IpResource ipResource = ipResourceInDbs.get(0);
+						ipResource.setId(ipResource.getId());
+						if (ipResource.getiPDesc() != null) {
+							ipDesc.setId(ipResource.getiPDesc().getId());
+						}
 						ipDesc.setUpdateTime(new Date());
 						addEmail(ipDesc);
-						ipDescService.update(ipDesc);
+						ipResource.setUpdateTime(new Date());
+						ipResource.setiPDesc(ipDesc);
+						ipResourceService.update(ipResource);
 					}
 				}
 			}
@@ -129,18 +144,23 @@ public class IPDescManagerImpl implements IPDescManager {
 		if (StringUtils.isBlank(ip)) {
 			return null;
 		}
-		IPDesc ipDesc = ipDescService.findByIp(ip);
-		if (ipDesc == null) {
-			ipDesc = cmdbService.getIpDesc(ip);
+		List<IpResource> ipResources = ipResourceService.findByIp(ip);
+		if (ipResources == null || ipResources.size() == 0) {
+			IPDesc ipDesc = cmdbService.getIpDesc(ip);
 			if (ipDesc == null) {
 				return null;
 			}
 			addEmail(ipDesc);
 			ipDesc.setCreateTime(new Date());
 			ipDesc.setUpdateTime(new Date());
-			ipDescService.insert(ipDesc);
+			IpResource ipResource = new IpResource();
+			ipResource.setIp(ip);
+			ipResource.setiPDesc(ipDesc);
+			ipResource.setCreateTime(new Date());
+			ipResource.setUpdateTime(new Date());
+			ipResourceService.insert(ipResource);
 		}
-		return ipDesc;
+		return ipResources.get(0).getiPDesc();
 	}
 
 	private void addEmail(IPDesc ipDesc) {

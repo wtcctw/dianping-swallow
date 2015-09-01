@@ -12,7 +12,6 @@ import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.container.StatsDataContainer;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ProducerServerStatsDataService;
@@ -25,7 +24,7 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
  *         2015年8月4日 下午1:22:31
  */
 @Component
-public class ProducerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
+public class ProducerStatsDataStorager extends AbstractStatsDataStorager  {
 
 	@Autowired
 	private StatsDataContainer statsDataContainer;
@@ -49,17 +48,9 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager impleme
 		storagerName = getClass().getSimpleName();
 	}
 
-	@Override
-	public void achieveMonitorData() {
-		dataCount.incrementAndGet();
-	}
-
+	
 	@Override
 	protected void doStorage() {
-		if (dataCount.get() <= 0) {
-			return;
-		}
-		dataCount.decrementAndGet();
 		List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(lastTimeKey.get());
 		List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey.get());
 		storageServerStatis(serverStatsDatas);

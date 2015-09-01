@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
-import com.dianping.swallow.web.model.resource.ServerResource;
 import com.mongodb.WriteResult;
 
 /**
@@ -98,9 +97,9 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 	}
 
 	@Override
-	public List<ServerResource> findAll() {
+	public List<ConsumerServerResource> findAll() {
 
-		return mongoTemplate.findAll(ServerResource.class, CONSUMERSERVERRESOURCE_COLLECTION);
+		return mongoTemplate.findAll(ConsumerServerResource.class, CONSUMERSERVERRESOURCE_COLLECTION);
 	}
 
 }

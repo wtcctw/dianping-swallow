@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor;
 
+import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.common.server.monitor.data.QPX;
@@ -10,7 +11,7 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
  *         2015年4月21日 上午10:38:07
  */
 public interface ProducerDataRetriever extends MonitorDataRetriever {
-	
+
 	boolean dataExistInMemory(long start, long end);
 
 	StatsData getSaveDelay(String topic, long start, long end);
@@ -25,11 +26,7 @@ public interface ProducerDataRetriever extends MonitorDataRetriever {
 
 	Map<String, StatsData> getServerQpx(QPX qpx);
 
-	OrderStatsData getDelayOrder(int size, long start, long end);
+	List<OrderStatsData> getOrder(int size);
 
-	OrderStatsData getDelayOrder(int size);
-
-	OrderStatsData getQpxOrder(int size, long start, long end);
-
-	OrderStatsData getQpxOrder(int size);
+	List<OrderStatsData> getOrder(int size, long start, long end);
 }

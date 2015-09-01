@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
-import com.dianping.swallow.web.model.resource.ServerResource;
 
 
 /**
@@ -28,7 +27,7 @@ public interface ProducerServerResourceDao extends ServerResourceDao{
 
 	ProducerServerResource findDefault();
 
-	List<ServerResource> findAll();
+	List<ProducerServerResource> findAll();
 	
 	Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(int offset, int limit);
 

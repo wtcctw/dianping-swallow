@@ -83,7 +83,7 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	}
 
 	private void findCServerResourceData() {
-		List<ServerResource> tempResources = cServerResourceService.findAll();
+		List<ConsumerServerResource> tempResources = cServerResourceService.findAll();
 		if (tempResources != null) {
 			Map<String, ConsumerServerResource> newCServerResources = new HashMap<String, ConsumerServerResource>();
 			for (ServerResource tempResource : tempResources) {
@@ -94,7 +94,7 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	}
 
 	private void findPServerResourceData() {
-		List<ServerResource> tempResources = pServerResourceService.findAll();
+		List<ProducerServerResource> tempResources = pServerResourceService.findAll();
 		if (tempResources != null) {
 			Map<String, ProducerServerResource> newPServerResources = new HashMap<String, ProducerServerResource>();
 			for (ServerResource tempResource : tempResources) {
@@ -154,6 +154,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public ConsumerServerResource findConsumerServerResource(String ip) {
+		if (cServerResources == null) {
+			return null;
+		}
 		if (cServerResources.containsKey(ip)) {
 			cServerResources.get(ip);
 		} else {
@@ -164,6 +167,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public ProducerServerResource findProducerServerResource(String ip) {
+		if (pServerResources == null) {
+			return null;
+		}
 		if (pServerResources.containsKey(ip)) {
 			return pServerResources.get(ip);
 		} else {
@@ -173,6 +179,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public TopicResource findTopicResource(String topic) {
+		if (topicResources == null) {
+			return null;
+		}
 		if (topicResources.containsKey(topic)) {
 			return topicResources.get(topic);
 		} else {
@@ -182,6 +191,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public ConsumerIdResource findConsumerIdResource(String topicName, String consumerId) {
+		if (consumerIdResources == null) {
+			return null;
+		}
 		String key = topicName + KEY_SPLIT + consumerId;
 		if (consumerIdResources.containsKey(key)) {
 			return consumerIdResources.get(key);

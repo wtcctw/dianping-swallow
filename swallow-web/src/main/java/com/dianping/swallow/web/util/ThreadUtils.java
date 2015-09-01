@@ -6,7 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年8月1日 下午12:47:32
+ */
 public class ThreadUtils {
 
 	private static final String PREFIX = "Swallow-thread-";

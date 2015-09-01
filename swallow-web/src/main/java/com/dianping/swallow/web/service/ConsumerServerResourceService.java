@@ -19,5 +19,7 @@ public interface ConsumerServerResourceService extends ServerResourceService{
 	
 	int remove(String ip);
 	
+	List<ConsumerServerResource> findAll();
+	
 	Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(int offset, int limit);
 }

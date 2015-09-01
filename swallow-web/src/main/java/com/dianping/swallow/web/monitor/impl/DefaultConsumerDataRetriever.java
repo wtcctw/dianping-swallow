@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.server.monitor.data.ConsumerStatisRetriever;
 import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerAllData;
@@ -23,6 +25,10 @@ import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.OrderEntity;
 import com.dianping.swallow.web.monitor.OrderStatsData;
@@ -55,6 +61,12 @@ public class DefaultConsumerDataRetriever
 	@Autowired
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
+	@Autowired
+	private AccumulationRetriever accumulationRetriever;
+
+	@Autowired
+	private AlarmResourceContainer resourceContainer;
+
 	@Override
 	public boolean dataExistInMemory(long start, long end) {
 		NavigableMap<Long, Long> qpxStatsData = statis.getQpx(StatisType.SEND);
@@ -72,7 +84,6 @@ public class DefaultConsumerDataRetriever
 		return false;
 	}
 
-	@Override
 	public ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size, long start, long end) {
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		long fromKey = getKey(start);
@@ -118,12 +129,10 @@ public class DefaultConsumerDataRetriever
 		return orderDataResult;
 	}
 
-	@Override
 	public ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size) {
 		return getDelayOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
 	}
 
-	@Override
 	public ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size, long start, long end) {
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
 		long fromKey = getKey(start);
@@ -170,9 +179,77 @@ public class DefaultConsumerDataRetriever
 		return orderDataResult;
 	}
 
-	@Override
 	public ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size) {
 		return getQpxOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
+	}
+	
+	@Override
+	public List<OrderStatsData> getOrderForAllConsumerId(int size) {
+		return getOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
+	}
+	
+	@Override
+	public List<OrderStatsData> getOrderForAllConsumerId(int size, long start, long end) {
+
+		if (dataExistInMemory(start, end)) {
+			return getOrderInMemory(size, start, end);
+		}
+
+		return getOrderInDb(size, start, end);
+	}
+
+	public List<OrderStatsData> getOrderInMemory(int size, long start, long end) {
+		ConsumerOrderDataPair delayOrderPair = getDelayOrderForAllConsumerId(size, start, end);
+		ConsumerOrderDataPair qpxOrderPair = getQpxOrderForAllConsumerId(size, start, end);
+		OrderStatsData accuStatsData = accumulationRetriever.getAccuOrderForAllConsumerId(size, start, end);
+		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+		orderStatsDatas.add(delayOrderPair.getSendStatsData());
+		orderStatsDatas.add(delayOrderPair.getAckStatsData());
+		orderStatsDatas.add(qpxOrderPair.getSendStatsData());
+		orderStatsDatas.add(qpxOrderPair.getAckStatsData());
+		orderStatsDatas.add(accuStatsData);
+		return orderStatsDatas;
+	}
+
+	public List<OrderStatsData> getOrderInDb(int size, long start, long end) {
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+		OrderStatsData qpxSendStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SEND), start,
+				end);
+		OrderStatsData qpxAckStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.ACK), start, end);
+		OrderStatsData delaySendStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SEND),
+				start, end);
+		OrderStatsData delayAckStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.ACK), start,
+				end);
+		OrderStatsData accuStatsData = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY,
+				StatisDetailType.ACCUMULATION), start, end);
+		List<ConsumerIdResource> consumerIdResources = resourceContainer.findConsumerIdResources();
+		if (consumerIdResources != null) {
+			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
+				String topicName = consumerIdResource.getTopic();
+				String consumerId = consumerIdResource.getConsumerId();
+				ConsumerIdStatsData preStatsData = getPreConsumerIdStatsData(topicName, consumerId, fromKey);
+				ConsumerIdStatsData postStatsData = getPostConsumerIdStatsData(topicName, consumerId, toKey);
+				qpxSendStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getSendQps()
+						- preStatsData.getSendQps()));
+				qpxAckStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getAckQps()
+						- preStatsData.getAckQps()));
+				delaySendStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getSendDelay()
+						- preStatsData.getSendDelay()));
+				delayAckStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getAckDelay()
+						- preStatsData.getAckDelay()));
+				accuStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getAccumulation()
+						- preStatsData.getAccumulation()));
+			}
+
+		}
+		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+		orderStatsDatas.add(delaySendStatsData);
+		orderStatsDatas.add(delayAckStatsData);
+		orderStatsDatas.add(qpxSendStatsData);
+		orderStatsDatas.add(qpxAckStatsData);
+		orderStatsDatas.add(accuStatsData);
+		return orderStatsDatas;
 	}
 
 	@Override
@@ -473,6 +550,29 @@ public class DefaultConsumerDataRetriever
 		return retriever.getAllTopics();
 	}
 
+	private ConsumerIdStatsData getPreConsumerIdStatsData(String topicName, String consumerId, long timeKey) {
+		ConsumerIdStatsData consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(
+				topicName, timeKey, consumerId, false);
+		if (consumerIdStatsData != null) {
+			return consumerIdStatsData;
+		}
+		return new ConsumerIdStatsData();
+	}
+
+	private ConsumerIdStatsData getPostConsumerIdStatsData(String topicName, String consumerId, long timeKey) {
+		ConsumerIdStatsData consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(
+				topicName, timeKey, consumerId, true);
+		if (consumerIdStatsData != null) {
+			return consumerIdStatsData;
+		}
+		consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(topicName, timeKey,
+				consumerId, false);
+		if (consumerIdStatsData != null) {
+			return consumerIdStatsData;
+		}
+		return new ConsumerIdStatsData();
+	}
+
 	public static class StatsDataPair {
 
 		private Map<String, StatsData> sendStatsDatas;
@@ -496,4 +596,5 @@ public class DefaultConsumerDataRetriever
 		}
 
 	}
+
 }

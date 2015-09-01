@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
-import com.dianping.swallow.web.manager.IPDescManager;
+import com.dianping.swallow.web.manager.IPResourceManager;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
@@ -62,7 +62,7 @@ public abstract class Event {
 
 	private AlarmService alarmService;
 
-	private IPDescManager ipDescManager;
+	private IPResourceManager ipDescManager;
 
 	private AlarmMetaContainer alarmMetaContainer;
 
@@ -122,7 +122,7 @@ public abstract class Event {
 		this.alarmMetaContainer = alarmMetaContainer;
 	}
 
-	public void setIPDescManager(IPDescManager ipDescManager) {
+	public void setIPDescManager(IPResourceManager ipDescManager) {
 		this.ipDescManager = ipDescManager;
 	}
 
