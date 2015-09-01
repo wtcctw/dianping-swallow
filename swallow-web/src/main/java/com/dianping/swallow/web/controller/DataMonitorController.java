@@ -35,11 +35,9 @@ import com.dianping.swallow.web.dashboard.model.ResultEntry;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
-import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerOrderDataPair;
 import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
-import com.dianping.swallow.web.monitor.StatsDataOrderable;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
 import com.dianping.swallow.web.service.MinuteEntryService;
@@ -76,9 +74,6 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
-
-	@Autowired
-	private StatsDataOrderable statsDataOrderable;
 
 	@Autowired
 	private TopicScanner topicScanner;
@@ -431,7 +426,17 @@ public class DataMonitorController extends AbstractMonitorController {
 	@RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}", method = RequestMethod.POST)
 	@ResponseBody
 	public Object getConsumerOrderMonitor(@PathVariable final int size) throws Exception {
-		return statsDataOrderable.getOrderStatsData(size);
+		List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size);
+		List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size);
+		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+		orderStatsDatas.add(pOrderStatsDatas.get(0));
+		orderStatsDatas.add(cOrderStatsDatas.get(0));
+		orderStatsDatas.add(cOrderStatsDatas.get(1));
+		orderStatsDatas.add(pOrderStatsDatas.get(1));
+		orderStatsDatas.add(cOrderStatsDatas.get(2));
+		orderStatsDatas.add(cOrderStatsDatas.get(3));
+		orderStatsDatas.add(cOrderStatsDatas.get(4));
+		return orderStatsDatas;
 	}
 
 	@RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}/{startTime}/{endTime}", method = RequestMethod.POST)
@@ -442,40 +447,19 @@ public class DataMonitorController extends AbstractMonitorController {
 			return getConsumerOrderMonitor(size);
 		}
 		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
-		return statsDataOrderable.getOrderStatsData(size, searchTime.getStartTime(), searchTime.getEndTime());
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/total/delay/order/get/{size}", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getConsumerDelayOrderMonitor(@PathVariable final int size) throws Exception {
-		OrderStatsData saveDelayStatsData = producerDataRetriever.getDelayOrder(size);
-		ConsumerOrderDataPair consumerDelayOrderData = consumerDataRetriever.getDelayOrderForAllConsumerId(size);
-		OrderStatsDataResult result = new OrderStatsDataResult();
-		result.add(saveDelayStatsData);
-		result.add(consumerDelayOrderData.getSendStatsData());
-		result.add(consumerDelayOrderData.getAckStatsData());
-		return result;
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/total/accu/order/get/{size}", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getConsumerAccuOrderMonitor(@PathVariable final int size) throws Exception {
-		OrderStatsData accuStatsData = accumulationRetriever.getAccuOrderForAllConsumerId(size);
-		OrderStatsDataResult result = new OrderStatsDataResult();
-		result.add(accuStatsData);
-		return result;
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/total/qpx/order/get/{size}", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getConsumerQpxOrderMonitor(@PathVariable final int size) throws Exception {
-		OrderStatsData saveQpxStatsData = producerDataRetriever.getQpxOrder(size);
-		ConsumerOrderDataPair consumerQpxOrderData = consumerDataRetriever.getQpxOrderForAllConsumerId(size);
-		OrderStatsDataResult result = new OrderStatsDataResult();
-		result.add(saveQpxStatsData);
-		result.add(consumerQpxOrderData.getSendStatsData());
-		result.add(consumerQpxOrderData.getAckStatsData());
-		return result;
+		List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size, searchTime.getStartTime(),
+				searchTime.getEndTime());
+		List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size,
+				searchTime.getStartTime(), searchTime.getEndTime());
+		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+		orderStatsDatas.add(pOrderStatsDatas.get(0));
+		orderStatsDatas.add(cOrderStatsDatas.get(0));
+		orderStatsDatas.add(cOrderStatsDatas.get(1));
+		orderStatsDatas.add(pOrderStatsDatas.get(1));
+		orderStatsDatas.add(cOrderStatsDatas.get(2));
+		orderStatsDatas.add(cOrderStatsDatas.get(3));
+		orderStatsDatas.add(cOrderStatsDatas.get(4));
+		return orderStatsDatas;
 	}
 
 	private List<HighChartsWrapper> buildStatsHighChartsWrapper(String yAxis, Map<String, StatsData> stats) {

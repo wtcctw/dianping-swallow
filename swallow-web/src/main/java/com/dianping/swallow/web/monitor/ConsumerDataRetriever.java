@@ -12,16 +12,12 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
  *         2015年4月21日 上午10:38:07
  */
 public interface ConsumerDataRetriever extends MonitorDataRetriever {
-	
+
 	boolean dataExistInMemory(long start, long end);
-	
-	ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size, long start, long end);
-	
-	ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size);
-	
-	ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size, long start, long end);
-	
-	ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size);
+
+	List<OrderStatsData> getOrderForAllConsumerId(int size);
+
+	List<OrderStatsData> getOrderForAllConsumerId(int size, long start, long end);
 
 	List<ConsumerDataPair> getDelayForAllConsumerId(String topic, long start, long end);
 
