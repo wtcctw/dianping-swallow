@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 
 /**
  * @author mingdongli
@@ -33,7 +33,7 @@ public class LogFilter implements Filter {
 
 	private ServletContext context;
 
-	private ExtractUsernameUtils extractUsernameUtils;
+	private UserUtils extractUsernameUtils;
 
 	private List<Pattern> excludePatterns = new LinkedList<Pattern>();
 
@@ -43,7 +43,7 @@ public class LogFilter implements Filter {
 
 		this.context = fConfig.getServletContext();
 		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
-		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
+		this.extractUsernameUtils = ctx.getBean(UserUtils.class);
 		String excludeUrl = fConfig.getInitParameter("excludeURLs");
 		String[] excludeUrls = excludeUrl.split(",");
 		for (String exclude : excludeUrls) {

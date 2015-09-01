@@ -18,7 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.UserQueryDto;
-import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.UserType;
 import com.dianping.swallow.web.service.UserService;
@@ -33,7 +33,7 @@ public class AdministratorController extends AbstractMenuController {
 	private UserService userService;
 
 	@Autowired
-	ExtractUsernameUtils extractUsernameUtils;
+	UserUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/administrator")
 	public ModelAndView allApps(HttpServletRequest request, HttpServletResponse response) {

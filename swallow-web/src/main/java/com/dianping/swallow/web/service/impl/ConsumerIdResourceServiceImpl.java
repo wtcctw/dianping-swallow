@@ -102,5 +102,15 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 
 		return consumerIdResource;
 	}
+	
+	@Override
+	public ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId){
+		
+		ConsumerIdResource consumerIdResource =  consumerIdResourceDao.findByConsumerIdAndTopic(topic, consumerId);
+		if(consumerIdResource == null){
+			consumerIdResource = buildConsumerIdResource(topic, consumerId);
+		}
+		return consumerIdResource;
+	}
 
 }

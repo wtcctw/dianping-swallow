@@ -22,6 +22,8 @@ public interface ConsumerIdResourceDao extends Dao{
 	long count();
 
 	List<ConsumerIdResource> findByConsumerId(String consumerid);
+	
+	ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId);
 
 	Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam);
 	

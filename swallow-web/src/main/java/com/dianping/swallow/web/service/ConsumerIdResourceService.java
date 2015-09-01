@@ -35,4 +35,6 @@ public interface ConsumerIdResourceService {
 	Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam);
 	
 	ConsumerIdResource buildConsumerIdResource(String topic, String consumerId);
+
+	ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId);
 }

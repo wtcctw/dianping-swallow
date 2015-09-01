@@ -22,7 +22,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.dianping.swallow.common.internal.util.IOUtilsWrapper;
 import com.dianping.swallow.web.controller.MessageRetransmitController;
-import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.impl.AuthenticationServiceImpl;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -35,14 +35,14 @@ public class AuthenticationFilter implements Filter {
 
 	private AuthenticationService authenticationService;
 
-	private ExtractUsernameUtils extractUsernameUtils;
+	private UserUtils extractUsernameUtils;
 	
 	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		ServletContext context = fConfig.getServletContext();
 		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
 		this.authenticationService = ctx.getBean(AuthenticationServiceImpl.class);
-		this.extractUsernameUtils = ctx.getBean(ExtractUsernameUtils.class);
+		this.extractUsernameUtils = ctx.getBean(UserUtils.class);
 		
 	}
 

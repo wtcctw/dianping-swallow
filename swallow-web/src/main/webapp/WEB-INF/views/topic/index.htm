@@ -59,8 +59,13 @@
 						<th style="text-align: left;">操作</th>
 						#end 
 					</tr>
+					#if(${isadmin})
 					<tr ng-repeat="t in searchPaginator.currentPageItems "
 						on-finish-render-filters>
+					#else
+					<tr ng-repeat="t in searchPaginator.currentPageItems | nodefault"
+						on-finish-render-filters>
+					#end
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left"><a
 							ng-href="${rc.contextPath}/console/message"

@@ -125,7 +125,9 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
     	
     }
 	
+	$scope.isReadOnly = false;
 	$scope.clearModal = function(){
+		$scope.isReadOnly = false;
 		$scope.producerserverEntry.id = null;
 		$scope.producerserverEntry.ip = "";
 		$scope.producerserverEntry.hostname = "";
@@ -137,6 +139,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
+		$scope.isReadOnly = true;
 		$scope.producerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.producerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.producerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;

@@ -171,7 +171,9 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		
 	}
 	
+	$scope.isReadOnly = false;
 	$scope.clearModal = function(){
+		$scope.isReadOnly = false;
 		$scope.consumerserverEntry.id = null;
 		$scope.consumerserverEntry.ip = "";
 		$scope.consumerserverEntry.hostname = "";
@@ -187,6 +189,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
+		$scope.isReadOnly = true;
 		$scope.consumerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.consumerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.consumerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;

@@ -12,7 +12,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
-import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.AuthenticationService;
 
@@ -37,7 +37,7 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 	private UserService userService;
 
 	@Autowired
-	ExtractUsernameUtils extractUsernameUtils;
+	UserUtils extractUsernameUtils;
 	
 	private static final Logger logger = Logger
 			.getLogger(ModelAndViewInterceptor.class);

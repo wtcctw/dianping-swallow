@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Resource;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.service.UserService;
 
 
@@ -24,15 +23,14 @@ public class IndexController extends AbstractMenuController {
 	private UserService userService;
 	
 	@Autowired
-	private ExtractUsernameUtils extractUsernameUtils;
+	private UserUtils userUtils;
 
 	@RequestMapping(value = "/")
 	public ModelAndView allApps(HttpServletRequest request,
 			HttpServletResponse response) {
 		
-		String username = extractUsernameUtils.getUsername(request);
-		Set<String> adminSet = userService.loadCachedAdministratorSet();
-		boolean admin = adminSet.contains(username);
+		String username = userUtils.getUsername(request);
+		boolean admin = userUtils.isTrueAdministrator(username);
 		isAdmin.set(admin);
 		
 		if(admin){
