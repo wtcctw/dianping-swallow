@@ -7,6 +7,10 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
+import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
@@ -42,6 +46,9 @@ public class StatsDataOrderableImpl implements StatsDataOrderable {
 	@Autowired
 	private ProducerTopicStatsDataService pTopicStatsDataService;
 
+	@Autowired
+	private AlarmResourceContainer resourceContainer;
+
 	@Override
 	public List<OrderStatsData> getOrderStatsData(int size) {
 		return getOrderStatsData(size, getDefaultStart(), getDefaultEnd());
@@ -60,6 +67,7 @@ public class StatsDataOrderableImpl implements StatsDataOrderable {
 		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
 		long startKey = AbstractRetriever.getKey(start);
 		long endKey = AbstractRetriever.getKey(end);
+		List<ConsumerIdResource> consumerIdResources =resourceContainer.findConsumerIdResources();
 		
 		return orderStatsDatas;
 	}

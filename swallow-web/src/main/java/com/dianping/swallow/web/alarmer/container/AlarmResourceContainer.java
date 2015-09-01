@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.alarmer.container;
 
+import java.util.List;
+
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
@@ -20,5 +22,8 @@ public interface AlarmResourceContainer {
 	TopicResource findTopicResource(String topic);
 	
 	ConsumerIdResource findConsumerIdResource(String topicName, String consumerId);
-
+	
+	List<TopicResource> findTopicResources();
+	
+	List<ConsumerIdResource> findConsumerIdResources();
 }
