@@ -319,24 +319,48 @@ module.controller('ConsumerDelayController', function($scope, $http) {
 
 module.controller('ConsumerOrderController', function($scope, $http) {
 
-	$scope.resultCount = 1;
+	$scope.queryOrder = function(url) {
+		$http({
+				method : 'POST',
+				url : window.contextPath + url
+			  }).success(function(datas, status, headers, config) {
+					$scope.orderDatas = datas;
+					$scope.IsShowOrderQps = true;
+					$scope.copyData();
+			   }).error(function(datas, status, headers, config) {
+					console.log("orderQpxs读取错误");
+					$scope.clearData();
+					$scope.IsShowOrderQps = false;
+		 });
+		
+	};
+	$scope.clearData = function() {
+		$scope.orderDatas = [];
+		$scope.delayOrderDatas= [];
+		$scope.qpxOrderDatas= [];
+		$scope.accuOrderDatas= [];
+	}
+	$scope.copyData = function() {
+		if($scope.orderDatas.length > 0) {
+			$scope.delayOrderDatas= [];
+			$scope.delayOrderDatas.push($scope.orderDatas[0]);
+			$scope.delayOrderDatas.push($scope.orderDatas[1]);
+			$scope.delayOrderDatas.push($scope.orderDatas[2]);
+			$scope.qpxOrderDatas= [];
+			$scope.qpxOrderDatas.push($scope.orderDatas[3]);
+			$scope.qpxOrderDatas.push($scope.orderDatas[4]);
+			$scope.qpxOrderDatas.push($scope.orderDatas[5]);
+			$scope.accuOrderDatas= [];
+			$scope.accuOrderDatas.push($scope.orderDatas[6]);
+		} 
+	}
 	$scope.queryOrderList = function(topicName) {
 		if($scope.resultCount == null||$scope.resultCount.length == 0){
 			$scope.resultCount = 10;
 		}
-		$http({
-				method : 'POST',
-				url : window.contextPath + '/console/monitor/consumer/total/order/get/' + $scope.resultCount
-			  }).success(function(datas, status, headers, config) {
-					$scope.orderDatas = datas;
-					$scope.IsShowOrderQps = true;
-			   }).error(function(datas, status, headers, config) {
-					console.log("orderQpxs读取错误");
-					$scope.orderDatas = [];
-					$scope.IsShowOrderQps = false;
-			   });
-		
+		$scope.queryOrder('/console/monitor/consumer/total/order/get/' + $scope.resultCount);
 	};
+	
 	
 	$scope.getOrder = function(topicName) {
 		$scope.queryOrderList('total');
@@ -388,8 +412,7 @@ module.controller('ConsumerOrderController', function($scope, $http) {
 		}
 		if ($scope.startTime != null && $scope.endTime != null) {
 			if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
-				renderGraph("/console/monitor/consumer/" + topicName + "/order/get/" + $scope.resultCount, "container",
-				$http);
+				queryOrderList
 				return;
 			}else if($scope.startTime.length == 0 && $scope.endTime.length > 0){
 				alert("开始时间不能为空");
@@ -405,8 +428,8 @@ module.controller('ConsumerOrderController', function($scope, $http) {
 				}
 			}
 		}
-		renderGraph("/console/monitor/consumer/" + topicName + "/order/get/" + $scope.resultCount + "/"
-				+ $scope.startTime + "/" + $scope.endTime, "container", $http);
+		$scope.queryOrder("/console/monitor/consumer/" + topicName + "/order/get/" + $scope.resultCount + "/"
+				+ $scope.startTime + "/" + $scope.endTime)
 	};
 });
 

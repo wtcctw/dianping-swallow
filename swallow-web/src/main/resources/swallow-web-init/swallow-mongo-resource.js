@@ -99,6 +99,31 @@ if (srcData != null && destData == null) {
 }
 print("CONSUMERID_ALARM_SETTING export to CONSUMERID_RESOURCE end");
 
+//TOPIC_RESOURCE
+print("TOPIC export to TOPIC_RESOURCE start");
+
+var alarmData = db.TOPIC_ALARM_SETTING.findOne();
+var srcData = db.TOPIC.find();
+destData = db.TOPIC_RESOURCE.findOne();
+if (srcData != null && destData == null) {
+	while (srcData.hasNext()) {
+		var temp = srcData.next();
+		var resource = {};
+		resource.topic = temp.name;
+		resource.administrator = temp.prop;
+		resource.producerAlarm = true;
+		resource.consumerAlarm = true;
+		resource.producerIps = [];
+		resource.producerAlarmSetting = alarmData.producerAlarmSetting;
+		resource.createTime = new Date();
+		resource.updateTime = new Date();
+		db.TOPIC_RESOURCE.insert(resource);
+	}
+} else {
+	print("TOPIC no data or TOPIC_RESOURCE already exsits");
+}
+print("TOPIC export to TOPIC_RESOURCE end");
+
 
 //IP_RESOURCE
 print("IP_DESC export to IP_RESOURCE start");
@@ -122,5 +147,9 @@ if (srcData != null && destData == null) {
 print("IP_DESC export to IP_RESOURCE end");
 
 
+
+db.CONSUMERID_STATS_DATA.ensureIndex({'topicName': -1,'consumerId' : -1 }, {"name":"IX_TOPICNAME_CONSUMERID"},{background:true});
+
+db.PRODUCER_TOPIC_STATS_DATA.ensureIndex({'topicName': -1}, {"name":"IX_TOPICNAME"},{background:true});
 
 

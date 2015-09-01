@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
-import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
@@ -86,8 +85,8 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 		List<ConsumerServerResource> tempResources = cServerResourceService.findAll();
 		if (tempResources != null) {
 			Map<String, ConsumerServerResource> newCServerResources = new HashMap<String, ConsumerServerResource>();
-			for (ServerResource tempResource : tempResources) {
-				newCServerResources.put(tempResource.getIp(), (ConsumerServerResource) tempResource);
+			for (ConsumerServerResource tempResource : tempResources) {
+				newCServerResources.put(tempResource.getIp(),  tempResource);
 			}
 			cServerResources = newCServerResources;
 		}
@@ -97,8 +96,8 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 		List<ProducerServerResource> tempResources = pServerResourceService.findAll();
 		if (tempResources != null) {
 			Map<String, ProducerServerResource> newPServerResources = new HashMap<String, ProducerServerResource>();
-			for (ServerResource tempResource : tempResources) {
-				newPServerResources.put(tempResource.getIp(), (ProducerServerResource) tempResource);
+			for (ProducerServerResource tempResource : tempResources) {
+				newPServerResources.put(tempResource.getIp(),  tempResource);
 			}
 			pServerResources = newPServerResources;
 		}

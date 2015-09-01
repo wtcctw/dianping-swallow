@@ -366,16 +366,16 @@ input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
 }
 
 .page-content-div {
-	margin-left:auto;
-	margin-right:auto;
-	text-align:center;
-    width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	width: 100%;
 }
 
 .page-content-input-div {
 	display: inline-block;
 	line-height: 1.5;
-	text-align:center;
+	text-align: center;
 }
 
 .page-content-input-div input {
@@ -389,4 +389,9 @@ input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
 	height: 35px;
 	padding: 0 6px;
 	border-radius: 0 !important;
+}
+
+.div-table {
+	display: block;
+	float: left;
 }
