@@ -1109,6 +1109,7 @@ body .markdown-body
 <li><a href="#server">server告警</a></li>
 <li><a href="#topic_4">topic告警</a></li>
 <li><a href="#consumerid">consumerId告警</a></li>
+<li><a href="#ip">IP告警</a></li>
 </ul>
 </li>
 <li><a href="#swallow_7">Swallow 大盘</a><ul>
@@ -1953,6 +1954,14 @@ public static void main(String[] args) {
 <p>consumerId告警分析</p>
 <p>如果出现延时或者累积报警，先查看是否是消息接收端处理过慢（并发数过低、单条消息处理过慢，异常导致onMessage处理挂起），可以借助swallow管理平台上的监控和Cat监控，参见<a href="#commonProblems">Swallow常见问题以及处理</a>。</p>
 </li>
+<li>
+<p>告警配置</p>
+<p>根据业务自身的情况,可以设置对应ConsumerId的告警配置,可以取消告警或者修改默认的告警配置值.</p>
+</li>
+</ol>
+<h3 id="ip"><a name="user-content-ip" href="#ip" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>IP告警</h3>
+<ol>
+<li>IP告警定位到消费者程序运行的主机,用户可以根据自身需要设置是否告警.</li>
 </ol>
 <h2 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 大盘</h2>
 <h3 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>综合大盘</h3>

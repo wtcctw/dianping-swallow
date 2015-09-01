@@ -27,4 +27,6 @@ public interface ProducerStatsDataWapper {
 	 * @return
 	 */
 	Set<String> getTopicIps(String topicName);
+	
+	Set<String> getTopics();
 }

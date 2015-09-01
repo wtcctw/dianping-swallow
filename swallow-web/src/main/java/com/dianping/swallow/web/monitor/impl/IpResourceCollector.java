@@ -24,8 +24,11 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
+import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
@@ -33,12 +36,18 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *
  *         2015年8月31日下午8:14:56
  */
-public class ConsumerIdResourceCollector implements MonitorDataListener, Runnable {
+public class IpResourceCollector implements MonitorDataListener, Runnable {
 
 	private static final String FACTORY_NAME = "ConsumerIdResourceCollector";
 
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
+
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
+
+	@Resource(name = "producerStatsDataWapper")
+	private ProducerStatsDataWapper producerStatsDataWapper;
 
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
@@ -91,7 +100,10 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 					Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
 
 					if (pair.getFirst() == 0) {
-						ConsumerIdResource consumerIdResource = buildConsumerIdResource(topic, cid, ips);
+						ConsumerIdResource consumerIdResource = consumerIdResourceService.buildConsumerIdResource(topic, cid);
+						if (ips != null && !ips.isEmpty()) {
+							consumerIdResource.setConsumerIps(new ArrayList<String>(ips));
+						}
 						consumerIdResourceService.insert(consumerIdResource);
 					} else {
 						if (ips != null && !ips.isEmpty()) {
@@ -100,6 +112,30 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 							consumerIdResourceService.insert(consumerIdResource);
 						}
 					}
+				}
+			}
+		}
+	}
+	
+	private void flushTopicMetaData(){
+		
+		Set<String> topics = producerStatsDataWapper.getTopics();
+		if(topics != null){
+			for(String topic : topics){
+				Set<String> ips = producerStatsDataWapper.getTopicIps(topic);
+				if(ips != null){
+					TopicResource topicResource = topicResourceService.findByTopic(topic);
+					List<String> ipList = new ArrayList<String>(ips);
+					
+					if(topicResource == null){
+						topicResource = topicResourceService.buildTopicResource(topic);
+						topicResource.setProducerIps(ipList);
+						topicResourceService.insert(topicResource);
+					}else{
+						topicResource.setProducerIps(ipList);
+						topicResourceService.insert(topicResource);
+					}
+					
 				}
 			}
 		}
@@ -114,32 +150,6 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 		}
 	}
 
-	private ConsumerIdResource buildConsumerIdResource(String topic, String consumerId, Set<String> ips) {
-
-		ConsumerIdResource consumerIdResource = new ConsumerIdResource();
-		consumerIdResource.setAlarm(Boolean.TRUE);
-		consumerIdResource.setTopic(topic);
-		consumerIdResource.setConsumerId(consumerId);
-
-		List<String> ipList = null;
-
-		if (ips == null) {
-			ipList = new ArrayList<String>();
-		} else {
-			ipList = new ArrayList<String>(ips);
-		}
-
-		consumerIdResource.setConsumerIps(ipList);
-
-		ConsumerIdResource defaultResource = consumerIdResourceService.findDefault();
-		if (defaultResource == null) {
-			throw new RuntimeException("No default configuration for ConsumerIdResource");
-		}
-		consumerIdResource.setConsumerAlarmSetting(defaultResource.getConsumerAlarmSetting());
-
-		return consumerIdResource;
-	}
-
 	@Override
 	public void run() {
 
@@ -149,6 +159,7 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 				@Override
 				public void doAction() throws SwallowException {
 					flushConsumerIdMetaData();
+					flushTopicMetaData();
 				}
 			});
 		} catch (Throwable th) {

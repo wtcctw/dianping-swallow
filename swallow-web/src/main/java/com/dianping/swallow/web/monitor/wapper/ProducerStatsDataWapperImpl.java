@@ -130,4 +130,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		return producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
 	}
 
+	@Override
+	public Set<String> getTopics() {
+		return producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+	}
+
 }
