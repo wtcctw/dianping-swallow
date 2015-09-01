@@ -33,9 +33,9 @@ public class AlarmMetaController extends AbstractSidebarBasedController {
 	@Autowired
 	private AlarmMetaService alarmMetaService;
 
-	@RequestMapping(value = "/console/setting")
+	@RequestMapping(value = "/console/setting/alarmmeta")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
-		return new ModelAndView("setting/alarmmetasetting", createViewMap());
+		return new ModelAndView("tool/alarmmetasetting", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/setting/alarmmeta/list", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -52,7 +52,7 @@ public class AlarmMetaController extends AbstractSidebarBasedController {
 	public ModelAndView alarmDetail(@PathVariable int metaId) {
 		Map<String, Object> paras = super.createViewMap();
 		paras.put("entity", alarmMetaService.findByMetaId(metaId));
-		return new ModelAndView("setting/alarmmetadetail", paras);
+		return new ModelAndView("tool/alarmmetadetail", paras);
 	}
 
 	@RequestMapping(value = "/console/setting/alarmmeta/create", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
@@ -123,7 +123,7 @@ public class AlarmMetaController extends AbstractSidebarBasedController {
 
 	@Override
 	protected String getSide() {
-		return "metasetting";
+		return "alarm";
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class AlarmMetaController extends AbstractSidebarBasedController {
 
 	@Override
 	protected String getMenu() {
-		return "setting";
+		return "tool";
 	}
 
 }

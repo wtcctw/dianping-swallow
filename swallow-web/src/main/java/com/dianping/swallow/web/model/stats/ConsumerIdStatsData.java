@@ -17,8 +17,7 @@ import com.dianping.swallow.web.model.event.StatisType;
  *         2015年7月31日 下午3:56:31
  */
 @Document(collection = "CONSUMERID_STATS_DATA")
-@CompoundIndexes({ @CompoundIndex(name = "IX_TIMEKEY_TOPICNAME_CONSUMERID", def = "{'timeKey': 1, 'topicName': -1, 'consumerId': -1}") ,
-	@CompoundIndex(name = "IX_TOPICNAME_CONSUMERID", def = "{'topicName': -1, 'consumerId': -1}") })
+@CompoundIndexes({ @CompoundIndex(name = "IX_TIMEKEY_TOPICNAME_CONSUMERID", def = "{'timeKey': 1, 'topicName': -1, 'consumerId': -1}") })
 public class ConsumerIdStatsData extends ConsumerStatsData {
 
 	private String topicName;

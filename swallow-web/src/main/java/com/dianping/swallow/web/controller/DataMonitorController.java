@@ -617,20 +617,6 @@ public class DataMonitorController extends AbstractMonitorController {
 		return subSide;
 	}
 
-	public static class OrderStatsDataResult {
-
-		List<OrderStatsData> orderStatsDatas = null;
-
-		public OrderStatsDataResult() {
-			orderStatsDatas = new ArrayList<OrderStatsData>();
-		}
-
-		public void add(OrderStatsData statsData) {
-			orderStatsDatas.add(statsData);
-		}
-
-	}
-
 	private static class SearchTime {
 
 		private long startTime;

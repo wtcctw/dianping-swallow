@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -14,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.ConsumerStatisRetriever;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
@@ -38,6 +42,7 @@ import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsDataMapPair;
 import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mengwenchao
@@ -51,6 +56,8 @@ public class DefaultConsumerDataRetriever
 		implements ConsumerDataRetriever {
 
 	public static final String CAT_TYPE = "ConsumerDataRetriever";
+
+	public static final String FACTORY_NAME = "ConsumerOrderInDb";
 
 	@Autowired
 	private ConsumerServerStatsDataService cServerStatsDataService;
@@ -182,12 +189,12 @@ public class DefaultConsumerDataRetriever
 	public ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size) {
 		return getQpxOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
 	}
-	
+
 	@Override
 	public List<OrderStatsData> getOrderForAllConsumerId(int size) {
 		return getOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
 	}
-	
+
 	@Override
 	public List<OrderStatsData> getOrderForAllConsumerId(int size, long start, long end) {
 
@@ -225,23 +232,14 @@ public class DefaultConsumerDataRetriever
 				StatisDetailType.ACCUMULATION), start, end);
 		List<ConsumerIdResource> consumerIdResources = resourceContainer.findConsumerIdResources();
 		if (consumerIdResources != null) {
+			QueryQrderTask queryQrderTask = new QueryQrderTask();
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 				String topicName = consumerIdResource.getTopic();
 				String consumerId = consumerIdResource.getConsumerId();
-				ConsumerIdStatsData preStatsData = getPreConsumerIdStatsData(topicName, consumerId, fromKey);
-				ConsumerIdStatsData postStatsData = getPostConsumerIdStatsData(topicName, consumerId, toKey);
-				qpxSendStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getSendQps()
-						- preStatsData.getSendQps()));
-				qpxAckStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getAckQps()
-						- preStatsData.getAckQps()));
-				delaySendStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getSendDelay()
-						- preStatsData.getSendDelay()));
-				delayAckStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getAckDelay()
-						- preStatsData.getAckDelay()));
-				accuStatsData.add(new OrderEntity(topicName, consumerId, postStatsData.getAccumulation()
-						- preStatsData.getAccumulation()));
+				queryQrderTask.submit(new QueryOrderParam(topicName, consumerId, fromKey, toKey, qpxSendStatsData,
+						qpxAckStatsData, delaySendStatsData, delayAckStatsData, accuStatsData));
 			}
-
+			queryQrderTask.await();
 		}
 		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
 		orderStatsDatas.add(delaySendStatsData);
@@ -552,7 +550,7 @@ public class DefaultConsumerDataRetriever
 
 	private ConsumerIdStatsData getPreConsumerIdStatsData(String topicName, String consumerId, long timeKey) {
 		ConsumerIdStatsData consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(
-				topicName, timeKey, consumerId, false);
+				topicName, timeKey, consumerId, true);
 		if (consumerIdStatsData != null) {
 			return consumerIdStatsData;
 		}
@@ -561,12 +559,7 @@ public class DefaultConsumerDataRetriever
 
 	private ConsumerIdStatsData getPostConsumerIdStatsData(String topicName, String consumerId, long timeKey) {
 		ConsumerIdStatsData consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(
-				topicName, timeKey, consumerId, true);
-		if (consumerIdStatsData != null) {
-			return consumerIdStatsData;
-		}
-		consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(topicName, timeKey,
-				consumerId, false);
+				topicName, timeKey, consumerId, false);
 		if (consumerIdStatsData != null) {
 			return consumerIdStatsData;
 		}
@@ -593,6 +586,148 @@ public class DefaultConsumerDataRetriever
 
 		public void setAckStatsDatas(Map<String, StatsData> ackStatsDatas) {
 			this.ackStatsDatas = ackStatsDatas;
+		}
+
+	}
+
+	private class QueryQrderTask {
+
+		private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 4;
+		
+		private static final int MAX_WAIT_TIME =60;
+
+		private ExecutorService executorService = Executors.newFixedThreadPool(poolSize,
+				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+
+		public void submit(final QueryOrderParam orderParam) {
+			executorService.submit(new Runnable() {
+
+				@Override
+				public void run() {
+					String topicName = orderParam.getTopicName();
+					String consumerId = orderParam.getConsumerId();
+					ConsumerIdStatsData preStatsData = getPreConsumerIdStatsData(topicName, consumerId,
+							orderParam.getFromKey());
+					ConsumerIdStatsData postStatsData = getPostConsumerIdStatsData(topicName, consumerId,
+							orderParam.getToKey());
+					orderParam.getQpxSendStatsData().add(
+							new OrderEntity(topicName, consumerId, postStatsData.getSendQps()
+									- preStatsData.getSendQps()));
+					orderParam.getQpxAckStatsData()
+							.add(new OrderEntity(topicName, consumerId, postStatsData.getAckQps()
+									- preStatsData.getAckQps()));
+					orderParam.getDelaySendStatsData().add(
+							new OrderEntity(topicName, consumerId, postStatsData.getSendDelay()
+									- preStatsData.getSendDelay()));
+					orderParam.getDelayAckStatsData().add(
+							new OrderEntity(topicName, consumerId, postStatsData.getAckDelay()
+									- preStatsData.getAckDelay()));
+					orderParam.getAccuStatsData().add(
+							new OrderEntity(topicName, consumerId, postStatsData.getAccumulation()
+									- preStatsData.getAccumulation()));
+				}
+			});
+		}
+
+		public void await() {
+			executorService.shutdown();
+			try {
+				executorService.awaitTermination(MAX_WAIT_TIME, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private static class QueryOrderParam {
+
+		private String topicName;
+
+		private String consumerId;
+
+		private long fromKey;
+
+		private long toKey;
+
+		private OrderStatsData delaySendStatsData;
+
+		private OrderStatsData delayAckStatsData;
+
+		private OrderStatsData qpxSendStatsData;
+
+		private OrderStatsData qpxAckStatsData;
+
+		private OrderStatsData accuStatsData;
+
+		public QueryOrderParam(String topicName, String consumerId, long fromKey, long toKey,
+				OrderStatsData delaySendStatsData, OrderStatsData delayAckStatsData, OrderStatsData qpxSendStatsData,
+				OrderStatsData qpxAckStatsData, OrderStatsData accuStatsData) {
+			this.topicName = topicName;
+			this.consumerId = consumerId;
+			this.fromKey = fromKey;
+			this.toKey = toKey;
+			this.setDelaySendStatsData(delaySendStatsData);
+			this.setDelayAckStatsData(delayAckStatsData);
+			this.setQpxSendStatsData(qpxSendStatsData);
+			this.setQpxAckStatsData(qpxAckStatsData);
+			this.setAccuStatsData(accuStatsData);
+		}
+
+		public String getTopicName() {
+			return topicName;
+		}
+
+		public long getFromKey() {
+			return fromKey;
+		}
+
+		public long getToKey() {
+			return toKey;
+		}
+
+		public OrderStatsData getDelaySendStatsData() {
+			return delaySendStatsData;
+		}
+
+		public void setDelaySendStatsData(OrderStatsData delaySendStatsData) {
+			this.delaySendStatsData = delaySendStatsData;
+		}
+
+		public OrderStatsData getDelayAckStatsData() {
+			return delayAckStatsData;
+		}
+
+		public void setDelayAckStatsData(OrderStatsData delayAckStatsData) {
+			this.delayAckStatsData = delayAckStatsData;
+		}
+
+		public OrderStatsData getQpxSendStatsData() {
+			return qpxSendStatsData;
+		}
+
+		public void setQpxSendStatsData(OrderStatsData qpxSendStatsData) {
+			this.qpxSendStatsData = qpxSendStatsData;
+		}
+
+		public OrderStatsData getQpxAckStatsData() {
+			return qpxAckStatsData;
+		}
+
+		public void setQpxAckStatsData(OrderStatsData qpxAckStatsData) {
+			this.qpxAckStatsData = qpxAckStatsData;
+		}
+
+		public OrderStatsData getAccuStatsData() {
+			return accuStatsData;
+		}
+
+		public void setAccuStatsData(OrderStatsData accuStatsData) {
+			this.accuStatsData = accuStatsData;
+		}
+
+		public String getConsumerId() {
+			return consumerId;
 		}
 
 	}
