@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.alarmer.container;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,5 +188,21 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 		} else {
 			return consumerIdResources.get(DEFAULT_DEFAULT_RECORD);
 		}
+	}
+
+	@Override
+	public List<TopicResource> findTopicResources() {
+		if (topicResources != null) {
+			return new ArrayList<TopicResource>(topicResources.values());
+		}
+		return null;
+	}
+
+	@Override
+	public List<ConsumerIdResource> findConsumerIdResources() {
+		if (consumerIdResources != null) {
+			return new ArrayList<ConsumerIdResource>(consumerIdResources.values());
+		}
+		return null;
 	}
 }
