@@ -2,7 +2,7 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,16 +10,15 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
-import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
+import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
-import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
-import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
 /**
  * 
@@ -40,10 +39,7 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements M
 	private ProducerTopicStatsDataService topicStatsDataService;
 
 	@Autowired
-	private TopicAlarmSettingService topicAlarmSettingService;
-
-	@Autowired
-	private ProducerServerAlarmSettingService serverAlarmSettingService;
+	private AlarmResourceContainer resourceContainer;
 
 	@Override
 	public void achieveMonitorData() {
@@ -77,23 +73,20 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements M
 		if (topicStatsDatas == null) {
 			return;
 		}
-		TopicAlarmSetting topicAlarmSetting = topicAlarmSettingService.findDefault();
-		if (topicAlarmSetting == null || topicAlarmSetting.getProducerAlarmSetting() == null) {
-			return;
-		}
-
-		ProducerBaseAlarmSetting producerAlarmSetting = topicAlarmSetting.getProducerAlarmSetting();
-		QPSAlarmSetting qps = producerAlarmSetting.getQpsAlarmSetting();
-		long delay = producerAlarmSetting.getDelay();
-		List<String> whiteList = serverAlarmSettingService.getTopicWhiteList();
 		for (ProducerTopicStatsData topicStatsData : topicStatsDatas) {
-			if (StringUtils.equals(TOTAL_KEY, topicStatsData.getTopicName())) {
+			String topicName = topicStatsData.getTopicName();
+			TopicResource topicResource = resourceContainer.findTopicResource(topicName);
+			if (topicResource == null || !topicResource.isProducerAlarm() || StringUtils.equals(TOTAL_KEY, topicName)) {
 				continue;
 			}
-			if (whiteList == null || !whiteList.contains(topicStatsData.getTopicName())) {
-				qpsAlarm(topicStatsData, qps);
-				topicStatsData.checkDelay(delay);
+			ProducerBaseAlarmSetting pBaseAlarmSetting = topicResource.getProducerAlarmSetting();
+			if (pBaseAlarmSetting == null) {
+				continue;
 			}
+			QPSAlarmSetting qps = pBaseAlarmSetting.getQpsAlarmSetting();
+			long delay = pBaseAlarmSetting.getDelay();
+			qpsAlarm(topicStatsData, qps);
+			topicStatsData.checkDelay(delay);
 		}
 	}
 

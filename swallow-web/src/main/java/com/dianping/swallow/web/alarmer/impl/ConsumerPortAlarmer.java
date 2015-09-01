@@ -15,10 +15,11 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
-import com.dianping.swallow.web.service.GlobalAlarmSettingService;
+import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.NetUtil;
 
@@ -43,7 +44,7 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 	private ConfigCache configCache;
 
 	@Autowired
-	private GlobalAlarmSettingService globalAlarmSettingService;
+	private AlarmResourceContainer resourceContainer;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -88,13 +89,13 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 			logger.error("[checkPort] cannot find consumermaster or consumerslave ips.");
 			return false;
 		}
-		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 		int index = 0;
-
 		for (String masterIp : consumerServerMasterIps) {
-			if (whiteList == null || !whiteList.contains(masterIp)) {
-				alarmPort(masterIp, consumerServerSlaveIps.get(index));
+			ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(masterIp);
+			if (cServerResource == null || !cServerResource.isAlarm()) {
+				continue;
 			}
+			alarmPort(masterIp, consumerServerSlaveIps.get(index));
 			index++;
 		}
 		return true;

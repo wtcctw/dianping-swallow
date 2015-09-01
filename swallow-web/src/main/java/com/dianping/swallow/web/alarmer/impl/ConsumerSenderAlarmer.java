@@ -11,10 +11,11 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
-import com.dianping.swallow.web.service.GlobalAlarmSettingService;
+import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.service.IPCollectorService;
 
 /**
@@ -30,7 +31,7 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private GlobalAlarmSettingService globalAlarmSettingService;
+	private AlarmResourceContainer resourceContainer;
 
 	@Autowired
 	private ConsumerPortAlarmer consumerPortAlarmer;
@@ -58,32 +59,33 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 		}
 
 		Map<String, Long> statisConsumerServerIps = ipCollectorService.getStatisConsumerServerIps();
-		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 		int index = 0;
 		for (String serverIp : consumerServerMasterIps) {
-			if (whiteList == null || !whiteList.contains(serverIp)) {
-				if (!statisConsumerServerIps.containsKey(serverIp)
-						|| System.currentTimeMillis() - statisConsumerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
-					String slaveIp = consumerServerSlaveIps.get(index);
-					if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
-						ServerEvent serverEvent = eventFactory.createServerEvent();
-						serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER)
-								.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-						eventReporter.report(serverEvent);
-						lastCheckStatus.put(serverIp, false);
-					}
-				} else {
-					if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-						ServerEvent serverEvent = eventFactory.createServerEvent();
-						serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER_OK)
-								.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-						eventReporter.report(serverEvent);
-						lastCheckStatus.put(serverIp, true);
-					}
+			ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(serverIp);
+			if (cServerResource == null || !cServerResource.isAlarm()) {
+				continue;
+			}
+			if (!statisConsumerServerIps.containsKey(serverIp)
+					|| System.currentTimeMillis() - statisConsumerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
+				String slaveIp = consumerServerSlaveIps.get(index);
+				if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
+					ServerEvent serverEvent = eventFactory.createServerEvent();
+					serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER)
+							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
+					eventReporter.report(serverEvent);
+					lastCheckStatus.put(serverIp, false);
+				}
+			} else {
+				if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
+					ServerEvent serverEvent = eventFactory.createServerEvent();
+					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER_OK)
+							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
+					eventReporter.report(serverEvent);
+					lastCheckStatus.put(serverIp, true);
 				}
 			}
-			index++;
 		}
+		index++;
 		return true;
 	}
 

@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +13,11 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
-import com.dianping.swallow.web.service.GlobalAlarmSettingService;
+import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 import com.dianping.swallow.web.service.IPCollectorService;
@@ -41,7 +42,7 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private GlobalAlarmSettingService globalAlarmSettingService;
+	private AlarmResourceContainer resourceContainer;
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -83,7 +84,6 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 
 	private boolean checkService() {
 		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
-		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 		if (producerServerIps == null) {
 			logger.error("[checkService] cannot find producerserver ips.");
 			return false;
@@ -92,23 +92,26 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 			if (StringUtils.isBlank(serverIp)) {
 				continue;
 			}
-			if (whiteList == null || !whiteList.contains(serverIp)) {
-				String url = StringUtils.replace(pigeonHealthUrl, "{ip}", serverIp);
-				HttpResult result = checkUrl(url);
-				if (!result.isSuccess()) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE)
-							.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
-					lastCheckStatus.put(serverIp, false);
-				} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE_OK)
-							.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
-					lastCheckStatus.put(serverIp, true);
-				}
+			ProducerServerResource pServerResource = resourceContainer.findProducerServerResource(serverIp);
+			if (pServerResource == null || !pServerResource.isAlarm()) {
+				continue;
 			}
+			String url = StringUtils.replace(pigeonHealthUrl, "{ip}", serverIp);
+			HttpResult result = checkUrl(url);
+			if (!result.isSuccess()) {
+				ServerEvent serverEvent = eventFactory.createServerEvent();
+				serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE)
+						.setEventType(EventType.PRODUCER).setCreateTime(new Date());
+				eventReporter.report(serverEvent);
+				lastCheckStatus.put(serverIp, false);
+			} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
+				ServerEvent serverEvent = eventFactory.createServerEvent();
+				serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE_OK)
+						.setEventType(EventType.PRODUCER).setCreateTime(new Date());
+				eventReporter.report(serverEvent);
+				lastCheckStatus.put(serverIp, true);
+			}
+
 		}
 		return true;
 	}

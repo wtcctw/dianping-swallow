@@ -2,7 +2,7 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,20 +10,20 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
+import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
-import com.dianping.swallow.web.service.GlobalAlarmSettingService;
-import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerStatsDataService;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年8月3日 下午6:06:54
+ *         2015年8月3日 下午6:06:54
  */
 @Component
 public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {
@@ -38,16 +38,13 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 	private ProducerServerStatsDataService serverStatsDataService;
 
 	@Autowired
-	private GlobalAlarmSettingService globalAlarmSettingService;
-
-	@Autowired
-	private ProducerServerAlarmSettingService serverAlarmSettingService;
+	private AlarmResourceContainer resourceContainer;
 
 	@Override
 	public void achieveMonitorData() {
 		dataCount.incrementAndGet();
 	}
-	
+
 	@Override
 	public void doInitialize() throws Exception {
 		super.doInitialize();
@@ -75,19 +72,14 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 		if (serverStatsDatas == null) {
 			return;
 		}
-		ProducerServerAlarmSetting serverAlarmSetting = serverAlarmSettingService.findDefault();
-		if (serverAlarmSetting == null) {
-			return;
-		}
-		QPSAlarmSetting qps = serverAlarmSetting.getAlarmSetting();
-		List<String> whiteList = globalAlarmSettingService.getProducerWhiteList();
 		for (ProducerServerStatsData serverStatsData : serverStatsDatas) {
-			if (StringUtils.equals(TOTAL_KEY, serverStatsData.getIp())) {
+			String ip = serverStatsData.getIp();
+			ProducerServerResource pServerResource = resourceContainer.findProducerServerResource(ip);
+			if (pServerResource == null || !pServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
 				continue;
 			}
-			if (whiteList == null || (!whiteList.contains(serverStatsData.getIp()))) {
-				qpsAlarm(serverStatsData, qps);
-			}
+			QPSAlarmSetting qps = pServerResource.getSaveAlarmSetting();
+			qpsAlarm(serverStatsData, qps);
 		}
 	}
 

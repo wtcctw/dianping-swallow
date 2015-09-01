@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +13,11 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
-import com.dianping.swallow.web.service.GlobalAlarmSettingService;
+import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 
@@ -33,7 +34,7 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private GlobalAlarmSettingService globalAlarmSettingService;
+	private AlarmResourceContainer resourceContainer;
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -74,29 +75,30 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 	}
 
 	private boolean checkSlaveService() {
-		List<String> whiteList = globalAlarmSettingService.getConsumerWhiteList();
 		List<String> consumerServerSlaveIps = ipCollectorService.getConsumerServerSlaveIps();
 		if (consumerServerSlaveIps == null) {
 			return false;
 		}
 		for (String slaveIp : consumerServerSlaveIps) {
-			if (whiteList == null || !whiteList.contains(slaveIp)) {
-				String url = StringUtils.replace(slaveMonitorUrl, "{ip}", slaveIp);
-				HttpResult result = checkUrl(url);
-				if (!result.isSuccess() || !result.getResponseBody().contains(MONOGO_MONITOR_SIGN)) {
+			ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(slaveIp);
+			if (cServerResource == null || !cServerResource.isAlarm()) {
+				continue;
+			}
+			String url = StringUtils.replace(slaveMonitorUrl, "{ip}", slaveIp);
+			HttpResult result = checkUrl(url);
+			if (!result.isSuccess() || !result.getResponseBody().contains(MONOGO_MONITOR_SIGN)) {
+				ServerEvent serverEvent = eventFactory.createServerEvent();
+				serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE)
+						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
+				eventReporter.report(serverEvent);
+				lastCheckStatus.put(slaveIp, false);
+			} else {
+				if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
 					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE)
+					serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE_OK)
 							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 					eventReporter.report(serverEvent);
-					lastCheckStatus.put(slaveIp, false);
-				} else {
-					if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
-						ServerEvent serverEvent = eventFactory.createServerEvent();
-						serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE_OK)
-								.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-						eventReporter.report(serverEvent);
-						lastCheckStatus.put(slaveIp, true);
-					}
+					lastCheckStatus.put(slaveIp, true);
 				}
 			}
 		}

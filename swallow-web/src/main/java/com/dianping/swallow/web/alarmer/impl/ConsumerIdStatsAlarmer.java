@@ -2,7 +2,7 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,18 +10,17 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
-import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
+import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
-import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
-import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
-import com.dianping.swallow.web.service.TopicAlarmSettingService;
 
 @Component
 public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {
@@ -36,13 +35,7 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements Moni
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@Autowired
-	private ConsumerIdAlarmSettingService consumerIdAlarmSettingService;
-
-	@Autowired
-	private TopicAlarmSettingService topicAlarmSettingService;
-
-	@Autowired
-	private ConsumerServerAlarmSettingService serverAlarmSettingService;
+	private AlarmResourceContainer resourceContainer;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -76,45 +69,36 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements Moni
 		if (consumerIdStatsDatas == null || consumerIdStatsDatas.size() == 0) {
 			return;
 		}
-		ConsumerIdAlarmSetting consumerIdAlarmSetting = consumerIdAlarmSettingService.findDefault();
-		if (consumerIdAlarmSetting == null) {
-			return;
-		}
-		List<String> topicWhiteList = serverAlarmSettingService.getTopicWhiteList();
-		List<String> whiteList = topicAlarmSettingService.getConsumerIdWhiteList();
-		ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdAlarmSetting.getConsumerAlarmSetting();
-		QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
-		QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
-		long sendDelay = consumerAlarmSetting.getSendDelay();
-		long ackDelay = consumerAlarmSetting.getAckDelay();
-		long accumulation = consumerAlarmSetting.getAccumulation();
 
 		for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
 			String topicName = consumerIdStatsData.getTopicName();
 			String consumerId = consumerIdStatsData.getConsumerId();
-			if (StringUtils.equals(TOTAL_KEY, topicName)) {
+			ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
+			TopicResource topicResource = resourceContainer.findTopicResource(topicName);
+			if ((topicResource != null && !topicResource.isConsumerAlarm())
+					|| consumerIdResource == null || !consumerIdResource.isAlarm()
+					|| StringUtils.equals(TOTAL_KEY, topicName) || StringUtils.equals(TOTAL_KEY, consumerId)) {
 				continue;
 			}
-			if (topicWhiteList != null && topicWhiteList.contains(topicName)) {
-				continue;
+			ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();
+			QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
+			QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
+			long sendDelay = consumerAlarmSetting.getSendDelay();
+			long ackDelay = consumerAlarmSetting.getAckDelay();
+			long accumulation = consumerAlarmSetting.getAccumulation();
+			// 告警
+			boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);
+			boolean isAckQps = ackSendAlarm(consumerIdStatsData, ackQps);
+			if (isSendQps && isAckQps) {
+				long timeKey = consumerIdStatsData.getTimeKey();
+				Pair<Long, Long> preResult = getExpectedQps(topicName, consumerId, timeKey);
+				sendQpsFluAlarm(consumerIdStatsData, preResult.getFirst(), sendQps);
+				ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
 			}
-			if (StringUtils.equals(TOTAL_KEY, consumerId)) {
-				continue;
-			}
-			if (whiteList == null || !whiteList.contains(consumerId)) {
+			sendDelayAlarm(consumerIdStatsData, sendDelay);
+			sendAccuAlarm(consumerIdStatsData, accumulation);
+			ackDelayAlarm(consumerIdStatsData, ackDelay);
 
-				boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);
-				boolean isAckQps = ackSendAlarm(consumerIdStatsData, ackQps);
-				if (isSendQps && isAckQps) {
-					long timeKey = consumerIdStatsData.getTimeKey();
-					Pair<Long, Long> preResult = getExpectedQps(topicName, consumerId, timeKey);
-					sendQpsFluAlarm(consumerIdStatsData, preResult.getFirst(), sendQps);
-					ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
-				}
-				sendDelayAlarm(consumerIdStatsData, sendDelay);
-				sendAccuAlarm(consumerIdStatsData, accumulation);
-				ackDelayAlarm(consumerIdStatsData, ackDelay);
-			}
 		}
 
 	}

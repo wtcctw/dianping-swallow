@@ -8,30 +8,20 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
-import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
-import com.dianping.swallow.web.model.alarm.GlobalAlarmSetting;
-import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
-import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
-import com.dianping.swallow.web.service.ConsumerIdAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
-import com.dianping.swallow.web.service.ConsumerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
-import com.dianping.swallow.web.service.GlobalAlarmSettingService;
-import com.dianping.swallow.web.service.ProducerServerAlarmSettingService;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
-import com.dianping.swallow.web.service.TopicAlarmSettingService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
@@ -52,7 +42,7 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	private static final String DEFAULT_DEFAULT_RECORD = DEFAULT_RECORD + KEY_SPLIT + DEFAULT_RECORD;
 
-	private int interval = 300;// 秒
+	private int interval = 120;// 秒
 
 	private int delay = 5;
 
@@ -92,21 +82,46 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	}
 
 	private void findCServerResourceData() {
+		List<ServerResource> tempResources = cServerResourceService.findAll();
+		if (tempResources != null) {
+			Map<String, ConsumerServerResource> newCServerResources = new HashMap<String, ConsumerServerResource>();
+			for (ServerResource tempResource : tempResources) {
+				newCServerResources.put(tempResource.getIp(), (ConsumerServerResource) tempResource);
+			}
+			cServerResources = newCServerResources;
+		}
 	}
 
 	private void findPServerResourceData() {
-
+		List<ServerResource> tempResources = pServerResourceService.findAll();
+		if (tempResources != null) {
+			Map<String, ProducerServerResource> newPServerResources = new HashMap<String, ProducerServerResource>();
+			for (ServerResource tempResource : tempResources) {
+				newPServerResources.put(tempResource.getIp(), (ProducerServerResource) tempResource);
+			}
+			pServerResources = newPServerResources;
+		}
 	}
 
 	private void findTopicResourceData() {
+		List<TopicResource> tempResources = topicResourceService.findAll();
+		if (tempResources != null) {
+			Map<String, TopicResource> newTopicResources = new HashMap<String, TopicResource>();
+			for (TopicResource tempResource : tempResources) {
+				newTopicResources.put(tempResource.getTopic(), tempResource);
+			}
+			topicResources = newTopicResources;
+		}
 	}
 
 	private void findConsumerIdResourceData() {
 		List<ConsumerIdResource> tempResources = consumerIdResourceService.findAll();
 		if (tempResources != null) {
+			Map<String, ConsumerIdResource> newConsumerIdResources = new HashMap<String, ConsumerIdResource>();
 			for (ConsumerIdResource tempResource : tempResources) {
-				consumerIdResources.put(tempResource.generateKey(), tempResource);
+				newConsumerIdResources.put(tempResource.generateKey(), tempResource);
 			}
+			consumerIdResources = newConsumerIdResources;
 		}
 	}
 
@@ -138,9 +153,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public ConsumerServerResource findConsumerServerResource(String ip) {
-		if(cServerResources.containsKey(ip)){
+		if (cServerResources.containsKey(ip)) {
 			cServerResources.get(ip);
-		}else{
+		} else {
 			cServerResources.get(DEFAULT_RECORD);
 		}
 		return null;
@@ -148,9 +163,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public ProducerServerResource findProducerServerResource(String ip) {
-		if(pServerResources.containsKey(ip)){
+		if (pServerResources.containsKey(ip)) {
 			return pServerResources.get(ip);
-		}else{
+		} else {
 			return pServerResources.get(DEFAULT_RECORD);
 		}
 	}
