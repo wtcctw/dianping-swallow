@@ -25,10 +25,12 @@
 					href="${contextPath}/console/monitor/consumer/total/accu"> <i
 						class="icon-globe"></i> 消息堆积(topic)
 				</a></li>
+				#if(${isadmin})
 				<li class="#if($subside == 'consumerorder') active #end"><a
 					href="${contextPath}/console/monitor/consumer/total/order"> <i
 						class="icon-globe"></i> 监控排序
 				</a></li>
+				#end
 			</ul></li>
 	</ul>
 	<ul class="nav nav-list">

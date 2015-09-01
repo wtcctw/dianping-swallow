@@ -1,7 +1,9 @@
 package com.dianping.swallow.web.monitor.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
@@ -22,7 +24,10 @@ import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
+import com.dianping.swallow.web.model.resource.TopicResource;
+import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.OrderEntity;
 import com.dianping.swallow.web.monitor.OrderStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
@@ -51,6 +56,9 @@ public class DefaultProducerDataRetriever
 	private ProducerTopicStatsDataService pTopicStatsDataService;
 
 	@Autowired
+	private AlarmResourceContainer resourceContainer;
+
+	@Autowired
 	private ProducerMonitorDao producerMonitorDao;
 
 	@Override
@@ -68,7 +76,6 @@ public class DefaultProducerDataRetriever
 		return false;
 	}
 
-	@Override
 	public OrderStatsData getDelayOrder(int size, long start, long end) {
 		return getDelayOrderInMemory(size, StatisType.SAVE, start, end);
 	}
@@ -93,14 +100,58 @@ public class DefaultProducerDataRetriever
 		return orderResults;
 	}
 
-	@Override
 	public OrderStatsData getDelayOrder(int size) {
 		return getDelayOrder(size, getDefaultStart(), getDefaultEnd());
 	}
 
-	@Override
 	public OrderStatsData getQpxOrder(int size, long start, long end) {
 		return getQpxOrderInMemory(size, StatisType.SAVE, start, end);
+	}
+
+	public List<OrderStatsData> getOrder(int size) {
+		return getOrder(size, getDefaultStart(), getDefaultEnd());
+	}
+
+	public List<OrderStatsData> getOrder(int size, long start, long end) {
+		
+		if (dataExistInMemory(start, end)) {
+			return getOrderInMemory(size, start, end);
+		}
+
+		return getOrderInDb(size, start, end);
+	}
+
+	public List<OrderStatsData> getOrderInMemory(int size, long start, long end) {
+		OrderStatsData delayOrderResult = getDelayOrderInMemory(size, StatisType.SAVE, start, end);
+		OrderStatsData qpxOrderResult = getQpxOrderInMemory(size, StatisType.SAVE, start, end);
+		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+		orderStatsDatas.add(delayOrderResult);
+		orderStatsDatas.add(qpxOrderResult);
+		return orderStatsDatas;
+	}
+
+	public List<OrderStatsData> getOrderInDb(int size, long start, long end) {
+		long fromKey = getKey(start);
+		long toKey = getKey(end);
+		OrderStatsData delayOrderResult = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SAVE), start,
+				end);
+		OrderStatsData qpxOrderResult = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SAVE), start, end);
+		List<TopicResource> topicResources = resourceContainer.findTopicResources();
+		if (topicResources != null) {
+			for (TopicResource topicResource : topicResources) {
+				ProducerTopicStatsData preStatsData = getPrePTopicStatsData(topicResource.getTopic(), fromKey);
+				ProducerTopicStatsData postStatsData = getPostPTopicStatsData(topicResource.getTopic(), toKey);
+				delayOrderResult.add(new OrderEntity(topicResource.getTopic(), StringUtils.EMPTY, postStatsData
+						.getTotalDelay() - preStatsData.getTotalDelay()));
+				qpxOrderResult.add(new OrderEntity(topicResource.getTopic(), StringUtils.EMPTY, postStatsData
+						.getTotalQps() - preStatsData.getTotalQps()));
+
+			}
+		}
+		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+		orderStatsDatas.add(delayOrderResult);
+		orderStatsDatas.add(qpxOrderResult);
+		return orderStatsDatas;
 	}
 
 	protected OrderStatsData getQpxOrderInMemory(int size, StatisType type, long start, long end) {
@@ -123,7 +174,6 @@ public class DefaultProducerDataRetriever
 		return orderResults;
 	}
 
-	@Override
 	public OrderStatsData getQpxOrder(int size) {
 		return getQpxOrder(size, getDefaultStart(), getDefaultEnd());
 	}
@@ -255,6 +305,27 @@ public class DefaultProducerDataRetriever
 	protected StatsDataDesc createServerDelayDesc(String serverIp, StatisType type) {
 
 		return new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getDelayDetailType());
+	}
+
+	private ProducerTopicStatsData getPrePTopicStatsData(String topicName, long timeKey) {
+		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService
+				.findOneByTopicAndTime(topicName, timeKey, false);
+		if (pTopicStatsData != null) {
+			return pTopicStatsData;
+		}
+		return new ProducerTopicStatsData();
+	}
+
+	private ProducerTopicStatsData getPostPTopicStatsData(String topicName, long timeKey) {
+		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, timeKey, true);
+		if (pTopicStatsData != null) {
+			return pTopicStatsData;
+		}
+		pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, timeKey, false);
+		if (pTopicStatsData != null) {
+			return pTopicStatsData;
+		}
+		return new ProducerTopicStatsData();
 	}
 
 }
