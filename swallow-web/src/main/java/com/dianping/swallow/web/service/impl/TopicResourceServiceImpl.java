@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,8 +20,6 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.TopicResourceDao;
-import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
-import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -225,16 +224,18 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		Long id = System.currentTimeMillis();
 		TopicResource topicResource = new TopicResource();
 		topicResource.setAdministrator("");
-		;
 		topicResource.setConsumerAlarm(Boolean.TRUE);
 		topicResource.setProducerAlarm(Boolean.TRUE);
+		topicResource.setProducerIps(new ArrayList<String>());
 		topicResource.setTopic(topic);
 		topicResource.setCreateTime(new Date());
 		topicResource.setId(id.toString());
-		QPSAlarmSetting qPSAlarmSetting = new QPSAlarmSetting();
-		ProducerBaseAlarmSetting producerBaseAlarmSetting = new ProducerBaseAlarmSetting();
-		producerBaseAlarmSetting.setQpsAlarmSetting(qPSAlarmSetting);
-		topicResource.setProducerAlarmSetting(producerBaseAlarmSetting);
+		
+		TopicResource defaultTopicResource = topicResourceDao.findDefault();
+		if(defaultTopicResource == null){
+			throw new RuntimeException("No default TopicResource configuration");
+		}
+		topicResource.setProducerAlarmSetting(defaultTopicResource.getProducerAlarmSetting());
 		return topicResource;
 	}
 

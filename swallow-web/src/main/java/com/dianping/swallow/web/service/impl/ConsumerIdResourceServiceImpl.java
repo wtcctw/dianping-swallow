@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,25 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam consumerIdParam) {
 
 		return consumerIdResourceDao.findByConsumerIp(consumerIdParam);
+	}
+	
+	@Override
+	public ConsumerIdResource buildConsumerIdResource(String topic, String consumerId) {
+
+		ConsumerIdResource consumerIdResource = new ConsumerIdResource();
+		consumerIdResource.setAlarm(Boolean.TRUE);
+		consumerIdResource.setTopic(topic);
+		consumerIdResource.setConsumerId(consumerId);
+
+		consumerIdResource.setConsumerIps(new ArrayList<String>());
+
+		ConsumerIdResource defaultResource = consumerIdResourceDao.findDefault();
+		if (defaultResource == null) {
+			throw new RuntimeException("No default configuration for ConsumerIdResource");
+		}
+		consumerIdResource.setConsumerAlarmSetting(defaultResource.getConsumerAlarmSetting());
+
+		return consumerIdResource;
 	}
 
 }
