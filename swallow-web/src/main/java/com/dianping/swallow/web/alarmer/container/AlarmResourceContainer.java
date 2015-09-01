@@ -1,10 +1,9 @@
 package com.dianping.swallow.web.alarmer.container;
 
-import com.dianping.swallow.web.model.alarm.ConsumerIdAlarmSetting;
-import com.dianping.swallow.web.model.alarm.ConsumerServerAlarmSetting;
-import com.dianping.swallow.web.model.alarm.GlobalAlarmSetting;
-import com.dianping.swallow.web.model.alarm.ProducerServerAlarmSetting;
-import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
+import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.resource.TopicResource;
 
 /**
  * 
@@ -14,14 +13,12 @@ import com.dianping.swallow.web.model.alarm.TopicAlarmSetting;
  */
 public interface AlarmResourceContainer {
 
-	GlobalAlarmSetting findGlobalAlarmSetting(String globalId);
+	ConsumerServerResource findConsumerServerResource(String ip);
 
-	ProducerServerAlarmSetting findProducerServerAlarmSetting(String serverId);
+	ProducerServerResource findProducerServerResource(String ip);
 
-	ConsumerServerAlarmSetting findConsumerServerAlarmSetting(String serverId);
-
-	TopicAlarmSetting findTopicAlarmSetting(String topicName);
-
-	ConsumerIdAlarmSetting findConsumerIdAlarmSetting(String topicName, String consumerId);
+	TopicResource findTopicResource(String topic);
+	
+	ConsumerIdResource findConsumerIdResource(String topicName, String consumerId);
 
 }

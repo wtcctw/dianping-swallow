@@ -67,6 +67,10 @@ public class ConsumerIdResource extends BaseResource{
 	public void setConsumerAlarmSetting(ConsumerBaseAlarmSetting consumerAlarmSetting) {
 		this.consumerAlarmSetting = consumerAlarmSetting;
 	}
+	
+	public String generateKey() {
+		return topic + "&" + consumerId;
+	}
 
 	@Override
 	public String toString() {
