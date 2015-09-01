@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
@@ -35,6 +39,7 @@ import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 import com.dianping.swallow.web.service.ProducerServerStatsDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mengwenchao
@@ -48,6 +53,8 @@ public class DefaultProducerDataRetriever
 		implements ProducerDataRetriever {
 
 	public static final String CAT_TYPE = "DefaultProducerDataRetriever";
+
+	public static final String FACTORY_NAME = "ProducerOrderInDb";
 
 	@Autowired
 	private ProducerServerStatsDataService pServerStatsDataService;
@@ -113,7 +120,7 @@ public class DefaultProducerDataRetriever
 	}
 
 	public List<OrderStatsData> getOrder(int size, long start, long end) {
-		
+
 		if (dataExistInMemory(start, end)) {
 			return getOrderInMemory(size, start, end);
 		}
@@ -137,16 +144,14 @@ public class DefaultProducerDataRetriever
 				end);
 		OrderStatsData qpxOrderResult = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SAVE), start, end);
 		List<TopicResource> topicResources = resourceContainer.findTopicResources();
-		if (topicResources != null) {
+		if (topicResources != null && topicResources.size() > 0) {
+			QueryQrderTask queryQrderTask = new QueryQrderTask();
 			for (TopicResource topicResource : topicResources) {
-				ProducerTopicStatsData preStatsData = getPrePTopicStatsData(topicResource.getTopic(), fromKey);
-				ProducerTopicStatsData postStatsData = getPostPTopicStatsData(topicResource.getTopic(), toKey);
-				delayOrderResult.add(new OrderEntity(topicResource.getTopic(), StringUtils.EMPTY, postStatsData
-						.getTotalDelay() - preStatsData.getTotalDelay()));
-				qpxOrderResult.add(new OrderEntity(topicResource.getTopic(), StringUtils.EMPTY, postStatsData
-						.getTotalQps() - preStatsData.getTotalQps()));
 
+				queryQrderTask.submit(new QueryOrderParam(topicResource.getTopic(), fromKey, toKey, delayOrderResult,
+						qpxOrderResult));
 			}
+			queryQrderTask.await();
 		}
 		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
 		orderStatsDatas.add(delayOrderResult);
@@ -308,6 +313,14 @@ public class DefaultProducerDataRetriever
 	}
 
 	private ProducerTopicStatsData getPrePTopicStatsData(String topicName, long timeKey) {
+		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, timeKey, true);
+		if (pTopicStatsData != null) {
+			return pTopicStatsData;
+		}
+		return new ProducerTopicStatsData();
+	}
+
+	private ProducerTopicStatsData getPostPTopicStatsData(String topicName, long timeKey) {
 		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService
 				.findOneByTopicAndTime(topicName, timeKey, false);
 		if (pTopicStatsData != null) {
@@ -316,16 +329,86 @@ public class DefaultProducerDataRetriever
 		return new ProducerTopicStatsData();
 	}
 
-	private ProducerTopicStatsData getPostPTopicStatsData(String topicName, long timeKey) {
-		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, timeKey, true);
-		if (pTopicStatsData != null) {
-			return pTopicStatsData;
+	private class QueryQrderTask {
+
+		private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 4;
+
+		private static final int MAX_WAIT_TIME = 60;
+
+		private ExecutorService executorService = Executors.newFixedThreadPool(poolSize,
+				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+
+		public void submit(final QueryOrderParam orderParam) {
+
+			executorService.submit(new Runnable() {
+
+				@Override
+				public void run() {
+					ProducerTopicStatsData preStatsData = getPrePTopicStatsData(orderParam.getTopicName(),
+							orderParam.getFromKey());
+					ProducerTopicStatsData postStatsData = getPostPTopicStatsData(orderParam.getTopicName(),
+							orderParam.getToKey());
+					orderParam.getDelayStatsData().add(
+							new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalDelay()
+									- preStatsData.getTotalDelay()));
+					orderParam.getQpxStatsData().add(
+							new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalQps()
+									- preStatsData.getTotalQps()));
+				}
+			});
 		}
-		pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, timeKey, false);
-		if (pTopicStatsData != null) {
-			return pTopicStatsData;
+
+		public void await() {
+			executorService.shutdown();
+			try {
+				executorService.awaitTermination(MAX_WAIT_TIME, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-		return new ProducerTopicStatsData();
+
 	}
 
+	private static class QueryOrderParam {
+
+		private String topicName;
+
+		private long fromKey;
+
+		private long toKey;
+
+		private OrderStatsData delayStatsData;
+
+		private OrderStatsData qpxStatsData;
+
+		public QueryOrderParam(String topicName, long fromKey, long toKey, OrderStatsData delayStatsData,
+				OrderStatsData qpxStatsData) {
+			this.topicName = topicName;
+			this.fromKey = fromKey;
+			this.toKey = toKey;
+			this.delayStatsData = delayStatsData;
+			this.qpxStatsData = qpxStatsData;
+		}
+
+		public String getTopicName() {
+			return topicName;
+		}
+
+		public long getFromKey() {
+			return fromKey;
+		}
+
+		public long getToKey() {
+			return toKey;
+		}
+
+		public OrderStatsData getDelayStatsData() {
+			return delayStatsData;
+		}
+
+		public OrderStatsData getQpxStatsData() {
+			return qpxStatsData;
+		}
+
+	}
 }

@@ -46,7 +46,7 @@ public class OrderStatsData {
 		this.end = end;
 	}
 
-	public void add(OrderEntity entity) {
+	public synchronized void add(OrderEntity entity) {
 		if (this.datas.size() < this.capacity) {
 			this.datas.add(entity);
 		} else {
