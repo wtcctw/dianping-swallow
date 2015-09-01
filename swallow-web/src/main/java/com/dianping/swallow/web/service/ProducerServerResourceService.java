@@ -19,5 +19,7 @@ public interface ProducerServerResourceService extends ServerResourceService{
 	
 	int remove(String ip);
 	
+	List<ProducerServerResource> findAll();
+	
 	Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(int offset, int limit);
 }

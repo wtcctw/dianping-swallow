@@ -83,7 +83,7 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	}
 
 	private void findCServerResourceData() {
-		List<ServerResource> tempResources = cServerResourceService.findAll();
+		List<ConsumerServerResource> tempResources = cServerResourceService.findAll();
 		if (tempResources != null) {
 			Map<String, ConsumerServerResource> newCServerResources = new HashMap<String, ConsumerServerResource>();
 			for (ServerResource tempResource : tempResources) {
@@ -94,7 +94,7 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	}
 
 	private void findPServerResourceData() {
-		List<ServerResource> tempResources = pServerResourceService.findAll();
+		List<ProducerServerResource> tempResources = pServerResourceService.findAll();
 		if (tempResources != null) {
 			Map<String, ProducerServerResource> newPServerResources = new HashMap<String, ProducerServerResource>();
 			for (ServerResource tempResource : tempResources) {

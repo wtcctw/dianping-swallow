@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ProducerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
-import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 
@@ -67,7 +66,7 @@ public class ProducerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 	
 	@Override
-	public List<ServerResource> findAll(){
+	public List<ProducerServerResource> findAll(){
 		
 		return producerServerResourceDao.findAll();
 	}

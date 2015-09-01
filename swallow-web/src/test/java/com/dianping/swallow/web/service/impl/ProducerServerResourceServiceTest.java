@@ -15,7 +15,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
-import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 
 /**
@@ -62,15 +61,6 @@ public class ProducerServerResourceServiceTest {
 	public void test() {
 		
 		/*--------------------------------Producer---------------------------------*/
-		List<ServerResource> resources = producerServerResourceService.findAll();
-		for(ServerResource sr : resources){
-			ProducerServerResource producerServerResource = (ProducerServerResource)sr;
-			QPSAlarmSetting qPSAlarmSetting = producerServerResource.getSaveAlarmSetting();
-			System.out.println("fluctuation is " + qPSAlarmSetting.getFluctuation());
-			System.out.println("peak is " + qPSAlarmSetting.getPeak());
-			String ip = producerServerResource.getIp();
-			System.out.println("ip is " + ip);
-		}
 		ProducerServerResource producerServerResource = createProducerServerResource();
 		boolean result = producerServerResourceService.insert(producerServerResource);
 		Assert.assertTrue(result);
@@ -92,6 +82,14 @@ public class ProducerServerResourceServiceTest {
 		System.out.println(producerServer3.toString());
 		Assert.assertNotNull(producerServer3);
 		
+		List<ProducerServerResource> resources = producerServerResourceService.findAll();
+		for(ProducerServerResource sr : resources){
+			QPSAlarmSetting qPSAlarmSetting = sr.getSaveAlarmSetting();
+			System.out.println("fluctuation is " + qPSAlarmSetting.getFluctuation());
+			System.out.println("peak is " + qPSAlarmSetting.getPeak());
+			String ip = sr.getIp();
+			System.out.println("ip is " + ip);
+		}
 		
 		int delete = producerServerResourceService.remove("127.0.0.1");
 		Assert.assertEquals(delete, 1);

@@ -6,7 +6,7 @@ package com.dianping.swallow.web.model.resource;
  *
  * 2015年8月10日下午4:58:04
  */
-public abstract class ServerResource extends BaseResource{
+public class ServerResource extends BaseResource{
 
 	private String ip;
 	

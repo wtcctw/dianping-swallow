@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.service;
 
-import java.util.List;
-
 import com.dianping.swallow.web.model.resource.ServerResource;
 
 
@@ -18,6 +16,4 @@ public interface ServerResourceService {
 
 	ServerResource findDefault();
 
-	List<ServerResource> findAll();
-	
 }
