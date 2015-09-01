@@ -154,6 +154,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public ConsumerServerResource findConsumerServerResource(String ip) {
+		if (cServerResources == null) {
+			return null;
+		}
 		if (cServerResources.containsKey(ip)) {
 			cServerResources.get(ip);
 		} else {
@@ -164,6 +167,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public ProducerServerResource findProducerServerResource(String ip) {
+		if (pServerResources == null) {
+			return null;
+		}
 		if (pServerResources.containsKey(ip)) {
 			return pServerResources.get(ip);
 		} else {
@@ -173,6 +179,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public TopicResource findTopicResource(String topic) {
+		if (topicResources == null) {
+			return null;
+		}
 		if (topicResources.containsKey(topic)) {
 			return topicResources.get(topic);
 		} else {
@@ -182,6 +191,9 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public ConsumerIdResource findConsumerIdResource(String topicName, String consumerId) {
+		if (consumerIdResources == null) {
+			return null;
+		}
 		String key = topicName + KEY_SPLIT + consumerId;
 		if (consumerIdResources.containsKey(key)) {
 			return consumerIdResources.get(key);

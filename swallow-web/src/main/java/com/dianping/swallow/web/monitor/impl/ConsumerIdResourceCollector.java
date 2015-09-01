@@ -3,8 +3,8 @@ package com.dianping.swallow.web.monitor.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +20,6 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
@@ -46,9 +45,8 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 
 	private AtomicBoolean minute = new AtomicBoolean(false);
 
-	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
-			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-
+	private ExecutorService scheduled = Executors.newSingleThreadExecutor(ThreadFactoryUtils
+			.getThreadFactory(FACTORY_NAME));
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@PostConstruct

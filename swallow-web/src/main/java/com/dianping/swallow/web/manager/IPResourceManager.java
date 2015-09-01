@@ -8,7 +8,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
  *
  *         2015年8月17日 下午5:52:44
  */
-public interface IPDescManager {
+public interface IPResourceManager {
 
 	/**
 	 * get ipdesc from cmdb or db

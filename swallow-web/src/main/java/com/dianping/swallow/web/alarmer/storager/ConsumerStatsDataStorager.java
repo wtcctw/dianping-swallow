@@ -14,7 +14,6 @@ import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
@@ -27,7 +26,7 @@ import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
  *         2015年8月4日 下午1:22:31
  */
 @Component
-public class ConsumerStatsDataStorager extends AbstractStatsDataStorager implements MonitorDataListener {
+public class ConsumerStatsDataStorager extends AbstractStatsDataStorager  {
 
 	@Autowired
 	private StatsDataContainer statsDataContainer;
@@ -55,16 +54,7 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager impleme
 	}
 
 	@Override
-	public void achieveMonitorData() {
-		dataCount.incrementAndGet();
-	}
-
-	@Override
 	protected void doStorage() {
-		if (dataCount.get() <= 0) {
-			return;
-		}
-		dataCount.decrementAndGet();
 		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper
 				.getServerStatsDatas(lastTimeKey.get());
 		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(lastTimeKey
