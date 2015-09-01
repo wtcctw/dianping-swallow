@@ -68,6 +68,16 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	}
 
 	@Override
+	public ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId) {
+
+		Query query = new Query(Criteria.where(CONSUMERID).is(consumerId).andOperator(Criteria.where(TOPIC).is(topic)));
+		ConsumerIdResource consumerIdResources = mongoTemplate.findOne(query, ConsumerIdResource.class,
+				CONSUMERIDRESOURCE_COLLECTION);
+
+		return consumerIdResources;
+	}
+
+	@Override
 	public List<ConsumerIdResource> findByConsumerId(String consumerid) {
 
 		Query query = new Query(Criteria.where(CONSUMERID).is(consumerid));

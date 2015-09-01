@@ -119,7 +119,20 @@ module.filter('notblank', function() {
 	return function(items) {
 		if (items != null) {
 			for (var i = 0; i < items.length; ++i) {
-				if (typeof (items[i].name) == "undefined") {
+				if (typeof (items[i].topic) == "undefined") {
+					items.splice(i, 1);
+				}
+			}
+		}
+		return items;
+	};
+});
+
+module.filter('nodefault', function() {
+	return function(items) {
+		if (items != null) {
+			for (var i = 0; i < items.length; ++i) {
+				if ( items[i].topic == "default") {
 					items.splice(i, 1);
 				}
 			}

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.dto.MessageQueryDto;
-import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
 import com.dianping.swallow.web.model.Message;
 import com.dianping.swallow.web.service.MessageService;
@@ -36,7 +36,7 @@ public class MessageController extends AbstractMenuController {
 	private MessageService messageService;
 
 	@Autowired
-	ExtractUsernameUtils extractUsernameUtils;
+	UserUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/message")
 	public ModelAndView message(HttpServletRequest request, HttpServletResponse response) {

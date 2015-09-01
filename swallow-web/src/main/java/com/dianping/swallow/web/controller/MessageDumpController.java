@@ -24,7 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.controller.dto.MessageQueryDto;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
-import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.MessageDump;
 import com.dianping.swallow.web.service.MessageDumpService;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -52,7 +52,7 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 	private MessageDumpService messageDumpService;
 
 	@Autowired
-	private ExtractUsernameUtils extractUsernameUtils;
+	private UserUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/download")
 	public ModelAndView download(HttpServletRequest request, HttpServletResponse response) {

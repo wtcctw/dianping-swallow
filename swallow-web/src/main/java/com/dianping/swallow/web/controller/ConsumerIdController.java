@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
 import com.dianping.swallow.web.controller.dto.ConsumerIdResourceDto;
 import com.dianping.swallow.web.controller.mapper.ConsumerIdResourceMapper;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
@@ -42,6 +44,9 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
+	
+	@Autowired
+	private UserUtils userUtils;
 
 	@RequestMapping(value = "/console/consumerid")
 	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
@@ -126,7 +131,7 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/consumerid/allconsumerid", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadCmsumerid() {
+	public List<String> loadCmsumerid(HttpServletRequest request, HttpServletResponse response) {
 
 		Set<String> consumerids = new HashSet<String>();
 		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID);
@@ -136,6 +141,11 @@ public class ConsumerIdController extends AbstractMenuController {
 			if (!consumerids.contains(cid)) {
 				consumerids.add(cid);
 			}
+		}
+		
+		String username = userUtils.getUsername(request);
+		if(!userUtils.isTrueAdministrator(username)){
+			consumerids.remove(TopicController.DEFAULT);
 		}
 
 		return new ArrayList<String>(consumerids);

@@ -32,7 +32,7 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.dto.TopicResourceDto;
 import com.dianping.swallow.web.controller.mapper.TopicResourceMapper;
-import com.dianping.swallow.web.controller.utils.ExtractUsernameUtils;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -53,7 +53,7 @@ public class TopicController extends AbstractMenuController {
 
 	private static final String POSTFIX = "@dianping.com";
 
-	public static final String ALL = "all";
+	public static final String DEFAULT = "default";
 
 	@Resource(name = "userService")
 	private UserService userService;
@@ -62,7 +62,7 @@ public class TopicController extends AbstractMenuController {
 	private TopicResourceService topicResourceService;
 
 	@Autowired
-	private ExtractUsernameUtils extractUsernameUtils;
+	private UserUtils userUtils;
 
 	@RequestMapping(value = "/console/topic")
 	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
@@ -85,9 +85,8 @@ public class TopicController extends AbstractMenuController {
 		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp);
 
 		if (isAllEmpry) {
-			String username = extractUsernameUtils.getUsername(request);
-			Set<String> adminSet = userService.loadCachedAdministratorSet();
-			boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
+			String username = userUtils.getUsername(request);
+			boolean findAll = userUtils.isAdministrator(username);
 			if (findAll) {
 				pair = topicResourceService.findTopicResourcePage(offset, limit);
 			} else {
@@ -108,10 +107,9 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object topicName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
-		String username = extractUsernameUtils.getUsername(request);
-		Set<String> adminSet = userService.loadCachedAdministratorSet();
+		String username = userUtils.getUsername(request);
+		boolean findAll = userUtils.isAdministrator(username);
 		Set<String> producerIp = new HashSet<String>();
-		boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
 
 		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
 		if (findAll) {
@@ -123,6 +121,9 @@ public class TopicController extends AbstractMenuController {
 				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}
+			}
+			if(userUtils.isTrueAdministrator(username)){
+				topics.add(DEFAULT);
 			}
 			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
 		} else {
@@ -150,9 +151,8 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object propName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 
-		String username = extractUsernameUtils.getUsername(request);
-		Set<String> adminSet = userService.loadCachedAdministratorSet();
-		boolean findAll = adminSet.contains(username) || adminSet.contains(ALL);
+		String username = userUtils.getUsername(request);
+		boolean findAll = userUtils.isAdministrator(username);
 
 		Set<String> editProposal = new HashSet<String>();
 		List<TopicResource> topicResources = topicResourceService.findAll();
@@ -200,7 +200,7 @@ public class TopicController extends AbstractMenuController {
 			@RequestParam(value = "exec_user") String approver, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		String username = extractUsernameUtils.getUsername(request);
+		String username = userUtils.getUsername(request);
 		TopicResource topicResource = null;
 
 		username = StringUtils.isEmpty(username) ? approver : username;
