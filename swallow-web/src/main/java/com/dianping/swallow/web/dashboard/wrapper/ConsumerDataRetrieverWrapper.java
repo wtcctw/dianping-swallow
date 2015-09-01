@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
-import com.dianping.swallow.web.dashboard.DashboardContainerUpdater;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 

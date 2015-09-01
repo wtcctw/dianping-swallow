@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ProducerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.resource.ServerResource;
 import com.mongodb.WriteResult;
 
 /**
@@ -72,7 +73,7 @@ public class DefaultProducerServerResourceDao extends AbstractWriteDao implement
 	public Pair<Long, List<ProducerServerResource>> findProducerServerResourcePage(int offset, int limit) {
 
 		Query query = new Query();
-		
+
 		query.skip(offset).limit(limit);
 		List<ProducerServerResource> producerServerResources = mongoTemplate.find(query, ProducerServerResource.class,
 				PRODUCERSERVERRESOURCE_COLLECTION);
@@ -94,6 +95,12 @@ public class DefaultProducerServerResourceDao extends AbstractWriteDao implement
 		ProducerServerResource producerServerResource = mongoTemplate.findOne(query, ProducerServerResource.class,
 				PRODUCERSERVERRESOURCE_COLLECTION);
 		return producerServerResource;
+	}
+
+	@Override
+	public List<ServerResource> findAll() {
+
+		return mongoTemplate.findAll(ServerResource.class, PRODUCERSERVERRESOURCE_COLLECTION);
 	}
 
 }
