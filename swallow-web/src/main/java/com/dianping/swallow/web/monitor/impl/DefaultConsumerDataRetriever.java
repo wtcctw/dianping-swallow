@@ -239,8 +239,8 @@ public class DefaultConsumerDataRetriever
 				if (TOTAL_KEY.equals(topicName) || TOTAL_KEY.equals(consumerId)) {
 					continue;
 				}
-				queryQrderTask.submit(new QueryOrderParam(topicName, consumerId, fromKey, toKey, qpxSendStatsData,
-						qpxAckStatsData, delaySendStatsData, delayAckStatsData, accuStatsData));
+				queryQrderTask.submit(new QueryOrderParam(topicName, consumerId, fromKey, toKey, delaySendStatsData,
+						delayAckStatsData, qpxSendStatsData, qpxAckStatsData, accuStatsData));
 			}
 			queryQrderTask.await();
 		}
