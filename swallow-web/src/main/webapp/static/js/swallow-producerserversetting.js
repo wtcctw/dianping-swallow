@@ -169,15 +169,24 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	
 	$http({
 		method : 'GET',
-		url : window.contextPath + '/console/server/producerserverids'
+		url : window.contextPath + '/console/server/producerserverinfo'
 	}).success(function(data, status, headers, config) {
-		var topicNameList = data;
+		var ips = data.second;
+		var hosts = data.first;
 		$("#serverId").typeahead({
 			items: 16, 
-			source : topicNameList,
+			source : ips,
 			updater : function(c) {
 				$scope.producerserverEntry.ip = c;
-				$scope.loadtopics($scope.producerserverEntry.ip);
+				return c;
+			}
+		})
+
+		$("#hostname").typeahead({
+			items: 16, 
+			source : hosts,
+			updater : function(c) {
+				$scope.producerserverEntry.hostname = c;
 				return c;
 			}
 		})

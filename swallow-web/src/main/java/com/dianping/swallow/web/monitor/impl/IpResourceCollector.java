@@ -127,6 +127,9 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 			for (String topic : topics) {
 				Set<String> ips = producerStatsDataWapper.getTopicIps(topic);
 				if (ips != null) {
+					if(ips.contains(ConsumerDataRetrieverWrapper.TOTAL)){
+						ips.remove(ConsumerDataRetrieverWrapper.TOTAL);
+					}
 					TopicResource topicResource = topicResourceService.findByTopic(topic);
 					List<String> ipList = new ArrayList<String>(ips);
 

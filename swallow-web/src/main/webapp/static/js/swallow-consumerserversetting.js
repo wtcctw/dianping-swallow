@@ -132,44 +132,53 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	
 	$http({
 		method : 'GET',
-		url : window.contextPath + '/console/server/consumerserverids'
+		url : window.contextPath + '/console/server/consumerserverinfo'
 	}).success(function(data, status, headers, config) {
-		var topicNameList = data;
+		var ips = data.second;
+		var hosts = data.first;
 		$("#serverId").typeahead({
 			items: 16, 
-			source : topicNameList,
+			source : ips,
 			updater : function(c) {
 				$scope.consumerserverEntry.ip = c;
-				$scope.loadtopics($scope.consumerserverEntry.ip);
+				return c;
+			}
+		})
+		
+		$("#hostname").typeahead({
+			items: 16, 
+			source : hosts,
+			updater : function(c) {
+				$scope.consumerserverEntry.hostname = c;
 				return c;
 			}
 		})
 	}).error(function(data, status, headers, config) {
 	});
 	
-	$scope.loadtopics = function(serverid){
-		$http(
-				{
-					method : 'GET',
-					params : { serverId: serverid},
-					url : window.contextPath
-					+ '/console/server/consumer/topics'
-				}).success(
-						function(data, status, headers, config) {
-							$('#whitelist').tagsinput({
-								typeahead : {
-									items : 16,
-									source : data,
-									displayText : function(item) {
-										return item;
-									} // necessary
-								}
-							});
-						}).error(
-								function(data, status, headers, config) {
-								});
-		
-	}
+//	$scope.loadtopics = function(serverid){
+//		$http(
+//				{
+//					method : 'GET',
+//					params : { serverId: serverid},
+//					url : window.contextPath
+//					+ '/console/server/consumer/topics'
+//				}).success(
+//						function(data, status, headers, config) {
+//							$('#whitelist').tagsinput({
+//								typeahead : {
+//									items : 16,
+//									source : data,
+//									displayText : function(item) {
+//										return item;
+//									} // necessary
+//								}
+//							});
+//						}).error(
+//								function(data, status, headers, config) {
+//								});
+//		
+//	}
 	
 	$scope.isReadOnly = false;
 	$scope.clearModal = function(){
