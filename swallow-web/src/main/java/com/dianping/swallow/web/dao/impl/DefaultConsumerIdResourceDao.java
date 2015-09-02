@@ -124,14 +124,15 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 			query.addCriteria(Criteria.where(CONSUMERIPS).is(consumerIp));
 		}
 
-		List<ConsumerIdResource> consumerIdResource = mongoTemplate.find(query, ConsumerIdResource.class,
-				CONSUMERIDRESOURCE_COLLECTION);
+		long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
 
 		int offset = consumerIdParam.getOffset();
 		int limit = consumerIdParam.getLimit();
-
+		
 		query.skip(offset).limit(limit);
-		long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
+		List<ConsumerIdResource> consumerIdResource = mongoTemplate.find(query, ConsumerIdResource.class,
+				CONSUMERIDRESOURCE_COLLECTION);
+		
 
 		return new Pair<Long, List<ConsumerIdResource>>(size, consumerIdResource);
 	}

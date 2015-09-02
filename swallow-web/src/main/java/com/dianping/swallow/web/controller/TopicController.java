@@ -273,7 +273,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/producer/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public void editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
+	public boolean editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
 			HttpServletRequest request, HttpServletResponse response) {
 
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
@@ -289,6 +289,8 @@ public class TopicController extends AbstractMenuController {
 				logger.info(String.format("Update producer alarm of %s to %b fail", topic, alarm));
 			}
 		}
+		
+		return result;
 	}
 
 	@RequestMapping(value = "/console/topic/consumer/alarm", method = RequestMethod.GET)

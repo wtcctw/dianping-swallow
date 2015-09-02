@@ -106,13 +106,13 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.producerserverEntry.ip;
 	$scope.producerserverEntry.hostname;
 	$scope.producerserverEntry.alarm;
-	$scope.producerserverEntry.producerpeak;
-	$scope.producerserverEntry.producervalley;
-	$scope.producerserverEntry.producerfluctuation;
-	$scope.producerserverEntry.fluctuationBase;
+	$scope.producerserverEntry.sendpeak;
+	$scope.producerserverEntry.sendvalley;
+	$scope.producerserverEntry.sendfluctuation;
+	$scope.producerserverEntry.sendfluctuationBase;
 	
 	$scope.refreshpage = function(myForm){
-		if ($scope.producerserverEntry.producerpeak < $scope.producerserverEntry.producervalley){
+		if ($scope.producerserverEntry.sendpeak < $scope.producerserverEntry.sendvalley){
 			alert("谷值不能小于峰值");
 			return;
 		}
@@ -131,11 +131,18 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.id = null;
 		$scope.producerserverEntry.ip = "";
 		$scope.producerserverEntry.hostname = "";
-		$scope.producerserverEntry.alarm = false;
-		$scope.producerserverEntry.producerpeak = "";
-		$scope.producerserverEntry.producervalley = "";
-		$scope.producerserverEntry.producerfluctuation = "";
-		$scope.producerserverEntry.fluctuationBase = "";
+		$scope.producerserverEntry.alarm = true;
+		$scope.producerserverEntry.sendpeak = "";
+		$scope.producerserverEntry.sendvalley = "";
+		$scope.producerserverEntry.sendfluctuation = "";
+		$scope.producerserverEntry.sendfluctuationBase = "";
+		
+		$http.get(window.contextPath + "/console/server/defaultpresource").success(function(data){
+			$scope.producerserverEntry.sendpeak = data.sendpeak;
+			$scope.producerserverEntry.sendvalley = data.sendvalley;
+			$scope.producerserverEntry.sendfluctuation = data.sendfluctuation;
+			$scope.producerserverEntry.sendfluctuationBase = data.sendfluctuationBase;
+		});
 	}
 	
 	$scope.setModalInput = function(index){
@@ -143,11 +150,10 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.producerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.producerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
-		$scope.producerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
-		$scope.producerserverEntry.producerpeak = $scope.searchPaginator.currentPageItems[index].producerpeak;
-		$scope.producerserverEntry.producervalley = $scope.searchPaginator.currentPageItems[index].producervalley;
-		$scope.producerserverEntry.producerfluctuation = $scope.searchPaginator.currentPageItems[index].producerfluctuation;
-		$scope.producerserverEntry.fluctuationBase = $scope.searchPaginator.currentPageItems[index].fluctuationBase;
+		$scope.producerserverEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
+		$scope.producerserverEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
+		$scope.producerserverEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
+		$scope.producerserverEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
 	}
 	
 	$rootScope.removerecord = function(sid){
@@ -179,8 +185,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	});
 	
 	$scope.loadtopics = function(serverid){
-		$http(
-				{
+		$http({
 					method : 'GET',
 					params : { serverId: serverid},
 					url : window.contextPath
@@ -198,8 +203,19 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 							});
 						}).error(
 								function(data, status, headers, config) {
-								});
+						});
 		
+	}
+	
+	$scope.changeproduceralarm = function(ip, index){
+		var id = "#palarm" + index;
+		var check = $(id).prop('checked');
+
+		$http.get(window.contextPath + '/console/server/producer/alarm', {
+			params : {
+				ip : ip,
+				alarm: check } }).success(function(response) {
+    	});
 	}
 	
 	$scope.dialog = function(cid) {
@@ -226,6 +242,9 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 					className : 'ngdialog-theme-default'
 			});
 	};
-	
+
+	$scope.isdefault = function(compare){
+		return compare != "default"; 
+	}
 }]);
 

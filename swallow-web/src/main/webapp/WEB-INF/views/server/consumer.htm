@@ -23,7 +23,6 @@
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">ServerId</th>
 						<th style="text-align: left">主机名</th>
-						<th style="text-align: left">告警</th>
 						<th style="text-align: left">发送峰值</th>
 						<th style="text-align: left">发送谷值</th>
 						<th style="text-align: left">发送波动</th>
@@ -32,6 +31,7 @@
 						<th style="text-align: left">确认谷值</th>
 						<th style="text-align: left">确认波动</th>
 						<th style="text-align: left">确认波动基数</th>
+						<th style="text-align: left">告警</th>
 						<th style="text-align: left">操作</th>
 					</tr>
 					<tr ng-repeat="ad in searchPaginator.currentPageItems">
@@ -39,7 +39,6 @@
 						<td style="text-align: left"><a style="cursor:pointer;"
 							ng-click="setConsumerIps(ad.ip)" ng-bind="ad.ip"></a></td>
 						<td style="text-align: left" ng-bind="ad.hostname"></td>
-						<td style="text-align: left" ng-bind="ad.alarm"></td>
 						<td style="text-align: left" ng-bind="ad.sendpeak"></td>
 						<td style="text-align: left" ng-bind="ad.sendvalley"></td>
 						<td style="text-align: left" ng-bind="ad.sendfluctuation"></td>
@@ -48,10 +47,15 @@
 						<td style="text-align: left" ng-bind="ad.ackvalley"></td>
 						<td style="text-align: left" ng-bind="ad.ackfluctuation"></td>
 						<td style="text-align: left" ng-bind="ad.ackfluctuationBase"></td>
+						<td style="text-align: left"><label class="pull-left inline">
+								<small class="muted smaller-90"></small> <input
+								id="calarm{{$index}}" type="checkbox" ng-model="ad.alarm" ng-click="changeconsumeralarm(ad.ip, $index)"
+								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
+						</label></td>
 						<td style="text-align: left"><a href="#myModal"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
-								data-original-title="编辑配置值"></i></a> <a href=""
+								data-original-title="编辑配置值"></i></a> <a href ng-show="isdefault(ad.ip)"
 							ng-click="dialog(ad.ip);"
 							class="edit-config-btn"><i class="icon-remove" rel="tooltip"
 								data-original-title="删除配置项"></i></a></td>
@@ -89,15 +93,6 @@
 									<label class="control-label"><b>主机名</b></label> <input
 										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
 										ng-model="consumerserverEntry.hostname" id="hostname" required>
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>告警</b></label> <input
-										type="text" class="form-control"  autocomplete="off"
-										ng-model="consumerserverEntry.alarm" id="alarm">
 									</input>
 								</div>
 							</div>
