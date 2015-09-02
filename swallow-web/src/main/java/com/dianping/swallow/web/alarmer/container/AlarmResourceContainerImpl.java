@@ -125,14 +125,14 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 		}
 	}
 
-	private void scheduleAlarmMetaTask() {
+	private void scheduleResourceTask() {
 		future = scheduled.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					doLoadResourceTask();
 				} catch (Throwable th) {
-					logger.error("[scheduleAlarmMetaTask]", th);
+					logger.error("[scheduleResourceTask]", th);
 				} finally {
 
 				}
@@ -148,7 +148,7 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		scheduleAlarmMetaTask();
+		scheduleResourceTask();
 	}
 
 	@Override
