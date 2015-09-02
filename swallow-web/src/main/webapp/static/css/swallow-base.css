@@ -358,6 +358,7 @@ input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
 
 .table-smalll-td-consumerId {
 	width: 70%;
+	max-width: 230px;
 }
 
 .table-smalll-td-consumerId a {
