@@ -15,6 +15,7 @@ import jodd.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -36,6 +37,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *
  *         2015年8月31日下午8:14:56
  */
+@Component
 public class IpResourceCollector implements MonitorDataListener, Runnable {
 
 	private static final String FACTORY_NAME = "ConsumerIdResourceCollector";
@@ -100,7 +102,8 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 					Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
 
 					if (pair.getFirst() == 0) {
-						ConsumerIdResource consumerIdResource = consumerIdResourceService.buildConsumerIdResource(topic, cid);
+						ConsumerIdResource consumerIdResource = consumerIdResourceService.buildConsumerIdResource(
+								topic, cid);
 						if (ips != null && !ips.isEmpty()) {
 							consumerIdResource.setConsumerIps(new ArrayList<String>(ips));
 						}
@@ -116,26 +119,26 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 			}
 		}
 	}
-	
-	private void flushTopicMetaData(){
-		
+
+	private void flushTopicMetaData() {
+
 		Set<String> topics = producerStatsDataWapper.getTopics();
-		if(topics != null){
-			for(String topic : topics){
+		if (topics != null) {
+			for (String topic : topics) {
 				Set<String> ips = producerStatsDataWapper.getTopicIps(topic);
-				if(ips != null){
+				if (ips != null) {
 					TopicResource topicResource = topicResourceService.findByTopic(topic);
 					List<String> ipList = new ArrayList<String>(ips);
-					
-					if(topicResource == null){
+
+					if (topicResource == null) {
 						topicResource = topicResourceService.buildTopicResource(topic);
 						topicResource.setProducerIps(ipList);
 						topicResourceService.insert(topicResource);
-					}else{
+					} else {
 						topicResource.setProducerIps(ipList);
 						topicResourceService.insert(topicResource);
 					}
-					
+
 				}
 			}
 		}
@@ -154,7 +157,7 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 	public void run() {
 
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doCollector");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doIPCollector");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {
