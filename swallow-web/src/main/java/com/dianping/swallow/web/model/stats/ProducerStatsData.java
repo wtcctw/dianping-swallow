@@ -30,7 +30,7 @@ public abstract class ProducerStatsData extends StatsData {
 
 	@Override
 	public String toString() {
-		return "ProducerStatsData [qps=" + qps + ", delay=" + delay + "]";
+		return "ProducerStatsData [qps=" + qps + ", delay=" + delay + "]"+ super.toString();
 	}
 
 	

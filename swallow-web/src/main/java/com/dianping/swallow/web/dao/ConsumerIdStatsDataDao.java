@@ -32,7 +32,8 @@ public interface ConsumerIdStatsDataDao {
 
 	List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
 
-	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId, boolean isGt);
+	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, String consumerId, long startKey,
+			long endKey, boolean isGt);
 
 	List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey);
 

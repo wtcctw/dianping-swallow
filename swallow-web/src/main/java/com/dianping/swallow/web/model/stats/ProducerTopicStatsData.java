@@ -121,7 +121,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	@Override
 	public String toString() {
 		return "ProducerTopicStatsData [topicName=" + topicName + ", totalQps=" + totalQps + ", totalDelay="
-				+ totalDelay + "]";
+				+ totalDelay + "]" + super.toString();
 	}
 
 }

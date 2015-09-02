@@ -25,7 +25,7 @@ public class ConsumerTopicStatsData extends ConsumerStatsData {
 
 	@Override
 	public String toString() {
-		return "ConsumerTopicStatsData [topicName=" + topicName + "]";
+		return "ConsumerTopicStatsData [topicName=" + topicName + "]"+ super.toString();
 	}
 	
 }

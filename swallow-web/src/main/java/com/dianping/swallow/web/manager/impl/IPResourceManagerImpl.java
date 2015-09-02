@@ -78,11 +78,11 @@ public class IPResourceManagerImpl implements IPResourceManager {
 			public void run() {
 				try {
 					logger.info("[startTask] scheduled task running.");
-					SwallowActionWrapper catWrapper = new CatActionWrapper("IPDescManagerImpl", "doIpDescTask");
+					SwallowActionWrapper catWrapper = new CatActionWrapper("IPResourceManagerImpl", "doIPDescTask");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {
-							doIpDescTask();
+							doIPDescTask();
 						}
 					});
 				} catch (Throwable th) {
@@ -95,7 +95,7 @@ public class IPResourceManagerImpl implements IPResourceManager {
 		}, getDelay(), getInterval(), TimeUnit.MINUTES));
 	}
 
-	private void doIpDescTask() {
+	private void doIPDescTask() {
 		Set<String> ips = ipCollectorService.getStatisIps();
 		if (ips != null && ips.size() > 0) {
 			Iterator<String> iterator = ips.iterator();

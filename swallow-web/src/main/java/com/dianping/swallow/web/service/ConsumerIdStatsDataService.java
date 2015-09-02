@@ -30,7 +30,7 @@ public interface ConsumerIdStatsDataService {
 	List<ConsumerIdStatsData> findByTopicAndTime(String topicName, long timeKey);
 
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId);
-	
+
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit);
 
 	List<ConsumerIdStatsData> findByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId);
@@ -44,6 +44,7 @@ public interface ConsumerIdStatsDataService {
 	Map<String, StatsDataMapPair> findSectionDelayData(String topicName, long startKey, long endKey);
 
 	Map<String, NavigableMap<Long, Long>> findSectionAccuData(String topicName, long startKey, long endKey);
-	
-	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId, boolean isGt);
+
+	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, String consumerId, long startKey,
+			long endKey, boolean isGt);
 }

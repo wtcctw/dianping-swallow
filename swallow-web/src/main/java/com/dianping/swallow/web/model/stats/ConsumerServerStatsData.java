@@ -33,7 +33,7 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 		return checkQpsPeak(this.getSendQps(), expectQps, StatisType.SENDQPS_PEAK);
 	}
 
-	public boolean checkSendQpsValley(long expectQps){
+	public boolean checkSendQpsValley(long expectQps) {
 		return checkQpsValley(this.getSendQps(), expectQps, StatisType.SENDQPS_VALLEY);
 	}
 
@@ -48,9 +48,9 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 	public boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps > expectQps) {
-				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip)
-						.setCurrentValue(qps).setExpectedValue(expectQps).setStatisType(statisType)
-						.setCreateTime(new Date()).setEventType(EventType.CONSUMER));
+				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip).setCurrentValue(qps)
+						.setExpectedValue(expectQps).setStatisType(statisType).setCreateTime(new Date())
+						.setEventType(EventType.CONSUMER));
 				return false;
 			}
 		}
@@ -60,13 +60,18 @@ public class ConsumerServerStatsData extends ConsumerStatsData {
 	public boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
 		if (qps != 0L) {
 			if (qps < expectQps) {
-				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip)
-						.setCurrentValue(qps).setExpectedValue(expectQps).setStatisType(statisType)
-						.setCreateTime(new Date()).setEventType(EventType.CONSUMER));
+				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip).setCurrentValue(qps)
+						.setExpectedValue(expectQps).setStatisType(statisType).setCreateTime(new Date())
+						.setEventType(EventType.CONSUMER));
 				return false;
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ConsumerServerStatsData [ip=" + ip + "]" + super.toString();
 	}
 
 }

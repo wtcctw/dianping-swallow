@@ -113,15 +113,10 @@ public class DefaultConsumerIdStatsDataDao extends AbstractStatsDao implements C
 	}
 
 	@Override
-	public ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, long timeKey, String consumerId,
-			boolean isGt) {
-
+	public ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, String consumerId, long startKey,
+			long endKey, boolean isGt) {
 		Criteria criteria = Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId);
-		if (isGt) {
-			criteria.and(TIMEKEY_FIELD).gte(timeKey);
-		} else {
-			criteria.and(TIMEKEY_FIELD).lte(timeKey);
-		}
+		criteria.and(TIMEKEY_FIELD).gte(startKey).lte(endKey);
 		Query query = new Query(criteria);
 		query.skip(0).limit(1).with(new Sort(new Sort.Order(isGt ? Direction.ASC : Direction.DESC, TIMEKEY_FIELD)));
 		ConsumerIdStatsData statsData = mongoTemplate.findOne(query, ConsumerIdStatsData.class,

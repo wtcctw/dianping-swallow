@@ -551,18 +551,20 @@ public class DefaultConsumerDataRetriever
 		return retriever.getAllTopics();
 	}
 
-	private ConsumerIdStatsData getPreConsumerIdStatsData(String topicName, String consumerId, long timeKey) {
+	private ConsumerIdStatsData getPreConsumerIdStatsData(String topicName, String consumerId, long startKey,
+			long endKey) {
 		ConsumerIdStatsData consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(
-				topicName, timeKey, consumerId, true);
+				topicName, consumerId, startKey, endKey, true);
 		if (consumerIdStatsData != null) {
 			return consumerIdStatsData;
 		}
 		return new ConsumerIdStatsData();
 	}
 
-	private ConsumerIdStatsData getPostConsumerIdStatsData(String topicName, String consumerId, long timeKey) {
+	private ConsumerIdStatsData getPostConsumerIdStatsData(String topicName, String consumerId, long startKey,
+			long endKey) {
 		ConsumerIdStatsData consumerIdStatsData = consumerIdStatsDataService.findOneByTopicAndTimeAndConsumerId(
-				topicName, timeKey, consumerId, false);
+				topicName, consumerId, startKey, endKey, false);
 		if (consumerIdStatsData != null) {
 			return consumerIdStatsData;
 		}
@@ -607,7 +609,7 @@ public class DefaultConsumerDataRetriever
 		}
 
 		public void submit(final QueryOrderParam orderParam) {
-			logger.info("[submit] QueryOrderParam {} .", orderParam);
+			// logger.info("[submit] QueryOrderParam {} .", orderParam);
 			executorService.submit(new Runnable() {
 
 				@Override
@@ -615,9 +617,9 @@ public class DefaultConsumerDataRetriever
 					String topicName = orderParam.getTopicName();
 					String consumerId = orderParam.getConsumerId();
 					ConsumerIdStatsData preStatsData = getPreConsumerIdStatsData(topicName, consumerId,
-							orderParam.getFromKey());
+							orderParam.getFromKey(), orderParam.getToKey());
 					ConsumerIdStatsData postStatsData = getPostConsumerIdStatsData(topicName, consumerId,
-							orderParam.getToKey());
+							orderParam.getFromKey(), orderParam.getToKey());
 					orderParam.getQpxSendStatsData().add(
 							new OrderEntity(topicName, consumerId, postStatsData.getTotalSendQps()
 									- preStatsData.getTotalSendQps()));

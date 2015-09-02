@@ -22,15 +22,15 @@ public interface ProducerTopicStatsDataService {
 	ProducerTopicStatsData findById(String id);
 
 	List<ProducerTopicStatsData> findByTopic(String topicName);
-	
+
 	List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit);
 
 	List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
 
 	NavigableMap<Long, Long> findSectionQpsData(String topicName, long startKey, long endKey);
-	
+
 	NavigableMap<Long, Long> findSectionDelayData(String topicName, long startKey, long endKey);
-	
-	ProducerTopicStatsData findOneByTopicAndTime(String topicName, long timeKey, boolean isGt);
-	
+
+	ProducerTopicStatsData findOneByTopicAndTime(String topicName, long startKey, long endKey, boolean isGt);
+
 }

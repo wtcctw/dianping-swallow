@@ -61,7 +61,7 @@ public abstract class ConsumerStatsData extends StatsData {
 	@Override
 	public String toString() {
 		return "ConsumerStatsData [sendQps=" + sendQps + ", sendDelay=" + sendDelay + ", ackQps=" + ackQps
-				+ ", ackDelay=" + ackDelay + ", accumulation=" + accumulation + "]";
+				+ ", ackDelay=" + ackDelay + ", accumulation=" + accumulation + "]"+ super.toString();
 	}
 
 }
