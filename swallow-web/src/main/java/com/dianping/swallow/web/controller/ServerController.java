@@ -132,6 +132,44 @@ public class ServerController extends AbstractSidebarBasedController {
 		}
 	}
 
+	@RequestMapping(value = "/console/server/defaultpresource", method = RequestMethod.GET)
+	@ResponseBody
+	public Object loadDefaultProducerSereverResource() {
+
+		ProducerServerResource producerServerResource = (ProducerServerResource) producerServerResourceService
+				.findDefault();
+
+		return ProducerServerResourceMapper.toProducerServerResourceDto(producerServerResource);
+
+	}
+
+	@RequestMapping(value = "/console/server/producer/alarm", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean editProducerAlarmSetting(@RequestParam String ip, @RequestParam boolean alarm,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		ProducerServerResource producerServerResource = (ProducerServerResource) producerServerResourceService
+				.findByIp(ip);
+		producerServerResource.setAlarm(alarm);
+		boolean result = producerServerResourceService.update(producerServerResource);
+
+		if (result) {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Update producer server alarm of %s to %b successfully", ip, alarm));
+			}
+		} else {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Update producer server alarm of %s to %b fail", ip, alarm));
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * Consumer server controller
+	 */
+
 	@RequestMapping(value = "/console/server/consumer")
 	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
 
@@ -145,8 +183,8 @@ public class ServerController extends AbstractSidebarBasedController {
 
 		int offset = baseDto.getOffset();
 		int limit = baseDto.getLimit();
-		Pair<Long, List<ConsumerServerResource>> pair = consumerServerResourceService
-				.findConsumerServerResourcePage(offset, limit);
+		Pair<Long, List<ConsumerServerResource>> pair = consumerServerResourceService.findConsumerServerResourcePage(
+				offset, limit);
 		List<ConsumerServerResourceDto> consumerServerResourceDto = new ArrayList<ConsumerServerResourceDto>();
 		for (ConsumerServerResource consumerServerResource : pair.getSecond()) {
 			consumerServerResourceDto.add(ConsumerServerResourceMapper
@@ -212,6 +250,39 @@ public class ServerController extends AbstractSidebarBasedController {
 			}
 		}
 
+		return result;
+	}
+
+	@RequestMapping(value = "/console/server/defaultcresource", method = RequestMethod.GET)
+	@ResponseBody
+	public Object loadDefaultConsumerSereverResource() {
+
+		ConsumerServerResource consumerServerResource = (ConsumerServerResource) consumerServerResourceService
+				.findDefault();
+
+		return ConsumerServerResourceMapper.toConsumerServerResourceDto(consumerServerResource);
+
+	}
+
+	@RequestMapping(value = "/console/server/consumer/alarm", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean editConsumerAlarmSetting(@RequestParam String ip, @RequestParam boolean alarm) {
+
+		ConsumerServerResource consumerServerResource = (ConsumerServerResource) consumerServerResourceService
+				.findByIp(ip);
+		consumerServerResource.setAlarm(alarm);
+		boolean result = consumerServerResourceService.update(consumerServerResource);
+
+		if (result) {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Update consumer server alarm of %s to %b successfully", ip, alarm));
+			}
+		} else {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Update consumer server alarm of %s to %b fail", ip, alarm));
+			}
+		}
+		
 		return result;
 	}
 

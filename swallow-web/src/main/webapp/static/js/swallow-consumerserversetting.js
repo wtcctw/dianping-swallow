@@ -186,6 +186,16 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ackvalley = "";
 		$scope.consumerserverEntry.ackfluctuation = "";
 		$scope.consumerserverEntry.ackfluctuationBase = "";
+		$http.get(window.contextPath + "/console/server/defaultcresource").success(function(data){
+			$scope.consumerserverEntry.sendpeak = data.sendpeak;
+			$scope.consumerserverEntry.sendvalley = data.sendvalley;
+			$scope.consumerserverEntry.sendfluctuation = data.sendfluctuation;
+			$scope.consumerserverEntry.sendfluctuationBase = data.sendfluctuationBase;
+			$scope.consumerserverEntry.ackpeak = data.ackpeak;
+			$scope.consumerserverEntry.ackvalley = data.ackvalley;
+			$scope.consumerserverEntry.ackfluctuation = data.ackfluctuation;
+			$scope.consumerserverEntry.ackfluctuationBase = data.ackfluctuationBase;
+		});
 	}
 	
 	$scope.setModalInput = function(index){
@@ -229,6 +239,20 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
 		});
 		return true;
+	}
+	
+	$scope.isdefault = function(compare){
+		return compare != "default"; 
+	}
+	
+	$scope.changeconsumeralarm = function(ip, index){
+		var id = "#calarm" + index;
+		var check = $(id).prop('checked');
+		$http.get(window.contextPath + '/console/server/consumer/alarm', {
+			params : {
+				ip : ip,
+				alarm: check } }).success(function(response) {
+    	});
 	}
 	
 	$scope.dialog = function(cid) {

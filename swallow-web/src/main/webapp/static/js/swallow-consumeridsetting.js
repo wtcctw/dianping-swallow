@@ -319,6 +319,10 @@ module
 												});
 								return true;
 							}
+							
+							$scope.isdefault = function(compare){
+								return compare != "default"; 
+							}
 
 							$scope.dialog = function(cid, topic) {
 								$rootScope.cid = cid;

@@ -145,7 +145,7 @@ public class IPController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/ip/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public void editIpAlarm(@RequestParam String ip, @RequestParam boolean alarm, HttpServletRequest request,
+	public boolean editIpAlarm(@RequestParam String ip, @RequestParam boolean alarm, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		List<IpResource> ipResources = ipResourceService.findByIp(ip);
@@ -165,6 +165,8 @@ public class IPController extends AbstractMenuController {
 				logger.info(String.format("Update alarm of %s to %b fail", ip, alarm));
 			}
 		}
+		
+		return result;
 	}
 
 	@Override

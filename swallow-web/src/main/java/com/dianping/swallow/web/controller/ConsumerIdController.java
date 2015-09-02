@@ -91,7 +91,7 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/consumerid/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public void editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
+	public boolean editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
 			@RequestParam String consumerId, HttpServletRequest request, HttpServletResponse response) {
 
 		ConsumerIdParam consumerIdParam = new ConsumerIdParam();
@@ -113,7 +113,11 @@ public class ConsumerIdController extends AbstractMenuController {
 					logger.info(String.format("Update alarm of %s to %b fail", topic, alarm));
 				}
 			}
+			
+			return result;
 		}
+		
+		return Boolean.FALSE;
 	}
 
 	@RequestMapping(value = "/console/consumerid/remove", method = RequestMethod.GET)

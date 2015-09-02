@@ -85,7 +85,7 @@
 						<td style="text-align: left"><a href="#myModal0"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
-								data-original-title="编辑配置值"></i></a> <a href=""
+								data-original-title="编辑配置值"></i></a> <a href ng-show="isdefault(ad.consumerId)"
 							ng-click="dialog(ad.consumerId, ad.topic);" class="edit-config-btn"><i
 								class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
 						</tr>
