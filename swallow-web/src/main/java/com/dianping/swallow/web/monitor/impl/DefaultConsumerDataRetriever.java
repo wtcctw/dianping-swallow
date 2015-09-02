@@ -84,7 +84,7 @@ public class DefaultConsumerDataRetriever
 
 		Long firstKey = statis.getQpx(StatisType.SEND).firstKey();
 		if (firstKey != null) {
-			if (getKey(start) - getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
+			if (getKey(start) + getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
 				return true;
 			}
 		}
