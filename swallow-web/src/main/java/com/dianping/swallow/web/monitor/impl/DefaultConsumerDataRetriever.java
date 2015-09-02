@@ -620,11 +620,6 @@ public class DefaultConsumerDataRetriever
 							orderParam.getFromKey(), orderParam.getToKey());
 					ConsumerIdStatsData postStatsData = getPostConsumerIdStatsData(topicName, consumerId,
 							orderParam.getFromKey(), orderParam.getToKey());
-					if ("LoadTestTopic-0".equals(orderParam.getTopicName())) {
-						logger.info("[submit-run] preStatsData timeKey {} postStatsData timeKey {}.",
-								orderParam.getFromKey(), orderParam.getToKey());
-						logger.info("[submit-run] preStatsData {} postStatsData{}.", preStatsData, postStatsData);
-					}
 					orderParam.getQpxSendStatsData().add(
 							new OrderEntity(topicName, consumerId, postStatsData.getTotalSendQps()
 									- preStatsData.getTotalSendQps()));

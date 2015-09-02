@@ -355,11 +355,6 @@ public class DefaultProducerDataRetriever
 							orderParam.getFromKey(), orderParam.getToKey());
 					ProducerTopicStatsData postStatsData = getPostPTopicStatsData(orderParam.getTopicName(),
 							orderParam.getFromKey(), orderParam.getToKey());
-					if ("LoadTestTopic-0".equals(orderParam.getTopicName())) {
-						logger.info("[submit-run] preStatsData timeKey {} postStatsData timeKey {}.",
-								orderParam.getFromKey(), orderParam.getToKey());
-						logger.info("[submit-run] preStatsData {} postStatsData {}.", preStatsData, postStatsData);
-					}
 					orderParam.getDelayStatsData().add(
 							new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalDelay()
 									- preStatsData.getTotalDelay()));
