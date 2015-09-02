@@ -2,6 +2,7 @@ package com.dianping.swallow.web.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,7 +11,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -111,12 +111,25 @@ public class ServerController extends AbstractSidebarBasedController {
 		}
 	}
 
-	@RequestMapping(value = "/console/server/producerserverids", method = RequestMethod.GET)
+	@RequestMapping(value = "/console/server/producerserverinfo", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadProducerSereverIds() {
+	public Object loadProducerSereverIps() {
 
-		Set<String> hostNames = ipCollectorService.getProducerServerIpsMap().keySet();
-		return new ArrayList<String>(hostNames);
+		List<String> hostsList;
+		List<String> ipsList;
+		Map<String, String> hostNames = ipCollectorService.getProducerServerIpsMap();
+		
+		if(hostNames != null){
+			Set<String> hosts = hostNames.keySet();
+			hostsList = new ArrayList<String>(hosts);
+			Collection<String> ipCollection = hostNames.values();
+			ipsList = new ArrayList<String>(ipCollection);
+		}else{
+			hostsList = new ArrayList<String>();
+			ipsList = new ArrayList<String>();
+		}
+		
+		return new Pair<List<String>, List<String>>(hostsList, ipsList);
 	}
 
 	@RequestMapping(value = "/console/server/producertopics", method = RequestMethod.GET)
@@ -221,14 +234,27 @@ public class ServerController extends AbstractSidebarBasedController {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/console/server/consumerserverids", method = RequestMethod.GET)
+	@RequestMapping(value = "/console/server/consumerserverinfo", method = RequestMethod.GET)
 	@ResponseBody
-	public Collection<String> loadConsumerSereverIds() {
+	public Object loadConsumerSereverInfo() {
+		
+		Set<String> hostsSet = new HashSet<String>();
+		Set<String> ipsSet = new HashSet<String>();
+		
+		Map<String, String> master = ipCollectorService.getProducerServerIpsMap();
+		if(master != null){
+			hostsSet.addAll(master.keySet());
+			ipsSet.addAll(master.values());
+		}
 
-		Set<String> masterIps = ipCollectorService.getConsumerServerMasterIpsMap().keySet();
-		Set<String> slaveIps = ipCollectorService.getConsumerServerMasterIpsMap().keySet();
-		return CollectionUtils.union(masterIps, slaveIps);
+		Map<String, String> slave = ipCollectorService.getConsumerServerMasterIpsMap();
+		if(slave != null){
+			hostsSet.addAll(slave.keySet());
+			ipsSet.addAll(slave.values());
+		}
+		
+		return new Pair<List<String>, List<String>>(new ArrayList<String>(hostsSet), new ArrayList<String>(ipsSet));
+
 	}
 
 	@RequestMapping(value = "/console/server/consumer/get/topics", method = RequestMethod.GET)
