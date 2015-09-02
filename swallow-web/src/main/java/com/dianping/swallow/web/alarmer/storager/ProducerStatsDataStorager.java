@@ -68,6 +68,7 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager  {
 					for (ProducerServerStatsData serverStatsData : serverStatsDatas) {
 						if (isFirstTime) {
 							lastTimeKey.set(serverStatsData.getTimeKey());
+							isFirstTime = false;
 						}
 						serverStatsDataService.insert(serverStatsData);
 					}

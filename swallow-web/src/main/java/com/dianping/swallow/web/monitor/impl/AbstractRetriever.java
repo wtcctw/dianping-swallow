@@ -36,8 +36,10 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 	protected final int BUILD_TIMES_AGEO = 15000;// 每次构建时，构建此时间(ms)以前的数据
 
 	private static final String FACTORY_NAME = "DataRetriever";
-	
+
 	protected static final String TOTAL_KEY = "total";
+
+	protected static final int OFFSET_TIMESPAN = 10 * 1000;
 
 	@Value("${swallow.web.monitor.keepinmemory}")
 	public int keepInMemoryHour = 3;// 保存最新小时
@@ -106,7 +108,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		long oldest = System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(keepInMemoryHour, TimeUnit.HOURS);
 
 		// 允许10s内的误差
-		if (oldest <= (start + 10 * 1000)) {
+		if (oldest <= (start + OFFSET_TIMESPAN)) {
 			return true;
 		}
 		return false;
@@ -273,7 +275,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 		return statsDatas;
 	}
-	
+
 	protected long getSumStatsData(NavigableMap<Long, Long> rawDatas, long fromKey, long toKey) {
 		long sumData = 0;
 		if (rawDatas != null) {

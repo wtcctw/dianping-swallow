@@ -84,7 +84,7 @@ public class DefaultConsumerDataRetriever
 
 		Long firstKey = statis.getQpx(StatisType.SEND).firstKey();
 		if (firstKey != null) {
-			if (getKey(start) >= firstKey.longValue()) {
+			if (getKey(start) - getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
 				return true;
 			}
 		}
@@ -231,11 +231,14 @@ public class DefaultConsumerDataRetriever
 		OrderStatsData accuStatsData = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY,
 				StatisDetailType.ACCUMULATION), start, end);
 		List<ConsumerIdResource> consumerIdResources = resourceContainer.findConsumerIdResources();
-		if (consumerIdResources != null) {
+		if (consumerIdResources != null && consumerIdResources.size() > 0) {
 			QueryQrderTask queryQrderTask = new QueryQrderTask();
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 				String topicName = consumerIdResource.getTopic();
 				String consumerId = consumerIdResource.getConsumerId();
+				if (TOTAL_KEY.equals(topicName) || TOTAL_KEY.equals(consumerId)) {
+					continue;
+				}
 				queryQrderTask.submit(new QueryOrderParam(topicName, consumerId, fromKey, toKey, qpxSendStatsData,
 						qpxAckStatsData, delaySendStatsData, delayAckStatsData, accuStatsData));
 			}
@@ -592,14 +595,19 @@ public class DefaultConsumerDataRetriever
 
 	private class QueryQrderTask {
 
-		private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 4;
-		
-		private static final int MAX_WAIT_TIME =60;
+		private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 6;
+
+		private static final int MAX_WAIT_TIME = 60;
 
 		private ExecutorService executorService = Executors.newFixedThreadPool(poolSize,
 				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
+		public QueryQrderTask() {
+			logger.info("[QueryQrderTask] poolSize {} .", poolSize);
+		}
+
 		public void submit(final QueryOrderParam orderParam) {
+			logger.info("[submit] QueryOrderParam {} .", orderParam);
 			executorService.submit(new Runnable() {
 
 				@Override
@@ -611,28 +619,30 @@ public class DefaultConsumerDataRetriever
 					ConsumerIdStatsData postStatsData = getPostConsumerIdStatsData(topicName, consumerId,
 							orderParam.getToKey());
 					orderParam.getQpxSendStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getSendQps()
-									- preStatsData.getSendQps()));
-					orderParam.getQpxAckStatsData()
-							.add(new OrderEntity(topicName, consumerId, postStatsData.getAckQps()
-									- preStatsData.getAckQps()));
+							new OrderEntity(topicName, consumerId, postStatsData.getTotalSendQps()
+									- preStatsData.getTotalSendQps()));
+					orderParam.getQpxAckStatsData().add(
+							new OrderEntity(topicName, consumerId, postStatsData.getTotalAckQps()
+									- preStatsData.getTotalAckQps()));
 					orderParam.getDelaySendStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getSendDelay()
-									- preStatsData.getSendDelay()));
+							new OrderEntity(topicName, consumerId, postStatsData.getTotalSendDelay()
+									- preStatsData.getTotalSendDelay()));
 					orderParam.getDelayAckStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getAckDelay()
-									- preStatsData.getAckDelay()));
+							new OrderEntity(topicName, consumerId, postStatsData.getTotalAckDelay()
+									- preStatsData.getTotalAckDelay()));
 					orderParam.getAccuStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getAccumulation()
-									- preStatsData.getAccumulation()));
+							new OrderEntity(topicName, consumerId, postStatsData.getTotalAccumulation()
+									- preStatsData.getTotalAccumulation()));
 				}
 			});
 		}
 
 		public void await() {
+
 			executorService.shutdown();
 			try {
 				executorService.awaitTermination(MAX_WAIT_TIME, TimeUnit.SECONDS);
+				logger.info("[await] QueryQrderTask is over.");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -728,6 +738,14 @@ public class DefaultConsumerDataRetriever
 
 		public String getConsumerId() {
 			return consumerId;
+		}
+
+		@Override
+		public String toString() {
+			return "QueryOrderParam [topicName=" + topicName + ", consumerId=" + consumerId + ", fromKey=" + fromKey
+					+ ", toKey=" + toKey + ", delaySendStatsData=" + delaySendStatsData + ", delayAckStatsData="
+					+ delayAckStatsData + ", qpxSendStatsData=" + qpxSendStatsData + ", qpxAckStatsData="
+					+ qpxAckStatsData + ", accuStatsData=" + accuStatsData + "]";
 		}
 
 	}

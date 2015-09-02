@@ -26,11 +26,11 @@ import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
  *         2015年8月4日 下午1:22:31
  */
 @Component
-public class ConsumerStatsDataStorager extends AbstractStatsDataStorager  {
+public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 
 	@Autowired
 	private StatsDataContainer statsDataContainer;
-	
+
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 
@@ -45,7 +45,7 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager  {
 
 	@Autowired
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
@@ -55,8 +55,7 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager  {
 
 	@Override
 	protected void doStorage() {
-		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper
-				.getServerStatsDatas(lastTimeKey.get());
+		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(lastTimeKey.get());
 		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(lastTimeKey
 				.get());
 		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
@@ -78,6 +77,7 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager  {
 				for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
 					if (isFirstTime) {
 						lastTimeKey.set(serverStatsData.getTimeKey());
+						isFirstTime = false;
 					}
 					serverStatsDataService.insert(serverStatsData);
 				}
@@ -110,9 +110,9 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager  {
 				if (consumerIdStatsDatas == null) {
 					return;
 				}
-				
+
 				statsDataContainer.setConsumerIdTotalRatio(consumerIdStatsDatas);
-				
+
 				for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
 					consumerIdStatsDataService.insert(consumerIdStatsData);
 				}
