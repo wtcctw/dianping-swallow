@@ -412,7 +412,7 @@ module.controller('ConsumerOrderController', function($scope, $http) {
 		}
 		if ($scope.startTime != null && $scope.endTime != null) {
 			if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
-				queryOrderList
+				$scope.queryOrderList(topicName);
 				return;
 			}else if($scope.startTime.length == 0 && $scope.endTime.length > 0){
 				alert("开始时间不能为空");

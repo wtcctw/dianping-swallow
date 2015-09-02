@@ -14,9 +14,8 @@ import jodd.io.StreamUtil;
 public class BodyReaderHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
 	private final byte[] body;
-	
-	public BodyReaderHttpServletRequestWrapper(HttpServletRequest request) 
-throws IOException {
+
+	public BodyReaderHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
 		super(request);
 		body = StreamUtil.readBytes(request.getReader());
 	}

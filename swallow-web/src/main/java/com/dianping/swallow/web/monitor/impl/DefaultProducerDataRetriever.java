@@ -76,7 +76,7 @@ public class DefaultProducerDataRetriever
 		}
 		Long firstKey = statis.getQpx(StatisType.SAVE).firstKey();
 		if (firstKey != null) {
-			if (getKey(start) >= firstKey.longValue()) {
+			if (getKey(start) - getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
 				return true;
 			}
 		}
@@ -147,9 +147,11 @@ public class DefaultProducerDataRetriever
 		if (topicResources != null && topicResources.size() > 0) {
 			QueryQrderTask queryQrderTask = new QueryQrderTask();
 			for (TopicResource topicResource : topicResources) {
-
-				queryQrderTask.submit(new QueryOrderParam(topicResource.getTopic(), fromKey, toKey, delayOrderResult,
-						qpxOrderResult));
+				String topicName = topicResource.getTopic();
+				if (TOTAL_KEY.equals(topicName)) {
+					continue;
+				}
+				queryQrderTask.submit(new QueryOrderParam(topicName, fromKey, toKey, delayOrderResult, qpxOrderResult));
 			}
 			queryQrderTask.await();
 		}
@@ -331,15 +333,19 @@ public class DefaultProducerDataRetriever
 
 	private class QueryQrderTask {
 
-		private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 4;
+		private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 6;
 
 		private static final int MAX_WAIT_TIME = 60;
 
 		private ExecutorService executorService = Executors.newFixedThreadPool(poolSize,
 				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
-		public void submit(final QueryOrderParam orderParam) {
+		public QueryQrderTask() {
+			logger.info("[QueryQrderTask] poolSize {} .", poolSize);
+		}
 
+		public void submit(final QueryOrderParam orderParam) {
+			logger.info("[submit] QueryOrderParam {} .", orderParam);
 			executorService.submit(new Runnable() {
 
 				@Override
@@ -362,6 +368,7 @@ public class DefaultProducerDataRetriever
 			executorService.shutdown();
 			try {
 				executorService.awaitTermination(MAX_WAIT_TIME, TimeUnit.SECONDS);
+				logger.info("[await] QueryQrderTask is over .");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -408,6 +415,12 @@ public class DefaultProducerDataRetriever
 
 		public OrderStatsData getQpxStatsData() {
 			return qpxStatsData;
+		}
+
+		@Override
+		public String toString() {
+			return "QueryOrderParam [topicName=" + topicName + ", fromKey=" + fromKey + ", toKey=" + toKey
+					+ ", delayStatsData=" + delayStatsData + ", qpxStatsData=" + qpxStatsData + "]";
 		}
 
 	}

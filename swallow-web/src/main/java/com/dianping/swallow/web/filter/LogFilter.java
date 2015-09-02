@@ -47,7 +47,7 @@ public class LogFilter implements Filter {
 		String excludeUrl = fConfig.getInitParameter("excludeURLs");
 		String[] excludeUrls = excludeUrl.split(",");
 		for (String exclude : excludeUrls) {
-			if(exclude.contains("*")){
+			if (exclude.contains("*")) {
 				exclude = exclude.replaceAll("\\*", ".\\*");
 			}
 			Pattern excludePattern = Pattern.compile(exclude);
