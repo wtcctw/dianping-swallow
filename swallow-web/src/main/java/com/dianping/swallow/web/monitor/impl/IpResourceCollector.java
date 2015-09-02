@@ -131,15 +131,22 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 						ips.remove(ConsumerDataRetrieverWrapper.TOTAL);
 					}
 					TopicResource topicResource = topicResourceService.findByTopic(topic);
-					List<String> ipList = new ArrayList<String>(ips);
+					List<String> newList = new ArrayList<String>(ips);
 
 					if (topicResource == null) {
 						topicResource = topicResourceService.buildTopicResource(topic);
-						topicResource.setProducerIps(ipList);
+						topicResource.setProducerIps(newList);
 						topicResourceService.insert(topicResource);
 					} else {
-						topicResource.setProducerIps(ipList);
-						topicResourceService.insert(topicResource);
+						List<String> originalList = topicResource.getProducerIps();
+						
+						if(originalList.containsAll(newList) && newList.containsAll(originalList)){
+							return;
+						}else{
+							topicResource.setProducerIps(newList);
+							topicResourceService.insert(topicResource);
+						}
+						
 					}
 
 				}
