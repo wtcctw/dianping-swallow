@@ -76,7 +76,7 @@ public class DefaultProducerDataRetriever
 		}
 		Long firstKey = statis.getQpx(StatisType.SAVE).firstKey();
 		if (firstKey != null) {
-			if (getKey(start) - getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
+			if (getKey(start) + getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
 				return true;
 			}
 		}

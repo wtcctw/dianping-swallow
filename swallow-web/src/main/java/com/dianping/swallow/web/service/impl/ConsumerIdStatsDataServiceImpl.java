@@ -106,7 +106,7 @@ public class ConsumerIdStatsDataServiceImpl implements ConsumerIdStatsDataServic
 					NavigableMap<Long, Long> sendStatsData = new TreeMap<Long, Long>();
 					sendStatsData.put(consumerIdStatsData.getTimeKey(), consumerIdStatsData.getSendQps());
 					NavigableMap<Long, Long> ackStatsData = new TreeMap<Long, Long>();
-					sendStatsData.put(consumerIdStatsData.getTimeKey(), consumerIdStatsData.getAckQps());
+					ackStatsData.put(consumerIdStatsData.getTimeKey(), consumerIdStatsData.getAckQps());
 					statsDataResult.setSendStatsData(sendStatsData);
 					statsDataResult.setAckStatsData(ackStatsData);
 					consumerIdStatsDataMaps.put(consumerIdStatsData.getConsumerId(), statsDataResult);
@@ -136,7 +136,7 @@ public class ConsumerIdStatsDataServiceImpl implements ConsumerIdStatsDataServic
 					NavigableMap<Long, Long> sendStatsData = new TreeMap<Long, Long>();
 					sendStatsData.put(consumerIdStatsData.getTimeKey(), consumerIdStatsData.getSendDelay());
 					NavigableMap<Long, Long> ackStatsData = new TreeMap<Long, Long>();
-					sendStatsData.put(consumerIdStatsData.getTimeKey(), consumerIdStatsData.getAckDelay());
+					ackStatsData.put(consumerIdStatsData.getTimeKey(), consumerIdStatsData.getAckDelay());
 					statsDataResult.setSendStatsData(sendStatsData);
 					statsDataResult.setAckStatsData(ackStatsData);
 					consumerIdStatsDataMaps.put(consumerIdStatsData.getConsumerId(), statsDataResult);

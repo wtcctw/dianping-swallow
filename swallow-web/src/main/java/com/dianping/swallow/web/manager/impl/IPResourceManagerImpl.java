@@ -171,19 +171,24 @@ public class IPResourceManagerImpl implements IPResourceManager {
 			String strDpMobile = ipDesc.getDpMobile();
 			Set<String> dpEmails = getEmailsByStrMobile(strDpMobile);
 
-			if (StringUtils.isNotBlank(ipDesc.getEmail())) {
-				ipDesc.setEmail(ipDesc.getEmail() + COMMA_SPLIT + convertSetToEmail(dpEmails));
-			} else {
-				ipDesc.setEmail(convertSetToEmail(dpEmails));
+			String strOtherDpEmail = convertSetToEmail(dpEmails);
+			if (StringUtils.isNotBlank(strOtherDpEmail)) {
+				if (StringUtils.isNotBlank(ipDesc.getEmail())) {
+					ipDesc.setEmail(ipDesc.getEmail() + COMMA_SPLIT + strOtherDpEmail);
+				} else {
+					ipDesc.setEmail(strOtherDpEmail);
+				}
 			}
 
 			String strOpMobile = ipDesc.getOpMobile();
 			Set<String> opEmails = getEmailsByStrMobile(strOpMobile);
-
-			if (StringUtils.isNotBlank(ipDesc.getOpEmail())) {
-				ipDesc.setOpEmail(ipDesc.getOpEmail() + COMMA_SPLIT + convertSetToEmail(opEmails));
-			} else {
-				ipDesc.setOpEmail(convertSetToEmail(opEmails));
+			String strOtherOpEmail = convertSetToEmail(opEmails);
+			if (StringUtils.isNotBlank(strOtherOpEmail)) {
+				if (StringUtils.isNotBlank(ipDesc.getOpEmail())) {
+					ipDesc.setOpEmail(ipDesc.getOpEmail() + COMMA_SPLIT + strOtherOpEmail);
+				} else {
+					ipDesc.setOpEmail(strOtherOpEmail);
+				}
 			}
 		} catch (Exception e) {
 			logger.error("[addEmail]", e);
