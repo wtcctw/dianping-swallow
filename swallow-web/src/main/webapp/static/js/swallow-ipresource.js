@@ -167,6 +167,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 							updater : function(c) {
 								$scope.searchip = c;
 								$scope.query.ip = $scope.searchip;
+								$scope.query.application = $("#searchapplication").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 								return c;
 							}
@@ -185,6 +186,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 							updater : function(c) {
 								$scope.searchapplication = c;
 								$scope.query.application = $scope.searchapplication;
+								$scope.query.ip = $("#searchip").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 								return c;
 							}

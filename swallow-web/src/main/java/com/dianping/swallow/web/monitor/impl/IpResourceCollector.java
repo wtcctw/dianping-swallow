@@ -111,8 +111,13 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 					} else {
 						if (ips != null && !ips.isEmpty()) {
 							ConsumerIdResource consumerIdResource = pair.getSecond().get(0);
-							consumerIdResource.setConsumerIps(new ArrayList<String>(ips));
-							consumerIdResourceService.insert(consumerIdResource);
+							List<String> originalIps = consumerIdResource.getConsumerIps();
+							if(ips.containsAll(originalIps) && originalIps.containsAll(ips)){
+								return;
+							}else{
+								consumerIdResource.setConsumerIps(new ArrayList<String>(ips));
+								consumerIdResourceService.insert(consumerIdResource);
+							}
 						}
 					}
 				}
@@ -140,7 +145,7 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 					} else {
 						List<String> originalList = topicResource.getProducerIps();
 						
-						if(originalList.containsAll(newList) && newList.containsAll(originalList)){
+						if(newList.containsAll(originalList) && originalList.containsAll(newList)){
 							return;
 						}else{
 							topicResource.setProducerIps(newList);

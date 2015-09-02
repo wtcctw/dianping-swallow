@@ -188,6 +188,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							updater : function(c) {
 								$scope.name = c;
 								$scope.query.topic = $scope.name;
+								$scope.query.producerServer = $("#searchip").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
 								return c;
 							}
@@ -199,6 +200,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							updater : function(c) {
 								$scope.searchip = c;
 								$scope.query.producerServer = $scope.searchip;
+								$scope.query.topic = $("#searchtopic").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
 								return c;
 							}
