@@ -160,9 +160,6 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 				td.setListAck(ackList.subList(ackListSize - 2, ackListSize));
 				td.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
 				totalDataMap.put(totalcDataKey, td);
-				if (logger.isInfoEnabled()) {
-					logger.info(String.format("Generate totalData for topic %s and consumerid %s", topic, consumerid));
-				}
 			}
 		}
 		if (logger.isInfoEnabled()) {
@@ -356,7 +353,7 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 	public void run() {
 		
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doCollector");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "CalculateDashboard");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {
