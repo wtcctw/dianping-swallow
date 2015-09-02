@@ -87,13 +87,9 @@ public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implement
 	}
 
 	@Override
-	public ProducerTopicStatsData findOneByTopicAndTime(String topicName, long timeKey, boolean isGt) {
+	public ProducerTopicStatsData findOneByTopicAndTime(String topicName, long startKey, long endKey, boolean isGt) {
 		Criteria criteria = Criteria.where(TOPICNAME_FIELD).is(topicName);
-		if (isGt) {
-			criteria.and(TIMEKEY_FIELD).gte(timeKey);
-		} else {
-			criteria.and(TIMEKEY_FIELD).lte(timeKey);
-		}
+		criteria.and(TIMEKEY_FIELD).gte(startKey).lte(endKey);
 		Query query = new Query(criteria);
 		query.skip(0).limit(1).with(new Sort(new Sort.Order(isGt ? Direction.ASC : Direction.DESC, TIMEKEY_FIELD)));
 		ProducerTopicStatsData statsData = mongoTemplate.findOne(query, ProducerTopicStatsData.class,

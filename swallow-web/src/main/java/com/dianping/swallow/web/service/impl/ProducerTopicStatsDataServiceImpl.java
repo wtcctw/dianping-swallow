@@ -87,8 +87,8 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 	}
 
 	@Override
-	public ProducerTopicStatsData findOneByTopicAndTime(String topicName, long timeKey, boolean isGt) {
-		return producerTopicStatsDataDao.findOneByTopicAndTime(topicName, timeKey, isGt);
+	public ProducerTopicStatsData findOneByTopicAndTime(String topicName, long startKey,long endKey, boolean isGt) {
+		return producerTopicStatsDataDao.findOneByTopicAndTime(topicName, startKey,endKey, isGt);
 	}
 
 }

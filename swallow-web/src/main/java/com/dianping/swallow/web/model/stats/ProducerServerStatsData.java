@@ -32,9 +32,8 @@ public class ProducerServerStatsData extends ProducerStatsData {
 	public boolean checkQpsPeak(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() > expectQps) {
-				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip)
-						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
-						.setStatisType(StatisType.SENDQPS_PEAK).setCreateTime(new Date())
+				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip).setCurrentValue(this.getQps())
+						.setExpectedValue(expectQps).setStatisType(StatisType.SENDQPS_PEAK).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
 				return false;
 			}
@@ -45,14 +44,18 @@ public class ProducerServerStatsData extends ProducerStatsData {
 	public boolean checkQpsValley(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() < expectQps) {
-				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip)
-						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
-						.setStatisType(StatisType.SENDQPS_VALLEY).setCreateTime(new Date())
+				eventReporter.report(eventFactory.createServerStatisEvent().setIp(ip).setCurrentValue(this.getQps())
+						.setExpectedValue(expectQps).setStatisType(StatisType.SENDQPS_VALLEY).setCreateTime(new Date())
 						.setEventType(EventType.PRODUCER));
 				return false;
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ProducerServerStatsData [ip=" + ip + "]" + super.toString();
 	}
 
 }

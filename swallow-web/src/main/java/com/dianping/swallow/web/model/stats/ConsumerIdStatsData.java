@@ -219,7 +219,7 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	public String toString() {
 		return "ConsumerIdStatsData [topicName=" + topicName + ", consumerId=" + consumerId + ", totalSendQps="
 				+ totalSendQps + ", totalSendDelay=" + totalSendDelay + ", totalAckQps=" + totalAckQps
-				+ ", totalAckDelay=" + totalAckDelay + ", totalAccumulation=" + totalAccumulation + "]";
+				+ ", totalAckDelay=" + totalAckDelay + ", totalAccumulation=" + totalAccumulation + "]"+ super.toString();
 	}
 
 }

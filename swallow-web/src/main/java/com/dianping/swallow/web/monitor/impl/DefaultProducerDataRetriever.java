@@ -314,17 +314,18 @@ public class DefaultProducerDataRetriever
 		return new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getDelayDetailType());
 	}
 
-	private ProducerTopicStatsData getPrePTopicStatsData(String topicName, long timeKey) {
-		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, timeKey, true);
+	private ProducerTopicStatsData getPrePTopicStatsData(String topicName, long startKey, long endKey) {
+		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, startKey,
+				endKey, true);
 		if (pTopicStatsData != null) {
 			return pTopicStatsData;
 		}
 		return new ProducerTopicStatsData();
 	}
 
-	private ProducerTopicStatsData getPostPTopicStatsData(String topicName, long timeKey) {
-		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService
-				.findOneByTopicAndTime(topicName, timeKey, false);
+	private ProducerTopicStatsData getPostPTopicStatsData(String topicName, long startKey, long endKey) {
+		ProducerTopicStatsData pTopicStatsData = pTopicStatsDataService.findOneByTopicAndTime(topicName, startKey,
+				endKey, false);
 		if (pTopicStatsData != null) {
 			return pTopicStatsData;
 		}
@@ -345,15 +346,20 @@ public class DefaultProducerDataRetriever
 		}
 
 		public void submit(final QueryOrderParam orderParam) {
-			logger.info("[submit] QueryOrderParam {} .", orderParam);
+			// logger.info("[submit] QueryOrderParam {} .", orderParam);
 			executorService.submit(new Runnable() {
 
 				@Override
 				public void run() {
 					ProducerTopicStatsData preStatsData = getPrePTopicStatsData(orderParam.getTopicName(),
-							orderParam.getFromKey());
+							orderParam.getFromKey(), orderParam.getToKey());
 					ProducerTopicStatsData postStatsData = getPostPTopicStatsData(orderParam.getTopicName(),
-							orderParam.getToKey());
+							orderParam.getFromKey(), orderParam.getToKey());
+					if ("LoadTestTopic-0".equals(orderParam.getTopicName())) {
+						logger.info("[submit-run] preStatsData timeKey {} postStatsData timeKey {}.",
+								orderParam.getFromKey(), orderParam.getToKey());
+						logger.info("[submit-run] preStatsData {} postStatsData {}.", preStatsData, postStatsData);
+					}
 					orderParam.getDelayStatsData().add(
 							new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalDelay()
 									- preStatsData.getTotalDelay()));
