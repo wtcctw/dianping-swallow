@@ -321,14 +321,13 @@ public class DefaultConsumerDataRetriever
 	protected Map<String, StatsDataMapPair> getTopicDelayInDb(String topic, long start, long end) {
 		long startKey = getKey(start);
 		long endKey = getKey(end);
-		Map<String, StatsDataMapPair> statsDataResults = null;
+		Map<String, StatsDataMapPair> statsDataResults = new HashMap<String, StatsDataMapPair>();
 		if (MonitorData.TOTAL_KEY.equals(topic)) {
-			StatsDataMapPair statsDataResult = cTopicStatsDataService.findSectionDelayData(MonitorData.TOTAL_KEY,
+			StatsDataMapPair statsDataResult = cTopicStatsDataService.findSectionDelayData(topic,
 					startKey, endKey);
-			statsDataResults = new HashMap<String, StatsDataMapPair>();
 			statsDataResults.put(topic, statsDataResult);
 		} else {
-			statsDataResults = consumerIdStatsDataService.findSectionQpsData(topic, startKey, endKey);
+			statsDataResults = consumerIdStatsDataService.findSectionDelayData(topic, startKey, endKey);
 		}
 		return statsDataResults;
 	}

@@ -45,7 +45,7 @@ public class ConsumerTopicStatsDataServiceImpl implements ConsumerTopicStatsData
 			NavigableMap<Long, Long> ackStatsData = new TreeMap<Long, Long>();
 			for (ConsumerTopicStatsData topicStatsData : topicStatsDatas) {
 				sendStatsData.put(topicStatsData.getTimeKey(), topicStatsData.getSendQps());
-				sendStatsData.put(topicStatsData.getTimeKey(), topicStatsData.getAckQps());
+				ackStatsData.put(topicStatsData.getTimeKey(), topicStatsData.getAckQps());
 				statsDataResult.setSendStatsData(sendStatsData);
 				statsDataResult.setAckStatsData(ackStatsData);
 			}
@@ -64,7 +64,7 @@ public class ConsumerTopicStatsDataServiceImpl implements ConsumerTopicStatsData
 			NavigableMap<Long, Long> ackStatsData = new TreeMap<Long, Long>();
 			for (ConsumerTopicStatsData topicStatsData : topicStatsDatas) {
 				sendStatsData.put(topicStatsData.getTimeKey(), topicStatsData.getSendDelay());
-				sendStatsData.put(topicStatsData.getTimeKey(), topicStatsData.getAckDelay());
+				ackStatsData.put(topicStatsData.getTimeKey(), topicStatsData.getAckDelay());
 				statsDataResult.setSendStatsData(sendStatsData);
 				statsDataResult.setAckStatsData(ackStatsData);
 			}
