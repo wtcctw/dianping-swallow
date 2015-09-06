@@ -21,9 +21,10 @@ public interface ConsumerStatsDataWapper {
 	 * @return
 	 */
 	List<ConsumerServerStatsData> getServerStatsDatas(long timeKey);
-	
+
 	/**
 	 * get total topic statis data at timekey point
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
@@ -46,12 +47,33 @@ public interface ConsumerStatsDataWapper {
 	List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey);
 
 	/**
+	 * get ConsumerId
+	 * 
+	 * @return
+	 */
+	List<String> getConusmerIdInfos();
+	
+	/**
+	 * 
+	 * @param isTotal
+	 * @return
+	 */
+	Set<String> getTopics(boolean isTotal);
+
+	/**
+	 * 
+	 * @param isTotal
+	 * @return
+	 */
+	Set<String> getServerIps(boolean isTotal);
+
+	/**
 	 * get consumerId related ip
 	 * 
 	 * @param timeKey
 	 * @return
 	 */
-	Set<String> getConsumerIdIps(String topicName, String consumerId);
+	Set<String> getConsumerIdIps(String topicName, String consumerId, boolean isTotal);
 
 	/**
 	 * get topic related ip
@@ -59,10 +81,12 @@ public interface ConsumerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	Set<String> getTopicIps(String topicName);
+	Set<String> getTopicIps(String topicName, boolean isTotal);
+
 	/**
-	 * get ConsumerId
+	 * 
+	 * @param isTotal
 	 * @return
 	 */
-	List<String> getConusmerIdInfos();
+	Set<String> getIps(boolean isTotal);
 }

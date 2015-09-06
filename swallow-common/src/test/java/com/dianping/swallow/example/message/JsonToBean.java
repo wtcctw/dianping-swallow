@@ -3,7 +3,7 @@ package com.dianping.swallow.example.message;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 public class JsonToBean {

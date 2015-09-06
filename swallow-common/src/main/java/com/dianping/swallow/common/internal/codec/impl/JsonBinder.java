@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.codec;
+package com.dianping.swallow.common.internal.codec.impl;
 
 import java.io.IOException;
 

@@ -5,6 +5,7 @@ package com.dianping.swallow.test.load.consumer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.dianping.swallow.common.internal.netty.DirectBuffPrinter;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.Consumer;
@@ -47,14 +48,23 @@ public class ConsumerRunner extends AbstractLoadTest{
     }
 
     @Override
-	protected void doStart() {
+	protected void doStart() throws Exception {
     	if(logger.isInfoEnabled()){
     		logger.info("[doStart][topicCount, consumerCount, threadPoolSize, totalMessageCount, differentConsumerId]" + 
     				topicCount + "," + consumerCount + "," + threadPoolSize + "," + totalMessageCount + "," + differentConsumerId);
     	}
+    	startDirectPrinter();
 		startReceiver();
 	}
-    @Override
+    
+	private void startDirectPrinter() throws Exception {
+		
+    	DirectBuffPrinter dbp = new DirectBuffPrinter();
+    	dbp.initialize();
+    	dbp.start();
+	}
+
+	@Override
 	protected boolean isExitOnExecutorsReturn() {
     	
 		return false;

@@ -4,8 +4,7 @@ package com.dianping.swallow.web.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 
 /**
  * @author mengwenchao

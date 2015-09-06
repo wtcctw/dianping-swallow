@@ -157,11 +157,10 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 			return null;
 		}
 		if (cServerResources.containsKey(ip)) {
-			cServerResources.get(ip);
+			return cServerResources.get(ip);
 		} else {
-			cServerResources.get(DEFAULT_RECORD);
+			return cServerResources.get(DEFAULT_RECORD);
 		}
-		return null;
 	}
 
 	@Override

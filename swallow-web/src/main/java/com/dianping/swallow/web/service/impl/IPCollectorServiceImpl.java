@@ -65,8 +65,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private static final String CONSUMER_SERVER_SLAVE_IPLIST_KEY = "swallow.consumer.server.slave.iplist";
 
-	private static final String TOTAL_KEY = "total";
-
 	private static final String TOPIC_CONSUMERID_SPLIT = "&";
 
 	private static final String FACTORY_NAME = "IpCollector";
@@ -419,28 +417,19 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	@Override
 	public Set<String> getTopicConsumerIdIps(String topicName, String consumerId) {
-		Set<String> consumerIdIps = consumerStatsDataWapper.getConsumerIdIps(topicName, consumerId);
-		if (consumerIdIps != null) {
-			consumerIdIps.remove(TOTAL_KEY);
-		}
+		Set<String> consumerIdIps = consumerStatsDataWapper.getConsumerIdIps(topicName, consumerId, false);
 		return consumerIdIps;
 	}
 
 	@Override
 	public Set<String> getProducerTopicIps(String topicName) {
-		Set<String> topicIps = producerStatsDataWapper.getTopicIps(topicName);
-		if (topicIps != null) {
-			topicIps.remove(TOTAL_KEY);
-		}
+		Set<String> topicIps = producerStatsDataWapper.getTopicIps(topicName, false);
 		return topicIps;
 	}
 
 	@Override
 	public Set<String> getConsumerTopicIps(String topicName) {
-		Set<String> topicIps = consumerStatsDataWapper.getTopicIps(topicName);
-		if (topicIps != null) {
-			topicIps.remove(TOTAL_KEY);
-		}
+		Set<String> topicIps = consumerStatsDataWapper.getTopicIps(topicName,false);
 		return topicIps;
 	}
 

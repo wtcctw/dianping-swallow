@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.monitor.impl;
+package com.dianping.swallow.web.monitor.collector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +10,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import jodd.util.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -38,7 +37,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月31日下午8:14:56
  */
 @Component
-public class IpResourceCollector implements MonitorDataListener, Runnable {
+public class ConsumerIdResourceCollector implements MonitorDataListener, Runnable {
 
 	private static final String FACTORY_NAME = "ConsumerIdResourceCollector";
 
@@ -127,10 +126,10 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 
 	private void flushTopicMetaData() {
 
-		Set<String> topics = producerStatsDataWapper.getTopics();
+		Set<String> topics = producerStatsDataWapper.getTopics(false);
 		if (topics != null) {
 			for (String topic : topics) {
-				Set<String> ips = producerStatsDataWapper.getTopicIps(topic);
+				Set<String> ips = producerStatsDataWapper.getTopicIps(topic, false);
 				if (ips != null) {
 					if (ips.contains(ConsumerDataRetrieverWrapper.TOTAL)) {
 						ips.remove(ConsumerDataRetrieverWrapper.TOTAL);
@@ -161,7 +160,7 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 
 	private boolean valid(String topic, String consumerId) {
 
-		if (StringUtil.isNotBlank(topic) && StringUtil.isNotBlank(consumerId)) {
+		if (StringUtils.isNotBlank(topic) && StringUtils.isNotBlank(consumerId)) {
 			return true;
 		} else {
 			return false;
@@ -172,7 +171,7 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 	public void run() {
 
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doIPCollector");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doConsumerIdCollector");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {

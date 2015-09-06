@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.codec;
+package com.dianping.swallow.common.internal.netty.handler;
 
 import java.io.ByteArrayOutputStream;
 

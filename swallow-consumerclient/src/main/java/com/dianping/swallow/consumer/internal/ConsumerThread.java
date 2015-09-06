@@ -1,10 +1,11 @@
 package com.dianping.swallow.consumer.internal;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public class ConsumerThread extends Thread {
 
    private static final Logger logger = LoggerFactory.getLogger(ConsumerThread.class);
 
-   private ClientBootstrap     bootstrap;
+   private Bootstrap     bootstrap;
 
    private InetSocketAddress   remoteAddress;
 
@@ -33,7 +34,7 @@ public class ConsumerThread extends Thread {
 	   this.consumerImpl = consumerImpl;
    }
 
-	public void setBootstrap(ClientBootstrap bootstrap) {
+	public void setBootstrap(Bootstrap bootstrap) {
       this.bootstrap = bootstrap;
 	}
 
@@ -47,6 +48,7 @@ public class ConsumerThread extends Thread {
 
    @Override
    public void run() {
+	   
       ChannelFuture future = null;
       while (!Thread.currentThread().isInterrupted()) {
          synchronized (bootstrap) {
@@ -57,12 +59,12 @@ public class ConsumerThread extends Thread {
             	   }
                   future = bootstrap.connect(remoteAddress);
                   future.await();
-                  if (future.getChannel().isConnected()) {
-                     SocketAddress localAddress = future.getChannel().getLocalAddress();
+                  if (future.channel().isActive()) {
+                     SocketAddress localAddress = future.channel().localAddress();
                      if(logger.isInfoEnabled()){
                     	 logger.info("[run][connected][" + getDesc() + "]" + localAddress + "->" + remoteAddress);
                      }
-                     future.getChannel().getCloseFuture().await();//等待channel关闭，否则一直阻塞！
+                     future.channel().closeFuture().await();//等待channel关闭，否则一直阻塞！
                      if(logger.isInfoEnabled()){
                     	 logger.info("[run][closed   ][" + getDesc() + "]" + localAddress + "->" + remoteAddress);
                      }
@@ -81,8 +83,8 @@ public class ConsumerThread extends Thread {
          }
       }
       
-      if(future!=null && future.getChannel()!=null){
-          future.getChannel().close();//线程被中断了，主动关闭连接
+      if(future!=null && future.channel()!=null){
+          future.channel().close();//线程被中断了，主动关闭连接
       }
       
       if(logger.isInfoEnabled()){
@@ -91,6 +93,6 @@ public class ConsumerThread extends Thread {
    }
 
 	private String getDesc() {
-		return consumerImpl.toString();
+		return consumerImpl.toString() + "@" + toString();
 	}
 }
