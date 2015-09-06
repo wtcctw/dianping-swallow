@@ -20,4 +20,5 @@
 		</property>
 	</bean>
 
+	<bean id="directBuffPrinter" class="com.dianping.swallow.common.internal.netty.DirectBuffPrinter"></bean>
 </beans>

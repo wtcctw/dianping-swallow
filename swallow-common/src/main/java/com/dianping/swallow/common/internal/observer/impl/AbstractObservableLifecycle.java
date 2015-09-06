@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
-import com.dianping.swallow.common.internal.lifecycle.Ordered;
 
 /**
  * @author mengwenchao
@@ -72,7 +71,7 @@ public abstract class AbstractObservableLifecycle extends AbstractObservable imp
 	@Override
 	public int getOrder() {
 		
-		return Ordered.LAST;
+		return 0;
 	}
 
 

@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.heartbeat;
 
-import org.jboss.netty.channel.Channel;
+import io.netty.channel.Channel;
+
 
 /**
  * @author mengwenchao

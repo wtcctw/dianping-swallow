@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.bson.types.BSONTimestamp;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;

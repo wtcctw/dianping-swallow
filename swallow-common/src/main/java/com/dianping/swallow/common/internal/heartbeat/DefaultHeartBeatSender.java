@@ -1,5 +1,7 @@
 package com.dianping.swallow.common.internal.heartbeat;
 
+import io.netty.channel.Channel;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -7,7 +9,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.jboss.netty.channel.Channel;
 
 import com.dianping.swallow.common.internal.packet.PacketType;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
@@ -79,7 +80,7 @@ public class DefaultHeartBeatSender implements HeartBeatSender{
 				}
 				PktConsumerMessage message = new PktConsumerMessage();
 				message.setPacketType(PacketType.HEART_BEAT);
-				channel.write(message);
+				channel.writeAndFlush(message);
 			}catch(Throwable th){
 				logger.error("[run][error heart beat]" + channel, th);
 			}

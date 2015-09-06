@@ -1,7 +1,7 @@
 package com.dianping.swallow.consumer.internal.task;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
+import io.netty.channel.ChannelHandlerContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +27,7 @@ public class DefaultConsumerTask implements ConsumerTask{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@SuppressWarnings("unused")
 	private final ChannelHandlerContext 	ctx;
-	private final MessageEvent 				e;
 	private final String 					catNameStr;
 	private final String 					connectionDesc;
 	private final ConsumerProcessor 		consumerProcessor;
@@ -38,18 +36,17 @@ public class DefaultConsumerTask implements ConsumerTask{
 	private final TaskChecker				taskChecker;
 	private final SwallowMessage 			swallowMessage;
 	
-	public DefaultConsumerTask(ChannelHandlerContext ctx, MessageEvent e, Consumer consumer, ConsumerProcessor consumerProcessor, 
+	public DefaultConsumerTask(ChannelHandlerContext ctx, PktMessage message, Consumer consumer, ConsumerProcessor consumerProcessor, 
 			SwallowCatActionWrapper actionWrapper, TaskChecker taskChecker){
 		
 		this.ctx = ctx;
-		this.e = e;
-        this.catNameStr = consumer.getDest().getName() + ":" + consumer.getConsumerId() +  ":" + IPUtil.getStrAddress(e.getChannel().getLocalAddress());
-        this.connectionDesc = IPUtil.getConnectionDesc(e);
+        this.catNameStr = consumer.getDest().getName() + ":" + consumer.getConsumerId() +  ":" + IPUtil.getStrAddress(ctx.channel().localAddress());
+        this.connectionDesc = IPUtil.getConnectionDesc(ctx.channel());
         this.consumer = consumer;
         this.consumerProcessor  = consumerProcessor;
         this.actionWrapper = actionWrapper;
         this.taskChecker = taskChecker;
-        this.swallowMessage = ((PktMessage) e.getMessage()).getContent();
+        this.swallowMessage = message.getContent();
 	}
 	
 	@Override
@@ -85,7 +82,7 @@ public class DefaultConsumerTask implements ConsumerTask{
 			} catch (SwallowException e1) {
 				logger.error("[message process exception]" +  swallowMessage, e1);
 			}
-        	sendAck(e, swallowMessage.getMessageId());
+        	sendAck(swallowMessage.getMessageId());
             consumerClientTransaction.complete();
             
         	if(logger.isInfoEnabled()){
@@ -122,13 +119,13 @@ public class DefaultConsumerTask implements ConsumerTask{
         return transaction;
 	}
     
-	private void sendAck(MessageEvent event, Long messageId) {
+	private void sendAck(Long messageId) {
         try {
         	if(logger.isDebugEnabled()){
         		logger.debug("[run][send ack]" + connectionDesc + "," + messageId);
         	}
             PktConsumerMessage consumermessage = new PktConsumerMessage(messageId, consumer.isClosed());
-            event.getChannel().write(consumermessage);
+            ctx.channel().writeAndFlush(consumermessage);
         } catch (RuntimeException e) {
             logger.warn("[sendAck][Write to server error]" + connectionDesc, e);
         }

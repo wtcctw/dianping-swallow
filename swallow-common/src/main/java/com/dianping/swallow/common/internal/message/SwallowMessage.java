@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.message.Message;
 
 public class SwallowMessage implements Serializable, Message {
