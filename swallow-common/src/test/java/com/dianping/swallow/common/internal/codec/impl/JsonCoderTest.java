@@ -1,15 +1,12 @@
-package com.dianping.swallow.common.internal.codec;
+package com.dianping.swallow.common.internal.codec.impl;
 
-import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.example.message.DemoBean;
@@ -30,8 +27,8 @@ public class JsonCoderTest {
       JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
       String json = jsonBinder.toJson(message);
       //使用HessianDecoder解码
-      JsonCoder jsonDecoder = new JsonCoder(SwallowMessage.class, SwallowMessage.class);
-      Message actualMessage = (Message) jsonDecoder.decode(null, ChannelBuffers.wrappedBuffer(json.getBytes("UTF-8")));
+      JsonCodec jsonDecoder = new JsonCodec(SwallowMessage.class, SwallowMessage.class);
+      Message actualMessage = (Message) jsonDecoder.decode(json);
       //assert
       Assert.assertEquals(message, actualMessage);
    }
@@ -40,8 +37,8 @@ public class JsonCoderTest {
    public void testDecode2() throws Exception {
 	   
       Object o = new Object();
-      JsonCoder jsonDecoder = new JsonCoder(SwallowMessage.class, SwallowMessage.class);
-      Assert.assertEquals(o, jsonDecoder.decode(null, o));
+      JsonCodec jsonDecoder = new JsonCodec(SwallowMessage.class, SwallowMessage.class);
+      Assert.assertEquals(o, jsonDecoder.decode(o));
       
    }
 
@@ -54,12 +51,11 @@ public class JsonCoderTest {
       HashMap<String, String> map = new HashMap<String, String>();
       map.put("property-key", "property-value");
       msg.setContent("content");
-      JsonCoder jsonEncoder = new JsonCoder(SwallowMessage.class, SwallowMessage.class);
-      ChannelBuffer channelBuffer = (ChannelBuffer) jsonEncoder.encode(null, msg);
+      JsonCodec jsonEncoder = new JsonCodec(SwallowMessage.class, SwallowMessage.class);
+      String result = (String) jsonEncoder.encode(msg);
       //解码
       JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
-      SwallowMessage actualMsg = jsonBinder.fromJson(channelBuffer.toString(Charset.forName("UTF-8")),
-            SwallowMessage.class);
+      SwallowMessage actualMsg = jsonBinder.fromJson(result, SwallowMessage.class);
 
       //assert
       Assert.assertEquals(msg, actualMsg);
@@ -68,8 +64,8 @@ public class JsonCoderTest {
    @Test
    public void testEncode2() throws Exception {
       Object o = new Object();
-      JsonCoder jsonEncoder = new JsonCoder(SwallowMessage.class, SwallowMessage.class);
-      Assert.assertEquals(o, jsonEncoder.encode(null, o));
+      JsonCodec jsonEncoder = new JsonCodec(SwallowMessage.class, SwallowMessage.class);
+      Assert.assertEquals(o, jsonEncoder.encode(o));
    }
    
    

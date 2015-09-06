@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.codec;
+package com.dianping.swallow.common.internal.netty.handler;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import com.caucho.hessian.io.Hessian2Output;
 import com.caucho.hessian.io.SerializerFactory;
-import com.dianping.swallow.common.internal.codec.HessianDecoder;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.netty.handler.HessianDecoder;
 import com.dianping.swallow.common.message.Message;
 
 public class HessianDecoderTest {

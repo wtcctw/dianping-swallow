@@ -1,14 +1,14 @@
 package com.dianping.swallow.consumerserver.bootstrap;
-
+	
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -19,12 +19,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.dianping.swallow.common.internal.codec.JsonCoder;
+import com.dianping.swallow.common.internal.codec.Codec;
+import com.dianping.swallow.common.internal.codec.impl.JsonCodec;
 import com.dianping.swallow.common.internal.lifecycle.MasterSlaveComponent;
 import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
+import com.dianping.swallow.common.internal.netty.channel.CodecServerChannelFactory;
+import com.dianping.swallow.common.internal.netty.handler.CodecHandler;
+import com.dianping.swallow.common.internal.netty.handler.LengthPrepender;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.DateUtils;
 import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
@@ -66,11 +71,15 @@ public abstract class AbstractBootStrap {
 	    }
 
 		ServerBootstrap bootstrap = new ServerBootstrap();
-		bossGroup = new NioEventLoopGroup(1, new MQThreadFactory("Swallow-Netty-Boss-"));
-		workerGroup = new NioEventLoopGroup(1, new MQThreadFactory("Swallow-Netty-Worker-"));
 		
-		bootstrap.group(bossGroup, workerGroup)
-		.channel(NioServerSocketChannel.class)
+		final Codec jsonCodec = new JsonCodec(PktMessage.class, PktConsumerMessage.class);
+		int workerCount = 4 * CommonUtils.getCpuCount();
+		bossGroup = new NioEventLoopGroup(1, new MQThreadFactory("Swallow-Netty-Boss-"));
+		workerGroup = new NioEventLoopGroup(workerCount, new MQThreadFactory("Swallow-Netty-Worker-"));
+
+		bootstrap.channelFactory(new CodecServerChannelFactory(jsonCodec))
+		.group(bossGroup, workerGroup)
+		.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true, workerCount/2, workerCount/2, 8 * 1024, 10))
 		.childHandler(new ChannelInitializer<Channel>() {
 
 			@Override
@@ -84,8 +93,8 @@ public abstract class AbstractBootStrap {
 				pipeline.addLast("frameDecoder",
 						new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0,
 								4, 0, 4));
-				pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
-				pipeline.addLast("jsonDecoder", new JsonCoder(PktMessage.class, PktConsumerMessage.class));
+				pipeline.addLast("frameEncoder", new LengthPrepender());
+				pipeline.addLast("jsonDecoder", new CodecHandler(jsonCodec));
 				
 				pipeline.addLast("handler", handler);
 			}

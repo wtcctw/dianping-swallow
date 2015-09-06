@@ -1,27 +1,33 @@
 package com.dianping.swallow.consumer.internal;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
-import com.dianping.swallow.common.internal.codec.JsonCoder;
+import com.dianping.swallow.common.internal.codec.Codec;
+import com.dianping.swallow.common.internal.codec.impl.JsonCodec;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
+import com.dianping.swallow.common.internal.netty.channel.CodecChannelFactory;
+import com.dianping.swallow.common.internal.netty.handler.CodecHandler;
+import com.dianping.swallow.common.internal.netty.handler.LengthPrepender;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.processor.ConsumerProcessor;
@@ -63,15 +69,16 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 	private ConsumerConfig config;
 
 	private final String consumerIP = IPUtil.getFirstNoLoopbackIP4Address();
-
-	private Bootstrap bootstrap;
-	private EventLoopGroup group;
+	
+	private static AtomicInteger consumerCount = new AtomicInteger();
 
 	private ExecutorService service;
 
 	private ConsumerThread masterConsumerThread;
 
 	private ConsumerThread slaveConsumerThread;
+	
+	private EventLoopGroup group;
 
 	private ConsumerProcessor processor;
 
@@ -134,23 +141,26 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 	}
 
 	private void startListener() {
-		final MessageClientHandler handler = new MessageClientHandler(this, processor, taskChecker,
-				createRetryWrapper(), this);
 		
-		bootstrap = new Bootstrap();
-        group = new NioEventLoopGroup();
-		
+		Bootstrap bootstrap = new Bootstrap();
+        final Codec codec = new JsonCodec(PktConsumerMessage.class, PktMessage.class);
+        EventLoopGroup group = new NioEventLoopGroup(0, new MQThreadFactory("Swallow-Netty-Client-" + consumerCount.incrementAndGet() + "-"));;
+        ByteBufAllocator allocator = new UnpooledByteBufAllocator(true);
 		bootstrap.group(group)
-		.channel(NioSocketChannel.class)
+		.channelFactory(new CodecChannelFactory(codec))
+		.option(ChannelOption.ALLOCATOR, allocator)
 		.handler(new ChannelInitializer<Channel>() {
 
 			@Override
 			protected void initChannel(Channel ch) throws Exception {
 				
+				MessageClientHandler handler = new MessageClientHandler(ConsumerImpl.this, processor, taskChecker,
+						createRetryWrapper(), ConsumerImpl.this);
+				
 				ChannelPipeline pipeline = ch.pipeline();
 				pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-				pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
-				pipeline.addLast("jsonDecoder", new JsonCoder(PktConsumerMessage.class, PktMessage.class));
+				pipeline.addLast("frameEncoder", new LengthPrepender());
+				pipeline.addLast("jsonDecoder", new CodecHandler(codec));
 				pipeline.addLast("handler", handler);
 			}
 		});
@@ -217,7 +227,9 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 		
 		masterConsumerThread.interrupt();
 		slaveConsumerThread.interrupt();
-		group.shutdownGracefully();
+		if(group != null){
+			group.shutdownGracefully();
+		}
 	}
 
 	public void submit(Runnable task) {

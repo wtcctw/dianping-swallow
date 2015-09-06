@@ -9,7 +9,7 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.dao.MessageDAO;

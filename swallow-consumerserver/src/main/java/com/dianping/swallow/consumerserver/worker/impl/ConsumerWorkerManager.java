@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 
 
+import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
@@ -24,6 +25,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.lifecycle.impl.DefaultLifecycleManager;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
+import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.common.internal.util.task.AbstractEternalTask;
 import com.dianping.swallow.common.server.monitor.collector.ConsumerCollector;
@@ -99,8 +101,13 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
             //接收到连接，直接就关闭它
             channel.close();
         } else {
+        	
         	synchronized (consumerInfo2ConsumerWorker) {
-                findOrCreateConsumerWorker(consumerInfo, startMessageId).handleGreet(channel, clientThreadCount, messageFilter);
+                ConsumerWorker consumerWorker = findOrCreateConsumerWorker(consumerInfo, startMessageId, channel);
+                if(consumerWorker != null){
+                	consumerWorker.handleGreet(channel, clientThreadCount, messageFilter);
+                }
+                		
 			}
         }
     }
@@ -168,7 +175,8 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         return consumerInfo2ConsumerWorker;
     }
 
-    private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo, long startMessageId) {
+    private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo, long startMessageId, Channel channel) {
+    	
         ConsumerWorker worker = findConsumerWorker(consumerInfo);
         
         if(logger.isInfoEnabled()){
@@ -176,7 +184,13 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         }
         
         if(startMessageId != -1){
-        	cleanConsumerInfo(consumerInfo, worker);
+        	
+        	if(worker != null){
+        		logger.warn("[findOrCreateConsumerWorker][worker exists, close channel]" + channel);
+        		channel.close();
+        		return null;
+        	}
+        	cleanBackupMessage(consumerInfo, worker);
         	worker = null;
         }
         
@@ -202,18 +216,12 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         return worker;
     }
 
-	private void cleanConsumerInfo(ConsumerInfo consumerInfo,
+	private void cleanBackupMessage(ConsumerInfo consumerInfo,
 			ConsumerWorker worker) {
-    	messageDAO.cleanMessage(consumerInfo.getDest().getName(), consumerInfo.getConsumerId());
-        if (worker != null) {
-            try {
-				worker.dispose();
-			} catch (Exception e) {
-				logger.error("[cleanConsumerInfo]", e);
-			}
-            worker = null;
-            consumerInfo2ConsumerWorker.remove(consumerInfo);
-        }
+		
+		if(consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
+			ackDAO.add(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), MongoUtils.getLongByCurTime(), "idReint", true);
+		}
 	}
 
 	@Override

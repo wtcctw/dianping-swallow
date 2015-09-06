@@ -60,7 +60,7 @@
 		<spring.version>3.2.9.RELEASE</spring.version>
 		<spring.data.mongo.version>1.5.4.RELEASE</spring.data.mongo.version>
 		<jackson-databind.version>2.1.4</jackson-databind.version>
-		<netty.version>4.0.24.Final</netty.version>
+		<netty.version>4.0.30.Final</netty.version>
 		<hession.version>3.1.5</hession.version>
 		<mongo.java.driver.version>2.12.4</mongo.java.driver.version>
 		<swallow-client.version>0.5.4</swallow-client.version>

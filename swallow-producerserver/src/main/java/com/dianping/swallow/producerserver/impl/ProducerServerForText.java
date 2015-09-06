@@ -1,18 +1,22 @@
 package com.dianping.swallow.producerserver.impl;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 
 import java.net.InetSocketAddress;
 
-import com.dianping.swallow.common.internal.codec.JsonCoder;
+import com.dianping.swallow.common.internal.codec.Codec;
+import com.dianping.swallow.common.internal.codec.impl.JsonCodec;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.netty.channel.CodecServerChannelFactory;
+import com.dianping.swallow.common.internal.netty.handler.CodecHandler;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 
@@ -48,8 +52,11 @@ public class ProducerServerForText extends AbstractProducerServer {
 		bossGroup = new NioEventLoopGroup(1, new MQThreadFactory("SWALLOW_SERVER_BOSS"));
 		workerGroup = new NioEventLoopGroup(1, new MQThreadFactory("SWALLOW_SERVER_WORKER"));
 		
+		final Codec codec = new JsonCodec(TextACK.class, TextObject.class);
+		
 		bootstrap.group(bossGroup, workerGroup)
-		.channel(NioServerSocketChannel.class)
+		.channelFactory(new CodecServerChannelFactory(codec))
+		.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator())
 		.childHandler(new ChannelInitializer<Channel>() {
 
 			@Override
@@ -60,7 +67,7 @@ public class ProducerServerForText extends AbstractProducerServer {
 			      pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
 			      pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
 			      
-			      pipeline.addLast("jsonDecoder", new JsonCoder(TextACK.class, TextObject.class));
+			      pipeline.addLast("jsonDecoder", new CodecHandler(codec));
 
 			      pipeline.addLast("handler", new ProducerServerTextHandler(messageDAO, topicWhiteList, producerCollector));
 

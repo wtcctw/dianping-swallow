@@ -2,7 +2,7 @@ package com.dianping.swallow.common.internal.config;
 
 import java.util.Set;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.util.StringUtils;

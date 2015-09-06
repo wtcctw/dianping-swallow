@@ -3,7 +3,7 @@ package com.dianping.swallow.common.internal.config;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionUtilImpl.LionRet;
 

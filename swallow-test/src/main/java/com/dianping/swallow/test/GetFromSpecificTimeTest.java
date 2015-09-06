@@ -23,7 +23,7 @@ public class GetFromSpecificTimeTest extends AbstractConsumerTest{
 
 	
 	@Test
-	public void testFromSpecificTime() throws SendFailedException, RemoteServiceInitFailedException{
+	public void testFromSpecificTime() throws SendFailedException, RemoteServiceInitFailedException, InterruptedException{
 		
 		Long currentMessageId = getMaxMessageId(topic);
 		
@@ -31,8 +31,16 @@ public class GetFromSpecificTimeTest extends AbstractConsumerTest{
 		sendMessage(messageCount, topic);
 
 		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
+		Consumer consumer2 = addListener(topic, getConsumerId(), concurrentCount);
+		
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
+		Assert.assertEquals(0, getConsumerMessageCount(consumer2));
+		
+		consumer.close();
+		waitForListernToComplete(messageCount*2);
+		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
+		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer2));
 		
 	}
 
