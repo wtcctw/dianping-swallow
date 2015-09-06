@@ -140,13 +140,74 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 				localStorage.clear();
 			}
 			$scope.query.application = $scope.searchapplication;
-			tmpip = location.search;
-			if(tmpip != null && tmpip.length > 3 && tmpip.substr(0,4)=="?ip="){
-				var subtmpip = tmpip.substring(4);
-				$scope.searchip = subtmpip;
-				$scope.query.ip = subtmpip;
+//			tmpip = location.search;
+//			if(tmpip != null && tmpip.length > 3 && tmpip.substr(0,4)=="?ip="){
+//				var subtmpip = tmpip.substring(4);
+//				$scope.searchip = subtmpip;
+//				$scope.query.ip = subtmpip;
+//			}
+			var tmplocation = location.search;
+			if(tmplocation != null && tmplocation.length > 7){
+				var index = tmplocation.indexOf("&");
+				if(index != -1){
+					var topic = tmplocation.substring(7, index).trim();
+					var cid = tmplocation.substring(index + 5).trim();
+					if(topic.length > 0 && cid.length > 0){
+						var entity = new Object();
+						entity.offset = 0;
+						entity.limit = 1;
+						entity.topic = topic;
+						entity.consumerId = cid;
+						entity.consumerIp = "";
+						$http.post(window.contextPath + "/console/consumerid/list", entity).success(function(data){
+							if(data.first == 1){
+								var tmpip = data.second[0].consumerIp;
+								if(tmpip != null){
+									
+									if(tmpip.indexOf(',') == -1){
+										$scope.searchip = tmpip;
+										$scope.query.ip = tmpip;
+									}else{
+										$scope.query.ip = tmpip;
+										$scope.searchip = "";
+									}
+									
+									$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+								}
+							}
+						});
+					}
+				}else{
+					var topic = tmplocation.substring(7).trim();
+					if(topic.length > 0){
+						var entity = new Object();
+						entity.offset = 0;
+						entity.limit = 1;
+						entity.topic = topic;
+						entity.producerServer = "";
+						$http.post(window.contextPath + "/console/topic/list", entity).success(function(data){
+							if(data.first == 1){
+								var tmpip = data.second[0].producerServer;
+								if(tmpip != null){
+									
+									if(tmpip.indexOf(',') == -1){
+										$scope.searchip = tmpip;
+										$scope.query.ip = tmpip;
+									}else{
+										$scope.query.ip = tmpip;
+										$scope.searchip = "";
+									}
+
+									$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+								}
+							}
+						});
+					}
+				}
+				
+			}else{
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 			}
-			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 			
 			//如果topic列表返回空，则不会执行initpage
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
