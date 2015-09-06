@@ -166,7 +166,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			for (String topic : topics) {
 				Set<String> topicIps = getTopicIps(topic, isTotal);
 				if (topicIps != null) {
-					ips.addAll(getTopics(isTotal));
+					ips.addAll(topicIps);
 				}
 			}
 		}
