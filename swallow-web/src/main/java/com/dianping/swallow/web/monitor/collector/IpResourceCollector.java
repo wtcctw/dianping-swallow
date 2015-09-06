@@ -133,6 +133,8 @@ public class IpResourceCollector {
 				IpResource ipResource = null;
 				if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
 					ipResource = new IpResource();
+					ipResource.setAlarm(false);
+					ipResource.setiPDesc(new IPDesc(ip));
 					ipResource.setCreateTime(new Date());
 					ipResource.setUpdateTime(new Date());
 				} else {
@@ -140,9 +142,6 @@ public class IpResourceCollector {
 					ipResource.setUpdateTime(new Date());
 				}
 				ipResource.setIp(ip);
-				ipResource.setAlarm(false);
-				ipResource.setCreateTime(new Date());
-				ipResource.setiPDesc(new IPDesc(ip));
 				ipResourceService.update(ipResource);
 			}
 		}
