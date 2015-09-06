@@ -28,7 +28,7 @@ import com.dianping.swallow.web.manager.IPResourceManager;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.CmdbService;
-import com.dianping.swallow.web.service.IpCollectorService;
+import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.IpResourceService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
@@ -65,7 +65,7 @@ public class IPResourceManagerImpl implements IPResourceManager {
 	private CmdbService cmdbService;
 
 	@Autowired
-	private IpCollectorService ipCollectorService;
+	private IPCollectorService ipCollectorService;
 
 	@Autowired
 	private UserService baUserService;

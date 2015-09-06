@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
 import com.dianping.swallow.web.manager.IPResourceManager;
 import com.dianping.swallow.web.service.AlarmService;
-import com.dianping.swallow.web.service.IpCollectorService;
+import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.SeqGeneratorService;
 
 /**
@@ -28,7 +28,7 @@ public class EventFactory {
 	private AlarmMetaContainer alarmMetaContainer;
 
 	@Autowired
-	protected IpCollectorService ipCollectorService;
+	protected IPCollectorService ipCollectorService;
 
 	@Autowired
 	private SeqGeneratorService seqGeneratorService;

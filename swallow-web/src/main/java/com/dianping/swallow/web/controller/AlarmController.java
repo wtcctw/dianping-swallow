@@ -26,7 +26,7 @@ import com.dianping.swallow.web.dao.AlarmDao.AlarmParam;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.AlarmService;
-import com.dianping.swallow.web.service.IpCollectorService;
+import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
@@ -42,7 +42,7 @@ public class AlarmController extends AbstractSidebarBasedController {
 	private AlarmService alarmService;
 
 	@Autowired
-	private IpCollectorService ipCollectorService;
+	private IPCollectorService ipCollectorService;
 
 	@Autowired
 	private ConsumerStatsDataWapper consumerStatsDataWapper;

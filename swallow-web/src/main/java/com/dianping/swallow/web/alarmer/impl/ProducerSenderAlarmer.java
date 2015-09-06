@@ -16,7 +16,7 @@ import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
-import com.dianping.swallow.web.service.IpCollectorService;
+import com.dianping.swallow.web.service.IPCollectorService;
 
 /**
  * 
@@ -28,7 +28,7 @@ import com.dianping.swallow.web.service.IpCollectorService;
 public class ProducerSenderAlarmer extends AbstractServiceAlarmer {
 
 	@Autowired
-	private IpCollectorService ipCollectorService;
+	private IPCollectorService ipCollectorService;
 
 	@Autowired
 	private AlarmResourceContainer resourceContainer;

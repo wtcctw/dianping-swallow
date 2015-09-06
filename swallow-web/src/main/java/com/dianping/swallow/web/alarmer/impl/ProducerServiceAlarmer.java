@@ -20,7 +20,7 @@ import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
-import com.dianping.swallow.web.service.IpCollectorService;
+import com.dianping.swallow.web.service.IPCollectorService;
 
 /**
  * 
@@ -39,7 +39,7 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 	private HttpService httpSerivice;
 
 	@Autowired
-	private IpCollectorService ipCollectorService;
+	private IPCollectorService ipCollectorService;
 
 	@Autowired
 	private AlarmResourceContainer resourceContainer;

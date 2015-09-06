@@ -10,7 +10,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
  *
  *         2015年8月17日 下午5:41:44
  */
-public interface IpDescService {
+public interface IPDescService {
 
 	/**
 	 * insert

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.IPDescDao;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
-import com.dianping.swallow.web.service.IpDescService;
+import com.dianping.swallow.web.service.IPDescService;
 
 /**
  * 
@@ -15,7 +15,7 @@ import com.dianping.swallow.web.service.IpDescService;
  *
  */
 @Service("ipDescService")
-public class IpDescServiceImpl implements IpDescService {
+public class IPDescServiceImpl implements IPDescService {
 
 	@Autowired
 	private IPDescDao ipDescDao;

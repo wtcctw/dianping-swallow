@@ -40,7 +40,7 @@ import com.dianping.swallow.web.model.cmdb.EnvDevice;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.CmdbService;
-import com.dianping.swallow.web.service.IpCollectorService;
+import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
@@ -49,9 +49,9 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *
  */
 @Service("ipCollectorService")
-public class IpCollectorServiceImpl implements IpCollectorService {
+public class IPCollectorServiceImpl implements IPCollectorService {
 
-	private static final Logger logger = LoggerFactory.getLogger(IpCollectorServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(IPCollectorServiceImpl.class);
 
 	private static final String SWALLOW_PRODUCER_NAME = "swallow-producer";
 
