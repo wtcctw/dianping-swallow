@@ -50,7 +50,7 @@ public class JsonDataTest extends AbstractConsumerTest {
 		if(result.get() != null){
 			throw result.get();
 		}
-		
+				
 		Assert.assertEquals(data, realData.get());
 		
 		

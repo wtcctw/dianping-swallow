@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;

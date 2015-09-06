@@ -223,6 +223,8 @@ module
 											updater : function(c) {
 												$scope.topic = c;
 												$scope.query.topic = $scope.topic;
+												$scope.query.consumerId = $("#searchconsumerid").val();
+												$scope.query.consumerIp = $("#searchconsumerip").val();
 												$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 												return c;
 											}
@@ -240,6 +242,8 @@ module
 											updater : function(c) {
 												$scope.consumerId = c;
 												$scope.query.consumerId = $scope.consumerId;
+												$scope.query.topic = $("#searchtopic").val();
+												$scope.query.consumerIp = $("#searchconsumerip").val();
 												$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 												return c;
 											}
@@ -258,6 +262,8 @@ module
 											updater : function(c) {
 												$scope.consumerIp = c;
 												$scope.query.consumerIp = $scope.consumerIp;
+												$scope.query.topic = $("#searchtopic").val();
+												$scope.query.consumerId = $("#searchconsumerid").val();
 												$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 												return c;
 											}

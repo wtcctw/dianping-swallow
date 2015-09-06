@@ -3,12 +3,13 @@ package com.dianping.swallow.web.dao.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import jodd.util.StringUtil;
+
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.dao.IpResourceDao;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.mongodb.WriteResult;
@@ -65,7 +66,7 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 
 	@Override
-	public List<IpResource> findByIp(String ... ips) {
+	public Pair<Long, List<IpResource>> findByIp(int offset, int limit, String ... ips) {
 
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		for (String ip : ips) {
@@ -75,9 +76,11 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 		Query query = new Query();
 		query.addCriteria(Criteria.where(IP).exists(true)
 				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
+		long size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
 		
+		query.skip(offset).limit(limit);
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
-		return ipResources;
+		return new Pair<Long, List<IpResource>>(size, ipResources);
 	}
 
 	@Override
@@ -93,12 +96,17 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 	
 	@Override
-	public IpResource find(IpQueryDto ipQueryDto) {
-
-		String ip = ipQueryDto.getIp();
-		String application = ipQueryDto.getApplication();
+	public IpResource find(String ip, String application) {
 		
-		Query query = new Query(Criteria.where(IP).is(ip).andOperator(Criteria.where(APPLICATION).is(application)));
+		Query query = new Query();
+
+		if (StringUtil.isNotBlank(ip)) {
+			query.addCriteria(Criteria.where(IP).is(ip));
+		}
+		if (StringUtil.isNotBlank(application)) {
+			query.addCriteria(Criteria.where(APPLICATION).is(application));
+		}
+
 		IpResource ipResource = mongoTemplate.findOne(query, IpResource.class, IPRESOURCE_COLLECTION);
 		
 		return ipResource;

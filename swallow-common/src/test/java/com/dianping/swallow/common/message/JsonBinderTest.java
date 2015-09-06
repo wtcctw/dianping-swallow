@@ -9,7 +9,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 

@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.exception.SwallowAlertException;
 import com.dianping.swallow.common.internal.util.StringUtils;

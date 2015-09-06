@@ -3,13 +3,12 @@ package com.dianping.swallow.producerserver.impl;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-import java.net.UnknownHostException;
 import java.util.Date;
 
 import jmockmongo.MockMongo;
-import junit.framework.Assert;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -24,8 +23,8 @@ import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.SHAUtil;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.ServerDaoException;
+import com.dianping.swallow.common.server.monitor.collector.DefaultProducerCollector;
 
 public class ProducerServerForClientTest {
 
@@ -34,9 +33,10 @@ public class ProducerServerForClientTest {
     static MockMongo            mockMongo2;
 
     @Test
-    public void testProducerServerForClient() throws UnknownHostException, RemoteServiceInitFailedException {
+    public void testProducerServerForClient() throws Exception {
         //初始化ProducerServerForClient对象
         ProducerServerForClient producerServerForClient = new ProducerServerForClient();
+        producerServerForClient.setProducerCollector(new DefaultProducerCollector());
         TopicWhiteList topicWhiteList = new TopicWhiteList();
         topicWhiteList.addTopic(UNIT_TEST);
         producerServerForClient.setTopicWhiteList(topicWhiteList);

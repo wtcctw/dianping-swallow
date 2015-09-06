@@ -4,7 +4,7 @@ package com.dianping.swallow.web.controller.utils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
