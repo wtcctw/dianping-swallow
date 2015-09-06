@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import jodd.util.StringUtil;
@@ -31,6 +32,8 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	private static final String ID = "id";
 
 	private static final String PEODUCERIPS = "producerIps";
+
+	private static final String ADMINISTRATOR = "administrator";
 
 	private static final String DEFAULT = "default";
 
@@ -81,13 +84,18 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp) {
 
 		Query query = new Query();
-
+		
+		long size = -1;
 		if (StringUtil.isNotBlank(topic)) {
 			String[] topics = topic.split(",");
-			if(topics.length > 1){
+			int length = topics.length;
+			if(length > 1){
+				size = length;
+				Arrays.sort(topics);
+				int rightIndex = (int) Math.min(length, offset + limit);
 				List<Criteria> criterias = new ArrayList<Criteria>();
-				for (String t : topics) {
-					criterias.add(Criteria.where(TOPIC).is(t));
+				for (int i = offset; i < rightIndex; ++i) {
+					criterias.add(Criteria.where(TOPIC).is(topics[i]));
 				}
 
 				query.addCriteria(Criteria.where(TOPIC).exists(true)
@@ -103,7 +111,9 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 		List<TopicResource> topicResources = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
 
 		query.skip(offset).limit(limit);
-		long size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
+		if(size < 0){
+			size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
+		}
 
 		return new Pair<Long, List<TopicResource>>(size, topicResources);
 
@@ -175,6 +185,20 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 
 		return new Pair<Long, List<TopicResource>>(size, topicResource);
 
+	}
+
+	@Override
+	public 	Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator) {
+		
+		Query query = new Query(Criteria.where(ADMINISTRATOR).regex(".*" + administrator + ".*"));
+		
+		Long size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
+		
+		query.skip(offset).limit(limit);
+		List<TopicResource> topicResource = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
+		
+		return new Pair<Long, List<TopicResource>>(size, topicResource);
+		
 	}
 
 }

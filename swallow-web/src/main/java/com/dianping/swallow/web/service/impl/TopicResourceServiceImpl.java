@@ -170,6 +170,12 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
+	public 	Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator) {
+		
+		return topicResourceDao.findByAdministrator(offset, limit, administrator);
+	}
+
+	@Override
 	public Map<String, Set<String>> loadCachedTopicToWhiteList() {
 
 		return this.topicToWhiteList;

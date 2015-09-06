@@ -90,8 +90,7 @@ public class TopicController extends AbstractMenuController {
 			if (findAll) {
 				pair = topicResourceService.findTopicResourcePage(offset, limit);
 			} else {
-				topicQueryDto.setProposal(username);
-				pair = topicResourceService.findTopicResourcePage(offset, limit);
+				pair = topicResourceService.findByAdministrator(offset, limit, username);
 			}
 		} else {
 			pair = topicResourceService.find(offset, limit, topic, producerIp);

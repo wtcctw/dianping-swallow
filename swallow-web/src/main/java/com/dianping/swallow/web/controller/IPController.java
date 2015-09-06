@@ -70,7 +70,6 @@ public class IPController extends AbstractMenuController {
 
 		Pair<Long, List<IpResource>> pair = null;
 		List<IpResourceDto> ipResourceDto = new ArrayList<IpResourceDto>();
-		List<IpResource> ipResources = new ArrayList<IpResource>();
 		int offset = ipQueryDto.getOffset();
 		int limit = ipQueryDto.getLimit();
 		String ip = ipQueryDto.getIp();
@@ -111,9 +110,8 @@ public class IPController extends AbstractMenuController {
 			} else if (StringUtils.isBlank(ip)) {
 				pair = ipResourceService.findByApplication(offset, limit, application);
 			} else {
-				IpResource ipResource = ipResourceService.find(ip, application);
-				ipResources.add(ipResource);
-				pair = new Pair<Long, List<IpResource>>(1L, ipResources);
+				String[] ips = ip.split(",");
+				pair = ipResourceService.find(offset, limit, application, ips);
 			}
 
 		}

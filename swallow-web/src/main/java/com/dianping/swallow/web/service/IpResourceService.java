@@ -25,7 +25,7 @@ public interface IpResourceService {
 
 	Pair<Long, List<IpResource>> findByApplication(int offset, int limit, String application);
 	
-	IpResource find(String ip, String application);
+	Pair<Long, List<IpResource>> find(int offset, int limit, String application, String ...ips);
 	
 	List<IpResource> findAll(String ... fields);
 
