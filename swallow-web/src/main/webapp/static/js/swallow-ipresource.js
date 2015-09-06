@@ -83,6 +83,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 			
 			$scope.searchip = "";
 			$scope.searchapplication = "";
+			$scope.searchtype = "";
 			
 			$scope.ipEntry = {};
 			$scope.ipEntry.ip;
@@ -140,6 +141,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 				localStorage.clear();
 			}
 			$scope.query.application = $scope.searchapplication;
+			$scope.query.type = $scope.searchtype;
 //			tmpip = location.search;
 //			if(tmpip != null && tmpip.length > 3 && tmpip.substr(0,4)=="?ip="){
 //				var subtmpip = tmpip.substring(4);
@@ -214,6 +216,19 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 				$scope.initpage();
 			});
 			
+			$("#searchtype").typeahead({
+				items: 16, 
+				source : ["PRODUCER", "CONSUMER"],
+				updater : function(c) {
+					$scope.searchtype = c;
+					$scope.query.type = c;
+					$scope.query.ip = $("#searchip").val();
+					$scope.query.application = $("#searchapplication").val();
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
+					return c;
+				}
+			})
+			
 			$scope.initpage = function(){
 
 		          //下面是在table render完成后执行的js
@@ -229,6 +244,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 								$scope.searchip = c;
 								$scope.query.ip = $scope.searchip;
 								$scope.query.application = $("#searchapplication").val();
+								$scope.query.type = $("#searchtype").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 								return c;
 							}
@@ -248,6 +264,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 								$scope.searchapplication = c;
 								$scope.query.application = $scope.searchapplication;
 								$scope.query.ip = $("#searchip").val();
+								$scope.query.type = $("#searchtype").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 								return c;
 							}

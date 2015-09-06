@@ -112,9 +112,9 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 						if (ips != null && !ips.isEmpty()) {
 							ConsumerIdResource consumerIdResource = pair.getSecond().get(0);
 							List<String> originalIps = consumerIdResource.getConsumerIps();
-							if(ips.containsAll(originalIps) && originalIps.containsAll(ips)){
-								return;
-							}else{
+							if (ips.containsAll(originalIps) && originalIps.containsAll(ips)) {
+								continue;
+							} else {
 								consumerIdResource.setConsumerIps(new ArrayList<String>(ips));
 								consumerIdResourceService.insert(consumerIdResource);
 							}
@@ -132,7 +132,7 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 			for (String topic : topics) {
 				Set<String> ips = producerStatsDataWapper.getTopicIps(topic);
 				if (ips != null) {
-					if(ips.contains(ConsumerDataRetrieverWrapper.TOTAL)){
+					if (ips.contains(ConsumerDataRetrieverWrapper.TOTAL)) {
 						ips.remove(ConsumerDataRetrieverWrapper.TOTAL);
 					}
 					TopicResource topicResource = topicResourceService.findByTopic(topic);
@@ -144,14 +144,14 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 						topicResourceService.insert(topicResource);
 					} else {
 						List<String> originalList = topicResource.getProducerIps();
-						
-						if(newList.containsAll(originalList) && originalList.containsAll(newList)){
-							return;
-						}else{
+
+						if (newList.containsAll(originalList) && originalList.containsAll(newList)) {
+							continue;
+						} else {
 							topicResource.setProducerIps(newList);
 							topicResourceService.insert(topicResource);
 						}
-						
+
 					}
 
 				}
