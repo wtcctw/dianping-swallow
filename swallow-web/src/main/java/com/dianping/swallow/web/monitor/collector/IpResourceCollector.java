@@ -130,11 +130,13 @@ public class IpResourceCollector {
 				}
 			} else {
 				List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
-				IpResource ipResource = new IpResource();
+				IpResource ipResource = null;
 				if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
+					ipResource = new IpResource();
 					ipResource.setCreateTime(new Date());
 					ipResource.setUpdateTime(new Date());
 				} else {
+					ipResource = ipResourceInDbs.get(0);
 					ipResource.setUpdateTime(new Date());
 				}
 				ipResource.setIp(ip);
