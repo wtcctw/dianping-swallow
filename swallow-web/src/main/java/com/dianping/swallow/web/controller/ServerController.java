@@ -30,7 +30,7 @@ import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
-import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.IpCollectorService;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -45,7 +45,7 @@ public class ServerController extends AbstractSidebarBasedController {
 	private ConsumerServerResourceService consumerServerResourceService;
 
 	@Resource(name = "ipCollectorService")
-	private IPCollectorService ipCollectorService;
+	private IpCollectorService ipCollectorService;
 
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;

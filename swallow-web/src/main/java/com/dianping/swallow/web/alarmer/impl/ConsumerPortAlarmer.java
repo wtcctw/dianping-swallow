@@ -20,7 +20,7 @@ import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
-import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.IpCollectorService;
 import com.dianping.swallow.web.util.NetUtil;
 
 @Component
@@ -39,7 +39,7 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 	private static final String KEY_SPLIT = "&";
 
 	@Autowired
-	private IPCollectorService ipCollectorService;
+	private IpCollectorService ipCollectorService;
 
 	private ConfigCache configCache;
 

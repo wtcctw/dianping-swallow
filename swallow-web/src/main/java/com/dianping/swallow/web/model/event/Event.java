@@ -22,7 +22,7 @@ import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
-import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.IpCollectorService;
 import com.dianping.swallow.web.service.SeqGeneratorService;
 import com.dianping.swallow.web.util.DateUtil;
 
@@ -66,7 +66,7 @@ public abstract class Event {
 
 	private AlarmMetaContainer alarmMetaContainer;
 
-	protected IPCollectorService ipCollectorService;
+	protected IpCollectorService ipCollectorService;
 
 	private SeqGeneratorService seqGeneratorService;
 
@@ -126,7 +126,7 @@ public abstract class Event {
 		this.ipDescManager = ipDescManager;
 	}
 
-	public void setIPCollectorService(IPCollectorService ipCollectorService) {
+	public void setIPCollectorService(IpCollectorService ipCollectorService) {
 		this.ipCollectorService = ipCollectorService;
 	}
 

@@ -20,7 +20,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
-import com.dianping.swallow.web.service.IPDescService;
+import com.dianping.swallow.web.service.IpDescService;
 
 /**
  * 
@@ -52,7 +52,7 @@ public class CmdbServiceImpl implements CmdbService, InitializingBean {
 	private HttpService httpService;
 
 	@Autowired
-	private IPDescService ipDescService;
+	private IpDescService ipDescService;
 
 	private ObjectMapper objectMapper;
 

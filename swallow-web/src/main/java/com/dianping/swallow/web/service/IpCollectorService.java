@@ -12,7 +12,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
  *
  *         2015年8月17日 下午5:42:18
  */
-public interface IPCollectorService {
+public interface IpCollectorService {
 
 	/**
 	 * add all ip

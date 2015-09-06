@@ -21,7 +21,7 @@ import com.dianping.swallow.web.dao.ConsumerMonitorDao;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
-import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.IpCollectorService;
 
 
 /**
@@ -45,7 +45,7 @@ public class DataCollectorController extends AbstractController{
 	private ConsumerDataRetriever consumerDataRetriever;
 	
 	@Autowired
-	private IPCollectorService ipCollectorService;
+	private IpCollectorService ipCollectorService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(DataCollectorController.class);  
 	

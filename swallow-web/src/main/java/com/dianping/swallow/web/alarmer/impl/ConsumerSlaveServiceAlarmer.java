@@ -18,7 +18,7 @@ import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
-import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.IpCollectorService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 
 @Component
@@ -31,7 +31,7 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 	private static final String MONOGO_MONITOR_SIGN = "mongoManager";
 
 	@Autowired
-	private IPCollectorService ipCollectorService;
+	private IpCollectorService ipCollectorService;
 
 	@Autowired
 	private AlarmResourceContainer resourceContainer;
