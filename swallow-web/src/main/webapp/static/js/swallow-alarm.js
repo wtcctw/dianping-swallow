@@ -221,6 +221,15 @@ module
 									}
 								}
 
+								$scope.getRelatedUrl = function(relatedUrl) {
+									if(relatedUrl=="#"){
+										return "#";
+									}else{
+										return window.contextPath + relatedUrl;
+									}
+									
+								}
+
 								$scope.searchPaginator = Paginator(
 										fetchFunction, $scope.pageSize,
 										$scope.receiver, $scope.startTime,
