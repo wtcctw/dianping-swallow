@@ -69,13 +69,11 @@ public class IPController extends AbstractMenuController {
 
 			if (StringUtil.isBlank(application)) {
 				String[] ips = ip.split(",");
-				ipResources = ipResourceService.findByIp(ips);
-				long size = ipResources.size();
-				pair = new Pair<Long, List<IpResource>>(size, ipResources);
+				pair = ipResourceService.findByIp(offset, limit, ips);
 			} else if (StringUtil.isBlank(ip)) {
 				pair = ipResourceService.findByApplication(offset, limit, application);
 			} else {
-				IpResource ipResource = ipResourceService.find(ipQueryDto);
+				IpResource ipResource = ipResourceService.find(ip, application);
 				ipResources.add(ipResource);
 				pair = new Pair<Long, List<IpResource>>(1L, ipResources);
 			}
@@ -148,10 +146,11 @@ public class IPController extends AbstractMenuController {
 	public boolean editIpAlarm(@RequestParam String ip, @RequestParam boolean alarm, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		List<IpResource> ipResources = ipResourceService.findByIp(ip);
-		if(ipResources == null){
+		Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, 1, ip);
+		if(pair.getFirst() == 0){
 			throw new RuntimeException(String.format("Record of %s not found.", ip));
 		}
+		List<IpResource> ipResources = pair.getSecond();
 		IpResource ipResource = ipResources.get(0);
 		ipResource.setAlarm(alarm);
 		boolean result = ipResourceService.update(ipResource);

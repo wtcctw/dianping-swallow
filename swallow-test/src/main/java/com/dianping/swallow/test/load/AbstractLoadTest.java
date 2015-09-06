@@ -104,7 +104,7 @@ public abstract class AbstractLoadTest {
 	}
 
 
-	protected abstract void doStart() throws InterruptedException, IOException;
+	protected abstract void doStart() throws InterruptedException, IOException, Exception;
 
 	private void startFrequencyCounter() {
 		

@@ -1,5 +1,7 @@
 package com.dianping.swallow.consumerserver.worker.impl;
 
+import io.netty.channel.Channel;
+
 import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,7 +13,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -311,7 +312,7 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 	public boolean sendMessage() {
 
 		final Channel channel = freeChannels.poll();
-		if (channel == null || !channel.isConnected()) {
+		if (channel == null || !channel.isActive()) {
 			return false;
 		}
 
@@ -335,7 +336,7 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 					ConsumerMessage consumerMessage = createConsumerMessage(channel, message);
 
 					// 发消息前，验证消费者是否合法
-					boolean isAuth = consumerAuthController.isValid(consumerInfo, ((InetSocketAddress) channel.getRemoteAddress()).getAddress().getHostAddress());
+					boolean isAuth = consumerAuthController.isValid(consumerInfo, ((InetSocketAddress) channel.remoteAddress()).getAddress().getHostAddress());
 					if (!isAuth) {
 						logger.error(ConsumerUtil.getPrettyConsumerInfo(consumerInfo, channel)
 								+ " Consumer is disabled, channel will close.");
@@ -401,7 +402,7 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 
 			consumerCollector.sendMessage(consumerInfo, consumerIpPort, consumerMessage.message);
 
-			channel.write(pktMessage);
+			channel.writeAndFlush(pktMessage);
 
 			consumerServerTransaction.addData("mid", pktMessage.getContent().getMessageId());
 			consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);

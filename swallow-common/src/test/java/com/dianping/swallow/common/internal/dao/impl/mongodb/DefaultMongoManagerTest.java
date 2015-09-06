@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.dianping.swallow.AbstractTest;
-import com.dianping.swallow.common.internal.codec.JsonBinder;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.util.EnvUtil;

@@ -140,6 +140,12 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 				localStorage.clear();
 			}
 			$scope.query.application = $scope.searchapplication;
+			tmpip = location.search;
+			if(tmpip != null && tmpip.length > 3 && tmpip.substr(0,4)=="?ip="){
+				var subtmpip = tmpip.substring(4);
+				$scope.searchip = subtmpip;
+				$scope.query.ip = subtmpip;
+			}
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 			
 			//如果topic列表返回空，则不会执行initpage
@@ -161,6 +167,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 							updater : function(c) {
 								$scope.searchip = c;
 								$scope.query.ip = $scope.searchip;
+								$scope.query.application = $("#searchapplication").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 								return c;
 							}
@@ -179,6 +186,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 							updater : function(c) {
 								$scope.searchapplication = c;
 								$scope.query.application = $scope.searchapplication;
+								$scope.query.ip = $("#searchip").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 								return c;
 							}

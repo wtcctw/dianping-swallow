@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 import com.dianping.swallow.common.internal.lifecycle.LifecycleCallback;
 import com.dianping.swallow.common.internal.lifecycle.LifecycleManager;
-import com.dianping.swallow.common.internal.lifecycle.Ordered;
 import com.dianping.swallow.common.internal.monitor.LifecycleComponentStatus;
 import com.dianping.swallow.common.internal.monitor.impl.AbstractComponentMonitorable;
 
@@ -89,8 +88,9 @@ public abstract class AbstractLifecycle extends AbstractComponentMonitorable imp
 
 	@Override
 	public int getOrder() {
-		
-		return Ordered.LAST;
+
+		//middle
+		return 0;
 	}
 
 	@Override

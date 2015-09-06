@@ -25,7 +25,7 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 	public void testBigMessage() throws SendFailedException, RemoteServiceInitFailedException{
 		
 		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
-		sendMessage(1, topic, 1024*1024);
+		sendMessage(1, topic, 1024);
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(1, getConsumerMessageCount(consumer));
 	}

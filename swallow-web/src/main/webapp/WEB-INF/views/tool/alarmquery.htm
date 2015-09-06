@@ -81,7 +81,7 @@
 								ng-href='${rc.contextPath}/console/alarm/detail/{{m.eventId}}'>{{m.eventId}}</a></td>
 							<td style="text-align: left"><a
 								ng-href='${rc.contextPath}/console/setting/alarmmeta/detail/{{m.number}}'>{{m.number}}</a></td>
-							<td style="text-align: left" class="row-table-td"><a ng-href='{{m.relatedUrl}}'>{{m.related}}</a></td>
+							<td style="text-align: left" class="row-table-td"><a ng-href='{{getRelatedUrl(m.relatedUrl)}}'>{{m.related}}</a></td>
 							<td style="text-align: left">{{m.title}}</td>
 							<td style="text-align: left" class="row-table-td">{{m.body}}</td>
 							<td style="text-align: left" class="row-table-td">

@@ -1,5 +1,7 @@
 package com.dianping.swallow.common.internal.util;
 
+import io.netty.channel.Channel;
+
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -8,9 +10,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelEvent;
 
 
 /**
@@ -78,7 +77,7 @@ public class IPUtil {
          return "unknown";
       }
       try {
-         return getStrAddress(channel.getRemoteAddress());
+         return getStrAddress(channel.remoteAddress());
       } catch (RuntimeException e) {
       }
       return "unknown";
@@ -88,11 +87,10 @@ public class IPUtil {
 	   return address.toString().substring(1);
    }
    
-   public static String getConnectionDesc(ChannelEvent e) {
+   public static String getConnectionDesc(Channel channel) {
 		
-		Channel channel = e.getChannel();
-		String 	connectionDesc = IPUtil.getStrAddress(channel.getLocalAddress()) + 
-				"->" + IPUtil.getStrAddress(channel.getRemoteAddress());
+		String 	connectionDesc = IPUtil.getStrAddress(channel.remoteAddress()) + 
+				"->" + IPUtil.getStrAddress(channel.localAddress());
 		return connectionDesc;
 	}
 

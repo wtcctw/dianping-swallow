@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.dianping.swallow</groupId>
 	<artifactId>swallow-parent</artifactId>
@@ -29,7 +30,7 @@
 		<module>swallow-test</module>
 		<module>swallow-web</module>
 		<module>swallow-common-server</module>
-  </modules>
+	</modules>
 
 	<description>swallow is a message service!</description>
 	<developers>
@@ -46,7 +47,7 @@
 	<properties>
 		<!-- -->
 		<env>dev</env>
-    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- dianping -->
 		<lion-client.version>0.5.3</lion-client.version>
@@ -59,7 +60,7 @@
 		<spring.version>3.2.9.RELEASE</spring.version>
 		<spring.data.mongo.version>1.5.4.RELEASE</spring.data.mongo.version>
 		<jackson-databind.version>2.1.4</jackson-databind.version>
-		<netty.version>3.2.7.Final</netty.version>
+		<netty.version>4.0.24.Final</netty.version>
 		<hession.version>3.1.5</hession.version>
 		<mongo.java.driver.version>2.12.4</mongo.java.driver.version>
 		<swallow-client.version>0.5.4</swallow-client.version>
@@ -169,8 +170,8 @@
 				<version>${jackson-databind.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.netty</groupId>
-				<artifactId>netty</artifactId>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
 				<version>${netty.version}</version>
 			</dependency>
 			<dependency>

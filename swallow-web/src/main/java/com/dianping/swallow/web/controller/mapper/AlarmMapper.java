@@ -20,7 +20,14 @@ public class AlarmMapper {
 		} else {
 			alarmDto.setRelated(alarm.getRelated());
 		}
-		alarmDto.setRelatedUrl("#");
+		if (alarm.getRelatedType().isPServerIp() || alarm.getRelatedType().isPIp()
+				|| alarm.getRelatedType().isCServerIp() || alarm.getRelatedType().isCIp()) {
+			alarmDto.setRelatedUrl("#");
+		} else if (alarm.getRelatedType().isPTopic() || alarm.getRelatedType().isCTopic()) {
+			alarmDto.setRelatedUrl("/console/ip?topic=" + alarm.getRelated());
+		} else if (alarm.getRelatedType().isCConsumerId()) {
+			alarmDto.setRelatedUrl("/console/ip?topic=" + alarm.getRelated() + "&cid=" + alarm.getSubRelated());
+		}
 		alarmDto.setRelatedType(alarm.getRelatedType());
 		alarmDto.setSendInfos(alarm.getSendInfos());
 		alarmDto.setSourceIp(alarm.getSourceIp());

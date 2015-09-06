@@ -1,6 +1,7 @@
 package com.dianping.swallow.consumerserver.worker;
 
-import org.jboss.netty.channel.Channel;
+
+import io.netty.channel.Channel;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;

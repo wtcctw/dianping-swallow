@@ -55,9 +55,6 @@ public class IPResourceManagerImpl implements IPResourceManager {
 
 	private ScheduledFuture<?> future = null;
 
-	// @Autowired
-	// /private IPDescService ipDescService;
-
 	@Autowired
 	private IpResourceService ipResourceService;
 
@@ -70,7 +67,7 @@ public class IPResourceManagerImpl implements IPResourceManager {
 	@Autowired
 	private UserService baUserService;
 
-	@PostConstruct
+	//@PostConstruct
 	public void startTask() {
 		setFuture(scheduled.scheduleAtFixedRate(new Runnable() {
 
@@ -126,6 +123,20 @@ public class IPResourceManagerImpl implements IPResourceManager {
 						ipResource.setiPDesc(ipDesc);
 						ipResourceService.update(ipResource);
 					}
+				} else {
+					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
+					IpResource ipResource = new IpResource();
+					if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
+						ipResource.setCreateTime(new Date());
+						ipResource.setUpdateTime(new Date());
+					}else{
+						ipResource.setUpdateTime(new Date());
+					}
+					ipResource.setIp(ip);
+					ipResource.setAlarm(false);
+					ipResource.setCreateTime(new Date());
+					ipResource.setiPDesc(new IPDesc(ip));
+					ipResourceService.update(ipResource);
 				}
 			}
 		}

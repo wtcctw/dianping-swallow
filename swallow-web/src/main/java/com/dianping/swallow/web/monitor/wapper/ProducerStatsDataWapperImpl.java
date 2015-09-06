@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor.wapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableMap;
@@ -126,13 +127,53 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public Set<String> getTopicIps(String topicName) {
-		return producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
+	public Set<String> getTopicIps(String topicName, boolean isTotal) {
+		Set<String> topicIps = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
+		if (!isTotal && topicIps != null) {
+			if (topicIps.contains(TOTAL_KEY)) {
+				topicIps.remove(TOTAL_KEY);
+			}
+		}
+		return topicIps;
 	}
 
 	@Override
-	public Set<String> getTopics() {
-		return producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+	public Set<String> getTopics(boolean isTotal) {
+		Set<String> topics = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+		if (!isTotal && topics != null) {
+			if (topics.contains(TOTAL_KEY)) {
+				topics.remove(TOTAL_KEY);
+			}
+		}
+		return topics;
 	}
 
+	@Override
+	public Set<String> getServerIps(boolean isTotal) {
+		Set<String> serverIps = producerDataRetriever.getKeys(new CasKeys());
+		if (!isTotal && serverIps != null) {
+			if (serverIps.contains(TOTAL_KEY)) {
+				serverIps.remove(TOTAL_KEY);
+			}
+		}
+		return serverIps;
+	}
+
+	public Set<String> getIps(boolean isTotal) {
+		Set<String> ips = new HashSet<String>();
+		Set<String> topics = getTopics(isTotal);
+		if (topics != null) {
+			for (String topic : topics) {
+				Set<String> topicIps = getTopicIps(topic, isTotal);
+				if (topicIps != null) {
+					ips.addAll(topicIps);
+				}
+			}
+		}
+		Set<String> serverIps = getServerIps(isTotal);
+		if (serverIps != null) {
+			ips.addAll(serverIps);
+		}
+		return ips;
+	}
 }

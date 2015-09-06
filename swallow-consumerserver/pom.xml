@@ -41,10 +41,9 @@
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
 		<dependency>
-			<groupId>org.jboss.netty</groupId>
-			<artifactId>netty</artifactId>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
@@ -84,6 +83,16 @@
 			<artifactId>swallow-common</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping</groupId>
+			<artifactId>jmockmongo-patched</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
