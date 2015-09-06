@@ -246,29 +246,6 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public Set<String> getConsumerIdIps(String topicName, String consumerId) {
-		return consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
-	}
-
-	@Override
-	public Set<String> getTopicIps(String topicName) {
-		Set<String> consumerIds = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName), StatisType.SEND);
-		if (consumerIds != null) {
-			Iterator<String> iterator = consumerIds.iterator();
-			Set<String> ips = new HashSet<String>();
-			while (iterator.hasNext()) {
-				String consumerId = iterator.next();
-				Set<String> tempIps = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId),
-						StatisType.SEND);
-				ips.addAll(tempIps);
-			}
-			return ips;
-		} else {
-			return null;
-		}
-	}
-
-	@Override
 	public List<String> getConusmerIdInfos() {
 		List<String> consumerIdInfos = new ArrayList<String>();
 		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
@@ -302,5 +279,75 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			}
 		}
 		return consumerIdInfos;
+	}
+
+	@Override
+	public Set<String> getTopics(boolean isTotal) {
+		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+		if (!isTotal && topicKeys != null) {
+			if (topicKeys.contains(TOTAL_KEY)) {
+				topicKeys.remove(TOTAL_KEY);
+			}
+		}
+		return topicKeys;
+	}
+
+	@Override
+	public Set<String> getServerIps(boolean isTotal) {
+		Set<String> serverIps = consumerDataRetriever.getKeys(new CasKeys());
+		if (!isTotal && serverIps != null) {
+			if (serverIps.contains(TOTAL_KEY)) {
+				serverIps.remove(TOTAL_KEY);
+			}
+		}
+		return serverIps;
+	}
+
+	@Override
+	public Set<String> getConsumerIdIps(String topicName, String consumerId, boolean isTotal) {
+		Set<String> consumerIdIps = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId),
+				StatisType.SEND);
+		if (!isTotal && consumerIdIps != null) {
+			if (consumerIdIps.contains(TOTAL_KEY)) {
+				consumerIdIps.remove(TOTAL_KEY);
+			}
+		}
+		return consumerIdIps;
+	}
+
+	@Override
+	public Set<String> getTopicIps(String topicName, boolean isTotal) {
+		Set<String> consumerIds = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName), StatisType.SEND);
+		if (consumerIds != null) {
+			Iterator<String> iterator = consumerIds.iterator();
+			Set<String> ips = new HashSet<String>();
+			while (iterator.hasNext()) {
+				String consumerId = iterator.next();
+				Set<String> tempIps = getConsumerIdIps(topicName, consumerId, false);
+				ips.addAll(tempIps);
+			}
+			return ips;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Set<String> getIps(boolean isTotal) {
+		Set<String> ips = new HashSet<String>();
+		Set<String> topics = getTopics(false);
+		if (topics != null) {
+			for (String topic : topics) {
+				Set<String> topicIps = getTopicIps(topic, false);
+				if (topicIps != null) {
+					ips.addAll(topicIps);
+				}
+			}
+		}
+		Set<String> serverIps = getServerIps(false);
+		if (serverIps != null) {
+			ips.addAll(serverIps);
+		}
+		return ips;
 	}
 }

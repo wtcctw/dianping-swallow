@@ -34,6 +34,14 @@ public class IPDesc {
 
 	private Date updateTime;
 
+	public IPDesc() {
+
+	}
+
+	public IPDesc(String ip) {
+		this.ip = ip;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -128,5 +136,5 @@ public class IPDesc {
 				+ opManager + ", opMobile = " + opMobile + ", opEmail = " + opEmail + ", dpManager = " + dpManager
 				+ ", dpMobile = " + dpMobile + ", createTime = " + createTime + ", updateTime = " + updateTime + "]";
 	}
-	
+
 }

@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.monitor.impl;
+package com.dianping.swallow.web.monitor.collector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月31日下午8:14:56
  */
 @Component
-public class IpResourceCollector implements MonitorDataListener, Runnable {
+public class ConsumerIdResourceCollector implements MonitorDataListener, Runnable {
 
 	private static final String FACTORY_NAME = "ConsumerIdResourceCollector";
 
@@ -112,9 +112,9 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 						if (ips != null && !ips.isEmpty()) {
 							ConsumerIdResource consumerIdResource = pair.getSecond().get(0);
 							List<String> originalIps = consumerIdResource.getConsumerIps();
-							if(ips.containsAll(originalIps) && originalIps.containsAll(ips)){
+							if (ips.containsAll(originalIps) && originalIps.containsAll(ips)) {
 								return;
-							}else{
+							} else {
 								consumerIdResource.setConsumerIps(new ArrayList<String>(ips));
 								consumerIdResourceService.insert(consumerIdResource);
 							}
@@ -127,12 +127,12 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 
 	private void flushTopicMetaData() {
 
-		Set<String> topics = producerStatsDataWapper.getTopics();
+		Set<String> topics = producerStatsDataWapper.getTopics(false);
 		if (topics != null) {
 			for (String topic : topics) {
-				Set<String> ips = producerStatsDataWapper.getTopicIps(topic);
+				Set<String> ips = producerStatsDataWapper.getTopicIps(topic, false);
 				if (ips != null) {
-					if(ips.contains(ConsumerDataRetrieverWrapper.TOTAL)){
+					if (ips.contains(ConsumerDataRetrieverWrapper.TOTAL)) {
 						ips.remove(ConsumerDataRetrieverWrapper.TOTAL);
 					}
 					TopicResource topicResource = topicResourceService.findByTopic(topic);
@@ -144,14 +144,14 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 						topicResourceService.insert(topicResource);
 					} else {
 						List<String> originalList = topicResource.getProducerIps();
-						
-						if(newList.containsAll(originalList) && originalList.containsAll(newList)){
+
+						if (newList.containsAll(originalList) && originalList.containsAll(newList)) {
 							return;
-						}else{
+						} else {
 							topicResource.setProducerIps(newList);
 							topicResourceService.insert(topicResource);
 						}
-						
+
 					}
 
 				}
@@ -172,7 +172,7 @@ public class IpResourceCollector implements MonitorDataListener, Runnable {
 	public void run() {
 
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doIPCollector");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doConsumerIdCollector");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {

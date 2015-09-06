@@ -9,6 +9,7 @@ import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 public interface ProducerStatsDataWapper {
 	/**
 	 * get all server statis data at timekey point
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
@@ -16,17 +17,38 @@ public interface ProducerStatsDataWapper {
 
 	/**
 	 * get all topic statis data at timekey point
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
 	List<ProducerTopicStatsData> getTopicStatsDatas(long timeKey);
-	
+
 	/**
 	 * get topic related ip
+	 * 
 	 * @param timeKey
 	 * @return
 	 */
-	Set<String> getTopicIps(String topicName);
+	Set<String> getTopicIps(String topicName, boolean isTotal);
+
+	/**
+	 * 
+	 * @param isTotal
+	 * @return
+	 */
+	Set<String> getTopics(boolean isTotal);
+
+	/**
+	 * 
+	 * @param isTotal
+	 * @return
+	 */
+	Set<String> getServerIps(boolean isTotal);
 	
-	Set<String> getTopics();
+	/**
+	 * 
+	 * @param isTotal
+	 * @return
+	 */
+	Set<String> getIps(boolean isTotal);
 }
