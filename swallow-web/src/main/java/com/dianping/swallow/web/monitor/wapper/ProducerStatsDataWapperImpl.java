@@ -14,6 +14,7 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerTopicStatisData;
+import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
@@ -124,6 +125,25 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			producerTopicStatsDatas.add(producerTopicStatsData);
 		}
 		return producerTopicStatsDatas;
+	}
+
+	public List<ProducerIpStatsData> getIpStatsDatas(long timeKey) {
+		List<ProducerIpStatsData> ipStatsDatas = new ArrayList<ProducerIpStatsData>();
+
+		return ipStatsDatas;
+	}
+
+	public List<ProducerIpStatsData> getIpStatsDatas(String topicName, long timeKey) {
+		List<ProducerIpStatsData> ipStatsDatas = new ArrayList<ProducerIpStatsData>();
+		Set<String> ipKeys = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
+		if (ipKeys == null) {
+			return null;
+		}
+		for (String ipKey : ipKeys) {
+
+		}
+
+		return ipStatsDatas;
 	}
 
 	@Override
