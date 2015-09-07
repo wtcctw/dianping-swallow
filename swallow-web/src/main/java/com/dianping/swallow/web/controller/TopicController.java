@@ -28,7 +28,9 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
+import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.dto.TopicResourceDto;
 import com.dianping.swallow.web.controller.mapper.TopicResourceMapper;
@@ -121,7 +123,7 @@ public class TopicController extends AbstractMenuController {
 					producerIp.addAll(tmpips);
 				}
 			}
-			if(userUtils.isTrueAdministrator(username)){
+			if (userUtils.isTrueAdministrator(username)) {
 				topics.add(DEFAULT);
 			}
 			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
@@ -195,9 +197,8 @@ public class TopicController extends AbstractMenuController {
 	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
-			@RequestParam(value = "time") String time,
-			@RequestParam(value = "exec_user") String approver, HttpServletRequest request,
-			HttpServletResponse response) {
+			@RequestParam(value = "time") String time, @RequestParam(value = "exec_user") String approver,
+			HttpServletRequest request, HttpServletResponse response) {
 
 		String username = userUtils.getUsername(request);
 		TopicResource topicResource = null;
@@ -288,7 +289,7 @@ public class TopicController extends AbstractMenuController {
 				logger.info(String.format("Update producer alarm of %s to %b fail", topic, alarm));
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -310,7 +311,7 @@ public class TopicController extends AbstractMenuController {
 				logger.info(String.format("Update consumer alarm of %s to %b fail", topic, alarm));
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -336,6 +337,82 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		return administrators;
+	}
+
+	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
+	@ResponseBody
+	public Object applyTopic(@RequestBody TopicApplyDto topicApplyDto) {
+
+		ResponseStatus responseStatus = validate(topicApplyDto);
+		if(responseStatus != ResponseStatus.SUCCESS){
+			return responseStatus;
+		}
+		chooseMongoDb();
+		chooseConsumerServer();
+		editSwallowLionConfiguration();
+		return new Object();
+	}
+	
+	private String chooseMongoDb(){
+		return "";
+	}
+	
+	private String chooseConsumerServer(){
+		return "";
+	}
+	
+	private boolean editSwallowLionConfiguration(){
+		return true;
+	}
+	
+	private ResponseStatus validate(TopicApplyDto topicApplyDto){
+		
+		String approver = topicApplyDto.getApprover();
+		boolean pass = validateAuthentication(approver);
+		if (!pass) {
+			return ResponseStatus.UNAUTHENTICATION;
+		}
+
+		String topics = topicApplyDto.getTopics();
+		pass = validateTopicName(topics);
+		if (!pass) {
+			return ResponseStatus.INVALIDTOPICNAME;
+		}
+
+		int size = topicApplyDto.getSize();
+		float amount = topicApplyDto.getAmount();
+		pass = validateCapSize(size, amount);
+		if (!pass) {
+			return ResponseStatus.TOOLARGEQUOTA;
+		}
+		
+		return ResponseStatus.SUCCESS;
+	}
+
+	private boolean validateAuthentication(String approver) {
+
+		return userUtils.isTrueAdministrator(approver);
+	}
+
+	private boolean validateTopicName(String topics) {
+
+		if (StringUtils.isBlank(topics)) {
+			return false;
+		}
+		String[] topicArray = topics.split(",");
+		for (String topic : topicArray) {
+			String tmptopic = topic.trim();
+			if (!NameCheckUtil.isTopicNameValid(tmptopic)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean validateCapSize(long size, float amount) {
+
+		return size * amount <= 700.0f;
 	}
 
 	private String checkProposalName(String proposal) {

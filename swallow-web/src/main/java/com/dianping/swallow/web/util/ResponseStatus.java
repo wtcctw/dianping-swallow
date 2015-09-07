@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize(using = ResponseStatusSerializer.class)
 public enum ResponseStatus {
 
-	INVALIDTOPIC("no such topic", -10), TOPICBLANK("topic blank", -9), IOEXCEPTION("io exception", -8), RUNTIMEEXCEPTION(
+	TOOLARGEQUOTA("exceed quota", -12),INVALIDTOPICNAME("invalid topic name", -11),INVALIDTOPIC("no such topic", -10), TOPICBLANK("topic blank", -9), IOEXCEPTION("io exception", -8), RUNTIMEEXCEPTION(
 			"runtime exception", -7), INTERRUPTEDEXCEPTION("interrupted exception", -6), PARSEEXCEPTION("parse error",
 			-5), EMPTYCONTENT("empty content", -4), NOAUTHENTICATION("no authenticaton", -3), UNAUTHENTICATION(
 			"unauthorized", -2), MONGOWRITE("write mongo error", -1), SUCCESS("success", 0), TRY_MONGOWRITE(
