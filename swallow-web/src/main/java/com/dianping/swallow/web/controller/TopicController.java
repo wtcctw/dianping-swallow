@@ -294,7 +294,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/consumer/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public void editConsumerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
+	public boolean editConsumerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
 			HttpServletRequest request, HttpServletResponse response) {
 
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
@@ -310,6 +310,8 @@ public class TopicController extends AbstractMenuController {
 				logger.info(String.format("Update consumer alarm of %s to %b fail", topic, alarm));
 			}
 		}
+		
+		return result;
 	}
 
 	@RequestMapping(value = "/console/topic/administrator", method = RequestMethod.GET)

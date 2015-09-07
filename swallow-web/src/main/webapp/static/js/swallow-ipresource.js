@@ -142,14 +142,13 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 			}
 			$scope.query.application = $scope.searchapplication;
 			$scope.query.type = $scope.searchtype;
-//			tmpip = location.search;
-//			if(tmpip != null && tmpip.length > 3 && tmpip.substr(0,4)=="?ip="){
-//				var subtmpip = tmpip.substring(4);
-//				$scope.searchip = subtmpip;
-//				$scope.query.ip = subtmpip;
-//			}
+
 			var tmplocation = location.search;
-			if(tmplocation != null && tmplocation.length > 7){
+			if(tmplocation != null && tmplocation.length > 3 && tmplocation.substr(0,4)=="?ip="){
+				var subtmpip = tmplocation.substring(4);
+				$scope.searchip = subtmpip;
+				$scope.query.ip = subtmpip;
+			}else if(tmplocation != null && tmplocation.length > 7){
 				var index = tmplocation.indexOf("&");
 				if(index != -1){
 					var topic = tmplocation.substring(7, index).trim();
