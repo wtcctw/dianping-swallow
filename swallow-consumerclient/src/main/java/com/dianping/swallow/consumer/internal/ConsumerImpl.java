@@ -2,7 +2,7 @@ package com.dianping.swallow.consumer.internal;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.UnpooledByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -35,6 +35,7 @@ import com.dianping.swallow.common.internal.processor.DefaultMessageProcessorTem
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.message.Destination;
@@ -78,7 +79,8 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
 	private ConsumerThread slaveConsumerThread;
 	
-	private EventLoopGroup group;
+    private static EventLoopGroup group = new NioEventLoopGroup(CommonUtils.getCpuCount() * 2, new MQThreadFactory("Swallow-Netty-Client-" + consumerCount.incrementAndGet() + "-"));;
+    private static ByteBufAllocator allocator = new PooledByteBufAllocator(true, CommonUtils.getCpuCount(), CommonUtils.getCpuCount(), 8 *1024, 10);
 
 	private ConsumerProcessor processor;
 
@@ -144,8 +146,6 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 		
 		Bootstrap bootstrap = new Bootstrap();
         final Codec codec = new JsonCodec(PktConsumerMessage.class, PktMessage.class);
-        EventLoopGroup group = new NioEventLoopGroup(0, new MQThreadFactory("Swallow-Netty-Client-" + consumerCount.incrementAndGet() + "-"));;
-        ByteBufAllocator allocator = new UnpooledByteBufAllocator(true);
 		bootstrap.group(group)
 		.channelFactory(new CodecChannelFactory(codec))
 		.option(ChannelOption.ALLOCATOR, allocator)
@@ -227,9 +227,6 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 		
 		masterConsumerThread.interrupt();
 		slaveConsumerThread.interrupt();
-		if(group != null){
-			group.shutdownGracefully();
-		}
 	}
 
 	public void submit(Runnable task) {

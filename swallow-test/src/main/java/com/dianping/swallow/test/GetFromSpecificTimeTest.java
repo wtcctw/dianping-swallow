@@ -73,6 +73,7 @@ public class GetFromSpecificTimeTest extends AbstractConsumerTest{
 		for(int i=0;i<1;i++){
 			
 			closeConsumer(consumer);
+			sleep(10000);
 			consumer = addListener(topic, getConsumerId(), concurrentCount);
 			sendMessage(10, topic);
 			waitForListernToComplete(messageCount);

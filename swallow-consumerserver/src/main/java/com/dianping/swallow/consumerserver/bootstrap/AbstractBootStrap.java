@@ -1,6 +1,7 @@
 package com.dianping.swallow.consumerserver.bootstrap;
 	
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -23,6 +24,7 @@ import com.dianping.swallow.common.internal.codec.Codec;
 import com.dianping.swallow.common.internal.codec.impl.JsonCodec;
 import com.dianping.swallow.common.internal.lifecycle.MasterSlaveComponent;
 import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
+import com.dianping.swallow.common.internal.netty.NettyHeapUtil;
 import com.dianping.swallow.common.internal.netty.channel.CodecServerChannelFactory;
 import com.dianping.swallow.common.internal.netty.handler.CodecHandler;
 import com.dianping.swallow.common.internal.netty.handler.LengthPrepender;
@@ -74,12 +76,16 @@ public abstract class AbstractBootStrap {
 		
 		final Codec jsonCodec = new JsonCodec(PktMessage.class, PktConsumerMessage.class);
 		int workerCount = 4 * CommonUtils.getCpuCount();
+		int pageSize = 8 * 1024, maxOrder = 10;
 		bossGroup = new NioEventLoopGroup(1, new MQThreadFactory("Swallow-Netty-Boss-"));
 		workerGroup = new NioEventLoopGroup(workerCount, new MQThreadFactory("Swallow-Netty-Worker-"));
+		ByteBufAllocator bufAllocator = new PooledByteBufAllocator(true, 
+				NettyHeapUtil.heapArenaCount(workerCount/2, pageSize, maxOrder), NettyHeapUtil.directArenaCount(workerCount/2, pageSize, maxOrder)
+				, pageSize, maxOrder);
 
 		bootstrap.channelFactory(new CodecServerChannelFactory(jsonCodec))
 		.group(bossGroup, workerGroup)
-		.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true, workerCount/2, workerCount/2, 8 * 1024, 10))
+		.childOption(ChannelOption.ALLOCATOR, bufAllocator)
 		.childHandler(new ChannelInitializer<Channel>() {
 
 			@Override

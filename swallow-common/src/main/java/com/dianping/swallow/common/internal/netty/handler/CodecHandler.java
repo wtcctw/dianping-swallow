@@ -16,7 +16,7 @@ import io.netty.channel.ChannelPromise;
 public class CodecHandler extends ChannelDuplexHandler {
 	
 	private Codec codec;
-
+	
 	public CodecHandler(Codec codec) {
 		
 		this.codec = codec;
@@ -41,7 +41,12 @@ public class CodecHandler extends ChannelDuplexHandler {
 		}
 
 		ByteBuf buf = (ByteBuf) msg;
-		String json = buf.toString(Codec.DEFAULT_CHARSET);
+		int messageLength = buf.readableBytes(); 
+		
+		byte []tmp  = new byte[messageLength];
+		buf.readBytes(tmp, 0, messageLength);
+		
+		String json = new String(tmp,0, messageLength, Codec.DEFAULT_CHARSET);
 		Object result = codec.decode(json);
 		
 		buf.release();

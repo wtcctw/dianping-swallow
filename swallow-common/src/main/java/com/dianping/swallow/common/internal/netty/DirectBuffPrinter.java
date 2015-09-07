@@ -42,8 +42,8 @@ public class DirectBuffPrinter extends AbstractLifecycle implements Runnable {
 			e.printStackTrace();
 
 		}
-		
 	}
+	
 
 	@Override
 	public void doStart(){
@@ -65,7 +65,7 @@ public class DirectBuffPrinter extends AbstractLifecycle implements Runnable {
 	
 	
 
-	private Long maxMemory() {
+	public Long maxMemory() {
 		
 		try {
 			return (Long) maxMemory.get(null);
@@ -91,8 +91,8 @@ public class DirectBuffPrinter extends AbstractLifecycle implements Runnable {
 	@Override
 	public void run() {
 		
-		if(logger.isInfoEnabled()){
-			logger.info("[run][Used]" +  getReadable(reservedMemory()));
+		if(logger.isDebugEnabled()){
+			logger.debug("[run][Used]" +  getReadable(reservedMemory()));
 		}
 	}
 	
