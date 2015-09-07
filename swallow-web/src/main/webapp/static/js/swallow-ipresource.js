@@ -148,6 +148,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 				var subtmpip = tmplocation.substring(4);
 				$scope.searchip = subtmpip;
 				$scope.query.ip = subtmpip;
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 			}else if(tmplocation != null && tmplocation.length > 7){
 				var index = tmplocation.indexOf("&");
 				if(index != -1){
