@@ -31,3 +31,13 @@ db.ALARM_META.update({ "isSmsMode" : true }, { $set: {"isSmsMode" : false } }, f
 db.ALARM_META.update({ "isWeiXinMode" : true }, { $set: {"isWeiXinMode" : false } }, false, true);
 
 db.ALARM_META.update({ "isMailMode" : false }, { $set: {"isMailMode" : true } }, false, true);
+
+
+
+db.runCommand({"convertToCapped": "CONSUMERID_STATS_DATA", size: 52428800, max:1000000});
+<<<<<<< Updated upstream
+=======
+
+
+
+>>>>>>> Stashed changes

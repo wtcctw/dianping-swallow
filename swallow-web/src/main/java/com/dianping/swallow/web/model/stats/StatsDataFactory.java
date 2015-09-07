@@ -44,6 +44,18 @@ public class StatsDataFactory {
 		setComponent(consumerTopicStatsData);
 		return consumerTopicStatsData;
 	}
+	
+	public ProducerIpStatsData createProducerIpStatsData(){
+		ProducerIpStatsData producerIpStatsData = new ProducerIpStatsData();
+		setComponent(producerIpStatsData);
+		return producerIpStatsData;
+	}
+	
+	public ConsumerIpStatsData createConsumerIpStatsData(){
+		ConsumerIpStatsData consumerIpStatsData = new ConsumerIpStatsData();
+		setComponent(consumerIpStatsData);
+		return consumerIpStatsData;
+	}
 
 	private void setComponent(StatsData statsData) {
 		statsData.setEventReporter(eventReporter);

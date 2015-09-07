@@ -16,7 +16,9 @@ import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerTopicStatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
@@ -182,6 +184,86 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
 		}
 		return consumerIdStatsDatas;
+	}
+
+	@Override
+	public List<ConsumerIpStatsData> getConsumerIpStatsDatas(long timeKey) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ConsumerIpStatsData> getConsumerIpStatsDatas(String topicName, long timeKey) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ConsumerIpStatsData> getConsumerIpStatsDatas(String topicName, String consumerId, long timeKey) {
+		Set<String> ipKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId));
+		if (ipKeys == null) {
+			return null;
+		}
+		int index = 0;
+		for (String ip : ipKeys) {
+
+			MessageInfoStatis sendMStatisData = (MessageInfoStatis) consumerDataRetriever.getValue(new CasKeys(
+					TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND);
+
+			MessageInfoStatis ackMStatisData = (MessageInfoStatis) consumerDataRetriever.getValue(new CasKeys(
+					TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK);
+
+			if (sendMStatisData == null && ackMStatisData == null) {
+				continue;
+			}
+			NavigableMap<Long, Long> sendQpx = sendMStatisData.getQpx(StatisType.SEND);
+			NavigableMap<Long, Long> sendDelay = sendMStatisData.getDelay(StatisType.SEND);
+			NavigableMap<Long, Long> ackQpx = ackMStatisData.getQpx(StatisType.ACK);
+			NavigableMap<Long, Long> ackDelay = ackMStatisData.getDelay(StatisType.ACK);
+
+			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
+					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+				continue;
+			}
+			if (index == 0) {
+				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				if (tempKey == null) {
+					return null;
+				}
+				timeKey = tempKey.longValue();
+				index++;
+			}
+
+			ConsumerIpStatsData consumerIpStatsData = statsDataFactory.createConsumerIpStatsData();
+			consumerIpStatsData.setTopicName(topicName);
+			consumerIpStatsData.setConsumerId(consumerId);
+			consumerIpStatsData.setTimeKey(timeKey);
+			Long sendQpxValue = sendQpx.get(timeKey);
+
+			if (sendQpxValue != null) {
+				consumerIpStatsData.setSendQps(sendQpxValue.longValue());
+			}
+
+			Long sendDelayValue = sendDelay.get(timeKey);
+			
+			if (sendDelayValue != null) {
+				consumerIpStatsData.setSendDelay(sendDelayValue.longValue());
+			}
+			
+			Long ackQpxValue = ackQpx.get(timeKey);
+			
+			if (ackQpxValue != null) {
+				consumerIpStatsData.setSendDelay(ackQpxValue.longValue());
+			}
+			Long ackDelayValue = ackDelay.get(timeKey);
+			
+			if (ackDelayValue != null) {
+				consumerIpStatsData.setSendDelay(ackDelayValue.longValue());
+			}
+			consumerIpStatsData.setAccumulation(0L);
+			
+		}
+		return null;
 	}
 
 	private long getConsumerIdAccumulation(String topic, String consumerId, long timeKey) {
@@ -350,4 +432,5 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		}
 		return ips;
 	}
+
 }
