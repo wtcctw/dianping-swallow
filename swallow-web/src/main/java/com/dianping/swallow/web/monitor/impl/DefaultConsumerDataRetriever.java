@@ -300,7 +300,7 @@ public class DefaultConsumerDataRetriever
 					NavigableMap<Long, Long> ackRawData = null;
 					if (statsDataMapPair != null) {
 						sendRawData = statsDataMapPair.getSendStatsData();
-						ackRawData = statsDataMapPair.getSendStatsData();
+						ackRawData = statsDataMapPair.getAckStatsData();
 					}
 					sendRawData = fillStatsData(sendRawData, startKey, endKey);
 					StatsData sendStatis = createStatsData(
@@ -379,7 +379,7 @@ public class DefaultConsumerDataRetriever
 					NavigableMap<Long, Long> ackRawData = null;
 					if (statsDataMapPair != null) {
 						sendRawData = statsDataMapPair.getSendStatsData();
-						ackRawData = statsDataMapPair.getSendStatsData();
+						ackRawData = statsDataMapPair.getAckStatsData();
 					}
 					sendRawData = fillStatsData(sendRawData, startKey, endKey);
 					StatsData sendStatis = createStatsData(

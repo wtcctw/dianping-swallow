@@ -36,8 +36,8 @@ public class LengthPrepender extends ChannelOutboundHandlerAdapter{
 
 	private ByteBuf processByteBuf(ByteBufAllocator alloc, ByteBuf rawMessage) {
 
-		if(rawMessage.readableBytes() > Integer.MAX_VALUE){
-			throw new IllegalStateException("message too long " + rawMessage.readableBytes());
+		if(rawMessage.readableBytes() < 0){
+			throw new IllegalStateException("message length:" + rawMessage.readableBytes());
 		}
 
 		ByteBuf buff = alloc.ioBuffer(rawMessage.readableBytes() + 4);
@@ -49,8 +49,8 @@ public class LengthPrepender extends ChannelOutboundHandlerAdapter{
 
 	private ByteBuf processBytes(ByteBufAllocator byteBufAllocator, byte[] rawMessage) {
 		
-		if(rawMessage.length > Integer.MAX_VALUE){
-			throw new IllegalStateException("message too long " + rawMessage.length);
+		if(rawMessage.length < 0){
+			throw new IllegalStateException("message length:" + rawMessage.length);
 		}
 		
 		ByteBuf buff = byteBufAllocator.ioBuffer(rawMessage.length + 4);

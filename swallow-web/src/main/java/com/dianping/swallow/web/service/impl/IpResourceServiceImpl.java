@@ -62,9 +62,9 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 	
 	@Override
-	public IpResource find(String ip, String application) {
+	public Pair<Long, List<IpResource>> find(int offset, int limit, String application, String ...ips) {
 
-		return ipResourceDao.find(ip, application);
+		return ipResourceDao.find(offset, limit, application, ips);
 	}
 
 	@Override
