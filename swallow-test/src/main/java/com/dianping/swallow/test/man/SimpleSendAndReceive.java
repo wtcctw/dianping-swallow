@@ -3,9 +3,11 @@ package com.dianping.swallow.test.man;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
+import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.SendFailedException;
 import com.dianping.swallow.consumer.Consumer;
@@ -60,6 +62,43 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 		
 		sleep(1000000);
 	}
+
 	
+	
+	@Test
+	public void testClose() throws InterruptedException{
+		
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				try {
+					sendMessage(10000, topic);
+				} catch (SendFailedException e) {
+					e.printStackTrace();
+				} catch (RemoteServiceInitFailedException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	
+		Consumer consumer = addListener(topic);
+		TimeUnit.SECONDS.sleep(5);
+		
+		System.out.println("begin close ");
+		consumer.close();
+		TimeUnit.SECONDS.sleep(50);
+		
+	}
+	
+	
+	private AtomicInteger count = new AtomicInteger();
+	@Override
+	protected void doOnMessage(Message msg) {
+		
+		int total = count.incrementAndGet();
+		if(total % 10 == 0){
+			System.out.println(total);
+		}
+	}
 	
 }

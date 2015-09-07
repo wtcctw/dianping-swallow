@@ -3,8 +3,7 @@ package com.dianping.swallow.web.dao.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import jodd.util.StringUtil;
-
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -96,20 +95,28 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 	
 	@Override
-	public IpResource find(String ip, String application) {
+	public Pair<Long, List<IpResource>> find(int offset, int limit, String application, String ...ips) {
 		
 		Query query = new Query();
-
-		if (StringUtil.isNotBlank(ip)) {
-			query.addCriteria(Criteria.where(IP).is(ip));
+		List<Criteria> criterias = new ArrayList<Criteria>();
+		if(ips.length > 0){
+			for (String ip : ips) {
+				criterias.add(Criteria.where(IP).is(ip));
+			}
+			query.addCriteria(Criteria.where(IP).exists(true)
+					.orOperator(criterias.toArray(new Criteria[criterias.size()])));
 		}
-		if (StringUtil.isNotBlank(application)) {
+
+		if (StringUtils.isNotBlank(application)) {
 			query.addCriteria(Criteria.where(APPLICATION).is(application));
 		}
-
-		IpResource ipResource = mongoTemplate.findOne(query, IpResource.class, IPRESOURCE_COLLECTION);
 		
-		return ipResource;
+		long size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
+
+		query.skip(offset).limit(limit);
+		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
+		
+		return new Pair<Long, List<IpResource>>(size, ipResources);
 	}
 
 	@Override

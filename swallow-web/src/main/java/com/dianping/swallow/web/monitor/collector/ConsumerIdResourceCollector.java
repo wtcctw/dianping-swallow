@@ -10,12 +10,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import jodd.util.StringUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -113,7 +112,7 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 							ConsumerIdResource consumerIdResource = pair.getSecond().get(0);
 							List<String> originalIps = consumerIdResource.getConsumerIps();
 							if (ips.containsAll(originalIps) && originalIps.containsAll(ips)) {
-								return;
+								continue;
 							} else {
 								consumerIdResource.setConsumerIps(new ArrayList<String>(ips));
 								consumerIdResourceService.insert(consumerIdResource);
@@ -146,7 +145,7 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 						List<String> originalList = topicResource.getProducerIps();
 
 						if (newList.containsAll(originalList) && originalList.containsAll(newList)) {
-							return;
+							continue;
 						} else {
 							topicResource.setProducerIps(newList);
 							topicResourceService.insert(topicResource);
@@ -161,7 +160,7 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 
 	private boolean valid(String topic, String consumerId) {
 
-		if (StringUtil.isNotBlank(topic) && StringUtil.isNotBlank(consumerId)) {
+		if (StringUtils.isNotBlank(topic) && StringUtils.isNotBlank(consumerId)) {
 			return true;
 		} else {
 			return false;
