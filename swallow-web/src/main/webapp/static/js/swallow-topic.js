@@ -192,8 +192,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							items: 16, 
 							source : topicNameList,
 							updater : function(c) {
-								$scope.name = c;
-								$scope.query.topic = $scope.name;
+								$scope.topic = c;
+								$scope.query.topic = $scope.topic;
 								$scope.query.producerServer = $("#searchip").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
 								return c;
