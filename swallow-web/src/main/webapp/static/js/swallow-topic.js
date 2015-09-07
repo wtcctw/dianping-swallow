@@ -161,10 +161,16 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.query = new Object();
 			var tmptopic = localStorage.getItem("topic");
 			if(tmptopic != null){
-				$scope.topic = tmptopic;
+				
+				if(tmptopic.indexOf(',') == -1){
+					$scope.topic = tmptopic;
+					$scope.query.topic = tmptopic;
+				}else{
+					$scope.query.topic = tmptopic;
+					$scope.topic = "";
+				}
 				localStorage.clear();
 			}
-			$scope.query.topic = $scope.topic;
 			$scope.query.producerServer = $scope.searchip;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 			

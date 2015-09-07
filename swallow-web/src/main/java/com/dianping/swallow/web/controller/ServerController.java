@@ -37,6 +37,8 @@ import com.dianping.swallow.web.util.ResponseStatus;
 
 @Controller
 public class ServerController extends AbstractSidebarBasedController {
+	
+	private static final String DEFAULT = "default";
 
 	@Resource(name = "producerServerResourceService")
 	private ProducerServerResourceService producerServerResourceService;
@@ -261,11 +263,11 @@ public class ServerController extends AbstractSidebarBasedController {
 	@ResponseBody
 	public List<String> loadConsumerSereverTopics(@RequestParam String ip) {
 
-		List<String> result = new ArrayList<String>();
+		Set<String> result = new HashSet<String>();
 		Map<String, Set<String>> topicToConsumerServer = topicResourceService.loadCachedTopicToConsumerServer();
 
 		if (topicToConsumerServer == null) {
-			return result;
+			return new ArrayList<String>(result);
 		} else {
 			for (Map.Entry<String, Set<String>> entry : topicToConsumerServer.entrySet()) {
 				Set<String> servers = entry.getValue();
@@ -275,8 +277,18 @@ public class ServerController extends AbstractSidebarBasedController {
 				}
 			}
 		}
+		
+		if(result.contains(DEFAULT)){
+			result.remove(DEFAULT);
+			Set<String> allTopics = topicResourceService.loadCachedTopicToWhiteList().keySet();
+			Set<String> allTopicsClone = new HashSet<String>(allTopics);
+			Set<String> excludeTopics = topicToConsumerServer.keySet();
+			allTopicsClone.removeAll(excludeTopics);
+			result.addAll(allTopicsClone);
+			
+		}
 
-		return result;
+		return new ArrayList<String>(result);
 	}
 
 	@RequestMapping(value = "/console/server/defaultcresource", method = RequestMethod.GET)

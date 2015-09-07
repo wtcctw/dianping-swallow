@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
+import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
@@ -70,6 +72,26 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	public List<ConsumerServerResource> findAll() {
 
 		return consumerServerResourceDao.findAll();
+	}
+	
+	@Override
+	public ConsumerServerResource buildConsumerServerResource(String ip,String hostName) {
+		ConsumerServerResource serverResource = new ConsumerServerResource();
+		serverResource.setIp(ip);
+		serverResource.setAlarm(true);
+		serverResource.setHostname(hostName);
+		serverResource.setCreateTime(new Date());
+		serverResource.setUpdateTime(new Date());
+		ConsumerServerResource defaultResource = (ConsumerServerResource) findDefault();
+		if (defaultResource == null) {
+			serverResource.setAlarm(false);
+			serverResource.setSendAlarmSetting(new QPSAlarmSetting());
+			serverResource.setAckAlarmSetting(new QPSAlarmSetting());
+		} else {
+			serverResource.setSendAlarmSetting(defaultResource.getSendAlarmSetting());
+			serverResource.setAckAlarmSetting(defaultResource.getAckAlarmSetting());
+		}
+		return serverResource;
 	}
 
 }

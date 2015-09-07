@@ -28,6 +28,8 @@ public interface TopicResourceService extends ConfigChange{
 	
 	Pair<Long, List<TopicResource>> findByServer(int offset, int limit, String producerIp);
 
+	Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator);
+
 	Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp);
 
 	TopicResource findDefault();

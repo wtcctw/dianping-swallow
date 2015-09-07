@@ -2,7 +2,10 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,8 +13,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jodd.util.StringUtil;
-
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.plexus.util.CollectionUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +27,14 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.controller.dto.IpResourceDto;
 import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
+import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
+import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpResource;
+import com.dianping.swallow.web.model.resource.TopicResource;
+import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.service.IpResourceService;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
@@ -43,6 +51,12 @@ public class IPController extends AbstractMenuController {
 
 	@Resource(name = "ipResourceService")
 	private IpResourceService ipResourceService;
+	
+	@Resource(name = "topicResourceService")
+	private TopicResourceService topicResourceService;
+	
+	@Resource(name = "consumerIdResourceService")
+	private ConsumerIdResourceService consumerIdResourceService;
 
 	@RequestMapping(value = "/console/ip")
 	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
@@ -55,32 +69,52 @@ public class IPController extends AbstractMenuController {
 	public Object producerserverSettingList(@RequestBody IpQueryDto ipQueryDto) {
 
 		Pair<Long, List<IpResource>> pair = null;
-		List<IpResource> ipResources = new ArrayList<IpResource>();
+		List<IpResourceDto> ipResourceDto = new ArrayList<IpResourceDto>();
 		int offset = ipQueryDto.getOffset();
 		int limit = ipQueryDto.getLimit();
 		String ip = ipQueryDto.getIp();
 		String application = ipQueryDto.getApplication();
-
-		Boolean isAllBlank = StringUtil.isAllBlank(ip, application);
+		String type = ipQueryDto.getType();
+		if(StringUtils.isNotBlank(type)){
+			List<String> ips = null;
+			
+			if("PRODUCER".equals(type)){
+				ips = loadProducerIps();
+			}else{
+				ips = loadConsumerIps();
+			}
+			
+			if(StringUtils.isNotBlank(ip)){
+				String[] queryIps = StringUtils.split(ip);
+				
+				Collection<String> intersection = CollectionUtils.intersection(ips, Arrays.asList(queryIps));
+				if(intersection.isEmpty()){
+					return new Pair<Long, List<IpResourceDto>>(0L, ipResourceDto);
+				}else{
+					ip = StringUtils.join(intersection, ",");
+				}
+			}else{
+				ip = StringUtils.join(ips, ",");
+			}
+		}
+		
+		Boolean isAllBlank = StringUtils.isBlank(ip) && StringUtils.isBlank(application);
 
 		if (isAllBlank) {
 			pair = ipResourceService.findIpResourcePage(offset, limit);
 		} else {
 
-			if (StringUtil.isBlank(application)) {
+			if (StringUtils.isBlank(application)) {
 				String[] ips = ip.split(",");
 				pair = ipResourceService.findByIp(offset, limit, ips);
-			} else if (StringUtil.isBlank(ip)) {
+			} else if (StringUtils.isBlank(ip)) {
 				pair = ipResourceService.findByApplication(offset, limit, application);
 			} else {
-				IpResource ipResource = ipResourceService.find(ip, application);
-				ipResources.add(ipResource);
-				pair = new Pair<Long, List<IpResource>>(1L, ipResources);
+				String[] ips = ip.split(",");
+				pair = ipResourceService.find(offset, limit, application, ips);
 			}
 
 		}
-
-		List<IpResourceDto> ipResourceDto = new ArrayList<IpResourceDto>();
 
 		for (IpResource ipResource : pair.getSecond()) {
 			ipResourceDto.add(IpResourceMapper.toIpResourceDto(ipResource));
@@ -132,7 +166,7 @@ public class IPController extends AbstractMenuController {
 			IPDesc iPDesc = ipResource.getiPDesc();
 			if (iPDesc != null) {
 				String app = iPDesc.getName();
-				if (StringUtil.isNotBlank(app) && !apps.contains(app)) {
+				if (StringUtils.isNotBlank(app) && !apps.contains(app)) {
 					apps.add(app);
 				}
 			}
@@ -167,7 +201,37 @@ public class IPController extends AbstractMenuController {
 		
 		return result;
 	}
-
+	
+	private List<String> loadProducerIps(){
+		
+		List<TopicResource> topicResources = topicResourceService.findAll();
+		Set<String> ips = new LinkedHashSet<String>();
+		
+		List<String> ipList = null;
+		for(TopicResource topicResource : topicResources){
+			ipList = topicResource.getProducerIps();
+			if(ipList != null){
+				ips.addAll(ipList);
+			}
+		}
+		return new ArrayList<String>(ips);
+	}
+	
+	private List<String> loadConsumerIps(){
+		
+		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(DefaultConsumerIdResourceDao.CONSUMERIPS);
+		Set<String> ips = new LinkedHashSet<String>();
+		
+		List<String> ipList = null;
+		for(ConsumerIdResource consumerIdResource : consumerIdResources){
+			ipList = consumerIdResource.getConsumerIps();
+			if(ipList != null){
+				ips.addAll(ipList);
+			}
+		}
+		return new ArrayList<String>(ips);
+	}
+	
 	@Override
 	protected String getMenu() {
 		return "ip";

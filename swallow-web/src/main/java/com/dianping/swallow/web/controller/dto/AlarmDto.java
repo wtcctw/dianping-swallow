@@ -25,7 +25,7 @@ public class AlarmDto {
 	private String body;
 
 	private String related;
-
+	
 	private String relatedUrl;
 
 	private RelatedType relatedType;

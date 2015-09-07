@@ -53,8 +53,10 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  */
 @Component
 public class DashboardContainerUpdater implements MonitorDataListener, Runnable {
-	
+
 	private static final String FACTORY_NAME = "Dashboard";
+
+	private static final String DEFAULT = "default";
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
@@ -75,7 +77,7 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 
 	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
 			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-	
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
@@ -160,53 +162,50 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 				td.setListAck(ackList.subList(ackListSize - 2, ackListSize));
 				td.setListAccu(accuList.subList(accuListSize - 2, accuListSize));
 				totalDataMap.put(totalcDataKey, td);
-				if (logger.isInfoEnabled()) {
-					logger.info(String.format("Generate totalData for topic %s and consumerid %s", topic, consumerid));
-				}
 			}
 		}
 		if (logger.isInfoEnabled()) {
 			logger.info(String.format("Generate totalData for all topic and consumerid"));
 		}
 
-		if(totalDataMap.isEmpty()){
+		if (totalDataMap.isEmpty()) {
 			return;
 		}
-		
+
 		FixSizedPriorityQueueContainer pqContainer = new FixSizedPriorityQueueContainer();
-		
+
 		for (Map.Entry<TotalDataKey, TotalData> entry : totalDataMap.entrySet()) {
 			Entry e = generateEntry(entry);
 			pqContainer.addEntry(e);
 		}
-		
+
 		MinuteEntry me = new MinuteEntry();
 
 		me.setTime(entryTime);
-		me.setComprehensiveList( setCmdpInfo(pqContainer.getComprehensivePriorityQueue().sortedList()) );
-		me.setSendList( setCmdpInfo(pqContainer.getSendPriorityQueue().sortedList()));
-		me.setAckList( setCmdpInfo(pqContainer.getAckPriorityQueue().sortedList()));
-		me.setAccuList( setCmdpInfo(pqContainer.getAccuPriorityQueue().sortedList()));
+		me.setComprehensiveList(setCmdpInfo(pqContainer.getComprehensivePriorityQueue().sortedList()));
+		me.setSendList(setCmdpInfo(pqContainer.getSendPriorityQueue().sortedList()));
+		me.setAckList(setCmdpInfo(pqContainer.getAckPriorityQueue().sortedList()));
+		me.setAccuList(setCmdpInfo(pqContainer.getAccuPriorityQueue().sortedList()));
 
 		boolean inserted = dashboardContainer.insertMinuteEntry(me);
 		if (logger.isInfoEnabled()) {
 			logger.info(String.format("Insert MinuteEntry to dashboard %s", inserted ? "successfully" : "failed"));
 		}
-		
+
 		totalDataMap.clear();
 	}
 
 	private Entry generateEntry(Map.Entry<TotalDataKey, TotalData> entry) {
 
 		TotalData totalData = entry.getValue();
-		
+
 		List<Long> mergeData = calMinuteStats(totalData.getListSend());
 		totalData.setListSend(mergeData);
 		mergeData = calMinuteStats(totalData.getListAck());
 		totalData.setListAck(mergeData);
 		mergeData = calMinuteStats(totalData.getListAccu());
 		totalData.setListAccu(mergeData);
-		
+
 		return doGenerateEntry(entry);
 	}
 
@@ -220,11 +219,11 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 
 		TotalData totalData = entry.getValue();
 		TotalDataKey totalDataKey = entry.getKey();
-		
+
 		List<Long> sendList = totalData.getListSend();
 		List<Long> ackList = totalData.getListAck();
 		List<Long> accuList = totalData.getListAccu();
-		
+
 		float senddelay = (float) (sendList.get(0) / 1000.0);
 		float ackdelay = (float) (ackList.get(0) / 1000.0);
 		long accu = accuList.get(0);
@@ -234,27 +233,49 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 		boolean alarm = true;
 		ConsumerBaseAlarmSetting consumerBaseAlarmSetting = null;
 		TopicResource topicResource = alarmResourceContainer.findTopicResource(topic);
-		
-		if(topicResource != null){
-			if(topicResource.isConsumerAlarm()){
-				ConsumerIdResource consumerIdResource = alarmResourceContainer.findConsumerIdResource(topic, consumerid);
-				if(consumerIdResource != null){
+
+		if (topicResource != null) {
+			
+			if (topicResource.isConsumerAlarm()) {
+				ConsumerIdResource consumerIdResource = alarmResourceContainer
+						.findConsumerIdResource(topic, consumerid);
+				
+				if (consumerIdResource != null) {
 					alarm = consumerIdResource.isAlarm();
-					consumerIdResource.getConsumerAlarmSetting();
+					consumerBaseAlarmSetting = consumerIdResource.getConsumerAlarmSetting();
+					if (consumerBaseAlarmSetting == null) {
+						consumerBaseAlarmSetting = loadDefaultConfiguration();
+					}
+				}else{
+					consumerBaseAlarmSetting = loadDefaultConfiguration();
 				}
-			}else{
+				
+			} else {
 				alarm = false;
 			}
+			
 		}
-		
+
 		Entry e = new Entry();
 
 		e.setConsumerId(consumerid).setTopic(topic).setSenddelay(senddelay).setAckdelay(ackdelay).setAccu(accu);
 
 		e.setAlert(consumerBaseAlarmSetting, alarm);
-		
+
 		return e;
-			
+
+	}
+	
+	private ConsumerBaseAlarmSetting loadDefaultConfiguration(){
+		
+		ConsumerIdResource consumerIdResource = alarmResourceContainer.findConsumerIdResource(DEFAULT, DEFAULT);
+
+		if (consumerIdResource == null) {
+			throw new RuntimeException("No default configuration for ConsumerIdResource.");
+		} else {
+			return consumerIdResource.getConsumerAlarmSetting();
+		}
+		
 	}
 
 	private List<Long> calMinuteStats(List<Long> number) {
@@ -302,22 +323,22 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 
 		return list;
 	}
-	
-	private List<Entry> setCmdpInfo(List<Entry> list){
-		
+
+	private List<Entry> setCmdpInfo(List<Entry> list) {
+
 		List<Entry> result = new ArrayList<Entry>();
-		
+
 		for (Entry e : list) {
 			if (StringUtils.isBlank(e.getDpMobile()) || StringUtils.isBlank(e.getEmail())
-					|| StringUtils.isBlank(e.getName())){
+					|| StringUtils.isBlank(e.getName())) {
 				doSetCmdpInfo(e);
 			}
 			result.add(e);
 		}
-		
+
 		return result;
 	}
-	
+
 	private void doSetCmdpInfo(Entry entry) {
 
 		String topic = entry.getTopic();
@@ -342,7 +363,7 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 
 		entry.setEmail(email).setName(name).setDpMobile(mobile);
 	}
-	
+
 	private static String loadFirstElement(Set<String> set) {
 
 		Iterator<String> it = set.iterator();
@@ -354,9 +375,9 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 
 	@Override
 	public void run() {
-		
+
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doCollector");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "CalculateDashboard");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {
@@ -368,7 +389,7 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 		} finally {
 
 		}
-		
+
 	}
 
 }

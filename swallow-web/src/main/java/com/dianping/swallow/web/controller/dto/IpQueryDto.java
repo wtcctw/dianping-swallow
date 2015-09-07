@@ -12,6 +12,8 @@ public class IpQueryDto extends BaseDto{
 	
 	private String application;
 	
+	private String type;
+	
 	public IpQueryDto(){
 		
 	}
@@ -30,6 +32,14 @@ public class IpQueryDto extends BaseDto{
 
 	public void setApplication(String application) {
 		this.application = application;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 }

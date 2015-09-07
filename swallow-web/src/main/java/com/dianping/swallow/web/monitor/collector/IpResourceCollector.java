@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.manager.impl;
+package com.dianping.swallow.web.monitor.collector;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.dianping.ba.base.organizationalstructure.api.user.UserService;
 import com.dianping.ba.base.organizationalstructure.api.user.dto.UserProfileDto;
@@ -24,11 +23,11 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.manager.IPResourceManager;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.IpResource;
+import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
+import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.CmdbService;
-import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.IpResourceService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
@@ -36,50 +35,53 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  * 
  * @author qiyin
  *
+ *         2015年9月6日 下午4:02:01
  */
-@Service("ipDescManager")
-public class IPResourceManagerImpl implements IPResourceManager {
+@Component
+public class IpResourceCollector {
 
-	private static final Logger logger = LoggerFactory.getLogger(IPResourceManagerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(IpResourceCollector.class);
+
+	private static final String FACTORY_NAME = "IpResourceCollector";
 
 	private static final String COMMA_SPLIT = ",";
 
-	private static final String FACTORY_NAME = "IPDescManager";
+	@Autowired
+	private ConsumerStatsDataWapper consumerStatsDataWapper;
 
-	private int interval = 120;// 分钟
-
-	private int delay = 10;
-
-	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
-			.getThreadFactory(FACTORY_NAME));
-
-	private ScheduledFuture<?> future = null;
+	@Autowired
+	private ProducerStatsDataWapper producerStatsDataWapper;
 
 	@Autowired
 	private IpResourceService ipResourceService;
 
 	@Autowired
-	private CmdbService cmdbService;
-
-	@Autowired
-	private IPCollectorService ipCollectorService;
-
-	@Autowired
 	private UserService baUserService;
 
-	//@PostConstruct
-	public void startTask() {
-		setFuture(scheduled.scheduleAtFixedRate(new Runnable() {
+	@Autowired
+	private CmdbService cmdbService;
+
+	private int collectorInterval = 30;
+
+	private int delayInterval = 2;
+
+	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
+			.getThreadFactory(FACTORY_NAME));
+
+	@PostConstruct
+	public void doScheduledTask() {
+		scheduled.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
 					logger.info("[startTask] scheduled task running.");
-					SwallowActionWrapper catWrapper = new CatActionWrapper("IPResourceManagerImpl", "doIPDescTask");
+					SwallowActionWrapper catWrapper = new CatActionWrapper(IpResourceCollector.class.getSimpleName(),
+							"doResourceCollector");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {
-							doIPDescTask();
+							doIpResource();
 						}
 					});
 				} catch (Throwable th) {
@@ -89,89 +91,60 @@ public class IPResourceManagerImpl implements IPResourceManager {
 				}
 			}
 
-		}, getDelay(), getInterval(), TimeUnit.MINUTES));
+		}, getDelayInterval(), getCollectorInterval(), TimeUnit.MINUTES);
 	}
 
-	private void doIPDescTask() {
-		Set<String> ips = ipCollectorService.getStatisIps();
-		if (ips != null && ips.size() > 0) {
-			Iterator<String> iterator = ips.iterator();
-			while (iterator.hasNext()) {
-				String ip = iterator.next();
-				IPDesc ipDesc = cmdbService.getIpDesc(ip);
-				if (ipDesc != null) {
-					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
-					if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
-						ipDesc.setCreateTime(new Date());
-						ipDesc.setUpdateTime(new Date());
-						addEmail(ipDesc);
-						IpResource ipResource = new IpResource();
-						ipResource.setIp(ipDesc.getIp());
-						ipResource.setCreateTime(new Date());
-						ipResource.setUpdateTime(new Date());
-						ipResource.setiPDesc(ipDesc);
-						ipResourceService.insert(ipResource);
-					} else {
-						IpResource ipResource = ipResourceInDbs.get(0);
-						ipResource.setId(ipResource.getId());
-						if (ipResource.getiPDesc() != null) {
-							ipDesc.setId(ipResource.getiPDesc().getId());
-						}
-						ipDesc.setUpdateTime(new Date());
-						addEmail(ipDesc);
-						ipResource.setUpdateTime(new Date());
-						ipResource.setiPDesc(ipDesc);
-						ipResourceService.update(ipResource);
-					}
-				} else {
-					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
+	public void doIpResource() {
+		Set<String> producerIps = producerStatsDataWapper.getIps(false);
+		Set<String> consuemerIps = consumerStatsDataWapper.getIps(false);
+		doIpResourceTask(producerIps);
+		doIpResourceTask(consuemerIps);
+	}
+
+	private void doIpResourceTask(Set<String> ips) {
+		for (String ip : ips) {
+			IPDesc ipDesc = cmdbService.getIpDesc(ip);
+			if (ipDesc != null) {
+				List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
+				if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
+					ipDesc.setCreateTime(new Date());
+					ipDesc.setUpdateTime(new Date());
+					addEmail(ipDesc);
 					IpResource ipResource = new IpResource();
-					if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
-						ipResource.setCreateTime(new Date());
-						ipResource.setUpdateTime(new Date());
-					}else{
-						ipResource.setUpdateTime(new Date());
-					}
-					ipResource.setIp(ip);
-					ipResource.setAlarm(false);
+					ipResource.setIp(ipDesc.getIp());
 					ipResource.setCreateTime(new Date());
-					ipResource.setiPDesc(new IPDesc(ip));
+					ipResource.setUpdateTime(new Date());
+					ipResource.setiPDesc(ipDesc);
+					ipResourceService.insert(ipResource);
+				} else {
+					IpResource ipResource = ipResourceInDbs.get(0);
+					ipResource.setId(ipResource.getId());
+					if (ipResource.getiPDesc() != null) {
+						ipDesc.setId(ipResource.getiPDesc().getId());
+					}
+					ipDesc.setUpdateTime(new Date());
+					addEmail(ipDesc);
+					ipResource.setUpdateTime(new Date());
+					ipResource.setiPDesc(ipDesc);
 					ipResourceService.update(ipResource);
 				}
+			} else {
+				List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
+				IpResource ipResource = null;
+				if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
+					ipResource = new IpResource();
+					ipResource.setAlarm(false);
+					ipResource.setiPDesc(new IPDesc(ip));
+					ipResource.setCreateTime(new Date());
+					ipResource.setUpdateTime(new Date());
+				} else {
+					ipResource = ipResourceInDbs.get(0);
+					ipResource.setUpdateTime(new Date());
+				}
+				ipResource.setIp(ip);
+				ipResourceService.update(ipResource);
 			}
 		}
-	}
-
-	public int getInterval() {
-		return interval;
-	}
-
-	public int getDelay() {
-		return delay;
-	}
-
-	@Override
-	public IPDesc getIPDesc(String ip) {
-		if (StringUtils.isBlank(ip)) {
-			return null;
-		}
-		List<IpResource> ipResources = ipResourceService.findByIp(ip);
-		if (ipResources == null || ipResources.size() == 0) {
-			IPDesc ipDesc = cmdbService.getIpDesc(ip);
-			if (ipDesc == null) {
-				return null;
-			}
-			addEmail(ipDesc);
-			ipDesc.setCreateTime(new Date());
-			ipDesc.setUpdateTime(new Date());
-			IpResource ipResource = new IpResource();
-			ipResource.setIp(ip);
-			ipResource.setiPDesc(ipDesc);
-			ipResource.setCreateTime(new Date());
-			ipResource.setUpdateTime(new Date());
-			ipResourceService.insert(ipResource);
-		}
-		return ipResources.get(0).getiPDesc();
 	}
 
 	private void addEmail(IPDesc ipDesc) {
@@ -256,12 +229,20 @@ public class IPResourceManagerImpl implements IPResourceManager {
 		return emails;
 	}
 
-	public ScheduledFuture<?> getFuture() {
-		return future;
+	public int getCollectorInterval() {
+		return collectorInterval;
 	}
 
-	public void setFuture(ScheduledFuture<?> future) {
-		this.future = future;
+	public void setCollectorInterval(int collectorInterval) {
+		this.collectorInterval = collectorInterval;
+	}
+
+	public int getDelayInterval() {
+		return delayInterval;
+	}
+
+	public void setDelayInterval(int delayInterval) {
+		this.delayInterval = delayInterval;
 	}
 
 }
