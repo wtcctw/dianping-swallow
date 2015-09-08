@@ -28,6 +28,7 @@ import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mingdongli
@@ -36,6 +37,8 @@ import com.dianping.swallow.web.service.TopicResourceService;
  */
 @Component
 public class ConsumerIdResourceCollector implements Runnable {
+
+	private static final String FACTORY_NAME = "ConsumerIdResourceCollector";
 
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
@@ -49,7 +52,8 @@ public class ConsumerIdResourceCollector implements Runnable {
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
-	private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+	private ScheduledExecutorService scheduledExecutorService = Executors
+			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 

@@ -30,6 +30,7 @@ import com.dianping.swallow.web.dao.TopicResourceDao;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.TopicResourceService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 import freemarker.template.utility.StringUtil;
 
@@ -41,6 +42,8 @@ import freemarker.template.utility.StringUtil;
 @Service("topicResourceService")
 public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService, Runnable {
 
+	private static final String FACTORY_NAME = "TopicResourceServiceImpl";
+	
 	private static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist";
 
 	private static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
@@ -54,7 +57,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 	private Map<String, Set<String>> topicToConsumerServer = new ConcurrentHashMap<String, Set<String>>();
 
-	private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+	private ScheduledExecutorService scheduledExecutorService = Executors
+			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	@PostConstruct
 	void initLionConfig() {
