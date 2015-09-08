@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.util.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +27,8 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.controller.dto.IpResourceDto;
 import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
@@ -45,10 +45,6 @@ import com.dianping.swallow.web.util.ResponseStatus;
 @Controller
 public class IPController extends AbstractMenuController {
 
-	private static final String IP = "ip";
-
-	private static final String APPLICATION = "iPDesc.name";
-
 	@Resource(name = "ipResourceService")
 	private IpResourceService ipResourceService;
 	
@@ -57,9 +53,12 @@ public class IPController extends AbstractMenuController {
 	
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
+	
+	@Autowired
+	private UserUtils userUtils;
 
 	@RequestMapping(value = "/console/ip")
-	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView ipView(HttpServletRequest request, HttpServletResponse response) {
 
 		return new ModelAndView("ip/index", createViewMap());
 	}
@@ -140,39 +139,18 @@ public class IPController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/ip/allip", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadCmsumerid() {
+	public List<String> loadCmsumerid(HttpServletRequest request, HttpServletResponse response) {
 
-		Set<String> ips = new HashSet<String>();
-		List<IpResource> ipResources = ipResourceService.findAll(IP);
-
-		for (IpResource ipResource : ipResources) {
-			String ip = ipResource.getIp();
-			if (!ips.contains(ip)) {
-				ips.add(ip);
-			}
-		}
-
-		return new ArrayList<String>(ips);
+		String username = userUtils.getUsername(request);
+		return userUtils.consumerIps(username);
 	}
 
 	@RequestMapping(value = "/console/ip/application", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadApplication() {
+	public List<String> loadApplication(HttpServletRequest request, HttpServletResponse response) {
 
-		Set<String> apps = new HashSet<String>();
-		List<IpResource> ipResources = ipResourceService.findAll(APPLICATION);
-
-		for (IpResource ipResource : ipResources) {
-			IPDesc iPDesc = ipResource.getiPDesc();
-			if (iPDesc != null) {
-				String app = iPDesc.getName();
-				if (StringUtils.isNotBlank(app) && !apps.contains(app)) {
-					apps.add(app);
-				}
-			}
-		}
-
-		return new ArrayList<String>(apps);
+		String username = userUtils.getUsername(request);
+		return userUtils.applications(username);
 	}
 
 	@RequestMapping(value = "/console/ip/alarm", method = RequestMethod.GET)

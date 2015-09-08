@@ -2,9 +2,7 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +34,6 @@ import com.dianping.swallow.web.util.ResponseStatus;
  */
 @Controller
 public class ConsumerIdController extends AbstractMenuController {
-
-	private static final String CONSUMERID = "consumerId";
 
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
@@ -132,30 +128,12 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/consumerid/allconsumerid", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadCmsumerid(HttpServletRequest request, HttpServletResponse response) {
+	public List<String> loadConsumerid(HttpServletRequest request, HttpServletResponse response) {
 
-		Set<String> consumerids = new HashSet<String>();
 		String username = userUtils.getUsername(request);
 		
-		if (!userUtils.isAdministrator(username)) {
-			List<String> consumeridList = userUtils.consumerIds(username);
-			consumerids.addAll(consumeridList);
-		}else{
-			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID);
-			
-			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-				String cid = consumerIdResource.getConsumerId();
-				if (!consumerids.contains(cid)) {
-					consumerids.add(cid);
-				}
-			}
-		}
+		return userUtils.consumerIds(username);
 
-		if (!userUtils.isTrueAdministrator(username)) {
-			consumerids.remove(TopicController.DEFAULT);
-		}
-
-		return new ArrayList<String>(consumerids);
 	}
 
 	@RequestMapping(value = "/console/consumerid/ips", method = RequestMethod.GET)
