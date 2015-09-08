@@ -5,6 +5,8 @@ import java.util.List;
 
 import jodd.util.StringUtil;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -96,7 +98,7 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 		int limit = consumerIdParam.getLimit();
 
 		Query query = new Query();
-		
+
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		for (String t : topics) {
 			criterias.add(Criteria.where(TOPIC).is(t));
@@ -144,11 +146,11 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 
 		int offset = consumerIdParam.getOffset();
 		int limit = consumerIdParam.getLimit();
-		
-		query.skip(offset).limit(limit);
+
+		query.skip(offset).limit(limit)
+				.with(new Sort(new Sort.Order(Direction.ASC, TOPIC), new Sort.Order(Direction.ASC, CONSUMERID)));
 		List<ConsumerIdResource> consumerIdResource = mongoTemplate.find(query, ConsumerIdResource.class,
 				CONSUMERIDRESOURCE_COLLECTION);
-		
 
 		return new Pair<Long, List<ConsumerIdResource>>(size, consumerIdResource);
 	}
@@ -187,7 +189,8 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 		int offset = consumerIdParam.getOffset();
 		int limit = consumerIdParam.getLimit();
 
-		query.skip(offset).limit(limit);
+		query.skip(offset).limit(limit)
+				.with(new Sort(new Sort.Order(Direction.ASC, TOPIC), new Sort.Order(Direction.ASC, CONSUMERID)));
 		List<ConsumerIdResource> consumerIdResources = mongoTemplate.find(query, ConsumerIdResource.class,
 				CONSUMERIDRESOURCE_COLLECTION);
 		Long size = this.count();

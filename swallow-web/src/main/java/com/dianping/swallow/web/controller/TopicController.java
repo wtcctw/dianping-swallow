@@ -412,11 +412,18 @@ public class TopicController extends AbstractMenuController {
 		if (StringUtils.isBlank(topics)) {
 			return false;
 		}
+		Set<String> allTopics = topicResourceService.loadCachedTopicToWhiteList().keySet();
+		Set<String> allTopicsCopy = new HashSet<String>(allTopics); 
 		String[] topicArray = topics.split(",");
 		for (String topic : topicArray) {
 			String tmptopic = topic.trim();
 			if (!NameCheckUtil.isTopicNameValid(tmptopic)) {
 				return false;
+			}
+			if(allTopicsCopy.contains(tmptopic)){
+				return false;
+			}else{ //防止重复
+				allTopicsCopy.add(tmptopic);
 			}
 		}
 
