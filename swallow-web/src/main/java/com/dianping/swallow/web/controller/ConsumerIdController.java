@@ -28,7 +28,6 @@ import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
-import com.dianping.swallow.web.util.TopicNameUtil;
 
 /**
  * @author mingdongli
@@ -45,9 +44,6 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	@Autowired
 	private UserUtils userUtils;
-
-	@Autowired
-	private TopicNameUtil topicNameUtil;
 
 	@RequestMapping(value = "/console/consumerid")
 	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
