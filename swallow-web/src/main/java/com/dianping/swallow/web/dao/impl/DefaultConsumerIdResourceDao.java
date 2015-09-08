@@ -91,10 +91,19 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam) {
 
 		String topic = consumerIdParam.getTopic();
+		String[] topics = topic.split(",");
 		int offset = consumerIdParam.getOffset();
 		int limit = consumerIdParam.getLimit();
 
-		Query query = new Query(Criteria.where(TOPIC).is(topic));
+		Query query = new Query();
+		
+		List<Criteria> criterias = new ArrayList<Criteria>();
+		for (String t : topics) {
+			criterias.add(Criteria.where(TOPIC).is(t));
+		}
+
+		query.addCriteria(Criteria.where(TOPIC).exists(true)
+				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
 
 		Long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
 
@@ -115,7 +124,14 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 		Query query = new Query();
 
 		if (StringUtil.isNotBlank(topic)) {
-			query.addCriteria(Criteria.where(TOPIC).is(topic));
+			String[] topics = topic.split(",");
+			List<Criteria> criterias = new ArrayList<Criteria>();
+			for (String t : topics) {
+				criterias.add(Criteria.where(TOPIC).is(t));
+			}
+
+			query.addCriteria(Criteria.where(TOPIC).exists(true)
+					.orOperator(criterias.toArray(new Criteria[criterias.size()])));
 		}
 		if (StringUtil.isNotBlank(consumerId)) {
 			query.addCriteria(Criteria.where(CONSUMERID).is(consumerId));

@@ -117,9 +117,6 @@ module
 							$scope.query.consumerId = $scope.consumerId;
 							$scope.query.consumerIp = $scope.consumerIp;
 							
-							$scope.searchPaginator = Paginator(fetchFunction,
-									$scope.numrecord, $scope.query);
-
 							$scope.consumeridEntry = {};
 							$scope.consumeridEntry.consumerId;
 							$scope.consumeridEntry.topic;
@@ -205,9 +202,9 @@ module
 							}
 							
 							//如果topic列表返回空，则不会执行initpage
-							$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
-								$scope.initpage();
-							});
+//							$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
+//								$scope.initpage();
+//							});
 							
 							$scope.initpage = function(){
 
@@ -229,6 +226,19 @@ module
 												return c;
 											}
 										})
+										
+										if($scope.topic.length == 0){ //默认请求
+											var topics = topicNameList.join(",");
+											if(topicNameList.length == 1){
+												$scope.topic = topics;
+											}else{
+												$scope.topic = "";
+											}
+											$scope.query.topic = topics;
+											$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+										}else{//点击cid跳转过来
+											$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+										}
 									}).error(function(data, status, headers, config) {
 								});
 										
@@ -287,6 +297,8 @@ module
 									}).error(function(data, status, headers, config) {
 								});
 							}
+							
+							$scope.initpage();
 							
 							$scope.setIp = function(ip){
 								localStorage.setItem("ip", ip);

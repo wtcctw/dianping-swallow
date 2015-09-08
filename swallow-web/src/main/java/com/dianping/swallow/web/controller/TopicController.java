@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -75,7 +74,7 @@ public class TopicController extends AbstractMenuController {
 	@RequestMapping(value = "/console/topic/list", method = RequestMethod.POST)
 	@ResponseBody
 	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
-			HttpServletResponse response) throws UnknownHostException {
+			HttpServletResponse response) {
 
 		List<TopicResourceDto> result = new ArrayList<TopicResourceDto>();
 		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
@@ -106,7 +105,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
 	@ResponseBody
-	public Object topicName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
+	public Pair<List<String>, List<String>> topicName(HttpServletRequest request) {
 
 		String username = userUtils.getUsername(request);
 		boolean findAll = userUtils.isAdministrator(username);
@@ -150,7 +149,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET)
 	@ResponseBody
-	public Object propName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
+	public Object propName(HttpServletRequest request, HttpServletResponse response) {
 
 		String username = userUtils.getUsername(request);
 		boolean findAll = userUtils.isAdministrator(username);
@@ -182,7 +181,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/update", method = RequestMethod.POST)
 	@ResponseBody
-	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto) throws UnknownHostException {
+	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto) {
 
 		TopicResource topicResource = TopicResourceMapper.toTopicResource(topicResourceDto);
 		boolean result = topicResourceService.update(topicResource);

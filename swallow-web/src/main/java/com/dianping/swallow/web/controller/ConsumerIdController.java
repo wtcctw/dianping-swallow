@@ -28,25 +28,26 @@ import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
-
+import com.dianping.swallow.web.util.TopicNameUtil;
 
 /**
  * @author mingdongli
  *
- * 2015年8月27日下午3:33:36
+ *         2015年8月27日下午3:33:36
  */
 @Controller
 public class ConsumerIdController extends AbstractMenuController {
 
 	private static final String CONSUMERID = "consumerId";
 
-	private static final String CONSUMERIP = "consumerIps";
-
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
-	
+
 	@Autowired
 	private UserUtils userUtils;
+
+	@Autowired
+	private TopicNameUtil topicNameUtil;
 
 	@RequestMapping(value = "/console/consumerid")
 	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
@@ -99,11 +100,11 @@ public class ConsumerIdController extends AbstractMenuController {
 		consumerIdParam.setConsumerId(consumerId);
 		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
 		List<ConsumerIdResource> consumerIdResourceList = pair.getSecond();
-		if(consumerIdResourceList != null && !consumerIdResourceList.isEmpty()){
+		if (consumerIdResourceList != null && !consumerIdResourceList.isEmpty()) {
 			ConsumerIdResource consumerIdResource = consumerIdResourceList.get(0);
 			consumerIdResource.setAlarm(alarm);
 			boolean result = consumerIdResourceService.update(consumerIdResource);
-			
+
 			if (result) {
 				if (logger.isInfoEnabled()) {
 					logger.info(String.format("Update alarm of %s to %b successfully", topic, alarm));
@@ -113,10 +114,10 @@ public class ConsumerIdController extends AbstractMenuController {
 					logger.info(String.format("Update alarm of %s to %b fail", topic, alarm));
 				}
 			}
-			
+
 			return result;
 		}
-		
+
 		return Boolean.FALSE;
 	}
 
@@ -138,38 +139,36 @@ public class ConsumerIdController extends AbstractMenuController {
 	public List<String> loadCmsumerid(HttpServletRequest request, HttpServletResponse response) {
 
 		Set<String> consumerids = new HashSet<String>();
-		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID);
-
-		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-			String cid = consumerIdResource.getConsumerId();
-			if (!consumerids.contains(cid)) {
-				consumerids.add(cid);
+		String username = userUtils.getUsername(request);
+		
+		if (!userUtils.isAdministrator(username)) {
+			List<String> consumeridList = userUtils.consumerIds(username);
+			consumerids.addAll(consumeridList);
+		}else{
+			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID);
+			
+			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
+				String cid = consumerIdResource.getConsumerId();
+				if (!consumerids.contains(cid)) {
+					consumerids.add(cid);
+				}
 			}
 		}
-		
-		String username = userUtils.getUsername(request);
-		if(!userUtils.isTrueAdministrator(username)){
+
+		if (!userUtils.isTrueAdministrator(username)) {
 			consumerids.remove(TopicController.DEFAULT);
 		}
 
 		return new ArrayList<String>(consumerids);
 	}
-	
+
 	@RequestMapping(value = "/console/consumerid/ips", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadConsumerIps() {
+	public List<String> loadConsumerIps(HttpServletRequest request, HttpServletResponse response) {
+		
+		String username = userUtils.getUsername(request);
+		return userUtils.consumerIps(username);
 
-		Set<String> consumerips = new HashSet<String>();
-		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERIP);
-
-		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-			List<String> cips = consumerIdResource.getConsumerIps();
-			if ( !cips.isEmpty()) {
-				consumerips.addAll(cips);
-			}
-		}
-
-		return new ArrayList<String>(consumerips);
 	}
 
 	@Override
