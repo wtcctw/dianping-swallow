@@ -192,6 +192,20 @@ public class TopicController extends AbstractMenuController {
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
+	
+	@RequestMapping(value = "/console/topic/auth/ip", method = RequestMethod.POST)
+	@ResponseBody
+	public Object queryProducerIp(@RequestBody TopicQueryDto topicQueryDto) {
+
+		TopicResourceDto topicResourceDto = null;
+		String topic = topicQueryDto.getTopic();
+		TopicResource topicResource = topicResourceService.findByTopic(topic);
+		if(topicResource != null){
+			topicResourceDto = TopicResourceMapper.toTopicResourceDto(topicResource);
+		}
+		
+		return topicResourceDto;
+	}
 
 	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody

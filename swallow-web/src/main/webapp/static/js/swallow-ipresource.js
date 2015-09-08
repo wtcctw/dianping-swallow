@@ -161,9 +161,9 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 						entity.topic = topic;
 						entity.consumerId = cid;
 						entity.consumerIp = "";
-						$http.post(window.contextPath + "/console/consumerid/list", entity).success(function(data){
-							if(data.first == 1){
-								var tmpip = data.second[0].consumerIp;
+						$http.post(window.contextPath + "/console/topic/auth/cid", entity).success(function(data){
+							if(data.status == null){//authentication
+								var tmpip = data.consumerIp;
 								if(tmpip != null){
 									
 									if(tmpip.indexOf(',') == -1){
@@ -187,9 +187,9 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 						entity.limit = 1;
 						entity.topic = topic;
 						entity.producerServer = "";
-						$http.post(window.contextPath + "/console/topic/list", entity).success(function(data){
-							if(data.first == 1){
-								var tmpip = data.second[0].producerServer;
+						$http.post(window.contextPath + "/console/topic/auth/ip", entity).success(function(data){
+							if(data.status == null){
+								var tmpip = data.producerServer;
 								if(tmpip != null){
 									
 									if(tmpip.indexOf(',') == -1){

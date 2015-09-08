@@ -68,6 +68,24 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	}
 
+	@RequestMapping(value = "/console/topic/auth/cid", method = RequestMethod.POST)
+	@ResponseBody
+	public Object queryComsumeridResource(@RequestBody ConsumerIdQueryDto consumerIdQueryDto) {
+		
+		ConsumerIdResourceDto consumerIdResourceDto = null;
+		
+		String topic = consumerIdQueryDto.getTopic();
+		String consumerId = consumerIdQueryDto.getConsumerId();
+		ConsumerIdResource consumerIdResource = consumerIdResourceService.findByConsumerIdAndTopic(topic, consumerId);
+		
+		if(consumerIdResource != null){
+			consumerIdResourceDto = ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource);
+		}
+		
+		return consumerIdResourceDto;
+		
+	}
+
 	@RequestMapping(value = "/console/consumerid/update", method = RequestMethod.POST)
 	@ResponseBody
 	public Object updateTopic(@RequestBody ConsumerIdResourceDto consumerIdResourceDto) throws UnknownHostException {
