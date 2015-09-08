@@ -228,14 +228,16 @@ module
 										})
 										
 										if($scope.topic.length == 0){ //默认请求
-											var topics = topicNameList.join(",");
-											if(topicNameList.length == 1){
-												$scope.topic = topics;
-											}else{
-												$scope.topic = "";
+											if(topicNameList != null && topicNameList.length > 0){
+												var topics = topicNameList.join(",");
+												if(topicNameList.length == 1){
+													$scope.topic = topics;
+												}else{
+													$scope.topic = "";
+												}
+												$scope.query.topic = topics;
+												$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 											}
-											$scope.query.topic = topics;
-											$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 										}else{//点击cid跳转过来
 											$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 										}

@@ -255,14 +255,16 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 						})
 						
 						if(tmpip == null && tmplocation == null){ //默认界面
-							var ipString = ips.join(",");
-							if(ips.length == 1){
-								$scope.searchip = ips;
-							}else{
-								$scope.searchip = "";
+							if(ips.length > 0){
+								var ipString = ips.join(",");
+								if(ips.length == 1){
+									$scope.searchip = ips;
+								}else{
+									$scope.searchip = "";
+								}
+								$scope.query.ip = ipString;
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 							}
-							$scope.query.ip = ipString;
-							$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
 						}
 					}).error(function(data, status, headers, config) {
 				});
