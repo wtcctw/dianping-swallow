@@ -357,8 +357,13 @@ input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
 }
 
 .table-smalll-td-consumerId {
-	max-width: 250px;
-	width: 250px;
+	max-width: 240px;
+	width: 240px;
+}
+
+.table-smalll-td-data{
+	max-width: 70px;
+	width: 70px;
 }
 
 .table-smalll-td-consumerId a {
