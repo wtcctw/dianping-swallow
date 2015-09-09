@@ -58,11 +58,8 @@ db.CONSUMER_TOPIC_STATS_DATA.ensureIndex({'timeKey': 1}, {"name":"IX_TIMEKEY", "
 db.CONSUMER_TOPIC_STATS_DATA.ensureIndex({'topicName': -1, 'timeKey': 1}, {"name":"IX_TOPICNAME_TIMEKEY", "background": true});
 
 db.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1}, {"name":"IX_TIMEKEY", "background": true});
-db.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1, 'consumerId': -1 }, {"name":"IX_TIMEKEY_TOPICNAME_CONSUMERID", "background": true});
-
-
-
 db.CONSUMERID_STATS_DATA.ensureIndex({ 'topicName': -1, 'consumerId': -1,'timeKey': 1 }, {"name":"IX_TOPICNAME_CONSUMERID_TIMEKEY", 'background': true});
+
 db.PRODUCER_TOPIC_STATS_DATA.ensureIndex({ 'topicName': -1, 'timeKey': 1 }, {"name":"IX_TOPICNAME_TIMEKEY", "background": true});
 
 
