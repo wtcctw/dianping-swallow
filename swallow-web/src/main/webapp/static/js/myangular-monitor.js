@@ -370,7 +370,7 @@ module.controller('ConsumerOrderController', function($scope, $http) {
 		if(consumerId == null || consumerId == 'undefined' || consumerId.length == 0){
 			return topic;
 		}
-		return consumerId;
+		return topic+"."+consumerId;
 	};
 	$scope.showRelatedUrl = function(type, topicName, consumerId){
 		if(consumerId == null || consumerId == 'undefined' || consumerId.length == 0){

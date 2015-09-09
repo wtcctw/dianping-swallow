@@ -75,17 +75,19 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 	}
 
 	private boolean checkSlaveService() {
-		List<String> consumerServerSlaveIps = ipCollectorService.getConsumerServerSlaveIps();
-		if (consumerServerSlaveIps == null) {
+		List<ConsumerServerResource> cSlaveReources = resourceContainer.findConsumerSlaveServerResources();
+		if (cSlaveReources == null) {
+			logger.error("[checkSlaveService] cannot find consumerSlaveServerResources.");
 			return false;
 		}
-		for (String slaveIp : consumerServerSlaveIps) {
-			ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(slaveIp);
-			if (cServerResource == null || !cServerResource.isAlarm()) {
+		for (ConsumerServerResource cSlaveReource : cSlaveReources) {
+			String slaveIp = cSlaveReource.getIp();
+			if (StringUtils.isBlank(slaveIp) || !cSlaveReource.isAlarm()) {
 				continue;
 			}
 			String url = StringUtils.replace(slaveMonitorUrl, "{ip}", slaveIp);
 			HttpResult result = checkUrl(url);
+
 			if (!result.isSuccess() || !result.getResponseBody().contains(MONOGO_MONITOR_SIGN)) {
 				ServerEvent serverEvent = eventFactory.createServerEvent();
 				serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE)

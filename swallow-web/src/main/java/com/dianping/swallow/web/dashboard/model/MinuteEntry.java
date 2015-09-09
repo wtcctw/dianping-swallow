@@ -6,41 +6,40 @@ import java.util.List;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 /**
  * @author mingdongli
  *
- * 2015年7月7日上午9:36:34
+ *         2015年7月7日上午9:36:34
  */
 @Document(collection = "DASHBOARD_STATS_DATA")
 public class MinuteEntry {
-	
-	@Indexed
+
+	@Indexed(name = "IX_TIME")
 	private Date time;
 
 	private List<Entry> comprehensiveList;
 
 	private List<Entry> sendList;
-	
+
 	private List<Entry> ackList;
-	
+
 	private List<Entry> accuList;
-	
+
 	public MinuteEntry() {
-		
+
 	}
 
 	public Date getTime() {
-		
+
 		return time;
 	}
 
 	public MinuteEntry setTime(Date time) {
-		
+
 		this.time = time;
 		return this;
 	}
-	
+
 	public List<Entry> getComprehensiveList() {
 		return comprehensiveList;
 	}
@@ -73,18 +72,17 @@ public class MinuteEntry {
 		this.accuList = accuList;
 	}
 
-	public List<Entry> getListByType(DashboardEnum dashboardEnum){
-		
-		if(dashboardEnum == DashboardEnum.COMPREHENSIVE){
+	public List<Entry> getListByType(DashboardEnum dashboardEnum) {
+
+		if (dashboardEnum == DashboardEnum.COMPREHENSIVE) {
 			return comprehensiveList;
-		}else if(dashboardEnum == DashboardEnum.SEND){
+		} else if (dashboardEnum == DashboardEnum.SEND) {
 			return sendList;
-		}else if(dashboardEnum == DashboardEnum.ACK){
+		} else if (dashboardEnum == DashboardEnum.ACK) {
 			return ackList;
-		}else{
+		} else {
 			return accuList;
 		}
 	}
 
 }
-

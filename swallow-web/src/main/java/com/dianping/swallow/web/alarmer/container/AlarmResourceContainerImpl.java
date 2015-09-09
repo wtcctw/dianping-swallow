@@ -1,7 +1,9 @@
 package com.dianping.swallow.web.alarmer.container;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -9,12 +11,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.web.model.resource.BaseResource;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
@@ -40,9 +44,13 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	private static final String KEY_SPLIT = "&";
 
+	private static final String MASTER_NAME = "master";
+
+	private static final String SLAVE_NAME = "slave";
+
 	private static final String DEFAULT_DEFAULT_RECORD = DEFAULT_RECORD + KEY_SPLIT + DEFAULT_RECORD;
 
-	private int interval = 120;// 秒
+	private int interval = 300;// 秒
 
 	private int delay = 5;
 
@@ -68,6 +76,10 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	private volatile Map<String, ConsumerServerResource> cServerResources = null;
 
+	private volatile List<ConsumerServerResource> cMasterServerResources = null;
+
+	private volatile List<ConsumerServerResource> cSlaveServerResources = null;
+
 	private volatile Map<String, ProducerServerResource> pServerResources = null;
 
 	private volatile Map<String, TopicResource> topicResources = null;
@@ -86,10 +98,37 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 		if (tempResources != null) {
 			Map<String, ConsumerServerResource> newCServerResources = new HashMap<String, ConsumerServerResource>();
 			for (ConsumerServerResource tempResource : tempResources) {
-				newCServerResources.put(tempResource.getIp(),  tempResource);
+				newCServerResources.put(tempResource.getIp(), tempResource);
 			}
 			cServerResources = newCServerResources;
+			findCHAServerResourceData(tempResources);
 		}
+	}
+
+	private void findCHAServerResourceData(List<ConsumerServerResource> tempResources) {
+		List<ConsumerServerResource> newCMasterServerResources = new ArrayList<ConsumerServerResource>();
+		List<ConsumerServerResource> newCSlaveServerResources = new ArrayList<ConsumerServerResource>();
+		for (ConsumerServerResource tempResource0 : tempResources) {
+			if (StringUtils.isBlank(tempResource0.getHostname())
+					|| !StringUtils.contains(tempResource0.getHostname(), MASTER_NAME)) {
+				continue;
+			}
+
+			for (ConsumerServerResource tempResource : tempResources) {
+				if (StringUtils.isBlank(tempResource.getHostname())
+						|| !StringUtils.contains(tempResource.getHostname(), SLAVE_NAME)) {
+					continue;
+				}
+
+				String replaceName = StringUtils.replace(tempResource0.getHostname(), MASTER_NAME, SLAVE_NAME);
+				if (StringUtils.equals(tempResource.getHostname(), replaceName)) {
+					newCMasterServerResources.add(tempResource0);
+					newCSlaveServerResources.add(tempResource);
+				}
+			}
+		}
+		cMasterServerResources = newCMasterServerResources;
+		cSlaveServerResources = newCSlaveServerResources;
 	}
 
 	private void findPServerResourceData() {
@@ -97,7 +136,7 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 		if (tempResources != null) {
 			Map<String, ProducerServerResource> newPServerResources = new HashMap<String, ProducerServerResource>();
 			for (ProducerServerResource tempResource : tempResources) {
-				newPServerResources.put(tempResource.getIp(),  tempResource);
+				newPServerResources.put(tempResource.getIp(), tempResource);
 			}
 			pServerResources = newPServerResources;
 		}
@@ -201,18 +240,78 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	}
 
 	@Override
-	public List<TopicResource> findTopicResources() {
-		if (topicResources != null) {
-			return new ArrayList<TopicResource>(topicResources.values());
+	public List<ConsumerServerResource> findConsumerServerResources(boolean isDefault) {
+		if (cServerResources != null) {
+			List<ConsumerServerResource> results = new ArrayList<ConsumerServerResource>(cServerResources.values());
+			if (!isDefault) {
+				removeDefault(results);
+			}
+			return results;
 		}
 		return null;
 	}
 
 	@Override
-	public List<ConsumerIdResource> findConsumerIdResources() {
-		if (consumerIdResources != null) {
-			return new ArrayList<ConsumerIdResource>(consumerIdResources.values());
+	public List<ConsumerServerResource> findConsumerMasterServerResources() {
+		if (cMasterServerResources != null) {
+			return Collections.unmodifiableList(cMasterServerResources);
 		}
 		return null;
+	}
+
+	@Override
+	public List<ConsumerServerResource> findConsumerSlaveServerResources() {
+		if (cSlaveServerResources != null) {
+			return Collections.unmodifiableList(cSlaveServerResources);
+		}
+		return null;
+	}
+
+	@Override
+	public List<ProducerServerResource> findProducerServerResources(boolean isDefault) {
+		if (pServerResources != null) {
+			List<ProducerServerResource> results = new ArrayList<ProducerServerResource>(pServerResources.values());
+			if (!isDefault) {
+				removeDefault(results);
+			}
+			return results;
+		}
+		return null;
+	}
+
+	@Override
+	public List<TopicResource> findTopicResources(boolean isDefault) {
+		if (topicResources != null) {
+			List<TopicResource> results = new ArrayList<TopicResource>(topicResources.values());
+			if (!isDefault) {
+				removeDefault(results);
+			}
+			return results;
+		}
+		return null;
+	}
+
+	@Override
+	public List<ConsumerIdResource> findConsumerIdResources(boolean isDefault) {
+		if (consumerIdResources != null) {
+			List<ConsumerIdResource> results = new ArrayList<ConsumerIdResource>(consumerIdResources.values());
+			if (!isDefault) {
+				removeDefault(results);
+			}
+			return results;
+		}
+		return null;
+	}
+
+	private <T extends BaseResource> void removeDefault(List<T> resources) {
+		if (resources != null) {
+			for (Iterator<T> iterator = resources.iterator(); iterator.hasNext();) {
+				T serverResource = iterator.next();
+				if (serverResource.isDefault()) {
+					resources.remove(serverResource);
+					break;
+				}
+			}
+		}
 	}
 }

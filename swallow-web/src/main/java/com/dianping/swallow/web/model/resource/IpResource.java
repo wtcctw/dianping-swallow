@@ -14,7 +14,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 @Document(collection = "IP_RESOURCE")
 public class IpResource extends BaseResource{
 
-	@Indexed
+	@Indexed(name="IX_IP")
 	private String ip;
 	
 	private boolean alarm;
@@ -49,6 +49,11 @@ public class IpResource extends BaseResource{
 	public String toString() {
 		return "IpResource [ip=" + ip + ", alarm=" + alarm + ", iPDesc=" + iPDesc + ", toString()=" + super.toString()
 				+ "]";
+	}
+
+	@Override
+	public boolean isDefault() {
+		return false;
 	}
 
 }

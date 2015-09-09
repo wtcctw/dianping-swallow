@@ -3,20 +3,25 @@ package com.dianping.swallow.web.model.resource;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mingdongli
  *
- * 2015年8月18日下午6:17:12
+ *         2015年8月18日下午6:17:12
  */
-public class BaseResource {
-	
+public abstract class BaseResource {
+
+	@Transient
+	protected static final String DEFAULT_RECORD = "default";
+
 	@Id
-	private String id; 
-	
+	private String id;
+
 	private Date createTime;
-	
+
 	private Date updateTime;
 
 	public String getId() {
@@ -47,5 +52,8 @@ public class BaseResource {
 	public String toString() {
 		return "BaseResource [id=" + id + ", createTime=" + createTime + ", updateTime=" + updateTime + "]";
 	}
+	
+	@JsonIgnore
+	public abstract boolean isDefault();
 
 }

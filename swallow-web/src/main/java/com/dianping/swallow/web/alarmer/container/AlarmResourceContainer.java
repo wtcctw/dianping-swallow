@@ -20,10 +20,18 @@ public interface AlarmResourceContainer {
 	ProducerServerResource findProducerServerResource(String ip);
 
 	TopicResource findTopicResource(String topic);
-	
+
 	ConsumerIdResource findConsumerIdResource(String topicName, String consumerId);
-	
-	List<TopicResource> findTopicResources();
-	
-	List<ConsumerIdResource> findConsumerIdResources();
+
+	List<ConsumerServerResource> findConsumerServerResources(boolean isDefault);
+
+	List<ProducerServerResource> findProducerServerResources(boolean isDefault);
+
+	List<TopicResource> findTopicResources(boolean isDefault);
+
+	List<ConsumerIdResource> findConsumerIdResources(boolean isDefault);
+
+	List<ConsumerServerResource> findConsumerMasterServerResources();
+
+	List<ConsumerServerResource> findConsumerSlaveServerResources();
 }

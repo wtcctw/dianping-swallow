@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -16,10 +17,10 @@ import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 @Document(collection = "CONSUMERID_RESOURCE")
 public class ConsumerIdResource extends BaseResource{
 	
-	@Indexed
+	@Indexed(name="IX_CONSUMERID")
 	private String consumerId;
 
-	@Indexed
+	@Indexed(name="IX_TOPIC")
 	private String topic;
 	
 	private boolean alarm;
@@ -79,4 +80,11 @@ public class ConsumerIdResource extends BaseResource{
 				+ super.toString() + "]";
 	}
 
+	@JsonIgnore
+	public boolean isDefault() {
+		if (DEFAULT_RECORD.equals(consumerId)) {
+			return true;
+		}
+		return false;
+	}
 }

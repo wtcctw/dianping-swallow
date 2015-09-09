@@ -1,19 +1,20 @@
 package com.dianping.swallow.web.model.resource;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mingdongli
  *
- * 2015年8月10日下午4:58:04
+ *         2015年8月10日下午4:58:04
  */
-public class ServerResource extends BaseResource{
+public class ServerResource extends BaseResource {
 
 	private String ip;
-	
+
 	private String hostname;
-	
+
 	private boolean alarm;
-	
+
 	public String getIp() {
 		return ip;
 	}
@@ -29,7 +30,7 @@ public class ServerResource extends BaseResource{
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
 	}
-	
+
 	public boolean isAlarm() {
 		return alarm;
 	}
@@ -43,5 +44,13 @@ public class ServerResource extends BaseResource{
 		return "ServerResource [ip=" + ip + ", hostname=" + hostname + ", alarm=" + alarm + ", toString()="
 				+ super.toString() + "]";
 	}
-	
+
+	@JsonIgnore
+	public boolean isDefault() {
+		if (DEFAULT_RECORD.equals(ip)) {
+			return true;
+		}
+		return false;
+	}
+
 }
