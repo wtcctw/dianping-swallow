@@ -230,7 +230,7 @@ public class DefaultConsumerDataRetriever
 				end);
 		OrderStatsData accuStatsData = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY,
 				StatisDetailType.ACCUMULATION), start, end);
-		List<ConsumerIdResource> consumerIdResources = resourceContainer.findConsumerIdResources();
+		List<ConsumerIdResource> consumerIdResources = resourceContainer.findConsumerIdResources(false);
 		if (consumerIdResources != null && consumerIdResources.size() > 0) {
 			QueryQrderTask queryQrderTask = new QueryQrderTask();
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
@@ -300,7 +300,7 @@ public class DefaultConsumerDataRetriever
 					NavigableMap<Long, Long> ackRawData = null;
 					if (statsDataMapPair != null) {
 						sendRawData = statsDataMapPair.getSendStatsData();
-						ackRawData = statsDataMapPair.getSendStatsData();
+						ackRawData = statsDataMapPair.getAckStatsData();
 					}
 					sendRawData = fillStatsData(sendRawData, startKey, endKey);
 					StatsData sendStatis = createStatsData(
@@ -379,7 +379,7 @@ public class DefaultConsumerDataRetriever
 					NavigableMap<Long, Long> ackRawData = null;
 					if (statsDataMapPair != null) {
 						sendRawData = statsDataMapPair.getSendStatsData();
-						ackRawData = statsDataMapPair.getSendStatsData();
+						ackRawData = statsDataMapPair.getAckStatsData();
 					}
 					sendRawData = fillStatsData(sendRawData, startKey, endKey);
 					StatsData sendStatis = createStatsData(

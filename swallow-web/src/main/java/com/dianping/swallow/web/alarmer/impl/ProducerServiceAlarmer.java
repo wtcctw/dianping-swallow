@@ -83,17 +83,14 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 	}
 
 	private boolean checkService() {
-		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
-		if (producerServerIps == null) {
-			logger.error("[checkService] cannot find producerserver ips.");
+		List<ProducerServerResource> pServerResources = resourceContainer.findProducerServerResources(false);
+		if (pServerResources == null) {
+			logger.error("[checkService] cannot find producerServerResources.");
 			return false;
 		}
-		for (String serverIp : producerServerIps) {
-			if (StringUtils.isBlank(serverIp)) {
-				continue;
-			}
-			ProducerServerResource pServerResource = resourceContainer.findProducerServerResource(serverIp);
-			if (pServerResource == null || !pServerResource.isAlarm()) {
+		for (ProducerServerResource pServerResource : pServerResources) {
+			String serverIp = pServerResource.getIp();
+			if (StringUtils.isBlank(serverIp) || !pServerResource.isAlarm()) {
 				continue;
 			}
 			String url = StringUtils.replace(pigeonHealthUrl, "{ip}", serverIp);

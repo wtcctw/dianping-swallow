@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -16,7 +17,7 @@ import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 @Document(collection = "TOPIC_RESOURCE")
 public class TopicResource extends BaseResource{
 	
-	@Indexed
+	@Indexed(name="IX_TOPIC")
 	private String topic;
 	
 	private String administrator;
@@ -82,6 +83,14 @@ public class TopicResource extends BaseResource{
 		return "TopicResource [topic=" + topic + ", administrator=" + administrator + ", producerAlarm="
 				+ producerAlarm + ", consumerAlarm=" + consumerAlarm + ", producerIps=" + producerIps
 				+ ", producerAlarmSetting=" + producerAlarmSetting + ", toString()=" + super.toString() + "]";
+	}
+	
+	@JsonIgnore
+	public boolean isDefault() {
+		if (DEFAULT_RECORD.equals(topic)) {
+			return true;
+		}
+		return false;
 	}
 
 }

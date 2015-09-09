@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 2015年8月24日 上午10:03:32
  */
 @Document(collection = "CONSUMER_TOPIC_STATS_DATA")
-@CompoundIndexes({ @CompoundIndex(name = "IX_TIMEKEY_TOPICNAME", def = "{'timeKey': 1, 'topicName': -1}") })
+@CompoundIndexes({ @CompoundIndex(name = "IX_TOPICNAME_TIMEKEY", def = "{'topicName': -1, 'timeKey': 1 }") })
 public class ConsumerTopicStatsData extends ConsumerStatsData {
 	
 	private String topicName;
