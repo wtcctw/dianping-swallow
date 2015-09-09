@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.web.model.event.EventType;
@@ -20,7 +19,6 @@ import com.dianping.swallow.web.model.event.StatisType;
 @CompoundIndexes({ @CompoundIndex(name = "IX_TOPICNAME_TIMEKEY", def = "{'topicName': -1, 'timeKey': 1}") })
 public class ProducerTopicStatsData extends ProducerStatsData {
 
-	@Indexed(name = "IX_TOPICNAME")
 	private String topicName;
 
 	private long totalQps;

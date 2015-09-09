@@ -46,21 +46,18 @@ db.ALARM.ensureIndex({'sendInfos.receiver': 1}, {"name":"IX_SENDINFOS_RECEIVER",
 db.DASHBOARD_STATS_DATA.ensureIndex({'time': 1}, {"name":"IX_TIME", "background": true});
 
 db.PRODUCER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1}, {"name":"IX_TIMEKEY", "background": true});
-db.PRODUCER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'ip': -1 }, {"name":"IX_TIMEKEY_IP", "background": true});
+db.PRODUCER_SERVER_STATS_DATA.ensureIndex({'ip': -1 ,'timeKey': 1 }, {"name":"IX_IP_TIMEKEY", "background": true});
 
 db.PRODUCER_TOPIC_STATS_DATA.ensureIndex({'timeKey': 1}, {"name":"IX_TIMEKEY", "background": true});
-db.PRODUCER_TOPIC_STATS_DATA.ensureIndex({'topicName': -1}, {"name":"IX_TOPICNAME", "background": true});
-db.PRODUCER_TOPIC_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1}, {"name":"IX_TIMEKEY_TOPICNAME", "background": true});
+db.PRODUCER_TOPIC_STATS_DATA.ensureIndex({'topicName': -1, 'timeKey': 1 }, {"name":"IX_TOPICNAME_TIMEKEY", "background": true});
 
 db.CONSUMER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1}, {"name":"IX_TIMEKEY", "background": true});
-db.CONSUMER_SERVER_STATS_DATA.ensureIndex({'timeKey': 1, 'ip': -1 }, {"name":"IX_TIMEKEY_IP", "background": true});
+db.CONSUMER_SERVER_STATS_DATA.ensureIndex({'ip': -1, 'timeKey': 1}, {"name":"IX_IP_TIMEKEY", "background": true});
 
 db.CONSUMER_TOPIC_STATS_DATA.ensureIndex({'timeKey': 1}, {"name":"IX_TIMEKEY", "background": true});
-db.CONSUMER_TOPIC_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1 }, {"name":"IX_TIMEKEY_TOPICNAME", "background": true});
+db.CONSUMER_TOPIC_STATS_DATA.ensureIndex({'topicName': -1, 'timeKey': 1}, {"name":"IX_TOPICNAME_TIMEKEY", "background": true});
 
 db.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1}, {"name":"IX_TIMEKEY", "background": true});
-db.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1 }, {"name":"IX_TIMEKEY_TOPICNAME", "background": true});
-db.CONSUMERID_STATS_DATA.ensureIndex({'topicName': -1, 'consumerId': -1 }, {"name":"IX_TOPICNAME_CONSUMERID", "background": true});
 db.CONSUMERID_STATS_DATA.ensureIndex({'timeKey': 1, 'topicName': -1, 'consumerId': -1 }, {"name":"IX_TIMEKEY_TOPICNAME_CONSUMERID", "background": true});
 
 
