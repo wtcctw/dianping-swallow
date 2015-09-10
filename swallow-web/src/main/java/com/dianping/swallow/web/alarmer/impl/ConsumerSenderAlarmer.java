@@ -51,7 +51,7 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	}
 
 	public boolean checkSender() {
-		List<ConsumerServerResource> cMasterReources = resourceContainer.findConsumerSlaveServerResources();
+		List<ConsumerServerResource> cMasterReources = resourceContainer.findConsumerMasterServerResources();
 		List<ConsumerServerResource> cSlaveReources = resourceContainer.findConsumerSlaveServerResources();
 		if (cMasterReources == null || cMasterReources.size() == 0 || cSlaveReources == null
 				|| cSlaveReources.size() == 0) {

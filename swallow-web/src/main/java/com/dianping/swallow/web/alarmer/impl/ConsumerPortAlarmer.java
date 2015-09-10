@@ -84,7 +84,7 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 
 	public boolean checkPort() {
 
-		List<ConsumerServerResource> cMasterReources = resourceContainer.findConsumerSlaveServerResources();
+		List<ConsumerServerResource> cMasterReources = resourceContainer.findConsumerMasterServerResources();
 		List<ConsumerServerResource> cSlaveReources = resourceContainer.findConsumerSlaveServerResources();
 
 		if (cMasterReources == null || cMasterReources.size() == 0 || cSlaveReources == null
