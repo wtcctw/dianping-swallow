@@ -3,6 +3,7 @@ package com.dianping.swallow.web.model;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 
 /**
@@ -15,6 +16,7 @@ public class MessageDump {
 	@Id
 	private String _id;
 	
+	@Indexed(name = "IX_TOPIC")
 	private String topic;
 	
 	private String name;

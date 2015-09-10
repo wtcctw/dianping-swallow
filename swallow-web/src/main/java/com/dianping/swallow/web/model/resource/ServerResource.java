@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model.resource;
 
+import org.springframework.data.mongodb.core.index.Indexed;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -9,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class ServerResource extends BaseResource {
 
+	@Indexed(name="IX_IP")
 	private String ip;
 
 	private String hostname;

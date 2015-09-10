@@ -2,7 +2,8 @@ package com.dianping.swallow.web.model.resource;
 
 import java.util.List;
 
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
@@ -15,12 +16,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 2015年8月10日下午3:23:20
  */
 @Document(collection = "CONSUMERID_RESOURCE")
+@CompoundIndexes({
+	@CompoundIndex(name = "IX_TOPICNAME_CONSUMERID", def = "{'topicName': -1, 'consumerId': -1}")
+	})
 public class ConsumerIdResource extends BaseResource{
 	
-	@Indexed(name="IX_CONSUMERID")
 	private String consumerId;
 
-	@Indexed(name="IX_TOPIC")
 	private String topic;
 	
 	private boolean alarm;
