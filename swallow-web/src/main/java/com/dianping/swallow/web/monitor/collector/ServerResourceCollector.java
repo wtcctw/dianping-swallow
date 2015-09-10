@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.monitor.collector;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -94,18 +96,17 @@ public class ServerResourceCollector {
 
 	public void doProducerServerCollector() {
 		Map<String, String> ipsMap = new HashMap<String, String>();
+		List<String> serverIps = ipCollectorService.getProducerServerIps();
 		Map<String, String> serverIpsMap = getServerIpsMap(ipCollectorService.getProducerServerIpsMap());
-		Set<String> serverIps = producerStatsDataWapper.getServerIps(false);
+		Set<String> statsServerIps = producerStatsDataWapper.getServerIps(false);
+		setServerMap(serverIps, ipsMap);
+
 		if (serverIpsMap != null) {
 			ipsMap.putAll(serverIpsMap);
 		}
-		if (serverIps != null) {
-			for (String ip : serverIps) {
-				if (!ipsMap.containsKey(ip)) {
-					ipsMap.put(ip, StringUtils.EMPTY);
-				}
-			}
-		}
+
+		setServerMap(statsServerIps, ipsMap);
+
 		for (Map.Entry<String, String> ipEntry : ipsMap.entrySet()) {
 			ServerResource serverResource = pServerResourceService.findByIp(ipEntry.getKey());
 			if (serverResource == null) {
@@ -118,22 +119,20 @@ public class ServerResourceCollector {
 
 	public void doConsumerServerCollector() {
 		Map<String, String> ipsMap = new HashMap<String, String>();
+		List<String> masterIps = ipCollectorService.getConsumerServerMasterIps();
+		List<String> slaveIps = ipCollectorService.getConsumerServerSlaveIps();
 		Map<String, String> masterIpsMap = getServerIpsMap(ipCollectorService.getConsumerServerMasterIpsMap());
 		Map<String, String> slaveIpsMap = getServerIpsMap(ipCollectorService.getConsumerServerSlaveIpsMap());
-		Set<String> serverIps = consumerStatsDataWapper.getServerIps(false);
+		Set<String> statsServerIps = consumerStatsDataWapper.getServerIps(false);
+		setServerMap(masterIps, ipsMap);
+		setServerMap(slaveIps, ipsMap);
 		if (masterIpsMap != null) {
 			ipsMap.putAll(masterIpsMap);
 		}
 		if (slaveIpsMap != null) {
 			ipsMap.putAll(slaveIpsMap);
 		}
-		if (serverIps != null) {
-			for (String ip : serverIps) {
-				if (!ipsMap.containsKey(ip)) {
-					ipsMap.put(ip, StringUtils.EMPTY);
-				}
-			}
-		}
+		setServerMap(statsServerIps, ipsMap);
 		for (Map.Entry<String, String> ipEntry : ipsMap.entrySet()) {
 			ServerResource serverResource = cServerResourceService.findByIp(ipEntry.getKey());
 			if (serverResource == null) {
@@ -154,6 +153,16 @@ public class ServerResourceCollector {
 			}
 		}
 		return resultIpsMap;
+	}
+
+	private void setServerMap(Collection<String> serverIps, Map<String, String> ipsMap) {
+		if (serverIps != null) {
+			for (String ip : serverIps) {
+				if (!ipsMap.containsKey(ip)) {
+					ipsMap.put(ip, StringUtils.EMPTY);
+				}
+			}
+		}
 	}
 
 	public int getCollectorInterval() {

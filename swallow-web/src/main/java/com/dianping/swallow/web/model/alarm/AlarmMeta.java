@@ -3,6 +3,7 @@ package com.dianping.swallow.web.model.alarm;
 import java.util.Date;
 
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 public class AlarmMeta {
 
@@ -35,6 +36,7 @@ public class AlarmMeta {
 
 	private String id;
 
+	@Indexed(name="IX_METAID")
 	private int metaId;
 
 	private AlarmType type;

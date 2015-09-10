@@ -1,4 +1,7 @@
 package com.dianping.swallow.web.model.alarm;
+
+import org.springframework.data.mongodb.core.index.Indexed;
+
 /**
  * 
  * @author qiyin
@@ -7,6 +10,7 @@ package com.dianping.swallow.web.model.alarm;
  */
 public class SendInfo {
 
+	@Indexed(name ="IX_CREATETIME")
 	private String receiver;
 
 	private SendType sendType;

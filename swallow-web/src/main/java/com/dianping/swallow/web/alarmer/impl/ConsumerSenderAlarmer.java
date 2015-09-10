@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,24 +51,25 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	}
 
 	public boolean checkSender() {
-		List<String> consumerServerMasterIps = ipCollectorService.getConsumerServerMasterIps();
-		List<String> consumerServerSlaveIps = ipCollectorService.getConsumerServerMasterIps();
-		if (consumerServerMasterIps == null || consumerServerMasterIps.size() == 0 || consumerServerSlaveIps == null
-				|| consumerServerSlaveIps.size() == 0) {
-			logger.error("[checkSender] cannot find consumer server master ips.");
+		List<ConsumerServerResource> cMasterReources = resourceContainer.findConsumerMasterServerResources();
+		List<ConsumerServerResource> cSlaveReources = resourceContainer.findConsumerSlaveServerResources();
+		if (cMasterReources == null || cMasterReources.size() == 0 || cSlaveReources == null
+				|| cSlaveReources.size() == 0) {
+			logger.error("[checkSender] cannot find consumer server master reources.");
 			return false;
 		}
 
 		Map<String, Long> statisConsumerServerIps = ipCollectorService.getStatisConsumerServerIps();
 		int index = 0;
-		for (String serverIp : consumerServerMasterIps) {
-			ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(serverIp);
-			if (cServerResource == null || !cServerResource.isAlarm()) {
+		for (ConsumerServerResource cMasterReource : cMasterReources) {
+			String serverIp = cMasterReource.getIp();
+			if (StringUtils.isBlank(serverIp) || !cMasterReource.isAlarm()) {
 				continue;
 			}
 			if (!statisConsumerServerIps.containsKey(serverIp)
 					|| System.currentTimeMillis() - statisConsumerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
-				String slaveIp = consumerServerSlaveIps.get(index);
+				ConsumerServerResource cSlaveReource = cSlaveReources.get(index);
+				String slaveIp = cSlaveReource.getIp();
 				if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
 					ServerEvent serverEvent = eventFactory.createServerEvent();
 					serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER)

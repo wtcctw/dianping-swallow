@@ -143,7 +143,7 @@ public class DefaultProducerDataRetriever
 		OrderStatsData delayOrderResult = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SAVE), start,
 				end);
 		OrderStatsData qpxOrderResult = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SAVE), start, end);
-		List<TopicResource> topicResources = resourceContainer.findTopicResources();
+		List<TopicResource> topicResources = resourceContainer.findTopicResources(false);
 		if (topicResources != null && topicResources.size() > 0) {
 			QueryQrderTask queryQrderTask = new QueryQrderTask();
 			for (TopicResource topicResource : topicResources) {

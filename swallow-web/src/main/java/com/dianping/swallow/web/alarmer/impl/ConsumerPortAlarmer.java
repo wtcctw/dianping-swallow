@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -82,26 +83,30 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 	}
 
 	public boolean checkPort() {
-		List<String> consumerServerMasterIps = ipCollectorService.getConsumerServerMasterIps();
-		List<String> consumerServerSlaveIps = ipCollectorService.getConsumerServerSlaveIps();
-		if (consumerServerMasterIps == null || consumerServerMasterIps.size() == 0 || consumerServerSlaveIps == null
-				|| consumerServerSlaveIps.size() == 0) {
-			logger.error("[checkPort] cannot find consumermaster or consumerslave ips.");
+
+		List<ConsumerServerResource> cMasterReources = resourceContainer.findConsumerMasterServerResources();
+		List<ConsumerServerResource> cSlaveReources = resourceContainer.findConsumerSlaveServerResources();
+
+		if (cMasterReources == null || cMasterReources.size() == 0 || cSlaveReources == null
+				|| cSlaveReources.size() == 0) {
+			logger.error("[checkPort] cannot find consumermaster or consumerslave reources.");
 			return false;
 		}
 		int index = 0;
-		for (String masterIp : consumerServerMasterIps) {
-			ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(masterIp);
-			if (cServerResource == null || !cServerResource.isAlarm()) {
+		for (ConsumerServerResource cMasterReource : cMasterReources) {
+			String masterIp = cMasterReource.getIp();
+			if (StringUtils.isBlank(masterIp) || !cMasterReource.isAlarm()) {
 				continue;
 			}
-			alarmPort(masterIp, consumerServerSlaveIps.get(index));
+			ConsumerServerResource cSlaveReource = cSlaveReources.get(index);
+			alarmPort(masterIp, cSlaveReource);
 			index++;
 		}
 		return true;
 	}
 
-	private boolean alarmPort(String masterIp, String slaveIp) {
+	private boolean alarmPort(String masterIp, ConsumerServerResource cSlaveReource) {
+		String slaveIp = cSlaveReource.getIp();
 		boolean usingMaster = checkPort(masterIp, masterPort);
 		boolean usingSlave = checkPort(slaveIp, slavePort);
 		String key = masterIp + KEY_SPLIT + slaveIp;

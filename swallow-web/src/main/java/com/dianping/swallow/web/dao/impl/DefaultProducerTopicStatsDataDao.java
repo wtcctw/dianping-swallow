@@ -80,7 +80,7 @@ public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implement
 	@Override
 	public List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)
-				.lte(endKey)).with(new Sort(new Sort.Order(Direction.ASC, TIMEKEY_FIELD)));
+				.lte(endKey));
 		List<ProducerTopicStatsData> topicStatsDatas = mongoTemplate.find(query, ProducerTopicStatsData.class,
 				TOPICSTATSDATA_COLLECTION);
 		return topicStatsDatas;

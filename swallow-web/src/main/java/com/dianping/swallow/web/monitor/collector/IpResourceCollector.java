@@ -61,7 +61,7 @@ public class IpResourceCollector {
 	@Autowired
 	private CmdbService cmdbService;
 
-	private int collectorInterval = 30;
+	private int collectorInterval = 60;
 
 	private int delayInterval = 2;
 
@@ -118,7 +118,6 @@ public class IpResourceCollector {
 					ipResourceService.insert(ipResource);
 				} else {
 					IpResource ipResource = ipResourceInDbs.get(0);
-					ipResource.setId(ipResource.getId());
 					if (ipResource.getiPDesc() != null) {
 						ipDesc.setId(ipResource.getiPDesc().getId());
 					}
@@ -137,12 +136,9 @@ public class IpResourceCollector {
 					ipResource.setiPDesc(new IPDesc(ip));
 					ipResource.setCreateTime(new Date());
 					ipResource.setUpdateTime(new Date());
-				} else {
-					ipResource = ipResourceInDbs.get(0);
-					ipResource.setUpdateTime(new Date());
-				}
-				ipResource.setIp(ip);
-				ipResourceService.update(ipResource);
+					ipResource.setIp(ip);
+					ipResourceService.insert(ipResource);
+				} 
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,15 +48,15 @@ public class ProducerSenderAlarmer extends AbstractServiceAlarmer {
 	}
 
 	public boolean checkSender() {
-		List<String> producerServerIps = ipCollectorService.getProducerServerIps();
+		List<ProducerServerResource> pServerResources = resourceContainer.findProducerServerResources(false);
 		Map<String, Long> statisProducerServerIps = ipCollectorService.getStatisProducerServerIps();
-		if (producerServerIps == null) {
-			logger.error("[checkSender] cannot find producerserver ips.");
+		if (pServerResources == null) {
+			logger.error("[checkSender] cannot find producerServerResources.");
 			return false;
 		}
-		for (String serverIp : producerServerIps) {
-			ProducerServerResource pServerResource = resourceContainer.findProducerServerResource(serverIp);
-			if (pServerResource == null || !pServerResource.isAlarm()) {
+		for (ProducerServerResource pServerResource : pServerResources) {
+			String serverIp = pServerResource.getIp();
+			if (StringUtils.isBlank(serverIp) || !pServerResource.isAlarm()) {
 				continue;
 			}
 			if (!statisProducerServerIps.containsKey(serverIp)

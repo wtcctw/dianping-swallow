@@ -38,5 +38,5 @@ public class ConsumerServerResource extends ServerResource{
 		return "ConsumerServerResource [sendAlarmSetting=" + sendAlarmSetting + ", ackAlarmSetting=" + ackAlarmSetting
 				+ ", toString()=" + super.toString() + "]";
 	}
-
+	
 }
