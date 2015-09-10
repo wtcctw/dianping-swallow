@@ -465,13 +465,8 @@ public class DataMonitorController extends AbstractMonitorController implements 
 		List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size);
 		List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size);
 		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-		orderStatsDatas.add(pOrderStatsDatas.get(0));
-		orderStatsDatas.add(cOrderStatsDatas.get(0));
-		orderStatsDatas.add(cOrderStatsDatas.get(1));
-		orderStatsDatas.add(pOrderStatsDatas.get(1));
-		orderStatsDatas.add(cOrderStatsDatas.get(2));
-		orderStatsDatas.add(cOrderStatsDatas.get(3));
-		orderStatsDatas.add(cOrderStatsDatas.get(4));
+		orderStatsDatas.addAll(pOrderStatsDatas);
+		orderStatsDatas.addAll(cOrderStatsDatas);
 		return orderStatsDatas;
 	}
 
@@ -488,13 +483,8 @@ public class DataMonitorController extends AbstractMonitorController implements 
 		List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size,
 				searchTime.getStartTime(), searchTime.getEndTime());
 		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-		orderStatsDatas.add(pOrderStatsDatas.get(0));
-		orderStatsDatas.add(cOrderStatsDatas.get(0));
-		orderStatsDatas.add(cOrderStatsDatas.get(1));
-		orderStatsDatas.add(pOrderStatsDatas.get(1));
-		orderStatsDatas.add(cOrderStatsDatas.get(2));
-		orderStatsDatas.add(cOrderStatsDatas.get(3));
-		orderStatsDatas.add(cOrderStatsDatas.get(4));
+		orderStatsDatas.addAll(pOrderStatsDatas);
+		orderStatsDatas.addAll(cOrderStatsDatas);
 		return orderStatsDatas;
 	}
 
