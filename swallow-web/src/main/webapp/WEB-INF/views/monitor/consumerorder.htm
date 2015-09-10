@@ -32,22 +32,30 @@
 	<div class="page-content">
 		<div>
 			<div class="row row-div-table">
-				<table
-					class="table table-small table-bordered table-striped  table-condensed table-hover"
-					ng-repeat="item in orderDatas">
-					<tr class="table-smalll-tr">
-						<th class="text-primary table-smalll-td" colspan="2">{{item.info.desc}}排序</th>
-					</tr>
-					<tr class="table-smalll-tr">
-						<th class="text-danger table-smalll-td" colspan="2">{{item.start|date:'yyyy-MM-dd HH:mm:ss'}} - {{ item.end|date:'yyyy-MM-dd HH:mm:ss'}}</th>
-					</tr>
-					<tr ng-repeat="subItem in item.dataResults">
-						<td class="table-smalll-td table-smalll-td-consumerId"><a
-							ng-href='{{showRelatedUrl(item.info.dt, subItem.topicName, subItem.consumerId)}}'>
-								{{showRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
-						<td class="table-smalll-td table-smalll-td-data">{{subItem.sumData}}</td>
-					</tr>
-				</table>
+					<table
+						class="table table-small table-bordered table-striped  table-condensed table-hover"
+						ng-repeat="item in orderDatas">
+						<tr class="table-smalll-tr">
+							<th class="table-smalll-td" colspan="3">{{item.info.desc}}排序</th>
+						</tr>
+						<tr class="table-smalll-tr">
+							<th class="text-danger table-smalll-td" colspan="3">{{item.start|date:'yyyy-MM-dd HH:mm:ss'}} - {{ item.end|date:'yyyy-MM-dd HH:mm:ss'}}</th>
+						</tr>
+						<tr class="table-smalll-tr">
+							<th class="table-smalll-td">TOPIC</th>
+							<th class="table-smalll-td">CONSUMERID</th>
+							<th class="table-smalll-td">总计</th>
+						</tr>
+						<tr ng-repeat="subItem in item.dataResults">
+							<td class="table-smalll-td table-smalll-td-topic"><a
+								ng-href='{{showRelatedUrl(item.info.dt, subItem.topicName,"")}}'>
+									{{showRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
+							<td class="table-smalll-td table-smalll-td-consumerId"><a
+								ng-href='{{showRelatedUrl(item.info.dt, subItem.topicName, subItem.consumerId)}}'>
+									{{showSubRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
+							<td class="table-smalll-td table-smalll-td-data">{{subItem.sumData}}</td>
+						</tr>
+					</table>
 			</div>
 		</div>
 	</div>

@@ -356,14 +356,24 @@ input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
 	word-break: keep-all;
 }
 
+.table-smalll-td-topic {
+	max-width: 200px;
+	width: 200px;
+}
+
 .table-smalll-td-consumerId {
-	max-width: 350px;
-	width: 350px;
+	max-width: 150px;
+	width: 150px;
 }
 
 .table-smalll-td-data{
 	max-width: 99px;
 	width: 99px;
+}
+
+.table-smalll-td-topic a {
+	color: rgb(0, 0, 238);
+	cursor: pointer;
 }
 
 .table-smalll-td-consumerId a {
