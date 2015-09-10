@@ -44,9 +44,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 	private static final String FACTORY_NAME = "TopicResourceServiceImpl";
 	
-	private static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist";
+	public static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist.applytopictest";
 
-	private static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
+	public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI.applytopictest";
 
 	@Autowired
 	private TopicResourceDao topicResourceDao;
@@ -93,7 +93,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 			String[] whitelist = StringUtil.split(value, ';');
 
-			for (String wl : whitelist) {
+			for (int i = whitelist.length - 1; i >= 0; i--) {
+				String wl = whitelist[i];
 				if (StringUtils.isNotBlank(wl) && topicResourceDao.findByTopic(wl) == null) {
 					TopicResource topicResource = buildTopicResource(wl);
 					try {
