@@ -336,22 +336,20 @@ module.controller('ConsumerOrderController', function($scope, $http) {
 	};
 	$scope.clearData = function() {
 		$scope.orderDatas = [];
-		$scope.delayOrderDatas= [];
-		$scope.qpxOrderDatas= [];
-		$scope.accuOrderDatas= [];
+		$scope.topicOrderDatas = [];
+		$scope.consumerIdOrderDatas = [];
 	}
 	$scope.copyData = function() {
 		if($scope.orderDatas.length > 0) {
-			$scope.delayOrderDatas= [];
-			$scope.delayOrderDatas.push($scope.orderDatas[0]);
-			$scope.delayOrderDatas.push($scope.orderDatas[1]);
-			$scope.delayOrderDatas.push($scope.orderDatas[2]);
-			$scope.qpxOrderDatas= [];
-			$scope.qpxOrderDatas.push($scope.orderDatas[3]);
-			$scope.qpxOrderDatas.push($scope.orderDatas[4]);
-			$scope.qpxOrderDatas.push($scope.orderDatas[5]);
-			$scope.accuOrderDatas= [];
-			$scope.accuOrderDatas.push($scope.orderDatas[6]);
+			$scope.topicOrderDatas = [];
+			$scope.topicOrderDatas.push($scope.orderDatas[0]);
+			$scope.topicOrderDatas.push($scope.orderDatas[1]);
+			$scope.consumerIdOrderDatas = [];
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[2]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[3]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[4]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[5]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[6]);
 		} 
 	}
 	$scope.queryOrderList = function(topicName) {
@@ -367,11 +365,16 @@ module.controller('ConsumerOrderController', function($scope, $http) {
 	};
 	
 	$scope.showRelatedInfo = function(topic, consumerId){
+		return topic;
+	};
+	
+	$scope.showSubRelatedInfo = function(topic, consumerId){
 		if(consumerId == null || consumerId == 'undefined' || consumerId.length == 0){
-			return topic;
+			return "";
 		}
 		return consumerId;
 	};
+	
 	$scope.showRelatedUrl = function(type, topicName, consumerId){
 		if(consumerId == null || consumerId == 'undefined' || consumerId.length == 0){
 			switch(type){

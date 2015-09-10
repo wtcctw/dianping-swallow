@@ -16,7 +16,7 @@ import com.dianping.swallow.web.model.event.StatisType;
  *         2015年7月31日 下午3:57:04
  */
 @Document(collection = "PRODUCER_TOPIC_STATS_DATA")
-@CompoundIndexes({ @CompoundIndex(name = "IX_TIMEKEY_TOPICNAME", def = "{'timeKey': 1, 'topicName': -1}") })
+@CompoundIndexes({ @CompoundIndex(name = "IX_TOPICNAME_TIMEKEY", def = "{'topicName': -1, 'timeKey': 1}") })
 public class ProducerTopicStatsData extends ProducerStatsData {
 
 	private String topicName;

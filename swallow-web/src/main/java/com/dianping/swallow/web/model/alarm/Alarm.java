@@ -5,17 +5,22 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * 
  * @author qiyin
  *
+ *         2015年9月8日 下午4:22:39
  */
+@Document(collection = "ALARM")
 public class Alarm implements Cloneable {
 
 	@Id
 	private String id;
-
+	
+	@Indexed(name ="IX_EVENTID")
 	private long eventId;
 
 	private int number;
@@ -26,14 +31,16 @@ public class Alarm implements Cloneable {
 
 	private String body;
 
+	@Indexed(name ="IX_RELATED")
 	private String related;
-	
+
 	private String subRelated;
 
 	private RelatedType relatedType;
 
 	private List<SendInfo> sendInfos;
 
+	@Indexed(name ="IX_CREATETIME")
 	private Date createTime;
 
 	private String sourceIp;
@@ -141,7 +148,6 @@ public class Alarm implements Cloneable {
 		return this;
 	}
 
-	
 	public List<SendInfo> getSendInfos() {
 		return sendInfos;
 	}
@@ -159,6 +165,14 @@ public class Alarm implements Cloneable {
 			}
 		}
 		this.sendInfos.add(sendInfo);
+	}
+
+	@Override
+	public String toString() {
+		return "Alarm [id=" + id + ", eventId=" + eventId + ", number=" + number + ", type=" + type + ", title="
+				+ title + ", body=" + body + ", related=" + related + ", subRelated=" + subRelated + ", relatedType="
+				+ relatedType + ", sendInfos=" + sendInfos + ", createTime=" + createTime + ", sourceIp=" + sourceIp
+				+ "]";
 	}
 
 }

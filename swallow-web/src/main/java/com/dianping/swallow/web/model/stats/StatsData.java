@@ -18,7 +18,7 @@ public abstract class StatsData {
 	@Id
 	private String id;
 
-	@Indexed
+	@Indexed(name="IX_TIMEKEY")
 	private long timeKey;
 	
 	@Transient

@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.ConfigChange;
+import com.dianping.lion.client.LionException;
 import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.server.monitor.data.QPX;
@@ -50,7 +54,7 @@ import com.dianping.swallow.web.util.DateUtil;
  *         2015年4月14日 下午9:24:38
  */
 @Controller
-public class DataMonitorController extends AbstractMonitorController {
+public class DataMonitorController extends AbstractMonitorController implements InitializingBean {
 
 	public static final String Y_AXIS_TYPE_QPS = "QPS";
 
@@ -64,7 +68,13 @@ public class DataMonitorController extends AbstractMonitorController {
 
 	public static final String FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-	private static final long maxSearchTimeSpan = 3 * 60 * 60 * 1000;
+	private static final String STATSDATA_QUERY_TIMESPAN_KEY = "swallow.web.statsdata.query.timespan";
+
+	private static final long TIMESPAN_UNIT = 60 * 60 * 1000;
+
+	private static final long maxOrderTimeSpan = 3 * TIMESPAN_UNIT;
+
+	private volatile Integer queryTimeSpan;
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -78,8 +88,29 @@ public class DataMonitorController extends AbstractMonitorController {
 	@Autowired
 	private TopicScanner topicScanner;
 
+	ConfigCache configCache;
+
 	@Resource(name = "minuteEntryService")
 	private MinuteEntryService minuteEntryService;
+
+	private void initLionConfig() {
+		try {
+			configCache = ConfigCache.getInstance();
+			queryTimeSpan = configCache.getIntProperty(STATSDATA_QUERY_TIMESPAN_KEY);
+			configCache.addChange(new ConfigChange() {
+				@Override
+				public void onChange(String key, String value) {
+					if (STATSDATA_QUERY_TIMESPAN_KEY.equals(key)) {
+						if (StringUtils.isNotBlank(value)) {
+							queryTimeSpan = Integer.valueOf(value);
+						}
+					}
+				}
+			});
+		} catch (LionException e) {
+			logger.error("lion read producer and consumer server ips failed", e);
+		}
+	}
 
 	@RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
 	public ModelAndView viewConsumerServerQps() {
@@ -207,7 +238,8 @@ public class DataMonitorController extends AbstractMonitorController {
 		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
 			return getConsumerServerQps();
 		}
-		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
+		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+				* TIMESPAN_UNIT);
 
 		serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
 		return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
@@ -229,7 +261,8 @@ public class DataMonitorController extends AbstractMonitorController {
 		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
 			return getProducerServerQps();
 		}
-		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
+		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+				* TIMESPAN_UNIT);
 		serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
 
 		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
@@ -259,7 +292,8 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
+		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+				* TIMESPAN_UNIT);
 		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND, searchTime.getStartTime(),
 				searchTime.getEndTime());
 		List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND,
@@ -328,7 +362,8 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
+		final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+				* TIMESPAN_UNIT);
 
 		Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic,
 				searchTime.getStartTime(), searchTime.getEndTime());
@@ -401,7 +436,8 @@ public class DataMonitorController extends AbstractMonitorController {
 
 		final Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
+		final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+				* TIMESPAN_UNIT);
 
 		SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(
 				CAT_TYPE, "getConsumerDelayMonitor");
@@ -429,13 +465,8 @@ public class DataMonitorController extends AbstractMonitorController {
 		List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size);
 		List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size);
 		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-		orderStatsDatas.add(pOrderStatsDatas.get(0));
-		orderStatsDatas.add(cOrderStatsDatas.get(0));
-		orderStatsDatas.add(cOrderStatsDatas.get(1));
-		orderStatsDatas.add(pOrderStatsDatas.get(1));
-		orderStatsDatas.add(cOrderStatsDatas.get(2));
-		orderStatsDatas.add(cOrderStatsDatas.get(3));
-		orderStatsDatas.add(cOrderStatsDatas.get(4));
+		orderStatsDatas.addAll(pOrderStatsDatas);
+		orderStatsDatas.addAll(cOrderStatsDatas);
 		return orderStatsDatas;
 	}
 
@@ -446,19 +477,14 @@ public class DataMonitorController extends AbstractMonitorController {
 		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
 			return getConsumerOrderMonitor(size);
 		}
-		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime);
+		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, false, maxOrderTimeSpan);
 		List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size, searchTime.getStartTime(),
 				searchTime.getEndTime());
 		List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size,
 				searchTime.getStartTime(), searchTime.getEndTime());
 		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-		orderStatsDatas.add(pOrderStatsDatas.get(0));
-		orderStatsDatas.add(cOrderStatsDatas.get(0));
-		orderStatsDatas.add(cOrderStatsDatas.get(1));
-		orderStatsDatas.add(pOrderStatsDatas.get(1));
-		orderStatsDatas.add(cOrderStatsDatas.get(2));
-		orderStatsDatas.add(cOrderStatsDatas.get(3));
-		orderStatsDatas.add(cOrderStatsDatas.get(4));
+		orderStatsDatas.addAll(pOrderStatsDatas);
+		orderStatsDatas.addAll(cOrderStatsDatas);
 		return orderStatsDatas;
 	}
 
@@ -639,34 +665,46 @@ public class DataMonitorController extends AbstractMonitorController {
 			this.endTime = endTime;
 		}
 
-		public SearchTime getSearchTime(String startTime, String endTime) {
+		public SearchTime getSearchTime(String startTime, String endTime, boolean isLimited, long maxTimeSpan) {
 
 			if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
 
 				this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
 				this.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
-
-				if (this.getEndTime() - this.getStartTime() > maxSearchTimeSpan) {
-					this.setEndTime(this.getStartTime() + maxSearchTimeSpan);
+				if (isLimited) {
+					if (this.getEndTime() - this.getStartTime() > maxTimeSpan) {
+						this.setEndTime(this.getStartTime() + maxTimeSpan);
+					}
 				}
 
 			} else {
-
 				if (StringUtils.isBlank(startTime) && StringUtils.isNotBlank(endTime)) {
-
-					this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
-					this.setEndTime(this.getStartTime() + maxSearchTimeSpan);
-
-				} else if (StringUtils.isNotBlank(startTime) && StringUtils.isBlank(endTime)) {
-
 					this.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
-					this.setStartTime(this.getEndTime() - maxSearchTimeSpan);
-
+					this.setStartTime(this.getEndTime() - maxTimeSpan);
+				} else if (StringUtils.isNotBlank(startTime) && StringUtils.isBlank(endTime)) {
+					this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
+					if (isLimited) {
+						this.setEndTime(this.getStartTime() + maxTimeSpan);
+					} else {
+						this.setEndTime(System.currentTimeMillis());
+					}
 				}
 			}
 			return this;
 		}
 
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		initLionConfig();
+	}
+
+	public int getQueryTimeSpan() {
+		if (queryTimeSpan != null) {
+			return queryTimeSpan.intValue();
+		}
+		return 3;
 	}
 
 }

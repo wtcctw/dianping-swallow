@@ -16,7 +16,7 @@ public class Administrator {
 	@Id
 	private String id;
 
-	@Indexed
+	@Indexed(name = "IX_NAME")
 	private String name;
 
 	private UserType role;

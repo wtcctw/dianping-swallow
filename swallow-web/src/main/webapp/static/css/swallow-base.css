@@ -332,8 +332,8 @@ input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
 }
 
 .table-small {
-	max-width: 300px;
-	width: 300px;
+	max-width: 450px;
+	width: 450px;
 	margin-right: 30px;
 	margin-bottom: 30px;
 	float: left;
@@ -356,9 +356,24 @@ input[type=checkbox].ace.ace-switch.btn-rotate+.lbl::after {
 	word-break: keep-all;
 }
 
+.table-smalll-td-topic {
+	max-width: 200px;
+	width: 200px;
+}
+
 .table-smalll-td-consumerId {
-	width: 70%;
-	max-width: 230px;
+	max-width: 150px;
+	width: 150px;
+}
+
+.table-smalll-td-data{
+	max-width: 99px;
+	width: 99px;
+}
+
+.table-smalll-td-topic a {
+	color: rgb(0, 0, 238);
+	cursor: pointer;
 }
 
 .table-smalll-td-consumerId a {
