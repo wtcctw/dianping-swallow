@@ -336,6 +336,8 @@ module.controller('ConsumerOrderController', function($scope, $http) {
 	};
 	$scope.clearData = function() {
 		$scope.orderDatas = [];
+		$scope.topicOrderDatas = [];
+		$scope.consumerIdOrderDatas = [];
 	}
 	$scope.copyData = function() {
 		if($scope.orderDatas.length > 0) {
@@ -343,11 +345,11 @@ module.controller('ConsumerOrderController', function($scope, $http) {
 			$scope.topicOrderDatas.push($scope.orderDatas[0]);
 			$scope.topicOrderDatas.push($scope.orderDatas[1]);
 			$scope.consumerIdOrderDatas = [];
-			$scope.topicOrderDatas.push($scope.orderDatas[2]);
-			$scope.topicOrderDatas.push($scope.orderDatas[3]);
-			$scope.topicOrderDatas.push($scope.orderDatas[4]);
-			$scope.topicOrderDatas.push($scope.orderDatas[5]);
-			$scope.topicOrderDatas.push($scope.orderDatas[6]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[2]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[3]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[4]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[5]);
+			$scope.consumerIdOrderDatas.push($scope.orderDatas[6]);
 		} 
 	}
 	$scope.queryOrderList = function(topicName) {
