@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -73,7 +72,7 @@ public class TopicController extends AbstractMenuController {
 	@RequestMapping(value = "/console/topic/list", method = RequestMethod.POST)
 	@ResponseBody
 	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
-			HttpServletResponse response) throws UnknownHostException {
+			HttpServletResponse response) {
 
 		List<TopicResourceDto> result = new ArrayList<TopicResourceDto>();
 		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
@@ -104,7 +103,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
 	@ResponseBody
-	public Object topicName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
+	public Pair<List<String>, List<String>> topicName(HttpServletRequest request) {
 
 		String username = userUtils.getUsername(request);
 		boolean findAll = userUtils.isAdministrator(username);
@@ -121,7 +120,7 @@ public class TopicController extends AbstractMenuController {
 					producerIp.addAll(tmpips);
 				}
 			}
-			if(userUtils.isTrueAdministrator(username)){
+			if (userUtils.isTrueAdministrator(username)) {
 				topics.add(DEFAULT);
 			}
 			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
@@ -148,7 +147,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET)
 	@ResponseBody
-	public Object propName(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
+	public Object propName(HttpServletRequest request, HttpServletResponse response) {
 
 		String username = userUtils.getUsername(request);
 		boolean findAll = userUtils.isAdministrator(username);
@@ -180,7 +179,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/update", method = RequestMethod.POST)
 	@ResponseBody
-	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto) throws UnknownHostException {
+	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto) {
 
 		TopicResource topicResource = TopicResourceMapper.toTopicResource(topicResourceDto);
 		boolean result = topicResourceService.update(topicResource);
@@ -191,13 +190,26 @@ public class TopicController extends AbstractMenuController {
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
+	
+	@RequestMapping(value = "/console/topic/auth/ip", method = RequestMethod.POST)
+	@ResponseBody
+	public Object queryProducerIp(@RequestBody TopicQueryDto topicQueryDto) {
+
+		TopicResourceDto topicResourceDto = null;
+		String topic = topicQueryDto.getTopic();
+		TopicResource topicResource = topicResourceService.findByTopic(topic);
+		if(topicResource != null){
+			topicResourceDto = TopicResourceMapper.toTopicResourceDto(topicResource);
+		}
+		
+		return topicResourceDto;
+	}
 
 	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
-			@RequestParam(value = "time") String time,
-			@RequestParam(value = "exec_user") String approver, HttpServletRequest request,
-			HttpServletResponse response) {
+			@RequestParam(value = "time") String time, @RequestParam(value = "exec_user") String approver,
+			HttpServletRequest request, HttpServletResponse response) {
 
 		String username = userUtils.getUsername(request);
 		TopicResource topicResource = null;
@@ -288,7 +300,7 @@ public class TopicController extends AbstractMenuController {
 				logger.info(String.format("Update producer alarm of %s to %b fail", topic, alarm));
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -310,7 +322,7 @@ public class TopicController extends AbstractMenuController {
 				logger.info(String.format("Update consumer alarm of %s to %b fail", topic, alarm));
 			}
 		}
-		
+
 		return result;
 	}
 

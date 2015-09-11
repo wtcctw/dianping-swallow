@@ -2,9 +2,7 @@ package com.dianping.swallow.web.controller;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -29,22 +27,17 @@ import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
-
 /**
  * @author mingdongli
  *
- * 2015年8月27日下午3:33:36
+ *         2015年8月27日下午3:33:36
  */
 @Controller
 public class ConsumerIdController extends AbstractMenuController {
 
-	private static final String CONSUMERID = "consumerId";
-
-	private static final String CONSUMERIP = "consumerIps";
-
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
-	
+
 	@Autowired
 	private UserUtils userUtils;
 
@@ -75,6 +68,24 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	}
 
+	@RequestMapping(value = "/console/topic/auth/cid", method = RequestMethod.POST)
+	@ResponseBody
+	public Object queryComsumeridResource(@RequestBody ConsumerIdQueryDto consumerIdQueryDto) {
+		
+		ConsumerIdResourceDto consumerIdResourceDto = null;
+		
+		String topic = consumerIdQueryDto.getTopic();
+		String consumerId = consumerIdQueryDto.getConsumerId();
+		ConsumerIdResource consumerIdResource = consumerIdResourceService.findByConsumerIdAndTopic(topic, consumerId);
+		
+		if(consumerIdResource != null){
+			consumerIdResourceDto = ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource);
+		}
+		
+		return consumerIdResourceDto;
+		
+	}
+
 	@RequestMapping(value = "/console/consumerid/update", method = RequestMethod.POST)
 	@ResponseBody
 	public Object updateTopic(@RequestBody ConsumerIdResourceDto consumerIdResourceDto) throws UnknownHostException {
@@ -99,11 +110,11 @@ public class ConsumerIdController extends AbstractMenuController {
 		consumerIdParam.setConsumerId(consumerId);
 		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
 		List<ConsumerIdResource> consumerIdResourceList = pair.getSecond();
-		if(consumerIdResourceList != null && !consumerIdResourceList.isEmpty()){
+		if (consumerIdResourceList != null && !consumerIdResourceList.isEmpty()) {
 			ConsumerIdResource consumerIdResource = consumerIdResourceList.get(0);
 			consumerIdResource.setAlarm(alarm);
 			boolean result = consumerIdResourceService.update(consumerIdResource);
-			
+
 			if (result) {
 				if (logger.isInfoEnabled()) {
 					logger.info(String.format("Update alarm of %s to %b successfully", topic, alarm));
@@ -113,10 +124,10 @@ public class ConsumerIdController extends AbstractMenuController {
 					logger.info(String.format("Update alarm of %s to %b fail", topic, alarm));
 				}
 			}
-			
+
 			return result;
 		}
-		
+
 		return Boolean.FALSE;
 	}
 
@@ -135,41 +146,21 @@ public class ConsumerIdController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/consumerid/allconsumerid", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadCmsumerid(HttpServletRequest request, HttpServletResponse response) {
+	public List<String> loadConsumerid(HttpServletRequest request, HttpServletResponse response) {
 
-		Set<String> consumerids = new HashSet<String>();
-		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID);
-
-		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-			String cid = consumerIdResource.getConsumerId();
-			if (!consumerids.contains(cid)) {
-				consumerids.add(cid);
-			}
-		}
-		
 		String username = userUtils.getUsername(request);
-		if(!userUtils.isTrueAdministrator(username)){
-			consumerids.remove(TopicController.DEFAULT);
-		}
+		
+		return userUtils.consumerIds(username);
 
-		return new ArrayList<String>(consumerids);
 	}
-	
+
 	@RequestMapping(value = "/console/consumerid/ips", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadConsumerIps() {
+	public List<String> loadConsumerIps(HttpServletRequest request, HttpServletResponse response) {
+		
+		String username = userUtils.getUsername(request);
+		return userUtils.consumerIps(username);
 
-		Set<String> consumerips = new HashSet<String>();
-		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERIP);
-
-		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-			List<String> cips = consumerIdResource.getConsumerIps();
-			if ( !cips.isEmpty()) {
-				consumerips.addAll(cips);
-			}
-		}
-
-		return new ArrayList<String>(consumerips);
 	}
 
 	@Override

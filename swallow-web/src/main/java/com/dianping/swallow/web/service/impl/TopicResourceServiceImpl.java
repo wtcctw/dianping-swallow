@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -18,11 +21,16 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.TopicResourceDao;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.TopicResourceService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 import freemarker.template.utility.StringUtil;
 
@@ -32,11 +40,13 @@ import freemarker.template.utility.StringUtil;
  *         2015年8月10日下午7:34:53
  */
 @Service("topicResourceService")
-public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService {
+public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService, Runnable {
 
-	private static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist";
+	private static final String FACTORY_NAME = "TopicResourceServiceImpl";
+	
+	public static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist.applytopictest";
 
-	private static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
+	public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI.applytopictest";
 
 	@Autowired
 	private TopicResourceDao topicResourceDao;
@@ -46,6 +56,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	private Map<String, Set<String>> topicToWhiteList = new ConcurrentHashMap<String, Set<String>>();
 
 	private Map<String, Set<String>> topicToConsumerServer = new ConcurrentHashMap<String, Set<String>>();
+
+	private ScheduledExecutorService scheduledExecutorService = Executors
+			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	@PostConstruct
 	void initLionConfig() {
@@ -62,6 +75,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			topicToConsumerServer = parseServerURIString(value);
 
 			configCache.addChange(this);
+
+			scheduledExecutorService.scheduleAtFixedRate(this, 1, 2, TimeUnit.MINUTES);
 			logger.info("Init configCache successfully.");
 		} catch (LionException e) {
 			logger.error("Erroe when init lion config", e);
@@ -78,7 +93,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 			String[] whitelist = StringUtil.split(value, ';');
 
-			for (String wl : whitelist) {
+			for (int i = whitelist.length - 1; i >= 0; i--) {
+				String wl = whitelist[i];
 				if (StringUtils.isNotBlank(wl) && topicResourceDao.findByTopic(wl) == null) {
 					TopicResource topicResource = buildTopicResource(wl);
 					try {
@@ -118,6 +134,12 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	@Override
 	public boolean update(TopicResource topicResource) {
 
+		String topic = topicResource.getTopic();
+		String proposal = topicResource.getAdministrator();
+		String[] proposalArray = proposal.split(",");
+		Set<String> proposalSet = new HashSet<String>(Arrays.asList(proposalArray));
+		topicToWhiteList.put(topic, proposalSet);
+
 		return topicResourceDao.update(topicResource);
 	}
 
@@ -128,7 +150,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String ... topics) {
+	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String... topics) {
 
 		return topicResourceDao.findByTopics(offset, limit, topics);
 	}
@@ -170,8 +192,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public 	Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator) {
-		
+	public Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator) {
+
 		return topicResourceDao.findByAdministrator(offset, limit, administrator);
 	}
 
@@ -236,9 +258,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		topicResource.setTopic(topic);
 		topicResource.setCreateTime(new Date());
 		topicResource.setId(id.toString());
-		
+
 		TopicResource defaultTopicResource = topicResourceDao.findDefault();
-		if(defaultTopicResource == null){
+		if (defaultTopicResource == null) {
 			throw new RuntimeException("No default TopicResource configuration");
 		}
 		topicResource.setProducerAlarmSetting(defaultTopicResource.getProducerAlarmSetting());
@@ -280,6 +302,29 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			logger.info("[parseConsumerServerURIString][parse]" + value);
 		}
 		return result;
+	}
+
+	@Override
+	public void run() {
+
+		try {
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "updateTopicToWhiteList");
+			catWrapper.doAction(new SwallowAction() {
+				@Override
+				public void doAction() throws SwallowException {
+
+					Set<String> whiltlist = topicToWhiteList.keySet();
+					for (String wl : whiltlist) {
+						cacheTopicToWhiteList(wl);
+					}
+
+				}
+			});
+		} catch (Throwable th) {
+			logger.error("[startUpdateTopicToWhiteList]", th);
+		} finally {
+
+		}
 	}
 
 }

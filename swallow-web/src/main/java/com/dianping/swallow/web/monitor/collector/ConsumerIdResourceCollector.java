@@ -3,18 +3,18 @@ package com.dianping.swallow.web.monitor.collector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -25,7 +25,6 @@ import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -37,7 +36,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月31日下午8:14:56
  */
 @Component
-public class ConsumerIdResourceCollector implements MonitorDataListener, Runnable {
+public class ConsumerIdResourceCollector implements Runnable {
 
 	private static final String FACTORY_NAME = "ConsumerIdResourceCollector";
 
@@ -53,36 +52,16 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
-	private AtomicBoolean minute = new AtomicBoolean(false);
+	private ScheduledExecutorService scheduledExecutorService = Executors
+			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
-	private ExecutorService scheduled = Executors.newSingleThreadExecutor(ThreadFactoryUtils
-			.getThreadFactory(FACTORY_NAME));
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@PostConstruct
 	void updateDashboardContainer() {
 
-		consumerDataRetrieverWrapper.registerListener(this);
-	}
-
-	@Override
-	public void achieveMonitorData() {
-
-		if (minute.get()) {
-			try {
-				logger.info("[startCollectConsumerIdResource]");
-				scheduled.submit(this);
-			} catch (Exception e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("Error when flush consumerid data to database.", e);
-				}
-			} finally {
-				minute.compareAndSet(true, false);
-			}
-		} else {
-			minute.compareAndSet(false, true);
-		}
-
+		logger.info("[startCollectConsumerIdResource]");
+		scheduledExecutorService.scheduleAtFixedRate(this, 1, 10, TimeUnit.MINUTES);
 	}
 
 	private void flushConsumerIdMetaData() {

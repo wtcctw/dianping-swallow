@@ -184,7 +184,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 		          //下面是在table render完成后执行的js
 				 $http({
 						method : 'GET',
-						url : window.contextPath + '/console/topic/namelist'
+						url : window.contextPath + '/console/topic/namelist?time=' + new Date()
 					}).success(function(data, status, headers, config) {
 						var topicNameList = data.first;
 						var producerip = data.second;
