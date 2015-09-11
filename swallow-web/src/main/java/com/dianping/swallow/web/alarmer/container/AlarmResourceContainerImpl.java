@@ -80,6 +80,8 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 
 	private volatile List<ConsumerServerResource> cSlaveServerResources = null;
 
+	private volatile List<ConsumerServerResourcePair> cServerResourcePairs = null;
+
 	private volatile Map<String, ProducerServerResource> pServerResources = null;
 
 	private volatile Map<String, TopicResource> topicResources = null;
@@ -108,27 +110,34 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	private void findCHAServerResourceData(List<ConsumerServerResource> tempResources) {
 		List<ConsumerServerResource> newCMasterServerResources = new ArrayList<ConsumerServerResource>();
 		List<ConsumerServerResource> newCSlaveServerResources = new ArrayList<ConsumerServerResource>();
-		for (ConsumerServerResource tempResource0 : tempResources) {
-			if (StringUtils.isBlank(tempResource0.getHostname())
-					|| !StringUtils.contains(tempResource0.getHostname(), MASTER_NAME)) {
+		List<ConsumerServerResourcePair> newCServerResourcePairs = new ArrayList<ConsumerServerResourcePair>();
+		for (ConsumerServerResource masterResource : tempResources) {
+			if (StringUtils.isBlank(masterResource.getHostname())
+					|| !StringUtils.contains(masterResource.getHostname(), MASTER_NAME)) {
 				continue;
 			}
 
-			for (ConsumerServerResource tempResource : tempResources) {
-				if (StringUtils.isBlank(tempResource.getHostname())
-						|| !StringUtils.contains(tempResource.getHostname(), SLAVE_NAME)) {
+			for (ConsumerServerResource slaveResource : tempResources) {
+				if (StringUtils.isBlank(slaveResource.getHostname())
+						|| !StringUtils.contains(slaveResource.getHostname(), SLAVE_NAME)) {
 					continue;
 				}
 
-				String replaceName = StringUtils.replace(tempResource0.getHostname(), MASTER_NAME, SLAVE_NAME);
-				if (StringUtils.equals(tempResource.getHostname(), replaceName)) {
-					newCMasterServerResources.add(tempResource0);
-					newCSlaveServerResources.add(tempResource);
+				String replaceName = StringUtils.replace(masterResource.getHostname(), MASTER_NAME, SLAVE_NAME);
+				if (StringUtils.equals(slaveResource.getHostname(), replaceName)) {
+					newCMasterServerResources.add(masterResource);
+					newCSlaveServerResources.add(slaveResource);
+					newCServerResourcePairs.add(new ConsumerServerResourcePair(masterResource, slaveResource));
 				}
 			}
 		}
 		cMasterServerResources = newCMasterServerResources;
+		logger.info("consumer master server resource {}.", cMasterServerResources);
 		cSlaveServerResources = newCSlaveServerResources;
+		logger.info("consumer slave server resource {}.", cSlaveServerResources);
+		cServerResourcePairs = newCServerResourcePairs;
+		logger.info("consumer server pair resource {}.", cServerResourcePairs);
+
 	}
 
 	private void findPServerResourceData() {
@@ -268,6 +277,14 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	}
 
 	@Override
+	public List<ConsumerServerResourcePair> findConsumerServerResourcePairs() {
+		if (cServerResourcePairs != null) {
+			return Collections.unmodifiableList(cServerResourcePairs);
+		}
+		return null;
+	}
+
+	@Override
 	public List<ProducerServerResource> findProducerServerResources(boolean isDefault) {
 		if (pServerResources != null) {
 			List<ProducerServerResource> results = new ArrayList<ProducerServerResource>(pServerResources.values());
@@ -314,4 +331,5 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 			}
 		}
 	}
+
 }
