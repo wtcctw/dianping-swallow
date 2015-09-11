@@ -13,6 +13,7 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer.ConsumerServerResourcePair;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -51,25 +52,28 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	}
 
 	public boolean checkSender() {
-		List<ConsumerServerResource> cMasterReources = resourceContainer.findConsumerMasterServerResources();
-		List<ConsumerServerResource> cSlaveReources = resourceContainer.findConsumerSlaveServerResources();
-		if (cMasterReources == null || cMasterReources.size() == 0 || cSlaveReources == null
-				|| cSlaveReources.size() == 0) {
+
+		List<ConsumerServerResourcePair> cServerReourcePairs = resourceContainer.findConsumerServerResourcePairs();
+
+		if (cServerReourcePairs == null || cServerReourcePairs.size() == 0) {
 			logger.error("[checkSender] cannot find consumer server master reources.");
 			return false;
 		}
 
 		Map<String, Long> statisConsumerServerIps = ipCollectorService.getStatisConsumerServerIps();
-		int index = 0;
-		for (ConsumerServerResource cMasterReource : cMasterReources) {
-			String serverIp = cMasterReource.getIp();
-			if (StringUtils.isBlank(serverIp) || !cMasterReource.isAlarm()) {
+		
+		for (ConsumerServerResourcePair cServerReourcePair : cServerReourcePairs) {
+
+			ConsumerServerResource cMasterResource = cServerReourcePair.getMasterResource();
+			ConsumerServerResource cSlaveResource = cServerReourcePair.getSlaveResource();
+			String serverIp = cMasterResource.getIp();
+
+			if (StringUtils.isBlank(serverIp) || !cMasterResource.isAlarm()) {
 				continue;
 			}
 			if (!statisConsumerServerIps.containsKey(serverIp)
 					|| System.currentTimeMillis() - statisConsumerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
-				ConsumerServerResource cSlaveReource = cSlaveReources.get(index);
-				String slaveIp = cSlaveReource.getIp();
+				String slaveIp = cSlaveResource.getIp();
 				if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
 					ServerEvent serverEvent = eventFactory.createServerEvent();
 					serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER)
@@ -87,7 +91,6 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 				}
 			}
 		}
-		index++;
 		return true;
 	}
 

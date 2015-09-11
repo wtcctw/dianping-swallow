@@ -34,4 +34,45 @@ public interface AlarmResourceContainer {
 	List<ConsumerServerResource> findConsumerMasterServerResources();
 
 	List<ConsumerServerResource> findConsumerSlaveServerResources();
+
+	List<ConsumerServerResourcePair> findConsumerServerResourcePairs();
+
+	public static class ConsumerServerResourcePair {
+
+		private ConsumerServerResource masterResource;
+
+		private ConsumerServerResource slaveResource;
+
+		public ConsumerServerResourcePair() {
+
+		}
+
+		public ConsumerServerResourcePair(ConsumerServerResource masterResource, ConsumerServerResource slaveResource) {
+			this.masterResource = masterResource;
+			this.slaveResource = slaveResource;
+		}
+
+		public ConsumerServerResource getMasterResource() {
+			return masterResource;
+		}
+
+		public void setMasterResource(ConsumerServerResource masterResource) {
+			this.masterResource = masterResource;
+		}
+
+		public ConsumerServerResource getSlaveResource() {
+			return slaveResource;
+		}
+
+		public void setSlaveResource(ConsumerServerResource slaveResource) {
+			this.slaveResource = slaveResource;
+		}
+
+		@Override
+		public String toString() {
+			return "ConsumerServerResourcePair [masterResource=" + masterResource + ", slaveResource=" + slaveResource
+					+ "]";
+		}
+		
+	}
 }
