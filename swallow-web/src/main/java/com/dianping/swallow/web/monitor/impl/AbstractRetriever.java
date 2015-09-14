@@ -239,9 +239,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 			long tempKey = tempStartKey;
 			tempKey -= getStorageIntervalCount();
 			while (startTimeKey < tempKey) {
-				if (!statsDatas.containsKey(tempKey)) {
-					statsDatas.put(tempKey, 0L);
-				}
+				statsDatas.put(tempKey, 0L);
 				tempKey -= getStorageIntervalCount();
 			}
 
@@ -264,11 +262,10 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 			}
 
 			tempKey = tempEndKey;
+			tempEndKey = endTimeKey - getStorageIntervalCount();
 			tempKey += getStorageIntervalCount();
-			while (tempKey < endTimeKey) {
-				if (!statsDatas.containsKey(tempKey)) {
-					statsDatas.put(tempKey, 0L);
-				}
+			while (tempKey < tempEndKey) {
+				statsDatas.put(tempKey, 0L);
 				tempKey += getStorageIntervalCount();
 			}
 		}
