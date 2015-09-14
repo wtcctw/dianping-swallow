@@ -3,6 +3,7 @@ package com.dianping.swallow.web.dashboard.model;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "DASHBOARD_STATS_DATA")
 public class MinuteEntry {
 
-	@Indexed(name = "IX_TIME")
+	@Indexed(name = "IX_TIME", direction = IndexDirection.ASCENDING)
 	private Date time;
 
 	private List<Entry> comprehensiveList;

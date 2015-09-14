@@ -2,6 +2,7 @@ package com.dianping.swallow.web.model.stats;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
@@ -18,9 +19,9 @@ public abstract class StatsData {
 	@Id
 	private String id;
 
-	@Indexed(name="IX_TIMEKEY")
+	@Indexed(name = "IX_TIMEKEY", direction = IndexDirection.ASCENDING)
 	private long timeKey;
-	
+
 	@Transient
 	protected EventReporter eventReporter;
 

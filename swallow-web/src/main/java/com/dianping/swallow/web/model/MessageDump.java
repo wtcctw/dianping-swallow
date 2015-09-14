@@ -3,67 +3,67 @@ package com.dianping.swallow.web.model;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
-
 
 /**
  * @author mingdongli
  *
- * 2015年6月24日下午1:43:19
+ *         2015年6月24日下午1:43:19
  */
 public class MessageDump {
-	
+
 	@Id
 	private String _id;
-	
-	@Indexed(name = "IX_TOPIC")
+
+	@Indexed(name = "IX_TOPIC", direction = IndexDirection.DESCENDING)
 	private String topic;
-	
+
 	private String name;
-	
+
 	private Date time;
-	
+
 	private Date startdt;
-	
+
 	private Date stopdt;
-	
+
 	private String filename;
-	
+
 	private boolean finished;
-	
+
 	private String desc;
-	
-	public MessageDump(){
-		
+
+	public MessageDump() {
+
 	}
-	
+
 	public String get_id() {
 		return _id;
 	}
-	
+
 	public MessageDump set_id(String _id) {
 		this._id = _id;
 		return this;
 	}
-	
+
 	public String getTopic() {
 		return topic;
 	}
-	
+
 	public MessageDump setTopic(String topic) {
 		this.topic = topic;
 		return this;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public MessageDump setName(String name) {
 		this.name = name;
 		return this;
 	}
-	
+
 	public Date getTime() {
 		return time;
 	}
@@ -99,7 +99,7 @@ public class MessageDump {
 		this.filename = filename;
 		return this;
 	}
-	
+
 	public boolean isFinished() {
 		return finished;
 	}
@@ -108,7 +108,7 @@ public class MessageDump {
 		this.finished = finished;
 		return this;
 	}
-	
+
 	public String getDesc() {
 		return desc;
 	}
@@ -124,6 +124,5 @@ public class MessageDump {
 				+ startdt + ", stopdt=" + stopdt + ", filename=" + filename + ", finished=" + finished + ", desc="
 				+ desc + "]";
 	}
-
 
 }
