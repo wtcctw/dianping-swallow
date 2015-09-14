@@ -118,6 +118,10 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		List<ComponentWrapper> result = new LinkedList<LifecycleComponentManager.ComponentWrapper>();
 		for(Entry<String, Lifecycle> entry : components.entrySet()){
 			
+			if(!accept(entry.getKey(), entry.getValue())){
+				continue;
+			}
+			
 			result.add(new ComponentWrapper(entry.getKey(), entry.getValue()));
 		}
 		
@@ -134,6 +138,11 @@ public class LifecycleComponentManager implements ApplicationContextAware, Initi
 		}
 		
 		return result;
+	}
+
+	protected boolean accept(String key, Lifecycle component) {
+		
+		return true;
 	}
 
 	@Override

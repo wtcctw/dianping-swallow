@@ -24,6 +24,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -64,6 +65,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	
 	private HttpClient httpClient;
 	protected final int maxWaitConnectionTime = 5000;
+	protected final int soTimeout = 1000;
 	
 	protected static final int maxRetryTimesOnException = 3;
 	protected static final int maxRetryIntervalOnException = 1000;
@@ -118,6 +120,8 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
         HttpParams params = new BasicHttpParams();
         ConnManagerParams.setMaxConnectionsPerRoute(params, new ConnPerRouteBean(CommonUtils.getCpuCount()));
         ConnManagerParams.setTimeout(params, maxWaitConnectionTime);
+        HttpConnectionParams.setSoTimeout(params, soTimeout);
+        
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
         ClientConnectionManager connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry);
