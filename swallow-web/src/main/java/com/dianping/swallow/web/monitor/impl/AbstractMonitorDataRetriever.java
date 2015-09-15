@@ -185,10 +185,18 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	}
 
 	protected void doChangeNotify() {
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doChangeNotify");
+		catWrapper.doAction(new SwallowAction() {
 
-		for (MonitorDataListener statisListener : statisListeners) {
-			statisListener.achieveMonitorData();
-		}
+			@Override
+			public void doAction() throws SwallowException {
+
+				for (MonitorDataListener statisListener : statisListeners) {
+					statisListener.achieveMonitorData();
+				}
+			}
+		});
+
 	}
 
 	@Override

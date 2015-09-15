@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  *         2015年9月6日 上午9:46:03
  */
 @Document(collection = "CONSUMER_IP_STATS_DATA")
-@CompoundIndexes({ @CompoundIndex(name = "IX_TIMEKEY_TOPICNAME_CONSUMERID_IP", def = "{'timeKey': 1, 'topicName':-1, 'consumerId': -1, 'ip': -1}") })
+@CompoundIndexes({ @CompoundIndex(name = "IX_TOPICNAME_CONSUMERID_IP_TIMEKEY", def = "{'topicName':-1, 'consumerId': -1, 'ip': -1, 'timeKey': 1}") })
 public class ConsumerIpStatsData extends ConsumerStatsData {
 
 	private String topicName;

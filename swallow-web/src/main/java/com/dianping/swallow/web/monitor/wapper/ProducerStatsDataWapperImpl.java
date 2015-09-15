@@ -16,6 +16,7 @@ import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerTopicStatisData;
+import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
@@ -196,6 +197,30 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
+	public List<ProducerIpGroupStatsData> getIpGroupStatsDatas(long timeKey) {
+		Set<String> topicKeys = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+		if (topicKeys == null) {
+			return null;
+		}
+		List<ProducerIpGroupStatsData> ipGroupStatsDatas = new ArrayList<ProducerIpGroupStatsData>();
+		for (String topic : topicKeys) {
+			if (StringUtils.isBlank(topic)) {
+				continue;
+			}
+			ipGroupStatsDatas.add(getIpGroupStatsData(topic, timeKey));
+		}
+		return ipGroupStatsDatas;
+	}
+
+	@Override
+	public ProducerIpGroupStatsData getIpGroupStatsData(String topicName, long timeKey) {
+		ProducerIpGroupStatsData ipGroupStatsData = new ProducerIpGroupStatsData();
+		List<ProducerIpStatsData> ipStatsDatas = getIpStatsDatas(topicName, timeKey);
+		ipGroupStatsData.setProducerIpStatsDatas(ipStatsDatas);
+		return ipGroupStatsData;
+	}
+
+	@Override
 	public Set<String> getTopicIps(String topicName, boolean isTotal) {
 		Set<String> topicIps = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
 		if (!isTotal && topicIps != null) {
@@ -245,4 +270,5 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		}
 		return ips;
 	}
+
 }

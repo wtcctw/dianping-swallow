@@ -2,7 +2,7 @@ package com.dianping.swallow.web.model.stats;
 
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,11 +14,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
  *         2015年9月6日 上午9:45:54
  */
 @Document(collection = "PRODUCER_IP_STATS_DATA")
-@CompoundIndexes({ @CompoundIndex(name = "IX_TIMEKEY_TOPICNAME_IP", def = "{'timeKey': 1, 'topicName': -1, 'ip': -1}") })
+@CompoundIndexes({ @CompoundIndex(name = "IX_TOPICNAME_IP_TIMEKEY", def = "{'topicName': -1, 'ip': -1, 'timeKey': 1}") })
 public class ProducerIpStatsData extends ProducerStatsData {
-	
+
 	private String ip;
-	
+
 	private String topicName;
 
 	public String getIp() {
@@ -36,7 +36,7 @@ public class ProducerIpStatsData extends ProducerStatsData {
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
 	}
-	
+
 	public boolean checkPreStatsData(ProducerIpStatsData statsData) {
 		if (this.getQps() == 0L && this.getDelay() == 0L) {
 			if (statsData.getQps() != 0L || statsData.getDelay() != 0L) {
