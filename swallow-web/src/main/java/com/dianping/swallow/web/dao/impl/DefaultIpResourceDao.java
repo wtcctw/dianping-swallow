@@ -73,13 +73,13 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 		}
 
 		Query query = new Query();
-		query.addCriteria(Criteria.where(IP).exists(true)
-				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
 		long size = 0;
 		
 		if(admin){
-			size = mongoTemplate.count(new Query(), IPRESOURCE_COLLECTION);
+			size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
 		}else{
+			query.addCriteria(Criteria.where(IP).exists(true)
+					.orOperator(criterias.toArray(new Criteria[criterias.size()])));
 			size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
 		}
 		
