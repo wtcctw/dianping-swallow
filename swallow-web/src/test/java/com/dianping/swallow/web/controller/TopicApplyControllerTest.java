@@ -45,12 +45,12 @@ public class TopicApplyControllerTest {
 	
 	private boolean autotest;
 
-	private String json = "{\"topic\":\"lmdyyh_swallow_test\",\"approver\":\"hongjun.zhong\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":false}";
+	private String json = "{\"topic\":\"lmdyyh_swallow_test\",\"approver\":\"hongjun.zhong\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":true}";
 
 	@Before
 	public void setUp() throws Exception {
 
-		this.autotest = false;
+		this.autotest = true;
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 	}
 

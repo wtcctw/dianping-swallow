@@ -106,13 +106,14 @@ public class IPController extends AbstractMenuController {
 
 			if (StringUtils.isBlank(application)) {
 				String[] ips = ip.split(",");
+				String username = userUtils.getUsername(request);
 				if (ips.length == 1) {
-					String username = userUtils.getUsername(request);
 					if(!userUtils.ips(username).contains(ips[0])){
 						return new Pair<Long, List<IpResourceDto>>(0L, ipResourceDto);
 					}
 				}
-				pair = ipResourceService.findByIp(offset, limit, ips);
+				boolean admin = userUtils.isAdministrator(username);
+				pair = ipResourceService.findByIp(offset, limit, admin, ips);
 			} else if (StringUtils.isBlank(ip)) {
 				pair = ipResourceService.findByApplication(offset, limit, application);
 			} else {
@@ -165,7 +166,7 @@ public class IPController extends AbstractMenuController {
 	public boolean editIpAlarm(@RequestParam String ip, @RequestParam boolean alarm, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, 1, ip);
+		Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, 1, false, ip);
 		if (pair.getFirst() == 0) {
 			throw new RuntimeException(String.format("Record of %s not found.", ip));
 		}

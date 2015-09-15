@@ -272,7 +272,7 @@ public class UserUtils {
 
 		if (!isAdministrator(username)) {
 			List<String> ipList = ips(username);
-			Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, Integer.MAX_VALUE,
+			Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, Integer.MAX_VALUE, false,
 					ipList.toArray(new String[ipList.size()]));
 			if(pair.getFirst() > 0){
 				for(IpResource ipResource : pair.getSecond()){

@@ -21,7 +21,7 @@ public interface IpResourceDao extends Dao{
 	
 	long count();
 
-	Pair<Long, List<IpResource>> findByIp(int offset, int limit, String ... ips);
+	Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String ... ips);
 
 	Pair<Long, List<IpResource>> findByApplication(int offset, int limit, String application);
 	
