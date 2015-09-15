@@ -3,6 +3,8 @@ package com.dianping.swallow.web.authentication;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import javax.servlet.http.Cookie;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
@@ -46,25 +48,32 @@ public class AuthenticationServiceImplTest {
 
 		MvcResult result;
 		try {
-//			result = this.mockMvc
-//					.perform(
-//							post("/api/topic/edittopic").param("prop", "dp.wang")
-//									.param("topic", "example").param("time", "2015-05-12 09:46").param("exec_user", "hongjun.zhong"))
-//					.andDo(MockMvcResultHandlers.print()).andReturn();
-//			
-//			JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
-//			assertEquals(jsonObject.getInt("status"), 0);
 			
 			String json = "{\"offset\":0,\"limit\":31,\"topic\":\"example\",\"messageId\":\"\",\"basemid\":\"\",\"sort\":false}";
+			
 			result = this.mockMvc
 					.perform(
-							post("/console/message/auth/list", "json").characterEncoding("UTF-8")
-							.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
-							.andDo(MockMvcResultHandlers.print()).andReturn();
-			
+							post("/api/topic/edittopic").param("prop", "dp.wang").param("topic", "example")
+									.param("time", "2015-05-12 09:46").param("exec_user", "hongjun.zhong"))
+					.andDo(MockMvcResultHandlers.print()).andReturn();
+
+			JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
+			assertEquals(jsonObject.getInt("status"), 0);
+
+			result = this.mockMvc
+					.perform(
+							post("/console/message/auth/list", "json")
+									.characterEncoding("UTF-8")
+									.contentType(MediaType.APPLICATION_JSON)
+									.content(json.getBytes())
+									.cookie(new Cookie("JSESSIONID", "xxwhh7x3yc7319a6tvewbh8xa"),
+											new Cookie("ticket",
+													"AAFSsPYAkNKN6Mb0Q6Li8D8gawrtLABMOoPxYWug50tdKFJH2fY1V+Qh")))
+					.andDo(MockMvcResultHandlers.print()).andReturn();
+
 			String resultString = result.getResponse().getContentAsString();
-			JSONObject jsonObject = new JSONObject(resultString);
-			JSONArray array = jsonObject.getJSONArray("message");
+			JSONObject jsonObject1 = new JSONObject(resultString);
+			JSONArray array = jsonObject1.getJSONArray("message");
 			assertEquals(array.length(), 31);
 
 			Thread.sleep(1000);
