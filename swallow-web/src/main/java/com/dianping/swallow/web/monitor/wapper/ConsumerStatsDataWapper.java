@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 
@@ -47,12 +48,36 @@ public interface ConsumerStatsDataWapper {
 	List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey);
 
 	/**
+	 * get all ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	List<ConsumerIpStatsData> getConsumerIpStatsDatas(long timeKey);
+
+	/**
+	 * get one topic related ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	List<ConsumerIpStatsData> getConsumerIpStatsDatas(String topicName, long timeKey);
+
+	/**
+	 * get one topic and consumerid related ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	List<ConsumerIpStatsData> getConsumerIpStatsDatas(String topicName, String consumerId, long timeKey);
+
+	/**
 	 * get ConsumerId
 	 * 
 	 * @return
 	 */
 	List<String> getConusmerIdInfos();
-	
+
 	/**
 	 * 
 	 * @param isTotal
