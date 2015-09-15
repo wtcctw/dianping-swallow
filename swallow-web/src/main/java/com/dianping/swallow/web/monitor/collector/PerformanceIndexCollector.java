@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.monitor.collector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,10 +31,13 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.dom.MongoReport;
+import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
+import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 import com.dianping.swallow.web.service.LionHttpService;
 import com.dianping.swallow.web.service.TopicResourceService;
+import com.dianping.swallow.web.util.DateUtil;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
@@ -65,6 +70,10 @@ public class PerformanceIndexCollector implements Runnable{
 
 	private static final int MAX_QPX = 7000;
 
+	private static final int MASTER_PORT = 8081;
+	
+	private static final int SLAVE_PORT = 8082;
+
 	private String bestMongo;
 
 	private String bestConsumerServer;
@@ -74,6 +83,9 @@ public class PerformanceIndexCollector implements Runnable{
 
 	@Resource(name = "lionHttpService")
 	private LionHttpService lionHttpService;
+
+	@Resource(name = "consumerServerStatsDataService")
+	private ConsumerServerStatsDataService consumerServerStatsDataService;
 
 	@Autowired
 	private HttpService httpSerivice;
@@ -224,7 +236,42 @@ public class PerformanceIndexCollector implements Runnable{
 	}
 	
 	public Pair<String, ResponseStatus> chooseConsumerServer() {
-		return new Pair<String, ResponseStatus>("", ResponseStatus.SUCCESS);
+		
+		Set<String> masters = new HashSet<String>();
+		Map<String, String> master2slave = new HashMap<String, String>();
+		
+		Map<String, Pair<String, String>> topicToConsumerServer = topicResourceService.loadCachedTopicToConsumerServer();
+		for(Map.Entry<String, Pair<String, String>> entry : topicToConsumerServer.entrySet()){
+			String master = entry.getValue().getFirst();
+			String slave = entry.getValue().getSecond();
+			masters.add(master);
+			master2slave.put(master, slave);
+		}
+		
+		long originalStart = DateUtil.getYesterayStart();
+		long originalStop = DateUtil.getYesterayStop();
+		long startKey = AbstractRetriever.getKey(originalStart);
+		long endKey = AbstractRetriever.getKey(originalStop);
+		
+		int count = 0;
+		while(count < 5){
+			String bestMaster = consumerServerStatsDataService.findIdleConsumerServer(new ArrayList<String>(masters), startKey, endKey);
+			
+			if(StringUtils.isBlank(bestMaster)){
+				count++;
+				originalStart = DateUtil.getOneDayBefore(originalStart);
+				originalStop = DateUtil.getOneDayBefore(originalStop);
+				startKey = AbstractRetriever.getKey(originalStart);
+				endKey = AbstractRetriever.getKey(originalStop);
+			}else{
+				String slaveIp = master2slave.get(bestMaster);
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append(bestMaster).append(":").append(MASTER_PORT).append(",").append(slaveIp).append(":").append(SLAVE_PORT);
+				return new Pair<String, ResponseStatus>(stringBuilder.toString(), ResponseStatus.SUCCESS);
+			}
+		}
+		
+		return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
 	}
 	
 	public String getBestMongo() {

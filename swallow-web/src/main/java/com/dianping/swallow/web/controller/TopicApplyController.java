@@ -156,6 +156,9 @@ public class TopicApplyController {
 		lionConfigBean.setMongo(mongoChose);
 		lionConfigBean.setConsumerServer(consumerServerChose);
 		lionConfigBean.setSize(size4sevenday);
+		if("product".equals(DEFAULT_ENV)){
+			DEFAULT_GROUP = "";
+		}
 		lionConfigBean.setGroup(DEFAULT_GROUP);
 		lionConfigBean.setTest(test);
 
