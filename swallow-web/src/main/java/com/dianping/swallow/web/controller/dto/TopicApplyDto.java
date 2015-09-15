@@ -16,6 +16,16 @@ public class TopicApplyDto {
 	private String approver; // 批准人
 	
 	private String applicant;
+	
+	private boolean test;
+
+	public boolean isTest() {
+		return test;
+	}
+
+	public void setTest(boolean test) {
+		this.test = test;
+	}
 
 	public String getTopic() {
 		return topic;

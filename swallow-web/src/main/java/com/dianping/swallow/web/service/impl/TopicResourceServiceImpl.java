@@ -43,10 +43,10 @@ import freemarker.template.utility.StringUtil;
 public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService, Runnable {
 
 	private static final String FACTORY_NAME = "TopicResourceServiceImpl";
-	
-	public static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist.applytopictest";
 
-	public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI.applytopictest";
+	public static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist";
+
+	public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
 
 	@Autowired
 	private TopicResourceDao topicResourceDao;
@@ -139,6 +139,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		String[] proposalArray = proposal.split(",");
 		Set<String> proposalSet = new HashSet<String>(Arrays.asList(proposalArray));
 		topicToWhiteList.put(topic, proposalSet);
+		if(logger.isInfoEnabled()){
+			logger.info(String.format("Update cache topicToWhiteList of topic %s administrator to %s", topic, proposal));
+		}
 
 		return topicResourceDao.update(topicResource);
 	}

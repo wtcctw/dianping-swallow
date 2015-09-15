@@ -90,13 +90,12 @@ public class PerformanceIndexCollector implements Runnable{
 	void updateDashboardContainer() {
 
 		logger.info("[PerformanceIndexCollector]");
-		//scheduledExecutorService.scheduleAtFixedRate(this, 0, 6, TimeUnit.HOURS);
+		scheduledExecutorService.scheduleAtFixedRate(this, 0, 6, TimeUnit.HOURS);
 	}
 	
 	public Pair<String, ResponseStatus> chooseMongoDb() {
 
 		Pair<String, ResponseStatus> pair = new Pair<String, ResponseStatus>();
-		// HttpService httpSerivice = new HttpServiceImpl();
 		HttpResult httpResult = httpSerivice.httpPost(MONGO_REPORT, new ArrayList<NameValuePair>());
 
 		if (httpResult.isSuccess()) {
@@ -110,15 +109,15 @@ public class PerformanceIndexCollector implements Runnable{
 				Set<MongoReport> mongoReportSet = new TreeSet<MongoReport>();
 
 				for (Map<String, Object> data : datas) {
-					MongoReport mongoReport = convertObjectToMongoReport(data);
+					MongoReport mongoReport = convertMapToObject(data);
 					Float disk = mongoReport.getDisk();
 					String catalog = mongoReport.getCatalog();
 					if (disk != null && disk <= 80f && !PAY_MONGO.equals(catalog)) {
 						mongoReportSet.add(mongoReport);
+						if(logger.isInfoEnabled()){
+							logger.info(mongoReport.toString());
+						}
 					}
-				}
-				for (MongoReport mongoReport : mongoReportSet) {
-					System.out.println(mongoReport.toString());
 				}
 				if (mongoReportSet.isEmpty()) {
 					pair.setSecond(ResponseStatus.NODISKSPACE);
@@ -203,7 +202,7 @@ public class PerformanceIndexCollector implements Runnable{
 				@SuppressWarnings("unchecked")
 				Map<String, List<String>> messages = (Map<String, List<String>>) map.get(MESSAGE);
 				List<String> ips = messages.get(key);
-				if (ips != null && ips.size() > 0) {
+				if (ips != null && ips.size() == 2) {
 					return StringUtils.join(ips, ",");
 				} else {
 					return BLANK_STRING;
@@ -217,7 +216,7 @@ public class PerformanceIndexCollector implements Runnable{
 
 	}
 	
-	private MongoReport convertObjectToMongoReport(Map<String, Object> data) {
+	private MongoReport convertMapToObject(Map<String, Object> data) {
 
 		ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
 		MongoReport pojo = mapper.convertValue(data, MongoReport.class);
