@@ -18,6 +18,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.BaseResource;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
@@ -36,7 +40,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月3日 上午11:34:10
  */
 @Component("alarmResourceContainer")
-public class AlarmResourceContainerImpl implements AlarmResourceContainer, InitializingBean {
+public class AlarmResourceContainerImpl extends AbstractContainer implements AlarmResourceContainer, InitializingBean {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmResourceContainerImpl.class);
 
@@ -178,7 +182,15 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 			@Override
 			public void run() {
 				try {
-					doLoadResourceTask();
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+							+ "-doLoadResource");
+					catWrapper.doAction(new SwallowAction() {
+						@Override
+						public void doAction() throws SwallowException {
+							doLoadResourceTask();
+						}
+					});
+
 				} catch (Throwable th) {
 					logger.error("[scheduleResourceTask]", th);
 				} finally {

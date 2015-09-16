@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -23,6 +24,7 @@ import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ProducerIpStatsDataService;
 
+@Component
 public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Autowired
@@ -45,23 +47,23 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ProducerIpGroupStatsData> pIpGroupStatsDatas = pStatsDataWapper.getIpGroupStatsDatas(
+		final List<ProducerIpGroupStatsData> ipGroupStatsDatas = pStatsDataWapper.getIpGroupStatsDatas(
 				getLastTimeKey(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				pIpGroupAlarms(pIpGroupStatsDatas);
+				pIpGroupAlarms(ipGroupStatsDatas);
 			}
 		});
 	}
 
-	public void pIpGroupAlarms(final List<ProducerIpGroupStatsData> pIpGroupStatsDatas) {
-		if (pIpGroupStatsDatas == null || pIpGroupStatsDatas.size() == 0) {
+	public void pIpGroupAlarms(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
+		if (ipGroupStatsDatas == null || ipGroupStatsDatas.size() == 0) {
 			return;
 		}
 
-		for (final ProducerIpGroupStatsData ipGroupStatsData : pIpGroupStatsDatas) {
+		for (final ProducerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
 			checkIpGroup(ipGroupStatsData);
 		}
 

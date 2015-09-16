@@ -14,6 +14,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.AlarmMetaService;
@@ -26,7 +30,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月3日 上午11:33:46
  */
 @Component("alarmMetaContainer")
-public class AlarmMetaContainerImpl implements InitializingBean, AlarmMetaContainer {
+public class AlarmMetaContainerImpl extends AbstractContainer implements InitializingBean, AlarmMetaContainer {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmMetaContainerImpl.class);
 
@@ -57,7 +61,15 @@ public class AlarmMetaContainerImpl implements InitializingBean, AlarmMetaContai
 			@Override
 			public void run() {
 				try {
-					doAlarmMetaTask();
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+							+ "-doLoadMeta");
+					catWrapper.doAction(new SwallowAction() {
+						@Override
+						public void doAction() throws SwallowException {
+							doAlarmMetaTask();
+						}
+					});
+					
 				} catch (Throwable th) {
 					logger.error("[scheduleAlarmMetaTask]", th);
 				} finally {

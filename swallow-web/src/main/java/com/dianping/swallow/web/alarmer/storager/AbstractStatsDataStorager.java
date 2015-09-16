@@ -12,6 +12,7 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
@@ -35,8 +36,8 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	protected volatile AtomicLong lastTimeKey = new AtomicLong();
 
-	protected ExecutorService scheduled = Executors.newSingleThreadExecutor(ThreadFactoryUtils
-			.getThreadFactory(FACTORY_NAME));
+	protected final ExecutorService executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
+			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -51,7 +52,7 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	@Override
 	public void achieveMonitorData() {
-		scheduled.submit(new Runnable() {
+		executor.submit(new Runnable() {
 
 			@Override
 			public void run() {
