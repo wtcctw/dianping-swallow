@@ -148,8 +148,3 @@ print("IP_DESC export to IP_RESOURCE end");
 
 
 
-db.CONSUMERID_STATS_DATA.ensureIndex({'topicName': -1,'consumerId' : -1 }, {"name":"IX_TOPICNAME_CONSUMERID"},{background:true});
-
-db.PRODUCER_TOPIC_STATS_DATA.ensureIndex({'topicName': -1}, {"name":"IX_TOPICNAME"},{background:true});
-
-
