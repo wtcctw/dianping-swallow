@@ -54,8 +54,8 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements Moni
 			return;
 		}
 		dataCount.decrementAndGet();
-		final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper
-				.getConsumerIdStatsDatas(lastTimeKey.get());
+		final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
+				lastTimeKey.get(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
@@ -75,9 +75,9 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements Moni
 			String consumerId = consumerIdStatsData.getConsumerId();
 			ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
 			TopicResource topicResource = resourceContainer.findTopicResource(topicName);
-			if ((topicResource != null && !topicResource.isConsumerAlarm())
-					|| consumerIdResource == null || !consumerIdResource.isAlarm()
-					|| StringUtils.equals(TOTAL_KEY, topicName) || StringUtils.equals(TOTAL_KEY, consumerId)) {
+			if ((topicResource != null && !topicResource.isConsumerAlarm()) || consumerIdResource == null
+					|| !consumerIdResource.isAlarm() || StringUtils.equals(TOTAL_KEY, topicName)
+					|| StringUtils.equals(TOTAL_KEY, consumerId)) {
 				continue;
 			}
 			ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();

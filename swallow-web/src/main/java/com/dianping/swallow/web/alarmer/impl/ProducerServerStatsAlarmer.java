@@ -57,8 +57,8 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 			return;
 		}
 		dataCount.decrementAndGet();
-		final List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(lastTimeKey
-				.get());
+		final List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(
+				lastTimeKey.get(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
 		catWrapper.doAction(new SwallowAction() {
 			@Override

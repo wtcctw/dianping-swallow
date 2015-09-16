@@ -58,8 +58,8 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements M
 			return;
 		}
 		dataCount.decrementAndGet();
-		final List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey
-				.get());
+		final List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(
+				lastTimeKey.get(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
 		catWrapper.doAction(new SwallowAction() {
 			@Override

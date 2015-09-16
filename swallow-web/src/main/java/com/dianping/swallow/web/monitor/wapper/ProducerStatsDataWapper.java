@@ -15,7 +15,7 @@ public interface ProducerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	List<ProducerServerStatsData> getServerStatsDatas(long timeKey);
+	List<ProducerServerStatsData> getServerStatsDatas(long timeKey, boolean isTotal);
 
 	/**
 	 * get all topic statis data at timekey point
@@ -23,7 +23,7 @@ public interface ProducerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	List<ProducerTopicStatsData> getTopicStatsDatas(long timeKey);
+	List<ProducerTopicStatsData> getTopicStatsDatas(long timeKey, boolean isTotal);
 
 	/**
 	 * get all ip statis data at timekey point
@@ -31,7 +31,7 @@ public interface ProducerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	List<ProducerIpStatsData> getIpStatsDatas(long timeKey);
+	List<ProducerIpStatsData> getIpStatsDatas(long timeKey, boolean isTotal);
 
 	/**
 	 * get all ip statis data at timekey point and topic
@@ -40,7 +40,7 @@ public interface ProducerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	List<ProducerIpStatsData> getIpStatsDatas(String topicName, long timeKey);
+	List<ProducerIpStatsData> getIpStatsDatas(String topicName, long timeKey, boolean isTotal);
 
 	/**
 	 * get all ip group statis data at timekey point
@@ -48,7 +48,7 @@ public interface ProducerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	List<ProducerIpGroupStatsData> getIpGroupStatsDatas(long timeKey);
+	List<ProducerIpGroupStatsData> getIpGroupStatsDatas(long timeKey, boolean isTotal);
 
 	/**
 	 * get all ip group statis data at timekey point and topic
@@ -57,7 +57,7 @@ public interface ProducerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	ProducerIpGroupStatsData getIpGroupStatsData(String topicName, long timeKey);
+	ProducerIpGroupStatsData getIpGroupStatsData(String topicName, long timeKey,boolean isTotal);
 
 	/**
 	 * get topic related ip

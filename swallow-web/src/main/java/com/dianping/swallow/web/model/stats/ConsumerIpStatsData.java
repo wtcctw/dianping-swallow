@@ -46,14 +46,50 @@ public class ConsumerIpStatsData extends ConsumerStatsData {
 	public void setConsumerId(String consumerId) {
 		this.consumerId = consumerId;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((consumerId == null) ? 0 : consumerId.hashCode());
+		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
+		result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConsumerIpStatsData other = (ConsumerIpStatsData) obj;
+		if (topicName == null) {
+			if (other.topicName != null)
+				return false;
+		} else if (!topicName.equals(other.topicName))
+			return false;
+		if (consumerId == null) {
+			if (other.consumerId != null)
+				return false;
+		} else if (!consumerId.equals(other.consumerId))
+			return false;
+		if (ip == null) {
+			if (other.ip != null)
+				return false;
+		} else if (!ip.equals(other.ip))
+			return false;
+		return true;
+	}
 
 	public boolean checkPreStatsData(ConsumerIpStatsData statsData) {
-		if (this.getSendQps() == 0L && this.getAckQps() == 0L && this.getSendDelay() == 0L && this.getAckDelay() == 0L) {
+		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
 			if (this.getAccumulation() > 0) {
 				return false;
 			} else {
-				if (statsData.getSendQps() != 0L || statsData.getAckQps() != 0L || statsData.getSendDelay() != 0L
-						|| statsData.getAckDelay() != 0L) {
+				if (statsData.getSendQps() != 0L || statsData.getAckQps() != 0L) {
 					return false;
 				}
 			}
@@ -61,15 +97,21 @@ public class ConsumerIpStatsData extends ConsumerStatsData {
 		return true;
 	}
 
+	public boolean checkStatsData(boolean hasStatsData) {
+		if (this.getSendQps() == 0L && this.getAckQps() == 0L && hasStatsData) {
+			return false;
+		}
+		return true;
+	}
+
 	public boolean checkGroupStatsData(List<ConsumerIpStatsData> statsDatas) {
-		if (this.getSendQps() == 0L && this.getAckQps() == 0L && this.getSendDelay() == 0L && this.getAckDelay() == 0L) {
+		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
 			if (statsDatas != null && statsDatas.size() > 0) {
 				for (ConsumerIpStatsData statsData : statsDatas) {
 					if (StringUtils.equals(statsData.getIp(), this.ip)) {
 						continue;
 					} else {
-						if (statsData.getSendQps() != 0L || statsData.getAckQps() != 0L
-								|| statsData.getSendDelay() != 0L || statsData.getAckDelay() != 0L) {
+						if (statsData.getSendQps() != 0L || statsData.getAckQps() != 0L) {
 							return false;
 						}
 					}

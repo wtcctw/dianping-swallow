@@ -14,4 +14,16 @@ public class ConsumerIpGroupStatsData {
 		this.consumerIpStatsDatas = consumerIpStatsDatas;
 	}
 
+	public boolean hasStatsData() {
+		if (consumerIpStatsDatas == null || consumerIpStatsDatas.size() == 0) {
+			return false;
+		}
+		for (ConsumerIpStatsData ipStatsData : consumerIpStatsDatas) {
+			if (ipStatsData.getSendQps() != 0L || ipStatsData.getAckQps() != 0L) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }

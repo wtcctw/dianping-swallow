@@ -36,6 +36,37 @@ public class ProducerIpStatsData extends ProducerStatsData {
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
+		result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ProducerIpStatsData other = (ProducerIpStatsData) obj;
+		if (topicName == null) {
+			if (other.topicName != null)
+				return false;
+		} else if (!topicName.equals(other.topicName))
+			return false;
+		if (ip == null) {
+			if (other.ip != null)
+				return false;
+		} else if (!ip.equals(other.ip))
+			return false;
+		return true;
+	}
 
 	public boolean checkPreStatsData(ProducerIpStatsData statsData) {
 		if (this.getQps() == 0L && this.getDelay() == 0L) {
@@ -46,14 +77,21 @@ public class ProducerIpStatsData extends ProducerStatsData {
 		return true;
 	}
 
+	public boolean checkStatsData(boolean hasStatsData) {
+		if (this.getQps() == 0L && hasStatsData) {
+			return false;
+		}
+		return true;
+	}
+
 	public boolean checkGroupStatsData(List<ProducerIpStatsData> statsDatas) {
-		if (this.getQps() == 0L && this.getDelay() == 0L) {
+		if (this.getQps() == 0L) {
 			if (statsDatas != null && statsDatas.size() > 0) {
 				for (ProducerIpStatsData statsData : statsDatas) {
 					if (StringUtils.equals(statsData.getIp(), this.ip)) {
 						continue;
 					} else {
-						if (statsData.getQps() != 0L || statsData.getDelay() != 0L) {
+						if (statsData.getQps() != 0L) {
 							return false;
 						}
 					}

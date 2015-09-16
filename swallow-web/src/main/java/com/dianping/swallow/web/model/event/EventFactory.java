@@ -64,4 +64,16 @@ public class EventFactory {
 		setComponent(consumerIdEvent);
 		return consumerIdEvent;
 	}
+
+	public ConsumerClientEvent createCClientEvent() {
+		ConsumerClientEvent cClientEvent = new ConsumerClientEvent();
+		setComponent(cClientEvent);
+		return cClientEvent;
+	}
+
+	public ProducerClientEvent createPClientEvent() {
+		ProducerClientEvent pClientEvent = new ProducerClientEvent();
+		setComponent(pClientEvent);
+		return pClientEvent;
+	}
 }

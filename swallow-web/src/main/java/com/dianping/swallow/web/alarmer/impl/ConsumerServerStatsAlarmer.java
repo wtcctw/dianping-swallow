@@ -51,8 +51,8 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 			return;
 		}
 		dataCount.decrementAndGet();
-		final List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(lastTimeKey
-				.get());
+		final List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(
+				lastTimeKey.get(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
@@ -76,7 +76,7 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 			}
 			QPSAlarmSetting sendQps = cServerResource.getSendAlarmSetting();
 			QPSAlarmSetting ackQps = cServerResource.getAckAlarmSetting();
-			
+
 			qpsSendAlarm(serverStatsData, sendQps);
 			qpsAckAlarm(serverStatsData, ackQps);
 		}

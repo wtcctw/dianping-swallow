@@ -181,7 +181,7 @@ public class AlarmResourceContainerImpl implements AlarmResourceContainer, Initi
 	}
 
 	private void doLoadResourceTask() {
-		logger.info("[doLoadResourceTask] scheduled load setting data.");
+		logger.info("[doLoadResourceTask] scheduled load resource data.");
 		findResourceData();
 	}
 

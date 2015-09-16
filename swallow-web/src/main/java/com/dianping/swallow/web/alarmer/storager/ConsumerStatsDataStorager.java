@@ -55,9 +55,10 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 
 	@Override
 	protected void doStorage() {
-		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(lastTimeKey.get());
-		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(lastTimeKey
-				.get());
+		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(lastTimeKey.get(),
+				true);
+		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
+				lastTimeKey.get(), true);
 		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
 		storageServerStatis(serverStatsDatas);
 		storageTopicStatis(topicStatsData);

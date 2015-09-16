@@ -24,11 +24,11 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
  *         2015年8月4日 下午1:22:31
  */
 @Component
-public class ProducerStatsDataStorager extends AbstractStatsDataStorager  {
+public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 
 	@Autowired
 	private StatsDataContainer statsDataContainer;
-	
+
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 
@@ -48,11 +48,12 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager  {
 		storagerName = getClass().getSimpleName();
 	}
 
-	
 	@Override
 	protected void doStorage() {
-		List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(lastTimeKey.get());
-		List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey.get());
+		List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(lastTimeKey.get(),
+				true);
+		List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey.get(),
+				true);
 		storageServerStatis(serverStatsDatas);
 		storageTopicStatis(topicStatsDatas);
 	}
@@ -84,9 +85,9 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager  {
 			@Override
 			public void doAction() throws SwallowException {
 				if (topicStatsDatas != null) {
-					
+
 					statsDataContainer.setProducerTopicTotalRatio(topicStatsDatas);
-					
+
 					for (ProducerTopicStatsData producerTopicStatisData : topicStatsDatas) {
 						topicStatsDataService.insert(producerTopicStatisData);
 					}
