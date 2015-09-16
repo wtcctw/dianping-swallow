@@ -2,6 +2,8 @@ package com.dianping.swallow.web.dao.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -89,7 +91,7 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 
 		Query query = new Query();
 
-		query.skip(offset).limit(limit);
+		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, HOSTNAME)));
 		List<ConsumerServerResource> consumerServerResources = mongoTemplate.find(query, ConsumerServerResource.class,
 				CONSUMERSERVERRESOURCE_COLLECTION);
 		Long size = this.count();

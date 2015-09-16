@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Document(collection = "CONSUMERID_RESOURCE")
 @CompoundIndexes({
-	@CompoundIndex(name = "IX_TOPICNAME_CONSUMERID", def = "{'topicName': -1, 'consumerId': -1}")
+	@CompoundIndex(name = "IX_TOPIC_CONSUMERID", def = "{'topic': -1, 'consumerId': -1}")
 	})
 public class ConsumerIdResource extends BaseResource{
 	

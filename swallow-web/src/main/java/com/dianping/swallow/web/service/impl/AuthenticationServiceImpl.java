@@ -28,6 +28,8 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 
 	private static final String ADMINURI = "/console/admin/auth";
 
+	private static final String TOPICURI = "/console/topic/auth";
+
 	private static final String SETTINGURI = "/console/setting";
 
 	private static final String ALL = "all";
@@ -60,7 +62,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 			return true;
 		} else if (loadAdminSet.contains(ALL) && !uri.startsWith(ADMINURI) && !uri.startsWith(SETTINGURI)) {
 			return true;
-		} else if (uri.startsWith(MESSAGEURI) || uri.startsWith(DOWNLOAD)) {
+		} else if (uri.startsWith(MESSAGEURI) || uri.startsWith(DOWNLOAD) || uri.startsWith(TOPICURI)) {
 			if (StringUtils.isNotBlank(topic) && topicResourceService.loadCachedTopicToWhiteList().get(topic).contains(username)) {
 				return true;
 			} else {

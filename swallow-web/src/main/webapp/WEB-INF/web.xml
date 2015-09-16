@@ -151,6 +151,7 @@
 		<url-pattern>/console/admin/auth/*</url-pattern>
 		<url-pattern>/console/download/auth/*</url-pattern>
 		<url-pattern>/console/setting/*</url-pattern>
+		<url-pattern>/console/topic/auth/*</url-pattern>
 		<url-pattern>/console/monitor/consumer/total/order/*</url-pattern>
 	</filter-mapping>
 

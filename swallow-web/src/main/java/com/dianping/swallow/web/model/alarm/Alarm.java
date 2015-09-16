@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,8 +20,8 @@ public class Alarm implements Cloneable {
 
 	@Id
 	private String id;
-	
-	@Indexed(name ="IX_EVENTID")
+
+	@Indexed(name = "IX_EVENTID", direction = IndexDirection.DESCENDING)
 	private long eventId;
 
 	private int number;
@@ -31,7 +32,7 @@ public class Alarm implements Cloneable {
 
 	private String body;
 
-	@Indexed(name ="IX_RELATED")
+	@Indexed(name = "IX_RELATED", direction = IndexDirection.ASCENDING)
 	private String related;
 
 	private String subRelated;
@@ -40,7 +41,7 @@ public class Alarm implements Cloneable {
 
 	private List<SendInfo> sendInfos;
 
-	@Indexed(name ="IX_CREATETIME")
+	@Indexed(name = "IX_CREATETIME", direction = IndexDirection.DESCENDING)
 	private Date createTime;
 
 	private String sourceIp;

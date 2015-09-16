@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.util.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +27,8 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.controller.dto.IpResourceDto;
 import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
@@ -45,28 +45,28 @@ import com.dianping.swallow.web.util.ResponseStatus;
 @Controller
 public class IPController extends AbstractMenuController {
 
-	private static final String IP = "ip";
-
-	private static final String APPLICATION = "iPDesc.name";
-
 	@Resource(name = "ipResourceService")
 	private IpResourceService ipResourceService;
-	
+
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
-	
+
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
 
+	@Autowired
+	private UserUtils userUtils;
+
 	@RequestMapping(value = "/console/ip")
-	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView ipView(HttpServletRequest request, HttpServletResponse response) {
 
 		return new ModelAndView("ip/index", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/ip/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object producerserverSettingList(@RequestBody IpQueryDto ipQueryDto) {
+	public Object producerserverSettingList(@RequestBody IpQueryDto ipQueryDto, HttpServletRequest request,
+			HttpServletResponse response) {
 
 		Pair<Long, List<IpResource>> pair = null;
 		List<IpResourceDto> ipResourceDto = new ArrayList<IpResourceDto>();
@@ -75,29 +75,29 @@ public class IPController extends AbstractMenuController {
 		String ip = ipQueryDto.getIp();
 		String application = ipQueryDto.getApplication();
 		String type = ipQueryDto.getType();
-		if(StringUtils.isNotBlank(type)){
+		if (StringUtils.isNotBlank(type)) {
 			List<String> ips = null;
-			
-			if("PRODUCER".equals(type)){
+
+			if ("PRODUCER".equals(type)) {
 				ips = loadProducerIps();
-			}else{
+			} else {
 				ips = loadConsumerIps();
 			}
-			
-			if(StringUtils.isNotBlank(ip)){
+
+			if (StringUtils.isNotBlank(ip)) {
 				String[] queryIps = StringUtils.split(ip);
-				
+
 				Collection<String> intersection = CollectionUtils.intersection(ips, Arrays.asList(queryIps));
-				if(intersection.isEmpty()){
+				if (intersection.isEmpty()) {
 					return new Pair<Long, List<IpResourceDto>>(0L, ipResourceDto);
-				}else{
+				} else {
 					ip = StringUtils.join(intersection, ",");
 				}
-			}else{
+			} else {
 				ip = StringUtils.join(ips, ",");
 			}
 		}
-		
+
 		Boolean isAllBlank = StringUtils.isBlank(ip) && StringUtils.isBlank(application);
 
 		if (isAllBlank) {
@@ -106,6 +106,12 @@ public class IPController extends AbstractMenuController {
 
 			if (StringUtils.isBlank(application)) {
 				String[] ips = ip.split(",");
+				if (ips.length == 1) {
+					String username = userUtils.getUsername(request);
+					if(!userUtils.ips(username).contains(ips[0])){
+						return new Pair<Long, List<IpResourceDto>>(0L, ipResourceDto);
+					}
+				}
 				pair = ipResourceService.findByIp(offset, limit, ips);
 			} else if (StringUtils.isBlank(ip)) {
 				pair = ipResourceService.findByApplication(offset, limit, application);
@@ -140,39 +146,18 @@ public class IPController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/ip/allip", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadCmsumerid() {
+	public List<String> loadCmsumerid(HttpServletRequest request, HttpServletResponse response) {
 
-		Set<String> ips = new HashSet<String>();
-		List<IpResource> ipResources = ipResourceService.findAll(IP);
-
-		for (IpResource ipResource : ipResources) {
-			String ip = ipResource.getIp();
-			if (!ips.contains(ip)) {
-				ips.add(ip);
-			}
-		}
-
-		return new ArrayList<String>(ips);
+		String username = userUtils.getUsername(request);
+		return userUtils.consumerIps(username);
 	}
 
 	@RequestMapping(value = "/console/ip/application", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadApplication() {
+	public List<String> loadApplication(HttpServletRequest request, HttpServletResponse response) {
 
-		Set<String> apps = new HashSet<String>();
-		List<IpResource> ipResources = ipResourceService.findAll(APPLICATION);
-
-		for (IpResource ipResource : ipResources) {
-			IPDesc iPDesc = ipResource.getiPDesc();
-			if (iPDesc != null) {
-				String app = iPDesc.getName();
-				if (StringUtils.isNotBlank(app) && !apps.contains(app)) {
-					apps.add(app);
-				}
-			}
-		}
-
-		return new ArrayList<String>(apps);
+		String username = userUtils.getUsername(request);
+		return userUtils.applications(username);
 	}
 
 	@RequestMapping(value = "/console/ip/alarm", method = RequestMethod.GET)
@@ -181,7 +166,7 @@ public class IPController extends AbstractMenuController {
 			HttpServletResponse response) {
 
 		Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, 1, ip);
-		if(pair.getFirst() == 0){
+		if (pair.getFirst() == 0) {
 			throw new RuntimeException(String.format("Record of %s not found.", ip));
 		}
 		List<IpResource> ipResources = pair.getSecond();
@@ -198,40 +183,41 @@ public class IPController extends AbstractMenuController {
 				logger.info(String.format("Update alarm of %s to %b fail", ip, alarm));
 			}
 		}
-		
+
 		return result;
 	}
-	
-	private List<String> loadProducerIps(){
-		
+
+	private List<String> loadProducerIps() {
+
 		List<TopicResource> topicResources = topicResourceService.findAll();
 		Set<String> ips = new LinkedHashSet<String>();
-		
+
 		List<String> ipList = null;
-		for(TopicResource topicResource : topicResources){
+		for (TopicResource topicResource : topicResources) {
 			ipList = topicResource.getProducerIps();
-			if(ipList != null){
+			if (ipList != null) {
 				ips.addAll(ipList);
 			}
 		}
 		return new ArrayList<String>(ips);
 	}
-	
-	private List<String> loadConsumerIps(){
-		
-		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(DefaultConsumerIdResourceDao.CONSUMERIPS);
+
+	private List<String> loadConsumerIps() {
+
+		List<ConsumerIdResource> consumerIdResources = consumerIdResourceService
+				.findAll(DefaultConsumerIdResourceDao.CONSUMERIPS);
 		Set<String> ips = new LinkedHashSet<String>();
-		
+
 		List<String> ipList = null;
-		for(ConsumerIdResource consumerIdResource : consumerIdResources){
+		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 			ipList = consumerIdResource.getConsumerIps();
-			if(ipList != null){
+			if (ipList != null) {
 				ips.addAll(ipList);
 			}
 		}
 		return new ArrayList<String>(ips);
 	}
-	
+
 	@Override
 	protected String getMenu() {
 		return "ip";

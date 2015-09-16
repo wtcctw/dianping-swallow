@@ -116,12 +116,11 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
 					parentDomain + ":" + swallowMessage.getSourceIp());
 			// 将swallowMessage保存到mongodb
 			try {
-
-				Date timeBeforeSave = new Date();
+				Date generateTime = swallowMessage.getGeneratedTime() != null ? swallowMessage.getGeneratedTime() :  new Date(); 
 
 				getMessageDAO().saveMessage(topicName, swallowMessage);
 
-				producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, timeBeforeSave.getTime(),
+				producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, generateTime.getTime(),
 						System.currentTimeMillis());
 
 				producerServerTransaction.addData("sha1", swallowMessage.getSha1());

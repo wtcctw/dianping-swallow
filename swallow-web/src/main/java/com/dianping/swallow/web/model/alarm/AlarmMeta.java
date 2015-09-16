@@ -3,6 +3,7 @@ package com.dianping.swallow.web.model.alarm;
 import java.util.Date;
 
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 public class AlarmMeta {
@@ -36,7 +37,7 @@ public class AlarmMeta {
 
 	private String id;
 
-	@Indexed(name="IX_METAID")
+	@Indexed(name = "IX_METAID", direction = IndexDirection.DESCENDING)
 	private int metaId;
 
 	private AlarmType type;
@@ -62,7 +63,7 @@ public class AlarmMeta {
 	private int maxTimeSpan;
 
 	private int daySpanBase;
-	
+
 	private int nightSpanBase;
 
 	private Date createTime;
@@ -214,7 +215,5 @@ public class AlarmMeta {
 				+ maxTimeSpan + ", daySpanBase=" + daySpanBase + ", nightSpanBase=" + nightSpanBase + ", createTime="
 				+ createTime + ", updateTime=" + updateTime + "]";
 	}
-	
-	
 
 }

@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.model.resource;
 
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,7 +15,7 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 @Document(collection = "IP_RESOURCE")
 public class IpResource extends BaseResource{
 
-	@Indexed(name="IX_IP")
+	@Indexed(name = "IX_IP", direction = IndexDirection.ASCENDING)
 	private String ip;
 	
 	private boolean alarm;

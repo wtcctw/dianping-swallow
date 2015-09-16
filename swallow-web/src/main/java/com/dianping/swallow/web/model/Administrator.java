@@ -3,6 +3,7 @@ package com.dianping.swallow.web.model;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,7 +17,7 @@ public class Administrator {
 	@Id
 	private String id;
 
-	@Indexed(name = "IX_NAME")
+	@Indexed(name = "IX_NAME", direction = IndexDirection.ASCENDING)
 	private String name;
 
 	private UserType role;

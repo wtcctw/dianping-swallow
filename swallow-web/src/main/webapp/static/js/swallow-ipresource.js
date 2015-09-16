@@ -144,14 +144,14 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 			$scope.query.type = $scope.searchtype;
 
 			var tmplocation = location.search;
-			if(tmplocation != null && tmplocation.length > 3 && tmplocation.substr(0,4)=="?ip="){
+			if(tmplocation != "" && tmplocation.length > 3 && tmplocation.substr(0,4)=="?ip="){//ip get
 				var subtmpip = tmplocation.substring(4);
 				$scope.searchip = subtmpip;
 				$scope.query.ip = subtmpip;
-				$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
-			}else if(tmplocation != null && tmplocation.length > 7){
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);//topic
+			}else if(tmplocation != "" && tmplocation.length > 7){
 				var index = tmplocation.indexOf("&");
-				if(index != -1){
+				if(index != -1){ //topic and cid
 					var topic = tmplocation.substring(7, index).trim();
 					var cid = tmplocation.substring(index + 5).trim();
 					if(topic.length > 0 && cid.length > 0){
@@ -161,9 +161,9 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 						entity.topic = topic;
 						entity.consumerId = cid;
 						entity.consumerIp = "";
-						$http.post(window.contextPath + "/console/consumerid/list", entity).success(function(data){
-							if(data.first == 1){
-								var tmpip = data.second[0].consumerIp;
+						$http.post(window.contextPath + "/console/topic/auth/cid", entity).success(function(data){
+							if(data.status == null){//authentication
+								var tmpip = data.consumerIp;
 								if(tmpip != null){
 									
 									if(tmpip.indexOf(',') == -1){
@@ -179,7 +179,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 							}
 						});
 					}
-				}else{
+				}else{ //topic
 					var topic = tmplocation.substring(7).trim();
 					if(topic.length > 0){
 						var entity = new Object();
@@ -187,9 +187,9 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 						entity.limit = 1;
 						entity.topic = topic;
 						entity.producerServer = "";
-						$http.post(window.contextPath + "/console/topic/list", entity).success(function(data){
-							if(data.first == 1){
-								var tmpip = data.second[0].producerServer;
+						$http.post(window.contextPath + "/console/topic/auth/ip", entity).success(function(data){
+							if(data.status == null){
+								var tmpip = data.producerServer;
 								if(tmpip != null){
 									
 									if(tmpip.indexOf(',') == -1){
@@ -207,14 +207,18 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 					}
 				}
 				
-			}else{
-				$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+			}else{ //
+				tmplocation = null;
+				if(tmpip != null){  // 跳转过来
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+				}
+				//否则查询过allip后再返回默认界面
 			}
 			
 			//如果topic列表返回空，则不会执行initpage
-			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
-				$scope.initpage();
-			});
+//			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
+//				$scope.initpage();
+//			});
 			
 			$("#searchtype").typeahead({
 				items: 16, 
@@ -249,6 +253,19 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 								return c;
 							}
 						})
+						
+						if(tmpip == null && tmplocation == null){ //默认界面
+							if(ips.length > 0){
+								var ipString = ips.join(",");
+								if(ips.length == 1){
+									$scope.searchip = ips;
+								}else{
+									$scope.searchip = "";
+								}
+								$scope.query.ip = ipString;
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);		
+							}
+						}
 					}).error(function(data, status, headers, config) {
 				});
 				 
@@ -273,6 +290,8 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 					});
 					
 			}
+			
+			$scope.initpage();
 			
 			$scope.changealarm = function(ip, index){
 				var id = "#alarm" + index;

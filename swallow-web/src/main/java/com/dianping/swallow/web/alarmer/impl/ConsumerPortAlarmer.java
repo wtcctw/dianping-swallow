@@ -17,6 +17,7 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer.ConsumerServerResourcePair;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -83,24 +84,20 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 	}
 
 	public boolean checkPort() {
-
-		List<ConsumerServerResource> cMasterReources = resourceContainer.findConsumerSlaveServerResources();
-		List<ConsumerServerResource> cSlaveReources = resourceContainer.findConsumerSlaveServerResources();
-
-		if (cMasterReources == null || cMasterReources.size() == 0 || cSlaveReources == null
-				|| cSlaveReources.size() == 0) {
+		List<ConsumerServerResourcePair> cServerReourcePairs = resourceContainer.findConsumerServerResourcePairs();
+		
+		if (cServerReourcePairs == null || cServerReourcePairs.size() == 0) {
 			logger.error("[checkPort] cannot find consumermaster or consumerslave reources.");
 			return false;
 		}
-		int index = 0;
-		for (ConsumerServerResource cMasterReource : cMasterReources) {
-			String masterIp = cMasterReource.getIp();
-			if (StringUtils.isBlank(masterIp) || !cMasterReource.isAlarm()) {
+		
+		for (ConsumerServerResourcePair cServerReourcePair : cServerReourcePairs) {
+			ConsumerServerResource cMasterResource = cServerReourcePair.getMasterResource();
+			ConsumerServerResource cSlaveReource = cServerReourcePair.getSlaveResource();
+			if (StringUtils.isBlank(cMasterResource.getIp()) || !cMasterResource.isAlarm()) {
 				continue;
 			}
-			ConsumerServerResource cSlaveReource = cSlaveReources.get(index);
-			alarmPort(masterIp, cSlaveReource);
-			index++;
+			alarmPort(cMasterResource.getIp(), cSlaveReource);
 		}
 		return true;
 	}
@@ -109,7 +106,9 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 		String slaveIp = cSlaveReource.getIp();
 		boolean usingMaster = checkPort(masterIp, masterPort);
 		boolean usingSlave = checkPort(slaveIp, slavePort);
+		
 		String key = masterIp + KEY_SPLIT + slaveIp;
+		
 		if (!usingMaster && usingSlave) {
 			isSlaveIps.put(masterIp, true);
 			ServerEvent serverEvent = eventFactory.createServerEvent();
