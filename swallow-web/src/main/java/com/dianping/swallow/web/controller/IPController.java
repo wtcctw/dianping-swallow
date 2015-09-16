@@ -65,7 +65,7 @@ public class IPController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/ip/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object producerserverSettingList(@RequestBody IpQueryDto ipQueryDto, HttpServletRequest request,
+	public Object ipQuery(@RequestBody IpQueryDto ipQueryDto, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		Pair<Long, List<IpResource>> pair = null;
@@ -106,13 +106,16 @@ public class IPController extends AbstractMenuController {
 
 			if (StringUtils.isBlank(application)) {
 				String[] ips = ip.split(",");
+				String username = userUtils.getUsername(request);
 				if (ips.length == 1) {
-					String username = userUtils.getUsername(request);
 					if(!userUtils.ips(username).contains(ips[0])){
 						return new Pair<Long, List<IpResourceDto>>(0L, ipResourceDto);
 					}
 				}
-				pair = ipResourceService.findByIp(offset, limit, ips);
+				int size = userUtils.ips(username).size();
+				int length = ips.length;
+				boolean adminIp =  userUtils.isAdministrator(username) && (size == length);
+				pair = ipResourceService.findByIp(offset, limit, adminIp, ips);
 			} else if (StringUtils.isBlank(ip)) {
 				pair = ipResourceService.findByApplication(offset, limit, application);
 			} else {
@@ -146,10 +149,10 @@ public class IPController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/ip/allip", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadCmsumerid(HttpServletRequest request, HttpServletResponse response) {
+	public List<String> loadConsumerips(HttpServletRequest request, HttpServletResponse response) {
 
 		String username = userUtils.getUsername(request);
-		return userUtils.consumerIps(username);
+		return userUtils.ips(username);
 	}
 
 	@RequestMapping(value = "/console/ip/application", method = RequestMethod.GET)
@@ -165,7 +168,7 @@ public class IPController extends AbstractMenuController {
 	public boolean editIpAlarm(@RequestParam String ip, @RequestParam boolean alarm, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, 1, ip);
+		Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, 1, false, ip);
 		if (pair.getFirst() == 0) {
 			throw new RuntimeException(String.format("Record of %s not found.", ip));
 		}

@@ -15,6 +15,26 @@ public class LionConfigBean {
 	private String consumerServer;
 	
 	private int size;
+	
+	private String group;
+	
+	private boolean test;
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	public boolean isTest() {
+		return test;
+	}
+
+	public void setTest(boolean test) {
+		this.test = test;
+	}
 
 	public String getTopic() {
 		return topic;

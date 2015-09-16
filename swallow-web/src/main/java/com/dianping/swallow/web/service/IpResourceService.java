@@ -19,7 +19,7 @@ public interface IpResourceService {
 	
 	int remove(String ip);
 	
-	Pair<Long, List<IpResource>> findByIp(int offset, int limit, String ... ips);
+	Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String ... ips);
 
 	List<IpResource> findByIp(String ip);
 

@@ -40,7 +40,7 @@ public interface TopicResourceService extends ConfigChange{
 	
 	Map<String, Set<String>> loadCachedTopicToWhiteList();
 
-	Map<String, Set<String>> loadCachedTopicToConsumerServer();
+	Map<String, Pair<String, String>> loadCachedTopicToConsumerServer();
 	
 	TopicResource buildTopicResource(String topic);
 }

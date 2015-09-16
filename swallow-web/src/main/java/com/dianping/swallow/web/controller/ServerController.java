@@ -264,13 +264,16 @@ public class ServerController extends AbstractSidebarBasedController {
 	public List<String> loadConsumerSereverTopics(@RequestParam String ip) {
 
 		Set<String> result = new HashSet<String>();
-		Map<String, Set<String>> topicToConsumerServer = topicResourceService.loadCachedTopicToConsumerServer();
+		Map<String, Pair<String, String>> topicToConsumerServer = topicResourceService.loadCachedTopicToConsumerServer();
 
 		if (topicToConsumerServer == null) {
 			return new ArrayList<String>(result);
 		} else {
-			for (Map.Entry<String, Set<String>> entry : topicToConsumerServer.entrySet()) {
-				Set<String> servers = entry.getValue();
+			for (Map.Entry<String, Pair<String, String>> entry : topicToConsumerServer.entrySet()) {
+				Pair<String, String> pair = entry.getValue();
+				Set<String> servers = new HashSet<String>();
+				servers.add(pair.getFirst());
+				servers.add(pair.getSecond());
 				String topic = entry.getKey();
 				if (servers != null && servers.contains(ip) && !result.contains(topic)) {
 					result.add(topic);

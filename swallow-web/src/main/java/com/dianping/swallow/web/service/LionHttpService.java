@@ -8,13 +8,13 @@ package com.dianping.swallow.web.service;
  */
 public interface LionHttpService {
 	
-	LionHttpResponse setUsingGet(int id, String env, String key, String value);
+	LionHttpResponse setUsingGet(int id, String env, String key, String value, String group);
 
-	LionHttpResponse setUsingPost(int id, String env, String key, String value);
+	LionHttpResponse setUsingPost(int id, String env, String key, String value, String group);
 
 	LionHttpResponse create(int id, String project, String key, String desc);
 
-	LionHttpResponse get(int id, String env, String key);
+	LionHttpResponse get(int id, String env, String key, String group);
 
 	public static class LionHttpResponse{
 		

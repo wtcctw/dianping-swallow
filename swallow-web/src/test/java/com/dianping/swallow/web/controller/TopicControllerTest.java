@@ -26,20 +26,19 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.service.TopicResourceService;
 
-
 /**
  * @author mingdongli
  *
- * 2015年8月31日下午6:39:21
+ *         2015年8月31日下午6:39:21
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:applicationContext.xml" })
 @WebAppConfiguration
 public class TopicControllerTest {
-	
+
 	private static final String AUTHORIZATION = "Authorization";
 	private static final String USERNAME = "yapu.wang";
-	
+
 	@Autowired
 	private WebApplicationContext wac;
 
@@ -50,41 +49,38 @@ public class TopicControllerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		
+
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 	}
 
 	@Test
 	public void testEditTopic() {
-		
+
 		try {
-			this.mockMvc.perform(post("/api/topic/edittopic")
-					.param("prop", "yapu.wang,mingdong.li,leon.li").param("topic",
-							"example").param("time", "2015-05-12 09:46"));
+			this.mockMvc.perform(post("/api/topic/edittopic").param("prop", "yapu.wang,mingdong.li,leon.li")
+					.param("topic", "example").param("time", "2015-05-12 09:46").param("exec_user", "hongjun.zhong"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static HttpMethod postMethod(String url) throws IOException {
 		PostMethod post = new PostMethod(url);
-		NameValuePair[] param = {
-				new NameValuePair("prop", "leon.li,mingdong.li"),
-				new NameValuePair("time", "2015-06-12 35:35"),
-				new NameValuePair("topic", "example3"),
-				new NameValuePair("exec_user", "hongjun.zhong")};
+		NameValuePair[] param = { new NameValuePair("prop", "leon.li,mingdong.li"),
+				new NameValuePair("time", "2015-06-12 35:35"), new NameValuePair("topic", "example3"),
+				new NameValuePair("exec_user", "hongjun.zhong") };
 		post.setRequestBody(param);
 		post.releaseConnection();
 		return post;
 	}
-	
+
 	public static void main(String[] args) {
-		
+
 		String host = null;
 		try {
 			ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 			host = configCache.getProperty("swallow.web.sso.url");
-			host = "http://localhost:8080";  //本机测试使用，真实环境时注释之
+			host = "http://localhost:8080"; // 本机测试使用，真实环境时注释之
 		} catch (LionException e1) {
 			e1.printStackTrace();
 		}
@@ -97,11 +93,11 @@ public class TopicControllerTest {
 
 			String response = method.getResponseBodyAsString();
 			try {
-//				JSONObject json = new JSONObject(response);
-//				assertEquals(json.getInt("status"), 0);
+				// JSONObject json = new JSONObject(response);
+				// assertEquals(json.getInt("status"), 0);
 				System.out.println(response);
-//				System.out.println(json.getInt("status"));
-//				System.out.println(json.getString("message"));
+				// System.out.println(json.getInt("status"));
+				// System.out.println(json.getString("message"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

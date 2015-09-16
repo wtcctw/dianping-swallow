@@ -1,12 +1,13 @@
 package com.dianping.swallow.web.controller;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
@@ -24,7 +27,6 @@ import com.dianping.swallow.web.model.dom.LionConfigBean;
 import com.dianping.swallow.web.model.dom.MongoConfigBean;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.monitor.collector.PerformanceIndexCollector;
-import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.LionHttpService;
 import com.dianping.swallow.web.service.LionHttpService.LionHttpResponse;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -37,16 +39,15 @@ import com.dianping.swallow.web.util.ResponseStatus;
  *         2015年9月9日下午12:04:31
  */
 @Controller
-public class TopicApplyController{
- 
-	//测试完成后需要修改 PRE_TOPIC_KEY DEFAULT_ENV TopicResourceServiceImpl
-	private static final String PRE_TOPIC_KEY = "swallow.topiccfgtest.applytopictest.";
+public class TopicApplyController {
+
+	private static final String PRE_TOPIC_KEY = "swallow.topiccfg.";
 
 	private static final String PRE_MONGO = "mongodb://";
 
 	private static final String SUCCESS = "success";
 
-	private static final String DEFAULT_ENV = "alpha";
+	private static final String DEFAULT_ENV = EnvZooKeeperConfig.getEnv();
 
 	private static final String DEFAULT_PROJECT = "swallow";
 
@@ -54,18 +55,17 @@ public class TopicApplyController{
 
 	private static final String CREATE_ERROR = "already exists";
 
-	private static final int DEFAULT_ID = 2;
-
 	private static Set<Integer> SIZE_SET = new TreeSet<Integer>();
+
+	private int DEFAULT_ID = 2;
+
+	private String DEFAULT_GROUP = "test";
 
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
 
 	@Resource(name = "lionHttpService")
 	private LionHttpService lionHttpService;
-
-	@Autowired
-	private HttpService httpSerivice;
 
 	@Autowired
 	private PerformanceIndexCollector performanceIndexCollector;
@@ -88,12 +88,18 @@ public class TopicApplyController{
 		SIZE_SET.add(50000);
 	}
 
-//	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
-//	@ResponseBody
+	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
+	@ResponseBody
 	public Object applyTopic(@RequestBody TopicApplyDto topicApplyDto) {
+
+		boolean test = topicApplyDto.isTest();
 
 		ResponseStatus responseStatus = validate(topicApplyDto);
 		if (responseStatus != ResponseStatus.SUCCESS) {
+			if (logger.isInfoEnabled() && test) {
+				logger.info(String.format("Error when validate topicApplyDto with response status %d and message %s",
+						responseStatus.getStatus(), responseStatus.getMessage()));
+			}
 			return responseStatus;
 		}
 
@@ -150,19 +156,25 @@ public class TopicApplyController{
 		lionConfigBean.setMongo(mongoChose);
 		lionConfigBean.setConsumerServer(consumerServerChose);
 		lionConfigBean.setSize(size4sevenday);
-		
+		if("product".equals(DEFAULT_ENV)){
+			DEFAULT_GROUP = "";
+			DEFAULT_ID = 67;
+		}
+		lionConfigBean.setGroup(DEFAULT_GROUP);
+		lionConfigBean.setTest(test);
+
 		responseStatus = editSwallowLionConfiguration(lionConfigBean);
-		if(responseStatus != ResponseStatus.SUCCESS){
-			//若在操作lion失败，则将缓存中的topic清楚，再次操作时就不会出现topic重复的错误
-			topicResourceService.loadCachedTopicToWhiteList().remove(topic); 
+		if (responseStatus != ResponseStatus.SUCCESS) {
+			// 若操作lion失败，则将缓存中的topic清除，再次操作时就不会出现topic重复的错误
+			topicResourceService.loadCachedTopicToWhiteList().remove(topic);
 			return responseStatus;
 		}
-		
+
 		responseStatus = addApplicantToTopicAdmin(topic, topicApplyDto.getApplicant());
-		if(responseStatus != ResponseStatus.SUCCESS){
+		if (responseStatus != ResponseStatus.SUCCESS) {
 			return responseStatus;
 		}
-		
+
 		return ResponseStatus.SUCCESS;
 	}
 
@@ -170,33 +182,31 @@ public class TopicApplyController{
 
 		String topic = lionConfigBean.getTopic();
 		String consumerServer = lionConfigBean.getConsumerServer();
-		boolean success = setLionValue(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topic, ";");
+		String group = lionConfigBean.getGroup();
+		boolean test = lionConfigBean.isTest();
+		boolean success = setLionValue(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topic, ";", test, group);
+		Map<String,Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
 
 		if (success) {
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append(topic).append("=").append(consumerServer);
 			String consumerValue = stringBuilder.toString();
-			success = setLionValue(TopicResourceServiceImpl.SWALLOW_CONSUMER_SERVER_URI, consumerValue, "\\s*;\\s*");
+			success = setLionValue(TopicResourceServiceImpl.SWALLOW_CONSUMER_SERVER_URI, consumerValue, "\\s*;\\s*",
+					test, group);
 
 			if (success) {
+				//在else失败时，清除了缓存的topic，再次申请时lion没有更新，所以lion不会通知，需要手动增加
+				topicToWhiteList.put(topic, new HashSet<String>());
 				String key = PRE_TOPIC_KEY + topic;
 				MongoConfigBean mongoConfigBean = new MongoConfigBean();
 				String mongoURL = PRE_MONGO + lionConfigBean.getMongo();
 				mongoConfigBean.setMongoUrl(mongoURL);
 				mongoConfigBean.setSize(lionConfigBean.getSize());
-				ObjectMapper mapper = new ObjectMapper();
-				String value;
 
-				try {
-					value = mapper.writeValueAsString(mongoConfigBean);
-				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Error when json MongoConfigBean");
-					}
-					return ResponseStatus.LIONEXCEPTION;
-				}
+				JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
+				String value = jsonBinder.toJson(mongoConfigBean);
 
-				success = createLionValue(key, value);
+				success = createLionValue(key, value, test, group);
 				if (success) {
 					return ResponseStatus.SUCCESS;
 				}
@@ -204,15 +214,23 @@ public class TopicApplyController{
 
 		}
 
+		//失败后缓存的whitelist中清除相应的topic，再次操作则保证不报-11错误
+		topicToWhiteList.remove(topic);
 		return ResponseStatus.LIONEXCEPTION;
 	}
 
-	private boolean setLionValue(String key, String value, String delimitor) {
+	private boolean setLionValue(String key, String value, String delimitor, boolean test, String group) {
 
-		LionHttpResponse lionHttpResponse = lionHttpService.get(DEFAULT_ID, DEFAULT_ENV, key);
+		LionHttpResponse lionHttpResponse = lionHttpService.get(DEFAULT_ID, DEFAULT_ENV, key, group);
 
 		if (SUCCESS.equals(lionHttpResponse.getStatus())) {
 			String oldValue = lionHttpResponse.getResult();
+			if (oldValue == null || StringUtils.isBlank(oldValue)) {
+				if (logger.isErrorEnabled()) {
+					logger.error(String.format("Error when get value of key %s from lion ", key));
+				}
+				return false;
+			}
 			String[] oldValues = oldValue.split(delimitor);
 			for (String t : oldValues) { // exists
 				if (t.equals(value)) {
@@ -221,13 +239,22 @@ public class TopicApplyController{
 			}
 			StringBuilder stringBuilder = new StringBuilder();
 			int length = delimitor.length();
-			if(length > 1){ //通配空格
+			if (length > 1) { // 通配空格
 				char[] dArray = delimitor.toCharArray();
-				delimitor =  dArray[length / 2] + "\n";
+				delimitor = dArray[length / 2] + "\n";
 			}
 			stringBuilder.append(oldValue).append(delimitor).append(value);
-			String updateWhiteList = stringBuilder.toString();
-			lionHttpResponse = lionHttpService.setUsingPost(DEFAULT_ID, DEFAULT_ENV, key, updateWhiteList);
+			String newValue = stringBuilder.toString();
+
+			if (test) {
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("Set value from [%s] to [%s] of lion key %s in env %s with id %d",
+							oldValue, newValue, key, DEFAULT_ENV, DEFAULT_ID));
+				}
+				return true;
+			} else {
+				lionHttpResponse = lionHttpService.setUsingPost(DEFAULT_ID, DEFAULT_ENV, key, newValue, group);
+			}
 
 			if (SUCCESS.equals(lionHttpResponse.getStatus())) {
 				return true;
@@ -237,16 +264,26 @@ public class TopicApplyController{
 		return false;
 	}
 
-	private boolean createLionValue(String key, String value) {
+	private boolean createLionValue(String key, String value, boolean test, String group) {
 
-		LionHttpResponse lionHttpResponse = lionHttpService.create(DEFAULT_ID, DEFAULT_PROJECT, key, DEFAULT_DESC);
-		String status = lionHttpResponse.getStatus();
-		String message = lionHttpResponse.getMessage(); // 已经创建
-		if (SUCCESS.equals(status) || message.endsWith(CREATE_ERROR)) {
+		if (test) {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Create lion key %s with desc %s in env %s with id %d", key, DEFAULT_DESC,
+						DEFAULT_ENV, DEFAULT_ID));
+				logger.info(String.format("Set value to %s of lion key %s in env %s with id %d", value, key,
+						DEFAULT_ENV, DEFAULT_ID));
+			}
+			return true;
+		} else {
+			LionHttpResponse lionHttpResponse = lionHttpService.create(DEFAULT_ID, DEFAULT_PROJECT, key, DEFAULT_DESC);
+			String status = lionHttpResponse.getStatus();
+			String message = lionHttpResponse.getMessage(); // 已经创建
+			if (SUCCESS.equals(status) || (message != null && message.endsWith(CREATE_ERROR))) {
 
-			lionHttpResponse = lionHttpService.setUsingPost(DEFAULT_ID, DEFAULT_ENV, key, value);
-			if (SUCCESS.equals(lionHttpResponse.getStatus())) {
-				return true;
+				lionHttpResponse = lionHttpService.setUsingPost(DEFAULT_ID, DEFAULT_ENV, key, value, group);
+				if (SUCCESS.equals(lionHttpResponse.getStatus())) {
+					return true;
+				}
 			}
 		}
 
@@ -287,10 +324,10 @@ public class TopicApplyController{
 		if (StringUtils.isBlank(topic)) {
 			return false;
 		}
-		Set<String> allTopics = topicResourceService.loadCachedTopicToWhiteList().keySet();
 		if (!NameCheckUtil.isTopicNameValid(topic)) {
 			return false;
 		}
+		Set<String> allTopics = topicResourceService.loadCachedTopicToWhiteList().keySet();
 		if (allTopics.contains(topic)) {
 			return false;
 		}
@@ -307,20 +344,21 @@ public class TopicApplyController{
 		}
 	}
 
-	private ResponseStatus addApplicantToTopicAdmin(String topic, String applicant){
-		
+	private ResponseStatus addApplicantToTopicAdmin(String topic, String applicant) {
+
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		
-		if(topicResource != null){ //修改白名单时已经添加
+
+		if (topicResource != null) { // 修改白名单时已经添加
 			String oldAdmin = topicResource.getAdministrator();
-			
-			if(StringUtils.isBlank(oldAdmin)){
+
+			if (StringUtils.isBlank(oldAdmin)) {
 				oldAdmin = applicant;
 				topicResource.setAdministrator(oldAdmin);
-			}else{
+			} else {
 				String[] adminArray = oldAdmin.split(",");
-				for(String admin : adminArray){
-					if(admin.equals(applicant)){
+				for (String admin : adminArray) {
+					if (admin.equals(applicant)) {
+						topicResourceService.update(topicResource);
 						return ResponseStatus.SUCCESS;
 					}
 				}
@@ -328,20 +366,20 @@ public class TopicApplyController{
 				stringBuilder.append(oldAdmin).append(",").append(applicant);
 				topicResource.setAdministrator(stringBuilder.toString());
 			}
-			
-		}else{
+
+		} else {
 			topicResource = topicResourceService.buildTopicResource(topic);
 			topicResource.setAdministrator(applicant);
 		}
 
 		boolean success = topicResourceService.update(topicResource);
-		
-		if(!success){
+
+		if (!success) {
 			return ResponseStatus.MONGOWRITE;
-		}else{
+		} else {
 			return ResponseStatus.SUCCESS;
 		}
-		
+
 	}
 
 	public static void main(String[] args) {

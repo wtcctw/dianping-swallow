@@ -51,5 +51,35 @@ public class DateUtil {
 		return dateTime.getTime();
 	}
 
+	public static long getYesterayStop(){
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
 
+		return calendar.getTimeInMillis();
+	}
+	
+	public static long getYesterayStart(){
+		
+		Calendar calendar = Calendar.getInstance();
+		long milis = getYesterayStop();
+		calendar.setTimeInMillis(milis);
+		calendar.add(Calendar.HOUR_OF_DAY, -24);
+
+		return calendar.getTimeInMillis();
+		
+	}
+	
+	public static long getOneDayBefore(long milis){
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(milis);
+		calendar.add(Calendar.HOUR_OF_DAY, -24);
+
+		return calendar.getTimeInMillis();
+	}
+	
 }
