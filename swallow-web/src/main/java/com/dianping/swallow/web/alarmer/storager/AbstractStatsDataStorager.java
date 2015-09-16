@@ -22,7 +22,8 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *
  *         2015年8月4日 下午1:22:31
  */
-public abstract class AbstractStatsDataStorager extends AbstractLifecycle implements MonitorDataListener {
+public abstract class AbstractStatsDataStorager extends AbstractLifecycle implements MonitorDataListener,
+		StoragerLifeCycle {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -36,13 +37,14 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	protected volatile AtomicLong lastTimeKey = new AtomicLong();
 
-	protected final ExecutorService executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
-			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+	protected ExecutorService executor = null;
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		lastTimeKey.set(DEFAULT_VALUE);
+		executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
+				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
 	@Override
@@ -52,6 +54,9 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	@Override
 	public void achieveMonitorData() {
+		if (executor == null) {
+			return;
+		}
 		executor.submit(new Runnable() {
 
 			@Override

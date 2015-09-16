@@ -3,23 +3,13 @@ package com.dianping.swallow.web.monitor.collector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
@@ -28,7 +18,6 @@ import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mingdongli
@@ -36,9 +25,11 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月31日下午8:14:56
  */
 @Component
-public class ConsumerIdResourceCollector extends AbstractResourceCollector implements Runnable {
+public class ConsumerIdResourceCollector extends AbstractResourceCollector {
 
-	private static final String FACTORY_NAME = "ConsumerIdResourceCollector";
+	private int collectorInterval;
+
+	private int collectorDelay;
 
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
@@ -52,16 +43,19 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
-	private ScheduledExecutorService scheduledExecutorService = Executors
-			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		collectorName = getClass().getSimpleName();
+		collectorInterval = 10;
+		collectorDelay = 2;
+	}
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-
-	@PostConstruct
-	void updateDashboardContainer() {
-
+	@Override
+	public void doCollector() {
 		logger.info("[startCollectConsumerIdResource]");
-		scheduledExecutorService.scheduleAtFixedRate(this, 1, 10, TimeUnit.MINUTES);
+		flushConsumerIdMetaData();
+		flushTopicMetaData();
 	}
 
 	private void flushConsumerIdMetaData() {
@@ -147,23 +141,13 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 	}
 
 	@Override
-	public void run() {
+	public int getCollectorDelay() {
+		return collectorDelay;
+	}
 
-		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
-					+ "-doCollector");
-			catWrapper.doAction(new SwallowAction() {
-				@Override
-				public void doAction() throws SwallowException {
-					flushConsumerIdMetaData();
-					flushTopicMetaData();
-				}
-			});
-		} catch (Throwable th) {
-			logger.error("[startConsumerIdResourceCollector]", th);
-		} finally {
-
-		}
+	@Override
+	public int getCollectorInterval() {
+		return collectorInterval;
 	}
 
 }

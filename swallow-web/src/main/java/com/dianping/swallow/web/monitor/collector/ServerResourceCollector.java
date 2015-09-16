@@ -5,22 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.model.resource.ServerResource;
@@ -29,7 +18,6 @@ import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -39,10 +27,6 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  */
 @Component
 public class ServerResourceCollector extends AbstractResourceCollector {
-
-	private static final Logger logger = LoggerFactory.getLogger(ServerResourceCollector.class);
-
-	private static final String FACTORY_NAME = "ServerResourceCollector";
 
 	@Autowired
 	private ConsumerStatsDataWapper consumerStatsDataWapper;
@@ -59,34 +43,16 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
-	private int collectorInterval = 360;
-
-	private int delayInterval = 60;
-
-	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
-			.getThreadFactory(FACTORY_NAME));
-
-	@PostConstruct
-	public void doScheduledTask() {
-		scheduled.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, ServerResourceCollector.class
-							.getSimpleName() + "-doCollector");
-					catWrapper.doAction(new SwallowAction() {
-						@Override
-						public void doAction() throws SwallowException {
-							doServerCollector();
-						}
-					});
-				} catch (Throwable th) {
-					logger.error("[run]", th);
-				} finally {
-
-				}
-			}
-		}, getDelayInterval(), getCollectorInterval(), TimeUnit.SECONDS);
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		collectorName = getClass().getSimpleName();
+		collectorInterval = 6;
+		collectorDelay = 1;
+	}
+	@Override
+	public void doCollector() {
+		doServerCollector();
 	}
 
 	public void doServerCollector() {
@@ -165,6 +131,7 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 		}
 	}
 
+	@Override
 	public int getCollectorInterval() {
 		return collectorInterval;
 	}
@@ -173,11 +140,8 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 		this.collectorInterval = collectorInterval;
 	}
 
-	public int getDelayInterval() {
-		return delayInterval;
-	}
-
-	public void setDelayInterval(int delayInterval) {
-		this.delayInterval = delayInterval;
+	@Override
+	public int getCollectorDelay() {
+		return collectorDelay;
 	}
 }
