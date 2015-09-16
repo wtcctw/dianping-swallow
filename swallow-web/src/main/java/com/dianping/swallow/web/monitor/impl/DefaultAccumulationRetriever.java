@@ -231,7 +231,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 				NavigableMap<Long, Long> rawDatas = consumerIdAccu.getValue()
 						.getAccumulations(getSampleIntervalCount());
 				orderResults.add(new OrderEntity(topicName, consumerIdAccu.getKey(), getSumStatsData(rawDatas, fromKey,
-						toKey)));
+						toKey), getOtherSampleCount(start, end)));
 			}
 		}
 		return orderResults;

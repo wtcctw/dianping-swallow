@@ -102,7 +102,8 @@ public class DefaultProducerDataRetriever
 				continue;
 			}
 			NavigableMap<Long, Long> rawDatas = statis.getDelayForTopic(topicName, type);
-			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey),
+					getOtherSampleCount(start, end)));
 		}
 		return orderResults;
 	}
@@ -176,7 +177,8 @@ public class DefaultProducerDataRetriever
 				continue;
 			}
 			NavigableMap<Long, Long> rawDatas = statis.getQpxForTopic(topicName, type);
-			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)
+					* getSampleIntervalTime(), getQpsSampleCount(start, end)));
 		}
 		return orderResults;
 	}
@@ -360,12 +362,15 @@ public class DefaultProducerDataRetriever
 					orderParam.getFromKey(), orderParam.getToKey());
 			ProducerTopicStatsData postStatsData = getPostPTopicStatsData(orderParam.getTopicName(),
 					orderParam.getFromKey(), orderParam.getToKey());
+			long start = orderParam.getDelayStatsData().getStart();
+			long end = orderParam.getDelayStatsData().getEnd();
 			orderParam.getDelayStatsData().add(
 					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalDelay()
-							- preStatsData.getTotalDelay()));
+							- preStatsData.getTotalDelay(), getOtherSampleCount(start, end)));
 			orderParam.getQpxStatsData().add(
-					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalQps()
-							- preStatsData.getTotalQps()));
+					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY,
+							(postStatsData.getTotalQps() - preStatsData.getTotalQps()) * getSampleIntervalTime(),
+							getQpsSampleCount(start, end)));
 		}
 
 		public void await() {

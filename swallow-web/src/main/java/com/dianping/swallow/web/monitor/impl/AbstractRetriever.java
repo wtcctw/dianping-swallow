@@ -286,4 +286,12 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return sumData;
 	}
 
+	protected long getQpsSampleCount(long start, long end) {
+		return (end - start) / 1000;
+	}
+
+	protected long getOtherSampleCount(long start, long end) {
+		return (end - start) / 1000 / getSampleIntervalTime();
+	}
+
 }
