@@ -17,7 +17,17 @@ public class TopicApplyDto {
 	
 	private String applicant;
 	
+	private boolean search;
+	
 	private boolean test;
+
+	public boolean isSearch() {
+		return search;
+	}
+
+	public void setSearch(boolean search) {
+		this.search = search;
+	}
 
 	public boolean isTest() {
 		return test;
