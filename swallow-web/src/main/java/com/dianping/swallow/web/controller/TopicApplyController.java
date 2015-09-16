@@ -26,9 +26,9 @@ import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.dom.LionConfigBean;
 import com.dianping.swallow.web.model.dom.MongoConfigBean;
 import com.dianping.swallow.web.model.resource.TopicResource;
-import com.dianping.swallow.web.monitor.collector.PerformanceIndexCollector;
 import com.dianping.swallow.web.service.LionHttpService;
 import com.dianping.swallow.web.service.LionHttpService.LionHttpResponse;
+import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.impl.TopicResourceServiceImpl;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -63,12 +63,12 @@ public class TopicApplyController {
 
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
+	
+	@Resource(name = "topicApplyService")
+	private TopicApplyService topicApplyService;
 
 	@Resource(name = "lionHttpService")
 	private LionHttpService lionHttpService;
-
-	@Autowired
-	private PerformanceIndexCollector performanceIndexCollector;
 
 	@Autowired
 	private UserUtils userUtils;
@@ -111,9 +111,9 @@ public class TopicApplyController {
 		String bestMongo = null;
 		
 		if(search){
-			bestMongo = performanceIndexCollector.getSearchMongo();
+			bestMongo = topicApplyService.getSearchMongo();
 		}else{
-			bestMongo = performanceIndexCollector.getBestMongo();
+			bestMongo = topicApplyService.getBestMongo();
 		}
 		
 		if (StringUtils.isNotBlank(bestMongo)) {
@@ -121,9 +121,9 @@ public class TopicApplyController {
 		} else {
 			
 			if(search){
-				pair = performanceIndexCollector.chooseSearchMongoDb();
+				pair = topicApplyService.chooseSearchMongoDb();
 			}else{
-				pair = performanceIndexCollector.chooseMongoDbWithoutSearch();
+				pair = topicApplyService.chooseMongoDbWithoutSearch();
 			}
 
 			if (pair.getSecond() == ResponseStatus.SUCCESS) {
@@ -136,11 +136,11 @@ public class TopicApplyController {
 
 		}
 
-		String bestConsumerServer = performanceIndexCollector.getBestConsumerServer();
+		String bestConsumerServer = topicApplyService.getBestConsumerServer();
 		if (StringUtils.isNotBlank(bestConsumerServer)) {
 			consumerServerChose = bestConsumerServer;
 		} else {
-			pair = performanceIndexCollector.chooseConsumerServer();
+			pair = topicApplyService.chooseConsumerServer();
 
 			if (pair.getSecond() == ResponseStatus.SUCCESS) {
 				String consumerServerFetched = pair.getFirst();
@@ -393,19 +393,6 @@ public class TopicApplyController {
 			return ResponseStatus.SUCCESS;
 		}
 
-	}
-
-	public static void main(String[] args) {
-		PerformanceIndexCollector PerformanceIndexCollector = new PerformanceIndexCollector();
-		String res = PerformanceIndexCollector.chooseMongoDbWithoutSearch().getFirst();
-		System.out.println("res is " + res);
-		LionConfigBean lionConfigBean = new LionConfigBean();
-		lionConfigBean.setConsumerServer("1.1.1.1:1234,1.1.1.2:1235");
-		lionConfigBean.setMongo("1.1.1.1:1234,1.1.1.2:1235");
-		lionConfigBean.setTopic("example");
-		lionConfigBean.setSize(300);
-		TopicApplyController topicApplyController = new TopicApplyController();
-		topicApplyController.editSwallowLionConfiguration(lionConfigBean);
 	}
 
 }

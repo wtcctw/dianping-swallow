@@ -5,13 +5,21 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.dao.AdministratorDao;
@@ -20,6 +28,7 @@ import com.dianping.swallow.web.model.UserType;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.UserService;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mingdongli
@@ -27,7 +36,11 @@ import com.dianping.swallow.web.service.UserService;
  *         2015年5月14日下午8:04:43
  */
 @Service("userService")
-public class UserServiceImpl extends AbstractSwallowService implements UserService {
+public class UserServiceImpl extends AbstractSwallowService implements UserService, Runnable {
+
+	private static final String DELIMITOR = ",";
+
+	private static final String FACTORY_NAME = "UserServiceImpl";
 
 	@Value("${swallow.web.admin.defaultadmin}")
 	private String defaultAdmin;
@@ -38,14 +51,24 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
 
+	private ScheduledExecutorService scheduledExecutorService = Executors
+			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+
 	private Set<String> adminSet = new HashSet<String>();
+
+	@PostConstruct
+	void initAdminSet() {
+
+		scheduledExecutorService.scheduleAtFixedRate(this, 0, 5, TimeUnit.MINUTES);
+		logger.info("Init adminSet successfully.");
+	}
 
 	@Override
 	public Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto) {
 
 		Long totalNumOfTopic = administratorDao.countAdministrator();
 		List<Administrator> administratorList = administratorDao.findFixedAdministrator(baseDto);
-		
+
 		return new Pair<Long, List<Administrator>>(totalNumOfTopic, administratorList);
 	}
 
@@ -53,12 +76,14 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	public boolean createUser(String name, UserType auth) {
 
 		if (auth.equals(UserType.ADMINISTRATOR)) {
-			this.loadCachedAdministratorSet().add(name); // create, need add in adminSet in
-											// memory
+			this.loadCachedAdministratorSet().add(name); // create, need add in
+															// adminSet in
+			// memory
 			logger.info(String.format("Add administrator %s to admin list.", name));
 		} else {
-			this.loadCachedAdministratorSet().remove(name); // edit, need remove in adminSet
-												// in memory
+			this.loadCachedAdministratorSet().remove(name); // edit, need remove
+															// in adminSet
+			// in memory
 			logger.info(String.format("Remove administrator %s from admin list.", name));
 		}
 		return this.updateUser(name, auth);
@@ -76,7 +101,7 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 			return true;
 		}
 	}
-	
+
 	@Override
 	public List<Administrator> loadUsers() {
 		return administratorDao.findAll();
@@ -141,6 +166,48 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 			}
 		}
 		return false;
+	}
+
+	private void loadAmdin() {
+		List<Administrator> aList = loadUsers();
+		if (!aList.isEmpty()) {
+			for (Administrator list : aList) {
+				UserType role = list.getRole();
+				String name = list.getName();
+				if (role.equals(UserType.ADMINISTRATOR)) {
+					if (loadCachedAdministratorSet().add(name)) {
+						logger.info("admiSet add " + name);
+					}
+				}
+			}
+		} else {
+			String[] admins = defaultAdmin.split(DELIMITOR);
+			for (String admin : admins) {
+				loadCachedAdministratorSet().add(admin);
+				createUser(admin, UserType.ADMINISTRATOR);
+				logger.info("admiSet add admin " + admin);
+			}
+		}
+	}
+
+	@Override
+	public void run() {
+
+		try {
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "updateAdminSet");
+			catWrapper.doAction(new SwallowAction() {
+				@Override
+				public void doAction() throws SwallowException {
+
+					loadAmdin();
+				}
+			});
+		} catch (Throwable th) {
+			logger.error("[startUpdateTopicToWhiteList]", th);
+		} finally {
+
+		}
+
 	}
 
 }

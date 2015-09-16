@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.monitor.collector;
+package com.dianping.swallow.web.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +18,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.JavaType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
@@ -32,10 +30,12 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.dom.MongoReport;
 import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
+import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 import com.dianping.swallow.web.service.LionHttpService;
+import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.DateUtil;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -44,10 +44,10 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
 /**
  * @author mingdongli
  *
- *         2015年9月10日上午9:28:40
+ *         2015年9月16日下午6:59:12
  */
-@Component
-public class PerformanceIndexCollector extends AbstractResourceCollector implements Runnable {
+@Service("topicApplyService")
+public class TopicApplyServiceImpl extends AbstractSwallowService implements TopicApplyService, Runnable {
 
 	private static final String MONGO_REPORT = "http://dom.dp/db_daily/message";
 
@@ -99,8 +99,6 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 	private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(
 			CommonUtils.DEFAULT_CPU_COUNT, ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
-
 	@PostConstruct
 	void updateDashboardContainer() {
 
@@ -108,6 +106,7 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 		scheduledExecutorService.scheduleAtFixedRate(this, 0, 6, TimeUnit.HOURS);
 	}
 
+	@Override
 	public Pair<String, ResponseStatus> chooseSearchMongoDb() {
 
 		String searchCatalog = null;
@@ -178,6 +177,7 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 
 	}
 
+	@Override
 	public Pair<String, ResponseStatus> chooseMongoDbWithoutSearch() {
 
 		Pair<String, ResponseStatus> pair = new Pair<String, ResponseStatus>();
@@ -309,6 +309,7 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 		return pojo;
 	}
 
+	@Override
 	public Pair<String, ResponseStatus> chooseConsumerServer() {
 
 		Set<String> masters = new HashSet<String>();
@@ -351,14 +352,17 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 		return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
 	}
 
+	@Override
 	public String getBestMongo() {
 		return bestMongo;
 	}
-	
+
+	@Override
 	public String getSearchMongo() {
 		return searchMongo;
 	}
 
+	@Override
 	public String getBestConsumerServer() {
 		return bestConsumerServer;
 	}
@@ -367,8 +371,8 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 	public void run() {
 
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
-					+ "-doCollector");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(),
+					"updateMongoAndConsumerServer");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {
