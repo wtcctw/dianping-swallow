@@ -55,9 +55,9 @@ public class TopicApplyController {
 
 	private static final String CREATE_ERROR = "already exists";
 
-	private static final int DEFAULT_ID = 2;
-
 	private static Set<Integer> SIZE_SET = new TreeSet<Integer>();
+
+	private int DEFAULT_ID = 2;
 
 	private String DEFAULT_GROUP = "test";
 
@@ -158,6 +158,7 @@ public class TopicApplyController {
 		lionConfigBean.setSize(size4sevenday);
 		if("product".equals(DEFAULT_ENV)){
 			DEFAULT_GROUP = "";
+			DEFAULT_ID = 67;
 		}
 		lionConfigBean.setGroup(DEFAULT_GROUP);
 		lionConfigBean.setTest(test);

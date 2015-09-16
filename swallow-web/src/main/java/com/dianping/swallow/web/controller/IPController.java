@@ -65,7 +65,7 @@ public class IPController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/ip/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object producerserverSettingList(@RequestBody IpQueryDto ipQueryDto, HttpServletRequest request,
+	public Object ipQuery(@RequestBody IpQueryDto ipQueryDto, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		Pair<Long, List<IpResource>> pair = null;
@@ -112,8 +112,10 @@ public class IPController extends AbstractMenuController {
 						return new Pair<Long, List<IpResourceDto>>(0L, ipResourceDto);
 					}
 				}
-				boolean admin = userUtils.isAdministrator(username);
-				pair = ipResourceService.findByIp(offset, limit, admin, ips);
+				int size = userUtils.ips(username).size();
+				int length = ips.length;
+				boolean adminIp =  userUtils.isAdministrator(username) && (size == length);
+				pair = ipResourceService.findByIp(offset, limit, adminIp, ips);
 			} else if (StringUtils.isBlank(ip)) {
 				pair = ipResourceService.findByApplication(offset, limit, application);
 			} else {
@@ -147,10 +149,10 @@ public class IPController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/ip/allip", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadCmsumerid(HttpServletRequest request, HttpServletResponse response) {
+	public List<String> loadConsumerips(HttpServletRequest request, HttpServletResponse response) {
 
 		String username = userUtils.getUsername(request);
-		return userUtils.consumerIps(username);
+		return userUtils.ips(username);
 	}
 
 	@RequestMapping(value = "/console/ip/application", method = RequestMethod.GET)
