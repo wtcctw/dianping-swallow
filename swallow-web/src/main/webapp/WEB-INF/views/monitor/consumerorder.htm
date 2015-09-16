@@ -51,7 +51,7 @@
 							ng-href='{{showRelatedUrl(item.info.dt, subItem.topicName,"")}}'>
 								{{showRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
 						<td class="table-smalll-td table-smalll-td-sumdata">{{subItem.sumData}}</td>
-						<td class="table-smalll-td table-smalll-td-avgdata">{{subItem.avgData | number:2}}</td>
+						<td class="table-smalll-td table-smalll-td-avgdata">{{subItem.avgData | number:1}}</td>
 					</tr>
 				</table>
 				<table
@@ -77,7 +77,7 @@
 							ng-href='{{showRelatedUrl(item.info.dt, subItem.topicName, subItem.consumerId)}}'>
 								{{showSubRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
 						<td class="table-smalll-td table-smalll-td-sumdata">{{subItem.sumData}}</td>
-						<td class="table-smalll-td table-smalll-td-avgdata">{{subItem.avgData| number:2}}</td>
+						<td class="table-smalll-td table-smalll-td-avgdata">{{subItem.avgData| number:1}}</td>
 					</tr>
 				</table>
 			</div>
