@@ -65,6 +65,8 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 
 	private static final String PAY_MONGO = "下单消息队列";
 
+	private static final String SEARCH_MONGO = "搜索消息队列";
+
 	private static final int BASE_QPX = 5000;
 
 	private static final int MAX_QPX = 7000;
@@ -74,6 +76,8 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 	private static final int SLAVE_PORT = 8082;
 
 	private String bestMongo;
+
+	private String searchMongo;
 
 	private String bestConsumerServer;
 
@@ -104,7 +108,77 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 		scheduledExecutorService.scheduleAtFixedRate(this, 0, 6, TimeUnit.HOURS);
 	}
 
-	public Pair<String, ResponseStatus> chooseMongoDb() {
+	public Pair<String, ResponseStatus> chooseSearchMongoDb() {
+
+		String searchCatalog = null;
+		Pair<String, ResponseStatus> pair = new Pair<String, ResponseStatus>();
+		HttpResult httpResult = httpSerivice.httpPost(MONGO_REPORT, new ArrayList<NameValuePair>());
+
+		if (httpResult.isSuccess()) {
+			String response = httpResult.getResponseBody();
+			ObjectMapper mapper = new ObjectMapper();
+			JavaType javaType = mapper.getTypeFactory().constructParametricType(Map.class, String.class, List.class);
+
+			try {
+				Map<String, List<Map<String, Object>>> map = mapper.readValue(response, javaType);
+				List<Map<String, Object>> datas = map.get(DATA);
+
+				for (Map<String, Object> data : datas) {
+					MongoReport mongoReport = convertMapToObject(data);
+					String catalog = mongoReport.getCatalog();
+					if (SEARCH_MONGO.equals(catalog)) {
+						if (logger.isInfoEnabled()) {
+							logger.info(mongoReport.toString());
+						}
+						searchCatalog = catalog;
+						break;
+					}
+				}
+				if (StringUtils.isBlank(searchCatalog)) {
+					pair.setSecond(ResponseStatus.NOTEXIST);
+					return pair;
+				}
+
+				httpResult = httpSerivice.httpGet(MONGO_IP_MAPPING);
+
+				if (httpResult.isSuccess()) {
+					String responseBody = httpResult.getResponseBody();
+					String searchMongo = extractIpFromHttpResult(responseBody, searchCatalog);
+
+					if (StringUtils.isNotBlank(searchMongo)) {
+						pair.setFirst(searchMongo);
+						pair.setSecond(ResponseStatus.SUCCESS);
+						return pair;
+					} else {
+						pair.setSecond(ResponseStatus.INVALIDIP);
+						return pair;
+					}
+
+				} else {
+					if (logger.isErrorEnabled()) {
+						logger.error("Error when get ip mapping");
+					}
+					pair.setSecond(ResponseStatus.HTTPEXCEPTION);
+					return pair;
+				}
+			} catch (Exception e) {
+				if (logger.isErrorEnabled()) {
+					logger.error("Error when parse response to MongoReport");
+				}
+				pair.setSecond(ResponseStatus.RUNTIMEEXCEPTION);
+				return pair;
+			}
+		} else {
+			if (logger.isErrorEnabled()) {
+				logger.error("Error when post mongo report");
+			}
+			pair.setSecond(ResponseStatus.HTTPEXCEPTION);
+			return pair;
+		}
+
+	}
+
+	public Pair<String, ResponseStatus> chooseMongoDbWithoutSearch() {
 
 		Pair<String, ResponseStatus> pair = new Pair<String, ResponseStatus>();
 		HttpResult httpResult = httpSerivice.httpPost(MONGO_REPORT, new ArrayList<NameValuePair>());
@@ -123,11 +197,11 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 					MongoReport mongoReport = convertMapToObject(data);
 					Float disk = mongoReport.getDisk();
 					String catalog = mongoReport.getCatalog();
-					if (disk != null && disk <= 80f && !PAY_MONGO.equals(catalog)) {
-						mongoReportSet.add(mongoReport);
+					if (disk != null && disk <= 80f && !PAY_MONGO.equals(catalog) && !SEARCH_MONGO.equals(catalog)) {
 						if (logger.isInfoEnabled()) {
 							logger.info(mongoReport.toString());
 						}
+						mongoReportSet.add(mongoReport);
 					}
 				}
 				if (mongoReportSet.isEmpty()) {
@@ -140,7 +214,8 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 					httpResult = httpSerivice.httpGet(MONGO_IP_MAPPING);
 
 					if (httpResult.isSuccess()) {
-						String ip = extractIpFromHttpResult(httpResult.getResponseBody(), pair.getFirst());
+						String responseBody = httpResult.getResponseBody();
+						String ip = extractIpFromHttpResult(responseBody, pair.getFirst());
 
 						if (StringUtils.isNotBlank(ip)) {
 							pair.setFirst(ip);
@@ -279,17 +354,13 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 	public String getBestMongo() {
 		return bestMongo;
 	}
-
-	public void setBestMongo(String bestMongo) {
-		this.bestMongo = bestMongo;
+	
+	public String getSearchMongo() {
+		return searchMongo;
 	}
 
 	public String getBestConsumerServer() {
 		return bestConsumerServer;
-	}
-
-	public void setBestConsumerServer(String bestConsumerServer) {
-		this.bestConsumerServer = bestConsumerServer;
 	}
 
 	@Override
@@ -302,9 +373,14 @@ public class PerformanceIndexCollector extends AbstractResourceCollector impleme
 				@Override
 				public void doAction() throws SwallowException {
 
-					Pair<String, ResponseStatus> pair = chooseMongoDb();
+					Pair<String, ResponseStatus> pair = chooseMongoDbWithoutSearch();
 					if (pair.getSecond() == ResponseStatus.SUCCESS) {
 						bestMongo = pair.getFirst();
+					}
+
+					pair = chooseSearchMongoDb();
+					if (pair.getSecond() == ResponseStatus.SUCCESS) {
+						searchMongo = pair.getFirst();
 					}
 
 					pair = chooseConsumerServer();
