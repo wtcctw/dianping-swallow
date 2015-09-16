@@ -54,13 +54,14 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 				true);
 		List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey.get(),
 				true);
-		storageServerStatis(serverStatsDatas);
-		storageTopicStatis(topicStatsDatas);
+		doStorageServerStats(serverStatsDatas);
+		doStorageTopicStats(topicStatsDatas);
 	}
 
-	private void storageServerStatis(final List<ProducerServerStatsData> serverStatsDatas) {
-		logger.info("[storageServerStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageProducerServerStats");
+	private void doStorageServerStats(final List<ProducerServerStatsData> serverStatsDatas) {
+		logger.info("[doStorageServerStats]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+				+ "-doStorageServerStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -78,9 +79,10 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 		});
 	}
 
-	private void storageTopicStatis(final List<ProducerTopicStatsData> topicStatsDatas) {
-		logger.info("[storageTopicStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageProducerTopicStats");
+	private void doStorageTopicStats(final List<ProducerTopicStatsData> topicStatsDatas) {
+		logger.info("[doStorageTopicStats]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+				+ "-doStorageTopicStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {

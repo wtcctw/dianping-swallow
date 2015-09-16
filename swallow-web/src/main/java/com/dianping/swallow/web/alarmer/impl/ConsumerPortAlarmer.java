@@ -74,7 +74,7 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 
 	@Override
 	public void doAlarm() {
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -85,12 +85,12 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 
 	public boolean checkPort() {
 		List<ConsumerServerResourcePair> cServerReourcePairs = resourceContainer.findConsumerServerResourcePairs();
-		
+
 		if (cServerReourcePairs == null || cServerReourcePairs.size() == 0) {
 			logger.error("[checkPort] cannot find consumermaster or consumerslave reources.");
 			return false;
 		}
-		
+
 		for (ConsumerServerResourcePair cServerReourcePair : cServerReourcePairs) {
 			ConsumerServerResource cMasterResource = cServerReourcePair.getMasterResource();
 			ConsumerServerResource cSlaveReource = cServerReourcePair.getSlaveResource();
@@ -106,9 +106,9 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 		String slaveIp = cSlaveReource.getIp();
 		boolean usingMaster = checkPort(masterIp, masterPort);
 		boolean usingSlave = checkPort(slaveIp, slavePort);
-		
+
 		String key = masterIp + KEY_SPLIT + slaveIp;
-		
+
 		if (!usingMaster && usingSlave) {
 			isSlaveIps.put(masterIp, true);
 			ServerEvent serverEvent = eventFactory.createServerEvent();

@@ -26,10 +26,10 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected String storagerName;
-	
-	protected final static String CAT_TYPE = "StatsStorager";
 
-	private static final String FACTORY_NAME = "StatsStorager";
+	protected final static String CAT_TYPE = "StatsDataStorager";
+
+	private static final String FACTORY_NAME = "StatsDataStorager";
 
 	protected static final long DEFAULT_VALUE = -1L;
 
@@ -56,7 +56,7 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 			@Override
 			public void run() {
 				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(storagerName, "doStorage");
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, storagerName + "-doStorage");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {

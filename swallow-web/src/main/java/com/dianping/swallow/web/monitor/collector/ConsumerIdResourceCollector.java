@@ -150,7 +150,8 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 	public void run() {
 
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
+			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+					+ "-doCollector");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {

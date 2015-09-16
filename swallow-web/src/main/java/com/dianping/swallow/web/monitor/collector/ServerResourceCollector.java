@@ -73,7 +73,7 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 			public void run() {
 				try {
 					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, ServerResourceCollector.class
-							.getSimpleName());
+							.getSimpleName() + "-doCollector");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {

@@ -60,14 +60,15 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
 				lastTimeKey.get(), true);
 		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
-		storageServerStatis(serverStatsDatas);
-		storageTopicStatis(topicStatsData);
-		storageConsumerIdStatis(consumerIdStatsDatas);
+		doStorageServerStats(serverStatsDatas);
+		doStorageTopicStats(topicStatsData);
+		doStorageConsumerIdStats(consumerIdStatsDatas);
 	}
 
-	private void storageServerStatis(final List<ConsumerServerStatsData> serverStatsDatas) {
-		logger.info("[storageServerStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageConsumerServerStats");
+	private void doStorageServerStats(final List<ConsumerServerStatsData> serverStatsDatas) {
+		logger.info("[doStorageServerStats]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+				+ "-doStorageServerStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -87,9 +88,10 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 
 	}
 
-	private void storageTopicStatis(final ConsumerTopicStatsData topicStatsData) {
-		logger.info("[storageTopicStatis]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageConsumerTopicStats");
+	private void doStorageTopicStats(final ConsumerTopicStatsData topicStatsData) {
+		logger.info("[doStorageTopicStats]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+				+ "-doStorageTopicStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -102,9 +104,10 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 
 	}
 
-	private void storageConsumerIdStatis(final List<ConsumerIdStatsData> consumerIdStatsDatas) {
-		logger.info("[storageConsumerIdStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageConsumerIdStats");
+	private void doStorageConsumerIdStats(final List<ConsumerIdStatsData> consumerIdStatsDatas) {
+		logger.info("[doStorageConsumerIdStats]");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+				+ "-doStorageConsumerIdStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {

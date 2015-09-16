@@ -42,7 +42,7 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 
 	@Override
 	public void doAlarm() {
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -61,7 +61,7 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 		}
 
 		Map<String, Long> statisConsumerServerIps = ipCollectorService.getStatisConsumerServerIps();
-		
+
 		for (ConsumerServerResourcePair cServerReourcePair : cServerReourcePairs) {
 
 			ConsumerServerResource cMasterResource = cServerReourcePair.getMasterResource();

@@ -25,7 +25,7 @@ import com.dianping.swallow.web.service.ConsumerIpStatsDataService;
 import com.dianping.swallow.web.service.ConsumerIpStatsDataService.ConsumerIpQpsPair;
 
 public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
-	
+
 	@Autowired
 	protected EventReporter eventReporter;
 
@@ -48,7 +48,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 	public void doAlarm() {
 		final List<ConsumerIpGroupStatsData> cIpGroupStatsDatas = cStatsDataWapper.getIpGroupStatsDatas(
 				getLastTimeKey(), false);
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {

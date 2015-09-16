@@ -77,7 +77,7 @@ public class IpResourceCollector extends AbstractResourceCollector {
 				try {
 					logger.info("[startTask] scheduled task running.");
 					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, IpResourceCollector.class
-							.getSimpleName());
+							.getSimpleName() + "-doCollector");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {

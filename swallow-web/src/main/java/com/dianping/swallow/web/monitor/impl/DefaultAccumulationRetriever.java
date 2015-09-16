@@ -91,7 +91,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	@Override
 	protected void doBuild() {
 
-		SwallowActionWrapper actionWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
+		SwallowActionWrapper actionWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doBuild");
 
 		actionWrapper.doAction(new SwallowAction() {
 			@Override

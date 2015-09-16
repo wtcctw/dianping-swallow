@@ -17,6 +17,8 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 public abstract class AbstractAlarmer extends AbstractLifecycle {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
+	
+	protected static final String FUNCTION_DOALARM = "-doAlarm";
 
 	protected CountDownLatch createCountDownLatch(int totalCount) {
 		return new CountDownLatch(totalCount);
