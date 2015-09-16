@@ -1,3 +1,10 @@
-db = db.getSiblingDB('swallowweb');
-load("swallow-mongo-alarmmeta.js");
-load("swallow-mongo-alarmsetting.js");
+db = db.getSiblingDB('swallowstatsdata');
+load("mongo-tb-alarm.js");
+load("mongo-tb-dashboardstatsdata.js");
+load("mongo-tb-producerserverstatsdata.js");
+load("mongo-tb-consumerserverstatsdata.js");
+load("mongo-tb-producertopicstatsdata.js");
+load("mongo-tb-consumertopicstatsdata.js");
+load("mongo-tb-produceripstatsdata.js");
+load("mongo-tb-consumeridstatsdata.js");
+load("mongo-tb-consumeripstatsdata.js");

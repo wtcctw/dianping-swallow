@@ -7,6 +7,8 @@ if(result != null) {
 
 	print("ALARM_META load data start");
 	
+	db.ALARM_META.ensureIndex({'metaId': -1}, {"name":"IX_METAID", "background": true});
+	
 	db.ALARM_META.update({
 		 "metaId" : 1
 		}, {
@@ -960,6 +962,49 @@ if(result != null) {
 	    "isSendBusiness" : true,
 	    "alarmTitle" : "消费端确认延时告警",
 	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]",
+	    "alarmDetail" : "",
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
+	    "createTime" : new Date(),
+	    "updateTime" : new Date()
+	}, true, false);
+	
+	
+	db.ALARM_META.update({
+		 "metaId" : 1022
+		},{
+	    "metaId" : 1022,
+	    "type" : "PRODUCER_CLIENT_SENDER",
+	    "levelType" : "GENERAL",
+	    "isSmsMode" : true,
+	    "isWeiXinMode" : true,
+	    "isMailMode" : true,
+	    "isSendSwallow" : false,
+	    "isSendBusiness" : true,
+	    "alarmTitle" : "生产端SENDER告警",
+	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[IP]{ip}一段时间未发送消息，可能宕机。[{date}]",
+	    "alarmDetail" : "",
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
+	    "createTime" : new Date(),
+	    "updateTime" : new Date()
+	}, true, false);
+	
+	db.ALARM_META.update({
+		 "metaId" : 1023
+		},{
+	    "metaId" : 1023,
+	    "type" : "CONSUMER_CLIENT_RECEIVER",
+	    "levelType" : "GENERAL",
+	    "isSmsMode" : true,
+	    "isWeiXinMode" : true,
+	    "isMailMode" : true,
+	    "isSendSwallow" : false,
+	    "isSendBusiness" : true,
+	    "alarmTitle" : "消费端RECEIVER告警",
+	    "alarmTemplate" : "消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}[IP]{ip}一段时间未发送消息，可能宕机。[{date}]",
 	    "alarmDetail" : "",
   		"maxTimeSpan" : 120,
 	    "daySpanBase" : 10,

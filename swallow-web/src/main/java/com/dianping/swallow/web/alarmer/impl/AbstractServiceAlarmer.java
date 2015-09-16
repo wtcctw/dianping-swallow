@@ -57,7 +57,6 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
-		scheduled.shutdown();
 		future.cancel(false);
 	}
 
