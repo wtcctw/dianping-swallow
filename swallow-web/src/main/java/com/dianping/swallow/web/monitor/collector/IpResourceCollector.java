@@ -38,7 +38,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年9月6日 下午4:02:01
  */
 @Component
-public class IpResourceCollector {
+public class IpResourceCollector extends AbstractResourceCollector {
 
 	private static final Logger logger = LoggerFactory.getLogger(IpResourceCollector.class);
 
@@ -76,8 +76,8 @@ public class IpResourceCollector {
 			public void run() {
 				try {
 					logger.info("[startTask] scheduled task running.");
-					SwallowActionWrapper catWrapper = new CatActionWrapper(IpResourceCollector.class.getSimpleName(),
-							"doResourceCollector");
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, IpResourceCollector.class
+							.getSimpleName());
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {
@@ -138,7 +138,7 @@ public class IpResourceCollector {
 					ipResource.setUpdateTime(new Date());
 					ipResource.setIp(ip);
 					ipResourceService.insert(ipResource);
-				} 
+				}
 			}
 		}
 	}

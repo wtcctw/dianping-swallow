@@ -37,7 +37,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月31日下午8:14:56
  */
 @Component
-public class ConsumerIdResourceCollector implements MonitorDataListener, Runnable {
+public class ConsumerIdResourceCollector extends AbstractResourceCollector implements MonitorDataListener, Runnable {
 
 	private static final String FACTORY_NAME = "ConsumerIdResourceCollector";
 
@@ -171,7 +171,7 @@ public class ConsumerIdResourceCollector implements MonitorDataListener, Runnabl
 	public void run() {
 
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doConsumerIdCollector");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {

@@ -15,12 +15,11 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 
 @Component
-public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {
+public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
@@ -41,19 +40,10 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 	}
 
 	@Override
-	public void achieveMonitorData() {
-		dataCount.incrementAndGet();
-	}
-
-	@Override
 	public void doAlarm() {
-		if (dataCount.get() <= 0) {
-			return;
-		}
-		dataCount.decrementAndGet();
 		final List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(
-				lastTimeKey.get(), false);
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+				getLastTimeKey(), false);
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {

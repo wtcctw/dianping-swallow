@@ -18,12 +18,11 @@ import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 
 @Component
-public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {
+public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
@@ -44,19 +43,10 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer implements Moni
 	}
 
 	@Override
-	public void achieveMonitorData() {
-		dataCount.incrementAndGet();
-	}
-
-	@Override
 	public void doAlarm() {
-		if (dataCount.get() <= 0) {
-			return;
-		}
-		dataCount.decrementAndGet();
 		final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
-				lastTimeKey.get(), false);
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+				getLastTimeKey(), false);
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {

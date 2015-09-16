@@ -38,7 +38,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年9月6日 上午10:54:32
  */
 @Component
-public class ServerResourceCollector {
+public class ServerResourceCollector extends AbstractResourceCollector {
 
 	private static final Logger logger = LoggerFactory.getLogger(ServerResourceCollector.class);
 
@@ -72,8 +72,8 @@ public class ServerResourceCollector {
 			@Override
 			public void run() {
 				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(ServerResourceCollector.class
-							.getSimpleName(), "doResourceCollector");
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, ServerResourceCollector.class
+							.getSimpleName());
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {

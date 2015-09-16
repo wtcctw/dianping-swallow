@@ -73,7 +73,7 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 
 	@Override
 	public void doAlarm() {
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {

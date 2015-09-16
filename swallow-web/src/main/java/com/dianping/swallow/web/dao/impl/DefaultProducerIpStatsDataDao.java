@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ProducerIpStatsDataDao;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
@@ -16,6 +17,7 @@ import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
  *
  *         2015年9月15日 下午5:39:10
  */
+@Service("producerIpStatsDataDao")
 public class DefaultProducerIpStatsDataDao extends AbstractStatsDao implements ProducerIpStatsDataDao {
 
 	private static final String PRODUCERIPSTATSDATA_COLLECTION = "PRODUCER_IP_STATS_DATA";

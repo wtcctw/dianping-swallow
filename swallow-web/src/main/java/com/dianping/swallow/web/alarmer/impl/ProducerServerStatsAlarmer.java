@@ -14,7 +14,6 @@ import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ProducerServerStatsDataService;
@@ -26,7 +25,7 @@ import com.dianping.swallow.web.service.ProducerServerStatsDataService;
  *         2015年8月3日 下午6:06:54
  */
 @Component
-public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {
+public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -41,11 +40,6 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 	private AlarmResourceContainer resourceContainer;
 
 	@Override
-	public void achieveMonitorData() {
-		dataCount.incrementAndGet();
-	}
-
-	@Override
 	public void doInitialize() throws Exception {
 		super.doInitialize();
 		producerDataRetriever.registerListener(this);
@@ -53,13 +47,9 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 
 	@Override
 	public void doAlarm() {
-		if (dataCount.get() <= 0) {
-			return;
-		}
-		dataCount.decrementAndGet();
 		final List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(
-				lastTimeKey.get(), false);
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+				getLastTimeKey(), false);
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
