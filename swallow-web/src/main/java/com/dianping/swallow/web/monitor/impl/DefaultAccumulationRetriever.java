@@ -91,7 +91,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	@Override
 	protected void doBuild() {
 
-		SwallowActionWrapper actionWrapper = new CatActionWrapper("DefaultAccumulationRetriever", "doBuild");
+		SwallowActionWrapper actionWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
 
 		actionWrapper.doAction(new SwallowAction() {
 			@Override
@@ -241,7 +241,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	public boolean dataExistInMemory(long start, long end) {
 		return consumerDataRetriever.dataExistInMemory(start, end);
 	}
-	
+
 	@Override
 	public Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end) {
 

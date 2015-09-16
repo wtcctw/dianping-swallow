@@ -26,6 +26,8 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected String storagerName;
+	
+	protected final static String CAT_TYPE = "StatsStorager";
 
 	private static final String FACTORY_NAME = "StatsStorager";
 

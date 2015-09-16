@@ -65,7 +65,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 			return;
 		}
 
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doBuild");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName());
 		catWrapper.doAction(new SwallowAction() {
 
 			@Override

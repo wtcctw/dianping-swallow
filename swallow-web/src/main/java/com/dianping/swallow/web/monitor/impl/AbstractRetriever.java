@@ -35,6 +35,8 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 
 	protected final int BUILD_TIMES_AGEO = 15000;// 每次构建时，构建此时间(ms)以前的数据
 
+	protected static final String CAT_TYPE = "DataRetriever";
+
 	private static final String FACTORY_NAME = "DataRetriever";
 
 	protected static final String TOTAL_KEY = "total";

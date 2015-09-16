@@ -67,7 +67,7 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 
 	private void storageServerStatis(final List<ConsumerServerStatsData> serverStatsDatas) {
 		logger.info("[storageServerStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageServerStats");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageConsumerServerStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -89,7 +89,7 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 
 	private void storageTopicStatis(final ConsumerTopicStatsData topicStatsData) {
 		logger.info("[storageTopicStatis]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStats");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageConsumerTopicStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -104,7 +104,7 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 
 	private void storageConsumerIdStatis(final List<ConsumerIdStatsData> consumerIdStatsDatas) {
 		logger.info("[storageConsumerIdStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageConsumerIdStats");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageConsumerIdStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {

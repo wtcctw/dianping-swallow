@@ -60,7 +60,7 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 
 	private void storageServerStatis(final List<ProducerServerStatsData> serverStatsDatas) {
 		logger.info("[storageServerStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageServerStats");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageProducerServerStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -80,7 +80,7 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 
 	private void storageTopicStatis(final List<ProducerTopicStatsData> topicStatsDatas) {
 		logger.info("[storageTopicStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "storageTopicStats");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, "storageProducerTopicStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
