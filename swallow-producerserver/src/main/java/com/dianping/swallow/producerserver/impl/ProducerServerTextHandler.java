@@ -75,8 +75,10 @@ public class ProducerServerTextHandler extends ChannelInboundHandlerAdapter {
             } else {
                 //调用DAO层将SwallowMessage存入DB
                 try {
+    				Date generateTime = swallowMessage.getGeneratedTime() != null ? swallowMessage.getGeneratedTime() :  new Date(); 
+                	
                     messageDao.saveMessage(topicName, swallowMessage);
-                    producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, swallowMessage.getGeneratedTime().getTime(), System.currentTimeMillis());                    
+                    producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, generateTime.getTime(), System.currentTimeMillis());                    
                     textAck.setInfo(swallowMessage.getSha1());
                 } catch (Exception e1) {
                     //记录异常，返回失败ACK，reason是“Can not save message”
