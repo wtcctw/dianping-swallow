@@ -107,11 +107,24 @@ public class TopicApplyController {
 		String mongoChose;
 		String consumerServerChose;
 
-		String bestMongo = performanceIndexCollector.getBestMongo();
+		boolean search = topicApplyDto.isSearch();
+		String bestMongo = null;
+		
+		if(search){
+			bestMongo = performanceIndexCollector.getSearchMongo();
+		}else{
+			bestMongo = performanceIndexCollector.getBestMongo();
+		}
+		
 		if (StringUtils.isNotBlank(bestMongo)) {
 			mongoChose = bestMongo;
 		} else {
-			pair = performanceIndexCollector.chooseMongoDb();
+			
+			if(search){
+				pair = performanceIndexCollector.chooseSearchMongoDb();
+			}else{
+				pair = performanceIndexCollector.chooseMongoDbWithoutSearch();
+			}
 
 			if (pair.getSecond() == ResponseStatus.SUCCESS) {
 				String mongoFetched = pair.getFirst();
@@ -384,7 +397,7 @@ public class TopicApplyController {
 
 	public static void main(String[] args) {
 		PerformanceIndexCollector PerformanceIndexCollector = new PerformanceIndexCollector();
-		String res = PerformanceIndexCollector.chooseMongoDb().getFirst();
+		String res = PerformanceIndexCollector.chooseMongoDbWithoutSearch().getFirst();
 		System.out.println("res is " + res);
 		LionConfigBean lionConfigBean = new LionConfigBean();
 		lionConfigBean.setConsumerServer("1.1.1.1:1234,1.1.1.2:1235");
