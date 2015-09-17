@@ -24,7 +24,12 @@ import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ProducerIpStatsDataService;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年9月17日 下午8:25:05
+ */
 @Component
 public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 

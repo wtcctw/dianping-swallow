@@ -4,7 +4,12 @@ import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年9月17日 下午8:25:19
+ */
 public class CountDownLatchUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(CountDownLatchUtil.class);

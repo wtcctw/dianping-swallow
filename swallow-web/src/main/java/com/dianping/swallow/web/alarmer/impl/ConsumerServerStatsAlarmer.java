@@ -17,7 +17,12 @@ import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年9月17日 下午8:24:46
+ */
 @Component
 public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
 
