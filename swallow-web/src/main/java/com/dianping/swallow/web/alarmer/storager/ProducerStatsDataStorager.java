@@ -11,7 +11,6 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.container.StatsDataContainer;
-import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
@@ -62,11 +61,10 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 				true);
 		List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey.get(),
 				true);
-		List<ProducerIpGroupStatsData> ipGroupStatsDatas = producerStatsDataWapper.getIpGroupStatsDatas(
-				lastTimeKey.get(), false);
+		List<ProducerIpStatsData> ipStatsDatas = producerStatsDataWapper.getIpStatsDatas(lastTimeKey.get(), false);
 		doStorageServerStats(serverStatsDatas);
 		doStorageTopicStats(topicStatsDatas);
-		doStorageIpStats(ipGroupStatsDatas);
+		doStorageIpStats(ipStatsDatas);
 	}
 
 	private void doStorageServerStats(final List<ProducerServerStatsData> serverStatsDatas) {
@@ -119,24 +117,19 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 		});
 	}
 
-	private void doStorageIpStats(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
+	private void doStorageIpStats(final List<ProducerIpStatsData> ipStatsDatas) {
 		logger.info("[doStorageIpStats]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
 				+ "-doStorageIpStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				if (ipGroupStatsDatas != null) {
+				if (ipStatsDatas != null) {
 
-					final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(ipGroupStatsDatas.size());
+					final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(ipStatsDatas.size());
 
-					for (ProducerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
-						List<ProducerIpStatsData> ipStatsDatas = ipGroupStatsData.getProducerIpStatsDatas();
-						if (ipStatsDatas == null) {
-							continue;
-						}
-
-						for (final ProducerIpStatsData ipStatsData : ipStatsDatas) {
+					for (final ProducerIpStatsData ipStatsData : ipStatsDatas) {
+						try {
 
 							executor.submit(new Runnable() {
 								@Override
@@ -144,9 +137,11 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 									ipStatsDataService.insert(ipStatsData);
 								}
 							});
+						} catch (Throwable t) {
+							logger.error("[doStorageIpStats] insert {}", ipStatsData, t);
+						} finally {
+							downLatch.countDown();
 						}
-						downLatch.countDown();
-
 					}
 					CountDownLatchUtil.await(downLatch);
 				}

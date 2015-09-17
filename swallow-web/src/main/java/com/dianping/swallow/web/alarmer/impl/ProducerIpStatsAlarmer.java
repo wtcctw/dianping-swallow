@@ -21,12 +21,16 @@ import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ProducerClientEvent;
 import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
+import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ProducerIpStatsDataService;
 
 @Component
 public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
+	@Autowired
+	private ProducerDataRetriever producerDataRetriever;
+	
 	@Autowired
 	protected EventReporter eventReporter;
 
@@ -43,7 +47,13 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	private Map<ProducerIpStatsData, Long> sureRecords = new ConcurrentHashMap<ProducerIpStatsData, Long>();
 
-	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
+	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
+	
+	@Override
+	public void doInitialize() throws Exception {
+		super.doInitialize();
+		producerDataRetriever.registerListener(this);
+	}
 
 	@Override
 	public void doAlarm() {
@@ -53,12 +63,13 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				pIpGroupAlarms(ipGroupStatsDatas);
+				ipGroupAlarms(ipGroupStatsDatas);
+				
 			}
 		});
 	}
 
-	public void pIpGroupAlarms(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
+	public void ipGroupAlarms(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
 		if (ipGroupStatsDatas == null || ipGroupStatsDatas.size() == 0) {
 			return;
 		}

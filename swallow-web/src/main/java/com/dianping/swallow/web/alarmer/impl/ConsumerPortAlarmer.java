@@ -24,7 +24,12 @@ import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.NetUtil;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年9月17日 下午8:24:37
+ */
 @Component
 public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 

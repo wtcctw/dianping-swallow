@@ -37,14 +37,13 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	protected volatile AtomicLong lastTimeKey = new AtomicLong();
 
-	protected ExecutorService executor = null;
+	protected static ExecutorService executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
+			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		lastTimeKey.set(DEFAULT_VALUE);
-		executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
-				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
 	@Override
@@ -54,9 +53,6 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	@Override
 	public void achieveMonitorData() {
-		if (executor == null) {
-			return;
-		}
 		executor.submit(new Runnable() {
 
 			@Override

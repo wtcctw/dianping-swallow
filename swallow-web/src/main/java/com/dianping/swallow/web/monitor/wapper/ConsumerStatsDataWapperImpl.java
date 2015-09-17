@@ -210,7 +210,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				continue;
 			}
 			List<ConsumerIpStatsData> ipStatsDatas = getIpStatsDatas(topicName, timeKey, isTotal);
-			ipStatsDataResults.addAll(ipStatsDatas);
+			if (ipStatsDatas != null) {
+				ipStatsDataResults.addAll(ipStatsDatas);
+			}
 		}
 		return ipStatsDataResults;
 	}
@@ -229,7 +231,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				continue;
 			}
 			List<ConsumerIpStatsData> ipStatsDatas = getIpStatsDatas(topicName, consumerId, timeKey, isTotal);
-			ipStatsDatasResults.addAll(ipStatsDatas);
+			if (ipStatsDatas != null) {
+				ipStatsDatasResults.addAll(ipStatsDatas);
+			}
 		}
 		return ipStatsDatasResults;
 	}
@@ -241,6 +245,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			return null;
 		}
 		int index = 0;
+		List<ConsumerIpStatsData> ipStatsDatas = new ArrayList<ConsumerIpStatsData>();
 		for (String ip : ipKeys) {
 			if (!isTotal && TOTAL_KEY.equals(ip)) {
 				continue;
@@ -291,17 +296,17 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			Long ackQpxValue = ackQpx.get(timeKey);
 
 			if (ackQpxValue != null) {
-				consumerIpStatsData.setSendDelay(ackQpxValue.longValue());
+				consumerIpStatsData.setAckQps(ackQpxValue.longValue());
 			}
 			Long ackDelayValue = ackDelay.get(timeKey);
 
 			if (ackDelayValue != null) {
-				consumerIpStatsData.setSendDelay(ackDelayValue.longValue());
+				consumerIpStatsData.setAckDelay(ackDelayValue.longValue());
 			}
 			consumerIpStatsData.setAccumulation(0L);
-
+			ipStatsDatas.add(consumerIpStatsData);
 		}
-		return null;
+		return ipStatsDatas;
 	}
 
 	@Override
@@ -318,7 +323,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				continue;
 			}
 			List<ConsumerIpGroupStatsData> ipGroupStatsDatas = getIpGroupStatsDatas(topicName, timeKey, isTotal);
-			ipGroupStatsDataResults.addAll(ipGroupStatsDatas);
+			if (ipGroupStatsDatas != null) {
+				ipGroupStatsDataResults.addAll(ipGroupStatsDatas);
+			}
 		}
 		return ipGroupStatsDataResults;
 	}

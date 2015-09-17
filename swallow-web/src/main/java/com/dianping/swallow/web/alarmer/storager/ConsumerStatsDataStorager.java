@@ -12,7 +12,6 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.container.StatsDataContainer;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
-import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
@@ -68,12 +67,11 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
 				lastTimeKey.get(), true);
 		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
-		final List<ConsumerIpGroupStatsData> ipGroupStatsDatas = consumerStatsDataWapper.getIpGroupStatsDatas(
-				lastTimeKey.get(), false);
+		List<ConsumerIpStatsData> ipStatsDatas = consumerStatsDataWapper.getIpStatsDatas(lastTimeKey.get(), false);
 		doStorageServerStats(serverStatsDatas);
 		doStorageTopicStats(topicStatsData);
 		doStorageConsumerIdStats(consumerIdStatsDatas);
-		doStorageIpStats(ipGroupStatsDatas);
+		doStorageIpStats(ipStatsDatas);
 	}
 
 	private void doStorageServerStats(final List<ConsumerServerStatsData> serverStatsDatas) {
@@ -133,8 +131,13 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 
 						@Override
 						public void run() {
-							consumerIdStatsDataService.insert(consumerIdStatsData);
-							downLatch.countDown();
+							try {
+								consumerIdStatsDataService.insert(consumerIdStatsData);
+							} catch (Throwable t) {
+								logger.error("[doStorageConsumerIdStats] insert {}", consumerIdStatsData, t);
+							} finally {
+								downLatch.countDown();
+							}
 						}
 
 					});
@@ -144,33 +147,33 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 		});
 	}
 
-	private void doStorageIpStats(final List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
+	private void doStorageIpStats(final List<ConsumerIpStatsData> ipStatsDatas) {
 		logger.info("[doStorageIpStats]");
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
 				+ "-doStorageIpStats");
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				if (ipGroupStatsDatas == null) {
+				if (ipStatsDatas == null) {
 					return;
 				}
-				final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(ipGroupStatsDatas.size());
-				
-				for (ConsumerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
-					List<ConsumerIpStatsData> ipStatsDatas = ipGroupStatsData.getConsumerIpStatsDatas();
-					if (ipStatsDatas == null) {
-						continue;
-					}
-					for (final ConsumerIpStatsData ipStatsData : ipStatsDatas) {
+
+				final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(ipStatsDatas.size());
+
+				for (final ConsumerIpStatsData ipStatsData : ipStatsDatas) {
+					try {
+
 						executor.submit(new Runnable() {
 							@Override
 							public void run() {
 								ipStatsDataService.insert(ipStatsData);
 							}
 						});
+					} catch (Throwable t) {
+						logger.error("[doStorageIpStats] insert {}", ipStatsData, t);
+					} finally {
+						downLatch.countDown();
 					}
-					downLatch.countDown();
-
 				}
 				CountDownLatchUtil.await(downLatch);
 			}

@@ -20,13 +20,14 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 
 	protected final static String CAT_TYPE = "StatsDataAlarmer";
 
-	protected String FACTORY_NAME = "StatsDataAlarmer";
+	protected static final String FACTORY_NAME = "StatsDataAlarmer";
 
 	protected static final String TOTAL_KEY = MonitorData.TOTAL_KEY;
 
 	private final static long DAY_TIMESTAMP_UNIT = 24 * 60 * 60 * 1000;
 
-	private ExecutorService executor = null;
+	private static ExecutorService executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 4,
+			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	protected static final long TIME_SECTION = 5 * 60 / AbstractCollector.SEND_INTERVAL;
 
@@ -35,8 +36,6 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 	@Override
 	public void doInitialize() throws Exception {
 		super.doInitialize();
-		executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 4,
-				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
 	@Override
@@ -52,9 +51,6 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 
 	@Override
 	public void achieveMonitorData() {
-		if (executor == null) {
-			return;
-		}
 		logger.info("[achieveMonitorData] statsDataAlarmer {}", getClass().getSimpleName());
 
 		executor.submit(new Runnable() {

@@ -198,6 +198,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (delay != null) {
 				ipStatsData.setDelay(delay.longValue());
 			}
+			ipStatsDatas.add(ipStatsData);
 		}
 
 		return ipStatsDatas;

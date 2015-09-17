@@ -21,12 +21,21 @@ import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIpStatsDataService;
 import com.dianping.swallow.web.service.ConsumerIpStatsDataService.ConsumerIpQpsPair;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年9月17日 下午8:24:14
+ */
 @Component
 public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
+
+	@Autowired
+	private ConsumerDataRetriever consumerDataRetriever;
 
 	@Autowired
 	protected EventReporter eventReporter;
@@ -47,6 +56,12 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
 
 	@Override
+	public void doInitialize() throws Exception {
+		super.doInitialize();
+		consumerDataRetriever.registerListener(this);
+	}
+
+	@Override
 	public void doAlarm() {
 		final List<ConsumerIpGroupStatsData> ipGroupStatsDatas = cStatsDataWapper.getIpGroupStatsDatas(
 				getLastTimeKey(), false);
@@ -54,12 +69,12 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				cIpGroupAlarms(ipGroupStatsDatas);
+				ipGroupAlarms(ipGroupStatsDatas);
 			}
 		});
 	}
 
-	public void cIpGroupAlarms(List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
+	public void ipGroupAlarms(List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
 		if (ipGroupStatsDatas == null || ipGroupStatsDatas.size() == 0) {
 			return;
 		}
@@ -67,7 +82,9 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 		for (final ConsumerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
 			cIpGroupAlarm(ipGroupStatsData);
 		}
-
+		
+		alarmSureRecords();
+		alarmUnSureRecords();
 	}
 
 	public void cIpGroupAlarm(ConsumerIpGroupStatsData ipGroupStatsData) {
