@@ -14,10 +14,9 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
-import com.dianping.swallow.web.common.WebLifeCycle;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
-public abstract class AbstractResourceCollector extends AbstractLifecycle implements WebLifeCycle {
+public abstract class AbstractResourceCollector extends AbstractLifecycle implements CollectorLifeCycle {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	

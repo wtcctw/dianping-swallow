@@ -18,4 +18,21 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 
 	protected static final String FUNCTION_DOALARM = "-doAlarm";
 
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+	}
+
+	@Override
+	protected void doStart() throws Exception {
+		super.doStart();
+		logger.info("[doStart] {} start.", getClass().getSimpleName());
+	}
+	
+	@Override
+	protected void doStop() throws Exception {
+		super.doStop();
+		logger.info("[doStart] {} stop.", getClass().getSimpleName());
+	}
+
 }

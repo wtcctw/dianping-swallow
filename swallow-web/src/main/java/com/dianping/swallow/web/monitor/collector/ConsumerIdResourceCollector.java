@@ -27,10 +27,6 @@ import com.dianping.swallow.web.service.TopicResourceService;
 @Component
 public class ConsumerIdResourceCollector extends AbstractResourceCollector {
 
-	private int collectorInterval;
-
-	private int collectorDelay;
-
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
 

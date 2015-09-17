@@ -24,7 +24,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  */
 public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	
-	protected final static String CAT_TYPE = "ServerServiceAlarmer";
+	protected final static String CAT_TYPE = "ServiceAlarmer";
 
 	protected Map<String, Boolean> lastCheckStatus = new HashMap<String, Boolean>();
 

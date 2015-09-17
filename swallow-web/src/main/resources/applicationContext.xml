@@ -21,7 +21,7 @@
 	</bean>
 
 	<bean
-		class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager" />
+		class="com.dianping.swallow.web.common.WebLifecycleComponentManager" />
 
 	<bean id="messageDAO"
 		class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
