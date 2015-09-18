@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 import com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager;
@@ -24,90 +25,25 @@ public class WebLifecycleComponentManager extends LifecycleComponentManager {
 
 	private static final String COMPONENT_SWITCH = "/data/appdatas/swallowweb/swallow-web-switch.properties";
 
-	private static final String ALARMER_SWITCH = "alarmer";
-	private static final String COLLECTOR_SWITCH = "collector";
-	private static final String STORAGER_SWITCH = "storager";
-	private static final String DASHBOARD_SWITCH = "dashboard";
-
-	private boolean isAlarmer = true;
-	private boolean isCollector = true;
-	private boolean isStorager = true;
-	private boolean isDashboard = true;
+	@Autowired
+	private WebComponentConfig componentConfig;
 
 	public WebLifecycleComponentManager() {
-		initProperties();
+		
 	}
 
 	@Override
 	protected boolean accept(String key, Lifecycle component) {
 		if (component instanceof AlarmerLifecycle) {
-			return isAlarmer;
+			return componentConfig.isAlarmer();
 		} else if (component instanceof CollectorLifecycle) {
-			return isCollector;
+			return componentConfig.isCollector();
 		} else if (component instanceof StoragerLifecycle) {
-			return isStorager;
+			return componentConfig.isStorager();
 		} else if (component instanceof DashboardLifecycle) {
-			return isDashboard;
+			return componentConfig.isDashboard();
 		}
 		return true;
-	}
-
-	private void initProperties() {
-		try {
-			File file = new File(COMPONENT_SWITCH);
-			InputStream in = new FileInputStream(file);
-			if (in != null) {
-				Properties prop = new Properties();
-				try {
-					prop.load(in);
-					setAlarmer(Boolean.valueOf(StringUtils.trim(prop.getProperty(ALARMER_SWITCH))));
-					setCollector(Boolean.valueOf(StringUtils.trim(prop.getProperty(COLLECTOR_SWITCH))));
-					setStorager(Boolean.valueOf(StringUtils.trim(prop.getProperty(STORAGER_SWITCH))));
-					setDashboard(Boolean.valueOf(StringUtils.trim(prop.getProperty(DASHBOARD_SWITCH))));
-					if (logger.isInfoEnabled()) {
-						logger.info("component switch alarmer: " + isAlarmer() + " collector: " + isCollector()
-								+ " storager: " + isStorager() + " dashboard: " + isDashboard());
-					}
-
-				} finally {
-					in.close();
-				}
-			}
-		} catch (Exception e) {
-			logger.info("[initProperties] Load {} file failed.", COMPONENT_SWITCH);
-		}
-	}
-
-	public boolean isAlarmer() {
-		return isAlarmer;
-	}
-
-	public void setAlarmer(boolean isAlarmer) {
-		this.isAlarmer = isAlarmer;
-	}
-
-	public boolean isCollector() {
-		return isCollector;
-	}
-
-	public void setCollector(boolean isCollector) {
-		this.isCollector = isCollector;
-	}
-
-	public boolean isStorager() {
-		return isStorager;
-	}
-
-	public void setStorager(boolean isStorager) {
-		this.isStorager = isStorager;
-	}
-
-	public boolean isDashboard() {
-		return isDashboard;
-	}
-
-	public void setDashboard(boolean isDashboard) {
-		this.isDashboard = isDashboard;
 	}
 
 }

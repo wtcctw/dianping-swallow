@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.common;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.config.AbstractConfig;
@@ -13,18 +15,24 @@ import com.dianping.swallow.common.internal.config.AbstractConfig;
 @Component
 public class WebComponentConfig extends AbstractConfig {
 
+	private static final String COMPONENT_SWITCH_FILE = "/data/appdatas/swallowweb/swallow-web-switch.properties";
+
 	private boolean isAlarmer = true;
 	private boolean isCollector = true;
 	private boolean isStorager = true;
 	private boolean isDashboard = true;
 
 	public WebComponentConfig() {
-
+		super(COMPONENT_SWITCH_FILE);
 	}
 
-	@Override
-	protected void loadConfig() {
-
+	@PostConstruct
+	public void postWebComponentConfig() {
+		try {
+			loadConfig();
+		} catch (Exception e) {
+			logger.error("loadConfig error.", e);
+		}
 	}
 
 	public boolean isAlarmer() {
