@@ -280,6 +280,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			ConsumerIpStatsData consumerIpStatsData = statsDataFactory.createConsumerIpStatsData();
 			consumerIpStatsData.setTopicName(topicName);
 			consumerIpStatsData.setConsumerId(consumerId);
+			consumerIpStatsData.setIp(ip);
 			consumerIpStatsData.setTimeKey(timeKey);
 			Long sendQpxValue = sendQpx.get(timeKey);
 

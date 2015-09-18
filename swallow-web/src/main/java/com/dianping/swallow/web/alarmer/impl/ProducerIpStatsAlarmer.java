@@ -121,7 +121,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 			long lastTime = checkRecord.getValue();
 			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
 				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) < lastTime) {
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastTime) {
 					continue;
 				}
 				ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
@@ -144,7 +144,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
 				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) < lastTime) {
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastTime) {
 					continue;
 				}
 				long avgQps = pIpStatsDataService.findAvgQps(ipStatsData.getTopicName(), ipStatsData.getIp(),

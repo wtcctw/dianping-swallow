@@ -41,18 +41,23 @@ public abstract class ClientEvent extends Event {
 		switch (getEventType()) {
 		case CONSUMER:
 			switch (getClientType()) {
-			case CLIENT_SENDER:
-				sendMessage(AlarmType.PRODUCER_CLIENT_SENDER);
-				break;
 			case CLIENT_RECEIVER:
 				sendMessage(AlarmType.CONSUMER_CLIENT_RECEIVER);
 				break;
+			default:
+				break;
 			}
 			break;
-		default:
+		case PRODUCER:
+			switch (getClientType()) {
+			case CLIENT_SENDER:
+				sendMessage(AlarmType.PRODUCER_CLIENT_SENDER);
+				break;
+			default:
+				break;
+			}
 			break;
 		}
-
 	}
 
 	@Override

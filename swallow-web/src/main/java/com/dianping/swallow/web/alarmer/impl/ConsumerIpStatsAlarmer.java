@@ -123,7 +123,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 			long lastTime = firstCandidate.getValue();
 			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
 				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) < lastTime) {
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastTime) {
 					continue;
 				}
 				ConsumerClientEvent clientEvent = eventFactory.createCClientEvent();
@@ -147,7 +147,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
 				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) < lastTime) {
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastTime) {
 					continue;
 				}
 				
