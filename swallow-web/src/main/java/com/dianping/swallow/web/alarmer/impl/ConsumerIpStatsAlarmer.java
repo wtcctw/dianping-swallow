@@ -25,11 +25,12 @@ import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIpStatsDataService;
 import com.dianping.swallow.web.service.ConsumerIpStatsDataService.ConsumerIpQpsPair;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年9月17日 下午8:24:14
+ *         2015年9月17日 下午8:24:14
  */
 @Component
 public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
@@ -49,11 +50,13 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 	@Autowired
 	private ConsumerIpStatsDataService cIpStatsDataService;
 
-	private Map<ConsumerIpStatsData, Long> unSureRecords = new ConcurrentHashMap<ConsumerIpStatsData, Long>();
+	private Map<ConsumerIpStatsData, Long> firstCandidates = new ConcurrentHashMap<ConsumerIpStatsData, Long>();
 
-	private Map<ConsumerIpStatsData, Long> sureRecords = new ConcurrentHashMap<ConsumerIpStatsData, Long>();
+	private Map<ConsumerIpStatsData, Long> secondCandidates = new ConcurrentHashMap<ConsumerIpStatsData, Long>();
 
-	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
+	private Map<ConsumerIpStatsData, Long> whiteLists = new ConcurrentHashMap<ConsumerIpStatsData, Long>();
+
+	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -69,62 +72,65 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				ipGroupAlarms(ipGroupStatsDatas);
+				alarmIpData(ipGroupStatsDatas);
 			}
 		});
 	}
 
-	public void ipGroupAlarms(List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
+	public void alarmIpData(List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
+		checkIpGroups(ipGroupStatsDatas);
+		alarmSureRecords();
+		alarmUnSureRecords();
+	}
+
+	public void checkIpGroups(List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
 		if (ipGroupStatsDatas == null || ipGroupStatsDatas.size() == 0) {
 			return;
 		}
 
 		for (final ConsumerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
-			cIpGroupAlarm(ipGroupStatsData);
+			checkIpGroup(ipGroupStatsData);
 		}
-		
-		alarmSureRecords();
-		alarmUnSureRecords();
 	}
 
-	public void cIpGroupAlarm(ConsumerIpGroupStatsData ipGroupStatsData) {
-		boolean hasStatsData = ipGroupStatsData.hasStatsData();
+	public void checkIpGroup(ConsumerIpGroupStatsData ipGroupStatsData) {
+		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		List<ConsumerIpStatsData> ipStatsDatas = ipGroupStatsData.getConsumerIpStatsDatas();
 		if (ipStatsDatas == null || ipStatsDatas.size() == 0) {
 			return;
 		}
 		for (ConsumerIpStatsData ipStatsData : ipStatsDatas) {
-			if (!hasStatsData && ipStatsDatas.size() == 1) {
-				if (!unSureRecords.containsKey(ipStatsData)) {
-					unSureRecords.put(ipStatsData, System.currentTimeMillis());
+			boolean hasStatsData = ipStatsData.checkStatsData();
+			if (hasStatsData) {
+				whiteLists.put(ipStatsData, System.currentTimeMillis());
+			} else if (!hasStatsData && hasGroupStatsData) {
+				if (!firstCandidates.containsKey(ipStatsData)) {
+					firstCandidates.put(ipStatsData, System.currentTimeMillis());
 				}
-				return;
-			}
-			boolean isStatsData = ipStatsData.checkStatsData(hasStatsData);
-			if (isStatsData) {
-				sureRecords.put(ipStatsData, System.currentTimeMillis());
-			} else {
-				if (!sureRecords.containsKey(ipStatsData)) {
-					sureRecords.put(ipStatsData, System.currentTimeMillis());
+			} else if (!hasStatsData && !hasGroupStatsData) {
+				if (ipStatsDatas.size() == 1 && !secondCandidates.containsKey(ipStatsData)) {
+					secondCandidates.put(ipStatsData, System.currentTimeMillis());
 				}
 			}
 		}
 	}
 
 	public void alarmSureRecords() {
-		Iterator<Entry<ConsumerIpStatsData, Long>> iterator = sureRecords.entrySet().iterator();
+		Iterator<Entry<ConsumerIpStatsData, Long>> iterator = firstCandidates.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Entry<ConsumerIpStatsData, Long> checkRecord = iterator.next();
-			ConsumerIpStatsData ipStatsData = checkRecord.getKey();
-			long lastTime = checkRecord.getValue();
+			Entry<ConsumerIpStatsData, Long> firstCandidate = iterator.next();
+			ConsumerIpStatsData ipStatsData = firstCandidate.getKey();
+			long lastTime = firstCandidate.getValue();
 			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
-
+				iterator.remove();
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) < lastTime) {
+					continue;
+				}
 				ConsumerClientEvent clientEvent = eventFactory.createCClientEvent();
 				clientEvent.setConsumerId(ipStatsData.getConsumerId()).setTopicName(ipStatsData.getTopicName())
 						.setIp(ipStatsData.getIp()).setClientType(ClientType.CLIENT_RECEIVER)
 						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 				eventReporter.report(clientEvent);
-				iterator.remove();
 
 			}
 		}
@@ -133,14 +139,18 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	public void alarmUnSureRecords() {
 
-		Iterator<Entry<ConsumerIpStatsData, Long>> iterator = unSureRecords.entrySet().iterator();
+		Iterator<Entry<ConsumerIpStatsData, Long>> iterator = secondCandidates.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Entry<ConsumerIpStatsData, Long> checkRecord = iterator.next();
-			ConsumerIpStatsData ipStatsData = checkRecord.getKey();
-			long lastTime = checkRecord.getValue();
+			Entry<ConsumerIpStatsData, Long> secondCandidate = iterator.next();
+			ConsumerIpStatsData ipStatsData = secondCandidate.getKey();
+			long lastTime = secondCandidate.getValue();
 
 			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
-
+				iterator.remove();
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) < lastTime) {
+					continue;
+				}
+				
 				ConsumerIpQpsPair avgQpsPair = cIpStatsDataService.findAvgQps(ipStatsData.getTopicName(),
 						ipStatsData.getConsumerId(), ipStatsData.getIp(), getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)),
 						getTimeKey(System.currentTimeMillis()));
@@ -153,7 +163,6 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
 					eventReporter.report(clientEvent);
 				}
-				iterator.remove();
 			}
 		}
 	}

@@ -6,7 +6,7 @@ print("CONSUMER_SERVER_RESOURCE load data start");
 data = db.CONSUMER_SERVER_RESOURCE.findOne();
 if (data == null) {
 	
-	db.CONSUMER_SERVER_RESOURCE.ensureIndex({'ip': -1 }, {"name":"IX_IP", "background": true});
+	db.CONSUMER_SERVER_RESOURCE.ensureIndex({'ip': -1 }, {"name":"IX_IP", "unique": true, "dropDups" : true, "background": true});
 	
 	var resource = {};
 	resource.ip = "default";

@@ -62,6 +62,7 @@ public class IPResourceManagerImpl implements IPResourceManager {
 			IpResource ipResource = new IpResource();
 			ipResource.setIp(ip);
 			ipResource.setiPDesc(ipDesc);
+			ipResource.setAlarm(true);
 			ipResource.setCreateTime(new Date());
 			ipResource.setUpdateTime(new Date());
 			ipResourceService.insert(ipResource);

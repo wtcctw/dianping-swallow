@@ -45,7 +45,7 @@ public abstract class ClientEvent extends Event {
 				sendMessage(AlarmType.PRODUCER_CLIENT_SENDER);
 				break;
 			case CLIENT_RECEIVER:
-				sendMessage(AlarmType.PRODUCER_CLIENT_SENDER);
+				sendMessage(AlarmType.CONSUMER_CLIENT_RECEIVER);
 				break;
 			}
 			break;

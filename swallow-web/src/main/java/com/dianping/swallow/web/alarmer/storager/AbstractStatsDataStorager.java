@@ -23,7 +23,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月4日 下午1:22:31
  */
 public abstract class AbstractStatsDataStorager extends AbstractLifecycle implements MonitorDataListener,
-		StoragerLifeCycle {
+		StoragerLifecycle {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 

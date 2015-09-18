@@ -9,11 +9,17 @@ import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 import com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager;
-import com.dianping.swallow.web.alarmer.AlarmerLifeCycle;
-import com.dianping.swallow.web.alarmer.storager.StoragerLifeCycle;
-import com.dianping.swallow.web.dashboard.DashboardLifeCycle;
-import com.dianping.swallow.web.monitor.collector.CollectorLifeCycle;
+import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
+import com.dianping.swallow.web.alarmer.storager.StoragerLifecycle;
+import com.dianping.swallow.web.dashboard.DashboardLifecycle;
+import com.dianping.swallow.web.monitor.collector.CollectorLifecycle;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年9月18日 上午9:52:08
+ */
 public class WebLifecycleComponentManager extends LifecycleComponentManager {
 
 	private static final String COMPONENT_SWITCH = "/data/appdatas/swallowweb/swallow-web-switch.properties";
@@ -34,13 +40,13 @@ public class WebLifecycleComponentManager extends LifecycleComponentManager {
 
 	@Override
 	protected boolean accept(String key, Lifecycle component) {
-		if (component instanceof AlarmerLifeCycle) {
+		if (component instanceof AlarmerLifecycle) {
 			return isAlarmer;
-		} else if (component instanceof CollectorLifeCycle) {
+		} else if (component instanceof CollectorLifecycle) {
 			return isCollector;
-		} else if (component instanceof StoragerLifeCycle) {
+		} else if (component instanceof StoragerLifecycle) {
 			return isStorager;
-		} else if (component instanceof DashboardLifeCycle) {
+		} else if (component instanceof DashboardLifecycle) {
 			return isDashboard;
 		}
 		return true;

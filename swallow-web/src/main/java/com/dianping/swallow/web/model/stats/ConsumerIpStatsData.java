@@ -51,9 +51,9 @@ public class ConsumerIpStatsData extends ConsumerStatsData {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
 		result = prime * result + ((consumerId == null) ? 0 : consumerId.hashCode());
 		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
-		result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
 		return result;
 	}
 
@@ -97,8 +97,8 @@ public class ConsumerIpStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	public boolean checkStatsData(boolean hasStatsData) {
-		if (this.getSendQps() == 0L && this.getAckQps() == 0L && hasStatsData) {
+	public boolean checkStatsData() {
+		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
 			return false;
 		}
 		return true;

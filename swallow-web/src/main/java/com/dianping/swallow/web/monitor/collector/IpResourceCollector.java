@@ -52,7 +52,7 @@ public class IpResourceCollector extends AbstractResourceCollector {
 		collectorInterval = 60;
 		collectorDelay = 2;
 	}
-	
+
 	@Override
 	public void doCollector() {
 		doIpResource();
@@ -72,42 +72,46 @@ public class IpResourceCollector extends AbstractResourceCollector {
 
 	private void doIpResourceTask(Set<String> ips) {
 		for (String ip : ips) {
-			IPDesc ipDesc = cmdbService.getIpDesc(ip);
-			if (ipDesc != null) {
-				List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
-				if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
-					ipDesc.setCreateTime(new Date());
-					ipDesc.setUpdateTime(new Date());
-					addEmail(ipDesc);
-					IpResource ipResource = new IpResource();
-					ipResource.setIp(ipDesc.getIp());
-					ipResource.setCreateTime(new Date());
-					ipResource.setUpdateTime(new Date());
-					ipResource.setiPDesc(ipDesc);
-					ipResourceService.insert(ipResource);
-				} else {
-					IpResource ipResource = ipResourceInDbs.get(0);
-					if (ipResource.getiPDesc() != null) {
-						ipDesc.setId(ipResource.getiPDesc().getId());
+			try {
+				IPDesc ipDesc = cmdbService.getIpDesc(ip);
+				if (ipDesc != null) {
+					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
+					if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
+						ipDesc.setCreateTime(new Date());
+						ipDesc.setUpdateTime(new Date());
+						addEmail(ipDesc);
+						IpResource ipResource = new IpResource();
+						ipResource.setIp(ipDesc.getIp());
+						ipResource.setCreateTime(new Date());
+						ipResource.setUpdateTime(new Date());
+						ipResource.setiPDesc(ipDesc);
+						ipResourceService.insert(ipResource);
+					} else {
+						IpResource ipResource = ipResourceInDbs.get(0);
+						if (ipResource.getiPDesc() != null) {
+							ipDesc.setId(ipResource.getiPDesc().getId());
+						}
+						ipDesc.setUpdateTime(new Date());
+						addEmail(ipDesc);
+						ipResource.setUpdateTime(new Date());
+						ipResource.setiPDesc(ipDesc);
+						ipResourceService.update(ipResource);
 					}
-					ipDesc.setUpdateTime(new Date());
-					addEmail(ipDesc);
-					ipResource.setUpdateTime(new Date());
-					ipResource.setiPDesc(ipDesc);
-					ipResourceService.update(ipResource);
+				} else {
+					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
+					IpResource ipResource = null;
+					if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
+						ipResource = new IpResource();
+						ipResource.setAlarm(false);
+						ipResource.setiPDesc(new IPDesc(ip));
+						ipResource.setCreateTime(new Date());
+						ipResource.setUpdateTime(new Date());
+						ipResource.setIp(ip);
+						ipResourceService.insert(ipResource);
+					}
 				}
-			} else {
-				List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
-				IpResource ipResource = null;
-				if (ipResourceInDbs == null || ipResourceInDbs.size() == 0) {
-					ipResource = new IpResource();
-					ipResource.setAlarm(false);
-					ipResource.setiPDesc(new IPDesc(ip));
-					ipResource.setCreateTime(new Date());
-					ipResource.setUpdateTime(new Date());
-					ipResource.setIp(ip);
-					ipResourceService.insert(ipResource);
-				}
+			} catch (Exception e) {
+				logger.error("[doIpResourceTask] update ip resouces error.{}", ip, e);
 			}
 		}
 	}

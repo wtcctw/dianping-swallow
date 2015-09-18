@@ -52,7 +52,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年7月7日上午9:36:49
  */
 @Component
-public class DashboardContainerUpdater extends AbstractLifecycle implements MonitorDataListener, DashboardLifeCycle,
+public class DashboardContainerUpdater extends AbstractLifecycle implements MonitorDataListener, DashboardLifecycle,
 		Runnable {
 
 	private static final String FACTORY_NAME = "Dashboard";

@@ -16,7 +16,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
-public abstract class AbstractResourceCollector extends AbstractLifecycle implements CollectorLifeCycle {
+public abstract class AbstractResourceCollector extends AbstractLifecycle implements CollectorLifecycle {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -53,7 +53,7 @@ public abstract class AbstractResourceCollector extends AbstractLifecycle implem
 	public abstract int getCollectorInterval();
 
 	public void startCollector() {
-		future = scheduled.scheduleAtFixedRate(new Runnable() {
+		future = scheduled.scheduleWithFixedDelay(new Runnable() {
 
 			@Override
 			public void run() {
@@ -67,7 +67,7 @@ public abstract class AbstractResourceCollector extends AbstractLifecycle implem
 						}
 					});
 				} catch (Throwable th) {
-					logger.error("[startAlarm]", th);
+					logger.error("[startCollector]", th);
 				} finally {
 
 				}

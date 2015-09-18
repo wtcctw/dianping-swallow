@@ -77,8 +77,8 @@ public class ProducerIpStatsData extends ProducerStatsData {
 		return true;
 	}
 
-	public boolean checkStatsData(boolean hasStatsData) {
-		if (this.getQps() == 0L && hasStatsData) {
+	public boolean checkStatsData() {
+		if (this.getQps() == 0L) {
 			return false;
 		}
 		return true;

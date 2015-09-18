@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
-import com.dianping.swallow.web.alarmer.AlarmerLifeCycle;
+import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
 
 /**
  * 
@@ -12,7 +12,7 @@ import com.dianping.swallow.web.alarmer.AlarmerLifeCycle;
  *
  *         2015年8月3日 下午6:06:07
  */
-public abstract class AbstractAlarmer extends AbstractLifecycle implements AlarmerLifeCycle {
+public abstract class AbstractAlarmer extends AbstractLifecycle implements AlarmerLifecycle {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
