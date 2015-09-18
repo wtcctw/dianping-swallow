@@ -1,5 +1,8 @@
 package com.dianping.swallow.common.internal.config;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -40,7 +43,19 @@ public class AbstractConfig {
 			return ;
 		}
 		
-		InputStream ins = DefaultMongoManager.class.getClassLoader().getResourceAsStream(localFileName);
+		InputStream ins = null;
+		File file = new File(localFileName);
+		
+		if(!file.exists()){
+			ins = DefaultMongoManager.class.getClassLoader().getResourceAsStream(localFileName);
+		}else{
+			try {
+				ins = new FileInputStream(file);
+			} catch (FileNotFoundException e) {
+				logger.error("[loadConfig]" + localFileName, e);
+			}
+		}
+		
 		if(ins == null){
 			logger.warn("[loadLocalConfig][file not found]" + localFileName);
 			return;
