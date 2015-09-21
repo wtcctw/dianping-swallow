@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,9 +62,11 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	private ScheduledExecutorService scheduledExecutorService = Executors
 			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
+	
+	Logger logger2 = LogManager.getLogger(getClass());
+	
 	@PostConstruct
 	void initLionConfig() {
-
 		try {
 			configCache = ConfigCache.getInstance();
 			String value = configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);

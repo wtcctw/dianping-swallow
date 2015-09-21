@@ -3,7 +3,6 @@ package com.dianping.swallow.web.controller;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
@@ -17,17 +16,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
-import com.dianping.swallow.common.internal.util.NameCheckUtil;
+import com.dianping.swallow.common.internal.config.LionUtil;
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
-import com.dianping.swallow.web.controller.utils.UserUtils;
+import com.dianping.swallow.web.controller.validator.AuthenticationValidator;
+import com.dianping.swallow.web.controller.validator.NameValidator;
+import com.dianping.swallow.web.controller.validator.QuoteValidator;
+import com.dianping.swallow.web.controller.validator.Validator;
 import com.dianping.swallow.web.model.dom.LionConfigBean;
 import com.dianping.swallow.web.model.dom.MongoConfigBean;
+import com.dianping.swallow.web.model.resource.MongoResource;
+import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.model.resource.TopicResource;
+import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.LionHttpService;
 import com.dianping.swallow.web.service.LionHttpService.LionHttpResponse;
+import com.dianping.swallow.web.service.MongoResourceService;
 import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.impl.TopicResourceServiceImpl;
@@ -47,7 +53,7 @@ public class TopicApplyController {
 
 	private static final String SUCCESS = "success";
 
-	private static final String DEFAULT_ENV = EnvZooKeeperConfig.getEnv();
+	private static final String DEFAULT_ENV = EnvUtil.getEnv();
 
 	private static final String DEFAULT_PROJECT = "swallow";
 
@@ -55,123 +61,77 @@ public class TopicApplyController {
 
 	private static final String CREATE_ERROR = "already exists";
 
-	private static Set<Integer> SIZE_SET = new TreeSet<Integer>();
-
-	private int DEFAULT_ID = 2;
+	private static final int DEFAULT_ID = 2;
 
 	private String DEFAULT_GROUP = "test";
 
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
-	
+
 	@Resource(name = "topicApplyService")
 	private TopicApplyService topicApplyService;
+
+	@Resource(name = "consumerServerResourceService")
+	private ConsumerServerResourceService consumerServerResourceService;
 
 	@Resource(name = "lionHttpService")
 	private LionHttpService lionHttpService;
 
+	@Resource(name = "mongoResourceService")
+	private MongoResourceService mongoResourceService;
+	
 	@Autowired
-	private UserUtils userUtils;
+	private LionUtil lionUtil;
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-
-	static { // 最少500M，最大50G
-		SIZE_SET.add(500);
-		SIZE_SET.add(1000);
-		SIZE_SET.add(2000);
-		SIZE_SET.add(3000);
-		SIZE_SET.add(5000);
-		SIZE_SET.add(10000);
-		SIZE_SET.add(20000);
-		SIZE_SET.add(30000);
-		SIZE_SET.add(40000);
-		SIZE_SET.add(50000);
-	}
 
 	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
 	@ResponseBody
 	public Object applyTopic(@RequestBody TopicApplyDto topicApplyDto) {
 
-		boolean test = topicApplyDto.isTest();
-
-		ResponseStatus responseStatus = validate(topicApplyDto);
+		Validator validator = new AuthenticationValidator(new NameValidator(new QuoteValidator()));
+		ResponseStatus responseStatus = validator.ValidateTopicApplyDto(topicApplyDto);
 		if (responseStatus != ResponseStatus.SUCCESS) {
-			if (logger.isInfoEnabled() && test) {
-				logger.info(String.format("Error when validate topicApplyDto with response status %d and message %s",
-						responseStatus.getStatus(), responseStatus.getMessage()));
-			}
 			return responseStatus;
 		}
 
-		Pair<String, ResponseStatus> pair;
-		String mongoChose;
+		String type = topicApplyDto.getType();
+		MongoType mongoType = MongoType.findByType(type);
+		MongoResource mongoResource = mongoResourceService.findIdleMongoByType(mongoType);
+		if (mongoResource == null) {
+			return ResponseStatus.NOTEXIST;
+		}
+		
+		String mongoChosen = mongoResource.getIp();
+		if (StringUtils.isBlank(mongoChosen)) {
+			return ResponseStatus.INVALIDIP;
+		}
+		
+		Pair<String, ResponseStatus> pair = consumerServerResourceService.loadIdleConsumerServer();
 		String consumerServerChose;
-
-		boolean search = topicApplyDto.isSearch();
-		String bestMongo = null;
 		
-		if(search){
-			bestMongo = topicApplyService.getSearchMongo();
-		}else{
-			bestMongo = topicApplyService.getBestMongo();
-		}
-		
-		if (StringUtils.isNotBlank(bestMongo)) {
-			mongoChose = bestMongo;
+		if (pair.getSecond() == ResponseStatus.SUCCESS) {
+			consumerServerChose = pair.getFirst();
 		} else {
-			
-			if(search){
-				pair = topicApplyService.chooseSearchMongoDb();
-			}else{
-				pair = topicApplyService.chooseMongoDbWithoutSearch();
-			}
-
-			if (pair.getSecond() == ResponseStatus.SUCCESS) {
-				String mongoFetched = pair.getFirst();
-				bestMongo = mongoFetched;
-				mongoChose = mongoFetched;
-			} else {
-				return pair.getSecond();
-			}
-
+			return pair.getSecond();
 		}
-
-		String bestConsumerServer = topicApplyService.getBestConsumerServer();
-		if (StringUtils.isNotBlank(bestConsumerServer)) {
-			consumerServerChose = bestConsumerServer;
-		} else {
-			pair = topicApplyService.chooseConsumerServer();
-
-			if (pair.getSecond() == ResponseStatus.SUCCESS) {
-				String consumerServerFetched = pair.getFirst();
-				bestConsumerServer = consumerServerFetched;
-				consumerServerChose = consumerServerFetched;
-			} else {
-				return pair.getSecond();
-			}
-
-		}
-
-		LionConfigBean lionConfigBean = new LionConfigBean();
 
 		float amount = topicApplyDto.getAmount();
 		int size = topicApplyDto.getSize();
 		int size4sevenday = (int) (amount * size * 7 * 10);
-		for (Integer s : SIZE_SET) {
-			if (s >= size4sevenday) {
-				size4sevenday = s;
-				break;
-			}
-		}
+		//size4sevenday取500的倍数
+		int mod = size4sevenday % 500;
+		size4sevenday = (mod != 0) ? (size4sevenday / 500 + 1) * 500 : size4sevenday;
 
+		LionConfigBean lionConfigBean = new LionConfigBean();
 		String topic = topicApplyDto.getTopic().trim();
+		boolean test = topicApplyDto.isTest();
 		lionConfigBean.setTopic(topic);
-		lionConfigBean.setMongo(mongoChose);
+		lionConfigBean.setMongo(mongoChosen);
 		lionConfigBean.setConsumerServer(consumerServerChose);
 		lionConfigBean.setSize(size4sevenday);
-		if("product".equals(DEFAULT_ENV)){
+		if ("product".equals(DEFAULT_ENV)) {
 			DEFAULT_GROUP = "";
-			DEFAULT_ID = 67;
 		}
 		lionConfigBean.setGroup(DEFAULT_GROUP);
 		lionConfigBean.setTest(test);
@@ -193,12 +153,13 @@ public class TopicApplyController {
 
 	private ResponseStatus editSwallowLionConfiguration(LionConfigBean lionConfigBean) {
 
+		System.out.println(lionUtil.getClass());
 		String topic = lionConfigBean.getTopic();
 		String consumerServer = lionConfigBean.getConsumerServer();
 		String group = lionConfigBean.getGroup();
 		boolean test = lionConfigBean.isTest();
 		boolean success = setLionValue(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topic, ";", test, group);
-		Map<String,Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
+		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
 
 		if (success) {
 			StringBuilder stringBuilder = new StringBuilder();
@@ -208,7 +169,7 @@ public class TopicApplyController {
 					test, group);
 
 			if (success) {
-				//在else失败时，清除了缓存的topic，再次申请时lion没有更新，所以lion不会通知，需要手动增加
+				// 在else失败时，清除了缓存的topic，再次申请时lion没有更新，所以lion不会通知，需要手动增加
 				topicToWhiteList.put(topic, new HashSet<String>());
 				String key = PRE_TOPIC_KEY + topic;
 				MongoConfigBean mongoConfigBean = new MongoConfigBean();
@@ -227,7 +188,7 @@ public class TopicApplyController {
 
 		}
 
-		//失败后缓存的whitelist中清除相应的topic，再次操作则保证不报-11错误
+		// 失败后缓存的whitelist中清除相应的topic，再次操作则保证不报-11错误
 		topicToWhiteList.remove(topic);
 		return ResponseStatus.LIONEXCEPTION;
 	}
@@ -238,7 +199,7 @@ public class TopicApplyController {
 
 		if (SUCCESS.equals(lionHttpResponse.getStatus())) {
 			String oldValue = lionHttpResponse.getResult();
-			if (oldValue == null || StringUtils.isBlank(oldValue)) {
+			if (StringUtils.isBlank(oldValue)) {
 				if (logger.isErrorEnabled()) {
 					logger.error(String.format("Error when get value of key %s from lion ", key));
 				}
@@ -303,60 +264,6 @@ public class TopicApplyController {
 		return false;
 	}
 
-	private ResponseStatus validate(TopicApplyDto topicApplyDto) {
-
-		String approver = topicApplyDto.getApprover();
-		boolean pass = validateAuthentication(approver);
-		if (!pass) {
-			return ResponseStatus.UNAUTHENTICATION;
-		}
-
-		String topic = topicApplyDto.getTopic();
-		pass = validateTopicName(topic.trim());
-		if (!pass) {
-			return ResponseStatus.INVALIDTOPICNAME;
-		}
-
-		int size = topicApplyDto.getSize();
-		float amount = topicApplyDto.getAmount();
-		pass = validateCapSize(size, amount);
-		if (!pass) {
-			return ResponseStatus.TOOLARGEQUOTA;
-		}
-
-		return ResponseStatus.SUCCESS;
-	}
-
-	private boolean validateAuthentication(String approver) {
-
-		return userUtils.isTrueAdministrator(approver);
-	}
-
-	private boolean validateTopicName(String topic) {
-
-		if (StringUtils.isBlank(topic)) {
-			return false;
-		}
-		if (!NameCheckUtil.isTopicNameValid(topic)) {
-			return false;
-		}
-		Set<String> allTopics = topicResourceService.loadCachedTopicToWhiteList().keySet();
-		if (allTopics.contains(topic)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private boolean validateCapSize(long size, float amount) {
-
-		if (size > 500 || size <= 0 || amount <= 0) {
-			return false;
-		} else {
-			return size * amount <= 700.0f;
-		}
-	}
-
 	private ResponseStatus addApplicantToTopicAdmin(String topic, String applicant) {
 
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
@@ -394,5 +301,5 @@ public class TopicApplyController {
 		}
 
 	}
-
+	
 }

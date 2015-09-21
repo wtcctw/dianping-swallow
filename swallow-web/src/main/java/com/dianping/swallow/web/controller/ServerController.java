@@ -23,21 +23,27 @@ import org.springframework.web.servlet.ModelAndView;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.ConsumerServerResourceDto;
+import com.dianping.swallow.web.controller.dto.MongoResourceDto;
 import com.dianping.swallow.web.controller.dto.ServerResourceDto;
 import com.dianping.swallow.web.controller.mapper.ConsumerServerResourceMapper;
+import com.dianping.swallow.web.controller.mapper.MongoResourceMapper;
 import com.dianping.swallow.web.controller.mapper.ProducerServerResourceMapper;
+import com.dianping.swallow.web.dao.impl.DefaultMongoDao;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.model.resource.MongoResource;
+import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.MongoResourceService;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 @Controller
 public class ServerController extends AbstractSidebarBasedController {
-	
+
 	private static final String DEFAULT = "default";
 
 	@Resource(name = "producerServerResourceService")
@@ -45,6 +51,9 @@ public class ServerController extends AbstractSidebarBasedController {
 
 	@Resource(name = "consumerServerResourceService")
 	private ConsumerServerResourceService consumerServerResourceService;
+
+	@Resource(name = "mongoResourceService")
+	private MongoResourceService mongoResourceService;
 
 	@Resource(name = "ipCollectorService")
 	private IPCollectorService ipCollectorService;
@@ -120,17 +129,17 @@ public class ServerController extends AbstractSidebarBasedController {
 		List<String> hostsList;
 		List<String> ipsList;
 		Map<String, String> hostNames = ipCollectorService.getProducerServerIpsMap();
-		
-		if(hostNames != null){
+
+		if (hostNames != null) {
 			Set<String> hosts = hostNames.keySet();
 			hostsList = new ArrayList<String>(hosts);
 			Collection<String> ipCollection = hostNames.values();
 			ipsList = new ArrayList<String>(ipCollection);
-		}else{
+		} else {
 			hostsList = new ArrayList<String>();
 			ipsList = new ArrayList<String>();
 		}
-		
+
 		return new Pair<List<String>, List<String>>(hostsList, ipsList);
 	}
 
@@ -239,22 +248,22 @@ public class ServerController extends AbstractSidebarBasedController {
 	@RequestMapping(value = "/console/server/consumerserverinfo", method = RequestMethod.GET)
 	@ResponseBody
 	public Object loadConsumerSereverInfo() {
-		
+
 		Set<String> hostsSet = new HashSet<String>();
 		Set<String> ipsSet = new HashSet<String>();
-		
+
 		Map<String, String> master = ipCollectorService.getProducerServerIpsMap();
-		if(master != null){
+		if (master != null) {
 			hostsSet.addAll(master.keySet());
 			ipsSet.addAll(master.values());
 		}
 
 		Map<String, String> slave = ipCollectorService.getConsumerServerMasterIpsMap();
-		if(slave != null){
+		if (slave != null) {
 			hostsSet.addAll(slave.keySet());
 			ipsSet.addAll(slave.values());
 		}
-		
+
 		return new Pair<List<String>, List<String>>(new ArrayList<String>(hostsSet), new ArrayList<String>(ipsSet));
 
 	}
@@ -264,7 +273,8 @@ public class ServerController extends AbstractSidebarBasedController {
 	public List<String> loadConsumerSereverTopics(@RequestParam String ip) {
 
 		Set<String> result = new HashSet<String>();
-		Map<String, Pair<String, String>> topicToConsumerServer = topicResourceService.loadCachedTopicToConsumerServer();
+		Map<String, Pair<String, String>> topicToConsumerServer = topicResourceService
+				.loadCachedTopicToConsumerServer();
 
 		if (topicToConsumerServer == null) {
 			return new ArrayList<String>(result);
@@ -280,15 +290,15 @@ public class ServerController extends AbstractSidebarBasedController {
 				}
 			}
 		}
-		
-		if(result.contains(DEFAULT)){
+
+		if (result.contains(DEFAULT)) {
 			result.remove(DEFAULT);
 			Set<String> allTopics = topicResourceService.loadCachedTopicToWhiteList().keySet();
 			Set<String> allTopicsClone = new HashSet<String>(allTopics);
 			Set<String> excludeTopics = topicToConsumerServer.keySet();
 			allTopicsClone.removeAll(excludeTopics);
 			result.addAll(allTopicsClone);
-			
+
 		}
 
 		return new ArrayList<String>(result);
@@ -323,8 +333,93 @@ public class ServerController extends AbstractSidebarBasedController {
 				logger.info(String.format("Update consumer server alarm of %s to %b fail", ip, alarm));
 			}
 		}
-		
+
 		return result;
+	}
+	
+	@RequestMapping(value = "/console/server/mongo")
+	public ModelAndView mongoServerSetting(HttpServletRequest request, HttpServletResponse response) {
+
+		subSide = "mongo";
+		return new ModelAndView("server/mongo", createViewMap());
+	}
+
+	@RequestMapping(value = "/console/server/mongo/list", method = RequestMethod.POST)
+	@ResponseBody
+	public Object mongoserverSettingList(@RequestBody MongoResourceDto dto) {
+
+		int offset = dto.getOffset();
+		int limit = dto.getLimit();
+		Pair<Long, List<MongoResource>> pair = mongoResourceService.findMongoResourcePage(offset, limit);
+		List<MongoResourceDto> mongoResourceDto = new ArrayList<MongoResourceDto>();
+		for (MongoResource mongoResource : pair.getSecond()) {
+			mongoResourceDto.add(MongoResourceMapper.toMongoResourceDto(mongoResource));
+		}
+		return new Pair<Long, List<MongoResourceDto>>(pair.getFirst(), mongoResourceDto);
+
+	}
+
+	@RequestMapping(value = "/console/server/mongo/create", method = RequestMethod.POST)
+	@ResponseBody
+	public int mongoResourceCreate(@RequestBody MongoResourceDto dto) {
+
+		MongoResource mongoResource = MongoResourceMapper.toMongoResource(dto);
+		boolean result = mongoResourceService.update(mongoResource);
+
+		if (!result) {
+			return ResponseStatus.SUCCESS.getStatus();
+		} else {
+			return ResponseStatus.MONGOWRITE.getStatus();
+		}
+	}
+	
+	@RequestMapping(value = "/console/server/mongo/remove", method = RequestMethod.GET)
+	@ResponseBody
+	public int remvoeMongoResource(@RequestParam(value = "catalog") String catalog) {
+
+		int result = mongoResourceService.remove(catalog);
+
+		if (result > 0) {
+			return ResponseStatus.SUCCESS.getStatus();
+		} else {
+			return ResponseStatus.MONGOWRITE.getStatus();
+		}
+	}
+	
+	@RequestMapping(value = "/console/server/mongoip", method = RequestMethod.GET)
+	@ResponseBody
+	public Object loadMongoSereverIp() {
+
+		List<String> list = new ArrayList<String>();
+
+		List<MongoResource> mongoResources = mongoResourceService.findAll(DefaultMongoDao.IP);
+		for(MongoResource mongoResource : mongoResources){
+			String ip = mongoResource.getIp();
+			if(!list.contains(ip)){
+				list.add(ip);
+			}
+		}
+
+		return list;
+
+	}
+	
+	@RequestMapping(value = "/console/server/mongotype", method = RequestMethod.GET)
+	@ResponseBody
+	public Object loadMongoSereverType() {
+
+		List<MongoType> list = new ArrayList<MongoType>();
+
+		List<MongoResource> mongoResources = mongoResourceService.findAll(DefaultMongoDao.TYPE);
+		for(MongoResource mongoResource : mongoResources){
+			MongoType type = mongoResource.getMongoType();
+			if(!list.contains(type)){
+				list.add(type);
+			}
+		}
+
+		return list;
+
 	}
 
 	@Override

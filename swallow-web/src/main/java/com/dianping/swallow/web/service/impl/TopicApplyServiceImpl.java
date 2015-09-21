@@ -103,7 +103,7 @@ public class TopicApplyServiceImpl extends AbstractSwallowService implements Top
 	void updateDashboardContainer() {
 
 		logger.info("[PerformanceIndexCollector]");
-		scheduledExecutorService.scheduleAtFixedRate(this, 0, 6, TimeUnit.HOURS);
+		//scheduledExecutorService.scheduleAtFixedRate(this, 0, 6, TimeUnit.HOURS);
 	}
 
 	@Override

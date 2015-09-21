@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,8 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	private Set<String> adminSet = new HashSet<String>();
+	
+	Logger logger2 = LogManager.getLogger(getClass());
 
 	@PostConstruct
 	void initAdminSet() {
