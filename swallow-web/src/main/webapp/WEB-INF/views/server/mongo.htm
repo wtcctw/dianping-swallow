@@ -71,7 +71,7 @@
 								<label class="control-label"><b>IP</b></label> <input
 									type="text" class="form-control" data-provide="typeahead"
 									autocomplete="off" ng-model="mongoserverEntry.ip" id="ip"
-									ng-readonly="isReadOnly"> </input>
+									ng-readonly="true"> </input>
 							</div>
 						</div>
 						<div class="control-group">
@@ -80,7 +80,7 @@
 								<label class="control-label"><b>集群</b></label> <input
 									type="text" class="form-control" data-provide="typeahead"
 									autocomplete="off" ng-model="mongoserverEntry.catalog"
-									id="hostname" required> </input>
+									id="hostname" required ng-readonly="true"> </input>
 							</div>
 						</div>
 						<div class="control-group">
@@ -88,7 +88,7 @@
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>磁盘利用率</b></label> <input
 									type="text" class="form-control"
-									ng-model="mongoserverEntry.disk" id="disk" required> </input>
+									ng-model="mongoserverEntry.disk" id="disk" required ng-readonly="true"> </input>
 							</div>
 						</div>
 						<div class="control-group">
@@ -96,7 +96,7 @@
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>负载</b></label> <input
 									type="text" class="form-control"
-									ng-model="mongoserverEntry.load" id="load" required> </input>
+									ng-model="mongoserverEntry.load" id="load" required ng-readonly="true"> </input>
 							</div>
 						</div>
 						<div class="control-group">
@@ -104,7 +104,7 @@
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>QPS峰值</b></label> <input
 									type="text" class="form-control"
-									ng-model="mongoserverEntry.qps" id="qps" required> </input>
+									ng-model="mongoserverEntry.qps" id="qps" required ng-readonly="true"> </input>
 							</div>
 						</div>
 						<!-- 							<div class="control-group">

@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.controller.validator;
+package com.dianping.swallow.web.controller.chain.validator;
 
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -11,5 +11,5 @@ import com.dianping.swallow.web.util.ResponseStatus;
  */
 public interface Validator {
 
-	ResponseStatus ValidateTopicApplyDto(TopicApplyDto topicApplyDto);
+	ResponseStatus ValidateTopicApplyDto(final TopicApplyDto topicApplyDto);
 }

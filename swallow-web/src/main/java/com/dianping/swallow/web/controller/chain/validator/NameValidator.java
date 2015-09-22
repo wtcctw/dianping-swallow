@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.controller.validator;
+package com.dianping.swallow.web.controller.chain.validator;
 
 import java.util.Set;
 
@@ -23,18 +23,16 @@ public class NameValidator extends AbstractValidator implements Validator{
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
 
-	private Validator nextSuccessor;
-	
 	public NameValidator(){
-		
+		super();
 	}
 
 	public NameValidator(Validator nextSuccessor) {
-		this.nextSuccessor = nextSuccessor;
+		super(nextSuccessor);
 	}
 
 	@Override
-	public ResponseStatus ValidateTopicApplyDto(TopicApplyDto topicApplyDto) {
+	public ResponseStatus ValidateTopicApplyDto(final TopicApplyDto topicApplyDto) {
 
 		String topic = topicApplyDto.getTopic();
 		boolean pass = validateTopicName(topic);
@@ -66,7 +64,7 @@ public class NameValidator extends AbstractValidator implements Validator{
 			}
 			return false;
 		}
-		Set<String> allTopics = topicResourceService.loadCachedTopicToWhiteList().keySet();
+		Set<String> allTopics = topicResourceService.loadCachedTopicToAdministrator().keySet();
 		if (allTopics.contains(topic)) {
 			if(logger.isInfoEnabled()){
 				logger.info("Fail NameValidator, Same Topic");

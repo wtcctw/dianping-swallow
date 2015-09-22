@@ -163,7 +163,7 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 
 	private boolean isTopicOwner(String username) {
 
-		Collection<Set<String>> topicUsers = topicResourceService.loadCachedTopicToWhiteList().values();
+		Collection<Set<String>> topicUsers = topicResourceService.loadCachedTopicToAdministrator().values();
 		for (Set<String> set : topicUsers) {
 			if (set.contains(username)) {
 				return true;

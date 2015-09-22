@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.controller.validator;
+package com.dianping.swallow.web.controller.chain.validator;
 
 import org.springframework.stereotype.Component;
 
@@ -14,18 +14,16 @@ import com.dianping.swallow.web.util.ResponseStatus;
 @Component
 public class QuoteValidator extends AbstractValidator implements Validator{
 
-	private Validator nextSuccessor;
-	
 	public QuoteValidator(){
-		
+		super();
 	}
 
 	public QuoteValidator(Validator nextSuccessor) {
-		this.nextSuccessor = nextSuccessor;
+		super(nextSuccessor);
 	}
 
 	@Override
-	public ResponseStatus ValidateTopicApplyDto(TopicApplyDto topicApplyDto) {
+	public ResponseStatus ValidateTopicApplyDto(final TopicApplyDto topicApplyDto) {
 
 		int size = topicApplyDto.getSize();
 		float amount = topicApplyDto.getAmount();

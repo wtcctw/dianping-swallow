@@ -26,4 +26,9 @@ public interface ConsumerServerResourceService extends ServerResourceService {
 	ConsumerServerResource buildConsumerServerResource(String ip, String hostName);
 	
 	Pair<String, ResponseStatus> loadIdleConsumerServer();
+	
+	String loadConsumerServerLionConfig();
+
+	void setConsumerServerLionConfig(String consumerServerLionConfig);
+	
 }

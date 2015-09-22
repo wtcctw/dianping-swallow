@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.controller.validator;
+package com.dianping.swallow.web.controller.chain.validator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,20 +17,18 @@ import com.dianping.swallow.web.util.ResponseStatus;
 public class AuthenticationValidator extends AbstractValidator implements Validator{
 
 	@Autowired
-	protected UserUtils userUtils;
-	
-	private Validator nextSuccessor;
+	private UserUtils userUtils;
 	
 	public AuthenticationValidator(){
-		
+		super();
 	}
 
 	public AuthenticationValidator(Validator nextSuccessor) {
-		this.nextSuccessor = nextSuccessor;
+		super(nextSuccessor);
 	}
 	
 	@Override
-	public ResponseStatus ValidateTopicApplyDto(TopicApplyDto topicApplyDto) {
+	public ResponseStatus ValidateTopicApplyDto(final TopicApplyDto topicApplyDto) {
 
 		String approver = topicApplyDto.getApprover();
 		boolean pass = userUtils.isTrueAdministrator(approver);

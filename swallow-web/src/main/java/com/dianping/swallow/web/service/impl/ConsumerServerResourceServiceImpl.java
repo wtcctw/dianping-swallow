@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
@@ -33,6 +36,9 @@ import com.dianping.swallow.web.util.ResponseStatus;
 public class ConsumerServerResourceServiceImpl extends AbstractSwallowService implements ConsumerServerResourceService {
 
 	private static final String BLANK_STRING = "";
+	
+	public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
+	
 	@Autowired
 	private ConsumerServerResourceDao consumerServerResourceDao;
 
@@ -41,7 +47,24 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 
 	@Resource(name = "consumerServerStatsDataService")
 	private ConsumerServerStatsDataService consumerServerStatsDataService;
+	
+	private ConfigCache configCache;
+	
+	private String consumerServerLionConfig;
 
+	@PostConstruct
+	void initLionConfig() {
+		try {
+			configCache = ConfigCache.getInstance();
+
+			consumerServerLionConfig = configCache.getProperty(SWALLOW_CONSUMER_SERVER_URI);
+
+			logger.info("Init configCache successfully.");
+		} catch (LionException e) {
+			logger.error("Erroe when init lion config", e);
+		}
+	}
+	
 	@Override
 	public boolean insert(ConsumerServerResource consumerServerResource) {
 
@@ -123,6 +146,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 				}
 			}
 		}
+
 		long originalStart = DateUtil.getYesterayStart();
 		long originalStop = DateUtil.getYesterayStop();
 		long startKey = AbstractRetriever.getKey(originalStart);
@@ -152,6 +176,9 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 				int masterPort = ConsumerServerResource.getPort();
 				String slaveIp = ConsumerServerResource.getIpCorrelated();
 				ConsumerServerResource = (ConsumerServerResource) this.findByIp(slaveIp);
+				if(ConsumerServerResource == null){
+					return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
+				}
 				int slavePort = ConsumerServerResource.getPort();
 				String ipCorrelated = ConsumerServerResource.getIpCorrelated();
 				if (!bestMaster.equals(ipCorrelated)) {
@@ -165,5 +192,17 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		}
 
 		return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
+	}
+
+	@Override
+	public String loadConsumerServerLionConfig() {
+
+		return consumerServerLionConfig;
+	}
+
+	@Override
+	public synchronized void setConsumerServerLionConfig(String consumerServerLionConfig) {
+		
+		this.consumerServerLionConfig = consumerServerLionConfig;
 	}
 }

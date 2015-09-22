@@ -38,9 +38,9 @@ public interface TopicResourceService extends ConfigChange{
 	
 	Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limit);
 	
-	Map<String, Set<String>> loadCachedTopicToWhiteList();
+	Map<String, Set<String>> loadCachedTopicToAdministrator();
 
-	Map<String, Pair<String, String>> loadCachedTopicToConsumerServer();
-	
 	TopicResource buildTopicResource(String topic);
+	
+	boolean updateTopicAdministrator(String topic, String administrator);
 }

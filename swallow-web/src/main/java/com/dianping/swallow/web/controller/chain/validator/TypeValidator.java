@@ -1,6 +1,7 @@
-package com.dianping.swallow.web.controller.validator;
+package com.dianping.swallow.web.controller.chain.validator;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.model.resource.MongoType;
@@ -12,20 +13,19 @@ import com.dianping.swallow.web.util.ResponseStatus;
  *
  * 2015年9月21日上午11:39:37
  */
+@Component
 public class TypeValidator extends AbstractValidator implements Validator{
 
-	private Validator nextSuccessor;
-	
 	public TypeValidator(){
-		
+		super();
 	}
 
 	public TypeValidator(Validator nextSuccessor) {
-		this.nextSuccessor = nextSuccessor;
+		super(nextSuccessor);
 	}
 
 	@Override
-	public ResponseStatus ValidateTopicApplyDto(TopicApplyDto topicApplyDto) {
+	public ResponseStatus ValidateTopicApplyDto(final TopicApplyDto topicApplyDto) {
 
 		String type = topicApplyDto.getType();
 		if(StringUtils.isBlank(type)){

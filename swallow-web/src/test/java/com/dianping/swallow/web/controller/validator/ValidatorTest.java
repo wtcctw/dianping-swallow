@@ -12,6 +12,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import com.dianping.swallow.web.MockTest;
+import com.dianping.swallow.web.controller.chain.validator.AuthenticationValidator;
+import com.dianping.swallow.web.controller.chain.validator.NameValidator;
+import com.dianping.swallow.web.controller.chain.validator.QuoteValidator;
+import com.dianping.swallow.web.controller.chain.validator.TypeValidator;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.resource.MongoType;
@@ -60,7 +64,7 @@ public class ValidatorTest extends MockTest{
 		nameValidator.setTopicResourceService(topicResourceService);
 		validator = authenticationValidator;
 		Mockito.doReturn(Boolean.TRUE).when(userUtils).isTrueAdministrator(topicApplyDto.getApprover());
-		Mockito.doReturn(topicToWhiltelist).when(topicResourceService).loadCachedTopicToWhiteList();
+		Mockito.doReturn(topicToWhiltelist).when(topicResourceService).loadCachedTopicToAdministrator();
 	}
 
 	@Test

@@ -2,6 +2,7 @@ package com.dianping.swallow.web.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -273,27 +275,24 @@ public class ServerController extends AbstractSidebarBasedController {
 	public List<String> loadConsumerSereverTopics(@RequestParam String ip) {
 
 		Set<String> result = new HashSet<String>();
-		Map<String, Pair<String, String>> topicToConsumerServer = topicResourceService
-				.loadCachedTopicToConsumerServer();
-
-		if (topicToConsumerServer == null) {
+		String consumerServerLionConfig = consumerServerResourceService.loadConsumerServerLionConfig();
+		if (consumerServerLionConfig == null) {
 			return new ArrayList<String>(result);
-		} else {
-			for (Map.Entry<String, Pair<String, String>> entry : topicToConsumerServer.entrySet()) {
-				Pair<String, String> pair = entry.getValue();
-				Set<String> servers = new HashSet<String>();
-				servers.add(pair.getFirst());
-				servers.add(pair.getSecond());
-				String topic = entry.getKey();
-				if (servers != null && servers.contains(ip) && !result.contains(topic)) {
-					result.add(topic);
-				}
+		}
+
+		Map<String, Set<String>> topicToConsumerServer = parseServerURIString(consumerServerLionConfig);
+
+		for (Map.Entry<String, Set<String>> entry : topicToConsumerServer.entrySet()) {
+			Set<String> servers = entry.getValue();
+			String topic = entry.getKey();
+			if (servers != null && servers.contains(ip) && !result.contains(topic)) {
+				result.add(topic);
 			}
 		}
 
 		if (result.contains(DEFAULT)) {
 			result.remove(DEFAULT);
-			Set<String> allTopics = topicResourceService.loadCachedTopicToWhiteList().keySet();
+			Set<String> allTopics = topicResourceService.loadCachedTopicToAdministrator().keySet();
 			Set<String> allTopicsClone = new HashSet<String>(allTopics);
 			Set<String> excludeTopics = topicToConsumerServer.keySet();
 			allTopicsClone.removeAll(excludeTopics);
@@ -336,7 +335,7 @@ public class ServerController extends AbstractSidebarBasedController {
 
 		return result;
 	}
-	
+
 	@RequestMapping(value = "/console/server/mongo")
 	public ModelAndView mongoServerSetting(HttpServletRequest request, HttpServletResponse response) {
 
@@ -372,7 +371,7 @@ public class ServerController extends AbstractSidebarBasedController {
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/server/mongo/remove", method = RequestMethod.GET)
 	@ResponseBody
 	public int remvoeMongoResource(@RequestParam(value = "catalog") String catalog) {
@@ -385,7 +384,7 @@ public class ServerController extends AbstractSidebarBasedController {
 			return ResponseStatus.MONGOWRITE.getStatus();
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/server/mongoip", method = RequestMethod.GET)
 	@ResponseBody
 	public Object loadMongoSereverIp() {
@@ -393,9 +392,9 @@ public class ServerController extends AbstractSidebarBasedController {
 		List<String> list = new ArrayList<String>();
 
 		List<MongoResource> mongoResources = mongoResourceService.findAll(DefaultMongoDao.IP);
-		for(MongoResource mongoResource : mongoResources){
+		for (MongoResource mongoResource : mongoResources) {
 			String ip = mongoResource.getIp();
-			if(!list.contains(ip)){
+			if (!list.contains(ip)) {
 				list.add(ip);
 			}
 		}
@@ -403,7 +402,7 @@ public class ServerController extends AbstractSidebarBasedController {
 		return list;
 
 	}
-	
+
 	@RequestMapping(value = "/console/server/mongotype", method = RequestMethod.GET)
 	@ResponseBody
 	public Object loadMongoSereverType() {
@@ -411,15 +410,57 @@ public class ServerController extends AbstractSidebarBasedController {
 		List<MongoType> list = new ArrayList<MongoType>();
 
 		List<MongoResource> mongoResources = mongoResourceService.findAll(DefaultMongoDao.TYPE);
-		for(MongoResource mongoResource : mongoResources){
+		for (MongoResource mongoResource : mongoResources) {
 			MongoType type = mongoResource.getMongoType();
-			if(!list.contains(type)){
+			if (!list.contains(type)) {
 				list.add(type);
 			}
 		}
 
 		return list;
 
+	}
+
+	private Map<String, Set<String>> parseServerURIString(String value) {
+
+		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+
+		for (String topicNamesToURI : value.split("\\s*;\\s*")) {
+
+			if (StringUtils.isEmpty(topicNamesToURI)) {
+				continue;
+			}
+
+			String[] splits = topicNamesToURI.split("=");
+			if (splits.length != 2) {
+				logger.error("[parseServerURIString][wrong config]" + topicNamesToURI);
+				continue;
+			}
+			String consumerServerURI = splits[1].trim();
+			String[] ipAddrs = consumerServerURI.split(",");
+			Set<String> ips = new HashSet<String>();
+			if (ipAddrs.length == 2) {
+				for (int i = 0; i < 2; ++i) {
+					String[] ipPort = ipAddrs[i].split(":");
+					if (ipPort.length != 2) {
+						logger.error("[parseConsumerServerURIString][wrong config]" + topicNamesToURI);
+						continue;
+					}
+					ips.add(ipPort[0]);
+				}
+			} else {
+				logger.error("[parseConsumerServerURIString][wrong config]" + topicNamesToURI);
+				continue;
+			}
+
+			String topicNameStr = splits[0].trim();
+			result.put(topicNameStr, ips);
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("[parseConsumerServerURIString][parse]" + value);
+		}
+		return result;
 	}
 
 	@Override
