@@ -9,6 +9,12 @@ import org.junit.Test;
 import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.alarmer.impl.MongoConfigAlarmer.MongoAddress;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年9月22日 下午8:01:38
+ */
 public class MongoConfigAlarmerTest extends MockTest {
 
 	MongoConfigAlarmer alamerAlarmer;
