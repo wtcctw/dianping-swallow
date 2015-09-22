@@ -129,6 +129,16 @@ public enum AlarmType {
 	CONSUMER_SERVER_ACKQPS_OK(24),
 
 	/**
+	 * 
+	 */
+	SERVER_MONGO_CONFIG(25),
+	
+	/**
+	 * 
+	 */
+	SERVER_MONGO_CONFIG_OK(26),
+
+	/**
 	 * producer topic statis data qps peak type
 	 */
 	PRODUCER_TOPIC_QPS_PEAK(1001),

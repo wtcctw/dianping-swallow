@@ -118,10 +118,10 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 		while (iterator.hasNext()) {
 			Entry<ProducerIpStatsData, Long> checkRecord = iterator.next();
 			ProducerIpStatsData ipStatsData = checkRecord.getKey();
-			long lastTime = checkRecord.getValue();
-			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
+			long lastRecordTime = checkRecord.getValue();
+			if (System.currentTimeMillis() - lastRecordTime >= CHECK_TIMESPAN) {
 				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastTime) {
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
 					continue;
 				}
 				ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
@@ -140,11 +140,11 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 		while (iterator.hasNext()) {
 			Entry<ProducerIpStatsData, Long> checkRecord = iterator.next();
 			ProducerIpStatsData ipStatsData = checkRecord.getKey();
-			long lastTime = checkRecord.getValue();
+			long lastRecordTime = checkRecord.getValue();
 
-			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
+			if (System.currentTimeMillis() - lastRecordTime >= CHECK_TIMESPAN) {
 				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastTime) {
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
 					continue;
 				}
 				long avgQps = pIpStatsDataService.findAvgQps(ipStatsData.getTopicName(), ipStatsData.getIp(),

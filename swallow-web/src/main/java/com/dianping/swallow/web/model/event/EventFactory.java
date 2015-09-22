@@ -76,4 +76,10 @@ public class EventFactory {
 		setComponent(pClientEvent);
 		return pClientEvent;
 	}
+	
+	public MongoConfigEvent createMongoConfigEvent() {
+		MongoConfigEvent configEvent = new MongoConfigEvent();
+		setComponent(configEvent);
+		return configEvent;
+	}
 }

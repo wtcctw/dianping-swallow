@@ -120,10 +120,10 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 		while (iterator.hasNext()) {
 			Entry<ConsumerIpStatsData, Long> firstCandidate = iterator.next();
 			ConsumerIpStatsData ipStatsData = firstCandidate.getKey();
-			long lastTime = firstCandidate.getValue();
-			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
+			long lastRecordTime = firstCandidate.getValue();
+			if (System.currentTimeMillis() - lastRecordTime >= CHECK_TIMESPAN) {
 				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastTime) {
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
 					continue;
 				}
 				ConsumerClientEvent clientEvent = eventFactory.createCClientEvent();
@@ -143,11 +143,11 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 		while (iterator.hasNext()) {
 			Entry<ConsumerIpStatsData, Long> secondCandidate = iterator.next();
 			ConsumerIpStatsData ipStatsData = secondCandidate.getKey();
-			long lastTime = secondCandidate.getValue();
+			long lastRecordTime = secondCandidate.getValue();
 
-			if (System.currentTimeMillis() - lastTime >= CHECK_TIMESPAN) {
+			if (System.currentTimeMillis() - lastRecordTime >= CHECK_TIMESPAN) {
 				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastTime) {
+				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
 					continue;
 				}
 				

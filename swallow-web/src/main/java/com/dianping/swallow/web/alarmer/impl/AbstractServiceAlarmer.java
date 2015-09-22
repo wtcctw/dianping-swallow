@@ -23,31 +23,37 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月3日 下午6:06:14
  */
 public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
-	
+
 	protected final static String CAT_TYPE = "ServiceAlarmer";
 
 	protected Map<String, Boolean> lastCheckStatus = new HashMap<String, Boolean>();
-
-	protected static String SERVER_CHECK_URL_FILE = "server-check-url.properties";
 
 	@Autowired
 	private HttpService httpService;
 
 	@Autowired
 	protected EventReporter eventReporter;
-	
+
 	@Autowired
 	protected EventFactory eventFactory;
-	
+
 	private ScheduledFuture<?> future;
-	
-	private int alarmInterval = 30;
 
-	private static final String FACTORY_NAME = "ServerServiceAlarmer";
+	protected int alarmInterval = 30;
 
-	private static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(
-			CommonUtils.DEFAULT_CPU_COUNT * 2, ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-	
+	protected int alarmDelay = 30;
+
+	private static final String FACTORY_NAME = "ServiceAlarmer";
+
+	private static ScheduledExecutorService scheduled = null;
+
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
+				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+	}
+
 	@Override
 	protected void doStart() throws Exception {
 		super.doStart();
@@ -61,8 +67,11 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	}
 
 	public abstract void doAlarm();
-	
+
 	public void startAlarm() {
+		if (scheduled == null) {
+			return;
+		}
 		future = scheduled.scheduleAtFixedRate(new Runnable() {
 
 			@Override
@@ -79,9 +88,9 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 
 			}
 
-		}, getAlarmInterval(), getAlarmInterval(), TimeUnit.SECONDS);
+		}, getAlarmDelay(), getAlarmInterval(), TimeUnit.SECONDS);
 	}
-	
+
 	public int getAlarmInterval() {
 		return alarmInterval;
 	}
@@ -89,7 +98,15 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	public void setAlarmInterval(int alarmInterval) {
 		this.alarmInterval = alarmInterval;
 	}
-	
+
+	public int getAlarmDelay() {
+		return alarmDelay;
+	}
+
+	public void setAlarmDelay(int alarmDelay) {
+		this.alarmDelay = alarmDelay;
+	}
+
 	protected void threadSleep() {
 		try {
 			TimeUnit.SECONDS.sleep(1);
@@ -98,7 +115,7 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 		}
 	}
 
-	protected HttpResult checkUrl(String url) {
+	protected HttpResult httpRequest(String url) {
 		HttpResult result = httpService.httpGet(url);
 		if (!result.isSuccess()) {
 			threadSleep();

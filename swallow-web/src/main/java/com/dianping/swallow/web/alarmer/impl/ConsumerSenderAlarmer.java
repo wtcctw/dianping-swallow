@@ -41,6 +41,13 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	private static final long SENDER_TIME_SPAN = 20 * 1000;
 
 	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		alarmInterval = 30;
+		alarmDelay = 30;
+	}
+
+	@Override
 	public void doAlarm() {
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {

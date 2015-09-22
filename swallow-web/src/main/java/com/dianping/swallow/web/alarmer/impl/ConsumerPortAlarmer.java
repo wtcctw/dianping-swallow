@@ -24,11 +24,12 @@ import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.NetUtil;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年9月17日 下午8:24:37
+ *         2015年9月17日 下午8:24:37
  */
 @Component
 public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
@@ -56,6 +57,8 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 	@Override
 	public void doInitialize() throws Exception {
 		super.doInitialize();
+		alarmInterval = 30;
+		alarmDelay = 30;
 		try {
 			configCache = ConfigCache.getInstance();
 			masterPort = configCache.getIntProperty(CONSUMER_SERVER_MASTER_PORT_KEY);

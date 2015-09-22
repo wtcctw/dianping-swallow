@@ -2,6 +2,12 @@ package com.dianping.swallow.web.model.stats;
 
 import java.util.List;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年9月18日 下午6:05:42
+ */
 public class ProducerIpGroupStatsData {
 
 	private List<ProducerIpStatsData> producerIpStatsDatas;

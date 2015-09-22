@@ -1,8 +1,6 @@
 package com.dianping.swallow.web.model.stats;
 
-import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -84,39 +82,9 @@ public class ConsumerIpStatsData extends ConsumerStatsData {
 		return true;
 	}
 
-	public boolean checkPreStatsData(ConsumerIpStatsData statsData) {
-		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
-			if (this.getAccumulation() > 0) {
-				return false;
-			} else {
-				if (statsData.getSendQps() != 0L || statsData.getAckQps() != 0L) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	public boolean checkStatsData() {
 		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
 			return false;
-		}
-		return true;
-	}
-
-	public boolean checkGroupStatsData(List<ConsumerIpStatsData> statsDatas) {
-		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
-			if (statsDatas != null && statsDatas.size() > 0) {
-				for (ConsumerIpStatsData statsData : statsDatas) {
-					if (StringUtils.equals(statsData.getIp(), this.ip)) {
-						continue;
-					} else {
-						if (statsData.getSendQps() != 0L || statsData.getAckQps() != 0L) {
-							return false;
-						}
-					}
-				}
-			}
 		}
 		return true;
 	}
