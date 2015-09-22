@@ -102,8 +102,9 @@ public class DefaultProducerDataRetriever
 				continue;
 			}
 			NavigableMap<Long, Long> rawDatas = statis.getDelayForTopic(topicName, type);
-			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey),
-					getOtherSampleCount(start, end)));
+			NavigableMap<Long, Long> qpsRawDatas = statis.getQpxForTopic(topicName, type);
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getDelaySumStatsData(rawDatas, qpsRawDatas,
+					fromKey, toKey), getQpsSumStatsData(qpsRawDatas, fromKey, toKey)));
 		}
 		return orderResults;
 	}
@@ -177,8 +178,8 @@ public class DefaultProducerDataRetriever
 				continue;
 			}
 			NavigableMap<Long, Long> rawDatas = statis.getQpxForTopic(topicName, type);
-			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)
-					* getSampleIntervalTime(), getQpsSampleCount(start, end)));
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY,
+					getQpsSumStatsData(rawDatas, fromKey, toKey), getQpsSampleCount(start, end)));
 		}
 		return orderResults;
 	}
@@ -366,7 +367,7 @@ public class DefaultProducerDataRetriever
 			long end = orderParam.getDelayStatsData().getEnd();
 			orderParam.getDelayStatsData().add(
 					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalDelay()
-							- preStatsData.getTotalDelay(), getOtherSampleCount(start, end)));
+							- preStatsData.getTotalDelay(), postStatsData.getTotalQps() - preStatsData.getTotalQps()));
 			orderParam.getQpxStatsData().add(
 					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalQps()
 							- preStatsData.getTotalQps(), getQpsSampleCount(start, end)));

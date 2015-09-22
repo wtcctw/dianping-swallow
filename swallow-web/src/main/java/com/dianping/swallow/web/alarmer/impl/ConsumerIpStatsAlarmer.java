@@ -150,7 +150,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 				ConsumerIpQpsPair avgQpsPair = cIpStatsDataService.findAvgQps(ipStatsData.getTopicName(),
 						ipStatsData.getConsumerId(), ipStatsData.getIp(), getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)),
-						getTimeKey(System.currentTimeMillis()));
+						getTimeKey(getPreNDayKey(1, 0)));
 
 				if (avgQpsPair.getSendQps() > 0 || avgQpsPair.getAckQps() > 0) {
 					report(ipStatsData.getTopicName(), ipStatsData.getConsumerId(), ipStatsData.getIp());

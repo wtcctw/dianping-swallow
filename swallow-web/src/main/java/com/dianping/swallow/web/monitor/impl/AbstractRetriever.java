@@ -280,7 +280,38 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		if (rawDatas != null) {
 			rawDatas = rawDatas.subMap(fromKey, true, toKey, true);
 			for (Map.Entry<Long, Long> rowData : rawDatas.entrySet()) {
-				sumData += rowData.getValue().floatValue();
+				sumData += rowData.getValue().longValue();
+			}
+		}
+		return sumData;
+	}
+
+	protected long getQpsSumStatsData(NavigableMap<Long, Long> rawDatas, long fromKey, long toKey) {
+		long sumData = 0;
+		if (rawDatas != null) {
+			rawDatas = rawDatas.subMap(fromKey, true, toKey, true);
+			for (Map.Entry<Long, Long> rowData : rawDatas.entrySet()) {
+				sumData += rowData.getValue().longValue();
+			}
+		}
+		return sumData * getSampleIntervalTime();
+	}
+
+	protected long getDelaySumStatsData(NavigableMap<Long, Long> rawDatas, NavigableMap<Long, Long> qpsRawDatas,
+			long fromKey, long toKey) {
+		long sumData = 0;
+		if (rawDatas != null) {
+			rawDatas = rawDatas.subMap(fromKey, true, toKey, true);
+			for (Map.Entry<Long, Long> rowData : rawDatas.entrySet()) {
+				Long qps = null;
+				if (qpsRawDatas != null) {
+					qps = qpsRawDatas.get(rowData.getKey());
+				}
+				if (qps != null) {
+					sumData += rowData.getValue().longValue() + qps * getSampleIntervalTime();
+				} else {
+					sumData += rowData.getValue().longValue();
+				}
 			}
 		}
 		return sumData;

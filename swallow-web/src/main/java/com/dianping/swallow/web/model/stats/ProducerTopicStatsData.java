@@ -109,12 +109,11 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	}
 
 	public void setTotalStatsDatas(ProducerTopicStatsData lastStatsData, int sampleInterval) {
+		long currQps = this.getQps() * sampleInterval;
 		if (lastStatsData != null) {
-			long currQps = this.getQps() * sampleInterval;
 			this.totalQps = lastStatsData.getTotalQps() + currQps;
 			this.totalDelay = lastStatsData.getTotalDelay() + this.getDelay() * currQps;
 		} else {
-			long currQps = this.getQps() * sampleInterval;
 			this.totalQps = currQps;
 			this.totalDelay = this.getDelay();
 		}

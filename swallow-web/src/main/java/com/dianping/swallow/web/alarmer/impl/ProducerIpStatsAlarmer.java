@@ -144,7 +144,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 					continue;
 				}
 				long avgQps = pIpStatsDataService.findAvgQps(ipStatsData.getTopicName(), ipStatsData.getIp(),
-						getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(System.currentTimeMillis()));
+						getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(getPreNDayKey(1, 0)));
 
 				if (avgQps > 0) {
 					report(ipStatsData.getTopicName(), ipStatsData.getIp());
