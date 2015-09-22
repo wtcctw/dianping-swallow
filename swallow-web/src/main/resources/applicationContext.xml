@@ -39,6 +39,22 @@
 	<bean id="swallowConfig"
 		class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl" />
 
+	<bean id="lionUtil"
+		class="com.dianping.swallow.common.internal.config.impl.LionUtilImpl" />
+
+	<bean id="topicWhiteList"
+		class="com.dianping.swallow.common.internal.whitelist.TopicWhiteList"
+		init-method="init">
+		<property name="lionDynamicConfig" ref="lionDynamicConfig"></property>
+	</bean>
+
+	<bean id="lionDynamicConfig"
+		class="com.dianping.swallow.common.internal.config.impl.LionDynamicConfig">
+		<constructor-arg>
+			<value>swallow-topic-whitelist-lion.properties</value>
+		</constructor-arg>
+	</bean>
+
 	<context:component-scan base-package="com.dianping.swallow.web" />
 	<context:annotation-config />
 
@@ -63,6 +79,7 @@
 			<mvc:mapping path="/console/setting/*" />
 			<mvc:mapping path="/console/server/producer" />
 			<mvc:mapping path="/console/server/consumer" />
+			<mvc:mapping path="/console/server/mongo" />
 			<mvc:mapping path="/console/setting/alarmmeta/detail/*" />
 			<mvc:mapping path="/console/tool" />
 			<mvc:mapping path="/console/alarm/detail/*" />

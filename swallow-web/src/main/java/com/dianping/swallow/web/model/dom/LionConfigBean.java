@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.model.dom;
 
+import com.dianping.swallow.web.controller.chain.config.Configure;
+
 
 /**
  * @author mingdongli
@@ -10,23 +12,9 @@ public class LionConfigBean {
 	
 	private String topic;
 	
-	private String mongo;
-	
-	private String consumerServer;
-	
-	private int size;
-	
-	private String group;
+	private Configure.ConfigureResult configureResult;
 	
 	private boolean test;
-
-	public String getGroup() {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
-	}
 
 	public boolean isTest() {
 		return test;
@@ -44,28 +32,12 @@ public class LionConfigBean {
 		this.topic = topic;
 	}
 
-	public String getMongo() {
-		return mongo;
+	public Configure.ConfigureResult getConfigureResult() {
+		return configureResult;
 	}
 
-	public void setMongo(String mongo) {
-		this.mongo = mongo;
-	}
-
-	public String getConsumerServer() {
-		return consumerServer;
-	}
-
-	public void setConsumerServer(String consumerServer) {
-		this.consumerServer = consumerServer;
-	}
-
-	public int getSize() {
-		return size;
-	}
-
-	public void setSize(int size) {
-		this.size = size;
+	public void setConfigureResult(Configure.ConfigureResult configureResult) {
+		this.configureResult = configureResult;
 	}
 
 }

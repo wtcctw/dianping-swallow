@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
+import com.dianping.swallow.common.internal.config.HttpMethod;
 import com.dianping.swallow.common.internal.config.LionUtil;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
@@ -145,14 +146,14 @@ public class LionUtilImpl implements LionUtil{
 		return value;
 	}
 
-	public void setValue(String key, String value) {
+	public void setValue(String key, String value, HttpMethod method) {
 		
 		String args = getBasicArgs("topic配置信息");
 		String url = BASIC_LION_CONFIG_URL + "/set?" + args;
 		url += "&" + keyValue("key", key)
 				+ "&" + keyValue("value", value);
 		
-		LionRetResultString ret = executeGet(url, LionRetResultString.class);
+		LionRetResultString ret = method.setValue(url, LionRetResultString.class);
 		if(ret ==null || !ret.isSuccess()){
 			throw new IllegalStateException("[setValue][set value failed][" + key + ":" + value + "]" + ret);
 		}
@@ -173,7 +174,25 @@ public class LionUtilImpl implements LionUtil{
 		value = value.trim();
 		
 		createConfig(key);
-		setValue(key, value);
+		setValue(key, value, new GetHttpMethod());
+	}
+	
+	@Override
+	public void createOrSetConfig(String key, String value, HttpMethod method) {
+		
+		if(StringUtils.isEmpty(key)){
+			throw new IllegalArgumentException("key null:" + key);
+		}
+		if(value == null){
+			throw new IllegalArgumentException("value null:" + key);
+		}
+		
+		key = key.trim();
+		value = value.trim();
+		
+		createConfig(key);
+		setValue(key, value, method);
+		
 	}
 
 	public static class LionRet{

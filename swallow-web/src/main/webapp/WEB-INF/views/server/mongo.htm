@@ -1,0 +1,146 @@
+<div class="main-content" ng-controller="MongoServerSettingController"
+	id="MongoServerSettingController">
+	<div class="breadcrumbs" id="breadcrumbs">
+		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/swallow-mongosetting.js"></script>
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
+		<ul class="breadcrumb">
+			<li class="active">mongo server设置</li>
+		</ul>
+		<!-- <a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
+				data-toggle="modal"><i class="icon-plus"></i></a> -->
+	</div>
+	<div class="page-content" id="container">
+		<div class="row">
+			<table
+				class="table table-bordered table-striped  table-condensed table-hover">
+				<tr>
+					<th style="text-align: left">序号</th>
+					<th style="text-align: left">IP</th>
+					<th style="text-align: left">集群</th>
+					<th style="text-align: left">磁盘利用率(%)</th>
+					<th style="text-align: left">负载</th>
+					<th style="text-align: left">峰值QPS</th>
+					<th style="text-align: left">类型</th>
+					<!-- <th style="text-align: left">Topic</th> -->
+					<th style="text-align: left">操作</th>
+				</tr>
+				<tr ng-repeat="ad in searchPaginator.currentPageItems">
+					<td style="text-align: left" ng-bind="$index+1"></td>
+					<td style="text-align: left" ng-bind="ad.ip"></td>
+					<td style="text-align: left" ng-bind="ad.catalog"></td>
+					<td style="text-align: left" ng-bind="ad.disk | number : 2"></td>
+					<td style="text-align: left" ng-bind="ad.load | number : 2"></td>
+					<td style="text-align: left" ng-bind="ad.qps"></td>
+					<td style="text-align: left" ng-bind="ad.mongoType"></td>
+					<!-- 						<td style="text-align: left" ng-bind="ad.topics"></td>
+ -->
+					<td style="text-align: left"><a href="#myModal"
+						ng-click="setModalInput($index);" data-toggle="modal"
+						class="edit-config-btn"><i class="icon-edit " rel="tooltip"
+							data-original-title="编辑配置值"></i></a> <a href
+						ng-click="dialog(ad.catalog);" class="edit-config-btn"><i
+							class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+
+	<!-- 模态框（Modal） -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">配置Mongo</h4>
+				</div>
+				<div class="modal-body">
+					<form method="post" class="form-horizontal" name="myForm"
+						ng-submit="refreshpage(myForm)">
+						<div class="control-group">
+							<div class="form-group"
+								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+								<label class="control-label"><b>IP</b></label> <input
+									type="text" class="form-control" data-provide="typeahead"
+									autocomplete="off" ng-model="mongoserverEntry.ip" id="ip"
+									ng-readonly="true"> </input>
+							</div>
+						</div>
+						<div class="control-group">
+							<div class="form-group"
+								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+								<label class="control-label"><b>集群</b></label> <input
+									type="text" class="form-control" data-provide="typeahead"
+									autocomplete="off" ng-model="mongoserverEntry.catalog"
+									id="hostname" required ng-readonly="true"> </input>
+							</div>
+						</div>
+						<div class="control-group">
+							<div class="form-group"
+								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+								<label class="control-label"><b>磁盘利用率</b></label> <input
+									type="text" class="form-control"
+									ng-model="mongoserverEntry.disk" id="disk" required ng-readonly="true"> </input>
+							</div>
+						</div>
+						<div class="control-group">
+							<div class="form-group"
+								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+								<label class="control-label"><b>负载</b></label> <input
+									type="text" class="form-control"
+									ng-model="mongoserverEntry.load" id="load" required ng-readonly="true"> </input>
+							</div>
+						</div>
+						<div class="control-group">
+							<div class="form-group"
+								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+								<label class="control-label"><b>QPS峰值</b></label> <input
+									type="text" class="form-control"
+									ng-model="mongoserverEntry.qps" id="qps" required ng-readonly="true"> </input>
+							</div>
+						</div>
+						<!-- 							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>Topics</b></label> <input
+										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+										ng-model="mongoserverEntry.topics" id="topics" required>
+									</input>
+								</div>
+							</div> -->
+						<div class="control-group">
+							<div class="form-group"
+								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+								<label class="control-label"><b>类型</b></label> <select
+									class="form-control" ng-model="mongoserverEntry.mongoType"
+									id="mongoType" required>
+									<option ng-repeat="type in types"
+										value="{{type}}">{{type}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="control-group" style="margin-top: 40px">
+							<div class="controls">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">关闭</button>
+								<button type="submit" class="btn btn-success">提交</button>
+							</div>
+						</div>
+					</form>
+				</div>
+
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+

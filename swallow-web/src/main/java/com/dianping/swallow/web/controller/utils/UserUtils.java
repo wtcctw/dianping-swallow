@@ -85,7 +85,7 @@ public class UserUtils {
 	public List<String> topicNames(String username) {
 
 		List<String> topics = null;
-		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
+		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToAdministrator();
 		boolean findAll = isAdministrator(username);
 
 		if (findAll) {
