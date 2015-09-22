@@ -126,11 +126,8 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
 					continue;
 				}
-				ConsumerClientEvent clientEvent = eventFactory.createCClientEvent();
-				clientEvent.setConsumerId(ipStatsData.getConsumerId()).setTopicName(ipStatsData.getTopicName())
-						.setIp(ipStatsData.getIp()).setClientType(ClientType.CLIENT_RECEIVER)
-						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-				eventReporter.report(clientEvent);
+
+				report(ipStatsData.getTopicName(), ipStatsData.getConsumerId(), ipStatsData.getIp());
 
 			}
 		}
@@ -150,21 +147,23 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
 					continue;
 				}
-				
+
 				ConsumerIpQpsPair avgQpsPair = cIpStatsDataService.findAvgQps(ipStatsData.getTopicName(),
 						ipStatsData.getConsumerId(), ipStatsData.getIp(), getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)),
 						getTimeKey(System.currentTimeMillis()));
 
 				if (avgQpsPair.getSendQps() > 0 || avgQpsPair.getAckQps() > 0) {
-
-					ConsumerClientEvent clientEvent = eventFactory.createCClientEvent();
-					clientEvent.setConsumerId(ipStatsData.getConsumerId()).setTopicName(ipStatsData.getTopicName())
-							.setIp(ipStatsData.getIp()).setClientType(ClientType.CLIENT_RECEIVER)
-							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-					eventReporter.report(clientEvent);
+					report(ipStatsData.getTopicName(), ipStatsData.getConsumerId(), ipStatsData.getIp());
 				}
 			}
 		}
+	}
+
+	private void report(String topicName, String consumerId, String ip) {
+		ConsumerClientEvent clientEvent = eventFactory.createCClientEvent();
+		clientEvent.setConsumerId(consumerId).setTopicName(topicName).setIp(ip)
+				.setClientType(ClientType.CLIENT_RECEIVER).setEventType(EventType.CONSUMER).setCreateTime(new Date());
+		eventReporter.report(clientEvent);
 	}
 
 }

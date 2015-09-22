@@ -119,39 +119,34 @@ public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 
 		if (!usingMaster && usingSlave) {
 			isSlaveIps.put(masterIp, true);
-			ServerEvent serverEvent = eventFactory.createServerEvent();
-			serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVEPORT_OPENED)
-					.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-			eventReporter.report(serverEvent);
+			report(masterIp, slaveIp, ServerType.SLAVEPORT_OPENED);
 			lastCheckStatus.put(key, false);
 			return false;
 		} else if (usingMaster && usingSlave) {
 			isSlaveIps.put(masterIp, false);
-			ServerEvent serverEvent = eventFactory.createServerEvent();
-			serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(ServerType.BOTHPORT_OPENED)
-					.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-			eventReporter.report(serverEvent);
+			report(masterIp, slaveIp, ServerType.BOTHPORT_OPENED);
 			lastCheckStatus.put(key, false);
 			return false;
 		} else if (!usingMaster && !usingSlave) {
 			isSlaveIps.put(masterIp, false);
-			ServerEvent serverEvent = eventFactory.createServerEvent();
-			serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(ServerType.BOTHPORT_UNOPENED)
-					.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-			eventReporter.report(serverEvent);
+			report(masterIp, slaveIp, ServerType.BOTHPORT_UNOPENED);
 			lastCheckStatus.put(key, false);
 			return false;
 		} else {
 			isSlaveIps.put(masterIp, false);
 			if (lastCheckStatus.containsKey(key) && !lastCheckStatus.get(key).booleanValue()) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(ServerType.PORT_OPENED_OK)
-						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(masterIp, slaveIp, ServerType.PORT_OPENED_OK);
 				lastCheckStatus.put(key, true);
 			}
 		}
 		return true;
+	}
+
+	private void report(String masterIp, String slaveIp, ServerType serverType) {
+		ServerEvent serverEvent = eventFactory.createServerEvent();
+		serverEvent.setIp(masterIp).setSlaveIp(slaveIp).setServerType(serverType).setEventType(EventType.CONSUMER)
+				.setCreateTime(new Date());
+		eventReporter.report(serverEvent);
 	}
 
 	public int getMasterPort() {

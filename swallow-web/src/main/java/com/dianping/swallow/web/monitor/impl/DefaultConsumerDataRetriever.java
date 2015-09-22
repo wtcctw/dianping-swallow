@@ -626,11 +626,11 @@ public class DefaultConsumerDataRetriever
 			long start = orderParam.getQpxSendStatsData().getStart();
 			long end = orderParam.getQpxSendStatsData().getEnd();
 			orderParam.getQpxSendStatsData().add(
-					new OrderEntity(topicName, consumerId, (postStatsData.getTotalSendQps() - preStatsData
-							.getTotalSendQps()) * getSampleIntervalTime(), getQpsSampleCount(start, end)));
+					new OrderEntity(topicName, consumerId, postStatsData.getTotalSendQps() - preStatsData
+							.getTotalSendQps(), getQpsSampleCount(start, end)));
 			orderParam.getQpxAckStatsData().add(
-					new OrderEntity(topicName, consumerId, (postStatsData.getTotalAckQps() - preStatsData
-							.getTotalAckQps()) * getSampleIntervalTime(), getQpsSampleCount(start, end)));
+					new OrderEntity(topicName, consumerId, postStatsData.getTotalAckQps() - preStatsData
+							.getTotalAckQps(), getQpsSampleCount(start, end)));
 			orderParam.getDelaySendStatsData().add(
 					new OrderEntity(topicName, consumerId, postStatsData.getTotalSendDelay()
 							- preStatsData.getTotalSendDelay(), getOtherSampleCount(start, end)));

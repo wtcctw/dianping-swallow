@@ -82,18 +82,12 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 					|| System.currentTimeMillis() - statisConsumerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
 				String slaveIp = cSlaveResource.getIp();
 				if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER)
-							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
+					report(serverIp, serverIp, ServerType.SERVER_SENDER);
 					lastCheckStatus.put(serverIp, false);
 				}
 			} else {
 				if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER_OK)
-							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
+					report(serverIp, serverIp, ServerType.SERVER_SENDER_OK);
 					lastCheckStatus.put(serverIp, true);
 				}
 			}
@@ -104,23 +98,24 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	private boolean checkSlaveServerSender(Map<String, Long> statisIps, String masterIp, String slaveIp) {
 		if (consumerPortAlarmer.isSlaveOpen(masterIp)) {
 			if (!statisIps.containsKey(slaveIp)) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER_OK)
-						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(slaveIp, slaveIp, ServerType.SERVER_SENDER);
 				lastCheckStatus.put(slaveIp, false);
 			} else {
 				if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER_OK)
-							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
+					report(slaveIp, slaveIp, ServerType.SERVER_SENDER_OK);
 					lastCheckStatus.put(slaveIp, true);
 				}
 			}
 			return false;
 		}
 		return true;
+	}
+
+	private void report(String serverIp, String slaveIp, ServerType serverType) {
+		ServerEvent serverEvent = eventFactory.createServerEvent();
+		serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(serverType)
+				.setEventType(EventType.CONSUMER).setCreateTime(new Date());
+		eventReporter.report(serverEvent);
 	}
 
 }

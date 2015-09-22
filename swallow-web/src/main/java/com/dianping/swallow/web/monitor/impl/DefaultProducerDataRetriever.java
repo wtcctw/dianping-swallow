@@ -368,9 +368,8 @@ public class DefaultProducerDataRetriever
 					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalDelay()
 							- preStatsData.getTotalDelay(), getOtherSampleCount(start, end)));
 			orderParam.getQpxStatsData().add(
-					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY,
-							(postStatsData.getTotalQps() - preStatsData.getTotalQps()) * getSampleIntervalTime(),
-							getQpsSampleCount(start, end)));
+					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalQps()
+							- preStatsData.getTotalQps(), getQpsSampleCount(start, end)));
 		}
 
 		public void await() {

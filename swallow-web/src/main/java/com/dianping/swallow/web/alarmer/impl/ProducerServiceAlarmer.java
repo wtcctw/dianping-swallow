@@ -79,21 +79,22 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 			String url = StringUtils.replace(pigeonHealthUrl, "{ip}", serverIp);
 			HttpResult result = httpRequest(url);
 			if (!result.isSuccess()) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE)
-						.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(serverIp, ServerType.PIGEON_SERVICE);
 				lastCheckStatus.put(serverIp, false);
 			} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE_OK)
-						.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(serverIp, ServerType.PIGEON_SERVICE_OK);
 				lastCheckStatus.put(serverIp, true);
 			}
 
 		}
 		return true;
+	}
+
+	private void report(String serverIp, ServerType serverType) {
+		ServerEvent serverEvent = eventFactory.createServerEvent();
+		serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(serverType).setEventType(EventType.PRODUCER)
+				.setCreateTime(new Date());
+		eventReporter.report(serverEvent);
 	}
 
 }

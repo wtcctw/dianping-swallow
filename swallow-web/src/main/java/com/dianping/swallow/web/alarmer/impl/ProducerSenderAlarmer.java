@@ -71,19 +71,20 @@ public class ProducerSenderAlarmer extends AbstractServiceAlarmer {
 				if (logger.isInfoEnabled()) {
 					logger.info("serverIp : {}", serverIp);
 				}
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER)
-						.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(serverIp, ServerType.SERVER_SENDER);
 				lastCheckStatus.put(serverIp, false);
 			} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER_OK)
-						.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(serverIp, ServerType.SERVER_SENDER_OK);
 				lastCheckStatus.put(serverIp, true);
 			}
 		}
 		return true;
+	}
+
+	private void report(String serverIp, ServerType serverType) {
+		ServerEvent serverEvent = eventFactory.createServerEvent();
+		serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(serverType).setEventType(EventType.PRODUCER)
+				.setCreateTime(new Date());
+		eventReporter.report(serverEvent);
 	}
 }

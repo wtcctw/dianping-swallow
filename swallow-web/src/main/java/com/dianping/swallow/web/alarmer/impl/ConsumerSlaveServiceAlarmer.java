@@ -78,22 +78,23 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 			HttpResult result = httpRequest(url);
 
 			if (!result.isSuccess() || !result.getResponseBody().contains(MONOGO_MONITOR_SIGN)) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE)
-						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(slaveIp, ServerType.SLAVE_SERVICE);
 				lastCheckStatus.put(slaveIp, false);
 			} else {
 				if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SLAVE_SERVICE_OK)
-							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
+					report(slaveIp, ServerType.SLAVE_SERVICE_OK);
 					lastCheckStatus.put(slaveIp, true);
 				}
 			}
 		}
 		return true;
+	}
+
+	private void report(String slaveIp, ServerType serverType) {
+		ServerEvent serverEvent = eventFactory.createServerEvent();
+		serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(serverType)
+				.setEventType(EventType.CONSUMER).setCreateTime(new Date());
+		eventReporter.report(serverEvent);
 	}
 
 }

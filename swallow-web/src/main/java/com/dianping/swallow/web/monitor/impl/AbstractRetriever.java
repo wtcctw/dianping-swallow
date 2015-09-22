@@ -31,7 +31,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  */
 public abstract class AbstractRetriever extends AbstractLifecycle implements Retriever {
 
-	protected final int DEFAULT_INTERVAL = 30;// 每隔多少秒采样
+	protected static final int DEFAULT_INTERVAL = 30;// 每隔多少秒采样
 
 	protected final int BUILD_TIMES_AGEO = 15000;// 每次构建时，构建此时间(ms)以前的数据
 
@@ -154,7 +154,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return DEFAULT_INTERVAL;
 	}
 
-	protected int getStorageIntervalTime() {
+	public static int getStorageIntervalTime() {
 		return DEFAULT_INTERVAL;
 	}
 

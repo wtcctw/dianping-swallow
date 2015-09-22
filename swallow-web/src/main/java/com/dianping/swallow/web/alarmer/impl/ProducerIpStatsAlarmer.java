@@ -52,7 +52,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 	private Map<ProducerIpStatsData, Long> firstCandidates = new ConcurrentHashMap<ProducerIpStatsData, Long>();
 
 	private Map<ProducerIpStatsData, Long> secondCandidates = new ConcurrentHashMap<ProducerIpStatsData, Long>();
-	
+
 	private Map<ProducerIpStatsData, Long> whiteLists = new ConcurrentHashMap<ProducerIpStatsData, Long>();
 
 	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
@@ -124,11 +124,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
 					continue;
 				}
-				ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
-				clientEvent.setTopicName(ipStatsData.getTopicName()).setIp(ipStatsData.getIp())
-						.setClientType(ClientType.CLIENT_SENDER).setEventType(EventType.PRODUCER)
-						.setCreateTime(new Date());
-				eventReporter.report(clientEvent);
+				report(ipStatsData.getTopicName(), ipStatsData.getIp());
 			}
 		}
 
@@ -151,15 +147,17 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 						getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(System.currentTimeMillis()));
 
 				if (avgQps > 0) {
-
-					ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
-					clientEvent.setTopicName(ipStatsData.getTopicName()).setIp(ipStatsData.getIp())
-							.setClientType(ClientType.CLIENT_SENDER).setEventType(EventType.PRODUCER)
-							.setCreateTime(new Date());
-					eventReporter.report(clientEvent);
+					report(ipStatsData.getTopicName(), ipStatsData.getIp());
 				}
 			}
 		}
+	}
+
+	private void report(String topicName, String ip) {
+		ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
+		clientEvent.setTopicName(topicName).setIp(ip).setClientType(ClientType.CLIENT_SENDER)
+				.setEventType(EventType.PRODUCER).setCreateTime(new Date());
+		eventReporter.report(clientEvent);
 	}
 
 }

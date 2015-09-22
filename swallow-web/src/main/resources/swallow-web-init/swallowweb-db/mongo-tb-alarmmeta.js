@@ -520,7 +520,48 @@ if(result != null) {
 	    "updateTime" : new Date()
 	}, true, false);
 	
+	db.ALARM_META.update({
+		 "metaId" : 25
+		}, {
+	    "metaId" : 25,
+	    "type" : "SERVER_MONGO_CONFIG",
+	    "levelType" : "MAJOR",
+	    "isSmsMode" : true,
+	    "isWeiXinMode" : true,
+	    "isMailMode" : false,
+	    "isSendSwallow" : true,
+	    "isSendBusiness" : false,
+	    "alarmTitle" : "服务器MONGO配置告警",
+	    "alarmTemplate" : "消费服务器[IP]{ip}[TOPIC]{topic}配置与Lion配置不一致。[{date}]",
+	    "alarmDetail" : "",
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
+	    "createTime" : new Date(),
+	    "updateTime" : new Date()
+	}, true, false);
 	
+	db.ALARM_META.update({
+		 "metaId" : 26
+		}, {
+	    "metaId" : 26,
+	    "type" : "SERVER_MONGO_CONFIG_OK",
+	    "levelType" : "MAJOR",
+	    "isSmsMode" : true,
+	    "isWeiXinMode" : true,
+	    "isMailMode" : false,
+	    "isSendSwallow" : true,
+	    "isSendBusiness" : false,
+	    "alarmTitle" : "服务器MONGO配置告警",
+	    "alarmTemplate" : "消费服务器[IP]{ip}[TOPIC]{topic}配置已正常。[{date}]",
+	    "alarmDetail" : "",
+  		"maxTimeSpan" : 120,
+	    "daySpanBase" : 10,
+	    "nightSpanBase" : 20,
+	    "createTime" : new Date(),
+	    "updateTime" : new Date()
+	}, true, false);
+
 	db.ALARM_META.update({
 		 "metaId" : 1001
 		}, {
