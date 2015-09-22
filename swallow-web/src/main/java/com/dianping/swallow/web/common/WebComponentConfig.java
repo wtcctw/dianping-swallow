@@ -27,7 +27,7 @@ public class WebComponentConfig extends AbstractConfig {
 	}
 
 	@PostConstruct
-	public void postWebComponentConfig() {
+	public void init() {
 		try {
 			loadConfig();
 		} catch (Exception e) {

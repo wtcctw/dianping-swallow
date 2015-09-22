@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.alarmer.impl;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.config.AbstractConfig;
@@ -24,6 +26,11 @@ public class DefaultAlarmConfig extends AbstractConfig implements AlarmConfig {
 
 	public DefaultAlarmConfig() {
 		super(SERVER_CHECK_URL_FILE);
+	}
+	
+	@PostConstruct
+	public void init(){
+		loadConfig();
 	}
 
 	public String getSlaveMonitorUrl() {
