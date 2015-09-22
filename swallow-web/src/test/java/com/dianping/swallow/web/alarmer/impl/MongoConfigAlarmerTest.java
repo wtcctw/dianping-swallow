@@ -11,14 +11,16 @@ import com.dianping.swallow.web.alarmer.impl.MongoConfigAlarmer.MongoAddress;
 
 public class MongoConfigAlarmerTest extends MockTest {
 
+	MongoConfigAlarmer alamerAlarmer;
+
 	@Before
 	public void before() throws Exception {
+		alamerAlarmer = new MongoConfigAlarmer();
 	}
 
 	@Test
 	public void parseMongoUrlTest() {
 		String mongoUrl = "mongodb://10.1.115.11:27018,10.1.115.12:27018";
-		MongoConfigAlarmer alamerAlarmer = new MongoConfigAlarmer();
 		List<MongoAddress> addresses = alamerAlarmer.parseMongoUrl(mongoUrl);
 		Assert.assertTrue(addresses.get(0).getHost().equals("10.1.115.11"));
 

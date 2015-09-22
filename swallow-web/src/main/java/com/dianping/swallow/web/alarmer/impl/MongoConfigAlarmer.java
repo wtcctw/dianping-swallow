@@ -138,7 +138,7 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		}
 	}
 
-	public void report(String ip, String topicName, EventType eventType) {
+	private void report(String ip, String topicName, EventType eventType) {
 		MongoConfigEvent configEvent = eventFactory.createMongoConfigEvent();
 		configEvent.setTopicName(topicName).setIp(ip).setSlaveIp(ip).setServerType(ServerType.MONGO_CONFIG)
 				.setEventType(eventType).setCreateTime(new Date());
@@ -173,7 +173,7 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		return topicConfigs;
 	}
 
-	public List<MongoAddress> parseMongoUrl(String mongoUrl) {
+	List<MongoAddress> parseMongoUrl(String mongoUrl) {
 		List<MongoAddress> mongoAddrs = new ArrayList<MongoAddress>();
 		final String mongoUrlStart = "mongodb://";
 		final String urlSplit = ",";
