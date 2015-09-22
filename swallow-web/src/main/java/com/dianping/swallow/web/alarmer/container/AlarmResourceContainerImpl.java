@@ -182,7 +182,7 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 			@Override
 			public void run() {
 				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, AlarmResourceContainerImpl.this.getClass().getSimpleName()
 							+ "-doLoadResource");
 					catWrapper.doAction(new SwallowAction() {
 						@Override

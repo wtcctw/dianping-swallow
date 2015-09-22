@@ -61,7 +61,7 @@ public class AlarmMetaContainerImpl extends AbstractContainer implements Initial
 			@Override
 			public void run() {
 				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, AlarmMetaContainerImpl.this.getClass().getSimpleName()
 							+ "-doLoadMeta");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
