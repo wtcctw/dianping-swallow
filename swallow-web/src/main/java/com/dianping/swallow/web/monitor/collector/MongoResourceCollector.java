@@ -3,11 +3,7 @@ package com.dianping.swallow.web.monitor.collector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
@@ -19,10 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.dom.MongoReport;
 import com.dianping.swallow.web.model.resource.MongoResource;
 import com.dianping.swallow.web.model.resource.MongoType;
@@ -30,7 +22,6 @@ import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 import com.dianping.swallow.web.service.LionHttpService;
 import com.dianping.swallow.web.service.MongoResourceService;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mingdongli
@@ -38,9 +29,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年9月18日上午9:58:52
  */
 @Component
-public class MongoResourceCollector extends AbstractResourceCollector implements Runnable {
-
-	private static final String FACTORY_NAME = "MongoResourceCollector";
+public class MongoResourceCollector extends AbstractResourceCollector{
 
 	private static final String MONGO_REPORT = "http://dom.dp/db_daily/message";
 
@@ -61,19 +50,18 @@ public class MongoResourceCollector extends AbstractResourceCollector implements
 	@Autowired
 	private HttpService httpSerivice;
 
-	private ScheduledExecutorService scheduledExecutorService = Executors
-			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-
-	@PostConstruct
-	void updateMongoResource() {
-
-		logger.info("[startCollectMongoResource]");
-		scheduledExecutorService.scheduleAtFixedRate(this, 0, 6, TimeUnit.HOURS);
+	
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		collectorName = getClass().getSimpleName();
+		collectorInterval = 6 * 60 * 60;
+		collectorDelay = 1;
 	}
 
-	private void flushMongoMetaData() {
+	@Override
+	public void doCollector() {
 
 		HttpResult httpResult = httpSerivice.httpPost(MONGO_REPORT, new ArrayList<NameValuePair>());
 
@@ -183,22 +171,15 @@ public class MongoResourceCollector extends AbstractResourceCollector implements
 	}
 
 	@Override
-	public void run() {
+	public int getCollectorDelay() {
 
-		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
-					+ "-doCollector");
-			catWrapper.doAction(new SwallowAction() {
-				@Override
-				public void doAction() throws SwallowException {
-					flushMongoMetaData();
-				}
-			});
-		} catch (Throwable th) {
-			logger.error("[startConsumerIdResourceCollector]", th);
-		} finally {
+		return collectorDelay;
+	}
 
-		}
+	@Override
+	public int getCollectorInterval() {
+
+		return collectorInterval;
 	}
 
 }
