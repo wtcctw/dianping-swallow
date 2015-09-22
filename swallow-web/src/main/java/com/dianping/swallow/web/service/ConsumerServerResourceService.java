@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
  * @author mingdongli
@@ -19,8 +20,15 @@ public interface ConsumerServerResourceService extends ServerResourceService {
 	int remove(String ip);
 
 	List<ConsumerServerResource> findAll();
-
+	
 	Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(int offset, int limit);
 
 	ConsumerServerResource buildConsumerServerResource(String ip, String hostName);
+	
+	Pair<String, ResponseStatus> loadIdleConsumerServer();
+	
+	String loadConsumerServerLionConfig();
+
+	void setConsumerServerLionConfig(String consumerServerLionConfig);
+	
 }

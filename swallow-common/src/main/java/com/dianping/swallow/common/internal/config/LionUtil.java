@@ -10,6 +10,8 @@ import java.util.Map;
 public interface LionUtil {
 	
 	void createOrSetConfig(String key, String value);
+
+	void createOrSetConfig(String key, String value, HttpMethod method);
 	
 	Map<String, String> getCfgs(String prefix);
 	

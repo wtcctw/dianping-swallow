@@ -109,7 +109,7 @@ public class TopicController extends AbstractMenuController {
 		boolean findAll = userUtils.isAdministrator(username);
 		Set<String> producerIp = new HashSet<String>();
 
-		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
+		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToAdministrator();
 		if (findAll) {
 			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
 			List<TopicResource> topicResources = topicResourceService.findAll();

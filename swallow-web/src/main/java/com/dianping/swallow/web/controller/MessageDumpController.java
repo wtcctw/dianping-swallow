@@ -149,7 +149,7 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 	
 	private List<String> loadTopicNames(String username) {
 
-		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
+		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToAdministrator();
 		List<String> topics = new ArrayList<String>();
 		for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
 			if (entry.getValue().contains(username)) {
