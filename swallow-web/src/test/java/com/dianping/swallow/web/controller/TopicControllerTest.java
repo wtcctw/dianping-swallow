@@ -57,7 +57,7 @@ public class TopicControllerTest {
 	public void testEditTopic() {
 
 		try {
-			this.mockMvc.perform(post("/api/topic/edittopic").param("prop", "yapu.wang,mingdong.li,leon.li")
+			this.mockMvc.perform(post("/api/topic/edittopic").param("prop", "qi.yin")
 					.param("topic", "example").param("time", "2015-05-12 09:46").param("exec_user", "hongjun.zhong"));
 		} catch (Exception e) {
 			e.printStackTrace();
