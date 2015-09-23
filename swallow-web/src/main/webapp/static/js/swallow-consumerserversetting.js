@@ -100,8 +100,12 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.ackvalley = "";
 	$scope.consumerserverEntry.ackfluctuation = "";
 	$scope.consumerserverEntry.ackfluctuationBase = "";
+	$scope.consumerserverEntry.port = "";
+	$scope.consumerserverEntry.type = "";
+	$scope.consumerserverEntry.ipCorrelated = "";
 	
 	$scope.refreshpage = function(myForm){
+		$scope.consumerserverEntry.type = $('#serverType').val();
 		if ($scope.consumerserverEntry.consumersendpeak < $scope.consumerserverEntry.consumersendvalley
 				|| $scope.consumerserverEntry.consumerackpeak < $scope.consumerserverEntry.consumerackvalley){
 			alert("谷值不能小于峰值");
@@ -195,6 +199,9 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ackvalley = "";
 		$scope.consumerserverEntry.ackfluctuation = "";
 		$scope.consumerserverEntry.ackfluctuationBase = "";
+		$scope.consumerserverEntry.port = "";
+		$scope.consumerserverEntry.type = "";
+		$scope.consumerserverEntry.ipCorrelated = "";
 		$http.get(window.contextPath + "/console/server/defaultcresource").success(function(data){
 			$scope.consumerserverEntry.sendpeak = data.sendpeak;
 			$scope.consumerserverEntry.sendvalley = data.sendvalley;
@@ -208,6 +215,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
+		$('#serverType').val($scope.searchPaginator.currentPageItems[index].type);
 		$scope.isReadOnly = true;
 		$scope.consumerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.consumerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
@@ -221,6 +229,8 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
 		$scope.consumerserverEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
 		$scope.consumerserverEntry.ackfluctuationBase = $scope.searchPaginator.currentPageItems[index].ackfluctuationBase;
+		$scope.consumerserverEntry.port = $scope.searchPaginator.currentPageItems[index].port;
+		$scope.consumerserverEntry.ipCorrelated = $scope.searchPaginator.currentPageItems[index].ipCorrelated;
 		
 	}
 	
@@ -253,6 +263,8 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.isdefault = function(compare){
 		return compare != "default"; 
 	}
+	
+	$scope.types = ["MASTER","SLAVE"];
 	
 	$scope.changeconsumeralarm = function(ip, index){
 		var id = "#calarm" + index;

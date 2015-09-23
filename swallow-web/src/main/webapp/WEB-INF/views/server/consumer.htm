@@ -23,6 +23,9 @@
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">ServerId</th>
 						<th style="text-align: left">主机名</th>
+						<th style="text-align: left">类型</th>
+						<th style="text-align: left">端口</th>
+						<th style="text-align: left">关联IP</th>
 						<th style="text-align: left">发送峰值</th>
 						<th style="text-align: left">发送谷值</th>
 						<th style="text-align: left">发送波动</th>
@@ -39,6 +42,9 @@
 						<td style="text-align: left"><a style="cursor:pointer;"
 							ng-click="setConsumerIps(ad.ip)" ng-bind="ad.ip"></a></td>
 						<td style="text-align: left" ng-bind="ad.hostname"></td>
+						<td style="text-align: left" ng-bind="ad.type"></td>
+						<td style="text-align: left" ng-bind="ad.port"></td>
+						<td style="text-align: left" ng-bind="ad.ipCorrelated"></td>
 						<td style="text-align: left" ng-bind="ad.sendpeak"></td>
 						<td style="text-align: left" ng-bind="ad.sendvalley"></td>
 						<td style="text-align: left" ng-bind="ad.sendfluctuation"></td>
@@ -92,7 +98,36 @@
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>主机名</b></label> <input
 										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
-										ng-model="consumerserverEntry.hostname" id="hostname" required>
+										ng-model="consumerserverEntry.hostname" id="hostname" >
+									</input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>类型</b></label> <select
+									class="form-control" ng-model="consumerserverEntry.type"
+									id="serverType" required>
+									<option ng-repeat="type in types"
+										value="{{type}}">{{type}}</option>
+								</select>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>端口</b></label> <input
+										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+										ng-model="consumerserverEntry.port" id="prot" >
+									</input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>关联IP</b></label> <input
+										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+										ng-model="consumerserverEntry.ipCorrelated" id="ipCorrelated">
 									</input>
 								</div>
 							</div>

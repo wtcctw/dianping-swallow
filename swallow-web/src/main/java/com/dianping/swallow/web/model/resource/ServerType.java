@@ -8,8 +8,8 @@ package com.dianping.swallow.web.model.resource;
  */
 public enum ServerType {
 
-	MASTER("master"),
-	SLAVE("slave");
+	MASTER("MASTER"),
+	SLAVE("SLAVE");
 	
 	private String type;
 	

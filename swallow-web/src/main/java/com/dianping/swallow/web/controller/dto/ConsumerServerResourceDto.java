@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller.dto;
 
 
+
 /**
  * @author mingdongli
  *
@@ -15,6 +16,36 @@ public class ConsumerServerResourceDto  extends ServerResourceDto{
 	private int ackfluctuation;
 	
 	private long ackfluctuationBase;
+	
+	private int port;
+	
+	private String type;
+	
+	private String ipCorrelated;
+	
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getIpCorrelated() {
+		return ipCorrelated;
+	}
+
+	public void setIpCorrelated(String ipCorrelated) {
+		this.ipCorrelated = ipCorrelated;
+	}
 
 	public long getAckpeak() {
 		return ackpeak;
