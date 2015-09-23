@@ -117,8 +117,10 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 		List<ConsumerServerResource> newCSlaveServerResources = new ArrayList<ConsumerServerResource>();
 		List<ConsumerServerResourcePair> newCServerResourcePairs = new ArrayList<ConsumerServerResourcePair>();
 		for (ConsumerServerResource masterResource : tempResources) {
-			if (!(masterResource.getType() == ServerType.MASTER)
-					|| StringUtils.isBlank(masterResource.getIpCorrelated())) {
+			if (!(masterResource.getType() == ServerType.MASTER)) {
+				continue;
+			}
+			if (StringUtils.isBlank(masterResource.getIpCorrelated())) {
 				continue;
 			}
 			for (ConsumerServerResource slaveResource : tempResources) {
