@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor.collector;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,10 +14,13 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.model.resource.ServerResource;
+import com.dianping.swallow.web.model.resource.ServerType;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.IPCollectorService.ConsumerServer;
+import com.dianping.swallow.web.service.IPCollectorService.ConsumerServerPair;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 
 /**
@@ -50,6 +54,7 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 		collectorInterval = 6;
 		collectorDelay = 1;
 	}
+
 	@Override
 	public void doCollector() {
 		doServerCollector();
@@ -84,27 +89,45 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 	}
 
 	public void doConsumerServerCollector() {
-		Map<String, String> ipsMap = new HashMap<String, String>();
-		List<String> masterIps = ipCollectorService.getConsumerServerMasterIps();
-		List<String> slaveIps = ipCollectorService.getConsumerServerSlaveIps();
-		Map<String, String> masterIpsMap = getServerIpsMap(ipCollectorService.getConsumerServerMasterIpsMap());
-		Map<String, String> slaveIpsMap = getServerIpsMap(ipCollectorService.getConsumerServerSlaveIpsMap());
+
+		List<ConsumerServerPair> consumerServerPairs = new ArrayList<ConsumerServerPair>();
+		List<ConsumerServerPair> collectorServerPairs = ipCollectorService.getConsumerServerPairs();
+		if (collectorServerPairs != null) {
+			consumerServerPairs.addAll(collectorServerPairs);
+		}
+
+		for (ConsumerServerPair consumerServerPair : consumerServerPairs) {
+			ConsumerServer masterServer = consumerServerPair.getMasterServer();
+			ConsumerServer slaveServer = consumerServerPair.getSlaveServer();
+			if (StringUtils.isNotBlank(masterServer.getIp())) {
+				ServerResource masterResource = cServerResourceService.findByIp(masterServer.getIp());
+				if (masterResource == null) {
+					ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(
+							masterServer.getIp(), masterServer.getHostName(), masterServer.getPort(),
+							slaveServer.getIp(), ServerType.MASTER);
+					cServerResourceService.insert(cServerResource);
+					logger.info("[doConsumerServerCollector] masterServer {} is saved.", masterServer);
+				}
+			}
+			if (StringUtils.isNotBlank(slaveServer.getIp())) {
+				ServerResource slaveResource = cServerResourceService.findByIp(slaveServer.getIp());
+				if (slaveResource == null) {
+					ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(
+							slaveServer.getIp(), slaveServer.getHostName(), slaveServer.getPort(),
+							masterServer.getIp(), ServerType.MASTER);
+					cServerResourceService.insert(cServerResource);
+					logger.info("[doConsumerServerCollector] slaveServer {} is saved.", slaveServer);
+				}
+			}
+		}
+		
 		Set<String> statsServerIps = consumerStatsDataWapper.getServerIps(false);
-		setServerMap(masterIps, ipsMap);
-		setServerMap(slaveIps, ipsMap);
-		if (masterIpsMap != null) {
-			ipsMap.putAll(masterIpsMap);
-		}
-		if (slaveIpsMap != null) {
-			ipsMap.putAll(slaveIpsMap);
-		}
-		setServerMap(statsServerIps, ipsMap);
-		for (Map.Entry<String, String> ipEntry : ipsMap.entrySet()) {
-			ServerResource serverResource = cServerResourceService.findByIp(ipEntry.getKey());
-			if (serverResource == null) {
-				ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(
-						ipEntry.getKey(), ipEntry.getValue());
+		for (String serverIp : statsServerIps) {
+			ServerResource slaveResource = cServerResourceService.findByIp(serverIp);
+			if (slaveResource == null) {
+				ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(serverIp);
 				cServerResourceService.insert(cServerResource);
+				logger.info("[doConsumerServerCollector] serverIp {} is saved.", serverIp);
 			}
 		}
 

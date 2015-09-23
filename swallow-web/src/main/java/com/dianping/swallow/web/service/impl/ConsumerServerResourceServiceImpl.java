@@ -36,9 +36,9 @@ import com.dianping.swallow.web.util.ResponseStatus;
 public class ConsumerServerResourceServiceImpl extends AbstractSwallowService implements ConsumerServerResourceService {
 
 	private static final String BLANK_STRING = "";
-	
+
 	public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
-	
+
 	@Autowired
 	private ConsumerServerResourceDao consumerServerResourceDao;
 
@@ -47,9 +47,9 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 
 	@Resource(name = "consumerServerStatsDataService")
 	private ConsumerServerStatsDataService consumerServerStatsDataService;
-	
+
 	private ConfigCache configCache;
-	
+
 	private String consumerServerLionConfig;
 
 	@PostConstruct
@@ -64,7 +64,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 			logger.error("Erroe when init lion config", e);
 		}
 	}
-	
+
 	@Override
 	public boolean insert(ConsumerServerResource consumerServerResource) {
 
@@ -114,11 +114,34 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public ConsumerServerResource buildConsumerServerResource(String ip, String hostName) {
+	public ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, String relatedIp,
+			ServerType serverType) {
 		ConsumerServerResource serverResource = new ConsumerServerResource();
 		serverResource.setIp(ip);
 		serverResource.setAlarm(true);
 		serverResource.setHostname(hostName);
+		serverResource.setPort(port);
+		serverResource.setIpCorrelated(relatedIp);
+		serverResource.setType(serverType);
+		serverResource.setCreateTime(new Date());
+		serverResource.setUpdateTime(new Date());
+		ConsumerServerResource defaultResource = (ConsumerServerResource) findDefault();
+		if (defaultResource == null) {
+			serverResource.setAlarm(false);
+			serverResource.setSendAlarmSetting(new QPSAlarmSetting());
+			serverResource.setAckAlarmSetting(new QPSAlarmSetting());
+		} else {
+			serverResource.setSendAlarmSetting(defaultResource.getSendAlarmSetting());
+			serverResource.setAckAlarmSetting(defaultResource.getAckAlarmSetting());
+		}
+		return serverResource;
+	}
+	
+	@Override
+	public ConsumerServerResource buildConsumerServerResource(String ip) {
+		ConsumerServerResource serverResource = new ConsumerServerResource();
+		serverResource.setIp(ip);
+		serverResource.setAlarm(true);
 		serverResource.setCreateTime(new Date());
 		serverResource.setUpdateTime(new Date());
 		ConsumerServerResource defaultResource = (ConsumerServerResource) findDefault();
@@ -176,7 +199,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 				int masterPort = ConsumerServerResource.getPort();
 				String slaveIp = ConsumerServerResource.getIpCorrelated();
 				ConsumerServerResource = (ConsumerServerResource) this.findByIp(slaveIp);
-				if(ConsumerServerResource == null){
+				if (ConsumerServerResource == null) {
 					return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
 				}
 				int slavePort = ConsumerServerResource.getPort();
@@ -202,7 +225,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 
 	@Override
 	public synchronized void setConsumerServerLionConfig(String consumerServerLionConfig) {
-		
+
 		this.consumerServerLionConfig = consumerServerLionConfig;
 	}
 }

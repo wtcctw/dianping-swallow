@@ -48,10 +48,6 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 
 	private static final String KEY_SPLIT = "&";
 
-	private static final String MASTER_NAME = "master";
-
-	private static final String SLAVE_NAME = "slave";
-
 	private static final String DEFAULT_DEFAULT_RECORD = DEFAULT_RECORD + KEY_SPLIT + DEFAULT_RECORD;
 
 	private int interval = 300;// 秒
@@ -100,14 +96,18 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 	}
 
 	private void findCServerResourceData() {
-		List<ConsumerServerResource> tempResources = cServerResourceService.findAll();
-		if (tempResources != null) {
-			Map<String, ConsumerServerResource> newCServerResources = new HashMap<String, ConsumerServerResource>();
-			for (ConsumerServerResource tempResource : tempResources) {
-				newCServerResources.put(tempResource.getIp(), tempResource);
+		try {
+			List<ConsumerServerResource> tempResources = cServerResourceService.findAll();
+			if (tempResources != null) {
+				Map<String, ConsumerServerResource> newCServerResources = new HashMap<String, ConsumerServerResource>();
+				for (ConsumerServerResource tempResource : tempResources) {
+					newCServerResources.put(tempResource.getIp(), tempResource);
+				}
+				cServerResources = newCServerResources;
+				findCHAServerResourceData(tempResources);
 			}
-			cServerResources = newCServerResources;
-			findCHAServerResourceData(tempResources);
+		} catch (Exception e) {
+			logger.error("[findCServerResourceData] find ConsumerServerResource error.", e);
 		}
 	}
 
@@ -116,23 +116,17 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 		List<ConsumerServerResource> newCSlaveServerResources = new ArrayList<ConsumerServerResource>();
 		List<ConsumerServerResourcePair> newCServerResourcePairs = new ArrayList<ConsumerServerResourcePair>();
 		for (ConsumerServerResource masterResource : tempResources) {
-			if (StringUtils.isBlank(masterResource.getHostname())
-					|| !StringUtils.contains(masterResource.getHostname(), MASTER_NAME)) {
+			if (StringUtils.isBlank(masterResource.getIpCorrelated())) {
 				continue;
 			}
-
 			for (ConsumerServerResource slaveResource : tempResources) {
-				if (StringUtils.isBlank(slaveResource.getHostname())
-						|| !StringUtils.contains(slaveResource.getHostname(), SLAVE_NAME)) {
+				if (!slaveResource.getIp().equals(masterResource.getIpCorrelated())) {
 					continue;
 				}
-
-				String replaceName = StringUtils.replace(masterResource.getHostname(), MASTER_NAME, SLAVE_NAME);
-				if (StringUtils.equals(slaveResource.getHostname(), replaceName)) {
-					newCMasterServerResources.add(masterResource);
-					newCSlaveServerResources.add(slaveResource);
-					newCServerResourcePairs.add(new ConsumerServerResourcePair(masterResource, slaveResource));
-				}
+				newCMasterServerResources.add(masterResource);
+				newCSlaveServerResources.add(slaveResource);
+				newCServerResourcePairs.add(new ConsumerServerResourcePair(masterResource, slaveResource));
+				break;
 			}
 		}
 		cMasterServerResources = newCMasterServerResources;
@@ -145,35 +139,47 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 	}
 
 	private void findPServerResourceData() {
-		List<ProducerServerResource> tempResources = pServerResourceService.findAll();
-		if (tempResources != null) {
-			Map<String, ProducerServerResource> newPServerResources = new HashMap<String, ProducerServerResource>();
-			for (ProducerServerResource tempResource : tempResources) {
-				newPServerResources.put(tempResource.getIp(), tempResource);
+		try {
+			List<ProducerServerResource> tempResources = pServerResourceService.findAll();
+			if (tempResources != null) {
+				Map<String, ProducerServerResource> newPServerResources = new HashMap<String, ProducerServerResource>();
+				for (ProducerServerResource tempResource : tempResources) {
+					newPServerResources.put(tempResource.getIp(), tempResource);
+				}
+				pServerResources = newPServerResources;
 			}
-			pServerResources = newPServerResources;
+		} catch (Exception e) {
+			logger.error("[findPServerResourceData] find ProducerServerResource error.", e);
 		}
 	}
 
 	private void findTopicResourceData() {
-		List<TopicResource> tempResources = topicResourceService.findAll();
-		if (tempResources != null) {
-			Map<String, TopicResource> newTopicResources = new HashMap<String, TopicResource>();
-			for (TopicResource tempResource : tempResources) {
-				newTopicResources.put(tempResource.getTopic(), tempResource);
+		try {
+			List<TopicResource> tempResources = topicResourceService.findAll();
+			if (tempResources != null) {
+				Map<String, TopicResource> newTopicResources = new HashMap<String, TopicResource>();
+				for (TopicResource tempResource : tempResources) {
+					newTopicResources.put(tempResource.getTopic(), tempResource);
+				}
+				topicResources = newTopicResources;
 			}
-			topicResources = newTopicResources;
+		} catch (Exception e) {
+			logger.error("[findTopicResourceData] find TopicResource error.", e);
 		}
 	}
 
 	private void findConsumerIdResourceData() {
-		List<ConsumerIdResource> tempResources = consumerIdResourceService.findAll();
-		if (tempResources != null) {
-			Map<String, ConsumerIdResource> newConsumerIdResources = new HashMap<String, ConsumerIdResource>();
-			for (ConsumerIdResource tempResource : tempResources) {
-				newConsumerIdResources.put(tempResource.generateKey(), tempResource);
+		try {
+			List<ConsumerIdResource> tempResources = consumerIdResourceService.findAll();
+			if (tempResources != null) {
+				Map<String, ConsumerIdResource> newConsumerIdResources = new HashMap<String, ConsumerIdResource>();
+				for (ConsumerIdResource tempResource : tempResources) {
+					newConsumerIdResources.put(tempResource.generateKey(), tempResource);
+				}
+				consumerIdResources = newConsumerIdResources;
 			}
-			consumerIdResources = newConsumerIdResources;
+		} catch (Exception e) {
+			logger.error("[findConsumerIdResourceData] find ConsumerIdResource error.", e);
 		}
 	}
 
@@ -182,8 +188,8 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 			@Override
 			public void run() {
 				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, AlarmResourceContainerImpl.this.getClass().getSimpleName()
-							+ "-doLoadResource");
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, AlarmResourceContainerImpl.this
+							.getClass().getSimpleName() + "-doLoadResource");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {
