@@ -105,6 +105,8 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private volatile Map<String, String> cmdbConsumerMasterMap = null;
 
+	private volatile List<ProducerServer> producerServers = null;
+
 	private volatile List<ConsumerServerPair> consumerServerPairs = null;
 
 	@Autowired
@@ -225,12 +227,15 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		if (producerEnvDevices != null) {
 			List<String> producerIps = new ArrayList<String>();
 			Map<String, String> producerIpsMap = new HashMap<String, String>();
+			List<ProducerServer> producerServers = new ArrayList<ProducerServer>();
 			for (EnvDevice envDevice : producerEnvDevices) {
 				producerIps.add(envDevice.getIp());
 				producerIpsMap.put(envDevice.getHostName(), envDevice.getIp());
+				producerServers.add(new ProducerServer(envDevice.getIp(), envDevice.getHostName()));
 			}
 			this.cmdbProducerIps = producerIps;
 			this.cmdbProducerMap = producerIpsMap;
+			this.producerServers = producerServers;
 			logger.info("[doCmdbIpTask] cmdbProducerIps= {}, cmdbProducerMap= {}", cmdbProducerIps, cmdbProducerMap);
 		}
 	}
@@ -263,14 +268,14 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			}
 			this.cmdbConsumerMasterIps = consumerMasterIps;
 			this.cmdbConsumerMasterMap = consumerMasterIpsMap;
-			logger.info("[doCmdbIpTask] cmdbConsumerMasterIps= {}, cmdbConsumerMasterMap= {}", cmdbConsumerMasterIps,
-					cmdbConsumerMasterMap);
+			logger.info("[doCmdbConsumerIpTask] cmdbConsumerMasterIps= {}, cmdbConsumerMasterMap= {}",
+					cmdbConsumerMasterIps, cmdbConsumerMasterMap);
 
 			this.cmdbConsumerSlaveIps = consumerSlaveIps;
 			this.cmdbConsumerSlaveMap = consumerSlaveIpsMap;
 
-			logger.info("[doCmdbIpTask] cmdbConsumerSlaveIps= {}, cmdbConsumerSlaveMap= {}", cmdbConsumerSlaveIps,
-					cmdbConsumerSlaveMap);
+			logger.info("[doCmdbConsumerIpTask] cmdbConsumerSlaveIps= {}, cmdbConsumerSlaveMap= {}",
+					cmdbConsumerSlaveIps, cmdbConsumerSlaveMap);
 
 			this.consumerServerPairs = consumerServerPairs;
 		}
@@ -478,6 +483,14 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	public List<ConsumerServerPair> getConsumerServerPairs() {
 		if (consumerServerPairs != null) {
 			return Collections.unmodifiableList(consumerServerPairs);
+		}
+		return null;
+	}
+	
+	@Override
+	public List<ProducerServer> getProducerServers(){
+		if (producerServers != null) {
+			return Collections.unmodifiableList(producerServers);
 		}
 		return null;
 	}

@@ -78,6 +78,13 @@ public interface IPCollectorService {
 	int getConsumerSlavePort();
 
 	/**
+	 * get producer server ips
+	 * 
+	 * @return
+	 */
+	List<ProducerServer> getProducerServers();
+
+	/**
 	 * get consumer server pair ips
 	 * 
 	 * @return
@@ -255,6 +262,38 @@ public interface IPCollectorService {
 		@Override
 		public String toString() {
 			return "ConsumerServer [ip=" + ip + ", hostName=" + hostName + ", port=" + port + "]";
+		}
+
+		public String getHostName() {
+			return hostName;
+		}
+
+		public void setHostName(String hostName) {
+			this.hostName = hostName;
+		}
+
+	}
+
+	public static class ProducerServer {
+		private String ip;
+
+		private String hostName;
+
+		public ProducerServer() {
+
+		}
+
+		public ProducerServer(String ip, String hostName) {
+			this.ip = ip;
+			this.hostName = hostName;
+		}
+
+		public String getIp() {
+			return ip;
+		}
+
+		public void setIp(String ip) {
+			this.ip = ip;
 		}
 
 		public String getHostName() {

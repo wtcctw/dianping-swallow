@@ -215,7 +215,9 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 	}
 
 	class MongoAddress {
+		
 		private String host;
+		
 		private int port;
 
 		public String getHost() {
