@@ -22,10 +22,10 @@ public class JsonUtil {
 
 	private static ObjectMapper om = new ObjectMapper();
 
-	public static <T> T fromJson(String content, Class<T> valueType) {
+	public static <T> T fromJson(String content, Class<T> clazz) {
 		T result = null;
 		try {
-			result = om.readValue(content, valueType);
+			result = om.readValue(content, clazz);
 		} catch (JsonParseException e) {
 			logger.error("[getObject] JsonParseException.", e);
 		} catch (JsonMappingException e) {
