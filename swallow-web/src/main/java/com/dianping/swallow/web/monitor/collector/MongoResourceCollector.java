@@ -10,8 +10,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.JavaType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,8 +48,6 @@ public class MongoResourceCollector extends AbstractResourceCollector{
 	@Autowired
 	private HttpService httpSerivice;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-	
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
