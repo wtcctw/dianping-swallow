@@ -26,6 +26,7 @@ import com.dianping.swallow.web.model.resource.BaseResource;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.resource.ServerType;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
@@ -116,10 +117,14 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 		List<ConsumerServerResource> newCSlaveServerResources = new ArrayList<ConsumerServerResource>();
 		List<ConsumerServerResourcePair> newCServerResourcePairs = new ArrayList<ConsumerServerResourcePair>();
 		for (ConsumerServerResource masterResource : tempResources) {
-			if (StringUtils.isBlank(masterResource.getIpCorrelated())) {
+			if (!(masterResource.getType() == ServerType.MASTER)
+					|| StringUtils.isBlank(masterResource.getIpCorrelated())) {
 				continue;
 			}
 			for (ConsumerServerResource slaveResource : tempResources) {
+				if (!(masterResource.getType() == ServerType.SLAVE)) {
+					continue;
+				}
 				if (!slaveResource.getIp().equals(masterResource.getIpCorrelated())) {
 					continue;
 				}
