@@ -259,10 +259,18 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (sendMStatisData == null && ackMStatisData == null) {
 				continue;
 			}
-			NavigableMap<Long, Long> sendQpx = sendMStatisData.getQpx(StatisType.SEND);
-			NavigableMap<Long, Long> sendDelay = sendMStatisData.getDelay(StatisType.SEND);
-			NavigableMap<Long, Long> ackQpx = ackMStatisData.getQpx(StatisType.ACK);
-			NavigableMap<Long, Long> ackDelay = ackMStatisData.getDelay(StatisType.ACK);
+			NavigableMap<Long, Long> sendQpx = null;
+			NavigableMap<Long, Long> sendDelay = null;
+			if (sendMStatisData != null) {
+				sendQpx = sendMStatisData.getQpx(StatisType.SEND);
+				sendDelay = sendMStatisData.getDelay(StatisType.SEND);
+			}
+			NavigableMap<Long, Long> ackQpx = null;
+			NavigableMap<Long, Long> ackDelay = null;
+			if (ackMStatisData != null) {
+				ackQpx = ackMStatisData.getQpx(StatisType.ACK);
+				ackDelay = ackMStatisData.getDelay(StatisType.ACK);
+			}
 
 			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
 					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
