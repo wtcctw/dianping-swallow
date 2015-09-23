@@ -185,9 +185,9 @@ public class TopicController extends AbstractMenuController {
 		boolean result = topicResourceService.update(topicResource);
 
 		if (result) {
-			return ResponseStatus.SUCCESS.getStatus();
+			return ResponseStatus.SUCCESS;
 		} else {
-			return ResponseStatus.MONGOWRITE.getStatus();
+			return ResponseStatus.MONGOWRITE;
 		}
 	}
 	

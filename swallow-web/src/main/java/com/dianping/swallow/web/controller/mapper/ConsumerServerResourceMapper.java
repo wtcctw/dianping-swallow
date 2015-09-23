@@ -3,6 +3,7 @@ package com.dianping.swallow.web.controller.mapper;
 import com.dianping.swallow.web.controller.dto.ConsumerServerResourceDto;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.model.resource.ServerType;
 
 /**
  * @author mingdongli
@@ -33,7 +34,10 @@ public class ConsumerServerResourceMapper {
 		consumerServerResource.setIp(dto.getIp());
 		consumerServerResource.setAlarm(dto.isAlarm());
 		consumerServerResource.setHostname(dto.getHostname());
-
+		consumerServerResource.setPort(dto.getPort());
+		consumerServerResource.setIpCorrelated(dto.getIpCorrelated());
+		consumerServerResource.setType(ServerType.valueOf(dto.getType()));
+		
 		return consumerServerResource;
 	}
 
@@ -57,6 +61,12 @@ public class ConsumerServerResourceMapper {
 		dto.setIp(consumerServerResourceDto.getIp());
 		dto.setHostname(consumerServerResourceDto.getHostname());
 		dto.setAlarm(consumerServerResourceDto.isAlarm());
+		dto.setPort(consumerServerResourceDto.getPort());
+		dto.setIpCorrelated(consumerServerResourceDto.getIpCorrelated());
+		ServerType type = consumerServerResourceDto.getType();
+		if(type != null){
+			dto.setType(type.name());
+		}
 
 		return dto;
 	}
