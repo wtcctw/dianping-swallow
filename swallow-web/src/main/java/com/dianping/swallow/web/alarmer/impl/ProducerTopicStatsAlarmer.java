@@ -64,19 +64,24 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
 			return;
 		}
 		for (ProducerTopicStatsData topicStatsData : topicStatsDatas) {
-			String topicName = topicStatsData.getTopicName();
-			TopicResource topicResource = resourceContainer.findTopicResource(topicName);
-			if (topicResource == null || !topicResource.isProducerAlarm() || StringUtils.equals(TOTAL_KEY, topicName)) {
-				continue;
+			try {
+				String topicName = topicStatsData.getTopicName();
+				TopicResource topicResource = resourceContainer.findTopicResource(topicName);
+				if (topicResource == null || !topicResource.isProducerAlarm()
+						|| StringUtils.equals(TOTAL_KEY, topicName)) {
+					continue;
+				}
+				ProducerBaseAlarmSetting pBaseAlarmSetting = topicResource.getProducerAlarmSetting();
+				if (pBaseAlarmSetting == null) {
+					continue;
+				}
+				QPSAlarmSetting qps = pBaseAlarmSetting.getQpsAlarmSetting();
+				long delay = pBaseAlarmSetting.getDelay();
+				qpsAlarm(topicStatsData, qps);
+				topicStatsData.checkDelay(delay);
+			} catch (Exception e) {
+				logger.error("[topicAlarm] topicStatsData {} error.", topicStatsData);
 			}
-			ProducerBaseAlarmSetting pBaseAlarmSetting = topicResource.getProducerAlarmSetting();
-			if (pBaseAlarmSetting == null) {
-				continue;
-			}
-			QPSAlarmSetting qps = pBaseAlarmSetting.getQpsAlarmSetting();
-			long delay = pBaseAlarmSetting.getDelay();
-			qpsAlarm(topicStatsData, qps);
-			topicStatsData.checkDelay(delay);
 		}
 	}
 

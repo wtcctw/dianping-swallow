@@ -20,11 +20,12 @@ import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年9月17日 下午8:24:20
+ *         2015年9月17日 下午8:24:20
  */
 @Component
 public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
@@ -66,33 +67,38 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
 		}
 
 		for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
-			String topicName = consumerIdStatsData.getTopicName();
-			String consumerId = consumerIdStatsData.getConsumerId();
-			ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
-			TopicResource topicResource = resourceContainer.findTopicResource(topicName);
-			if ((topicResource != null && !topicResource.isConsumerAlarm()) || consumerIdResource == null
-					|| !consumerIdResource.isAlarm() || StringUtils.equals(TOTAL_KEY, topicName)
-					|| StringUtils.equals(TOTAL_KEY, consumerId)) {
-				continue;
+			try {
+				String topicName = consumerIdStatsData.getTopicName();
+				String consumerId = consumerIdStatsData.getConsumerId();
+				ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
+				TopicResource topicResource = resourceContainer.findTopicResource(topicName);
+				if ((topicResource != null && !topicResource.isConsumerAlarm()) || consumerIdResource == null
+						|| !consumerIdResource.isAlarm() || StringUtils.equals(TOTAL_KEY, topicName)
+						|| StringUtils.equals(TOTAL_KEY, consumerId)) {
+					continue;
+				}
+				ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();
+				QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
+				QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
+				long sendDelay = consumerAlarmSetting.getSendDelay();
+				long ackDelay = consumerAlarmSetting.getAckDelay();
+				long accumulation = consumerAlarmSetting.getAccumulation();
+				// 告警
+				boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);
+				boolean isAckQps = ackSendAlarm(consumerIdStatsData, ackQps);
+				if (isSendQps && isAckQps) {
+					long timeKey = consumerIdStatsData.getTimeKey();
+					Pair<Long, Long> preResult = getExpectedQps(topicName, consumerId, timeKey);
+					sendQpsFluAlarm(consumerIdStatsData, preResult.getFirst(), sendQps);
+					ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
+				}
+				sendDelayAlarm(consumerIdStatsData, sendDelay);
+				sendAccuAlarm(consumerIdStatsData, accumulation);
+				ackDelayAlarm(consumerIdStatsData, ackDelay);
+
+			} catch (Exception e) {
+				logger.error("[consumerIdAlarm] consumerIdStatsData {} error.", consumerIdStatsData);
 			}
-			ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();
-			QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
-			QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
-			long sendDelay = consumerAlarmSetting.getSendDelay();
-			long ackDelay = consumerAlarmSetting.getAckDelay();
-			long accumulation = consumerAlarmSetting.getAccumulation();
-			// 告警
-			boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);
-			boolean isAckQps = ackSendAlarm(consumerIdStatsData, ackQps);
-			if (isSendQps && isAckQps) {
-				long timeKey = consumerIdStatsData.getTimeKey();
-				Pair<Long, Long> preResult = getExpectedQps(topicName, consumerId, timeKey);
-				sendQpsFluAlarm(consumerIdStatsData, preResult.getFirst(), sendQps);
-				ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
-			}
-			sendDelayAlarm(consumerIdStatsData, sendDelay);
-			sendAccuAlarm(consumerIdStatsData, accumulation);
-			ackDelayAlarm(consumerIdStatsData, ackDelay);
 
 		}
 

@@ -63,13 +63,17 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer {
 			return;
 		}
 		for (ProducerServerStatsData serverStatsData : serverStatsDatas) {
-			String ip = serverStatsData.getIp();
-			ProducerServerResource pServerResource = resourceContainer.findProducerServerResource(ip);
-			if (pServerResource == null || !pServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
-				continue;
+			try {
+				String ip = serverStatsData.getIp();
+				ProducerServerResource pServerResource = resourceContainer.findProducerServerResource(ip);
+				if (pServerResource == null || !pServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
+					continue;
+				}
+				QPSAlarmSetting qps = pServerResource.getSaveAlarmSetting();
+				qpsAlarm(serverStatsData, qps);
+			} catch (Exception e) {
+				logger.error("[serverAlarm] serverStatsData {} error.", serverStatsData);
 			}
-			QPSAlarmSetting qps = pServerResource.getSaveAlarmSetting();
-			qpsAlarm(serverStatsData, qps);
 		}
 	}
 

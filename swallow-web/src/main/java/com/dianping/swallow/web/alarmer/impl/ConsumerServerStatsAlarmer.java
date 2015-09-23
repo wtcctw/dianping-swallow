@@ -17,11 +17,12 @@ import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
+
 /**
  * 
  * @author qiyin
  *
- * 2015年9月17日 下午8:24:46
+ *         2015年9月17日 下午8:24:46
  */
 @Component
 public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
@@ -64,16 +65,21 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
 		}
 
 		for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
-			String ip = serverStatsData.getIp();
-			ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(ip);
-			if (cServerResource == null || !cServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
-				continue;
-			}
-			QPSAlarmSetting sendQps = cServerResource.getSendAlarmSetting();
-			QPSAlarmSetting ackQps = cServerResource.getAckAlarmSetting();
+			try {
+				String ip = serverStatsData.getIp();
+				ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(ip);
+				if (cServerResource == null || !cServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
+					continue;
+				}
+				QPSAlarmSetting sendQps = cServerResource.getSendAlarmSetting();
+				QPSAlarmSetting ackQps = cServerResource.getAckAlarmSetting();
 
-			qpsSendAlarm(serverStatsData, sendQps);
-			qpsAckAlarm(serverStatsData, ackQps);
+				qpsSendAlarm(serverStatsData, sendQps);
+				qpsAckAlarm(serverStatsData, ackQps);
+
+			} catch (Exception e) {
+				logger.error("[serverAlarm] serverStatsData {} error.", serverStatsData);
+			}
 		}
 	}
 
