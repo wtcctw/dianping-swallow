@@ -63,6 +63,9 @@ public class MongoResourceCollector extends AbstractResourceCollector{
 	@Override
 	public void doCollector() {
 
+		if(logger.isInfoEnabled()){
+			logger.info("[startMongoResourceCollector]");
+		}
 		HttpResult httpResult = httpSerivice.httpPost(MONGO_REPORT, new ArrayList<NameValuePair>());
 
 		if (httpResult.isSuccess()) {
