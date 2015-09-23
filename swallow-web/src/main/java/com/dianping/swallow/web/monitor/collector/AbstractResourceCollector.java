@@ -74,7 +74,7 @@ public abstract class AbstractResourceCollector extends AbstractLifecycle implem
 
 			}
 
-		}, getCollectorDelay(), getCollectorInterval(), TimeUnit.SECONDS);
+		}, getCollectorDelay(), getCollectorInterval(), TimeUnit.MINUTES);
 	}
 
 	@Override

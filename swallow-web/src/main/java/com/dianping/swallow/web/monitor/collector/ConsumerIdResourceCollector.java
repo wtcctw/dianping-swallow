@@ -43,8 +43,8 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector {
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		collectorName = getClass().getSimpleName();
-		collectorInterval = 10;
-		collectorDelay = 2;
+		collectorInterval = 20;
+		collectorDelay = 1;
 	}
 
 	@Override

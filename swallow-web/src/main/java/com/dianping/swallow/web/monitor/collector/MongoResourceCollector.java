@@ -56,7 +56,7 @@ public class MongoResourceCollector extends AbstractResourceCollector{
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		collectorName = getClass().getSimpleName();
-		collectorInterval = 6 * 60 * 60;
+		collectorInterval = 6 * 60;
 		collectorDelay = 1;
 	}
 

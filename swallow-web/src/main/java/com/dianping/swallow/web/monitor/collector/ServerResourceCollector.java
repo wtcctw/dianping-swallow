@@ -51,7 +51,7 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		collectorName = getClass().getSimpleName();
-		collectorInterval = 6;
+		collectorInterval = 10;
 		collectorDelay = 1;
 	}
 
