@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -12,9 +13,23 @@ import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.util.EnvUtil;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.mongodb.CommandResult;
 import com.mongodb.DBCollection;
+import com.mongodb.MongoClientOptions;
 
 /**
  * @author mengwenchao
@@ -51,15 +66,45 @@ public class DefaultMongoManagerTest extends AbstractTest{
 	}
 	
 	@Test
-	public void testMongo(){
+	public void testMongo() throws JsonParseException, JsonMappingException, IOException{
 		
 		String json = JsonBinder.getNonEmptyBinder().toPrettyJson(mongoManager.getStatus());
 		System.out.println(json);
 
-		Map<String, MongoStatus> result = JsonBinder.getNonEmptyBinder().fromJson(json, new TypeReference<Map<String, MongoStatus>>() {});
 		
-		System.out.println(result.get("default").getClass());
+		Map<String, MongoStatus> result = createObjectMapper().readValue(json, new TypeReference<Map<String, MongoStatus>>() {});
+		System.out.println(result.get("default").getAddAddress());
+	}
+	
+	private ObjectMapper createObjectMapper(){
 		
+		ObjectMapper mapper = new ObjectMapper();
+		// 设置输出时包含属性的风格
+		mapper.setSerializationInclusion(Include.NON_EMPTY);
+		// 序列化时，忽略空的bean(即沒有任何Field)
+		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		// 序列化时，忽略在JSON字符串中存在但Java对象实际没有的属性
+		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		// make all member fields serializable without further annotations,
+		// instead of just public fields (default setting).
+		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+		
+		
+		SimpleModule module = new SimpleModule();
+		module.addDeserializer(MongoClientOptions.class, new JsonDeserializer<MongoClientOptions>() {
+
+			@Override
+			public MongoClientOptions deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException,
+					JsonProcessingException {
+				
+				jp.skipChildren();
+				return MongoClientOptions.builder().build();
+			}
+		});
+		mapper.registerModule(module);
+		
+		return mapper;
+
 	}
 
 	@Test

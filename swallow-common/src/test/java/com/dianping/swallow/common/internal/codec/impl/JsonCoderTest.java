@@ -67,6 +67,9 @@ public class JsonCoderTest {
       JsonCodec jsonEncoder = new JsonCodec(SwallowMessage.class, SwallowMessage.class);
       Assert.assertEquals(o, jsonEncoder.encode(o));
    }
+
+   
+   
    
    
 }
