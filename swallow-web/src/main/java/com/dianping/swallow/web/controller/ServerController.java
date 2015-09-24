@@ -421,7 +421,7 @@ public class ServerController extends AbstractSidebarBasedController {
 
 	}
 
-	private Map<String, Set<String>> parseServerURIString(String value) {
+	public static Map<String, Set<String>> parseServerURIString(String value) {
 
 		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
 
@@ -433,7 +433,6 @@ public class ServerController extends AbstractSidebarBasedController {
 
 			String[] splits = topicNamesToURI.split("=");
 			if (splits.length != 2) {
-				logger.error("[parseServerURIString][wrong config]" + topicNamesToURI);
 				continue;
 			}
 			String consumerServerURI = splits[1].trim();
@@ -443,13 +442,11 @@ public class ServerController extends AbstractSidebarBasedController {
 				for (int i = 0; i < 2; ++i) {
 					String[] ipPort = ipAddrs[i].split(":");
 					if (ipPort.length != 2) {
-						logger.error("[parseConsumerServerURIString][wrong config]" + topicNamesToURI);
 						continue;
 					}
 					ips.add(ipPort[0]);
 				}
 			} else {
-				logger.error("[parseConsumerServerURIString][wrong config]" + topicNamesToURI);
 				continue;
 			}
 
@@ -457,9 +454,6 @@ public class ServerController extends AbstractSidebarBasedController {
 			result.put(topicNameStr, ips);
 		}
 
-		if (logger.isInfoEnabled()) {
-			logger.info("[parseConsumerServerURIString][parse]" + value);
-		}
 		return result;
 	}
 

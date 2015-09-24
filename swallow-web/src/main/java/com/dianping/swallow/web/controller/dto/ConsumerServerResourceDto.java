@@ -23,6 +23,16 @@ public class ConsumerServerResourceDto  extends ServerResourceDto{
 	
 	private String ipCorrelated;
 	
+	private long qps;
+	
+	public long getQps() {
+		return qps;
+	}
+
+	public void setQps(long qps) {
+		this.qps = qps;
+	}
+
 	public int getPort() {
 		return port;
 	}

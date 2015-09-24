@@ -42,85 +42,85 @@ public class TopicApplyControllerTest {
 	private WebApplicationContext wac;
 
 	private MockMvc mockMvc;
-	
+
 	private boolean autotest;
 
-	private String json = "{\"topic\":\"lmdyyh_swallow_test\",\"approver\":\"hongjun.zhong\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":false,\"search\":true}";
+	private String json = "{\"topic\":\"lmdyyh_swallow_test\",\"approver\":\"hongjun.zhong\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":false,\"type\":\"一般消息队列\"}";
 
 	@Before
 	public void setUp() throws Exception {
 
-		this.autotest = false;
+		this.autotest = true;
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 	}
 
 	@Test
 	public void test() {
 		try {
-			
-			if(autotest){
-				
+
+			if (autotest) {
+
 				/*------------case 1 新建topic：lmdyyh_swallow_test-----------------*/
 				MvcResult result = this.mockMvc
 						.perform(
 								post("/api/topic/apply", "json").characterEncoding("UTF-8")
-								.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
-								.andDo(MockMvcResultHandlers.print()).andReturn();
+										.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
+						.andDo(MockMvcResultHandlers.print()).andReturn();
 				JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
 				assertEquals(jsonObject.getInt("status"), 0);
-				
+
 				Thread.sleep(1000);
-				
+
 				/*------------case 2 批复人无权限-----------------*/
 				json = "{\"topic\":\"lmdyyh_swallow_test1\",\"approver\":\"dp.wang\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":false}";
-				
+
 				result = this.mockMvc
 						.perform(
 								post("/api/topic/apply", "json").characterEncoding("UTF-8")
-								.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
-								.andDo(MockMvcResultHandlers.print()).andReturn();
+										.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
+						.andDo(MockMvcResultHandlers.print()).andReturn();
 				jsonObject = new JSONObject(result.getResponse().getContentAsString());
 				assertEquals(jsonObject.getInt("status"), -2);
-				
+
 				Thread.sleep(1000);
-				
+
 				/*------------case 3 配额大于700-----------------*/
 				json = "{\"topic\":\"lmdyyh_swallow_test1\",\"approver\":\"hongjun.zhong\",\"size\":10,\"amount\":100,\"applicant\":\"yapu.wang\",\"test\":false}";
-				
+
 				result = this.mockMvc
 						.perform(
 								post("/api/topic/apply", "json").characterEncoding("UTF-8")
-								.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
-								.andDo(MockMvcResultHandlers.print()).andReturn();
+										.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
+						.andDo(MockMvcResultHandlers.print()).andReturn();
 				jsonObject = new JSONObject(result.getResponse().getContentAsString());
 				assertEquals(jsonObject.getInt("status"), -12);
-				
+
 				Thread.sleep(1000);
-				
+
 				/*------------case 4 名称不合法-----------------*/
 				json = "{\"topic\":\"lmdyyh.swallow.test\",\"approver\":\"hongjun.zhong\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":false}";
-				
+
 				result = this.mockMvc
 						.perform(
 								post("/api/topic/apply", "json").characterEncoding("UTF-8")
-								.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
-								.andDo(MockMvcResultHandlers.print()).andReturn();
+										.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
+						.andDo(MockMvcResultHandlers.print()).andReturn();
 				jsonObject = new JSONObject(result.getResponse().getContentAsString());
 				assertEquals(jsonObject.getInt("status"), -11);
-				
+
 				Thread.sleep(1000);
-				
+
 				/*------------case 5 新建重复topic：lmdyyh_swallow_test-----------------*/
 				json = "{\"topic\":\"lmdyyh_swallow_test\",\"approver\":\"hongjun.zhong\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":false}";
-				
+
 				result = this.mockMvc
 						.perform(
 								post("/api/topic/apply", "json").characterEncoding("UTF-8")
-								.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
-								.andDo(MockMvcResultHandlers.print()).andReturn();
+										.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
+						.andDo(MockMvcResultHandlers.print()).andReturn();
 				jsonObject = new JSONObject(result.getResponse().getContentAsString());
 				assertEquals(jsonObject.getInt("status"), -11);
-			}else{
+			} else {
 				/*-------------测试修改lion配置失败----------------*/
 				/*-------------case 1 修改whitelist成功后，修改consumerServer失败----------------*/
 				/*-------------写成功后断网----------------*/
@@ -133,17 +133,16 @@ public class TopicApplyControllerTest {
 				MvcResult result = this.mockMvc
 						.perform(
 								post("/api/topic/apply", "json").characterEncoding("UTF-8")
-								.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
-								.andDo(MockMvcResultHandlers.print()).andReturn();
+										.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
+						.andDo(MockMvcResultHandlers.print()).andReturn();
 				JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
 				assertEquals(jsonObject.getInt("status"), -17);
-				
-				
+
 				result = this.mockMvc
 						.perform(
 								post("/api/topic/apply", "json").characterEncoding("UTF-8")
-								.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
-								.andDo(MockMvcResultHandlers.print()).andReturn();
+										.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()))
+						.andDo(MockMvcResultHandlers.print()).andReturn();
 				jsonObject = new JSONObject(result.getResponse().getContentAsString());
 				assertEquals(jsonObject.getInt("status"), 0);
 			}

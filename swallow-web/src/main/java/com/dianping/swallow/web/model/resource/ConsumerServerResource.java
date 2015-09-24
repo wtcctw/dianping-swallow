@@ -19,9 +19,19 @@ public class ConsumerServerResource extends ServerResource{
 	
 	private String ipCorrelated;
 	
+	private long qsp;
+	
 	private QPSAlarmSetting sendAlarmSetting;
 	
 	private QPSAlarmSetting ackAlarmSetting;
+
+	public long getQsp() {
+		return qsp;
+	}
+
+	public void setQsp(long qsp) {
+		this.qsp = qsp;
+	}
 
 	public int getPort() {
 		return port;

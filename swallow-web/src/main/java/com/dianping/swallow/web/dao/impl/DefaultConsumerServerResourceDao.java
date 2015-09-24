@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.WriteResult;
 
 /**
@@ -103,5 +104,19 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 
 		return mongoTemplate.findAll(ConsumerServerResource.class, CONSUMERSERVERRESOURCE_COLLECTION);
 	}
+
+	@Override
+	public ConsumerServerResource loadIdleConsumerServer() {
+		
+		Query query = new Query();
+
+		query.with(new Sort(new Sort.Order(Direction.ASC, QPS)));
+		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,
+				CONSUMERSERVERRESOURCE_COLLECTION);
+		
+		return consumerServerResource;
+	}
+	
+	
 
 }

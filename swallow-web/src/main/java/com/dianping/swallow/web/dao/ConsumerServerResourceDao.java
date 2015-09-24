@@ -30,4 +30,6 @@ public interface ConsumerServerResourceDao extends ServerResourceDao{
 	List<ConsumerServerResource> findAll();
 	
 	Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(int offset, int limit);
+	
+	ConsumerServerResource loadIdleConsumerServer();
 }
