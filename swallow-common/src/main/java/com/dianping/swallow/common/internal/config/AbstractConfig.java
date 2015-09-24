@@ -7,12 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 
 /**
  * @author mengwenchao
@@ -44,13 +44,29 @@ public class AbstractConfig {
 		}
 		
 		InputStream ins = null;
+		
 		File file = new File(localFileName);
 		
 		if(!file.exists()){
-			ins = DefaultMongoManager.class.getClassLoader().getResourceAsStream(localFileName);
+			
+			URL url = getClass().getClassLoader().getResource(localFileName);
+			if(url != null){
+				try {
+					ins = url.openStream();
+					if(logger.isInfoEnabled()){
+						logger.info("[loadConfig]" + url);
+					}
+				} catch (IOException e) {
+					logger.error("[loadLocalConfig]" + url, e);
+				}
+			}
+			
 		}else{
 			try {
 				ins = new FileInputStream(file);
+				if(logger.isInfoEnabled()){
+					logger.info("[loadConfig]" + file.getAbsolutePath());
+				}
 			} catch (FileNotFoundException e) {
 				logger.error("[loadConfig]" + localFileName, e);
 			}
@@ -60,9 +76,7 @@ public class AbstractConfig {
 			logger.warn("[loadLocalConfig][file not found]" + localFileName);
 			return;
 		}
-		if(logger.isInfoEnabled()){
-			logger.info("[loadConfig]" + localFileName);
-		}
+		
 		loadLocalConfig(ins);
 
 	}

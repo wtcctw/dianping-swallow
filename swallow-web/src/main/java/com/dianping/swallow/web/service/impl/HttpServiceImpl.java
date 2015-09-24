@@ -10,10 +10,12 @@ import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.params.ConnManagerParams;
@@ -77,10 +79,12 @@ public class HttpServiceImpl implements HttpService {
 		final String release = (vi != null) ? vi.getRelease() : VersionInfo.UNAVAILABLE;
 		HttpProtocolParams.setUserAgent(params, "Apache-HttpClient/" + release + " (java 1.5)");
 
-		ConnManagerParams.setMaxConnectionsPerRoute(params, new ConnPerRouteBean(CommonUtils.getCpuCount()));
+		ConnManagerParams.setMaxConnectionsPerRoute(params, new ConnPerRouteBean(CommonUtils.getCpuCount() * 2));
+		// 等待获取链接时间
 		ConnManagerParams.setTimeout(params, TIMEOUT);
-
+		// 链接超时时间
 		HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
+		// 读取超时时间
 		HttpConnectionParams.setSoTimeout(params, SOCKET_TIMEOUT);
 
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
@@ -106,27 +110,28 @@ public class HttpServiceImpl implements HttpService {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
 				result.setResultType(ResultType.SUCCESS);
 				result.setSuccess(true);
+			} else {
+				handleException(httpPost, result, ResultType.FAILED);
+				logger.error("http post request failed. url = {}", url);
 			}
 		} catch (UnknownHostException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_HOST_UNKNOWN);
+			handleException(httpPost, result, ResultType.FAILED_HOST_UNKNOWN);
 			logger.error("http post request failed. url = {}", url, e);
 		} catch (ConnectTimeoutException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_CONNECTION_TIMEOUT);
+			handleException(httpPost, result, ResultType.FAILED_CONNECTION_TIMEOUT);
 			logger.error("http post request failed. url = {}", url, e);
 		} catch (ConnectException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_CONNECT);
+			handleException(httpPost, result, ResultType.FAILED_CONNECT);
 			logger.error("http post request failed. url = {}", url, e);
 		} catch (SocketTimeoutException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_SOCKET_TIMEOUT);
+			handleException(httpPost, result, ResultType.FAILED_SOCKET_TIMEOUT);
 			logger.error("http post request failed. url = {}", url, e);
 		} catch (IOException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED);
+			handleException(httpPost, result, ResultType.FAILED);
 			logger.error("http post request failed. url = {}", url, e);
+		} catch (ParseException e) {
+			handleException(httpPost, result, ResultType.FAILED);
+			logger.error("http get request failed. url = {}", url, e);
 		}
 		return result;
 	}
@@ -141,29 +146,35 @@ public class HttpServiceImpl implements HttpService {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
 				result.setResultType(ResultType.SUCCESS);
 				result.setSuccess(true);
+			} else {
+				handleException(httpGet, result, ResultType.FAILED);
 			}
 		} catch (UnknownHostException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_HOST_UNKNOWN);
+			handleException(httpGet, result, ResultType.FAILED_HOST_UNKNOWN);
 			logger.error("http get request failed. url = {}", url, e);
 		} catch (ConnectTimeoutException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_CONNECTION_TIMEOUT);
+			handleException(httpGet, result, ResultType.FAILED_CONNECTION_TIMEOUT);
 			logger.error("http get request failed. url = {}", url, e);
 		} catch (ConnectException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_CONNECT);
+			handleException(httpGet, result, ResultType.FAILED_CONNECT);
 			logger.error("http get request failed. url = {}", url, e);
 		} catch (SocketTimeoutException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_SOCKET_TIMEOUT);
+			handleException(httpGet, result, ResultType.FAILED_SOCKET_TIMEOUT);
 			logger.error("http get request failed. url = {}", url, e);
 		} catch (IOException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED);
+			handleException(httpGet, result, ResultType.FAILED);
+			logger.error("http get request failed. url = {}", url, e);
+		} catch (ParseException e) {
+			handleException(httpGet, result, ResultType.FAILED);
 			logger.error("http get request failed. url = {}", url, e);
 		}
 		return result;
+	}
+
+	private void handleException(HttpRequestBase request, HttpResult result, ResultType resultType) {
+		result.setSuccess(false);
+		result.setResultType(resultType);
+		request.abort();
 	}
 
 	public HttpClient getHttpClient() {

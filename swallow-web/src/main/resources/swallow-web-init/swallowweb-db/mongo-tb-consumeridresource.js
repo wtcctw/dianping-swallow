@@ -40,6 +40,6 @@ if (data == null) {
 	resource.updateTime = new Date();
 	db.CONSUMERID_RESOURCE.insert(resource);
 } else {
-	print("CONSUMERID_ALARM_SETTING no data or CONSUMERID_RESOURCE already exsits");
+	print("CONSUMERID_RESOURCE no data or CONSUMERID_RESOURCE already exsits");
 }
-print("CONSUMERID_ALARM_SETTING export to CONSUMERID_RESOURCE end");
+print("CONSUMERID_RESOURCE load data end");
