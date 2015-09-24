@@ -55,8 +55,8 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		super.doInitialize();
 		alarmInterval = 600;
 		alarmDelay = 30;
-		if (StringUtils.isNotBlank(alarmConfig.getSlaveMonitorUrl())) {
-			serverMonitorUrl = alarmConfig.getSlaveMonitorUrl() + MONOGO_MONITOR_SIGN;
+		if (StringUtils.isNotBlank(alarmConfig.getServerMonitorUrl())) {
+			serverMonitorUrl = alarmConfig.getServerMonitorUrl() + MONOGO_MONITOR_SIGN;
 		}
 	}
 
@@ -215,9 +215,9 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 	}
 
 	class MongoAddress {
-		
+
 		private String host;
-		
+
 		private int port;
 
 		public String getHost() {
