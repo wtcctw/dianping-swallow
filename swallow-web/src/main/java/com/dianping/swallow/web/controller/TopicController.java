@@ -120,7 +120,7 @@ public class TopicController extends AbstractMenuController {
 					producerIp.addAll(tmpips);
 				}
 			}
-			if (userUtils.isTrueAdministrator(username)) {
+			if (userUtils.isAdministrator(username, true)) {
 				topics.add(DEFAULT);
 			}
 			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));

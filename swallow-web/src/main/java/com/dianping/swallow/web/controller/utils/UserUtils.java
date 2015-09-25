@@ -67,19 +67,20 @@ public class UserUtils {
 			return userinfo[0];
 		}
 	}
-
+	
 	public boolean isAdministrator(String username) {
-
-		Set<String> adminSet = userService.loadCachedAdministratorSet();
-		boolean isAdmin = adminSet.contains(username) || adminSet.contains(ALL);
-		return isAdmin;
+		return isAdministrator(username, false);
 	}
 
-	public boolean isTrueAdministrator(String username) {
+	public boolean isAdministrator(String username, boolean real) {
 
 		Set<String> adminSet = userService.loadCachedAdministratorSet();
-		boolean isAdmin = adminSet.contains(username);
-		return isAdmin;
+		
+		if(!real){
+			return adminSet.contains(username) || adminSet.contains(ALL);
+		}else{
+			return adminSet.contains(username);
+		}
 	}
 
 	public List<String> topicNames(String username) {
@@ -90,7 +91,7 @@ public class UserUtils {
 
 		if (findAll) {
 			topics = new ArrayList<String>(topicToWhiteList.keySet());
-			if (isTrueAdministrator(username)) {
+			if (isAdministrator(username, true)) {
 				topics.add(TopicController.DEFAULT);
 			}
 		} else {
@@ -143,7 +144,7 @@ public class UserUtils {
 			}
 		}
 
-		if (isTrueAdministrator(username)) {
+		if (isAdministrator(username, true)) {
 			consumerIds.remove(TopicController.DEFAULT);
 		}
 

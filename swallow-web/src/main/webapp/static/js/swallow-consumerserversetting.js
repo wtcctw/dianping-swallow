@@ -102,7 +102,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.ackfluctuationBase = "";
 	$scope.consumerserverEntry.port = "";
 	$scope.consumerserverEntry.type = "";
-	$scope.consumerserverEntry.ipCorrelated = "";
+	$scope.consumerserverEntry.groupId = "";
 	
 	$scope.refreshpage = function(myForm){
 		$scope.consumerserverEntry.type = $('#serverType').val();
@@ -160,29 +160,6 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}).error(function(data, status, headers, config) {
 	});
 	
-//	$scope.loadtopics = function(serverid){
-//		$http(
-//				{
-//					method : 'GET',
-//					params : { serverId: serverid},
-//					url : window.contextPath
-//					+ '/console/server/consumer/topics'
-//				}).success(
-//						function(data, status, headers, config) {
-//							$('#whitelist').tagsinput({
-//								typeahead : {
-//									items : 16,
-//									source : data,
-//									displayText : function(item) {
-//										return item;
-//									} // necessary
-//								}
-//							});
-//						}).error(
-//								function(data, status, headers, config) {
-//								});
-//		
-//	}
 	
 	$scope.isReadOnly = false;
 	$scope.clearModal = function(){
@@ -201,7 +178,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ackfluctuationBase = "";
 		$scope.consumerserverEntry.port = "";
 		$scope.consumerserverEntry.type = "";
-		$scope.consumerserverEntry.ipCorrelated = "";
+		$scope.consumerserverEntry.groupId = "";
 		$http.get(window.contextPath + "/console/server/defaultcresource").success(function(data){
 			$scope.consumerserverEntry.sendpeak = data.sendpeak;
 			$scope.consumerserverEntry.sendvalley = data.sendvalley;
@@ -230,7 +207,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
 		$scope.consumerserverEntry.ackfluctuationBase = $scope.searchPaginator.currentPageItems[index].ackfluctuationBase;
 		$scope.consumerserverEntry.port = $scope.searchPaginator.currentPageItems[index].port;
-		$scope.consumerserverEntry.ipCorrelated = $scope.searchPaginator.currentPageItems[index].ipCorrelated;
+		$scope.consumerserverEntry.groupId = $scope.searchPaginator.currentPageItems[index].groupId;
 		
 	}
 	

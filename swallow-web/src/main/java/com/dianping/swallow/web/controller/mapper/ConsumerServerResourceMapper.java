@@ -35,7 +35,8 @@ public class ConsumerServerResourceMapper {
 		consumerServerResource.setAlarm(dto.isAlarm());
 		consumerServerResource.setHostname(dto.getHostname());
 		consumerServerResource.setPort(dto.getPort());
-		consumerServerResource.setIpCorrelated(dto.getIpCorrelated());
+		consumerServerResource.setGroupId(dto.getGroupId());
+		consumerServerResource.setQsp(dto.getQps());
 		consumerServerResource.setType(ServerType.valueOf(dto.getType()));
 		
 		return consumerServerResource;
@@ -62,7 +63,8 @@ public class ConsumerServerResourceMapper {
 		dto.setHostname(consumerServerResourceDto.getHostname());
 		dto.setAlarm(consumerServerResourceDto.isAlarm());
 		dto.setPort(consumerServerResourceDto.getPort());
-		dto.setIpCorrelated(consumerServerResourceDto.getIpCorrelated());
+		dto.setQps(consumerServerResourceDto.getQsp());
+		dto.setGroupId(consumerServerResourceDto.getGroupId());
 		ServerType type = consumerServerResourceDto.getType();
 		if(type != null){
 			dto.setType(type.name());

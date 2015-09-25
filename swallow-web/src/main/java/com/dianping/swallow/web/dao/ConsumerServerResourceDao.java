@@ -24,10 +24,14 @@ public interface ConsumerServerResourceDao extends ServerResourceDao{
 	ConsumerServerResource findByIp(String ip);
 
 	ConsumerServerResource findByHostname(String hostname);
+	
+	List<ConsumerServerResource> findByGroupId(long groupId);
 
 	ConsumerServerResource findDefault();
 
 	List<ConsumerServerResource> findAll();
 	
 	Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(int offset, int limit);
+	
+	ConsumerServerResource loadIdleConsumerServer();
 }

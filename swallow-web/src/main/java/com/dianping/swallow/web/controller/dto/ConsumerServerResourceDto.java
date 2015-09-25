@@ -21,8 +21,18 @@ public class ConsumerServerResourceDto  extends ServerResourceDto{
 	
 	private String type;
 	
-	private String ipCorrelated;
+	private int groupId;
 	
+	private long qps;
+	
+	public long getQps() {
+		return qps;
+	}
+
+	public void setQps(long qps) {
+		this.qps = qps;
+	}
+
 	public int getPort() {
 		return port;
 	}
@@ -39,12 +49,12 @@ public class ConsumerServerResourceDto  extends ServerResourceDto{
 		this.type = type;
 	}
 
-	public String getIpCorrelated() {
-		return ipCorrelated;
+	public int getGroupId() {
+		return groupId;
 	}
 
-	public void setIpCorrelated(String ipCorrelated) {
-		this.ipCorrelated = ipCorrelated;
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
 	}
 
 	public long getAckpeak() {

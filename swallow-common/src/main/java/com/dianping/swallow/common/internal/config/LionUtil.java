@@ -11,7 +11,7 @@ public interface LionUtil {
 	
 	void createOrSetConfig(String key, String value);
 
-	void createOrSetConfig(String key, String value, HttpMethod method);
+	void createOrSetConfig(String key, String value, String type);
 	
 	Map<String, String> getCfgs(String prefix);
 	

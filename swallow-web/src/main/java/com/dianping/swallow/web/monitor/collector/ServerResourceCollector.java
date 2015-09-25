@@ -104,7 +104,7 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 				if (masterResource == null) {
 					ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(
 							masterServer.getIp(), masterServer.getHostName(), masterServer.getPort(),
-							slaveServer.getIp(), ServerType.MASTER);
+							slaveServer, ServerType.MASTER);
 					cServerResourceService.insert(cServerResource);
 					logger.info("[doConsumerServerCollector] masterServer {} is saved.", masterServer);
 				}

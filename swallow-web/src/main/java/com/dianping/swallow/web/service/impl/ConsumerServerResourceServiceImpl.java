@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,12 +18,10 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.model.resource.ServerType;
-import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 import com.dianping.swallow.web.service.TopicResourceService;
-import com.dianping.swallow.web.util.DateUtil;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
@@ -58,7 +55,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 			configCache = ConfigCache.getInstance();
 
 			consumerServerLionConfig = configCache.getProperty(SWALLOW_CONSUMER_SERVER_URI);
-
+			configCache.addChange(this);
 			logger.info("Init configCache successfully.");
 		} catch (LionException e) {
 			logger.error("Erroe when init lion config", e);
@@ -102,6 +99,12 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
+	public List<ConsumerServerResource> findByGroupId(long groupId) {
+		
+		return consumerServerResourceDao.findByGroupId(groupId);
+	}
+
+	@Override
 	public ServerResource findDefault() {
 
 		return consumerServerResourceDao.findDefault();
@@ -114,14 +117,14 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, String relatedIp,
+	public ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, int groupId,
 			ServerType serverType) {
 		ConsumerServerResource serverResource = new ConsumerServerResource();
 		serverResource.setIp(ip);
 		serverResource.setAlarm(true);
 		serverResource.setHostname(hostName);
 		serverResource.setPort(port);
-		serverResource.setIpCorrelated(relatedIp);
+		serverResource.setGroupId(groupId);
 		serverResource.setType(serverType);
 		serverResource.setCreateTime(new Date());
 		serverResource.setUpdateTime(new Date());
@@ -136,7 +139,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		}
 		return serverResource;
 	}
-	
+
 	@Override
 	public ConsumerServerResource buildConsumerServerResource(String ip) {
 		ConsumerServerResource serverResource = new ConsumerServerResource();
@@ -159,62 +162,44 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	@Override
 	public Pair<String, ResponseStatus> loadIdleConsumerServer() {
 
-		List<ConsumerServerResource> consumerServerResources = findAll();
-		List<String> masterips = new ArrayList<String>();
-		for (ConsumerServerResource consumerServerResource : consumerServerResources) {
-			if (consumerServerResource.getType() == ServerType.MASTER) {
-				String ip = consumerServerResource.getIp();
-				if (StringUtils.isNotBlank(ip) && !masterips.contains(ip)) {
-					masterips.add(ip);
+		ConsumerServerResource consumerServerResource = consumerServerResourceDao.loadIdleConsumerServer();
+
+		if (consumerServerResource == null) {
+			return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
+		}
+		long groupId = consumerServerResource.getGroupId();
+		List<ConsumerServerResource> consumerServerResourceList = consumerServerResourceDao.findByGroupId(groupId);
+		if(consumerServerResourceList.size() < 2){
+			return new Pair<String, ResponseStatus>(StringUtils.EMPTY, ResponseStatus.NOCONSUMERSERVER);
+		}
+		String masterIp = consumerServerResource.getIp();
+		int masterPort = consumerServerResource.getPort();
+		if(!validateIpPort(masterIp, masterPort)){
+			return new Pair<String, ResponseStatus>(StringUtils.EMPTY, ResponseStatus.NOCONSUMERSERVER);
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(masterIp).append(":").append(masterPort);
+		for(ConsumerServerResource csr : consumerServerResourceList){
+			ServerType serverType = csr.getType();
+			
+			if(ServerType.MASTER == serverType){
+				if(!masterIp.equals(csr.getIp())){
+					return new Pair<String, ResponseStatus>(StringUtils.EMPTY, ResponseStatus.NOCONSUMERSERVER);
 				}
+			}else{
+				String slaveIp = csr.getIp();
+				int slavePort = csr.getPort();
+				
+				if(!validateIpPort(slaveIp, slavePort)){
+					return new Pair<String, ResponseStatus>(StringUtils.EMPTY, ResponseStatus.NOCONSUMERSERVER);
+				}else{
+					stringBuilder.append(",").append(slaveIp).append(":").append(slavePort);
+				}
+				
 			}
 		}
-
-		long originalStart = DateUtil.getYesterayStart();
-		long originalStop = DateUtil.getYesterayStop();
-		long startKey = AbstractRetriever.getKey(originalStart);
-		long endKey = AbstractRetriever.getKey(originalStop);
-
-		int count = 0;
-		while (count < 5) {
-			String bestMaster = consumerServerStatsDataService.findIdleConsumerServer(masterips, startKey, endKey);
-
-			if (StringUtils.isBlank(bestMaster)) {
-				count++;
-				originalStart = DateUtil.getOneDayBefore(originalStart);
-				originalStop = DateUtil.getOneDayBefore(originalStop);
-				startKey = AbstractRetriever.getKey(originalStart);
-				endKey = AbstractRetriever.getKey(originalStop);
-			} else {
-				for (ConsumerServerResource consumerServerResource : consumerServerResources) {
-					String mip = consumerServerResource.getIp();
-					if (StringUtils.isNotBlank(mip) && mip.equals(bestMaster)) {
-						String ip = consumerServerResource.getIp();
-						if (StringUtils.isNotBlank(ip) && !masterips.contains(ip)) {
-							masterips.add(ip);
-						}
-					}
-				}
-				ConsumerServerResource ConsumerServerResource = (ConsumerServerResource) this.findByIp(bestMaster);
-				int masterPort = ConsumerServerResource.getPort();
-				String slaveIp = ConsumerServerResource.getIpCorrelated();
-				ConsumerServerResource = (ConsumerServerResource) this.findByIp(slaveIp);
-				if (ConsumerServerResource == null) {
-					return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
-				}
-				int slavePort = ConsumerServerResource.getPort();
-				String ipCorrelated = ConsumerServerResource.getIpCorrelated();
-				if (!bestMaster.equals(ipCorrelated)) {
-					return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
-				}
-				StringBuilder stringBuilder = new StringBuilder();
-				stringBuilder.append(bestMaster).append(":").append(masterPort).append(",").append(slaveIp).append(":")
-						.append(slavePort);
-				return new Pair<String, ResponseStatus>(stringBuilder.toString(), ResponseStatus.SUCCESS);
-			}
-		}
-
-		return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
+		
+		return new Pair<String, ResponseStatus>(stringBuilder.toString(), ResponseStatus.SUCCESS);
 	}
 
 	@Override
@@ -227,5 +212,26 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	public synchronized void setConsumerServerLionConfig(String consumerServerLionConfig) {
 
 		this.consumerServerLionConfig = consumerServerLionConfig;
+	}
+
+	@Override
+	public void onChange(String key, String value) {
+
+		if (key != null && key.equals(SWALLOW_CONSUMER_SERVER_URI)) {
+			if (logger.isInfoEnabled()) {
+				logger.info("[onChange][" + SWALLOW_CONSUMER_SERVER_URI + "]" + value);
+			}
+			this.consumerServerLionConfig = value.trim();
+		} else {
+			if (logger.isInfoEnabled()) {
+				logger.info("not match");
+			}
+		}
+
+	}
+
+	private boolean validateIpPort(String masterIp, int masterPort) {
+
+		return StringUtils.isNotBlank(masterIp) && masterPort > 0;
 	}
 }
