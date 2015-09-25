@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.filter;
+package com.dianping.swallow.web.filter.wrapper;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

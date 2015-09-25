@@ -23,6 +23,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.dianping.swallow.common.internal.util.IOUtilsWrapper;
 import com.dianping.swallow.web.controller.MessageRetransmitController;
 import com.dianping.swallow.web.controller.utils.UserUtils;
+import com.dianping.swallow.web.filter.wrapper.BodyReaderHttpServletRequestWrapper;
 import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.impl.AuthenticationServiceImpl;
 import com.dianping.swallow.web.util.ResponseStatus;
