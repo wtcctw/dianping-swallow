@@ -16,6 +16,13 @@
 			<param name="ConversionPattern" value="%d[%-5p][%t][%c]%m%n" />
 		</layout>
 	</appender>
+
+	<appender name="logFilterFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/data/applogs/swallow-web/logs/logfilter/swallow-web.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d[%-5p][%t][%c]%m%n" />
+		</layout>
+	</appender>
 	
 	<appender name="catAppender" class="com.dianping.cat.log4j.CatAppender"/>
 
@@ -30,6 +37,11 @@
 
 	<logger name="org.springframework" additivity="true">
 		<priority value ="WARN"/>
+	</logger>
+
+	<logger name="com.dianping.swallow.web.filter" additivity="false">
+		<priority value ="INFO"/>
+		<appender-ref ref="logFilterFileAppender" />
 	</logger>
 
 	<root>

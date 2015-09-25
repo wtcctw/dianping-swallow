@@ -70,6 +70,12 @@ public interface HttpService {
 			this.responseBody = responseBody;
 		}
 
+		@Override
+		public String toString() {
+			return "HttpResult [isSuccess=" + isSuccess + ", resultType=" + resultType + ", responseBody="
+					+ responseBody + "]";
+		}
+
 	}
 
 }

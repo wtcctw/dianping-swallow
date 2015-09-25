@@ -65,7 +65,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 			return;
 		}
 
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doBuild");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doBuild");
 		catWrapper.doAction(new SwallowAction() {
 
 			@Override
@@ -81,7 +81,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	@Override
 	protected void doRemove(final long toKey) {
 
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doRemove");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doRemove");
 		catWrapper.doAction(new SwallowAction() {
 
 			@Override
@@ -168,7 +168,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	@Override
 	public void add(final MonitorData monitorData) {
 
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "add");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doAdd");
 		catWrapper.doAction(new SwallowAction() {
 
 			@Override
@@ -185,10 +185,18 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 	}
 
 	protected void doChangeNotify() {
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doChangeNotify");
+		catWrapper.doAction(new SwallowAction() {
 
-		for (MonitorDataListener statisListener : statisListeners) {
-			statisListener.achieveMonitorData();
-		}
+			@Override
+			public void doAction() throws SwallowException {
+
+				for (MonitorDataListener statisListener : statisListeners) {
+					statisListener.achieveMonitorData();
+				}
+			}
+		});
+
 	}
 
 	@Override

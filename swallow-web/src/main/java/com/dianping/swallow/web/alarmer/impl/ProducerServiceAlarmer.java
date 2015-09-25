@@ -1,9 +1,7 @@
 package com.dianping.swallow.web.alarmer.impl;
 
-import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,7 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.AlarmConfig;
 import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
@@ -33,7 +32,8 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 
 	private String pigeonHealthUrl = "http://{ip}:4080/stats.json";
 
-	private static final String PIGEON_HEALTH_URL_KEY = "pigeonHealthUrl";
+	@Autowired
+	private AlarmConfig alarmConfig;
 
 	@Autowired
 	private HttpService httpSerivice;
@@ -47,33 +47,16 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		initProperties();
-	}
-
-	private void initProperties() {
-		try {
-			InputStream in = ProducerServiceAlarmer.class.getClassLoader().getResourceAsStream(SERVER_CHECK_URL_FILE);
-			if (in != null) {
-				Properties prop = new Properties();
-				try {
-					prop.load(in);
-					pigeonHealthUrl = StringUtils.trim(prop.getProperty(PIGEON_HEALTH_URL_KEY));
-				} finally {
-					in.close();
-				}
-			} else {
-				logger.info("[initProperties] Load {} file failed.", SERVER_CHECK_URL_FILE);
-				throw new RuntimeException();
-			}
-		} catch (Exception e) {
-			logger.info("[initProperties] Load {} file failed.", SERVER_CHECK_URL_FILE);
-			throw new RuntimeException(e);
+		alarmInterval = 30;
+		alarmDelay = 30;
+		if (StringUtils.isNotBlank(alarmConfig.getPigeonHealthUrl())) {
+			pigeonHealthUrl = alarmConfig.getPigeonHealthUrl();
 		}
 	}
 
 	@Override
 	public void doAlarm() {
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -94,23 +77,24 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 				continue;
 			}
 			String url = StringUtils.replace(pigeonHealthUrl, "{ip}", serverIp);
-			HttpResult result = checkUrl(url);
+			HttpResult result = httpRequest(url);
 			if (!result.isSuccess()) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE)
-						.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(serverIp, ServerType.PIGEON_SERVICE);
 				lastCheckStatus.put(serverIp, false);
 			} else if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.PIGEON_SERVICE_OK)
-						.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(serverIp, ServerType.PIGEON_SERVICE_OK);
 				lastCheckStatus.put(serverIp, true);
 			}
 
 		}
 		return true;
+	}
+
+	private void report(String serverIp, ServerType serverType) {
+		ServerEvent serverEvent = eventFactory.createServerEvent();
+		serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(serverType).setEventType(EventType.PRODUCER)
+				.setCreateTime(new Date());
+		eventReporter.report(serverEvent);
 	}
 
 }

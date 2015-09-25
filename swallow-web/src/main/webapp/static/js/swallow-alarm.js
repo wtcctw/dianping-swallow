@@ -163,7 +163,7 @@ module
 												+ '/console/topic/namelist'
 									}).success(
 									function(datas, status, headers, config) {
-										$scope.topicnames = datas;
+										$scope.topicnames = datas.first;
 									}).error(
 									function(datas, status, headers, config) {
 										console.log("topicname读取错误");
@@ -201,6 +201,7 @@ module
 												}
 												$("#relatedInfo").data(
 														'typeahead').source = $scope.relatedDatas;
+												console.log($scope.relatedDatas);
 											});
 							$scope.query = function() {
 								if ($scope.queryCount != 0) {

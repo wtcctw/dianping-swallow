@@ -16,7 +16,10 @@ import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerTopicStatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
@@ -42,7 +45,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	private StatsDataFactory statsDataFactory;
 
 	@Override
-	public List<ConsumerServerStatsData> getServerStatsDatas(long timeKey) {
+	public List<ConsumerServerStatsData> getServerStatsDatas(long timeKey, boolean isTotal) {
 		Set<String> serverKeys = consumerDataRetriever.getKeys(new CasKeys());
 		if (serverKeys == null) {
 			return null;
@@ -52,6 +55,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String serverIp = iterator.next();
+			if (!isTotal && TOTAL_KEY.equals(serverIp)) {
+				continue;
+			}
 			ConsumerServerStatisData serverStatisData = (ConsumerServerStatisData) consumerDataRetriever.getValue(
 					new CasKeys(serverIp), StatisType.SEND);
 			if (serverStatisData == null) {
@@ -102,7 +108,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public List<ConsumerIdStatsData> getConsumerIdStatsDatas(long timeKey) {
+	public List<ConsumerIdStatsData> getConsumerIdStatsDatas(long timeKey, boolean isTotal) {
 		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
 		if (topicKeys == null) {
 			return null;
@@ -111,7 +117,10 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		List<ConsumerIdStatsData> consumerIdStatsDataResults = new ArrayList<ConsumerIdStatsData>();
 		while (iterator.hasNext()) {
 			String topicName = iterator.next();
-			List<ConsumerIdStatsData> consumerIdStatsDatas = getConsumerIdStatsDatas(topicName, timeKey);
+			if (!isTotal && TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
+			List<ConsumerIdStatsData> consumerIdStatsDatas = getConsumerIdStatsDatas(topicName, timeKey, isTotal);
 			if (consumerIdStatsDatas == null) {
 				continue;
 			}
@@ -121,7 +130,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey) {
+	public List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey, boolean isTotal) {
 		Set<String> consumerIdKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
 		if (consumerIdKeys == null) {
 			return null;
@@ -131,6 +140,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String consumerId = iterator.next();
+			if (!isTotal && TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
 			ConsumerIdStatsData consumerIdStatsData = statsDataFactory.createConsumerIdStatsData();
 			consumerIdStatsData.setConsumerId(consumerId);
 			consumerIdStatsData.setTopicName(topicName);
@@ -182,6 +194,177 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
 		}
 		return consumerIdStatsDatas;
+	}
+
+	@Override
+	public List<ConsumerIpStatsData> getIpStatsDatas(long timeKey, boolean isTotal) {
+		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+		if (topicKeys == null) {
+			return null;
+		}
+		Iterator<String> iterator = topicKeys.iterator();
+		List<ConsumerIpStatsData> ipStatsDataResults = new ArrayList<ConsumerIpStatsData>();
+		while (iterator.hasNext()) {
+			String topicName = iterator.next();
+			if (!isTotal && TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
+			List<ConsumerIpStatsData> ipStatsDatas = getIpStatsDatas(topicName, timeKey, isTotal);
+			if (ipStatsDatas != null) {
+				ipStatsDataResults.addAll(ipStatsDatas);
+			}
+		}
+		return ipStatsDataResults;
+	}
+
+	@Override
+	public List<ConsumerIpStatsData> getIpStatsDatas(String topicName, long timeKey, boolean isTotal) {
+		Set<String> consumerIdKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
+		if (consumerIdKeys == null) {
+			return null;
+		}
+		Iterator<String> iterator = consumerIdKeys.iterator();
+		List<ConsumerIpStatsData> ipStatsDatasResults = new ArrayList<ConsumerIpStatsData>();
+		while (iterator.hasNext()) {
+			String consumerId = iterator.next();
+			if (!isTotal && TOTAL_KEY.equals(consumerId)) {
+				continue;
+			}
+			List<ConsumerIpStatsData> ipStatsDatas = getIpStatsDatas(topicName, consumerId, timeKey, isTotal);
+			if (ipStatsDatas != null) {
+				ipStatsDatasResults.addAll(ipStatsDatas);
+			}
+		}
+		return ipStatsDatasResults;
+	}
+
+	@Override
+	public List<ConsumerIpStatsData> getIpStatsDatas(String topicName, String consumerId, long timeKey, boolean isTotal) {
+		Set<String> ipKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId));
+		if (ipKeys == null) {
+			return null;
+		}
+		int index = 0;
+		List<ConsumerIpStatsData> ipStatsDatas = new ArrayList<ConsumerIpStatsData>();
+		for (String ip : ipKeys) {
+			if (!isTotal && TOTAL_KEY.equals(ip)) {
+				continue;
+			}
+			MessageInfoStatis sendMStatisData = (MessageInfoStatis) consumerDataRetriever.getValue(new CasKeys(
+					TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND);
+
+			MessageInfoStatis ackMStatisData = (MessageInfoStatis) consumerDataRetriever.getValue(new CasKeys(
+					TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK);
+
+			if (sendMStatisData == null && ackMStatisData == null) {
+				continue;
+			}
+			NavigableMap<Long, Long> sendQpx = null;
+			NavigableMap<Long, Long> sendDelay = null;
+			if (sendMStatisData != null) {
+				sendQpx = sendMStatisData.getQpx(StatisType.SEND);
+				sendDelay = sendMStatisData.getDelay(StatisType.SEND);
+			}
+			NavigableMap<Long, Long> ackQpx = null;
+			NavigableMap<Long, Long> ackDelay = null;
+			if (ackMStatisData != null) {
+				ackQpx = ackMStatisData.getQpx(StatisType.ACK);
+				ackDelay = ackMStatisData.getDelay(StatisType.ACK);
+			}
+
+			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
+					|| sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+				continue;
+			}
+			if (index == 0) {
+				Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+				if (tempKey == null) {
+					return null;
+				}
+				timeKey = tempKey.longValue();
+				index++;
+			}
+
+			ConsumerIpStatsData consumerIpStatsData = statsDataFactory.createConsumerIpStatsData();
+			consumerIpStatsData.setTopicName(topicName);
+			consumerIpStatsData.setConsumerId(consumerId);
+			consumerIpStatsData.setIp(ip);
+			consumerIpStatsData.setTimeKey(timeKey);
+			Long sendQpxValue = sendQpx.get(timeKey);
+
+			if (sendQpxValue != null) {
+				consumerIpStatsData.setSendQps(sendQpxValue.longValue());
+			}
+
+			Long sendDelayValue = sendDelay.get(timeKey);
+
+			if (sendDelayValue != null) {
+				consumerIpStatsData.setSendDelay(sendDelayValue.longValue());
+			}
+
+			Long ackQpxValue = ackQpx.get(timeKey);
+
+			if (ackQpxValue != null) {
+				consumerIpStatsData.setAckQps(ackQpxValue.longValue());
+			}
+			Long ackDelayValue = ackDelay.get(timeKey);
+
+			if (ackDelayValue != null) {
+				consumerIpStatsData.setAckDelay(ackDelayValue.longValue());
+			}
+			consumerIpStatsData.setAccumulation(0L);
+			ipStatsDatas.add(consumerIpStatsData);
+		}
+		return ipStatsDatas;
+	}
+
+	@Override
+	public List<ConsumerIpGroupStatsData> getIpGroupStatsDatas(long timeKey, boolean isTotal) {
+		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+		if (topicKeys == null) {
+			return null;
+		}
+		Iterator<String> iterator = topicKeys.iterator();
+		List<ConsumerIpGroupStatsData> ipGroupStatsDataResults = new ArrayList<ConsumerIpGroupStatsData>();
+		while (iterator.hasNext()) {
+			String topicName = iterator.next();
+			if (!isTotal && TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
+			List<ConsumerIpGroupStatsData> ipGroupStatsDatas = getIpGroupStatsDatas(topicName, timeKey, isTotal);
+			if (ipGroupStatsDatas != null) {
+				ipGroupStatsDataResults.addAll(ipGroupStatsDatas);
+			}
+		}
+		return ipGroupStatsDataResults;
+	}
+
+	@Override
+	public List<ConsumerIpGroupStatsData> getIpGroupStatsDatas(String topicName, long timeKey, boolean isTotal) {
+		Set<String> consumerIdKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
+		if (consumerIdKeys == null) {
+			return null;
+		}
+		Iterator<String> iterator = consumerIdKeys.iterator();
+		List<ConsumerIpGroupStatsData> ipGroupStatsDatas = new ArrayList<ConsumerIpGroupStatsData>();
+		while (iterator.hasNext()) {
+			String consumerId = iterator.next();
+			if (!isTotal && TOTAL_KEY.equals(consumerId)) {
+				continue;
+			}
+			ConsumerIpGroupStatsData ipGroupStatsData = getIpGroupStatsDatas(topicName, consumerId, timeKey, isTotal);
+			ipGroupStatsDatas.add(ipGroupStatsData);
+		}
+
+		return ipGroupStatsDatas;
+	}
+
+	@Override
+	public ConsumerIpGroupStatsData getIpGroupStatsDatas(String topicName, String consumerId, long timeKey,
+			boolean isTotal) {
+		ConsumerIpGroupStatsData ipGroupStatsData = new ConsumerIpGroupStatsData();
+		ipGroupStatsData.setConsumerIpStatsDatas(getIpStatsDatas(topicName, consumerId, timeKey, isTotal));
+		return ipGroupStatsData;
 	}
 
 	private long getConsumerIdAccumulation(String topic, String consumerId, long timeKey) {
@@ -350,4 +533,5 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		}
 		return ips;
 	}
+
 }

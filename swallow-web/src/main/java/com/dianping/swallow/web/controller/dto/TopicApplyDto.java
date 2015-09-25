@@ -7,7 +7,7 @@ package com.dianping.swallow.web.controller.dto;
  */
 public class TopicApplyDto {
 
-	private String topic; // 可多个
+	private String topic; // 1个
 
 	private int size; // KB/消息
 
@@ -15,7 +15,27 @@ public class TopicApplyDto {
 
 	private String approver; // 批准人
 	
-	private String applicant;
+	private String applicant; //申请人
+	
+	private String type; //topic类型
+	
+	private boolean test;
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public boolean isTest() {
+		return test;
+	}
+
+	public void setTest(boolean test) {
+		this.test = test;
+	}
 
 	public String getTopic() {
 		return topic;

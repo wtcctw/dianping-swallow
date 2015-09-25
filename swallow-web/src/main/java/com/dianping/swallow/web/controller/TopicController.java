@@ -109,7 +109,7 @@ public class TopicController extends AbstractMenuController {
 		boolean findAll = userUtils.isAdministrator(username);
 		Set<String> producerIp = new HashSet<String>();
 
-		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
+		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToAdministrator();
 		if (findAll) {
 			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
 			List<TopicResource> topicResources = topicResourceService.findAll();
@@ -120,7 +120,7 @@ public class TopicController extends AbstractMenuController {
 					producerIp.addAll(tmpips);
 				}
 			}
-			if (userUtils.isTrueAdministrator(username)) {
+			if (userUtils.isAdministrator(username, true)) {
 				topics.add(DEFAULT);
 			}
 			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
@@ -185,9 +185,9 @@ public class TopicController extends AbstractMenuController {
 		boolean result = topicResourceService.update(topicResource);
 
 		if (result) {
-			return ResponseStatus.SUCCESS.getStatus();
+			return ResponseStatus.SUCCESS;
 		} else {
-			return ResponseStatus.MONGOWRITE.getStatus();
+			return ResponseStatus.MONGOWRITE;
 		}
 	}
 	

@@ -17,9 +17,7 @@ import com.dianping.swallow.web.model.event.StatisType;
  *         2015年7月31日 下午3:56:31
  */
 @Document(collection = "CONSUMERID_STATS_DATA")
-@CompoundIndexes({
-		@CompoundIndex(name = "IX_TOPICNAME_CONSUMERID_TIMEKEY", def = "{'topicName': -1, 'consumerId': -1, 'timeKey': 1}")
-		})
+@CompoundIndexes({ @CompoundIndex(name = "IX_TOPICNAME_CONSUMERID_TIMEKEY", def = "{'topicName': -1, 'consumerId': -1, 'timeKey': 1}") })
 public class ConsumerIdStatsData extends ConsumerStatsData {
 
 	private String topicName;
@@ -201,18 +199,20 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		return topicName + "&" + consumerId;
 	}
 
-	public void setTotalStatsDatas(ConsumerIdStatsData lastStatsData) {
+	public void setTotalStatsDatas(ConsumerIdStatsData lastStatsData, int sampleInterval) {
+		long currentSendQps = sampleInterval * getSendQps();
+		long currentAckQps = sampleInterval * getAckQps();
 		if (lastStatsData != null) {
-			this.totalSendDelay = lastStatsData.getTotalSendDelay() + getSendDelay();
-			this.totalSendQps = lastStatsData.getTotalSendQps() + getSendQps();
-			this.totalAckDelay = lastStatsData.getTotalAckDelay() + getAckDelay();
-			this.totalAckQps = lastStatsData.getTotalAckQps() + getAckQps();
+			this.totalSendDelay = lastStatsData.getTotalSendDelay() + getSendDelay() * currentSendQps;
+			this.totalSendQps = lastStatsData.getTotalSendQps() + currentSendQps;
+			this.totalAckDelay = lastStatsData.getTotalAckDelay() + getAckDelay() * currentAckQps;
+			this.totalAckQps = lastStatsData.getTotalAckQps() + currentAckQps;
 			this.totalAccumulation = lastStatsData.getTotalAccumulation() + getAccumulation();
 		} else {
-			this.totalSendDelay = getSendDelay();
-			this.totalSendQps = getSendQps();
-			this.totalAckDelay = getAckDelay();
-			this.totalAckQps = getAckQps();
+			this.totalSendDelay = getSendDelay() * currentSendQps;
+			this.totalSendQps = currentSendQps;
+			this.totalAckDelay = getAckDelay() * currentAckQps;
+			this.totalAckQps = currentAckQps;
 			this.totalAccumulation = getAccumulation();
 		}
 	}

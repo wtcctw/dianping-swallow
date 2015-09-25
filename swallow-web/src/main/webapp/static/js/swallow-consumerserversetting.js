@@ -100,8 +100,12 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.ackvalley = "";
 	$scope.consumerserverEntry.ackfluctuation = "";
 	$scope.consumerserverEntry.ackfluctuationBase = "";
+	$scope.consumerserverEntry.port = "";
+	$scope.consumerserverEntry.type = "";
+	$scope.consumerserverEntry.groupId = "";
 	
 	$scope.refreshpage = function(myForm){
+		$scope.consumerserverEntry.type = $('#serverType').val();
 		if ($scope.consumerserverEntry.consumersendpeak < $scope.consumerserverEntry.consumersendvalley
 				|| $scope.consumerserverEntry.consumerackpeak < $scope.consumerserverEntry.consumerackvalley){
 			alert("谷值不能小于峰值");
@@ -156,29 +160,6 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}).error(function(data, status, headers, config) {
 	});
 	
-//	$scope.loadtopics = function(serverid){
-//		$http(
-//				{
-//					method : 'GET',
-//					params : { serverId: serverid},
-//					url : window.contextPath
-//					+ '/console/server/consumer/topics'
-//				}).success(
-//						function(data, status, headers, config) {
-//							$('#whitelist').tagsinput({
-//								typeahead : {
-//									items : 16,
-//									source : data,
-//									displayText : function(item) {
-//										return item;
-//									} // necessary
-//								}
-//							});
-//						}).error(
-//								function(data, status, headers, config) {
-//								});
-//		
-//	}
 	
 	$scope.isReadOnly = false;
 	$scope.clearModal = function(){
@@ -195,6 +176,9 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ackvalley = "";
 		$scope.consumerserverEntry.ackfluctuation = "";
 		$scope.consumerserverEntry.ackfluctuationBase = "";
+		$scope.consumerserverEntry.port = "";
+		$scope.consumerserverEntry.type = "";
+		$scope.consumerserverEntry.groupId = "";
 		$http.get(window.contextPath + "/console/server/defaultcresource").success(function(data){
 			$scope.consumerserverEntry.sendpeak = data.sendpeak;
 			$scope.consumerserverEntry.sendvalley = data.sendvalley;
@@ -208,6 +192,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
+		$('#serverType').val($scope.searchPaginator.currentPageItems[index].type);
 		$scope.isReadOnly = true;
 		$scope.consumerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.consumerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
@@ -221,6 +206,8 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
 		$scope.consumerserverEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
 		$scope.consumerserverEntry.ackfluctuationBase = $scope.searchPaginator.currentPageItems[index].ackfluctuationBase;
+		$scope.consumerserverEntry.port = $scope.searchPaginator.currentPageItems[index].port;
+		$scope.consumerserverEntry.groupId = $scope.searchPaginator.currentPageItems[index].groupId;
 		
 	}
 	
@@ -253,6 +240,8 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.isdefault = function(compare){
 		return compare != "default"; 
 	}
+	
+	$scope.types = ["MASTER","SLAVE"];
 	
 	$scope.changeconsumeralarm = function(ip, index){
 		var id = "#calarm" + index;

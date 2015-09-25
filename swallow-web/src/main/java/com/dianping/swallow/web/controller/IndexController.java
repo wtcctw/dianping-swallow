@@ -30,7 +30,7 @@ public class IndexController extends AbstractMenuController {
 			HttpServletResponse response) {
 		
 		String username = userUtils.getUsername(request);
-		boolean admin = userUtils.isTrueAdministrator(username);
+		boolean admin = userUtils.isAdministrator(username, true);
 		isAdmin.set(admin);
 		
 		if(admin){

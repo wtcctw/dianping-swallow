@@ -107,6 +107,12 @@ public class ServerEvent extends Event {
 			case PIGEON_SERVICE_OK:
 				sendMessage(AlarmType.PRODUCER_SERVER_PIGEON_SERVICE_OK);
 				break;
+			case MONGO_CONFIG:
+				sendMessage(AlarmType.SERVER_MONGO_CONFIG);
+				break;
+			case MONGO_CONFIG_OK:
+				sendMessage(AlarmType.SERVER_MONGO_CONFIG_OK);
+				break;
 			default:
 				break;
 			}

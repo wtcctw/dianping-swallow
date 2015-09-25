@@ -4,7 +4,7 @@ package com.dianping.swallow.web.model.alarm;
  * 
  * @author qiyin
  *
- * 2015年8月5日 上午10:45:54
+ *         2015年8月5日 上午10:45:54
  */
 public enum AlarmType {
 
@@ -42,7 +42,7 @@ public enum AlarmType {
 	 * producer server statis data qps fluctuation type
 	 */
 	PRODUCER_SERVER_QPS_FLUCTUATION(7),
-	
+
 	/**
 	 * producer server statis data qps ok type
 	 */
@@ -52,7 +52,7 @@ public enum AlarmType {
 	 * consumer server data sender type
 	 */
 	CONSUMER_SERVER_SENDER(9),
-	
+
 	/**
 	 * consumer server data sender repaired type
 	 */
@@ -72,7 +72,7 @@ public enum AlarmType {
 	 * consumer server slave and master port both open type
 	 */
 	CONSUMER_SERVER_BOTHPORT_UNOPENED(13),
-	
+
 	/**
 	 * consumer server slave port open repaired type
 	 */
@@ -102,7 +102,7 @@ public enum AlarmType {
 	 * consumer server statis data send qps fluctuation type
 	 */
 	CONSUMER_SERVER_SENDQPS_FLUCTUATION(19),
-	
+
 	/**
 	 * consumer server statis data send qps ok type
 	 */
@@ -122,11 +122,21 @@ public enum AlarmType {
 	 * consumer server statis data ack qps fluctuation type
 	 */
 	CONSUMER_SERVER_ACKQPS_FLUCTUATION(23),
-	
+
 	/**
 	 * consumer server statis data send qps ok type
 	 */
 	CONSUMER_SERVER_ACKQPS_OK(24),
+
+	/**
+	 * 
+	 */
+	SERVER_MONGO_CONFIG(25),
+	
+	/**
+	 * 
+	 */
+	SERVER_MONGO_CONFIG_OK(26),
 
 	/**
 	 * producer topic statis data qps peak type
@@ -147,7 +157,7 @@ public enum AlarmType {
 	 * producer topic statis data delay type
 	 */
 	PRODUCER_TOPIC_MESSAGE_DELAY(1004),
-	
+
 	/**
 	 * consumer topic statis data send qps peak type
 	 */
@@ -231,8 +241,18 @@ public enum AlarmType {
 	/**
 	 * consumer consumerid statis data ack delay type
 	 */
-	CONSUMER_CONSUMERID_ACKMESSAGE_DELAY(1021);
-	
+	CONSUMER_CONSUMERID_ACKMESSAGE_DELAY(1021),
+
+	/**
+	 * producer client send data type
+	 */
+	PRODUCER_CLIENT_SENDER(1022),
+
+	/**
+	 * consumer client receive data type
+	 */
+	CONSUMER_CLIENT_RECEIVER(1023);
+
 	private int number;
 
 	private AlarmType() {

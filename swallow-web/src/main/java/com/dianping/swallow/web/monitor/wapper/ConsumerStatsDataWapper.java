@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
+import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 
@@ -20,7 +22,7 @@ public interface ConsumerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	List<ConsumerServerStatsData> getServerStatsDatas(long timeKey);
+	List<ConsumerServerStatsData> getServerStatsDatas(long timeKey, boolean isTotal);
 
 	/**
 	 * get total topic statis data at timekey point
@@ -36,7 +38,7 @@ public interface ConsumerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	List<ConsumerIdStatsData> getConsumerIdStatsDatas(long timeKey);
+	List<ConsumerIdStatsData> getConsumerIdStatsDatas(long timeKey, boolean isTotal);
 
 	/**
 	 * get one topic related consumerId statis data at timekey point
@@ -44,7 +46,55 @@ public interface ConsumerStatsDataWapper {
 	 * @param timeKey
 	 * @return
 	 */
-	List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey);
+	List<ConsumerIdStatsData> getConsumerIdStatsDatas(String topicName, long timeKey, boolean isTotal);
+
+	/**
+	 * get all ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	List<ConsumerIpStatsData> getIpStatsDatas(long timeKey, boolean isTotal);
+
+	/**
+	 * get one topic related ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	List<ConsumerIpStatsData> getIpStatsDatas(String topicName, long timeKey, boolean isTotal);
+
+	/**
+	 * get one topic and consumerid related ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	List<ConsumerIpStatsData> getIpStatsDatas(String topicName, String consumerId, long timeKey, boolean isTotal);
+
+	/**
+	 * get all ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	List<ConsumerIpGroupStatsData> getIpGroupStatsDatas(long timeKey, boolean isTotal);
+
+	/**
+	 * get one topic related ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	List<ConsumerIpGroupStatsData> getIpGroupStatsDatas(String topicName, long timeKey, boolean isTotal);
+
+	/**
+	 * get one topic and consumerid related ip statis data at timekey point
+	 * 
+	 * @param timeKey
+	 * @return
+	 */
+	ConsumerIpGroupStatsData getIpGroupStatsDatas(String topicName, String consumerId, long timeKey, boolean isTotal);
 
 	/**
 	 * get ConsumerId
@@ -52,7 +102,7 @@ public interface ConsumerStatsDataWapper {
 	 * @return
 	 */
 	List<String> getConusmerIdInfos();
-	
+
 	/**
 	 * 
 	 * @param isTotal

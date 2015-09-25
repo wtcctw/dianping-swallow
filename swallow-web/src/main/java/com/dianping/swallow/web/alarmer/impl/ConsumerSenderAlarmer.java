@@ -41,8 +41,15 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	private static final long SENDER_TIME_SPAN = 20 * 1000;
 
 	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		alarmInterval = 30;
+		alarmDelay = 30;
+	}
+
+	@Override
 	public void doAlarm() {
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -61,7 +68,7 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 		}
 
 		Map<String, Long> statisConsumerServerIps = ipCollectorService.getStatisConsumerServerIps();
-		
+
 		for (ConsumerServerResourcePair cServerReourcePair : cServerReourcePairs) {
 
 			ConsumerServerResource cMasterResource = cServerReourcePair.getMasterResource();
@@ -75,18 +82,12 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 					|| System.currentTimeMillis() - statisConsumerServerIps.get(serverIp).longValue() > SENDER_TIME_SPAN) {
 				String slaveIp = cSlaveResource.getIp();
 				if (checkSlaveServerSender(statisConsumerServerIps, serverIp, slaveIp)) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER)
-							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
+					report(serverIp, serverIp, ServerType.SERVER_SENDER);
 					lastCheckStatus.put(serverIp, false);
 				}
 			} else {
 				if (lastCheckStatus.containsKey(serverIp) && !lastCheckStatus.get(serverIp).booleanValue()) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(serverIp).setSlaveIp(serverIp).setServerType(ServerType.SERVER_SENDER_OK)
-							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
+					report(serverIp, serverIp, ServerType.SERVER_SENDER_OK);
 					lastCheckStatus.put(serverIp, true);
 				}
 			}
@@ -97,23 +98,24 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	private boolean checkSlaveServerSender(Map<String, Long> statisIps, String masterIp, String slaveIp) {
 		if (consumerPortAlarmer.isSlaveOpen(masterIp)) {
 			if (!statisIps.containsKey(slaveIp)) {
-				ServerEvent serverEvent = eventFactory.createServerEvent();
-				serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER_OK)
-						.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-				eventReporter.report(serverEvent);
+				report(slaveIp, slaveIp, ServerType.SERVER_SENDER);
 				lastCheckStatus.put(slaveIp, false);
 			} else {
 				if (lastCheckStatus.containsKey(slaveIp) && !lastCheckStatus.get(slaveIp).booleanValue()) {
-					ServerEvent serverEvent = eventFactory.createServerEvent();
-					serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(ServerType.SERVER_SENDER_OK)
-							.setEventType(EventType.CONSUMER).setCreateTime(new Date());
-					eventReporter.report(serverEvent);
+					report(slaveIp, slaveIp, ServerType.SERVER_SENDER_OK);
 					lastCheckStatus.put(slaveIp, true);
 				}
 			}
 			return false;
 		}
 		return true;
+	}
+
+	private void report(String serverIp, String slaveIp, ServerType serverType) {
+		ServerEvent serverEvent = eventFactory.createServerEvent();
+		serverEvent.setIp(serverIp).setSlaveIp(slaveIp).setServerType(serverType)
+				.setEventType(EventType.CONSUMER).setCreateTime(new Date());
+		eventReporter.report(serverEvent);
 	}
 
 }

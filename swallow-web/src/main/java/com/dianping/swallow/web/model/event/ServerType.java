@@ -46,6 +46,13 @@ public enum ServerType {
 	/**
 	 * 
 	 */
-	SLAVE_SERVICE_OK
-
+	SLAVE_SERVICE_OK,
+	/**
+	 * 
+	 */
+	MONGO_CONFIG,
+	/**
+	 * 
+	 */
+	MONGO_CONFIG_OK
 }

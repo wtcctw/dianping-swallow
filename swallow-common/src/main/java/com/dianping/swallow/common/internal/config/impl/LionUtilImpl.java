@@ -3,6 +3,7 @@ package com.dianping.swallow.common.internal.config.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -49,7 +50,7 @@ public class LionUtilImpl implements LionUtil{
 		String url = BASIC_LION_CONFIG_URL + "/create?" + args;
 		url += "&" + keyValue("key", getRealKey(key));
 		
-		LionRetResultString ret = executeGet(url, LionRetResultString.class);
+		LionRetResultString ret = executeGet(url, LionRetResultString.class, "get");
 		return ret.isSuccess() || ret.getMessage().contains("exists");
 	
 	}
@@ -61,7 +62,7 @@ public class LionUtilImpl implements LionUtil{
 		String url = BASIC_LION_CONFIG_URL + "/get?" + args;
 		url += "&" + keyValue("prefix", getRealKey(prefix));
 		
-		LionRetResultMap ret = executeGet(url, LionRetResultMap.class);
+		LionRetResultMap ret = executeGet(url, LionRetResultMap.class, "get");
 		return ret.getResult();
 	}
 
@@ -85,7 +86,7 @@ public class LionUtilImpl implements LionUtil{
 		return result;
 	}
 
-	private <T extends LionRet> T executeGet(String urlAddress, Class<T> clazz) {
+	private <T extends LionRet> T executeGet(String urlAddress, Class<T> clazz, String type) {
 		
 		if(logger.isDebugEnabled()){
 			logger.debug("[executeGet]" + urlAddress);
@@ -95,8 +96,29 @@ public class LionUtilImpl implements LionUtil{
 		StringBuffer result = new StringBuffer();
 		HttpURLConnection connection = null;
 		try {
-			url = new URL(urlAddress);
-			connection = (HttpURLConnection) url.openConnection();
+			if("get".equals(type)){
+				url = new URL(urlAddress);
+				connection = (HttpURLConnection) url.openConnection();
+			}else if("post".equals(type)){
+				String[] urlParam = urlAddress.split("\\?");
+				if (urlParam.length != 2) {
+					throw new IllegalArgumentException("illegal urlAddress :" + urlAddress);
+				}
+				url = new URL(urlParam[0]);
+				connection = (HttpURLConnection) url.openConnection();
+				connection.setDoOutput(true);
+				connection.setUseCaches(false);
+				connection.setRequestMethod("POST");
+
+				OutputStream os = connection.getOutputStream();
+				os.write(urlParam[1].getBytes("UTF-8"));
+				os.flush();
+				os.close();
+			}else{
+				throw new IllegalArgumentException("illegal type : " + type);
+			}
+			connection.setConnectTimeout(5000);
+			connection.setReadTimeout(3000);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			
 			String line = null;
@@ -145,14 +167,14 @@ public class LionUtilImpl implements LionUtil{
 		return value;
 	}
 
-	public void setValue(String key, String value) {
+	public void setValue(String key, String value, String type) {
 		
 		String args = getBasicArgs("topic配置信息");
 		String url = BASIC_LION_CONFIG_URL + "/set?" + args;
 		url += "&" + keyValue("key", key)
 				+ "&" + keyValue("value", value);
 		
-		LionRetResultString ret = executeGet(url, LionRetResultString.class);
+		LionRetResultString ret = executeGet(url, LionRetResultString.class, type);
 		if(ret ==null || !ret.isSuccess()){
 			throw new IllegalStateException("[setValue][set value failed][" + key + ":" + value + "]" + ret);
 		}
@@ -173,7 +195,25 @@ public class LionUtilImpl implements LionUtil{
 		value = value.trim();
 		
 		createConfig(key);
-		setValue(key, value);
+		setValue(key, value, "get");
+	}
+	
+	@Override
+	public void createOrSetConfig(String key, String value, String type) {
+		
+		if(StringUtils.isEmpty(key)){
+			throw new IllegalArgumentException("key null:" + key);
+		}
+		if(value == null){
+			throw new IllegalArgumentException("value null:" + key);
+		}
+		
+		key = key.trim();
+		value = value.trim();
+		
+		createConfig(key);
+		setValue(key, value, type);
+		
 	}
 
 	public static class LionRet{

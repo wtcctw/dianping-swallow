@@ -125,8 +125,8 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 
 		Query query = new Query();
 
+		String[] topics = topic.split(",");
 		if (StringUtil.isNotBlank(topic)) {
-			String[] topics = topic.split(",");
 			List<Criteria> criterias = new ArrayList<Criteria>();
 			for (String t : topics) {
 				criterias.add(Criteria.where(TOPIC).is(t));
@@ -142,7 +142,12 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 			query.addCriteria(Criteria.where(CONSUMERIPS).is(consumerIp));
 		}
 
-		long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
+		long size = 0;
+		if(topics.length > 100){
+			size = mongoTemplate.count(new Query(), CONSUMERIDRESOURCE_COLLECTION);
+		}else{
+			size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
+		}
 
 		int offset = consumerIdParam.getOffset();
 		int limit = consumerIdParam.getLimit();

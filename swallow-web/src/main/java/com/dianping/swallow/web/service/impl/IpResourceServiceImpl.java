@@ -42,15 +42,15 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findByIp(int offset, int limit, String ... ips) {
+	public Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String ... ips) {
 
-		return ipResourceDao.findByIp(offset, limit, ips);
+		return ipResourceDao.findByIp(offset, limit, admin, ips);
 	}
 	
 	@Override
 	public List<IpResource> findByIp(String ip){
 		
-		Pair<Long, List<IpResource>> pair = ipResourceDao.findByIp(0, 1, ip);
+		Pair<Long, List<IpResource>> pair = ipResourceDao.findByIp(0, 1, false, ip);
 		
 		return pair.getSecond();
 	}
