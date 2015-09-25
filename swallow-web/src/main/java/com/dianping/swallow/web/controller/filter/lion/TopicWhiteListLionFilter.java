@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
@@ -22,11 +21,11 @@ import com.dianping.swallow.web.util.ResponseStatus;
 @Component
 public class TopicWhiteListLionFilter extends AbstractLionFilter{
 
-	@Value("${swallow.web.lion.topicwhitelistlength}")
-	private int whiteListLengthThreshold;
-
 	@Autowired
 	private TopicWhiteList topicWhiteList;
+
+	@Autowired
+	private LionConfigManager lionConfigManager;
 
 	@Override
 	public ResponseStatus doFilterHelper(LionFilterEntity lionFilterEntity, LionFilterResult result,
@@ -42,7 +41,7 @@ public class TopicWhiteListLionFilter extends AbstractLionFilter{
 		Set<String> newTopics = new LinkedHashSet<String>(oldTopics);
 		newTopics.add(topic);
 		String topicJoin = StringUtils.join(newTopics, ";");
-		if (topicJoin.length() < whiteListLengthThreshold) {
+		if (topicJoin.length() < lionConfigManager.getWhitelistLength()) {
 			topicResourceService.loadCachedTopicToAdministrator().remove(topic);
 			return ResponseStatus.INVALIDLENGTH;
 		}

@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.controller.filter.FilterChain;
@@ -26,8 +26,8 @@ public class ConsumerServerLionFilter extends AbstractLionFilter {
 
 	public static final String DEFAULT = "default";
 
-	@Value("${swallow.web.lion.consumerserverlength}")
-	private int consumerServerLengthThreshold;
+	@Autowired
+	private LionConfigManager lionConfigManager;
 
 	@Resource(name = "consumerServerResourceService")
 	private ConsumerServerResourceService consumerServerResourceService;
@@ -61,7 +61,7 @@ public class ConsumerServerLionFilter extends AbstractLionFilter {
 		stringBuilder.append(oldConsumerServerLionConfig).append(";\n").append(topic).append("=")
 				.append(consumerServer);
 		String newConsumerServerLionConfig = stringBuilder.toString();
-		if (newConsumerServerLionConfig.length() < consumerServerLengthThreshold) {
+		if (newConsumerServerLionConfig.length() < lionConfigManager.getConsumerServerUriLength()) {
 			topicResourceService.loadCachedTopicToAdministrator().remove(topic);
 			return ResponseStatus.INVALIDLENGTH;
 		}
