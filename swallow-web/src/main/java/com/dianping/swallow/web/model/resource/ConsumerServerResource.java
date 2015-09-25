@@ -17,7 +17,7 @@ public class ConsumerServerResource extends ServerResource{
 	
 	private ServerType type;
 	
-	private String ipCorrelated;
+	private int groupId;
 	
 	private long qsp;
 	
@@ -49,12 +49,12 @@ public class ConsumerServerResource extends ServerResource{
 		this.type = type;
 	}
 
-	public String getIpCorrelated() {
-		return ipCorrelated;
+	public int getGroupId() {
+		return groupId;
 	}
 
-	public void setIpCorrelated(String ipCorrelated) {
-		this.ipCorrelated = ipCorrelated;
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
 	}
 
 	public QPSAlarmSetting getSendAlarmSetting() {
@@ -75,9 +75,8 @@ public class ConsumerServerResource extends ServerResource{
 
 	@Override
 	public String toString() {
-		return "ConsumerServerResource [port=" + port + ", type=" + type + ", ipCorrelated=" + ipCorrelated
-				+ ", sendAlarmSetting=" + sendAlarmSetting + ", ackAlarmSetting=" + ackAlarmSetting + ", toString()="
-				+ super.toString() + "]";
+		return "ConsumerServerResource [port=" + port + ", type=" + type + ", groupId=" + groupId + ", qsp=" + qsp
+				+ ", sendAlarmSetting=" + sendAlarmSetting + ", ackAlarmSetting=" + ackAlarmSetting + "]";
 	}
-	
+
 }

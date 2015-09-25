@@ -99,6 +99,12 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
+	public List<ConsumerServerResource> findByGroupId(long groupId) {
+		
+		return consumerServerResourceDao.findByGroupId(groupId);
+	}
+
+	@Override
 	public ServerResource findDefault() {
 
 		return consumerServerResourceDao.findDefault();
@@ -111,14 +117,14 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, String relatedIp,
+	public ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, int groupId,
 			ServerType serverType) {
 		ConsumerServerResource serverResource = new ConsumerServerResource();
 		serverResource.setIp(ip);
 		serverResource.setAlarm(true);
 		serverResource.setHostname(hostName);
 		serverResource.setPort(port);
-		serverResource.setIpCorrelated(relatedIp);
+		serverResource.setGroupId(groupId);
 		serverResource.setType(serverType);
 		serverResource.setCreateTime(new Date());
 		serverResource.setUpdateTime(new Date());
@@ -161,23 +167,39 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		if (consumerServerResource == null) {
 			return new Pair<String, ResponseStatus>(BLANK_STRING, ResponseStatus.NOCONSUMERSERVER);
 		}
-		String masterIp = consumerServerResource.getIp();
-		int masterPort = consumerServerResource.getPort();
-		String slaveIp = consumerServerResource.getIpCorrelated();
-		consumerServerResource = (ConsumerServerResource) this.findByIp(slaveIp);
-		if (consumerServerResource == null) {
+		long groupId = consumerServerResource.getGroupId();
+		List<ConsumerServerResource> consumerServerResourceList = consumerServerResourceDao.findByGroupId(groupId);
+		if(consumerServerResourceList.size() < 2){
 			return new Pair<String, ResponseStatus>(StringUtils.EMPTY, ResponseStatus.NOCONSUMERSERVER);
 		}
-		int slavePort = consumerServerResource.getPort();
-		boolean isValidated = validateIpPort(masterIp, masterPort, slaveIp, slavePort);
-		if(!isValidated){
+		String masterIp = consumerServerResource.getIp();
+		int masterPort = consumerServerResource.getPort();
+		if(!validateIpPort(masterIp, masterPort)){
 			return new Pair<String, ResponseStatus>(StringUtils.EMPTY, ResponseStatus.NOCONSUMERSERVER);
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(masterIp).append(":").append(masterPort).append(",").append(slaveIp).append(":")
-				.append(slavePort);
+		stringBuilder.append(masterIp).append(":").append(masterPort);
+		for(ConsumerServerResource csr : consumerServerResourceList){
+			ServerType serverType = csr.getType();
+			
+			if(ServerType.MASTER == serverType){
+				if(!masterIp.equals(csr.getIp())){
+					return new Pair<String, ResponseStatus>(StringUtils.EMPTY, ResponseStatus.NOCONSUMERSERVER);
+				}
+			}else{
+				String slaveIp = csr.getIp();
+				int slavePort = csr.getPort();
+				
+				if(!validateIpPort(slaveIp, slavePort)){
+					return new Pair<String, ResponseStatus>(StringUtils.EMPTY, ResponseStatus.NOCONSUMERSERVER);
+				}else{
+					stringBuilder.append(",").append(slaveIp).append(":").append(slavePort);
+				}
+				
+			}
+		}
+		
 		return new Pair<String, ResponseStatus>(stringBuilder.toString(), ResponseStatus.SUCCESS);
-
 	}
 
 	@Override
@@ -208,8 +230,8 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 
 	}
 
-	private boolean validateIpPort(String masterIp, int masterPort, String slaveIp, int slavePort) {
+	private boolean validateIpPort(String masterIp, int masterPort) {
 
-		return StringUtils.isNotBlank(masterIp) && masterPort > 0 && StringUtils.isNotBlank(slaveIp) && slavePort > 0;
+		return StringUtils.isNotBlank(masterIp) && masterPort > 0;
 	}
 }

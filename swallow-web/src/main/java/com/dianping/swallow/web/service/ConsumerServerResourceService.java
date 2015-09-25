@@ -13,7 +13,7 @@ import com.dianping.swallow.web.util.ResponseStatus;
  *
  *         2015年8月10日下午5:28:21
  */
-public interface ConsumerServerResourceService extends ServerResourceService, ConfigChange{
+public interface ConsumerServerResourceService extends ServerResourceService, ConfigChange {
 
 	boolean insert(ConsumerServerResource consumerServerResource);
 
@@ -25,9 +25,9 @@ public interface ConsumerServerResourceService extends ServerResourceService, Co
 
 	Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(int offset, int limit);
 
-	ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, String relatedIp,
+	ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, int groupId,
 			ServerType serverType);
-	
+
 	ConsumerServerResource buildConsumerServerResource(String ip);
 
 	Pair<String, ResponseStatus> loadIdleConsumerServer();
@@ -35,5 +35,7 @@ public interface ConsumerServerResourceService extends ServerResourceService, Co
 	String loadConsumerServerLionConfig();
 
 	void setConsumerServerLionConfig(String consumerServerLionConfig);
+
+	List<ConsumerServerResource> findByGroupId(long groupId);
 
 }

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.config.LionUtil;
-import com.dianping.swallow.common.internal.config.impl.PostHttpMethod;
 import com.dianping.swallow.web.controller.filter.Filter;
 import com.dianping.swallow.web.controller.filter.FilterChain;
 import com.dianping.swallow.web.controller.filter.result.LionFilterResult;
@@ -52,7 +51,7 @@ public abstract class AbstractLionFilter implements Filter<LionFilterEntity, Lio
 		
 		try {
 			if(!test){
-				lionUtil.createOrSetConfig(key, newValue, new PostHttpMethod());
+				lionUtil.createOrSetConfig(key, newValue, "post");
 			}
 			if (logger.isInfoEnabled()) {
 				logger.info(String.format("Set value from \n[%s]\n to \n[%s]\n of lion key %s successfully", oldValue,

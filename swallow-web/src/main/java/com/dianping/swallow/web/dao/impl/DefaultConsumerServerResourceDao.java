@@ -24,6 +24,8 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 
 	private static final String CONSUMERSERVERRESOURCE_COLLECTION = "CONSUMER_SERVER_RESOURCE";
 
+	private static final String GROUPID = "groupId";
+
 	@Override
 	public boolean insert(ConsumerServerResource consumerServerResource) {
 
@@ -67,6 +69,15 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,
 				CONSUMERSERVERRESOURCE_COLLECTION);
 		return consumerServerResource;
+	}
+
+	@Override
+	public List<ConsumerServerResource> findByGroupId(long groupId) {
+		
+		Query query = new Query(Criteria.where(GROUPID).is(groupId));
+		List<ConsumerServerResource> consumerServerResources = mongoTemplate.find(query, ConsumerServerResource.class,
+				CONSUMERSERVERRESOURCE_COLLECTION);
+		return consumerServerResources;
 	}
 
 	@Override

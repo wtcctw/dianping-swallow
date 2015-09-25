@@ -24,6 +24,8 @@ public interface ConsumerServerResourceDao extends ServerResourceDao{
 	ConsumerServerResource findByIp(String ip);
 
 	ConsumerServerResource findByHostname(String hostname);
+	
+	List<ConsumerServerResource> findByGroupId(long groupId);
 
 	ConsumerServerResource findDefault();
 

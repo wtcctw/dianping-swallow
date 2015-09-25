@@ -50,7 +50,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		
 		for(String addKey : newKeys){
 			
-			lionUtil.createOrSetConfig(TEST_KEY + addKey, value + addKey, new PostHttpMethod());
+			lionUtil.createOrSetConfig(TEST_KEY + addKey, value + addKey, "get");
 		}
 		
 		Map<String, String> cfgs = lionUtil.getCfgs(TEST_KEY);
@@ -70,7 +70,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 	public void testCreateOrSetConfig(){
 		
 		String value = UUID.randomUUID().toString();
-		lionUtil.createOrSetConfig(TEST_KEY, value, new PostHttpMethod());
+		lionUtil.createOrSetConfig(TEST_KEY, value, "get");
 
 		keyValue = cc.getProperty("swallow." + TEST_KEY);
 		
@@ -78,12 +78,33 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		
 		
 		value = UUID.randomUUID().toString();
-		lionUtil.createOrSetConfig(TEST_KEY, value, new PostHttpMethod());
+		
+		lionUtil.createOrSetConfig(TEST_KEY, value, "post");
 
 		sleep(100);
 		//configlistener
 		Assert.assertEquals(value, keyValue);
 
+	}
+	
+	@Test
+	public void testPut(){
+		
+		String value = "put method "  + UUID.randomUUID().toString();
+		lionUtil.createOrSetConfig(TEST_KEY, value, "get");
+
+		keyValue = cc.getProperty("swallow." + TEST_KEY);
+		
+		Assert.assertEquals(value, keyValue);
+		
+		
+		value = "put method " + UUID.randomUUID().toString();
+		try{
+			lionUtil.createOrSetConfig(TEST_KEY, value, "put");
+		}catch(Exception e){
+			Assert.assertEquals(e.getMessage(), "illegal type :put");
+		}
+		
 	}
 	
 	@Test
