@@ -99,15 +99,19 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 		for (ConsumerServerPair consumerServerPair : consumerServerPairs) {
 			ConsumerServer masterServer = consumerServerPair.getMasterServer();
 			ConsumerServer slaveServer = consumerServerPair.getSlaveServer();
-			int groupId = cServerResourceService.getNextGroupId();
+			int groupId = 0;
 			if (StringUtils.isNotBlank(masterServer.getIp())) {
-				ServerResource masterResource = cServerResourceService.findByIp(masterServer.getIp());
+				ConsumerServerResource masterResource = (ConsumerServerResource) cServerResourceService
+						.findByIp(masterServer.getIp());
 				if (masterResource == null) {
+					groupId = cServerResourceService.getNextGroupId();
 					ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(
 							masterServer.getIp(), masterServer.getHostName(), masterServer.getPort(), groupId,
 							ServerType.MASTER);
 					cServerResourceService.insert(cServerResource);
 					logger.info("[doConsumerServerCollector] masterServer {} is saved.", masterServer);
+				} else {
+					groupId = masterResource.getGroupId();
 				}
 			}
 			if (StringUtils.isNotBlank(slaveServer.getIp())) {
@@ -124,11 +128,10 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 
 		Set<String> statsServerIps = consumerStatsDataWapper.getServerIps(false);
 		for (String serverIp : statsServerIps) {
-			ServerResource slaveResource = cServerResourceService.findByIp(serverIp);
-			if (slaveResource == null) {
-				int groupId = cServerResourceService.getNextGroupId();
+			ServerResource serverResource = cServerResourceService.findByIp(serverIp);
+			if (serverResource == null) {
 				ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(serverIp,
-						groupId);
+						cServerResourceService.getNextGroupId());
 				cServerResourceService.insert(cServerResource);
 				logger.info("[doConsumerServerCollector] serverIp {} is saved.", serverIp);
 			}

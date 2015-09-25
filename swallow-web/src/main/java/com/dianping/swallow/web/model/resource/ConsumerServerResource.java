@@ -4,25 +4,24 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 
-
 /**
  * @author mingdongli
  *
- * 2015年8月10日下午2:44:55
+ *         2015年8月10日下午2:44:55
  */
 @Document(collection = "CONSUMER_SERVER_RESOURCE")
-public class ConsumerServerResource extends ServerResource{
-	
+public class ConsumerServerResource extends ServerResource {
+
 	private int port;
-	
+
 	private ServerType type;
-	
+
 	private int groupId;
-	
+
 	private long qps;
-	
+
 	private QPSAlarmSetting sendAlarmSetting;
-	
+
 	private QPSAlarmSetting ackAlarmSetting;
 
 	public int getPort() {

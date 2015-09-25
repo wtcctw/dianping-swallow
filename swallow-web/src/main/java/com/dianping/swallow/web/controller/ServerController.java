@@ -226,7 +226,6 @@ public class ServerController extends AbstractSidebarBasedController {
 
 		ConsumerServerResource consumerServerResource = ConsumerServerResourceMapper.toConsumerResourceSetting(dto);
 		boolean result = consumerServerResourceService.update(consumerServerResource);
-
 		if (!result) {
 			return ResponseStatus.SUCCESS.getStatus();
 		} else {
