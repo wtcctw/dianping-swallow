@@ -27,13 +27,14 @@ import com.dianping.swallow.web.model.alarm.SendInfo;
 import com.dianping.swallow.web.model.alarm.SendType;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.HttpService;
+import com.dianping.swallow.web.service.SeqGeneratorService;
 import com.dianping.swallow.web.util.NetUtil;
 
 /**
  * 
  * @author qiyin
  *
- * 2015年8月12日 下午6:22:31
+ *         2015年8月12日 下午6:22:31
  */
 @Service("alarmService")
 public class AlarmServiceImpl implements AlarmService, InitializingBean {
@@ -56,6 +57,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
 	private static final String NEW_LINE_SIGN = "\n";
 
+	private static final String ALARM_EVENTID_CATEGORY = "alarmEventId";
+
 	private String mailUrl;
 	private String smsUrl;
 	private String weiXinUrl;
@@ -65,6 +68,9 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
 	@Autowired
 	private HttpService httpService;
+
+	@Autowired
+	private SeqGeneratorService seqGeneratorService;
 
 	public AlarmServiceImpl() {
 
@@ -257,7 +263,6 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		initProperties();
 	}
 
-	
 	@Override
 	public Pair<List<Alarm>, Long> findByPage(AlarmParam alarmParam) {
 		return alarmDao.findByPage(alarmParam);
@@ -266,6 +271,11 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 	@Override
 	public Alarm findByEventId(long eventId) {
 		return alarmDao.findByEventId(eventId);
+	}
+
+	@Override
+	public long getNextEventId() {
+		return seqGeneratorService.nextSeq(ALARM_EVENTID_CATEGORY);
 	}
 
 }

@@ -19,19 +19,11 @@ public class ConsumerServerResource extends ServerResource{
 	
 	private int groupId;
 	
-	private long qsp;
+	private long qps;
 	
 	private QPSAlarmSetting sendAlarmSetting;
 	
 	private QPSAlarmSetting ackAlarmSetting;
-
-	public long getQsp() {
-		return qsp;
-	}
-
-	public void setQsp(long qsp) {
-		this.qsp = qsp;
-	}
 
 	public int getPort() {
 		return port;
@@ -75,8 +67,16 @@ public class ConsumerServerResource extends ServerResource{
 
 	@Override
 	public String toString() {
-		return "ConsumerServerResource [port=" + port + ", type=" + type + ", groupId=" + groupId + ", qsp=" + qsp
+		return "ConsumerServerResource [port=" + port + ", type=" + type + ", groupId=" + groupId + ", qps=" + qps
 				+ ", sendAlarmSetting=" + sendAlarmSetting + ", ackAlarmSetting=" + ackAlarmSetting + "]";
+	}
+
+	public long getQps() {
+		return qps;
+	}
+
+	public void setQps(long qps) {
+		this.qps = qps;
 	}
 
 }

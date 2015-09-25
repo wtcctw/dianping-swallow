@@ -11,7 +11,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -120,14 +119,14 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 			if (!(masterResource.getType() == ServerType.MASTER)) {
 				continue;
 			}
-			if (StringUtils.isBlank(masterResource.getIpCorrelated())) {
+			if (masterResource.getGroupId() != 0) {
 				continue;
 			}
 			for (ConsumerServerResource slaveResource : tempResources) {
 				if (!(masterResource.getType() == ServerType.SLAVE)) {
 					continue;
 				}
-				if (!slaveResource.getIp().equals(masterResource.getIpCorrelated())) {
+				if (!slaveResource.getIp().equals(masterResource.getGroupId())) {
 					continue;
 				}
 				newCMasterServerResources.add(masterResource);
