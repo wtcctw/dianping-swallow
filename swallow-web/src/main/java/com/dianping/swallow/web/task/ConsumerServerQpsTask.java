@@ -40,8 +40,25 @@ public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLife
 	@Autowired
 	private ConsumerServerStatsDataService cServerStatsDataService;
 
+	private volatile boolean isOpen = false;
+
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		isOpen = true;
+	}
+
+	@Override
+	protected void doStart() throws Exception {
+		super.doStart();
+		isOpen = true;
+	}
+
 	@Scheduled(cron = "0 5 0 ? * *")
 	public void findQpsTask() {
+		if (!isOpen) {
+			return;
+		}
 		try {
 			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "findQpsTask");
 			catWrapper.doAction(new SwallowAction() {
