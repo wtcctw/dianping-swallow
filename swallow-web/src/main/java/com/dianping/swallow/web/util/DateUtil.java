@@ -46,40 +46,37 @@ public class DateUtil {
 	public static int getCurrentHour() {
 		return Calendar.getInstance(DEFAULT_TIMEZONE).get(Calendar.HOUR_OF_DAY);
 	}
-	
-	public static long ConvertToTimestamp(Date dateTime){
+
+	public static long ConvertToTimestamp(Date dateTime) {
 		return dateTime.getTime();
 	}
 
-	public static long getYesterayStop(){
-		
+	public static long getStartPreNDays(int nDays) {
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.HOUR_OF_DAY, -24 * (nDays + 1));
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 
 		return calendar.getTimeInMillis();
 	}
-	
-	public static long getYesterayStart(){
-		
+
+	public static long getEndPreNDays(int nDays) {
 		Calendar calendar = Calendar.getInstance();
-		long milis = getYesterayStop();
-		calendar.setTimeInMillis(milis);
-		calendar.add(Calendar.HOUR_OF_DAY, -24);
+		calendar.set(Calendar.HOUR_OF_DAY, -24 * nDays);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
 
 		return calendar.getTimeInMillis();
-		
-	}
-	
-	public static long getOneDayBefore(long milis){
-		
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(milis);
-		calendar.add(Calendar.HOUR_OF_DAY, -24);
 
+	}
+
+	public static long getTimePreNDays(int nDays, long curMillis) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(curMillis);
+		calendar.add(Calendar.HOUR_OF_DAY, -24 * nDays);
 		return calendar.getTimeInMillis();
 	}
-	
+
 }

@@ -21,7 +21,6 @@ import com.dianping.swallow.web.model.resource.ServerType;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
-import com.dianping.swallow.web.service.SeqGeneratorService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
@@ -37,8 +36,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 
 	public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
 
-	private static final String SERVER_GROUPID_CATEGORY = "consumerServerGroupId";
-
 	@Autowired
 	private ConsumerServerResourceDao consumerServerResourceDao;
 
@@ -47,9 +44,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 
 	@Resource(name = "consumerServerStatsDataService")
 	private ConsumerServerStatsDataService consumerServerStatsDataService;
-
-	@Autowired
-	private SeqGeneratorService seqGeneratorService;
 
 	private ConfigCache configCache;
 
@@ -242,7 +236,8 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		return StringUtils.isNotBlank(masterIp) && masterPort > 0;
 	}
 
+	@Override
 	public int getNextGroupId() {
-		return (int) seqGeneratorService.nextSeq(SERVER_GROUPID_CATEGORY);
+		return consumerServerResourceDao.getMaxGroupId() + 1;
 	}
 }
