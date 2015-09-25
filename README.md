@@ -558,7 +558,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 ## Swallow 告警
 
-### server告警
+### server告警（针对swallow研发团队）
 
 1.	producer server服务告警
 
@@ -622,43 +622,59 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 	* [24]CONSUMER_SERVER_ACKQPS_OK，确认QPS恢复正常。
 
-### topic告警
+5. 	producer and consumer server配置一致性告警
+
+	服务告警目前只检测mongo的配置，有两种告警类型：
+
+	* [25]SERVER_MONGO_CONFIG，配置与lion上的mongo配置不一致。
+
+	* [26]SERVER_MONGO_CONFIG_OK，配置与lion上的mongo配置不一致。
+
+### topic告警（针对消息的生产者）
 
 1. 	topic统计数据告警
 
 	topic告警目前只检测producer topic QPS的峰值、谷值、波动以及topic message延时四个方面，四种告警类型：
 
-	* [1001]PRODUCER_TOPIC_QPS_PEAK，Topic QPS超过峰值。
+	* [1001]PRODUCER_TOPIC_QPS_PEAK，Topic QPS超过峰值（生产端发送的qps过高，超过设定的峰值）。
 
-	* [1002]PRODUCER_TOPIC_QPS_VALLEY，Topic QPS低于谷值。
+	* [1002]PRODUCER_TOPIC_QPS_VALLEY，Topic QPS低于谷值（生产端发送的qps过低，低于设定的谷值）。
 
-	* [1003]PRODUCER_TOPIC_QPS_FLUCTUATION，Topic QPS与历史数据相比波动过大。
+	* [1003]PRODUCER_TOPIC_QPS_FLUCTUATION，Topic QPS与历史数据相比波动过大（生产端发送的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。
 
-	* [1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message延时。
+	* [1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message存储延时（生产端发送到server端持久化的时间差过大，大于设定的延时阈值）。
 
-### consumerId告警
+2.	topic告警分析
+
+	对于峰值、谷值、波动、延时告警都是对系统当前可能出现异常的一个提示，都可能是程序bug引起的问题，当然也可能没有问题。
+
+3.	告警配置
+
+	根据业务自身的情况,可以设置对应topic的告警配置,可以取消告警或者修改默认的告警配置值。
+
+### consumerId告警（针对消息的消费者）
 
 1. 	consumerId 统计数据告警
 
 	consumerId告警目前只检测某consumerId发送和确认QPS 峰值、谷值、波动以及消费累积九个方面，九种告警类型：
 
-	* [1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值。
+	* [1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值（服务端发送到消费端的qps过高，超过设定的峰值）。
 
-	* [1014]CONSUMER_CONSUMERID_SENDQPS_VALLEY，ConsumerId 发送QPS低于谷值。
+	* [1014]CONSUMER_CONSUMERID_SENDQPS_VALLEY，ConsumerId 发送QPS低于谷值（服务端发送到消费端的qps过低，低于设定的谷值）。
 
-	* [1015]CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION，ConsumerId 发送QPS与历史数据相比波动过大。
+	* [1015]CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION，ConsumerId 发送QPS与历史数据相比波动过大（服务端发送到消费端的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。
 
-	* [1016]CONSUMER_CONSUMERID_SENDMESSAGE_DELAY，ConsumerId 发送QPS延时。
+	* [1016]CONSUMER_CONSUMERID_SENDMESSAGE_DELAY，ConsumerId 发送QPS延时（从服务端从存储取消息到发送到消费端这个过程时间差过大，大于设定的延时阈值）。
 
-	* [1017]CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION，ConsumerId message累积。
+	* [1017]CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION，ConsumerId message累积（服务端消息累积，累积量大于阈值）。
 
-	* [1018]CONSUMER_CONSUMERID_ACKQPS_PEAK，ConsumerId 确认QPS超过峰值。
+	* [1018]CONSUMER_CONSUMERID_ACKQPS_PEAK，ConsumerId 确认QPS超过峰值（消费端确认消息的qps过高，超过设定的峰值）。
 
-	* [1019]CONSUMER_CONSUMERID_ACKQPS_VALLEY，ConsumerId 确认QPS低于谷值。
+	* [1019]CONSUMER_CONSUMERID_ACKQPS_VALLEY，ConsumerId 确认QPS低于谷值（消费端确认消息的qps过低，低于设定的谷值）。
 
-	* [1020]CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION，ConsumerId 确认QPS与历史数据相比波动过大。
+	* [1020]CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION，ConsumerId 确认QPS与历史数据相比波动过大（消费端确认消息的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。
 
-	* [1021]CONSUMER_CONSUMERID_ACKMESSAGE_DELAY，ConsumerId 确认QPS延时。
+	* [1021]CONSUMER_CONSUMERID_ACKMESSAGE_DELAY，ConsumerId 确认QPS延时（从服务端发送成功到消费端确认消息的时间差过大，大于设定的延时阈值）。
 
 2.	consumerId告警分析
 
@@ -671,7 +687,17 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 ### IP告警
 
-1.	IP告警定位到消费者程序运行的主机,用户可以根据自身需要设置是否告警.
+1.	producer ip告警（针对消息的生产者）
+
+	producer ip告警定位到生产者主机，根据统计数据判断主机是否宕机，一种告警类型：
+
+	* [1022]PRODUCER_CLIENT_SENDER，producer client一段时间未发送消息。
+
+2.	consumer ip告警（针对消息的消费者）
+
+	consumer ip告警定位到消费者主机，根据统计数据判断主机是否宕机，一种告警类型：
+
+	* [1023]CONSUMER_CLIENT_RECEIVER，consumer client一段时间未接收消息。
 
 ## Swallow 大盘
 

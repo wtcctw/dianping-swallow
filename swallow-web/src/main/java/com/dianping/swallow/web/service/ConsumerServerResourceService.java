@@ -28,7 +28,7 @@ public interface ConsumerServerResourceService extends ServerResourceService, Co
 	ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, int groupId,
 			ServerType serverType);
 
-	ConsumerServerResource buildConsumerServerResource(String ip);
+	ConsumerServerResource buildConsumerServerResource(String ip, int groupId);
 
 	Pair<String, ResponseStatus> loadIdleConsumerServer();
 
@@ -37,5 +37,7 @@ public interface ConsumerServerResourceService extends ServerResourceService, Co
 	void setConsumerServerLionConfig(String consumerServerLionConfig);
 
 	List<ConsumerServerResource> findByGroupId(long groupId);
+	
+	int getNextGroupId();
 
 }

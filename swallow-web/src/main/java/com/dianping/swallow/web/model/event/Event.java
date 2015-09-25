@@ -23,7 +23,6 @@ import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.SeqGeneratorService;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
@@ -50,8 +49,6 @@ public abstract class Event {
 
 	private static Set<String> devEmails;
 
-	private static final String ALARMEVENTID_CATEGORY = "alarmEventId";
-
 	private static final String ALARM_RECIEVER_FILE_NAME = "swallow-alarm-reciever.properties";
 
 	private static final long timeUnit = 60 * 1000;
@@ -67,8 +64,6 @@ public abstract class Event {
 	private AlarmMetaContainer alarmMetaContainer;
 
 	protected IPCollectorService ipCollectorService;
-
-	private SeqGeneratorService seqGeneratorService;
 
 	private long eventId;
 
@@ -128,10 +123,6 @@ public abstract class Event {
 
 	public void setIPCollectorService(IPCollectorService ipCollectorService) {
 		this.ipCollectorService = ipCollectorService;
-	}
-
-	public void setSeqGeneratorService(SeqGeneratorService seqGeneratorService) {
-		this.seqGeneratorService = seqGeneratorService;
 	}
 
 	@Override
@@ -246,7 +237,7 @@ public abstract class Event {
 	}
 
 	protected long getNextSeq() {
-		return seqGeneratorService.nextSeq(ALARMEVENTID_CATEGORY);
+		return alarmService.getNextEventId();
 	}
 
 	private Set<String> getSwallowIps() {

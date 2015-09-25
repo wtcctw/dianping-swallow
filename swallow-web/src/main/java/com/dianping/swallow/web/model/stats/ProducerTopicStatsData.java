@@ -115,7 +115,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 			this.totalDelay = lastStatsData.getTotalDelay() + this.getDelay() * currQps;
 		} else {
 			this.totalQps = currQps;
-			this.totalDelay = this.getDelay();
+			this.totalDelay = this.getDelay() * currQps;
 		}
 	}
 

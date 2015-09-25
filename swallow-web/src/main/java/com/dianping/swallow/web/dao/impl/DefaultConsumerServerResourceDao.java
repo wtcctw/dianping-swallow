@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
-import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.WriteResult;
 
 /**
@@ -73,7 +72,7 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 
 	@Override
 	public List<ConsumerServerResource> findByGroupId(long groupId) {
-		
+
 		Query query = new Query(Criteria.where(GROUPID).is(groupId));
 		List<ConsumerServerResource> consumerServerResources = mongoTemplate.find(query, ConsumerServerResource.class,
 				CONSUMERSERVERRESOURCE_COLLECTION);
@@ -118,16 +117,27 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 
 	@Override
 	public ConsumerServerResource loadIdleConsumerServer() {
-		
+
 		Query query = new Query();
 
 		query.with(new Sort(new Sort.Order(Direction.ASC, QPS)));
 		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,
 				CONSUMERSERVERRESOURCE_COLLECTION);
-		
+
 		return consumerServerResource;
 	}
-	
-	
+
+	@Override
+	public int getMaxGroupId() {
+		Query query = new Query();
+
+		query.skip(0).limit(1).with(new Sort(new Sort.Order(Direction.DESC, GROUPID)));
+		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,
+				CONSUMERSERVERRESOURCE_COLLECTION);
+		if (consumerServerResource == null) {
+			return 0;
+		}
+		return consumerServerResource.getGroupId();
+	}
 
 }
