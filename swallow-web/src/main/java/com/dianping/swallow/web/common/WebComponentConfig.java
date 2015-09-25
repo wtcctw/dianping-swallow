@@ -22,6 +22,8 @@ public class WebComponentConfig extends AbstractConfig {
 	private boolean isStorager = true;
 	private boolean isDashboard = true;
 
+	private boolean isJobTask = true;
+
 	public WebComponentConfig() {
 		super(COMPONENT_SWITCH_FILE);
 	}
@@ -65,6 +67,14 @@ public class WebComponentConfig extends AbstractConfig {
 
 	public void setDashboard(boolean isDashboard) {
 		this.isDashboard = isDashboard;
+	}
+
+	public boolean isJobTask() {
+		return isJobTask;
+	}
+
+	public void setJobTask(boolean isJobTask) {
+		this.isJobTask = isJobTask;
 	}
 
 }
