@@ -79,12 +79,11 @@ public class LogFilter implements Filter {
 			ServletException {
 
 		Log log = new Log();
-		String username = null;
-		String uri = null;
 
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
-		username = extractUsernameUtils.getUsername(httpRequest);
-		uri = httpRequest.getRequestURI();
+		String username = extractUsernameUtils.getUsername(httpRequest);
+		String uri = httpRequest.getRequestURI();
+		String ip = httpRequest.getRemoteAddr();
 		BufferedRequestWrapper requestWrapper = new BufferedRequestWrapper(httpRequest);
 
 		String requestContent = new String(requestWrapper.getBuffer());
@@ -133,6 +132,7 @@ public class LogFilter implements Filter {
 		log.setUrl(uri);
 		log.setUser(username);
 		log.setResult(result);
+		log.setIp(ip);
 
 		logger.info(log.toString());
 

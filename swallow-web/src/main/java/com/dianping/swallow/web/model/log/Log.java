@@ -19,6 +19,16 @@ public class Log {
 	private String parameter;
 	
 	private String result;
+	
+	private String ip;
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
 
 	public Date getCreateTime() {
 		return createTime;
@@ -62,8 +72,8 @@ public class Log {
 
 	@Override
 	public String toString() {
-		return "Log [createTime=" + createTime + ", user=" + user + ", url=" + url + ", parameter=" + parameter
-				+ ", result=" + result + "]";
+		return "[createTime=" + createTime + ", user=" + user + ", url=" + url + ", parameter=" + parameter
+				+ ", result=" + result + ", ip=" + ip + "]";
 	}
 
 }
