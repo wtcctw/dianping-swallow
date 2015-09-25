@@ -308,7 +308,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 					qps = qpsRawDatas.get(rowData.getKey());
 				}
 				if (qps != null) {
-					sumData += rowData.getValue().longValue() + qps * getSampleIntervalTime();
+					sumData += rowData.getValue().longValue() * qps * getSampleIntervalTime();
 				} else {
 					sumData += rowData.getValue().longValue();
 				}
