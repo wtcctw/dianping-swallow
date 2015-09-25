@@ -1106,9 +1106,9 @@ body .markdown-body
 </ul>
 </li>
 <li><a href="#swallow_6">Swallow 告警</a><ul>
-<li><a href="#server">server告警</a></li>
-<li><a href="#topic_4">topic告警</a></li>
-<li><a href="#consumerid">consumerId告警</a></li>
+<li><a href="#serverswallow">server告警（针对swallow研发团队）</a></li>
+<li><a href="#topic_4">topic告警（针对消息的生产者）</a></li>
+<li><a href="#consumerid">consumerId告警（针对消息的消费者）</a></li>
 <li><a href="#ip">IP告警</a></li>
 </ul>
 </li>
@@ -1798,7 +1798,7 @@ public static void main(String[] args) {
 <img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=C5RhmEkN8Q8PaQaD4sVy1cec%2b7fkmSFNaph0e5Cghbs%3d&amp;docid=014f1aa2503154f31879e4b422cf462ed" /></li>
 </ul>
 <h2 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 告警</h2>
-<h3 id="server"><a name="user-content-server" href="#server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server告警</h3>
+<h3 id="serverswallow"><a name="user-content-serverswallow" href="#serverswallow" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server告警（针对swallow研发团队）</h3>
 <ol>
 <li>
 <p>producer server服务告警</p>
@@ -1893,60 +1893,80 @@ public static void main(String[] args) {
 </li>
 </ul>
 </li>
+<li>
+<p>producer and consumer server配置一致性告警</p>
+<p>服务告警目前只检测mongo的配置，有两种告警类型：</p>
+<ul>
+<li>
+<p>[25]SERVER_MONGO_CONFIG，配置与lion上的mongo配置不一致。</p>
+</li>
+<li>
+<p>[26]SERVER_MONGO_CONFIG_OK，配置与lion上的mongo配置不一致。</p>
+</li>
+</ul>
+</li>
 </ol>
-<h3 id="topic_4"><a name="user-content-topic_4" href="#topic_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>topic告警</h3>
+<h3 id="topic_4"><a name="user-content-topic_4" href="#topic_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>topic告警（针对消息的生产者）</h3>
 <ol>
 <li>
 <p>topic统计数据告警</p>
 <p>topic告警目前只检测producer topic QPS的峰值、谷值、波动以及topic message延时四个方面，四种告警类型：</p>
 <ul>
 <li>
-<p>[1001]PRODUCER_TOPIC_QPS_PEAK，Topic QPS超过峰值。</p>
+<p>[1001]PRODUCER_TOPIC_QPS_PEAK，Topic QPS超过峰值（生产端发送的qps过高，超过设定的峰值）。</p>
 </li>
 <li>
-<p>[1002]PRODUCER_TOPIC_QPS_VALLEY，Topic QPS低于谷值。</p>
+<p>[1002]PRODUCER_TOPIC_QPS_VALLEY，Topic QPS低于谷值（生产端发送的qps过低，低于设定的谷值）。</p>
 </li>
 <li>
-<p>[1003]PRODUCER_TOPIC_QPS_FLUCTUATION，Topic QPS与历史数据相比波动过大。</p>
+<p>[1003]PRODUCER_TOPIC_QPS_FLUCTUATION，Topic QPS与历史数据相比波动过大（生产端发送的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。</p>
 </li>
 <li>
-<p>[1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message延时。</p>
+<p>[1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message存储延时（生产端发送到server端持久化的时间差过大，大于设定的延时阈值）。</p>
 </li>
 </ul>
 </li>
+<li>
+<p>topic告警分析</p>
+<p>对于峰值、谷值、波动、延时告警都是对系统当前可能出现异常的一个提示，都可能是程序bug引起的问题，当然也可能没有问题。</p>
+</li>
+<li>
+<p>告警配置</p>
+<p>根据业务自身的情况,可以设置对应topic的告警配置,可以取消告警或者修改默认的告警配置值。</p>
+</li>
 </ol>
-<h3 id="consumerid"><a name="user-content-consumerid" href="#consumerid" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumerId告警</h3>
+<h3 id="consumerid"><a name="user-content-consumerid" href="#consumerid" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumerId告警（针对消息的消费者）</h3>
 <ol>
 <li>
 <p>consumerId 统计数据告警</p>
 <p>consumerId告警目前只检测某consumerId发送和确认QPS 峰值、谷值、波动以及消费累积九个方面，九种告警类型：</p>
 <ul>
 <li>
-<p>[1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值。</p>
+<p>[1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值（服务端发送到消费端的qps过高，超过设定的峰值）。</p>
 </li>
 <li>
-<p>[1014]CONSUMER_CONSUMERID_SENDQPS_VALLEY，ConsumerId 发送QPS低于谷值。</p>
+<p>[1014]CONSUMER_CONSUMERID_SENDQPS_VALLEY，ConsumerId 发送QPS低于谷值（服务端发送到消费端的qps过低，低于设定的谷值）。</p>
 </li>
 <li>
-<p>[1015]CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION，ConsumerId 发送QPS与历史数据相比波动过大。</p>
+<p>[1015]CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION，ConsumerId 发送QPS与历史数据相比波动过大（服务端发送到消费端的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。</p>
 </li>
 <li>
-<p>[1016]CONSUMER_CONSUMERID_SENDMESSAGE_DELAY，ConsumerId 发送QPS延时。</p>
+<p>[1016]CONSUMER_CONSUMERID_SENDMESSAGE_DELAY，ConsumerId 发送QPS延时（从服务端从存储取消息到发送到消费端这个过程时间差过大，大于设定的延时阈值）。</p>
 </li>
 <li>
-<p>[1017]CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION，ConsumerId message累积。</p>
+<p>[1017]CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION，ConsumerId message累积（服务端消息累积，累积量大于阈值）。</p>
 </li>
 <li>
-<p>[1018]CONSUMER_CONSUMERID_ACKQPS_PEAK，ConsumerId 确认QPS超过峰值。</p>
+<p>[1018]CONSUMER_CONSUMERID_ACKQPS_PEAK，ConsumerId 确认QPS超过峰值（消费端确认消息的qps过高，超过设定的峰值）。</p>
 </li>
 <li>
-<p>[1019]CONSUMER_CONSUMERID_ACKQPS_VALLEY，ConsumerId 确认QPS低于谷值。</p>
+<p>[1019]CONSUMER_CONSUMERID_ACKQPS_VALLEY，ConsumerId 确认QPS低于谷值（消费端确认消息的qps过低，低于设定的谷值）。</p>
 </li>
 <li>
-<p>[1020]CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION，ConsumerId 确认QPS与历史数据相比波动过大。</p>
+<p>[1020]CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION，ConsumerId 确认QPS与历史数据相比波动过大（消费端确认消息的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。</p>
 </li>
 <li>
-<p>[1021]CONSUMER_CONSUMERID_ACKMESSAGE_DELAY，ConsumerId 确认QPS延时。</p>
+<p>[1021]CONSUMER_CONSUMERID_ACKMESSAGE_DELAY，ConsumerId 确认QPS延时（从服务端发送成功到消费端确认消息的时间差过大，大于设定的延时阈值）。</p>
 </li>
 </ul>
 </li>
@@ -1961,7 +1981,20 @@ public static void main(String[] args) {
 </ol>
 <h3 id="ip"><a name="user-content-ip" href="#ip" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>IP告警</h3>
 <ol>
-<li>IP告警定位到消费者程序运行的主机,用户可以根据自身需要设置是否告警.</li>
+<li>
+<p>producer ip告警（针对消息的生产者）</p>
+<p>producer ip告警定位到生产者主机，根据统计数据判断主机是否宕机，一种告警类型：</p>
+<ul>
+<li>[1022]PRODUCER_CLIENT_SENDER，producer client一段时间未发送消息。</li>
+</ul>
+</li>
+<li>
+<p>consumer ip告警（针对消息的消费者）</p>
+<p>consumer ip告警定位到消费者主机，根据统计数据判断主机是否宕机，一种告警类型：</p>
+<ul>
+<li>[1023]CONSUMER_CLIENT_RECEIVER，consumer client一段时间未接收消息。</li>
+</ul>
+</li>
 </ol>
 <h2 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 大盘</h2>
 <h3 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>综合大盘</h3>
