@@ -43,13 +43,12 @@ public class MessageRetransmitController extends AbstractController {
 	@Autowired
 	private AuthenticationStringGenerator authenticationStringGenerator;
 
-	@RequestMapping(value = "/api/message/sendmessageid", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/api/message/sendmessageid", method = RequestMethod.POST)
 	@ResponseBody
-	public Object retransmitapi(@RequestBody SendMessageIDDto sendMessageDto, HttpServletRequest request,
+	public Object retransmitApi(@RequestBody SendMessageIDDto sendMessageDto, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		if (StringUtils.isNotBlank(sendMessageDto.getAuthentication())
-				&& !authenticationStringGenerator.loadAuthenticationString().equals(sendMessageDto.getAuthentication())) {
+		if (!authenticationStringGenerator.loadAuthenticationString().equals(sendMessageDto.getAuthentication())) {
 			return generateResponse(ResponseStatus.UNAUTHENTICATION.getStatus(),
 					ResponseStatus.UNAUTHENTICATION.getMessage());
 		}
@@ -90,16 +89,66 @@ public class MessageRetransmitController extends AbstractController {
 		return generateResponse(ResponseStatus.SUCCESS.getStatus(), ResponseStatus.SUCCESS.getMessage());
 	}
 
-	@RequestMapping(value = "/api/message/sendmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/sendmessageid", method = RequestMethod.POST)
 	@ResponseBody
-	public Object sendOneMessages(@RequestBody SendMessageDto sendMessageDto, HttpServletRequest request,
+	public Object retransmitConsole(@RequestBody SendMessageIDDto sendMessageDto, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		if (StringUtils.isNotBlank(sendMessageDto.getAuthentication())
-				&& !authenticationStringGenerator.loadAuthenticationString().equals(sendMessageDto.getAuthentication())) {
+		if (StringUtils.isBlank(sendMessageDto.getMid())) {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("mid is empty"));
+			}
+			return generateResponse(ResponseStatus.EMPTYCONTENT.getStatus(), ResponseStatus.EMPTYCONTENT.getMessage());
+		}
+		boolean successornot = false;
+		String topicName = sendMessageDto.getTopic();
+		String[] mids = sendMessageDto.getMid().split(",");
+		for (String mid : mids) {
+			Transaction producerTransaction = Cat.getProducer().newTransaction("MsgRetransmit",
+					topicName + ":" + IPUtil.getFirstNoLoopbackIP4Address());
+			try {
+				successornot = messageRetransmitService.doRetransmit(topicName, Long.parseLong(mid));
+				producerTransaction.setStatus(Message.SUCCESS);
+			} catch (Exception e) {
+				producerTransaction.setStatus(e);
+				Cat.getProducer().logError(e);
+			} finally {
+				producerTransaction.complete();
+			}
+
+			if (successornot) {
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("retransmit messages with mid: %s successfully.", mid));
+				}
+			} else {
+				if (logger.isInfoEnabled()) {
+					logger.info(String.format("retransmit messages with mid: %s failed.", mid));
+				}
+				return generateResponse(ResponseStatus.MONGOWRITE.getStatus(), ResponseStatus.MONGOWRITE.getMessage());
+			}
+		}
+
+		return generateResponse(ResponseStatus.SUCCESS.getStatus(), ResponseStatus.SUCCESS.getMessage());
+	}
+
+	@RequestMapping(value = "/api/message/sendmessage", method = RequestMethod.POST)
+	@ResponseBody
+	public Object sendOneMessagesApi(@RequestBody SendMessageDto sendMessageDto, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		if (!authenticationStringGenerator.loadAuthenticationString().equals(sendMessageDto.getAuthentication())) {
 			return generateResponse(ResponseStatus.UNAUTHENTICATION.getStatus(),
 					ResponseStatus.UNAUTHENTICATION.getMessage());
 		}
+		return doSendMessage(sendMessageDto.getTopic(), sendMessageDto.getContent(), sendMessageDto.getType(),
+				sendMessageDto.getDelimitor(), sendMessageDto.getProperty());
+	}
+
+	@RequestMapping(value = "/console/message/sendmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public Object sendOneMessagesConsole(@RequestBody SendMessageDto sendMessageDto, HttpServletRequest request,
+			HttpServletResponse response) {
+
 		return doSendMessage(sendMessageDto.getTopic(), sendMessageDto.getContent(), sendMessageDto.getType(),
 				sendMessageDto.getDelimitor(), sendMessageDto.getProperty());
 	}
