@@ -13,6 +13,7 @@ import org.codehaus.jackson.type.JavaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.model.dom.MongoReport;
 import com.dianping.swallow.web.model.resource.MongoResource;
 import com.dianping.swallow.web.model.resource.MongoType;
@@ -59,6 +60,9 @@ public class MongoResourceCollector extends AbstractResourceCollector{
 	@Override
 	public void doCollector() {
 
+		if(!EnvUtil.isProduct()){
+			return;
+		}
 		if(logger.isInfoEnabled()){
 			logger.info("[startMongoResourceCollector]");
 		}

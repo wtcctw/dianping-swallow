@@ -109,7 +109,9 @@ module.controller('MongoServerSettingController', ['$rootScope', '$scope', '$htt
     	
     }
 	
+	$scope.isReadOnly = false;
 	$scope.clearModal = function(){
+		$scope.isReadOnly = false;
 		$scope.mongoserverEntry.ip = "";
 		$scope.mongoserverEntry.catalog = "";
 		$scope.mongoserverEntry.disk = "";
@@ -117,10 +119,10 @@ module.controller('MongoServerSettingController', ['$rootScope', '$scope', '$htt
 		$scope.mongoserverEntry.qps = "";
 		$scope.mongoserverEntry.topics = "";
 		$scope.mongoserverEntry.mongoType = "";
-		
 	}
 	
 	$scope.setModalInput = function(index){
+		$scope.isReadOnly = true;
 		if(typeof($scope.searchPaginator.currentPageItems[index].topics) != "undefined"){
 			var topics = $scope.searchPaginator.currentPageItems[index].topics;
 			$('#topics').tagsinput('removeAll');
@@ -158,23 +160,7 @@ module.controller('MongoServerSettingController', ['$rootScope', '$scope', '$htt
 	}).error(function(data, status, headers, config) {
 	});
 
-	$scope.types = [];
-	$http({
-		method : 'GET',
-		url : window.contextPath + '/console/server/mongotype'
-	}).success(function(data, status, headers, config) {
-		var types = data;
-		$scope.types = types
-//		$("#mongoType").typeahead({
-//			items: 16, 
-//			source : types,
-//			updater : function(c) {
-//				$scope.mongoserverEntry.ip = c;
-//				return c;
-//			}
-//		})
-	}).error(function(data, status, headers, config) {
-	});
+	$scope.types = ["GENERAL","PAYMENT","SEARCH"];
 	
 	$rootScope.removerecord = function(catalog){
 		$http.get(window.contextPath + "/console/server/mongo/remove", {
