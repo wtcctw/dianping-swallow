@@ -1,30 +1,24 @@
 package com.dianping.swallow.web.controller.mapper;
 
 import com.dianping.swallow.web.controller.dto.IpResourceDto;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.IpResource;
 
+
+/**
+ * @author mingdongli
+ *
+ * 2015年9月29日下午3:18:41
+ */
 public class IpResourceMapper {
 
 	public static IpResource toIpResource(IpResourceDto dto) {
 		
 		IpResource ipResource = new IpResource();
 		
-		IPDesc iPDesc = new IPDesc();
-		iPDesc.setCreateTime(dto.getCreateTime());
-		iPDesc.setDpManager(dto.getDpManager());
-		iPDesc.setDpMobile(dto.getDpMobile());
-		iPDesc.setEmail(dto.getEmail());
-		iPDesc.setIp(dto.getIp());
-		iPDesc.setName(dto.getApplication());
-		iPDesc.setOpEmail(dto.getOpEmail());
-		iPDesc.setOpManager(dto.getOpManager());
-		iPDesc.setOpMobile(dto.getOpMobile());
-		
-		ipResource.setiPDesc(iPDesc);
 		ipResource.setId(dto.getId());
 		ipResource.setAlarm(dto.isAlarm());
 		ipResource.setIp(dto.getIp());
+		ipResource.setApplication(dto.getApplication());
 
 		return ipResource;
 		
@@ -34,21 +28,10 @@ public class IpResourceMapper {
 		
 		IpResourceDto dto = new IpResourceDto();
 		
-		IPDesc iPDesc = ipResource.getiPDesc();
-		
-		dto.setCreateTime(iPDesc.getCreateTime());
-		dto.setDpManager(iPDesc.getDpManager());
-		dto.setDpMobile(iPDesc.getDpMobile());
-		dto.setEmail(iPDesc.getEmail());
-		dto.setIp(iPDesc.getIp());
-		dto.setApplication(iPDesc.getName());
-		dto.setOpEmail(iPDesc.getOpEmail());
-		dto.setOpManager(iPDesc.getOpManager());
-		dto.setOpMobile(iPDesc.getOpMobile());
-		
 		dto.setId(ipResource.getId());
 		dto.setAlarm(ipResource.isAlarm());
 		dto.setIp(ipResource.getIp());
+		dto.setApplication(ipResource.getApplication());
 		
 		return dto;
 		

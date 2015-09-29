@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.model.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.index.CompoundIndex;
@@ -27,7 +28,9 @@ public class ConsumerIdResource extends BaseResource{
 	
 	private boolean alarm;
 	
-	private List<String> consumerIps;
+	private List<IpInfo> ipInfos;
+	
+	private String application;
 	
 	private ConsumerBaseAlarmSetting consumerAlarmSetting;
 
@@ -55,14 +58,6 @@ public class ConsumerIdResource extends BaseResource{
 		this.alarm = alarm;
 	}
 
-	public List<String> getConsumerIps() {
-		return consumerIps;
-	}
-
-	public void setConsumerIps(List<String> consumerIps) {
-		this.consumerIps = consumerIps;
-	}
-
 	public ConsumerBaseAlarmSetting getConsumerAlarmSetting() {
 		return consumerAlarmSetting;
 	}
@@ -75,11 +70,20 @@ public class ConsumerIdResource extends BaseResource{
 		return topic + "&" + consumerId;
 	}
 
-	@Override
-	public String toString() {
-		return "ConsumerIdResource [consumerId=" + consumerId + ", topic=" + topic + ", alarm=" + alarm
-				+ ", consumerIps=" + consumerIps + ", consumerAlarmSetting=" + consumerAlarmSetting + ", toString()="
-				+ super.toString() + "]";
+	public List<IpInfo> getIpInfos() {
+		return ipInfos == null ? new ArrayList<IpInfo>() : ipInfos;
+	}
+
+	public void setIpInfos(List<IpInfo> ipInfos) {
+		this.ipInfos = ipInfos;
+	}
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
 	}
 
 	@JsonIgnore
