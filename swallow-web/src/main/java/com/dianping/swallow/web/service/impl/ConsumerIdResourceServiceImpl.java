@@ -37,7 +37,7 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 		ConsumerIdResource oldConsumerIdResource = consumerIdResourceDao.findByConsumerIdAndTopic(
 				consumerIdResource.getTopic(), consumerIdResource.getConsumerId());
 		if(oldConsumerIdResource != null){
-			consumerIdResource.setIpInfos(oldConsumerIdResource.getIpInfos());
+			consumerIdResource.setConsumerIpInfos(oldConsumerIdResource.getConsumerIpInfos());
 		}
 		return consumerIdResourceDao.update(consumerIdResource);
 	}
@@ -98,7 +98,8 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 		consumerIdResource.setTopic(topic);
 		consumerIdResource.setConsumerId(consumerId);
 
-		consumerIdResource.setIpInfos(new ArrayList<IpInfo>());
+		consumerIdResource.setConsumerIpInfos(new ArrayList<IpInfo>());
+		consumerIdResource.setConsumerApplications(new ArrayList<String>());
 
 		ConsumerIdResource defaultResource = consumerIdResourceDao.findDefault();
 		if (defaultResource == null) {

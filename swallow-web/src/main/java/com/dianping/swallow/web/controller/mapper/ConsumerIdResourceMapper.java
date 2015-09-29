@@ -83,7 +83,7 @@ public class ConsumerIdResourceMapper {
 		dto.setId(consumerIdResource.getId());
 		dto.setAlarm(consumerIdResource.isAlarm());
 		
-		List<IpInfo> list = consumerIdResource.getIpInfos();
+		List<IpInfo> list = consumerIdResource.getConsumerIpInfos();
 		Set<String> ips = IpInfoUtils.extractIps(list);
 		dto.setConsumerIp(StringUtils.join(ips, DELIMITOR));
 		

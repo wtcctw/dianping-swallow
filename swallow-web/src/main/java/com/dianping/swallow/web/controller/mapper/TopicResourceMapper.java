@@ -1,22 +1,29 @@
 package com.dianping.swallow.web.controller.mapper;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.web.controller.dto.TopicResourceDto;
+import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 
+
+/**
+ * @author mingdongli
+ *
+ * 2015年9月29日下午4:51:03
+ */
 public class TopicResourceMapper {
 	private static final String DELIMITOR = ",";
 
 	public static TopicResource toTopicResource(TopicResourceDto dto) {
 		
 		TopicResource topicResource = new TopicResource();
-		
 
 		ProducerBaseAlarmSetting producerBaseAlarmSetting = new ProducerBaseAlarmSetting();
 		
@@ -30,20 +37,6 @@ public class TopicResourceMapper {
 		producerBaseAlarmSetting.setDelay(dto.getDelay());
 		
 		topicResource.setProducerAlarmSetting(producerBaseAlarmSetting);
-		
-		List<String> producerList = new ArrayList<String>();
-		String whiteList = dto.getProducerServer();
-		
-		if (StringUtils.isNotBlank(whiteList)) {
-			String[] whiteLists = whiteList.split(DELIMITOR);
-			for (String wl : whiteLists) {
-				if (!producerList.contains(wl)) {
-					producerList.add(wl);
-				}
-			}
-		}
-		
-		topicResource.setProducerIps(producerList);
 		
 		topicResource.setConsumerAlarm(dto.isConsumerAlarm());
 		topicResource.setProducerAlarm(dto.isProducerAlarm());
@@ -73,8 +66,9 @@ public class TopicResourceMapper {
 		topicResourceDto.setTopic(topicResource.getTopic());
 		topicResourceDto.setAdministrator(topicResource.getAdministrator());
 		
-		List<String> list = topicResource.getProducerIps();
-		topicResourceDto.setProducerServer(StringUtils.join(list, DELIMITOR));
+		List<IpInfo> list = topicResource.getProducerIpInfos();
+		Set<String> ips = IpInfoUtils.extractIps(list);
+		topicResourceDto.setProducerServer(StringUtils.join(ips, DELIMITOR));
 		
 		return topicResourceDto;
 	}

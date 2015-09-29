@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.model.resource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.index.CompoundIndex;
@@ -28,9 +27,9 @@ public class ConsumerIdResource extends BaseResource{
 	
 	private boolean alarm;
 	
-	private List<IpInfo> ipInfos;
+	private List<IpInfo> consumerIpInfos;
 	
-	private String application;
+	private List<String> consumerApplications;
 	
 	private ConsumerBaseAlarmSetting consumerAlarmSetting;
 
@@ -70,20 +69,20 @@ public class ConsumerIdResource extends BaseResource{
 		return topic + "&" + consumerId;
 	}
 
-	public List<IpInfo> getIpInfos() {
-		return ipInfos == null ? new ArrayList<IpInfo>() : ipInfos;
+	public List<IpInfo> getConsumerIpInfos() {
+		return consumerIpInfos;
 	}
 
-	public void setIpInfos(List<IpInfo> ipInfos) {
-		this.ipInfos = ipInfos;
+	public void setConsumerIpInfos(List<IpInfo> consumerIpInfos) {
+		this.consumerIpInfos = consumerIpInfos;
 	}
 
-	public String getApplication() {
-		return application;
+	public List<String> getConsumerApplications() {
+		return consumerApplications;
 	}
 
-	public void setApplication(String application) {
-		this.application = application;
+	public void setConsumerApplications(List<String> consumerApplications) {
+		this.consumerApplications = consumerApplications;
 	}
 
 	@JsonIgnore

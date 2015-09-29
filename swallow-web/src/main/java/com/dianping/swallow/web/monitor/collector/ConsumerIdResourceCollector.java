@@ -78,13 +78,13 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector {
 								topic, cid);
 						if (ips != null && !ips.isEmpty()) {
 							List<IpInfo> ipInfo = IpInfoUtils.buildIpInfo(ips);
-							consumerIdResource.setIpInfos(ipInfo);
+							consumerIdResource.setConsumerIpInfos(ipInfo);
 						}
 						consumerIdResourceService.insert(consumerIdResource);
 					} else {
 						if (ips != null && !ips.isEmpty()) {
 							ConsumerIdResource consumerIdResource = pair.getSecond().get(0);
-							List<IpInfo> ipInfo = consumerIdResource.getIpInfos();
+							List<IpInfo> ipInfo = consumerIdResource.getConsumerIpInfos();
 							Set<String> oldIps = IpInfoUtils.extractIps(ipInfo);
 							@SuppressWarnings("unchecked")
 							Collection<String> subtractCollection = CollectionUtils.subtract(ips, oldIps);
@@ -92,7 +92,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector {
 								continue;
 							} else {
 								ipInfo.addAll(IpInfoUtils.buildIpInfo(subtractCollection));
-								consumerIdResource.setIpInfos(ipInfo);
+								consumerIdResource.setConsumerIpInfos(ipInfo);
 								consumerIdResourceService.insert(consumerIdResource);
 							}
 						}
@@ -117,15 +117,20 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector {
 
 					if (topicResource == null) {
 						topicResource = topicResourceService.buildTopicResource(topic);
-						topicResource.setProducerIps(newList);
+						List<IpInfo> ipInfo = IpInfoUtils.buildIpInfo(ips);
+						topicResource.setProducerIpInfos(ipInfo);
 						topicResourceService.insert(topicResource);
 					} else {
-						List<String> originalList = topicResource.getProducerIps();
+						List<IpInfo> originalIpInfoList = topicResource.getProducerIpInfos();
+						Set<String> originalList = IpInfoUtils.extractIps(originalIpInfoList);
 
 						if (newList.containsAll(originalList) && originalList.containsAll(newList)) {
 							continue;
 						} else {
-							topicResource.setProducerIps(newList);
+							@SuppressWarnings("unchecked")
+							Collection<String> subtractCollection = CollectionUtils.subtract(newList, originalList);
+							originalIpInfoList.addAll(IpInfoUtils.buildIpInfo(subtractCollection));
+							topicResource.setProducerIpInfos(originalIpInfoList);
 							topicResourceService.insert(topicResource);
 						}
 

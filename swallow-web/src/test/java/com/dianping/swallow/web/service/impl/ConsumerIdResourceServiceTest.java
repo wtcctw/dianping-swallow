@@ -72,7 +72,7 @@ public class ConsumerIdResourceServiceTest {
 		consumerip.add("1.0.0.3");
 		
 		List<IpInfo> ipInfo = IpInfoUtils.buildIpInfo(consumerip);
-		consumerIdResource.setIpInfos(ipInfo);
+		consumerIdResource.setConsumerIpInfos(ipInfo);
 		consumerIdResource.setAlarm(Boolean.TRUE);
 		
 		return consumerIdResource;

@@ -44,7 +44,6 @@ public class IpResource extends BaseResource{
 		this.alarm = alarm;
 	}
 
-
 	@Override
 	public String toString() {
 		return "IpResource [ip=" + ip + ", alarm=" + alarm + "]";

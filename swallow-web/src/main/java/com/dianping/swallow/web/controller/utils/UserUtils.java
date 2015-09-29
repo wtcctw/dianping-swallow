@@ -175,7 +175,7 @@ public class UserUtils {
 			Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.findByTopic(consumerIdParam);
 			if (pair.getFirst() > 0) {
 				for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
-					List<IpInfo> ipInfos = consumerIdResource.getIpInfos();
+					List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
 					Set<String> ips = IpInfoUtils.extractIps(ipInfos);
 					if (!ips.isEmpty()) {
 						consumerIps.addAll(ips);
@@ -186,7 +186,7 @@ public class UserUtils {
 			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERIP);
 
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-				List<IpInfo> ipInfos = consumerIdResource.getIpInfos();
+				List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
 				Set<String> ips = IpInfoUtils.extractIps(ipInfos);
 				if (!ips.isEmpty()) {
 					consumerIps.addAll(ips);
@@ -216,7 +216,7 @@ public class UserUtils {
 			Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.findByTopic(consumerIdParam);
 			if (pair.getFirst() > 0) {
 				for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
-					List<IpInfo> ipInfos = consumerIdResource.getIpInfos();
+					List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
 					Set<String> ips = IpInfoUtils.extractIps(ipInfos);
 					if (!ips.isEmpty()) {
 						consumerIps.addAll(ips);
@@ -236,7 +236,7 @@ public class UserUtils {
 				if (!consumerIds.contains(cid)) {
 					consumerIds.add(cid);
 				}
-				List<IpInfo> ipInfos = consumerIdResource.getIpInfos();
+				List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
 				Set<String> ips = IpInfoUtils.extractIps(ipInfos);
 				if (!ips.isEmpty()) {
 					consumerIps.addAll(ips);
@@ -253,14 +253,15 @@ public class UserUtils {
 		Set<String> producerIp = new HashSet<String>();
 
 		List<TopicResource> topicResources = topicResourceService.findAll();
-		List<String> tmpips;
+		Set<String> tmpips;
 		if (!isAdministrator(username)) {
 			for (TopicResource topicResource : topicResources) {
 				String admin = topicResource.getAdministrator();
 				if (StringUtils.isNotBlank(admin)) {
 					String[] adminArray = admin.split(",");
 					if (Arrays.asList(adminArray).contains(username)) {
-						tmpips = topicResource.getProducerIps();
+						List<IpInfo> tmpIpInfos = topicResource.getProducerIpInfos();
+						tmpips = IpInfoUtils.extractIps(tmpIpInfos);
 						if (tmpips != null) {
 							producerIp.addAll(tmpips);
 						}
@@ -269,7 +270,8 @@ public class UserUtils {
 			}
 		} else {
 			for (TopicResource topicResource : topicResources) {
-				tmpips = topicResource.getProducerIps();
+				List<IpInfo> tmpIpInfos = topicResource.getProducerIpInfos();
+				tmpips = IpInfoUtils.extractIps(tmpIpInfos);
 				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}

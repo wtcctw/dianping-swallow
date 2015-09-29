@@ -28,6 +28,7 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.controller.dto.IpResourceDto;
 import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
+import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
@@ -197,9 +198,9 @@ public class IPController extends AbstractMenuController {
 		List<TopicResource> topicResources = topicResourceService.findAll();
 		Set<String> ips = new LinkedHashSet<String>();
 
-		List<String> ipList = null;
 		for (TopicResource topicResource : topicResources) {
-			ipList = topicResource.getProducerIps();
+			List<IpInfo> ipInfoList = topicResource.getProducerIpInfos();
+			Set<String> ipList = IpInfoUtils.extractIps(ipInfoList);
 			if (ipList != null) {
 				ips.addAll(ipList);
 			}
@@ -214,10 +215,11 @@ public class IPController extends AbstractMenuController {
 		Set<String> ips = new LinkedHashSet<String>();
 
 		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-			List<IpInfo> ipList = consumerIdResource.getIpInfos();
+			List<IpInfo> ipInfoList = consumerIdResource.getConsumerIpInfos();
+			Set<String> ipList = IpInfoUtils.extractIps(ipInfoList);
 			if (ipList != null) {
-				for(IpInfo ipInfo : ipList){
-					ips.add(ipInfo.getIp());
+				for(String ip : ipList){
+					ips.add(ip);
 				}
 			}
 		}

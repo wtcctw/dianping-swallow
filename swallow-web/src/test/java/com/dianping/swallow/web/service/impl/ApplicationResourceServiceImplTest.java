@@ -14,7 +14,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.ApplicationResource;
 import com.dianping.swallow.web.service.ApplicationResourceService;
 
@@ -40,16 +39,10 @@ public class ApplicationResourceServiceImplTest {
 	private ApplicationResource createApplicationResource() {
 
 		ApplicationResource applicationResource = new ApplicationResource();
-		IPDesc iPDesc = new IPDesc();
-
-		iPDesc.setCreateTime(new Date());
-		iPDesc.setEmail("lmdyyh@163.com");
-		iPDesc.setDpMobile("18795858599");
-		iPDesc.setOpEmail("jiaxin.fan@dianping.com");
-		iPDesc.setName("tuangou");
-
-		applicationResource.setiPDesc(iPDesc);
-		
+		applicationResource.setCreateTime(new Date());
+		applicationResource.setEmail("lmdyyh@163.com");
+		applicationResource.setDpMobile("18795858599");
+		applicationResource.setOpEmail("jiaxin.fan@dianping.com");
 		applicationResource.setApplication("tuangou");
 
 		return applicationResource;

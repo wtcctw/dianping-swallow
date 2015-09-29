@@ -171,7 +171,7 @@ public class ConsumerIdController extends AbstractMenuController {
 		ConsumerIdResource consumerIdResource = consumerIdResourceService.findByConsumerIdAndTopic(topic, cid);
 		map.put("topic", topic);
 		map.put("cid", cid);
-		map.put("entity", consumerIdResource.getIpInfos());
+		map.put("entity", consumerIdResource.getConsumerIpInfos());
 		return new ModelAndView("consumerid/ipinfo", map);
 	}
 
@@ -192,7 +192,7 @@ public class ConsumerIdController extends AbstractMenuController {
 	private boolean doSetIpInfo(String topic, String cid, String ip, String type, boolean value){
 		
 		ConsumerIdResource consumerIdResource = consumerIdResourceService.findByConsumerIdAndTopic(topic, cid);
-		List<IpInfo> ipInfos = consumerIdResource.getIpInfos();
+		List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
 		if(ipInfos == null || ip == null || type == null){
 			return false;
 		}
@@ -205,7 +205,7 @@ public class ConsumerIdController extends AbstractMenuController {
 				}else{
 					return false;
 				}
-				consumerIdResource.setIpInfos(ipInfos);
+				consumerIdResource.setConsumerIpInfos(ipInfos);
 				//修改ipinfo调用insert，其他的则调用update
 				return consumerIdResourceService.insert(consumerIdResource);
 			}

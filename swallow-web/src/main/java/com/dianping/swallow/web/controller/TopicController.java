@@ -31,8 +31,10 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.dto.TopicResourceDto;
 import com.dianping.swallow.web.controller.mapper.TopicResourceMapper;
+import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.Administrator;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.UserService;
@@ -113,9 +115,9 @@ public class TopicController extends AbstractMenuController {
 		if (findAll) {
 			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
 			List<TopicResource> topicResources = topicResourceService.findAll();
-			List<String> tmpips;
 			for (TopicResource topicResource : topicResources) {
-				tmpips = topicResource.getProducerIps();
+				List<IpInfo> tmpIpInfos = topicResource.getProducerIpInfos();
+				Set<String> tmpips = IpInfoUtils.extractIps(tmpIpInfos);
 				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}
@@ -136,7 +138,8 @@ public class TopicController extends AbstractMenuController {
 			}
 
 			for (String topic : topics) {
-				List<String> tmpips = topicResourceService.findByTopic(topic).getProducerIps();
+				List<IpInfo> tmpIpInfos = topicResourceService.findByTopic(topic).getProducerIpInfos();
+				Set<String> tmpips = IpInfoUtils.extractIps(tmpIpInfos);
 				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}
@@ -190,7 +193,7 @@ public class TopicController extends AbstractMenuController {
 			return ResponseStatus.MONGOWRITE;
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/topic/auth/ip", method = RequestMethod.POST)
 	@ResponseBody
 	public Object queryProducerIp(@RequestBody TopicQueryDto topicQueryDto) {
@@ -198,10 +201,10 @@ public class TopicController extends AbstractMenuController {
 		TopicResourceDto topicResourceDto = null;
 		String topic = topicQueryDto.getTopic();
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		if(topicResource != null){
+		if (topicResource != null) {
 			topicResourceDto = TopicResourceMapper.toTopicResourceDto(topicResource);
 		}
-		
+
 		return topicResourceDto;
 	}
 

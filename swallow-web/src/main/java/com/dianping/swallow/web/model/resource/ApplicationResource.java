@@ -4,7 +4,6 @@ import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -19,7 +18,17 @@ public class ApplicationResource extends BaseResource{
 	@Indexed(name = "IX_APPLICATION", direction = IndexDirection.ASCENDING)
 	private String application;
 	
-	private IPDesc iPDesc;
+	private String email;
+
+	private String opManager;
+
+	private String opMobile;
+
+	private String opEmail;
+
+	private String dpManager;
+
+	private String dpMobile;
 	
 	public String getApplication() {
 		return application;
@@ -29,17 +38,52 @@ public class ApplicationResource extends BaseResource{
 		this.application = application;
 	}
 
-	public IPDesc getiPDesc() {
-		return iPDesc;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setiPDesc(IPDesc iPDesc) {
-		this.iPDesc = iPDesc;
+	public void setEmail(String email) {
+		this.email = email;
 	}
-	
-	@Override
-	public String toString() {
-		return "ApplicationResource [application=" + application + ", iPDesc=" + iPDesc + "]";
+
+	public String getOpManager() {
+		return opManager;
+	}
+
+	public void setOpManager(String opManager) {
+		this.opManager = opManager;
+	}
+
+	public String getOpMobile() {
+		return opMobile;
+	}
+
+	public void setOpMobile(String opMobile) {
+		this.opMobile = opMobile;
+	}
+
+	public String getOpEmail() {
+		return opEmail;
+	}
+
+	public void setOpEmail(String opEmail) {
+		this.opEmail = opEmail;
+	}
+
+	public String getDpManager() {
+		return dpManager;
+	}
+
+	public void setDpManager(String dpManager) {
+		this.dpManager = dpManager;
+	}
+
+	public String getDpMobile() {
+		return dpMobile;
+	}
+
+	public void setDpMobile(String dpMobile) {
+		this.dpMobile = dpMobile;
 	}
 
 	@JsonIgnore
