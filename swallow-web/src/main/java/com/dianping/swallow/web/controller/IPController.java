@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.controller;
 
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
@@ -211,11 +213,12 @@ public class IPController extends AbstractMenuController {
 				.findAll(DefaultConsumerIdResourceDao.CONSUMERIPS);
 		Set<String> ips = new LinkedHashSet<String>();
 
-		List<String> ipList = null;
 		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-			ipList = consumerIdResource.getConsumerIps();
+			List<IpInfo> ipList = consumerIdResource.getIpInfos();
 			if (ipList != null) {
-				ips.addAll(ipList);
+				for(IpInfo ipInfo : ipList){
+					ips.add(ipInfo.getIp());
+				}
 			}
 		}
 		return new ArrayList<String>(ips);
