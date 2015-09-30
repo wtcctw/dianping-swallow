@@ -190,7 +190,7 @@ public class TopicController extends AbstractMenuController {
 			return ResponseStatus.MONGOWRITE;
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/topic/auth/ip", method = RequestMethod.POST)
 	@ResponseBody
 	public Object queryProducerIp(@RequestBody TopicQueryDto topicQueryDto) {
@@ -198,10 +198,10 @@ public class TopicController extends AbstractMenuController {
 		TopicResourceDto topicResourceDto = null;
 		String topic = topicQueryDto.getTopic();
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		if(topicResource != null){
+		if (topicResource != null) {
 			topicResourceDto = TopicResourceMapper.toTopicResourceDto(topicResource);
 		}
-		
+
 		return topicResourceDto;
 	}
 
@@ -235,14 +235,14 @@ public class TopicController extends AbstractMenuController {
 					return ResponseStatus.INVALIDTOPIC;
 				}
 				String proposal = topicResource.getAdministrator();
-				StringBuffer sb = new StringBuffer();
 				prop = checkProposalName(prop);
 				if (StringUtils.isNotEmpty(proposal)) {
-					sb.append(proposal).append(",").append(prop);
-				} else {
-					sb.append(prop);
+					StringBuffer sb = new StringBuffer();
+					sb.append(proposal).append(DELIMITOR).append(prop);
+					String[] propsals = sb.toString().split(DELIMITOR);
+					Set<String> propsalSet = new HashSet<String>(Arrays.asList(propsals));
+					prop = StringUtils.join(propsalSet, DELIMITOR);
 				}
-				prop = sb.toString();
 			}
 		}
 

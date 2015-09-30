@@ -83,7 +83,8 @@ public class LogFilter implements Filter {
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String username = extractUsernameUtils.getUsername(httpRequest);
 		String uri = httpRequest.getRequestURI();
-		String ip = httpRequest.getRemoteAddr();
+		String xforward = httpRequest.getHeader("X-Forwarded-For");
+		String ip = xforward != null ? xforward : httpRequest.getRemoteAddr();
 		BufferedRequestWrapper requestWrapper = new BufferedRequestWrapper(httpRequest);
 
 		String requestContent = new String(requestWrapper.getBuffer());

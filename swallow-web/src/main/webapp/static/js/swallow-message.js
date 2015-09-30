@@ -483,7 +483,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					topic:$scope.topic
 			};
 			console.log($scope.entity);
-	        	$http.post(window.contextPath + '/api/message/sendmessageid', 
+	        	$http.post(window.contextPath + '/console/message/sendmessageid', 
 					  messageIdEntity).success(function(response) {
         			  $("#selectnone").prop('checked', false);
         			  $("#selectall").prop('checked', false);
@@ -567,7 +567,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 					delimitor:$scope.delimitor,
 					property:$scope.tproperty
 				};
-	        	$http.post(window.contextPath + '/api/message/sendmessage', messageEntity).success(function(response) {
+	        	$http.post(window.contextPath + '/console/message/sendmessage', messageEntity).success(function(response) {
 					$scope.textarea = "";
 					$scope.tproperty = "";
 					
