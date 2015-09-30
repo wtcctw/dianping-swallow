@@ -67,11 +67,11 @@ public class ConsumerStatsDataStorager extends AbstractStatsDataStorager {
 		List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
 				lastTimeKey.get(), true);
 		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
-		List<ConsumerIpStatsData> ipStatsDatas = consumerStatsDataWapper.getIpStatsDatas(lastTimeKey.get(), false);
+		//List<ConsumerIpStatsData> ipStatsDatas = consumerStatsDataWapper.getIpStatsDatas(lastTimeKey.get(), false);
 		doStorageServerStats(serverStatsDatas);
 		doStorageTopicStats(topicStatsData);
 		doStorageConsumerIdStats(consumerIdStatsDatas);
-		doStorageIpStats(ipStatsDatas);
+		//doStorageIpStats(ipStatsDatas);
 	}
 
 	private void doStorageServerStats(final List<ConsumerServerStatsData> serverStatsDatas) {
