@@ -25,7 +25,7 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 
 	private static final String IP = "ip";
 
-	private static final String APPLICATION = "iPDesc.name";
+	private static final String APPLICATION = "application";
 
 	private static final String DEFAULT = "default";
 
@@ -188,6 +188,14 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 		query.addCriteria(Criteria.where(IP).is(ip));
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
 		return ipResources;
+	}
+
+	@Override
+	public IpResource findByIp(String ip, String appName) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where(IP).is(ip).and(APPLICATION).is(appName));
+		IpResource ipResource = mongoTemplate.findOne(query, IpResource.class, IPRESOURCE_COLLECTION);
+		return ipResource;
 	}
 
 }
