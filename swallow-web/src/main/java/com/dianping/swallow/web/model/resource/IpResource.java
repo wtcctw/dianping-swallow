@@ -4,22 +4,31 @@ import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 /**
  * @author mingdongli
  *
- * 2015年8月10日下午3:36:34
+ *         2015年8月10日下午3:36:34
  */
 @Document(collection = "IP_RESOURCE")
-public class IpResource extends BaseResource{
+public class IpResource extends BaseResource {
 
 	@Indexed(name = "IX_IP", direction = IndexDirection.ASCENDING)
 	private String ip;
-	
+
 	private String application;
-	
+
 	private boolean alarm;
-	
+
+	public IpResource(String ip, String application, boolean alarm) {
+		this.ip = ip;
+		this.application = application;
+		this.alarm = alarm;
+	}
+
+	public IpResource() {
+
+	}
+
 	public String getApplication() {
 		return application;
 	}

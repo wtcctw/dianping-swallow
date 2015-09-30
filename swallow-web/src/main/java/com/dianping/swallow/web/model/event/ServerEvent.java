@@ -1,12 +1,11 @@
 package com.dianping.swallow.web.model.event;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.util.StringUtils;
 
+import com.dianping.swallow.web.manager.AlarmReceiverManager.AlarmReceiver;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
@@ -143,10 +142,8 @@ public class ServerEvent extends Event {
 	}
 
 	@Override
-	public Set<String> getRelatedIps() {
-		Set<String> ips = new HashSet<String>();
-		ips.add(ip);
-		return ips;
+	public AlarmReceiver getRelatedReceiver() {
+		return this.receiverManager.getAlarmReceiverByIp(ip);
 	}
 
 	@Override

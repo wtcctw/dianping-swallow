@@ -3,7 +3,6 @@ package com.dianping.swallow.web.dashboard;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -36,9 +35,9 @@ import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.dashboard.model.TotalData;
 import com.dianping.swallow.web.dashboard.model.TotalDataKey;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
-import com.dianping.swallow.web.manager.IPResourceManager;
+import com.dianping.swallow.web.manager.AppResourceManager;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
+import com.dianping.swallow.web.model.resource.ApplicationResource;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
@@ -68,8 +67,8 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 	@Autowired
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
-	@Resource(name = "ipDescManager")
-	private IPResourceManager ipDescManager;
+	@Autowired
+	private AppResourceManager appResourceManager;
 
 	@Resource(name = "alarmResourceContainer")
 	private AlarmResourceContainer alarmResourceContainer;
@@ -355,35 +354,19 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 	private void doSetCmdpInfo(Entry entry) {
 
 		String topic = entry.getTopic();
-		String consumerid = entry.getConsumerId();
+		String consumerId = entry.getConsumerId();
 
-		Set<String> ips = consumerDataRetrieverWrapper.getKeyWithoutTotal(ConsumerDataRetrieverWrapper.TOTAL, topic,
-				consumerid);
-		if (logger.isInfoEnabled() && ips != null) {
-			logger.info(String.format("Load ips %s of topic %s and consumerid %s", ips.toString(), topic, consumerid));
-		}
-
-		String ip = loadFirstElement(ips);
-		IPDesc iPDesc = ipDescManager.getIPDesc(ip);
+		List<ApplicationResource> appResources = appResourceManager.getAppResourceByConsumerId(topic, consumerId);
 		String mobile = "Blank";
 		String email = "Blank";
 		String name = "Blank";
-		if (iPDesc != null) {
-			mobile = iPDesc.getDpMobile();
-			email = iPDesc.getEmail();
-			name = iPDesc.getName();
+		if (appResources != null && !appResources.isEmpty()) {
+			mobile = appResources.get(0).getDpMobile();
+			email = appResources.get(0).getEmail();
+			name = appResources.get(0).getApplication();
 		}
 
 		entry.setEmail(email).setName(name).setDpMobile(mobile);
-	}
-
-	private static String loadFirstElement(Set<String> set) {
-
-		Iterator<String> it = set.iterator();
-		while (it.hasNext()) {
-			return it.next();
-		}
-		return "";
 	}
 
 	@Override

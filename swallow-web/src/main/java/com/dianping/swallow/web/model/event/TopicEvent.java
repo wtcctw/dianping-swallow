@@ -1,11 +1,11 @@
 package com.dianping.swallow.web.model.event;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.util.StringUtils;
 
+import com.dianping.swallow.web.manager.AlarmReceiverManager.AlarmReceiver;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
@@ -109,12 +109,12 @@ public class TopicEvent extends StatisEvent {
 	}
 
 	@Override
-	public Set<String> getRelatedIps() {
+	public AlarmReceiver getRelatedReceiver() {
 		switch (getEventType()) {
 		case PRODUCER:
-			return ipCollectorService.getProducerTopicIps(topicName);
+			return this.receiverManager.getAlarmReceiverByPTopic(topicName);
 		case CONSUMER:
-			return ipCollectorService.getConsumerTopicIps(topicName);
+			return null;
 		}
 		return null;
 	}
