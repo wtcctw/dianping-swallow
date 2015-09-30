@@ -1,11 +1,11 @@
 package com.dianping.swallow.web.model.event;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.util.StringUtils;
 
+import com.dianping.swallow.web.manager.AlarmReceiverManager.AlarmReceiver;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
@@ -106,8 +106,8 @@ public class ConsumerIdEvent extends TopicEvent {
 	}
 
 	@Override
-	public Set<String> getRelatedIps() {
-		return ipCollectorService.getTopicConsumerIdIps(getTopicName(), consumerId);
+	public AlarmReceiver getRelatedReceiver() {
+		return this.receiverManager.getAlarmReceiverByConsumerId(getTopicName(), consumerId);
 	}
 
 	@Override

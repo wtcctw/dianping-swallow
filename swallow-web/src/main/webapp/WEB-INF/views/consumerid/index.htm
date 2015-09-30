@@ -56,7 +56,7 @@
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">ConsumerId</th>
 						<th style="text-align: left">Topic</th>
-						<th style="text-align: left">消费者IP</th>
+						<th style="text-align: left">消费者IP配置</th>
 						<th style="text-align: left">告警配置</th>
 						<th style="text-align: left">告警</th>
 						<th style="text-align: left">操作</th>
@@ -72,8 +72,8 @@
 						<td style="text-align: left" ng-bind="ad.consumerId"></td>
 						<td style="text-align: left" ng-bind="ad.topic"></td>
 						<td style="text-align: left"><a
-							ng-href="${rc.contextPath}/console/ip"
-							ng-click="setIp(ad.consumerIp)" ng-bind="ad.consumerIp | limitTo : 15 "></a></td>
+							ng-href="${rc.contextPath}/console/consumerid/ipinfo/{{ad.topic}}/{{ad.consumerId}}"
+							ng-click="setIp(ad.topic,ad.consumerId)" ng-bind="ad.consumerIp | limitTo : 15 "></a></td>
 						<td style="text-align: left" ><a href="#myModal1"
 							ng-click="setModalInput($index);"
 							data-toggle="modal" >详情</a></td>
@@ -136,7 +136,7 @@
 										id="topic" readonly> </input>
 								</div>
 							</div>
-						<div class="control-group">
+<!-- 						<div class="control-group">
 							<div class="form-group"
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>消费者IP</b></label> <input
@@ -144,7 +144,7 @@
 									ng-model="consumeridEntry.consumerIp" id="consumerIp"
 									data-provide="typeahead" autocomplete="off"> </input>
 							</div>
-						</div>
+						</div> -->
 							<div class="control-group">
 								<label class="control-label">发送QPS</label>
 								<div class="form-group"

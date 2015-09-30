@@ -29,6 +29,7 @@ import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.TopicResourceDao;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -62,7 +63,6 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 	private ScheduledExecutorService scheduledExecutorService = Executors
 			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-
 	
 	Logger logger2 = LogManager.getLogger(getClass());
 	
@@ -248,7 +248,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		topicResource.setAdministrator("");
 		topicResource.setConsumerAlarm(Boolean.TRUE);
 		topicResource.setProducerAlarm(Boolean.TRUE);
-		topicResource.setProducerIps(new ArrayList<String>());
+		topicResource.setProducerIpInfos(new ArrayList<IpInfo>());
+		topicResource.setProducerApplications(new ArrayList<String>());
 		topicResource.setTopic(topic);
 		topicResource.setCreateTime(new Date());
 		topicResource.setId(id.toString());

@@ -32,4 +32,8 @@ public interface IpResourceDao extends Dao{
 	IpResource findDefault();
 	
 	Pair<Long, List<IpResource>> findIpResourcePage(int offset, int limit);
+	
+	List<IpResource> findByIps(String ... ips);
+	
+	List<IpResource> findByIp(String ip);
 }

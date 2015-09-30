@@ -284,26 +284,29 @@ module
 									}).error(function(data, status, headers, config) {
 								});
 								 
-								 $http({
-										method : 'GET',
-										url : window.contextPath + '/console/ip/allip'
-									}).success(function(data, status, headers, config) {
-										$("#consumerIp").tagsinput({
-											  typeahead: {
-												  items: 16,
-												  source: data,
-												  displayText: function(item){ return item;}  //necessary
-											  }
-										});
-										$('#consumerIp').typeahead().data('typeahead').source = data;
-									}).error(function(data, status, headers, config) {
-								});
+//								 $http({
+//										method : 'GET',
+//										url : window.contextPath + '/console/ip/allip'
+//									}).success(function(data, status, headers, config) {
+//										$("#consumerIp").tagsinput({
+//											  typeahead: {
+//												  items: 16,
+//												  source: data,
+//												  displayText: function(item){ return item;}  //necessary
+//											  }
+//										});
+//										$('#consumerIp').typeahead().data('typeahead').source = data;
+//									}).error(function(data, status, headers, config) {
+//								});
 							}
 							
 							$scope.initpage();
 							
-							$scope.setIp = function(ip){
-								localStorage.setItem("ip", ip);
+							$scope.setIp = function(topic, cid){
+//								localStorage.setItem("ip", ip);
+								$http.get(window.contextPath + '/console/consumerid/ipinfo/' + topic + "/" + "cid").success(function(response) {
+					        	});
+								
 							}
 							
 							$scope.changealarm = function( consumerid, topic, index){

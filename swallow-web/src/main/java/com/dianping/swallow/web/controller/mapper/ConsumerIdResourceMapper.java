@@ -1,14 +1,16 @@
 package com.dianping.swallow.web.controller.mapper;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.web.controller.dto.ConsumerIdResourceDto;
+import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
 
 
 /**
@@ -52,20 +54,6 @@ public class ConsumerIdResourceMapper {
 		consumerIdResource.setId(dto.getId());
 		consumerIdResource.setAlarm(dto.isAlarm());
 		
-		List<String> idList = new ArrayList<String>();
-		String whiteList = dto.getConsumerIp();
-		
-		if (StringUtils.isNotBlank(whiteList)) {
-			String[] whiteLists = whiteList.split(DELIMITOR);
-			for (String wl : whiteLists) {
-				if (!idList.contains(wl)) {
-					idList.add(wl);
-				}
-			}
-		}
-		
-		consumerIdResource.setConsumerIps(idList);
-		
 		return consumerIdResource;
 	}
 
@@ -95,8 +83,9 @@ public class ConsumerIdResourceMapper {
 		dto.setId(consumerIdResource.getId());
 		dto.setAlarm(consumerIdResource.isAlarm());
 		
-		List<String> list = consumerIdResource.getConsumerIps();
-		dto.setConsumerIp(StringUtils.join(list, DELIMITOR));
+		List<IpInfo> list = consumerIdResource.getConsumerIpInfos();
+		Set<String> ips = IpInfoUtils.extractIps(list);
+		dto.setConsumerIp(StringUtils.join(ips, DELIMITOR));
 		
 		return dto;
 	}

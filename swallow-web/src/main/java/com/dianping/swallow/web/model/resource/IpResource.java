@@ -4,23 +4,38 @@ import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.web.model.cmdb.IPDesc;
-
-
 /**
  * @author mingdongli
  *
- * 2015年8月10日下午3:36:34
+ *         2015年8月10日下午3:36:34
  */
 @Document(collection = "IP_RESOURCE")
-public class IpResource extends BaseResource{
+public class IpResource extends BaseResource {
 
 	@Indexed(name = "IX_IP", direction = IndexDirection.ASCENDING)
 	private String ip;
-	
+
+	private String application;
+
 	private boolean alarm;
-	
-	private IPDesc iPDesc;
+
+	public IpResource(String ip, String application, boolean alarm) {
+		this.ip = ip;
+		this.application = application;
+		this.alarm = alarm;
+	}
+
+	public IpResource() {
+
+	}
+
+	public String getApplication() {
+		return application;
+	}
+
+	public void setApplication(String application) {
+		this.application = application;
+	}
 
 	public String getIp() {
 		return ip;
@@ -38,18 +53,9 @@ public class IpResource extends BaseResource{
 		this.alarm = alarm;
 	}
 
-	public IPDesc getiPDesc() {
-		return iPDesc;
-	}
-
-	public void setiPDesc(IPDesc iPDesc) {
-		this.iPDesc = iPDesc;
-	}
-
 	@Override
 	public String toString() {
-		return "IpResource [ip=" + ip + ", alarm=" + alarm + ", iPDesc=" + iPDesc + ", toString()=" + super.toString()
-				+ "]";
+		return "IpResource [ip=" + ip + ", alarm=" + alarm + "]";
 	}
 
 	@Override

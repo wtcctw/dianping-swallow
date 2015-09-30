@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
-import com.dianping.swallow.web.manager.IPResourceManager;
+import com.dianping.swallow.web.manager.AlarmReceiverManager;
 import com.dianping.swallow.web.service.AlarmService;
-import com.dianping.swallow.web.service.IPCollectorService;
 
 /**
  * 
@@ -21,19 +20,15 @@ public class EventFactory {
 	private AlarmService alarmService;
 
 	@Autowired
-	private IPResourceManager ipDescManager;
+	private AlarmReceiverManager receiverManager;
 
 	@Autowired
 	private AlarmMetaContainer alarmMetaContainer;
 
-	@Autowired
-	protected IPCollectorService ipCollectorService;
-
 	private void setComponent(Event event) {
 		event.setAlarmService(alarmService);
-		event.setIPDescManager(ipDescManager);
+		event.setAlarmReceiverManager(receiverManager);
 		event.setAlarmMetaContainer(alarmMetaContainer);
-		event.setIPCollectorService(ipCollectorService);
 	}
 
 	public TopicEvent createTopicEvent() {

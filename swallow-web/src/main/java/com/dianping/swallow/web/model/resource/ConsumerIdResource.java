@@ -27,7 +27,9 @@ public class ConsumerIdResource extends BaseResource{
 	
 	private boolean alarm;
 	
-	private List<String> consumerIps;
+	private List<IpInfo> consumerIpInfos;
+	
+	private List<String> consumerApplications;
 	
 	private ConsumerBaseAlarmSetting consumerAlarmSetting;
 
@@ -55,14 +57,6 @@ public class ConsumerIdResource extends BaseResource{
 		this.alarm = alarm;
 	}
 
-	public List<String> getConsumerIps() {
-		return consumerIps;
-	}
-
-	public void setConsumerIps(List<String> consumerIps) {
-		this.consumerIps = consumerIps;
-	}
-
 	public ConsumerBaseAlarmSetting getConsumerAlarmSetting() {
 		return consumerAlarmSetting;
 	}
@@ -75,11 +69,20 @@ public class ConsumerIdResource extends BaseResource{
 		return topic + "&" + consumerId;
 	}
 
-	@Override
-	public String toString() {
-		return "ConsumerIdResource [consumerId=" + consumerId + ", topic=" + topic + ", alarm=" + alarm
-				+ ", consumerIps=" + consumerIps + ", consumerAlarmSetting=" + consumerAlarmSetting + ", toString()="
-				+ super.toString() + "]";
+	public List<IpInfo> getConsumerIpInfos() {
+		return consumerIpInfos;
+	}
+
+	public void setConsumerIpInfos(List<IpInfo> consumerIpInfos) {
+		this.consumerIpInfos = consumerIpInfos;
+	}
+
+	public List<String> getConsumerApplications() {
+		return consumerApplications;
+	}
+
+	public void setConsumerApplications(List<String> consumerApplications) {
+		this.consumerApplications = consumerApplications;
 	}
 
 	@JsonIgnore

@@ -65,7 +65,7 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String ... ips) {
+	public Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String... ips) {
 
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		for (String ip : ips) {
@@ -74,15 +74,15 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 
 		Query query = new Query();
 		long size = 0;
-		
-		if(admin){
+
+		if (admin) {
 			size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
-		}else{
+		} else {
 			query.addCriteria(Criteria.where(IP).exists(true)
 					.orOperator(criterias.toArray(new Criteria[criterias.size()])));
 			size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
 		}
-		
+
 		query.skip(offset).limit(limit);
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
 		return new Pair<Long, List<IpResource>>(size, ipResources);
@@ -99,13 +99,13 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 
 		return new Pair<Long, List<IpResource>>(size, ipResources);
 	}
-	
+
 	@Override
-	public Pair<Long, List<IpResource>> find(int offset, int limit, String application, String ...ips) {
-		
+	public Pair<Long, List<IpResource>> find(int offset, int limit, String application, String... ips) {
+
 		Query query = new Query();
 		List<Criteria> criterias = new ArrayList<Criteria>();
-		if(ips.length > 0){
+		if (ips.length > 0) {
 			for (String ip : ips) {
 				criterias.add(Criteria.where(IP).is(ip));
 			}
@@ -116,30 +116,28 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 		if (StringUtils.isNotBlank(application)) {
 			query.addCriteria(Criteria.where(APPLICATION).is(application));
 		}
-		
+
 		long size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
 
 		query.skip(offset).limit(limit);
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
-		
+
 		return new Pair<Long, List<IpResource>>(size, ipResources);
 	}
 
 	@Override
-	public List<IpResource> findAll(String ... fields) {
-		
+	public List<IpResource> findAll(String... fields) {
+
 		List<IpResource> ipResources = new ArrayList<IpResource>();
-		
-		if(fields.length == 0){
-			ipResources = mongoTemplate.findAll(IpResource.class,
-					IPRESOURCE_COLLECTION);
-		}else{
+
+		if (fields.length == 0) {
+			ipResources = mongoTemplate.findAll(IpResource.class, IPRESOURCE_COLLECTION);
+		} else {
 			Query query = new Query();
-			for(String field : fields){
+			for (String field : fields) {
 				query.fields().include(field);
 			}
-			ipResources = mongoTemplate.find(query, IpResource.class,
-					IPRESOURCE_COLLECTION);
+			ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
 		}
 
 		return ipResources;
@@ -157,12 +155,39 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	public Pair<Long, List<IpResource>> findIpResourcePage(int offset, int limit) {
 
 		Query query = new Query();
-		
+
 		query.skip(offset).limit(limit);
-		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class,
-				IPRESOURCE_COLLECTION);
+		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
 		Long size = this.count();
 		return new Pair<Long, List<IpResource>>(size, ipResources);
+	}
+
+	@Override
+	public List<IpResource> findByIps(String... ips) {
+		List<Criteria> criterias = new ArrayList<Criteria>();
+		Query query = new Query();
+		List<IpResource> ipResources = null;
+		if (ips != null && ips.length > 0) {
+			for (String ip : ips) {
+				criterias.add(Criteria.where(IP).is(ip));
+			}
+			query.addCriteria(Criteria.where(IP).exists(true)
+					.orOperator(criterias.toArray(new Criteria[criterias.size()])));
+			ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
+		}
+
+		return ipResources;
+	}
+
+	@Override
+	public List<IpResource> findByIp(String ip) {
+		if (StringUtils.isBlank(ip)) {
+			return null;
+		}
+		Query query = new Query();
+		query.addCriteria(Criteria.where(IP).is(ip));
+		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);
+		return ipResources;
 	}
 
 }
