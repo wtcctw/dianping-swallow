@@ -55,6 +55,7 @@ public class AppResourceCollector extends AbstractResourceCollector {
 
 	@Override
 	public void doCollector() {
+		logger.info("[doCollector] start collect appResource.");
 		doIpResource();
 	}
 

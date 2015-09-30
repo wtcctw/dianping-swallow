@@ -57,6 +57,7 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 
 	@Override
 	public void doCollector() {
+		logger.info("[doCollector] start collect serverResource.");
 		doServerCollector();
 	}
 

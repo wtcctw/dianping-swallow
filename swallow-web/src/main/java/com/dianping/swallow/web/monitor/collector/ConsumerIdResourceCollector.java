@@ -53,7 +53,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector {
 
 	@Override
 	public void doCollector() {
-		logger.info("[startCollectConsumerIdResource]");
+		logger.info("[doCollector] start collect consumerIdResource.");
 		flushConsumerIdMetaData();
 		flushTopicMetaData();
 	}

@@ -27,7 +27,7 @@ import com.dianping.swallow.web.service.MongoResourceService;
  *         2015年9月18日上午9:58:52
  */
 @Component
-public class MongoResourceCollector extends AbstractResourceCollector{
+public class MongoResourceCollector extends AbstractResourceCollector {
 
 	private static final String MONGO_REPORT = "http://dom.dp/db_daily/message";
 
@@ -59,8 +59,8 @@ public class MongoResourceCollector extends AbstractResourceCollector{
 	@Override
 	public void doCollector() {
 
-		if(logger.isInfoEnabled()){
-			logger.info("[startMongoResourceCollector]");
+		if (logger.isInfoEnabled()) {
+			logger.info("[doCollector] start collect mongoResource.");
 		}
 		HttpResult httpResult = httpSerivice.httpPost(MONGO_REPORT, new ArrayList<NameValuePair>());
 
@@ -85,7 +85,7 @@ public class MongoResourceCollector extends AbstractResourceCollector{
 							MongoResource mongoResourceOld = mongoResourceService.findByIp(ips);
 							if (mongoResourceOld != null) {
 								MongoType mongoType = mongoResourceOld.getMongoType();
-								if(mongoType != null){
+								if (mongoType != null) {
 									mongoResource.setMongoType(mongoType);
 								}
 								mongoResource.setId(mongoResourceOld.getId());
@@ -145,12 +145,12 @@ public class MongoResourceCollector extends AbstractResourceCollector{
 		MongoResource mongoResource = new MongoResource();
 		String catalog = mongoReport.getCatalog();
 		MongoType mongoType;
-		try{
+		try {
 			mongoType = MongoType.findByType(catalog);
-		}catch(Exception e){
+		} catch (Exception e) {
 			mongoType = MongoType.GENERAL;
 		}
-		
+
 		mongoResource.setMongoType(mongoType);
 		mongoResource.setCatalog(catalog);
 		mongoResource.setDisk(mongoReport.getDisk());
