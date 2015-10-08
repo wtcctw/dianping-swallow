@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  *         2015年10月8日 上午11:06:00
  */
-public class ActiveIpManager<T> {
+public class ActiveIpContainer<T> {
 
 	private static final long ACTIVE_TIMESPAN = 6 * 60 * 60 * 1000;
 

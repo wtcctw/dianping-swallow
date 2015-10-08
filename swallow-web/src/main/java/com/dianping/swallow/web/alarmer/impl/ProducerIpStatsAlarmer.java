@@ -62,7 +62,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	private Map<ProducerIpStatsData, Long> whiteLists = new ConcurrentHashMap<ProducerIpStatsData, Long>();
 
-	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
+	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
 
 	@Override
 	public void doInitialize() throws Exception {

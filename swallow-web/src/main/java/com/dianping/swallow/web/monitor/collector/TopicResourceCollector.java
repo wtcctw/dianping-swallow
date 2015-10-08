@@ -42,7 +42,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 
 	private ExecutorService executor = null;
 
-	private ActiveIpManager<String> activeIpManager = new ActiveIpManager<String>();
+	private ActiveIpContainer<String> activeIpManager = new ActiveIpContainer<String>();
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -87,9 +87,9 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 						ipStatsData.hasStatsData());
 			}
 		}
-		
+
 	}
-	
+
 	@Override
 	public void doCollector() {
 		logger.info("[doCollector] start collect topicResource.");
@@ -124,6 +124,9 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 					ipInfo.setActive(false);
 				}
 			} else {
+				for (IpInfo ipInfo : ipInfos) {
+					ipInfo.setActive(false);
+				}
 				for (String activeIp : activeIps) {
 					if (StringUtils.isBlank(activeIp)) {
 						continue;

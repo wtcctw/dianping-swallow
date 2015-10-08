@@ -41,7 +41,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 
 	private ExecutorService executor = null;
 
-	private ActiveIpManager<ConsumerIdKey> activeIpManager = new ActiveIpManager<ConsumerIdKey>();
+	private ActiveIpContainer<ConsumerIdKey> activeIpManager = new ActiveIpContainer<ConsumerIdKey>();
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -155,6 +155,9 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 				ipInfo.setActive(false);
 			}
 		} else {
+			for (IpInfo ipInfo : ipInfos) {
+					ipInfo.setActive(false);
+			}
 			for (String activeIp : activeIps) {
 				if (StringUtils.isBlank(activeIp)) {
 					continue;
