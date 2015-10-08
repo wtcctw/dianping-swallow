@@ -2,7 +2,6 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -35,7 +34,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 	@Autowired
 	private EventChannel eventChannel;
 
-	private static final String FACTORY_NAME = "AlarmWorker";
+	private static final String FACTORY_NAME = "AlarmWorker-Worker";
 
 	private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 2;
 
@@ -62,7 +61,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 				start();
 			}
 
-		}, "AlarmWorker-Start", true);
+		}, "AlarmWorker-Boss", true);
 		alarmTaskThread.start();
 	}
 
@@ -74,7 +73,9 @@ public class AlarmWorkerImpl implements AlarmWorker {
 				event = eventChannel.next();
 				logger.info("[start] {}. ", event.getClass().getSimpleName());
 				executorService.submit(new AlarmTask(event));
-			} catch (RejectedExecutionException e) {
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			} catch (Exception e) {
 				CatUtil.logException(e);
 				try {
 					TimeUnit.SECONDS.sleep(200);
@@ -82,8 +83,6 @@ public class AlarmWorkerImpl implements AlarmWorker {
 					// ignore
 				}
 				logger.error("[start] lost event {}. ", event.toString());
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
 			}
 		}
 	}

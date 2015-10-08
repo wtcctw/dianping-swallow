@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,10 +16,13 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.EventReporter;
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.event.ClientType;
 import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ProducerClientEvent;
+import com.dianping.swallow.web.model.resource.IpInfo;
+import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
@@ -48,6 +52,9 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Autowired
 	private ProducerIpStatsDataService pIpStatsDataService;
+
+	@Autowired
+	private AlarmResourceContainer resourceContainer;
 
 	private Map<ProducerIpStatsData, Long> firstCandidates = new ConcurrentHashMap<ProducerIpStatsData, Long>();
 
@@ -119,15 +126,15 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 			Entry<ProducerIpStatsData, Long> checkRecord = iterator.next();
 			ProducerIpStatsData ipStatsData = checkRecord.getKey();
 			long lastRecordTime = checkRecord.getValue();
-			if (System.currentTimeMillis() - lastRecordTime >= CHECK_TIMESPAN) {
-				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
-					continue;
-				}
-				report(ipStatsData.getTopicName(), ipStatsData.getIp());
+			if (System.currentTimeMillis() - lastRecordTime < CHECK_TIMESPAN) {
+				continue;
 			}
+			iterator.remove();
+			if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
+				continue;
+			}
+			report(ipStatsData.getTopicName(), ipStatsData.getIp());
 		}
-
 	}
 
 	public void alarmUnSureRecords() {
@@ -138,26 +145,48 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 			ProducerIpStatsData ipStatsData = checkRecord.getKey();
 			long lastRecordTime = checkRecord.getValue();
 
-			if (System.currentTimeMillis() - lastRecordTime >= CHECK_TIMESPAN) {
-				iterator.remove();
-				if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
-					continue;
-				}
-				long avgQps = pIpStatsDataService.findAvgQps(ipStatsData.getTopicName(), ipStatsData.getIp(),
-						getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(getPreNDayKey(1, 0)));
+			if (System.currentTimeMillis() - lastRecordTime < CHECK_TIMESPAN) {
+				continue;
+			}
+			iterator.remove();
+			if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
+				continue;
+			}
+			long avgQps = pIpStatsDataService.findAvgQps(ipStatsData.getTopicName(), ipStatsData.getIp(),
+					getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(getPreNDayKey(1, 0)));
 
-				if (avgQps > 0) {
-					report(ipStatsData.getTopicName(), ipStatsData.getIp());
+			if (avgQps > 0) {
+				report(ipStatsData.getTopicName(), ipStatsData.getIp());
+			}
+		}
+
+	}
+
+	private boolean isReport(String topicName, String ip) {
+		TopicResource topicResource = resourceContainer.findTopicResource(topicName);
+		if (topicResource.isProducerAlarm()) {
+			List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
+			if (StringUtils.isNotBlank(ip)) {
+				for (IpInfo ipInfo : ipInfos) {
+					if (ip.equals(ipInfo.getIp())) {
+						return ipInfo.isActiveAndAlarm();
+					}
 				}
 			}
+			return true;
+		} else {
+			return false;
 		}
 	}
 
 	private void report(String topicName, String ip) {
-		ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
-		clientEvent.setTopicName(topicName).setIp(ip).setClientType(ClientType.CLIENT_SENDER)
-				.setEventType(EventType.PRODUCER).setCreateTime(new Date());
-		eventReporter.report(clientEvent);
+		if (isReport(topicName, ip)) {
+
+			ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
+			clientEvent.setTopicName(topicName).setIp(ip).setClientType(ClientType.CLIENT_SENDER)
+					.setEventType(EventType.PRODUCER).setCreateTime(new Date());
+			eventReporter.report(clientEvent);
+		}
 	}
 
 }

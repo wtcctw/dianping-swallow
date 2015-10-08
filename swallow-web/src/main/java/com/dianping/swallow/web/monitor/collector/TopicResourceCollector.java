@@ -1,11 +1,8 @@
 package com.dianping.swallow.web.monitor.collector;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,11 +42,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 
 	private ExecutorService executor = null;
 
-	private long lastTimeKey;
-
-	private static final long ACTIVE_TIMESPAN = 6 * 60 * 60 * 1000;
-
-	private Map<String, ActiveIpData> topicActiveIpDatas = new ConcurrentHashMap<String, ActiveIpData>();
+	private ActiveIpManager<String> activeIpManager = new ActiveIpManager<String>();
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -57,7 +50,6 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 		collectorName = getClass().getSimpleName();
 		collectorInterval = 20;
 		collectorDelay = 1;
-		lastTimeKey = -1;
 		executor = Executors.newSingleThreadExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
@@ -78,7 +70,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 	}
 
 	private void doIpDataMonitor() {
-		List<ProducerIpGroupStatsData> ipGroupStatsDatas = pStatsDataWapper.getIpGroupStatsDatas(lastTimeKey, false);
+		List<ProducerIpGroupStatsData> ipGroupStatsDatas = pStatsDataWapper.getIpGroupStatsDatas(-1, false);
 		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
 			return;
 		}
@@ -91,19 +83,13 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 				continue;
 			}
 			for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
-				ActiveIpData activeIpData = null;
-				if (topicActiveIpDatas.containsKey(ipStatsData.getTopicName())) {
-					activeIpData = topicActiveIpDatas.get(ipStatsData.getTopicName());
-
-				} else {
-					activeIpData = new ActiveIpData();
-					topicActiveIpDatas.put(ipStatsData.getTopicName(), activeIpData);
-				}
-				activeIpData.addData(ipStatsData.getIp(), ipStatsData.hasStatsData());
+				activeIpManager.putActiveIpData(ipStatsData.getTopicName(), ipStatsData.getIp(),
+						ipStatsData.hasStatsData());
 			}
 		}
+		
 	}
-
+	
 	@Override
 	public void doCollector() {
 		logger.info("[doCollector] start collect topicResource.");
@@ -114,15 +100,17 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 		Set<String> topicNames = pStatsDataWapper.getTopics(false);
 		if (topicNames != null && !topicNames.isEmpty()) {
 			for (String topicName : topicNames) {
-				ProducerIpGroupStatsData ipGroupStatsData = pStatsDataWapper.getIpGroupStatsData(topicName,
-						lastTimeKey, false);
-				Set<String> activeIps = getActiveGroupIps(ipGroupStatsData);
-				updateTopicIpInfos(topicName,activeIps);
+				try {
+					updateTopicIpInfos(topicName);
+				} catch (Exception e) {
+					logger.error("[doTopicCollector] update topicIpInfos error.", e);
+				}
 			}
 		}
 	}
 
-	private void updateTopicIpInfos(String topicName, Set<String> activeIps) {
+	private void updateTopicIpInfos(String topicName) {
+		Set<String> activeIps = activeIpManager.getActiveIps(topicName);
 		TopicResource topicResource = topicResourceService.findByTopic(topicName);
 		if (topicResource != null) {
 			List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
@@ -157,29 +145,6 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 		}
 	}
 
-	private Set<String> getActiveGroupIps(ProducerIpGroupStatsData ipGroupStatsData) {
-		if (ipGroupStatsData == null) {
-			return null;
-		}
-		List<ProducerIpStatsData> ipStatsDatas = ipGroupStatsData.getProducerIpStatsDatas();
-		if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
-			return null;
-		} else {
-			Set<String> activeIps = new HashSet<String>();
-			for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
-				if (topicActiveIpDatas.containsKey(ipStatsData.getTopicName())) {
-					ActiveIpData activeIpData = topicActiveIpDatas.get(ipStatsData.getTopicName());
-					if (activeIpData.isIpActive(ipStatsData.getIp())) {
-						activeIps.add(ipStatsData.getIp());
-					}
-				} else {
-					activeIps.add(ipStatsData.getIp());
-				}
-			}
-			return activeIps;
-		}
-	}
-
 	@Override
 	public int getCollectorDelay() {
 		return collectorDelay;
@@ -188,28 +153,6 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 	@Override
 	public int getCollectorInterval() {
 		return collectorInterval;
-	}
-
-	public static class ActiveIpData {
-
-		private Map<String, Long> activeDatas = new ConcurrentHashMap<String, Long>();
-
-		public void addData(String ip, boolean hasData) {
-			if (hasData) {
-				activeDatas.put(ip, System.currentTimeMillis());
-			} else {
-				if (!activeDatas.containsKey(ip)) {
-					activeDatas.put(ip, System.currentTimeMillis());
-				}
-			}
-		}
-
-		public boolean isIpActive(String ip) {
-			if (activeDatas.containsKey(ip)) {
-				return System.currentTimeMillis() - activeDatas.get(ip) > ACTIVE_TIMESPAN;
-			}
-			return true;
-		}
 	}
 
 }

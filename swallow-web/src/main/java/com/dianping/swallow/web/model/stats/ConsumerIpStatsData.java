@@ -88,5 +88,12 @@ public class ConsumerIpStatsData extends ConsumerStatsData {
 		}
 		return true;
 	}
+	
+	public boolean hasStatsData(){
+		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
+			return false;
+		}
+		return true;
+	}
 
 }

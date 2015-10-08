@@ -95,13 +95,13 @@ public interface ConsumerStatsDataWapper {
 	 * @return
 	 */
 	ConsumerIpGroupStatsData getIpGroupStatsDatas(String topicName, String consumerId, long timeKey, boolean isTotal);
-
 	/**
-	 * get ConsumerId
 	 * 
+	 * @param topicName
+	 * @param isTotal
 	 * @return
 	 */
-	List<String> getConusmerIdInfos();
+	Set<String> getConsumerIds(String topicName, boolean isTotal);
 
 	/**
 	 * 
