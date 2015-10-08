@@ -36,7 +36,7 @@ public class ProducerIpStatsData extends ProducerStatsData {
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -79,6 +79,13 @@ public class ProducerIpStatsData extends ProducerStatsData {
 
 	public boolean checkStatsData() {
 		if (this.getQps() == 0L) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean hasStatsData() {
+		if (this.getQps() <= 0L) {
 			return false;
 		}
 		return true;
