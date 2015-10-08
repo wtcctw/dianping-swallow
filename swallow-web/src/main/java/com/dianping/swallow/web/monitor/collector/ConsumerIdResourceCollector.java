@@ -14,7 +14,6 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
@@ -31,9 +30,6 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  */
 @Component
 public class ConsumerIdResourceCollector extends AbstractResourceCollector implements MonitorDataListener {
-
-	@Autowired
-	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
 	@Autowired
 	private ConsumerStatsDataWapper cStatsDataWapper;
