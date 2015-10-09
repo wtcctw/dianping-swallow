@@ -12,8 +12,11 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
+import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerTopicStatisData;
+import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
+import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
@@ -35,7 +38,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	private StatsDataFactory statsDataFactory;
 
 	@Override
-	public List<ProducerServerStatsData> getServerStatsDatas(long timeKey) {
+	public List<ProducerServerStatsData> getServerStatsDatas(long timeKey, boolean isTotal) {
 		Set<String> serverKeys = producerDataRetriever.getKeys(new CasKeys());
 		if (serverKeys == null) {
 			return null;
@@ -45,7 +48,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String serverIp = iterator.next();
-
+			if (!isTotal && TOTAL_KEY.equals(serverIp)) {
+				continue;
+			}
 			ProducerServerStatisData serverStatisData = (ProducerServerStatisData) producerDataRetriever
 					.getValue(new CasKeys(serverIp));
 			if (serverStatisData == null) {
@@ -81,7 +86,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public List<ProducerTopicStatsData> getTopicStatsDatas(long timeKey) {
+	public List<ProducerTopicStatsData> getTopicStatsDatas(long timeKey, boolean isTotal) {
 		Set<String> topicKeys = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
 		if (topicKeys == null) {
 			return null;
@@ -91,6 +96,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String topicName = String.valueOf(iterator.next());
+			if (!isTotal && TOTAL_KEY.equals(topicName)) {
+				continue;
+			}
 			ProducerTopicStatisData serverStatisData = (ProducerTopicStatisData) producerDataRetriever
 					.getValue(new CasKeys(TOTAL_KEY, topicName));
 			if (serverStatisData == null) {
@@ -124,6 +132,100 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			producerTopicStatsDatas.add(producerTopicStatsData);
 		}
 		return producerTopicStatsDatas;
+	}
+
+	@Override
+	public List<ProducerIpStatsData> getIpStatsDatas(long timeKey, boolean isTotal) {
+		Set<String> topicKeys = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+		if (topicKeys == null) {
+			return null;
+		}
+		List<ProducerIpStatsData> ipStatsDatas = new ArrayList<ProducerIpStatsData>();
+		for (String topic : topicKeys) {
+			if (!isTotal && TOTAL_KEY.equals(topic)) {
+				continue;
+			}
+			List<ProducerIpStatsData> tempIpStatsDatas = getIpStatsDatas(topic, timeKey, isTotal);
+			if (tempIpStatsDatas != null) {
+				ipStatsDatas.addAll(tempIpStatsDatas);
+			}
+		}
+		return ipStatsDatas;
+	}
+
+	@Override
+	public List<ProducerIpStatsData> getIpStatsDatas(String topicName, long timeKey, boolean isTotal) {
+		List<ProducerIpStatsData> ipStatsDatas = new ArrayList<ProducerIpStatsData>();
+		Set<String> ipKeys = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName));
+		if (ipKeys == null) {
+			return null;
+		}
+		int index = 0;
+		for (String ip : ipKeys) {
+			if (!isTotal && TOTAL_KEY.equals(ip)) {
+				continue;
+			}
+
+			MessageInfoStatis messageStatisData = (MessageInfoStatis) producerDataRetriever.getValue(new CasKeys(
+					TOTAL_KEY, topicName, ip));
+			if (messageStatisData == null) {
+				continue;
+			}
+			NavigableMap<Long, Long> ipQpxs = messageStatisData.getQpx(StatisType.SAVE);
+			if (ipQpxs == null || ipQpxs.isEmpty()) {
+				continue;
+			}
+			if (index == 0) {
+				Long tempKey = timeKey == DEFAULT_VALUE ? ipQpxs.lastKey() : ipQpxs.higherKey(timeKey);
+				if (tempKey == null) {
+					return null;
+				}
+				timeKey = tempKey.longValue();
+				index++;
+			}
+
+			ProducerIpStatsData ipStatsData = statsDataFactory.createProducerIpStatsData();
+			ipStatsData.setTopicName(topicName);
+			ipStatsData.setTimeKey(timeKey);
+			ipStatsData.setIp(ip);
+			NavigableMap<Long, Long> ipDelays = messageStatisData.getDelay(StatisType.SAVE);
+			Long qps = ipQpxs.get(timeKey);
+			if (qps != null) {
+				ipStatsData.setQps(qps.longValue());
+			}
+
+			Long delay = ipDelays.get(timeKey);
+			if (delay != null) {
+				ipStatsData.setDelay(delay.longValue());
+			}
+			ipStatsDatas.add(ipStatsData);
+		}
+
+		return ipStatsDatas;
+	}
+
+	@Override
+	public List<ProducerIpGroupStatsData> getIpGroupStatsDatas(long timeKey, boolean isTotal) {
+		Set<String> topicKeys = producerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
+		if (topicKeys == null) {
+			return null;
+		}
+		List<ProducerIpGroupStatsData> ipGroupStatsDatas = new ArrayList<ProducerIpGroupStatsData>();
+		for (String topic : topicKeys) {
+			if (!isTotal && TOTAL_KEY.equals(topic)) {
+				continue;
+			}
+			ipGroupStatsDatas.add(getIpGroupStatsData(topic, timeKey, isTotal));
+		}
+		return ipGroupStatsDatas;
+	}
+
+	@Override
+	public ProducerIpGroupStatsData getIpGroupStatsData(String topicName, long timeKey, boolean isTotal) {
+		ProducerIpGroupStatsData ipGroupStatsData = new ProducerIpGroupStatsData();
+		List<ProducerIpStatsData> ipStatsDatas = getIpStatsDatas(topicName, timeKey, isTotal);
+		ipGroupStatsData.setProducerIpStatsDatas(ipStatsDatas);
+		return ipGroupStatsData;
 	}
 
 	@Override
@@ -176,4 +278,5 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		}
 		return ips;
 	}
+
 }

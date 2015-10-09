@@ -1,35 +1,27 @@
 package com.dianping.swallow.web.monitor.collector;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.model.resource.ServerResource;
+import com.dianping.swallow.web.model.resource.ServerType;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.IPCollectorService;
+import com.dianping.swallow.web.service.IPCollectorService.ConsumerServer;
+import com.dianping.swallow.web.service.IPCollectorService.ConsumerServerPair;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -38,11 +30,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年9月6日 上午10:54:32
  */
 @Component
-public class ServerResourceCollector {
-
-	private static final Logger logger = LoggerFactory.getLogger(ServerResourceCollector.class);
-
-	private static final String FACTORY_NAME = "ServerResourceCollector";
+public class ServerResourceCollector extends AbstractResourceCollector {
 
 	@Autowired
 	private ConsumerStatsDataWapper consumerStatsDataWapper;
@@ -59,34 +47,17 @@ public class ServerResourceCollector {
 	@Autowired
 	private IPCollectorService ipCollectorService;
 
-	private int collectorInterval = 360;
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		collectorName = getClass().getSimpleName();
+		collectorInterval = 10;
+		collectorDelay = 1;
+	}
 
-	private int delayInterval = 60;
-
-	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
-			.getThreadFactory(FACTORY_NAME));
-
-	@PostConstruct
-	public void doScheduledTask() {
-		scheduled.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(ServerResourceCollector.class
-							.getSimpleName(), "doResourceCollector");
-					catWrapper.doAction(new SwallowAction() {
-						@Override
-						public void doAction() throws SwallowException {
-							doServerCollector();
-						}
-					});
-				} catch (Throwable th) {
-					logger.error("[run]", th);
-				} finally {
-
-				}
-			}
-		}, getDelayInterval(), getCollectorInterval(), TimeUnit.SECONDS);
+	@Override
+	public void doCollector() {
+		doServerCollector();
 	}
 
 	public void doServerCollector() {
@@ -118,27 +89,51 @@ public class ServerResourceCollector {
 	}
 
 	public void doConsumerServerCollector() {
-		Map<String, String> ipsMap = new HashMap<String, String>();
-		List<String> masterIps = ipCollectorService.getConsumerServerMasterIps();
-		List<String> slaveIps = ipCollectorService.getConsumerServerSlaveIps();
-		Map<String, String> masterIpsMap = getServerIpsMap(ipCollectorService.getConsumerServerMasterIpsMap());
-		Map<String, String> slaveIpsMap = getServerIpsMap(ipCollectorService.getConsumerServerSlaveIpsMap());
+
+		List<ConsumerServerPair> consumerServerPairs = new ArrayList<ConsumerServerPair>();
+		List<ConsumerServerPair> collectorServerPairs = ipCollectorService.getConsumerServerPairs();
+		if (collectorServerPairs != null) {
+			consumerServerPairs.addAll(collectorServerPairs);
+		}
+
+		for (ConsumerServerPair consumerServerPair : consumerServerPairs) {
+			ConsumerServer masterServer = consumerServerPair.getMasterServer();
+			ConsumerServer slaveServer = consumerServerPair.getSlaveServer();
+			int groupId = 0;
+			if (StringUtils.isNotBlank(masterServer.getIp())) {
+				ConsumerServerResource masterResource = (ConsumerServerResource) cServerResourceService
+						.findByIp(masterServer.getIp());
+				if (masterResource == null) {
+					groupId = cServerResourceService.getNextGroupId();
+					ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(
+							masterServer.getIp(), masterServer.getHostName(), masterServer.getPort(), groupId,
+							ServerType.MASTER);
+					cServerResourceService.insert(cServerResource);
+					logger.info("[doConsumerServerCollector] masterServer {} is saved.", masterServer);
+				} else {
+					groupId = masterResource.getGroupId();
+				}
+			}
+			if (StringUtils.isNotBlank(slaveServer.getIp())) {
+				ServerResource slaveResource = cServerResourceService.findByIp(slaveServer.getIp());
+				if (slaveResource == null) {
+					ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(
+							slaveServer.getIp(), slaveServer.getHostName(), slaveServer.getPort(), groupId,
+							ServerType.SLAVE);
+					cServerResourceService.insert(cServerResource);
+					logger.info("[doConsumerServerCollector] slaveServer {} is saved.", slaveServer);
+				}
+			}
+		}
+
 		Set<String> statsServerIps = consumerStatsDataWapper.getServerIps(false);
-		setServerMap(masterIps, ipsMap);
-		setServerMap(slaveIps, ipsMap);
-		if (masterIpsMap != null) {
-			ipsMap.putAll(masterIpsMap);
-		}
-		if (slaveIpsMap != null) {
-			ipsMap.putAll(slaveIpsMap);
-		}
-		setServerMap(statsServerIps, ipsMap);
-		for (Map.Entry<String, String> ipEntry : ipsMap.entrySet()) {
-			ServerResource serverResource = cServerResourceService.findByIp(ipEntry.getKey());
+		for (String serverIp : statsServerIps) {
+			ServerResource serverResource = cServerResourceService.findByIp(serverIp);
 			if (serverResource == null) {
-				ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(
-						ipEntry.getKey(), ipEntry.getValue());
+				ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(serverIp,
+						cServerResourceService.getNextGroupId());
 				cServerResourceService.insert(cServerResource);
+				logger.info("[doConsumerServerCollector] serverIp {} is saved.", serverIp);
 			}
 		}
 
@@ -165,6 +160,7 @@ public class ServerResourceCollector {
 		}
 	}
 
+	@Override
 	public int getCollectorInterval() {
 		return collectorInterval;
 	}
@@ -173,11 +169,8 @@ public class ServerResourceCollector {
 		this.collectorInterval = collectorInterval;
 	}
 
-	public int getDelayInterval() {
-		return delayInterval;
-	}
-
-	public void setDelayInterval(int delayInterval) {
-		this.delayInterval = delayInterval;
+	@Override
+	public int getCollectorDelay() {
+		return collectorDelay;
 	}
 }

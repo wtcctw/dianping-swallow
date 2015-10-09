@@ -110,5 +110,10 @@ public class TopicWhiteList implements ConfigChangeListener {
     public void addTopic(String topic) {
         this.topics.add(topic);
     }
+    
+    public Set<String>  getTopics(){
+    	
+    	return new HashSet<String>(topics);
+    }
 
 }

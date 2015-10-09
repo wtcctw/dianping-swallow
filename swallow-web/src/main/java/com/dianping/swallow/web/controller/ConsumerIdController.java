@@ -59,8 +59,9 @@ public class ConsumerIdController extends AbstractMenuController {
 		consumerIdParam.setTopic(consumerIdQueryDto.getTopic());
 		consumerIdParam.setConsumerId(consumerIdQueryDto.getConsumerId());
 		consumerIdParam.setConsumerIp(consumerIdQueryDto.getConsumerIp());
+		System.out.println(System.currentTimeMillis());
 		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
-
+		System.out.println(System.currentTimeMillis());
 		for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
 			resultDto.add(ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource));
 		}

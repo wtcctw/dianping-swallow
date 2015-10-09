@@ -8,20 +8,37 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.params.ConnPerRouteBean;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.apache.http.util.VersionInfo;
 import org.mortbay.jetty.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.model.alarm.ResultType;
 import com.dianping.swallow.web.service.HttpService;
 
@@ -37,6 +54,47 @@ public class HttpServiceImpl implements HttpService {
 
 	private static final String UTF_8 = "UTF-8";
 
+	private static final int TIMEOUT = 2000;
+
+	private static final int CONNECTION_TIMEOUT = 2000;
+
+	private static final int SOCKET_TIMEOUT = 1000;
+
+	private HttpClient httpClient;
+
+	public HttpServiceImpl() {
+		createHttpClient();
+	}
+
+	private void createHttpClient() {
+		HttpParams params = new BasicHttpParams();
+
+		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setContentCharset(params, HTTP.DEFAULT_CONTENT_CHARSET);
+		HttpProtocolParams.setUseExpectContinue(params, true);
+		HttpConnectionParams.setTcpNoDelay(params, true);
+		HttpConnectionParams.setSocketBufferSize(params, 8192);
+
+		final VersionInfo vi = VersionInfo.loadVersionInfo("org.apache.http.client", getClass().getClassLoader());
+		final String release = (vi != null) ? vi.getRelease() : VersionInfo.UNAVAILABLE;
+		HttpProtocolParams.setUserAgent(params, "Apache-HttpClient/" + release + " (java 1.5)");
+
+		ConnManagerParams.setMaxConnectionsPerRoute(params, new ConnPerRouteBean(CommonUtils.getCpuCount() * 2));
+		// 等待获取链接时间
+		ConnManagerParams.setTimeout(params, TIMEOUT);
+		// 链接超时时间
+		HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
+		// 读取超时时间
+		HttpConnectionParams.setSoTimeout(params, SOCKET_TIMEOUT);
+
+		SchemeRegistry schemeRegistry = new SchemeRegistry();
+		schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+		schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+
+		ClientConnectionManager connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry);
+		httpClient = new DefaultHttpClient(connectionManager, params);
+	}
+
 	@Override
 	public HttpResult httpPost(String url, List<NameValuePair> params) {
 		HttpPost httpPost = new HttpPost(url);
@@ -47,33 +105,33 @@ public class HttpServiceImpl implements HttpService {
 			logger.error("http post param encoded failed. ", e);
 		}
 		try {
-			HttpClient httpClient = new DefaultHttpClient();
 			HttpResponse response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
 				result.setResultType(ResultType.SUCCESS);
 				result.setSuccess(true);
+			} else {
+				handleException(httpPost, result, ResultType.FAILED);
+				logger.error("http post request failed. url = {}", url);
 			}
 		} catch (UnknownHostException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_HOST_UNKNOWN);
+			handleException(httpPost, result, ResultType.FAILED_HOST_UNKNOWN);
 			logger.error("http post request failed. url = {}", url, e);
 		} catch (ConnectTimeoutException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_CONNECTION_TIMEOUT);
+			handleException(httpPost, result, ResultType.FAILED_CONNECTION_TIMEOUT);
 			logger.error("http post request failed. url = {}", url, e);
 		} catch (ConnectException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_CONNECT);
+			handleException(httpPost, result, ResultType.FAILED_CONNECT);
 			logger.error("http post request failed. url = {}", url, e);
 		} catch (SocketTimeoutException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_SOCKET_TIMEOUT);
+			handleException(httpPost, result, ResultType.FAILED_SOCKET_TIMEOUT);
 			logger.error("http post request failed. url = {}", url, e);
 		} catch (IOException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED);
+			handleException(httpPost, result, ResultType.FAILED);
 			logger.error("http post request failed. url = {}", url, e);
+		} catch (ParseException e) {
+			handleException(httpPost, result, ResultType.FAILED);
+			logger.error("http get request failed. url = {}", url, e);
 		}
 		return result;
 	}
@@ -83,36 +141,47 @@ public class HttpServiceImpl implements HttpService {
 		HttpGet httpGet = new HttpGet(url);
 		HttpResult result = new HttpResult();
 		try {
-			HttpClient httpClient = new DefaultHttpClient();
-			httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 1000);
-			httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 1000);
 			HttpResponse response = httpClient.execute(httpGet);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
 				result.setResponseBody(EntityUtils.toString(response.getEntity()));
 				result.setResultType(ResultType.SUCCESS);
 				result.setSuccess(true);
+			} else {
+				handleException(httpGet, result, ResultType.FAILED);
 			}
 		} catch (UnknownHostException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_HOST_UNKNOWN);
+			handleException(httpGet, result, ResultType.FAILED_HOST_UNKNOWN);
 			logger.error("http get request failed. url = {}", url, e);
 		} catch (ConnectTimeoutException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_CONNECTION_TIMEOUT);
+			handleException(httpGet, result, ResultType.FAILED_CONNECTION_TIMEOUT);
 			logger.error("http get request failed. url = {}", url, e);
 		} catch (ConnectException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_CONNECT);
+			handleException(httpGet, result, ResultType.FAILED_CONNECT);
 			logger.error("http get request failed. url = {}", url, e);
 		} catch (SocketTimeoutException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED_SOCKET_TIMEOUT);
+			handleException(httpGet, result, ResultType.FAILED_SOCKET_TIMEOUT);
 			logger.error("http get request failed. url = {}", url, e);
 		} catch (IOException e) {
-			result.setSuccess(false);
-			result.setResultType(ResultType.FAILED);
+			handleException(httpGet, result, ResultType.FAILED);
+			logger.error("http get request failed. url = {}", url, e);
+		} catch (ParseException e) {
+			handleException(httpGet, result, ResultType.FAILED);
 			logger.error("http get request failed. url = {}", url, e);
 		}
 		return result;
+	}
+
+	private void handleException(HttpRequestBase request, HttpResult result, ResultType resultType) {
+		result.setSuccess(false);
+		result.setResultType(resultType);
+		request.abort();
+	}
+
+	public HttpClient getHttpClient() {
+		return httpClient;
+	}
+
+	public void setHttpClient(HttpClient httpClient) {
+		this.httpClient = httpClient;
 	}
 }

@@ -36,35 +36,38 @@
 					class="table table-small table-bordered table-striped  table-condensed table-hover"
 					ng-repeat="item in topicOrderDatas">
 					<tr class="table-smalll-tr">
-						<th class="table-smalll-td" colspan="3">{{item.info.desc}}排序</th>
+						<th class="table-smalll-td" colspan="4">{{item.info.desc}}排序</th>
 					</tr>
 					<tr class="table-smalll-tr">
-						<th class="text-danger table-smalll-td" colspan="3">{{item.start|date:'yyyy-MM-dd HH:mm:ss'}} - {{ item.end|date:'yyyy-MM-dd HH:mm:ss'}}</th>
+						<th class="text-danger table-smalll-td" colspan="4">{{item.start|date:'yyyy-MM-dd HH:mm:ss'}} - {{ item.end|date:'yyyy-MM-dd HH:mm:ss'}}</th>
 					</tr>
 					<tr class="table-smalll-tr">
 						<th class="table-smalll-td" colspan="2">TOPIC</th>
 						<th class="table-smalll-td">总计</th>
+						<th class="table-smalll-td">平均</th>
 					</tr>
 					<tr ng-repeat="subItem in item.dataResults">
 						<td class="table-smalll-td table-smalll-td-topic"  colspan="2"><a
 							ng-href='{{showRelatedUrl(item.info.dt, subItem.topicName,"")}}'>
 								{{showRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
-						<td class="table-smalll-td table-smalll-td-data">{{subItem.sumData}}</td>
+						<td class="table-smalll-td table-smalll-td-sumdata">{{subItem.sumData}}</td>
+						<td class="table-smalll-td table-smalll-td-avgdata">{{subItem.avgData | number:1}}</td>
 					</tr>
 				</table>
 				<table
 					class="table table-small table-bordered table-striped  table-condensed table-hover"
 					ng-repeat="item in consumerIdOrderDatas">
 					<tr class="table-smalll-tr">
-						<th class="table-smalll-td" colspan="3">{{item.info.desc}}排序</th>
+						<th class="table-smalll-td" colspan="4">{{item.info.desc}}排序</th>
 					</tr>
 					<tr class="table-smalll-tr">
-						<th class="text-danger table-smalll-td" colspan="3">{{item.start|date:'yyyy-MM-dd HH:mm:ss'}} - {{ item.end|date:'yyyy-MM-dd HH:mm:ss'}}</th>
+						<th class="text-danger table-smalll-td" colspan="4">{{item.start|date:'yyyy-MM-dd HH:mm:ss'}} - {{ item.end|date:'yyyy-MM-dd HH:mm:ss'}}</th>
 					</tr>
 					<tr class="table-smalll-tr">
 						<th class="table-smalll-td">TOPIC</th>
 						<th class="table-smalll-td">CONSUMERID</th>
 						<th class="table-smalll-td">总计</th>
+						<th class="table-smalll-td">平均</th>
 					</tr>
 					<tr ng-repeat="subItem in item.dataResults">
 						<td class="table-smalll-td table-smalll-td-topic"><a
@@ -73,7 +76,8 @@
 						<td class="table-smalll-td table-smalll-td-consumerId"><a
 							ng-href='{{showRelatedUrl(item.info.dt, subItem.topicName, subItem.consumerId)}}'>
 								{{showSubRelatedInfo(subItem.topicName, subItem.consumerId)}}</a></td>
-						<td class="table-smalll-td table-smalll-td-data">{{subItem.sumData}}</td>
+						<td class="table-smalll-td table-smalll-td-sumdata">{{subItem.sumData}}</td>
+						<td class="table-smalll-td table-smalll-td-avgdata">{{subItem.avgData| number:1}}</td>
 					</tr>
 				</table>
 			</div>

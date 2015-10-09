@@ -1,3 +1,3 @@
 db = db.getSiblingDB('swallowweb');
-load("swallow-mongo-alarmmeta.js");
-load("swallow-mongo-alarmsetting.js");
+load("./swallowweb-db/mongo-db-init.js");
+load("./swallowstatsdata-db/mongo-db-init.js");

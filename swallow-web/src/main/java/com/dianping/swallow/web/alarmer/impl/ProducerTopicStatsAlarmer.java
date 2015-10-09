@@ -15,7 +15,6 @@ import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
@@ -27,7 +26,7 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
  *         2015年8月3日 下午6:07:16
  */
 @Component
-public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {
+public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
@@ -42,11 +41,6 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements M
 	private AlarmResourceContainer resourceContainer;
 
 	@Override
-	public void achieveMonitorData() {
-		dataCount.incrementAndGet();
-	}
-
-	@Override
 	public void doInitialize() throws Exception {
 		super.doInitialize();
 		producerDataRetriever.registerListener(this);
@@ -54,13 +48,9 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements M
 
 	@Override
 	public void doAlarm() {
-		if (dataCount.get() <= 0) {
-			return;
-		}
-		dataCount.decrementAndGet();
-		final List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey
-				.get());
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+		final List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(
+				getLastTimeKey(), false);
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -74,19 +64,24 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements M
 			return;
 		}
 		for (ProducerTopicStatsData topicStatsData : topicStatsDatas) {
-			String topicName = topicStatsData.getTopicName();
-			TopicResource topicResource = resourceContainer.findTopicResource(topicName);
-			if (topicResource == null || !topicResource.isProducerAlarm() || StringUtils.equals(TOTAL_KEY, topicName)) {
-				continue;
+			try {
+				String topicName = topicStatsData.getTopicName();
+				TopicResource topicResource = resourceContainer.findTopicResource(topicName);
+				if (topicResource == null || !topicResource.isProducerAlarm()
+						|| StringUtils.equals(TOTAL_KEY, topicName)) {
+					continue;
+				}
+				ProducerBaseAlarmSetting pBaseAlarmSetting = topicResource.getProducerAlarmSetting();
+				if (pBaseAlarmSetting == null) {
+					continue;
+				}
+				QPSAlarmSetting qps = pBaseAlarmSetting.getQpsAlarmSetting();
+				long delay = pBaseAlarmSetting.getDelay();
+				qpsAlarm(topicStatsData, qps);
+				topicStatsData.checkDelay(delay);
+			} catch (Exception e) {
+				logger.error("[topicAlarm] topicStatsData {} error.", topicStatsData);
 			}
-			ProducerBaseAlarmSetting pBaseAlarmSetting = topicResource.getProducerAlarmSetting();
-			if (pBaseAlarmSetting == null) {
-				continue;
-			}
-			QPSAlarmSetting qps = pBaseAlarmSetting.getQpsAlarmSetting();
-			long delay = pBaseAlarmSetting.getDelay();
-			qpsAlarm(topicStatsData, qps);
-			topicStatsData.checkDelay(delay);
 		}
 	}
 

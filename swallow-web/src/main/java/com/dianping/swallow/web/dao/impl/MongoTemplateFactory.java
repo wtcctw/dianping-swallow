@@ -42,7 +42,7 @@ public class MongoTemplateFactory {
 
 	@Value("${swallow.web.mongodbname.web}")
 	private String webMongoDbName;
-	
+
 	@Value("${swallow.web.mongodbname.statsdata}")
 	private String statsDataMongoDbName;
 
@@ -63,7 +63,7 @@ public class MongoTemplateFactory {
 		dynamicConfig = new LionDynamicConfig(SWALLOW_MONGO_ADDRESS_FILE);
 		String mongoUrl = dynamicConfig.get(SWALLOW_STATS_MONGO_URL_KEY);
 		config = new MongoConfig(SWALLOW_MONGO_CONFIG_FILE);
-		
+
 		mongo = new MongoClient(MongoUtils.parseUriToAddressList(mongoUrl), config.buildMongoOptions());
 		if (logger.isInfoEnabled()) {
 			logger.info("[getMongo]" + mongo);
@@ -73,34 +73,41 @@ public class MongoTemplateFactory {
 	@Bean(name = "statsMongoTemplate")
 	public MongoTemplate getStatisMongoTemplate() {
 
-		MongoTemplate statisMongoTemplate = createMongoTemplate(statsMongoDbName);
-		
-		//create collection
-		
-		long size = Long.parseLong(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionSize"));
-		long max =  Long.parseLong(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionMaxDocNum"));
-		createCappedCollection(statisMongoTemplate, ProducerMonitorData.class.getSimpleName(), size, max);
-		createCappedCollection(statisMongoTemplate, ConsumerMonitorData.class.getSimpleName(), size, max);
-		
-		return statisMongoTemplate;
+		// MongoTemplate statisMongoTemplate =
+		// createMongoTemplate(statsMongoDbName);
+		//
+		// //create collection
+		//
+		// long size =
+		// Long.parseLong(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionSize"));
+		// long max =
+		// Long.parseLong(dynamicConfig.get("swallow.mongo.web.stais.cappedCollectionMaxDocNum"));
+		// createCappedCollection(statisMongoTemplate,
+		// ProducerMonitorData.class.getSimpleName(), size, max);
+		// createCappedCollection(statisMongoTemplate,
+		// ConsumerMonitorData.class.getSimpleName(), size, max);
+
+		// return statisMongoTemplate;
+		return null;
 	}
-	
+
 	@Bean(name = "statsDataMongoTemplate")
 	public MongoTemplate getAlarmStatisMongoTemplate() {
-		
+
 		return new MongoTemplate(new SimMongoDbFactory(mongo, statsDataMongoDbName));
 	}
-	
-	private synchronized void createCappedCollection(MongoTemplate mongoTemplate, String collectionName, long size, long max) {
-		
-		if(!mongoTemplate.collectionExists(collectionName)){			
-			if(logger.isInfoEnabled()){
-				logger.info("[createCappedCollection][createCollection]" + collectionName + ",size:" + size + ",max:" + max);
+
+	private synchronized void createCappedCollection(MongoTemplate mongoTemplate, String collectionName, long size,
+			long max) {
+
+		if (!mongoTemplate.collectionExists(collectionName)) {
+			if (logger.isInfoEnabled()) {
+				logger.info("[createCappedCollection][createCollection]" + collectionName + ",size:" + size + ",max:"
+						+ max);
 			}
 			mongoTemplate.getDb().createCollection(collectionName, getCappedOptions(size, max));
 		}
-		
-		
+
 	}
 
 	private DBObject getCappedOptions(long size, long max) {
@@ -139,8 +146,7 @@ public class MongoTemplateFactory {
 			if (logger.isInfoEnabled()) {
 				logger.info("[initMongoTemplate]" + MAP_KEY_DOT_REPLACEMENT);
 			}
-			((MappingMongoConverter) converter)
-					.setMapKeyDotReplacement(MAP_KEY_DOT_REPLACEMENT);
+			((MappingMongoConverter) converter).setMapKeyDotReplacement(MAP_KEY_DOT_REPLACEMENT);
 		}
 
 		if (logger.isInfoEnabled()) {
@@ -154,5 +160,5 @@ public class MongoTemplateFactory {
 		template.setWriteConcern(WriteConcern.SAFE);
 
 	}
-	
+
 }

@@ -110,15 +110,22 @@ public class DefaultConsumerDataRetriever
 			}
 			Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topicName,
 					StatisType.SEND, false);
+			Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
+					StatisType.SEND, false);
 			Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topicName,
 					StatisType.ACK, false);
+			Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topicName, StatisType.ACK,
+					false);
 			if (sendDelays != null) {
 				for (Map.Entry<String, NavigableMap<Long, Long>> sendDelay : sendDelays.entrySet()) {
 					if (TOTAL_KEY.equals(sendDelay.getKey())) {
 						continue;
 					}
-					sendStatsData.add(new OrderEntity(topicName, sendDelay.getKey(), getSumStatsData(
-							sendDelay.getValue(), fromKey, toKey)));
+					NavigableMap<Long, Long> sendQpx = sendQpxs.get(sendDelay.getKey());
+					sendStatsData
+							.add(new OrderEntity(topicName, sendDelay.getKey(), getDelaySumStatsData(
+									sendDelay.getValue(), sendQpx, fromKey, toKey), getQpsSumStatsData(sendQpx,
+									fromKey, toKey)));
 				}
 			}
 
@@ -127,8 +134,9 @@ public class DefaultConsumerDataRetriever
 					if (TOTAL_KEY.equals(ackDelay.getKey())) {
 						continue;
 					}
-					ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getSumStatsData(ackDelay.getValue(),
-							fromKey, toKey)));
+					NavigableMap<Long, Long> ackQpx = ackQpxs.get(ackDelay.getKey());
+					ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getDelaySumStatsData(
+							ackDelay.getValue(), ackQpx, fromKey, toKey), getQpsSumStatsData(ackQpx, fromKey, toKey)));
 				}
 			}
 
@@ -166,8 +174,8 @@ public class DefaultConsumerDataRetriever
 					if (TOTAL_KEY.equals(sendQpx.getKey())) {
 						continue;
 					}
-					sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getSumStatsData(sendQpx.getValue(),
-							fromKey, toKey)));
+					sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getQpsSumStatsData(
+							sendQpx.getValue(), fromKey, toKey), getQpsSampleCount(start, end)));
 				}
 			}
 
@@ -176,8 +184,8 @@ public class DefaultConsumerDataRetriever
 					if (TOTAL_KEY.equals(ackQpx.getKey())) {
 						continue;
 					}
-					ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getSumStatsData(ackQpx.getValue(),
-							fromKey, toKey)));
+					ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getQpsSumStatsData(ackQpx.getValue(),
+							fromKey, toKey), getQpsSampleCount(start, end)));
 				}
 			}
 
@@ -323,8 +331,7 @@ public class DefaultConsumerDataRetriever
 		long endKey = getKey(end);
 		Map<String, StatsDataMapPair> statsDataResults = new HashMap<String, StatsDataMapPair>();
 		if (MonitorData.TOTAL_KEY.equals(topic)) {
-			StatsDataMapPair statsDataResult = cTopicStatsDataService.findSectionDelayData(topic,
-					startKey, endKey);
+			StatsDataMapPair statsDataResult = cTopicStatsDataService.findSectionDelayData(topic, startKey, endKey);
 			statsDataResults.put(topic, statsDataResult);
 		} else {
 			statsDataResults = consumerIdStatsDataService.findSectionDelayData(topic, startKey, endKey);
@@ -608,34 +615,44 @@ public class DefaultConsumerDataRetriever
 		}
 
 		public void submit(final QueryOrderParam orderParam) {
-			// logger.info("[submit] QueryOrderParam {} .", orderParam);
 			executorService.submit(new Runnable() {
 
 				@Override
 				public void run() {
-					String topicName = orderParam.getTopicName();
-					String consumerId = orderParam.getConsumerId();
-					ConsumerIdStatsData preStatsData = getPreConsumerIdStatsData(topicName, consumerId,
-							orderParam.getFromKey(), orderParam.getToKey());
-					ConsumerIdStatsData postStatsData = getPostConsumerIdStatsData(topicName, consumerId,
-							orderParam.getFromKey(), orderParam.getToKey());
-					orderParam.getQpxSendStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getTotalSendQps()
-									- preStatsData.getTotalSendQps()));
-					orderParam.getQpxAckStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getTotalAckQps()
-									- preStatsData.getTotalAckQps()));
-					orderParam.getDelaySendStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getTotalSendDelay()
-									- preStatsData.getTotalSendDelay()));
-					orderParam.getDelayAckStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getTotalAckDelay()
-									- preStatsData.getTotalAckDelay()));
-					orderParam.getAccuStatsData().add(
-							new OrderEntity(topicName, consumerId, postStatsData.getTotalAccumulation()
-									- preStatsData.getTotalAccumulation()));
+					queryOrder(orderParam);
 				}
 			});
+		}
+
+		private void queryOrder(QueryOrderParam orderParam) {
+			String topicName = orderParam.getTopicName();
+			String consumerId = orderParam.getConsumerId();
+			ConsumerIdStatsData preStatsData = getPreConsumerIdStatsData(topicName, consumerId,
+					orderParam.getFromKey(), orderParam.getToKey());
+			ConsumerIdStatsData postStatsData = getPostConsumerIdStatsData(topicName, consumerId,
+					orderParam.getFromKey(), orderParam.getToKey());
+			long start = orderParam.getQpxSendStatsData().getStart();
+			long end = orderParam.getQpxSendStatsData().getEnd();
+			
+			long totalSendQps = postStatsData.getTotalSendQps() - preStatsData.getTotalSendQps();
+			orderParam.getQpxSendStatsData().add(
+					new OrderEntity(topicName, consumerId, totalSendQps, getQpsSampleCount(start, end)));
+			
+			long totalAckQps = postStatsData.getTotalAckQps() - preStatsData.getTotalAckQps();
+			orderParam.getQpxAckStatsData().add(
+					new OrderEntity(topicName, consumerId, totalAckQps, getQpsSampleCount(start, end)));
+			
+			orderParam.getDelaySendStatsData().add(
+					new OrderEntity(topicName, consumerId, postStatsData.getTotalSendDelay()
+							- preStatsData.getTotalSendDelay(), totalSendQps));
+			
+			orderParam.getDelayAckStatsData().add(
+					new OrderEntity(topicName, consumerId, postStatsData.getTotalAckDelay()
+							- preStatsData.getTotalAckDelay(), totalAckQps));
+			
+			orderParam.getAccuStatsData().add(
+					new OrderEntity(topicName, consumerId, postStatsData.getTotalAccumulation()
+							- preStatsData.getTotalAccumulation(), getOtherSampleCount(start, end)));
 		}
 
 		public void await() {

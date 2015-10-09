@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author qiyin
  *
- * 2015年8月1日 下午11:20:20
+ *         2015年8月1日 下午11:20:20
  */
 public class NetUtil {
 
@@ -36,14 +36,14 @@ public class NetUtil {
 			socket.connect(new InetSocketAddress(inetAddr, port), TIME_OUT);
 			return true;
 		} catch (IOException e) {
+			logger.error("[isPortOpen] connect host : port{}.", host + ":" + Integer.toString(port), e);
 			return false;
-		}
-		finally {
+		} finally {
 			if (socket != null && socket.isConnected()) {
 				try {
 					socket.close();
 				} catch (IOException e) {
-					logger.error("[isPortUsing] socket close failed.", e);
+					logger.error("[isPortOpen] socket close failed.", e);
 				}
 			}
 			socket = null;

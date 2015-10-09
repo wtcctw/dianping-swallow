@@ -7,7 +7,6 @@ import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
 import com.dianping.swallow.web.manager.IPResourceManager;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.SeqGeneratorService;
 
 /**
  * 
@@ -30,15 +29,11 @@ public class EventFactory {
 	@Autowired
 	protected IPCollectorService ipCollectorService;
 
-	@Autowired
-	private SeqGeneratorService seqGeneratorService;
-
 	private void setComponent(Event event) {
 		event.setAlarmService(alarmService);
 		event.setIPDescManager(ipDescManager);
 		event.setAlarmMetaContainer(alarmMetaContainer);
 		event.setIPCollectorService(ipCollectorService);
-		event.setSeqGeneratorService(seqGeneratorService);
 	}
 
 	public TopicEvent createTopicEvent() {
@@ -63,5 +58,23 @@ public class EventFactory {
 		ConsumerIdEvent consumerIdEvent = new ConsumerIdEvent();
 		setComponent(consumerIdEvent);
 		return consumerIdEvent;
+	}
+
+	public ConsumerClientEvent createCClientEvent() {
+		ConsumerClientEvent cClientEvent = new ConsumerClientEvent();
+		setComponent(cClientEvent);
+		return cClientEvent;
+	}
+
+	public ProducerClientEvent createPClientEvent() {
+		ProducerClientEvent pClientEvent = new ProducerClientEvent();
+		setComponent(pClientEvent);
+		return pClientEvent;
+	}
+	
+	public MongoConfigEvent createMongoConfigEvent() {
+		MongoConfigEvent configEvent = new MongoConfigEvent();
+		setComponent(configEvent);
+		return configEvent;
 	}
 }

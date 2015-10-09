@@ -65,7 +65,7 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	}
 
 	@Override
-	public Pair<Long, List<IpResource>> findByIp(int offset, int limit, String ... ips) {
+	public Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String ... ips) {
 
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		for (String ip : ips) {
@@ -73,9 +73,15 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 		}
 
 		Query query = new Query();
-		query.addCriteria(Criteria.where(IP).exists(true)
-				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
-		long size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
+		long size = 0;
+		
+		if(admin){
+			size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
+		}else{
+			query.addCriteria(Criteria.where(IP).exists(true)
+					.orOperator(criterias.toArray(new Criteria[criterias.size()])));
+			size = mongoTemplate.count(query, IPRESOURCE_COLLECTION);
+		}
 		
 		query.skip(offset).limit(limit);
 		List<IpResource> ipResources = mongoTemplate.find(query, IpResource.class, IPRESOURCE_COLLECTION);

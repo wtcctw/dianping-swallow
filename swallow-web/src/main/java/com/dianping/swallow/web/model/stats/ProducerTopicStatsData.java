@@ -108,13 +108,14 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 		return true;
 	}
 
-	public void setTotalStatsDatas(ProducerTopicStatsData lastStatsData) {
+	public void setTotalStatsDatas(ProducerTopicStatsData lastStatsData, int sampleInterval) {
+		long currQps = this.getQps() * sampleInterval;
 		if (lastStatsData != null) {
-			this.totalQps = lastStatsData.getTotalQps() + this.getQps();
-			this.totalDelay = lastStatsData.getTotalDelay() + this.getDelay();
+			this.totalQps = lastStatsData.getTotalQps() + currQps;
+			this.totalDelay = lastStatsData.getTotalDelay() + this.getDelay() * currQps;
 		} else {
-			this.totalQps = this.getQps();
-			this.totalDelay = this.getDelay();
+			this.totalQps = currQps;
+			this.totalDelay = this.getDelay() * currQps;
 		}
 	}
 

@@ -102,7 +102,9 @@ public class DefaultProducerDataRetriever
 				continue;
 			}
 			NavigableMap<Long, Long> rawDatas = statis.getDelayForTopic(topicName, type);
-			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
+			NavigableMap<Long, Long> qpsRawDatas = statis.getQpxForTopic(topicName, type);
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getDelaySumStatsData(rawDatas, qpsRawDatas,
+					fromKey, toKey), getQpsSumStatsData(qpsRawDatas, fromKey, toKey)));
 		}
 		return orderResults;
 	}
@@ -176,7 +178,8 @@ public class DefaultProducerDataRetriever
 				continue;
 			}
 			NavigableMap<Long, Long> rawDatas = statis.getQpxForTopic(topicName, type);
-			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getSumStatsData(rawDatas, fromKey, toKey)));
+			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY,
+					getQpsSumStatsData(rawDatas, fromKey, toKey), getQpsSampleCount(start, end)));
 		}
 		return orderResults;
 	}
@@ -346,23 +349,28 @@ public class DefaultProducerDataRetriever
 		}
 
 		public void submit(final QueryOrderParam orderParam) {
-			// logger.info("[submit] QueryOrderParam {} .", orderParam);
 			executorService.submit(new Runnable() {
 
 				@Override
 				public void run() {
-					ProducerTopicStatsData preStatsData = getPrePTopicStatsData(orderParam.getTopicName(),
-							orderParam.getFromKey(), orderParam.getToKey());
-					ProducerTopicStatsData postStatsData = getPostPTopicStatsData(orderParam.getTopicName(),
-							orderParam.getFromKey(), orderParam.getToKey());
-					orderParam.getDelayStatsData().add(
-							new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalDelay()
-									- preStatsData.getTotalDelay()));
-					orderParam.getQpxStatsData().add(
-							new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalQps()
-									- preStatsData.getTotalQps()));
+					queryOrder(orderParam);
 				}
 			});
+		}
+
+		private void queryOrder(QueryOrderParam orderParam) {
+			ProducerTopicStatsData preStatsData = getPrePTopicStatsData(orderParam.getTopicName(),
+					orderParam.getFromKey(), orderParam.getToKey());
+			ProducerTopicStatsData postStatsData = getPostPTopicStatsData(orderParam.getTopicName(),
+					orderParam.getFromKey(), orderParam.getToKey());
+			long start = orderParam.getDelayStatsData().getStart();
+			long end = orderParam.getDelayStatsData().getEnd();
+			orderParam.getDelayStatsData().add(
+					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalDelay()
+							- preStatsData.getTotalDelay(), postStatsData.getTotalQps() - preStatsData.getTotalQps()));
+			orderParam.getQpxStatsData().add(
+					new OrderEntity(orderParam.getTopicName(), StringUtils.EMPTY, postStatsData.getTotalQps()
+							- preStatsData.getTotalQps(), getQpsSampleCount(start, end)));
 		}
 
 		public void await() {

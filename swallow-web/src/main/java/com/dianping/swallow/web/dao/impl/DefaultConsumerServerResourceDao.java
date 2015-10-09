@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.model.resource.ServerType;
 import com.mongodb.WriteResult;
 
 /**
@@ -22,6 +23,10 @@ import com.mongodb.WriteResult;
 public class DefaultConsumerServerResourceDao extends AbstractWriteDao implements ConsumerServerResourceDao {
 
 	private static final String CONSUMERSERVERRESOURCE_COLLECTION = "CONSUMER_SERVER_RESOURCE";
+
+	private static final String GROUPID = "groupId";
+
+	private static final String TYPE = "type";
 
 	@Override
 	public boolean insert(ConsumerServerResource consumerServerResource) {
@@ -69,6 +74,15 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 	}
 
 	@Override
+	public List<ConsumerServerResource> findByGroupId(long groupId) {
+
+		Query query = new Query(Criteria.where(GROUPID).is(groupId));
+		List<ConsumerServerResource> consumerServerResources = mongoTemplate.find(query, ConsumerServerResource.class,
+				CONSUMERSERVERRESOURCE_COLLECTION);
+		return consumerServerResources;
+	}
+
+	@Override
 	public ConsumerServerResource findByHostname(String hostname) {
 
 		Query query = new Query(Criteria.where(HOSTNAME).is(hostname));
@@ -102,6 +116,31 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 	public List<ConsumerServerResource> findAll() {
 
 		return mongoTemplate.findAll(ConsumerServerResource.class, CONSUMERSERVERRESOURCE_COLLECTION);
+	}
+
+	@Override
+	public ConsumerServerResource loadIdleConsumerServer() {
+
+		Query query = new Query(Criteria.where(TYPE).is(ServerType.MASTER));
+
+		query.with(new Sort(new Sort.Order(Direction.ASC, QPS)));
+		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,
+				CONSUMERSERVERRESOURCE_COLLECTION);
+
+		return consumerServerResource;
+	}
+
+	@Override
+	public int getMaxGroupId() {
+		Query query = new Query();
+
+		query.skip(0).limit(1).with(new Sort(new Sort.Order(Direction.DESC, GROUPID)));
+		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,
+				CONSUMERSERVERRESOURCE_COLLECTION);
+		if (consumerServerResource == null) {
+			return 0;
+		}
+		return consumerServerResource.getGroupId();
 	}
 
 }

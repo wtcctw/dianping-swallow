@@ -31,9 +31,11 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  */
 public abstract class AbstractRetriever extends AbstractLifecycle implements Retriever {
 
-	protected final int DEFAULT_INTERVAL = 30;// 每隔多少秒采样
+	protected static final int DEFAULT_INTERVAL = 30;// 每隔多少秒采样
 
 	protected final int BUILD_TIMES_AGEO = 15000;// 每次构建时，构建此时间(ms)以前的数据
+
+	protected static final String CAT_TYPE = "DataRetriever";
 
 	private static final String FACTORY_NAME = "DataRetriever";
 
@@ -152,7 +154,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		return DEFAULT_INTERVAL;
 	}
 
-	protected int getStorageIntervalTime() {
+	public static int getStorageIntervalTime() {
 		return DEFAULT_INTERVAL;
 	}
 
@@ -239,9 +241,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 			long tempKey = tempStartKey;
 			tempKey -= getStorageIntervalCount();
 			while (startTimeKey < tempKey) {
-				if (!statsDatas.containsKey(tempKey)) {
-					statsDatas.put(tempKey, 0L);
-				}
+				statsDatas.put(tempKey, 0L);
 				tempKey -= getStorageIntervalCount();
 			}
 
@@ -264,11 +264,10 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 			}
 
 			tempKey = tempEndKey;
+			tempEndKey = endTimeKey - 2 * getStorageIntervalCount();
 			tempKey += getStorageIntervalCount();
-			while (tempKey < endTimeKey) {
-				if (!statsDatas.containsKey(tempKey)) {
-					statsDatas.put(tempKey, 0L);
-				}
+			while (tempKey < tempEndKey) {
+				statsDatas.put(tempKey, 0L);
 				tempKey += getStorageIntervalCount();
 			}
 		}
@@ -281,10 +280,49 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
 		if (rawDatas != null) {
 			rawDatas = rawDatas.subMap(fromKey, true, toKey, true);
 			for (Map.Entry<Long, Long> rowData : rawDatas.entrySet()) {
-				sumData += rowData.getValue().floatValue();
+				sumData += rowData.getValue().longValue();
 			}
 		}
 		return sumData;
+	}
+
+	protected long getQpsSumStatsData(NavigableMap<Long, Long> rawDatas, long fromKey, long toKey) {
+		long sumData = 0;
+		if (rawDatas != null) {
+			rawDatas = rawDatas.subMap(fromKey, true, toKey, true);
+			for (Map.Entry<Long, Long> rowData : rawDatas.entrySet()) {
+				sumData += rowData.getValue().longValue();
+			}
+		}
+		return sumData * getSampleIntervalTime();
+	}
+
+	protected long getDelaySumStatsData(NavigableMap<Long, Long> rawDatas, NavigableMap<Long, Long> qpsRawDatas,
+			long fromKey, long toKey) {
+		long sumData = 0;
+		if (rawDatas != null) {
+			rawDatas = rawDatas.subMap(fromKey, true, toKey, true);
+			for (Map.Entry<Long, Long> rowData : rawDatas.entrySet()) {
+				Long qps = null;
+				if (qpsRawDatas != null) {
+					qps = qpsRawDatas.get(rowData.getKey());
+				}
+				if (qps != null) {
+					sumData += rowData.getValue().longValue() * qps * getSampleIntervalTime();
+				} else {
+					sumData += rowData.getValue().longValue();
+				}
+			}
+		}
+		return sumData;
+	}
+
+	protected long getQpsSampleCount(long start, long end) {
+		return (end - start) / 1000;
+	}
+
+	protected long getOtherSampleCount(long start, long end) {
+		return (end - start) / 1000 / getSampleIntervalTime();
 	}
 
 }

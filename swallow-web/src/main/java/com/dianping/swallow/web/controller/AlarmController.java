@@ -1,10 +1,11 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,14 +20,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.AlarmSearchDto;
 import com.dianping.swallow.web.controller.mapper.AlarmMapper;
 import com.dianping.swallow.web.dao.AlarmDao.AlarmParam;
 import com.dianping.swallow.web.model.alarm.Alarm;
-import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
+import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.service.AlarmService;
-import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
@@ -42,10 +45,7 @@ public class AlarmController extends AbstractSidebarBasedController {
 	private AlarmService alarmService;
 
 	@Autowired
-	private IPCollectorService ipCollectorService;
-
-	@Autowired
-	private ConsumerStatsDataWapper consumerStatsDataWapper;
+	private AlarmResourceContainer resourceContainer;
 
 	@RequestMapping(value = "/console/tool")
 	public ModelAndView alarm(HttpServletRequest request, HttpServletResponse response) {
@@ -96,18 +96,14 @@ public class AlarmController extends AbstractSidebarBasedController {
 	@RequestMapping(value = "/console/alarm/query/ip", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object searchServerIps() {
-		List<String> serverIps = new ArrayList<String>();
-		List<String> tempIps = ipCollectorService.getConsumerServerMasterIps();
-		if (tempIps != null) {
-			serverIps.addAll(tempIps);
+		Set<String> serverIps = new HashSet<String>();
+		List<ProducerServerResource> pServerResources = resourceContainer.findProducerServerResources(false);
+		List<ConsumerServerResource> cServerResources = resourceContainer.findConsumerServerResources(false);
+		for (ProducerServerResource serverResource : pServerResources) {
+			serverIps.add(serverResource.getIp());
 		}
-		tempIps = ipCollectorService.getConsumerServerSlaveIps();
-		if (tempIps != null) {
-			serverIps.addAll(tempIps);
-		}
-		tempIps = ipCollectorService.getProducerServerIps();
-		if (tempIps != null) {
-			serverIps.addAll(tempIps);
+		for (ConsumerServerResource serverResource : cServerResources) {
+			serverIps.add(serverResource.getIp());
 		}
 		return serverIps;
 	}
@@ -115,7 +111,12 @@ public class AlarmController extends AbstractSidebarBasedController {
 	@RequestMapping(value = "/console/alarm/query/consumerid", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Object searchConsumerIds() {
-		return consumerStatsDataWapper.getConusmerIdInfos();
+		Set<String> consumerIds = new HashSet<String>();
+		List<ConsumerIdResource> consumerIdResources = resourceContainer.findConsumerIdResources(false);
+		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
+			consumerIds.add(consumerIdResource.getConsumerId() + " " + consumerIdResource.getTopic());
+		}
+		return consumerIds;
 	}
 
 	@Override

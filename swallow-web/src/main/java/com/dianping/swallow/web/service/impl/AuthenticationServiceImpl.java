@@ -63,7 +63,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 		} else if (loadAdminSet.contains(ALL) && !uri.startsWith(ADMINURI) && !uri.startsWith(SETTINGURI)) {
 			return true;
 		} else if (uri.startsWith(MESSAGEURI) || uri.startsWith(DOWNLOAD) || uri.startsWith(TOPICURI)) {
-			if (StringUtils.isNotBlank(topic) && topicResourceService.loadCachedTopicToWhiteList().get(topic).contains(username)) {
+			if (StringUtils.isNotBlank(topic) && topicResourceService.loadCachedTopicToAdministrator().get(topic).contains(username)) {
 				return true;
 			} else {
 				return false;
@@ -79,7 +79,7 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 		if (userService.loadCachedAdministratorSet().contains(username)) {
 			return AuthenticationService.ADMINI;
 		} else {
-			Collection<Set<String>> topicUsers = topicResourceService.loadCachedTopicToWhiteList().values();
+			Collection<Set<String>> topicUsers = topicResourceService.loadCachedTopicToAdministrator().values();
 			for (Set<String> set : topicUsers) {
 				if (set.contains(username)) {
 					return AuthenticationService.USER;

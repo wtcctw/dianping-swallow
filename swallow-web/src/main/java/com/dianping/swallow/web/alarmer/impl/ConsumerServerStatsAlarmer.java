@@ -15,12 +15,17 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年9月17日 下午8:24:46
+ */
 @Component
-public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements MonitorDataListener {
+public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
@@ -41,19 +46,10 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 	}
 
 	@Override
-	public void achieveMonitorData() {
-		dataCount.incrementAndGet();
-	}
-
-	@Override
 	public void doAlarm() {
-		if (dataCount.get() <= 0) {
-			return;
-		}
-		dataCount.decrementAndGet();
-		final List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(lastTimeKey
-				.get());
-		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "doAlarm");
+		final List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(
+				getLastTimeKey(), false);
+		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
@@ -69,16 +65,21 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer implements 
 		}
 
 		for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
-			String ip = serverStatsData.getIp();
-			ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(ip);
-			if (cServerResource == null || !cServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
-				continue;
+			try {
+				String ip = serverStatsData.getIp();
+				ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(ip);
+				if (cServerResource == null || !cServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
+					continue;
+				}
+				QPSAlarmSetting sendQps = cServerResource.getSendAlarmSetting();
+				QPSAlarmSetting ackQps = cServerResource.getAckAlarmSetting();
+
+				qpsSendAlarm(serverStatsData, sendQps);
+				qpsAckAlarm(serverStatsData, ackQps);
+
+			} catch (Exception e) {
+				logger.error("[serverAlarm] serverStatsData {} error.", serverStatsData);
 			}
-			QPSAlarmSetting sendQps = cServerResource.getSendAlarmSetting();
-			QPSAlarmSetting ackQps = cServerResource.getAckAlarmSetting();
-			
-			qpsSendAlarm(serverStatsData, sendQps);
-			qpsAckAlarm(serverStatsData, ackQps);
 		}
 	}
 

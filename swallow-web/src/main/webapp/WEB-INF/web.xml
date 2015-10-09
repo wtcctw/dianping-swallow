@@ -14,6 +14,9 @@
 		</param-value>
 	</context-param>
 
+	<!-- <listener> <listener-class>com.dianping.swallow.web.servlet.listener.LoggerContextLoaderListener</listener-class> 
+		</listener> -->
+
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
@@ -104,7 +107,7 @@
 	</filter>
 
 	<!-- 不要修改 filter-mapping的顺序 -->
-	  
+
 	<filter-mapping>
 		<filter-name>CAS Single Sign Out Filter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -121,7 +124,7 @@
 		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
 	<filter>
 		<filter-name>characterEncodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -160,7 +163,11 @@
 		<filter-class>com.dianping.swallow.web.filter.LogFilter</filter-class>
 		<init-param>
 			<param-name>excludeURLs</param-name>
-			<param-value>/api/stats/*,/static/*,/assets/*,/help/*</param-value>
+			<param-value>/api/stats/*,/console/alarm/*,/static/*,/assets/*,/console/setting/alarmmeta/*,/console/setting/alarmmeta,/console/alarmmeta/*</param-value>
+		</init-param>
+		<init-param>
+			<param-name>includeURLs</param-name>
+			<param-value>create,update,remove,alarm,api,sendmessage</param-value>
 		</init-param>
 	</filter>
 

@@ -150,4 +150,7 @@ public interface AlarmService {
 	 * @return
 	 */
 	Alarm findByEventId(long eventId);
+	
+	
+	long getNextEventId();
 }

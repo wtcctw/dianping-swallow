@@ -109,7 +109,7 @@ public class TopicController extends AbstractMenuController {
 		boolean findAll = userUtils.isAdministrator(username);
 		Set<String> producerIp = new HashSet<String>();
 
-		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToWhiteList();
+		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToAdministrator();
 		if (findAll) {
 			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
 			List<TopicResource> topicResources = topicResourceService.findAll();
@@ -120,7 +120,7 @@ public class TopicController extends AbstractMenuController {
 					producerIp.addAll(tmpips);
 				}
 			}
-			if (userUtils.isTrueAdministrator(username)) {
+			if (userUtils.isAdministrator(username, true)) {
 				topics.add(DEFAULT);
 			}
 			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
@@ -185,12 +185,12 @@ public class TopicController extends AbstractMenuController {
 		boolean result = topicResourceService.update(topicResource);
 
 		if (result) {
-			return ResponseStatus.SUCCESS.getStatus();
+			return ResponseStatus.SUCCESS;
 		} else {
-			return ResponseStatus.MONGOWRITE.getStatus();
+			return ResponseStatus.MONGOWRITE;
 		}
 	}
-	
+
 	@RequestMapping(value = "/console/topic/auth/ip", method = RequestMethod.POST)
 	@ResponseBody
 	public Object queryProducerIp(@RequestBody TopicQueryDto topicQueryDto) {
@@ -198,10 +198,10 @@ public class TopicController extends AbstractMenuController {
 		TopicResourceDto topicResourceDto = null;
 		String topic = topicQueryDto.getTopic();
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		if(topicResource != null){
+		if (topicResource != null) {
 			topicResourceDto = TopicResourceMapper.toTopicResourceDto(topicResource);
 		}
-		
+
 		return topicResourceDto;
 	}
 
@@ -235,14 +235,14 @@ public class TopicController extends AbstractMenuController {
 					return ResponseStatus.INVALIDTOPIC;
 				}
 				String proposal = topicResource.getAdministrator();
-				StringBuffer sb = new StringBuffer();
 				prop = checkProposalName(prop);
 				if (StringUtils.isNotEmpty(proposal)) {
-					sb.append(proposal).append(",").append(prop);
-				} else {
-					sb.append(prop);
+					StringBuffer sb = new StringBuffer();
+					sb.append(proposal).append(DELIMITOR).append(prop);
+					String[] propsals = sb.toString().split(DELIMITOR);
+					Set<String> propsalSet = new HashSet<String>(Arrays.asList(propsals));
+					prop = StringUtils.join(propsalSet, DELIMITOR);
 				}
-				prop = sb.toString();
 			}
 		}
 

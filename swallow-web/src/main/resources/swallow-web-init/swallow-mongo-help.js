@@ -29,6 +29,12 @@ db.ALARM_META.update({ "isSendSwallow" : false, "metaId" : {$gte : 1 ,  $lt: 100
 db.ALARM_META.update({ "isSmsMode" : true }, { $set: {"isSmsMode" : false } }, false, true);
 
 
+db.ALARM_META.update({ "isMailMode" : false }, { $set: {"isMailMode" : true } }, false, true);
+
+
+
+db.runCommand({"convertToCapped": "CONSUMERID_STATS_DATA", size: 52428800, max:1000000});
+
 db.runCommand({"convertToCapped": "ALARM", size: 52428800 });
 db.runCommand({"convertToCapped": "DASHBOARD_STATS_DATA", size: 52428800 });
 db.runCommand({"convertToCapped": "PRODUCER_SERVER_STATS_DATA", size: 52428800 });

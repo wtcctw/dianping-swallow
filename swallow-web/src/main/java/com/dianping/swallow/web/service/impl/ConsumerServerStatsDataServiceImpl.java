@@ -56,6 +56,33 @@ public class ConsumerServerStatsDataServiceImpl implements ConsumerServerStatsDa
 	}
 
 	@Override
+	public long findQpsByServerIp(String ip, long startKey, long endKey) {
+		List<ConsumerServerStatsData> serverStatsDatas = findSectionData(ip, startKey, endKey);
+		long totalQps = 0;
+		for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
+			totalQps += serverStatsData.getSendQps();
+		}
+		return totalQps;
+	}
+
+	@Override
+	public String findIdleConsumerServer(List<String> masterIps, long startKey, long endKey) {
+		if (masterIps == null) {
+			return null;
+		}
+		long minQps = Long.MAX_VALUE;
+		String idleIp = null;
+		for (String masterIp : masterIps) {
+			long tempQps = findQpsByServerIp(masterIp, startKey, endKey);
+			if (tempQps < minQps) {
+				minQps = tempQps;
+				idleIp = masterIp;
+			}
+		}
+		return idleIp;
+	}
+
+	@Override
 	public Map<String, StatsDataMapPair> findSectionQpsData(long startKey, long endKey) {
 		List<ConsumerServerStatsData> serverStatsDatas = consumerServerStatsDataDao.findSectionData(startKey, endKey);
 		Map<String, StatsDataMapPair> serverStatsDataMaps = null;
@@ -64,9 +91,9 @@ public class ConsumerServerStatsDataServiceImpl implements ConsumerServerStatsDa
 			serverStatsDataMaps = new HashMap<String, StatsDataMapPair>();
 
 			for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
-				
+
 				if (serverStatsDataMaps.containsKey(serverStatsData.getIp())) {
-					
+
 					StatsDataMapPair statsDataResult = serverStatsDataMaps.get(serverStatsData.getIp());
 					statsDataResult.getSendStatsData().put(serverStatsData.getTimeKey(), serverStatsData.getSendQps());
 					statsDataResult.getAckStatsData().put(serverStatsData.getTimeKey(), serverStatsData.getAckQps());

@@ -13,7 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,6 +25,7 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
@@ -52,7 +52,8 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年7月7日上午9:36:49
  */
 @Component
-public class DashboardContainerUpdater implements MonitorDataListener, Runnable {
+public class DashboardContainerUpdater extends AbstractLifecycle implements MonitorDataListener, DashboardLifecycle,
+		Runnable {
 
 	private static final String FACTORY_NAME = "Dashboard";
 
@@ -75,22 +76,34 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 
 	private Map<TotalDataKey, TotalData> totalDataMap = new ConcurrentHashMap<TotalDataKey, TotalData>();
 
-	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
-			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-
+	private ScheduledExecutorService scheduled = null;
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
 
-	@PostConstruct
-	void updateDashboardContainer() {
-
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
+				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 		consumerDataRetrieverWrapper.registerListener(this);
 	}
 
 	@Override
-	public void achieveMonitorData() {
+	protected void doStart() throws Exception {
+		super.doStart();
+	}
 
+	@Override
+	protected void doStop() throws Exception {
+		super.doStop();
+	}
+
+	@Override
+	public void achieveMonitorData() {
+		if (scheduled == null) {
+			return;
+		}
 		if (delayeven.get()) {
 			try {
 				scheduled.submit(this);
@@ -235,25 +248,25 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 		TopicResource topicResource = alarmResourceContainer.findTopicResource(topic);
 
 		if (topicResource != null) {
-			
+
 			if (topicResource.isConsumerAlarm()) {
 				ConsumerIdResource consumerIdResource = alarmResourceContainer
 						.findConsumerIdResource(topic, consumerid);
-				
+
 				if (consumerIdResource != null) {
 					alarm = consumerIdResource.isAlarm();
 					consumerBaseAlarmSetting = consumerIdResource.getConsumerAlarmSetting();
 					if (consumerBaseAlarmSetting == null) {
 						consumerBaseAlarmSetting = loadDefaultConfiguration();
 					}
-				}else{
+				} else {
 					consumerBaseAlarmSetting = loadDefaultConfiguration();
 				}
-				
+
 			} else {
 				alarm = false;
 			}
-			
+
 		}
 
 		Entry e = new Entry();
@@ -265,9 +278,9 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 		return e;
 
 	}
-	
-	private ConsumerBaseAlarmSetting loadDefaultConfiguration(){
-		
+
+	private ConsumerBaseAlarmSetting loadDefaultConfiguration() {
+
 		ConsumerIdResource consumerIdResource = alarmResourceContainer.findConsumerIdResource(DEFAULT, DEFAULT);
 
 		if (consumerIdResource == null) {
@@ -275,7 +288,7 @@ public class DashboardContainerUpdater implements MonitorDataListener, Runnable 
 		} else {
 			return consumerIdResource.getConsumerAlarmSetting();
 		}
-		
+
 	}
 
 	private List<Long> calMinuteStats(List<Long> number) {
