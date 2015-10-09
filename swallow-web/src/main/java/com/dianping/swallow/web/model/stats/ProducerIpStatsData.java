@@ -41,8 +41,8 @@ public class ProducerIpStatsData extends ProducerStatsData {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
 		result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
+		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
 		return result;
 	}
 
