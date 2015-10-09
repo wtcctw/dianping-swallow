@@ -44,7 +44,7 @@ public class AlarmMetaContainerImpl extends AbstractContainer implements AlarmMe
 
 	@Override
 	public void doLoadResource() {
-		logger.info("[doAlarmMetaTask] scheduled load alarmMeta info.");
+		logger.info("[doLoadResource] scheduled load alarmMeta info.");
 		List<AlarmMeta> alarmMetaTemps = alarmMetaService.findByPage(0, AlarmType.values().length);
 		if (alarmMetaTemps != null && alarmMetaTemps.size() > 0) {
 			for (AlarmMeta alarmMeta : alarmMetaTemps) {
@@ -52,6 +52,17 @@ public class AlarmMetaContainerImpl extends AbstractContainer implements AlarmMe
 			}
 		}
 
+	}
+	
+	@Override
+	public int getDelay() {
+		return delay;
+
+	}
+
+	@Override
+	public int getInterval() {
+		return interval;
 	}
 
 }

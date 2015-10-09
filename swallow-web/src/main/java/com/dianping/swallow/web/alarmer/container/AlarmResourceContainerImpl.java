@@ -173,7 +173,7 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 
 	@Override
 	public void doLoadResource() {
-		logger.info("[doLoadResourceTask] scheduled load resource data.");
+		logger.info("[doLoadResource] scheduled load resource data.");
 		findResourceData();
 	}
 
