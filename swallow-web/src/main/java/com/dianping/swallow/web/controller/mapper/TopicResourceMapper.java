@@ -1,15 +1,8 @@
 package com.dianping.swallow.web.controller.mapper;
 
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.dianping.swallow.web.controller.dto.TopicResourceDto;
-import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
-import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 
 
@@ -19,7 +12,6 @@ import com.dianping.swallow.web.model.resource.TopicResource;
  * 2015年9月29日下午4:51:03
  */
 public class TopicResourceMapper {
-	private static final String DELIMITOR = ",";
 
 	public static TopicResource toTopicResource(TopicResourceDto dto) {
 		
@@ -43,6 +35,7 @@ public class TopicResourceMapper {
 		topicResource.setId(dto.getId());
 		topicResource.setTopic(dto.getTopic());
 		topicResource.setAdministrator(dto.getAdministrator());
+		topicResource.setProducerIpInfos(dto.getProducerIpInfos());
 
 		return topicResource;
 		
@@ -65,10 +58,7 @@ public class TopicResourceMapper {
 		topicResourceDto.setId(topicResource.getId());
 		topicResourceDto.setTopic(topicResource.getTopic());
 		topicResourceDto.setAdministrator(topicResource.getAdministrator());
-		
-		List<IpInfo> list = topicResource.getProducerIpInfos();
-		Set<String> ips = IpInfoUtils.extractIps(list);
-		topicResourceDto.setProducerServer(StringUtils.join(ips, DELIMITOR));
+		topicResourceDto.setProducerIpInfos(topicResource.getProducerIpInfos());
 		
 		return topicResourceDto;
 	}

@@ -10,7 +10,7 @@
 			}
 		</script>
 
- 		<form class="bs-example bs-example-form-local" role="form">
+		<form class="bs-example bs-example-form-local" role="form">
 			<div class="input-group input-group-local">
 				<span class="input-group-addon">Topic</span> <input type="text"
 					class="form-control" placeholder="topic..." style="width: 150px"
@@ -18,15 +18,15 @@
 				<ul class="typeahead dropdown-menu"
 					style="top: 28px; left: 0px; display: none;">
 				</ul>
-					<span class="input-group-addon">消费者</span> <input type="text"
+				<span class="input-group-addon">消费者</span> <input type="text"
 					class="form-control" placeholder="消费IP..." style="width: 150px"
-					id="searchconsumerip" ng-model='consumerIp'>
+					id="searchconsumerip" ng-model='consumerIpInfos'>
 				<ul class="typeahead dropdown-menu"
 					style="top: 28px; left: 0px; display: none;">
 				</ul>
 			</div>
 		</form>
-		
+
 		<!-- #nav-search -->
 		<div class="nav-search nav-search-local" id="nav-search">
 			<form class="form-search">
@@ -56,39 +56,41 @@
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">ConsumerId</th>
 						<th style="text-align: left">Topic</th>
-						<th style="text-align: left">消费者IP配置</th>
+						<th style="text-align: left">消费IP配置</th>
 						<th style="text-align: left">告警配置</th>
 						<th style="text-align: left">告警</th>
 						<th style="text-align: left">操作</th>
 					</tr>
 					#if(${isadmin})
 					<tr ng-repeat="ad in searchPaginator.currentPageItems "
-						on-finish-render-filters>
-					#else
+						on-finish-render-filters>#else
 					<tr ng-repeat="ad in searchPaginator.currentPageItems  | nodefault"
 						on-finish-render-filters>
-					#end
+						#end
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="ad.consumerId"></td>
 						<td style="text-align: left" ng-bind="ad.topic"></td>
 						<td style="text-align: left"><a
-							ng-href="${rc.contextPath}/console/consumerid/ipinfo/{{ad.topic}}/{{ad.consumerId}}"
-							ng-click="setIp(ad.topic,ad.consumerId)" ng-bind="ad.consumerIp | limitTo : 15 "></a></td>
-						<td style="text-align: left" ><a href="#myModal1"
-							ng-click="setModalInput($index);"
-							data-toggle="modal" >详情</a></td>
-						<td style="text-align: left" ><label class="pull-left inline">
+							ng-href="#myModal2"
+							ng-click="setModalInput($index);" data-toggle="modal"
+							ng-bind="ad.ips | limitTo : 25 "></a></td>
+						<td style="text-align: left"><a href="#myModal1"
+							ng-click="setModalInput($index);" data-toggle="modal">详情</a></td>
+						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
-								id="alarm{{$index}}" type="checkbox" ng-model="ad.alarm" ng-click="changealarm(ad.consumerId, ad.topic, $index)"
+								id="alarm{{$index}}" type="checkbox" ng-model="ad.alarm"
+								ng-click="changealarm(ad.consumerId, ad.topic, $index)"
 								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
 						</label></td>
 						<td style="text-align: left"><a href="#myModal0"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
-								data-original-title="编辑配置值"></i></a> <a href ng-show="isdefault(ad.consumerId)"
-							ng-click="dialog(ad.consumerId, ad.topic);" class="edit-config-btn"><i
-								class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
-						</tr>
+								data-original-title="编辑配置值"></i></a> <a href
+							ng-show="isdefault(ad.consumerId)"
+							ng-click="dialog(ad.consumerId, ad.topic);"
+							class="edit-config-btn"><i class="icon-remove" rel="tooltip"
+								data-original-title="删除配置项"></i></a></td>
+					</tr>
 				</table>
 
 				<ul style="margin-top: 20px;" class="pagination">
@@ -107,7 +109,7 @@
 			<!--end row  -->
 		</div>
 
-<!-- 模态框（Modal） -->
+		<!-- 模态框（Modal） -->
 		<div class="modal fade" id="myModal0" tabindex="-1" role="dialog"
 			aria-labelledby="myModalLabel0" aria-hidden="true">
 			<div class="modal-dialog">
@@ -123,9 +125,9 @@
 							<div class="control-group">
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">ConsumerId</label> <input type="text"
-										class="form-control" ng-model="consumeridEntry.consumerId"
-										readonly> </input>
+									<label class="control-label">ConsumerId</label> <input
+										type="text" class="form-control"
+										ng-model="consumeridEntry.consumerId" readonly> </input>
 								</div>
 							</div>
 							<div class="control-group">
@@ -136,15 +138,36 @@
 										id="topic" readonly> </input>
 								</div>
 							</div>
-<!-- 						<div class="control-group">
-							<div class="form-group"
-								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-								<label class="control-label"><b>消费者IP</b></label> <input
-									type="text" class="form-control"
-									ng-model="consumeridEntry.consumerIp" id="consumerIp"
-									data-provide="typeahead" autocomplete="off"> </input>
-							</div>
-						</div> -->
+<!-- 							<div class="control-group" ng-show="consumeridEntry.consumerIpInfos">
+								<label class="control-label">消费IP配置</label>
+								<table
+									class="table table-bordered table-striped  table-condensed table-hover">
+									<tr>
+										<th style="text-align: left">序号</th>
+										<th style="text-align: left">IP</th>
+										<th style="text-align: left">alarm</th>
+										<th style="text-align: left">active</th>
+									</tr>
+									<tr ng-repeat="ipinfo in consumeridEntry.consumerIpInfos">
+									<td style="text-align: left" ng-bind="$index+1"></td>
+										<td style="text-align: left" ng-bind="ipinfo.ip"></td>
+										<td style="text-align: left"><label
+											class="pull-left inline"> <small
+												class="muted smaller-90"></small> <input
+												id="ipalarm{{$index}}" type="checkbox" ng-model="ipinfo.alarm"
+												class="ace ace-switch ace-switch-5" /><span
+												class="lbl middle"></span>
+										</label></td>
+										<td style="text-align: left"><label
+											class="pull-left inline"> <small
+												class="muted smaller-90"></small> <input
+												id="ipactive{{$index}}" type="checkbox" ng-model="ipinfo.active"
+												class="ace ace-switch ace-switch-5" /><span
+												class="lbl middle"></span>
+										</label></td>
+									</tr>
+								</table>
+							</div> -->
 							<div class="control-group">
 								<label class="control-label">发送QPS</label>
 								<div class="form-group"
@@ -158,7 +181,8 @@
 											class="col-sm-2 control-label">波动</label><input type="text"
 											class="col-sm-2" ng-model="consumeridEntry.sendfluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.sendfluctuationBase" />
+											class="col-sm-2"
+											ng-model="consumeridEntry.sendfluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -175,7 +199,8 @@
 											class="col-sm-2 control-label">波动</label><input type="text"
 											class="col-sm-2" ng-model="consumeridEntry.ackfluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.ackfluctuationBase" />
+											class="col-sm-2"
+											ng-model="consumeridEntry.ackfluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -220,7 +245,7 @@
 			<!-- /.modal-content -->
 		</div>
 		<!-- /.modal -->
-		
+
 		<!-- 模态框（Modal） -->
 		<div class="modal fade" id="myModal1" tabindex="-2" role="dialog"
 			aria-labelledby="myModalLabel1" aria-hidden="true">
@@ -237,9 +262,9 @@
 							<div class="control-group">
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">ConsumerId</label> <input type="text"
-										class="form-control" ng-model="consumeridEntry.consumerId"
-										 readonly> </input>
+									<label class="control-label">ConsumerId</label> <input
+										type="text" class="form-control"
+										ng-model="consumeridEntry.consumerId" readonly> </input>
 								</div>
 							</div>
 							<div class="control-group">
@@ -255,7 +280,8 @@
 											class="col-sm-2 control-label">波动</label><input type="text"
 											class="col-sm-2" ng-model="consumeridEntry.sendfluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.sendfluctuationBase" />
+											class="col-sm-2"
+											ng-model="consumeridEntry.sendfluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -272,7 +298,8 @@
 											class="col-sm-2 control-label">波动</label><input type="text"
 											class="col-sm-2" ng-model="consumeridEntry.ackfluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.ackfluctuationBase" />
+											class="col-sm-2"
+											ng-model="consumeridEntry.ackfluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -308,6 +335,73 @@
 										data-dismiss="modal">关闭</button>
 									<button type="submit" class="btn btn-success">提交</button>
 								</div>
+							</div>
+						</form>
+					</div>
+
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		
+				<!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal2" tabindex="-3" role="dialog"
+			aria-labelledby="myModalLabel1" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">告警配置</h4>
+					</div>
+					<div class="modal-body">
+						<form method="post" class="form-horizontal" name="myForm2"
+							ng-submit="refreshpage(myForm2, 2)">
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label">ConsumerId</label> <input
+										type="text" class="form-control"
+										ng-model="consumeridEntry.consumerId" readonly> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label">Topic</label> <input
+										type="text" class="form-control"
+										ng-model="consumeridEntry.topic" readonly> </input>
+								</div>
+							</div>
+							<div class="control-group" ng-show="consumeridEntry.consumerIpInfos">
+								<label class="control-label">消费IP配置</label>
+								<table
+									class="table table-bordered table-striped  table-condensed table-hover">
+									<tr>
+										<th style="text-align: left">序号</th>
+										<th style="text-align: left">IP</th>
+										<th style="text-align: left">alarm</th>
+										<th style="text-align: left">active</th>
+									</tr>
+									<tr ng-repeat="ipinfo in consumeridEntry.consumerIpInfos">
+									<td style="text-align: left" ng-bind="$index+1"></td>
+										<td style="text-align: left" ng-bind="ipinfo.ip"></td>
+										<td style="text-align: left"><label
+											class="pull-left inline"> <small
+												class="muted smaller-90"></small> <input ng-click="changeipinfo(consumeridEntry.consumerId, consumeridEntry.topic,'alarm',$index,ipinfo.ip )"
+												id="ipalarm{{$index}}" type="checkbox" ng-model="ipinfo.alarm"
+												class="ace ace-switch ace-switch-5" /><span
+												class="lbl middle"></span>
+										</label></td>
+										<td style="text-align: left"><label
+											class="pull-left inline"> <small
+												class="muted smaller-90"></small> <input ng-click="changeipinfo(consumeridEntry.consumerId, consumeridEntry.topic,'active',$index,ipinfo.ip )"
+												id="ipactive{{$index}}" type="checkbox" ng-model="ipinfo.active"
+												class="ace ace-switch ace-switch-5" /><span
+												class="lbl middle"></span>
+										</label></td>
+									</tr>
+								</table>
 							</div>
 						</form>
 					</div>

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.TopicController;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
+import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ApplicationResource;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpInfo;
@@ -38,10 +39,6 @@ public class UserUtils {
 	private static final String LOGINDELIMITOR = "\\|";
 
 	private static final String ALL = "all";
-
-	private static final String CONSUMERID = "consumerId";
-
-	private static final String CONSUMERIP = "consumerIps";
 
 	private static final String IP = "ip";
 
@@ -139,7 +136,8 @@ public class UserUtils {
 				}
 			}
 		} else {
-			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID);
+			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService
+					.findAll(DefaultConsumerIdResourceDao.CONSUMERID);
 
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 				String cid = consumerIdResource.getConsumerId();
@@ -183,7 +181,8 @@ public class UserUtils {
 				}
 			}
 		} else {
-			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERIP);
+			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService
+					.findAll(DefaultConsumerIdResourceDao.CONSUMERIPS);
 
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 				List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
@@ -229,7 +228,8 @@ public class UserUtils {
 				}
 			}
 		} else {
-			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID, CONSUMERIP);
+			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(
+					DefaultConsumerIdResourceDao.CONSUMERID, DefaultConsumerIdResourceDao.CONSUMERIPS);
 
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 				String cid = consumerIdResource.getConsumerId();
@@ -290,7 +290,7 @@ public class UserUtils {
 
 			for (IpResource ipResource : ipResources) {
 				String ip = ipResource.getIp();
-				if (!ips.contains(ip)) {
+				if (StringUtils.isNotBlank(ip) && !ips.contains(ip)) {
 					ips.add(ip);
 				}
 			}
@@ -308,8 +308,8 @@ public class UserUtils {
 		Set<String> apps = new HashSet<String>();
 
 		List<ApplicationResource> applicationResources = applicationResourceService.findAll(APPLICATION);
-		if(applicationResources != null){
-			for(ApplicationResource applicationResource : applicationResources){
+		if (applicationResources != null) {
+			for (ApplicationResource applicationResource : applicationResources) {
 				apps.add(applicationResource.getApplication());
 			}
 		}

@@ -34,11 +34,6 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	@Override
 	public boolean update(ConsumerIdResource consumerIdResource) {
 
-		ConsumerIdResource oldConsumerIdResource = consumerIdResourceDao.findByConsumerIdAndTopic(
-				consumerIdResource.getTopic(), consumerIdResource.getConsumerId());
-		if(oldConsumerIdResource != null){
-			consumerIdResource.setConsumerIpInfos(oldConsumerIdResource.getConsumerIpInfos());
-		}
 		return consumerIdResourceDao.update(consumerIdResource);
 	}
 

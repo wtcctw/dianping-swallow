@@ -12,8 +12,8 @@
 		<ul class="breadcrumb">
 			<li class="active">mongo server设置</li>
 		</ul>
-		<!-- <a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
-				data-toggle="modal"><i class="icon-plus"></i></a> -->
+		<a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
+				data-toggle="modal"><i class="icon-plus"></i></a>
 	</div>
 	<div class="page-content" id="container">
 		<div class="row">
@@ -71,7 +71,7 @@
 								<label class="control-label"><b>IP</b></label> <input
 									type="text" class="form-control" data-provide="typeahead"
 									autocomplete="off" ng-model="mongoserverEntry.ip" id="ip"
-									ng-readonly="true"> </input>
+									ng-readonly="isReadOnly"> </input>
 							</div>
 						</div>
 						<div class="control-group">
@@ -80,7 +80,7 @@
 								<label class="control-label"><b>集群</b></label> <input
 									type="text" class="form-control" data-provide="typeahead"
 									autocomplete="off" ng-model="mongoserverEntry.catalog"
-									id="hostname" required ng-readonly="true"> </input>
+									id="hostname" ng-readonly="isReadOnly"> </input>
 							</div>
 						</div>
 						<div class="control-group">
@@ -88,7 +88,7 @@
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>磁盘利用率</b></label> <input
 									type="text" class="form-control"
-									ng-model="mongoserverEntry.disk" id="disk" required ng-readonly="true"> </input>
+									ng-model="mongoserverEntry.disk" id="disk" required ng-readonly="isReadOnly"> </input>
 							</div>
 						</div>
 						<div class="control-group">
@@ -96,7 +96,7 @@
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>负载</b></label> <input
 									type="text" class="form-control"
-									ng-model="mongoserverEntry.load" id="load" required ng-readonly="true"> </input>
+									ng-model="mongoserverEntry.load" id="load" required ng-readonly="isReadOnly"> </input>
 							</div>
 						</div>
 						<div class="control-group">
@@ -104,7 +104,7 @@
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>QPS峰值</b></label> <input
 									type="text" class="form-control"
-									ng-model="mongoserverEntry.qps" id="qps" required ng-readonly="true"> </input>
+									ng-model="mongoserverEntry.qps" id="qps" required ng-readonly="isReadOnly"> </input>
 							</div>
 						</div>
 						<!-- 							<div class="control-group">

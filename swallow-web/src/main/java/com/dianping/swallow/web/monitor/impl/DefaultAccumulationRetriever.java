@@ -13,7 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -79,11 +80,15 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 		super.doInitialize();
 
-		int corePoolSize = mongoManager.getMongoCount() * mongoManager.getMongoOptions().getConnectionsPerHost();
+		int corePoolSize = mongoManager.getMongoCount() * 10;
+		int maxPoolSize = mongoManager.getMongoCount() * mongoManager.getMongoOptions().getConnectionsPerHost();
 		if (logger.isInfoEnabled()) {
 			logger.info("[postDefaultAccumulationRetriever]" + corePoolSize);
 		}
-		executors = Executors.newFixedThreadPool(corePoolSize, new MQThreadFactory("ACCUMULATION_RETRIEVER-"));
+		
+		executors = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 30, 
+				TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+				new MQThreadFactory("ACCUMULATION_RETRIEVER-"), new ThreadPoolExecutor.CallerRunsPolicy());
 		webConfig.addChangeListener(this);
 
 	}

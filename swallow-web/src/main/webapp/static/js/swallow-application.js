@@ -83,33 +83,33 @@ module.controller('ApplicationResourceController', ['$rootScope', '$scope', '$ht
 			
 			$scope.searchapplication = "";
 			
-			$scope.ipEntry = {};
-			$scope.ipEntry.application;
-			$scope.ipEntry.email;
-			$scope.ipEntry.opManager;
-			$scope.ipEntry.opMobile;
-			$scope.ipEntry.opEmail;
-			$scope.ipEntry.dpManager;
-			$scope.ipEntry.dpMobile;
+			$scope.applicationEntry = {};
+			$scope.applicationEntry.application;
+			$scope.applicationEntry.email;
+			$scope.applicationEntry.opManager;
+			$scope.applicationEntry.opMobile;
+			$scope.applicationEntry.opEmail;
+			$scope.applicationEntry.dpManager;
+			$scope.applicationEntry.dpMobile;
 			
 			$scope.setModalInput = function(index){
 				
-				$scope.ipEntry.id = $scope.searchPaginator.currentPageItems[index].id;
-				$scope.ipEntry.application = $scope.searchPaginator.currentPageItems[index].application;
-				$scope.ipEntry.email = $scope.searchPaginator.currentPageItems[index].email;
-				$scope.ipEntry.opManager = $scope.searchPaginator.currentPageItems[index].opManager;
-				$scope.ipEntry.opMobile = $scope.searchPaginator.currentPageItems[index].opMobile;
-				$scope.ipEntry.opEmail = $scope.searchPaginator.currentPageItems[index].opEmail;
-				$scope.ipEntry.dpManager = $scope.searchPaginator.currentPageItems[index].dpManager;
-				$scope.ipEntry.dpMobile = $scope.searchPaginator.currentPageItems[index].dpMobile;
+				$scope.applicationEntry.id = $scope.searchPaginator.currentPageItems[index].id;
+				$scope.applicationEntry.application = $scope.searchPaginator.currentPageItems[index].application;
+				$scope.applicationEntry.email = $scope.searchPaginator.currentPageItems[index].email;
+				$scope.applicationEntry.opManager = $scope.searchPaginator.currentPageItems[index].opManager;
+				$scope.applicationEntry.opMobile = $scope.searchPaginator.currentPageItems[index].opMobile;
+				$scope.applicationEntry.opEmail = $scope.searchPaginator.currentPageItems[index].opEmail;
+				$scope.applicationEntry.dpManager = $scope.searchPaginator.currentPageItems[index].dpManager;
+				$scope.applicationEntry.dpMobile = $scope.searchPaginator.currentPageItems[index].dpMobile;
 			}
 			
 			$scope.refreshpage = function(myForm){
 				$('#myModal').modal('hide');
-				var param = JSON.stringify($scope.ipEntry);
+				var param = JSON.stringify($scope.applicationEntry);
 				
-				$http.post(window.contextPath + '/console/ip/update', $scope.ipEntry).success(function(response) {
-					$scope.query.application = $scope.ipEntry.application;
+				$http.post(window.contextPath + '/console/application/create', $scope.applicationEntry).success(function(response) {
+					$scope.query.application = $scope.applicationEntry.application;
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 		    	});
 		    	
@@ -164,6 +164,42 @@ module.controller('ApplicationResourceController', ['$rootScope', '$scope', '$ht
 			}
 			
 			$scope.initpage();
+			
+			$scope.dialog = function(app) {
+				$rootScope.app = app;
+				ngDialog.open({
+								template : '\
+								<div class="widget-box">\
+								<div class="widget-header">\
+									<h4 class="widget-title">警告</h4>\
+								</div>\
+								<div class="widget-body">\
+									<div class="widget-main">\
+										<p class="alert alert-info">\
+											您确认要删除吗？\
+										</p>\
+									</div>\
+									<div class="modal-footer">\
+										<button type="button" class="btn btn-default" ng-click="closeThisDialog()">取消</button>\
+										<button type="button" class="btn btn-primary" ng-click="removerecord(app)&&closeThisDialog()">确定</button>\
+									</div>\
+								</div>\
+							</div>',
+							plain : true,
+							className : 'ngdialog-theme-default'
+					});
+			};
+			
+			$rootScope.removerecord = function(app){
+				$http.get(window.contextPath + "/console/application/remove", {
+					params : {
+						application : app
+					}
+				}).success(function(data){
+					$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+				});
+				return true;
+			}
 			
 }]);
 
