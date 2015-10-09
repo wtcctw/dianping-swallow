@@ -56,7 +56,7 @@ public class ServerEvent extends Event {
 
 	@Override
 	public String toString() {
-		return "ServerEvent [ip=" + ip + ", slaveIp=" + slaveIp + ", serverType=" + serverType + "]";
+		return "ServerEvent [ip=" + ip + ", slaveIp=" + slaveIp + ", serverType=" + serverType + super.toString() + "]";
 	}
 
 	@Override
@@ -156,4 +156,5 @@ public class ServerEvent extends Event {
 		}
 		return null;
 	}
+
 }

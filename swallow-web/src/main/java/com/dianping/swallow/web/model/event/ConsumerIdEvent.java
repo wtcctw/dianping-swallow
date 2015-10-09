@@ -34,7 +34,7 @@ public class ConsumerIdEvent extends TopicEvent {
 
 	@Override
 	public String toString() {
-		return "ConsumerIdEvent [consumerId=" + consumerId + "]";
+		return "ConsumerIdEvent [consumerId=" + consumerId + super.toString() + "]";
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class ConsumerIdEvent extends TopicEvent {
 	}
 
 	@Override
-	public boolean isSendAlarm(AlarmType alarmType,AlarmMeta alarmMeta) {
+	public boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta) {
 		String key = getTopicName() + KEY_SPLIT + getConsumerId() + KEY_SPLIT + alarmType.getNumber();
 		return isAlarm(lastAlarms, key, alarmMeta);
 	}
