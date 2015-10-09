@@ -86,6 +86,7 @@
 			<mvc:mapping path="/console/alarm/detail/*" />
 			<mvc:mapping path="/console/monitor/consumer/*/order" />
 			<mvc:mapping path="/console/consumerid/ipinfo/*/*" />
+			<mvc:mapping path="/console/topic/ipinfo/*" />
 			<mvc:mapping path="/help/" />
 			<bean class="com.dianping.swallow.web.interceptor.ModelAndViewInterceptor">
 			</bean>

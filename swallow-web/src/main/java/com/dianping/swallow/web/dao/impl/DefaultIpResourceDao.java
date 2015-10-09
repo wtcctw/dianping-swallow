@@ -25,7 +25,7 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 
 	private static final String IP = "ip";
 
-	private static final String APPLICATION = "iPDesc.name";
+	private static final String APPLICATION = "application";
 
 	private static final String DEFAULT = "default";
 

@@ -5,6 +5,7 @@ import java.util.List;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
 
 
 /**
@@ -17,7 +18,7 @@ public interface ConsumerIdResourceService {
 	boolean insert(ConsumerIdResource consumerIdResource);
 
 	boolean update(ConsumerIdResource consumerIdResource);
-	
+
 	int remove(String topic, String consumerid);
 	
 	List<ConsumerIdResource> findByConsumerId(String consumerid);

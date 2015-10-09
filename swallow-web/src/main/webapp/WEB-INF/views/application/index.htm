@@ -2,7 +2,7 @@
 	ng-controller="ApplicationResourceController">
 	<div class="breadcrumbs" id="breadcrumbs">
 		<script type="text/javascript"
-			src="${rc.contextPath}/static/js/swallow-ipresource.js"></script>
+			src="${rc.contextPath}/static/js/swallow-application.js"></script>
 		<script type="text/javascript">
 			try {
 				ace.settings.check('breadcrumbs', 'fixed')
@@ -14,7 +14,7 @@
 		<div class="nav-search nav-search-local" id="nav-search">
 			<form class="form-search">
 				<span class="input-icon"> <input type="text"
-					placeholder="应用名..." style="width: 220px"
+					placeholder=" 业务名..." style="width: 220px"
 					class="nav-search-input" id="searchapplication" autocomplete="off"
 					ng-model='searchapplication'>
 					<ul class="typeahead dropdown-menu"
@@ -23,6 +23,8 @@
 				</span>
 			</form>
 		</div>
+		<a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
+			data-toggle="modal"><i class="icon-plus"></i> </a>
 		<!-- end  breadcrumbs-->
 	</div>
 
@@ -44,7 +46,6 @@
 						<th style="text-align: left">运维邮箱</th>
 						<th style="text-align: left">运维电话</th>
 						<th style="text-align: left">运维姓名</th>
-						<th style="text-align: left">告警</th>
 						<th style="text-align: left;">操作</th>
 					</tr>
 					<tr ng-repeat="t in searchPaginator.currentPageItems "
@@ -57,16 +58,12 @@
 						<td style="text-align: left" ng-bind="t.opEmail | limitTo : 25"></td>
 						<td style="text-align: left" ng-bind="t.opMobile | limitTo : 25"></td>
 						<td style="text-align: left" ng-bind="t.opManager | limitTo : 25"></td>
-						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90"></small> <input
-								id="alarm{{$index}}" type="checkbox" ng-model="t.alarm"
-								ng-click="changealarm(t.ip, $index)"
-								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
 						<td style="text-align: left;"><a href="#myModal"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit" rel="tooltip"
-								data-original-title="编辑配置值"></i></a></td>
+								data-original-title="编辑配置值"></i></a><a href
+						ng-click="dialog(t.application);" class="edit-config-btn"><i
+							class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
 					</tr>
 				</table>
 
@@ -94,7 +91,7 @@
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"
 							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">配置应用</h4>
+						<h4 class="modal-title" id="myModalLabel">配置业务</h4>
 					</div>
 					<div class="modal-body">
 						<form method="post" class="form-horizontal" name="myForm"
@@ -104,7 +101,7 @@
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>业务名</b></label> <input
 										type="text" class="form-control"
-										ng-model="ipEntry.application" id="application">
+										ng-model="applicationEntry.application" id="application" required>
 									</input>
 								</div>
 							</div>
@@ -112,7 +109,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>开发邮箱</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.email"
+										type="text" class="form-control" ng-model="applicationEntry.email"
 										id="email"> </input>
 								</div>
 							</div>
@@ -120,7 +117,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>开发电话</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.dpMobile"
+										type="text" class="form-control" ng-model="applicationEntry.dpMobile"
 										id="dpMobile"> </input>
 								</div>
 							</div>
@@ -128,7 +125,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>开发姓名</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.dpManager"
+										type="text" class="form-control" ng-model="applicationEntry.dpManager"
 										id="dpManager"> </input>
 								</div>
 							</div>
@@ -136,7 +133,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>运维邮箱</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.opEmail"
+										type="text" class="form-control" ng-model="applicationEntry.opEmail"
 										id="opEmail"> </input>
 								</div>
 							</div>
@@ -144,7 +141,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>运维电话</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.opMobile"
+										type="text" class="form-control" ng-model="applicationEntry.opMobile"
 										id="opMobile"> </input>
 								</div>
 							</div>
@@ -152,7 +149,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>运维姓名</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.opManager"
+										type="text" class="form-control" ng-model="applicationEntry.opManager"
 										id="opManager"> </input>
 								</div>
 							</div>

@@ -9,6 +9,22 @@ module
 								this.currentOffset = (page - 1) * pageSize;
 								this._load();
 							},
+							handleResult: function(object){
+								for(var i = 0; i < this.currentPageItems.length; ++i){
+									if(typeof(this.currentPageItems[i].consumerIpInfos) != "undefined"){
+										var length = this.currentPageItems[i].consumerIpInfos.length;
+										var ips = "";
+										for(var j = 0; j < length; ++j){
+											if(j == 0){
+												ips += this.currentPageItems[i].consumerIpInfos[j].ip;
+											}else{
+												ips += "," + this.currentPageItems[i].consumerIpInfos[j].ip;
+											}
+										}
+										this.currentPageItems[i].ips = ips;
+									}
+								}
+							},
 							next : function() {
 								if (this.hasNextVar) {
 									this.currentOffset += pageSize;
@@ -52,6 +68,7 @@ module
 											}
 											self.currentPageItems = items
 													.slice(0, pageSize);
+											self.handleResult(new Object());
 											self.hasNextVar = items.length === pageSize + 1;
 										});
 							},
@@ -121,7 +138,7 @@ module
 							$scope.consumeridEntry.consumerId;
 							$scope.consumeridEntry.topic;
 							$scope.consumeridEntry.alarm;
-							$scope.consumeridEntry.consumerIp;
+							$scope.consumeridEntry.consumerIpInfos;
 							$scope.consumeridEntry.senddelay;
 							$scope.consumeridEntry.ackdelay;
 							$scope.consumeridEntry.accumulation;
@@ -140,11 +157,21 @@ module
 									alert("谷值不能小于峰值");
 									return;
 								}
-								$scope.consumeridEntry.consumerIp = $("#consumerIp").val();
+								if(typeof($scope.consumeridEntry.consumerIpInfos) != "undefined"){
+									var length = $scope.consumeridEntry.consumerIpInfos.length;
+									for(var i = 0; i < length; ++i){
+										var id = "#ip" + "alarm" + i;
+										var check = $(id).prop('checked');
+										$scope.consumeridEntry.consumerIpInfos[i].alarm = check;
+										id = "#ip" + "active" + i;
+										check = $(id).prop('checked');
+										$scope.consumeridEntry.consumerIpInfos[i].active = check;
+									}
+								}
+								
 								var id = "#myModal" + num;
 								$(id).modal('hide');
-								var param = JSON
-										.stringify($scope.consumeridEntry);
+								var param = JSON.stringify($scope.consumeridEntry);
 								
 								$http.post(window.contextPath + '/console/consumerid/update', $scope.consumeridEntry).success(function(response) {
 									$scope.query.topic = $scope.consumeridEntry.topic;
@@ -157,7 +184,7 @@ module
 								$scope.consumeridEntry.consumerId = "";
 								$scope.consumeridEntry.topic = "";
 								$scope.consumeridEntry.alarm = true;
-								$scope.consumeridEntry.consumerIp = "";
+								$scope.consumeridEntry.consumerIpInfos = "";
 								$scope.consumeridEntry.senddelay = "";
 								$scope.consumeridEntry.ackdelay = "";
 								$scope.consumeridEntry.accumulation = "";
@@ -172,17 +199,6 @@ module
 							}
 
 							$scope.setModalInput = function(index) {
-								if(typeof($scope.searchPaginator.currentPageItems[index].consumerIp) != "undefined"){
-									var consumerIp = $scope.searchPaginator.currentPageItems[index].consumerIp;
-									$('#consumerIp').tagsinput('removeAll');
-									if(consumerIp != null && consumerIp.length > 0){
-										var list = consumerIp.split(",");
-										for(var i = 0; i < list.length; ++i)
-											$('#consumerIp').tagsinput('add', list[i]);
-									}
-								}else{
-									$('#consumerIp').tagsinput('removeAll');
-								}
 								
 								$scope.consumeridEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 								$scope.consumeridEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
@@ -199,13 +215,10 @@ module
 								$scope.consumeridEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
 								$scope.consumeridEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
 								$scope.consumeridEntry.ackfluctuationBase = $scope.searchPaginator.currentPageItems[index].ackfluctuationBase;
+								$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
 							}
 							
 							//如果topic列表返回空，则不会执行initpage
-//							$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
-//								$scope.initpage();
-//							});
-							
 							$scope.initpage = function(){
 
 						          //下面是在table render完成后执行的js
@@ -284,20 +297,6 @@ module
 									}).error(function(data, status, headers, config) {
 								});
 								 
-//								 $http({
-//										method : 'GET',
-//										url : window.contextPath + '/console/ip/allip'
-//									}).success(function(data, status, headers, config) {
-//										$("#consumerIp").tagsinput({
-//											  typeahead: {
-//												  items: 16,
-//												  source: data,
-//												  displayText: function(item){ return item;}  //necessary
-//											  }
-//										});
-//										$('#consumerIp').typeahead().data('typeahead').source = data;
-//									}).error(function(data, status, headers, config) {
-//								});
 							}
 							
 							$scope.initpage();
@@ -320,10 +319,38 @@ module
 					        	});
 							}
 
+							$scope.changeipinfo = function( cid, topic, type, index, ip){
+								var id = "#ip" + type + index;
+								var check = $(id).prop('checked');
+								if("alarm" == type){
+									$http.get(window.contextPath + "/console/consumerid/alarm/ipinfo/alarm",
+											{
+												params : {
+													cid : cid,
+													topic : topic,
+													ip : ip,
+													alarm : check
+												}
+											})
+									.success(function(data) {
+											});
+								}else{
+									$http.get(window.contextPath + "/console/consumerid/alarm/ipinfo/active",
+											{
+												params : {
+													cid : cid,
+													topic : topic,
+													ip : ip,
+													active : check
+												}
+											})
+									.success(function(data) {
+											});
+								}
+							}
+							
 							$rootScope.removerecord = function(cid, topic) {
-								$http
-										.get(
-												window.contextPath
+								$http.get(window.contextPath
 														+ "/console/consumerid/remove",
 												{
 													params : {
@@ -331,8 +358,7 @@ module
 														topic : topic
 													}
 												})
-										.success(
-												function(data) {
+										.success(function(data) {
 													$scope.query.topic = "";
 													$scope.query.consumerId = "";
 													$scope.query.consumerIp = "";

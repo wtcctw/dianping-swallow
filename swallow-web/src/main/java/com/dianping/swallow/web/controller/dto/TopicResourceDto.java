@@ -1,6 +1,15 @@
 package com.dianping.swallow.web.controller.dto;
 
+import java.util.List;
 
+import com.dianping.swallow.web.model.resource.IpInfo;
+
+
+/**
+ * @author mingdongli
+ *
+ * 2015年9月30日上午11:52:59
+ */
 public class TopicResourceDto {
 	
 	private String id;
@@ -13,7 +22,7 @@ public class TopicResourceDto {
 
 	private boolean consumerAlarm;
 	
-	private String producerServer;
+	private List<IpInfo> producerIpInfos;
 
 	private long sendpeak;
 	
@@ -65,12 +74,12 @@ public class TopicResourceDto {
 		this.consumerAlarm = consumerAlarm;
 	}
 
-	public String getProducerServer() {
-		return producerServer;
+	public List<IpInfo> getProducerIpInfos() {
+		return producerIpInfos;
 	}
 
-	public void setProducerServer(String producerServer) {
-		this.producerServer = producerServer;
+	public void setProducerIpInfos(List<IpInfo> producerIpInfos) {
+		this.producerIpInfos = producerIpInfos;
 	}
 
 	public long getSendpeak() {

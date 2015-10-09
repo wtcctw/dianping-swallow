@@ -17,6 +17,7 @@ import jodd.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -351,6 +352,54 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		return administrators;
+	}
+	
+	@RequestMapping(value = "/console/topic/ipinfo/{topic}", method = RequestMethod.GET)
+	public ModelAndView alarmDetail(@PathVariable String topic) {
+		Map<String, Object> map = createViewMap();
+		TopicResource topicResource = topicResourceService.findByTopic(topic);
+		map.put("topic", topic);
+		map.put("entity", topicResource.getProducerIpInfos());
+		return new ModelAndView("topic/ipinfo", map);
+	}
+	
+	@RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean setAlarm(String topic, String ip, boolean alarm) {
+
+		return doSetIpInfo(topic, ip, "alarm", alarm);
+	}
+
+	@RequestMapping(value = "/console/topic/alarm/ipinfo/active", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean setActive(String topic, String cid, String ip, boolean active) {
+
+		return doSetIpInfo(topic, ip, "active", active);
+	}
+	
+	private boolean doSetIpInfo(String topic, String ip, String type, boolean value){
+		
+		TopicResource topicResource = topicResourceService.findByTopic(topic);
+		List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
+		if(ipInfos == null || ip == null || type == null){
+			return false;
+		}
+		for(IpInfo ipInfo : ipInfos){
+			if(ip.equals(ipInfo.getIp())){
+				if(type.equals("alarm")){
+					ipInfo.setAlarm(value);
+				}else if(type.equals("active")){
+					ipInfo.setActive(value);
+				}else{
+					return false;
+				}
+				topicResource.setProducerIpInfos(ipInfos);
+				//修改ipinfo调用insert，其他的则调用update
+				return topicResourceService.insert(topicResource);
+			}
+		}
+		
+		return false;
 	}
 
 	private String checkProposalName(String proposal) {

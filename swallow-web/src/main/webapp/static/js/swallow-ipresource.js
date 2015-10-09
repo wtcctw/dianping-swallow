@@ -89,12 +89,6 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 			$scope.ipEntry.ip;
 			$scope.ipEntry.alarm;
 			$scope.ipEntry.application;
-			$scope.ipEntry.email;
-			$scope.ipEntry.opManager;
-			$scope.ipEntry.opMobile;
-			$scope.ipEntry.opEmail;
-			$scope.ipEntry.dpManager;
-			$scope.ipEntry.dpMobile;
 			
 			$scope.setModalInput = function(index){
 				
@@ -102,19 +96,9 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 				$scope.ipEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 				$scope.ipEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
 				$scope.ipEntry.application = $scope.searchPaginator.currentPageItems[index].application;
-				$scope.ipEntry.email = $scope.searchPaginator.currentPageItems[index].email;
-				$scope.ipEntry.opManager = $scope.searchPaginator.currentPageItems[index].opManager;
-				$scope.ipEntry.opMobile = $scope.searchPaginator.currentPageItems[index].opMobile;
-				$scope.ipEntry.opEmail = $scope.searchPaginator.currentPageItems[index].opEmail;
-				$scope.ipEntry.dpManager = $scope.searchPaginator.currentPageItems[index].dpManager;
-				$scope.ipEntry.dpMobile = $scope.searchPaginator.currentPageItems[index].dpMobile;
 			}
 			
 			$scope.refreshpage = function(myForm){
-				if ($scope.ipEntry.sendpeak < $scope.ipEntry.sendvalley){
-					alert("峰值不能小于谷值");
-					return;
-				}
 				$('#myModal').modal('hide');
 				var param = JSON.stringify($scope.ipEntry);
 				
@@ -302,6 +286,10 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 						ip : ip,
 						alarm: check } }).success(function(response) {
 	        	});
+			}
+			
+			$scope.setApplication = function(app){
+				localStorage.setItem("application", app);
 			}
 			
 			

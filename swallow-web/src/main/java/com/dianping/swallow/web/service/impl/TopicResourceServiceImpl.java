@@ -142,7 +142,6 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		if (logger.isInfoEnabled()) {
 			logger.info(String.format("Update cache topicToWhiteList of topic %s administrator to %s", topic, proposal));
 		}
-
 		return topicResourceDao.update(topicResource);
 	}
 

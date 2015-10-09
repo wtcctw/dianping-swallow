@@ -26,11 +26,11 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 
 	private static final String CONSUMERIDRESOURCE_COLLECTION = "CONSUMERID_RESOURCE";
 
-	private static final String CONSUMERID = "consumerId";
+	public static final String CONSUMERID = "consumerId";
 
 	private static final String TOPIC = "topic";
 
-	public static final String CONSUMERIPS = "ipInfos.ip";
+	public static final String CONSUMERIPS = "consumerIpInfos.ip";
 
 	private static final String DEFAULT = "default";
 
