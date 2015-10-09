@@ -578,6 +578,15 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 				    if(typeof($scope.searchPaginator) != "undefined"){
 					    sort = $scope.searchPaginator.reverse;
 				    }
+				    if($scope.mintime.length == 0){
+				    	$http.get(window.contextPath + "/console/message/timespan", {
+							params : {
+								topic: $scope.topic
+							}
+						}).success(function(data){
+							$scope.mintime = data.replace(/\"/ig,"");
+						});
+				    }
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
 	            	if(typeof($scope.searchPaginator) != "undefined"){
 	            		$scope.searchPaginator.reverse = sort;	            		
