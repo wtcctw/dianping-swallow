@@ -11,28 +11,33 @@ import com.dianping.swallow.web.model.resource.ApplicationResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ApplicationResourceService;
 
-
 /**
  * @author mingdongli
  *
- * 2015年9月29日下午2:33:52
+ *         2015年9月29日下午2:33:52
  */
 @Service("applicationResourceService")
 public class ApplicationResourceServiceImpl extends AbstractSwallowService implements ApplicationResourceService {
 
 	@Autowired
 	private ApplicationResourceDao applicationResourceDao;
-	
+
 	@Override
 	public boolean insert(ApplicationResource applicationResource) {
-		
+
 		return applicationResourceDao.insert(applicationResource);
 	}
 
 	@Override
 	public boolean update(ApplicationResource applicationResource) {
-
-		return applicationResourceDao.update(applicationResource);
+		String appName = applicationResource.getApplication();
+		List<ApplicationResource> appResources = applicationResourceDao.findByApplication(appName);
+		if (appResources != null && !appResources.isEmpty()) {
+			applicationResource.setId(appResources.get(0).getId());
+			return applicationResourceDao.update(applicationResource);
+		} else {
+			return insert(applicationResource);
+		}
 	}
 
 	@Override
@@ -48,8 +53,8 @@ public class ApplicationResourceServiceImpl extends AbstractSwallowService imple
 	}
 
 	@Override
-	public List<ApplicationResource> findByApplication(String ... applications) {
-		
+	public List<ApplicationResource> findByApplication(String... applications) {
+
 		return applicationResourceDao.findByApplication(applications);
 	}
 

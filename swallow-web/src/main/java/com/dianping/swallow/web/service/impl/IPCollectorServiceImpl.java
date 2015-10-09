@@ -3,8 +3,6 @@ package com.dianping.swallow.web.service.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,8 +35,6 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.web.model.cmdb.EnvDevice;
-import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
-import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
@@ -111,12 +107,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	@Autowired
 	private CmdbService cmdbService;
-
-	@Autowired
-	private ProducerStatsDataWapper producerStatsDataWapper;
-
-	@Autowired
-	private ConsumerStatsDataWapper consumerStatsDataWapper;
 
 	private int interval = 120;// 秒
 
@@ -371,27 +361,12 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		return copyMap(statisProducerServerIps);
 	}
 
-	@Override
-	public Set<String> getStatisIps() {
-		return copySet(statisIps);
-	}
-
 	private <T> Map<String, T> copyMap(Map<String, T> srcMap) {
 		Map<String, T> destMap = new HashMap<String, T>();
 		for (Entry<String, T> srcEntity : srcMap.entrySet()) {
 			destMap.put(srcEntity.getKey(), srcEntity.getValue());
 		}
 		return destMap;
-	}
-
-	private Set<String> copySet(Set<String> srcSet) {
-		Set<String> destSet = new HashSet<String>();
-		Iterator<String> iterator = srcSet.iterator();
-		while (iterator.hasNext()) {
-			String entity = iterator.next();
-			destSet.add(entity);
-		}
-		return destSet;
 	}
 
 	@Override
@@ -449,24 +424,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			return Collections.unmodifiableMap(cmdbConsumerSlaveMap);
 		}
 		return null;
-	}
-
-	@Override
-	public Set<String> getTopicConsumerIdIps(String topicName, String consumerId) {
-		Set<String> consumerIdIps = consumerStatsDataWapper.getConsumerIdIps(topicName, consumerId, false);
-		return consumerIdIps;
-	}
-
-	@Override
-	public Set<String> getProducerTopicIps(String topicName) {
-		Set<String> topicIps = producerStatsDataWapper.getTopicIps(topicName, false);
-		return topicIps;
-	}
-
-	@Override
-	public Set<String> getConsumerTopicIps(String topicName) {
-		Set<String> topicIps = consumerStatsDataWapper.getTopicIps(topicName, false);
-		return topicIps;
 	}
 
 	@Override

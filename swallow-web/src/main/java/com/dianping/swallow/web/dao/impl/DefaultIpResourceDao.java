@@ -190,4 +190,12 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 		return ipResources;
 	}
 
+	@Override
+	public IpResource findByIp(String ip, String appName) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where(IP).is(ip).and(APPLICATION).is(appName));
+		IpResource ipResource = mongoTemplate.findOne(query, IpResource.class, IPRESOURCE_COLLECTION);
+		return ipResource;
+	}
+
 }

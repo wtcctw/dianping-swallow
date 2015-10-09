@@ -13,6 +13,7 @@ import com.dianping.swallow.web.model.resource.ApplicationResource;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
+import com.dianping.swallow.web.service.ApplicationResourceService;
 import com.dianping.swallow.web.service.CmdbService;
 import com.dianping.swallow.web.service.IPDescService;
 import com.dianping.swallow.web.service.IpResourceService;
@@ -24,7 +25,7 @@ import com.dianping.swallow.web.service.IpResourceService;
  *         2015年9月6日 下午4:02:01
  */
 @Component
-public class IpResourceCollector extends AbstractResourceCollector {
+public class AppResourceCollector extends AbstractResourceCollector {
 
 	@Autowired
 	private ConsumerStatsDataWapper consumerStatsDataWapper;
@@ -34,6 +35,9 @@ public class IpResourceCollector extends AbstractResourceCollector {
 
 	@Autowired
 	private IpResourceService ipResourceService;
+
+	@Autowired
+	private ApplicationResourceService appResourceService;
 
 	@Autowired
 	private IPDescService ipDescService;
@@ -51,6 +55,7 @@ public class IpResourceCollector extends AbstractResourceCollector {
 
 	@Override
 	public void doCollector() {
+		logger.info("[doCollector] start collect appResource.");
 		doIpResource();
 	}
 
@@ -62,33 +67,39 @@ public class IpResourceCollector extends AbstractResourceCollector {
 	public void doIpResource() {
 		Set<String> producerIps = producerStatsDataWapper.getIps(false);
 		Set<String> consuemerIps = consumerStatsDataWapper.getIps(false);
-		doIpResourceTask(producerIps);
-		doIpResourceTask(consuemerIps);
+		doAppResourceTask(producerIps);
+		doAppResourceTask(consuemerIps);
 	}
 
-	private void doIpResourceTask(Set<String> ips) {
+	private void doAppResourceTask(Set<String> ips) {
 		for (String ip : ips) {
+			if (StringUtils.isBlank(ip)) {
+				continue;
+			}
 			try {
 				IPDesc ipDesc = cmdbService.getIpDesc(ip);
-				if (ipDesc != null) {
-					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
-					if (ipResourceInDbs == null || ipResourceInDbs.isEmpty()) {
+				if (ipDesc != null && StringUtils.isNotBlank(ipDesc.getName())) {
+					IpResource ipResourceInDb = ipResourceService.findByIp(ip, ipDesc.getName());
+					if (ipResourceInDb == null) {
 						ipDescService.addEmail(ipDesc);
-						// ApplicationResource
-						ApplicationResource resource = new ApplicationResource();
-						resource.buildApplicationResource(ipDesc);
-
+						// AppResource
+						ApplicationResource appResource = new ApplicationResource();
+						appResource.buildApplicationResource(ipDesc);
+						appResourceService.update(appResource);
 						// IpResource
 						IpResource ipResource = new IpResource(ipDesc.getIp(), ipDesc.getName(), true);
 						ipResource.setCreateTime(new Date());
 						ipResource.setUpdateTime(new Date());
 						ipResourceService.insert(ipResource);
 					} else {
-						IpResource ipResource = ipResourceInDbs.get(0);
-						ipDesc.setUpdateTime(new Date());
 						ipDescService.addEmail(ipDesc);
-						ipResource.setUpdateTime(new Date());
-						ipResourceService.update(ipResource);
+						// AppResource
+						ApplicationResource appResource = new ApplicationResource();
+						appResource.buildApplicationResource(ipDesc);
+						appResourceService.update(appResource);
+						// IpResource
+						ipResourceInDb.setUpdateTime(new Date());
+						ipResourceService.update(ipResourceInDb);
 					}
 				} else {
 					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);

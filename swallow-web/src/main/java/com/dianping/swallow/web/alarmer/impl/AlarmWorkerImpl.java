@@ -2,20 +2,18 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CatUtil;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.alarmer.AlarmWorker;
+import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
 import com.dianping.swallow.web.alarmer.EventChannel;
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
@@ -28,14 +26,14 @@ import com.dianping.swallow.web.util.ThreadUtils;
  *         2015年8月3日 下午6:06:26
  */
 @Component
-public class AlarmWorkerImpl implements AlarmWorker {
+public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecycle, AlarmWorker {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmWorkerImpl.class);
 
 	@Autowired
 	private EventChannel eventChannel;
 
-	private static final String FACTORY_NAME = "AlarmWorker";
+	private static final String FACTORY_NAME = "AlarmWorker-Worker";
 
 	private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 2;
 
@@ -53,28 +51,37 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		executorService = Executors.newFixedThreadPool(poolSize, ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
-	@PostConstruct
-	public void init() {
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
 		isStopped = false;
+	}
+	
+	@Override
+	protected void doStart() throws Exception {
+		super.doStart();
 		alarmTaskThread = ThreadUtils.createThread(new Runnable() {
 			@Override
 			public void run() {
-				start();
+				startAlarmTask();
 			}
 
-		}, "AlarmWorker-Start", true);
+		}, "AlarmWorker-Boss", true);
 		alarmTaskThread.start();
 	}
+	
 
 	@Override
-	public void start() {
+	public void startAlarmTask() {
 		while (!checkStop()) {
 			Event event = null;
 			try {
 				event = eventChannel.next();
 				logger.info("[start] {}. ", event.getClass().getSimpleName());
 				executorService.submit(new AlarmTask(event));
-			} catch (RejectedExecutionException e) {
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			} catch (Exception e) {
 				CatUtil.logException(e);
 				try {
 					TimeUnit.SECONDS.sleep(200);
@@ -82,19 +89,22 @@ public class AlarmWorkerImpl implements AlarmWorker {
 					// ignore
 				}
 				logger.error("[start] lost event {}. ", event.toString());
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
 			}
 		}
 	}
 
-	@PreDestroy
-	public void distroy() {
-		stop();
-	}
-
 	@Override
-	public void stop() {
+	protected void doStop() throws Exception {
+		stopAlarmTask();
+	}
+	
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		executorService.shutdown();
+	}
+	
+	@Override
+	public void stopAlarmTask() {
 		isStopped = true;
 		alarmTaskThread.interrupt();
 	}

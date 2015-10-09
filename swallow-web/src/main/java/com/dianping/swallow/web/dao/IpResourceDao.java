@@ -36,4 +36,6 @@ public interface IpResourceDao extends Dao{
 	List<IpResource> findByIps(String ... ips);
 	
 	List<IpResource> findByIp(String ip);
+	
+	IpResource findByIp(String ip, String appName);
 }

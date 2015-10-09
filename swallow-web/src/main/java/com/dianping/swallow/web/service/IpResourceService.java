@@ -34,4 +34,5 @@ public interface IpResourceService {
 
 	List<IpResource> findByIps(String... ips);
 
+	IpResource findByIp(String ip, String appName);
 }

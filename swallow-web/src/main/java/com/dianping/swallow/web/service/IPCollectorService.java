@@ -2,7 +2,6 @@ package com.dianping.swallow.web.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -36,13 +35,6 @@ public interface IPCollectorService {
 	 * @param monitorData
 	 */
 	Map<String, Long> getStatisProducerServerIps();
-
-	/**
-	 * get all statis ip
-	 * 
-	 * @param monitorData
-	 */
-	Set<String> getStatisIps();
 
 	/**
 	 * get producer server ips
@@ -112,26 +104,6 @@ public interface IPCollectorService {
 	 */
 	Map<String, String> getConsumerServerSlaveIpsMap();
 
-	/**
-	 * topic consumerId related ip
-	 * 
-	 * @return
-	 */
-	Set<String> getTopicConsumerIdIps(String topicName, String consumerId);
-
-	/**
-	 * producer topic related ip
-	 * 
-	 * @return
-	 */
-	Set<String> getProducerTopicIps(String topicName);
-
-	/**
-	 * producer topic related ip
-	 * 
-	 * @return
-	 */
-	Set<String> getConsumerTopicIps(String topicName);
 
 	public static class ConsumerServerPair {
 

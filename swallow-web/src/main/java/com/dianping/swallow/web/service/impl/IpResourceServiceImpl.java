@@ -88,4 +88,8 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 		return ipResourceDao.findByIps(ips);
 	}
 
+	@Override
+	public IpResource findByIp(String ip, String appName) {
+		return ipResourceDao.findByIp(ip, appName);
+	}
 }

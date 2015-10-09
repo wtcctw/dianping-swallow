@@ -60,7 +60,7 @@ public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLife
 			return;
 		}
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "findQpsTask");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-findQpsTask");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {

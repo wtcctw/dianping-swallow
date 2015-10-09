@@ -225,9 +225,8 @@ public abstract class Event {
 	private void sendAlarm(AlarmReceiver alarmReceiver, Alarm alarm, AlarmMeta alarmMeta) {
 		if (alarmReceiver == null) {
 			logger.error("[sendAlarm] eventId {} no receiver.", alarm.getEventId());
-		} else {
 			alarmReceiver = new AlarmReceiver();
-		}
+		} 
 		if (alarmMeta.getIsMailMode()) {
 			alarmService.sendMail(alarmReceiver.getEmails(), alarm);
 		}
