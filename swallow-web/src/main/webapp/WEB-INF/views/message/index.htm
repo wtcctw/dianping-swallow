@@ -46,7 +46,7 @@
 		<!-- end  breadcrumbs-->
 	</div>
 
-	<div class="breadcrumbs" id="message-retransmit" style="display: none;">
+	<div class="breadcrumbs">
 		<script type="text/javascript">
 			try {
 				ace.settings.check('breadcrumbs', 'fixed')
@@ -58,10 +58,8 @@
 			style="margin-left: 20px;">
 			<button type="submit" class="btn btn-success btn-swallow-ok"
 				data-toggle="modal" data-target="#myModal">发送自定义消息</button>
-			<button type="button" class="btn btn-success btn-swallow-ok"
+			<button type="button" class="btn btn-success btn-swallow-ok" id="message-retransmit" style="display: none;"
 				ng-click="dialog()">发送下表消息</button>
-			<input type="checkbox" id="selectall" ng-click="selectall()">
-			全选
 		</div>
 		<div class="pull-right">
 			<a href="" data-toggle="tooltip"
@@ -82,7 +80,7 @@
 				<table
 					class="table table-bordered table-striped table-condensed  table-hover">
 					<tr>
-						<th style="text-align: left">操作</th>
+						<th style="text-align: left"><input type="checkbox" id="selectall" ng-click="selectall()"></th>
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left"><a href="" data-toggle="tooltip"
 							ng-click="reverse()" title="点击逆序显示">消息ID</a></th>
