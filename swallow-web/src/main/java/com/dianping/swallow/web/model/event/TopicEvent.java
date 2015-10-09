@@ -33,6 +33,11 @@ public class TopicEvent extends StatisEvent {
 	}
 
 	@Override
+	public String toString() {
+		return "TopicEvent [topicName=" + topicName + super.toString() + "]";
+	}
+
+	@Override
 	public void alarm() {
 		switch (getEventType()) {
 		case CONSUMER:

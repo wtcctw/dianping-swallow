@@ -56,7 +56,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 		super.doInitialize();
 		isStopped = false;
 	}
-	
+
 	@Override
 	protected void doStart() throws Exception {
 		super.doStart();
@@ -69,7 +69,6 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 		}, "AlarmWorker-Boss", true);
 		alarmTaskThread.start();
 	}
-	
 
 	@Override
 	public void startAlarmTask() {
@@ -77,7 +76,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 			Event event = null;
 			try {
 				event = eventChannel.next();
-				logger.info("[start] {}. ", event.getClass().getSimpleName());
+				logger.info("[start] {}. ", event.toString());
 				executorService.submit(new AlarmTask(event));
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -97,12 +96,12 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 	protected void doStop() throws Exception {
 		stopAlarmTask();
 	}
-	
+
 	protected void doDispose() throws Exception {
 		super.doDispose();
 		executorService.shutdown();
 	}
-	
+
 	@Override
 	public void stopAlarmTask() {
 		isStopped = true;

@@ -34,7 +34,7 @@ public class ServerStatisEvent extends StatisEvent {
 
 	@Override
 	public String toString() {
-		return "ServerStatisEvent [ip=" + ip + "]";
+		return "ServerStatisEvent [ip=" + ip + super.toString() + "]";
 	}
 
 	@Override

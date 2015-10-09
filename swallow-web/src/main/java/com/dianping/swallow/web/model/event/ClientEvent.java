@@ -89,4 +89,10 @@ public abstract class ClientEvent extends Event {
 		return this;
 	}
 
+	@Override
+	public String toString() {
+		return "ClientEvent [topicName=" + topicName + ", ip=" + ip + ", clientType=" + clientType + super.toString()
+				+ "]";
+	}
+
 }
