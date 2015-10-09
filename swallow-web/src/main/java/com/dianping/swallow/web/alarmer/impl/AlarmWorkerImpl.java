@@ -4,17 +4,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CatUtil;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.alarmer.AlarmWorker;
+import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
 import com.dianping.swallow.web.alarmer.EventChannel;
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
@@ -27,7 +26,7 @@ import com.dianping.swallow.web.util.ThreadUtils;
  *         2015年8月3日 下午6:06:26
  */
 @Component
-public class AlarmWorkerImpl implements AlarmWorker {
+public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecycle, AlarmWorker {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlarmWorkerImpl.class);
 
@@ -52,9 +51,15 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		executorService = Executors.newFixedThreadPool(poolSize, ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
-	@PostConstruct
-	public void init() {
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
 		isStopped = false;
+	}
+	
+	@Override
+	protected void doStart() throws Exception {
+		super.doStart();
 		alarmTaskThread = ThreadUtils.createThread(new Runnable() {
 			@Override
 			public void run() {
@@ -64,6 +69,7 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		}, "AlarmWorker-Boss", true);
 		alarmTaskThread.start();
 	}
+	
 
 	@Override
 	public void start() {
@@ -87,11 +93,16 @@ public class AlarmWorkerImpl implements AlarmWorker {
 		}
 	}
 
-	@PreDestroy
-	public void distroy() {
+	@Override
+	protected void doStop() throws Exception {
 		stop();
 	}
-
+	
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		executorService.shutdown();
+	}
+	
 	@Override
 	public void stop() {
 		isStopped = true;

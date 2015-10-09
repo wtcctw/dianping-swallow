@@ -46,7 +46,13 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
-		executor.shutdown();
+	}
+
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		if (executor != null && !executor.isShutdown()) {
+			executor.shutdown();
+		}
 	}
 
 	@Override

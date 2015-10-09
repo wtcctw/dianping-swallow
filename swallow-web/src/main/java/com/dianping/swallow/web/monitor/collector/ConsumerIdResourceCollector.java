@@ -156,7 +156,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 			}
 		} else {
 			for (IpInfo ipInfo : ipInfos) {
-					ipInfo.setActive(false);
+				ipInfo.setActive(false);
 			}
 			for (String activeIp : activeIps) {
 				if (StringUtils.isBlank(activeIp)) {
@@ -185,6 +185,14 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 	@Override
 	public int getCollectorInterval() {
 		return collectorInterval;
+	}
+
+	@Override
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		if (executor != null && !executor.isShutdown()) {
+			executor.shutdown();
+		}
 	}
 
 	public static class ConsumerIdKey {

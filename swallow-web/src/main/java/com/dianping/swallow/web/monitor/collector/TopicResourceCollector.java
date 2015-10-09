@@ -147,6 +147,14 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 			topicResourceService.update(topicResource);
 		}
 	}
+	
+	@Override
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		if (executor != null && !executor.isShutdown()) {
+			executor.shutdown();
+		}
+	}
 
 	@Override
 	public int getCollectorDelay() {

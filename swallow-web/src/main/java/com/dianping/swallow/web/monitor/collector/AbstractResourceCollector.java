@@ -86,6 +86,17 @@ public abstract class AbstractResourceCollector extends AbstractLifecycle implem
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
+		if (future != null && !future.isCancelled()) {
+			future.cancel(false);
+		}
+
+	}
+
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		if (scheduled != null && !scheduled.isShutdown()) {
+			scheduled.shutdown();
+		}
 	}
 
 	public ScheduledFuture<?> getFuture() {
