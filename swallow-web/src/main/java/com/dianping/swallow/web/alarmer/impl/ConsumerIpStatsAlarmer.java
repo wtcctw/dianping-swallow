@@ -109,17 +109,27 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 		}
 		for (ConsumerIpStatsData ipStatsData : ipStatsDatas) {
 			boolean hasStatsData = ipStatsData.checkStatsData();
-			IpStatsDataKey statsDataKey = new IpStatsDataKey(ipStatsData);
+			IpStatsDataKey key = new IpStatsDataKey(ipStatsData);
 			if (hasStatsData) {
-				whiteLists.put(statsDataKey, System.currentTimeMillis());
+				whiteLists.put(key, System.currentTimeMillis());
 			} else {
 				if (hasGroupStatsData) {
-					if (!firstCandidates.containsKey(statsDataKey)) {
-						firstCandidates.put(statsDataKey, System.currentTimeMillis());
+					if (!firstCandidates.containsKey(key)) {
+						firstCandidates.put(key, System.currentTimeMillis());
+					} else {
+						if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
+							firstCandidates.put(key, System.currentTimeMillis());
+						}
 					}
 				} else {
-					if (ipStatsDatas.size() == 1 && !secondCandidates.containsKey(ipStatsData)) {
-						secondCandidates.put(statsDataKey, System.currentTimeMillis());
+					if (ipStatsDatas.size() == 1) {
+						if (!secondCandidates.containsKey(ipStatsData)) {
+							secondCandidates.put(key, System.currentTimeMillis());
+						} else {
+							if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
+								firstCandidates.put(key, System.currentTimeMillis());
+							}
+						}
 					}
 				}
 			}
@@ -136,10 +146,6 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 				continue;
 			}
 			iterator.remove();
-			if (whiteLists.containsKey(key) && whiteLists.get(key) > lastRecordTime) {
-				continue;
-			}
-
 			report(key.getTopicName(), key.getConsumerId(), key.getIp());
 		}
 	}
@@ -156,10 +162,6 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 				continue;
 			}
 			iterator.remove();
-			if (whiteLists.containsKey(key) && whiteLists.get(key) > lastRecordTime) {
-				continue;
-			}
-
 			ConsumerIpQpsPair avgQpsPair = cIpStatsDataService.findAvgQps(key.getTopicName(), key.getConsumerId(),
 					key.getIp(), getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(getPreNDayKey(1, 0)));
 

@@ -106,17 +106,27 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 		}
 		for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
 			boolean hasStatsData = ipStatsData.checkStatsData();
-			IpStatsDataKey ipStatsDataKey = new IpStatsDataKey(ipStatsData);
+			IpStatsDataKey key = new IpStatsDataKey(ipStatsData);
 			if (hasStatsData) {
-				whiteLists.put(ipStatsDataKey, System.currentTimeMillis());
+				whiteLists.put(key, System.currentTimeMillis());
 			} else {
 				if (hasGroupStatsData) {
 					if (!firstCandidates.containsKey(ipStatsData)) {
-						firstCandidates.put(ipStatsDataKey, System.currentTimeMillis());
+						firstCandidates.put(key, System.currentTimeMillis());
+					} else {
+						if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
+							firstCandidates.put(key, System.currentTimeMillis());
+						}
 					}
 				} else {
-					if (ipStatsDatas.size() == 1 && !secondCandidates.containsKey(ipStatsData)) {
-						secondCandidates.put(ipStatsDataKey, System.currentTimeMillis());
+					if (ipStatsDatas.size() == 1) {
+						if (!secondCandidates.containsKey(ipStatsData)) {
+							secondCandidates.put(key, System.currentTimeMillis());
+						} else {
+							if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
+								firstCandidates.put(key, System.currentTimeMillis());
+							}
+						}
 					}
 				}
 			}
@@ -133,9 +143,6 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 				continue;
 			}
 			iterator.remove();
-			if (whiteLists.containsKey(key) && whiteLists.get(key) > lastRecordTime) {
-				continue;
-			}
 			report(key.getTopicName(), key.getIp());
 		}
 	}
@@ -151,10 +158,6 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 				continue;
 			}
 			iterator.remove();
-
-			if (whiteLists.containsKey(key) && whiteLists.get(key) > lastRecordTime) {
-				continue;
-			}
 			long avgQps = pIpStatsDataService.findAvgQps(key.getTopicName(), key.getIp(),
 					getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(getPreNDayKey(1, 0)));
 
