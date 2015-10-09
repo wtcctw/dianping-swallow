@@ -62,7 +62,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	private Map<ProducerIpStatsData, Long> whiteLists = new ConcurrentHashMap<ProducerIpStatsData, Long>();
 
-	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
+	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -90,7 +90,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 	}
 
 	public void checkIpGroups(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
-		if (ipGroupStatsDatas == null || ipGroupStatsDatas.size() == 0) {
+		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
 			return;
 		}
 		for (final ProducerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
@@ -101,20 +101,22 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 	public void checkIpGroup(ProducerIpGroupStatsData ipGroupStatsData) {
 		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		List<ProducerIpStatsData> ipStatsDatas = ipGroupStatsData.getProducerIpStatsDatas();
-		if (ipStatsDatas == null || ipStatsDatas.size() == 0) {
+		if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
 			return;
 		}
 		for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
 			boolean hasStatsData = ipStatsData.checkStatsData();
 			if (hasStatsData) {
 				whiteLists.put(ipStatsData, System.currentTimeMillis());
-			} else if (!hasStatsData && hasGroupStatsData) {
-				if (!firstCandidates.containsKey(ipStatsData)) {
-					firstCandidates.put(ipStatsData, System.currentTimeMillis());
-				}
-			} else if (!hasStatsData && !hasGroupStatsData) {
-				if (ipStatsDatas.size() == 1 && !secondCandidates.containsKey(ipStatsData)) {
-					secondCandidates.put(ipStatsData, System.currentTimeMillis());
+			} else {
+				if (hasGroupStatsData) {
+					if (!firstCandidates.containsKey(ipStatsData)) {
+						firstCandidates.put(ipStatsData, System.currentTimeMillis());
+					}
+				} else {
+					if (ipStatsDatas.size() == 1 && !secondCandidates.containsKey(ipStatsData)) {
+						secondCandidates.put(ipStatsData, System.currentTimeMillis());
+					}
 				}
 			}
 		}

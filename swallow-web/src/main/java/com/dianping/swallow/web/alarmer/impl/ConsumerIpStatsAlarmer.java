@@ -64,7 +64,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	private Map<ConsumerIpStatsData, Long> whiteLists = new ConcurrentHashMap<ConsumerIpStatsData, Long>();
 
-	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
+	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -92,7 +92,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 	}
 
 	public void checkIpGroups(List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
-		if (ipGroupStatsDatas == null || ipGroupStatsDatas.size() == 0) {
+		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
 			return;
 		}
 
@@ -104,20 +104,22 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 	public void checkIpGroup(ConsumerIpGroupStatsData ipGroupStatsData) {
 		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		List<ConsumerIpStatsData> ipStatsDatas = ipGroupStatsData.getConsumerIpStatsDatas();
-		if (ipStatsDatas == null || ipStatsDatas.size() == 0) {
+		if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
 			return;
 		}
 		for (ConsumerIpStatsData ipStatsData : ipStatsDatas) {
 			boolean hasStatsData = ipStatsData.checkStatsData();
 			if (hasStatsData) {
 				whiteLists.put(ipStatsData, System.currentTimeMillis());
-			} else if (!hasStatsData && hasGroupStatsData) {
-				if (!firstCandidates.containsKey(ipStatsData)) {
-					firstCandidates.put(ipStatsData, System.currentTimeMillis());
-				}
-			} else if (!hasStatsData && !hasGroupStatsData) {
-				if (ipStatsDatas.size() == 1 && !secondCandidates.containsKey(ipStatsData)) {
-					secondCandidates.put(ipStatsData, System.currentTimeMillis());
+			} else {
+				if (hasGroupStatsData) {
+					if (!firstCandidates.containsKey(ipStatsData)) {
+						firstCandidates.put(ipStatsData, System.currentTimeMillis());
+					}
+				} else {
+					if (ipStatsDatas.size() == 1 && !secondCandidates.containsKey(ipStatsData)) {
+						secondCandidates.put(ipStatsData, System.currentTimeMillis());
+					}
 				}
 			}
 		}
