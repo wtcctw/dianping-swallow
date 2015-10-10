@@ -62,7 +62,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	private Map<IpStatsDataKey, Long> whiteLists = new ConcurrentHashMap<IpStatsDataKey, Long>();
 
-	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
+	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -111,7 +111,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 				whiteLists.put(key, System.currentTimeMillis());
 			} else {
 				if (hasGroupStatsData) {
-					if (!firstCandidates.containsKey(ipStatsData)) {
+					if (!firstCandidates.containsKey(key)) {
 						firstCandidates.put(key, System.currentTimeMillis());
 					} else {
 						if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
@@ -120,7 +120,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 					}
 				} else {
 					if (ipStatsDatas.size() == 1) {
-						if (!secondCandidates.containsKey(ipStatsData)) {
+						if (!secondCandidates.containsKey(key)) {
 							secondCandidates.put(key, System.currentTimeMillis());
 						} else {
 							if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
@@ -171,6 +171,9 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 		TopicResource topicResource = resourceContainer.findTopicResource(topicName);
 		if (topicResource.isProducerAlarm()) {
 			List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
+			if (ipInfos == null || ipInfos.isEmpty()) {
+				return true;
+			}
 			if (StringUtils.isNotBlank(ip)) {
 				for (IpInfo ipInfo : ipInfos) {
 					if (ip.equals(ipInfo.getIp())) {

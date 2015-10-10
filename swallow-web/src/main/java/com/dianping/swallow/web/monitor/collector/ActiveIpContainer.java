@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
  * 
  * @author qiyin
@@ -31,7 +33,7 @@ public class ActiveIpContainer<T> {
 			}
 		}
 
-		public boolean isIpActive(String ip) {
+		public boolean isIpInActive(String ip) {
 			if (activeDatas.containsKey(ip)) {
 				return System.currentTimeMillis() - activeDatas.get(ip) > ACTIVE_TIMESPAN;
 			}
@@ -69,13 +71,15 @@ public class ActiveIpContainer<T> {
 		return null;
 	}
 
-	public Set<String> getActiveIps(T key) {
+	public Set<String> getInActiveIps(T key) {
 		Set<String> activeIps = new HashSet<String>();
 		if (resouceActiveIpDatas.containsKey(key)) {
 			ActiveIpData activeIpData = resouceActiveIpDatas.get(key);
 			for (String ip : activeIpData.activeDatas.keySet()) {
-				if (activeIpData.isIpActive(ip)) {
-					activeIps.add(ip);
+				if (StringUtils.isNotBlank(ip)) {
+					if (activeIpData.isIpInActive(ip)) {
+						activeIps.add(ip);
+					}
 				}
 			}
 		}
@@ -85,7 +89,7 @@ public class ActiveIpContainer<T> {
 	public void removeActiveIp(T key, String ip) {
 		if (resouceActiveIpDatas.containsKey(key)) {
 			ActiveIpData activeIpData = resouceActiveIpDatas.get(key);
-			if(activeIpData.activeDatas.containsKey(ip)){
+			if (activeIpData.activeDatas.containsKey(ip)) {
 				activeIpData.activeDatas.remove(ip);
 			}
 		}
