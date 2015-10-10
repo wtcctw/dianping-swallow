@@ -19,7 +19,6 @@ import com.dianping.swallow.web.model.resource.MongoResource;
 import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
-import com.dianping.swallow.web.service.LionHttpService;
 import com.dianping.swallow.web.service.MongoResourceService;
 
 /**
@@ -39,9 +38,6 @@ public class MongoResourceCollector extends AbstractResourceCollector {
 	private static final String STATUS = "status";
 
 	private static final String MESSAGE = "message";
-
-	@Resource(name = "lionHttpService")
-	private LionHttpService lionHttpService;
 
 	@Resource(name = "mongoResourceService")
 	private MongoResourceService mongoResourceService;

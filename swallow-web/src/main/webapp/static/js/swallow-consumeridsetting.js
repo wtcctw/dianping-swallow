@@ -301,11 +301,10 @@ module
 							
 							$scope.initpage();
 							
-							$scope.setIp = function(topic, cid){
-//								localStorage.setItem("ip", ip);
-								$http.get(window.contextPath + '/console/consumerid/ipinfo/' + topic + "/" + "cid").success(function(response) {
-					        	});
-								
+							$scope.setIP = function(ip){
+								localStorage.setItem("ip", ip);
+//								$http.get(window.contextPath + '/console/consumerid/ipinfo/' + topic + "/" + "cid").success(function(response) {
+//					        	});
 							}
 							
 							$scope.changealarm = function( consumerid, topic, index){

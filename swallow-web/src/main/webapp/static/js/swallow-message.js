@@ -524,6 +524,10 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        $scope.ttype = "";
 	        $scope.tproperty = "";
 	        $scope.refreshpage = function(myForm){
+	        	if($scope.topic.length == 0){
+	        		alert("topic为空");
+	        		return;
+	        	}
 	        	if($scope.dearray.indexOf($('#delimitor').val()) < 0){
 	        		alert("不合法的分隔符!");
 	        		return;
