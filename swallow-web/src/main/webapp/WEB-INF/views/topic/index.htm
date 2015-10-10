@@ -280,7 +280,9 @@
 									</tr>
 									<tr ng-repeat="ipinfo in topicEntry.producerIpInfos">
 										<td style="text-align: left" ng-bind="$index+1"></td>
-										<td style="text-align: left" ng-bind="ipinfo.ip"></td>
+										<td style="text-align: left"><a
+							ng-href="${rc.contextPath}/console/ip"
+							ng-click="setIP(ipinfo.ip)" ng-bind="ipinfo.ip"></a></td>
 										<td style="text-align: left"><label
 											class="pull-left inline"> <small
 												class="muted smaller-90"></small> <input

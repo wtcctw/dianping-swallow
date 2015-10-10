@@ -170,6 +170,10 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.setTopic = function(topic){
 				localStorage.setItem("topic", topic);
 			}
+
+			$scope.setIP = function(ip){
+				localStorage.setItem("ip", ip);
+			}
 			
 			//发送默认请求
 			$scope.query = new Object();

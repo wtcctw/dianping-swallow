@@ -5,7 +5,6 @@ import java.util.List;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
-import com.dianping.swallow.web.model.resource.IpInfo;
 
 
 /**
