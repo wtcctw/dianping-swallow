@@ -660,6 +660,7 @@ public class DefaultConsumerDataRetriever
 			executorService.shutdown();
 			try {
 				executorService.awaitTermination(MAX_WAIT_TIME, TimeUnit.SECONDS);
+				executorService.shutdownNow();
 				logger.info("[await] QueryQrderTask is over.");
 			} catch (InterruptedException e) {
 				e.printStackTrace();

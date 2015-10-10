@@ -18,6 +18,7 @@ import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
@@ -33,6 +34,9 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 
 	@Autowired
 	private ConsumerStatsDataWapper cStatsDataWapper;
+	
+	@Autowired
+	private ConsumerDataRetriever consumerDataRetriever;
 
 	@Autowired
 	private ConsumerIdResourceService consumerIdResourceService;
@@ -49,6 +53,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 		collectorName = getClass().getSimpleName();
 		collectorInterval = 20;
 		collectorDelay = 1;
+		consumerDataRetriever.registerListener(this);
 		executor = Executors.newSingleThreadExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
@@ -143,34 +148,38 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 	private void updateConsumerIdIpInfos(ConsumerIdResource consumerIdResource) {
 		String topicName = consumerIdResource.getTopic();
 		String consumerId = consumerIdResource.getConsumerId();
-		Set<String> activeIps = activeIpManager.getActiveIps(new ConsumerIdKey(topicName, consumerId));
+		Set<String> inActiveIps = activeIpManager.getInActiveIps(new ConsumerIdKey(topicName, consumerId));
 		List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
-		if ((activeIps == null || activeIps.isEmpty()) && (ipInfos == null || ipInfos.isEmpty())) {
-			return;
-		}
+		Set<String> consumerIdIps = cStatsDataWapper.getConsumerIdIps(topicName, consumerId, false);
 		if (ipInfos == null || ipInfos.isEmpty()) {
 			ipInfos = new ArrayList<IpInfo>();
-		} else if (activeIps == null || activeIps.isEmpty()) {
+		}
+		if (consumerIdIps != null && !consumerIdIps.isEmpty()) {
+			for (String consumerIdIp : consumerIdIps) {
+				boolean isHasIp = false;
+				for (IpInfo ipInfo : ipInfos) {
+					if (consumerIdIp.equals(ipInfo.getIp())) {
+						isHasIp = true;
+					}
+				}
+				if (!isHasIp) {
+					ipInfos.add(new IpInfo(consumerIdIp, true, true));
+				}
+			}
+		}
+		if (inActiveIps == null || inActiveIps.isEmpty()) {
 			for (IpInfo ipInfo : ipInfos) {
-				ipInfo.setActive(false);
+				ipInfo.setActive(true);
 			}
 		} else {
 			for (IpInfo ipInfo : ipInfos) {
-				ipInfo.setActive(false);
+				ipInfo.setActive(true);
 			}
-			for (String activeIp : activeIps) {
-				if (StringUtils.isBlank(activeIp)) {
-					continue;
-				}
-				boolean isIpExist = false;
+			for (String inActiveIp : inActiveIps) {
 				for (IpInfo ipInfo : ipInfos) {
-					if (activeIp.equals(ipInfo.getIp())) {
-						ipInfo.setActive(true);
-						isIpExist = true;
+					if (inActiveIp.equals(ipInfo.getIp())) {
+						ipInfo.setActive(false);
 					}
-				}
-				if (!isIpExist) {
-					ipInfos.add(new IpInfo(activeIp, true, true));
 				}
 			}
 		}

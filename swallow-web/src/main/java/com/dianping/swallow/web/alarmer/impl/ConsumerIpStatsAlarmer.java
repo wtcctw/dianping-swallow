@@ -64,7 +64,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	private Map<IpStatsDataKey, Long> whiteLists = new ConcurrentHashMap<IpStatsDataKey, Long>();
 
-	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
+	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -123,7 +123,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 					}
 				} else {
 					if (ipStatsDatas.size() == 1) {
-						if (!secondCandidates.containsKey(ipStatsData)) {
+						if (!secondCandidates.containsKey(key)) {
 							secondCandidates.put(key, System.currentTimeMillis());
 						} else {
 							if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
@@ -180,6 +180,9 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 		}
 		if (ConsumerIdResource.isAlarm()) {
 			List<IpInfo> ipInfos = ConsumerIdResource.getConsumerIpInfos();
+			if (ipInfos == null || ipInfos.isEmpty()) {
+				return true;
+			}
 			if (StringUtils.isNotBlank(ip)) {
 				for (IpInfo ipInfo : ipInfos) {
 					if (ip.equals(ipInfo.getIp())) {

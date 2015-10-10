@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +18,7 @@ import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
+import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
@@ -38,6 +38,9 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 	@Autowired
 	private ProducerStatsDataWapper pStatsDataWapper;
 
+	@Autowired
+	private ProducerDataRetriever producerDataRetriever;
+
 	private static final String FACTORY_NAME = "ResourceCollector-TopicIpMonitor";
 
 	private ExecutorService executor = null;
@@ -50,6 +53,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 		collectorName = getClass().getSimpleName();
 		collectorInterval = 20;
 		collectorDelay = 1;
+		producerDataRetriever.registerListener(this);
 		executor = Executors.newSingleThreadExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
@@ -110,36 +114,40 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 	}
 
 	private void updateTopicIpInfos(String topicName) {
-		Set<String> activeIps = activeIpManager.getActiveIps(topicName);
+		Set<String> inActiveIps = activeIpManager.getInActiveIps(topicName);
 		TopicResource topicResource = topicResourceService.findByTopic(topicName);
+		Set<String> topicIps = pStatsDataWapper.getTopicIps(topicName, false);
 		if (topicResource != null) {
 			List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
-			if ((activeIps == null || activeIps.isEmpty()) && (ipInfos == null || ipInfos.isEmpty())) {
-				return;
-			}
 			if (ipInfos == null || ipInfos.isEmpty()) {
 				ipInfos = new ArrayList<IpInfo>();
-			} else if (activeIps == null || activeIps.isEmpty()) {
+			}
+			if (topicIps != null && !topicIps.isEmpty()) {
+				for (String topicIp : topicIps) {
+					boolean isHasIp = false;
+					for (IpInfo ipInfo : ipInfos) {
+						if (topicIp.equals(ipInfo.getIp())) {
+							isHasIp = true;
+						}
+					}
+					if (!isHasIp) {
+						ipInfos.add(new IpInfo(topicIp, true, true));
+					}
+				}
+			}
+			if (inActiveIps == null || inActiveIps.isEmpty()) {
 				for (IpInfo ipInfo : ipInfos) {
-					ipInfo.setActive(false);
+					ipInfo.setActive(true);
 				}
 			} else {
 				for (IpInfo ipInfo : ipInfos) {
-					ipInfo.setActive(false);
+					ipInfo.setActive(true);
 				}
-				for (String activeIp : activeIps) {
-					if (StringUtils.isBlank(activeIp)) {
-						continue;
-					}
-					boolean isIpExist = false;
+				for (String inActiveIp : inActiveIps) {
 					for (IpInfo ipInfo : ipInfos) {
-						if (activeIp.equals(ipInfo.getIp())) {
-							ipInfo.setActive(true);
-							isIpExist = true;
+						if (inActiveIp.equals(ipInfo.getIp())) {
+							ipInfo.setActive(false);
 						}
-					}
-					if (!isIpExist) {
-						ipInfos.add(new IpInfo(activeIp, true, true));
 					}
 				}
 			}
@@ -147,7 +155,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 			topicResourceService.update(topicResource);
 		}
 	}
-	
+
 	@Override
 	protected void doDispose() throws Exception {
 		super.doDispose();
