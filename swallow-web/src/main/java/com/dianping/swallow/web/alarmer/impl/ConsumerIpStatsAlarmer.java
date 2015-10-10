@@ -198,7 +198,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 			ConsumerClientEvent clientEvent = eventFactory.createCClientEvent();
 			clientEvent.setConsumerId(consumerId).setTopicName(topicName).setIp(ip)
 					.setClientType(ClientType.CLIENT_RECEIVER).setEventType(EventType.CONSUMER)
-					.setCreateTime(new Date());
+					.setCreateTime(new Date()).setCheckInterval(CHECK_TIMESPAN);
 			eventReporter.report(clientEvent);
 		}
 	}

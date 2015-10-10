@@ -189,7 +189,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 			ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
 			clientEvent.setTopicName(topicName).setIp(ip).setClientType(ClientType.CLIENT_SENDER)
-					.setEventType(EventType.PRODUCER).setCreateTime(new Date());
+					.setEventType(EventType.PRODUCER).setCreateTime(new Date()).setCheckInterval(CHECK_TIMESPAN);
 			eventReporter.report(clientEvent);
 		}
 	}

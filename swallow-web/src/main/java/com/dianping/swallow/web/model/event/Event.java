@@ -46,6 +46,7 @@ public abstract class Event {
 
 	private static final String ALARM_RECIEVER_FILE_NAME = "swallow-alarm-reciever.properties";
 
+	//1 minute
 	private static final long timeUnit = 60 * 1000;
 
 	static {
@@ -57,6 +58,9 @@ public abstract class Event {
 	protected AlarmReceiverManager receiverManager;
 
 	private AlarmMetaContainer alarmMetaContainer;
+	
+	//unit millis
+	protected long checkInterval = 30 * 1000;
 
 	private long eventId;
 
@@ -112,6 +116,15 @@ public abstract class Event {
 
 	public void setAlarmReceiverManager(AlarmReceiverManager receiverManager) {
 		this.receiverManager = receiverManager;
+	}
+
+	public long getCheckInterval() {
+		return checkInterval;
+	}
+
+	public Event setCheckInterval(long checkInterval) {
+		this.checkInterval = checkInterval;
+		return this;
 	}
 
 	@Override
@@ -171,7 +184,7 @@ public abstract class Event {
 			long dCheckValue = System.currentTimeMillis() - lastAlarmRecord.getCheckAlarmTime();
 			int spanBase = getTimeSpan(alarmMeta.getDaySpanBase(), alarmMeta.getNightSpanBase());
 
-			if (0 < dCheckValue && dCheckValue < timeUnit) {
+			if (0 < dCheckValue && dCheckValue < 2 * checkInterval) {
 				long currentTimeSpan = spanBase * lastAlarmRecord.getAlarmCount() * timeUnit;
 				long maxTimeSpan = alarmMeta.getMaxTimeSpan() * timeUnit;
 				long timeSpan = currentTimeSpan > maxTimeSpan ? maxTimeSpan : currentTimeSpan;
@@ -226,7 +239,7 @@ public abstract class Event {
 		if (alarmReceiver == null) {
 			logger.error("[sendAlarm] eventId {} no receiver.", alarm.getEventId());
 			alarmReceiver = new AlarmReceiver();
-		} 
+		}
 		if (alarmMeta.getIsMailMode()) {
 			alarmService.sendMail(alarmReceiver.getEmails(), alarm);
 		}
@@ -301,5 +314,5 @@ public abstract class Event {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 }
