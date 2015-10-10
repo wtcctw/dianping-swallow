@@ -56,13 +56,13 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 	@Autowired
 	private AlarmResourceContainer resourceContainer;
 
-	private Map<ProducerIpStatsData, Long> firstCandidates = new ConcurrentHashMap<ProducerIpStatsData, Long>();
+	private Map<IpStatsDataKey, Long> firstCandidates = new ConcurrentHashMap<IpStatsDataKey, Long>();
 
-	private Map<ProducerIpStatsData, Long> secondCandidates = new ConcurrentHashMap<ProducerIpStatsData, Long>();
+	private Map<IpStatsDataKey, Long> secondCandidates = new ConcurrentHashMap<IpStatsDataKey, Long>();
 
-	private Map<ProducerIpStatsData, Long> whiteLists = new ConcurrentHashMap<ProducerIpStatsData, Long>();
+	private Map<IpStatsDataKey, Long> whiteLists = new ConcurrentHashMap<IpStatsDataKey, Long>();
 
-	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
+	private static final long CHECK_TIMESPAN = 2 * 60 * 1000;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -90,7 +90,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 	}
 
 	public void checkIpGroups(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
-		if (ipGroupStatsDatas == null || ipGroupStatsDatas.size() == 0) {
+		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
 			return;
 		}
 		for (final ProducerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
@@ -101,65 +101,70 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 	public void checkIpGroup(ProducerIpGroupStatsData ipGroupStatsData) {
 		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		List<ProducerIpStatsData> ipStatsDatas = ipGroupStatsData.getProducerIpStatsDatas();
-		if (ipStatsDatas == null || ipStatsDatas.size() == 0) {
+		if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
 			return;
 		}
 		for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
 			boolean hasStatsData = ipStatsData.checkStatsData();
+			IpStatsDataKey key = new IpStatsDataKey(ipStatsData);
 			if (hasStatsData) {
-				whiteLists.put(ipStatsData, System.currentTimeMillis());
-			} else if (!hasStatsData && hasGroupStatsData) {
-				if (!firstCandidates.containsKey(ipStatsData)) {
-					firstCandidates.put(ipStatsData, System.currentTimeMillis());
-				}
-			} else if (!hasStatsData && !hasGroupStatsData) {
-				if (ipStatsDatas.size() == 1 && !secondCandidates.containsKey(ipStatsData)) {
-					secondCandidates.put(ipStatsData, System.currentTimeMillis());
+				whiteLists.put(key, System.currentTimeMillis());
+			} else {
+				if (hasGroupStatsData) {
+					if (!firstCandidates.containsKey(ipStatsData)) {
+						firstCandidates.put(key, System.currentTimeMillis());
+					} else {
+						if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
+							firstCandidates.put(key, System.currentTimeMillis());
+						}
+					}
+				} else {
+					if (ipStatsDatas.size() == 1) {
+						if (!secondCandidates.containsKey(ipStatsData)) {
+							secondCandidates.put(key, System.currentTimeMillis());
+						} else {
+							if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
+								firstCandidates.put(key, System.currentTimeMillis());
+							}
+						}
+					}
 				}
 			}
 		}
 	}
 
 	public void alarmSureRecords() {
-		Iterator<Entry<ProducerIpStatsData, Long>> iterator = firstCandidates.entrySet().iterator();
+		Iterator<Entry<IpStatsDataKey, Long>> iterator = firstCandidates.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Entry<ProducerIpStatsData, Long> checkRecord = iterator.next();
-			ProducerIpStatsData ipStatsData = checkRecord.getKey();
+			Entry<IpStatsDataKey, Long> checkRecord = iterator.next();
+			IpStatsDataKey key = checkRecord.getKey();
 			long lastRecordTime = checkRecord.getValue();
 			if (System.currentTimeMillis() - lastRecordTime < CHECK_TIMESPAN) {
 				continue;
 			}
 			iterator.remove();
-			if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
-				continue;
-			}
-			report(ipStatsData.getTopicName(), ipStatsData.getIp());
+			report(key.getTopicName(), key.getIp());
 		}
 	}
 
 	public void alarmUnSureRecords() {
-
-		Iterator<Entry<ProducerIpStatsData, Long>> iterator = secondCandidates.entrySet().iterator();
+		Iterator<Entry<IpStatsDataKey, Long>> iterator = secondCandidates.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Entry<ProducerIpStatsData, Long> checkRecord = iterator.next();
-			ProducerIpStatsData ipStatsData = checkRecord.getKey();
+			Entry<IpStatsDataKey, Long> checkRecord = iterator.next();
+			IpStatsDataKey key = checkRecord.getKey();
 			long lastRecordTime = checkRecord.getValue();
 
 			if (System.currentTimeMillis() - lastRecordTime < CHECK_TIMESPAN) {
 				continue;
 			}
 			iterator.remove();
-			if (whiteLists.containsKey(ipStatsData) && whiteLists.get(ipStatsData) > lastRecordTime) {
-				continue;
-			}
-			long avgQps = pIpStatsDataService.findAvgQps(ipStatsData.getTopicName(), ipStatsData.getIp(),
+			long avgQps = pIpStatsDataService.findAvgQps(key.getTopicName(), key.getIp(),
 					getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(getPreNDayKey(1, 0)));
 
 			if (avgQps > 0) {
-				report(ipStatsData.getTopicName(), ipStatsData.getIp());
+				report(key.getTopicName(), key.getIp());
 			}
 		}
-
 	}
 
 	private boolean isReport(String topicName, String ip) {
@@ -184,9 +189,66 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 			ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
 			clientEvent.setTopicName(topicName).setIp(ip).setClientType(ClientType.CLIENT_SENDER)
-					.setEventType(EventType.PRODUCER).setCreateTime(new Date());
+					.setEventType(EventType.PRODUCER).setCreateTime(new Date()).setCheckInterval(CHECK_TIMESPAN);
 			eventReporter.report(clientEvent);
 		}
+	}
+
+	private static class IpStatsDataKey {
+
+		public IpStatsDataKey(ProducerIpStatsData ipStatsData) {
+			this.topicName = ipStatsData.getTopicName();
+			this.ip = ipStatsData.getIp();
+		}
+
+		private String topicName;
+
+		private String ip;
+
+		public String getTopicName() {
+			return topicName;
+		}
+
+		public String getIp() {
+			return ip;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
+			result = prime * result + ((ip == null) ? 0 : ip.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			IpStatsDataKey other = (IpStatsDataKey) obj;
+			if (topicName == null) {
+				if (other.topicName != null)
+					return false;
+			} else if (!topicName.equals(other.topicName))
+				return false;
+			if (ip == null) {
+				if (other.ip != null)
+					return false;
+			} else if (!ip.equals(other.ip))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "IpStatsDataKey [topicName=" + topicName + ", ip=" + ip + "]";
+		}
+
 	}
 
 }

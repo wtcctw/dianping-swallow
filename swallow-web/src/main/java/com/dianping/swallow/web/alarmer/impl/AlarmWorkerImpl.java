@@ -63,7 +63,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 		alarmTaskThread = ThreadUtils.createThread(new Runnable() {
 			@Override
 			public void run() {
-				startAlarmTask();
+				startAlarmer();
 			}
 
 		}, "AlarmWorker-Boss", true);
@@ -71,7 +71,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 	}
 
 	@Override
-	public void startAlarmTask() {
+	public void startAlarmer() {
 		while (!checkStop()) {
 			Event event = null;
 			try {
@@ -94,7 +94,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 
 	@Override
 	protected void doStop() throws Exception {
-		stopAlarmTask();
+		stopAlarmer();
 	}
 
 	protected void doDispose() throws Exception {
@@ -103,7 +103,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 	}
 
 	@Override
-	public void stopAlarmTask() {
+	public void stopAlarmer() {
 		isStopped = true;
 		alarmTaskThread.interrupt();
 	}

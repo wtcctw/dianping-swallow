@@ -8,8 +8,8 @@ package com.dianping.swallow.web.alarmer;
  */
 public interface AlarmWorker {
 
-	public void startAlarmTask();
+	public void startAlarmer();
 
-	public void stopAlarmTask();
+	public void stopAlarmer();
 
 }

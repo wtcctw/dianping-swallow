@@ -32,9 +32,11 @@ public class AppResourceManagerImpl implements AppResourceManager {
 
 	@Autowired
 	private ApplicationResourceService appResourceService;
-
+	
+	@Autowired
 	private ConsumerIdResourceService cResourceService;
-
+	
+	@Autowired
 	private TopicResourceService topicResourceService;
 
 	@Override
