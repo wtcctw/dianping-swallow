@@ -303,14 +303,34 @@ public class UserUtils {
 
 		return new ArrayList<String>(ips);
 	}
-
-	public List<String> applications(String username) {
+	
+	public List<String> allApplications(){
+		
 		Set<String> apps = new HashSet<String>();
-
+		
 		List<ApplicationResource> applicationResources = applicationResourceService.findAll(APPLICATION);
 		if (applicationResources != null) {
 			for (ApplicationResource applicationResource : applicationResources) {
 				apps.add(applicationResource.getApplication());
+			}
+		}
+		
+		return new ArrayList<String>(apps);
+	}
+
+	public List<String> applications(String username) {
+		Set<String> apps = new HashSet<String>();
+
+		if (isAdministrator(username)) {
+			return allApplications();
+		}else{
+			List<String> ips = this.ips(username);
+			List<IpResource> ipResources = ipResourceService.findByIps(ips.toArray(new String[ips.size()]));
+			for(IpResource ir : ipResources){
+				String app = ir.getApplication();
+				if(StringUtils.isNotBlank(app)){
+					apps.add(app);
+				}
 			}
 		}
 

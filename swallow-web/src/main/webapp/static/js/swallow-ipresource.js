@@ -91,15 +91,26 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 			$scope.ipEntry.application;
 			
 			$scope.setModalInput = function(index){
+				if(typeof($scope.searchPaginator.currentPageItems[index].application) != "undefined"){
+					var application = $scope.searchPaginator.currentPageItems[index].application;
+					$('#application').tagsinput('removeAll');
+					if(application != null && application.length > 0){
+						var list = application.split(",");
+						for(var i = 0; i < list.length; ++i)
+							$('#application').tagsinput('add', list[i]);
+					}
+				}else{
+					$('#application').tagsinput('removeAll');
+				}
 				
 				$scope.ipEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 				$scope.ipEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 				$scope.ipEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
-				$scope.ipEntry.application = $scope.searchPaginator.currentPageItems[index].application;
 			}
 			
 			$scope.refreshpage = function(myForm){
 				$('#myModal').modal('hide');
+				$scope.ipEntry.application = $("#application").val();
 				var param = JSON.stringify($scope.ipEntry);
 				
 				$http.post(window.contextPath + '/console/ip/update', $scope.ipEntry).success(function(response) {
@@ -270,6 +281,22 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 								return c;
 							}
 						})
+					}).error(function(data, status, headers, config) {
+					});
+				 
+				 $http({
+						method : 'GET',
+						url : window.contextPath + '/console/application/applicationname'
+					}).success(function(data, status, headers, config) {
+						//work
+						$('#application').tagsinput({
+							  typeahead: {
+								  items: 16,
+								  source: data,
+								  displayText: function(item){ return item;}  //necessary
+							  }
+						});
+		        		//$('#administrator').typeahead().data('typeahead').source = data;
 					}).error(function(data, status, headers, config) {
 					});
 					
