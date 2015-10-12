@@ -12,9 +12,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,8 +62,13 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	private ScheduledExecutorService scheduledExecutorService = Executors
 			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
-	Logger logger2 = LogManager.getLogger(getClass());
-
+	@PostConstruct
+	public void executeCacheTopicToAdministrator(){
+		
+		scheduledExecutorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.MINUTES);
+		logger.info("Init configCache successfully.");
+	}
+	
 	@Override
 	protected void doInitialize() throws Exception {
 
@@ -77,8 +82,6 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			// 申请topic运行后就不需要监听了
 			configCache.addChange(this);
 
-			scheduledExecutorService.scheduleAtFixedRate(this, 1, 5, TimeUnit.MINUTES);
-			logger.info("Init configCache successfully.");
 		} catch (LionException e) {
 			logger.error("Erroe when init lion config", e);
 		}
@@ -258,7 +261,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		Long id = System.currentTimeMillis();
 		TopicResource topicResource = new TopicResource();
 		if (adminSet != null) {
-			StringUtils.join(adminSet, ",");
+			topicResource.setAdministrator(StringUtils.join(adminSet, ","));
 		} else {
 			topicResource.setAdministrator("");
 		}
@@ -287,7 +290,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 				@Override
 				public void doAction() throws SwallowException {
 
-					Set<String> whiltlist = topicToAdministrator.keySet();
+					Set<String> whiltlist = topicWhiteList.getTopics();
 					for (String wl : whiltlist) {
 						cacheTopicToAdministrator(wl, new HashSet<String>());
 					}
