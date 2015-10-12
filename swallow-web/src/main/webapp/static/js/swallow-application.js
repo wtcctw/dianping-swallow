@@ -94,6 +94,7 @@ module.controller('ApplicationResourceController', ['$rootScope', '$scope', '$ht
 			
 			$scope.setModalInput = function(index){
 				
+				$scope.isReadOnly = true;
 				$scope.applicationEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 				$scope.applicationEntry.application = $scope.searchPaginator.currentPageItems[index].application;
 				$scope.applicationEntry.email = $scope.searchPaginator.currentPageItems[index].email;
@@ -102,6 +103,20 @@ module.controller('ApplicationResourceController', ['$rootScope', '$scope', '$ht
 				$scope.applicationEntry.opEmail = $scope.searchPaginator.currentPageItems[index].opEmail;
 				$scope.applicationEntry.dpManager = $scope.searchPaginator.currentPageItems[index].dpManager;
 				$scope.applicationEntry.dpMobile = $scope.searchPaginator.currentPageItems[index].dpMobile;
+			}
+
+			$scope.isReadOnly = false;
+			$scope.clearModal = function(){
+				
+				$scope.isReadOnly = false;
+				$scope.applicationEntry.id = "";
+				$scope.applicationEntry.application = "";
+				$scope.applicationEntry.email = "";
+				$scope.applicationEntry.opManager = "";
+				$scope.applicationEntry.opMobile = "";
+				$scope.applicationEntry.opEmail = "";
+				$scope.applicationEntry.dpManager = "";
+				$scope.applicationEntry.dpMobile = "";
 			}
 			
 			$scope.refreshpage = function(myForm){

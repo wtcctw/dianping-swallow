@@ -61,9 +61,13 @@
 						<td style="text-align: left;"><a href="#myModal"
 							ng-click="setModalInput($index);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit" rel="tooltip"
-								data-original-title="编辑配置值"></i></a><a href
+								data-original-title="编辑配置值"></i></a>
+						#if(${isadmin})
+						<a href
 						ng-click="dialog(t.application);" class="edit-config-btn"><i
-							class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
+							class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a>
+						#end	
+						</td>
 					</tr>
 				</table>
 
@@ -101,7 +105,7 @@
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>业务名</b></label> <input
 										type="text" class="form-control"
-										ng-model="applicationEntry.application" id="application" required>
+										ng-model="applicationEntry.application" id="application" required ng-readonly="isReadOnly">
 									</input>
 								</div>
 							</div>

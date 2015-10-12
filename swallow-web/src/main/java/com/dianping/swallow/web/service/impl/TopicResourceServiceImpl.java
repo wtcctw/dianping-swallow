@@ -78,7 +78,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			//申请topic运行后就不需要监听了
 			configCache.addChange(this);
 
-			scheduledExecutorService.scheduleAtFixedRate(this, 1, 2, TimeUnit.MINUTES);
+			scheduledExecutorService.scheduleAtFixedRate(this, 1, 5, TimeUnit.MINUTES);
 			logger.info("Init configCache successfully.");
 		} catch (LionException e) {
 			logger.error("Erroe when init lion config", e);
@@ -204,17 +204,28 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 		return this.topicToAdministrator;
 	}
-
-	private void cacheTopicToAdministrator(String str) {
-
+	
+	private TopicResource cacheTopicToAdministrator(String str){
+		
 		if (StringUtils.isBlank(str)) {
-			return;
+			return null;
 		}
 		TopicResource topicResource = findByTopic(str);
+		
 		if (topicResource != null) {
 			Set<String> set = splitString(topicResource.getAdministrator(), ",");
 			topicToAdministrator.put(str, set);
-		} else {
+		}else{
+			topicToAdministrator.put(str, new HashSet<String>());
+		}
+		
+		return topicResource;
+	}
+
+	private void updateTopicToAdministrator(String str) {
+		
+		TopicResource topicResource = cacheTopicToAdministrator(str);
+		if(topicResource == null){
 			topicResource = buildTopicResource(str);
 			boolean status = this.insert(topicResource);
 
@@ -228,7 +239,6 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 					logger.info(String.format("Save topic %s to topic collection failed.", str));
 				}
 			}
-
 		}
 
 	}
@@ -272,7 +282,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 					Set<String> whiltlist = topicToAdministrator.keySet();
 					for (String wl : whiltlist) {
-						cacheTopicToAdministrator(wl);
+						updateTopicToAdministrator(wl);
 					}
 
 				}

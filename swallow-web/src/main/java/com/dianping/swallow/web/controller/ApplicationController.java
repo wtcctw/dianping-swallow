@@ -100,8 +100,7 @@ public class ApplicationController extends AbstractMenuController {
 	@ResponseBody
 	public List<String> loadApplication(HttpServletRequest request, HttpServletResponse response) {
 
-		String username = userUtils.getUsername(request);
-		return userUtils.applications(username);
+		return userUtils.allApplications();
 	}
 
 	@Override
