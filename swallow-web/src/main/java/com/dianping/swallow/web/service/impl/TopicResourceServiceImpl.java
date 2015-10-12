@@ -12,8 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,19 +61,20 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 	private ScheduledExecutorService scheduledExecutorService = Executors
 			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-	
+
 	Logger logger2 = LogManager.getLogger(getClass());
-	
-	@PostConstruct
-	void initLionConfig() {
+
+	@Override
+	protected void doInitialize() throws Exception {
+
 		try {
 			configCache = ConfigCache.getInstance();
 			configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);
 			Set<String> whiltlist = topicWhiteList.getTopics();
 			for (String wl : whiltlist) {
-				cacheTopicToAdministrator(wl);
+				updateTopicAdministrator(wl, new HashSet<String>());
 			}
-			//申请topic运行后就不需要监听了
+			// 申请topic运行后就不需要监听了
 			configCache.addChange(this);
 
 			scheduledExecutorService.scheduleAtFixedRate(this, 1, 5, TimeUnit.MINUTES);
@@ -98,7 +97,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			for (int i = whitelist.length - 1; i >= 0; i--) {
 				String wl = whitelist[i];
 				if (StringUtils.isNotBlank(wl) && topicResourceDao.findByTopic(wl) == null) {
-					TopicResource topicResource = buildTopicResource(wl);
+					TopicResource topicResource = buildTopicResource(wl, null);
 					try {
 						boolean status = this.insert(topicResource);
 						if (logger.isInfoEnabled() && status) {
@@ -118,7 +117,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 					}
 				}
 			}
-		}else {
+		} else {
 			if (logger.isInfoEnabled()) {
 				logger.info("not match");
 			}
@@ -204,42 +203,46 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 		return this.topicToAdministrator;
 	}
-	
-	private TopicResource cacheTopicToAdministrator(String str){
-		
+
+	private TopicResource cacheTopicToAdministrator(String str, Set<String> defaultSet) {
+
 		if (StringUtils.isBlank(str)) {
 			return null;
 		}
 		TopicResource topicResource = findByTopic(str);
-		
+
 		if (topicResource != null) {
 			Set<String> set = splitString(topicResource.getAdministrator(), ",");
 			topicToAdministrator.put(str, set);
-		}else{
-			topicToAdministrator.put(str, new HashSet<String>());
+		} else {
+			topicToAdministrator.put(str, defaultSet == null ? new HashSet<String>() : defaultSet);
 		}
-		
+
 		return topicResource;
 	}
 
-	private void updateTopicToAdministrator(String str) {
-		
-		TopicResource topicResource = cacheTopicToAdministrator(str);
-		if(topicResource == null){
-			topicResource = buildTopicResource(str);
+	@Override
+	public boolean updateTopicAdministrator(String str, Set<String> defaultSet) {
+		// 先缓存再插入
+		TopicResource topicResource = cacheTopicToAdministrator(str, defaultSet);
+		if (topicResource == null) {
+			topicResource = buildTopicResource(str, defaultSet);
 			boolean status = this.insert(topicResource);
 
 			if (status) {
 				if (logger.isInfoEnabled()) {
 					logger.info(String.format("Save topic %s to topic collection successfully.", str));
 				}
-				topicToAdministrator.put(str, new HashSet<String>());
 			} else {
 				if (logger.isInfoEnabled()) {
 					logger.info(String.format("Save topic %s to topic collection failed.", str));
 				}
 			}
+
+			return status;
 		}
+
+		return true;
 
 	}
 
@@ -250,11 +253,15 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public TopicResource buildTopicResource(String topic) {
+	public TopicResource buildTopicResource(String topic, Set<String> adminSet) {
 
 		Long id = System.currentTimeMillis();
 		TopicResource topicResource = new TopicResource();
-		topicResource.setAdministrator("");
+		if (adminSet != null) {
+			StringUtils.join(adminSet, ",");
+		} else {
+			topicResource.setAdministrator("");
+		}
 		topicResource.setConsumerAlarm(Boolean.TRUE);
 		topicResource.setProducerAlarm(Boolean.TRUE);
 		topicResource.setProducerIpInfos(new ArrayList<IpInfo>());
@@ -282,7 +289,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 					Set<String> whiltlist = topicToAdministrator.keySet();
 					for (String wl : whiltlist) {
-						updateTopicToAdministrator(wl);
+						cacheTopicToAdministrator(wl, new HashSet<String>());
 					}
 
 				}
@@ -292,36 +299,6 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		} finally {
 
 		}
-	}
-
-	@Override
-	public boolean updateTopicAdministrator(String topic, String administrator) {
-		TopicResource topicResource = findByTopic(topic);
-
-		if (topicResource != null) {
-			String oldAdmin = topicResource.getAdministrator();
-
-			if (StringUtils.isBlank(oldAdmin)) {
-				oldAdmin = administrator;
-				topicResource.setAdministrator(oldAdmin);
-			} else {
-				String[] adminArray = oldAdmin.split(",");
-				for (String admin : adminArray) {
-					if (admin.equals(administrator)) {
-						return true; 
-					}
-				}
-				StringBuilder stringBuilder = new StringBuilder();
-				stringBuilder.append(oldAdmin).append(",").append(administrator);
-				topicResource.setAdministrator(stringBuilder.toString());
-			}
-
-		} else {
-			topicResource = buildTopicResource(topic);
-			topicResource.setAdministrator(administrator);
-		}
-
-		return update(topicResource);
 	}
 
 }

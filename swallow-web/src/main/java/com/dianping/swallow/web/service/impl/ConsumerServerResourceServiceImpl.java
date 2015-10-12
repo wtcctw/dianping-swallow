@@ -3,7 +3,6 @@ package com.dianping.swallow.web.service.impl;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
@@ -48,9 +47,9 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	private ConfigCache configCache;
 
 	private String consumerServerLionConfig;
-
-	@PostConstruct
-	void initLionConfig() {
+	
+	@Override
+	protected void doInitialize() throws Exception {
 		try {
 			configCache = ConfigCache.getInstance();
 

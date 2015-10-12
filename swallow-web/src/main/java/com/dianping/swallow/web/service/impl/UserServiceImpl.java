@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,13 +59,13 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	
 	Logger logger2 = LogManager.getLogger(getClass());
 
-	@PostConstruct
-	void initAdminSet() {
+	@Override
+	protected void doInitialize() throws Exception {
 
 		scheduledExecutorService.scheduleAtFixedRate(this, 0, 5, TimeUnit.MINUTES);
 		logger.info("Init adminSet successfully.");
 	}
-
+	
 	@Override
 	public Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto) {
 

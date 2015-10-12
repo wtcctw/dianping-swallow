@@ -8,6 +8,7 @@ import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
 import com.dianping.swallow.web.alarmer.storager.StoragerLifecycle;
 import com.dianping.swallow.web.dashboard.DashboardLifecycle;
 import com.dianping.swallow.web.monitor.collector.CollectorLifecycle;
+import com.dianping.swallow.web.service.ServiceLifecycle;
 import com.dianping.swallow.web.task.TaskLifecycle;
 
 /**
@@ -37,6 +38,8 @@ public class WebLifecycleComponentManager extends LifecycleComponentManager {
 			return componentConfig.isDashboard();
 		}else if(component instanceof TaskLifecycle){
 			return componentConfig.isJobTask();
+		}else if(component instanceof ServiceLifecycle){
+			return componentConfig.isServiceTask();
 		}
 		return true;
 	}
