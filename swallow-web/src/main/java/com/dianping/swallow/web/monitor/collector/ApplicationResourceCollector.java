@@ -25,7 +25,7 @@ import com.dianping.swallow.web.service.IpResourceService;
  *         2015年9月6日 下午4:02:01
  */
 @Component
-public class AppResourceCollector extends AbstractResourceCollector {
+public class ApplicationResourceCollector extends AbstractResourceCollector {
 
 	@Autowired
 	private ConsumerStatsDataWapper consumerStatsDataWapper;

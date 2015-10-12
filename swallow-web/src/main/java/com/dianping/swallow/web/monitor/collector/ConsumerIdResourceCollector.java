@@ -45,7 +45,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 
 	private ExecutorService executor = null;
 
-	private IpStatusContainer<ConsumerIdKey> activeIpManager = new IpStatusContainer<ConsumerIdKey>();
+	private IpStatusMonitor<ConsumerIdKey> activeIpManager = new IpStatusMonitor<ConsumerIdKey>();
 
 	@Override
 	protected void doInitialize() throws Exception {
