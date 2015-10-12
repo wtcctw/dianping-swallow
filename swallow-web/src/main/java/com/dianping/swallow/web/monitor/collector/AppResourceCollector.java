@@ -85,7 +85,7 @@ public class AppResourceCollector extends AbstractResourceCollector {
 						// AppResource
 						ApplicationResource appResource = new ApplicationResource();
 						appResource.buildApplicationResource(ipDesc);
-						appResourceService.update(appResource);
+						appResourceService.insert(appResource);
 						// IpResource
 						IpResource ipResource = new IpResource(ipDesc.getIp(), ipDesc.getName(), true);
 						ipResource.setCreateTime(new Date());

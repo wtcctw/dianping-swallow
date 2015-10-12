@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class ServerResource extends BaseResource {
 
-	@Indexed(name = "IX_IP", direction = IndexDirection.DESCENDING)
+	@Indexed(name = "IX_IP", direction = IndexDirection.DESCENDING, unique = true, dropDups = true)
 	private String ip;
 
 	private String hostname;

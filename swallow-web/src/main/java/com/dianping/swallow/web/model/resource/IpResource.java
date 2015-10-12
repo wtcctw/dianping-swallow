@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.model.resource;
 
-import org.springframework.data.mongodb.core.index.IndexDirection;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -10,9 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
  *         2015年8月10日下午3:36:34
  */
 @Document(collection = "IP_RESOURCE")
+@CompoundIndexes({ @CompoundIndex(name = "IX_APPLICATION_IP", def = "{'application': -1, 'ip': -1}" , unique = true, dropDups = true) })
 public class IpResource extends BaseResource {
 
-	@Indexed(name = "IX_IP", direction = IndexDirection.ASCENDING)
 	private String ip;
 
 	private String application;

@@ -9,28 +9,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
 /**
  * @author mingdongli
  *
- * 2015年8月10日下午3:23:20
+ *         2015年8月10日下午3:23:20
  */
 @Document(collection = "CONSUMERID_RESOURCE")
-@CompoundIndexes({
-	@CompoundIndex(name = "IX_TOPIC_CONSUMERID", def = "{'topic': -1, 'consumerId': -1}")
-	})
-public class ConsumerIdResource extends BaseResource{
-	
+@CompoundIndexes({ @CompoundIndex(name = "IX_TOPIC_CONSUMERID", def = "{'topic': -1, 'consumerId': -1}" , unique = true, dropDups = true) })
+public class ConsumerIdResource extends BaseResource {
+
 	private String consumerId;
 
 	private String topic;
-	
+
 	private boolean alarm;
-	
+
 	private List<IpInfo> consumerIpInfos;
-	
+
 	private List<String> consumerApplications;
-	
+
 	private ConsumerBaseAlarmSetting consumerAlarmSetting;
 
 	public String getConsumerId() {
@@ -64,7 +61,7 @@ public class ConsumerIdResource extends BaseResource{
 	public void setConsumerAlarmSetting(ConsumerBaseAlarmSetting consumerAlarmSetting) {
 		this.consumerAlarmSetting = consumerAlarmSetting;
 	}
-	
+
 	public String generateKey() {
 		return topic + "&" + consumerId;
 	}
