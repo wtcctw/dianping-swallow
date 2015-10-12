@@ -19,7 +19,7 @@ public class ConsumerServerResource extends ServerResource {
 	private int groupId;
 
 	private long qps;
-
+	
 	private QPSAlarmSetting sendAlarmSetting;
 
 	private QPSAlarmSetting ackAlarmSetting;
