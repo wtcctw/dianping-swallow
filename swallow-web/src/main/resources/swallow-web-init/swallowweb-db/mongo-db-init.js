@@ -5,4 +5,5 @@ load("mongo-tb-consumerserverresource.js");
 load("mongo-tb-producerserverresource.js");
 load("mongo-tb-topicresource.js");
 load("mongo-tb-ipresource.js");
+load("mongo-tb-applicationresource.js");
 load("mongo-tb-user.js");

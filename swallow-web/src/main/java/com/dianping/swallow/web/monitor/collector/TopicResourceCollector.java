@@ -45,7 +45,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 
 	private ExecutorService executor = null;
 
-	private ActiveIpContainer<String> activeIpManager = new ActiveIpContainer<String>();
+	private IpStatusContainer<String> activeIpManager = new IpStatusContainer<String>();
 
 	@Override
 	protected void doInitialize() throws Exception {

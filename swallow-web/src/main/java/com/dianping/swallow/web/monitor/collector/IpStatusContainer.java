@@ -13,7 +13,7 @@ import org.codehaus.plexus.util.StringUtils;
  *
  *         2015年10月8日 上午11:06:00
  */
-public class ActiveIpContainer<T> {
+public class IpStatusContainer<T> {
 
 	private static final long ACTIVE_TIMESPAN = 6 * 60 * 60 * 1000;
 

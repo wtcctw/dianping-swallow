@@ -34,6 +34,8 @@ public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLife
 
 	private static final String CAT_TYPE = "ConsumerServerQpsTask";
 
+	private static final long STATS_TIMESPAN = 24 * 60 * 60;
+
 	@Autowired
 	private ConsumerServerResourceService cServerResourceService;
 
@@ -60,7 +62,8 @@ public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLife
 			return;
 		}
 		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-findQpsTask");
+			SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
+					+ "-findQpsTask");
 			catWrapper.doAction(new SwallowAction() {
 				@Override
 				public void doAction() throws SwallowException {
@@ -81,9 +84,12 @@ public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLife
 				long qps = cServerStatsDataService.findQpsByServerIp(consumerServerResource.getIp(), startKey, endKey);
 				ConsumerServerResource cServerResource = (ConsumerServerResource) cServerResourceService
 						.findByIp(consumerServerResource.getIp());
-				cServerResource.setQps(qps);
-				cServerResource.setUpdateTime(new Date());
-				cServerResourceService.update(cServerResource);
+				qps = qps * STATS_TIMESPAN;
+				if (cServerResource != null) {
+					cServerResource.setQps(qps);
+					cServerResource.setUpdateTime(new Date());
+					cServerResourceService.update(cServerResource);
+				}
 			}
 		}
 	}

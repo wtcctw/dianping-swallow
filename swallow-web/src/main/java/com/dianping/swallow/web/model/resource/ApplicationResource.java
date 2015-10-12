@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Document(collection = "APPLICATION_RESOURCE")
 public class ApplicationResource extends BaseResource {
 
-	@Indexed(name = "IX_APPLICATION", direction = IndexDirection.ASCENDING)
+	@Indexed(name = "IX_APPLICATION", direction = IndexDirection.ASCENDING, unique = true, dropDups = true)
 	private String application;
 
 	private String email;
@@ -103,7 +103,7 @@ public class ApplicationResource extends BaseResource {
 		this.email = ipDesc.getEmail();
 		this.opManager = ipDesc.getOpManager();
 		this.opEmail = ipDesc.getOpEmail();
-		this.opMobile=ipDesc.getOpEmail();
+		this.opMobile = ipDesc.getOpEmail();
 		this.setCreateTime(new Date());
 		this.setUpdateTime(new Date());
 		return this;

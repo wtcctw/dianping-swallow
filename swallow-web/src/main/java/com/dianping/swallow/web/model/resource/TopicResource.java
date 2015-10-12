@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Document(collection = "TOPIC_RESOURCE")
 public class TopicResource extends BaseResource {
 
-	@Indexed(name = "IX_TOPIC", direction = IndexDirection.ASCENDING)
+	@Indexed(name = "IX_TOPIC", direction = IndexDirection.ASCENDING, unique = true, dropDups = true)
 	private String topic;
 
 	private String administrator;
@@ -27,7 +27,7 @@ public class TopicResource extends BaseResource {
 	private boolean consumerAlarm;
 
 	private List<IpInfo> producerIpInfos;
-	
+
 	private List<String> producerApplications;
 
 	private ProducerBaseAlarmSetting producerAlarmSetting;
