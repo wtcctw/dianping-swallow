@@ -153,7 +153,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 			}
 			topicResource.setProducerIpInfos(ipInfos);
 			topicResourceService.update(topicResource);
-			logger.info("[updateTopicIpInfos] topicResource ", topicResourceService.toString());
+			logger.info("[updateTopicIpInfos] topicResource {}", topicResourceService.toString());
 		}
 	}
 

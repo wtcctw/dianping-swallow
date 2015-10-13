@@ -11,6 +11,8 @@ if (data == null) {
 		'consumerId' : -1
 	}, {
 		"name" : "IX_TOPIC_CONSUMERID",
+		"unique" : true,
+		"dropDups" : true,
 		"background" : true
 	});
 
