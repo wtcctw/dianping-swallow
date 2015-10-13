@@ -14,8 +14,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.TopicResourceService;
 
@@ -69,7 +71,8 @@ public class TopicResourceServiceTest {
 		producerServer.add("1.0.0.2");
 		producerServer.add("1.0.0.3");
 		
-		topicResource.setProducerIps(producerServer);
+		List<IpInfo> producerIpInfo = IpInfoUtils.buildIpInfo(producerServer);
+		topicResource.setProducerIpInfos(producerIpInfo);
 		
 		return topicResource;
 		

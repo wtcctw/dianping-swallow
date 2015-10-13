@@ -28,6 +28,8 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 
 	private static final String TYPE = "type";
 
+	private static final String ACTIVE = "active";
+
 	@Override
 	public boolean insert(ConsumerServerResource consumerServerResource) {
 
@@ -105,7 +107,8 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 
 		Query query = new Query();
 
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, HOSTNAME)));
+		query.skip(offset).limit(limit)
+				.with(new Sort(new Sort.Order(Direction.ASC, GROUPID), new Sort.Order(Direction.ASC, HOSTNAME)));
 		List<ConsumerServerResource> consumerServerResources = mongoTemplate.find(query, ConsumerServerResource.class,
 				CONSUMERSERVERRESOURCE_COLLECTION);
 		Long size = this.count();
@@ -121,7 +124,8 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 	@Override
 	public ConsumerServerResource loadIdleConsumerServer() {
 
-		Query query = new Query(Criteria.where(TYPE).is(ServerType.MASTER));
+		Query query = new Query(Criteria.where(TYPE).is(ServerType.MASTER)
+				.andOperator(Criteria.where(ACTIVE).is(Boolean.TRUE)));
 
 		query.with(new Sort(new Sort.Order(Direction.ASC, QPS)));
 		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,

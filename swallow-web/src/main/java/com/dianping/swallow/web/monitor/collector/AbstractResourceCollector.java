@@ -16,10 +16,16 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年9月30日 上午11:45:47
+ */
 public abstract class AbstractResourceCollector extends AbstractLifecycle implements CollectorLifecycle {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	protected final static String CAT_TYPE = "ResourceCollector";
 
 	private static final String FACTORY_NAME = "ResourceCollector";
@@ -30,7 +36,7 @@ public abstract class AbstractResourceCollector extends AbstractLifecycle implem
 			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	protected String collectorName;
-	
+
 	protected int collectorInterval;
 
 	protected int collectorDelay;
@@ -80,6 +86,17 @@ public abstract class AbstractResourceCollector extends AbstractLifecycle implem
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
+		if (future != null && !future.isCancelled()) {
+			future.cancel(false);
+		}
+
+	}
+
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		if (scheduled != null && !scheduled.isShutdown()) {
+			scheduled.shutdown();
+		}
 	}
 
 	public ScheduledFuture<?> getFuture() {

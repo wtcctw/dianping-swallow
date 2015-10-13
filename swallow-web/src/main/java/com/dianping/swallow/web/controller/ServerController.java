@@ -191,6 +191,28 @@ public class ServerController extends AbstractSidebarBasedController {
 		return result;
 	}
 
+	@RequestMapping(value = "/console/server/producer/active", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean editProducerActiveSetting(@RequestParam String ip, @RequestParam boolean active,
+			HttpServletRequest request, HttpServletResponse response) {
+		
+		ProducerServerResource producerServerResource = (ProducerServerResource) producerServerResourceService
+				.findByIp(ip);
+		producerServerResource.setActive(active);
+		boolean result = producerServerResourceService.update(producerServerResource);
+		
+		if (result) {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Update producer server active of %s to %b successfully", ip, active));
+			}
+		} else {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Update producer server active of %s to %b fail", ip, active));
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * 
 	 * Consumer server controller
@@ -333,6 +355,28 @@ public class ServerController extends AbstractSidebarBasedController {
 			}
 		}
 
+		return result;
+	}
+
+	@RequestMapping(value = "/console/server/consumer/active", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean editConsumerActiveSetting(@RequestParam String ip, @RequestParam boolean active) {
+		
+		ConsumerServerResource consumerServerResource = (ConsumerServerResource) consumerServerResourceService
+				.findByIp(ip);
+		consumerServerResource.setActive(active);
+		boolean result = consumerServerResourceService.update(consumerServerResource);
+		
+		if (result) {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Update consumer server active of %s to %b successfully", ip, active));
+			}
+		} else {
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Update consumer server active of %s to %b fail", ip, active));
+			}
+		}
+		
 		return result;
 	}
 

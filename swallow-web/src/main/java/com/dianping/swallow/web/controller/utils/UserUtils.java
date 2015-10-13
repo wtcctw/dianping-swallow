@@ -16,10 +16,13 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.TopicController;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
+import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
+import com.dianping.swallow.web.model.resource.ApplicationResource;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
+import com.dianping.swallow.web.service.ApplicationResourceService;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.service.IpResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -37,13 +40,9 @@ public class UserUtils {
 
 	private static final String ALL = "all";
 
-	private static final String CONSUMERID = "consumerId";
-
-	private static final String CONSUMERIP = "consumerIps";
-
 	private static final String IP = "ip";
 
-	private static final String APPLICATION = "iPDesc.name";
+	private static final String APPLICATION = "application";
 
 	@Resource(name = "ipResourceService")
 	private IpResourceService ipResourceService;
@@ -57,6 +56,9 @@ public class UserUtils {
 	@Resource(name = "consumerIdResourceService")
 	private ConsumerIdResourceService consumerIdResourceService;
 
+	@Resource(name = "applicationResourceService")
+	private ApplicationResourceService applicationResourceService;
+
 	public String getUsername(HttpServletRequest request) {
 		String tmpusername = request.getRemoteUser();
 
@@ -67,7 +69,7 @@ public class UserUtils {
 			return userinfo[0];
 		}
 	}
-	
+
 	public boolean isAdministrator(String username) {
 		return isAdministrator(username, false);
 	}
@@ -75,10 +77,10 @@ public class UserUtils {
 	public boolean isAdministrator(String username, boolean real) {
 
 		Set<String> adminSet = userService.loadCachedAdministratorSet();
-		
-		if(!real){
+
+		if (!real) {
 			return adminSet.contains(username) || adminSet.contains(ALL);
-		}else{
+		} else {
 			return adminSet.contains(username);
 		}
 	}
@@ -134,7 +136,8 @@ public class UserUtils {
 				}
 			}
 		} else {
-			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID);
+			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService
+					.findAll(DefaultConsumerIdResourceDao.CONSUMERID);
 
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 				String cid = consumerIdResource.getConsumerId();
@@ -170,19 +173,22 @@ public class UserUtils {
 			Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.findByTopic(consumerIdParam);
 			if (pair.getFirst() > 0) {
 				for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
-					List<String> ips = consumerIdResource.getConsumerIps();
+					List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
+					Set<String> ips = IpInfoUtils.extractIps(ipInfos);
 					if (!ips.isEmpty()) {
 						consumerIps.addAll(ips);
 					}
 				}
 			}
 		} else {
-			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERIP);
+			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService
+					.findAll(DefaultConsumerIdResourceDao.CONSUMERIPS);
 
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-				List<String> cips = consumerIdResource.getConsumerIps();
-				if (!cips.isEmpty()) {
-					consumerIps.addAll(cips);
+				List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
+				Set<String> ips = IpInfoUtils.extractIps(ipInfos);
+				if (!ips.isEmpty()) {
+					consumerIps.addAll(ips);
 				}
 			}
 		}
@@ -209,9 +215,10 @@ public class UserUtils {
 			Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.findByTopic(consumerIdParam);
 			if (pair.getFirst() > 0) {
 				for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
-					List<String> list = consumerIdResource.getConsumerIps();
-					if (!list.isEmpty()) {
-						consumerIps.addAll(list);
+					List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
+					Set<String> ips = IpInfoUtils.extractIps(ipInfos);
+					if (!ips.isEmpty()) {
+						consumerIps.addAll(ips);
 					}
 
 					String id = consumerIdResource.getConsumerId();
@@ -221,16 +228,18 @@ public class UserUtils {
 				}
 			}
 		} else {
-			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(CONSUMERID, CONSUMERIP);
+			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(
+					DefaultConsumerIdResourceDao.CONSUMERID, DefaultConsumerIdResourceDao.CONSUMERIPS);
 
 			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
 				String cid = consumerIdResource.getConsumerId();
 				if (!consumerIds.contains(cid)) {
 					consumerIds.add(cid);
 				}
-				List<String> cips = consumerIdResource.getConsumerIps();
-				if (!cips.isEmpty()) {
-					consumerIps.addAll(cips);
+				List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
+				Set<String> ips = IpInfoUtils.extractIps(ipInfos);
+				if (!ips.isEmpty()) {
+					consumerIps.addAll(ips);
 				}
 			}
 		}
@@ -244,29 +253,31 @@ public class UserUtils {
 		Set<String> producerIp = new HashSet<String>();
 
 		List<TopicResource> topicResources = topicResourceService.findAll();
-		List<String> tmpips;
+		Set<String> tmpips;
 		if (!isAdministrator(username)) {
 			for (TopicResource topicResource : topicResources) {
 				String admin = topicResource.getAdministrator();
-				if(StringUtils.isNotBlank(admin)){
+				if (StringUtils.isNotBlank(admin)) {
 					String[] adminArray = admin.split(",");
-					if(Arrays.asList(adminArray).contains(username)){
-						tmpips = topicResource.getProducerIps();
-						if(tmpips != null){
+					if (Arrays.asList(adminArray).contains(username)) {
+						List<IpInfo> tmpIpInfos = topicResource.getProducerIpInfos();
+						tmpips = IpInfoUtils.extractIps(tmpIpInfos);
+						if (tmpips != null) {
 							producerIp.addAll(tmpips);
 						}
 					}
 				}
 			}
-		}else{
+		} else {
 			for (TopicResource topicResource : topicResources) {
-				tmpips = topicResource.getProducerIps();
+				List<IpInfo> tmpIpInfos = topicResource.getProducerIpInfos();
+				tmpips = IpInfoUtils.extractIps(tmpIpInfos);
 				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}
 			}
 		}
-		
+
 		return new ArrayList<String>(producerIp);
 	}
 
@@ -279,11 +290,11 @@ public class UserUtils {
 
 			for (IpResource ipResource : ipResources) {
 				String ip = ipResource.getIp();
-				if (!ips.contains(ip)) {
+				if (StringUtils.isNotBlank(ip) && !ips.contains(ip)) {
 					ips.add(ip);
 				}
 			}
-		}else{
+		} else {
 			List<String> producerIps = producerIps(username);
 			List<String> consumerIps = consumerIps(username);
 			ips.addAll(consumerIps);
@@ -292,35 +303,33 @@ public class UserUtils {
 
 		return new ArrayList<String>(ips);
 	}
+	
+	public List<String> allApplications(){
+		
+		Set<String> apps = new HashSet<String>();
+		
+		List<ApplicationResource> applicationResources = applicationResourceService.findAll(APPLICATION);
+		if (applicationResources != null) {
+			for (ApplicationResource applicationResource : applicationResources) {
+				apps.add(applicationResource.getApplication());
+			}
+		}
+		
+		return new ArrayList<String>(apps);
+	}
 
 	public List<String> applications(String username) {
 		Set<String> apps = new HashSet<String>();
 
-		if (!isAdministrator(username)) {
-			List<String> ipList = ips(username);
-			Pair<Long, List<IpResource>> pair = ipResourceService.findByIp(0, Integer.MAX_VALUE, false,
-					ipList.toArray(new String[ipList.size()]));
-			if (pair.getFirst() > 0) {
-				for (IpResource ipResource : pair.getSecond()) {
-					IPDesc iPDesc = ipResource.getiPDesc();
-					if (iPDesc != null) {
-						String app = iPDesc.getName();
-						if (StringUtils.isNotBlank(app) && !apps.contains(app)) {
-							apps.add(app);
-						}
-					}
-				}
-			}
-		} else {
-			List<IpResource> ipResources = ipResourceService.findAll(APPLICATION);
-
-			for (IpResource ipResource : ipResources) {
-				IPDesc iPDesc = ipResource.getiPDesc();
-				if (iPDesc != null) {
-					String app = iPDesc.getName();
-					if (StringUtils.isNotBlank(app) && !apps.contains(app)) {
-						apps.add(app);
-					}
+		if (isAdministrator(username)) {
+			return allApplications();
+		}else{
+			List<String> ips = this.ips(username);
+			List<IpResource> ipResources = ipResourceService.findByIps(ips.toArray(new String[ips.size()]));
+			for(IpResource ir : ipResources){
+				String app = ir.getApplication();
+				if(StringUtils.isNotBlank(app)){
+					apps.add(app);
 				}
 			}
 		}

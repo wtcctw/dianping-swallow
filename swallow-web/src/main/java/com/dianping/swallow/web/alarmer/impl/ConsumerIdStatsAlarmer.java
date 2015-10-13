@@ -56,12 +56,12 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				consumerIdAlarm(consumerIdStatsDatas);
+				alarmConsumerIds(consumerIdStatsDatas);
 			}
 		});
 	}
 
-	private void consumerIdAlarm(List<ConsumerIdStatsData> consumerIdStatsDatas) {
+	private void alarmConsumerIds(List<ConsumerIdStatsData> consumerIdStatsDatas) {
 		if (consumerIdStatsDatas == null || consumerIdStatsDatas.size() == 0) {
 			return;
 		}

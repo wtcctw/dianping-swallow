@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -58,15 +56,24 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 
 	private Set<String> adminSet = new HashSet<String>();
 	
-	Logger logger2 = LogManager.getLogger(getClass());
-
 	@PostConstruct
-	void initAdminSet() {
-
+	public void cacheAdminSet(){
+		
 		scheduledExecutorService.scheduleAtFixedRate(this, 0, 5, TimeUnit.MINUTES);
 		logger.info("Init adminSet successfully.");
 	}
-
+	
+	@Override
+	protected void doInitialize() throws Exception {
+		
+		String[] admins = defaultAdmin.split(DELIMITOR);
+		for (String admin : admins) {
+			loadCachedAdministratorSet().add(admin);
+			createUser(admin, UserType.ADMINISTRATOR);
+			logger.info("admiSet add admin " + admin);
+		}
+	}
+	
 	@Override
 	public Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto) {
 
@@ -80,14 +87,10 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	public boolean createUser(String name, UserType auth) {
 
 		if (auth.equals(UserType.ADMINISTRATOR)) {
-			this.loadCachedAdministratorSet().add(name); // create, need add in
-															// adminSet in
-			// memory
+			this.loadCachedAdministratorSet().add(name); 
 			logger.info(String.format("Add administrator %s to admin list.", name));
 		} else {
-			this.loadCachedAdministratorSet().remove(name); // edit, need remove
-															// in adminSet
-			// in memory
+			this.loadCachedAdministratorSet().remove(name); 
 			logger.info(String.format("Remove administrator %s from admin list.", name));
 		}
 		return this.updateUser(name, auth);
@@ -184,14 +187,7 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 					}
 				}
 			}
-		} else {
-			String[] admins = defaultAdmin.split(DELIMITOR);
-			for (String admin : admins) {
-				loadCachedAdministratorSet().add(admin);
-				createUser(admin, UserType.ADMINISTRATOR);
-				logger.info("admiSet add admin " + admin);
-			}
-		}
+		} 
 	}
 
 	@Override

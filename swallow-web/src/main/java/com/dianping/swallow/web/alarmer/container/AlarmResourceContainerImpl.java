@@ -6,21 +6,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.BaseResource;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
@@ -31,7 +20,6 @@ import com.dianping.swallow.web.service.ConsumerIdResourceService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -40,27 +28,13 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年8月3日 上午11:34:10
  */
 @Component("alarmResourceContainer")
-public class AlarmResourceContainerImpl extends AbstractContainer implements AlarmResourceContainer, InitializingBean {
-
-	private static final Logger logger = LoggerFactory.getLogger(AlarmResourceContainerImpl.class);
+public class AlarmResourceContainerImpl extends AbstractContainer implements AlarmResourceContainer {
 
 	private static final String DEFAULT_RECORD = "default";
 
 	private static final String KEY_SPLIT = "&";
 
 	private static final String DEFAULT_DEFAULT_RECORD = DEFAULT_RECORD + KEY_SPLIT + DEFAULT_RECORD;
-
-	private int interval = 300;// 秒
-
-	private int delay = 5;
-
-	@SuppressWarnings("unused")
-	private ScheduledFuture<?> future = null;
-
-	private static final String FACTORY_NAME = "AlarmResourceTask";
-
-	private ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
-			.getThreadFactory(FACTORY_NAME));
 
 	@Autowired
 	private ConsumerServerResourceService cServerResourceService;
@@ -87,6 +61,14 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 	private volatile Map<String, TopicResource> topicResources = null;
 
 	private volatile Map<String, ConsumerIdResource> consumerIdResources = null;
+
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		containerName = "AlarmResourceContainer";
+		delay = 5;
+		interval = 300;
+	}
 
 	public void findResourceData() {
 		findCServerResourceData();
@@ -189,38 +171,10 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 		}
 	}
 
-	private void scheduleResourceTask() {
-		future = scheduled.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, AlarmResourceContainerImpl.this
-							.getClass().getSimpleName() + "-doLoadResource");
-					catWrapper.doAction(new SwallowAction() {
-						@Override
-						public void doAction() throws SwallowException {
-							doLoadResourceTask();
-						}
-					});
-
-				} catch (Throwable th) {
-					logger.error("[scheduleResourceTask]", th);
-				} finally {
-
-				}
-			}
-
-		}, delay, interval, TimeUnit.SECONDS);
-	}
-
-	private void doLoadResourceTask() {
-		logger.info("[doLoadResourceTask] scheduled load resource data.");
-		findResourceData();
-	}
-
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		scheduleResourceTask();
+	public void doLoadResource() {
+		logger.info("[doLoadResource] scheduled load resource data.");
+		findResourceData();
 	}
 
 	@Override
@@ -354,6 +308,17 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 				}
 			}
 		}
+	}
+
+	@Override
+	public int getDelay() {
+		return delay;
+
+	}
+
+	@Override
+	public int getInterval() {
+		return interval;
 	}
 
 }

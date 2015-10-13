@@ -102,7 +102,8 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		List<ProducerServerResource> pServerResources = resourceContainer.findProducerServerResources(false);
 		for (ProducerServerResource serverResource : pServerResources) {
 			if (serverResource.isAlarm()) {
-				checkConfigByIp(serverResource.getIp(), EventType.PRODUCER, topicConfigs);
+				Map<String, MongoStatus> mongoStatuses = getMongoStatus(serverResource.getIp());
+				checkConfigByIp(mongoStatuses, topicConfigs, serverResource.getIp(), EventType.PRODUCER);
 			}
 		}
 	}
@@ -111,19 +112,18 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		List<ConsumerServerResource> cServerResources = resourceContainer.findConsumerServerResources(false);
 		for (ConsumerServerResource serverResource : cServerResources) {
 			if (serverResource.isAlarm()) {
-				checkConfigByIp(serverResource.getIp(), EventType.CONSUMER, topicConfigs);
+				Map<String, MongoStatus> mongoStatuses = getMongoStatus(serverResource.getIp());
+				checkConfigByIp(mongoStatuses, topicConfigs, serverResource.getIp(), EventType.CONSUMER);
 			}
 		}
 	}
-	
 
-	void checkConfigByIp(String ip, EventType eventType, Map<String, TopicConfig> topicConfigs) {
-		Map<String, MongoStatus> mongoStatuses = getMongoStatus(ip);
+	void checkConfigByIp(Map<String, MongoStatus> mongoStatuses, Map<String, TopicConfig> topicConfigs, String ip,
+			EventType eventType) {
 		if (mongoStatuses == null) {
 			logger.error("[checkConfigByIp] mongourl mongoStatuses are both empty.");
 			return;
 		}
-
 		List<MongoAddress> defaultAddresses = null;
 		if (topicConfigs.containsKey(DEFAULT_TOPICCONFIG_NAME)) {
 			TopicConfig defaultConfig = topicConfigs.get(DEFAULT_TOPICCONFIG_NAME);
@@ -133,40 +133,41 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		for (Map.Entry<String, TopicConfig> configEntry : topicConfigs.entrySet()) {
 			String topic = configEntry.getKey();
 			TopicConfig topicConfig = configEntry.getValue();
-			if (mongoStatuses.containsKey(topic)) {
-				MongoStatus mongoStatus = mongoStatuses.get(topic);
-				List<ServerAddress> serverAddresses = mongoStatus.getServerAddressList();
-				List<MongoAddress> mongoAddresses = parseMongoUrl(topicConfig.getMongoUrl());
-				if (mongoAddresses == null || mongoAddresses.isEmpty()) {
-					mongoAddresses = defaultAddresses;
-				}
-				if ((serverAddresses == null || serverAddresses.size() == 0)
-						&& (mongoAddresses == null || mongoAddresses.size() == 0)) {
-					logger.error("[checkConfigByIp] topic {} mongoaddr are both empty.", topic);
-					break;
-				} else if ((serverAddresses == null || serverAddresses.size() == 0) && mongoAddresses != null
-						&& mongoAddresses.size() > 0) {
-					logger.error("[checkConfigByIp] topic {} mongourl mongoaddr is empty.", topic);
-					break;
-				} else if (serverAddresses != null && serverAddresses.size() > 0
-						&& (mongoAddresses == null || mongoAddresses.size() == 0)) {
-					logger.error("[checkConfigByIp] topic {} lion mongoaddr both empty.", topic);
-					break;
-				}
-				for (MongoAddress mongoAddress : mongoAddresses) {
-					boolean isAlarm = true;
-					for (ServerAddress serverAddress : serverAddresses) {
-						if (mongoAddress.equalServerAddress(serverAddress)) {
-							isAlarm = false;
-							break;
-						}
+			List<MongoAddress> mongoAddresses = null;
+			List<ServerAddress> serverAddresses = null;
+			if (!mongoStatuses.containsKey(topic)) {
+				continue;
+			}
+			MongoStatus mongoStatus = mongoStatuses.get(topic);
+			serverAddresses = mongoStatus.getServerAddressList();
+			mongoAddresses = parseMongoUrl(topicConfig.getMongoUrl());
+			if (mongoAddresses == null || mongoAddresses.isEmpty()) {
+				mongoAddresses = defaultAddresses;
+			}
+			if ((serverAddresses == null || serverAddresses.isEmpty())
+					&& (mongoAddresses == null || mongoAddresses.isEmpty())) {
+				logger.error("[checkConfigByIp] topic {} mongoaddr are both empty.", topic);
+				continue;
+			} else if ((serverAddresses == null || serverAddresses.isEmpty()) && mongoAddresses != null
+					&& !mongoAddresses.isEmpty()) {
+				logger.error("[checkConfigByIp] topic {} mongourl mongoaddr is empty.", topic);
+				continue;
+			} else if (serverAddresses != null && !serverAddresses.isEmpty()
+					&& (mongoAddresses == null || mongoAddresses.isEmpty())) {
+				logger.error("[checkConfigByIp] topic {} lion mongoaddr both empty.", topic);
+				continue;
+			}
+			for (MongoAddress mongoAddress : mongoAddresses) {
+				boolean isAlarm = true;
+				for (ServerAddress serverAddress : serverAddresses) {
+					if (mongoAddress.equalServerAddress(serverAddress)) {
+						isAlarm = false;
+						break;
 					}
-					if (isAlarm) {
-						report(ip, topic, eventType);
-					}
 				}
-			} else {
-				report(ip, topic, eventType);
+				if (isAlarm) {
+					report(ip, topic, eventType);
+				}
 			}
 		}
 	}
@@ -174,7 +175,7 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 	private void report(String ip, String topicName, EventType eventType) {
 		MongoConfigEvent configEvent = eventFactory.createMongoConfigEvent();
 		configEvent.setTopicName(topicName).setIp(ip).setSlaveIp(ip).setServerType(ServerType.MONGO_CONFIG)
-				.setEventType(eventType).setCreateTime(new Date());
+				.setEventType(eventType).setCreateTime(new Date()).setCheckInterval(alarmInterval * 1000);
 		eventReporter.report(configEvent);
 	}
 
@@ -250,6 +251,16 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 			}
 		}
 		return mongoAddress;
+	}
+
+	@Override
+	public int getAlarmInterval() {
+		return alarmInterval;
+	}
+
+	@Override
+	public int getAlarmDelay() {
+		return alarmDelay;
 	}
 
 	class MongoAddress {

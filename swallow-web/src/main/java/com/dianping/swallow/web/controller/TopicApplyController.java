@@ -1,5 +1,8 @@
 package com.dianping.swallow.web.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import com.dianping.swallow.web.controller.filter.lion.TopicWhiteListLionFilter;
 import com.dianping.swallow.web.controller.filter.result.ConfigureFilterResult;
 import com.dianping.swallow.web.controller.filter.result.LionFilterResult;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
+import com.dianping.swallow.web.controller.filter.validator.ApplicantValidatorFilter;
 import com.dianping.swallow.web.controller.filter.validator.AuthenticationValidatorFilter;
 import com.dianping.swallow.web.controller.filter.validator.NameValidatorFilter;
 import com.dianping.swallow.web.controller.filter.validator.QuoteValidatorFilter;
@@ -62,6 +66,9 @@ public class TopicApplyController {
 	private TypeValidatorFilter typeValidatorFilter;
 
 	@Autowired
+	private ApplicantValidatorFilter applicantValidatorFilter;
+
+	@Autowired
 	private MongoConfigureFilter mongoConfigureFilter;
 
 	@Autowired
@@ -90,6 +97,7 @@ public class TopicApplyController {
 		validatorFilterChain.addFilter(nameValidatorFilter);
 		validatorFilterChain.addFilter(quoteValidatorFilter);
 		validatorFilterChain.addFilter(typeValidatorFilter);
+		validatorFilterChain.addFilter(applicantValidatorFilter);
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 
 		if (validatorFilterResult.getStatus() != 0) {
@@ -128,7 +136,10 @@ public class TopicApplyController {
 			return lionFilterResult;
 		}
 
-		boolean isSuccess = topicResourceService.updateTopicAdministrator(topic, topicApplyDto.getApplicant());
+		String applicant = topicApplyDto.getApplicant();
+		Set<String> administrator = new HashSet<String>();
+		administrator.add(applicant.trim());
+		boolean isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
 		return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
 	}
 

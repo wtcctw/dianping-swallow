@@ -3,14 +3,13 @@ package com.dianping.swallow.web.service.impl;
 import java.util.Collection;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.AuthenticationService;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -43,10 +42,10 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
 
-	@PostConstruct
-	private void addAllToAdmin() {
+	@Override
+	protected void doInitialize() throws Exception {
 
-		boolean env = EnvZooKeeperConfig.getEnv().equals("product");
+		boolean env = EnvUtil.isProduct();
 		if (showContentToAll && !env) {
 			userService.loadCachedAdministratorSet().add(ALL);
 		}

@@ -106,6 +106,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.producerserverEntry.ip;
 	$scope.producerserverEntry.hostname;
 	$scope.producerserverEntry.alarm;
+	$scope.producerserverEntry.active;
 	$scope.producerserverEntry.sendpeak;
 	$scope.producerserverEntry.sendvalley;
 	$scope.producerserverEntry.sendfluctuation;
@@ -132,6 +133,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.ip = "";
 		$scope.producerserverEntry.hostname = "";
 		$scope.producerserverEntry.alarm = true;
+		$scope.producerserverEntry.active = true;
 		$scope.producerserverEntry.sendpeak = "";
 		$scope.producerserverEntry.sendvalley = "";
 		$scope.producerserverEntry.sendfluctuation = "";
@@ -225,6 +227,17 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 				ip : ip,
 				alarm: check } }).success(function(response) {
     	});
+	}
+
+	$scope.changeproduceractive = function(ip, index){
+		var id = "#pactive" + index;
+		var check = $(id).prop('checked');
+		
+		$http.get(window.contextPath + '/console/server/producer/active', {
+			params : {
+				ip : ip,
+				active: check } }).success(function(response) {
+				});
 	}
 	
 	$scope.dialog = function(cid) {

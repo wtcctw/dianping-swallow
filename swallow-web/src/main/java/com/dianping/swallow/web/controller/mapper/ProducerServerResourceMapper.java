@@ -24,6 +24,7 @@ public class ProducerServerResourceMapper {
 		producerServerResource.setIp(dto.getIp());
 		producerServerResource.setHostname(dto.getHostname());
 		producerServerResource.setAlarm(dto.isAlarm());
+		producerServerResource.setActive(dto.isActive());
 
 		return producerServerResource;
 	}
@@ -42,6 +43,7 @@ public class ProducerServerResourceMapper {
 		dto.setIp(producerServerResource.getIp());
 		dto.setHostname(producerServerResource.getHostname());
 		dto.setAlarm(producerServerResource.isAlarm());
+		dto.setActive(producerServerResource.isActive());
 
 		return dto;
 	}

@@ -45,7 +45,6 @@ import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
 import com.dianping.swallow.web.service.MinuteEntryService;
-import com.dianping.swallow.web.task.TopicScanner;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
@@ -84,9 +83,6 @@ public class DataMonitorController extends AbstractMonitorController implements 
 
 	@Autowired
 	private AccumulationRetriever accumulationRetriever;
-
-	@Autowired
-	private TopicScanner topicScanner;
 
 	ConfigCache configCache;
 
@@ -202,13 +198,6 @@ public class DataMonitorController extends AbstractMonitorController implements 
 			logger.info(consumerDataRetriever.getDebugInfo(server));
 		}
 		return "ok";
-	}
-
-	@RequestMapping(value = "/console/monitor/scanner/debug", method = RequestMethod.GET)
-	@ResponseBody
-	public Map<String, Set<String>> getScannerDebug() {
-
-		return topicScanner.getTopics();
 	}
 
 	@RequestMapping(value = "/console/monitor/producer/debug/{server}", method = RequestMethod.GET)

@@ -113,8 +113,10 @@ public class AlarmController extends AbstractSidebarBasedController {
 	public Object searchConsumerIds() {
 		Set<String> consumerIds = new HashSet<String>();
 		List<ConsumerIdResource> consumerIdResources = resourceContainer.findConsumerIdResources(false);
-		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-			consumerIds.add(consumerIdResource.getConsumerId() + " " + consumerIdResource.getTopic());
+		if (consumerIdResources != null) {
+			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
+				consumerIds.add(consumerIdResource.getConsumerId() + " " + consumerIdResource.getTopic());
+			}
 		}
 		return consumerIds;
 	}

@@ -34,6 +34,7 @@
 						<th style="text-align: left">确认谷值</th>
 						<th style="text-align: left">确认波动</th>
 						<th style="text-align: left">确认波动基数</th>
+						<th style="text-align: left">启用</th>
 						<th style="text-align: left">告警</th>
 						<th style="text-align: left">操作</th>
 					</tr>
@@ -53,6 +54,11 @@
 						<td style="text-align: left" ng-bind="ad.ackvalley"></td>
 						<td style="text-align: left" ng-bind="ad.ackfluctuation"></td>
 						<td style="text-align: left" ng-bind="ad.ackfluctuationBase"></td>
+						<td style="text-align: left"><label class="pull-left inline">
+								<small class="muted smaller-90"></small> <input
+								id="cactive{{$index}}" type="checkbox" ng-model="ad.active" ng-click="changeconsumeractive(ad.ip, $index)"
+								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
+						</label></td>
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
 								id="calarm{{$index}}" type="checkbox" ng-model="ad.alarm" ng-click="changeconsumeralarm(ad.ip, $index)"

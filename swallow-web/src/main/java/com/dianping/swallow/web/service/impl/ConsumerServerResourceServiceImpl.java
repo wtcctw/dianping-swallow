@@ -10,8 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dianping.lion.client.ConfigCache;
-import com.dianping.lion.client.LionException;
+import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
@@ -45,21 +44,16 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	@Resource(name = "consumerServerStatsDataService")
 	private ConsumerServerStatsDataService consumerServerStatsDataService;
 
-	private ConfigCache configCache;
+	@Autowired
+	private LionDynamicConfig lionDynamicConfig;
 
 	private String consumerServerLionConfig;
 
 	@PostConstruct
-	void initLionConfig() {
-		try {
-			configCache = ConfigCache.getInstance();
+	public void initConsumerServerConfig() throws Exception {
 
-			consumerServerLionConfig = configCache.getProperty(SWALLOW_CONSUMER_SERVER_URI);
-			configCache.addChange(this);
-			logger.info("Init configCache successfully.");
-		} catch (LionException e) {
-			logger.error("Erroe when init lion config", e);
-		}
+		consumerServerLionConfig = lionDynamicConfig.get(SWALLOW_CONSUMER_SERVER_URI);
+		lionDynamicConfig.addConfigChangeListener(this);
 	}
 
 	@Override
@@ -122,6 +116,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		ConsumerServerResource serverResource = new ConsumerServerResource();
 		serverResource.setIp(ip);
 		serverResource.setAlarm(true);
+		serverResource.setActive(true);
 		serverResource.setHostname(hostName);
 		serverResource.setPort(port);
 		serverResource.setGroupId(groupId);
@@ -215,8 +210,18 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		this.consumerServerLionConfig = consumerServerLionConfig;
 	}
 
+	private boolean validateIpPort(String masterIp, int masterPort) {
+
+		return StringUtils.isNotBlank(masterIp) && masterPort > 0;
+	}
+
 	@Override
-	public void onChange(String key, String value) {
+	public int getNextGroupId() {
+		return consumerServerResourceDao.getMaxGroupId() + 1;
+	}
+
+	@Override
+	public void onConfigChange(String key, String value) {
 
 		if (key != null && key.equals(SWALLOW_CONSUMER_SERVER_URI)) {
 			if (logger.isInfoEnabled()) {
@@ -229,15 +234,5 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 			}
 		}
 
-	}
-
-	private boolean validateIpPort(String masterIp, int masterPort) {
-
-		return StringUtils.isNotBlank(masterIp) && masterPort > 0;
-	}
-
-	@Override
-	public int getNextGroupId() {
-		return consumerServerResourceDao.getMaxGroupId() + 1;
 	}
 }

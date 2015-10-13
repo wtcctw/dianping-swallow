@@ -12,12 +12,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class ServerResource extends BaseResource {
 
-	@Indexed(name = "IX_IP", direction = IndexDirection.DESCENDING)
+	@Indexed(name = "IX_IP", direction = IndexDirection.DESCENDING, unique = true, dropDups = true)
 	private String ip;
 
 	private String hostname;
 
 	private boolean alarm;
+	
+	private boolean active;
 
 	public String getIp() {
 		return ip;
@@ -43,10 +45,18 @@ public class ServerResource extends BaseResource {
 		this.alarm = alarm;
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 	@Override
 	public String toString() {
-		return "ServerResource [ip=" + ip + ", hostname=" + hostname + ", alarm=" + alarm + ", toString()="
-				+ super.toString() + "]";
+		return "ServerResource [ip=" + ip + ", hostname=" + hostname + ", alarm=" + alarm + ", active=" + active
+				+ ", toString()=" + super.toString() + "]";
 	}
 
 	@JsonIgnore

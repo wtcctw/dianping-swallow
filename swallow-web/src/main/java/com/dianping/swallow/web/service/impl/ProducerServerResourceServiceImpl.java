@@ -77,6 +77,7 @@ public class ProducerServerResourceServiceImpl extends AbstractSwallowService im
 		ProducerServerResource serverResource = new ProducerServerResource();
 		serverResource.setIp(ip);
 		serverResource.setAlarm(true);
+		serverResource.setActive(true);
 		serverResource.setCreateTime(new Date());
 		serverResource.setUpdateTime(new Date());
 		serverResource.setHostname(hostName);

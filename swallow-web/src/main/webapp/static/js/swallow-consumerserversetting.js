@@ -92,6 +92,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.ip = "";
 	$scope.consumerserverEntry.hostname = "";
 	$scope.consumerserverEntry.alarm = false;
+	$scope.consumerserverEntry.active = true;
 	$scope.consumerserverEntry.sendpeak = "";
 	$scope.consumerserverEntry.sendvalley = "";
 	$scope.consumerserverEntry.sendfluctuation = "";
@@ -168,6 +169,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ip = "";
 		$scope.consumerserverEntry.hostname = "";
 		$scope.consumerserverEntry.alarm = false;
+		$scope.consumerserverEntry.alarm = true;
 		$scope.consumerserverEntry.sendpeak = "";
 		$scope.consumerserverEntry.sendvalley = "";
 		$scope.consumerserverEntry.sendfluctuation = "";
@@ -197,7 +199,6 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.consumerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.consumerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
-		$scope.consumerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
 		$scope.consumerserverEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
 		$scope.consumerserverEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
 		$scope.consumerserverEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
@@ -251,6 +252,16 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 				ip : ip,
 				alarm: check } }).success(function(response) {
     	});
+	}
+
+	$scope.changeconsumeractive = function(ip, index){
+		var id = "#cactive" + index;
+		var check = $(id).prop('checked');
+		$http.get(window.contextPath + '/console/server/consumer/active', {
+			params : {
+				ip : ip,
+				active: check } }).success(function(response) {
+				});
 	}
 	
 	$scope.dialog = function(cid) {

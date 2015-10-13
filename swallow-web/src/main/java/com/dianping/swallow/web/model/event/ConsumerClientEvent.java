@@ -38,4 +38,8 @@ public class ConsumerClientEvent extends ClientEvent {
 		return isAlarm(lastAlarms, key, alarmMeta);
 	}
 
+	@Override
+	public String toString() {
+		return "ConsumerClientEvent [consumerId=" + consumerId + super.toString() + "]";
+	}
 }
