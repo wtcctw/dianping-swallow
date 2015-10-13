@@ -17,7 +17,7 @@ public class IpStatusMonitor<T> {
 
 	private static final long ACTIVE_TIMESPAN = 6 * 60 * 60 * 1000;
 
-	private Map<T, ActiveIpData> resouceActiveIpDatas = new ConcurrentHashMap<T, ActiveIpData>();
+	private Map<T, ActiveIpData> resourceActiveIpDatas = new ConcurrentHashMap<T, ActiveIpData>();
 
 	public static class ActiveIpData {
 
@@ -26,10 +26,6 @@ public class IpStatusMonitor<T> {
 		public void addData(String ip, boolean hasData) {
 			if (hasData) {
 				activeDatas.put(ip, System.currentTimeMillis());
-			} else {
-				if (!activeDatas.containsKey(ip)) {
-					activeDatas.put(ip, System.currentTimeMillis());
-				}
 			}
 		}
 
@@ -41,40 +37,40 @@ public class IpStatusMonitor<T> {
 		}
 	}
 
-	public Map<T, ActiveIpData> getResouceActiveIpDatas() {
-		return resouceActiveIpDatas;
+	public Map<T, ActiveIpData> getResourceActiveIpDatas() {
+		return resourceActiveIpDatas;
 	}
 
-	public void setResouceActiveIpDatas(Map<T, ActiveIpData> resouceActiveIpDatas) {
-		this.resouceActiveIpDatas = resouceActiveIpDatas;
+	public void setResourceActiveIpDatas(Map<T, ActiveIpData> resourceActiveIpDatas) {
+		this.resourceActiveIpDatas = resourceActiveIpDatas;
 	}
 
 	public void putActiveIpData(T key, String activeIp, boolean hasData) {
 		ActiveIpData activeIpData = null;
-		if (resouceActiveIpDatas.containsKey(key)) {
-			activeIpData = resouceActiveIpDatas.get(key);
+		if (resourceActiveIpDatas.containsKey(key)) {
+			activeIpData = resourceActiveIpDatas.get(key);
 		} else {
 			activeIpData = new ActiveIpData();
-			resouceActiveIpDatas.put(key, activeIpData);
+			resourceActiveIpDatas.put(key, activeIpData);
 		}
 		activeIpData.addData(activeIp, hasData);
 	}
 
 	public void putActiveIpData(T key, ActiveIpData activeIpData) {
-		resouceActiveIpDatas.put(key, activeIpData);
+		resourceActiveIpDatas.put(key, activeIpData);
 	}
 
 	public ActiveIpData getActiveIpData(T key) {
-		if (resouceActiveIpDatas.containsKey(key)) {
-			return resouceActiveIpDatas.get(key);
+		if (resourceActiveIpDatas.containsKey(key)) {
+			return resourceActiveIpDatas.get(key);
 		}
 		return null;
 	}
 
 	public Set<String> getInActiveIps(T key) {
 		Set<String> activeIps = new HashSet<String>();
-		if (resouceActiveIpDatas.containsKey(key)) {
-			ActiveIpData activeIpData = resouceActiveIpDatas.get(key);
+		if (resourceActiveIpDatas.containsKey(key)) {
+			ActiveIpData activeIpData = resourceActiveIpDatas.get(key);
 			for (String ip : activeIpData.activeDatas.keySet()) {
 				if (StringUtils.isNotBlank(ip)) {
 					if (activeIpData.isIpInActive(ip)) {
@@ -87,8 +83,8 @@ public class IpStatusMonitor<T> {
 	}
 
 	public void removeActiveIp(T key, String ip) {
-		if (resouceActiveIpDatas.containsKey(key)) {
-			ActiveIpData activeIpData = resouceActiveIpDatas.get(key);
+		if (resourceActiveIpDatas.containsKey(key)) {
+			ActiveIpData activeIpData = resourceActiveIpDatas.get(key);
 			if (activeIpData.activeDatas.containsKey(ip)) {
 				activeIpData.activeDatas.remove(ip);
 			}
