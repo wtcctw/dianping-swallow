@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ProducerTopicStatsDataDao;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
-import com.mongodb.WriteResult;
 
 /**
  * 
@@ -27,8 +26,6 @@ public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implement
 
 	private static final String TOPICNAME_FIELD = "topicName";
 
-	private static final String ID_FIELD = "id";
-
 	@Override
 	public boolean insert(ProducerTopicStatsData topicStatsData) {
 		try {
@@ -38,34 +35,6 @@ public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implement
 			logger.error("[insert] Error when save producer topic stats data " + topicStatsData, e);
 		}
 		return false;
-	}
-
-	@Override
-	public boolean update(ProducerTopicStatsData topicStatsData) {
-		return insert(topicStatsData);
-	}
-
-	@Override
-	public int deleteById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, ProducerTopicStatsData.class, TOPICSTATSDATA_COLLECTION);
-		return result.getN();
-	}
-
-	@Override
-	public ProducerTopicStatsData findById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		ProducerTopicStatsData topicStatisData = mongoTemplate.findOne(query, ProducerTopicStatsData.class,
-				TOPICSTATSDATA_COLLECTION);
-		return topicStatisData;
-	}
-
-	@Override
-	public List<ProducerTopicStatsData> findByTopic(String topicName) {
-		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName));
-		List<ProducerTopicStatsData> topicStatsDatas = mongoTemplate.find(query, ProducerTopicStatsData.class,
-				TOPICSTATSDATA_COLLECTION);
-		return topicStatsDatas;
 	}
 
 	@Override

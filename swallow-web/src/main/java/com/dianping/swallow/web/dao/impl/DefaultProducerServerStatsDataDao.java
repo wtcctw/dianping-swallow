@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ProducerServerStatsDataDao;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
-import com.mongodb.WriteResult;
 
 /**
  * 
@@ -25,8 +24,6 @@ public class DefaultProducerServerStatsDataDao extends AbstractStatsDao implemen
 
 	private static final String TIMEKEY_FIELD = "timeKey";
 
-	private static final String ID_FIELD = "id";
-
 	private static final String IP_FIELD = "ip";
 
 	@Override
@@ -38,35 +35,6 @@ public class DefaultProducerServerStatsDataDao extends AbstractStatsDao implemen
 			logger.error("[insert] error when save producer server stats data " + serverStatsData, e);
 		}
 		return false;
-	}
-
-	@Override
-	public boolean update(ProducerServerStatsData serverStatsData) {
-		return insert(serverStatsData);
-	}
-
-	@Override
-	public int deleteById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, ProducerServerStatsData.class,
-				PRODUCERSERVERSTATSDATA_COLLECTION);
-		return result.getN();
-	}
-
-	@Override
-	public ProducerServerStatsData findById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		ProducerServerStatsData serverStatisData = mongoTemplate.findOne(query, ProducerServerStatsData.class,
-				PRODUCERSERVERSTATSDATA_COLLECTION);
-		return serverStatisData;
-	}
-
-	@Override
-	public ProducerServerStatsData findByTimeKey(String ip, long timeKey) {
-		Query query = new Query(Criteria.where(TIMEKEY_FIELD).is(timeKey).and(IP_FIELD).is(ip));
-		ProducerServerStatsData serverStatisData = mongoTemplate.findOne(query, ProducerServerStatsData.class,
-				PRODUCERSERVERSTATSDATA_COLLECTION);
-		return serverStatisData;
 	}
 
 	@Override

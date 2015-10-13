@@ -31,23 +31,6 @@ public interface AlarmDao extends Dao {
 	boolean update(Alarm alarm);
 
 	/**
-	 * delete by id
-	 * 
-	 * @param ipDesc
-	 * @return
-	 */
-	int deleteById(String id);
-
-	/**
-	 * find by id
-	 * 
-	 * @param id
-	 * @return
-	 */
-	Alarm findById(String id);
-
-	
-	/**
 	 * find by receiver related and time
 	 * 
 	 * @param receiver
@@ -69,19 +52,19 @@ public interface AlarmDao extends Dao {
 	Alarm findByEventId(long eventId);
 
 	public static class AlarmParam {
-		
+
 		private String receiver;
-		
+
 		private String related;
-		
+
 		private String subRelated;
-		
+
 		private Date startTime;
-		
+
 		private Date endTime;
-		
+
 		private int offset;
-		
+
 		private int limit;
 
 		public String getReceiver() {

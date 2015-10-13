@@ -30,11 +30,6 @@ public class ConsumerTopicStatsDataServiceImpl implements ConsumerTopicStatsData
 	}
 
 	@Override
-	public List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
-		return consumerTopicStatsDataDao.findSectionData(topicName, startKey, endKey);
-	}
-
-	@Override
 	public StatsDataMapPair findSectionQpsData(String topicName, long startKey, long endKey) {
 		List<ConsumerTopicStatsData> topicStatsDatas = consumerTopicStatsDataDao.findSectionData(topicName, startKey,
 				endKey);

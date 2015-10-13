@@ -100,7 +100,6 @@ public class IPDescServiceImpl implements IPDescService {
 	}
 
 	private Set<String> getEmailsByMobile(String mobile) {
-		logger.info("[getEmailsByMobile] mobile {}", mobile);
 		List<UserProfileDto> userInfos = baUserService.getEmployeeInfoByKeyword(mobile);
 		Set<String> emails = new HashSet<String>();
 		if (userInfos != null) {
@@ -110,7 +109,6 @@ public class IPDescServiceImpl implements IPDescService {
 				}
 			}
 		}
-		logger.info("[getEmailsByMobile] emails {}", emails);
 		return emails;
 	}
 

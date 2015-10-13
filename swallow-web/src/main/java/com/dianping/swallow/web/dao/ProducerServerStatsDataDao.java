@@ -14,14 +14,6 @@ public interface ProducerServerStatsDataDao {
 
 	boolean insert(ProducerServerStatsData serverStatsData);
 
-	boolean update(ProducerServerStatsData serverStatsData);
-
-	int deleteById(String id);
-
-	ProducerServerStatsData findById(String id);
-
-	ProducerServerStatsData findByTimeKey(String ip, long timeKey);
-
 	List<ProducerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 
 	List<ProducerServerStatsData> findSectionData(long startKey, long endKey);

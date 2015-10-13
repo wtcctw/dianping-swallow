@@ -16,12 +16,6 @@ public interface ConsumerServerStatsDataDao {
 
 	boolean update(ConsumerServerStatsData serverStatsData);
 
-	int deleteById(String id);
-
-	ConsumerServerStatsData findById(String id);
-
-	ConsumerServerStatsData findByTimeKey(String ip, long timeKey);
-
 	List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 	
 	List<ConsumerServerStatsData> findSectionData(long startKey, long endKey);

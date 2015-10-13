@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.dao.ConsumerServerStatsDataDao;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
-import com.mongodb.WriteResult;
 
 /**
  * 
@@ -24,8 +23,6 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 	private static final String CONSUMERSERVERSTATSDATA_COLLECTION = "CONSUMER_SERVER_STATS_DATA";
 
 	private static final String TIMEKEY_FIELD = "timeKey";
-
-	private static final String ID_FIELD = "id";
 
 	private static final String IP_FIELD = "ip";
 
@@ -43,30 +40,6 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 	@Override
 	public boolean update(ConsumerServerStatsData serverStatsData) {
 		return insert(serverStatsData);
-	}
-
-	@Override
-	public int deleteById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, ConsumerServerStatsData.class,
-				CONSUMERSERVERSTATSDATA_COLLECTION);
-		return result.getN();
-	}
-
-	@Override
-	public ConsumerServerStatsData findById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		ConsumerServerStatsData serverStatisData = mongoTemplate.findOne(query, ConsumerServerStatsData.class,
-				CONSUMERSERVERSTATSDATA_COLLECTION);
-		return serverStatisData;
-	}
-
-	@Override
-	public ConsumerServerStatsData findByTimeKey(String ip, long timeKey) {
-		Query query = new Query(Criteria.where(TIMEKEY_FIELD).is(timeKey).and(IP_FIELD).is(ip));
-		ConsumerServerStatsData serverStatisData = mongoTemplate.findOne(query, ConsumerServerStatsData.class,
-				CONSUMERSERVERSTATSDATA_COLLECTION);
-		return serverStatisData;
 	}
 
 	@Override

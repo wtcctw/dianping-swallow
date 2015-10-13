@@ -29,26 +29,6 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 	}
 
 	@Override
-	public boolean update(ProducerTopicStatsData topicStatsData) {
-		return producerTopicStatsDataDao.update(topicStatsData);
-	}
-
-	@Override
-	public int deleteById(String id) {
-		return producerTopicStatsDataDao.deleteById(id);
-	}
-
-	@Override
-	public ProducerTopicStatsData findById(String id) {
-		return producerTopicStatsDataDao.findById(id);
-	}
-
-	@Override
-	public List<ProducerTopicStatsData> findByTopic(String topicName) {
-		return producerTopicStatsDataDao.findByTopic(topicName);
-	}
-	
-	@Override
 	public List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit){
 		return producerTopicStatsDataDao.findByTopic(topicName, offset, limit);
 	}

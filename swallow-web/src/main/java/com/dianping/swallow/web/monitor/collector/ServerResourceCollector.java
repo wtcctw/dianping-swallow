@@ -1,10 +1,7 @@
 package com.dianping.swallow.web.monitor.collector;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +18,7 @@ import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.service.IPCollectorService.ConsumerServer;
 import com.dianping.swallow.web.service.IPCollectorService.ConsumerServerPair;
+import com.dianping.swallow.web.service.IPCollectorService.ProducerServer;
 import com.dianping.swallow.web.service.ProducerServerResourceService;
 
 /**
@@ -67,23 +65,19 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 	}
 
 	public void doProducerServerCollector() {
-		Map<String, String> ipsMap = new HashMap<String, String>();
-		List<String> serverIps = ipCollectorService.getProducerServerIps();
-		Map<String, String> serverIpsMap = getServerIpsMap(ipCollectorService.getProducerServerIpsMap());
-		Set<String> statsServerIps = producerStatsDataWapper.getServerIps(false);
-		setServerMap(serverIps, ipsMap);
-
-		if (serverIpsMap != null) {
-			ipsMap.putAll(serverIpsMap);
+		List<ProducerServer> producerServers = new ArrayList<ProducerServer>();
+		List<ProducerServer> collectorServers = ipCollectorService.getProducerServers();
+		if (collectorServers != null && !collectorServers.isEmpty()) {
+			producerServers.addAll(collectorServers);
 		}
+		Set<String> statsServerIps = producerStatsDataWapper.getServerIps(false);
+		addProducerServer(producerServers, statsServerIps);
 
-		setServerMap(statsServerIps, ipsMap);
-
-		for (Map.Entry<String, String> ipEntry : ipsMap.entrySet()) {
-			ServerResource serverResource = pServerResourceService.findByIp(ipEntry.getKey());
+		for (ProducerServer producerServer : producerServers) {
+			ServerResource serverResource = pServerResourceService.findByIp(producerServer.getIp());
 			if (serverResource == null) {
 				ProducerServerResource pServerResource = pServerResourceService.buildProducerServerResource(
-						ipEntry.getKey(), ipEntry.getValue());
+						producerServer.getIp(), producerServer.getHostName());
 				pServerResourceService.insert(pServerResource);
 			}
 		}
@@ -91,13 +85,9 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 
 	public void doConsumerServerCollector() {
 
-		List<ConsumerServerPair> consumerServerPairs = new ArrayList<ConsumerServerPair>();
 		List<ConsumerServerPair> collectorServerPairs = ipCollectorService.getConsumerServerPairs();
-		if (collectorServerPairs != null) {
-			consumerServerPairs.addAll(collectorServerPairs);
-		}
 
-		for (ConsumerServerPair consumerServerPair : consumerServerPairs) {
+		for (ConsumerServerPair consumerServerPair : collectorServerPairs) {
 			ConsumerServer masterServer = consumerServerPair.getMasterServer();
 			ConsumerServer slaveServer = consumerServerPair.getSlaveServer();
 			int groupId = 0;
@@ -140,22 +130,17 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 
 	}
 
-	private Map<String, String> getServerIpsMap(Map<String, String> serverIpsMap) {
-		Map<String, String> resultIpsMap = null;
-		if (serverIpsMap != null) {
-			resultIpsMap = new HashMap<String, String>();
-			for (Map.Entry<String, String> serverIpEntry : serverIpsMap.entrySet()) {
-				resultIpsMap.put(serverIpEntry.getValue(), serverIpEntry.getKey());
-			}
-		}
-		return resultIpsMap;
-	}
-
-	private void setServerMap(Collection<String> serverIps, Map<String, String> ipsMap) {
-		if (serverIps != null) {
-			for (String ip : serverIps) {
-				if (!ipsMap.containsKey(ip)) {
-					ipsMap.put(ip, StringUtils.EMPTY);
+	private void addProducerServer(List<ProducerServer> producerServers, Set<String> statsServerIps) {
+		if (statsServerIps != null && !statsServerIps.isEmpty()) {
+			for (String serverIp : statsServerIps) {
+				boolean isExist = false;
+				for (ProducerServer producerServer : producerServers) {
+					if (producerServer.equalsIp(serverIp)) {
+						isExist = true;
+					}
+				}
+				if (!isExist) {
+					producerServers.add(new ProducerServer(serverIp, StringUtils.EMPTY));
 				}
 			}
 		}

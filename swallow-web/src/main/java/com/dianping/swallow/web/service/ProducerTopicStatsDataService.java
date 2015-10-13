@@ -15,14 +15,6 @@ public interface ProducerTopicStatsDataService {
 
 	boolean insert(ProducerTopicStatsData topicStatsData);
 
-	boolean update(ProducerTopicStatsData topicStatsData);
-
-	int deleteById(String id);
-
-	ProducerTopicStatsData findById(String id);
-
-	List<ProducerTopicStatsData> findByTopic(String topicName);
-
 	List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit);
 
 	List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
