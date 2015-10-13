@@ -15,6 +15,8 @@ public class ServerResourceDto {
 	private String hostname;
 	
 	private boolean alarm;
+
+	private boolean active;
 	
 	private long sendpeak;
 	
@@ -54,6 +56,14 @@ public class ServerResourceDto {
 
 	public void setAlarm(boolean alarm) {
 		this.alarm = alarm;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 	public long getSendpeak() {

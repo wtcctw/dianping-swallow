@@ -116,6 +116,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		ConsumerServerResource serverResource = new ConsumerServerResource();
 		serverResource.setIp(ip);
 		serverResource.setAlarm(true);
+		serverResource.setActive(true);
 		serverResource.setHostname(hostName);
 		serverResource.setPort(port);
 		serverResource.setGroupId(groupId);

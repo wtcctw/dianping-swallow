@@ -33,6 +33,7 @@ public class ConsumerServerResourceMapper {
 		consumerServerResource.setId(dto.getId());
 		consumerServerResource.setIp(dto.getIp());
 		consumerServerResource.setAlarm(dto.isAlarm());
+		consumerServerResource.setActive(dto.isActive());
 		consumerServerResource.setHostname(dto.getHostname());
 		consumerServerResource.setPort(dto.getPort());
 		consumerServerResource.setGroupId(dto.getGroupId());
@@ -62,6 +63,7 @@ public class ConsumerServerResourceMapper {
 		dto.setIp(consumerServerResourceDto.getIp());
 		dto.setHostname(consumerServerResourceDto.getHostname());
 		dto.setAlarm(consumerServerResourceDto.isAlarm());
+		dto.setActive(consumerServerResourceDto.isActive());
 		dto.setPort(consumerServerResourceDto.getPort());
 		dto.setQps(consumerServerResourceDto.getQps());
 		dto.setGroupId(consumerServerResourceDto.getGroupId());
