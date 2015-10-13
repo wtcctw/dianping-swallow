@@ -21,14 +21,10 @@ public interface ConsumerIdResourceDao extends Dao{
 	
 	long count();
 
-	List<ConsumerIdResource> findByConsumerId(String consumerid);
-	
 	ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId);
 
 	Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam);
 	
-	Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam consumerIdParam);
-
 	Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam  consumerIdParam);
 	
 	List<ConsumerIdResource> findAll(String ...fields );

@@ -17,8 +17,6 @@ public interface IpResourceDao extends Dao{
 
 	boolean update(IpResource ipResource);
 	
-	int remove(String ip);
-	
 	long count();
 
 	Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String ... ips);

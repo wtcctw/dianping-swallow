@@ -148,12 +148,6 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public int remove(String topic) {
-
-		return topicResourceDao.remove(topic);
-	}
-
-	@Override
 	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String... topics) {
 
 		return topicResourceDao.findByTopics(offset, limit, topics);

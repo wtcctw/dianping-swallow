@@ -131,8 +131,8 @@ public class ServerResourceCollector extends AbstractResourceCollector {
 		for (String serverIp : statsServerIps) {
 			ServerResource serverResource = cServerResourceService.findByIp(serverIp);
 			if (serverResource == null) {
-				ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(serverIp,
-						cServerResourceService.getNextGroupId());
+				ConsumerServerResource cServerResource = cServerResourceService.buildConsumerServerResource(serverIp, "", 0, 
+						cServerResourceService.getNextGroupId(), null);
 				cServerResourceService.insert(cServerResource);
 				logger.info("[doConsumerServerCollector] serverIp {} is saved.", serverIp);
 			}

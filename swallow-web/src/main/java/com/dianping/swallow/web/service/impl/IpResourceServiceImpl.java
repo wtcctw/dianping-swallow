@@ -35,22 +35,9 @@ public class IpResourceServiceImpl extends AbstractSwallowService implements IpR
 	}
 
 	@Override
-	public int remove(String ip) {
-
-		return ipResourceDao.remove(ip);
-	}
-
-	@Override
 	public Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String... ips) {
 
 		return ipResourceDao.findByIp(offset, limit, admin, ips);
-	}
-
-	@Override
-	public List<IpResource> findByIp(String ip) {
-		List<IpResource> ipResources = ipResourceDao.findByIp(ip);
-
-		return ipResources;
 	}
 
 	@Override

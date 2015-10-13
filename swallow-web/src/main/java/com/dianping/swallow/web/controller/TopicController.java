@@ -17,7 +17,6 @@ import jodd.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -74,8 +73,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
-			HttpServletResponse response) {
+	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request) {
 
 		List<TopicResourceDto> result = new ArrayList<TopicResourceDto>();
 		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
@@ -151,7 +149,7 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET)
 	@ResponseBody
-	public Object propName(HttpServletRequest request, HttpServletResponse response) {
+	public Object propName(HttpServletRequest request) {
 
 		String username = userUtils.getUsername(request);
 		boolean findAll = userUtils.isAdministrator(username);
@@ -173,7 +171,7 @@ public class TopicController extends AbstractMenuController {
 
 		}
 
-		List<Administrator> adminList = userService.loadUsers();
+		List<Administrator> adminList = userService.findAll();
 		for (Administrator admin : adminList) {
 			editProposal.add(admin.getName());
 		}
@@ -209,7 +207,7 @@ public class TopicController extends AbstractMenuController {
 		return topicResourceDto;
 	}
 
-	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST)
 	@ResponseBody
 	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
 			@RequestParam(value = "time") String time, @RequestParam(value = "exec_user") String approver,
@@ -288,46 +286,20 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/producer/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
-			HttpServletRequest request, HttpServletResponse response) {
+	public boolean editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm) {
 
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
 		topicResource.setProducerAlarm(alarm);
-		boolean result = topicResourceService.update(topicResource);
-
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update producer alarm of %s to %b successfully", topic, alarm));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update producer alarm of %s to %b fail", topic, alarm));
-			}
-		}
-
-		return result;
+		return topicResourceService.update(topicResource);
 	}
 
 	@RequestMapping(value = "/console/topic/consumer/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean editConsumerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
-			HttpServletRequest request, HttpServletResponse response) {
+	public boolean editConsumerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm) {
 
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
 		topicResource.setConsumerAlarm(alarm);
-		boolean result = topicResourceService.update(topicResource);
-
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update consumer alarm of %s to %b successfully", topic, alarm));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update consumer alarm of %s to %b fail", topic, alarm));
-			}
-		}
-
-		return result;
+		return topicResourceService.update(topicResource);
 	}
 
 	@RequestMapping(value = "/console/topic/administrator", method = RequestMethod.GET)
@@ -336,7 +308,7 @@ public class TopicController extends AbstractMenuController {
 
 		Set<String> administrators = new HashSet<String>();
 
-		List<Administrator> adminList = userService.loadUsers();
+		List<Administrator> adminList = userService.findAll();
 
 		for (Administrator administrator : adminList) {
 			administrators.add(administrator.getName());
@@ -353,16 +325,7 @@ public class TopicController extends AbstractMenuController {
 
 		return administrators;
 	}
-	
-	@RequestMapping(value = "/console/topic/ipinfo/{topic}", method = RequestMethod.GET)
-	public ModelAndView alarmDetail(@PathVariable String topic) {
-		Map<String, Object> map = createViewMap();
-		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		map.put("topic", topic);
-		map.put("entity", topicResource.getProducerIpInfos());
-		return new ModelAndView("topic/ipinfo", map);
-	}
-	
+
 	@RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean setAlarm(String topic, String ip, boolean alarm) {
@@ -376,29 +339,29 @@ public class TopicController extends AbstractMenuController {
 
 		return doSetIpInfo(topic, ip, "active", active);
 	}
-	
-	private boolean doSetIpInfo(String topic, String ip, String type, boolean value){
-		
+
+	private boolean doSetIpInfo(String topic, String ip, String type, boolean value) {
+
 		TopicResource topicResource = topicResourceService.findByTopic(topic);
 		List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
-		if(ipInfos == null || ip == null || type == null){
+		if (ipInfos == null || ip == null || type == null) {
 			return false;
 		}
-		for(IpInfo ipInfo : ipInfos){
-			if(ip.equals(ipInfo.getIp())){
-				if(type.equals("alarm")){
+		for (IpInfo ipInfo : ipInfos) {
+			if (ip.equals(ipInfo.getIp())) {
+				if (type.equals("alarm")) {
 					ipInfo.setAlarm(value);
-				}else if(type.equals("active")){
+				} else if (type.equals("active")) {
 					ipInfo.setActive(value);
-				}else{
+				} else {
 					return false;
 				}
 				topicResource.setProducerIpInfos(ipInfos);
-				//修改ipinfo调用insert，其他的则调用update
+				// 修改ipinfo调用insert，其他的则调用update
 				return topicResourceService.insert(topicResource);
 			}
 		}
-		
+
 		return false;
 	}
 

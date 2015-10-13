@@ -65,7 +65,7 @@ public class MessageRetransmitController extends AbstractController {
 			Transaction producerTransaction = Cat.getProducer().newTransaction("MsgRetransmit",
 					topicName + ":" + IPUtil.getFirstNoLoopbackIP4Address());
 			try {
-				successornot = messageRetransmitService.doRetransmit(topicName, Long.parseLong(mid));
+				successornot = messageRetransmitService.retransmitMessage(topicName, Long.parseLong(mid));
 				producerTransaction.setStatus(Message.SUCCESS);
 			} catch (Exception e) {
 				producerTransaction.setStatus(e);
@@ -107,7 +107,7 @@ public class MessageRetransmitController extends AbstractController {
 			Transaction producerTransaction = Cat.getProducer().newTransaction("MsgRetransmit",
 					topicName + ":" + IPUtil.getFirstNoLoopbackIP4Address());
 			try {
-				successornot = messageRetransmitService.doRetransmit(topicName, Long.parseLong(mid));
+				successornot = messageRetransmitService.retransmitMessage(topicName, Long.parseLong(mid));
 				producerTransaction.setStatus(Message.SUCCESS);
 			} catch (Exception e) {
 				producerTransaction.setStatus(e);

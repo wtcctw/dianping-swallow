@@ -80,16 +80,6 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	}
 
 	@Override
-	public List<ConsumerIdResource> findByConsumerId(String consumerid) {
-
-		Query query = new Query(Criteria.where(CONSUMERID).is(consumerid));
-		List<ConsumerIdResource> consumerIdResources = mongoTemplate.find(query, ConsumerIdResource.class,
-				CONSUMERIDRESOURCE_COLLECTION);
-
-		return consumerIdResources;
-	}
-
-	@Override
 	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam) {
 
 		String topic = consumerIdParam.getTopic();
@@ -201,23 +191,4 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 		Long size = this.count();
 		return new Pair<Long, List<ConsumerIdResource>>(size, consumerIdResources);
 	}
-
-	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam consumerIdParam) {
-
-		int offset = consumerIdParam.getOffset();
-		int limit = consumerIdParam.getLimit();
-		String consumerIp = consumerIdParam.getConsumerIp();
-		Query query = new Query(Criteria.where(CONSUMERIPS).is(consumerIp));
-
-		Long size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
-
-		query.skip(offset).limit(limit);
-		List<ConsumerIdResource> consumerIdResource = mongoTemplate.find(query, ConsumerIdResource.class,
-				CONSUMERIDRESOURCE_COLLECTION);
-
-		return new Pair<Long, List<ConsumerIdResource>>(size, consumerIdResource);
-
-	}
-
 }

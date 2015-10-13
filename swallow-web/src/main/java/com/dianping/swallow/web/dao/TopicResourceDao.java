@@ -17,8 +17,6 @@ public interface TopicResourceDao extends Dao{
 
 	boolean update(TopicResource topicResource);
 
-	int remove(String topic);
-	
 	long count();
 
 	Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerI);

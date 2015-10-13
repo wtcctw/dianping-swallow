@@ -43,6 +43,12 @@ import com.dianping.swallow.web.service.ProducerServerResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
+
+/**
+ * @author mingdongli
+ *
+ * 2015年9月13日下午2:46:30
+ */
 @Controller
 public class ServerController extends AbstractSidebarBasedController {
 

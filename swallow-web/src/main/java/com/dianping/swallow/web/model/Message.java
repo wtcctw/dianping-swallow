@@ -194,11 +194,4 @@ public class Message implements Comparable<Message> {
         }
     }
 
-	@Override
-	public String toString() {
-		return "Message [_id=" + _id + ", o_id=" + o_id + ", c=" + c + ", v=" + v + ", s=" + s + ", gt=" + gt + ", p="
-				+ p + ", _p=" + _p + ", t=" + t + ", si=" + si + ", mo_id=" + mo_id + ", mid=" + mid + ", gtstring="
-				+ gtstring + ", ststring=" + ststring + ", retransmit=" + retransmit + "]";
-	}
-
 }

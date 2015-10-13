@@ -47,11 +47,6 @@ public abstract class BaseResource {
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-
-	@Override
-	public String toString() {
-		return "BaseResource [id=" + id + ", createTime=" + createTime + ", updateTime=" + updateTime + "]";
-	}
 	
 	@JsonIgnore
 	public abstract boolean isDefault();

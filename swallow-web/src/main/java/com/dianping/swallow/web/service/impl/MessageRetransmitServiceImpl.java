@@ -28,7 +28,7 @@ public class MessageRetransmitServiceImpl extends AbstractSwallowService impleme
 	@Autowired
 	private MessageDAO messageDAO;
 
-	public boolean doRetransmit(String topic, long mid) {
+	public boolean retransmitMessage(String topic, long mid) {
 		SwallowMessage sm = new SwallowMessage();
 		sm = messageDAO.getMessage(topic, mid);
 		if (sm != null) { // already exists

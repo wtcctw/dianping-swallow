@@ -24,13 +24,9 @@ public interface MongoDao extends Dao{
 
 	MongoResource findByIp(String ip); 
 
-	MongoResource findByCatalog(String catalog);
-	
 	List<MongoResource> findByType(MongoType mongoType);
 
 	List<MongoResource> findAll(String ... fields);
 
-	MongoResource findDefault();
-	
 	Pair<Long, List<MongoResource>> findMongoResourcePage(int offset, int limit);
 }

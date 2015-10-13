@@ -78,7 +78,7 @@ public class AppResourceManagerImpl implements AppResourceManager {
 		if (StringUtils.isBlank(ip)) {
 			return null;
 		}
-		List<IpResource> ipResources = ipResourceService.findByIp(ip);
+		List<IpResource> ipResources = ipResourceService.findByIps(ip);
 		if (ipResources != null && !ipResources.isEmpty()) {
 			List<String> appNames = new ArrayList<String>();
 			for (IpResource ipResource : ipResources) {

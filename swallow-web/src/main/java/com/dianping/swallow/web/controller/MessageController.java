@@ -50,7 +50,7 @@ public class MessageController extends AbstractMenuController {
 	public Object messageDefault(@RequestBody MessageQueryDto messageQueryDto, HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
-		map = messageService.getMessageFromSpecificTopic(messageQueryDto);
+		map = messageService.getMessageFromTopic(messageQueryDto);
 		return map;
 	}
 

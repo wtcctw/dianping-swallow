@@ -77,7 +77,7 @@ public class AdministratorController extends AbstractMenuController {
 	@ResponseBody
 	public Object queryAllVisits(HttpServletRequest request, HttpServletResponse response) {
 
-		List<Administrator> adminList = userService.loadUsers();
+		List<Administrator> adminList = userService.findAll();
 		List<String> users = new ArrayList<String>();
 		for (Administrator admin : adminList) {
 			String name = admin.getName();

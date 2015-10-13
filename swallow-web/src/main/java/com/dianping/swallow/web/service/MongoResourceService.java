@@ -20,17 +20,11 @@ public interface MongoResourceService {
 	
 	int remove(String catalog);
 	
-	long count();
-
 	MongoResource findByIp(String ip);
 	
-	MongoResource findByCatalog(String catalog);
-
 	MongoResource findIdleMongoByType(MongoType mongoType);
 
 	List<MongoResource> findAll(String ... fields);
 
-	MongoResource findDefault();
-	
 	Pair<Long, List<MongoResource>> findMongoResourcePage(int offset, int limit);
 }

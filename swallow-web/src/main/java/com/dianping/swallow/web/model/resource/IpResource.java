@@ -54,11 +54,6 @@ public class IpResource extends BaseResource {
 	}
 
 	@Override
-	public String toString() {
-		return "IpResource [ip=" + ip + ", alarm=" + alarm + "]";
-	}
-
-	@Override
 	public boolean isDefault() {
 		return false;
 	}

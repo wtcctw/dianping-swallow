@@ -87,12 +87,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public ServerResource findByHostname(String hostname) {
-
-		return consumerServerResourceDao.findByHostname(hostname);
-	}
-
-	@Override
 	public List<ConsumerServerResource> findByGroupId(long groupId) {
 
 		return consumerServerResourceDao.findByGroupId(groupId);
@@ -123,26 +117,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		serverResource.setType(serverType);
 		serverResource.setCreateTime(new Date());
 		serverResource.setUpdateTime(new Date());
-		ConsumerServerResource defaultResource = (ConsumerServerResource) findDefault();
-		if (defaultResource == null) {
-			serverResource.setAlarm(false);
-			serverResource.setSendAlarmSetting(new QPSAlarmSetting());
-			serverResource.setAckAlarmSetting(new QPSAlarmSetting());
-		} else {
-			serverResource.setSendAlarmSetting(defaultResource.getSendAlarmSetting());
-			serverResource.setAckAlarmSetting(defaultResource.getAckAlarmSetting());
-		}
-		return serverResource;
-	}
-
-	@Override
-	public ConsumerServerResource buildConsumerServerResource(String ip, int groupId) {
-		ConsumerServerResource serverResource = new ConsumerServerResource();
-		serverResource.setIp(ip);
-		serverResource.setAlarm(true);
-		serverResource.setCreateTime(new Date());
-		serverResource.setUpdateTime(new Date());
-		serverResource.setGroupId(groupId);
 		ConsumerServerResource defaultResource = (ConsumerServerResource) findDefault();
 		if (defaultResource == null) {
 			serverResource.setAlarm(false);

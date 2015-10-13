@@ -76,9 +76,6 @@ public class ConsumerServerResourceServiceTest {
 		consumerServerResource.setHostname("10.128.30.19");
 		result = consumerServerResourceService.update(consumerServerResource);
 		Assert.assertTrue(result);
-		ConsumerServerResource consumerServer1 = (ConsumerServerResource) consumerServerResourceService.findByHostname("10.128.30.19");
-		System.out.println(consumerServer1.toString());
-		Assert.assertNotNull(consumerServer1);
 		ConsumerServerResource consumerServer2 = (ConsumerServerResource) consumerServerResourceService.findByIp("127.0.0.1");
 		System.out.println(consumerServer2.toString());
 		Assert.assertNotNull(consumerServer2);

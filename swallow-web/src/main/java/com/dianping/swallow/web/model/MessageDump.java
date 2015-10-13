@@ -118,11 +118,4 @@ public class MessageDump {
 		return this;
 	}
 
-	@Override
-	public String toString() {
-		return "MessageDump [_id=" + _id + ", topic=" + topic + ", name=" + name + ", time=" + time + ", startdt="
-				+ startdt + ", stopdt=" + stopdt + ", filename=" + filename + ", finished=" + finished + ", desc="
-				+ desc + "]";
-	}
-
 }

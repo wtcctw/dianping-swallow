@@ -49,7 +49,7 @@ public interface UserService {
 	 */
 	boolean updateUser(String name, UserType auth);
 
-	List<Administrator> loadUsers();
+	List<Administrator> findAll();
 	
 	Set<String> loadCachedAdministratorSet();
 

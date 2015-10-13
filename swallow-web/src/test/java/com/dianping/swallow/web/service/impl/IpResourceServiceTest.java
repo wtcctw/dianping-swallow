@@ -51,7 +51,7 @@ public class IpResourceServiceTest {
 		boolean result = ipResourceService.insert(ipResource);
 		Assert.assertTrue(result);
 
-		List<IpResource> ipResources = ipResourceService.findByIp("10.1.0.10");
+		List<IpResource> ipResources = ipResourceService.findByIps("10.1.0.10");
 		Assert.assertNotNull(ipResources);
 
 		ipResource.setIp("127.0.0.1");
@@ -71,12 +71,6 @@ public class IpResourceServiceTest {
 
 		ipResource1 = ipResourceService.findDefault();
 		Assert.assertNotNull(ipResource1);
-
-		int n = ipResourceService.remove("default");
-		Assert.assertEquals(n, 1);
-
-		n = ipResourceService.remove("127.0.0.1");
-		Assert.assertEquals(n, 1);
 	}
 
 }

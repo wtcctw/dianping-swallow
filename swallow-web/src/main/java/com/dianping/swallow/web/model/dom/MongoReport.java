@@ -130,11 +130,4 @@ public class MongoReport implements Comparable<MongoReport>{
 		}
 	}
 	
-    @Override
-	public String toString() {
-		return "MongoReport [load=" + load + ", disk=" + disk + ", create_date=" + create_date + ", dba=" + dba
-				+ ", catalog=" + catalog + ", threads=" + threads + ", io=" + io + ", qps=" + qps + ", _id=" + _id
-				+ ", dev_cnt=" + dev_cnt + ", ip=" + ip + "]";
-	}
-    
 }

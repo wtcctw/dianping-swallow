@@ -110,7 +110,7 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	}
 
 	@Override
-	public List<Administrator> loadUsers() {
+	public List<Administrator> findAll() {
 		return administratorDao.findAll();
 	}
 
@@ -176,7 +176,7 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	}
 
 	private void loadAmdin() {
-		List<Administrator> aList = loadUsers();
+		List<Administrator> aList = findAll();
 		if (!aList.isEmpty()) {
 			for (Administrator list : aList) {
 				UserType role = list.getRole();

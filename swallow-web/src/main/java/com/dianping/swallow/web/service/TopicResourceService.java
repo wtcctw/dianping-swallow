@@ -20,8 +20,6 @@ public interface TopicResourceService extends ConfigChange{
 
 	boolean update(TopicResource topicResource);
 
-	int remove(String topic);
-
 	Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String ... topics);
 
 	TopicResource findByTopic(String topic);

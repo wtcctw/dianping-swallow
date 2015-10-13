@@ -115,9 +115,6 @@ public class ConsumerIdResourceServiceTest {
 		Assert.assertNotNull(pages);
 		long size = pages.getFirst();
 		Assert.assertEquals(size, 2L);
-		
-		consumerIdResource1 = consumerIdResourceService.findDefault();
-		Assert.assertNotNull(consumerIdResource1);
 
 		int n = consumerIdResourceService.remove("lmdtest", "consumerid-1");
 		Assert.assertEquals(n, 1);

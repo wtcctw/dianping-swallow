@@ -88,14 +88,6 @@ public class TopicResource extends BaseResource {
 		this.producerAlarmSetting = producerAlarmSetting;
 	}
 
-	@Override
-	public String toString() {
-		return "TopicResource [topic=" + topic + ", administrator=" + administrator + ", producerAlarm="
-				+ producerAlarm + ", consumerAlarm=" + consumerAlarm + ", producerIpInfos=" + producerIpInfos
-				+ ", producerApplications=" + producerApplications + ", producerAlarmSetting=" + producerAlarmSetting
-				+ ", toString()=" + super.toString() + "]";
-	}
-
 	@JsonIgnore
 	public boolean isDefault() {
 		if (DEFAULT_RECORD.equals(topic)) {

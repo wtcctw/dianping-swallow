@@ -102,7 +102,7 @@ public class ApplicationResourceCollector extends AbstractResourceCollector {
 						ipResourceService.update(ipResourceInDb);
 					}
 				} else {
-					List<IpResource> ipResourceInDbs = ipResourceService.findByIp(ip);
+					List<IpResource> ipResourceInDbs = ipResourceService.findByIps(ip);
 					IpResource ipResource = null;
 					if (ipResourceInDbs == null || ipResourceInDbs.isEmpty()) {
 						ipResource = new IpResource(ip, StringUtils.EMPTY, false);

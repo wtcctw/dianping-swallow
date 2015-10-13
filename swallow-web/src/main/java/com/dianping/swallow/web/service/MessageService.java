@@ -25,7 +25,7 @@ public interface MessageService {
 	 * @param username   用户名
 	 * @param baseMid    基准消息ID
 	 */
-	Map<String, Object> getMessageFromSpecificTopic(MessageQueryDto messageQueryDto);
+	Map<String, Object> getMessageFromTopic(MessageQueryDto messageQueryDto);
 
 	/**
 	 * 查询指定消息ID的消息内容

@@ -50,21 +50,9 @@ public class MongoResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public long count() {
-
-		return mongoDao.count();
-	}
-
-	@Override
 	public MongoResource findByIp(String ip) {
 
 		return mongoDao.findByIp(ip);
-	}
-
-	@Override
-	public MongoResource findByCatalog(String catalog) {
-
-		return mongoDao.findByCatalog(catalog);
 	}
 
 	@Override
@@ -79,12 +67,6 @@ public class MongoResourceServiceImpl extends AbstractSwallowService implements 
 	public List<MongoResource> findAll(String... fields) {
 
 		return mongoDao.findAll(fields);
-	}
-
-	@Override
-	public MongoResource findDefault() {
-
-		return mongoDao.findDefault();
 	}
 
 	@Override

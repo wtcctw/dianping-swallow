@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.TopicResourceDao;
 import com.dianping.swallow.web.model.resource.TopicResource;
-import com.mongodb.WriteResult;
 
 /**
  * @author mingdongli
@@ -55,14 +54,6 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	public boolean update(TopicResource topicResource) {
 
 		return insert(topicResource);
-	}
-
-	@Override
-	public int remove(String topic) {
-
-		Query query = new Query(Criteria.where(TOPIC).is(topic));
-		WriteResult result = mongoTemplate.remove(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
-		return result.getN();
 	}
 
 	@Override
