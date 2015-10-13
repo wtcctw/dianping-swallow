@@ -40,6 +40,17 @@ public class DefaultConsumerIdStatsDataDao extends AbstractStatsDao implements C
 	}
 
 	@Override
+	public boolean insert(List<ConsumerIdStatsData> consumerIdstatsDatas) {
+		try {
+			mongoTemplate.save(consumerIdstatsDatas, CONSUMERIDSTATSDATA_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("[insert] error when save consumerid stats datas.", e);
+		}
+		return false;
+	}
+
+	@Override
 	public List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(CONSUMERID_FIELD).is(consumerId));
 		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.DESC, TIMEKEY_FIELD)));

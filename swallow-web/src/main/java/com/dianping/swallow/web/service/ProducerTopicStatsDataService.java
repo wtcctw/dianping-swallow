@@ -14,6 +14,8 @@ import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 public interface ProducerTopicStatsDataService {
 
 	boolean insert(ProducerTopicStatsData topicStatsData);
+	
+	boolean insert(List<ProducerTopicStatsData> topicStatsDatas);
 
 	List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit);
 

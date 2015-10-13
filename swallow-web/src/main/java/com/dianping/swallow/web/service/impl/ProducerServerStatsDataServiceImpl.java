@@ -31,6 +31,11 @@ public class ProducerServerStatsDataServiceImpl implements ProducerServerStatsDa
 	}
 
 	@Override
+	public boolean insert(List<ProducerServerStatsData> serverStatsDatas) {
+		return producerServerStatsDataDao.insert(serverStatsDatas);
+	}
+
+	@Override
 	public Map<String, NavigableMap<Long, Long>> findSectionQpsData(long startKey, long endKey) {
 		List<ProducerServerStatsData> serverStatsDatas = producerServerStatsDataDao.findSectionData(startKey, endKey);
 		Map<String, NavigableMap<Long, Long>> serverStatsDataMaps = null;

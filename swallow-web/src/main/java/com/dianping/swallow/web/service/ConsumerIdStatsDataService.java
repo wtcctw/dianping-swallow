@@ -16,6 +16,8 @@ import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsData
 public interface ConsumerIdStatsDataService {
 
 	boolean insert(ConsumerIdStatsData consumerIdStatsData);
+	
+	boolean insert(List<ConsumerIdStatsData> consumerIdStatsDatas);
 
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit);
 

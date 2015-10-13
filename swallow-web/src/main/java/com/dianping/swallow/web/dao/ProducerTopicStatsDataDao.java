@@ -13,6 +13,8 @@ import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 public interface ProducerTopicStatsDataDao {
 
 	boolean insert(ProducerTopicStatsData topicStatsData);
+	
+	boolean insert(List<ProducerTopicStatsData> topicStatsDatas);
 
 	ProducerTopicStatsData findOneByTopicAndTime(String topicName, long startKey, long endKey, boolean isGt);
 

@@ -28,6 +28,11 @@ public class ConsumerTopicStatsDataServiceImpl implements ConsumerTopicStatsData
 	public boolean insert(ConsumerTopicStatsData topicStatsData) {
 		return consumerTopicStatsDataDao.insert(topicStatsData);
 	}
+	
+	@Override
+	public boolean insert(List<ConsumerTopicStatsData> topicStatsDatas) {
+		return consumerTopicStatsDataDao.insert(topicStatsDatas);
+	}
 
 	@Override
 	public StatsDataMapPair findSectionQpsData(String topicName, long startKey, long endKey) {

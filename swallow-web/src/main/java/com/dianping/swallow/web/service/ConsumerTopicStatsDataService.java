@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.service;
 
+import java.util.List;
+
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsDataMapPair;
 
@@ -12,6 +14,8 @@ import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsData
 public interface ConsumerTopicStatsDataService {
 	
 	boolean insert(ConsumerTopicStatsData topicStatsData);
+	
+	boolean insert(List<ConsumerTopicStatsData> topicStatsDatas);
 
 	StatsDataMapPair findSectionDelayData(String topicName, long startKey, long endKey);
 	

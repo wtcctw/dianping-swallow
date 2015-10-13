@@ -14,5 +14,7 @@ public interface ConsumerIpStatsDataDao {
 
 	boolean insert(ConsumerIpStatsData ipStatsData);
 
+	boolean insert(List<ConsumerIpStatsData> ipStatsDatas);
+
 	List<ConsumerIpStatsData> find(String topicName, String consumerId, String ip, long startKey, long endKey);
 }

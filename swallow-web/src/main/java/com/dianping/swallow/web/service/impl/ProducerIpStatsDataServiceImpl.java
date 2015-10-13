@@ -25,6 +25,11 @@ public class ProducerIpStatsDataServiceImpl implements ProducerIpStatsDataServic
 	public boolean insert(ProducerIpStatsData ipStatsData) {
 		return producerIpStatsDataDao.insert(ipStatsData);
 	}
+	
+	@Override
+	public boolean insert(List<ProducerIpStatsData> ipStatsDatas) {
+		return producerIpStatsDataDao.insert(ipStatsDatas);
+	}
 
 	@Override
 	public List<ProducerIpStatsData> find(String topicName, String ip, long startKey, long endKey) {

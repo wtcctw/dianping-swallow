@@ -13,6 +13,8 @@ import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 public interface ConsumerIdStatsDataDao {
 
 	boolean insert(ConsumerIdStatsData consumerIdStatsData);
+	
+	boolean insert(List<ConsumerIdStatsData> consumerIdStatsDatas);
 
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit);
 

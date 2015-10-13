@@ -32,7 +32,18 @@ public class DefaultProducerServerStatsDataDao extends AbstractStatsDao implemen
 			mongoTemplate.save(serverStatsData, PRODUCERSERVERSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("[insert] error when save producer server stats data " + serverStatsData, e);
+			logger.error("[insert] error when save producer server statsdata." + serverStatsData, e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean insert(List<ProducerServerStatsData> serverStatsDatas) {
+		try {
+			mongoTemplate.save(serverStatsDatas, PRODUCERSERVERSTATSDATA_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("[insert] error when save producer server statsdatas.", e);
 		}
 		return false;
 	}

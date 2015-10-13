@@ -32,7 +32,18 @@ public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implement
 			mongoTemplate.save(topicStatsData, TOPICSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("[insert] Error when save producer topic stats data " + topicStatsData, e);
+			logger.error("[insert] Error when save producer topic statsdata." + topicStatsData, e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean insert(List<ProducerTopicStatsData> topicStatsDatas) {
+		try {
+			mongoTemplate.save(topicStatsDatas, TOPICSTATSDATA_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("[insert] Error when save producer topic statsdatas.", e);
 		}
 		return false;
 	}

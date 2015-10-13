@@ -29,6 +29,11 @@ public class ConsumerServerStatsDataServiceImpl implements ConsumerServerStatsDa
 	public boolean insert(ConsumerServerStatsData serverStatsData) {
 		return consumerServerStatsDataDao.insert(serverStatsData);
 	}
+	
+	@Override
+	public boolean insert(List<ConsumerServerStatsData> serverStatsDatas) {
+		return consumerServerStatsDataDao.insert(serverStatsDatas);
+	}
 
 	@Override
 	public List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey) {

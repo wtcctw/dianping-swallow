@@ -30,6 +30,11 @@ public class ConsumerIdStatsDataServiceImpl implements ConsumerIdStatsDataServic
 	public boolean insert(ConsumerIdStatsData consumerIdstatsData) {
 		return consumerIdStatsDataDao.insert(consumerIdstatsData);
 	}
+	
+	@Override
+	public boolean insert(List<ConsumerIdStatsData> consumerIdstatsDatas) {
+		return consumerIdStatsDataDao.insert(consumerIdstatsDatas);
+	}
 
 	@Override
 	public List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit) {
