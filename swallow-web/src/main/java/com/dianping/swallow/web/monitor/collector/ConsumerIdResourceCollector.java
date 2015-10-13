@@ -52,7 +52,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 		super.doInitialize();
 		collectorName = getClass().getSimpleName();
 		collectorInterval = 20;
-		collectorDelay = 1;
+		collectorDelay = 3;
 		consumerDataRetriever.registerListener(this);
 		executor = Executors.newSingleThreadExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
