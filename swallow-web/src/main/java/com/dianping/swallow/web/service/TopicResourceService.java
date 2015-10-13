@@ -40,7 +40,7 @@ public interface TopicResourceService extends ConfigChange{
 	
 	Map<String, Set<String>> loadCachedTopicToAdministrator();
 
-	TopicResource buildTopicResource(String topic);
+	TopicResource buildTopicResource(String topic, Set<String> adminSet);
 	
-	boolean updateTopicAdministrator(String topic, String administrator);
+	boolean updateTopicAdministrator(String topic, Set<String> adminSet);
 }

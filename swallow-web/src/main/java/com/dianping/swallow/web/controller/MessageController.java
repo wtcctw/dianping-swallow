@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,6 +59,9 @@ public class MessageController extends AbstractMenuController {
 	public String getMinAndMaxTime(String topic, HttpServletRequest request, HttpServletResponse response) {
 
 		long millions =  messageService.loadTimeOfFirstMessage(topic);
+		if(millions < 0){
+			return StringUtils.EMPTY;
+		}
 		return new SimpleDateFormat(DefaultMessageDao.TIMEFORMAT).format(new Date(millions));
 	}
 

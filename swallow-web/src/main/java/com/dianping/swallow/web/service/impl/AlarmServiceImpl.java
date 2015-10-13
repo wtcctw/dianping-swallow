@@ -122,7 +122,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 					.setSendType(SendType.SMS));
 			return false;
 		}
-		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
+		String title = getTitle(alarm.getNumber(), alarm.getTitle());
 		ResultType resultType = sendSms(receiver, title, alarm.getBody());
 		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.SMS));
 		return resultType.isSuccess();
@@ -136,7 +136,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 					.setSendType(SendType.WEIXIN));
 			return false;
 		}
-		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
+		String title = getTitle(alarm.getNumber(), alarm.getTitle());
 		ResultType resultType = sendWeiXin(receiver, title, alarm.getBody());
 		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.WEIXIN));
 		return resultType.isSuccess();
@@ -150,10 +150,14 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 					.setSendType(SendType.MAIL));
 			return false;
 		}
-		String title = LEFT_BRACKET + alarm.getNumber() + RIGHT_BRACKET + alarm.getTitle() + env;
+		String title = getTitle(alarm.getNumber(), alarm.getTitle());
 		ResultType resultType = sendMail(receiver, title, alarm.getBody());
 		alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.MAIL));
 		return resultType.isSuccess();
+	}
+
+	private String getTitle(int number, String title) {
+		return LEFT_BRACKET + number + RIGHT_BRACKET + title + env;
 	}
 
 	public boolean sendSms(Set<String> mobiles, Alarm alarm) {

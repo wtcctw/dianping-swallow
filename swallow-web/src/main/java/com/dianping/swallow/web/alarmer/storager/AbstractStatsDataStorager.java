@@ -52,6 +52,18 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 	}
 
 	@Override
+	protected void doStop() throws Exception {
+
+	}
+
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		if (executor != null && !executor.isShutdown()) {
+			executor.shutdown();
+		}
+	}
+
+	@Override
 	public void achieveMonitorData() {
 		executor.submit(new Runnable() {
 

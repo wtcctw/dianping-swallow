@@ -10,6 +10,7 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 
@@ -83,7 +84,7 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 
 		return consumerIdResourceDao.findByConsumerIp(consumerIdParam);
 	}
-	
+
 	@Override
 	public ConsumerIdResource buildConsumerIdResource(String topic, String consumerId) {
 
@@ -92,7 +93,8 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 		consumerIdResource.setTopic(topic);
 		consumerIdResource.setConsumerId(consumerId);
 
-		consumerIdResource.setConsumerIps(new ArrayList<String>());
+		consumerIdResource.setConsumerIpInfos(new ArrayList<IpInfo>());
+		consumerIdResource.setConsumerApplications(new ArrayList<String>());
 
 		ConsumerIdResource defaultResource = consumerIdResourceDao.findDefault();
 		if (defaultResource == null) {
@@ -102,12 +104,12 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 
 		return consumerIdResource;
 	}
-	
+
 	@Override
-	public ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId){
-		
-		ConsumerIdResource consumerIdResource =  consumerIdResourceDao.findByConsumerIdAndTopic(topic, consumerId);
-		if(consumerIdResource == null){
+	public ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId) {
+
+		ConsumerIdResource consumerIdResource = consumerIdResourceDao.findByConsumerIdAndTopic(topic, consumerId);
+		if (consumerIdResource == null) {
 			consumerIdResource = buildConsumerIdResource(topic, consumerId);
 		}
 		return consumerIdResource;

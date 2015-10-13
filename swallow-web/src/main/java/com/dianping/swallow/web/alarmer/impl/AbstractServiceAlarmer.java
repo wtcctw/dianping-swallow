@@ -62,7 +62,17 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
-		future.cancel(false);
+		if (future != null && !future.isCancelled()) {
+			future.cancel(false);
+		}
+
+	}
+
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		if (scheduled != null && !scheduled.isShutdown()) {
+			scheduled.shutdown();
+		}
 	}
 
 	public abstract void doAlarm();

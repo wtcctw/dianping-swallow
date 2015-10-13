@@ -15,10 +15,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
 
 
@@ -61,15 +63,16 @@ public class ConsumerIdResourceServiceTest {
 		
 		consumerIdResource.setConsumerAlarmSetting(consumerBaseAlarmSetting);
 		consumerIdResource.setCreateTime(new Date());
-		consumerIdResource.setTopic("total");
-		consumerIdResource.setConsumerId("default");
+		consumerIdResource.setTopic("example");
+		consumerIdResource.setConsumerId("apollo-message-lmd");
 		
 		List<String> consumerip = new ArrayList<String>();
 		consumerip.add("1.0.0.1");
 		consumerip.add("1.0.0.2");
 		consumerip.add("1.0.0.3");
 		
-		consumerIdResource.setConsumerIps(consumerip);
+		List<IpInfo> ipInfo = IpInfoUtils.buildIpInfo(consumerip);
+		consumerIdResource.setConsumerIpInfos(ipInfo);
 		consumerIdResource.setAlarm(Boolean.TRUE);
 		
 		return consumerIdResource;
@@ -84,7 +87,7 @@ public class ConsumerIdResourceServiceTest {
 		Assert.assertTrue(result);
 		
 		ConsumerIdParam consumerIdQueryDto = new ConsumerIdParam();
-		consumerIdQueryDto.setTopic("example");
+		consumerIdQueryDto.setTopic("example1");
 		consumerIdQueryDto.setOffset(0);
 		consumerIdQueryDto.setLimit(31);
 		Pair<Long, List<ConsumerIdResource>> consumerIdResources = consumerIdResourceService.findByTopic(consumerIdQueryDto);

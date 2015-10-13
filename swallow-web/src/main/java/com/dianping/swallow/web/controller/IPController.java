@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.controller;
 
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +28,11 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
 import com.dianping.swallow.web.controller.dto.IpResourceDto;
 import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
+import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
@@ -195,9 +198,9 @@ public class IPController extends AbstractMenuController {
 		List<TopicResource> topicResources = topicResourceService.findAll();
 		Set<String> ips = new LinkedHashSet<String>();
 
-		List<String> ipList = null;
 		for (TopicResource topicResource : topicResources) {
-			ipList = topicResource.getProducerIps();
+			List<IpInfo> ipInfoList = topicResource.getProducerIpInfos();
+			Set<String> ipList = IpInfoUtils.extractIps(ipInfoList);
 			if (ipList != null) {
 				ips.addAll(ipList);
 			}
@@ -211,11 +214,13 @@ public class IPController extends AbstractMenuController {
 				.findAll(DefaultConsumerIdResourceDao.CONSUMERIPS);
 		Set<String> ips = new LinkedHashSet<String>();
 
-		List<String> ipList = null;
 		for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-			ipList = consumerIdResource.getConsumerIps();
+			List<IpInfo> ipInfoList = consumerIdResource.getConsumerIpInfos();
+			Set<String> ipList = IpInfoUtils.extractIps(ipInfoList);
 			if (ipList != null) {
-				ips.addAll(ipList);
+				for(String ip : ipList){
+					ips.add(ip);
+				}
 			}
 		}
 		return new ArrayList<String>(ips);

@@ -1,11 +1,11 @@
 package com.dianping.swallow.web.model.event;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.util.StringUtils;
 
+import com.dianping.swallow.web.manager.AlarmReceiverManager.AlarmReceiver;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
@@ -34,7 +34,7 @@ public class ConsumerIdEvent extends TopicEvent {
 
 	@Override
 	public String toString() {
-		return "ConsumerIdEvent [consumerId=" + consumerId + "]";
+		return "ConsumerIdEvent [consumerId=" + consumerId + super.toString() + "]";
 	}
 
 	@Override
@@ -100,14 +100,14 @@ public class ConsumerIdEvent extends TopicEvent {
 	}
 
 	@Override
-	public boolean isSendAlarm(AlarmType alarmType,AlarmMeta alarmMeta) {
+	public boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta) {
 		String key = getTopicName() + KEY_SPLIT + getConsumerId() + KEY_SPLIT + alarmType.getNumber();
 		return isAlarm(lastAlarms, key, alarmMeta);
 	}
 
 	@Override
-	public Set<String> getRelatedIps() {
-		return ipCollectorService.getTopicConsumerIdIps(getTopicName(), consumerId);
+	public AlarmReceiver getRelatedReceiver() {
+		return this.receiverManager.getAlarmReceiverByConsumerId(getTopicName(), consumerId);
 	}
 
 	@Override

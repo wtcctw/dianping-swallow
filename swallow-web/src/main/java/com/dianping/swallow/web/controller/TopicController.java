@@ -17,6 +17,7 @@ import jodd.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,8 +32,10 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.dto.TopicResourceDto;
 import com.dianping.swallow.web.controller.mapper.TopicResourceMapper;
+import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.Administrator;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.UserService;
@@ -113,9 +116,9 @@ public class TopicController extends AbstractMenuController {
 		if (findAll) {
 			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
 			List<TopicResource> topicResources = topicResourceService.findAll();
-			List<String> tmpips;
 			for (TopicResource topicResource : topicResources) {
-				tmpips = topicResource.getProducerIps();
+				List<IpInfo> tmpIpInfos = topicResource.getProducerIpInfos();
+				Set<String> tmpips = IpInfoUtils.extractIps(tmpIpInfos);
 				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}
@@ -136,7 +139,8 @@ public class TopicController extends AbstractMenuController {
 			}
 
 			for (String topic : topics) {
-				List<String> tmpips = topicResourceService.findByTopic(topic).getProducerIps();
+				List<IpInfo> tmpIpInfos = topicResourceService.findByTopic(topic).getProducerIpInfos();
+				Set<String> tmpips = IpInfoUtils.extractIps(tmpIpInfos);
 				if (tmpips != null) {
 					producerIp.addAll(tmpips);
 				}
@@ -348,6 +352,54 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		return administrators;
+	}
+	
+	@RequestMapping(value = "/console/topic/ipinfo/{topic}", method = RequestMethod.GET)
+	public ModelAndView alarmDetail(@PathVariable String topic) {
+		Map<String, Object> map = createViewMap();
+		TopicResource topicResource = topicResourceService.findByTopic(topic);
+		map.put("topic", topic);
+		map.put("entity", topicResource.getProducerIpInfos());
+		return new ModelAndView("topic/ipinfo", map);
+	}
+	
+	@RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean setAlarm(String topic, String ip, boolean alarm) {
+
+		return doSetIpInfo(topic, ip, "alarm", alarm);
+	}
+
+	@RequestMapping(value = "/console/topic/alarm/ipinfo/active", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean setActive(String topic, String cid, String ip, boolean active) {
+
+		return doSetIpInfo(topic, ip, "active", active);
+	}
+	
+	private boolean doSetIpInfo(String topic, String ip, String type, boolean value){
+		
+		TopicResource topicResource = topicResourceService.findByTopic(topic);
+		List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
+		if(ipInfos == null || ip == null || type == null){
+			return false;
+		}
+		for(IpInfo ipInfo : ipInfos){
+			if(ip.equals(ipInfo.getIp())){
+				if(type.equals("alarm")){
+					ipInfo.setAlarm(value);
+				}else if(type.equals("active")){
+					ipInfo.setActive(value);
+				}else{
+					return false;
+				}
+				topicResource.setProducerIpInfos(ipInfos);
+				//修改ipinfo调用insert，其他的则调用update
+				return topicResourceService.insert(topicResource);
+			}
+		}
+		
+		return false;
 	}
 
 	private String checkProposalName(String proposal) {

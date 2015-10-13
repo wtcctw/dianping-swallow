@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Document(collection = "TOPIC_RESOURCE")
 public class TopicResource extends BaseResource {
 
-	@Indexed(name = "IX_TOPIC", direction = IndexDirection.ASCENDING)
+	@Indexed(name = "IX_TOPIC", direction = IndexDirection.ASCENDING, unique = true, dropDups = true)
 	private String topic;
 
 	private String administrator;
@@ -26,9 +26,27 @@ public class TopicResource extends BaseResource {
 
 	private boolean consumerAlarm;
 
-	private List<String> producerIps;
+	private List<IpInfo> producerIpInfos;
+
+	private List<String> producerApplications;
 
 	private ProducerBaseAlarmSetting producerAlarmSetting;
+
+	public List<IpInfo> getProducerIpInfos() {
+		return producerIpInfos;
+	}
+
+	public void setProducerIpInfos(List<IpInfo> producerIpInfos) {
+		this.producerIpInfos = producerIpInfos;
+	}
+
+	public List<String> getProducerApplications() {
+		return producerApplications;
+	}
+
+	public void setProducerApplications(List<String> producerApplications) {
+		this.producerApplications = producerApplications;
+	}
 
 	public String getTopic() {
 		return topic;
@@ -44,14 +62,6 @@ public class TopicResource extends BaseResource {
 
 	public void setAdministrator(String administrator) {
 		this.administrator = administrator;
-	}
-
-	public List<String> getProducerIps() {
-		return producerIps;
-	}
-
-	public void setProducerIps(List<String> producerIps) {
-		this.producerIps = producerIps;
 	}
 
 	public boolean isProducerAlarm() {
@@ -81,8 +91,9 @@ public class TopicResource extends BaseResource {
 	@Override
 	public String toString() {
 		return "TopicResource [topic=" + topic + ", administrator=" + administrator + ", producerAlarm="
-				+ producerAlarm + ", consumerAlarm=" + consumerAlarm + ", producerIps=" + producerIps
-				+ ", producerAlarmSetting=" + producerAlarmSetting + ", toString()=" + super.toString() + "]";
+				+ producerAlarm + ", consumerAlarm=" + consumerAlarm + ", producerIpInfos=" + producerIpInfos
+				+ ", producerApplications=" + producerApplications + ", producerAlarmSetting=" + producerAlarmSetting
+				+ ", toString()=" + super.toString() + "]";
 	}
 
 	@JsonIgnore
