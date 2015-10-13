@@ -1,24 +1,23 @@
 package com.dianping.swallow.web.model.resource;
 
-
 /**
  * @author mingdongli
  *
- * 2015年9月25日下午5:05:47
+ *         2015年9月25日下午5:05:47
  */
 public class IpInfo {
 
 	private String ip;
-	
+
 	private boolean alarm;
-	
+
 	private boolean active;
-	
-	public IpInfo(){
-		
+
+	public IpInfo() {
+
 	}
 
-	public IpInfo(String ip, boolean alarm, boolean active){
+	public IpInfo(String ip, boolean alarm, boolean active) {
 		this.ip = ip;
 		this.alarm = alarm;
 		this.active = active;
@@ -47,9 +46,14 @@ public class IpInfo {
 	public void setAlarm(boolean alarm) {
 		this.alarm = alarm;
 	}
-	
-	public boolean isActiveAndAlarm(){
+
+	public boolean isActiveAndAlarm() {
 		return active && alarm;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "IpInfo [ip=" + ip + ", alarm=" + alarm + ", active=" + active + "]";
+	}
+
 }

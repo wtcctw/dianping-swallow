@@ -57,7 +57,6 @@ public class AlarmMetaContainerImpl extends AbstractContainer implements AlarmMe
 	@Override
 	public int getDelay() {
 		return delay;
-
 	}
 
 	@Override
