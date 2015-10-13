@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -14,7 +13,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.IpResourceService;
 
@@ -38,15 +36,6 @@ public class IpResourceServiceTest {
 	private IpResource createIpResource() {
 
 		IpResource ipResource = new IpResource();
-		IPDesc iPDesc = new IPDesc();
-
-		iPDesc.setCreateTime(new Date());
-		iPDesc.setEmail("lmdyyh@163.com");
-		iPDesc.setDpMobile("18795858599");
-		iPDesc.setOpEmail("jiaxin.fan@dianping.com");
-		iPDesc.setName("tuangou");
-
-		ipResource.setiPDesc(iPDesc);
 
 		ipResource.setIp("10.1.0.10");
 		ipResource.setAlarm(Boolean.TRUE);

@@ -1,5 +1,9 @@
 package com.dianping.swallow.web.controller.dto;
 
+import java.util.List;
+
+import com.dianping.swallow.web.model.resource.IpInfo;
+
 
 /**
  * @author mingdongli
@@ -15,8 +19,6 @@ public class ConsumerIdResourceDto {
 	private String topic;
 	
 	private boolean alarm;
-	
-	private String consumerIp;
 	
 	private long sendpeak;
 	
@@ -39,6 +41,16 @@ public class ConsumerIdResourceDto {
 	private long ackdelay;
 	
 	private long accumulation;
+	
+	private List<IpInfo> consumerIpInfos;
+
+	public List<IpInfo> getConsumerIpInfos() {
+		return consumerIpInfos;
+	}
+
+	public void setConsumerIpInfos(List<IpInfo> consumerIpInfos) {
+		this.consumerIpInfos = consumerIpInfos;
+	}
 
 	public String getId() {
 		return id;
@@ -70,14 +82,6 @@ public class ConsumerIdResourceDto {
 
 	public void setAlarm(boolean alarm) {
 		this.alarm = alarm;
-	}
-
-	public String getConsumerIp() {
-		return consumerIp;
-	}
-
-	public void setConsumerIp(String consumerIp) {
-		this.consumerIp = consumerIp;
 	}
 
 	public long getSendpeak() {

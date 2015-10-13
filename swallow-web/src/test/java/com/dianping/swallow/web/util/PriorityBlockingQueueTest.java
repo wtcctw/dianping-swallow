@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
-
+/**
+ * 
+ * @author qiyin
+ *
+ * 2015年10月9日 上午11:00:19
+ */
 public class PriorityBlockingQueueTest {
 
 	private static PriorityBlockingQueue<Integer> queues = new PriorityBlockingQueue<Integer>(5);

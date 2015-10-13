@@ -1,22 +1,21 @@
 package com.dianping.swallow.web.controller.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.dianping.swallow.web.controller.dto.TopicResourceDto;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.TopicResource;
 
+
+/**
+ * @author mingdongli
+ *
+ * 2015年9月29日下午4:51:03
+ */
 public class TopicResourceMapper {
-	private static final String DELIMITOR = ",";
 
 	public static TopicResource toTopicResource(TopicResourceDto dto) {
 		
 		TopicResource topicResource = new TopicResource();
-		
 
 		ProducerBaseAlarmSetting producerBaseAlarmSetting = new ProducerBaseAlarmSetting();
 		
@@ -31,25 +30,12 @@ public class TopicResourceMapper {
 		
 		topicResource.setProducerAlarmSetting(producerBaseAlarmSetting);
 		
-		List<String> producerList = new ArrayList<String>();
-		String whiteList = dto.getProducerServer();
-		
-		if (StringUtils.isNotBlank(whiteList)) {
-			String[] whiteLists = whiteList.split(DELIMITOR);
-			for (String wl : whiteLists) {
-				if (!producerList.contains(wl)) {
-					producerList.add(wl);
-				}
-			}
-		}
-		
-		topicResource.setProducerIps(producerList);
-		
 		topicResource.setConsumerAlarm(dto.isConsumerAlarm());
 		topicResource.setProducerAlarm(dto.isProducerAlarm());
 		topicResource.setId(dto.getId());
 		topicResource.setTopic(dto.getTopic());
 		topicResource.setAdministrator(dto.getAdministrator());
+		topicResource.setProducerIpInfos(dto.getProducerIpInfos());
 
 		return topicResource;
 		
@@ -72,9 +58,7 @@ public class TopicResourceMapper {
 		topicResourceDto.setId(topicResource.getId());
 		topicResourceDto.setTopic(topicResource.getTopic());
 		topicResourceDto.setAdministrator(topicResource.getAdministrator());
-		
-		List<String> list = topicResource.getProducerIps();
-		topicResourceDto.setProducerServer(StringUtils.join(list, DELIMITOR));
+		topicResourceDto.setProducerIpInfos(topicResource.getProducerIpInfos());
 		
 		return topicResourceDto;
 	}

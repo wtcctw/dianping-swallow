@@ -6,6 +6,22 @@ module.factory('Paginator', function(){
 					this.currentOffset = (page - 1) * pageSize;
 					this._load();
 				},
+				handleResult: function(object){
+					for(var i = 0; i < this.currentPageItems.length; ++i){
+						if(typeof(this.currentPageItems[i].producerIpInfos) != "undefined"){
+							var length = this.currentPageItems[i].producerIpInfos.length;
+							var ips = "";
+							for(var j = 0; j < length; ++j){
+								if(j == 0){
+									ips += this.currentPageItems[i].producerIpInfos[j].ip;
+								}else{
+									ips += "," + this.currentPageItems[i].producerIpInfos[j].ip;
+								}
+							}
+							this.currentPageItems[i].ips = ips;
+						}
+					}
+				},
 				next: function(){
 					if(this.hasNextVar){
 						this.currentOffset += pageSize;
@@ -41,6 +57,7 @@ module.factory('Paginator', function(){
 			                ];
 			            }
 						self.currentPageItems = items.slice(0, pageSize);
+						self.handleResult(new Object());
 						self.hasNextVar = items.length === pageSize + 1;
 					});
 				},
@@ -110,18 +127,6 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					$('#administrator').tagsinput('removeAll');
 				}
 				
-				if(typeof($scope.searchPaginator.currentPageItems[index].producerServer) != "undefined"){
-					var producerServer = $scope.searchPaginator.currentPageItems[index].producerServer;
-					$('#producerServer').tagsinput('removeAll');
-					if(producerServer != null && producerServer.length > 0){
-						var list = producerServer.split(",");
-						for(var i = 0; i < list.length; ++i)
-							$('#producerServer').tagsinput('add', list[i]);
-					}
-				}else{
-					$('#producerServer').tagsinput('removeAll');
-				}
-				
 				$scope.topicEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 				$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
 				$scope.topicEntry.producerAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarm;
@@ -131,6 +136,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
 				$scope.topicEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
 				$scope.topicEntry.delay = $scope.searchPaginator.currentPageItems[index].delay;
+				$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
 			}
 			
 			$scope.refreshpage = function(myForm, index){
@@ -139,7 +145,18 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					return;
 				}
 				$scope.topicEntry.administrator = $("#administrator").val();
-				$scope.topicEntry.producerServer = $("#producerServer").val();
+				
+				if(typeof($scope.topicEntry.producerIpInfos) != "undefined"){
+					var length = $scope.topicEntry.producerIpInfos.length;
+					for(var i = 0; i < length; ++i){
+						var id = "#ip" + "alarm" + i;
+						var check = $(id).prop('checked');
+						$scope.topicEntry.producerIpInfos[i].alarm = check;
+						id = "#ip" + "active" + i;
+						check = $(id).prop('checked');
+						$scope.topicEntry.producerIpInfos[i].active = check;
+					}
+				}
 				var id = "#myModal" + index;
 				$(id).modal('hide');
 				var param = JSON.stringify($scope.topicEntry);
@@ -150,11 +167,12 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 		    	});
 		    }
 			
-			$scope.setIps = function(ip){
-				localStorage.setItem("ip", ip);
-			}
 			$scope.setTopic = function(topic){
 				localStorage.setItem("topic", topic);
+			}
+
+			$scope.setIP = function(ip){
+				localStorage.setItem("ip", ip);
 			}
 			
 			//发送默认请求
@@ -245,6 +263,34 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						}).error(function(data, status, headers, config) {
 						});
 					
+			}
+			
+			$scope.changeipinfo = function(topic, type, index, ip){
+				var id = "#ip" + type + index;
+				var check = $(id).prop('checked');
+				if("alarm" == type){
+					$http.get(window.contextPath + "/console/topic/alarm/ipinfo/alarm",
+							{
+								params : {
+									topic : topic,
+									ip : ip,
+									alarm : check
+								}
+							})
+					.success(function(data) {
+							});
+				}else{
+					$http.get(window.contextPath + "/console/topic/alarm/ipinfo/active",
+							{
+								params : {
+									topic : topic,
+									ip : ip,
+									active : check
+								}
+							})
+					.success(function(data) {
+							});
+				}
 			}
 			
 			$scope.changeproduceralarm = function(topic, index){

@@ -3,8 +3,6 @@ package com.dianping.swallow.web.model.event;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -15,14 +13,13 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
-import com.dianping.swallow.web.manager.IPResourceManager;
+import com.dianping.swallow.web.manager.AlarmReceiverManager;
+import com.dianping.swallow.web.manager.AlarmReceiverManager.AlarmReceiver;
 import com.dianping.swallow.web.model.alarm.Alarm;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
-import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.AlarmService;
-import com.dianping.swallow.web.service.IPCollectorService;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
@@ -41,8 +38,6 @@ public abstract class Event {
 
 	private static final String EMAIL_KEY = "email";
 
-	private static final String TOTAL_KEY = "total";
-
 	private static final String COMMA_SPLIT = ",";
 
 	private static Set<String> devMobiles;
@@ -51,6 +46,7 @@ public abstract class Event {
 
 	private static final String ALARM_RECIEVER_FILE_NAME = "swallow-alarm-reciever.properties";
 
+	//1 minute
 	private static final long timeUnit = 60 * 1000;
 
 	static {
@@ -59,11 +55,12 @@ public abstract class Event {
 
 	private AlarmService alarmService;
 
-	private IPResourceManager ipDescManager;
+	protected AlarmReceiverManager receiverManager;
 
 	private AlarmMetaContainer alarmMetaContainer;
-
-	protected IPCollectorService ipCollectorService;
+	
+	//unit millis
+	protected long checkInterval = 30 * 1000;
 
 	private long eventId;
 
@@ -117,12 +114,17 @@ public abstract class Event {
 		this.alarmMetaContainer = alarmMetaContainer;
 	}
 
-	public void setIPDescManager(IPResourceManager ipDescManager) {
-		this.ipDescManager = ipDescManager;
+	public void setAlarmReceiverManager(AlarmReceiverManager receiverManager) {
+		this.receiverManager = receiverManager;
 	}
 
-	public void setIPCollectorService(IPCollectorService ipCollectorService) {
-		this.ipCollectorService = ipCollectorService;
+	public long getCheckInterval() {
+		return checkInterval;
+	}
+
+	public Event setCheckInterval(long checkInterval) {
+		this.checkInterval = checkInterval;
+		return this;
 	}
 
 	@Override
@@ -145,7 +147,7 @@ public abstract class Event {
 
 	public abstract boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta);
 
-	public abstract Set<String> getRelatedIps();
+	public abstract AlarmReceiver getRelatedReceiver();
 
 	public void sendMessage(AlarmType alarmType) {
 		logger.info("[sendMessage] AlarmType {}. ", alarmType);
@@ -165,15 +167,8 @@ public abstract class Event {
 						.setBody(getMessage(alarmMeta.getAlarmTemplate())).setRelated(getRelated())
 						.setSubRelated(getSubRelated()).setRelatedType(getRelatedType())
 						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-				Set<String> mobiles = new HashSet<String>();
-				Set<String> emails = new HashSet<String>();
-				if (alarmMeta.getIsSendSwallow()) {
-					fillReciever(getSwallowIps(), mobiles, emails);
-				}
-				if (alarmMeta.getIsSendBusiness()) {
-					fillReciever(getRelatedIps(), mobiles, emails);
-				}
-				sendAlarm(mobiles, emails, alarm, alarmMeta);
+				AlarmReceiver alarmReceiver = fillReciever(alarmMeta);
+				sendAlarm(alarmReceiver, alarm, alarmMeta);
 			}
 		} else {
 			logger.error("[sendMessage] cannot find related alarmMeta. metaId {}. ", alarmType.getNumber());
@@ -189,7 +184,7 @@ public abstract class Event {
 			long dCheckValue = System.currentTimeMillis() - lastAlarmRecord.getCheckAlarmTime();
 			int spanBase = getTimeSpan(alarmMeta.getDaySpanBase(), alarmMeta.getNightSpanBase());
 
-			if (0 < dCheckValue && dCheckValue < timeUnit) {
+			if (0 < dCheckValue && dCheckValue < 2 * checkInterval) {
 				long currentTimeSpan = spanBase * lastAlarmRecord.getAlarmCount() * timeUnit;
 				long maxTimeSpan = alarmMeta.getMaxTimeSpan() * timeUnit;
 				long timeSpan = currentTimeSpan > maxTimeSpan ? maxTimeSpan : currentTimeSpan;
@@ -240,60 +235,44 @@ public abstract class Event {
 		return alarmService.getNextEventId();
 	}
 
-	private Set<String> getSwallowIps() {
-		List<String> serverIps = ipCollectorService.getProducerServerIps();
-		if (serverIps != null && serverIps.size() > 0) {
-			Set<String> ips = new HashSet<String>();
-			ips.addAll(serverIps);
-			return ips;
+	private void sendAlarm(AlarmReceiver alarmReceiver, Alarm alarm, AlarmMeta alarmMeta) {
+		if (alarmReceiver == null) {
+			logger.error("[sendAlarm] eventId {} no receiver.", alarm.getEventId());
+			alarmReceiver = new AlarmReceiver();
 		}
-		return null;
-	}
-
-	private void sendAlarm(Set<String> mobiles, Set<String> emails, Alarm alarm, AlarmMeta alarmMeta) {
-		logger.info("[sendAlarm] eventId {}. ", alarm.getEventId());
 		if (alarmMeta.getIsMailMode()) {
-			alarmService.sendMail(emails, alarm);
+			alarmService.sendMail(alarmReceiver.getEmails(), alarm);
 		}
 		if (alarmMeta.getIsSmsMode()) {
-			alarmService.sendSms(mobiles, alarm);
+			alarmService.sendSms(alarmReceiver.getMobiles(), alarm);
 		}
 		if (alarmMeta.getIsWeiXinMode()) {
-			alarmService.sendWeiXin(emails, alarm);
+			alarmService.sendWeiXin(alarmReceiver.getEmails(), alarm);
 		}
 		alarmService.insert(alarm);
 	}
 
-	private void fillReciever(Set<String> ips, Set<String> mobiles, Set<String> emails) {
-		if (ips == null || mobiles == null || emails == null) {
-			return;
-		}
+	private AlarmReceiver fillReciever(AlarmMeta alarmMeta) {
+		AlarmReceiver receiver = null;
 		if (EnvUtil.isDev()) {
 			if (devMobiles != null && devEmails != null) {
-				mobiles.addAll(devMobiles);
-				emails.addAll(devEmails);
+				receiver = new AlarmReceiver(devEmails, devMobiles);
 			}
-			return;
-		}
-		Iterator<String> iterator = ips.iterator();
-		while (iterator.hasNext()) {
-			String ip = iterator.next();
-			if (!StringUtils.equals(ip, TOTAL_KEY)) {
-				IPDesc ipDesc = ipDescManager.getIPDesc(ip);
-				if (ipDesc == null) {
-					logger.info("[fillReciever]cannot find {} related info from cmdb and db", ip);
-					continue;
+			return receiver;
+		} else {
+			if (alarmMeta.getIsSendSwallow()) {
+				receiver = receiverManager.getSwallowReceiver();
+			}
+			if (alarmMeta.getIsSendBusiness()) {
+				if (receiver == null) {
+					receiver = getRelatedReceiver();
+				} else {
+					receiver.addAlarmReceiver(getRelatedReceiver());
 				}
-				String strEmail = ipDesc.getEmail();
-				String strDpMobile = ipDesc.getDpMobile();
-				String strOpMobile = ipDesc.getOpMobile();
-				String strOpEmail = ipDesc.getOpEmail();
-				addElement(mobiles, strDpMobile);
-				addElement(mobiles, strOpMobile);
-				addElement(emails, strOpEmail);
-				addElement(emails, strEmail);
 			}
 		}
+
+		return receiver;
 	}
 
 	private static void addElement(Set<String> elementSet, String strSource) {

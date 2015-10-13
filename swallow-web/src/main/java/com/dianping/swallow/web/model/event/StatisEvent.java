@@ -4,7 +4,7 @@ package com.dianping.swallow.web.model.event;
  * 
  * @author qiyin
  *
- * 2015年8月3日 上午11:13:41
+ *         2015年8月3日 上午11:13:41
  */
 public abstract class StatisEvent extends Event {
 
@@ -44,7 +44,7 @@ public abstract class StatisEvent extends Event {
 	@Override
 	public String toString() {
 		return "StatisEvent [currentValue=" + currentValue + ", expectedValue=" + expectedValue + ", statisType="
-				+ statisType + "]";
+				+ statisType + super.toString() + "]";
 	}
 
 }

@@ -46,8 +46,8 @@ public class ConsumerDataRetrieverWrapper {
 	public Set<String> getKeyWithoutTotal(String... keys) {
 
 		Set<String> set = consumerDataRetriever.getKeys(new CasKeys(keys));
-		if (logger.isInfoEnabled() && set != null && keys != null) {
-			logger.info(String.format("Load keys %s without total of %s", set.toString(), keys.toString()));
+		if (logger.isDebugEnabled() && set != null && keys != null) {
+			logger.debug(String.format("Load keys %s without total of %s", set.toString(), keys.toString()));
 		}
 
 		if (set != null) {

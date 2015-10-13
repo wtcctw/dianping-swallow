@@ -25,4 +25,9 @@ public class ProducerClientEvent extends ClientEvent {
 		return isAlarm(lastAlarms, key, alarmMeta);
 	}
 
+	@Override
+	public String toString() {
+		return "ProducerClientEvent [" + super.toString() + "]";
+	}
+
 }

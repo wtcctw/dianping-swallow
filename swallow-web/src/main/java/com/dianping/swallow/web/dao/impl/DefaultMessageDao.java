@@ -340,9 +340,13 @@ public class DefaultMessageDao extends AbstractDao implements MessageDao {
 	@Override
 	public Message loadFirstMessage(String topicName) {
 
+		long count = this.count(topicName);
+		if(count == 0){
+			return null;
+		}
 		int offset = 0;
 		Message msg = null;
-		while(msg == null){
+		while(msg == null && offset <= count){
 			try{
 				Query query = new Query();
 				query.with(new Sort(new Sort.Order(Direction.ASC, ID))).skip(offset).limit(1);

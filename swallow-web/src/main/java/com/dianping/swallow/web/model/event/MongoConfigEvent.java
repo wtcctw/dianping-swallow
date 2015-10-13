@@ -44,4 +44,9 @@ public class MongoConfigEvent extends ServerEvent {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "MongoConfigEvent [topicName=" + topicName + super.toString() + "]";
+	}
+
 }

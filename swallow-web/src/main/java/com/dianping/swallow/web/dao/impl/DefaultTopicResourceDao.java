@@ -31,7 +31,7 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 
 	private static final String ID = "id";
 
-	private static final String PEODUCERIPS = "producerIps";
+	private static final String PEODUCERIPS = "producerIpInfos.ip";
 
 	private static final String ADMINISTRATOR = "administrator";
 

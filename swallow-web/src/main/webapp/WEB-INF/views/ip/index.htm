@@ -54,14 +54,8 @@
 					class="table table-bordered table-striped  table-condensed table-hover">
 					<tr>
 						<th style="text-align: left">序号</th>
-						<th style="text-align: left">IP</th>
+						<th style="text-align: left; width: 15%">IP</th>
 						<th style="text-align: left">业务名</th>
-						<th style="text-align: left">开发邮箱</th>
-						<th style="text-align: left">开发电话</th>
-						<th style="text-align: left">开发姓名</th>
-						<th style="text-align: left">运维邮箱</th>
-						<th style="text-align: left">运维电话</th>
-						<th style="text-align: left">运维姓名</th>
 						<th style="text-align: left">告警</th>
 						<th style="text-align: left;">操作</th>
 					</tr>
@@ -69,13 +63,9 @@
 						on-finish-render-filters>
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="t.ip"></td>
-						<td style="text-align: left" ng-bind="t.application | limitTo : 25"></td>
-						<td style="text-align: left" ng-bind="t.email | limitTo : 25"></td>
-						<td style="text-align: left" ng-bind="t.dpMobile | limitTo : 25"></td>
-						<td style="text-align: left" ng-bind="t.dpManager | limitTo : 25"></td>
-						<td style="text-align: left" ng-bind="t.opEmail | limitTo : 25"></td>
-						<td style="text-align: left" ng-bind="t.opMobile | limitTo : 25"></td>
-						<td style="text-align: left" ng-bind="t.opManager | limitTo : 25"></td>
+						<td style="text-align: left"><a
+							ng-href="${rc.contextPath}/console/application"
+							ng-click="setApplication(t.application)" ng-bind="t.application"></a></td>
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
 								id="alarm{{$index}}" type="checkbox" ng-model="t.alarm"
@@ -131,56 +121,7 @@
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label"><b>业务名</b></label> <input
 										type="text" class="form-control"
-										ng-model="ipEntry.application" id="application">
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>开发邮箱</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.email"
-										id="email"> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>开发电话</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.dpMobile"
-										id="dpMobile"> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>开发姓名</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.dpManager"
-										id="dpManager"> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>运维邮箱</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.opEmail"
-										id="opEmail"> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>运维电话</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.opMobile"
-										id="opMobile"> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>运维姓名</b></label> <input
-										type="text" class="form-control" ng-model="ipEntry.opManager"
-										id="opManager"> </input>
+										ng-model="ipEntry.application" id="application" data-provide="typeahead"> </input>
 								</div>
 							</div>
 							<div class="control-group" style="margin-top: 40px">

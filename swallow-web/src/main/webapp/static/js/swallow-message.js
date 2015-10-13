@@ -524,6 +524,10 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
 	        $scope.ttype = "";
 	        $scope.tproperty = "";
 	        $scope.refreshpage = function(myForm){
+	        	if($scope.topic.length == 0){
+	        		alert("topic为空");
+	        		return;
+	        	}
 	        	if($scope.dearray.indexOf($('#delimitor').val()) < 0){
 	        		alert("不合法的分隔符!");
 	        		return;
@@ -577,6 +581,15 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
       			    var sort;
 				    if(typeof($scope.searchPaginator) != "undefined"){
 					    sort = $scope.searchPaginator.reverse;
+				    }
+				    if($scope.mintime.length == 0){
+				    	$http.get(window.contextPath + "/console/message/timespan", {
+							params : {
+								topic: $scope.topic
+							}
+						}).success(function(data){
+							$scope.mintime = data.replace(/\"/ig,"");
+						});
 				    }
 					$scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic , $scope.messageId, $scope.startdt, $scope.stopdt, sort);
 	            	if(typeof($scope.searchPaginator) != "undefined"){

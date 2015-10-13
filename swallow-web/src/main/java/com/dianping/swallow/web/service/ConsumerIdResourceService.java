@@ -17,7 +17,7 @@ public interface ConsumerIdResourceService {
 	boolean insert(ConsumerIdResource consumerIdResource);
 
 	boolean update(ConsumerIdResource consumerIdResource);
-	
+
 	int remove(String topic, String consumerid);
 	
 	List<ConsumerIdResource> findByConsumerId(String consumerid);

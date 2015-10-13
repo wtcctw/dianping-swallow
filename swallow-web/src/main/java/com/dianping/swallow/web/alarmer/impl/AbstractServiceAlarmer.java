@@ -45,13 +45,12 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 
 	private static final String FACTORY_NAME = "ServiceAlarmer";
 
-	private static ScheduledExecutorService scheduled = null;
+	private static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(
+			CommonUtils.DEFAULT_CPU_COUNT * 2, ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
-				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
 	@Override
@@ -63,7 +62,17 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
-		future.cancel(false);
+		if (future != null && !future.isCancelled()) {
+			future.cancel(false);
+		}
+
+	}
+
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		if (scheduled != null && !scheduled.isShutdown()) {
+			scheduled.shutdown();
+		}
 	}
 
 	public abstract void doAlarm();

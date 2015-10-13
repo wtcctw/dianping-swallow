@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -429,39 +428,14 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	}
 
 	@Override
-	public List<String> getConusmerIdInfos() {
-		List<String> consumerIdInfos = new ArrayList<String>();
-		Set<String> topicKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY));
-		if (topicKeys != null) {
-			Iterator<String> iterator = topicKeys.iterator();
-			while (iterator.hasNext()) {
-				String topicName = iterator.next();
-				if (StringUtils.isNotBlank(topicName)) {
-					List<String> partConsumerIds = getConsumerIdsByTopic(topicName);
-					if (partConsumerIds == null) {
-						continue;
-					}
-					consumerIdInfos.addAll(partConsumerIds);
-				}
-			}
-		}
-		return consumerIdInfos;
-	}
-
-	private List<String> getConsumerIdsByTopic(String topicName) {
+	public Set<String> getConsumerIds(String topicName, boolean isTotal) {
 		Set<String> consumerIds = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName), StatisType.SEND);
-		List<String> consumerIdInfos = null;
-		if (consumerIds != null) {
-			consumerIdInfos = new ArrayList<String>();
-			Iterator<String> iterator = consumerIds.iterator();
-			while (iterator.hasNext()) {
-				String consumerId = iterator.next();
-				if (StringUtils.isNotBlank(consumerId)) {
-					consumerIdInfos.add(consumerId + " " + topicName);
-				}
+		if (!isTotal && consumerIds != null) {
+			if (consumerIds.contains(TOTAL_KEY)) {
+				consumerIds.remove(TOTAL_KEY);
 			}
 		}
-		return consumerIdInfos;
+		return consumerIds;
 	}
 
 	@Override
