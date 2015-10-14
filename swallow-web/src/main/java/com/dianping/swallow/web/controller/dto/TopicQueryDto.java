@@ -10,24 +10,14 @@ public class TopicQueryDto extends BaseDto{
 
 	private String topic;
 	
-	private String proposal;
-	
 	private String producerServer;
+	
+	private boolean inactive;
 	
 	public TopicQueryDto(){
 		
 	}
 	
-	public TopicQueryDto(String topic){
-		this(topic, null);
-	}
-	
-	public TopicQueryDto(String topic, String prop){
-		
-		this.topic = topic;
-		this.proposal = prop;
-	}
-
 	public String getTopic() {
 		return topic;
 	}
@@ -36,20 +26,20 @@ public class TopicQueryDto extends BaseDto{
 		this.topic = topic;
 	}
 
-	public String getProposal() {
-		return proposal;
-	}
-
-	public void setProposal(String proposal) {
-		this.proposal = proposal;
-	}
-
 	public String getProducerServer() {
 		return producerServer;
 	}
 
 	public void setProducerServer(String producerServer) {
 		this.producerServer = producerServer;
+	}
+
+	public boolean isInactive() {
+		return inactive;
+	}
+
+	public void setInactive(boolean inactive) {
+		this.inactive = inactive;
 	}
 
 }

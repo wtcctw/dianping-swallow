@@ -63,12 +63,12 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	@PostConstruct
-	public void executeCacheTopicToAdministrator(){
-		
+	public void executeCacheTopicToAdministrator() {
+
 		scheduledExecutorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.MINUTES);
 		logger.info("Init configCache successfully.");
 	}
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 
@@ -166,9 +166,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp) {
+	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, boolean inactive) {
 
-		return topicResourceDao.find(offset, limit, topic, producerIp);
+		return topicResourceDao.find(offset, limit, topic, producerIp, inactive);
 	}
 
 	@Override
@@ -302,6 +302,11 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		} finally {
 
 		}
+	}
+	
+	@Override
+	public long countInactive(){
+		return topicResourceDao.countInactive();
 	}
 
 }
