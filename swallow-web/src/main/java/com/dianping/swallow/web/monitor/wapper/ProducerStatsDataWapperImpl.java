@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
@@ -56,7 +57,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (serverStatisData == null) {
 				continue;
 			}
-			NavigableMap<Long, Long> qpx = serverStatisData.getQpx(StatisType.SAVE);
+			NavigableMap<Long, QpxData> qpx = serverStatisData.getQpx(StatisType.SAVE);
 			if (qpx == null || qpx.isEmpty()) {
 				continue;
 			}
@@ -74,9 +75,10 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			serverStatsData.setTimeKey(timeKey);
 			serverStatsData.setIp(serverIp);
 			serverStatsData.setDelay(0);
-			Long qpxValue = qpx.get(timeKey);
+			QpxData qpxValue = qpx.get(timeKey);
 			if (qpxValue != null) {
-				serverStatsData.setQps(qpxValue);
+				serverStatsData.setQps(qpxValue.getQpx() == null ? 0L : qpxValue.getQpx().longValue());
+				serverStatsData.setQpsTotal(qpxValue.getTotal() == null ? 0L : qpxValue.getTotal().longValue());
 			}
 
 			serverStatsDatas.add(serverStatsData);
@@ -104,7 +106,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (serverStatisData == null) {
 				continue;
 			}
-			NavigableMap<Long, Long> topicQpxs = serverStatisData.getQpx(StatisType.SAVE);
+			NavigableMap<Long, QpxData> topicQpxs = serverStatisData.getQpx(StatisType.SAVE);
 			if (topicQpxs == null || topicQpxs.isEmpty()) {
 				continue;
 			}
@@ -121,9 +123,10 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			producerTopicStatsData.setTimeKey(timeKey);
 			NavigableMap<Long, Long> topicDelays = serverStatisData.getDelay(StatisType.SAVE);
 
-			Long topicQpxValue = topicQpxs.get(timeKey);
-			if (topicQpxValue != null) {
-				producerTopicStatsData.setQps(topicQpxValue);
+			QpxData topicQpx = topicQpxs.get(timeKey);
+			if (topicQpx != null) {
+				producerTopicStatsData.setQps(topicQpx.getQpx());
+				producerTopicStatsData.setQps(topicQpx.getTotal());
 			}
 			Long delay = topicDelays.get(timeKey);
 			if (delay != null) {
@@ -171,7 +174,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (messageStatisData == null) {
 				continue;
 			}
-			NavigableMap<Long, Long> ipQpxs = messageStatisData.getQpx(StatisType.SAVE);
+			NavigableMap<Long, QpxData> ipQpxs = messageStatisData.getQpx(StatisType.SAVE);
 			if (ipQpxs == null || ipQpxs.isEmpty()) {
 				continue;
 			}
@@ -189,9 +192,10 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			ipStatsData.setTimeKey(timeKey);
 			ipStatsData.setIp(ip);
 			NavigableMap<Long, Long> ipDelays = messageStatisData.getDelay(StatisType.SAVE);
-			Long qps = ipQpxs.get(timeKey);
+			QpxData qps = ipQpxs.get(timeKey);
 			if (qps != null) {
-				ipStatsData.setQps(qps.longValue());
+				ipStatsData.setQps(qps.getQpx() == null ? 0L : qps.getQpx().longValue());
+				ipStatsData.setQpsTotal(qps.getTotal() == null ? 0L : qps.getTotal().longValue());
 			}
 
 			Long delay = ipDelays.get(timeKey);

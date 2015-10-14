@@ -1,7 +1,5 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,91 +24,89 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * @author mengwenchao
  *
- * 2015年5月20日 下午2:09:12
+ *         2015年5月20日 下午2:09:12
  */
-public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends TotalMap<M>> extends AbstractStatisable<V> implements MapStatisable<V>{
+public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends TotalMap<M>> extends
+		AbstractStatisable<V> implements MapStatisable<V> {
 
-	
 	protected Map<String, Statisable<M>> map = new ConcurrentHashMap<String, Statisable<M>>();
-	
+
 	@JsonIgnore
 	private ThreadLocal<AtomicInteger> step = new ThreadLocal<AtomicInteger>();
 
-	public Set<String> keySet(boolean includeTotal){
-		
+	public Set<String> keySet(boolean includeTotal) {
+
 		Set<String> result = new HashSet<String>(map.keySet());
-		if(!includeTotal && !isOnlyTotal()){
+		if (!includeTotal && !isOnlyTotal()) {
 			result.remove(MonitorData.TOTAL_KEY);
 		}
 		return result;
 	}
-	
+
 	@Override
 	public void add(Long time, V added) {
 
-		for(Entry<String, M> entry : added.entrySet()){
-			
+		for (Entry<String, M> entry : added.entrySet()) {
+
 			String addKey = entry.getKey();
 			M addValue = entry.getValue();
-			
+
 			Statisable<M> realValue = MapUtil.getOrCreate(map, addKey, getStatisClass());
 			realValue.add(time, addValue);
 		}
 	}
 
-	protected Statisable<?> getValue(Object key){
-		return map.get(key); 
+	protected Statisable<?> getValue(Object key) {
+		return map.get(key);
 	}
-
 
 	@Override
 	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
-		
-		for(Entry<String, Statisable<M>> entry : map.entrySet()){
-			
+
+		for (Entry<String, Statisable<M>> entry : map.entrySet()) {
+
 			String key = entry.getKey();
 			Statisable<M> value = entry.getValue();
-			
-			
-			try{
+
+			try {
 				increateStep();
-				if(logger.isDebugEnabled()){
-					logger.debug("[build]"+ getStepDebug() + key);
+				if (logger.isDebugEnabled()) {
+					logger.debug("[build]" + getStepDebug() + key);
 				}
-				
-				if(logger.isDebugEnabled()){
+
+				if (logger.isDebugEnabled()) {
 					logger.debug("[build]" + value);
 				}
 				value.build(qpx, startKey, endKey, intervalCount);
-			}finally{
+			} finally {
 				decreateStep();
 			}
-			
-			if(logger.isDebugEnabled()){
-				if(value instanceof MessageInfoStatis){
+
+			if (logger.isDebugEnabled()) {
+				if (value instanceof MessageInfoStatis) {
 					logger.debug("[build]" + getStepDebug() + value);
 				}
 			}
 		}
-		
+
 	}
 
 	private void increateStep() {
-		if(step.get() == null){
+		if (step.get() == null) {
 			step.set(new AtomicInteger());
 		}
-		
+
 		step.get().incrementAndGet();
 	}
-	
+
 	private void decreateStep() {
 		step.get().decrementAndGet();
 	}
 
 	protected String getStepDebug() {
-				
+
 		StringBuilder sb = new StringBuilder();
-		for(int i=0;i<=step.get().get();i++){
+		for (int i = 0; i <= step.get().get(); i++) {
 			sb.append("-----:");
 		}
 		return sb.toString();
@@ -118,14 +114,14 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 
 	@Override
 	public void cleanEmpty() {
-		
-		for(String key : map.keySet()){
-			
+
+		for (String key : map.keySet()) {
+
 			AbstractStatisable<M> value = (AbstractStatisable<M>) map.get(key);
 			value.cleanEmpty();
-			
-			if(value.isEmpty()){
-				if(logger.isDebugEnabled()){
+
+			if (value.isEmpty()) {
+				if (logger.isDebugEnabled()) {
 					logger.debug("[clean]" + key);
 				}
 				map.remove(key);
@@ -135,170 +131,166 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable,V extends T
 
 	@Override
 	public boolean isEmpty() {
-		
-		for(Statisable<M> value : map.values()){
-			if(!value.isEmpty()){
+
+		for (Statisable<M> value : map.values()) {
+			if (!value.isEmpty()) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
 	@Override
 	public void doRemoveBefore(Long time) {
-		
-		for(Statisable<M> value : map.values()){
+
+		for (Statisable<M> value : map.values()) {
 			value.removeBefore(time);
 		}
 	}
 
 	protected abstract Class<? extends Statisable<M>> getStatisClass();
 
-
 	@Override
 	public NavigableMap<Long, Long> getDelay(StatisType type, Object key) {
-		
+
 		Statisable<?> value = getValue(key);
-		if(value == null){
+		if (value == null) {
 			return null;
 		}
 		return value.getDelay(type);
 	}
 
 	@Override
-	public NavigableMap<Long, Long> getQpx(StatisType type, Object key) {
-		
+	public NavigableMap<Long, QpxData> getQpx(StatisType type, Object key) {
+
 		Statisable<?> value = getValue(key);
-		if(value == null){
+		if (value == null) {
 			return null;
 		}
 		return value.getQpx(type);
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> allDelay(StatisType type, boolean includeTotal){
-		
-		Map<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long,Long>>();
-					
-		for(Entry<String, Statisable<M>> entry : map.entrySet()){
-			
-			
+	public Map<String, NavigableMap<Long, Long>> allDelay(StatisType type, boolean includeTotal) {
+
+		Map<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long, Long>>();
+
+		for (Entry<String, Statisable<M>> entry : map.entrySet()) {
+
 			String key = entry.getKey();
 			Statisable<M> value = entry.getValue();
-			if(!isOnlyTotal()  && !includeTotal && isTotalKey(key)){
+			if (!isOnlyTotal() && !includeTotal && isTotalKey(key)) {
 				continue;
 			}
 			result.put(key, value.getDelay(type));
 		}
 		return result;
 	}
-	
+
 	private boolean isOnlyTotal() {
 		return map.size() == 1;
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> allQpx(StatisType type, boolean includeTotal){
+	public Map<String, NavigableMap<Long, QpxData>> allQpx(StatisType type, boolean includeTotal) {
 
-		Map<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long,Long>>();
-		
-		for(Entry<String, Statisable<M>> entry : map.entrySet()){
-			
+		Map<String, NavigableMap<Long, QpxData>> result = new HashMap<String, NavigableMap<Long, QpxData>>();
+
+		for (Entry<String, Statisable<M>> entry : map.entrySet()) {
+
 			String key = entry.getKey();
 			Statisable<M> value = entry.getValue();
-			if(!isOnlyTotal() && !includeTotal && isTotalKey(key)){
+			if (!isOnlyTotal() && !includeTotal && isTotalKey(key)) {
 				continue;
 			}
 
 			result.put(key, value.getQpx(type));
 		}
 		return result;
-		
+
 	}
-	
+
 	@Override
 	public NavigableMap<Long, Long> getDelay(StatisType type) {
-		
+
 		return getDelay(type, MonitorData.TOTAL_KEY);
 	}
 
 	@Override
-	public NavigableMap<Long, Long> getQpx(StatisType type) {
-		
+	public NavigableMap<Long, QpxData> getQpx(StatisType type) {
+
 		return getQpx(type, MonitorData.TOTAL_KEY);
 	}
 
-
-	
 	@Override
-	public Set<String> getKeys(CasKeys keys, StatisType type){
+	public Set<String> getKeys(CasKeys keys, StatisType type) {
 
-		if(!keys.hasNextKey()){
+		if (!keys.hasNextKey()) {
 			return new HashSet<String>(map.keySet());
 		}
-		
+
 		String key = keys.getNextKey();
 		Statisable<M> result = map.get(key);
-		
-		if(result == null){
+
+		if (result == null) {
 			throw new UnfoundKeyException(key);
 		}
-		
-		if(result instanceof MapRetriever){
-			return ((MapRetriever) result).getKeys(keys, type); 
+
+		if (result instanceof MapRetriever) {
+			return ((MapRetriever) result).getKeys(keys, type);
 		}
-		
+
 		throw new IllegalArgumentException("next not instanceof Map type!" + result.getClass());
 	}
-	
+
 	@Override
-	public Object getValue(CasKeys keys, StatisType type){
-		
-		if(!keys.hasNextKey()){
+	public Object getValue(CasKeys keys, StatisType type) {
+
+		if (!keys.hasNextKey()) {
 			throw new UnfoundKeyException(keys.toString());
 		}
 
 		String key = keys.getNextKey();
 		Statisable<M> result = map.get(key);
-		
-		if(result == null){
+
+		if (result == null) {
 			throw new UnfoundKeyException("key:" + key);
 		}
-		
-		if(keys.hasNextKey()){
-			
-			if(result instanceof MapRetriever){
+
+		if (keys.hasNextKey()) {
+
+			if (result instanceof MapRetriever) {
 				return ((MapRetriever) result).getValue(keys, type);
-			}else{
+			} else {
 				throw new IllegalArgumentException("has next key, but next is not Map type!!");
 			}
-			
-		}else{
+
+		} else {
 			return result;
 		}
 	}
 
 	@Override
 	public Set<String> getKeys(CasKeys keys) {
-		
+
 		return getKeys(keys, null);
 	}
 
 	public Object getValue(CasKeys keys) {
-		
+
 		return getValue(keys, null);
-		
+
 	}
-	
+
 	@Override
 	public String toString() {
-		
+
 		return JsonBinder.getNonEmptyBinder().toPrettyJson(map);
 	}
-	
-	public String toString(String key){
-		
+
+	public String toString(String key) {
+
 		return JsonBinder.getNonEmptyBinder().toPrettyJson(map.get(key));
 	}
 

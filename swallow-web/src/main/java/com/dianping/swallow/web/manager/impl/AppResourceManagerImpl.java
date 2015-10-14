@@ -128,7 +128,7 @@ public class AppResourceManagerImpl implements AppResourceManager {
 		if (ipInfos != null && !ipInfos.isEmpty()) {
 			List<String> alarmIps = new ArrayList<String>();
 			for (IpInfo ipInfo : ipInfos) {
-				if (ipInfo.isActiveAndAlarm()) {
+				if (ipInfo.isActive()) {
 					alarmIps.add(ipInfo.getIp());
 				}
 			}

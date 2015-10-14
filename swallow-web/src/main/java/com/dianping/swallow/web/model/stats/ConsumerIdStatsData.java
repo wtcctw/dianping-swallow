@@ -200,8 +200,8 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	}
 
 	public void setTotalStatsDatas(ConsumerIdStatsData lastStatsData, int sampleInterval) {
-		long currentSendQps = sampleInterval * getSendQps();
-		long currentAckQps = sampleInterval * getAckQps();
+		long currentSendQps = this.getSendQps() == 0L ? lastStatsData.getSendQpsTotal() : sampleInterval * getSendQps();
+		long currentAckQps = this.getAckQps() == 0L ? lastStatsData.getAckQpsTotal() : sampleInterval * getAckQps();
 		if (lastStatsData != null) {
 			this.totalSendDelay = lastStatsData.getTotalSendDelay() + getSendDelay() * currentSendQps;
 			this.totalSendQps = lastStatsData.getTotalSendQps() + currentSendQps;

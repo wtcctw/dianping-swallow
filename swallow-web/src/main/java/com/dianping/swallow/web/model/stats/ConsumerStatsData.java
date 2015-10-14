@@ -1,5 +1,9 @@
 package com.dianping.swallow.web.model.stats;
 
+import org.springframework.data.annotation.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * 
  * @author qiyin
@@ -9,9 +13,15 @@ package com.dianping.swallow.web.model.stats;
 public abstract class ConsumerStatsData extends StatsData {
 
 	private long sendQps;
+	
+	@Transient
+	private long sendQpsTotal;
 
 	private long sendDelay;
 
+	@Transient
+	private long ackQpsTotal;
+	
 	private long ackQps;
 
 	private long ackDelay;
@@ -62,6 +72,26 @@ public abstract class ConsumerStatsData extends StatsData {
 	public String toString() {
 		return "ConsumerStatsData [sendQps=" + sendQps + ", sendDelay=" + sendDelay + ", ackQps=" + ackQps
 				+ ", ackDelay=" + ackDelay + ", accumulation=" + accumulation + "]"+ super.toString();
+	}
+
+	@JsonIgnore
+	public long getSendQpsTotal() {
+		return sendQpsTotal;
+	}
+
+	@JsonIgnore
+	public void setSendQpsTotal(long sendQpsTotal) {
+		this.sendQpsTotal = sendQpsTotal;
+	}
+
+	@JsonIgnore
+	public long getAckQpsTotal() {
+		return ackQpsTotal;
+	}
+	
+	@JsonIgnore
+	public void setAckQpsTotal(long ackQpsTotal) {
+		this.ackQpsTotal = ackQpsTotal;
 	}
 
 }
