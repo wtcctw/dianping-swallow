@@ -115,4 +115,10 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 		return consumerIdResource;
 	}
 
+	@Override
+	public long countInactive() {
+
+		return consumerIdResourceDao.countInactive();
+	}
+
 }

@@ -29,6 +29,8 @@ public class TopicResource extends BaseResource {
 	private List<IpInfo> producerIpInfos;
 
 	private List<String> producerApplications;
+	
+	private long inactiveCount;
 
 	private ProducerBaseAlarmSetting producerAlarmSetting;
 
@@ -88,12 +90,12 @@ public class TopicResource extends BaseResource {
 		this.producerAlarmSetting = producerAlarmSetting;
 	}
 
-	@Override
-	public String toString() {
-		return "TopicResource [topic=" + topic + ", administrator=" + administrator + ", producerAlarm="
-				+ producerAlarm + ", consumerAlarm=" + consumerAlarm + ", producerIpInfos=" + producerIpInfos
-				+ ", producerApplications=" + producerApplications + ", producerAlarmSetting=" + producerAlarmSetting
-				+ ", toString()=" + super.toString() + "]";
+	public long getInactiveCount() {
+		return inactiveCount;
+	}
+
+	public void setInactiveCount(long inactiveCount) {
+		this.inactiveCount = inactiveCount;
 	}
 
 	@JsonIgnore

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.mongodb.WriteResult;
 
 /**
@@ -31,6 +32,8 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 	private static final String TOPIC = "topic";
 
 	public static final String CONSUMERIPS = "consumerIpInfos.ip";
+	
+	private static final String ACTIVE = "consumerIpInfos.active";
 
 	private static final String DEFAULT = "default";
 
@@ -122,31 +125,46 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 		String topic = consumerIdParam.getTopic();
 		String consumerId = consumerIdParam.getConsumerId();
 		String consumerIp = consumerIdParam.getConsumerIp();
+		boolean inactive = consumerIdParam.isInactive();
 
 		Query query = new Query();
-
-		String[] topics = topic.split(",");
-		if (StringUtil.isNotBlank(topic)) {
-			List<Criteria> criterias = new ArrayList<Criteria>();
-			for (String t : topics) {
-				criterias.add(Criteria.where(TOPIC).is(t));
-			}
-
-			query.addCriteria(Criteria.where(TOPIC).exists(true)
-					.orOperator(criterias.toArray(new Criteria[criterias.size()])));
+		String[] topics = null;
+		if(StringUtil.isNotBlank(topic)){
+			topics = topic.split(",");
 		}
+
 		if (StringUtil.isNotBlank(consumerId)) {
 			query.addCriteria(Criteria.where(CONSUMERID).is(consumerId));
 		}
 		if (StringUtil.isNotBlank(consumerIp)) {
 			query.addCriteria(Criteria.where(CONSUMERIPS).is(consumerIp));
 		}
-
-		long size = 0;
-		if(topics.length > 100){
-			size = mongoTemplate.count(new Query(), CONSUMERIDRESOURCE_COLLECTION);
-		}else{
+		
+		long size = -1;
+		if(!inactive){
+			if(topics != null && topics.length == 1){
+				query.addCriteria(Criteria.where(TOPIC).is(topics[0]));
+			}
+			query.addCriteria(Criteria.where(ACTIVE).is(inactive));
 			size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
+		}else{
+			if (topics != null) {
+				List<Criteria> criterias = new ArrayList<Criteria>();
+				for (String t : topics) {
+					criterias.add(Criteria.where(TOPIC).is(t));
+				}
+				
+				query.addCriteria(Criteria.where(TOPIC).exists(true)
+						.orOperator(criterias.toArray(new Criteria[criterias.size()])));
+			}
+		}
+
+		if(size < 0){
+			if(topics != null && topics.length > 100){
+				size = mongoTemplate.count(new Query(), CONSUMERIDRESOURCE_COLLECTION);
+			}else{
+				size = mongoTemplate.count(query, CONSUMERIDRESOURCE_COLLECTION);
+			}
 		}
 
 		int offset = consumerIdParam.getOffset();
@@ -218,6 +236,31 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 
 		return new Pair<Long, List<ConsumerIdResource>>(size, consumerIdResource);
 
+	}
+	
+	@Override
+	public long countInactive() {
+		Query query = new Query(Criteria.where(ACTIVE).is(Boolean.FALSE));
+		query.fields().include(ACTIVE);
+		List<ConsumerIdResource> cnsumerIdResources =  mongoTemplate.find(query, ConsumerIdResource.class, CONSUMERIDRESOURCE_COLLECTION);
+		
+		long result = 0;
+		int size = cnsumerIdResources.size();
+		ConsumerIdResource consumerIdResource = null;
+		List<IpInfo> ipInfos = null;
+		int ipInfoSize = 0;
+		for(int i = 0; i < size; ++i){
+			consumerIdResource = cnsumerIdResources.get(i);
+			ipInfos = consumerIdResource.getConsumerIpInfos();
+			ipInfoSize = ipInfos.size();
+			for(int j = 0; j < ipInfoSize; ++j){
+				if(!ipInfos.get(j).isActive()){
+					++result;
+				}
+			}
+		}
+		
+		return result;
 	}
 
 }
