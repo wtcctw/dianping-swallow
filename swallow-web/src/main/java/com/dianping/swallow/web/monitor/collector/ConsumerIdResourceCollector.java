@@ -153,40 +153,9 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 	private void updateConsumerIdIpInfos(ConsumerIdResource consumerIdResource) {
 		String topicName = consumerIdResource.getTopic();
 		String consumerId = consumerIdResource.getConsumerId();
-		Set<String> inActiveIps = activeIpManager.getInActiveIps(new ConsumerIdKey(topicName, consumerId));
 		List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
 		Set<String> consumerIdIps = cStatsDataWapper.getConsumerIdIps(topicName, consumerId, false);
-		if (ipInfos == null || ipInfos.isEmpty()) {
-			ipInfos = new ArrayList<IpInfo>();
-		}
-		if (consumerIdIps != null && !consumerIdIps.isEmpty()) {
-			for (String consumerIdIp : consumerIdIps) {
-				boolean isHasIp = false;
-				for (IpInfo ipInfo : ipInfos) {
-					if (consumerIdIp.equals(ipInfo.getIp())) {
-						isHasIp = true;
-						break;
-					}
-				}
-				if (!isHasIp) {
-					ipInfos.add(new IpInfo(consumerIdIp, true, true));
-				}
-			}
-		}
-		
-		for (IpInfo ipInfo : ipInfos) {
-			ipInfo.setActive(true);
-		}
-		if (inActiveIps != null && !inActiveIps.isEmpty()) {
-
-			for (String inActiveIp : inActiveIps) {
-				for (IpInfo ipInfo : ipInfos) {
-					if (inActiveIp.equals(ipInfo.getIp())) {
-						ipInfo.setActive(false);
-					}
-				}
-			}
-		}
+		ipInfos = activeIpManager.getRelatedIpInfo(new ConsumerIdKey(topicName, consumerId), ipInfos, consumerIdIps);
 		consumerIdResource.setConsumerIpInfos(ipInfos);
 	}
 
