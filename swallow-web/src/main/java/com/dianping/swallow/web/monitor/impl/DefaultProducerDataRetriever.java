@@ -206,7 +206,7 @@ public class DefaultProducerDataRetriever
 
 		NavigableMap<Long, Long> rawData = pTopicStatsDataService.findSectionDelayData(topic, startKey, endKey);
 		rawData = fillStatsData(rawData, startKey, endKey);
-		return createStatsData(createQpxDesc(topic, StatisType.SAVE), rawData, start, end);
+		return createStatsData(createDelayDesc(topic, StatisType.SAVE), rawData, start, end);
 	}
 
 	@Override
