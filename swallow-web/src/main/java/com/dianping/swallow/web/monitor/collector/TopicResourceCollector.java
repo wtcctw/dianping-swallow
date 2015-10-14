@@ -120,6 +120,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 					for (IpInfo ipInfo : ipInfos) {
 						if (topicIp.equals(ipInfo.getIp())) {
 							isHasIp = true;
+							break;
 						}
 					}
 					if (!isHasIp) {

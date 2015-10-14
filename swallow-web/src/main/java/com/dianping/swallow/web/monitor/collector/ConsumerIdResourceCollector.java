@@ -165,6 +165,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 				for (IpInfo ipInfo : ipInfos) {
 					if (consumerIdIp.equals(ipInfo.getIp())) {
 						isHasIp = true;
+						break;
 					}
 				}
 				if (!isHasIp) {
