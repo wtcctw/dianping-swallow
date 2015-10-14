@@ -79,10 +79,11 @@ public class TopicController extends AbstractMenuController {
 		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
 		String topic = topicQueryDto.getTopic();
 		String producerIp = topicQueryDto.getProducerServer();
+		boolean inactive = topicQueryDto.isInactive();
 		int offset = topicQueryDto.getOffset();
 		int limit = topicQueryDto.getLimit();
 
-		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp);
+		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp) && inactive;
 
 		if (isAllEmpry) {
 			String username = userUtils.getUsername(request);
@@ -93,7 +94,7 @@ public class TopicController extends AbstractMenuController {
 				pair = topicResourceService.findByAdministrator(offset, limit, username);
 			}
 		} else {
-			pair = topicResourceService.find(offset, limit, topic, producerIp);
+			pair = topicResourceService.find(offset, limit, topic, producerIp, inactive);
 		}
 
 		for (TopicResource topicResource : pair.getSecond()) {
@@ -325,7 +326,7 @@ public class TopicController extends AbstractMenuController {
 
 		return administrators;
 	}
-
+	
 	@RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean setAlarm(String topic, String ip, boolean alarm) {
@@ -363,6 +364,13 @@ public class TopicController extends AbstractMenuController {
 		}
 
 		return false;
+	}
+	
+	@RequestMapping(value = "/console/topic/alarm/ipinfo/count/inactive", method = RequestMethod.GET)
+	@ResponseBody
+	public long countInactive() {
+
+		return topicResourceService.countInactive();
 	}
 
 	private String checkProposalName(String proposal) {

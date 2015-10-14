@@ -133,6 +133,7 @@ module
 							$scope.query.topic = $scope.topic;
 							$scope.query.consumerId = $scope.consumerId;
 							$scope.query.consumerIp = $scope.consumerIp;
+							$scope.query.inactive = true;
 							
 							$scope.consumeridEntry = {};
 							$scope.consumeridEntry.consumerId;
@@ -218,6 +219,11 @@ module
 								$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
 							}
 							
+							$scope.setInactive = function(){
+								$scope.query.inactive = !$scope.query.inactive;
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+							}
+							
 							//如果topic列表返回空，则不会执行initpage
 							$scope.initpage = function(){
 
@@ -296,6 +302,14 @@ module
 										
 									}).error(function(data, status, headers, config) {
 								});
+								 
+								 $http({
+									 method : 'GET',
+									 url : window.contextPath + '/console/consumerid/alarm/ipinfo/count/inactive'
+								 }).success(function(data, status, headers, config) {
+									 $scope.countinactive = data;
+								 }).error(function(data, status, headers, config) {
+								 });
 								 
 							}
 							

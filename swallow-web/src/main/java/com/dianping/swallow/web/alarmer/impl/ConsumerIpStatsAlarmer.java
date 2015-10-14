@@ -126,8 +126,8 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 						if (!secondCandidates.containsKey(key)) {
 							secondCandidates.put(key, System.currentTimeMillis());
 						} else {
-							if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
-								firstCandidates.put(key, System.currentTimeMillis());
+							if (whiteLists.containsKey(key) && whiteLists.get(key) > secondCandidates.get(key)) {
+								secondCandidates.put(key, System.currentTimeMillis());
 							}
 						}
 					}

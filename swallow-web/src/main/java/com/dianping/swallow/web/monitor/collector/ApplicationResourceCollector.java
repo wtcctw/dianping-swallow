@@ -83,9 +83,7 @@ public class ApplicationResourceCollector extends AbstractResourceCollector {
 					if (ipResourceInDb == null) {
 						ipDescService.addEmail(ipDesc);
 						// AppResource
-						ApplicationResource appResource = new ApplicationResource();
-						appResource.buildApplicationResource(ipDesc);
-						appResourceService.insert(appResource);
+						updateAppResource(ipDesc);
 						// IpResource
 						IpResource ipResource = new IpResource(ipDesc.getIp(), ipDesc.getName(), true);
 						ipResource.setCreateTime(new Date());
@@ -94,9 +92,7 @@ public class ApplicationResourceCollector extends AbstractResourceCollector {
 					} else {
 						ipDescService.addEmail(ipDesc);
 						// AppResource
-						ApplicationResource appResource = new ApplicationResource();
-						appResource.buildApplicationResource(ipDesc);
-						appResourceService.update(appResource);
+						updateAppResource(ipDesc);
 						// IpResource
 						ipResourceInDb.setUpdateTime(new Date());
 						ipResourceService.update(ipResourceInDb);
@@ -115,6 +111,20 @@ public class ApplicationResourceCollector extends AbstractResourceCollector {
 				logger.error("[doIpResourceTask] update ip resouces error.{}", ip, e);
 			}
 		}
+	}
+
+	private void updateAppResource(IPDesc ipDesc) {
+		List<ApplicationResource> appResources = appResourceService.findByApplication(ipDesc.getName());
+		// AppResource
+		ApplicationResource appResource = null;
+		if (appResources != null && !appResources.isEmpty()) {
+			appResource = appResources.get(0);
+		} else {
+			appResource = new ApplicationResource();
+			appResource.setCreateTime(new Date());
+		}
+		appResource.buildApplicationResource(ipDesc);
+		appResourceService.update(appResource);
 	}
 
 	@Override

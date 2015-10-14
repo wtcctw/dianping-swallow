@@ -61,10 +61,10 @@ public class ProducerStatsDataStorager extends AbstractStatsDataStorager {
 				true);
 		List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(lastTimeKey.get(),
 				true);
-		List<ProducerIpStatsData> ipStatsDatas = producerStatsDataWapper.getIpStatsDatas(lastTimeKey.get(), false);
+		//List<ProducerIpStatsData> ipStatsDatas = producerStatsDataWapper.getIpStatsDatas(lastTimeKey.get(), false);
 		doStorageServerStats(serverStatsDatas);
 		doStorageTopicStats(topicStatsDatas);
-		doStorageIpStats(ipStatsDatas);
+		//doStorageIpStats(ipStatsDatas);
 	}
 
 	private void doStorageServerStats(final List<ProducerServerStatsData> serverStatsDatas) {

@@ -31,4 +31,6 @@ public interface ConsumerIdResourceService {
 	ConsumerIdResource buildConsumerIdResource(String topic, String consumerId);
 
 	ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId);
+	
+	long countInactive();
 }

@@ -8,6 +8,8 @@ public class ConsumerIdQueryDto extends BaseDto{
 	
 	private String consumerIp;
 	
+	private boolean inactive;
+	
 	public ConsumerIdQueryDto(){
 		
 	}
@@ -34,6 +36,14 @@ public class ConsumerIdQueryDto extends BaseDto{
 
 	public void setConsumerIp(String consumerIp) {
 		this.consumerIp = consumerIp;
+	}
+
+	public boolean isInactive() {
+		return inactive;
+	}
+
+	public void setInactive(boolean inactive) {
+		this.inactive = inactive;
 	}
 	
 }

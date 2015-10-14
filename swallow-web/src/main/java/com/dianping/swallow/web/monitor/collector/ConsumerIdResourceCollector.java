@@ -34,7 +34,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 
 	@Autowired
 	private ConsumerStatsDataWapper cStatsDataWapper;
-	
+
 	@Autowired
 	private ConsumerDataRetriever consumerDataRetriever;
 
@@ -52,7 +52,7 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 		super.doInitialize();
 		collectorName = getClass().getSimpleName();
 		collectorInterval = 20;
-		collectorDelay = 1;
+		collectorDelay = 3;
 		consumerDataRetriever.registerListener(this);
 		executor = Executors.newSingleThreadExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
@@ -136,9 +136,11 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 					consumerIdResource.setConsumerIpInfos(ipInfos);
 				}
 				consumerIdResourceService.insert(consumerIdResource);
+				logger.info("[updateConsumerIdResource] consumerIdResource {}", consumerIdResource.toString());
 			} else {
 				updateConsumerIdIpInfos(consumerIdResource);
 				consumerIdResourceService.update(consumerIdResource);
+				logger.info("[updateConsumerIdResource] consumerIdResource {}", consumerIdResource.toString());
 			}
 		} catch (Exception e) {
 			logger.error("[doConsumerIdCollector] collect consumerId resource error.", e);

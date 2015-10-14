@@ -29,7 +29,7 @@ public class TopicResource extends BaseResource {
 	private List<IpInfo> producerIpInfos;
 
 	private List<String> producerApplications;
-
+	
 	private ProducerBaseAlarmSetting producerAlarmSetting;
 
 	public List<IpInfo> getProducerIpInfos() {

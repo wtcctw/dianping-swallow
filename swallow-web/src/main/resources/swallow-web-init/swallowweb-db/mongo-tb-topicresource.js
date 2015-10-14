@@ -4,9 +4,16 @@ print("TOPIC_RESOURCE load data start");
 
 data = db.TOPIC_RESOURCE.findOne();
 if (data == null) {
-	
-	db.TOPIC_RESOURCE.ensureIndex({'topic': 1 }, {"name":"IX_TOPIC", "unique": true, "dropDups" : true, "background": true});
-	
+
+	db.TOPIC_RESOURCE.ensureIndex({
+		'topic' : 1
+	}, {
+		"name" : "IX_TOPIC",
+		"unique" : true,
+		"dropDups" : true,
+		"background" : true
+	});
+
 	var resource = {};
 	resource.topic = "default";
 	resource.administrator = "default";

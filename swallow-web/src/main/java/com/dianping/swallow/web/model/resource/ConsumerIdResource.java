@@ -89,4 +89,13 @@ public class ConsumerIdResource extends BaseResource {
 		}
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return "ConsumerIdResource [consumerId=" + consumerId + ", topic=" + topic + ", alarm=" + alarm
+				+ ", consumerIpInfos=" + consumerIpInfos + ", consumerApplications=" + consumerApplications
+				+ ", consumerAlarmSetting=" + consumerAlarmSetting + "]";
+	}
+	
+	
 }

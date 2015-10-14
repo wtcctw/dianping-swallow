@@ -52,7 +52,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 		super.doInitialize();
 		collectorName = getClass().getSimpleName();
 		collectorInterval = 20;
-		collectorDelay = 1;
+		collectorDelay = 3;
 		producerDataRetriever.registerListener(this);
 		executor = Executors.newSingleThreadExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
@@ -153,6 +153,7 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 			}
 			topicResource.setProducerIpInfos(ipInfos);
 			topicResourceService.update(topicResource);
+			logger.info("[updateTopicIpInfos] topicResource {}", topicResourceService.toString());
 		}
 	}
 
