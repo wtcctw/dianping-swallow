@@ -47,17 +47,14 @@ public class ProducerIpStatsData extends ProducerStatsData {
 	}
 
 	public boolean checkStatsData() {
-		if (this.getQps() == 0L) {
+		if (this.getQps() == 0L && this.getQpsTotal() == 0L) {
 			return false;
 		}
 		return true;
 	}
 
 	public boolean hasStatsData() {
-		if (this.getQps() <= 0L) {
-			return false;
-		}
-		return true;
+		return checkStatsData();
 	}
 
 	public boolean checkGroupStatsData(List<ProducerIpStatsData> statsDatas) {

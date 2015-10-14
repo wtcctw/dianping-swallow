@@ -51,5 +51,9 @@ public class IpInfo {
 	public boolean isActiveAndAlarm(){
 		return active && alarm;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "IpInfo [ip=" + ip + ", alarm=" + alarm + ", active=" + active + "]";
+	}
 }

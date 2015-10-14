@@ -38,8 +38,36 @@ public interface Statisable<V> {
 	NavigableMap<Long, Long> getDelay(StatisType type);
 
 	@JsonIgnore
-	NavigableMap<Long, Long> getQpx(StatisType type);
+	NavigableMap<Long, QpxData> getQpx(StatisType type);
 
 	String toString(String key);
+	
+	public static class QpxData {
+
+		private Long qpx;
+
+		private Long total;
+
+		public QpxData(Long qpx, Long total) {
+			this.qpx = qpx;
+			this.total = total;
+		}
+
+		public Long getQpx() {
+			return qpx;
+		}
+
+		public void setQpx(Long qpx) {
+			this.qpx = qpx;
+		}
+
+		public Long getTotal() {
+			return total;
+		}
+
+		public void setTotal(Long total) {
+			this.total = total;
+		}
+	}
 
 }

@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.model.stats;
 
-
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -44,19 +43,17 @@ public class ConsumerIpStatsData extends ConsumerStatsData {
 	public void setConsumerId(String consumerId) {
 		this.consumerId = consumerId;
 	}
-	
+
 	public boolean checkStatsData() {
-		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
+		if (this.getSendQps() == 0L && this.getSendQpsTotal() == 0L && this.getAckQps() == 0L
+				&& this.getAckQpsTotal() == 0L) {
 			return false;
 		}
 		return true;
 	}
-	
-	public boolean hasStatsData(){
-		if (this.getSendQps() == 0L && this.getAckQps() == 0L) {
-			return false;
-		}
-		return true;
+
+	public boolean hasStatsData() {
+		return checkStatsData();
 	}
 
 }

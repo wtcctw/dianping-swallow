@@ -16,7 +16,6 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpInfo;
-import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
@@ -74,22 +73,26 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 	}
 
 	private void doIpDataMonitor() {
-		List<ConsumerIpGroupStatsData> ipGroupStatsDatas = cStatsDataWapper.getIpGroupStatsDatas(-1, false);
-		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
+		Set<String> topicNames = cStatsDataWapper.getTopics(false);
+		if (topicNames == null) {
 			return;
 		}
-		for (ConsumerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
-			if (ipGroupStatsData == null) {
+		for (String topicName : topicNames) {
+			Set<String> consumerIds = cStatsDataWapper.getConsumerIds(topicName, false);
+			if (consumerIds == null) {
 				continue;
 			}
-			List<ConsumerIpStatsData> ipStatsDatas = ipGroupStatsData.getConsumerIpStatsDatas();
-			if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
-				continue;
-			}
-			for (ConsumerIpStatsData ipStatsData : ipStatsDatas) {
-				activeIpManager.putActiveIpData(
-						new ConsumerIdKey(ipStatsData.getTopicName(), ipStatsData.getConsumerId()),
-						ipStatsData.getIp(), ipStatsData.hasStatsData());
+			for (String consumerId : consumerIds) {
+				List<ConsumerIpStatsData> ipStatsDatas = cStatsDataWapper.getIpStatsDatas(topicName, consumerId, -1,
+						false);
+				if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
+					continue;
+				}
+				for (ConsumerIpStatsData ipStatsData : ipStatsDatas) {
+					activeIpManager.putActiveIpData(
+							new ConsumerIdKey(ipStatsData.getTopicName(), ipStatsData.getConsumerId()),
+							ipStatsData.getIp(), ipStatsData.hasStatsData());
+				}
 			}
 		}
 	}
@@ -169,14 +172,12 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 				}
 			}
 		}
-		if (inActiveIps == null || inActiveIps.isEmpty()) {
-			for (IpInfo ipInfo : ipInfos) {
-				ipInfo.setActive(true);
-			}
-		} else {
-			for (IpInfo ipInfo : ipInfos) {
-				ipInfo.setActive(true);
-			}
+		
+		for (IpInfo ipInfo : ipInfos) {
+			ipInfo.setActive(true);
+		}
+		if (inActiveIps != null && !inActiveIps.isEmpty()) {
+
 			for (String inActiveIp : inActiveIps) {
 				for (IpInfo ipInfo : ipInfos) {
 					if (inActiveIp.equals(ipInfo.getIp())) {

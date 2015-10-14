@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor.impl;
 
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractTotalMapStatisable;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
@@ -114,7 +116,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 	protected StatsData getQpxInMemory(String topic, StatisType type, long start, long end) {
 
-		NavigableMap<Long, Long> rawData = statis.getQpxForTopic(topic, type);
+		NavigableMap<Long, Long> rawData = convertQpxData(statis.getQpxForTopic(topic, type));
 		if (rawData != null) {
 			rawData = rawData.subMap(getKey(start), true, getKey(end), true);
 		}
@@ -125,12 +127,12 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
 		Map<String, StatsData> result = new HashMap<String, StatsData>();
 
-		Map<String, NavigableMap<Long, Long>> serversQpx = statis.getQpxForServers(type);
+		Map<String, NavigableMap<Long, QpxData>> serversQpx = statis.getQpxForServers(type);
 
-		for (Entry<String, NavigableMap<Long, Long>> entry : serversQpx.entrySet()) {
+		for (Entry<String, NavigableMap<Long, QpxData>> entry : serversQpx.entrySet()) {
 
 			String serverIp = entry.getKey();
-			NavigableMap<Long, Long> serverQpx = entry.getValue();
+			NavigableMap<Long, Long> serverQpx = convertQpxData(entry.getValue());
 			if (serverQpx != null) {
 				serverQpx = serverQpx.subMap(getKey(start), true, getKey(end), true);
 			}
@@ -227,4 +229,14 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 		return getValue(keys, null);
 	}
 
+	protected NavigableMap<Long, Long> convertQpxData(NavigableMap<Long, QpxData> qpxDatas) {
+		if (qpxDatas != null) {
+			NavigableMap<Long, Long> qpxMap = new ConcurrentSkipListMap<Long, Long>();
+			for (Entry<Long, QpxData> entry : qpxDatas.entrySet()) {
+				qpxMap.put(entry.getKey(), entry.getValue().getQpx());
+			}
+			return qpxMap;
+		}
+		return null;
+	}
 }
