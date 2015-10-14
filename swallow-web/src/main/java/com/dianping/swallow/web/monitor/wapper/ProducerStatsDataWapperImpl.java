@@ -125,8 +125,8 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
 			QpxData topicQpx = topicQpxs.get(timeKey);
 			if (topicQpx != null) {
-				producerTopicStatsData.setQps(topicQpx.getQpx());
-				producerTopicStatsData.setQps(topicQpx.getTotal());
+				producerTopicStatsData.setQps(topicQpx.getQpx() == null ? 0L : topicQpx.getQpx().longValue());
+				producerTopicStatsData.setQpsTotal(topicQpx.getTotal() == null ? 0L : topicQpx.getTotal().longValue());
 			}
 			Long delay = topicDelays.get(timeKey);
 			if (delay != null) {
