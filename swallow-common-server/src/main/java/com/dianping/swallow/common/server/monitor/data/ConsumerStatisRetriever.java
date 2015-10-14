@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
+import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
+
 
 /**
  * @author mengwenchao
@@ -13,13 +15,13 @@ import java.util.Set;
 public interface ConsumerStatisRetriever extends StatisRetriever{
 
 
-	Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(String topic, StatisType type);
+	Map<String, NavigableMap<Long, QpxData>> getQpxForAllConsumerId(String topic, StatisType type);
 	
 	Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(String topic, StatisType type);
 
 	Set<String>  getConsumerIds(String topic);
 
-	Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(String topic, StatisType type, boolean includeTotal);
+	Map<String, NavigableMap<Long, QpxData>> getQpxForAllConsumerId(String topic, StatisType type, boolean includeTotal);
 	
 	Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(String topic, StatisType type, boolean includeTotal);
 

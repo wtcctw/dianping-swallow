@@ -62,6 +62,7 @@ public class ConsumerIdController extends AbstractMenuController {
 		consumerIdParam.setTopic(consumerIdQueryDto.getTopic());
 		consumerIdParam.setConsumerId(consumerIdQueryDto.getConsumerId());
 		consumerIdParam.setConsumerIp(consumerIdQueryDto.getConsumerIp());
+		consumerIdParam.setInactive(consumerIdQueryDto.isInactive());
 		Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
 		for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
 			resultDto.add(ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource));
@@ -214,6 +215,13 @@ public class ConsumerIdController extends AbstractMenuController {
 		return false;
 	}
 
+	@RequestMapping(value = "/console/consumerid/alarm/ipinfo/count/inactive", method = RequestMethod.GET)
+	@ResponseBody
+	public long countInactive() {
+
+		return consumerIdResourceService.countInactive();
+	}
+	
 	@Override
 	protected String getMenu() {
 		return "consumerid";

@@ -17,7 +17,6 @@ import jodd.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -81,10 +80,11 @@ public class TopicController extends AbstractMenuController {
 		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
 		String topic = topicQueryDto.getTopic();
 		String producerIp = topicQueryDto.getProducerServer();
+		boolean inactive = topicQueryDto.isInactive();
 		int offset = topicQueryDto.getOffset();
 		int limit = topicQueryDto.getLimit();
 
-		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp);
+		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp) && inactive;
 
 		if (isAllEmpry) {
 			String username = userUtils.getUsername(request);
@@ -95,7 +95,7 @@ public class TopicController extends AbstractMenuController {
 				pair = topicResourceService.findByAdministrator(offset, limit, username);
 			}
 		} else {
-			pair = topicResourceService.find(offset, limit, topic, producerIp);
+			pair = topicResourceService.find(offset, limit, topic, producerIp, inactive);
 		}
 
 		for (TopicResource topicResource : pair.getSecond()) {
@@ -354,15 +354,6 @@ public class TopicController extends AbstractMenuController {
 		return administrators;
 	}
 	
-	@RequestMapping(value = "/console/topic/ipinfo/{topic}", method = RequestMethod.GET)
-	public ModelAndView alarmDetail(@PathVariable String topic) {
-		Map<String, Object> map = createViewMap();
-		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		map.put("topic", topic);
-		map.put("entity", topicResource.getProducerIpInfos());
-		return new ModelAndView("topic/ipinfo", map);
-	}
-	
 	@RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean setAlarm(String topic, String ip, boolean alarm) {
@@ -400,6 +391,13 @@ public class TopicController extends AbstractMenuController {
 		}
 		
 		return false;
+	}
+	
+	@RequestMapping(value = "/console/topic/alarm/ipinfo/count/inactive", method = RequestMethod.GET)
+	@ResponseBody
+	public long countInactive() {
+
+		return topicResourceService.countInactive();
 	}
 
 	private String checkProposalName(String proposal) {

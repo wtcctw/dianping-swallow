@@ -10,6 +10,7 @@ import org.junit.Test;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 
 /**
@@ -35,10 +36,10 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
 		String server = ips[0];
 		String topic = topics[0];
 		String ip = ips[0];
-		
+
 		System.out.println(producerAllData.getKeys(new CasKeys(server)));
 		System.out.println(producerAllData.getValue(new CasKeys(server, topic, ip)).getClass());
-		
+
 	}
 
 	@Test
@@ -48,22 +49,24 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
 		for (String topic : topics) {
 
 			NavigableMap<Long, Long> saveDelay = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
-			NavigableMap<Long, Long> saveQpx = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
+			NavigableMap<Long, QpxData> saveQpx = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
 
-			expected(saveDelay, totalCount, avergeDelay);
-			expected(saveQpx, totalCount, qpsPerUnit * ips.length);
+			expectedDelay(saveDelay, totalCount, avergeDelay);
+			expectedQpx(saveQpx, totalCount, qpsPerUnit * ips.length, qpsPerUnit * ips.length
+					* AbstractCollector.SEND_INTERVAL * intervalCount);
 		}
 
-		for (Entry<String, NavigableMap<Long, Long>> entry : producerAllData.getQpxForServers(StatisType.SAVE)
+		for (Entry<String, NavigableMap<Long, QpxData>> entry : producerAllData.getQpxForServers(StatisType.SAVE)
 				.entrySet()) {
 
 			String ip = entry.getKey();
-			NavigableMap<Long, Long> value = entry.getValue();
+			NavigableMap<Long, QpxData> value = entry.getValue();
 
 			if (logger.isInfoEnabled()) {
 				logger.info("[testProducerServerData]" + ip + "," + value);
 			}
-			expected(entry.getValue(), totalCount, qpsPerUnit * topics.length);
+			expectedQpx(entry.getValue(), totalCount, qpsPerUnit * topics.length, qpsPerUnit * topics.length
+					* AbstractCollector.SEND_INTERVAL * intervalCount);
 		}
 
 	}
@@ -73,7 +76,23 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
 	 * @param totalCount
 	 * @param avergeDelay2
 	 */
-	protected void expected(NavigableMap<Long, Long> data, int totalCount, Long result) {
+	protected void expectedQpx(NavigableMap<Long, QpxData> data, int totalCount, Long resultQpx, Long resultTotal) {
+
+		Assert.assertEquals(totalCount, data.size());
+		for (QpxData value : data.values()) {
+
+			Assert.assertEquals(resultQpx, value.getQpx());
+			Assert.assertEquals(resultTotal, value.getTotal());
+		}
+
+	}
+
+	/**
+	 * @param saveDelay
+	 * @param totalCount
+	 * @param avergeDelay2
+	 */
+	protected void expectedDelay(NavigableMap<Long, Long> data, int totalCount, Long result) {
 
 		Assert.assertEquals(totalCount, data.size());
 		for (Long value : data.values()) {

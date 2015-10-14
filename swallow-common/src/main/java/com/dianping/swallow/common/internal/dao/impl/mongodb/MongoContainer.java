@@ -16,7 +16,6 @@ import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 
-import com.mongodb.MongoException;
 import com.mongodb.ServerAddress;
 
 /**
@@ -55,7 +54,10 @@ public class MongoContainer {
 		List<ServerAddress> replicaSetSeeds = MongoUtils.parseUriToAddressList(uri);
 
 		List<ServerAddress> servers = null;
-		for(MongoClient mongo : mongoSet){
+		
+		MongoClient result = null;
+		
+		for(MongoClient mongo: mongoSet){
 			
 			servers = mongo.getAllAddress();
 			
@@ -63,31 +65,28 @@ public class MongoContainer {
 				if(logger.isInfoEnabled()){
 					logger.info("[createOrUseExistingMongo][use exist mongo]");
 				}
-				return mongo;
-			}else{
-				try{
-					servers = mongo.getServerAddressList();
-					if(seedIn(servers, replicaSetSeeds)){
-						if(logger.isInfoEnabled()){
-							logger.info("[createOrUseExistingMongo][use exist mongo]");
-						}
-						return mongo;
-					}
-				}catch(MongoException e){
-					logger.warn("[createOrUseExistingMongo]", e);
-				}
+				result = mongo;
+				break;
 			}
 		}
 		
-		if(logger.isInfoEnabled()){
-			logger.info("[createMongo]" + replicaSetSeeds);
+		if(result == null){
+			
+			if(logger.isInfoEnabled()){
+				logger.info("[createMongo][begin]" + replicaSetSeeds);
+			}
+			
+			result = new MongoClient(replicaSetSeeds, mongoOptions);
+
+			if(logger.isInfoEnabled()){
+				logger.info("[createMongo][end]" + replicaSetSeeds);
+			}
+
+			mongoSet.add(result);
 		}
 		
-		MongoClient mongo = new MongoClient(replicaSetSeeds, mongoOptions);
-		
-		mongoSet.add(mongo);
-		mongos.put(uri, mongo);
-		return mongo;
+		mongos.put(uri, result);
+		return result;
 	}
 
 

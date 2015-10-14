@@ -50,7 +50,8 @@
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">Topic名称</th>
 						<th style="text-align: left">访问者白名单</th>
-						<th style="text-align: left">生产IP配置</th>
+						<th style="text-align: left"><a href="" data-toggle="tooltip"
+							ng-click="setInactive()" title="只显示包含不活动IP的Topic">生产IP配置</a>#if(${isadmin}) &nbsp; | 不活动IP个数&nbsp;:{{countinactive}} #end</th>
 						<th style="text-align: left">消费ID配置</th>
 						<th style="text-align: left">告警配置</th> #if(${isadmin})
 						<th style="text-align: left">发送告警</th>

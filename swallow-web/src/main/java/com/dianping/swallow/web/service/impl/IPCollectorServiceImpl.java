@@ -191,6 +191,7 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 						consumerMasterIpsMap.put(envMasterDevice.getHostName(), envMasterDevice.getIp());
 						consumerSlaveIpsMap.put(envSlaveDevice.getHostName(), envSlaveDevice.getIp());
+						break;
 					}
 				}
 			}

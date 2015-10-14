@@ -2,6 +2,12 @@ package com.dianping.swallow.web.model.stats;
 
 import java.util.List;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年10月14日 下午1:16:01
+ */
 public class ConsumerIpGroupStatsData {
 
 	private List<ConsumerIpStatsData> consumerIpStatsDatas;
@@ -15,11 +21,11 @@ public class ConsumerIpGroupStatsData {
 	}
 
 	public boolean hasStatsData() {
-		if (consumerIpStatsDatas == null || consumerIpStatsDatas.size() == 0) {
+		if (consumerIpStatsDatas == null || consumerIpStatsDatas.isEmpty()) {
 			return false;
 		}
 		for (ConsumerIpStatsData ipStatsData : consumerIpStatsDatas) {
-			if (ipStatsData.getSendQps() != 0L || ipStatsData.getAckQps() != 0L) {
+			if (ipStatsData.hasStatsData()) {
 				return true;
 			}
 		}

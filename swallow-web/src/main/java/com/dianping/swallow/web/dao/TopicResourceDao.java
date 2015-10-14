@@ -21,7 +21,7 @@ public interface TopicResourceDao extends Dao{
 	
 	long count();
 
-	Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerI);
+	Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerI, boolean inactive);
 
 	Pair<Long, List<TopicResource>> findByServer(int offset, int limit, String producerIp);
 	
@@ -38,4 +38,6 @@ public interface TopicResourceDao extends Dao{
 	List<TopicResource> findAll();
 	
 	Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limti);
+	
+	long countInactive();
 }
