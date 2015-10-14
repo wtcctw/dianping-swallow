@@ -1,11 +1,15 @@
 package com.dianping.swallow.web.monitor.collector;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.util.StringUtils;
+
+import com.dianping.swallow.web.model.resource.IpInfo;
 
 /**
  * 
@@ -18,6 +22,8 @@ public class IpStatusMonitor<T> {
 	private static final long ACTIVE_TIMESPAN = 6 * 60 * 60 * 1000;
 
 	private Map<T, ActiveIpData> resourceActiveIpDatas = new ConcurrentHashMap<T, ActiveIpData>();
+
+	private final long startTimestamp = System.currentTimeMillis();
 
 	public static class ActiveIpData {
 
@@ -35,6 +41,10 @@ public class IpStatusMonitor<T> {
 			}
 			return true;
 		}
+	}
+
+	public boolean isValid() {
+		return System.currentTimeMillis() - startTimestamp > ACTIVE_TIMESPAN;
 	}
 
 	public Map<T, ActiveIpData> getResourceActiveIpDatas() {
@@ -67,19 +77,29 @@ public class IpStatusMonitor<T> {
 		return null;
 	}
 
-	public Set<String> getInActiveIps(T key) {
-		Set<String> activeIps = new HashSet<String>();
+	public Set<String> getInActiveIps(T key, List<IpInfo> ipInfos) {
+		Set<String> inActiveIps = new HashSet<String>();
 		if (resourceActiveIpDatas.containsKey(key)) {
 			ActiveIpData activeIpData = resourceActiveIpDatas.get(key);
-			for (String ip : activeIpData.activeDatas.keySet()) {
-				if (StringUtils.isNotBlank(ip)) {
-					if (activeIpData.isIpInActive(ip)) {
-						activeIps.add(ip);
+			if (activeIpData != null) {
+				for (String ip : activeIpData.activeDatas.keySet()) {
+					if (StringUtils.isNotBlank(ip)) {
+						if (activeIpData.isIpInActive(ip)) {
+							inActiveIps.add(ip);
+						}
+					}
+				}
+
+				if (ipInfos != null && !ipInfos.isEmpty()) {
+					for (IpInfo ipInfo : ipInfos) {
+						if (!activeIpData.activeDatas.containsKey(ipInfo.getIp())) {
+							inActiveIps.add(ipInfo.getIp());
+						}
 					}
 				}
 			}
 		}
-		return activeIps;
+		return inActiveIps;
 	}
 
 	public void removeActiveIp(T key, String ip) {
@@ -89,6 +109,43 @@ public class IpStatusMonitor<T> {
 				activeIpData.activeDatas.remove(ip);
 			}
 		}
+	}
+
+	public List<IpInfo> getRelatedIpInfo(T key, List<IpInfo> ipInfos, Set<String> statsDataIps) {
+		Set<String> inActiveIps = this.getInActiveIps(key, ipInfos);
+		if (ipInfos == null || ipInfos.isEmpty()) {
+			ipInfos = new ArrayList<IpInfo>();
+		}
+		if (statsDataIps != null && !statsDataIps.isEmpty()) {
+			for (String statsDataIp : statsDataIps) {
+				boolean isHasIp = false;
+				for (IpInfo ipInfo : ipInfos) {
+					if (statsDataIp.equals(ipInfo.getIp())) {
+						isHasIp = true;
+						break;
+					}
+				}
+				if (!isHasIp) {
+					ipInfos.add(new IpInfo(statsDataIp, true, true));
+				}
+			}
+		}
+		if (this.isValid()) {
+			for (IpInfo ipInfo : ipInfos) {
+				ipInfo.setActive(true);
+			}
+			if (inActiveIps != null && !inActiveIps.isEmpty()) {
+				for (String inActiveIp : inActiveIps) {
+					for (IpInfo ipInfo : ipInfos) {
+						if (inActiveIp.equals(ipInfo.getIp())) {
+							ipInfo.setActive(false);
+						}
+					}
+				}
+			}
+		}
+
+		return ipInfos;
 	}
 
 }
