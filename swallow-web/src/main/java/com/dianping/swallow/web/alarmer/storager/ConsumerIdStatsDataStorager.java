@@ -52,7 +52,7 @@ public class ConsumerIdStatsDataStorager extends AbstractConsumerStatsDataStorag
 				return;
 			}
 			statsDataContainer.setConsumerIdTotalRatio(consumerIdStatsDatas);
-			executor.submit(new Runnable() {
+			taskManager.submit(new Runnable() {
 				@Override
 				public void run() {
 					try {

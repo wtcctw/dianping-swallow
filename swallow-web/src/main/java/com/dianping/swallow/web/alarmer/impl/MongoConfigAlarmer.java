@@ -21,7 +21,7 @@ import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoStatus;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.message.JsonDeserializedException;
 import com.dianping.swallow.web.alarmer.AlarmConfig;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.MongoConfigEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -65,7 +65,7 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 	private AlarmConfig alarmConfig;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@Override
 	protected void doInitialize() throws Exception {

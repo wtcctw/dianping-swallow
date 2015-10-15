@@ -2,19 +2,15 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -43,11 +39,6 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 
 	protected int alarmDelay = 30;
 
-	private static final String FACTORY_NAME = "ServiceAlarmer";
-
-	private static ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(
-			CommonUtils.DEFAULT_CPU_COUNT * 2, ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
@@ -65,23 +56,16 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 		if (future != null && !future.isCancelled()) {
 			future.cancel(false);
 		}
-
 	}
 
 	protected void doDispose() throws Exception {
 		super.doDispose();
-		if (scheduled != null && !scheduled.isShutdown()) {
-			scheduled.shutdown();
-		}
 	}
 
 	public abstract void doAlarm();
 
 	public void startAlarm() {
-		if (scheduled == null) {
-			return;
-		}
-		future = scheduled.scheduleAtFixedRate(new Runnable() {
+		future = threadManager.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {

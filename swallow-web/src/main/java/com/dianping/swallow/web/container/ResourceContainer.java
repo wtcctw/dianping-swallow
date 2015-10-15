@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.alarmer.container;
+package com.dianping.swallow.web.container;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import com.dianping.swallow.web.model.resource.TopicResource;
  *
  *         2015年8月17日 下午5:49:38
  */
-public interface AlarmResourceContainer {
+public interface ResourceContainer {
 
 	ConsumerServerResource findConsumerServerResource(String ip);
 

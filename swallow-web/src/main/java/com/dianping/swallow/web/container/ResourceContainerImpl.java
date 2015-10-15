@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.alarmer.container;
+package com.dianping.swallow.web.container;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +28,7 @@ import com.dianping.swallow.web.service.TopicResourceService;
  *         2015年8月3日 上午11:34:10
  */
 @Component("alarmResourceContainer")
-public class AlarmResourceContainerImpl extends AbstractContainer implements AlarmResourceContainer {
+public class ResourceContainerImpl extends AbstractContainer implements ResourceContainer {
 
 	private static final String DEFAULT_RECORD = "default";
 

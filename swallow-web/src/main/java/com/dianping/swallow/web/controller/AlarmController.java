@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.controller.dto.AlarmSearchDto;
 import com.dianping.swallow.web.controller.mapper.AlarmMapper;
 import com.dianping.swallow.web.dao.AlarmDao.AlarmParam;
@@ -45,7 +45,7 @@ public class AlarmController extends AbstractSidebarBasedController {
 	private AlarmService alarmService;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@RequestMapping(value = "/console/tool")
 	public ModelAndView alarm(HttpServletRequest request, HttpServletResponse response) {

@@ -28,7 +28,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
@@ -63,7 +63,7 @@ public class DefaultProducerDataRetriever
 	private ProducerTopicStatsDataService pTopicStatsDataService;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@Autowired
 	private ProducerMonitorDao producerMonitorDao;

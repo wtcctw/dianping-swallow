@@ -17,7 +17,7 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.event.ClientType;
 import com.dianping.swallow.web.model.event.ConsumerClientEvent;
 import com.dianping.swallow.web.model.event.EventFactory;
@@ -57,7 +57,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 	private ConsumerIpStatsDataService cIpStatsDataService;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	private Map<IpStatsDataKey, Long> firstCandidates = new ConcurrentHashMap<IpStatsDataKey, Long>();
 

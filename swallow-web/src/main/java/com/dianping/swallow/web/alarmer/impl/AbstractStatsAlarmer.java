@@ -1,14 +1,11 @@
 package com.dianping.swallow.web.alarmer.impl;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -26,8 +23,7 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 
 	private final static long DAY_TIMESTAMP_UNIT = 24 * 60 * 60 * 1000;
 
-	private static ExecutorService executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 4,
-			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+	private Future<?> future;
 
 	protected static final long TIME_SECTION = 5 * 60 / AbstractCollector.SEND_INTERVAL;
 
@@ -46,20 +42,20 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
+		if (future != null && !future.isCancelled()) {
+			future.cancel(false);
+		}
 	}
 
 	protected void doDispose() throws Exception {
 		super.doDispose();
-		if (executor != null && !executor.isShutdown()) {
-			executor.shutdown();
-		}
 	}
 
 	@Override
 	public void achieveMonitorData() {
 		logger.info("[achieveMonitorData] statsDataAlarmer {}", getClass().getSimpleName());
 
-		executor.submit(new Runnable() {
+		future = threadManager.submit(new Runnable() {
 
 			@Override
 			public void run() {

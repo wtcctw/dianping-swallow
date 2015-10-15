@@ -12,8 +12,8 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer.ConsumerServerResourcePair;
+import com.dianping.swallow.web.container.ResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer.ConsumerServerResourcePair;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
@@ -33,7 +33,7 @@ public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 	private IPCollectorService ipCollectorService;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@Autowired
 	private ConsumerPortAlarmer consumerPortAlarmer;

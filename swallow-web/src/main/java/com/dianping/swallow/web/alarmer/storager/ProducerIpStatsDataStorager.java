@@ -53,7 +53,7 @@ public class ProducerIpStatsDataStorager extends AbstractProducerStatsDataStorag
 				continue;
 			}
 			try {
-				executor.submit(new Runnable() {
+				taskManager.submit(new Runnable() {
 					@Override
 					public void run() {
 						try {

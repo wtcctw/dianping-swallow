@@ -28,7 +28,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.dashboard.model.Entry;
 import com.dianping.swallow.web.dashboard.model.FixSizedPriorityQueueContainer;
 import com.dianping.swallow.web.dashboard.model.MinuteEntry;
@@ -71,7 +71,7 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 	private AppResourceManager appResourceManager;
 
 	@Resource(name = "alarmResourceContainer")
-	private AlarmResourceContainer alarmResourceContainer;
+	private ResourceContainer alarmResourceContainer;
 
 	private Map<TotalDataKey, TotalData> totalDataMap = new ConcurrentHashMap<TotalDataKey, TotalData>();
 
