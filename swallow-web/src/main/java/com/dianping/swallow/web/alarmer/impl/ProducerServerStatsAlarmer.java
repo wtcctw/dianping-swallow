@@ -47,19 +47,19 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(
-				getLastTimeKey(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				serverAlarm(serverStatsDatas);
+				serverAlarm();
 			}
 		});
 	}
 
-	private void serverAlarm(List<ProducerServerStatsData> serverStatsDatas) {
-		if (serverStatsDatas == null) {
+	private void serverAlarm() {
+		List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(getLastTimeKey(),
+				false);
+		if (serverStatsDatas == null || serverStatsDatas.isEmpty()) {
 			return;
 		}
 		for (ProducerServerStatsData serverStatsData : serverStatsDatas) {

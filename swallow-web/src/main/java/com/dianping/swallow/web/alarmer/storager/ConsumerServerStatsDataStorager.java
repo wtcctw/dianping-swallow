@@ -37,7 +37,7 @@ public class ConsumerServerStatsDataStorager extends AbstractConsumerStatsDataSt
 
 	private void doStorageServerStats() {
 		final List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(
-				lastTimeKey.get(), true);
+				getLastTimeKey(), true);
 		if (serverStatsDatas == null) {
 			return;
 		}

@@ -2,7 +2,6 @@ package com.dianping.swallow.web.alarmer.storager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +32,7 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	private static final String FACTORY_NAME = "StatsDataStorager";
 
-	protected static final long DEFAULT_VALUE = -1L;
-
-	protected volatile AtomicLong lastTimeKey = new AtomicLong();
+	protected volatile long lastTimeKey = -1L;
 
 	protected static ExecutorService executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
 			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
@@ -43,7 +40,6 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		lastTimeKey.set(DEFAULT_VALUE);
 	}
 
 	@Override
@@ -87,5 +83,9 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 	}
 
 	protected abstract void doStorage();
+
+	public long getLastTimeKey() {
+		return lastTimeKey;
+	}
 
 }

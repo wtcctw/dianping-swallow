@@ -22,7 +22,7 @@ public class ConsumerTopicStatsDataStorager extends AbstractConsumerStatsDataSto
 
 	@Override
 	protected void doStorage() {
-		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(lastTimeKey.get());
+		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(getLastTimeKey());
 		doStorageTopicStats(topicStatsData);
 	}
 

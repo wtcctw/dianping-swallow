@@ -38,7 +38,7 @@ public class ProducerServerStatsDataStorager extends AbstractProducerStatsDataSt
 
 	private void doStorageServerStats() {
 		final List<ProducerServerStatsData> serverStatsDatas = producerStatsDataWapper.getServerStatsDatas(
-				lastTimeKey.get(), true);
+				getLastTimeKey(), true);
 		if (serverStatsDatas != null) {
 			serverStatsDataService.insert(serverStatsDatas);
 		}

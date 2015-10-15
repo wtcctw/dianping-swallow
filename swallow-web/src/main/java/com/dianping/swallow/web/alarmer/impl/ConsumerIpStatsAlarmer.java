@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,39 +75,38 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ConsumerIpGroupStatsData> ipGroupStatsDatas = cStatsDataWapper.getIpGroupStatsDatas(
-				getLastTimeKey(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				alarmIpData(ipGroupStatsDatas);
+				alarmIpData();
 			}
 		});
 	}
 
-	public void alarmIpData(List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
-		checkIpGroups(ipGroupStatsDatas);
+	public void alarmIpData() {
+		Set<String> topicNames = cStatsDataWapper.getTopics(false);
+		for (String topicName : topicNames) {
+			Set<String> consumerIds = cStatsDataWapper.getConsumerIds(topicName, false);
+			for (String consumerId : consumerIds) {
+				ConsumerIpGroupStatsData ipGroupStatsData = cStatsDataWapper.getIpGroupStatsDatas(topicName,
+						consumerId, getLastTimeKey(), false);
+				checkIpGroup(ipGroupStatsData);
+			}
+		}
 		alarmSureRecords();
 		alarmUnSureRecords();
 	}
 
-	public void checkIpGroups(List<ConsumerIpGroupStatsData> ipGroupStatsDatas) {
-		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
+	public void checkIpGroup(ConsumerIpGroupStatsData ipGroupStatsData) {
+		if (ipGroupStatsData == null) {
 			return;
 		}
-
-		for (final ConsumerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
-			checkIpGroup(ipGroupStatsData);
-		}
-	}
-
-	public void checkIpGroup(ConsumerIpGroupStatsData ipGroupStatsData) {
-		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		List<ConsumerIpStatsData> ipStatsDatas = ipGroupStatsData.getConsumerIpStatsDatas();
 		if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
 			return;
 		}
+		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		for (ConsumerIpStatsData ipStatsData : ipStatsDatas) {
 			boolean hasStatsData = ipStatsData.checkStatsData();
 			IpStatsDataKey key = new IpStatsDataKey(ipStatsData);

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -72,38 +73,35 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ProducerIpGroupStatsData> ipGroupStatsDatas = pStatsDataWapper.getIpGroupStatsDatas(
-				getLastTimeKey(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				alarmIpData(ipGroupStatsDatas);
+				alarmIpData();
 			}
 		});
 	}
 
-	public void alarmIpData(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
-		checkIpGroups(ipGroupStatsDatas);
+	public void alarmIpData() {
+		Set<String> topicNames = pStatsDataWapper.getTopics(false);
+		for (String topicName : topicNames) {
+			ProducerIpGroupStatsData ipGroupStatsData = pStatsDataWapper.getIpGroupStatsData(topicName,
+					getLastTimeKey(), false);
+			checkIpGroup(ipGroupStatsData);
+		}
 		alarmSureRecords();
 		alarmUnSureRecords();
 	}
 
-	public void checkIpGroups(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
-		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
+	public void checkIpGroup(ProducerIpGroupStatsData ipGroupStatsData) {
+		if (ipGroupStatsData == null) {
 			return;
 		}
-		for (final ProducerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
-			checkIpGroup(ipGroupStatsData);
-		}
-	}
-
-	public void checkIpGroup(ProducerIpGroupStatsData ipGroupStatsData) {
-		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		List<ProducerIpStatsData> ipStatsDatas = ipGroupStatsData.getProducerIpStatsDatas();
 		if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
 			return;
 		}
+		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
 			boolean hasStatsData = ipStatsData.checkStatsData();
 			IpStatsDataKey key = new IpStatsDataKey(ipStatsData);

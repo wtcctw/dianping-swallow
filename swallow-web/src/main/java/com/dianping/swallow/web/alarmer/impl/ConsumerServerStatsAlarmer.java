@@ -47,23 +47,22 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(
-				getLastTimeKey(), false);
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				serverAlarm(serverStatsDatas);
+				serverAlarm();
 			}
 		});
 
 	}
 
-	private void serverAlarm(List<ConsumerServerStatsData> serverStatsDatas) {
+	private void serverAlarm() {
+		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(getLastTimeKey(),
+				false);
 		if (serverStatsDatas == null) {
 			return;
 		}
-
 		for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
 			try {
 				String ip = serverStatsData.getIp();

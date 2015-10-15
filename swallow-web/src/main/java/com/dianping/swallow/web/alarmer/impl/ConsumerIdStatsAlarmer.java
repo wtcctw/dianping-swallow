@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,25 +51,27 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
-				getLastTimeKey(), false);
+
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
-				alarmConsumerIds(consumerIdStatsDatas);
+				Set<String> topicNames = consumerStatsDataWapper.getTopics(false);
+				for (String topicName : topicNames) {
+					alarmConsumerIds(topicName);
+				}
 			}
 		});
 	}
 
-	private void alarmConsumerIds(List<ConsumerIdStatsData> consumerIdStatsDatas) {
-		if (consumerIdStatsDatas == null || consumerIdStatsDatas.size() == 0) {
+	private void alarmConsumerIds(String topicName) {
+		final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
+				topicName, getLastTimeKey(), false);
+		if (consumerIdStatsDatas == null || consumerIdStatsDatas.isEmpty()) {
 			return;
 		}
-
 		for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
 			try {
-				String topicName = consumerIdStatsData.getTopicName();
 				String consumerId = consumerIdStatsData.getConsumerId();
 				ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
 				TopicResource topicResource = resourceContainer.findTopicResource(topicName);

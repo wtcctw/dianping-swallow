@@ -47,7 +47,7 @@ public class ProducerIpStatsDataStorager extends AbstractProducerStatsDataStorag
 		final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(topicNames.size());
 		for (String topicName : topicNames) {
 			final List<ProducerIpStatsData> ipStatsDatas = producerStatsDataWapper.getIpStatsDatas(topicName,
-					lastTimeKey.get(), false);
+					getLastTimeKey(), false);
 			if (ipStatsDatas == null) {
 				downLatch.countDown();
 				continue;

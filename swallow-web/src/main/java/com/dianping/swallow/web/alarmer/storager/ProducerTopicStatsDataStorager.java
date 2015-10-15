@@ -40,7 +40,7 @@ public class ProducerTopicStatsDataStorager extends AbstractProducerStatsDataSto
 
 	private void doStorageTopicStats() {
 		final List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(
-				lastTimeKey.get(), true);
+				getLastTimeKey(), true);
 		if (topicStatsDatas != null) {
 			statsDataContainer.setProducerTopicTotalRatio(topicStatsDatas);
 			topicStatsDataService.insert(topicStatsDatas);

@@ -46,7 +46,7 @@ public class ConsumerIpStatsDataStorager extends AbstractConsumerStatsDataStorag
 			final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(consumerIds.size());
 			for (String consumerId : consumerIds) {
 				final List<ConsumerIpStatsData> ipStatsDatas = consumerStatsDataWapper.getIpStatsDatas(topicName,
-						consumerId, lastTimeKey.get(), false);
+						consumerId, getLastTimeKey(), false);
 				if (ipStatsDatas == null) {
 					downLatch.countDown();
 					continue;
