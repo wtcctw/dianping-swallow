@@ -67,7 +67,7 @@ public class ResourceContainerImpl extends AbstractContainer implements Resource
 		super.doInitialize();
 		containerName = "AlarmResourceContainer";
 		delay = 5;
-		interval = 300;
+		interval = 600;
 	}
 
 	public void findResourceData() {
