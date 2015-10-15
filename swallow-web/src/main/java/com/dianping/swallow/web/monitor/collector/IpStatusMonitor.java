@@ -19,7 +19,7 @@ import com.dianping.swallow.web.model.resource.IpInfo;
  */
 public class IpStatusMonitor<T> {
 
-	private static final long ACTIVE_TIMESPAN = 6 * 60 * 60 * 1000;
+	private static final long ACTIVE_TIMESPAN = 24 * 60 * 60 * 1000;
 
 	private Map<T, ActiveIpData> resourceActiveIpDatas = new ConcurrentHashMap<T, ActiveIpData>();
 
