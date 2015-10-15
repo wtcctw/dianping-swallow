@@ -2,6 +2,10 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.concurrent.Future;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
@@ -59,7 +63,13 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 
 			@Override
 			public void run() {
-				doAlarm();
+				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName + FUNCTION_DOALARM);
+				catWrapper.doAction(new SwallowAction() {
+					@Override
+					public void doAction() throws SwallowException {
+						doAlarm();
+					}
+				});
 			}
 
 		});
