@@ -7,10 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.AlarmConfig;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.event.EventType;
@@ -56,13 +52,7 @@ public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 
 	@Override
 	public void doAlarm() {
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				checkService();
-			}
-		});
+		checkService();
 	}
 
 	private boolean checkService() {

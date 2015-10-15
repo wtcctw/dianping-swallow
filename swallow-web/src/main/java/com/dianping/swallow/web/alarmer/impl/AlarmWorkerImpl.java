@@ -11,7 +11,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CatUtil;
 import com.dianping.swallow.web.alarmer.AlarmWorker;
 import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
-import com.dianping.swallow.web.alarmer.AlamerTaskManager;
+import com.dianping.swallow.web.alarmer.TaskManager;
 import com.dianping.swallow.web.alarmer.EventChannel;
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.util.ThreadUtils;
@@ -33,7 +33,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 	private volatile boolean isStopped = false;
 
 	@Autowired
-	protected AlamerTaskManager threadManager;
+	protected TaskManager threadManager;
 
 	private Thread alarmTaskThread;
 

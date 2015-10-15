@@ -6,10 +6,6 @@ import java.util.concurrent.CountDownLatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.service.ProducerIpStatsDataService;
 import com.dianping.swallow.web.util.CountDownLatchUtil;
@@ -27,19 +23,11 @@ public class ProducerIpStatsDataStorager extends AbstractProducerStatsDataStorag
 
 	@Override
 	protected void doStorage() {
-		logger.info("[doStorageIpStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
-				+ "-doStorageIpStats");
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				doStorageIpStats();
-			}
-		});
-
+		doStorageIpStats();
 	}
 
 	private void doStorageIpStats() {
+		logger.info("[doStorageIpStats].");
 		Set<String> topicNames = producerStatsDataWapper.getTopics(false);
 		if (topicNames == null || topicNames.isEmpty()) {
 			return;

@@ -15,6 +15,9 @@ import com.dianping.swallow.web.service.AlarmService;
  */
 @Service("eventFactory")
 public class EventFactory {
+	
+	@Autowired
+	private EventConfig eventConfig;
 
 	@Autowired
 	private AlarmService alarmService;
@@ -26,6 +29,7 @@ public class EventFactory {
 	private AlarmMetaContainer alarmMetaContainer;
 
 	private void setComponent(Event event) {
+		event.setEventConfig(eventConfig);
 		event.setAlarmService(alarmService);
 		event.setAlarmReceiverManager(receiverManager);
 		event.setAlarmMetaContainer(alarmMetaContainer);

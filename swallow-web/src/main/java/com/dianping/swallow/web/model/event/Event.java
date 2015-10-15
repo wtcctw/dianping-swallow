@@ -1,11 +1,7 @@
 package com.dianping.swallow.web.model.event;
 
-import java.io.InputStream;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -34,32 +30,18 @@ public abstract class Event {
 
 	protected static final String KEY_SPLIT = "&";
 
-	private static final String MOBILE_KEY = "mobile";
-
-	private static final String EMAIL_KEY = "email";
-
-	private static final String COMMA_SPLIT = ",";
-
-	private static Set<String> devMobiles;
-
-	private static Set<String> devEmails;
-
-	private static final String ALARM_RECIEVER_FILE_NAME = "swallow-alarm-reciever.properties";
-
-	//1 minute
+	// 1 minute
 	private static final long timeUnit = 60 * 1000;
 
-	static {
-		initProperties();
-	}
+	private EventConfig eventConfig;
 
 	private AlarmService alarmService;
 
 	protected AlarmReceiverManager receiverManager;
 
 	private AlarmMetaContainer alarmMetaContainer;
-	
-	//unit millis
+
+	// unit millis
 	protected long checkInterval = 30 * 1000;
 
 	private long eventId;
@@ -116,6 +98,10 @@ public abstract class Event {
 
 	public void setAlarmReceiverManager(AlarmReceiverManager receiverManager) {
 		this.receiverManager = receiverManager;
+	}
+
+	public void setEventConfig(EventConfig eventConfig) {
+		this.eventConfig = eventConfig;
 	}
 
 	public long getCheckInterval() {
@@ -255,8 +241,8 @@ public abstract class Event {
 	private AlarmReceiver fillReciever(AlarmMeta alarmMeta) {
 		AlarmReceiver receiver = null;
 		if (EnvUtil.isDev()) {
-			if (devMobiles != null && devEmails != null) {
-				receiver = new AlarmReceiver(devEmails, devMobiles);
+			if (eventConfig.getDevMobiles() != null && eventConfig.getDevEmails() != null) {
+				receiver = new AlarmReceiver(eventConfig.getDevEmails(), eventConfig.getDevMobiles());
 			}
 			return receiver;
 		} else {
@@ -273,46 +259,6 @@ public abstract class Event {
 		}
 
 		return receiver;
-	}
-
-	private static void addElement(Set<String> elementSet, String strSource) {
-		if (StringUtils.isBlank(strSource)) {
-			return;
-		}
-		String[] elements = strSource.split(COMMA_SPLIT);
-		if (elements != null) {
-			for (String element : elements) {
-				if (StringUtils.isNotBlank(element)) {
-					elementSet.add(element);
-				}
-			}
-		}
-	}
-
-	private static void initProperties() {
-		if (!EnvUtil.isDev()) {
-			return;
-		}
-		devMobiles = new HashSet<String>();
-		devEmails = new HashSet<String>();
-		try {
-			InputStream in = Event.class.getClassLoader().getResourceAsStream(ALARM_RECIEVER_FILE_NAME);
-			if (in != null) {
-				Properties prop = new Properties();
-				try {
-					prop.load(in);
-					String strMobile = StringUtils.trim(prop.getProperty(MOBILE_KEY));
-					addElement(devMobiles, strMobile);
-					String strEmail = StringUtils.trim(prop.getProperty(EMAIL_KEY));
-					addElement(devEmails, strEmail);
-				} finally {
-					in.close();
-				}
-			}
-		} catch (Exception e) {
-			logger.info("[initProperties] Load {} file failed.", ALARM_RECIEVER_FILE_NAME);
-			throw new RuntimeException(e);
-		}
 	}
 
 }

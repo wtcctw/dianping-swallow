@@ -17,7 +17,7 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
-import com.dianping.swallow.web.alarmer.AlamerTaskManager;
+import com.dianping.swallow.web.alarmer.TaskManager;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.service.AlarmMetaService;
@@ -39,7 +39,7 @@ public class AlarmMetaContainerImpl extends AbstractLifecycle implements AlarmMe
 	private AlarmMetaService alarmMetaService;
 
 	@Autowired
-	private AlamerTaskManager threadManager;
+	private TaskManager threadManager;
 
 	@Override
 	public AlarmMeta getAlarmMeta(int metaId) {

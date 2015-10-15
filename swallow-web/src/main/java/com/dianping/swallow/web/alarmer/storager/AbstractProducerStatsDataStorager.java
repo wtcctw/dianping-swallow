@@ -23,6 +23,5 @@ public abstract class AbstractProducerStatsDataStorager extends AbstractStatsDat
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		producerDataRetriever.registerListener(this);
-		storagerName = getClass().getSimpleName();
 	}
 }

@@ -6,10 +6,6 @@ import java.util.concurrent.CountDownLatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.container.StatsDataContainer;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
@@ -31,18 +27,11 @@ public class ConsumerIdStatsDataStorager extends AbstractConsumerStatsDataStorag
 
 	@Override
 	protected void doStorage() {
-		logger.info("[doStorageConsumerIdStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
-				+ "-doStorageConsumerIdStats");
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				doStorageConsumerIdStats();
-			}
-		});
+		doStorageConsumerIdStats();
 	}
 
 	private void doStorageConsumerIdStats() {
+		logger.info("[doStorageConsumerIdStats].");
 		Set<String> topicNames = consumerStatsDataWapper.getTopics(false);
 		final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(topicNames.size());
 		for (String topicName : topicNames) {

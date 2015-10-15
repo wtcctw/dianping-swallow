@@ -9,8 +9,6 @@ import com.dianping.swallow.web.service.HttpService.HttpResult;
 
 public class ProducerServer extends Server {
 
-	private static final Logger logger = LoggerFactory.getLogger(ProducerServer.class);
-	
 	private String pigeonHealthUrl;
 
 	public ProducerServer() {
@@ -19,7 +17,7 @@ public class ProducerServer extends Server {
 	
 	public ProducerServer(String ip){
 		this.setIp(ip);
-		pigeonHealthUrl = StringUtils.replace(pigeonHealthUrlFormat, "{ip}", ip);
+		pigeonHealthUrl = StringUtils.replace(serverConfig.getPigeonHealthUrl(), "{ip}", ip);
 	}
 
 	@Override

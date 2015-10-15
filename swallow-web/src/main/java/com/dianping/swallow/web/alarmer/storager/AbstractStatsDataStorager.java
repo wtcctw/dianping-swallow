@@ -11,7 +11,7 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
-import com.dianping.swallow.web.alarmer.AlamerTaskManager;
+import com.dianping.swallow.web.alarmer.TaskManager;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 
 /**
@@ -30,15 +30,16 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 	protected final static String CAT_TYPE = "StatsDataStorager";
 
 	protected volatile long lastTimeKey = -1L;
-	
+
 	private Future<?> future;
-	
+
 	@Autowired
-	protected AlamerTaskManager taskManager;
-	
+	protected TaskManager taskManager;
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
+		storagerName = getClass().getSimpleName();
 	}
 
 	@Override
@@ -60,7 +61,7 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	@Override
 	public void achieveMonitorData() {
-		 future = taskManager.submit(new Runnable() {
+		future = taskManager.submit(new Runnable() {
 			@Override
 			public void run() {
 				try {

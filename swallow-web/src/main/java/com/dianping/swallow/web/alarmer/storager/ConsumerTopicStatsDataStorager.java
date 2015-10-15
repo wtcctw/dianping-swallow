@@ -2,10 +2,6 @@ package com.dianping.swallow.web.alarmer.storager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
 
@@ -22,23 +18,15 @@ public class ConsumerTopicStatsDataStorager extends AbstractConsumerStatsDataSto
 
 	@Override
 	protected void doStorage() {
-		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(getLastTimeKey());
-		doStorageTopicStats(topicStatsData);
+		doStorageTopicStats();
 	}
 
-	private void doStorageTopicStats(final ConsumerTopicStatsData topicStatsData) {
-		logger.info("[doStorageTopicStats]");
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName()
-				+ "-doStorageTopicStats");
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				if (topicStatsData == null) {
-					return;
-				}
-				topicStatsDataService.insert(topicStatsData);
-			}
-		});
+	private void doStorageTopicStats() {
+		logger.info("[doStorageTopicStats].");
+		ConsumerTopicStatsData topicStatsData = consumerStatsDataWapper.getTotalTopicStatsData(getLastTimeKey());
+		if (topicStatsData != null) {
+			topicStatsDataService.insert(topicStatsData);
+		}
 	}
-	
+
 }

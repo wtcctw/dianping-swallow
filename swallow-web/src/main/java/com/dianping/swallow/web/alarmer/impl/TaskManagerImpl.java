@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
-import com.dianping.swallow.web.alarmer.AlamerTaskManager;
+import com.dianping.swallow.web.alarmer.TaskManager;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
@@ -22,7 +22,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年10月15日 下午12:40:27
  */
 @Component
-public class AlarmerTaskManagerImpl extends AbstractLifecycle implements AlamerTaskManager, AlarmerLifecycle {
+public class TaskManagerImpl extends AbstractLifecycle implements TaskManager, AlarmerLifecycle {
 
 	protected final static String EXECUTOR_FACTORY_NAME = "ExecutorAlamer";
 

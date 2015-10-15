@@ -7,6 +7,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.service.HttpService;
@@ -71,7 +75,13 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 			public void run() {
 
 				try {
-					doAlarm();
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName + FUNCTION_DOALARM);
+					catWrapper.doAction(new SwallowAction() {
+						@Override
+						public void doAction() throws SwallowException {
+							doAlarm();
+						}
+					});
 
 				} catch (Throwable th) {
 					logger.error("[startAlarm]", th);

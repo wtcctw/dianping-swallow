@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
-import com.dianping.swallow.web.alarmer.AlamerTaskManager;
+import com.dianping.swallow.web.alarmer.TaskManager;
 
 /**
  * 
@@ -21,11 +21,14 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 	protected static final String FUNCTION_DOALARM = "-doAlarm";
 	
 	@Autowired
-	protected AlamerTaskManager threadManager;
+	protected TaskManager threadManager;
+	
+	protected String alarmName;
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
+		alarmName = getClass().getSimpleName();
 	}
 
 	@Override

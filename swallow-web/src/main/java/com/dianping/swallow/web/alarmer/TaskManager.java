@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  *
  *         2015年10月15日 上午11:37:23
  */
-public interface AlamerTaskManager {
+public interface TaskManager {
 
 	Future<?> submit(Runnable command);
 

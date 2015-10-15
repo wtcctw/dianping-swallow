@@ -23,6 +23,5 @@ public abstract class AbstractConsumerStatsDataStorager extends AbstractStatsDat
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		consumerDataRetriever.registerListener(this);
-		storagerName = getClass().getSimpleName();
 	}
 }
