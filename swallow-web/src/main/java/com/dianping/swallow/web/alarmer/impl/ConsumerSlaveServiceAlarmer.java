@@ -7,10 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.alarmer.AlarmConfig;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.event.EventType;
@@ -54,13 +50,7 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 
 	@Override
 	public void doAlarm() {
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				checkSlaveService();
-			}
-		});
+		checkSlaveService();
 	}
 
 	private boolean checkSlaveService() {
@@ -92,8 +82,8 @@ public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 
 	private void report(String slaveIp, ServerType serverType) {
 		ServerEvent serverEvent = eventFactory.createServerEvent();
-		serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(serverType)
-				.setEventType(EventType.CONSUMER).setCreateTime(new Date());
+		serverEvent.setIp(slaveIp).setSlaveIp(slaveIp).setServerType(serverType).setEventType(EventType.CONSUMER)
+				.setCreateTime(new Date());
 		eventReporter.report(serverEvent);
 	}
 

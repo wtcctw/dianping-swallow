@@ -98,7 +98,7 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 		}
 		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		for (ConsumerIpStatsData ipStatsData : ipStatsDatas) {
-			boolean hasStatsData = ipStatsData.checkStatsData();
+			boolean hasStatsData = ipStatsData.hasStatsData();
 			IpStatsDataKey key = new IpStatsDataKey(ipStatsData);
 			if (hasStatsData) {
 				whiteLists.put(key, System.currentTimeMillis());

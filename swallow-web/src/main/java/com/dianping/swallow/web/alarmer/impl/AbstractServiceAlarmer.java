@@ -75,7 +75,7 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 			public void run() {
 
 				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName + FUNCTION_DOALARM);
+					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName);
 					catWrapper.doAction(new SwallowAction() {
 						@Override
 						public void doAction() throws SwallowException {

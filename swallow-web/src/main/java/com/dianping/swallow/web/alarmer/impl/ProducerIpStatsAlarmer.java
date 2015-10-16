@@ -93,7 +93,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 		}
 		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
 		for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
-			boolean hasStatsData = ipStatsData.checkStatsData();
+			boolean hasStatsData = ipStatsData.hasStatsData();
 			IpStatsDataKey key = new IpStatsDataKey(ipStatsData);
 			if (hasStatsData) {
 				whiteLists.put(key, System.currentTimeMillis());

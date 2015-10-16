@@ -21,8 +21,6 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 
 	protected final static String CAT_TYPE = "StatsDataAlarmer";
 
-	protected static final String FACTORY_NAME = "StatsDataAlarmer";
-
 	protected static final String TOTAL_KEY = MonitorData.TOTAL_KEY;
 
 	private final static long DAY_TIMESTAMP_UNIT = 24 * 60 * 60 * 1000;
@@ -63,7 +61,7 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 
 			@Override
 			public void run() {
-				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName + FUNCTION_DOALARM);
+				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName);
 				catWrapper.doAction(new SwallowAction() {
 					@Override
 					public void doAction() throws SwallowException {

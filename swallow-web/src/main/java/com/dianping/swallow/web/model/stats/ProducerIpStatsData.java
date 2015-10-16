@@ -1,8 +1,5 @@
 package com.dianping.swallow.web.model.stats;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -45,33 +42,11 @@ public class ProducerIpStatsData extends ProducerStatsData {
 		}
 		return true;
 	}
-
-	public boolean checkStatsData() {
+		
+	public boolean hasStatsData() {
 		if (this.getQps() == 0L && this.getQpsTotal() == 0L) {
 			return false;
 		}
 		return true;
 	}
-
-	public boolean hasStatsData() {
-		return checkStatsData();
-	}
-
-	public boolean checkGroupStatsData(List<ProducerIpStatsData> statsDatas) {
-		if (this.getQps() == 0L) {
-			if (statsDatas != null && statsDatas.size() > 0) {
-				for (ProducerIpStatsData statsData : statsDatas) {
-					if (StringUtils.equals(statsData.getIp(), this.ip)) {
-						continue;
-					} else {
-						if (statsData.getQps() != 0L) {
-							return false;
-						}
-					}
-				}
-			}
-		}
-		return true;
-	}
-
 }

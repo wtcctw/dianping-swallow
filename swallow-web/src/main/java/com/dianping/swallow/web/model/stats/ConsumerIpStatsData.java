@@ -44,16 +44,12 @@ public class ConsumerIpStatsData extends ConsumerStatsData {
 		this.consumerId = consumerId;
 	}
 
-	public boolean checkStatsData() {
+	public boolean hasStatsData() {
 		if (this.getSendQps() == 0L && this.getSendQpsTotal() == 0L && this.getAckQps() == 0L
 				&& this.getAckQpsTotal() == 0L) {
 			return false;
 		}
 		return true;
-	}
-
-	public boolean hasStatsData() {
-		return checkStatsData();
 	}
 
 }

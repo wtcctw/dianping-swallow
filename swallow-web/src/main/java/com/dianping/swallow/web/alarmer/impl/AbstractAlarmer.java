@@ -18,17 +18,17 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	protected static final String FUNCTION_DOALARM = "-doAlarm";
-	
+	protected static final String DOALARM_FUNCTION = "-doAlarm";
+
 	@Autowired
 	protected TaskManager threadManager;
-	
+
 	protected String alarmName;
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		alarmName = getClass().getSimpleName();
+		alarmName = getClass().getSimpleName() + DOALARM_FUNCTION;
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 		super.doStart();
 		logger.info("[doStart] {} start.", getClass().getSimpleName());
 	}
-	
+
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
