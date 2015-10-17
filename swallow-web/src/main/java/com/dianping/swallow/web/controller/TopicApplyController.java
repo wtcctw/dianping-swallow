@@ -142,10 +142,11 @@ public class TopicApplyController {
 		Set<String> administrator = new HashSet<String>();
 		administrator.add(applicant.trim());
 
+		boolean isSuccess;
 		synchronized (APPLY_TOPIC) {
-			boolean isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
-			return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
+			isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
 		}
+		return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
 	}
 
 }
