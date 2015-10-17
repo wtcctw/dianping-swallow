@@ -38,12 +38,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	@Autowired
 	private ConsumerServerResourceDao consumerServerResourceDao;
 
-	@Resource(name = "topicResourceService")
-	private TopicResourceService topicResourceService;
-
-	@Resource(name = "consumerServerStatsDataService")
-	private ConsumerServerStatsDataService consumerServerStatsDataService;
-
 	@Autowired
 	private LionDynamicConfig lionDynamicConfig;
 

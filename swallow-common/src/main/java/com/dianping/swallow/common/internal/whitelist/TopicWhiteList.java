@@ -24,7 +24,7 @@ public class TopicWhiteList implements ConfigChangeListener {
 
     private static final String TOPIC_WHITE_LIST = "swallow.topic.whitelist";
 
-    private Set<String>         topics           = new HashSet<String>();
+    private volatile Set<String>         topics           = new HashSet<String>();
     
     private static  int  MAX_TOPIC_WHILTE_LIST_DECREASE = 10;//一次最少减少10个topic白名单
 

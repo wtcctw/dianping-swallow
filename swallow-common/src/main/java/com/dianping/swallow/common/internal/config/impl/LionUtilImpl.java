@@ -1,23 +1,18 @@
 package com.dianping.swallow.common.internal.config.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.LionUtil;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 import com.dianping.swallow.common.internal.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * @author mengwenchao
@@ -43,10 +38,10 @@ public class LionUtilImpl implements LionUtil{
 		this.userId = userId;
 	}
 	
-	public boolean createConfig(String key) {
+	public boolean createConfig(String key, String env) {
 		
 		key = key.trim();
-		String args = getBasicArgs("topic config from LionUtilImpl", true);
+		String args = getBasicArgs("topic config from LionUtilImpl", true, env);
 		String url = BASIC_LION_CONFIG_URL + "/create?" + args;
 		url += "&" + keyValue("key", getRealKey(key));
 		
@@ -57,20 +52,31 @@ public class LionUtilImpl implements LionUtil{
 	
 	@Override
 	public Map<String, String> getCfgs(String prefix) {
-		
-		String args = getBasicArgs("get topic with prefix " + prefix, false);
+
+		String args = getBasicArgs("get topic with prefix " + prefix, false, null);
 		String url = BASIC_LION_CONFIG_URL + "/get?" + args;
 		url += "&" + keyValue("prefix", getRealKey(prefix));
-		
+
 		LionRetResultMap ret = executeGet(url, LionRetResultMap.class, "get");
 		return ret.getResult();
 	}
 
-	private String getBasicArgs(String desc, boolean withProject) {
+	@Override
+	public String getValue(String key) {
+
+		String args = getBasicArgs("get topic with key " + key, false, null);
+		String url = BASIC_LION_CONFIG_URL + "/get?" + args;
+		url += "&" + keyValue("key", getRealKey(key));
+
+		LionRetResultString ret = executeGet(url, LionRetResultString.class, "get");
+		return ret.getResult();
+	}
+
+	private String getBasicArgs(String desc, boolean withProject, String env) {
 
 		String result = StringUtils.join("&", keyValue("id", String.valueOf(userId)),
 				keyValue("desc", desc),
-				keyValue("env", EnvUtil.getEnv()));
+				keyValue("env", org.apache.commons.lang.StringUtils.isBlank(env) ? EnvUtil.getEnv() : env.trim()));
 
 		
 		if(withProject){
@@ -147,8 +153,8 @@ public class LionUtilImpl implements LionUtil{
 		return StringUtils.join(".", PROJECT, key);
 	}
 
-	private String getBasicArgs(String desc) {
-		return getBasicArgs(desc, true);
+	private String getBasicArgs(String desc, String env) {
+		return getBasicArgs(desc, true, env);
 	}
 
 	private String keyValue(String key, String value){
@@ -167,9 +173,9 @@ public class LionUtilImpl implements LionUtil{
 		return value;
 	}
 
-	public void setValue(String key, String value, String type) {
+	public void setValue(String key, String value, String type, String env) {
 		
-		String args = getBasicArgs("topic配置信息");
+		String args = getBasicArgs("topic配置信息", env);
 		String url = BASIC_LION_CONFIG_URL + "/set?" + args;
 		url += "&" + keyValue("key", key)
 				+ "&" + keyValue("value", value);
@@ -194,12 +200,12 @@ public class LionUtilImpl implements LionUtil{
 		key = key.trim();
 		value = value.trim();
 		
-		createConfig(key);
-		setValue(key, value, "get");
+		createConfig(key, null);
+		setValue(key, value, "get", null);
 	}
 	
 	@Override
-	public void createOrSetConfig(String key, String value, String type) {
+	public void createOrSetConfig(String key, String value, String type, String env) {
 		
 		if(StringUtils.isEmpty(key)){
 			throw new IllegalArgumentException("key null:" + key);
@@ -211,8 +217,8 @@ public class LionUtilImpl implements LionUtil{
 		key = key.trim();
 		value = value.trim();
 		
-		createConfig(key);
-		setValue(key, value, type);
+		createConfig(key, env);
+		setValue(key, value, type, env);
 		
 	}
 

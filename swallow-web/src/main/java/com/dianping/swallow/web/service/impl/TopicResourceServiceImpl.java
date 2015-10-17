@@ -215,7 +215,16 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		TopicResource topicResource = findByTopic(str);
 
 		if (topicResource != null) {
-			Set<String> set = splitString(topicResource.getAdministrator(), ",");
+			Set<String> set = new HashSet<String>();
+			String admin = topicResource.getAdministrator();
+			if(StringUtils.isBlank(admin)){
+				if(defaultSet != null && !defaultSet.isEmpty()){
+					set = defaultSet;
+				}
+			}else{
+				set = splitString(admin, ",");
+			}
+
 			topicToAdministrator.put(str, set);
 		} else {
 			topicToAdministrator.put(str, defaultSet == null ? new HashSet<String>() : defaultSet);

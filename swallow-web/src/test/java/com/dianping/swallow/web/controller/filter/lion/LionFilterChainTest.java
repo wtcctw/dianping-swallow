@@ -3,6 +3,7 @@ package com.dianping.swallow.web.controller.filter.lion;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.dianping.swallow.web.service.impl.ConsumerServerResourceServiceImpl;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +39,7 @@ public class LionFilterChainTest extends MockTest{
 	private TopicWhiteList topicWhiteList;
 	
 	@Mock
-	private ConsumerServerResourceService consumerServerResourceService;
+	private ConsumerServerResourceServiceImpl consumerServerResourceService;
 	
 	private TopicWhiteListLionFilter topicWhiteListLionFilter;
 	
@@ -90,8 +91,7 @@ public class LionFilterChainTest extends MockTest{
 		consumerServerLionFilter = new ConsumerServerLionFilter();
 		consumerServerLionFilter.setLionUtil(lionUtil);
 		consumerServerLionFilter.setTopicResourceService(topicResourceService);
-		consumerServerLionFilter.setConsumerServerResourceService(consumerServerResourceService);
-		
+
 		String consumerServerConfig = "default=3.3.3.3:8000,4.4.4.4:8001;\nswallow-hao=5.5.5.5:8000,6.6.6.6:8001";
 		Mockito.doReturn(consumerServerConfig).when(consumerServerResourceService).loadConsumerServerLionConfig();
 		
