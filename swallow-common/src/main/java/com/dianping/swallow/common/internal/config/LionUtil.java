@@ -11,8 +11,10 @@ public interface LionUtil {
 	
 	void createOrSetConfig(String key, String value);
 
-	void createOrSetConfig(String key, String value, String type);
+	void createOrSetConfig(String key, String value, String type, String env);
 	
 	Map<String, String> getCfgs(String prefix);
+
+	String getValue(String key);
 	
 }

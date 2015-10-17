@@ -209,7 +209,17 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		TopicResource topicResource = findByTopic(str);
 
 		if (topicResource != null) {
-			Set<String> set = splitString(topicResource.getAdministrator(), ",");
+			Set<String> set = new HashSet<String>();
+			String admin = topicResource.getAdministrator();
+			if(StringUtils.isBlank(admin)){
+				if(defaultSet != null && !defaultSet.isEmpty()){
+					set = defaultSet;
+					topicResource.setAdministrator(StringUtils.join(set, ","));
+				}
+			}else{
+				set = splitString(admin, ",");
+			}
+
 			topicToAdministrator.put(str, set);
 		} else {
 			topicToAdministrator.put(str, defaultSet == null ? new HashSet<String>() : defaultSet);
@@ -222,6 +232,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	public boolean updateTopicAdministrator(String str, Set<String> defaultSet) {
 		// 先缓存再插入
 		TopicResource topicResource = cacheTopicToAdministrator(str, defaultSet);
+
 		if (topicResource == null) {
 			topicResource = buildTopicResource(str, defaultSet);
 			boolean status = this.insert(topicResource);
@@ -237,6 +248,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			}
 
 			return status;
+		}else{
+			this.update(topicResource);
 		}
 
 		return true;

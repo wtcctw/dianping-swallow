@@ -37,7 +37,7 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(
+	public Map<String, NavigableMap<Long, QpxData>> getQpxForAllConsumerId(
 			String topic, StatisType type) {
 		
 		return getQpxForAllConsumerId(topic, type, true);
@@ -51,7 +51,7 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(
+	public Map<String, NavigableMap<Long, QpxData>> getQpxForAllConsumerId(
 			String topic, StatisType type, boolean includeTotal) {
 		
 		return getAllQpx(type, topic, includeTotal);

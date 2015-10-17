@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.controller.filter.lion;
 
+import com.dianping.swallow.web.service.impl.ConsumerServerResourceServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class ConsumerServerLionFilterTest extends MockTest{
 	private TopicResourceService topicResourceService;
 	
 	@Mock
-	private ConsumerServerResourceService consumerServerResourceService;
+	private ConsumerServerResourceServiceImpl consumerServerResourceService;
 	
 	private ConsumerServerLionFilter lionEditor;
 	
@@ -55,7 +56,6 @@ public class ConsumerServerLionFilterTest extends MockTest{
 		lionEditor = consumerServerLionEditor;
 		lionEditor.setLionUtil(lionUtil);
 		lionEditor.setTopicResourceService(topicResourceService);
-		lionEditor.setConsumerServerResourceService(consumerServerResourceService);
 
 		String consumerServerConfig = "default=3.3.3.3:8000,4.4.4.4:8001;\nswallow-hao=5.5.5.5:8000,6.6.6.6:8001";
 		Mockito.doReturn(consumerServerConfig).when(consumerServerResourceService).loadConsumerServerLionConfig();

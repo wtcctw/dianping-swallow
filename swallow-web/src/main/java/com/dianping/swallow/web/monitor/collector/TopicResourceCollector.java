@@ -1,6 +1,5 @@
 package com.dianping.swallow.web.monitor.collector;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -15,7 +14,6 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
-import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
@@ -74,15 +72,9 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 	}
 
 	private void doIpDataMonitor() {
-		List<ProducerIpGroupStatsData> ipGroupStatsDatas = pStatsDataWapper.getIpGroupStatsDatas(-1, false);
-		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
-			return;
-		}
-		for (ProducerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
-			if (ipGroupStatsData == null) {
-				continue;
-			}
-			List<ProducerIpStatsData> ipStatsDatas = ipGroupStatsData.getProducerIpStatsDatas();
+		Set<String> topicNames = pStatsDataWapper.getTopics(false);
+		for (String topicName : topicNames) {
+			List<ProducerIpStatsData> ipStatsDatas = pStatsDataWapper.getIpStatsDatas(topicName, -1, false);
 			if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
 				continue;
 			}
@@ -91,7 +83,6 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 						ipStatsData.hasStatsData());
 			}
 		}
-
 	}
 
 	@Override
@@ -114,43 +105,11 @@ public class TopicResourceCollector extends AbstractResourceCollector implements
 	}
 
 	private void updateTopicIpInfos(String topicName) {
-		Set<String> inActiveIps = activeIpManager.getInActiveIps(topicName);
 		TopicResource topicResource = topicResourceService.findByTopic(topicName);
 		Set<String> topicIps = pStatsDataWapper.getTopicIps(topicName, false);
 		if (topicResource != null) {
 			List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
-			if (ipInfos == null || ipInfos.isEmpty()) {
-				ipInfos = new ArrayList<IpInfo>();
-			}
-			if (topicIps != null && !topicIps.isEmpty()) {
-				for (String topicIp : topicIps) {
-					boolean isHasIp = false;
-					for (IpInfo ipInfo : ipInfos) {
-						if (topicIp.equals(ipInfo.getIp())) {
-							isHasIp = true;
-						}
-					}
-					if (!isHasIp) {
-						ipInfos.add(new IpInfo(topicIp, true, true));
-					}
-				}
-			}
-			if (inActiveIps == null || inActiveIps.isEmpty()) {
-				for (IpInfo ipInfo : ipInfos) {
-					ipInfo.setActive(true);
-				}
-			} else {
-				for (IpInfo ipInfo : ipInfos) {
-					ipInfo.setActive(true);
-				}
-				for (String inActiveIp : inActiveIps) {
-					for (IpInfo ipInfo : ipInfos) {
-						if (inActiveIp.equals(ipInfo.getIp())) {
-							ipInfo.setActive(false);
-						}
-					}
-				}
-			}
+			ipInfos = activeIpManager.getRelatedIpInfo(topicName, ipInfos, topicIps);
 			topicResource.setProducerIpInfos(ipInfos);
 			topicResourceService.update(topicResource);
 			logger.info("[updateTopicIpInfos] topicResource {}", topicResourceService.toString());

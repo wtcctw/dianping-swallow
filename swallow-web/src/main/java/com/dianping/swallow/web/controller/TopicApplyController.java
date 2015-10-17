@@ -76,7 +76,7 @@ public class TopicApplyController {
 
 	@Autowired
 	private QuoteConfigureFilter quoteConfigureFilter;
-	
+
 	@Autowired
 	private TopicWhiteListLionFilter topicWhiteListLionFilter;
 
@@ -85,14 +85,16 @@ public class TopicApplyController {
 
 	@Autowired
 	private TopicCfgLionFilter topicCfgLionFilter;
-	
+
+	private Object APPLY_TOPIC = new Object();
+
 	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
 	@ResponseBody
 	public Object applyTopic(@RequestBody TopicApplyDto topicApplyDto) {
 
 		ValidatorFilterResult validatorFilterResult = new ValidatorFilterResult();
 		ValidatorFilterChain validatorFilterChain = filterChainFactory.createValidatorFilterChain();
-		
+
 		validatorFilterChain.addFilter(authenticationValidatorFilter);
 		validatorFilterChain.addFilter(nameValidatorFilter);
 		validatorFilterChain.addFilter(quoteValidatorFilter);
@@ -106,7 +108,7 @@ public class TopicApplyController {
 
 		ConfigureFilterResult configureFilterResult = new ConfigureFilterResult();
 		ConfigureFilterChain configureFilterChain = filterChainFactory.createConfigureFilterChain();
-		
+
 		configureFilterChain.addFilter(mongoConfigureFilter);
 		configureFilterChain.addFilter(consumerServerConfigureFilter);
 		configureFilterChain.addFilter(quoteConfigureFilter);
@@ -124,7 +126,7 @@ public class TopicApplyController {
 		lionFilterEntity.setTopic(topic);
 		lionFilterEntity.setTest(isTest);
 		lionFilterEntity.setLionConfigure(configureFilterResult.getLionConfigure());
-		
+
 		LionFilterChain lionFilterChain = filterChainFactory.createLionFilterChain();
 
 		lionFilterChain.addFilter(topicWhiteListLionFilter);
@@ -139,7 +141,11 @@ public class TopicApplyController {
 		String applicant = topicApplyDto.getApplicant();
 		Set<String> administrator = new HashSet<String>();
 		administrator.add(applicant.trim());
-		boolean isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
+
+		boolean isSuccess;
+		synchronized (APPLY_TOPIC) {
+			isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
+		}
 		return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
 	}
 
