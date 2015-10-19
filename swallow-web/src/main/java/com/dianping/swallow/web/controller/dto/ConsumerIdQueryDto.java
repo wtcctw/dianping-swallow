@@ -1,6 +1,12 @@
 package com.dianping.swallow.web.controller.dto;
 
-public class ConsumerIdQueryDto extends BaseDto{
+
+/**
+ * @author mingdongli
+ *
+ * 2015年8月15日下午4:49:22
+ */
+public class ConsumerIdQueryDto extends BaseQueryDto{
 	
 	private String consumerId;
 	
@@ -8,32 +14,21 @@ public class ConsumerIdQueryDto extends BaseDto{
 	
 	private String consumerIp;
 	
-	public ConsumerIdQueryDto(){
-		
-	}
-
+	private boolean inactive;
+	
 	public String getConsumerId() {
 		return consumerId;
-	}
-
-	public void setConsumerId(String consumerId) {
-		this.consumerId = consumerId;
 	}
 
 	public String getTopic() {
 		return topic;
 	}
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
-
 	public String getConsumerIp() {
 		return consumerIp;
 	}
 
-	public void setConsumerIp(String consumerIp) {
-		this.consumerIp = consumerIp;
+	public boolean isInactive() {
+		return inactive;
 	}
-	
 }

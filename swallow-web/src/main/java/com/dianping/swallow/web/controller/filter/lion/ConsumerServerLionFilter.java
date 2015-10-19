@@ -33,7 +33,7 @@ public class ConsumerServerLionFilter extends AbstractLionFilter {
 	private ConsumerServerResourceService consumerServerResourceService;
 
 	@Override
-	public ResponseStatus doFilterHelper(LionFilterEntity lionFilterEntity, LionFilterResult result,
+	public synchronized ResponseStatus doFilterHelper(LionFilterEntity lionFilterEntity, LionFilterResult result,
 			FilterChain<LionFilterEntity, LionFilterResult> chain) {
 
 		String topic = lionFilterEntity.getTopic();

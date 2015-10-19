@@ -7,7 +7,7 @@ package com.dianping.swallow.web.controller.dto;
  *
  * 2015年9月18日上午9:22:43
  */
-public class MongoResourceDto extends BaseDto{
+public class MongoResourceDto extends BaseQueryDto{
 	
 	private String id;
 
@@ -17,17 +17,9 @@ public class MongoResourceDto extends BaseDto{
     
     private Float disk;
     
-    private String dba;
-    
     private String catalog;
     
-    private int threads;
-    
     private Integer qps;
-    
-    private int dev_cnt;
-    
-    private String topics;
     
     private String mongoType;
     
@@ -71,28 +63,12 @@ public class MongoResourceDto extends BaseDto{
 		this.disk = disk;
 	}
 
-	public String getDba() {
-		return dba;
-	}
-
-	public void setDba(String dba) {
-		this.dba = dba;
-	}
-
 	public String getCatalog() {
 		return catalog;
 	}
 
 	public void setCatalog(String catalog) {
 		this.catalog = catalog;
-	}
-
-	public int getThreads() {
-		return threads;
-	}
-
-	public void setThreads(int threads) {
-		this.threads = threads;
 	}
 
 	public Integer getQps() {
@@ -103,20 +79,4 @@ public class MongoResourceDto extends BaseDto{
 		this.qps = qps;
 	}
 
-	public int getDev_cnt() {
-		return dev_cnt;
-	}
-
-	public void setDev_cnt(int dev_cnt) {
-		this.dev_cnt = dev_cnt;
-	}
-
-	public String getTopics() {
-		return topics;
-	}
-
-	public void setTopics(String topics) {
-		this.topics = topics;
-	}
-    
 }

@@ -6,33 +6,13 @@ package com.dianping.swallow.web.controller.dto;
  *
  * 2015年7月14日下午2:26:06
  */
-public class ServerResourceDto {
-	
-	private String id;
+public class ServerResourceDto extends BaseAlarmResourceDto{
 	
 	private String ip;
 	
 	private String hostname;
 	
-	private boolean alarm;
-
 	private boolean active;
-	
-	private long sendpeak;
-	
-	private long sendvalley;
-	
-	private int sendfluctuation;
-	
-	private long sendfluctuationBase;
-	
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getIp() {
 		return ip;
@@ -50,52 +30,12 @@ public class ServerResourceDto {
 		this.hostname = hostname;
 	}
 
-	public boolean isAlarm() {
-		return alarm;
-	}
-
-	public void setAlarm(boolean alarm) {
-		this.alarm = alarm;
-	}
-
 	public boolean isActive() {
 		return active;
 	}
 
 	public void setActive(boolean active) {
 		this.active = active;
-	}
-
-	public long getSendpeak() {
-		return sendpeak;
-	}
-
-	public void setSendpeak(long sendpeak) {
-		this.sendpeak = sendpeak;
-	}
-
-	public long getSendvalley() {
-		return sendvalley;
-	}
-
-	public void setSendvalley(long sendvalley) {
-		this.sendvalley = sendvalley;
-	}
-
-	public int getSendfluctuation() {
-		return sendfluctuation;
-	}
-
-	public void setSendfluctuation(int sendfluctuation) {
-		this.sendfluctuation = sendfluctuation;
-	}
-
-	public long getSendfluctuationBase() {
-		return sendfluctuationBase;
-	}
-
-	public void setSendfluctuationBase(long sendfluctuationBase) {
-		this.sendfluctuationBase = sendfluctuationBase;
 	}
 
 }

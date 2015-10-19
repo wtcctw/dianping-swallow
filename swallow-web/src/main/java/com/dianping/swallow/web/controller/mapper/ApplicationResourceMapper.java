@@ -15,7 +15,6 @@ public class ApplicationResourceMapper {
 		
 		ApplicationResource applicationResource = new ApplicationResource();
 		
-		applicationResource.setCreateTime(dto.getCreateTime());
 		applicationResource.setDpManager(dto.getDpManager());
 		applicationResource.setDpMobile(dto.getDpMobile());
 		applicationResource.setEmail(dto.getEmail());
@@ -33,7 +32,6 @@ public class ApplicationResourceMapper {
 		
 		ApplicationResourceDto dto = new ApplicationResourceDto();
 		
-		dto.setCreateTime(applicationResource.getCreateTime());
 		dto.setDpManager(applicationResource.getDpManager());
 		dto.setDpMobile(applicationResource.getDpMobile());
 		dto.setEmail(applicationResource.getEmail());

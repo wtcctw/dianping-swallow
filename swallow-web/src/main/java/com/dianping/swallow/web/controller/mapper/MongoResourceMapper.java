@@ -1,10 +1,5 @@
 package com.dianping.swallow.web.controller.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.dianping.swallow.web.controller.dto.MongoResourceDto;
 import com.dianping.swallow.web.model.resource.MongoResource;
 import com.dianping.swallow.web.model.resource.MongoType;
@@ -17,8 +12,6 @@ import com.dianping.swallow.web.model.resource.MongoType;
  */
 public class MongoResourceMapper {
 	
-	private static final String DELIMITOR = ",";
-
 	public static MongoResource toMongoResource(MongoResourceDto dto) {
 
 		MongoResource mongoResource = new MongoResource();
@@ -31,18 +24,6 @@ public class MongoResourceMapper {
 		mongoResource.setQps(dto.getQps());
 		mongoResource.setMongoType(MongoType.valueOf(dto.getMongoType()));
 		
-		List<String> topicList = new ArrayList<String>();
-		String topics = dto.getTopics();
-		
-		if (StringUtils.isNotBlank(topics)) {
-			String[] topicLists = topics.split(DELIMITOR);
-			for (String wl : topicLists) {
-				if (!topicList.contains(wl)) {
-					topicList.add(wl);
-				}
-			}
-		}
-
 		return mongoResource;
 	}
 
@@ -58,9 +39,6 @@ public class MongoResourceMapper {
 		dto.setQps(mongoResource.getQps());
 		dto.setMongoType(mongoResource.getMongoType().name());
 		
-		List<String> list = mongoResource.getTopics();
-		dto.setTopics(StringUtils.join(list, DELIMITOR));
-
 		return dto;
 	}
 }

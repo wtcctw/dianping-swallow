@@ -80,7 +80,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 				updateTopicAdministrator(wl, new HashSet<String>());
 			}
 			// 申请topic运行后就不需要监听了
-			configCache.addChange(this);
+//			configCache.addChange(this);
 
 		} catch (LionException e) {
 			logger.error("Erroe when init lion config", e);
@@ -210,6 +210,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 		if (topicResource != null) {
 			Set<String> set = splitString(topicResource.getAdministrator(), ",");
+			if(set.isEmpty()){
+				set = defaultSet;
+			}
 			topicToAdministrator.put(str, set);
 		} else {
 			topicToAdministrator.put(str, defaultSet == null ? new HashSet<String>() : defaultSet);
@@ -223,6 +226,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		// 先缓存再插入
 		TopicResource topicResource = cacheTopicToAdministrator(str, defaultSet);
 		if (topicResource == null) {
+			System.out.println("+++++++++++++++++++++++++++defaultSet is " + defaultSet.toString());
 			topicResource = buildTopicResource(str, defaultSet);
 			boolean status = this.insert(topicResource);
 

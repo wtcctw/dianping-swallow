@@ -2,7 +2,6 @@ package com.dianping.swallow.web.dao;
 
 import java.util.List;
 
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.model.Administrator;
 
 
@@ -38,11 +37,6 @@ public interface AdministratorDao{
 	int deleteByName(String name);
 	
 	/**
-	 * 删除集合
-	 */
-	void dropCol();
-	
-	/**
 	 * 查询所有Administrator纪录
 	 */
 	List<Administrator> findAll();
@@ -57,6 +51,6 @@ public interface AdministratorDao{
 	 * @param offset	起始位置
 	 * @param limit		偏移量
 	 */
-	List<Administrator> findFixedAdministrator(BaseDto baseDto);
+	List<Administrator> findFixedAdministrator(int offset, int limit);
 	
  }

@@ -1,20 +1,17 @@
 package com.dianping.swallow.web.controller.dto;
 
-public class BaseDto {
+
+/**
+ * @author mingdongli
+ *
+ * 2015年8月15日下午2:49:25
+ */
+public class BaseQueryDto {
 	
 	private int offset;
 	
 	private int limit;
 	
-	public BaseDto(){
-		
-	}
-	
-	public BaseDto(int offset, int limit){
-		this.offset = offset;
-		this.limit = limit;
-	}
-
 	public int getOffset() {
 		return offset;
 	}

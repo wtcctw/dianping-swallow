@@ -5,6 +5,8 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -76,7 +78,7 @@ public class TopicApplyController {
 
 	@Autowired
 	private QuoteConfigureFilter quoteConfigureFilter;
-	
+
 	@Autowired
 	private TopicWhiteListLionFilter topicWhiteListLionFilter;
 
@@ -85,14 +87,17 @@ public class TopicApplyController {
 
 	@Autowired
 	private TopicCfgLionFilter topicCfgLionFilter;
-	
+
+	private Object APPLY_TOPIC = new Object();
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+
 	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
 	@ResponseBody
 	public Object applyTopic(@RequestBody TopicApplyDto topicApplyDto) {
 
 		ValidatorFilterResult validatorFilterResult = new ValidatorFilterResult();
 		ValidatorFilterChain validatorFilterChain = filterChainFactory.createValidatorFilterChain();
-		
+
 		validatorFilterChain.addFilter(authenticationValidatorFilter);
 		validatorFilterChain.addFilter(nameValidatorFilter);
 		validatorFilterChain.addFilter(quoteValidatorFilter);
@@ -106,7 +111,7 @@ public class TopicApplyController {
 
 		ConfigureFilterResult configureFilterResult = new ConfigureFilterResult();
 		ConfigureFilterChain configureFilterChain = filterChainFactory.createConfigureFilterChain();
-		
+
 		configureFilterChain.addFilter(mongoConfigureFilter);
 		configureFilterChain.addFilter(consumerServerConfigureFilter);
 		configureFilterChain.addFilter(quoteConfigureFilter);
@@ -124,7 +129,7 @@ public class TopicApplyController {
 		lionFilterEntity.setTopic(topic);
 		lionFilterEntity.setTest(isTest);
 		lionFilterEntity.setLionConfigure(configureFilterResult.getLionConfigure());
-		
+
 		LionFilterChain lionFilterChain = filterChainFactory.createLionFilterChain();
 
 		lionFilterChain.addFilter(topicWhiteListLionFilter);
@@ -136,11 +141,14 @@ public class TopicApplyController {
 			return lionFilterResult;
 		}
 
-		String applicant = topicApplyDto.getApplicant();
-		Set<String> administrator = new HashSet<String>();
-		administrator.add(applicant.trim());
-		boolean isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
-		return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
+		synchronized (APPLY_TOPIC) {
+			String applicant = topicApplyDto.getApplicant();
+			logger.info("----------------------------applicant " + applicant);
+			Set<String> administrator = new HashSet<String>();
+			administrator.add(applicant.trim());
+			boolean isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
+			return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
+		}
 	}
 
 }

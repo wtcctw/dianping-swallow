@@ -1,5 +1,11 @@
 package com.dianping.swallow.web.controller.dto;
 
+
+/**
+ * @author mingdongli
+ *
+ * 2015年8月15日下午2:53:21
+ */
 public class SendMessageIDDto {
 
 	private String mid;
@@ -24,11 +30,6 @@ public class SendMessageIDDto {
 		this.mid = mid;
 	}
 	
-	@Override
-	public String toString() {
-		return "SendMessageDto [mid=" + mid + ", topic=" + topic + "]";
-	}
-
 	public String getAuthentication() {
 		return authentication;
 	}

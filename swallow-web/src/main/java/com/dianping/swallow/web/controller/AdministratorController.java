@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.controller.dto.UserQueryDto;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.Administrator;
@@ -45,7 +44,7 @@ public class AdministratorController extends AbstractMenuController {
 	@ResponseBody
 	public Object adminDefault(@RequestBody UserQueryDto userQueryDto) {
 
-		return userService.loadUserPage(new BaseDto(userQueryDto.getOffset(), userQueryDto.getLimit()));
+		return userService.loadUserPage(userQueryDto.getOffset(), userQueryDto.getLimit());
 	}
 
 	@RequestMapping(value = "/console/admin/auth/createadmin", method = RequestMethod.POST)

@@ -19,7 +19,7 @@ import com.dianping.swallow.web.util.ResponseStatus;
  *         2015年9月24日下午3:27:31
  */
 @Component
-public class TopicWhiteListLionFilter extends AbstractLionFilter{
+public class TopicWhiteListLionFilter extends AbstractLionFilter {
 
 	@Autowired
 	private TopicWhiteList topicWhiteList;
@@ -28,7 +28,7 @@ public class TopicWhiteListLionFilter extends AbstractLionFilter{
 	private LionConfigManager lionConfigManager;
 
 	@Override
-	public ResponseStatus doFilterHelper(LionFilterEntity lionFilterEntity, LionFilterResult result,
+	public synchronized ResponseStatus doFilterHelper(LionFilterEntity lionFilterEntity, LionFilterResult result,
 			FilterChain<LionFilterEntity, LionFilterResult> chain) {
 
 		String topic = lionFilterEntity.getTopic();
@@ -45,9 +45,10 @@ public class TopicWhiteListLionFilter extends AbstractLionFilter{
 			topicResourceService.loadCachedTopicToAdministrator().remove(topic);
 			return ResponseStatus.INVALIDLENGTH;
 		}
-		return doEditLion(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topicJoin,
-				StringUtils.join(oldTopics, ";"), isTest);
 
+		ResponseStatus status =  doEditLion(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topicJoin,
+				StringUtils.join(oldTopics, ";"), isTest);
+		return status;
 	}
 
 	public void setTopicWhiteList(TopicWhiteList topicWhiteList) {

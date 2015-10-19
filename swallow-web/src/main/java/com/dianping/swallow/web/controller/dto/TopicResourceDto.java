@@ -10,10 +10,8 @@ import com.dianping.swallow.web.model.resource.IpInfo;
  *
  * 2015年9月30日上午11:52:59
  */
-public class TopicResourceDto {
+public class TopicResourceDto extends BaseAlarmResourceDto{
 	
-	private String id;
-
 	private String topic;
 	
 	private String administrator;
@@ -23,24 +21,6 @@ public class TopicResourceDto {
 	private boolean consumerAlarm;
 	
 	private List<IpInfo> producerIpInfos;
-
-	private long sendpeak;
-	
-	private long sendvalley;
-	
-	private int sendfluctuation;
-	
-	private long sendfluctuationBase;
-	
-	private long delay;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getTopic() {
 		return topic;
@@ -82,44 +62,4 @@ public class TopicResourceDto {
 		this.producerIpInfos = producerIpInfos;
 	}
 
-	public long getSendpeak() {
-		return sendpeak;
-	}
-
-	public void setSendpeak(long sendpeak) {
-		this.sendpeak = sendpeak;
-	}
-
-	public long getSendvalley() {
-		return sendvalley;
-	}
-
-	public void setSendvalley(long sendvalley) {
-		this.sendvalley = sendvalley;
-	}
-
-	public int getSendfluctuation() {
-		return sendfluctuation;
-	}
-
-	public void setSendfluctuation(int sendfluctuation) {
-		this.sendfluctuation = sendfluctuation;
-	}
-
-	public long getSendfluctuationBase() {
-		return sendfluctuationBase;
-	}
-
-	public void setSendfluctuationBase(long sendfluctuationBase) {
-		this.sendfluctuationBase = sendfluctuationBase;
-	}
-
-	public long getDelay() {
-		return delay;
-	}
-
-	public void setDelay(long delay) {
-		this.delay = delay;
-	}
-	
 }

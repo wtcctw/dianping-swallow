@@ -21,7 +21,6 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.dao.AdministratorDao;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.UserType;
@@ -75,10 +74,10 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
 	}
 	
 	@Override
-	public Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto) {
+	public Pair<Long, List<Administrator>> loadUserPage(int offset, int limit) {
 
 		Long totalNumOfTopic = administratorDao.countAdministrator();
-		List<Administrator> administratorList = administratorDao.findFixedAdministrator(baseDto);
+		List<Administrator> administratorList = administratorDao.findFixedAdministrator(offset, limit);
 
 		return new Pair<Long, List<Administrator>>(totalNumOfTopic, administratorList);
 	}

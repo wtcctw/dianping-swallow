@@ -112,7 +112,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicEntry.sendvalley;
 			$scope.topicEntry.sendfluctuation;
 			$scope.topicEntry.sendfluctuationBase;
-			$scope.topicEntry.delay;
+			$scope.topicEntry.senddelay;
 			
 			$scope.setModalInput = function(index){
 				if(typeof($scope.searchPaginator.currentPageItems[index].administrator) != "undefined"){
@@ -135,7 +135,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
 				$scope.topicEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
 				$scope.topicEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
-				$scope.topicEntry.delay = $scope.searchPaginator.currentPageItems[index].delay;
+				$scope.topicEntry.senddelay = $scope.searchPaginator.currentPageItems[index].senddelay;
 				$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
 			}
 			

@@ -156,8 +156,6 @@ public class MongoResourceCollector extends AbstractResourceCollector {
 		mongoResource.setDisk(mongoReport.getDisk());
 		mongoResource.setLoad(mongoReport.getLoad());
 		mongoResource.setQps(mongoReport.getQps());
-		mongoResource.setThreads(mongoReport.getThreads());
-		mongoResource.setDev_cnt(mongoReport.getDev_cnt());
 
 		return mongoResource;
 	}

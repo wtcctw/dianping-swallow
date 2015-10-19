@@ -6,7 +6,7 @@ package com.dianping.swallow.web.controller.dto;
  *
  * 2015年9月30日上午11:13:34
  */
-public class ApplicationQueryDto extends BaseDto{
+public class ApplicationQueryDto extends BaseQueryDto{
 
 	private String application;
 

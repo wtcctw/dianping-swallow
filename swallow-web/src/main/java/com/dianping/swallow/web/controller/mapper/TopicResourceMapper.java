@@ -26,7 +26,7 @@ public class TopicResourceMapper {
 		sendQPSAlarmSetting.setFluctuationBase(dto.getSendfluctuationBase());
 		
 		producerBaseAlarmSetting.setQpsAlarmSetting(sendQPSAlarmSetting);
-		producerBaseAlarmSetting.setDelay(dto.getDelay());
+		producerBaseAlarmSetting.setDelay(dto.getSenddelay());
 		
 		topicResource.setProducerAlarmSetting(producerBaseAlarmSetting);
 		
@@ -47,7 +47,7 @@ public class TopicResourceMapper {
 		ProducerBaseAlarmSetting producerBaseAlarmSetting = topicResource.getProducerAlarmSetting();
 		QPSAlarmSetting sendQPSAlarmSetting = producerBaseAlarmSetting.getQpsAlarmSetting();
 		
-		topicResourceDto.setDelay(producerBaseAlarmSetting.getDelay());
+		topicResourceDto.setSenddelay(producerBaseAlarmSetting.getDelay());
 		topicResourceDto.setSendpeak(sendQPSAlarmSetting.getPeak());
 		topicResourceDto.setSendvalley(sendQPSAlarmSetting.getValley());
 		topicResourceDto.setSendfluctuation(sendQPSAlarmSetting.getFluctuation());

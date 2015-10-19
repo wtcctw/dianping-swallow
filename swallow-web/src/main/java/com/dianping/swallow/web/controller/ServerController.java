@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
+import com.dianping.swallow.web.controller.dto.BaseQueryDto;
 import com.dianping.swallow.web.controller.dto.ConsumerServerResourceDto;
 import com.dianping.swallow.web.controller.dto.MongoResourceDto;
 import com.dianping.swallow.web.controller.dto.ServerResourceDto;
@@ -88,7 +88,7 @@ public class ServerController extends AbstractSidebarBasedController {
 
 	@RequestMapping(value = "/console/server/producer/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object producerserverSettingList(@RequestBody BaseDto baseDto) {
+	public Object producerserverSettingList(@RequestBody BaseQueryDto baseDto) {
 
 		int offset = baseDto.getOffset();
 		int limit = baseDto.getLimit();
@@ -233,7 +233,7 @@ public class ServerController extends AbstractSidebarBasedController {
 
 	@RequestMapping(value = "/console/server/consumer/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object consumerserverSettingList(@RequestBody BaseDto baseDto) {
+	public Object consumerserverSettingList(@RequestBody BaseQueryDto baseDto) {
 
 		int offset = baseDto.getOffset();
 		int limit = baseDto.getLimit();
