@@ -12,7 +12,7 @@ import org.junit.Test;
  */
 public class ApplyTopicTest {
 
-	private String TOPIC = "lionapi-get-alpha-apply-topic";
+	private String TOPIC = "env-lion-get-topic-final";
 	
 	private static final int THREAD_SIZE = 5;
 	

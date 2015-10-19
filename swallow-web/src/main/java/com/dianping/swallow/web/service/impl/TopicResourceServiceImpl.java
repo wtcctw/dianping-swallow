@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import com.dianping.swallow.web.service.ServiceLifecycle;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ import freemarker.template.utility.StringUtil;
  *         2015年8月10日下午7:34:53
  */
 @Service("topicResourceService")
-public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService, Runnable {
+public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService, Runnable, ServiceLifecycle {
 
 	private static final String FACTORY_NAME = "TopicResourceServiceImpl";
 
@@ -75,15 +76,14 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		try {
 			configCache = ConfigCache.getInstance();
 			configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);
-			Set<String> whiltlist = topicWhiteList.getTopics();
-			for (String wl : whiltlist) {
+			Set<String> whitelist = topicWhiteList.getTopics();
+			for (String wl : whitelist) {
 				updateTopicAdministrator(wl, new HashSet<String>());
 			}
-			// 申请topic运行后就不需要监听了
 			configCache.addChange(this);
 
 		} catch (LionException e) {
-			logger.error("Erroe when init lion config", e);
+			logger.error("Error when init lion config", e);
 		}
 	}
 
@@ -249,7 +249,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 
 			return status;
 		}else{
-			this.update(topicResource);
+			this.insert(topicResource);
 		}
 
 		return true;

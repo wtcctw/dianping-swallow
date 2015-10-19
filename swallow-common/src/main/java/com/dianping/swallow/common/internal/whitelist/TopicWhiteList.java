@@ -26,7 +26,7 @@ public class TopicWhiteList implements ConfigChangeListener {
 
     private Set<String>         topics           = new HashSet<String>();
     
-    private static  int  MAX_TOPIC_WHILTE_LIST_DECREASE = 10;//一次最少减少10个topic白名单
+    public static  int  MAX_TOPIC_WHILTE_LIST_DECREASE = 10;//一次最少减少10个topic白名单
 
     private DynamicConfig       lionDynamicConfig;
     

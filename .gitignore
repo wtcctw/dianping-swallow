@@ -83,7 +83,7 @@ Thumbs.db
 *.iml
 *.ipr
 *.iws
- .idea/
+.idea/
 #test
 config.online
 TODO

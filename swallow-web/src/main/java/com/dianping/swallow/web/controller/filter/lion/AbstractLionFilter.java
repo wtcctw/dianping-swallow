@@ -15,7 +15,9 @@ import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * @author mingdongli
@@ -83,20 +85,12 @@ public abstract class AbstractLionFilter implements Filter<LionFilterEntity, Lio
 
 	private Set<String> splitString(String value) {
 
-		Set<String> set = new HashSet<String>();
-
 		if (StringUtils.isBlank(value)) {
 			return null;
 		}
 
-		String[] values = value.split("\\s*(;|,)\\s*");
-		for (String v : values) {
-			if (StringUtils.isNotBlank(v)) {
-				set.add(v);
-			}
-		}
-
-		return set;
+		List<String> topicList = com.dianping.swallow.common.internal.util.StringUtils.splitByDelimiter(value, Pattern.compile("\\s*;\\s*"));
+		return new HashSet<String>(topicList);
 	}
 
 	protected void buildResult(LionFilterResult result, String message, int status) {

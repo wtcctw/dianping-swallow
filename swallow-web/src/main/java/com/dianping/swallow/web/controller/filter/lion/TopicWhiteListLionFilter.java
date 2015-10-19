@@ -37,10 +37,15 @@ public class TopicWhiteListLionFilter extends AbstractLionFilter {
 		String topic = lionFilterEntity.getTopic();
 		boolean isTest = lionFilterEntity.isTest();
 
-		Set<String> topics = (Set<String>)getValue(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, Boolean.TRUE);
-		Set<String> newTopics = new LinkedHashSet<String>(topics);
-		newTopics.add(topic);
-		String topicJoin = StringUtils.join(newTopics, ";");
+		Set<String> newTopics = (Set<String>)getValue(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, Boolean.TRUE);
+		Set<String> oldTopics = topicWhiteList.getTopics();
+		if(newTopics == null || oldTopics == null || (oldTopics.size() - newTopics.size()) > TopicWhiteList.MAX_TOPIC_WHILTE_LIST_DECREASE){
+			return ResponseStatus.INVALIDLENGTH;
+		}
+
+		Set<String> newTopicsCopy = new LinkedHashSet<String>(newTopics);
+		newTopicsCopy.add(topic);
+		String topicJoin = StringUtils.join(newTopicsCopy, ";");
 		if (topicJoin.length() < lionConfigManager.getWhitelistLength()) {
 			topicResourceService.loadCachedTopicToAdministrator().remove(topic);
 			return ResponseStatus.INVALIDLENGTH;
@@ -48,18 +53,18 @@ public class TopicWhiteListLionFilter extends AbstractLionFilter {
 
 		ResponseStatus status = null;
 
-		if(EnvUtil.isProduct()){
+		if(!EnvUtil.isProduct()){
 			Set<String> envs = EnvUtil.allEnv();
 			for(String env : envs){
 				status	=  doEditLion(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topicJoin,
-						StringUtils.join(topics, ";"), isTest, env);
+						StringUtils.join(newTopics, ";"), isTest, env);
 				if(status != ResponseStatus.SUCCESS){
 					return ResponseStatus.LIONEXCEPTION;
 				}
 			}
 		}else{
 			status	=  doEditLion(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topicJoin,
-					StringUtils.join(topics, ";"), isTest, null);
+					StringUtils.join(newTopics, ";"), isTest, null);
 
 		}
 
