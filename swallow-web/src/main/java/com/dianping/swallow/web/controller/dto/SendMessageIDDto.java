@@ -34,8 +34,4 @@ public class SendMessageIDDto {
 		return authentication;
 	}
 
-	public void setAuthentication(String authentication) {
-		this.authentication = authentication;
-	}
-
 }

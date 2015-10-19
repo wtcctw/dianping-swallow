@@ -209,12 +209,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		TopicResource topicResource = findByTopic(str);
 
 		if (topicResource != null) {
-<<<<<<< HEAD
-			Set<String> set = splitString(topicResource.getAdministrator(), ",");
-			if(set.isEmpty()){
-				set = defaultSet;
-			}
-=======
+
 			Set<String> set = new HashSet<String>();
 			String admin = topicResource.getAdministrator();
 			if(StringUtils.isBlank(admin)){
@@ -226,7 +221,6 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 				set = splitString(admin, ",");
 			}
 
->>>>>>> lmd
 			topicToAdministrator.put(str, set);
 		} else {
 			topicToAdministrator.put(str, defaultSet == null ? new HashSet<String>() : defaultSet);

@@ -6,23 +6,13 @@ package com.dianping.swallow.web.controller.dto;
  *
  *         2015年8月27日下午4:11:02
  */
-public class IpResourceDto {
-
-	private String id;
+public class IpResourceDto extends BaseResourceDto{
 
 	private String ip;
 
 	private boolean alarm;
 
 	private String application;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getIp() {
 		return ip;

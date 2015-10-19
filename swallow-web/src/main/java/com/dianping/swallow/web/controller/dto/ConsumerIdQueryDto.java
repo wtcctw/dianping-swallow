@@ -32,12 +32,4 @@ public class ConsumerIdQueryDto extends BaseQueryDto{
 		return inactive;
 	}
 
-	public boolean isInactive() {
-		return inactive;
-	}
-
-	public void setInactive(boolean inactive) {
-		this.inactive = inactive;
-	}
-	
 }

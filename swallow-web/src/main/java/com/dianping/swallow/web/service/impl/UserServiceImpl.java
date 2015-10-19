@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import com.dianping.swallow.web.controller.dto.BaseQueryDto;
 import com.dianping.swallow.web.service.ServiceLifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,10 +76,10 @@ public class UserServiceImpl extends AbstractSwallowService implements UserServi
     }
 
     @Override
-    public Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto) {
+    public Pair<Long, List<Administrator>> loadUserPage(int offset, int limit) {
 
         Long totalNumOfTopic = administratorDao.countAdministrator();
-        List<Administrator> administratorList = administratorDao.findFixedAdministrator(baseDto);
+        List<Administrator> administratorList = administratorDao.findFixedAdministrator(offset, limit);
 
         return new Pair<Long, List<Administrator>>(totalNumOfTopic, administratorList);
     }

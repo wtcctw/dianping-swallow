@@ -11,7 +11,7 @@ public enum RelatedTypeDto {
 
 	private String desc;
 
-	private RelatedTypeDto(String desc) {
+	RelatedTypeDto(String desc) {
 		this.setDesc(desc);
 	}
 

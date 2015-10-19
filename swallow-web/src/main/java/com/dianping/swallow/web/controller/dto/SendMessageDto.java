@@ -1,5 +1,10 @@
 package com.dianping.swallow.web.controller.dto;
 
+/**
+ * @author mingdongli
+ *
+ * 2015年7月15日下午2:56:03
+ */
 public class SendMessageDto {
 
 	private String topic;

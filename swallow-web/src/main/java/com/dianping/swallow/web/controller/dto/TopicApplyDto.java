@@ -73,8 +73,4 @@ public class TopicApplyDto {
 		return applicant;
 	}
 
-	public void setApplicant(String applicant) {
-		this.applicant = applicant;
-	}
-
 }

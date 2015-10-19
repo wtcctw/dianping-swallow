@@ -32,16 +32,8 @@ public class AlarmSearchDto extends BaseQueryDto{
 		return relatedType;
 	}
 
-	public void setRelatedType(RelatedTypeDto relatedType) {
-		this.relatedType = relatedType;
-	}
-
 	public String getRelatedInfo() {
 		return relatedInfo;
-	}
-
-	public void setRelatedInfo(String relatedInfo) {
-		this.relatedInfo = relatedInfo;
 	}
 
 	public String getStartTime() {

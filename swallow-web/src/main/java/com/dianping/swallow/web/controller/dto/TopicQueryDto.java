@@ -30,10 +30,6 @@ public class TopicQueryDto extends BaseQueryDto{
 		return producerServer;
 	}
 
-	public void setProducerServer(String producerServer) {
-		this.producerServer = producerServer;
-	}
-
 	public boolean isInactive() {
 		return inactive;
 	}
