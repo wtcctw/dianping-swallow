@@ -3,6 +3,7 @@ package com.dianping.swallow.web.model.stats;
 import org.springframework.data.annotation.Transient;
 
 import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.StatisType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -53,6 +54,14 @@ public abstract class ProducerStatsData extends StatsData {
 	@JsonIgnore
 	public void setQpsTotal(long qpsTotal) {
 		this.qpsTotal = qpsTotal;
+	}
+
+	public boolean checkQpsPeak(long expectQps) {
+		return checkQpsPeak(this.getQps(), expectQps, StatisType.SENDQPS_PEAK);
+	}
+
+	public boolean checkQpsValley(long expectQps) {
+		return checkQpsPeak(this.getQps(), expectQps, StatisType.SENDQPS_VALLEY);
 	}
 
 }

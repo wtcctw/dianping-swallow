@@ -4,6 +4,8 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.dianping.swallow.web.model.event.StatisEvent;
+
 /**
  * 
  * @author qiyin
@@ -48,5 +50,10 @@ public class ProducerIpStatsData extends ProducerStatsData {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public StatisEvent createEvent() {
+		throw new UnsupportedOperationException();
 	}
 }

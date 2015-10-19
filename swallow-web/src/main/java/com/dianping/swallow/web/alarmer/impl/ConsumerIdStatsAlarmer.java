@@ -3,7 +3,6 @@ package com.dianping.swallow.web.alarmer.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,8 +64,7 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
 				ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
 				TopicResource topicResource = resourceContainer.findTopicResource(topicName);
 				if ((topicResource != null && !topicResource.isConsumerAlarm()) || consumerIdResource == null
-						|| !consumerIdResource.isAlarm() || StringUtils.equals(TOTAL_KEY, topicName)
-						|| StringUtils.equals(TOTAL_KEY, consumerId)) {
+						|| !consumerIdResource.isAlarm()) {
 					continue;
 				}
 				ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();

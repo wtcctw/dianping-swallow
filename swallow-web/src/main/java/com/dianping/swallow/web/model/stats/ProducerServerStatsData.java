@@ -1,11 +1,10 @@
 package com.dianping.swallow.web.model.stats;
 
-
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.web.model.event.StatisType;
+import com.dianping.swallow.web.model.event.StatisEvent;
 
 /**
  * 
@@ -27,26 +26,9 @@ public class ProducerServerStatsData extends ProducerStatsData {
 		this.ip = ip;
 	}
 
-	public boolean checkQpsPeak(long expectQps) {
-		if (this.getQps() != 0L) {
-			if (this.getQps() > expectQps) {
-				report(eventFactory.createServerStatisEvent().setIp(ip), this.getQps(), expectQps,
-						StatisType.SENDQPS_PEAK);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean checkQpsValley(long expectQps) {
-		if (this.getQps() != 0L) {
-			if (this.getQps() < expectQps) {
-				report(eventFactory.createServerStatisEvent().setIp(ip), this.getQps(), expectQps,
-						StatisType.SENDQPS_VALLEY);
-				return false;
-			}
-		}
-		return true;
+	@Override
+	public StatisEvent createEvent() {
+		return eventFactory.createServerStatisEvent().setIp(ip);
 	}
 
 	@Override

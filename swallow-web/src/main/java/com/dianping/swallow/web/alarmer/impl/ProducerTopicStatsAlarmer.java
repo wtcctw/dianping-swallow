@@ -2,7 +2,6 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,8 +56,7 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
 			try {
 				String topicName = topicStatsData.getTopicName();
 				TopicResource topicResource = resourceContainer.findTopicResource(topicName);
-				if (topicResource == null || !topicResource.isProducerAlarm()
-						|| StringUtils.equals(TOTAL_KEY, topicName)) {
+				if (topicResource == null || !topicResource.isProducerAlarm()) {
 					continue;
 				}
 				ProducerBaseAlarmSetting pBaseAlarmSetting = topicResource.getProducerAlarmSetting();

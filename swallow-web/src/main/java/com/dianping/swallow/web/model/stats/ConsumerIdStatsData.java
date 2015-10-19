@@ -4,8 +4,8 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.dianping.swallow.web.model.event.StatisEvent;
 import com.dianping.swallow.web.model.event.StatisType;
-
 /**
  * 
  * @author qiyin
@@ -86,14 +86,10 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 		this.totalAccumulation = totalAccumulation;
 	}
 
-	public boolean checkSendQpsPeak(long expectQps) {
-		return checkQpsPeak(getSendQps(), expectQps, StatisType.SENDQPS_PEAK);
+	public String generateKey() {
+		return topicName + "&" + consumerId;
 	}
-
-	public boolean checkSendQpsValley(long expectQps) {
-		return checkQpsValley(getSendQps(), expectQps, StatisType.SENDQPS_VALLEY);
-	}
-
+	
 	public boolean checkSendQpsFlu(long baseQps, long preQps, int flu) {
 		return checkQpsFlu(getSendQps(), baseQps, preQps, flu, StatisType.SENDQPS_FLU);
 	}
@@ -105,88 +101,13 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 	public boolean checkSendAccu(long expectAccu) {
 		return checkAccu(getAccumulation(), expectAccu, StatisType.SENDACCU);
 	}
-
-	public boolean checkAckQpsPeak(long expectQps) {
-		return checkQpsPeak(getAckQps(), expectQps, StatisType.ACKQPS_PEAK);
-	}
-
-	public boolean checkAckQpsValley(long expectQps) {
-		return checkQpsValley(getAckQps(), expectQps, StatisType.ACKQPS_VALLEY);
-	}
-
+	
 	public boolean checkAckQpsFlu(long baseQps, long preQps, int flu) {
 		return checkQpsFlu(getAckQps(), baseQps, preQps, flu, StatisType.ACKQPS_FLU);
 	}
 
 	public boolean checkAckDelay(long expectDelay) {
 		return checkDelay(getAckDelay(), expectDelay, StatisType.ACKDELAY);
-	}
-
-	public boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
-		if (qps != 0L) {
-			if (qps > expectQps) {
-				report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId).setTopicName(topicName), qps,
-						expectQps, statisType);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
-		if (qps != 0L) {
-			if (qps < expectQps) {
-				report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId).setTopicName(topicName), qps,
-						expectQps, statisType);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean checkQpsFlu(long qps, long baseQps, long preQps, int flu, StatisType statisType) {
-		if (qps == 0L || preQps == 0L) {
-			return true;
-		}
-
-		if (qps > baseQps || preQps > baseQps) {
-
-			if ((qps >= preQps && (qps / preQps > flu)) || (qps < preQps && (preQps / qps > flu))) {
-
-				report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId).setTopicName(topicName), qps,
-						preQps, statisType);
-				return false;
-
-			}
-		}
-		return true;
-	}
-
-	public boolean checkDelay(long delay, long expectDelay, StatisType statisType) {
-		delay = delay / 1000;
-		if (delay != 0L && expectDelay != 0L) {
-			if ((delay) > expectDelay) {
-				report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId).setTopicName(topicName), delay,
-						expectDelay, statisType);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean checkAccu(long accu, long expectAccu, StatisType statisType) {
-		if (accu != 0L && expectAccu != 0L) {
-			if (accu > expectAccu) {
-				report(eventFactory.createConsumerIdEvent().setConsumerId(consumerId).setTopicName(topicName), accu,
-						expectAccu, statisType);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public String generateKey() {
-		return topicName + "&" + consumerId;
 	}
 
 	public void setTotalStatsDatas(ConsumerIdStatsData lastStatsData, int sampleInterval) {
@@ -213,6 +134,11 @@ public class ConsumerIdStatsData extends ConsumerStatsData {
 				+ totalSendQps + ", totalSendDelay=" + totalSendDelay + ", totalAckQps=" + totalAckQps
 				+ ", totalAckDelay=" + totalAckDelay + ", totalAccumulation=" + totalAccumulation + "]"
 				+ super.toString();
+	}
+
+	@Override
+	public StatisEvent createEvent() {
+		return eventFactory.createConsumerIdEvent().setConsumerId(consumerId).setTopicName(topicName);
 	}
 
 }

@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.dianping.swallow.web.model.event.StatisEvent;
 import com.dianping.swallow.web.model.event.StatisType;
 
 /**
@@ -46,55 +47,17 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 		this.totalDelay = totalDelay;
 	}
 
-	public boolean checkQpsPeak(long expectQps) {
-		if (this.getQps() != 0L) {
-			if (this.getQps() > expectQps) {
-				report(eventFactory.createTopicEvent().setTopicName(topicName), this.getQps(), expectQps,
-						StatisType.SENDQPS_PEAK);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean checkQpsValley(long expectQps) {
-		if (this.getQps() != 0L) {
-			if (this.getQps() < expectQps) {
-				report(eventFactory.createTopicEvent().setTopicName(topicName), this.getQps(), expectQps,
-						StatisType.SENDQPS_VALLEY);
-				return false;
-			}
-		}
-		return true;
+	@Override
+	public StatisEvent createEvent() {
+		return eventFactory.createTopicEvent().setTopicName(topicName);
 	}
 
 	public boolean checkQpsFlu(long baseQps, long preQps, int flu) {
-		if (this.getQps() == 0L || preQps == 0L) {
-			return true;
-		}
-
-		if (getQps() > baseQps || preQps > baseQps) {
-
-			if ((getQps() >= preQps && (getQps() / preQps > flu)) || (getQps() < preQps && (preQps / getQps() > flu))) {
-
-				report(eventFactory.createTopicEvent().setTopicName(topicName), this.getQps(), preQps,
-						StatisType.SENDQPS_FLU);
-				return false;
-			}
-		}
-		return true;
+		return checkQpsFlu(this.getQps(), baseQps, preQps, flu, StatisType.SENDQPS_FLU);
 	}
 
 	public boolean checkDelay(long expectDelay) {
-		long delay = this.getDelay() / 1000;
-		if (delay == 0L || expectDelay == 0L) {
-			return true;
-		}
-		if (delay > expectDelay) {
-			report(eventFactory.createTopicEvent().setTopicName(topicName), delay, expectDelay, StatisType.SENDDELAY);
-			return false;
-		}
-		return true;
+		return checkDelay(this.getDelay(), expectDelay, StatisType.SENDDELAY);
 	}
 
 	public void setTotalStatsDatas(ProducerTopicStatsData lastStatsData, int sampleInterval) {

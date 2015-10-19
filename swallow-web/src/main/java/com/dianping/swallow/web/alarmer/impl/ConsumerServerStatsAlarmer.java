@@ -2,7 +2,6 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -56,7 +55,7 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
 			try {
 				String ip = serverStatsData.getIp();
 				ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(ip);
-				if (cServerResource == null || !cServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
+				if (cServerResource == null || !cServerResource.isAlarm()) {
 					continue;
 				}
 				QPSAlarmSetting sendQps = cServerResource.getSendAlarmSetting();
