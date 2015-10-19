@@ -11,11 +11,7 @@ public class TotalDataKey implements Comparable<TotalDataKey>{
 	private String topic;
 	
 	private String consumerId;
-	
-	public TotalDataKey(){
-		
-	}
-	
+
 	public TotalDataKey(String topic, String consumerId){
 		
 		this.topic = topic;
@@ -36,11 +32,6 @@ public class TotalDataKey implements Comparable<TotalDataKey>{
 
 	public void setConsumerId(String consumerId) {
 		this.consumerId = consumerId;
-	}
-
-	@Override
-	public String toString() {
-		return "TotalDataKey [topic=" + topic + ", consumerId=" + consumerId + "]";
 	}
 
 	@Override

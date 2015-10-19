@@ -1,22 +1,13 @@
 package com.dianping.swallow.web.dashboard;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.annotation.Resource;
-
+import com.dianping.swallow.web.dashboard.model.MinuteEntry;
+import com.dianping.swallow.web.service.MinuteEntryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.dashboard.model.MinuteEntry;
-import com.dianping.swallow.web.service.MinuteEntryService;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * @author mingdongli
@@ -106,14 +97,6 @@ public class DashboardContainer {
 		}
 
 		return result;
-	}
-
-	public Map<Date, MinuteEntry> getDashboards() {
-		return dashboard;
-	}
-
-	public void setDashboards(Map<Date, MinuteEntry> dashboards) {
-		this.dashboard = dashboards;
 	}
 
 }

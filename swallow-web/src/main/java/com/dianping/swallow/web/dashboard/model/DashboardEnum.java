@@ -12,7 +12,7 @@ public enum DashboardEnum {
 	
 	private String type;
 	
-	private DashboardEnum(String type){
+	DashboardEnum(String type){
 		
 		this.type = type;
 	}
@@ -31,12 +31,7 @@ public enum DashboardEnum {
 				return dashboard;
 			}
 		}
-		throw new RuntimeException("Error typy : " + type);
-	}
-	
-	public static void main(String[] args) {
-		DashboardEnum dashboardEnum = findByType("comprehensive");
-		System.out.println(dashboardEnum.equals(DashboardEnum.COMPREHENSIVE));
+		throw new RuntimeException("Error type : " + type);
 	}
 	
 }
