@@ -6,6 +6,12 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年10月16日 上午10:08:29
+ */
 public class AlarmMeta {
 
 	@Transient

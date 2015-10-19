@@ -1,12 +1,9 @@
 package com.dianping.swallow.web.model.stats;
 
-import java.util.Date;
-
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.StatisType;
 
 /**
@@ -52,10 +49,8 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	public boolean checkQpsPeak(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() > expectQps) {
-				eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName)
-						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
-						.setStatisType(StatisType.SENDQPS_PEAK).setCreateTime(new Date())
-						.setEventType(EventType.PRODUCER));
+				report(eventFactory.createTopicEvent().setTopicName(topicName), this.getQps(), expectQps,
+						StatisType.SENDQPS_PEAK);
 				return false;
 			}
 		}
@@ -65,10 +60,8 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 	public boolean checkQpsValley(long expectQps) {
 		if (this.getQps() != 0L) {
 			if (this.getQps() < expectQps) {
-				eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName)
-						.setCurrentValue(this.getQps()).setExpectedValue(expectQps)
-						.setStatisType(StatisType.SENDQPS_VALLEY).setCreateTime(new Date())
-						.setEventType(EventType.PRODUCER));
+				report(eventFactory.createTopicEvent().setTopicName(topicName), this.getQps(), expectQps,
+						StatisType.SENDQPS_VALLEY);
 				return false;
 			}
 		}
@@ -84,11 +77,9 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 
 			if ((getQps() >= preQps && (getQps() / preQps > flu)) || (getQps() < preQps && (preQps / getQps() > flu))) {
 
-				eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName)
-						.setCurrentValue(this.getQps()).setExpectedValue(preQps).setStatisType(StatisType.SENDQPS_FLU)
-						.setCreateTime(new Date()).setEventType(EventType.PRODUCER));
+				report(eventFactory.createTopicEvent().setTopicName(topicName), this.getQps(), preQps,
+						StatisType.SENDQPS_FLU);
 				return false;
-
 			}
 		}
 		return true;
@@ -100,9 +91,7 @@ public class ProducerTopicStatsData extends ProducerStatsData {
 			return true;
 		}
 		if (delay > expectDelay) {
-			eventReporter.report(eventFactory.createTopicEvent().setTopicName(topicName).setCurrentValue(delay)
-					.setExpectedValue(expectDelay).setStatisType(StatisType.SENDDELAY).setCreateTime(new Date())
-					.setEventType(EventType.PRODUCER));
+			report(eventFactory.createTopicEvent().setTopicName(topicName), delay, expectDelay, StatisType.SENDDELAY);
 			return false;
 		}
 		return true;

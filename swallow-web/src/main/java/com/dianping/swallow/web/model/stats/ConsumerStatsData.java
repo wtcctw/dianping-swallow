@@ -2,6 +2,7 @@ package com.dianping.swallow.web.model.stats;
 
 import org.springframework.data.annotation.Transient;
 
+import com.dianping.swallow.web.model.event.EventType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -11,6 +12,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *         2015年7月31日 下午3:56:45
  */
 public abstract class ConsumerStatsData extends StatsData {
+	
+	public ConsumerStatsData() {
+		eventType = EventType.CONSUMER;
+	}
 
 	private long sendQps;
 	

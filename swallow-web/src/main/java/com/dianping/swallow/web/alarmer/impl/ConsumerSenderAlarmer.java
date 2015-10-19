@@ -22,7 +22,7 @@ import com.dianping.swallow.web.service.IPCollectorService;
  *
  *         2015年8月3日 下午6:06:35
  */
-@Component
+//@Component
 public class ConsumerSenderAlarmer extends AbstractServiceAlarmer {
 
 	@Autowired

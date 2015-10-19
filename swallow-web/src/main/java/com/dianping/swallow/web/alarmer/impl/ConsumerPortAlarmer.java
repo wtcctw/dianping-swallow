@@ -24,7 +24,7 @@ import com.dianping.swallow.web.util.NetUtil;
  *
  *         2015年9月17日 下午8:24:37
  */
-@Component
+//@Component
 public class ConsumerPortAlarmer extends AbstractServiceAlarmer {
 
 	private Map<String, Boolean> isSlaveIps = new ConcurrentHashMap<String, Boolean>();

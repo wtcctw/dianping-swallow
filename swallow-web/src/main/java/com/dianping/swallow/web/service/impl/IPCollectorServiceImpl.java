@@ -286,6 +286,19 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		map.put(data, System.currentTimeMillis());
 	}
 
+	public long getLastestStatsTimeByIp(String ip, boolean isProducer) {
+		if (isProducer) {
+			if (statisProducerServerIps.containsKey(ip)) {
+				return statisProducerServerIps.get(ip);
+			}
+		} else {
+			if (statisConsumerServerIps.containsKey(ip)) {
+				return statisConsumerServerIps.get(ip);
+			}
+		}
+		return 0L;
+	}
+
 	@Override
 	public Map<String, Long> getStatisConsumerServerIps() {
 		return copyMap(statisConsumerServerIps);

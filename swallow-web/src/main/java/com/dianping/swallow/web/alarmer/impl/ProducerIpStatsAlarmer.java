@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.event.ClientType;
-import com.dianping.swallow.web.model.event.EventFactory;
+import com.dianping.swallow.web.model.event.EventFactoryImpl;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ProducerClientEvent;
 import com.dianping.swallow.web.model.resource.IpInfo;
@@ -42,7 +42,7 @@ public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
 	protected EventReporter eventReporter;
 
 	@Autowired
-	protected EventFactory eventFactory;
+	protected EventFactoryImpl eventFactory;
 
 	@Autowired
 	private ProducerStatsDataWapper pStatsDataWapper;

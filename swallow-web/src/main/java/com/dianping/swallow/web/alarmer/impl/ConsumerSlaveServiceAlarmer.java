@@ -22,7 +22,7 @@ import com.dianping.swallow.web.service.HttpService.HttpResult;
  *
  *         2015年9月17日 下午8:24:53
  */
-@Component
+//@Component
 public class ConsumerSlaveServiceAlarmer extends AbstractServiceAlarmer {
 
 	private String slaveMonitorUrl = "http://{ip}:8080/names/";

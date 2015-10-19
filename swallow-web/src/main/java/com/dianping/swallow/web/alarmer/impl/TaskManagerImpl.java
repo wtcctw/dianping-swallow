@@ -3,6 +3,7 @@ package com.dianping.swallow.web.alarmer.impl;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,7 @@ public class TaskManagerImpl extends AbstractLifecycle implements TaskManager, A
 			scheduled.shutdown();
 		}
 	}
+
 	@Override
 	public Future<?> submit(Runnable command) {
 		return executor.submit(command);

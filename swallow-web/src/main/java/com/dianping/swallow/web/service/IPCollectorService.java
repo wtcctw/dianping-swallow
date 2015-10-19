@@ -36,6 +36,8 @@ public interface IPCollectorService {
 	 */
 	Map<String, Long> getStatisProducerServerIps();
 
+	long getLastestStatsTimeByIp(String ip, boolean isProducer);
+
 	/**
 	 * get producer server ips
 	 * 
@@ -70,7 +72,6 @@ public interface IPCollectorService {
 	 * @return
 	 */
 	Map<String, String> getConsumerServerSlaveIpsMap();
-
 
 	public static class ConsumerServerPair {
 
@@ -204,7 +205,7 @@ public interface IPCollectorService {
 			this.ip = ip;
 			this.hostName = hostName;
 		}
-		
+
 		public boolean equalsIp(String ip) {
 			if (!StringUtils.isBlank(this.ip)) {
 				if (this.ip.equals(ip)) {

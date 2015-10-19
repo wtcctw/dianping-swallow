@@ -23,7 +23,7 @@ import com.dianping.swallow.web.service.IPCollectorService;
  *
  *         2015年8月3日 下午6:07:08
  */
-@Component
+//@Component
 public class ProducerServiceAlarmer extends AbstractServiceAlarmer {
 
 	private String pigeonHealthUrl = "http://{ip}:4080/stats.json";
