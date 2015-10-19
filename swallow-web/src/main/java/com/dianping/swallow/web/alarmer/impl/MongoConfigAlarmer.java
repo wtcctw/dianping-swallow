@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -11,10 +10,10 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.common.internal.config.LionUtil;
 import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionUtilImpl;
-import com.dianping.swallow.web.alarmer.AlarmConfig;
 import com.dianping.swallow.web.container.ResourceContainer;
-import com.dianping.swallow.web.model.resource.ConsumerServerResource;
-import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.server.ConsumerHAServer;
+import com.dianping.swallow.web.model.server.ConsumerServer;
+import com.dianping.swallow.web.model.server.ProducerServer;
 import com.dianping.swallow.web.util.JsonUtil;
 
 /**
@@ -29,9 +28,6 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 	public static final String TOPIC_CFG_PREFIX = "swallow.topiccfg.";
 
 	@Autowired
-	private AlarmConfig alarmConfig;
-
-	@Autowired
 	private ResourceContainer resourceContainer;
 
 	@Override
@@ -43,10 +39,10 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 
 	@Override
 	public void doAlarm() {
-		checkConfig();
+		doCheckConfig();
 	}
 
-	private void checkConfig() {
+	private void doCheckConfig() {
 		Map<String, TopicConfig> topicConfigs = getMongoConfig();
 		if (topicConfigs == null || topicConfigs.size() == 0) {
 			logger.error("[checkConfig] lion mongoconfig is empty.");
@@ -57,18 +53,29 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 	}
 
 	private void checkProducerConfig(Map<String, TopicConfig> topicConfigs) {
-		List<ProducerServerResource> pServerResources = resourceContainer.findProducerServerResources(false);
-		for (ProducerServerResource serverResource : pServerResources) {
-			if (serverResource.isAlarm()) {
-			}
+		Map<String, ProducerServer> producerServers = serverContainer.getProducerServers();
+		if (producerServers == null || producerServers.isEmpty()) {
+			logger.error("[checkProducerConfig] producerServers is empty.");
+			return;
+		}
+		for (Map.Entry<String, ProducerServer> serverEntry : producerServers.entrySet()) {
+			ProducerServer producerServer = serverEntry.getValue();
+			producerServer.checkConfig(topicConfigs);
 		}
 	}
 
 	private void checkConsumerConfig(Map<String, TopicConfig> topicConfigs) {
-		List<ConsumerServerResource> cServerResources = resourceContainer.findConsumerServerResources(false);
-		for (ConsumerServerResource serverResource : cServerResources) {
-			if (serverResource.isAlarm()) {
-			}
+		Map<String, ConsumerHAServer> consumerHAServers = serverContainer.getConsumerHAServers();
+		if (consumerHAServers == null || consumerHAServers.isEmpty()) {
+			logger.error("[checkConsumerConfig] consumerHAServers is empty.");
+			return;
+		}
+		for (Map.Entry<String, ConsumerHAServer> serverEntry : consumerHAServers.entrySet()) {
+			ConsumerHAServer consumerHAServer = serverEntry.getValue();
+			ConsumerServer masterServer = consumerHAServer.getMasterServer();
+			masterServer.checkConfig(topicConfigs);
+			ConsumerServer slaveServer = consumerHAServer.getSlaveServer();
+			slaveServer.checkConfig(topicConfigs);
 		}
 	}
 
@@ -92,5 +99,4 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		return topicConfigs;
 	}
 
-	
 }

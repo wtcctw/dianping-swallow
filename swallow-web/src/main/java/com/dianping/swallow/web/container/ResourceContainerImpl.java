@@ -27,7 +27,7 @@ import com.dianping.swallow.web.service.TopicResourceService;
  *
  *         2015年8月3日 上午11:34:10
  */
-@Component("alarmResourceContainer")
+@Component("resourceContainer")
 public class ResourceContainerImpl extends AbstractContainer implements ResourceContainer {
 
 	private static final String DEFAULT_RECORD = "default";

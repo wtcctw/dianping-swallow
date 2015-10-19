@@ -70,7 +70,7 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 	@Autowired
 	private AppResourceManager appResourceManager;
 
-	@Resource(name = "alarmResourceContainer")
+	@Resource(name = "resourceContainer")
 	private ResourceContainer alarmResourceContainer;
 
 	private Map<TotalDataKey, TotalData> totalDataMap = new ConcurrentHashMap<TotalDataKey, TotalData>();

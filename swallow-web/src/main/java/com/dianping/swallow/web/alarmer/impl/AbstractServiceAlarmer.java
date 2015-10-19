@@ -9,9 +9,10 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.container.ServerContainer;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.server.Sendable;
-import com.dianping.swallow.web.model.server.ServerFactoryImpl;
+import com.dianping.swallow.web.model.server.ServerFactory;
 import com.dianping.swallow.web.service.IPCollectorService;
 
 public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
@@ -27,7 +28,10 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	protected ResourceContainer resourceContainer;
 
 	@Autowired
-	protected ServerFactoryImpl serverFactory;
+	protected ServerFactory serverFactory;
+
+	@Autowired
+	protected ServerContainer serverContainer;
 
 	protected int alarmInterval = 30;
 
