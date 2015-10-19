@@ -1,27 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.BaseQueryDto;
 import com.dianping.swallow.web.controller.dto.ConsumerServerResourceDto;
@@ -36,12 +14,18 @@ import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.MongoResource;
 import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
-import com.dianping.swallow.web.service.ConsumerServerResourceService;
-import com.dianping.swallow.web.service.IPCollectorService;
-import com.dianping.swallow.web.service.MongoResourceService;
-import com.dianping.swallow.web.service.ProducerServerResourceService;
-import com.dianping.swallow.web.service.TopicResourceService;
+import com.dianping.swallow.web.service.*;
 import com.dianping.swallow.web.util.ResponseStatus;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 
 /**
@@ -73,14 +57,14 @@ public class ServerController extends AbstractSidebarBasedController {
 	ConsumerDataRetrieverWrapper consumerDataRetrieverWrapper;
 
 	@RequestMapping(value = "/console/server")
-	public ModelAndView serverSetting(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView serverSetting() {
 
 		subSide = "producer";
 		return new ModelAndView("server/producer", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/server/producer")
-	public ModelAndView producerServerSetting(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView producerServerSetting() {
 
 		subSide = "producer";
 		return new ModelAndView("server/producer", createViewMap());
@@ -177,46 +161,24 @@ public class ServerController extends AbstractSidebarBasedController {
 
 	@RequestMapping(value = "/console/server/producer/alarm", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean editProducerAlarmSetting(@RequestParam String ip, @RequestParam boolean alarm,
-			HttpServletRequest request, HttpServletResponse response) {
+	public boolean editProducerAlarmSetting(@RequestParam String ip, @RequestParam boolean alarm) {
 
 		ProducerServerResource producerServerResource = (ProducerServerResource) producerServerResourceService
 				.findByIp(ip);
 		producerServerResource.setAlarm(alarm);
-		boolean result = producerServerResourceService.update(producerServerResource);
+		return producerServerResourceService.update(producerServerResource);
 
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update producer server alarm of %s to %b successfully", ip, alarm));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update producer server alarm of %s to %b fail", ip, alarm));
-			}
-		}
-		return result;
 	}
 
 	@RequestMapping(value = "/console/server/producer/active", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean editProducerActiveSetting(@RequestParam String ip, @RequestParam boolean active,
-			HttpServletRequest request, HttpServletResponse response) {
+	public boolean editProducerActiveSetting(@RequestParam String ip, @RequestParam boolean active) {
 		
 		ProducerServerResource producerServerResource = (ProducerServerResource) producerServerResourceService
 				.findByIp(ip);
 		producerServerResource.setActive(active);
-		boolean result = producerServerResourceService.update(producerServerResource);
-		
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update producer server active of %s to %b successfully", ip, active));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update producer server active of %s to %b fail", ip, active));
-			}
-		}
-		return result;
+		return producerServerResourceService.update(producerServerResource);
+
 	}
 
 	/**
@@ -225,7 +187,7 @@ public class ServerController extends AbstractSidebarBasedController {
 	 */
 
 	@RequestMapping(value = "/console/server/consumer")
-	public ModelAndView topicSetting(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView topicSetting() {
 
 		subSide = "consumer";
 		return new ModelAndView("server/consumer", createViewMap());
@@ -349,19 +311,8 @@ public class ServerController extends AbstractSidebarBasedController {
 		ConsumerServerResource consumerServerResource = (ConsumerServerResource) consumerServerResourceService
 				.findByIp(ip);
 		consumerServerResource.setAlarm(alarm);
-		boolean result = consumerServerResourceService.update(consumerServerResource);
+		return consumerServerResourceService.update(consumerServerResource);
 
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update consumer server alarm of %s to %b successfully", ip, alarm));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update consumer server alarm of %s to %b fail", ip, alarm));
-			}
-		}
-
-		return result;
 	}
 
 	@RequestMapping(value = "/console/server/consumer/active", method = RequestMethod.GET)
@@ -371,19 +322,8 @@ public class ServerController extends AbstractSidebarBasedController {
 		ConsumerServerResource consumerServerResource = (ConsumerServerResource) consumerServerResourceService
 				.findByIp(ip);
 		consumerServerResource.setActive(active);
-		boolean result = consumerServerResourceService.update(consumerServerResource);
-		
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update consumer server active of %s to %b successfully", ip, active));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update consumer server active of %s to %b fail", ip, active));
-			}
-		}
-		
-		return result;
+		return consumerServerResourceService.update(consumerServerResource);
+
 	}
 
 	@RequestMapping(value = "/console/server/mongo")

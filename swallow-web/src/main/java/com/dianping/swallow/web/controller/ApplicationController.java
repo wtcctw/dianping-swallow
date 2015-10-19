@@ -1,22 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ApplicationQueryDto;
 import com.dianping.swallow.web.controller.dto.ApplicationResourceDto;
@@ -25,6 +8,15 @@ import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.resource.ApplicationResource;
 import com.dianping.swallow.web.service.ApplicationResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -41,7 +33,7 @@ public class ApplicationController extends AbstractMenuController {
 	private UserUtils userUtils;
 
 	@RequestMapping(value = "/console/application")
-	public ModelAndView ipView(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView ipView() {
 
 		return new ModelAndView("application/index", createViewMap());
 	}
@@ -98,7 +90,7 @@ public class ApplicationController extends AbstractMenuController {
 	
 	@RequestMapping(value = "/console/application/applicationname", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadApplication(HttpServletRequest request, HttpServletResponse response) {
+	public List<String> loadApplication() {
 
 		return userUtils.allApplications();
 	}
