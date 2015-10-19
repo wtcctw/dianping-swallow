@@ -79,11 +79,12 @@ Thumbs.db
 
 #
 #*lion*properties*
-
+# Intellij project files
+*.iml
+*.ipr
+*.iws
+.idea/
 #test
 config.online
 TODO
 .idea/
-*.iml
-*.ipr
-*.iws

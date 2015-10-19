@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.TopicResourceDao;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 
 /**
@@ -31,6 +32,8 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	private static final String ID = "id";
 
 	private static final String PEODUCERIPS = "producerIpInfos.ip";
+
+	private static final String ACTIVE = "producerIpInfos.active";
 
 	private static final String ADMINISTRATOR = "administrator";
 
@@ -72,15 +75,15 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp) {
+	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, boolean inactive) {
 
 		Query query = new Query();
-		
+
 		long size = -1;
 		if (StringUtil.isNotBlank(topic)) {
 			String[] topics = topic.split(",");
 			int length = topics.length;
-			if(length > 1){
+			if (length > 1) {
 				size = length;
 				Arrays.sort(topics);
 				int rightIndex = (int) Math.min(length, offset + limit);
@@ -91,7 +94,7 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 
 				query.addCriteria(Criteria.where(TOPIC).exists(true)
 						.orOperator(criterias.toArray(new Criteria[criterias.size()])));
-			}else{
+			} else {
 				query.addCriteria(Criteria.where(TOPIC).is(topic));
 			}
 		}
@@ -99,10 +102,15 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 			query.addCriteria(Criteria.where(PEODUCERIPS).is(producerIp));
 		}
 
+		if(!inactive){
+			query.addCriteria(Criteria.where(ACTIVE).is(inactive));
+			size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
+		}
+
 		List<TopicResource> topicResources = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
 
 		query.skip(offset).limit(limit);
-		if(size < 0){
+		if (size < 0) {
 			size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
 		}
 
@@ -111,7 +119,7 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String ... topics) {
+	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String... topics) {
 
 		List<Criteria> criterias = new ArrayList<Criteria>();
 		for (String t : topics) {
@@ -179,17 +187,42 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public 	Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator) {
-		
+	public Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator) {
+
 		Query query = new Query(Criteria.where(ADMINISTRATOR).regex(".*" + administrator + ".*"));
-		
+
 		Long size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
-		
+
 		query.skip(offset).limit(limit);
 		List<TopicResource> topicResource = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
-		
+
 		return new Pair<Long, List<TopicResource>>(size, topicResource);
+
+	}
+
+	@Override
+	public long countInactive() {
+		Query query = new Query(Criteria.where(ACTIVE).is(Boolean.FALSE));
+		query.fields().include(ACTIVE);
+		List<TopicResource> topicResources =  mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
 		
+		long result = 0;
+		int size = topicResources.size();
+		TopicResource topicResource = null;
+		List<IpInfo> ipInfos = null;
+		int ipInfoSize = 0;
+		for(int i = 0; i < size; ++i){
+			topicResource = topicResources.get(i);
+			ipInfos = topicResource.getProducerIpInfos();
+			ipInfoSize = ipInfos.size();
+			for(int j = 0; j < ipInfoSize; ++j){
+				if(!ipInfos.get(j).isActive()){
+					++result;
+				}
+			}
+		}
+		
+		return result;
 	}
 
 }

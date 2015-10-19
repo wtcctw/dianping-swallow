@@ -3,6 +3,7 @@ package com.dianping.swallow.common.server.monitor.collector;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -65,7 +66,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	
 	private HttpClient httpClient;
 	protected final int maxWaitConnectionTime = 5000;
-	protected final int soTimeout = 1000;
+	protected final int soTimeout = 5000;
 	
 	protected static final int maxRetryTimesOnException = 3;
 	protected static final int maxRetryIntervalOnException = 1000;
@@ -193,10 +194,15 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 				success = checkResponse(response);
 			}catch(Exception e){
 				post.abort();
+				
 				if(e instanceof SocketException){
 					logger.error(e.toString());
 				}else{
 					logger.error("[doSendTask]", e);
+				}
+				
+				if(e instanceof SocketTimeoutException){
+					break;
 				}
 			}finally{
 				

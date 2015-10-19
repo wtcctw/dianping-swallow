@@ -11,7 +11,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
  *
  * 2015年5月20日下午2:05:16
  */
-public class AbstractSwallowService extends AbstractLifecycle implements ServiceLifecycle{
+public class AbstractSwallowService extends AbstractLifecycle{
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	

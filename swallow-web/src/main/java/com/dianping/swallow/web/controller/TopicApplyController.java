@@ -89,6 +89,7 @@ public class TopicApplyController {
 	private TopicCfgLionFilter topicCfgLionFilter;
 
 	private Object APPLY_TOPIC = new Object();
+	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
@@ -141,14 +142,15 @@ public class TopicApplyController {
 			return lionFilterResult;
 		}
 
+		String applicant = topicApplyDto.getApplicant();
+		Set<String> administrator = new HashSet<String>();
+		administrator.add(applicant.trim());
+
+		boolean isSuccess;
 		synchronized (APPLY_TOPIC) {
-			String applicant = topicApplyDto.getApplicant();
-			logger.info("----------------------------applicant " + applicant);
-			Set<String> administrator = new HashSet<String>();
-			administrator.add(applicant.trim());
-			boolean isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
-			return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
+			isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
 		}
+		return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
 	}
 
 }

@@ -190,6 +190,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				localStorage.clear();
 			}
 			$scope.query.producerServer = $scope.searchip;
+			$scope.query.inactive = true;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 			
 			//如果topic列表返回空，则不会执行initpage
@@ -259,10 +260,22 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 									  displayText: function(item){ return item;}  //necessary
 								  }
 							});
-			        		//$('#producerServer').typeahead().data('typeahead').source = data;
 						}).error(function(data, status, headers, config) {
 						});
+
+					 $http({
+						 method : 'GET',
+						 url : window.contextPath + '/console/topic/alarm/ipinfo/count/inactive'
+					 }).success(function(data, status, headers, config) {
+						 $scope.countinactive = data;
+					 }).error(function(data, status, headers, config) {
+					 });
 					
+			}
+			
+			$scope.setInactive = function(){
+				$scope.query.inactive = !$scope.query.inactive;
+				$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 			}
 			
 			$scope.changeipinfo = function(topic, type, index, ip){

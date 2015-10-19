@@ -21,11 +21,11 @@ public class ProducerIpGroupStatsData {
 	}
 
 	public boolean hasStatsData() {
-		if (producerIpStatsDatas == null || producerIpStatsDatas.size() == 0) {
+		if (producerIpStatsDatas == null || producerIpStatsDatas.isEmpty()) {
 			return false;
 		}
 		for (ProducerIpStatsData ipStatsData : producerIpStatsDatas) {
-			if (ipStatsData.getQps() != 0L) {
+			if (ipStatsData.hasStatsData()) {
 				return true;
 			}
 		}

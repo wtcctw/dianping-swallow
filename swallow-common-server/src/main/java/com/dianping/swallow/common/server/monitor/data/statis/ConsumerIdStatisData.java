@@ -77,7 +77,7 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 	}
 
 	@Override
-	public NavigableMap<Long, Long> getQpx(StatisType type) {
+	public NavigableMap<Long, QpxData> getQpx(StatisType type) {
 		
 		switch(type){
 			case SEND:

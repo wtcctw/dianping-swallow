@@ -4,6 +4,9 @@ import com.dianping.lion.Constants;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author mengwenchao
  *
@@ -49,6 +52,17 @@ public class EnvUtil {
 	public static boolean isProduct(){
 		
 		return env.equals("product");
+	}
+
+	public static Set<String> allEnv(){
+		Set<String> envs = new HashSet<String>();
+		envs.add("dev");
+		envs.add("alpha");
+		envs.add("qa");
+		envs.add("prelease");
+		envs.add("product");
+		envs.add("performance");
+		return envs;
 	}
 	
 	public static String getWebAddress(){

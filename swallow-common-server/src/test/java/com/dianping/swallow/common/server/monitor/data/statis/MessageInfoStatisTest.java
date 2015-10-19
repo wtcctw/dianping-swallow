@@ -10,41 +10,41 @@ import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfo;
 
 /**
  * @author mengwenchao
  *
- * 2015年5月20日 上午10:28:00
+ *         2015年5月20日 上午10:28:00
  */
-public class MessageInfoStatisTest extends AbstractTest{
-	
+public class MessageInfoStatisTest extends AbstractTest {
+
 	private MessageInfoStatis messageInfoStatis;
-	
+
 	private final Long startKey = 100L, endKey = 200L;
-	
+
 	private final Long expectedQpx = 2L, expectedDelay = 10L;
-	
+
 	private final int intervalCount = 4;
-	
+
 	@Before
-	public void beforeMessageInfoCollectionTest(){
-		
+	public void beforeMessageInfoCollectionTest() {
+
 		messageInfoStatis = new MessageInfoStatis();
-		
+
 		prepareData();
 	}
-	
-	
+
 	private void prepareData() {
 
 		MessageInfo info = new MessageInfo();
 
-		for(Long key = startKey; key <= endKey ;key++){
-			
-			for(int i =0; i< expectedQpx*AbstractCollector.SEND_INTERVAL;i++){
-				
+		for (Long key = startKey; key <= endKey; key++) {
+
+			for (int i = 0; i < expectedQpx * AbstractCollector.SEND_INTERVAL; i++) {
+
 				Long current = System.currentTimeMillis();
 				info.addMessage(key, current - expectedDelay, current);
 			}
@@ -57,184 +57,192 @@ public class MessageInfoStatisTest extends AbstractTest{
 	}
 
 	@Test
-	public void testMergeDirty() throws CloneNotSupportedException{
-		
+	public void testMergeDirty() throws CloneNotSupportedException {
+
 		int addCount = 100;
 		int wrong = 2;
-		
+
 		MessageInfo info1 = new MessageInfo();
 		MessageInfo info2 = new MessageInfo();
-		
-		for(Long i = endKey + 1;  i <= endKey + addCount; i++){
-			
+
+		for (Long i = endKey + 1; i <= endKey + addCount; i++) {
+
 			add(info1);
 			add(info2);
-			
-			if(i <= endKey + wrong){
-				messageInfoStatis.add(i , (MessageInfo)info1.clone());
-			}else{
-				messageInfoStatis.add(i , (MessageInfo)info1.clone());
-				messageInfoStatis.add(i , (MessageInfo)info2.clone());
+
+			if (i <= endKey + wrong) {
+				messageInfoStatis.add(i, (MessageInfo) info1.clone());
+			} else {
+				messageInfoStatis.add(i, (MessageInfo) info1.clone());
+				messageInfoStatis.add(i, (MessageInfo) info2.clone());
 			}
 		}
-		
+
 		messageInfoStatis.build(QPX.SECOND, endKey + 1, endKey + addCount, 1);
-		
-		NavigableMap<Long, Long> qpx = messageInfoStatis.getQpx(StatisType.SAVE);
+
+		NavigableMap<Long, QpxData> qpx = messageInfoStatis.getQpx(StatisType.SAVE);
 		NavigableMap<Long, Long> delay = messageInfoStatis.getDelay(StatisType.SAVE);
-		
-		expect(qpx.headMap(endKey + wrong, true), wrong , 0L);
-		expect(qpx.tailMap(endKey + wrong + 1, true), addCount - wrong - 1, expectedQpx * 2);
-		
-		expect(delay.headMap(endKey + wrong, true), wrong , 0L);
-		expect(delay.tailMap(endKey + wrong + 1, true), addCount - wrong -1, expectedDelay);
-		
-		
+
+		expectQpx(qpx.headMap(endKey + wrong, true), wrong, 0L, 0L);
+		expectQpx(qpx.tailMap(endKey + wrong + 1, true), addCount - wrong - 1, expectedQpx * 2, expectedQpx * 2
+				* AbstractCollector.SEND_INTERVAL);
+
+		expectDelay(delay.headMap(endKey + wrong, true), wrong, 0L);
+		expectDelay(delay.tailMap(endKey + wrong + 1, true), addCount - wrong - 1, expectedDelay);
+
 	}
 
-	
 	private void add(MessageInfo info) {
-		
-		for(int j=0; j<AbstractCollector.SEND_INTERVAL*expectedQpx ; j++){
+
+		for (int j = 0; j < AbstractCollector.SEND_INTERVAL * expectedQpx; j++) {
 			Long current = System.currentTimeMillis();
 			info.addMessage(1, current - expectedDelay, current);
 		}
 	}
 
-
 	@Test
-	public void testAjustBigInterval() throws CloneNotSupportedException{
-		
+	public void testAjustBigInterval() throws CloneNotSupportedException {
+
 		int addCount = 20;
 		addWrongData(addCount);
-		
-		messageInfoStatis.build(QPX.SECOND, endKey , endKey + addCount, intervalCount);
-		
-		expect(messageInfoStatis.getDelay(StatisType.SAVE), addCount/intervalCount, expectedDelay);
-		expect(messageInfoStatis.getQpx(StatisType.SAVE), addCount/intervalCount, expectedQpx);
-		
-		
+
+		messageInfoStatis.build(QPX.SECOND, endKey, endKey + addCount, intervalCount);
+
+		expectDelay(messageInfoStatis.getDelay(StatisType.SAVE), addCount / intervalCount, expectedDelay);
+		expectQpx(messageInfoStatis.getQpx(StatisType.SAVE), addCount / intervalCount, expectedQpx, expectedQpx
+				* intervalCount * AbstractCollector.SEND_INTERVAL);
+
 	}
-	
 
 	@Test
-	public void testAjustOneInterval() throws CloneNotSupportedException{
-		
+	public void testAjustOneInterval() throws CloneNotSupportedException {
+
 		int addCount = 20;
 		addWrongData(addCount);
-		
+
 		messageInfoStatis.build(QPX.SECOND, endKey, endKey + addCount, 1);
-		NavigableMap<Long, Long> qpx = messageInfoStatis.getQpx(StatisType.SAVE);
-		
-		expect(qpx.headMap(endKey + 1, true), 2, 0L);
-		expect(qpx.tailMap(endKey + 2, true), addCount - 2, expectedQpx);
+		NavigableMap<Long, QpxData> qpx = messageInfoStatis.getQpx(StatisType.SAVE);
+
+		expectQpx(qpx.headMap(endKey + 1, true), 2, 0L, 0L);
+		expectQpx(qpx.tailMap(endKey + 2, true), addCount - 2, expectedQpx, expectedQpx * intervalCount
+				* AbstractCollector.SEND_INTERVAL);
 
 		NavigableMap<Long, Long> delay = messageInfoStatis.getDelay(StatisType.SAVE);
-		
-		expect(delay.headMap(endKey + 1, true), 2, 0L);
-		expect(delay.tailMap(endKey + 2, true), addCount - 2, expectedDelay);
+
+		expectDelay(delay.headMap(endKey + 1, true), 2, 0L);
+		expectDelay(delay.tailMap(endKey + 2, true), addCount - 2, expectedDelay);
 
 	}
-	
-	
 
 	private void addWrongData(int addCount) throws CloneNotSupportedException {
-		
+
 		MessageInfo wrongInfo = new MessageInfo();
-		
-		for(int i=0 ; i < addCount; i++){
-			
+
+		for (int i = 0; i < addCount; i++) {
+
 			add(wrongInfo);
-			
+
 			messageInfoStatis.add(endKey + i + 1, (MessageInfo) wrongInfo.clone());
 		}
 	}
 
+	private void expectQpx(NavigableMap<Long, QpxData> data, int expectCount, Long expectedQpx, Long expectedTotal) {
 
-	private void expect(NavigableMap<Long, Long> data, int expectCount, Long expectedData) {
-		
-		if(logger.isInfoEnabled()){
+		if (logger.isInfoEnabled()) {
 			logger.info(data);
 		}
-		
+
 		Assert.assertEquals(expectCount, data.size());
-		for(Long value : data.values()){
+		for (QpxData value : data.values()) {
+			Assert.assertEquals(expectedQpx, value.getQpx());
+		}
+
+	}
+
+	private void expectDelay(NavigableMap<Long, Long> data, int expectCount, Long expectedData) {
+
+		if (logger.isInfoEnabled()) {
+			logger.info(data);
+		}
+
+		Assert.assertEquals(expectCount, data.size());
+		for (Long value : data.values()) {
 			Assert.assertEquals(expectedData, value);
 		}
-		
+
 	}
 
-
 	@Test
-	public void testQpx(){
-		
+	public void testQpx() {
+
 		messageInfoStatis.build(QPX.SECOND, startKey, endKey, intervalCount);
-		
-		NavigableMap<Long, Long>  qpx = messageInfoStatis.getQpx(StatisType.SAVE);
-		
-		int size = (int) ((endKey - startKey)/intervalCount);
+
+		NavigableMap<Long, QpxData> qpx = messageInfoStatis.getQpx(StatisType.SAVE);
+
+		int size = (int) ((endKey - startKey) / intervalCount);
 		Assert.assertEquals(size, qpx.size());
-		
-		for(Long qp : qpx.values()){
-			Assert.assertEquals(expectedQpx, qp);
+
+		for (QpxData qp : qpx.values()) {
+			Assert.assertEquals(expectedQpx, qp.getQpx());
 		}
 	}
-	
-	
+
 	@Test
-	public void testInsertLackData(){
-		
+	public void testInsertLackData() {
+
 		int insertCount = 100;
-		
+
 		messageInfoStatis.build(QPX.SECOND, startKey, endKey + insertCount, intervalCount);
-		
-		NavigableMap<Long, Long> qpxs = messageInfoStatis.getQpx(StatisType.SAVE);
+
+		NavigableMap<Long, QpxData> qpxs = messageInfoStatis.getQpx(StatisType.SAVE);
 		NavigableMap<Long, Long> delays = messageInfoStatis.getDelay(StatisType.SAVE);
-		
-		int size = (int) ((endKey - startKey + insertCount)/intervalCount);
+
+		int size = (int) ((endKey - startKey + insertCount) / intervalCount);
 		Assert.assertEquals(size, qpxs.size());
 		Assert.assertEquals(size, delays.size());
 
-		int firstSize = (int) ((endKey - startKey)/intervalCount);
+		int firstSize = (int) ((endKey - startKey) / intervalCount);
 		int count = 0;
-		for(Long qpx : qpxs.values()){
-			
-			if(count < firstSize){
-				Assert.assertEquals(expectedQpx, qpx);
-			}else{
-				Assert.assertEquals((Long)0L, qpx);
+		for (QpxData qpx : qpxs.values()) {
+
+			if (count < firstSize) {
+				Assert.assertEquals(expectedQpx, qpx.getQpx());
+				Assert.assertEquals(Long.valueOf(expectedQpx * AbstractCollector.SEND_INTERVAL * intervalCount),
+						qpx.getTotal());
+			} else {
+				Assert.assertEquals((Long) 0L, qpx.getQpx());
 			}
 			count++;
 		}
-		
-		count  = 0;
-		for(Long delay : delays.values()){
-			
-			if(count < firstSize){
+
+		count = 0;
+		for (Long delay : delays.values()) {
+
+			if (count < firstSize) {
 				Assert.assertEquals(expectedDelay, delay);
-			}else{
-				Assert.assertEquals((Long)0L, delay);
+			} else {
+				Assert.assertEquals((Long) 0L, delay);
 			}
 			count++;
 		}
-		
+
 	}
-	
+
 	@Test
-	public void testDelay(){
-		
+	public void testDelay() {
+
 		messageInfoStatis.build(QPX.SECOND, startKey, endKey, intervalCount);
-		
-		NavigableMap<Long, Long>  delays = messageInfoStatis.getDelay(StatisType.SAVE);
-		
-		int size = (int) ((endKey - startKey)/intervalCount);
-		
+
+		NavigableMap<Long, Long> delays = messageInfoStatis.getDelay(StatisType.SAVE);
+
+		int size = (int) ((endKey - startKey) / intervalCount);
+
 		Assert.assertEquals(size, delays.size());
-		
-		for(Long delay : delays.values()){
-			
+
+		for (Long delay : delays.values()) {
+
 			Assert.assertEquals(expectedDelay, delay);
 		}
 	}
-	
+
 }

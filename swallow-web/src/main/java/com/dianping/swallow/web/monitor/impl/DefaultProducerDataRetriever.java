@@ -70,7 +70,7 @@ public class DefaultProducerDataRetriever
 
 	@Override
 	public boolean dataExistInMemory(long start, long end) {
-		NavigableMap<Long, Long> qpxStatsData = statis.getQpx(StatisType.SAVE);
+		NavigableMap<Long, Long> qpxStatsData = convertQpxData(statis.getQpx(StatisType.SAVE));
 		if (qpxStatsData == null || qpxStatsData.isEmpty()) {
 			return false;
 		}
@@ -102,7 +102,7 @@ public class DefaultProducerDataRetriever
 				continue;
 			}
 			NavigableMap<Long, Long> rawDatas = statis.getDelayForTopic(topicName, type);
-			NavigableMap<Long, Long> qpsRawDatas = statis.getQpxForTopic(topicName, type);
+			NavigableMap<Long, Long> qpsRawDatas = convertQpxData(statis.getQpxForTopic(topicName, type));
 			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getDelaySumStatsData(rawDatas, qpsRawDatas,
 					fromKey, toKey), getQpsSumStatsData(qpsRawDatas, fromKey, toKey)));
 		}
@@ -177,7 +177,7 @@ public class DefaultProducerDataRetriever
 			if (TOTAL_KEY.equals(topicName)) {
 				continue;
 			}
-			NavigableMap<Long, Long> rawDatas = statis.getQpxForTopic(topicName, type);
+			NavigableMap<Long, Long> rawDatas = convertQpxData(statis.getQpxForTopic(topicName, type));
 			orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY,
 					getQpsSumStatsData(rawDatas, fromKey, toKey), getQpsSampleCount(start, end)));
 		}
@@ -206,7 +206,7 @@ public class DefaultProducerDataRetriever
 
 		NavigableMap<Long, Long> rawData = pTopicStatsDataService.findSectionDelayData(topic, startKey, endKey);
 		rawData = fillStatsData(rawData, startKey, endKey);
-		return createStatsData(createQpxDesc(topic, StatisType.SAVE), rawData, start, end);
+		return createStatsData(createDelayDesc(topic, StatisType.SAVE), rawData, start, end);
 	}
 
 	@Override

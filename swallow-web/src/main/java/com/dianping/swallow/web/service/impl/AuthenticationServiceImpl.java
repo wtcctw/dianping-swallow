@@ -3,6 +3,7 @@ package com.dianping.swallow.web.service.impl;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
@@ -42,8 +43,8 @@ public class AuthenticationServiceImpl extends AbstractSwallowService implements
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
 
-	@Override
-	protected void doInitialize() throws Exception {
+	@PostConstruct
+	public void doInitialize() throws Exception {
 
 		boolean env = EnvUtil.isProduct();
 		if (showContentToAll && !env) {

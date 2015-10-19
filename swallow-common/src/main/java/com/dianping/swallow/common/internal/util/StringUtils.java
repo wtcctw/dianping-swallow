@@ -25,6 +25,19 @@ public class StringUtils {
 		return result;
 	}
 
+	public static List<String> splitByDelimiter(String input, Pattern delimiterRegex){
+
+		List<String>  result = new LinkedList<String>();
+
+		for(String sp : delimiterRegex.split(input)){
+			if(isEmpty(sp)){
+				continue;
+			}
+			result.add(sp.trim());
+		}
+		return result;
+	}
+
 	public static boolean isEmpty(String buff){
 		
 		if(buff == null || buff.trim().length() == 0){

@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import com.dianping.swallow.web.service.ServiceLifecycle;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ import freemarker.template.utility.StringUtil;
  *         2015年8月10日下午7:34:53
  */
 @Service("topicResourceService")
-public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService, Runnable {
+public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService, Runnable, ServiceLifecycle {
 
 	private static final String FACTORY_NAME = "TopicResourceServiceImpl";
 
@@ -63,27 +64,26 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
 	@PostConstruct
-	public void executeCacheTopicToAdministrator(){
-		
+	public void executeCacheTopicToAdministrator() {
+
 		scheduledExecutorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.MINUTES);
 		logger.info("Init configCache successfully.");
 	}
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 
 		try {
 			configCache = ConfigCache.getInstance();
 			configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);
-			Set<String> whiltlist = topicWhiteList.getTopics();
-			for (String wl : whiltlist) {
+			Set<String> whitelist = topicWhiteList.getTopics();
+			for (String wl : whitelist) {
 				updateTopicAdministrator(wl, new HashSet<String>());
 			}
-			// 申请topic运行后就不需要监听了
-//			configCache.addChange(this);
+			configCache.addChange(this);
 
 		} catch (LionException e) {
-			logger.error("Erroe when init lion config", e);
+			logger.error("Error when init lion config", e);
 		}
 	}
 
@@ -160,9 +160,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp) {
+	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, boolean inactive) {
 
-		return topicResourceDao.find(offset, limit, topic, producerIp);
+		return topicResourceDao.find(offset, limit, topic, producerIp, inactive);
 	}
 
 	@Override
@@ -209,10 +209,24 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		TopicResource topicResource = findByTopic(str);
 
 		if (topicResource != null) {
+<<<<<<< HEAD
 			Set<String> set = splitString(topicResource.getAdministrator(), ",");
 			if(set.isEmpty()){
 				set = defaultSet;
 			}
+=======
+			Set<String> set = new HashSet<String>();
+			String admin = topicResource.getAdministrator();
+			if(StringUtils.isBlank(admin)){
+				if(defaultSet != null && !defaultSet.isEmpty()){
+					set = defaultSet;
+					topicResource.setAdministrator(StringUtils.join(set, ","));
+				}
+			}else{
+				set = splitString(admin, ",");
+			}
+
+>>>>>>> lmd
 			topicToAdministrator.put(str, set);
 		} else {
 			topicToAdministrator.put(str, defaultSet == null ? new HashSet<String>() : defaultSet);
@@ -225,6 +239,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 	public boolean updateTopicAdministrator(String str, Set<String> defaultSet) {
 		// 先缓存再插入
 		TopicResource topicResource = cacheTopicToAdministrator(str, defaultSet);
+
 		if (topicResource == null) {
 			System.out.println("+++++++++++++++++++++++++++defaultSet is " + defaultSet.toString());
 			topicResource = buildTopicResource(str, defaultSet);
@@ -241,6 +256,8 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 			}
 
 			return status;
+		}else{
+			this.insert(topicResource);
 		}
 
 		return true;
@@ -300,6 +317,11 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
 		} finally {
 
 		}
+	}
+	
+	@Override
+	public long countInactive(){
+		return topicResourceDao.countInactive();
 	}
 
 }

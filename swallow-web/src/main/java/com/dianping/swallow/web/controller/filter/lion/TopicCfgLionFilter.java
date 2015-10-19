@@ -44,7 +44,7 @@ public class TopicCfgLionFilter extends AbstractLionFilter {
 		JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
 		String value = jsonBinder.toJson(mongoConfigBean);
 
-		return doEditLion(key, value, "", isTest);
+		return doEditLion(key, value, "", isTest, null);
 	}
 
 }

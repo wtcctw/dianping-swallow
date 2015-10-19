@@ -130,7 +130,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	}
 
 	@Override
-	public NavigableMap<Long, Long> getQpx(StatisType type) {
+	public NavigableMap<Long, QpxData> getQpx(StatisType type) {
 		
 		checkSupported(type);
 		return getQpxForTopic(MonitorData.TOTAL_KEY, type);
@@ -138,7 +138,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
 	
 	@Override
-	public NavigableMap<Long, Long> getQpxForTopic(String topic, StatisType type) {
+	public NavigableMap<Long, QpxData> getQpxForTopic(String topic, StatisType type) {
 		
 		checkSupported(type);
 		
@@ -218,10 +218,10 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> getQpxForServers(StatisType type) {
+	public Map<String, NavigableMap<Long, QpxData>> getQpxForServers(StatisType type) {
 		
 		checkSupported(type);
-		HashMap<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long, Long>>();
+		HashMap<String, NavigableMap<Long, QpxData>> result = new HashMap<String, NavigableMap<Long, QpxData>>();
 		for(Entry<String, S> entry : servers.entrySet()){
 			
 			String serverIp = entry.getKey();
@@ -236,7 +236,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 	}
 
 	
-	protected Map<String, NavigableMap<Long, Long>> getAllQpx(StatisType type, String topic, boolean includeTotal) {
+	protected Map<String, NavigableMap<Long, QpxData>> getAllQpx(StatisType type, String topic, boolean includeTotal) {
 		
 		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
 		

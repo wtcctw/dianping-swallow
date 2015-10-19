@@ -1,20 +1,16 @@
 package com.dianping.swallow.web.controller.filter.lion;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import com.dianping.swallow.web.controller.filter.FilterChain;
+import com.dianping.swallow.web.controller.filter.result.LionConfigure;
+import com.dianping.swallow.web.controller.filter.result.LionFilterResult;
+import com.dianping.swallow.web.service.impl.TopicResourceServiceImpl;
+import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.controller.filter.FilterChain;
-import com.dianping.swallow.web.controller.filter.result.LionConfigure;
-import com.dianping.swallow.web.controller.filter.result.LionFilterResult;
-import com.dianping.swallow.web.service.ConsumerServerResourceService;
-import com.dianping.swallow.web.service.impl.TopicResourceServiceImpl;
-import com.dianping.swallow.web.util.ResponseStatus;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author mingdongli
@@ -29,9 +25,6 @@ public class ConsumerServerLionFilter extends AbstractLionFilter {
 	@Autowired
 	private LionConfigManager lionConfigManager;
 
-	@Resource(name = "consumerServerResourceService")
-	private ConsumerServerResourceService consumerServerResourceService;
-
 	@Override
 	public synchronized ResponseStatus doFilterHelper(LionFilterEntity lionFilterEntity, LionFilterResult result,
 			FilterChain<LionFilterEntity, LionFilterResult> chain) {
@@ -45,8 +38,8 @@ public class ConsumerServerLionFilter extends AbstractLionFilter {
 		String consumerServer = lionConfigure.getConsumerServer();
 		StringBuilder stringBuilder = new StringBuilder();
 
-		String oldConsumerServerLionConfig = consumerServerResourceService.loadConsumerServerLionConfig();
-		String defaultConfig = loadDefaultConfig(oldConsumerServerLionConfig);
+		String consumerServerConfig = (String) getValue(TopicResourceServiceImpl.SWALLOW_CONSUMER_SERVER_URI, Boolean.FALSE);
+		String defaultConfig = loadDefaultConfig(consumerServerConfig);
 		if (StringUtils.isBlank(defaultConfig)) {
 			topicResourceService.loadCachedTopicToAdministrator().remove(topic);
 			return ResponseStatus.NODEFAULT;
@@ -58,19 +51,16 @@ public class ConsumerServerLionFilter extends AbstractLionFilter {
 			}
 			return ResponseStatus.SUCCESS;
 		}
-		stringBuilder.append(oldConsumerServerLionConfig).append(";\n").append(topic).append("=")
+		stringBuilder.append(consumerServerConfig).append(";\n").append(topic).append("=")
 				.append(consumerServer);
 		String newConsumerServerLionConfig = stringBuilder.toString();
 		if (newConsumerServerLionConfig.length() < lionConfigManager.getConsumerServerUriLength()) {
 			topicResourceService.loadCachedTopicToAdministrator().remove(topic);
 			return ResponseStatus.INVALIDLENGTH;
 		}
-		return doEditLion(TopicResourceServiceImpl.SWALLOW_CONSUMER_SERVER_URI, newConsumerServerLionConfig,
-				oldConsumerServerLionConfig, isTest);
-	}
-
-	public void setConsumerServerResourceService(ConsumerServerResourceService consumerServerResourceService) {
-		this.consumerServerResourceService = consumerServerResourceService;
+		ResponseStatus status = doEditLion(TopicResourceServiceImpl.SWALLOW_CONSUMER_SERVER_URI,
+				newConsumerServerLionConfig, consumerServerConfig, isTest, null);
+		return status;
 	}
 
 	private String loadDefaultConfig(String config) {

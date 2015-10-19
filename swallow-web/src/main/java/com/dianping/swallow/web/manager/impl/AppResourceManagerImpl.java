@@ -32,10 +32,10 @@ public class AppResourceManagerImpl implements AppResourceManager {
 
 	@Autowired
 	private ApplicationResourceService appResourceService;
-	
+
 	@Autowired
 	private ConsumerIdResourceService cResourceService;
-	
+
 	@Autowired
 	private TopicResourceService topicResourceService;
 
@@ -96,7 +96,7 @@ public class AppResourceManagerImpl implements AppResourceManager {
 		if (ips == null || ips.isEmpty()) {
 			return null;
 		}
-		String[] strIps = (String[]) ips.toArray();
+		String[] strIps = ips.toArray(new String[ips.size()]);
 		List<IpResource> ipResources = ipResourceService.findByIps(strIps);
 		if (ipResources != null && !ipResources.isEmpty()) {
 			List<String> appNames = new ArrayList<String>();
@@ -118,7 +118,7 @@ public class AppResourceManagerImpl implements AppResourceManager {
 	@Override
 	public List<ApplicationResource> getAppResourceByName(List<String> appNames) {
 		if (appNames != null && !appNames.isEmpty()) {
-			String[] strAppNameArr = (String[]) appNames.toArray();
+			String[] strAppNameArr = appNames.toArray(new String[appNames.size()]);
 			return appResourceService.findByApplication(strAppNameArr);
 		}
 		return null;
@@ -129,6 +129,18 @@ public class AppResourceManagerImpl implements AppResourceManager {
 			List<String> alarmIps = new ArrayList<String>();
 			for (IpInfo ipInfo : ipInfos) {
 				if (ipInfo.isActiveAndAlarm()) {
+					alarmIps.add(ipInfo.getIp());
+				}
+			}
+			if (alarmIps == null || alarmIps.isEmpty()) {
+				for (IpInfo ipInfo : ipInfos) {
+					if (ipInfo.isAlarm()) {
+						alarmIps.add(ipInfo.getIp());
+					}
+				}
+			}
+			if (alarmIps == null || alarmIps.isEmpty()) {
+				for (IpInfo ipInfo : ipInfos) {
 					alarmIps.add(ipInfo.getIp());
 				}
 			}

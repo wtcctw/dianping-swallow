@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import com.dianping.swallow.web.service.ServiceLifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,182 +32,171 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * @author mingdongli
- *
+ *         <p/>
  *         2015年5月14日下午8:04:43
  */
 @Service("userService")
-public class UserServiceImpl extends AbstractSwallowService implements UserService, Runnable {
+public class UserServiceImpl extends AbstractSwallowService implements UserService, Runnable, ServiceLifecycle {
 
-	private static final String DELIMITOR = ",";
+    private static final String DELIMITOR = ",";
 
-	private static final String FACTORY_NAME = "UserServiceImpl";
+    private static final String FACTORY_NAME = "UserServiceImpl";
 
-	@Value("${swallow.web.admin.defaultadmin}")
-	private String defaultAdmin;
+    @Value("${swallow.web.admin.defaultadmin}")
+    private String defaultAdmin;
 
-	@Autowired
-	private AdministratorDao administratorDao;
+    @Autowired
+    private AdministratorDao administratorDao;
 
-	@Resource(name = "topicResourceService")
-	private TopicResourceService topicResourceService;
+    @Resource(name = "topicResourceService")
+    private TopicResourceService topicResourceService;
 
-	private ScheduledExecutorService scheduledExecutorService = Executors
-			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+    private ScheduledExecutorService scheduledExecutorService = Executors
+            .newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
-	private Set<String> adminSet = new HashSet<String>();
-	
-	@PostConstruct
-	public void cacheAdminSet(){
-		
-		scheduledExecutorService.scheduleAtFixedRate(this, 0, 5, TimeUnit.MINUTES);
-		logger.info("Init adminSet successfully.");
-	}
-	
-	@Override
-	protected void doInitialize() throws Exception {
-		
-		String[] admins = defaultAdmin.split(DELIMITOR);
-		for (String admin : admins) {
-			loadCachedAdministratorSet().add(admin);
-			createUser(admin, UserType.ADMINISTRATOR);
-			logger.info("admiSet add admin " + admin);
-		}
-	}
-	
-	@Override
-	public Pair<Long, List<Administrator>> loadUserPage(int offset, int limit) {
+    private Set<String> adminSet = new HashSet<String>();
 
-		Long totalNumOfTopic = administratorDao.countAdministrator();
-		List<Administrator> administratorList = administratorDao.findFixedAdministrator(offset, limit);
+    @PostConstruct
+    public void cacheAdminSet() {
 
-		return new Pair<Long, List<Administrator>>(totalNumOfTopic, administratorList);
-	}
+        scheduledExecutorService.scheduleAtFixedRate(this, 0, 5, TimeUnit.MINUTES);
+        logger.info("Init adminSet successfully.");
+    }
 
-	@Override
-	public boolean createUser(String name, UserType auth) {
+    @Override
+    protected void doInitialize() throws Exception {
 
-		if (auth.equals(UserType.ADMINISTRATOR)) {
-			this.loadCachedAdministratorSet().add(name); 
-			logger.info(String.format("Add administrator %s to admin list.", name));
-		} else {
-			this.loadCachedAdministratorSet().remove(name); 
-			logger.info(String.format("Remove administrator %s from admin list.", name));
-		}
-		return this.updateUser(name, auth);
-	}
+        String[] admins = defaultAdmin.split(DELIMITOR);
+        for (String admin : admins) {
+            loadCachedAdministratorSet().add(admin);
+            createUser(admin, UserType.ADMINISTRATOR);
+            logger.info("admiSet add admin " + admin);
+        }
+    }
 
-	@Override
-	public boolean removeUser(String name) {
-		this.loadCachedAdministratorSet().remove(name);
-		int n = administratorDao.deleteByName(name);
-		if (n != 1) {
-			logger.info("deleteByName is wrong with name: " + name);
-			return false;
-		} else {
-			logger.info("delete administrator with name [" + name + "]");
-			return true;
-		}
-	}
+    @Override
+    public Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto) {
 
-	@Override
-	public List<Administrator> findAll() {
-		return administratorDao.findAll();
-	}
+        Long totalNumOfTopic = administratorDao.countAdministrator();
+        List<Administrator> administratorList = administratorDao.findFixedAdministrator(baseDto);
 
-	@Override
-	public boolean updateUser(String name, UserType auth) {
-		Administrator admin = administratorDao.readByName(name);
-		if (admin == null) {
-			return doneCreateAdmin(name, auth);
-		} else {
-			admin.setName(name).setRole(auth).setDate(new Date());
-			return administratorDao.saveAdministrator(admin);
-		}
-	}
+        return new Pair<Long, List<Administrator>>(totalNumOfTopic, administratorList);
+    }
 
-	private boolean doneCreateAdmin(String name, UserType auth) {
+    @Override
+    public boolean createUser(String name, UserType auth) {
 
-		Administrator admin = buildAdministrator(name, auth);
-		return administratorDao.createAdministrator(admin);
-	}
+        if (auth.equals(UserType.ADMINISTRATOR)) {
+            this.loadCachedAdministratorSet().add(name);
+        } else {
+            this.loadCachedAdministratorSet().remove(name);
+        }
+        return this.updateUser(name, auth);
+    }
 
-	private Administrator buildAdministrator(String name, UserType role) {
-		Administrator admin = new Administrator();
-		admin.setName(name).setRole(role).setDate(new Date());
-		return admin;
-	}
+    @Override
+    public boolean removeUser(String name) {
+        this.loadCachedAdministratorSet().remove(name);
+        int n = administratorDao.deleteByName(name);
+        if (n != 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-	@Override
-	public Set<String> loadCachedAdministratorSet() {
+    @Override
+    public List<Administrator> findAll() {
+        return administratorDao.findAll();
+    }
 
-		return adminSet;
-	}
+    @Override
+    public boolean updateUser(String name, UserType auth) {
+        Administrator admin = administratorDao.readByName(name);
+        if (admin == null) {
+            return doneCreateAdmin(name, auth);
+        } else {
+            admin.setName(name).setRole(auth).setDate(new Date());
+            return administratorDao.saveAdministrator(admin);
+        }
+    }
 
-	@Override
-	public boolean createOrUpdateUser(String username) {
-		Administrator admin = administratorDao.readByName(username);
-		if (admin != null) {
-			UserType role = admin.getRole();
-			if (role.equals(UserType.ADMINISTRATOR)) {
-				return updateUser(username, role);
-			}
-		}
+    private boolean doneCreateAdmin(String name, UserType auth) {
 
-		return switchTopicOwnerAndVisitor(username);
-	}
+        Administrator admin = buildAdministrator(name, auth);
+        return administratorDao.createAdministrator(admin);
+    }
 
-	private boolean switchTopicOwnerAndVisitor(String username) {
-		if (isTopicOwner(username)) {
-			return this.updateUser(username, UserType.USER);
-		} else {
-			return this.updateUser(username, UserType.VISITOR);
-		}
-	}
+    private Administrator buildAdministrator(String name, UserType role) {
+        Administrator admin = new Administrator();
+        admin.setName(name).setRole(role).setDate(new Date());
+        return admin;
+    }
 
-	private boolean isTopicOwner(String username) {
+    @Override
+    public Set<String> loadCachedAdministratorSet() {
 
-		Collection<Set<String>> topicUsers = topicResourceService.loadCachedTopicToAdministrator().values();
-		for (Set<String> set : topicUsers) {
-			if (set.contains(username)) {
-				return true;
-			}
-		}
-		return false;
-	}
+        return adminSet;
+    }
 
-	private void loadAmdin() {
-		List<Administrator> aList = findAll();
-		if (!aList.isEmpty()) {
-			for (Administrator list : aList) {
-				UserType role = list.getRole();
-				String name = list.getName();
-				if (role.equals(UserType.ADMINISTRATOR)) {
-					if (loadCachedAdministratorSet().add(name)) {
-						logger.info("admiSet add " + name);
-					}
-				}
-			}
-		} 
-	}
+    @Override
+    public boolean createOrUpdateUser(String username) {
+        Administrator admin = administratorDao.readByName(username);
+        if (admin != null) {
+            UserType role = admin.getRole();
+            if (role.equals(UserType.ADMINISTRATOR)) {
+                return updateUser(username, role);
+            }
+        }
 
-	@Override
-	public void run() {
+        return switchTopicOwnerAndVisitor(username);
+    }
 
-		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "updateAdminSet");
-			catWrapper.doAction(new SwallowAction() {
-				@Override
-				public void doAction() throws SwallowException {
+    private boolean switchTopicOwnerAndVisitor(String username) {
+        if (isTopicOwner(username)) {
+            return this.updateUser(username, UserType.USER);
+        } else {
+            return this.updateUser(username, UserType.VISITOR);
+        }
+    }
 
-					loadAmdin();
-				}
-			});
-		} catch (Throwable th) {
-			logger.error("[startUpdateTopicToWhiteList]", th);
-		} finally {
+    private boolean isTopicOwner(String username) {
 
-		}
+        Collection<Set<String>> topicUsers = topicResourceService.loadCachedTopicToAdministrator().values();
+        for (Set<String> set : topicUsers) {
+            if (set.contains(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	}
+    private void loadAmdin() {
+        List<Administrator> aList = findAll();
+        if (!aList.isEmpty()) {
+            for (Administrator list : aList) {
+                UserType role = list.getRole();
+                String name = list.getName();
+                if (role.equals(UserType.ADMINISTRATOR)) {
+                    if (loadCachedAdministratorSet().add(name)) {
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+
+        SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "updateAdminSet");
+        catWrapper.doAction(new SwallowAction() {
+            @Override
+            public void doAction() throws SwallowException {
+
+                loadAmdin();
+            }
+        });
+
+    }
 
 }
