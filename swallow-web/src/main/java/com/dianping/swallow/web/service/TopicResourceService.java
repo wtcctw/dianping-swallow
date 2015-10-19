@@ -19,11 +19,7 @@ public interface TopicResourceService extends ConfigChange {
 
 	boolean update(TopicResource topicResource);
 
-	Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String ... topics);
-
 	TopicResource findByTopic(String topic);
-
-	Pair<Long, List<TopicResource>> findByServer(int offset, int limit, String producerIp);
 
 	Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator);
 

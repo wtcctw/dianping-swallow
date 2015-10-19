@@ -132,8 +132,4 @@ public class ApplicationResourceCollector extends AbstractResourceCollector {
 		return collectorInterval;
 	}
 
-	public void setCollectorInterval(int collectorInterval) {
-		this.collectorInterval = collectorInterval;
-	}
-
 }

@@ -44,278 +44,259 @@ import freemarker.template.utility.StringUtil;
 @Service("topicResourceService")
 public class TopicResourceServiceImpl extends AbstractSwallowService implements TopicResourceService, Runnable, ServiceLifecycle {
 
-	private static final String FACTORY_NAME = "TopicResourceServiceImpl";
+    private static final String FACTORY_NAME = "TopicResourceServiceImpl";
 
-	public static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist";
+    public static final String SWALLOW_TOPIC_WHITELIST_KEY = "swallow.topic.whitelist";
 
-	public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
+    public static final String SWALLOW_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
 
-	@Autowired
-	private TopicResourceDao topicResourceDao;
+    @Autowired
+    private TopicResourceDao topicResourceDao;
 
-	@Autowired
-	private TopicWhiteList topicWhiteList;
+    @Autowired
+    private TopicWhiteList topicWhiteList;
 
-	private ConfigCache configCache;
+    private ConfigCache configCache;
 
-	private Map<String, Set<String>> topicToAdministrator = new ConcurrentHashMap<String, Set<String>>();
+    private Map<String, Set<String>> topicToAdministrator = new ConcurrentHashMap<String, Set<String>>();
 
-	private ScheduledExecutorService scheduledExecutorService = Executors
-			.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+    private ScheduledExecutorService scheduledExecutorService = Executors
+            .newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 
-	@PostConstruct
-	public void executeCacheTopicToAdministrator() {
+    @PostConstruct
+    public void executeCacheTopicToAdministrator() {
 
-		scheduledExecutorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.MINUTES);
-		logger.info("Init configCache successfully.");
-	}
+        scheduledExecutorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.MINUTES);
+        logger.info("Init configCache successfully.");
+    }
 
-	@Override
-	protected void doInitialize() throws Exception {
+    @Override
+    protected void doInitialize() throws Exception {
 
-		try {
-			configCache = ConfigCache.getInstance();
-			configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);
-			Set<String> whitelist = topicWhiteList.getTopics();
-			for (String wl : whitelist) {
-				updateTopicAdministrator(wl, new HashSet<String>());
-			}
-			configCache.addChange(this);
+        try {
+            configCache = ConfigCache.getInstance();
+            configCache.getProperty(SWALLOW_TOPIC_WHITELIST_KEY);
+            Set<String> whitelist = topicWhiteList.getTopics();
+            for (String wl : whitelist) {
+                updateTopicAdministrator(wl, new HashSet<String>());
+            }
+            configCache.addChange(this);
 
-		} catch (LionException e) {
-			logger.error("Error when init lion config", e);
-		}
-	}
+        } catch (LionException e) {
+            logger.error("Error when init lion config", e);
+        }
+    }
 
-	@Override
-	public void onChange(String key, String value) {
+    @Override
+    public void onChange(String key, String value) {
 
-		if (key != null && key.equals(SWALLOW_TOPIC_WHITELIST_KEY)) {
-			if (logger.isInfoEnabled()) {
-				logger.info("[onChange][" + SWALLOW_TOPIC_WHITELIST_KEY + "]" + value);
-			}
+        if (key != null && key.equals(SWALLOW_TOPIC_WHITELIST_KEY)) {
+            if (logger.isInfoEnabled()) {
+                logger.info("[onChange][" + SWALLOW_TOPIC_WHITELIST_KEY + "]" + value);
+            }
 
-			String[] whitelist = StringUtil.split(value, ';');
+            String[] whitelist = StringUtil.split(value, ';');
 
-			for (int i = whitelist.length - 1; i >= 0; i--) {
-				String wl = whitelist[i];
-				if (StringUtils.isNotBlank(wl) && topicResourceDao.findByTopic(wl) == null) {
-					TopicResource topicResource = buildTopicResource(wl, null);
-					try {
-						boolean status = this.insert(topicResource);
-						if (logger.isInfoEnabled() && status) {
-							logger.info(String.format("Save topic %s to database", wl));
-						} else if (logger.isErrorEnabled() && !status) {
-							logger.error(String.format("Save topic %s to database fail with status %d", wl, status));
-							continue;
-						}
-						topicToAdministrator.put(wl, new HashSet<String>());
-						if (logger.isInfoEnabled()) {
-							logger.info(String.format("Add topic %s to whitelist with empty proposal", wl));
-						}
-					} catch (Exception e) {
-						if (logger.isInfoEnabled()) {
-							logger.error("Error when save topic to db", e);
-						}
-					}
-				}
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info("not match");
-			}
-		}
-	}
+            for (int i = whitelist.length - 1; i >= 0; i--) {
+                String wl = whitelist[i];
+                if (StringUtils.isNotBlank(wl) && topicResourceDao.findByTopic(wl) == null) {
+                    TopicResource topicResource = buildTopicResource(wl, null);
+                    try {
+                        boolean status = this.insert(topicResource);
+                        if (logger.isInfoEnabled() && status) {
+                            logger.info(String.format("Save topic %s to database", wl));
+                        } else if (logger.isErrorEnabled() && !status) {
+                            logger.error(String.format("Save topic %s to database fail with status %d", wl, status));
+                            continue;
+                        }
+                        topicToAdministrator.put(wl, new HashSet<String>());
+                        if (logger.isInfoEnabled()) {
+                            logger.info(String.format("Add topic %s to whitelist with empty proposal", wl));
+                        }
+                    } catch (Exception e) {
+                        if (logger.isInfoEnabled()) {
+                            logger.error("Error when save topic to db", e);
+                        }
+                    }
+                }
+            }
+        } else {
+            if (logger.isInfoEnabled()) {
+                logger.info("not match");
+            }
+        }
+    }
 
-	@Override
-	public boolean insert(TopicResource topicResource) {
+    @Override
+    public boolean insert(TopicResource topicResource) {
 
-		return topicResourceDao.insert(topicResource);
-	}
+        return topicResourceDao.insert(topicResource);
+    }
 
-	@Override
-	public boolean update(TopicResource topicResource) {
+    @Override
+    public boolean update(TopicResource topicResource) {
 
-		String topic = topicResource.getTopic();
-		String proposal = topicResource.getAdministrator();
-		String[] proposalArray = proposal.split(",");
-		Set<String> proposalSet = new HashSet<String>(Arrays.asList(proposalArray));
-		topicToAdministrator.put(topic, proposalSet);
-		if (logger.isInfoEnabled()) {
-			logger.info(String.format("Update cache topicToWhiteList of topic %s administrator to %s", topic, proposal));
-		}
-		return topicResourceDao.update(topicResource);
-	}
+        String topic = topicResource.getTopic();
+        String proposal = topicResource.getAdministrator();
+        String[] proposalArray = proposal.split(",");
+        Set<String> proposalSet = new HashSet<String>(Arrays.asList(proposalArray));
+        topicToAdministrator.put(topic, proposalSet);
+        if (logger.isInfoEnabled()) {
+            logger.info(String.format("Update cache topicToWhiteList of topic %s administrator to %s", topic, proposal));
+        }
+        return topicResourceDao.update(topicResource);
+    }
 
-	@Override
-	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String... topics) {
+    @Override
+    public TopicResource findByTopic(String topic) {
 
-		return topicResourceDao.findByTopics(offset, limit, topics);
-	}
+        return topicResourceDao.findByTopic(topic);
+    }
 
-	@Override
-	public TopicResource findByTopic(String topic) {
+    @Override
+    public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, boolean inactive) {
 
-		return topicResourceDao.findByTopic(topic);
-	}
+        return topicResourceDao.find(offset, limit, topic, producerIp, inactive);
+    }
 
-	@Override
-	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, boolean inactive) {
+    @Override
+    public TopicResource findDefault() {
 
-		return topicResourceDao.find(offset, limit, topic, producerIp, inactive);
-	}
+        return topicResourceDao.findDefault();
+    }
 
-	@Override
-	public TopicResource findDefault() {
+    @Override
+    public Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limit) {
 
-		return topicResourceDao.findDefault();
-	}
+        return topicResourceDao.findTopicResourcePage(offset, limit);
+    }
 
-	@Override
-	public Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limit) {
+    @Override
+    public List<TopicResource> findAll() {
 
-		return topicResourceDao.findTopicResourcePage(offset, limit);
-	}
+        return topicResourceDao.findAll();
+    }
 
-	@Override
-	public List<TopicResource> findAll() {
+    @Override
+    public Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator) {
 
-		return topicResourceDao.findAll();
-	}
+        return topicResourceDao.findByAdministrator(offset, limit, administrator);
+    }
 
-	@Override
-	public Pair<Long, List<TopicResource>> findByServer(int offset, int limit, String producerIp) {
+    @Override
+    public Map<String, Set<String>> loadCachedTopicToAdministrator() {
 
-		return topicResourceDao.findByServer(offset, limit, producerIp);
-	}
+        return this.topicToAdministrator;
+    }
 
-	@Override
-	public Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator) {
+    private TopicResource cacheTopicToAdministrator(String str, Set<String> defaultSet) {
 
-		return topicResourceDao.findByAdministrator(offset, limit, administrator);
-	}
+        if (StringUtils.isBlank(str)) {
+            return null;
+        }
+        TopicResource topicResource = findByTopic(str);
 
-	@Override
-	public Map<String, Set<String>> loadCachedTopicToAdministrator() {
+        if (topicResource != null) {
 
-		return this.topicToAdministrator;
-	}
+            Set<String> set = new HashSet<String>();
+            String admin = topicResource.getAdministrator();
+            if (StringUtils.isBlank(admin)) {
+                if (defaultSet != null && !defaultSet.isEmpty()) {
+                    set = defaultSet;
+                    topicResource.setAdministrator(StringUtils.join(set, ","));
+                }
+            } else {
+                set = splitString(admin, ",");
+            }
 
-	private TopicResource cacheTopicToAdministrator(String str, Set<String> defaultSet) {
+            topicToAdministrator.put(str, set);
+        } else {
+            topicToAdministrator.put(str, defaultSet == null ? new HashSet<String>() : defaultSet);
+        }
 
-		if (StringUtils.isBlank(str)) {
-			return null;
-		}
-		TopicResource topicResource = findByTopic(str);
+        return topicResource;
+    }
 
-		if (topicResource != null) {
+    @Override
+    public boolean updateTopicAdministrator(String str, Set<String> defaultSet) {
+        // 先缓存再插入
+        TopicResource topicResource = cacheTopicToAdministrator(str, defaultSet);
 
-			Set<String> set = new HashSet<String>();
-			String admin = topicResource.getAdministrator();
-			if(StringUtils.isBlank(admin)){
-				if(defaultSet != null && !defaultSet.isEmpty()){
-					set = defaultSet;
-					topicResource.setAdministrator(StringUtils.join(set, ","));
-				}
-			}else{
-				set = splitString(admin, ",");
-			}
+        if (topicResource == null) {
+            topicResource = buildTopicResource(str, defaultSet);
+            boolean status = this.insert(topicResource);
 
-			topicToAdministrator.put(str, set);
-		} else {
-			topicToAdministrator.put(str, defaultSet == null ? new HashSet<String>() : defaultSet);
-		}
+            if (status) {
+                if (logger.isInfoEnabled()) {
+                    logger.info(String.format("Save topic %s to topic collection successfully.", str));
+                }
+            } else {
+                if (logger.isInfoEnabled()) {
+                    logger.info(String.format("Save topic %s to topic collection failed.", str));
+                }
+            }
 
-		return topicResource;
-	}
+            return status;
+        } else {
+            this.insert(topicResource);
+        }
 
-	@Override
-	public boolean updateTopicAdministrator(String str, Set<String> defaultSet) {
-		// 先缓存再插入
-		TopicResource topicResource = cacheTopicToAdministrator(str, defaultSet);
+        return true;
 
-		if (topicResource == null) {
-			System.out.println("+++++++++++++++++++++++++++defaultSet is " + defaultSet.toString());
-			topicResource = buildTopicResource(str, defaultSet);
-			boolean status = this.insert(topicResource);
+    }
 
-			if (status) {
-				if (logger.isInfoEnabled()) {
-					logger.info(String.format("Save topic %s to topic collection successfully.", str));
-				}
-			} else {
-				if (logger.isInfoEnabled()) {
-					logger.info(String.format("Save topic %s to topic collection failed.", str));
-				}
-			}
+    private Set<String> splitString(String source, String delimitor) {
+        String[] prop = source.split(delimitor);
+        Set<String> lists = new HashSet<String>(Arrays.asList(prop));
+        return lists;
+    }
 
-			return status;
-		}else{
-			this.insert(topicResource);
-		}
+    @Override
+    public TopicResource buildTopicResource(String topic, Set<String> adminSet) {
 
-		return true;
+        Long id = System.currentTimeMillis();
+        TopicResource topicResource = new TopicResource();
+        if (adminSet != null) {
+            topicResource.setAdministrator(StringUtils.join(adminSet, ","));
+        } else {
+            topicResource.setAdministrator("");
+        }
+        topicResource.setConsumerAlarm(Boolean.TRUE);
+        topicResource.setProducerAlarm(Boolean.TRUE);
+        topicResource.setProducerIpInfos(new ArrayList<IpInfo>());
+        topicResource.setProducerApplications(new ArrayList<String>());
+        topicResource.setTopic(topic);
+        topicResource.setCreateTime(new Date());
+        topicResource.setId(id.toString());
 
-	}
+        TopicResource defaultTopicResource = topicResourceDao.findDefault();
+        if (defaultTopicResource == null) {
+            throw new RuntimeException("No default TopicResource configuration");
+        }
+        topicResource.setProducerAlarmSetting(defaultTopicResource.getProducerAlarmSetting());
+        return topicResource;
+    }
 
-	private Set<String> splitString(String source, String delimitor) {
-		String[] prop = source.split(delimitor);
-		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
-		return lists;
-	}
+    @Override
+    public void run() {
 
-	@Override
-	public TopicResource buildTopicResource(String topic, Set<String> adminSet) {
+        SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "updateTopicToWhiteList");
+        catWrapper.doAction(new SwallowAction() {
+            @Override
+            public void doAction() throws SwallowException {
 
-		Long id = System.currentTimeMillis();
-		TopicResource topicResource = new TopicResource();
-		if (adminSet != null) {
-			topicResource.setAdministrator(StringUtils.join(adminSet, ","));
-		} else {
-			topicResource.setAdministrator("");
-		}
-		topicResource.setConsumerAlarm(Boolean.TRUE);
-		topicResource.setProducerAlarm(Boolean.TRUE);
-		topicResource.setProducerIpInfos(new ArrayList<IpInfo>());
-		topicResource.setProducerApplications(new ArrayList<String>());
-		topicResource.setTopic(topic);
-		topicResource.setCreateTime(new Date());
-		topicResource.setId(id.toString());
+                Set<String> whitelist = topicWhiteList.getTopics();
+                for (String wl : whitelist) {
+                    cacheTopicToAdministrator(wl, new HashSet<String>());
+                }
 
-		TopicResource defaultTopicResource = topicResourceDao.findDefault();
-		if (defaultTopicResource == null) {
-			throw new RuntimeException("No default TopicResource configuration");
-		}
-		topicResource.setProducerAlarmSetting(defaultTopicResource.getProducerAlarmSetting());
-		return topicResource;
-	}
+            }
+        });
+    }
 
-	@Override
-	public void run() {
-
-		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "updateTopicToWhiteList");
-			catWrapper.doAction(new SwallowAction() {
-				@Override
-				public void doAction() throws SwallowException {
-
-					Set<String> whiltlist = topicWhiteList.getTopics();
-					for (String wl : whiltlist) {
-						cacheTopicToAdministrator(wl, new HashSet<String>());
-					}
-
-				}
-			});
-		} catch (Throwable th) {
-			logger.error("[startUpdateTopicToWhiteList]", th);
-		} finally {
-
-		}
-	}
-	
-	@Override
-	public long countInactive(){
-		return topicResourceDao.countInactive();
-	}
+    @Override
+    public long countInactive() {
+        return topicResourceDao.countInactive();
+    }
 
 }
