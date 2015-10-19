@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.alarmer.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -11,33 +9,25 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.model.event.EventFactoryImpl;
-import com.dianping.swallow.web.service.HttpService;
-import com.dianping.swallow.web.service.HttpService.HttpResult;
+import com.dianping.swallow.web.container.ResourceContainer;
+import com.dianping.swallow.web.model.server.Sendable;
+import com.dianping.swallow.web.model.server.ServerFactoryImpl;
+import com.dianping.swallow.web.service.IPCollectorService;
 
-/**
- * 
- * @author qiyin
- *
- *         2015年8月3日 下午6:06:14
- */
 public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 
 	protected final static String CAT_TYPE = "ServiceAlarmer";
 
-	protected Map<String, Boolean> lastCheckStatus = new HashMap<String, Boolean>();
-
-	@Autowired
-	private HttpService httpService;
-
-	@Autowired
-	protected EventReporter eventReporter;
-
-	@Autowired
-	protected EventFactoryImpl eventFactory;
-
 	private ScheduledFuture<?> future;
+
+	@Autowired
+	protected IPCollectorService ipCollectorService;
+
+	@Autowired
+	protected ResourceContainer resourceContainer;
+
+	@Autowired
+	protected ServerFactoryImpl serverFactory;
 
 	protected int alarmInterval = 30;
 
@@ -69,7 +59,7 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	public abstract void doAlarm();
 
 	public void startAlarm() {
-		future = threadManager.scheduleAtFixedRate(new Runnable() {
+		future = taskManager.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {
@@ -91,7 +81,16 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 
 			}
 
-		}, getAlarmDelay(), getAlarmInterval(), TimeUnit.SECONDS);
+		}, 30, 30, TimeUnit.SECONDS);
+	}
+
+	public void doDataSend(final Sendable server, final String ip, final boolean isProducer) {
+		try {
+			long sendTimeStamp = ipCollectorService.getLastestStatsTimeByIp(ip, isProducer);
+			server.checkSender(sendTimeStamp);
+		} catch (Throwable t) {
+			logger.error("[run] server {} checkSender error.", server);
+		}
 	}
 
 	public int getAlarmInterval() {
@@ -109,22 +108,4 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 	public void setAlarmDelay(int alarmDelay) {
 		this.alarmDelay = alarmDelay;
 	}
-
-	protected void threadSleep() {
-		try {
-			TimeUnit.SECONDS.sleep(1);
-		} catch (InterruptedException e) {
-			logger.error("[threadSleep] interrupted.", e);
-		}
-	}
-
-	protected HttpResult httpRequest(String url) {
-		HttpResult result = httpService.httpGet(url);
-		if (!result.isSuccess()) {
-			threadSleep();
-			result = httpService.httpGet(url);
-		}
-		return result;
-	}
-	
 }

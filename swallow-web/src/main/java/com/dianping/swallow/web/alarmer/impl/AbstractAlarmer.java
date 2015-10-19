@@ -21,7 +21,7 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 	protected static final String DOALARM_FUNCTION = "-doAlarm";
 
 	@Autowired
-	protected TaskManager threadManager;
+	protected TaskManager taskManager;
 
 	protected String alarmName;
 

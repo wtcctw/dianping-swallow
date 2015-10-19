@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.model.event.EventFactoryImpl;
+import com.dianping.swallow.web.model.event.EventFactory;
 
 @Service("statsDataFactory")
 public class StatsDataFactory {
@@ -13,7 +13,7 @@ public class StatsDataFactory {
 	private EventReporter eventReporter;
 	
 	@Autowired
-	private EventFactoryImpl eventFactory;
+	private EventFactory eventFactory;
 
 	public ProducerTopicStatsData createTopicStatsData() {
 		ProducerTopicStatsData topicStatsData = new ProducerTopicStatsData();

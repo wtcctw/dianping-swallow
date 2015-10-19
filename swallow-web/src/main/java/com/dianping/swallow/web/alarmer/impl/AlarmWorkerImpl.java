@@ -33,7 +33,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 	private volatile boolean isStopped = false;
 
 	@Autowired
-	protected TaskManager threadManager;
+	protected TaskManager taskManager;
 
 	private Thread alarmTaskThread;
 
@@ -63,7 +63,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 			try {
 				event = eventChannel.next();
 				logger.info("[start] {}. ", event.toString());
-				threadManager.submit(new AlarmTask(event));
+				taskManager.submit(new AlarmTask(event));
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} catch (Exception e) {

@@ -24,7 +24,7 @@ public class ConsumerMasterServer extends ConsumerServer {
 
 	@Override
 	public void initServer() {
-
+		super.initServer();
 	}
 
 }

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.model.event.EventFactoryImpl;
+import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.service.HttpService;
 
 /**
@@ -23,7 +23,7 @@ public class ServerFactoryImpl implements ServerFactory {
 	private HttpService httpService;
 
 	@Autowired
-	private EventFactoryImpl eventFactory;
+	private EventFactory eventFactory;
 
 	@Autowired
 	private EventReporter eventReporter;

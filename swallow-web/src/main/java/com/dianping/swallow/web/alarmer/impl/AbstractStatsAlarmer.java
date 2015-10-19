@@ -57,7 +57,7 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 	public void achieveMonitorData() {
 		logger.info("[achieveMonitorData] statsDataAlarmer {}", getClass().getSimpleName());
 
-		future = threadManager.submit(new Runnable() {
+		future = taskManager.submit(new Runnable() {
 
 			@Override
 			public void run() {

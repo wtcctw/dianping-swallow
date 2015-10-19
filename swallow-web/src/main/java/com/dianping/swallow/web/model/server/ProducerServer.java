@@ -14,7 +14,7 @@ import com.dianping.swallow.web.service.HttpService.HttpResult;
  */
 public class ProducerServer extends Server {
 
-	private String pigeonHealthUrl;
+	private String pigeonHealthUrl = "http://{ip}:4080/stats.json";
 
 	private boolean isServiceLastAlarmed;
 
@@ -25,7 +25,10 @@ public class ProducerServer extends Server {
 	}
 
 	public void initServer() {
-		pigeonHealthUrl = StringUtils.replace(serverConfig.getPigeonHealthUrl(), "{ip}", ip);
+		super.initServer();
+		if (StringUtils.isNotBlank(serverConfig.getPigeonHealthUrl())) {
+			pigeonHealthUrl = StringUtils.replace(serverConfig.getPigeonHealthUrl(), "{ip}", ip);
+		}
 	}
 
 	public void checkService() {

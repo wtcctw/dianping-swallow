@@ -21,6 +21,8 @@ public class ServerConfigImpl extends AbstractConfig implements ServerConfig {
 
 	private String slaveMonitorUrl = "http://{ip}:8080/names";
 
+	private String serverMonitorUrl = "http://{ip}:8080/name/mongoManager";
+
 	public ServerConfigImpl() {
 		super(SERVER_CHECK_URL_FILE);
 	}
@@ -36,6 +38,10 @@ public class ServerConfigImpl extends AbstractConfig implements ServerConfig {
 
 	public String getSlaveMonitorUrl() {
 		return slaveMonitorUrl;
+	}
+
+	public String getServerMonitorUrl() {
+		return serverMonitorUrl;
 	}
 
 }

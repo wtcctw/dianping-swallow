@@ -21,7 +21,7 @@ import com.dianping.swallow.web.util.CountDownLatchUtil;
  *         2015年10月16日 下午4:54:37
  */
 @Component
-public class ProducerServerServiceAlarmer extends AbstractServiceAlamer1 {
+public class ProducerServerServiceAlarmer extends AbstractServiceAlarmer {
 
 	private Map<String, ProducerServer> producerServers = new ConcurrentHashMap<String, ProducerServer>();
 
@@ -35,7 +35,7 @@ public class ProducerServerServiceAlarmer extends AbstractServiceAlamer1 {
 		for (Map.Entry<String, ProducerServer> serverEntry : producerServers.entrySet()) {
 			try {
 				final ProducerServer producerServer = serverEntry.getValue();
-				threadManager.submit(new Runnable() {
+				taskManager.submit(new Runnable() {
 					@Override
 					public void run() {
 						try {

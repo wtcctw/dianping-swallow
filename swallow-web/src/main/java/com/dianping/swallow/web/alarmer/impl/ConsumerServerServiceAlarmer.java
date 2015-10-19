@@ -24,7 +24,7 @@ import com.dianping.swallow.web.util.CountDownLatchUtil;
  *         2015年10月16日 下午4:54:31
  */
 @Component
-public class ConsumerServerServiceAlarmer extends AbstractServiceAlamer1 {
+public class ConsumerServerServiceAlarmer extends AbstractServiceAlarmer {
 
 	private Map<String, ConsumerHAServer> consumerHAServers = new ConcurrentHashMap<String, ConsumerHAServer>();
 
@@ -39,7 +39,7 @@ public class ConsumerServerServiceAlarmer extends AbstractServiceAlamer1 {
 		for (Map.Entry<String, ConsumerHAServer> serverEntry : consumerHAServers.entrySet()) {
 			try {
 				final ConsumerHAServer consumerHAServer = serverEntry.getValue();
-				threadManager.submit(new Runnable() {
+				taskManager.submit(new Runnable() {
 					@Override
 					public void run() {
 						try {

@@ -17,7 +17,7 @@ public class ConsumerSlaveServer extends ConsumerServer {
 
 	private boolean isServiceLastAlarmed = false;
 
-	private String slaveMonitorUrl;
+	private String slaveMonitorUrl = "http://{ip}:8080/names";
 
 	public ConsumerSlaveServer(String ip, int port) {
 		super(ip, port);
@@ -25,6 +25,7 @@ public class ConsumerSlaveServer extends ConsumerServer {
 	}
 
 	public void initServer() {
+		super.initServer();
 		slaveMonitorUrl = StringUtils.replace(serverConfig.getSlaveMonitorUrl(), "{ip}", ip);
 	}
 

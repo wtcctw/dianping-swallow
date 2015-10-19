@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.model.event.EventFactoryImpl;
+import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.StatisEvent;
 import com.dianping.swallow.web.model.event.StatisType;
@@ -31,7 +31,7 @@ public abstract class StatsData {
 	protected EventReporter eventReporter;
 
 	@Transient
-	protected EventFactoryImpl eventFactory;
+	protected EventFactory eventFactory;
 
 	@Transient
 	protected EventType eventType;
@@ -56,7 +56,7 @@ public abstract class StatsData {
 		this.eventReporter = eventReporter;
 	}
 
-	public void setEventFactory(EventFactoryImpl eventFactory) {
+	public void setEventFactory(EventFactory eventFactory) {
 		this.eventFactory = eventFactory;
 	}
 
