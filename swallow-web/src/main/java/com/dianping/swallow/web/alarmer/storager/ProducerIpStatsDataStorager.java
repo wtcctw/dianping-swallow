@@ -34,13 +34,13 @@ public class ProducerIpStatsDataStorager extends AbstractProducerStatsDataStorag
 		}
 		final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(topicNames.size());
 		for (String topicName : topicNames) {
-			final List<ProducerIpStatsData> ipStatsDatas = producerStatsDataWapper.getIpStatsDatas(topicName,
-					getLastTimeKey(), false);
-			if (ipStatsDatas == null) {
-				downLatch.countDown();
-				continue;
-			}
 			try {
+				final List<ProducerIpStatsData> ipStatsDatas = producerStatsDataWapper.getIpStatsDatas(topicName,
+						getLastTimeKey(), false);
+				if (ipStatsDatas == null) {
+					downLatch.countDown();
+					continue;
+				}
 				taskManager.submit(new Runnable() {
 					@Override
 					public void run() {
@@ -55,6 +55,8 @@ public class ProducerIpStatsDataStorager extends AbstractProducerStatsDataStorag
 				});
 			} catch (Throwable t) {
 				logger.error("[doStorageIpStats] executor submit error.", t);
+			} finally {
+				downLatch.countDown();
 			}
 		}
 		CountDownLatchUtil.await(downLatch);

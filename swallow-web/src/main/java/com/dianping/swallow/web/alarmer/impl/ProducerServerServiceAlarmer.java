@@ -17,6 +17,7 @@ import com.dianping.swallow.web.util.CountDownLatchUtil;
 @Component
 public class ProducerServerServiceAlarmer extends AbstractServiceAlarmer {
 
+	@Override
 	public void doAlarm() {
 		doCheck();
 	}

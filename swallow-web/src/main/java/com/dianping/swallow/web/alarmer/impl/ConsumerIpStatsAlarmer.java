@@ -141,7 +141,6 @@ public class ConsumerIpStatsAlarmer extends AbstractStatsAlarmer {
 	}
 
 	public void alarmUnSureRecords() {
-
 		Iterator<Entry<IpStatsDataKey, Long>> iterator = secondCandidates.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Entry<IpStatsDataKey, Long> secondCandidate = iterator.next();

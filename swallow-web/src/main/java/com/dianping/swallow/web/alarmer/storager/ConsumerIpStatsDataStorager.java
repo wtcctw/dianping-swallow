@@ -54,6 +54,8 @@ public class ConsumerIpStatsDataStorager extends AbstractConsumerStatsDataStorag
 					});
 				} catch (Throwable t) {
 					logger.error("[doStorageIpStats] executor submit error.", t);
+				}finally{
+					downLatch.countDown();
 				}
 			}
 			CountDownLatchUtil.await(downLatch);

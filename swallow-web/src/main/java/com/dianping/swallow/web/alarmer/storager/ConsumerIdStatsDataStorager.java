@@ -35,27 +35,33 @@ public class ConsumerIdStatsDataStorager extends AbstractConsumerStatsDataStorag
 		Set<String> topicNames = consumerStatsDataWapper.getTopics(false);
 		final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(topicNames.size());
 		for (String topicName : topicNames) {
-			final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
-					topicName, getLastTimeKey(), true);
-			if (consumerIdStatsDatas == null) {
-				return;
-			}
-			statsDataContainer.setConsumerIdTotalRatio(consumerIdStatsDatas);
-			taskManager.submit(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						consumerIdStatsDataService.insert(consumerIdStatsDatas);
-					} catch (Throwable t) {
-						logger.error("[doStorageConsumerIdStats] insert consumerIdStatsDatas", t);
-					} finally {
-						downLatch.countDown();
-					}
+			try {
+				final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
+						topicName, getLastTimeKey(), true);
+				if (consumerIdStatsDatas == null) {
+					downLatch.countDown();
+					return;
 				}
+				statsDataContainer.setConsumerIdTotalRatio(consumerIdStatsDatas);
+				taskManager.submit(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							consumerIdStatsDataService.insert(consumerIdStatsDatas);
+						} catch (Throwable t) {
+							logger.error("[doStorageConsumerIdStats] insert consumerIdStatsDatas error.", t);
+						} finally {
+							downLatch.countDown();
+						}
+					}
 
-			});
-			CountDownLatchUtil.await(downLatch);
+				});
+			} catch (Throwable t) {
+				logger.error("[doStorageConsumerIdStats] insert consumerIdStatsDatas error.", t);
+			} finally {
+				downLatch.countDown();
+			}
 		}
-
+		CountDownLatchUtil.await(downLatch);
 	}
 }
