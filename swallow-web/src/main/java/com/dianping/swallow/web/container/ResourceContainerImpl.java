@@ -101,14 +101,14 @@ public class ResourceContainerImpl extends AbstractContainer implements Resource
 			if (!(masterResource.getType() == ServerType.MASTER)) {
 				continue;
 			}
-			if (masterResource.getGroupId() != 0) {
+			if (masterResource.getGroupId() == 0) {
 				continue;
 			}
 			for (ConsumerServerResource slaveResource : tempResources) {
-				if (!(masterResource.getType() == ServerType.SLAVE)) {
+				if (!(slaveResource.getType() == ServerType.SLAVE)) {
 					continue;
 				}
-				if (!slaveResource.getIp().equals(masterResource.getGroupId())) {
+				if (!(slaveResource.getGroupId() == masterResource.getGroupId())) {
 					continue;
 				}
 				newCMasterServerResources.add(masterResource);

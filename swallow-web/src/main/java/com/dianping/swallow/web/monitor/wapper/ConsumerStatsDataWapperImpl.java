@@ -144,7 +144,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String consumerId = iterator.next();
-			if (!isTotal && TOTAL_KEY.equals(topicName)) {
+			if (!isTotal && TOTAL_KEY.equals(consumerId)) {
 				continue;
 			}
 			ConsumerIdStatsData consumerIdStatsData = statsDataFactory.createConsumerIdStatsData();

@@ -29,8 +29,14 @@ public class ConsumerIpStatsDataStorager extends AbstractConsumerStatsDataStorag
 	private void doStorageIpStats() {
 		logger.info("[doStorageIpStats].");
 		Set<String> topicNames = consumerStatsDataWapper.getTopics(false);
+		if (topicNames == null) {
+			return;
+		}
 		for (String topicName : topicNames) {
 			Set<String> consumerIds = consumerStatsDataWapper.getConsumerIds(topicName, false);
+			if (consumerIds == null) {
+				continue;
+			}
 			final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(consumerIds.size());
 			for (String consumerId : consumerIds) {
 				final List<ConsumerIpStatsData> ipStatsDatas = consumerStatsDataWapper.getIpStatsDatas(topicName,
@@ -54,7 +60,7 @@ public class ConsumerIpStatsDataStorager extends AbstractConsumerStatsDataStorag
 					});
 				} catch (Throwable t) {
 					logger.error("[doStorageIpStats] executor submit error.", t);
-				}finally{
+				} finally {
 					downLatch.countDown();
 				}
 			}

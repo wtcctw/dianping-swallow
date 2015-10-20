@@ -8,11 +8,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.event.ClientType;
 import com.dianping.swallow.web.model.event.ConsumerClientEvent;
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpInfo;
@@ -39,19 +36,10 @@ public class ConsumerIpStatsAlarmer extends
 	private ConsumerDataRetriever consumerDataRetriever;
 
 	@Autowired
-	protected EventReporter eventReporter;
-
-	@Autowired
-	protected EventFactory eventFactory;
-
-	@Autowired
 	private ConsumerStatsDataWapper cStatsDataWapper;
 
 	@Autowired
 	private ConsumerIpStatsDataService cIpStatsDataService;
-
-	@Autowired
-	private ResourceContainer resourceContainer;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -66,8 +54,14 @@ public class ConsumerIpStatsAlarmer extends
 
 	public void alarmIpData() {
 		Set<String> topicNames = cStatsDataWapper.getTopics(false);
+		if (topicNames == null) {
+			return;
+		}
 		for (String topicName : topicNames) {
 			Set<String> consumerIds = cStatsDataWapper.getConsumerIds(topicName, false);
+			if (consumerIds == null) {
+				continue;
+			}
 			for (String consumerId : consumerIds) {
 				ConsumerIpGroupStatsData ipGroupStatsData = cStatsDataWapper.getIpGroupStatsDatas(topicName,
 						consumerId, getLastTimeKey(), false);

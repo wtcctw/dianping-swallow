@@ -33,6 +33,9 @@ public class ConsumerIdStatsDataStorager extends AbstractConsumerStatsDataStorag
 	private void doStorageConsumerIdStats() {
 		logger.info("[doStorageConsumerIdStats].");
 		Set<String> topicNames = consumerStatsDataWapper.getTopics(false);
+		if (topicNames == null) {
+			return;
+		}
 		final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(topicNames.size());
 		for (String topicName : topicNames) {
 			try {
@@ -40,7 +43,7 @@ public class ConsumerIdStatsDataStorager extends AbstractConsumerStatsDataStorag
 						topicName, getLastTimeKey(), true);
 				if (consumerIdStatsDatas == null) {
 					downLatch.countDown();
-					return;
+					continue;
 				}
 				statsDataContainer.setConsumerIdTotalRatio(consumerIdStatsDatas);
 				taskManager.submit(new Runnable() {

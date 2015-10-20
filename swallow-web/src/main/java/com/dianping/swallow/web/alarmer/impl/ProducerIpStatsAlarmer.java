@@ -19,6 +19,7 @@ import com.dianping.swallow.web.model.stats.ProducerIpStatsData.ProducerIpStatsD
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ProducerIpStatsDataService;
+
 /**
  * 
  * @author qiyin
@@ -51,6 +52,9 @@ public class ProducerIpStatsAlarmer extends
 
 	public void alarmIpData() {
 		Set<String> topicNames = pStatsDataWapper.getTopics(false);
+		if (topicNames == null) {
+			return;
+		}
 		for (String topicName : topicNames) {
 			ProducerIpGroupStatsData ipGroupStatsData = pStatsDataWapper.getIpGroupStatsData(topicName,
 					getLastTimeKey(), false);

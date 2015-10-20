@@ -96,6 +96,9 @@ public class ServerContainerImpl extends AbstractAlamerContainer implements Serv
 	}
 
 	private void addProducerServer(List<ProducerServerResource> serverResources) {
+		if (serverResources == null) {
+			return;
+		}
 		for (ProducerServerResource serverResource : serverResources) {
 			String ip = serverResource.getIp();
 			if (StringUtils.isBlank(ip) || !serverResource.isAlarm()) {
@@ -159,7 +162,7 @@ public class ServerContainerImpl extends AbstractAlamerContainer implements Serv
 			}
 		}
 	}
-	
+
 	@Override
 	public int getInterval() {
 		return interval;

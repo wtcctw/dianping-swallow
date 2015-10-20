@@ -47,6 +47,9 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
 	@Override
 	public void doAlarm() {
 		Set<String> topicNames = consumerStatsDataWapper.getTopics(false);
+		if (topicNames == null) {
+			return;
+		}
 		for (String topicName : topicNames) {
 			alarmConsumerIds(topicName);
 		}
