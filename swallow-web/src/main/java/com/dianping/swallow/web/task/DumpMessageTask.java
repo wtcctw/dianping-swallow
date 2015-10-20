@@ -1,18 +1,5 @@
 package com.dianping.swallow.web.task;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Date;
-import java.util.Map;
-import java.util.zip.GZIPOutputStream;
-
-import org.apache.commons.lang.StringUtils;
-import org.bson.types.BSONTimestamp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.controller.MessageDumpController;
 import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
@@ -23,6 +10,18 @@ import com.dianping.swallow.web.service.impl.MessageServiceImpl;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
+import org.apache.commons.lang.StringUtils;
+import org.bson.types.BSONTimestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Date;
+import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author mingdongli
@@ -47,17 +46,9 @@ public class DumpMessageTask implements Runnable {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	public MessageDumpService getMessageDumpService() {
-		return messageDumpService;
-	}
-
 	public DumpMessageTask setMessageDumpService(MessageDumpService messageDumpService) {
 		this.messageDumpService = messageDumpService;
 		return this;
-	}
-
-	public MessageService getMessageService() {
-		return messageService;
 	}
 
 	public DumpMessageTask setMessageService(MessageService messageService) {

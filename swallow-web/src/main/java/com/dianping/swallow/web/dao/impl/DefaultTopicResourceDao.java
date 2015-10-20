@@ -1,21 +1,19 @@
 package com.dianping.swallow.web.dao.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.dao.TopicResourceDao;
+import com.dianping.swallow.web.model.resource.IpInfo;
+import com.dianping.swallow.web.model.resource.TopicResource;
 import jodd.util.StringUtil;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.dao.TopicResourceDao;
-import com.dianping.swallow.web.model.resource.IpInfo;
-import com.dianping.swallow.web.model.resource.TopicResource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -119,25 +117,6 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> findByTopics(int offset, int limit, String... topics) {
-
-		List<Criteria> criterias = new ArrayList<Criteria>();
-		for (String t : topics) {
-			criterias.add(Criteria.where(TOPIC).is(t));
-		}
-
-		Query query = new Query();
-		query.addCriteria(Criteria.where(TOPIC).exists(true)
-				.orOperator(criterias.toArray(new Criteria[criterias.size()])));
-
-		long size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
-
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, TOPIC)));
-		List<TopicResource> topicResources = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
-		return new Pair<Long, List<TopicResource>>(size, topicResources);
-	}
-
-	@Override
 	public TopicResource findById(String id) {
 
 		Query query = new Query(Criteria.where(ID).is(id));
@@ -170,20 +149,6 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 
 		long size = this.count();
 		return new Pair<Long, List<TopicResource>>(size, topicResource);
-	}
-
-	@Override
-	public Pair<Long, List<TopicResource>> findByServer(int offset, int limit, String producerIp) {
-
-		Query query = new Query(Criteria.where(PEODUCERIPS).is(producerIp));
-
-		Long size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
-
-		query.skip(offset).limit(limit);
-		List<TopicResource> topicResource = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
-
-		return new Pair<Long, List<TopicResource>>(size, topicResource);
-
 	}
 
 	@Override

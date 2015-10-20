@@ -128,10 +128,6 @@ public class Entry {
 		return this;
 	}
 
-	public long getAccu() {
-		return accu;
-	}
-
 	public Entry setAccu(long accu) {
 		this.accu = accu;
 		return this;
@@ -141,27 +137,12 @@ public class Entry {
 		return senddelayAlarm;
 	}
 
-	public Entry setSenddelayAlarm(int senddelayAlarm) {
-		this.senddelayAlarm = senddelayAlarm;
-		return this;
-	}
-
 	public int getAckdelayAlarm() {
 		return ackdelayAlarm;
 	}
 
-	public Entry setAckdelayAlarm(int ackdelayAlarm) {
-		this.ackdelayAlarm = ackdelayAlarm;
-		return this;
-	}
-
 	public int getAccuAlarm() {
 		return accuAlarm;
-	}
-
-	public Entry setAccuAlarm(int accuAlarm) {
-		this.accuAlarm = accuAlarm;
-		return this;
 	}
 
 	public Integer getNumAlarm() {
@@ -216,16 +197,6 @@ public class Entry {
 	public Entry setNormalizedAccu(Float normalizedAccu) {
 		this.normalizedAccu = normalizedAccu;
 		return this;
-	}
-
-	@Override
-	public String toString() {
-		return "Entry [server=" + server + ", topic=" + topic + ", consumerId=" + consumerId + ", senddelay="
-				+ senddelay + ", ackdelay=" + ackdelay + ", accu=" + accu + ", senddelayAlarm=" + senddelayAlarm
-				+ ", ackdelayAlarm=" + ackdelayAlarm + ", accuAlarm=" + accuAlarm + ", normalizedSendDelaly="
-				+ normalizedSendDelay + ", normalizedAckDelaly=" + normalizedAckDelay + ", normalizedAccu="
-				+ normalizedAccu + ", numAlarm=" + numAlarm + ", name=" + name + ", email=" + email + ", dpMobile="
-				+ dpMobile + "]";
 	}
 
 }

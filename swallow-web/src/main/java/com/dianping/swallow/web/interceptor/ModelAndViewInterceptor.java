@@ -89,9 +89,10 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 		
 		userService.createOrUpdateUser(username);
 
-		logger.info(String
-				.format("Add [username : %s], [visittype : %d],  [logouturl : %s] to ModelAndView",
+		if(logger.isInfoEnabled()){
+			logger.info(String.format("Add [username : %s], [visittype : %d],  [logouturl : %s] to ModelAndView",
 						username, visittype, logoutUrl));
+		}
 	}
 
 }

@@ -55,15 +55,14 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 	private UserUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/download")
-	public ModelAndView download(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView download() {
 
 		return new ModelAndView("tool/filedownload", createViewMap());
 	}
 
-	@RequestMapping(value = "/console/message/auth/dump", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+	@RequestMapping(value = "/console/message/auth/dump", method = RequestMethod.POST)
 	@ResponseBody
-	public Object dumpMessageByTime(@RequestBody MessageQueryDto messageQueryDto, HttpServletRequest request,
-			HttpServletResponse response) {
+	public Object dumpMessageByTime(@RequestBody MessageQueryDto messageQueryDto, HttpServletRequest request) {
 
 		String topic = messageQueryDto.getTopic();
 		Date startdt = messageQueryDto.getStartdt();
@@ -96,8 +95,7 @@ public class MessageDumpController extends AbstractSidebarBasedController {
 
 	@RequestMapping(value = "/console/download/filename", method = RequestMethod.POST)
 	@ResponseBody
-	public Object loadFilename(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
-			HttpServletResponse response) {
+	public Object loadFilename(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request) {
 
 		String username = extractUsernameUtils.getUsername(request);
 		String topic = topicQueryDto.getTopic();

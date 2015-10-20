@@ -15,10 +15,7 @@ public enum UserType {
 	
 	private String type;
 	
-	private UserType(){
-	}
-	
-	private UserType(String type){
+	UserType(String type){
 		this.type = type;
 		
 	}
@@ -37,7 +34,7 @@ public enum UserType {
 				return userType;
 			}
 		}
-		throw new RuntimeException("Error typy : " + type);
+		throw new RuntimeException("Error type : " + type);
 	}
 	
 	@Override

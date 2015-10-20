@@ -19,14 +19,13 @@ public class IpResource extends BaseResource {
 
 	private boolean alarm;
 
+	public IpResource() {
+
+	}
 	public IpResource(String ip, String application, boolean alarm) {
 		this.ip = ip;
 		this.application = application;
 		this.alarm = alarm;
-	}
-
-	public IpResource() {
-
 	}
 
 	public String getApplication() {

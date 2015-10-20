@@ -42,32 +42,16 @@ public class FixSizedPriorityQueueContainer {
 		return comprehensivePriorityQueue;
 	}
 
-	public void setComprehensivePriorityQueue(FixSizedPriorityQueue comprehensivePriorityQueue) {
-		this.comprehensivePriorityQueue = comprehensivePriorityQueue;
-	}
-
 	public FixSizedPriorityQueue getSendPriorityQueue() {
 		return sendPriorityQueue;
-	}
-
-	public void setSendPriorityQueue(FixSizedPriorityQueue sendPriorityQueue) {
-		this.sendPriorityQueue = sendPriorityQueue;
 	}
 
 	public FixSizedPriorityQueue getAckPriorityQueue() {
 		return ackPriorityQueue;
 	}
 
-	public void setAckPriorityQueue(FixSizedPriorityQueue ackPriorityQueue) {
-		this.ackPriorityQueue = ackPriorityQueue;
-	}
-
 	public FixSizedPriorityQueue getAccuPriorityQueue() {
 		return accuPriorityQueue;
 	}
 
-	public void setAccuPriorityQueue(FixSizedPriorityQueue accuPriorityQueue) {
-		this.accuPriorityQueue = accuPriorityQueue;
-	}
-	
 }

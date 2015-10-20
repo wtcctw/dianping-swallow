@@ -1,12 +1,11 @@
 package com.dianping.swallow.web.model;
 
+import com.dianping.swallow.common.internal.util.MongoUtils;
+import org.bson.types.BSONTimestamp;
+import org.springframework.data.annotation.Id;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.springframework.data.annotation.Id;
-import org.bson.types.BSONTimestamp;
-
-import com.dianping.swallow.common.internal.util.MongoUtils;
 
 
 /**
@@ -16,7 +15,6 @@ import com.dianping.swallow.common.internal.util.MongoUtils;
  */
 public class Message implements Comparable<Message> {
 
-	// id will be used for storing MongoDB _id
 	@Id
    private  BSONTimestamp        			_id;
    private  BSONTimestamp        			o_id;
@@ -70,10 +68,6 @@ public class Message implements Comparable<Message> {
 		return this;
 	}
 	
-	public String getMo_id() {
-		return mo_id;
-	}
-
 	public Message setMo_id(BSONTimestamp ts) {
 		long tmp = MongoUtils.BSONTimestampToLong(ts);
 		this.mo_id = Long.toString(tmp);
@@ -144,19 +138,11 @@ public class Message implements Comparable<Message> {
 		return this;
 	}
 	
-	public String getSi() {
-		return si;
-	}
-
 	public Message setSi(String si) {
 		this.si = si;
 		return this;
 	}
 	
-	public String  getStstring() {
-		return ststring;
-	}
-
 	public Message setStstring(BSONTimestamp ts) {
 		int seconds = ts.getTime();
 		long millions = new Long(seconds)*1000;
@@ -164,19 +150,11 @@ public class Message implements Comparable<Message> {
 		return this;
 	}
 	
-	public String  getGtstring() {
-		return gtstring;
-	}
-
 	public Message setGtstring(Date gt) {
 		this.gtstring = new SimpleDateFormat(TIMEFORMAT).format(gt);
 		return this;
 	}
 	
-    public String getRetransmit() {
-		return retransmit;
-	}
-
 	public Message setRetransmit(String retransmit) {
 		this.retransmit = retransmit;
 		return this;

@@ -1,29 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import jodd.util.StringUtil;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
@@ -31,7 +7,6 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.dto.TopicResourceDto;
 import com.dianping.swallow.web.controller.mapper.TopicResourceMapper;
-import com.dianping.swallow.web.controller.utils.IpInfoUtils;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.resource.IpInfo;
@@ -41,6 +16,17 @@ import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
+import jodd.util.StringUtil;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * @author mingdongli
@@ -66,7 +52,7 @@ public class TopicController extends AbstractMenuController {
 	private UserUtils userUtils;
 
 	@RequestMapping(value = "/console/topic")
-	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView topicView() {
 
 		return new ModelAndView("topic/index", createViewMap());
 	}
@@ -105,93 +91,21 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
 	@ResponseBody
-	public Pair<List<String>, List<String>> topicName(HttpServletRequest request) {
+	public Pair<List<String>, List<String>> topicAndIp(HttpServletRequest request) {
 
 		String username = userUtils.getUsername(request);
-		boolean findAll = userUtils.isAdministrator(username);
-		Set<String> producerIp = new HashSet<String>();
+		List<String> topics = userUtils.topicNames(username);
+		List<String> ips = userUtils.producerIps(username);
 
-		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToAdministrator();
-		if (findAll) {
-			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
-			List<TopicResource> topicResources = topicResourceService.findAll();
-			for (TopicResource topicResource : topicResources) {
-				List<IpInfo> tmpIpInfos = topicResource.getProducerIpInfos();
-				Set<String> tmpips = IpInfoUtils.extractIps(tmpIpInfos);
-				if (tmpips != null) {
-					producerIp.addAll(tmpips);
-				}
-			}
-			if (userUtils.isAdministrator(username, true)) {
-				topics.add(DEFAULT);
-			}
-			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
-		} else {
-			List<String> topics = new ArrayList<String>();
-			for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
-				if (entry.getValue().contains(username)) {
-					String topic = entry.getKey();
-					if (!topics.contains(topic)) {
-						topics.add(topic);
-					}
-				}
-			}
-
-			for (String topic : topics) {
-				List<IpInfo> tmpIpInfos = topicResourceService.findByTopic(topic).getProducerIpInfos();
-				Set<String> tmpips = IpInfoUtils.extractIps(tmpIpInfos);
-				if (tmpips != null) {
-					producerIp.addAll(tmpips);
-				}
-			}
-			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
-		}
-	}
-
-	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET)
-	@ResponseBody
-	public Object propName(HttpServletRequest request) {
-
-		String username = userUtils.getUsername(request);
-		boolean findAll = userUtils.isAdministrator(username);
-
-		Set<String> editProposal = new HashSet<String>();
-		List<TopicResource> topicResources = topicResourceService.findAll();
-
-		if (findAll) {
-			for (TopicResource topicResource : topicResources) {
-				editProposal.addAll(getPropList(topicResource));
-			}
-		} else {
-			for (TopicResource topicResource : topicResources) {
-				Set<String> tmpprop = getPropList(topicResource);
-				if (tmpprop.contains(username)) {
-					editProposal.addAll(tmpprop);
-				}
-			}
-
-		}
-
-		List<Administrator> adminList = userService.findAll();
-		for (Administrator admin : adminList) {
-			editProposal.add(admin.getName());
-		}
-
-		return new ArrayList<String>(editProposal);
+		return new Pair<List<String>, List<String>>(topics, ips);
 	}
 
 	@RequestMapping(value = "/console/topic/update", method = RequestMethod.POST)
 	@ResponseBody
-	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto) {
+	public boolean updateTopic(@RequestBody TopicResourceDto topicResourceDto) {
 
 		TopicResource topicResource = TopicResourceMapper.toTopicResource(topicResourceDto);
-		boolean result = topicResourceService.update(topicResource);
-
-		if (result) {
-			return ResponseStatus.SUCCESS;
-		} else {
-			return ResponseStatus.MONGOWRITE;
-		}
+		return topicResourceService.update(topicResource);
 	}
 
 	@RequestMapping(value = "/console/topic/auth/ip", method = RequestMethod.POST)
@@ -307,24 +221,7 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object loadAdministrators() {
 
-		Set<String> administrators = new HashSet<String>();
-
-		List<Administrator> adminList = userService.findAll();
-
-		for (Administrator administrator : adminList) {
-			administrators.add(administrator.getName());
-		}
-
-		List<TopicResource> topicResources = topicResourceService.findAll();
-		for (TopicResource topicResource : topicResources) {
-			String whiteListString = topicResource.getAdministrator();
-			String[] whiteList = whiteListString.split(DELIMITOR);
-			for (String wl : whiteList) {
-				administrators.add(wl);
-			}
-		}
-
-		return administrators;
+		return  userUtils.administrator();
 	}
 	
 	@RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)
@@ -358,7 +255,6 @@ public class TopicController extends AbstractMenuController {
 					return false;
 				}
 				topicResource.setProducerIpInfos(ipInfos);
-				// 修改ipinfo调用insert，其他的则调用update
 				return topicResourceService.insert(topicResource);
 			}
 		}
@@ -392,18 +288,6 @@ public class TopicController extends AbstractMenuController {
 		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
 
 		return lists;
-	}
-
-	private Set<String> getPropList(TopicResource topicResource) {
-		Set<String> props = new HashSet<String>();
-		String[] tmpprops = topicResource.getAdministrator().split(",");
-
-		for (String tmpProp : tmpprops) {
-			if (!StringUtils.isEmpty(tmpProp)) {
-				props.add(tmpProp);
-			}
-		}
-		return props;
 	}
 
 	@Override

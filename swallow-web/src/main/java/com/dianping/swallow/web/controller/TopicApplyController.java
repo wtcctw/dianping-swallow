@@ -1,10 +1,18 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
+import com.dianping.swallow.web.controller.dto.TopicApplyDto;
+import com.dianping.swallow.web.controller.filter.FilterChainFactory;
+import com.dianping.swallow.web.controller.filter.config.ConfigureFilterChain;
+import com.dianping.swallow.web.controller.filter.config.ConsumerServerConfigureFilter;
+import com.dianping.swallow.web.controller.filter.config.MongoConfigureFilter;
+import com.dianping.swallow.web.controller.filter.config.QuoteConfigureFilter;
+import com.dianping.swallow.web.controller.filter.lion.*;
+import com.dianping.swallow.web.controller.filter.result.ConfigureFilterResult;
+import com.dianping.swallow.web.controller.filter.result.LionFilterResult;
+import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
+import com.dianping.swallow.web.controller.filter.validator.*;
+import com.dianping.swallow.web.service.TopicResourceService;
+import com.dianping.swallow.web.util.ResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,29 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
-import com.dianping.swallow.web.controller.dto.TopicApplyDto;
-import com.dianping.swallow.web.controller.filter.FilterChainFactory;
-import com.dianping.swallow.web.controller.filter.config.ConfigureFilterChain;
-import com.dianping.swallow.web.controller.filter.config.ConsumerServerConfigureFilter;
-import com.dianping.swallow.web.controller.filter.config.MongoConfigureFilter;
-import com.dianping.swallow.web.controller.filter.config.QuoteConfigureFilter;
-import com.dianping.swallow.web.controller.filter.lion.ConsumerServerLionFilter;
-import com.dianping.swallow.web.controller.filter.lion.LionFilterChain;
-import com.dianping.swallow.web.controller.filter.lion.LionFilterEntity;
-import com.dianping.swallow.web.controller.filter.lion.TopicCfgLionFilter;
-import com.dianping.swallow.web.controller.filter.lion.TopicWhiteListLionFilter;
-import com.dianping.swallow.web.controller.filter.result.ConfigureFilterResult;
-import com.dianping.swallow.web.controller.filter.result.LionFilterResult;
-import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
-import com.dianping.swallow.web.controller.filter.validator.ApplicantValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.AuthenticationValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.NameValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.QuoteValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.TypeValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.ValidatorFilterChain;
-import com.dianping.swallow.web.service.TopicResourceService;
-import com.dianping.swallow.web.util.ResponseStatus;
+import javax.annotation.Resource;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author mingdongli
@@ -48,9 +36,6 @@ public class TopicApplyController {
 
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;
-
-	@Autowired
-	private TopicWhiteList topicWhiteList;
 
 	@Autowired
 	private FilterChainFactory filterChainFactory;

@@ -13,10 +13,7 @@ public enum ServerType {
 	
 	private String type;
 	
-	private ServerType(){
-	}
-	
-	private ServerType(String type){
+	ServerType(String type){
 		this.type = type;
 		
 	}
@@ -35,7 +32,7 @@ public enum ServerType {
 				return serverType;
 			}
 		}
-		throw new RuntimeException("Error typy : " + type);
+		throw new RuntimeException("Error type : " + type);
 	}
 	
 	@Override

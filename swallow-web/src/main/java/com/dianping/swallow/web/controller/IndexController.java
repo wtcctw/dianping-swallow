@@ -1,33 +1,25 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.dianping.swallow.web.controller.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.utils.UserUtils;
-import com.dianping.swallow.web.service.UserService;
+import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 @Controller
 public class IndexController extends AbstractMenuController {
 	
 	private AtomicBoolean isAdmin = new AtomicBoolean();
-	@Resource(name = "userService")
-	private UserService userService;
-	
+
 	@Autowired
 	private UserUtils userUtils;
 
 	@RequestMapping(value = "/")
-	public ModelAndView allApps(HttpServletRequest request,
-			HttpServletResponse response) {
+	public ModelAndView allApps(HttpServletRequest request) {
 		
 		String username = userUtils.getUsername(request);
 		boolean admin = userUtils.isAdministrator(username, true);

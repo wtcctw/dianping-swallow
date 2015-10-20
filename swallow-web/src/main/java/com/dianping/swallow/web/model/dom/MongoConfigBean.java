@@ -12,10 +12,6 @@ public class MongoConfigBean {
 	
 	private int size;
 
-	public String getMongoUrl() {
-		return mongoUrl;
-	}
-
 	public void setMongoUrl(String mongoUrl) {
 		this.mongoUrl = mongoUrl;
 	}
