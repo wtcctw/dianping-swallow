@@ -13,21 +13,11 @@ public class MongoReport implements Comparable<MongoReport>{
     
     private Float disk;
     
-    private String create_date;
-    
-    private String dba;
-    
     private String catalog;
-    
-    private int threads;
     
     private Float io;
     
     private Integer qps;
-    
-    private int _id;
-    
-    private int dev_cnt;
     
     private String ip;
 
@@ -55,36 +45,12 @@ public class MongoReport implements Comparable<MongoReport>{
 		this.disk = disk;
 	}
 
-	public String getCreate_date() {
-		return create_date;
-	}
-
-	public void setCreate_date(String create_date) {
-		this.create_date = create_date;
-	}
-
-	public String getDba() {
-		return dba;
-	}
-
-	public void setDba(String dba) {
-		this.dba = dba;
-	}
-
 	public String getCatalog() {
 		return catalog;
 	}
 
 	public void setCatalog(String catalog) {
 		this.catalog = catalog;
-	}
-
-	public int getThreads() {
-		return threads;
-	}
-
-	public void setThreads(int threads) {
-		this.threads = threads;
 	}
 
 	public float getIo() {
@@ -101,22 +67,6 @@ public class MongoReport implements Comparable<MongoReport>{
 
 	public void setQps(int qps) {
 		this.qps = qps;
-	}
-
-	public int get_id() {
-		return _id;
-	}
-
-	public void set_id(int _id) {
-		this._id = _id;
-	}
-
-	public int getDev_cnt() {
-		return dev_cnt;
-	}
-
-	public void setDev_cnt(int dev_cnt) {
-		this.dev_cnt = dev_cnt;
 	}
 
 	@Override

@@ -81,12 +81,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public List<ConsumerServerResource> findByGroupId(long groupId) {
-
-		return consumerServerResourceDao.findByGroupId(groupId);
-	}
-
-	@Override
 	public ServerResource findDefault() {
 
 		return consumerServerResourceDao.findDefault();
@@ -170,12 +164,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	public String loadConsumerServerLionConfig() {
 
 		return consumerServerLionConfig;
-	}
-
-	@Override
-	public synchronized void setConsumerServerLionConfig(String consumerServerLionConfig) {
-
-		this.consumerServerLionConfig = consumerServerLionConfig;
 	}
 
 	private boolean validateIpPort(String masterIp, int masterPort) {

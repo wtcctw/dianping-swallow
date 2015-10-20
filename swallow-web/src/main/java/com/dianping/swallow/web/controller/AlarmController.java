@@ -1,25 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.codehaus.plexus.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.controller.dto.AlarmSearchDto;
@@ -31,6 +11,13 @@ import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.util.DateUtil;
+import org.codehaus.plexus.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.*;
 
 /**
  * 
@@ -48,7 +35,7 @@ public class AlarmController extends AbstractSidebarBasedController {
 	private ResourceContainer resourceContainer;
 
 	@RequestMapping(value = "/console/tool")
-	public ModelAndView alarm(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView alarm() {
 		return new ModelAndView("tool/alarmquery", createViewMap());
 	}
 

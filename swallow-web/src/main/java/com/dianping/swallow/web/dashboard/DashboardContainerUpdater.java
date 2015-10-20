@@ -1,25 +1,5 @@
 package com.dianping.swallow.web.dashboard;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
@@ -29,11 +9,7 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.container.ResourceContainer;
-import com.dianping.swallow.web.dashboard.model.Entry;
-import com.dianping.swallow.web.dashboard.model.FixSizedPriorityQueueContainer;
-import com.dianping.swallow.web.dashboard.model.MinuteEntry;
-import com.dianping.swallow.web.dashboard.model.TotalData;
-import com.dianping.swallow.web.dashboard.model.TotalDataKey;
+import com.dianping.swallow.web.dashboard.model.*;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.manager.AppResourceManager;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
@@ -44,6 +20,18 @@ import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author mingdongli
@@ -372,20 +360,13 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 	@Override
 	public void run() {
 
-		try {
-			SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "CalculateDashboard");
-			catWrapper.doAction(new SwallowAction() {
-				@Override
-				public void doAction() throws SwallowException {
-					updateDelayInsDashboard();
-				}
-			});
-		} catch (Throwable th) {
-			logger.error("[startConsumerIdResourceCollector]", th);
-		} finally {
-
-		}
-
+		SwallowActionWrapper catWrapper = new CatActionWrapper(getClass().getSimpleName(), "CalculateDashboard");
+		catWrapper.doAction(new SwallowAction() {
+			@Override
+			public void doAction() throws SwallowException {
+				updateDelayInsDashboard();
+			}
+		});
 	}
 
 }

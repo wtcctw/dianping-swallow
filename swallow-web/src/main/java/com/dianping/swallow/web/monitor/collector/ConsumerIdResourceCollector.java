@@ -31,6 +31,8 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
 @Component
 public class ConsumerIdResourceCollector extends AbstractResourceCollector implements MonitorDataListener {
 
+	private static final String FACTORY_NAME = "ResourceCollector-ConsumerIdIpMonitor";
+
 	@Autowired
 	private ConsumerStatsDataWapper cStatsDataWapper;
 
@@ -39,8 +41,6 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 
 	@Autowired
 	private ConsumerIdResourceService consumerIdResourceService;
-
-	private static final String FACTORY_NAME = "ResourceCollector-ConsumerIdIpMonitor";
 
 	private ExecutorService executor = null;
 
@@ -182,10 +182,6 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 		private String topicName;
 
 		private String consumerId;
-
-		public ConsumerIdKey() {
-
-		}
 
 		public ConsumerIdKey(String topicName, String consumerId) {
 			this.topicName = topicName;

@@ -1,15 +1,10 @@
 package com.dianping.swallow.web.controller;
 
-import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.dianping.swallow.web.controller.dto.MessageQueryDto;
+import com.dianping.swallow.web.controller.utils.UserUtils;
+import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
+import com.dianping.swallow.web.model.Message;
+import com.dianping.swallow.web.service.MessageService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.dto.MessageQueryDto;
-import com.dianping.swallow.web.controller.utils.UserUtils;
-import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
-import com.dianping.swallow.web.model.Message;
-import com.dianping.swallow.web.service.MessageService;
+import javax.annotation.Resource;
+import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author mingdongli
@@ -40,23 +34,21 @@ public class MessageController extends AbstractMenuController {
 	UserUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/message")
-	public ModelAndView message(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView message() {
 
 		return new ModelAndView("message/index", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/message/auth/list", method = RequestMethod.POST)
 	@ResponseBody
-	public Object messageDefault(@RequestBody MessageQueryDto messageQueryDto, HttpServletRequest request, HttpServletResponse response) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-		map = messageService.getMessageFromTopic(messageQueryDto);
-		return map;
+	public Object messageDefault(@RequestBody MessageQueryDto messageQueryDto) {
+
+		return messageService.getMessageFromTopic(messageQueryDto);
 	}
 
 	@RequestMapping(value = "/console/message/timespan", method = RequestMethod.GET)
 	@ResponseBody
-	public String getMinAndMaxTime(String topic, HttpServletRequest request, HttpServletResponse response) {
+	public String getMinAndMaxTime(String topic) {
 
 		long millions =  messageService.loadTimeOfFirstMessage(topic);
 		if(millions < 0){
@@ -67,7 +59,7 @@ public class MessageController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/message/auth/content", method = RequestMethod.GET)
 	@ResponseBody
-	public Message showMessageContent(String topic, String mid, HttpServletRequest request, HttpServletResponse response)
+	public Message showMessageContent(String topic, String mid)
 			throws UnknownHostException {
 
 		return messageService.getMessageContent(topic, mid);

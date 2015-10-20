@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.dianping.swallow.web.model.Administrator;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -197,57 +198,6 @@ public class UserUtils {
 
 	}
 
-	public Pair<List<String>, Set<String>> consumerIdAndIps(String username) {
-
-		Set<String> consumerIps = new HashSet<String>();
-		List<String> consumerIds = new ArrayList<String>();
-
-		if (!isAdministrator(username)) {
-			List<String> topics = topicNames(username);
-			String topicString = StringUtils.join(topics, ",");
-			ConsumerIdParam consumerIdParam = new ConsumerIdParam();
-			consumerIdParam.setTopic(topicString);
-			consumerIdParam.setConsumerId("");
-			consumerIdParam.setConsumerIp("");
-			consumerIdParam.setLimit(Integer.MAX_VALUE);
-			consumerIdParam.setOffset(0);
-
-			Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.findByTopic(consumerIdParam);
-			if (pair.getFirst() > 0) {
-				for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
-					List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
-					Set<String> ips = IpInfoUtils.extractIps(ipInfos);
-					if (!ips.isEmpty()) {
-						consumerIps.addAll(ips);
-					}
-
-					String id = consumerIdResource.getConsumerId();
-					if (StringUtils.isNotBlank(id) && !consumerIds.contains(id)) {
-						consumerIds.add(id);
-					}
-				}
-			}
-		} else {
-			List<ConsumerIdResource> consumerIdResources = consumerIdResourceService.findAll(
-					DefaultConsumerIdResourceDao.CONSUMERID, DefaultConsumerIdResourceDao.CONSUMERIPS);
-
-			for (ConsumerIdResource consumerIdResource : consumerIdResources) {
-				String cid = consumerIdResource.getConsumerId();
-				if (!consumerIds.contains(cid)) {
-					consumerIds.add(cid);
-				}
-				List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
-				Set<String> ips = IpInfoUtils.extractIps(ipInfos);
-				if (!ips.isEmpty()) {
-					consumerIps.addAll(ips);
-				}
-			}
-		}
-
-		return new Pair<List<String>, Set<String>>(consumerIds, consumerIps);
-
-	}
-
 	public List<String> producerIps(String username) {
 
 		Set<String> producerIp = new HashSet<String>();
@@ -336,4 +286,27 @@ public class UserUtils {
 
 		return new ArrayList<String>(apps);
 	}
+
+	public List<String> administrator() {
+
+		Set<String> administrators = new HashSet<String>();
+
+		List<Administrator> adminList = userService.findAll();
+
+		for (Administrator administrator : adminList) {
+			administrators.add(administrator.getName());
+		}
+
+		List<TopicResource> topicResources = topicResourceService.findAll();
+		for (TopicResource topicResource : topicResources) {
+			String whiteListString = topicResource.getAdministrator();
+			String[] whiteList = whiteListString.split(",");
+			for (String wl : whiteList) {
+				administrators.add(wl);
+			}
+		}
+
+		return new ArrayList<String>(administrators);
+	}
+
 }
