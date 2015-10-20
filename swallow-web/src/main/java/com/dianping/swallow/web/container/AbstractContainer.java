@@ -55,20 +55,14 @@ public abstract class AbstractContainer extends AbstractLifecycle {
 		future = scheduled.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, containerName + "-doLoadResource");
-					catWrapper.doAction(new SwallowAction() {
-						@Override
-						public void doAction() throws SwallowException {
-							doLoadResource();
-						}
-					});
+				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, containerName + "-doLoadResource");
+				catWrapper.doAction(new SwallowAction() {
+					@Override
+					public void doAction() throws SwallowException {
+						doLoadResource();
+					}
+				});
 
-				} catch (Throwable th) {
-					logger.error("[startLoadResource]", th);
-				} finally {
-
-				}
 			}
 
 		}, getDelay(), getInterval(), TimeUnit.SECONDS);

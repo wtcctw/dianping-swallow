@@ -58,7 +58,6 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 		logger.info("[achieveMonitorData] statsDataAlarmer {}", getClass().getSimpleName());
 
 		future = taskManager.submit(new Runnable() {
-
 			@Override
 			public void run() {
 				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName);

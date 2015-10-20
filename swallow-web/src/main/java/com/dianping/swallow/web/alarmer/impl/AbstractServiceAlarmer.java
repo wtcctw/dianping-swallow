@@ -64,28 +64,19 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 
 	public void startAlarm() {
 		future = taskManager.scheduleAtFixedRate(new Runnable() {
-
 			@Override
 			public void run() {
 
-				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName);
-					catWrapper.doAction(new SwallowAction() {
-						@Override
-						public void doAction() throws SwallowException {
-							doAlarm();
-						}
-					});
-
-				} catch (Throwable th) {
-					logger.error("[startAlarm]", th);
-				} finally {
-
-				}
-
+				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName);
+				catWrapper.doAction(new SwallowAction() {
+					@Override
+					public void doAction() throws SwallowException {
+						doAlarm();
+					}
+				});
 			}
 
-		}, 30, 30, TimeUnit.SECONDS);
+		}, getAlarmDelay(), getAlarmInterval(), TimeUnit.SECONDS);
 	}
 
 	public void doDataSend(final Sendable server, final String ip, final boolean isProducer) {

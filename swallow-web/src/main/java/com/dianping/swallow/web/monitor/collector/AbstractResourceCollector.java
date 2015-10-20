@@ -63,21 +63,13 @@ public abstract class AbstractResourceCollector extends AbstractLifecycle implem
 
 			@Override
 			public void run() {
-
-				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, collectorName + "-doCollector");
-					catWrapper.doAction(new SwallowAction() {
-						@Override
-						public void doAction() throws SwallowException {
-							doCollector();
-						}
-					});
-				} catch (Throwable th) {
-					logger.error("[startCollector]", th);
-				} finally {
-
-				}
-
+				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, collectorName + "-doCollector");
+				catWrapper.doAction(new SwallowAction() {
+					@Override
+					public void doAction() throws SwallowException {
+						doCollector();
+					}
+				});
 			}
 
 		}, getCollectorDelay(), getCollectorInterval(), TimeUnit.MINUTES);
