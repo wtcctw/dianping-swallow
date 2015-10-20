@@ -3,7 +3,6 @@ package com.dianping.swallow.web.model.stats;
 import org.springframework.data.annotation.Transient;
 
 import com.dianping.swallow.web.model.event.EventType;
-import com.dianping.swallow.web.model.event.StatisEvent;
 import com.dianping.swallow.web.model.event.StatisType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -100,8 +99,6 @@ public abstract class ConsumerStatsData extends StatsData {
 	public void setAckQpsTotal(long ackQpsTotal) {
 		this.ackQpsTotal = ackQpsTotal;
 	}
-	
-	public abstract StatisEvent createEvent();
 	
 	public boolean checkSendQpsPeak(long expectQps) {
 		return checkQpsPeak(getSendQps(), expectQps, StatisType.SENDQPS_PEAK);

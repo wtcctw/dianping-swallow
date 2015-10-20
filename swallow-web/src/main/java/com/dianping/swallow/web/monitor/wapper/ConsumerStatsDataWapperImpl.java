@@ -375,7 +375,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	public ConsumerIpGroupStatsData getIpGroupStatsDatas(String topicName, String consumerId, long timeKey,
 			boolean isTotal) {
 		ConsumerIpGroupStatsData ipGroupStatsData = new ConsumerIpGroupStatsData();
-		ipGroupStatsData.setConsumerIpStatsDatas(getIpStatsDatas(topicName, consumerId, timeKey, isTotal));
+		ipGroupStatsData.setIpStatsDatas(getIpStatsDatas(topicName, consumerId, timeKey, isTotal));
 		return ipGroupStatsData;
 	}
 

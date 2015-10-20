@@ -61,7 +61,7 @@ public abstract class ProducerStatsData extends StatsData {
 	}
 
 	public boolean checkQpsValley(long expectQps) {
-		return checkQpsPeak(this.getQps(), expectQps, StatisType.SENDQPS_VALLEY);
+		return checkQpsValley(this.getQps(), expectQps, StatisType.SENDQPS_VALLEY);
 	}
 
 }

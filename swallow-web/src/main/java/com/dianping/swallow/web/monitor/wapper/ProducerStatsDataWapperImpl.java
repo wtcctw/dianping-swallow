@@ -228,7 +228,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	public ProducerIpGroupStatsData getIpGroupStatsData(String topicName, long timeKey, boolean isTotal) {
 		ProducerIpGroupStatsData ipGroupStatsData = new ProducerIpGroupStatsData();
 		List<ProducerIpStatsData> ipStatsDatas = getIpStatsDatas(topicName, timeKey, isTotal);
-		ipGroupStatsData.setProducerIpStatsDatas(ipStatsDatas);
+		ipGroupStatsData.setIpStatsDatas(ipStatsDatas);
 		return ipGroupStatsData;
 	}
 

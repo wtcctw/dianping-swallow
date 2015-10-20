@@ -16,7 +16,7 @@ import com.dianping.swallow.web.model.resource.TopicResource;
 public interface ResourceContainer {
 
 	ConsumerServerResource findConsumerServerResource(String ip);
-
+	
 	ProducerServerResource findProducerServerResource(String ip);
 
 	TopicResource findTopicResource(String topic);

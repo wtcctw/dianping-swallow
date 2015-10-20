@@ -7,11 +7,11 @@ import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.model.event.EventFactory;
 
 @Service("statsDataFactory")
-public class StatsDataFactoryImpl {
+public class StatsDataFactoryImpl implements StatsDataFactory {
 
 	@Autowired
 	private EventReporter eventReporter;
-	
+
 	@Autowired
 	private EventFactory eventFactory;
 
@@ -38,20 +38,20 @@ public class StatsDataFactoryImpl {
 		setComponent(consumerIdStatsData);
 		return consumerIdStatsData;
 	}
-	
-	public ConsumerTopicStatsData createConsumerTopicStatsData(){
+
+	public ConsumerTopicStatsData createConsumerTopicStatsData() {
 		ConsumerTopicStatsData consumerTopicStatsData = new ConsumerTopicStatsData();
 		setComponent(consumerTopicStatsData);
 		return consumerTopicStatsData;
 	}
-	
-	public ProducerIpStatsData createProducerIpStatsData(){
+
+	public ProducerIpStatsData createProducerIpStatsData() {
 		ProducerIpStatsData producerIpStatsData = new ProducerIpStatsData();
 		setComponent(producerIpStatsData);
 		return producerIpStatsData;
 	}
-	
-	public ConsumerIpStatsData createConsumerIpStatsData(){
+
+	public ConsumerIpStatsData createConsumerIpStatsData() {
 		ConsumerIpStatsData consumerIpStatsData = new ConsumerIpStatsData();
 		setComponent(consumerIpStatsData);
 		return consumerIpStatsData;
