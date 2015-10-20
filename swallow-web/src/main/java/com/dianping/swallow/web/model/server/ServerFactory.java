@@ -1,39 +1,17 @@
 package com.dianping.swallow.web.model.server;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年10月19日 上午9:32:28
+ */
+public interface ServerFactory {
 
-import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.model.event.EventFactory;
-import com.dianping.swallow.web.service.HttpService;
+	ProducerServer createProducerServer(String ip);
 
-@Service("serverFactory")
-public class ServerFactory {
+	ConsumerServer createConsumerServer(String ip, int port, boolean isMaster);
 
-	@Autowired
-	private HttpService httpService;
-	
-	@Autowired
-	private EventFactory eventFactory;
-	
-	@Autowired
-	private EventReporter eventReporter;
-	
-	public ProducerServer createProducerServer(String ip) {
-		ProducerServer producerServer = new ProducerServer(ip);
-		setComponent(producerServer);
-		return producerServer;
-	}
-	
-	public ConsumerServer createConsumerServer(String ip){
-		ConsumerServer consumerServer = new ConsumerServer(ip);
-		setComponent(consumerServer);
-		return consumerServer;
-	}
+	ConsumerHAServer createConsumerHAServer(ConsumerServer masterServer, ConsumerServer slaveServer);
 
-	private void setComponent(Server server) {
-		server.setHttpService(httpService);
-		server.setEventReporter(eventReporter);
-		server.setEventFactory(eventFactory);
-	}
 }

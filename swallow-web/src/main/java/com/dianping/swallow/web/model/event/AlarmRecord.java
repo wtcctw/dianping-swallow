@@ -4,12 +4,12 @@ package com.dianping.swallow.web.model.event;
  * 
  * @author qiyin
  *
- * 2015年8月10日 上午9:30:22
+ *         2015年8月10日 上午9:30:22
  */
 public class AlarmRecord {
 
 	private long lastAlarmTime;
-	
+
 	private long checkAlarmTime;
 
 	private long alarmCount;
@@ -46,5 +46,5 @@ public class AlarmRecord {
 		return "AlarmRecord [lastAlarmTime=" + lastAlarmTime + ", checkAlarmTime=" + checkAlarmTime + ", alarmCount="
 				+ alarmCount + "]";
 	}
-	
+
 }

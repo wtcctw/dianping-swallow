@@ -1,14 +1,15 @@
 package com.dianping.swallow.web.alarmer.impl;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import com.dianping.swallow.common.internal.util.CommonUtils;
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -20,14 +21,11 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 
 	protected final static String CAT_TYPE = "StatsDataAlarmer";
 
-	protected static final String FACTORY_NAME = "StatsDataAlarmer";
-
 	protected static final String TOTAL_KEY = MonitorData.TOTAL_KEY;
 
 	private final static long DAY_TIMESTAMP_UNIT = 24 * 60 * 60 * 1000;
 
-	private static ExecutorService executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 4,
-			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+	private Future<?> future;
 
 	protected static final long TIME_SECTION = 5 * 60 / AbstractCollector.SEND_INTERVAL;
 
@@ -46,24 +44,30 @@ public abstract class AbstractStatsAlarmer extends AbstractAlarmer implements Mo
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
+		if (future != null && !future.isCancelled()) {
+			future.cancel(false);
+		}
 	}
 
 	protected void doDispose() throws Exception {
 		super.doDispose();
-		if (executor != null && !executor.isShutdown()) {
-			executor.shutdown();
-		}
 	}
 
 	@Override
 	public void achieveMonitorData() {
 		logger.info("[achieveMonitorData] statsDataAlarmer {}", getClass().getSimpleName());
 
-		executor.submit(new Runnable() {
+		future = taskManager.submit(new Runnable() {
 
 			@Override
 			public void run() {
-				doAlarm();
+				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName);
+				catWrapper.doAction(new SwallowAction() {
+					@Override
+					public void doAction() throws SwallowException {
+						doAlarm();
+					}
+				});
 			}
 
 		});

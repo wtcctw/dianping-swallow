@@ -13,6 +13,8 @@ import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 public interface ProducerIpStatsDataDao {
 
 	boolean insert(ProducerIpStatsData ipStatsData);
+	
+	boolean insert(List<ProducerIpStatsData> ipStatsDatas);
 
 	List<ProducerIpStatsData> find(String topicName, String ip, long startKey, long endKey);
 

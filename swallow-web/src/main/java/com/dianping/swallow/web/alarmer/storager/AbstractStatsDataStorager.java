@@ -1,20 +1,18 @@
 package com.dianping.swallow.web.alarmer.storager;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
-import com.dianping.swallow.common.internal.util.CommonUtils;
+import com.dianping.swallow.web.alarmer.TaskManager;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
  * 
@@ -31,19 +29,17 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	protected final static String CAT_TYPE = "StatsDataStorager";
 
-	private static final String FACTORY_NAME = "StatsDataStorager";
+	protected volatile long lastTimeKey = -1L;
 
-	protected static final long DEFAULT_VALUE = -1L;
+	private Future<?> future;
 
-	protected volatile AtomicLong lastTimeKey = new AtomicLong();
-
-	protected static ExecutorService executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
-			ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+	@Autowired
+	protected TaskManager taskManager;
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		lastTimeKey.set(DEFAULT_VALUE);
+		storagerName = getClass().getSimpleName();
 	}
 
 	@Override
@@ -53,20 +49,19 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 
 	@Override
 	protected void doStop() throws Exception {
-
+		super.doStop();
+		if (future != null && !future.isCancelled()) {
+			future.cancel(false);
+		}
 	}
 
 	protected void doDispose() throws Exception {
 		super.doDispose();
-		if (executor != null && !executor.isShutdown()) {
-			executor.shutdown();
-		}
 	}
 
 	@Override
 	public void achieveMonitorData() {
-		executor.submit(new Runnable() {
-
+		future = taskManager.submit(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -87,5 +82,9 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 	}
 
 	protected abstract void doStorage();
+
+	public long getLastTimeKey() {
+		return lastTimeKey;
+	}
 
 }

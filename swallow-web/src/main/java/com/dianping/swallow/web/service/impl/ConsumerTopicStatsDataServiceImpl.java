@@ -28,10 +28,10 @@ public class ConsumerTopicStatsDataServiceImpl implements ConsumerTopicStatsData
 	public boolean insert(ConsumerTopicStatsData topicStatsData) {
 		return consumerTopicStatsDataDao.insert(topicStatsData);
 	}
-
+	
 	@Override
-	public List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
-		return consumerTopicStatsDataDao.findSectionData(topicName, startKey, endKey);
+	public boolean insert(List<ConsumerTopicStatsData> topicStatsDatas) {
+		return consumerTopicStatsDataDao.insert(topicStatsDatas);
 	}
 
 	@Override

@@ -37,7 +37,7 @@ public class EventReporterImpl implements EventReporter {
 			eventChannel.put(event);
 		} catch (InterruptedException e) {
 			CatUtil.logException(e);
-			logger.error("[reprot] ", e);
+			logger.error("[report] ", e);
 		}
 	}
 

@@ -3,6 +3,8 @@ package com.dianping.swallow.web.model.stats;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.dianping.swallow.web.model.event.StatisEvent;
 /**
  * 
  * @author qiyin
@@ -26,6 +28,11 @@ public class ConsumerTopicStatsData extends ConsumerStatsData {
 	@Override
 	public String toString() {
 		return "ConsumerTopicStatsData [topicName=" + topicName + "]"+ super.toString();
+	}
+
+	@Override
+	public StatisEvent createEvent() {
+		throw new UnsupportedOperationException();
 	}
 	
 }

@@ -229,16 +229,6 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 		return alarmDao.update(alarm);
 	}
 
-	@Override
-	public int deleteById(String id) {
-		return alarmDao.deleteById(id);
-	}
-
-	@Override
-	public Alarm findById(String id) {
-		return alarmDao.findById(id);
-	}
-
 	private void initProperties() {
 		try {
 			InputStream in = AlarmServiceImpl.class.getClassLoader().getResourceAsStream(AlARM_URL_FILE);

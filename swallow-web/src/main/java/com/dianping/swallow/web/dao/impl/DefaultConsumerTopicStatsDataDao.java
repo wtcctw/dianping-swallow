@@ -32,7 +32,18 @@ public class DefaultConsumerTopicStatsDataDao extends AbstractStatsDao implement
 			mongoTemplate.save(topicStatsData, CONSUMERTOPICSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save consumer topic statis dao " + topicStatsData, e);
+			logger.error("Error when save consumer topic statsdata." + topicStatsData, e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean insert(List<ConsumerTopicStatsData> topicStatsDatas) {
+		try {
+			mongoTemplate.save(topicStatsDatas, CONSUMERTOPICSTATSDATA_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("Error when save consumer topic statsdata.", e);
 		}
 		return false;
 	}

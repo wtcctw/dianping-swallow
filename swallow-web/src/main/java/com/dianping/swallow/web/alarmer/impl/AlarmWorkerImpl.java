@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.alarmer.impl;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -11,12 +9,11 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CatUtil;
-import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.alarmer.AlarmWorker;
 import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
+import com.dianping.swallow.web.alarmer.TaskManager;
 import com.dianping.swallow.web.alarmer.EventChannel;
 import com.dianping.swallow.web.model.event.Event;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 import com.dianping.swallow.web.util.ThreadUtils;
 
 /**
@@ -33,23 +30,12 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 	@Autowired
 	private EventChannel eventChannel;
 
-	private static final String FACTORY_NAME = "AlarmWorker-Worker";
-
-	private static final int poolSize = CommonUtils.DEFAULT_CPU_COUNT * 2;
-
 	private volatile boolean isStopped = false;
 
-	private ExecutorService executorService = null;
+	@Autowired
+	protected TaskManager taskManager;
 
 	private Thread alarmTaskThread;
-
-	public AlarmWorkerImpl() {
-		this(poolSize);
-	}
-
-	public AlarmWorkerImpl(int poolSize) {
-		executorService = Executors.newFixedThreadPool(poolSize, ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
-	}
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -77,7 +63,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 			try {
 				event = eventChannel.next();
 				logger.info("[start] {}. ", event.toString());
-				executorService.submit(new AlarmTask(event));
+				taskManager.submit(new AlarmTask(event));
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} catch (Exception e) {
@@ -99,7 +85,6 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 
 	protected void doDispose() throws Exception {
 		super.doDispose();
-		executorService.shutdown();
 	}
 
 	@Override

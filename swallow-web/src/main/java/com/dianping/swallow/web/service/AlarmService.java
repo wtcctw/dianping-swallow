@@ -114,22 +114,6 @@ public interface AlarmService {
 	boolean update(Alarm alarm);
 
 	/**
-	 * delete by id
-	 * 
-	 * @param ipDesc
-	 * @return
-	 */
-	int deleteById(String id);
-
-	/**
-	 * find by id
-	 * 
-	 * @param id
-	 * @return
-	 */
-	Alarm findById(String id);
-
-	/**
 	 * find by page
 	 * 
 	 * @param receiver

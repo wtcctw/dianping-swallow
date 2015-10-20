@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.alarmer.container;
+package com.dianping.swallow.web.container;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,8 +27,8 @@ import com.dianping.swallow.web.service.TopicResourceService;
  *
  *         2015年8月3日 上午11:34:10
  */
-@Component("alarmResourceContainer")
-public class AlarmResourceContainerImpl extends AbstractContainer implements AlarmResourceContainer {
+@Component("resourceContainer")
+public class ResourceContainerImpl extends AbstractContainer implements ResourceContainer {
 
 	private static final String DEFAULT_RECORD = "default";
 
@@ -67,7 +67,7 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 		super.doInitialize();
 		containerName = "AlarmResourceContainer";
 		delay = 5;
-		interval = 300;
+		interval = 600;
 	}
 
 	public void findResourceData() {
@@ -101,14 +101,14 @@ public class AlarmResourceContainerImpl extends AbstractContainer implements Ala
 			if (!(masterResource.getType() == ServerType.MASTER)) {
 				continue;
 			}
-			if (masterResource.getGroupId() != 0) {
+			if (masterResource.getGroupId() == 0) {
 				continue;
 			}
 			for (ConsumerServerResource slaveResource : tempResources) {
-				if (!(masterResource.getType() == ServerType.SLAVE)) {
+				if (!(slaveResource.getType() == ServerType.SLAVE)) {
 					continue;
 				}
-				if (!slaveResource.getIp().equals(masterResource.getGroupId())) {
+				if (!(slaveResource.getGroupId() == masterResource.getGroupId())) {
 					continue;
 				}
 				newCMasterServerResources.add(masterResource);

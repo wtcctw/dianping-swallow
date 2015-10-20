@@ -2,15 +2,10 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
@@ -37,7 +32,7 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
 	private ConsumerServerStatsDataService serverStatsDataService;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -47,28 +42,20 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(
-				getLastTimeKey(), false);
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				serverAlarm(serverStatsDatas);
-			}
-		});
-
+		serverAlarm();
 	}
 
-	private void serverAlarm(List<ConsumerServerStatsData> serverStatsDatas) {
+	private void serverAlarm() {
+		List<ConsumerServerStatsData> serverStatsDatas = consumerStatsDataWapper.getServerStatsDatas(getLastTimeKey(),
+				false);
 		if (serverStatsDatas == null) {
 			return;
 		}
-
 		for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
 			try {
 				String ip = serverStatsData.getIp();
 				ConsumerServerResource cServerResource = resourceContainer.findConsumerServerResource(ip);
-				if (cServerResource == null || !cServerResource.isAlarm() || StringUtils.equals(TOTAL_KEY, ip)) {
+				if (cServerResource == null || !cServerResource.isAlarm()) {
 					continue;
 				}
 				QPSAlarmSetting sendQps = cServerResource.getSendAlarmSetting();

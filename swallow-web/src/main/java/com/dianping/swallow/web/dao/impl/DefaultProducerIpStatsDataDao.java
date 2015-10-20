@@ -32,7 +32,18 @@ public class DefaultProducerIpStatsDataDao extends AbstractStatsDao implements P
 			mongoTemplate.save(ipStatsData, PRODUCERIPSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save producer ip stats dao " + ipStatsData, e);
+			logger.error("[insert] Error when save producer ip statsdata." + ipStatsData, e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean insert(List<ProducerIpStatsData> ipStatsDatas) {
+		try {
+			mongoTemplate.save(ipStatsDatas, PRODUCERIPSTATSDATA_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("Error when save producer ip statsdatas.", e);
 		}
 		return false;
 	}

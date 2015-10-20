@@ -1,65 +1,24 @@
 package com.dianping.swallow.web.model.stats;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+/**
+ * 
+ * @author qiyin
+ *
+ *         2015年10月19日 下午5:32:23
+ */
+public interface StatsDataFactory {
 
-import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.model.event.EventFactory;
+	ProducerTopicStatsData createTopicStatsData();
 
-@Service("statsDataFactory")
-public class StatsDataFactory {
+	ProducerServerStatsData createProducerServerStatsData();
 
-	@Autowired
-	private EventReporter eventReporter;
-	
-	@Autowired
-	private EventFactory eventFactory;
+	ConsumerServerStatsData createConsumerServerStatsData();
 
-	public ProducerTopicStatsData createTopicStatsData() {
-		ProducerTopicStatsData topicStatsData = new ProducerTopicStatsData();
-		setComponent(topicStatsData);
-		return topicStatsData;
-	}
+	ConsumerIdStatsData createConsumerIdStatsData();
 
-	public ProducerServerStatsData createProducerServerStatsData() {
-		ProducerServerStatsData serverStatsData = new ProducerServerStatsData();
-		setComponent(serverStatsData);
-		return serverStatsData;
-	}
+	ConsumerTopicStatsData createConsumerTopicStatsData();
 
-	public ConsumerServerStatsData createConsumerServerStatsData() {
-		ConsumerServerStatsData serverStatsData = new ConsumerServerStatsData();
-		setComponent(serverStatsData);
-		return serverStatsData;
-	}
+	ProducerIpStatsData createProducerIpStatsData();
 
-	public ConsumerIdStatsData createConsumerIdStatsData() {
-		ConsumerIdStatsData consumerIdStatsData = new ConsumerIdStatsData();
-		setComponent(consumerIdStatsData);
-		return consumerIdStatsData;
-	}
-	
-	public ConsumerTopicStatsData createConsumerTopicStatsData(){
-		ConsumerTopicStatsData consumerTopicStatsData = new ConsumerTopicStatsData();
-		setComponent(consumerTopicStatsData);
-		return consumerTopicStatsData;
-	}
-	
-	public ProducerIpStatsData createProducerIpStatsData(){
-		ProducerIpStatsData producerIpStatsData = new ProducerIpStatsData();
-		setComponent(producerIpStatsData);
-		return producerIpStatsData;
-	}
-	
-	public ConsumerIpStatsData createConsumerIpStatsData(){
-		ConsumerIpStatsData consumerIpStatsData = new ConsumerIpStatsData();
-		setComponent(consumerIpStatsData);
-		return consumerIpStatsData;
-	}
-
-	private void setComponent(StatsData statsData) {
-		statsData.setEventReporter(eventReporter);
-		statsData.setEventFactory(eventFactory);
-	}
-
+	ConsumerIpStatsData createConsumerIpStatsData();
 }

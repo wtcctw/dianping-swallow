@@ -1,17 +1,13 @@
 package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
+import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
@@ -40,7 +36,7 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -50,31 +46,28 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
-				getLastTimeKey(), false);
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				alarmConsumerIds(consumerIdStatsDatas);
-			}
-		});
-	}
-
-	private void alarmConsumerIds(List<ConsumerIdStatsData> consumerIdStatsDatas) {
-		if (consumerIdStatsDatas == null || consumerIdStatsDatas.size() == 0) {
+		Set<String> topicNames = consumerStatsDataWapper.getTopics(false);
+		if (topicNames == null) {
 			return;
 		}
+		for (String topicName : topicNames) {
+			alarmConsumerIds(topicName);
+		}
+	}
 
+	private void alarmConsumerIds(String topicName) {
+		final List<ConsumerIdStatsData> consumerIdStatsDatas = consumerStatsDataWapper.getConsumerIdStatsDatas(
+				topicName, getLastTimeKey(), false);
+		if (consumerIdStatsDatas == null || consumerIdStatsDatas.isEmpty()) {
+			return;
+		}
 		for (ConsumerIdStatsData consumerIdStatsData : consumerIdStatsDatas) {
 			try {
-				String topicName = consumerIdStatsData.getTopicName();
 				String consumerId = consumerIdStatsData.getConsumerId();
 				ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
 				TopicResource topicResource = resourceContainer.findTopicResource(topicName);
 				if ((topicResource != null && !topicResource.isConsumerAlarm()) || consumerIdResource == null
-						|| !consumerIdResource.isAlarm() || StringUtils.equals(TOTAL_KEY, topicName)
-						|| StringUtils.equals(TOTAL_KEY, consumerId)) {
+						|| !consumerIdResource.isAlarm()) {
 					continue;
 				}
 				ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();

@@ -282,13 +282,13 @@ public class ServerController extends AbstractSidebarBasedController {
 		Set<String> hostsSet = new HashSet<String>();
 		Set<String> ipsSet = new HashSet<String>();
 
-		Map<String, String> master = ipCollectorService.getProducerServerIpsMap();
+		Map<String, String> master = ipCollectorService.getConsumerServerMasterIpsMap();
 		if (master != null) {
 			hostsSet.addAll(master.keySet());
 			ipsSet.addAll(master.values());
 		}
 
-		Map<String, String> slave = ipCollectorService.getConsumerServerMasterIpsMap();
+		Map<String, String> slave = ipCollectorService.getConsumerServerSlaveIpsMap();
 		if (slave != null) {
 			hostsSet.addAll(slave.keySet());
 			ipsSet.addAll(slave.values());

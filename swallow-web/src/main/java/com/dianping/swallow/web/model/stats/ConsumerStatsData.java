@@ -2,6 +2,8 @@ package com.dianping.swallow.web.model.stats;
 
 import org.springframework.data.annotation.Transient;
 
+import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.StatisType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -11,6 +13,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *         2015年7月31日 下午3:56:45
  */
 public abstract class ConsumerStatsData extends StatsData {
+	
+	public ConsumerStatsData() {
+		eventType = EventType.CONSUMER;
+	}
 
 	private long sendQps;
 	
@@ -92,6 +98,22 @@ public abstract class ConsumerStatsData extends StatsData {
 	@JsonIgnore
 	public void setAckQpsTotal(long ackQpsTotal) {
 		this.ackQpsTotal = ackQpsTotal;
+	}
+	
+	public boolean checkSendQpsPeak(long expectQps) {
+		return checkQpsPeak(getSendQps(), expectQps, StatisType.SENDQPS_PEAK);
+	}
+
+	public boolean checkSendQpsValley(long expectQps) {
+		return checkQpsValley(getSendQps(), expectQps, StatisType.SENDQPS_VALLEY);
+	}
+
+	public boolean checkAckQpsPeak(long expectQps) {
+		return checkQpsPeak(getAckQps(), expectQps, StatisType.ACKQPS_PEAK);
+	}
+
+	public boolean checkAckQpsValley(long expectQps) {
+		return checkQpsValley(getAckQps(), expectQps, StatisType.ACKQPS_VALLEY);
 	}
 
 }

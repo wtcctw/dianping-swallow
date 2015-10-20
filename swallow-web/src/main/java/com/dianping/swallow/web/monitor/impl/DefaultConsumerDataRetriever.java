@@ -30,7 +30,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
@@ -73,7 +73,7 @@ public class DefaultConsumerDataRetriever
 	private AccumulationRetriever accumulationRetriever;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@Override
 	public boolean dataExistInMemory(long start, long end) {
