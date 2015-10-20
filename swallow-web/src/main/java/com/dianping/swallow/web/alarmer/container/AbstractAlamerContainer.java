@@ -53,7 +53,6 @@ public abstract class AbstractAlamerContainer extends AbstractLifecycle implemen
 		future = taskManager.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				try {
 					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, containerName + "-doLoadResource");
 					catWrapper.doAction(new SwallowAction() {
 						@Override
@@ -61,12 +60,6 @@ public abstract class AbstractAlamerContainer extends AbstractLifecycle implemen
 							doLoadResource();
 						}
 					});
-
-				} catch (Throwable th) {
-					logger.error("[startLoadResource]", th);
-				} finally {
-
-				}
 			}
 
 		}, getDelay(), getInterval(), TimeUnit.SECONDS);
