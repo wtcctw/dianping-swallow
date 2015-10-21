@@ -42,7 +42,7 @@ public class DefaultConsumerIdStatsDataDao extends AbstractStatsDao implements C
 	@Override
 	public boolean insert(List<ConsumerIdStatsData> consumerIdstatsDatas) {
 		try {
-			mongoTemplate.save(consumerIdstatsDatas, CONSUMERIDSTATSDATA_COLLECTION);
+			mongoTemplate.insert(consumerIdstatsDatas, CONSUMERIDSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
 			logger.error("[insert] error when save consumerid stats datas.", e);

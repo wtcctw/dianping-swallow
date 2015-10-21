@@ -65,6 +65,7 @@ public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLife
 		catWrapper.doAction(new SwallowAction() {
 			@Override
 			public void doAction() throws SwallowException {
+				logger.info("[findQpsTask] executor findConsumerQps.");
 				findConsumerQps();
 			}
 		});

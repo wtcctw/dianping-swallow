@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import com.dianping.swallow.web.controller.dto.BaseQueryDto;
 import com.dianping.swallow.web.service.ServiceLifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

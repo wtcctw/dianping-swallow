@@ -40,7 +40,7 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 	@Override
 	public boolean insert(List<ConsumerServerStatsData> serverStatsDatas) {
 		try {
-			mongoTemplate.save(serverStatsDatas, CONSUMERSERVERSTATSDATA_COLLECTION);
+			mongoTemplate.insert(serverStatsDatas, CONSUMERSERVERSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
 			logger.error("[insert] Error when save consumer server statsdatas.", e);

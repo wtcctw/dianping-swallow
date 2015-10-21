@@ -40,7 +40,7 @@ public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implement
 	@Override
 	public boolean insert(List<ProducerTopicStatsData> topicStatsDatas) {
 		try {
-			mongoTemplate.save(topicStatsDatas, TOPICSTATSDATA_COLLECTION);
+			mongoTemplate.insert(topicStatsDatas, TOPICSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
 			logger.error("[insert] Error when save producer topic statsdatas.", e);

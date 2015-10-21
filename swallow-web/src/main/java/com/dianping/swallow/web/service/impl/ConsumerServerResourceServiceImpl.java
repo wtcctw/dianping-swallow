@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,6 @@ import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.model.resource.ServerType;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
-import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
-import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
