@@ -139,36 +139,6 @@
 										id="topic" readonly> </input>
 								</div>
 							</div>
-<!-- 							<div class="control-group" ng-show="consumeridEntry.consumerIpInfos">
-								<label class="control-label">消费IP配置</label>
-								<table
-									class="table table-bordered table-striped  table-condensed table-hover">
-									<tr>
-										<th style="text-align: left">序号</th>
-										<th style="text-align: left">IP</th>
-										<th style="text-align: left">alarm</th>
-										<th style="text-align: left">active</th>
-									</tr>
-									<tr ng-repeat="ipinfo in consumeridEntry.consumerIpInfos">
-									<td style="text-align: left" ng-bind="$index+1"></td>
-										<td style="text-align: left" ng-bind="ipinfo.ip"></td>
-										<td style="text-align: left"><label
-											class="pull-left inline"> <small
-												class="muted smaller-90"></small> <input
-												id="ipalarm{{$index}}" type="checkbox" ng-model="ipinfo.alarm"
-												class="ace ace-switch ace-switch-5" /><span
-												class="lbl middle"></span>
-										</label></td>
-										<td style="text-align: left"><label
-											class="pull-left inline"> <small
-												class="muted smaller-90"></small> <input
-												id="ipactive{{$index}}" type="checkbox" ng-model="ipinfo.active"
-												class="ace ace-switch ace-switch-5" /><span
-												class="lbl middle"></span>
-										</label></td>
-									</tr>
-								</table>
-							</div> -->
 							<div class="control-group">
 								<label class="control-label">发送QPS</label>
 								<div class="form-group"
@@ -176,14 +146,14 @@
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
 											class="col-sm-2" type="text"
-											ng-model="consumeridEntry.sendpeak" /> <label
+											ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.sendvalley" /> <label
+											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.sendfluctuation" /><label
+											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
 											class="col-sm-2"
-											ng-model="consumeridEntry.sendfluctuationBase" />
+											ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -194,14 +164,14 @@
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
 											class="col-sm-2" type="text"
-											ng-model="consumeridEntry.ackpeak" /> <label
+											ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.ackvalley" /> <label
+											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.ackfluctuation" /><label
+											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
 											class="col-sm-2"
-											ng-model="consumeridEntry.ackfluctuationBase" />
+											ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -210,7 +180,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px; width: 50%;">
 									<input type="text" class="form-control"
-										ng-model="consumeridEntry.senddelay" name="senddelay" required>
+										ng-model="consumeridEntry.consumerAlarmSetting.sendDelay" name="senddelay" required>
 									</input>
 								</div>
 							</div>
@@ -219,7 +189,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<input type="text" class="form-control"
-										ng-model="consumeridEntry.ackdelay" name="ackdelay" required>
+										ng-model="consumeridEntry.consumerAlarmSetting.ackDelay" name="ackdelay" required>
 									</input>
 								</div>
 							</div>
@@ -227,7 +197,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label">消息堆积</label> <input type="text"
-										class="form-control" ng-model="consumeridEntry.accumulation"
+										class="form-control" ng-model="consumeridEntry.consumerAlarmSetting.accumulation"
 										name="accumulation" required> </input>
 								</div>
 							</div>
@@ -275,14 +245,14 @@
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
 											class="col-sm-2" type="text"
-											ng-model="consumeridEntry.sendpeak" /> <label
+											ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.sendvalley" /> <label
+											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.sendfluctuation" /><label
+											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
 											class="col-sm-2"
-											ng-model="consumeridEntry.sendfluctuationBase" />
+											ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -293,14 +263,14 @@
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
 											class="col-sm-2" type="text"
-											ng-model="consumeridEntry.ackpeak" /> <label
+											ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.ackvalley" /> <label
+											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.ackfluctuation" /><label
+											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
 											class="col-sm-2"
-											ng-model="consumeridEntry.ackfluctuationBase" />
+											ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase" />
 									</div>
 								</div>
 							</div>
@@ -309,7 +279,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px; width: 50%;">
 									<input type="text" class="form-control"
-										ng-model="consumeridEntry.senddelay" name="senddelay" required>
+										ng-model="consumeridEntry.consumerAlarmSetting.sendDelay" name="senddelay" required>
 									</input>
 								</div>
 							</div>
@@ -318,7 +288,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<input type="text" class="form-control"
-										ng-model="consumeridEntry.ackdelay" name="ackdelay" required>
+										ng-model="consumeridEntry.consumerAlarmSetting.ackDelay" name="ackdelay" required>
 									</input>
 								</div>
 							</div>
@@ -326,7 +296,7 @@
 								<div class="form-group"
 									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 									<label class="control-label">消息堆积</label> <input type="text"
-										class="form-control" ng-model="consumeridEntry.accumulation"
+										class="form-control" ng-model="consumeridEntry.consumerAlarmSetting.accumulation"
 										name="accumulation" required> </input>
 								</div>
 							</div>

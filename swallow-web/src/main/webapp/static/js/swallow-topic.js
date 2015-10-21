@@ -106,14 +106,14 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicEntry.administrator;
 			$scope.topicEntry.producerAlarm;
 			$scope.topicEntry.consumerAlarm;
-			$scope.topicEntry.whiteList;
-			$scope.topicEntry.producerServer;
-			$scope.topicEntry.sendpeak;
-			$scope.topicEntry.sendvalley;
-			$scope.topicEntry.sendfluctuation;
-			$scope.topicEntry.sendfluctuationBase;
-			$scope.topicEntry.senddelay;
-			
+			$scope.topicEntry.producerAlarmSetting = {};
+			$scope.topicEntry.producerAlarmSetting.delay;
+			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting = {};
+			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.peak;
+			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.valley;
+			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation;
+			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase;
+
 			$scope.setModalInput = function(index){
 				if(typeof($scope.searchPaginator.currentPageItems[index].administrator) != "undefined"){
 					var administrator = $scope.searchPaginator.currentPageItems[index].administrator;
@@ -131,16 +131,16 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
 				$scope.topicEntry.producerAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarm;
 				$scope.topicEntry.consumerAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarm;
-				$scope.topicEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
-				$scope.topicEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
-				$scope.topicEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
-				$scope.topicEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
-				$scope.topicEntry.senddelay = $scope.searchPaginator.currentPageItems[index].senddelay;
+				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.peak;
+				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.valley;
+				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuation;
+				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuationBase;
+				$scope.topicEntry.producerAlarmSetting.delay = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.delay;
 				$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
 			}
 			
 			$scope.refreshpage = function(myForm, index){
-				if ($scope.topicEntry.sendpeak < $scope.topicEntry.sendvalley){
+				if ($scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.peak < $scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.valley){
 					alert("峰值不能小于谷值");
 					return;
 				}
@@ -245,7 +245,6 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
-		        		//$('#administrator').typeahead().data('typeahead').source = data;
 					}).error(function(data, status, headers, config) {
 					});
 					

@@ -40,11 +40,6 @@ public class QPSAlarmSetting {
 		this.fluctuation = fluctuation;
 	}
 
-	@Override
-	public String toString() {
-		return "QPSAlarmSetting[ peak = " + peak + ", valley=" + valley + ", fluctuation = " + fluctuation + "]";
-	}
-
 	public long getFluctuationBase() {
 		return fluctuationBase;
 	}

@@ -3,12 +3,9 @@ package com.dianping.swallow.web.controller;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.IpQueryDto;
-import com.dianping.swallow.web.controller.dto.IpResourceDto;
-import com.dianping.swallow.web.controller.mapper.IpResourceMapper;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.IpResourceService;
-import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +45,7 @@ public class IPController extends AbstractMenuController {
 	public Object ipQuery(@RequestBody IpQueryDto ipQueryDto, HttpServletRequest request) {
 
 		Pair<Long, List<IpResource>> pair;
-		List<IpResourceDto> ipResourceDto = new ArrayList<IpResourceDto>();
+		List<IpResource> ipResources = new ArrayList<IpResource>();
 		String username = userUtils.getUsername(request);
 		int offset = ipQueryDto.getOffset();
 		int limit = ipQueryDto.getLimit();
@@ -69,7 +66,7 @@ public class IPController extends AbstractMenuController {
 
 				Collection<String> intersection = CollectionUtils.intersection(ips, Arrays.asList(queryIps));
 				if (intersection.isEmpty()) {
-					return new Pair<Long, List<IpResourceDto>>(0L, ipResourceDto);
+					return new Pair<Long, List<IpResource>>(0L, ipResources);
 				} else {
 					ip = StringUtils.join(intersection, ",");
 				}
@@ -82,13 +79,14 @@ public class IPController extends AbstractMenuController {
 
 		if (isAllBlank) {
 			pair = ipResourceService.findIpResourcePage(offset, limit);
+			return pair;
 		} else {
 
 			if (StringUtils.isBlank(application)) {
 				String[] ips = ip.split(",");
 				if (ips.length == 1) {
 					if(!userUtils.ips(username).contains(ips[0])){
-						return new Pair<Long, List<IpResourceDto>>(0L, ipResourceDto);
+						return new Pair<Long, List<IpResource>>(0L, ipResources);
 					}
 				}
 				int size = userUtils.ips(username).size();
@@ -104,26 +102,15 @@ public class IPController extends AbstractMenuController {
 
 		}
 
-		for (IpResource ipResource : pair.getSecond()) {
-			ipResourceDto.add(IpResourceMapper.toIpResourceDto(ipResource));
-		}
-
-		return new Pair<Long, List<IpResourceDto>>(pair.getFirst(), ipResourceDto);
+		return pair;
 
 	}
 
 	@RequestMapping(value = "/console/ip/update", method = RequestMethod.POST)
 	@ResponseBody
-	public Object updateIp(@RequestBody IpResourceDto IpResourceDto) {
+	public Boolean updateIp(@RequestBody IpResource ipResource) {
 
-		IpResource ipResource = IpResourceMapper.toIpResource(IpResourceDto);
-		boolean result = ipResourceService.update(ipResource);
-
-		if (result) {
-			return ResponseStatus.SUCCESS.getStatus();
-		} else {
-			return ResponseStatus.MONGOWRITE.getStatus();
-		}
+		return ipResourceService.update(ipResource);
 	}
 
 	@RequestMapping(value = "/console/ip/allip", method = RequestMethod.GET)

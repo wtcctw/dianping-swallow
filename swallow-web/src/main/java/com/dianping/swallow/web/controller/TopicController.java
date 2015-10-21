@@ -5,10 +5,7 @@ import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
-import com.dianping.swallow.web.controller.dto.TopicResourceDto;
-import com.dianping.swallow.web.controller.mapper.TopicResourceMapper;
 import com.dianping.swallow.web.controller.utils.UserUtils;
-import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -25,7 +22,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -61,32 +57,26 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request) {
 
-		List<TopicResourceDto> result = new ArrayList<TopicResourceDto>();
-		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
 		String topic = topicQueryDto.getTopic();
 		String producerIp = topicQueryDto.getProducerServer();
 		boolean inactive = topicQueryDto.isInactive();
 		int offset = topicQueryDto.getOffset();
 		int limit = topicQueryDto.getLimit();
 
-		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp) && inactive;
+		boolean isAllEmpty = StringUtil.isAllBlank(topic, producerIp) && inactive;
 
-		if (isAllEmpry) {
+		if (isAllEmpty) {
 			String username = userUtils.getUsername(request);
 			boolean findAll = userUtils.isAdministrator(username);
 			if (findAll) {
-				pair = topicResourceService.findTopicResourcePage(offset, limit);
+				return topicResourceService.findTopicResourcePage(offset, limit);
 			} else {
-				pair = topicResourceService.findByAdministrator(offset, limit, username);
+				return topicResourceService.findByAdministrator(offset, limit, username);
 			}
 		} else {
-			pair = topicResourceService.find(offset, limit, topic, producerIp, inactive);
+			return topicResourceService.find(offset, limit, topic, producerIp, inactive);
 		}
 
-		for (TopicResource topicResource : pair.getSecond()) {
-			result.add(TopicResourceMapper.toTopicResourceDto(topicResource));
-		}
-		return new Pair<Long, List<TopicResourceDto>>(pair.getFirst(), result);
 	}
 
 	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
@@ -102,9 +92,8 @@ public class TopicController extends AbstractMenuController {
 
 	@RequestMapping(value = "/console/topic/update", method = RequestMethod.POST)
 	@ResponseBody
-	public boolean updateTopic(@RequestBody TopicResourceDto topicResourceDto) {
+	public boolean updateTopic(@RequestBody TopicResource topicResource) {
 
-		TopicResource topicResource = TopicResourceMapper.toTopicResource(topicResourceDto);
 		return topicResourceService.update(topicResource);
 	}
 
@@ -112,21 +101,15 @@ public class TopicController extends AbstractMenuController {
 	@ResponseBody
 	public Object queryProducerIp(@RequestBody TopicQueryDto topicQueryDto) {
 
-		TopicResourceDto topicResourceDto = null;
 		String topic = topicQueryDto.getTopic();
-		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		if (topicResource != null) {
-			topicResourceDto = TopicResourceMapper.toTopicResourceDto(topicResource);
-		}
-
-		return topicResourceDto;
+		return topicResourceService.findByTopic(topic);
 	}
 
 	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST)
 	@ResponseBody
 	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
 			@RequestParam(value = "time") String time, @RequestParam(value = "exec_user") String approver,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request) {
 
 		String username = userUtils.getUsername(request);
 		TopicResource topicResource = null;

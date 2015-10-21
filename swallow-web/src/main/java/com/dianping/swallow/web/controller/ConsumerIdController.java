@@ -2,8 +2,6 @@ package com.dianping.swallow.web.controller;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
-import com.dianping.swallow.web.controller.dto.ConsumerIdResourceDto;
-import com.dianping.swallow.web.controller.mapper.ConsumerIdResourceMapper;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
@@ -17,7 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +42,6 @@ public class ConsumerIdController extends AbstractMenuController {
     @ResponseBody
     public Object comsumeridResourceList(@RequestBody ConsumerIdQueryDto consumerIdQueryDto) {
 
-        List<ConsumerIdResourceDto> resultDto = new ArrayList<ConsumerIdResourceDto>();
-
         ConsumerIdParam consumerIdParam = new ConsumerIdParam();
         consumerIdParam.setLimit(consumerIdQueryDto.getLimit());
         consumerIdParam.setOffset(consumerIdQueryDto.getOffset());
@@ -54,44 +49,23 @@ public class ConsumerIdController extends AbstractMenuController {
         consumerIdParam.setConsumerId(consumerIdQueryDto.getConsumerId());
         consumerIdParam.setConsumerIp(consumerIdQueryDto.getConsumerIp());
         consumerIdParam.setInactive(consumerIdQueryDto.isInactive());
-        Pair<Long, List<ConsumerIdResource>> pair = consumerIdResourceService.find(consumerIdParam);
-        for (ConsumerIdResource consumerIdResource : pair.getSecond()) {
-            resultDto.add(ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource));
-        }
-        return new Pair<Long, List<ConsumerIdResourceDto>>(pair.getFirst(), resultDto);
-
+        return consumerIdResourceService.find(consumerIdParam);
     }
 
     @RequestMapping(value = "/console/topic/auth/cid", method = RequestMethod.POST)
     @ResponseBody
     public Object queryComsumeridResource(@RequestBody ConsumerIdQueryDto consumerIdQueryDto) {
 
-        ConsumerIdResourceDto consumerIdResourceDto = null;
-
         String topic = consumerIdQueryDto.getTopic();
         String consumerId = consumerIdQueryDto.getConsumerId();
-        ConsumerIdResource consumerIdResource = consumerIdResourceService.findByConsumerIdAndTopic(topic, consumerId);
-
-        if (consumerIdResource != null) {
-            consumerIdResourceDto = ConsumerIdResourceMapper.toConsumerIdResourceDto(consumerIdResource);
-        }
-
-        return consumerIdResourceDto;
-
+        return consumerIdResourceService.findByConsumerIdAndTopic(topic, consumerId);
     }
 
     @RequestMapping(value = "/console/consumerid/update", method = RequestMethod.POST)
     @ResponseBody
-    public Object updateTopic(@RequestBody ConsumerIdResourceDto consumerIdResourceDto){
+    public Boolean updateTopic(@RequestBody ConsumerIdResource consumerIdResource){
 
-        ConsumerIdResource consumerIdResource = ConsumerIdResourceMapper.toConsumerIdResource(consumerIdResourceDto);
-        boolean result = consumerIdResourceService.update(consumerIdResource);
-
-        if (result) {
-            return ResponseStatus.SUCCESS.getStatus();
-        } else {
-            return ResponseStatus.MONGOWRITE.getStatus();
-        }
+        return consumerIdResourceService.update(consumerIdResource);
     }
 
     @RequestMapping(value = "/console/consumerid/alarm", method = RequestMethod.GET)
