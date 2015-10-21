@@ -40,7 +40,7 @@ public class DefaultProducerIpStatsDataDao extends AbstractStatsDao implements P
 	@Override
 	public boolean insert(List<ProducerIpStatsData> ipStatsDatas) {
 		try {
-			mongoTemplate.save(ipStatsDatas, PRODUCERIPSTATSDATA_COLLECTION);
+			mongoTemplate.insert(ipStatsDatas, PRODUCERIPSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
 			logger.error("Error when save producer ip statsdatas.", e);

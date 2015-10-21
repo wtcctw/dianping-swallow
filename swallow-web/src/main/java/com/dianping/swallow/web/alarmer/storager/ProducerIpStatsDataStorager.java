@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.service.ProducerIpStatsDataService;
@@ -16,6 +17,7 @@ import com.dianping.swallow.web.util.CountDownLatchUtil;
  *
  *         2015年10月14日 下午8:12:05
  */
+@Component
 public class ProducerIpStatsDataStorager extends AbstractProducerStatsDataStorager {
 
 	@Autowired

@@ -64,19 +64,13 @@ public abstract class AbstractStatsDataStorager extends AbstractLifecycle implem
 		future = taskManager.submit(new Runnable() {
 			@Override
 			public void run() {
-				try {
-					SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, storagerName + "-doStorage");
-					catWrapper.doAction(new SwallowAction() {
-						@Override
-						public void doAction() throws SwallowException {
-							doStorage();
-						}
-					});
-				} catch (Throwable th) {
-					logger.error("[startStorage]", th);
-				} finally {
-
-				}
+				SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, storagerName + "-doStorage");
+				catWrapper.doAction(new SwallowAction() {
+					@Override
+					public void doAction() throws SwallowException {
+						doStorage();
+					}
+				});
 			}
 		});
 	}

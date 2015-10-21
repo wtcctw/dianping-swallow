@@ -26,7 +26,7 @@ public class NetUtil {
 
 	public static final String IP = getFirstNoLoopbackIP4Address();
 
-	private static final int TIME_OUT = 300;
+	private static final int TIME_OUT = 500;
 
 	public static boolean isPortOpen(String host, int port) {
 		Socket socket = null;

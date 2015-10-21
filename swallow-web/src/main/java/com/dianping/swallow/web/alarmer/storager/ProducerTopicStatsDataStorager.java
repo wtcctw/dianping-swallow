@@ -1,7 +1,9 @@
 package com.dianping.swallow.web.alarmer.storager;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.alarmer.container.StatsDataContainer;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
@@ -13,6 +15,7 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
  *
  *         2015年10月14日 下午8:11:46
  */
+@Component
 public class ProducerTopicStatsDataStorager extends AbstractProducerStatsDataStorager {
 
 	@Autowired

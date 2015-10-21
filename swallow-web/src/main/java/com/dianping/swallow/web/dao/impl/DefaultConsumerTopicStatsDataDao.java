@@ -40,7 +40,7 @@ public class DefaultConsumerTopicStatsDataDao extends AbstractStatsDao implement
 	@Override
 	public boolean insert(List<ConsumerTopicStatsData> topicStatsDatas) {
 		try {
-			mongoTemplate.save(topicStatsDatas, CONSUMERTOPICSTATSDATA_COLLECTION);
+			mongoTemplate.insert(topicStatsDatas, CONSUMERTOPICSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
 			logger.error("Error when save consumer topic statsdata.", e);

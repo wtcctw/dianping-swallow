@@ -33,12 +33,14 @@ public class ProducerServer extends Server {
 
 	public void checkService() {
 		HttpResult httpResult = requestUrl(pigeonHealthUrl);
-		if (httpResult.isSuccess() && isServiceLastAlarmed) {
-			report(ip, ip, ServerType.PIGEON_SERVICE_OK);
-			isServiceLastAlarmed = false;
-		} else {
+		if (!httpResult.isSuccess()) {
 			report(ip, ip, ServerType.PIGEON_SERVICE);
 			isServiceLastAlarmed = true;
+		} else {
+			if (isServiceLastAlarmed) {
+				report(ip, ip, ServerType.PIGEON_SERVICE_OK);
+				isServiceLastAlarmed = false;
+			}
 		}
 	}
 
