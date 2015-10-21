@@ -55,7 +55,7 @@ public class ConsumerServerServiceAlarmer extends AbstractServiceAlarmer {
 		CountDownLatchUtil.await(downLatch);
 	}
 
-	public void doServerPort(final ConsumerHAServer consumerHAServer) {
+	public void doServerPort(ConsumerHAServer consumerHAServer) {
 		try {
 			consumerHAServer.checkPort();
 		} catch (Throwable t) {
@@ -63,11 +63,11 @@ public class ConsumerServerServiceAlarmer extends AbstractServiceAlarmer {
 		}
 	}
 
-	public void doDataSend(final ConsumerHAServer consumerHAServer) {
-		super.doDataSend(consumerHAServer, consumerHAServer.getMasterServer().getIp(), false);
+	public void doDataSend(ConsumerHAServer consumerHAServer) {
+		super.doDataSend(consumerHAServer, false);
 	}
 
-	public void doServerService(final ConsumerHAServer consumerHAServer) {
+	public void doServerService(ConsumerHAServer consumerHAServer) {
 		try {
 			consumerHAServer.checkService();
 		} catch (Throwable t) {

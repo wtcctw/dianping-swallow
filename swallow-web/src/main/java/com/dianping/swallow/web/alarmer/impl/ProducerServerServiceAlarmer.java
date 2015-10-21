@@ -54,7 +54,7 @@ public class ProducerServerServiceAlarmer extends AbstractServiceAlarmer {
 		CountDownLatchUtil.await(downLatch);
 	}
 
-	public void doServerService(final ProducerServer producerServer) {
+	public void doServerService(ProducerServer producerServer) {
 		try {
 			producerServer.checkService();
 		} catch (Throwable t) {
@@ -62,7 +62,7 @@ public class ProducerServerServiceAlarmer extends AbstractServiceAlarmer {
 		}
 	}
 
-	public void doDataSend(final ProducerServer producerServer) {
-		super.doDataSend(producerServer, producerServer.getIp(), true);
+	public void doDataSend(ProducerServer producerServer) {
+		super.doDataSend(producerServer, true);
 	}
 }

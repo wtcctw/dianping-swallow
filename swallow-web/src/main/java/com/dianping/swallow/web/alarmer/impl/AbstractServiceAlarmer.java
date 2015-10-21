@@ -79,9 +79,9 @@ public abstract class AbstractServiceAlarmer extends AbstractAlarmer {
 		}, getAlarmDelay(), getAlarmInterval(), TimeUnit.SECONDS);
 	}
 
-	public void doDataSend(final Sendable server, final String ip, final boolean isProducer) {
+	public void doDataSend(Sendable server, boolean isProducer) {
 		try {
-			long sendTimeStamp = ipCollectorService.getLastestStatsTimeByIp(ip, isProducer);
+			long sendTimeStamp = ipCollectorService.getLastestStatsTimeByIp(server.senderIp(), isProducer);
 			server.checkSender(sendTimeStamp);
 		} catch (Throwable t) {
 			logger.error("[run] server {} checkSender error.", server);

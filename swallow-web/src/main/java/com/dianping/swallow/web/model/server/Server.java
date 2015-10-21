@@ -98,6 +98,11 @@ public abstract class Server implements Sendable, Serviceable {
 	}
 
 	@Override
+	public String senderIp() {
+		return ip;
+	}
+
+	@Override
 	public void checkSender(long sendTimeStamp) {
 		if (System.currentTimeMillis() - sendTimeStamp > SENDER_INTERVAL) {
 			report(ip, ip, ServerType.SERVER_SENDER);
