@@ -71,8 +71,7 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		scheduled = Executors.newScheduledThreadPool(CommonUtils.DEFAULT_CPU_COUNT,
-				ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
+		scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 		consumerDataRetrieverWrapper.registerListener(this);
 	}
 
