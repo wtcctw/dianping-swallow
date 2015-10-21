@@ -105,12 +105,12 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 			size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
 		}
 
-		List<TopicResource> topicResources = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
 
-		query.skip(offset).limit(limit);
 		if (size < 0) {
 			size = mongoTemplate.count(query, TOPICRESOURCE_COLLECTION);
 		}
+		query.skip(offset).limit(limit);
+		List<TopicResource> topicResources = mongoTemplate.find(query, TopicResource.class, TOPICRESOURCE_COLLECTION);
 
 		return new Pair<Long, List<TopicResource>>(size, topicResources);
 
