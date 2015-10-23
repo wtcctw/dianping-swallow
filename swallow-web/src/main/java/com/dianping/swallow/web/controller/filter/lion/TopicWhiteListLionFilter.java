@@ -53,7 +53,7 @@ public class TopicWhiteListLionFilter extends AbstractLionFilter {
 
 		ResponseStatus status = null;
 
-		if(!EnvUtil.isProduct()){
+		if(EnvUtil.isProduct()){
 			Set<String> envs = EnvUtil.allEnv();
 			for(String env : envs){
 				status	=  doEditLion(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topicJoin,
