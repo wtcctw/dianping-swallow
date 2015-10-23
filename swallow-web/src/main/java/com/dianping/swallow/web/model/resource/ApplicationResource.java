@@ -103,7 +103,7 @@ public class ApplicationResource extends BaseResource {
 		this.email = ipDesc.getEmail();
 		this.opManager = ipDesc.getOpManager();
 		this.opEmail = ipDesc.getOpEmail();
-		this.opMobile = ipDesc.getOpEmail();
+		this.opMobile = ipDesc.getOpMobile();
 		this.setUpdateTime(new Date());
 		return this;
 	}
