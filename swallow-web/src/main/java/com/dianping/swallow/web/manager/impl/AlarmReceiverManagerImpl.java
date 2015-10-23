@@ -45,7 +45,7 @@ public class AlarmReceiverManagerImpl implements AlarmReceiverManager {
 				addElement(alarmReceiver.getEmails(), appResource.getEmail());
 				addElement(alarmReceiver.getEmails(), appResource.getOpEmail());
 				addElement(alarmReceiver.getMobiles(), appResource.getDpMobile());
-				addElement(alarmReceiver.getEmails(), appResource.getOpMobile());
+				addElement(alarmReceiver.getMobiles(), appResource.getOpMobile());
 			}
 			return alarmReceiver;
 		}
@@ -58,17 +58,7 @@ public class AlarmReceiverManagerImpl implements AlarmReceiverManager {
 			return null;
 		}
 		List<ApplicationResource> appResources = appResourceManager.getAppResourceByName(appNames);
-		if (appResources != null && !appResources.isEmpty()) {
-			AlarmReceiver alarmReceiver = new AlarmReceiver();
-			for (ApplicationResource appResource : appResources) {
-				addElement(alarmReceiver.getEmails(), appResource.getEmail());
-				addElement(alarmReceiver.getEmails(), appResource.getOpEmail());
-				addElement(alarmReceiver.getMobiles(), appResource.getDpMobile());
-				addElement(alarmReceiver.getEmails(), appResource.getOpMobile());
-			}
-			return alarmReceiver;
-		}
-		return null;
+		return getAlarmReceiverByApp(appResources);
 	}
 
 	@Override
