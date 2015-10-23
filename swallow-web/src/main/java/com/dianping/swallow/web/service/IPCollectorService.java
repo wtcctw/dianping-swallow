@@ -47,28 +47,28 @@ public interface IPCollectorService {
 
 	/**
 	 * get consumer server pair ips
-	 * 
+	 *
 	 * @return
 	 */
 	List<ConsumerServerPair> getConsumerServerPairs();
 
 	/**
 	 * get producer server master ips map
-	 * 
+	 *
 	 * @return
 	 */
 	Map<String, String> getProducerServerIpsMap();
 
 	/**
 	 * get consumer server master ips map
-	 * 
+	 *
 	 * @return
 	 */
 	Map<String, String> getConsumerServerMasterIpsMap();
 
 	/**
 	 * get consumer server slave ips map
-	 * 
+	 *
 	 * @return
 	 */
 	Map<String, String> getConsumerServerSlaveIpsMap();

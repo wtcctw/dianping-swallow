@@ -10,4 +10,6 @@ public interface Sendable {
 
 	void checkSender(long sendTimeStamp);
 
+	String senderIp();
+
 }

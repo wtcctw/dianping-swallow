@@ -30,11 +30,14 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 	@Autowired
 	private ResourceContainer resourceContainer;
 
+	private long checkInterval;
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		alarmInterval = 600;
 		alarmDelay = 30;
+		checkInterval = alarmInterval * 1000;
 	}
 
 	@Override
@@ -60,7 +63,7 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		}
 		for (Map.Entry<String, ProducerServer> serverEntry : producerServers.entrySet()) {
 			ProducerServer producerServer = serverEntry.getValue();
-			producerServer.checkConfig(topicConfigs);
+			producerServer.checkConfig(topicConfigs, checkInterval);
 		}
 	}
 
@@ -73,9 +76,9 @@ public class MongoConfigAlarmer extends AbstractServiceAlarmer {
 		for (Map.Entry<String, ConsumerHAServer> serverEntry : consumerHAServers.entrySet()) {
 			ConsumerHAServer consumerHAServer = serverEntry.getValue();
 			ConsumerServer masterServer = consumerHAServer.getMasterServer();
-			masterServer.checkConfig(topicConfigs);
+			masterServer.checkConfig(topicConfigs, checkInterval);
 			ConsumerServer slaveServer = consumerHAServer.getSlaveServer();
-			slaveServer.checkConfig(topicConfigs);
+			slaveServer.checkConfig(topicConfigs, checkInterval);
 		}
 	}
 

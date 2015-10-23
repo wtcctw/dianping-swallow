@@ -75,6 +75,15 @@ public class ConsumerHAServer implements Sendable, Serviceable {
 			slaveServer.checkSender(sendTimeStamp);
 		}
 	}
+	
+	@Override
+	public String senderIp() {
+		if (!isSlaveUsing) {
+			return this.masterServer.getIp();
+		} else {
+			return this.slaveServer.getIp();
+		}
+	}
 
 	@Override
 	public void checkService() {

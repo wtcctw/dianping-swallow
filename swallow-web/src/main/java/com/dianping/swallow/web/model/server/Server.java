@@ -17,6 +17,7 @@ import com.dianping.swallow.common.message.JsonDeserializedException;
 import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.MongoConfigEvent;
 import com.dianping.swallow.web.model.event.ServerEvent;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.service.HttpService;
@@ -97,6 +98,11 @@ public abstract class Server implements Sendable, Serviceable {
 	}
 
 	@Override
+	public String senderIp() {
+		return ip;
+	}
+
+	@Override
 	public void checkSender(long sendTimeStamp) {
 		if (System.currentTimeMillis() - sendTimeStamp > SENDER_INTERVAL) {
 			report(ip, ip, ServerType.SERVER_SENDER);
@@ -147,14 +153,14 @@ public abstract class Server implements Sendable, Serviceable {
 				+ ", serverConfig=" + serverConfig + "] " + super.toString();
 	}
 
-	//mongoconfig check start
-	public void checkConfig(Map<String, TopicConfig> topicConfigs) {
+	// mongoconfig check start
+	public void checkConfig(Map<String, TopicConfig> topicConfigs, long checkInterval) {
 		Map<String, MongoStatus> mongoStatuses = getMongoStatus(ip);
-		checkConfigDetail(mongoStatuses, topicConfigs, EventType.CONSUMER);
+		checkConfigDetail(mongoStatuses, topicConfigs, checkInterval);
 	}
 
 	void checkConfigDetail(Map<String, MongoStatus> mongoStatuses, Map<String, TopicConfig> topicConfigs,
-			EventType eventType) {
+			long checkInterval) {
 		if (mongoStatuses == null) {
 			logger.error("[checkConfigByIp] mongourl mongoStatuses are both empty.");
 			return;
@@ -201,7 +207,9 @@ public abstract class Server implements Sendable, Serviceable {
 					}
 				}
 				if (isAlarm) {
-					report(eventFactory.createMongoConfigEvent().setTopicName(topic), ip, ip, ServerType.MONGO_CONFIG);
+					MongoConfigEvent event = eventFactory.createMongoConfigEvent().setTopicName(topic);
+					event.setCheckInterval(checkInterval);
+					report(event, ip, ip, ServerType.MONGO_CONFIG);
 				}
 			}
 		}
