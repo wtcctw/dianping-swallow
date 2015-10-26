@@ -1,18 +1,20 @@
-package com.dianping.swallow.web.controller.filter.result;
+package com.dianping.swallow.web.controller.handler.result;
 
+
+import com.dianping.swallow.web.controller.handler.data.Treatable;
 
 /**
  * @author mingdongli
  *
  * 2015年9月24日下午3:15:58
  */
-public class LionConfigure {
+public class LionConfigureResult implements Result, Treatable{
 
 	private String mongoServer;
 	
 	private String consumerServer;
 	
-	private int size4sevenday;
+	private int size4SevenDay;
 
 	public String getMongoServer() {
 		return mongoServer;
@@ -30,11 +32,11 @@ public class LionConfigure {
 		this.consumerServer = consumerServer;
 	}
 
-	public int getSize4sevenday() {
-		return size4sevenday;
+	public int getSize4SevenDay() {
+		return size4SevenDay;
 	}
 
-	public void setSize4sevenday(int size4sevenday) {
-		this.size4sevenday = size4sevenday;
+	public void setSize4SevenDay(int size4SevenDay) {
+		this.size4SevenDay = size4SevenDay;
 	}
 }

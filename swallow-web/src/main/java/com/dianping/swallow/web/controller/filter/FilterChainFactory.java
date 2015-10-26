@@ -1,10 +1,7 @@
 package com.dianping.swallow.web.controller.filter;
 
-import org.springframework.stereotype.Component;
-
-import com.dianping.swallow.web.controller.filter.config.ConfigureFilterChain;
-import com.dianping.swallow.web.controller.filter.lion.LionFilterChain;
 import com.dianping.swallow.web.controller.filter.validator.ValidatorFilterChain;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -19,12 +16,4 @@ public class FilterChainFactory {
 		return new ValidatorFilterChain();
 	}
 
-	public LionFilterChain createLionFilterChain() {
-		return new LionFilterChain();
-	}
-
-	public ConfigureFilterChain createConfigureFilterChain() {
-		return new ConfigureFilterChain();
-	}
-	
 }
