@@ -274,6 +274,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			
 			$scope.setInactive = function(){
 				$scope.query.inactive = !$scope.query.inactive;
+				$scope.query.topic = $("#searchtopic").val();
+				$scope.query.producerServer = $("#searchip").val();
 				$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 			}
 			

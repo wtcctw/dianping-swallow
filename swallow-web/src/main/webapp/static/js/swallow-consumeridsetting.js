@@ -224,6 +224,9 @@ module
 							
 							$scope.setInactive = function(){
 								$scope.query.inactive = !$scope.query.inactive;
+								$scope.query.topic = $("#searchtopic").val();
+								$scope.query.consumerIp = $("#searchconsumerip").val();
+								$scope.query.consumerId = $("#searchconsumerid").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 							}
 							

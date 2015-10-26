@@ -107,14 +107,15 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.type = "";
 	$scope.consumerserverEntry.groupId = "";
 	
-	$scope.refreshpage = function(myForm){
+	$scope.refreshpage = function(myForm, index){
 		$scope.consumerserverEntry.type = $('#serverType').val();
 		if ($scope.consumerserverEntry.sendAlarmSetting.peak < $scope.consumerserverEntry.sendAlarmSetting.valley
 				|| $scope.consumerserverEntry.ackAlarmSetting.peak < $scope.consumerserverEntry.ackAlarmSetting.valley){
 			alert("谷值不能小于峰值");
 			return;
 		}
-		$('#myModal').modal('hide');
+		var id = "#myModal" + index;
+		$(id).modal('hide');
 		var param = JSON.stringify($scope.consumerserverEntry);
     	
 		$http.post(window.contextPath + '/console/server/consumer/create', $scope.consumerserverEntry).success(function(response) {
