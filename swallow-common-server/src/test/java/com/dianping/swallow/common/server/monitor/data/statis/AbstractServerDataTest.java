@@ -12,7 +12,7 @@ import com.dianping.swallow.AbstractTest;
 public abstract class AbstractServerDataTest extends AbstractTest{
 	
 	
-	protected Long startKey = 100L, endKey = 400L;
+	protected Long startKey = 100L, endKey = 110L;
 	
 	protected String []topics = new String[]{"topic1", "topic2"};
 	

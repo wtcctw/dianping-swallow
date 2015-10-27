@@ -2,6 +2,8 @@ package com.dianping.swallow.common.server.monitor.data;
 
 import java.util.NavigableMap;
 
+import com.dianping.swallow.common.internal.monitor.KeyMergeable;
+import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -10,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年5月19日 下午5:04:56
  */
-public interface Statisable<V> {
+public interface Statisable<V> extends KeyMergeable{
 
 	void add(Long time, V added);
 	
@@ -42,7 +44,7 @@ public interface Statisable<V> {
 
 	String toString(String key);
 	
-	public static class QpxData {
+	public static class QpxData implements Mergeable{
 
 		private Long qpx;
 
@@ -67,6 +69,26 @@ public interface Statisable<V> {
 
 		public void setTotal(Long total) {
 			this.total = total;
+		}
+
+		@Override
+		public void merge(Mergeable merge) {
+			if(!(merge instanceof QpxData)){
+				throw new IllegalArgumentException("wrong type " + merge.getClass());
+			}
+
+			QpxData toMerge = (QpxData) merge;
+			total += toMerge.getTotal();
+			qpx += toMerge.getQpx();
+		}
+
+		@Override
+		public Object clone() throws CloneNotSupportedException {
+
+			QpxData info = (QpxData) super.clone();
+			info.setQpx(this.qpx);
+			info.setTotal(this.total);
+			return info;
 		}
 	}
 

@@ -45,6 +45,10 @@ public class CasKeys {
 		return keyIndex < keys.length; 
 	}
 
+	public void reset(){
+		keyIndex = 0;
+	}
+
 	@Override
 	public String toString() {
 		return key;

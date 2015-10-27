@@ -1,25 +1,20 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
+import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
-import com.dianping.swallow.common.server.monitor.data.MapRetriever;
-import com.dianping.swallow.common.server.monitor.data.MapStatisable;
-import com.dianping.swallow.common.server.monitor.data.QPX;
-import com.dianping.swallow.common.server.monitor.data.StatisType;
-import com.dianping.swallow.common.server.monitor.data.Statisable;
+import com.dianping.swallow.common.server.monitor.data.*;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author mengwenchao
@@ -234,7 +229,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 		Statisable<M> result = map.get(key);
 
 		if (result == null) {
-			throw new UnfoundKeyException(key);
+			return Collections.emptySet();
 		}
 
 		if (result instanceof MapRetriever) {
@@ -293,5 +288,115 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 
 		return JsonBinder.getNonEmptyBinder().toPrettyJson(map.get(key));
 	}
+
+//	@Override
+//	public void merge(Mergeable merge){
+//
+//		checkType(merge);
+//
+//		AbstractTotalMapStatisable<M,V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
+//
+//		if(hasTotal(this) && hasTotal(toMerge)){
+//
+//			getValue(MonitorData.TOTAL_KEY).merge(toMerge.map.get(MonitorData.TOTAL_KEY));
+//			return;
+//		}
+//
+//		for(java.util.Map.Entry<String, Statisable<M>> entry : toMerge.map.entrySet()){
+//
+//			String key = entry.getKey();
+//			Mergeable value = entry.getValue();
+//
+//			if(hasTotal(this)){
+//				getValue(MonitorData.TOTAL_KEY).merge(value);
+//				continue;
+//			}
+//			Statisable<M> myValue = getOrCreate(key);
+//			myValue.merge(value);
+//		}
+//	}
+
+	@Override
+	public void merge(Mergeable merge){
+
+		AbstractTotalMapStatisable<M,V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
+
+		for(java.util.Map.Entry<String, Statisable<M>> entry : toMerge.map.entrySet()){
+
+			String key = entry.getKey();
+			Mergeable value = entry.getValue();
+
+			Statisable<M> myValue = map.get(key);
+			if(myValue == null){
+				myValue= createValue();
+				map.put(key, myValue);
+			}
+			myValue.merge(value);
+		}
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+
+		AbstractTotalMapStatisable<M,V> newMap = (AbstractTotalMapStatisable<M,V>) super.clone();
+
+		for(java.util.Map.Entry<String, Statisable<M>> entry : map.entrySet()){
+
+			String key = entry.getKey();
+			Statisable<M> value = entry.getValue();
+			newMap.map.put(key, (Statisable<M>) value.clone());
+		}
+
+		return map;
+	}
+
+	@Override
+	public void merge(String key, KeyMergeable merge){
+
+		checkType(merge);
+
+		AbstractTotalMapStatisable<M,V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
+		Statisable<M> value = toMerge.map.get(key);
+		if( value == null){
+			logger.warn("[merge][value null]" + key + "," + merge );
+			return;
+		}
+
+		Statisable<M> myValue = getOrCreate(key);
+		if(myValue instanceof KeyMergeable && value instanceof KeyMergeable){
+
+			((KeyMergeable)myValue).merge(key, (KeyMergeable)value);
+		}else{
+
+			myValue.merge(value);
+		}
+	}
+
+	private void checkType(Object merge) {
+
+		if(!(merge instanceof AbstractTotalMapStatisable)){
+			throw new IllegalArgumentException("wrong type : " + merge.getClass());
+		}
+	}
+
+	private boolean hasTotal(AbstractTotalMapStatisable merge){
+
+		Set<String> keys = merge.map.keySet();
+		if(keys != null && keys.contains(MonitorData.TOTAL_KEY)){
+			return true;
+		}
+		return false;
+	}
+
+	private Statisable<M> getOrCreate(String key) {
+		Statisable<M> m = map.get(key);
+		if(m == null){
+			m= createValue();
+			map.put(key, m);
+		}
+		return m;
+	}
+
+	protected abstract Statisable<M> createValue();
 
 }

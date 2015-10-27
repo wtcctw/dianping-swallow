@@ -17,4 +17,9 @@ public class MessageInfoTotalMapStatis extends AbstractTotalMapStatisable<Messag
 		return MessageInfoStatis.class;
 	}
 
+	@Override
+	protected Statisable<MessageInfo> createValue() {
+		return new MessageInfoStatis();
+	}
+
 }

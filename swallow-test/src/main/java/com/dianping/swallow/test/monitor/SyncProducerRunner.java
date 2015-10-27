@@ -24,7 +24,7 @@ public class SyncProducerRunner {
 
 				String msg = new Date() + "message";
 				producer.sendMessage(msg);
-				Thread.sleep(20);
+				Thread.sleep(400);
 				System.out.println("*****************");
 			}
 		} catch (Exception e) {

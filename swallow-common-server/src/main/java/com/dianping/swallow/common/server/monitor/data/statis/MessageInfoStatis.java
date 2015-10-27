@@ -1,25 +1,26 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.SortedMap;
-import java.util.concurrent.ConcurrentSkipListMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.dianping.swallow.common.internal.monitor.Mergeable;
+import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map.Entry;
+import java.util.NavigableMap;
+import java.util.SortedMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * @author mengwenchao
  *
  *         2015年5月19日 下午5:46:28
  */
-public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implements Statisable<MessageInfo> {
+public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implements Statisable<MessageInfo>, Mergeable {
 
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -278,4 +279,24 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 		throw new UnsupportedOperationException("unsupported operation getValue()");
 	}
 
+	@Override
+	public void merge(Mergeable merge) {
+		if (!(merge instanceof MessageInfoStatis)) {
+			throw new IllegalArgumentException("not MessageInfo, but " + merge.getClass());
+		}
+		MessageInfoStatis messageInfoStatis = (MessageInfoStatis)merge;
+		MapUtil.mergeMap(this.col, messageInfoStatis.col);
+		MapUtil.mergeMap(this.qpxMap, messageInfoStatis.qpxMap);
+		MapUtil.mergeMapOfTypeLong(this.delayMap, messageInfoStatis.delayMap);
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+
+		MessageInfoStatis infoStatis = (MessageInfoStatis) super.clone();
+		infoStatis.col = new ConcurrentSkipListMap<Long, MessageInfo>(this.col);
+		infoStatis.qpxMap = new ConcurrentSkipListMap<Long, QpxData>(this.qpxMap);
+		infoStatis.delayMap = new ConcurrentSkipListMap<Long, Long>(this.delayMap);
+		return infoStatis;
+	}
 }

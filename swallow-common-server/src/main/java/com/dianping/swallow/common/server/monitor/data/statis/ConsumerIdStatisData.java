@@ -1,13 +1,15 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-import java.util.NavigableMap;
-import java.util.Set;
-
+import com.dianping.swallow.common.internal.monitor.KeyMergeable;
+import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.MapRetriever;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerIdData;
+
+import java.util.NavigableMap;
+import java.util.Set;
 
 /**
  * @author mengwenchao
@@ -51,11 +53,8 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 
 	@Override
 	public boolean isEmpty() {
-		
-		if(!sendMessages.isEmpty() || !ackMessages.isEmpty()){
-			return false;
-		}
-		return true;
+
+		return !(!sendMessages.isEmpty() || !ackMessages.isEmpty());
 	}
 
 	@Override
@@ -93,7 +92,7 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 	public Set<String> getKeys(CasKeys keys, StatisType type) {
 		
 		if(type  == null){
-			return sendMessages.getKeys(keys, type); 
+			return sendMessages.getKeys(keys, null);
 		}
 		switch(type){
 			case SEND:
@@ -109,7 +108,7 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 	public Object getValue(CasKeys keys, StatisType type) {
 
 		if(type == null){
-			return sendMessages.getValue(keys, type);
+			return sendMessages.getValue(keys, null);
 		}
 		
 		switch(type){
@@ -133,4 +132,39 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 		return getValue(keys, null);
 	}
 
+	@Override
+	public void merge(String key, KeyMergeable merge) {
+
+		checkType(merge);
+
+		ConsumerIdStatisData toMerge = (ConsumerIdStatisData) merge;
+		sendMessages.merge(key, toMerge.sendMessages);
+		ackMessages.merge(key, toMerge.ackMessages);
+	}
+
+	@Override
+	public void merge(Mergeable merge) {
+
+		checkType(merge);
+
+		ConsumerIdStatisData toMerge = (ConsumerIdStatisData) merge;
+
+
+		sendMessages.merge(toMerge.sendMessages);
+		ackMessages.merge(toMerge.ackMessages);
+	}
+
+	private void checkType(Mergeable merge) {
+		if(!(merge instanceof ConsumerIdStatisData)){
+			throw new IllegalArgumentException("wrong type " + merge.getClass());
+		}
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+		ConsumerIdStatisData clone = (ConsumerIdStatisData) super.clone();
+		clone.sendMessages = (MessageInfoTotalMapStatis) sendMessages.clone();
+		clone.ackMessages = (MessageInfoTotalMapStatis) ackMessages.clone();
+		return clone;
+	}
 }
