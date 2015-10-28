@@ -39,7 +39,7 @@ public class ServerEventTest extends MockTest {
 		alarmMeta.setIsSendBusiness(true);
 		alarmMeta.setAlarmTitle("消费端确认延时告警");
 		alarmMeta
-				.setAlarmTemplate("消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认延时{currentValue}延时大于阈值{expectedValue}(s)。[{date}]");
+				.setAlarmTemplate("消费客户端[TOPIC]{topic}[CONSUMERID]{consumerId}确认延时{currentValue}延时大于阈值{expectedValue}(s)。");
 		alarmMeta.setAlarmDetail("");
 		alarmMeta.setMaxTimeSpan(120);
 		alarmMeta.setDaySpanBase(10);

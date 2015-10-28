@@ -42,6 +42,7 @@ public class ProducerIpStatsAlarmer extends
 	@Override
 	public void doInitialize() throws Exception {
 		super.doInitialize();
+		checkInterval = 30 * 60 * 1000;
 		producerDataRetriever.registerListener(this);
 	}
 
@@ -67,7 +68,7 @@ public class ProducerIpStatsAlarmer extends
 	@Override
 	protected void checkUnSureLastRecords(ProducerIpStatsDataKey statsDataKey) {
 		long avgQps = pIpStatsDataService.findAvgQps(statsDataKey.getTopicName(), statsDataKey.getIp(),
-				getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(getPreNDayKey(1, 0)));
+				getTimeKey(getPreNDayKey(1, checkInterval)), getTimeKey(getPreNDayKey(1, 0)));
 
 		if (avgQps > 0) {
 			report(statsDataKey);
@@ -101,7 +102,7 @@ public class ProducerIpStatsAlarmer extends
 			ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
 			clientEvent.setTopicName(statsDataKey.getTopicName()).setIp(statsDataKey.getIp())
 					.setClientType(ClientType.CLIENT_SENDER).setEventType(EventType.PRODUCER).setCreateTime(new Date())
-					.setCheckInterval(CHECK_TIMESPAN);
+					.setCheckInterval(checkInterval);
 			eventReporter.report(clientEvent);
 		}
 	}
