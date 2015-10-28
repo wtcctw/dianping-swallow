@@ -89,6 +89,7 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 				for (int i = offset; i < rightIndex; ++i) {
 					criterias.add(Criteria.where(TOPIC).is(topics[i]));
 				}
+				offset = 0;
 
 				query.addCriteria(Criteria.where(TOPIC).exists(true)
 						.orOperator(criterias.toArray(new Criteria[criterias.size()])));

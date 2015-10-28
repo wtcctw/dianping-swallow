@@ -117,7 +117,7 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 			Map<String, StatsData> accuStatsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
 
 			for (String consumerid : consumerids) {
-				ConsumerIdStatisData result = (ConsumerIdStatisData) consumerDataRetrieverWrapper.getValue(
+				ConsumerIdStatisData result = consumerDataRetrieverWrapper.getValue(
 						ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid);
 
 				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
