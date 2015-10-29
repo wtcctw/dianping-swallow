@@ -65,11 +65,10 @@ public class ConsumerIpStatsAlarmer extends
             for (String consumerId : consumerIds) {
                 ConsumerIpGroupStatsData ipGroupStatsData = cStatsDataWapper.getIpGroupStatsDatas(topicName,
                         consumerId, getLastTimeKey(), false);
-                checkIpGroup(ipGroupStatsData);
+                checkIpGroupStats(ipGroupStatsData);
             }
         }
-        alarmSureRecords();
-        alarmUnSureRecords();
+        alarmIpStatsData();
     }
 
     @Override

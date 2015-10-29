@@ -5,4 +5,9 @@ package com.dianping.swallow.web.alarmer.container;
  *         2015/10/28  下午5:58.
  */
 public interface IpResourceContainer {
+
+    String getApplicationName(String ip);
+
+
+
 }

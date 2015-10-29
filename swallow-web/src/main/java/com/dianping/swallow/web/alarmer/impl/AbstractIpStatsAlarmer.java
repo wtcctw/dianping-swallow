@@ -32,17 +32,15 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
     @Autowired
     protected ResourceContainer resourceContainer;
 
-    private Map<T, Long> firstCandidates = new ConcurrentHashMap<T, Long>();
-
-    private Map<T, Long> secondCandidates = new ConcurrentHashMap<T, Long>();
-
-    private Map<T, Long> whiteLists = new ConcurrentHashMap<T, Long>();
+    private Map<T, IpStatusData> ipStatusDatas = new ConcurrentHashMap<T, IpStatusData>();
 
     protected long checkInterval = 10 * 60 * 1000;
 
-    protected long qpsThreshold = 20;
+    protected long qpsThreshold = 3;
 
-    public void checkIpGroup(X ipGroupStatsData) {
+    protected long totalThreshold = 15;
+
+    public void checkIpGroupStats(X ipGroupStatsData) {
         if (ipGroupStatsData == null) {
             return;
         }
@@ -50,63 +48,52 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
             return;
         }
-        boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
+        boolean hasGroupStatsData = ipGroupStatsData.hasStatsData(qpsThreshold, totalThreshold);
         for (K ipStatsData : ipStatsDatas) {
             boolean hasStatsData = ipStatsData.hasStatsData();
-            @SuppressWarnings("unchecked")
             T key = (T) ipStatsData.createStatsDataKey();
+            IpStatusData ipStatusData = ipStatusDatas.get(key);
+            if (ipStatusData == null) {
+                ipStatusData = new IpStatusData();
+            }
             if (!hasStatsData) {
                 if (hasGroupStatsData) {
-                    if (!firstCandidates.containsKey(key)) {
-                        firstCandidates.put(key, System.currentTimeMillis());
-                    } else {
-                        if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
-                            firstCandidates.put(key, System.currentTimeMillis());
-                        }
-                    }
+                    ipStatusDatas.put(key, ipStatusData.updateNoDataTime(getCurrentTimeMillis()));
                 } else {
-                    if (ipStatsDatas.size() == 1) {
-                        if (!secondCandidates.containsKey(key)) {
-                            secondCandidates.put(key, System.currentTimeMillis());
-                        } else {
-                            if (whiteLists.containsKey(key) && whiteLists.get(key) > secondCandidates.get(key)) {
-                                secondCandidates.put(key, System.currentTimeMillis());
-                            }
-                        }
+                    if (ipStatsDatas.size() > 1) {
+                        //都没有数据不考虑
+                    } else {
+                        ipStatusDatas.put(key, ipStatusData.updateSubNoDataTime(getCurrentTimeMillis()));
                     }
                 }
             } else {
-                whiteLists.put(key, System.currentTimeMillis());
+                ipStatusDatas.put(key, ipStatusData.setHasDataTime(getCurrentTimeMillis()));
             }
         }
+
     }
 
-    public void alarmSureRecords() {
-        Iterator<Entry<T, Long>> iterator = firstCandidates.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Entry<T, Long> checkRecord = iterator.next();
-            T statsDataKey = checkRecord.getKey();
-            long lastRecordTime = checkRecord.getValue();
-            if (System.currentTimeMillis() - lastRecordTime < checkInterval) {
-                continue;
-            }
-            iterator.remove();
-            report(statsDataKey);
-        }
+    private long getCurrentTimeMillis() {
+        return System.currentTimeMillis();
     }
 
-    public void alarmUnSureRecords() {
-        Iterator<Entry<T, Long>> statsDataIterator = secondCandidates.entrySet().iterator();
-        while (statsDataIterator.hasNext()) {
-            Entry<T, Long> checkRecord = statsDataIterator.next();
-            T statsDataKey = checkRecord.getKey();
-            long lastRecordTime = checkRecord.getValue();
-
-            if (System.currentTimeMillis() - lastRecordTime < checkInterval) {
-                continue;
+    public void alarmIpStatsData() {
+        Iterator<Entry<T, IpStatusData>> itStatusData = ipStatusDatas.entrySet().iterator();
+        while (itStatusData.hasNext()) {
+            Entry<T, IpStatusData> statusDataEntry = itStatusData.next();
+            T statsDataKey = statusDataEntry.getKey();
+            IpStatusData ipStatusData = statusDataEntry.getValue();
+            if (ipStatusData.getNoDataCount() > 0) {
+                if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
+                    itStatusData.remove();
+                    report(statsDataKey);
+                }
+            } else if (ipStatusData.getSubNoDataCount() > 0) {
+                if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
+                    itStatusData.remove();
+                    checkUnSureLastRecords(statsDataKey);
+                }
             }
-            statsDataIterator.remove();
-            checkUnSureLastRecords(statsDataKey);
         }
     }
 
@@ -115,5 +102,93 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
     protected abstract boolean isReport(T statsDataKey);
 
     protected abstract void report(T statsDataKey);
+
+    class IpStatusData {
+
+        private long hasDataTime;
+
+        private long noDataTime;
+
+        private int noDataCount;
+
+        private long subNoDataTime;
+
+        private int subNoDataCount;
+
+        public IpStatusData updateNoDataTime(long currentTimeMillis) {
+            if (noDataCount != 0) {
+                if (noDataTime < hasDataTime) {
+                    noDataCount = 0;
+                    noDataTime = currentTimeMillis;
+                } else {
+                    noDataCount++;
+                }
+            } else {
+                noDataCount++;
+                noDataTime = currentTimeMillis;
+            }
+            return this;
+        }
+
+        public IpStatusData updateSubNoDataTime(long currentTimeMillis) {
+            if (subNoDataCount == 0) {
+                if (subNoDataTime < hasDataTime) {
+                    subNoDataCount = 0;
+                    subNoDataTime = currentTimeMillis;
+                } else {
+                    subNoDataCount++;
+                }
+            } else {
+                subNoDataCount++;
+                subNoDataTime = currentTimeMillis;
+            }
+            return this;
+        }
+
+        public long getHasDataTime() {
+            return hasDataTime;
+        }
+
+        public IpStatusData setHasDataTime(long hasDataTime) {
+            this.hasDataTime = hasDataTime;
+            return this;
+        }
+
+        public long getNoDataTime() {
+            return noDataTime;
+        }
+
+        public IpStatusData setNoDataTime(long noDataTime) {
+            this.noDataTime = noDataTime;
+            return this;
+        }
+
+        public int getNoDataCount() {
+            return noDataCount;
+        }
+
+        public IpStatusData setNoDataCount(int noDataCount) {
+            this.noDataCount = noDataCount;
+            return this;
+        }
+
+        public long getSubNoDataTime() {
+            return subNoDataTime;
+        }
+
+        public IpStatusData setSubNoDataTime(long subNoDataTime) {
+            this.subNoDataTime = subNoDataTime;
+            return this;
+        }
+
+        public int getSubNoDataCount() {
+            return subNoDataCount;
+        }
+
+        public IpStatusData setSubNoDataCount(int subNoDataCount) {
+            this.subNoDataCount = subNoDataCount;
+            return this;
+        }
+    }
 
 }
