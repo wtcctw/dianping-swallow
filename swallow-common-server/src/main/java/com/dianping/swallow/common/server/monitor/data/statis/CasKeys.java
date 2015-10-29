@@ -46,7 +46,7 @@ public class CasKeys {
 	}
 
 	public void reset(){
-		keyIndex = 0;
+		keyIndex = 1;
 	}
 
 	@Override
