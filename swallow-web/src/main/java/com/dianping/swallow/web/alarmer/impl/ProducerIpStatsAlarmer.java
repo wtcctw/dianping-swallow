@@ -44,7 +44,7 @@ public class ProducerIpStatsAlarmer extends
     @Override
     public void doInitialize() throws Exception {
         super.doInitialize();
-        checkInterval = 10 * 60 * 1000;
+        checkInterval = 2 * 60 * 1000;
         producerDataRetriever.registerListener(this);
     }
 
@@ -85,6 +85,9 @@ public class ProducerIpStatsAlarmer extends
     @Override
     protected boolean isReport(ProducerIpStatsDataKey statsDataKey) {
         TopicResource topicResource = resourceContainer.findTopicResource(statsDataKey.getTopicName());
+        if(topicResource==null){
+            return false;
+        }
         if (topicResource.isProducerAlarm()) {
             List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
             if (ipInfos == null || ipInfos.isEmpty()) {
@@ -129,6 +132,7 @@ public class ProducerIpStatsAlarmer extends
                 ipGroupStatsData = ipStatsDataMap.get(appName);
             } else {
                 ipGroupStatsData = new ProducerIpGroupStatsData();
+                ipStatsDataMap.put(appName,ipGroupStatsData);
             }
             ipGroupStatsData.addIpStatsData(ipStatsData);
         }

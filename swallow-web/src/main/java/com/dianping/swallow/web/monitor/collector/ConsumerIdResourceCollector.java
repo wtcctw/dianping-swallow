@@ -133,7 +133,7 @@ public class ConsumerIdResourceCollector extends AbstractRealTimeCollector imple
                 logger.info("[updateConsumerIdResource] insert consumerIdResource {}", consumerIdResource.toString());
             } else {
                 consumerIdResource.setConsumerIpInfos(currentIpInfos);
-                cResourceService.insert(consumerIdResource);
+                cResourceService.update(consumerIdResource);
                 logger.info("[updateConsumerIdResource] update consumerIdResource {}", consumerIdResource.toString());
             }
         }

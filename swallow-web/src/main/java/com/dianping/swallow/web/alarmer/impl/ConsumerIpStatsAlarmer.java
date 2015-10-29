@@ -85,13 +85,16 @@ public class ConsumerIpStatsAlarmer extends
     @Override
     protected boolean isReport(ConsumerIpStatsDataKey statsDataKey) {
         TopicResource topicResource = resourceContainer.findTopicResource(statsDataKey.getTopicName());
-        ConsumerIdResource ConsumerIdResource = resourceContainer.findConsumerIdResource(statsDataKey.getTopicName(),
+        ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(statsDataKey.getTopicName(),
                 statsDataKey.getConsumerId());
+        if (topicResource == null || consumerIdResource == null) {
+            return false;
+        }
         if (!topicResource.isConsumerAlarm()) {
             return false;
         }
-        if (ConsumerIdResource.isAlarm()) {
-            List<IpInfo> ipInfos = ConsumerIdResource.getConsumerIpInfos();
+        if (consumerIdResource.isAlarm()) {
+            List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
             if (ipInfos == null || ipInfos.isEmpty()) {
                 return true;
             }

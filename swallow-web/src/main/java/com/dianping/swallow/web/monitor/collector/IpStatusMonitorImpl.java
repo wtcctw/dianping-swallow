@@ -145,9 +145,10 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
     }
 
     public List<IpInfo> getRelatedIpInfo(T key) {
-        List<IpInfo> ipInfos = getLastIpInfos(key);
-        if (ipInfos == null) {
-            ipInfos = new ArrayList<IpInfo>();
+        List<IpInfo> lastIpInfos = getLastIpInfos(key);
+        List<IpInfo> ipInfos = new ArrayList<IpInfo>();
+        if (lastIpInfos != null) {
+            ipInfos.addAll(lastIpInfos);
         }
         Set<String> allIps = this.getAllIps(key);
         if (allIps != null && !allIps.isEmpty()) {

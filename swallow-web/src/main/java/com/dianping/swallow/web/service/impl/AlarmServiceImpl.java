@@ -84,8 +84,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
         if (!result.isSuccess()) {
             result = httpService.httpPost(getSmsUrl(), params);
         }
-        if(StringUtils.isNotBlank(result.getResponseBody())){
-            if(!result.getResponseBody().contains("200")){
+        if (StringUtils.isNotBlank(result.getResponseBody())) {
+            if (!result.getResponseBody().contains("200")) {
                 result.setResultType(ResultType.FAILED);
             }
         }
@@ -102,8 +102,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
         if (!result.isSuccess()) {
             result = httpService.httpPost(getWeiXinUrl(), params);
         }
-        if(StringUtils.isNotBlank(result.getResponseBody())){
-            if(!result.getResponseBody().contains("true")){
+        if (StringUtils.isNotBlank(result.getResponseBody())) {
+            if (!result.getResponseBody().contains("true")) {
                 result.setResultType(ResultType.FAILED);
             }
         }
@@ -120,8 +120,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
         if (!result.isSuccess()) {
             result = httpService.httpPost(getMailUrl(), params);
         }
-        if(StringUtils.isNotBlank(result.getResponseBody())){
-            if(!result.getResponseBody().contains("true")){
+        if (StringUtils.isNotBlank(result.getResponseBody())) {
+            if (!result.getResponseBody().contains("true")) {
                 result.setResultType(ResultType.FAILED);
             }
         }
