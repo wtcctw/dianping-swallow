@@ -88,9 +88,9 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	@Autowired
 	private CmdbService cmdbService;
 
-	private int interval = 120;// 秒
+	private int interval = 300;// 秒
 
-	private int delay = 5;
+	private int delay = 30;
 
 	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
 			.getThreadFactory(FACTORY_NAME));
