@@ -2,8 +2,8 @@ package com.dianping.swallow.consumerserver.buffer;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -18,7 +18,7 @@ import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
  */
 public abstract class AbstractRetrieveTask implements Runnable {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 	
 	protected RetriveStrategy retriveStrategy;
 	protected ConsumerInfo consumerInfo;

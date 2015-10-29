@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ import com.dianping.swallow.web.controller.utils.UserUtils;
 @Component
 public class AuthenticationValidatorFilter implements  Filter<TopicApplyDto, ValidatorFilterResult> {
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 	
 	@Autowired
 	private UserUtils userUtils;

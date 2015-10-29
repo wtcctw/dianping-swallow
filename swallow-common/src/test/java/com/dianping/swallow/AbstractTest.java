@@ -9,7 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,7 +26,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  */
 public abstract class AbstractTest {
 	
-	protected Logger logger = Logger.getLogger(getClass());
+	protected Logger logger = LogManager.getLogger(getClass());
 	
 	private final int localWebPort = 8080;
 	

@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * 管理所有swallow线程，提供jmx监控
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MQThreadFactory implements ThreadFactory, Closeable {
 
-   private final static Logger                      logger            = LoggerFactory.getLogger(MQThreadFactory.class);
+   private final static Logger                      logger            = LogManager.getLogger(MQThreadFactory.class);
 
    private static ThreadGroup                       topThreadGroup = new ThreadGroup("swallow-top");
    private final static String                      PREFIX_DEFAULT = "swallow-";

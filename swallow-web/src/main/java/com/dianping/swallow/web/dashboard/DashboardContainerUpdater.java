@@ -5,7 +5,6 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
-import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.container.ResourceContainer;
@@ -21,8 +20,8 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +63,8 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 	private Map<TotalDataKey, TotalData> totalDataMap = new ConcurrentHashMap<TotalDataKey, TotalData>();
 
 	private ScheduledExecutorService scheduled = null;
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	private AtomicBoolean delayeven = new AtomicBoolean(false);
 

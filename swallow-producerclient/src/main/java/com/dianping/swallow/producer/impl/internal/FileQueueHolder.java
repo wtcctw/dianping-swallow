@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.packet.Packet;
 import com.geekhua.filequeue.Config;
@@ -16,7 +16,7 @@ import com.geekhua.filequeue.FileQueueImpl;
 
 public class FileQueueHolder {
 	
-    private static final Logger                   logger                 = LoggerFactory
+    private static final Logger                   logger                 = LogManager
                                                                                  .getLogger(FileQueueHolder.class);
 
     private static  long                     	  DEFAULT_FILEQUEUE_SIZE = 100 * 1024 * 1024;

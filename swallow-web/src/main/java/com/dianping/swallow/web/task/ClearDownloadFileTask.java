@@ -7,8 +7,8 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,7 @@ public class ClearDownloadFileTask {
 
 	private static final String TIMEFORMATE = "yyyyMMddHHmmss";
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LogManager.getLogger(getClass());
 	
 	@Resource(name = "messageDumpService")
 	private MessageDumpService messageDumpService;

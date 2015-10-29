@@ -74,6 +74,7 @@ public class TopicController extends AbstractMenuController {
 				return topicResourceService.findByAdministrator(offset, limit, username);
 			}
 		} else {
+			logger.info("-------------------------------------------");
 			return topicResourceService.find(offset, limit, topic, producerIp, inactive);
 		}
 

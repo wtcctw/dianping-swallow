@@ -148,7 +148,7 @@ public class ProducerTest {
 
       ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, exceptionRemoteService, 5000, 1, 5000, createProducerProcessor(config));
 
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 500; i++) {
          String ret = producer.sendMessage(content);
          assertNull(ret);
       }

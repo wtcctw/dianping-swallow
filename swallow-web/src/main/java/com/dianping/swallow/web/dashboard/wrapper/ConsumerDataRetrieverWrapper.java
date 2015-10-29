@@ -3,8 +3,8 @@ package com.dianping.swallow.web.dashboard.wrapper;
 import java.util.Collections;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ public class ConsumerDataRetrieverWrapper {
 
 	public static final String TOTAL = "total";
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	public Set<String> getKey(String... keys) {
 

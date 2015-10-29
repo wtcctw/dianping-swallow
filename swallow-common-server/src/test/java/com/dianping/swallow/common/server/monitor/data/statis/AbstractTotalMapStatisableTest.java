@@ -77,8 +77,8 @@ public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
         String consumerId = consumerIds[0];
         String ip = ips[0];
 
-        method3("/Users/mingdongli/tmp/all.txt", consumerAllData.toString());
-        method3("/Users/mingdongli/tmp/total.txt", consumerAllData.getKeys(new CasKeys("total")).toString());
+        method3("/Users/mingdongli/tmp/consumer/all.txt", consumerAllData.toString());
+        method3("/Users/mingdongli/tmp/consumer/total.txt", consumerAllData.getKeys(new CasKeys("total")).toString());
 
         System.out.println(consumerAllData.getKeys(new CasKeys()));
         System.out.println(consumerAllData.getKeys(new CasKeys(server)));
@@ -89,15 +89,15 @@ public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
         System.out.println(consumerAllData.getKeys(new CasKeys("total",topic, consumerId)));
         ConsumerIdStatisData cisd = (ConsumerIdStatisData) consumerAllData.getValue(new CasKeys(server, topic,
                 consumerId));
-        method3("/Users/mingdongli/tmp/cids.txt", cisd.toString());
+        method3("/Users/mingdongli/tmp/consumer/cids.txt", cisd.toString());
 
-        method3("/Users/mingdongli/tmp/topic.txt", consumerAllData.getValue(new CasKeys(server)).toString());
-        method3("/Users/mingdongli/tmp/cid.txt", consumerAllData.getValue(new CasKeys(server, topic)).toString());
-        method3("/Users/mingdongli/tmp/ip.txt", consumerAllData.getValue(new CasKeys(server, topic, consumerId)).toString());
-        method3("/Users/mingdongli/tmp/iplevel.txt", consumerAllData.getValue(new CasKeys(server, topic, consumerId, ip)).toString());
-        method3("/Users/mingdongli/tmp/topicmerge.txt", consumerAllData.getValue(new CasKeys("total")).toString());
-        method3("/Users/mingdongli/tmp/cidmerge.txt", consumerAllData.getValue(new CasKeys("total", topic)).toString());
-        method3("/Users/mingdongli/tmp/ipmerge.txt", consumerAllData.getValue(new CasKeys("total", topic, consumerId)).toString());
+        method3("/Users/mingdongli/tmp/consumer/topic.txt", consumerAllData.getValue(new CasKeys(server)).toString());
+        method3("/Users/mingdongli/tmp/consumer/cid.txt", consumerAllData.getValue(new CasKeys(server, topic)).toString());
+        method3("/Users/mingdongli/tmp/consumer/ip.txt", consumerAllData.getValue(new CasKeys(server, topic, consumerId)).toString());
+        method3("/Users/mingdongli/tmp/consumer/iplevel.txt", consumerAllData.getValue(new CasKeys(server, topic, consumerId, ip)).toString());
+        method3("/Users/mingdongli/tmp/consumer/topicmerge.txt", consumerAllData.getValue(new CasKeys("total")).toString());
+        method3("/Users/mingdongli/tmp/consumer/cidmerge.txt", consumerAllData.getValue(new CasKeys("total", topic)).toString());
+        method3("/Users/mingdongli/tmp/consumer/ipmerge.txt", consumerAllData.getValue(new CasKeys("total", topic, consumerId)).toString());
     }
 
     @Test

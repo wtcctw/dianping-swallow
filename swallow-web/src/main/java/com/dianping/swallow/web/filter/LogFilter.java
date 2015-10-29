@@ -26,8 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.web.Log4jWebSupport;
+import org.apache.logging.log4j.web.WebLoggerContextUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -38,138 +40,145 @@ import com.dianping.swallow.web.model.log.Log;
 
 /**
  * @author mingdongli
- *
+ *         <p/>
  *         2015年9月23日上午10:55:39
  */
 public class LogFilter implements Filter {
 
-	private ServletContext context;
+    private ServletContext context;
 
-	private UserUtils extractUsernameUtils;
+    private UserUtils extractUsernameUtils;
 
-	private List<Pattern> excludePatterns = new LinkedList<Pattern>();
+    private List<Pattern> excludePatterns = new LinkedList<Pattern>();
 
-	private Set<String> includePatterns = new HashSet<String>();
+    private Set<String> includePatterns = new HashSet<String>();
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LogManager.getLogger(LogFilter.class);
 
-	public void init(FilterConfig fConfig) throws ServletException {
+    public void init(FilterConfig fConfig) throws ServletException {
 
-		this.context = fConfig.getServletContext();
-		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
-		this.extractUsernameUtils = ctx.getBean(UserUtils.class);
+        this.context = fConfig.getServletContext();
+        ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
+        this.extractUsernameUtils = ctx.getBean(UserUtils.class);
 
-		String excludeUrl = fConfig.getInitParameter("excludeURLs");
-		String[] excludeUrls = excludeUrl.split(",");
-		for (String exclude : excludeUrls) {
-			if (exclude.contains("*")) {
-				exclude = exclude.replaceAll("\\*", ".\\*");
-			}
-			Pattern excludePattern = Pattern.compile(exclude);
-			excludePatterns.add(excludePattern);
-		}
+        String excludeUrl = fConfig.getInitParameter("excludeURLs");
+        String[] excludeUrls = excludeUrl.split(",");
+        for (String exclude : excludeUrls) {
+            if (exclude.contains("*")) {
+                exclude = exclude.replaceAll("\\*", ".\\*");
+            }
+            Pattern excludePattern = Pattern.compile(exclude);
+            excludePatterns.add(excludePattern);
+        }
 
-		String includeUrl = fConfig.getInitParameter("includeURLs");
-		String[] includeUrls = includeUrl.split(",");
-		includePatterns.addAll(Arrays.asList(includeUrls));
+        String includeUrl = fConfig.getInitParameter("includeURLs");
+        String[] includeUrls = includeUrl.split(",");
+        includePatterns.addAll(Arrays.asList(includeUrls));
 
-	}
+    }
 
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-			ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+            ServletException {
 
-		Log log = new Log();
+        Log log = new Log();
 
-		final HttpServletRequest httpRequest = (HttpServletRequest) request;
-		String username = extractUsernameUtils.getUsername(httpRequest);
-		String uri = httpRequest.getRequestURI();
-		String xforward = httpRequest.getHeader("X-Forwarded-For");
-		String ip = xforward != null ? xforward : httpRequest.getRemoteAddr();
-		BufferedRequestWrapper requestWrapper = new BufferedRequestWrapper(httpRequest);
+        final HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String username = extractUsernameUtils.getUsername(httpRequest);
+        String uri = httpRequest.getRequestURI();
+        String xforward = httpRequest.getHeader("X-Forwarded-For");
+        String ip = xforward != null ? xforward : httpRequest.getRemoteAddr();
+        BufferedRequestWrapper requestWrapper = new BufferedRequestWrapper(httpRequest);
 
-		String requestContent = new String(requestWrapper.getBuffer());
+        String requestContent = new String(requestWrapper.getBuffer());
 
-		if (matchExcludePatterns(uri) || !matchIncludeUrl(uri)) {
-			chain.doFilter(requestWrapper, response);
-			return;
-		}
+        if (matchExcludePatterns(uri) || !matchIncludeUrl(uri)) {
+            chain.doFilter(requestWrapper, response);
+            return;
+        }
 
-		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		final ByteArrayPrintWriter pw = new ByteArrayPrintWriter();
-		HttpServletResponse responseWrapper = new HttpServletResponseWrapper(httpResponse) {
-			public PrintWriter getWriter() {
-				return pw.getWriter();
-			}
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        final ByteArrayPrintWriter pw = new ByteArrayPrintWriter();
+        HttpServletResponse responseWrapper = new HttpServletResponseWrapper(httpResponse) {
+            public PrintWriter getWriter() {
+                return pw.getWriter();
+            }
 
-			public ServletOutputStream getOutputStream() {
-				return pw.getStream();
-			}
+            public ServletOutputStream getOutputStream() {
+                return pw.getStream();
+            }
 
-		};
+        };
 
-		chain.doFilter(requestWrapper, responseWrapper);
+        chain.doFilter(requestWrapper, responseWrapper);
 
-		byte[] bytes = pw.toByteArray();
-		try {
-			httpResponse.getOutputStream().write(bytes);
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Error when getOutputStream of httpResponse", e);
-			}
-			bytes = e.getMessage().getBytes();
-		}
+        byte[] bytes = pw.toByteArray();
+        try {
+            httpResponse.getOutputStream().write(bytes);
+        } catch (Exception e) {
+            if (logger.isErrorEnabled()) {
+                logger.error("Error when getOutputStream of httpResponse", e);
+            }
+            bytes = e.getMessage().getBytes();
+        }
 
-		String result = new String(bytes);
-		log.setCreateTime(new Date());
-		if (StringUtils.isBlank(requestContent)) {
-			HttpServletRequest req = (HttpServletRequest) request;
-			@SuppressWarnings("unchecked")
-			Map<String, String[]> param = req.getParameterMap();
-			if (param != null) {
-				requestContent = param.toString();
-			}
-		}
-		log.setParameter(requestContent);
-		log.setUrl(uri);
-		log.setUser(username);
-		log.setResult(result);
-		log.setIp(ip);
+        String result = new String(bytes);
+        log.setCreateTime(new Date());
+        if (StringUtils.isBlank(requestContent)) {
+            HttpServletRequest req = (HttpServletRequest) request;
+            @SuppressWarnings("unchecked")
+            Map<String, String[]> param = req.getParameterMap();
+            if (param != null) {
+                StringBuilder content = new StringBuilder(" {");
+                for(Map.Entry<String, String[]> entry : param.entrySet()){
+                    String[] value = entry.getValue();
+                    content.append(entry.getKey()).append(" = ").append(StringUtils.join(value, ",")).append(" ,");
+                }
+                int length = content.length();
+                requestContent = content.substring(0, length - 2) + " }";
+            }
+        }
+        log.setParameter(requestContent);
+        log.setUrl(uri);
+        log.setUser(username);
+        log.setResult(result);
+        log.setIp(ip);
 
-		logger.info(log.toString());
+        if (logger.isInfoEnabled()) {
+            logger.info(log.toString());
+        }
 
-	}
+    }
 
-	public void destroy() {
-		// ignore
-	}
+    public void destroy() {
+    }
 
-	private boolean matchIncludeUrl(String uri) {
+    private boolean matchIncludeUrl(String uri) {
 
-		for (String end : includePatterns) {
-			if (uri.contains(end)) {
-				return true;
-			}
-		}
+        for (String end : includePatterns) {
+            if (uri.contains(end)) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	private boolean matchExcludePatterns(String uri) {
-		Iterator<Pattern> patternIter = excludePatterns.iterator();
+    private boolean matchExcludePatterns(String uri) {
+        Iterator<Pattern> patternIter = excludePatterns.iterator();
 
-		while (patternIter.hasNext()) {
-			Pattern p = (Pattern) patternIter.next();
-			Matcher m = p.matcher(uri);
-			if (m.matches()) {
-				return true;
-			}
-		}
+        while (patternIter.hasNext()) {
+            Pattern p = (Pattern) patternIter.next();
+            Matcher m = p.matcher(uri);
+            if (m.matches()) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public void setExtractUsernameUtils(UserUtils extractUsernameUtils) {
-		this.extractUsernameUtils = extractUsernameUtils;
-	}
+    public void setExtractUsernameUtils(UserUtils extractUsernameUtils) {
+        this.extractUsernameUtils = extractUsernameUtils;
+    }
 
 }

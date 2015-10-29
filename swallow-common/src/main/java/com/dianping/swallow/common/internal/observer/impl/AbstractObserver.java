@@ -1,10 +1,9 @@
 package com.dianping.swallow.common.internal.observer.impl;
 
 
-
-import org.apache.log4j.Logger;
-
 import com.dianping.swallow.common.internal.observer.Observer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author mengwenchao
@@ -13,6 +12,6 @@ import com.dianping.swallow.common.internal.observer.Observer;
  */
 public abstract class AbstractObserver implements Observer{
 
-	protected Logger logger = Logger.getLogger(getClass());
+	protected Logger logger = LogManager.getLogger(getClass());
 	
 }

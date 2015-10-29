@@ -9,8 +9,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.MongoClient;
@@ -25,7 +25,7 @@ import com.mongodb.ServerAddress;
  */
 public class MongoContainer {
 	
-	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+	protected final Logger logger     = LogManager.getLogger(getClass());
 
 	
 	private MongoClientOptions mongoOptions;

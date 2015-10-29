@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NetUtil {
 
-	private static final Logger logger = LoggerFactory.getLogger(NetUtil.class);
+	private static final Logger logger = LogManager.getLogger(NetUtil.class);
 
 	public static final String IP = getFirstNoLoopbackIP4Address();
 

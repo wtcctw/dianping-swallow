@@ -3,8 +3,8 @@ package com.dianping.swallow.consumerserver.auth.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
@@ -16,7 +16,7 @@ import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
  */
 public class ConsumerAuthControllerImpl implements ConsumerAuthController, ConfigChangeListener {
 
-    private static final Logger logger        = LoggerFactory.getLogger(ConsumerAuthControllerImpl.class);
+    private static final Logger logger        = LogManager.getLogger(ConsumerAuthControllerImpl.class);
 
     private static final String IP_SPLIT   = ";";
 

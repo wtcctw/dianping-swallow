@@ -1,9 +1,8 @@
 package com.dianping.swallow.web.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -13,6 +12,6 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
  */
 public class AbstractSwallowService extends AbstractLifecycle{
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 	
 }

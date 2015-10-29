@@ -3,6 +3,7 @@ package com.dianping.swallow.common.internal.util;
 import java.io.File;
 
 import com.dianping.cat.Cat;
+import com.dianping.swallow.common.internal.config.LoggerLoader;
 import com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler;
 
 /**
@@ -15,6 +16,7 @@ public class SwallowHelper {
 	public static void initialize(){
 		
 		new DefaultThreadExceptionHandler();
+		LoggerLoader.init();
 		Cat.initialize(new File(Cat.getCatHome(), "client.xml"));
 	}
 
