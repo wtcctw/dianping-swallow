@@ -3,7 +3,6 @@ package com.dianping.swallow.web.alarmer.impl;
 import java.util.*;
 
 import com.dianping.swallow.web.alarmer.container.IpResourceContainer;
-import com.dianping.swallow.web.model.resource.IpResource;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

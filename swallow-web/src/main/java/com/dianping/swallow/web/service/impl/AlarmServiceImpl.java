@@ -57,6 +57,8 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
     private static final String NEW_LINE_SIGN = "\n";
 
+    private static final String MESSAGE_HEAD = "Swallow告警信息：";
+
     private static final String ALARM_EVENTID_CATEGORY = "alarmEventId";
 
     private String mailUrl;
@@ -151,7 +153,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
             return false;
         }
         String title = getTitle(alarm.getNumber(), alarm.getTitle());
-        ResultType resultType = sendWeiXin(receiver, title, getBody(alarm.getBody()));
+        ResultType resultType = sendWeiXin(receiver, title, MESSAGE_HEAD + title + NEW_LINE_SIGN + alarm.getBody());
         alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.WEIXIN));
         return resultType.isSuccess();
     }

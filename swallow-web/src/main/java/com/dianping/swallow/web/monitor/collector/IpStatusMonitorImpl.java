@@ -63,51 +63,32 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
     }
 
     @Override
-    public boolean isChanged(T key, List<IpInfo> currIpInfos) {
-        if (lastIpInfoDatas.containsKey(key)) {
-            List<IpInfo> lastIpInfos = lastIpInfoDatas.get(key);
-            if (currIpInfos == null && lastIpInfos != null) {
+    public boolean isChanged(List<IpInfo> lastIpInfos, List<IpInfo> currIpInfos) {
+        if (currIpInfos == null && lastIpInfos != null) {
+            return true;
+        } else if (currIpInfos != null && lastIpInfos == null) {
+            return true;
+        } else if (currIpInfos == null && lastIpInfos == null) {
+            return false;
+        } else {
+            if (currIpInfos.size() != lastIpInfos.size()) {
                 return true;
-            } else if (currIpInfos != null && lastIpInfos == null) {
-                return true;
-            } else if (currIpInfos == null && lastIpInfos == null) {
-                return false;
             } else {
-                if (currIpInfos.size() != lastIpInfos.size()) {
-                    return true;
-                } else {
-                    for (IpInfo currIpInfo : currIpInfos) {
-                        boolean isEqual = false;
-                        for (IpInfo lastIpInfo : lastIpInfos) {
-                            if (currIpInfo.equals(lastIpInfo)) {
-                                isEqual = true;
-                                break;
-                            }
-                        }
-                        if (!isEqual) {
-                            return true;
+                for (IpInfo currIpInfo : currIpInfos) {
+                    boolean isEqual = false;
+                    for (IpInfo lastIpInfo : lastIpInfos) {
+                        if (currIpInfo.equals(lastIpInfo)) {
+                            isEqual = true;
+                            break;
                         }
                     }
-                    return false;
+                    if (!isEqual) {
+                        return true;
+                    }
                 }
+                return false;
             }
         }
-        return true;
-    }
-
-    @Override
-    public boolean isNeedLoaded(T key) {
-        return !lastIpInfoDatas.containsKey(key);
-    }
-
-    @Override
-    public void setLastIpInfos(T key, List<IpInfo> lastIpInfos) {
-        lastIpInfoDatas.put(key, lastIpInfos);
-    }
-
-    @Override
-    public List<IpInfo> getLastIpInfos(T key) {
-        return lastIpInfoDatas.get(key);
     }
 
     public Set<String> getInActiveIps(T key) {
@@ -144,8 +125,7 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
         return allIps;
     }
 
-    public List<IpInfo> getRelatedIpInfo(T key) {
-        List<IpInfo> lastIpInfos = getLastIpInfos(key);
+    public List<IpInfo> getRelatedIpInfo(T key, List<IpInfo> lastIpInfos) {
         List<IpInfo> ipInfos = new ArrayList<IpInfo>();
         if (lastIpInfos != null) {
             ipInfos.addAll(lastIpInfos);

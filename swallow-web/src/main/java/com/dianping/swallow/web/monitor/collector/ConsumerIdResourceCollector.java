@@ -1,9 +1,14 @@
 package com.dianping.swallow.web.monitor.collector;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
+import com.dianping.swallow.web.container.ResourceContainer;
+import com.dianping.swallow.web.controller.listener.ResourceListener;
+import com.dianping.swallow.web.controller.listener.ResourceObserver;
+import com.dianping.swallow.web.model.resource.BaseResource;
 import com.dianping.swallow.web.util.CountDownLatchUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +32,7 @@ import com.dianping.swallow.web.service.ConsumerIdResourceService;
  *         2015年10月8日 上午11:06:00
  */
 @Component
-public class ConsumerIdResourceCollector extends AbstractRealTimeCollector implements MonitorDataListener {
-
-    private static final String FACTORY_NAME = "ResourceCollector-ConsumerIdIpMonitor";
+public class ConsumerIdResourceCollector extends AbstractRealTimeCollector implements MonitorDataListener, ResourceObserver {
 
     @Autowired
     private ConsumerStatsDataWapper cStatsDataWapper;
@@ -40,7 +43,12 @@ public class ConsumerIdResourceCollector extends AbstractRealTimeCollector imple
     @Autowired
     private ConsumerIdResourceService cResourceService;
 
+    @Autowired
+    private ResourceContainer resourceContainer;
+
     private IpStatusMonitor<ConsumerIdKey, ConsumerIpStatsData> ipStatusMonitor = new IpStatusMonitorImpl<ConsumerIdKey, ConsumerIpStatsData>();
+
+    private List<ResourceListener> listeners = new ArrayList<ResourceListener>();
 
     @Override
     protected void doInitialize() throws Exception {
@@ -115,27 +123,46 @@ public class ConsumerIdResourceCollector extends AbstractRealTimeCollector imple
 
     private void updateConsumerIdResource(String topicName, String consumerId) {
         ConsumerIdKey consumerIdKey = new ConsumerIdKey(topicName, consumerId);
-        ConsumerIdResource consumerIdResource = null;
-        if (ipStatusMonitor.isNeedLoaded(consumerIdKey)) {
-            consumerIdResource = cResourceService.findByConsumerIdAndTopic(topicName, consumerId);
-            if (consumerIdResource != null) {
-                ipStatusMonitor.setLastIpInfos(consumerIdKey, consumerIdResource.getConsumerIpInfos());
-            } else {
-                ipStatusMonitor.setLastIpInfos(consumerIdKey, null);
+        ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
+        if (consumerIdResource != null) {
+            List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(consumerIdKey, consumerIdResource.getConsumerIpInfos());
+            if (ipStatusMonitor.isChanged(consumerIdResource.getConsumerIpInfos(), currentIpInfos)) {
+                boolean result = false;
+                if (consumerIdResource == null) {
+                    consumerIdResource = cResourceService.buildConsumerIdResource(topicName, consumerId);
+                    consumerIdResource.setConsumerIpInfos(currentIpInfos);
+                    result = cResourceService.insert(consumerIdResource);
+                    logger.info("[updateConsumerIdResource] insert consumerIdResource {}", consumerIdResource.toString());
+                } else {
+                    consumerIdResource.setConsumerIpInfos(currentIpInfos);
+                    result = cResourceService.update(consumerIdResource);
+                    logger.info("[updateConsumerIdResource] update consumerIdResource {}", consumerIdResource.toString());
+                }
+                if (result) {
+                    doUpdateNotify(consumerIdResource);
+                }
             }
+        } else {
+            logger.info("[updateConsumerIdResource] resourceContainer no consumerIdResource {},{}", topicName, consumerId);
         }
-        List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(consumerIdKey);
-        if (ipStatusMonitor.isChanged(consumerIdKey, currentIpInfos)) {
-            if (consumerIdResource == null) {
-                consumerIdResource = cResourceService.buildConsumerIdResource(topicName, consumerId);
-                consumerIdResource.setConsumerIpInfos(currentIpInfos);
-                cResourceService.insert(consumerIdResource);
-                logger.info("[updateConsumerIdResource] insert consumerIdResource {}", consumerIdResource.toString());
-            } else {
-                consumerIdResource.setConsumerIpInfos(currentIpInfos);
-                cResourceService.update(consumerIdResource);
-                logger.info("[updateConsumerIdResource] update consumerIdResource {}", consumerIdResource.toString());
-            }
+    }
+
+    @Override
+    public void doRegister(ResourceListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void doUpdateNotify(BaseResource resource) {
+        for (ResourceListener listener : listeners) {
+            listener.doUpdateNotify(resource);
+        }
+    }
+
+    @Override
+    public void doDeleteNotify(BaseResource resource) {
+        for (ResourceListener listener : listeners) {
+            listener.doDeleteNotify(resource);
         }
     }
 
@@ -198,4 +225,5 @@ public class ConsumerIdResourceCollector extends AbstractRealTimeCollector imple
         }
 
     }
+
 }

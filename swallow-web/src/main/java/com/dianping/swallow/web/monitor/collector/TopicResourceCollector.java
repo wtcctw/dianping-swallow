@@ -1,11 +1,15 @@
 package com.dianping.swallow.web.monitor.collector;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.dianping.swallow.web.container.ResourceContainer;
+import com.dianping.swallow.web.controller.listener.ResourceListener;
+import com.dianping.swallow.web.controller.listener.ResourceObserver;
+import com.dianping.swallow.web.model.resource.BaseResource;
 import com.dianping.swallow.web.util.CountDownLatchUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,7 +33,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  *         2015年9月30日 上午11:24:59
  */
 @Component
-public class TopicResourceCollector extends AbstractRealTimeCollector implements MonitorDataListener {
+public class TopicResourceCollector extends AbstractRealTimeCollector implements MonitorDataListener, ResourceObserver {
 
     @Autowired
     private TopicResourceService topicResourceService;
@@ -40,9 +44,14 @@ public class TopicResourceCollector extends AbstractRealTimeCollector implements
     @Autowired
     private ProducerDataRetriever producerDataRetriever;
 
+    @Autowired
+    private ResourceContainer resourceContainer;
+
     private static final String FACTORY_NAME = "ResourceCollector-TopicIpMonitor";
 
     private IpStatusMonitor<String, ProducerIpStatsData> ipStatusMonitor = new IpStatusMonitorImpl<String, ProducerIpStatsData>();
+
+    private List<ResourceListener> listeners = new ArrayList<ResourceListener>();
 
     @Override
     protected void doInitialize() throws Exception {
@@ -107,25 +116,42 @@ public class TopicResourceCollector extends AbstractRealTimeCollector implements
     }
 
     private void updateTopicResource(String topicName) {
-        TopicResource topicResource = null;
-        if (ipStatusMonitor.isNeedLoaded(topicName)) {
-            topicResource = topicResourceService.findByTopic(topicName);
-            if (topicResource == null) {
-                return;
+        TopicResource topicResource = resourceContainer.findTopicResource(topicName);
+        if (topicResource != null) {
+            List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(topicName, topicResource.getProducerIpInfos());
+            if (ipStatusMonitor.isChanged(topicResource.getProducerIpInfos(), currentIpInfos)) {
+                topicResource = topicResourceService.findByTopic(topicName);
+                if (topicResource == null) {
+                    return;
+                }
+                topicResource.setProducerIpInfos(currentIpInfos);
+                boolean result =  topicResourceService.update(topicResource);
+                if (result) {
+                    doUpdateNotify(topicResource);
+                }
+                logger.info("[updateTopicIpInfos] topicResource {}", topicResourceService.toString());
             }
-            ipStatusMonitor.setLastIpInfos(topicName, topicResource.getProducerIpInfos());
+        } else {
+            logger.info("[updateTopicResource] resourceContainer no topicResource {}", topicName);
         }
-        List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(topicName);
-        if (ipStatusMonitor.isChanged(topicName, currentIpInfos)) {
-            topicResource = topicResourceService.findByTopic(topicName);
-            if (topicResource == null) {
-                return;
-            }
-            topicResource.setProducerIpInfos(currentIpInfos);
-            topicResourceService.update(topicResource);
-            ipStatusMonitor.setLastIpInfos(topicName, topicResource.getProducerIpInfos());
-            logger.info("[updateTopicIpInfos] topicResource {}", topicResourceService.toString());
-        }
+    }
 
+    @Override
+    public void doRegister(ResourceListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void doUpdateNotify(BaseResource resource) {
+        for (ResourceListener listener : listeners) {
+            listener.doUpdateNotify(resource);
+        }
+    }
+
+    @Override
+    public void doDeleteNotify(BaseResource resource) {
+        for (ResourceListener listener : listeners) {
+            listener.doDeleteNotify(resource);
+        }
     }
 }

@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.alarmer.container;
 
-import com.dianping.swallow.web.model.alarm.AlarmMeta;
-import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.IpResourceService;
 import org.apache.commons.lang.StringUtils;

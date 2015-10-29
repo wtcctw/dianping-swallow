@@ -51,7 +51,8 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         boolean hasGroupStatsData = ipGroupStatsData.hasStatsData(qpsThreshold, totalThreshold);
         for (K ipStatsData : ipStatsDatas) {
             boolean hasStatsData = ipStatsData.hasStatsData();
-            T key = (T) ipStatsData.createStatsDataKey();
+            @SuppressWarnings("unchecked")
+			T key = (T) ipStatsData.createStatsDataKey();
             IpStatusData ipStatusData = ipStatusDatas.get(key);
             if (ipStatusData == null) {
                 ipStatusData = new IpStatusData();
