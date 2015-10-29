@@ -25,7 +25,7 @@ import java.util.Map;
  *         2015年9月18日上午9:58:52
  */
 @Component
-public class MongoResourceCollector extends AbstractResourceCollector {
+public class MongoResourceCollector extends AbstractRegularCollecter {
 
 	private static final String MONGO_REPORT = "http://dom.dp/db_daily/message";
 

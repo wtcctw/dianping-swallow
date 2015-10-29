@@ -87,4 +87,9 @@ Thumbs.db
 #test
 config.online
 TODO
+<<<<<<< HEAD
 .idea/
+=======
+*.idea
+*.iml
+>>>>>>> yq
