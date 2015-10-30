@@ -43,7 +43,7 @@ public class ProducerIpStatsAlarmer extends
     @Override
     public void doInitialize() throws Exception {
         super.doInitialize();
-        checkInterval = 2 * 60 * 1000;
+        checkInterval = 10 * 60 * 1000;
         producerDataRetriever.registerListener(this);
     }
 
