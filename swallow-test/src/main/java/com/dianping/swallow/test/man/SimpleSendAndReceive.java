@@ -31,7 +31,7 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 		
 //		sendMessage(topic, 200, 0);
 
-		sendMessage("lllll", 200, 0);
+		sendMessage(topic, 200, 0);
 
 		TimeUnit.SECONDS.sleep(10000);
 	}
