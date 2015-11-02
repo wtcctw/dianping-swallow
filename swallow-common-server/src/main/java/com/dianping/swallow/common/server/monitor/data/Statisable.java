@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年5月19日 下午5:04:56
  */
-public interface Statisable<V> extends KeyMergeable{
+public interface Statisable<V>{
 
 	void add(Long time, V added);
 	

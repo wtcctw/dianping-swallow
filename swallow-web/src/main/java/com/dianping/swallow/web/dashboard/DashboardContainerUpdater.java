@@ -7,6 +7,7 @@ import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.dashboard.model.*;
@@ -117,13 +118,10 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
 			Map<String, StatsData> accuStatsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
 
 			for (String consumerid : consumerids) {
-				ConsumerIdStatisData result = (ConsumerIdStatisData) consumerDataRetrieverWrapper.getValue(
-						ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid);
-
-				NavigableMap<Long, Long> senddelay = result.getDelay(StatisType.SEND);
+				NavigableMap<Long, Long> senddelay = consumerDataRetrieverWrapper.getDelayValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid),StatisType.SEND);
 				List<Long> sendList = extractListFromMap(senddelay);
 
-				NavigableMap<Long, Long> ackdelay = result.getDelay(StatisType.ACK);
+				NavigableMap<Long, Long> ackdelay = consumerDataRetrieverWrapper.getQpsValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid), StatisType.ACK);
 				List<Long> ackList = extractListFromMap(ackdelay);
 
 				int sendListSize = sendList.size();

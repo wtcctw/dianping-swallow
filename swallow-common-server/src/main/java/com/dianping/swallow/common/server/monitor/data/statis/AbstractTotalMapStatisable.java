@@ -51,7 +51,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 		}
 	}
 
-	protected Statisable<?> getValue(Object key) {
+	protected Statisable<M> getValue(Object key) {
 		return map.get(key);
 	}
 
@@ -149,7 +149,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 	@Override
 	public NavigableMap<Long, Long> getDelay(StatisType type, Object key) {
 
-		Statisable<?> value = getValue(key);
+		Statisable<M> value = getValue(key);
 		if (value == null) {
 			return null;
 		}
@@ -159,7 +159,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 	@Override
 	public NavigableMap<Long, QpxData> getQpx(StatisType type, Object key) {
 
-		Statisable<?> value = getValue(key);
+		Statisable<M> value = getValue(key);
 		if (value == null) {
 			return null;
 		}
@@ -240,10 +240,10 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 	}
 
 	@Override
-	public Object getValue(CasKeys keys, StatisType type) {
+	public NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type) {
 
 		if (!keys.hasNextKey()) {
-			throw new UnfoundKeyException(keys.toString());
+			return getDelay(type);
 		}
 
 		String key = keys.getNextKey();
@@ -256,13 +256,40 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 		if (keys.hasNextKey()) {
 
 			if (result instanceof MapRetriever) {
-				return ((MapRetriever) result).getValue(keys, type);
+				return ((MapRetriever) result).getDelayValue(keys, type);
 			} else {
 				throw new IllegalArgumentException("has next key, but next is not Map type!!");
 			}
 
 		} else {
-			return result;
+			return result.getDelay(type);
+		}
+	}
+
+	@Override
+	public NavigableMap<Long, Statisable.QpxData> getQpsValue(CasKeys keys, StatisType type) {
+
+		if (!keys.hasNextKey()) {
+			return getQpx(type);
+		}
+
+		String key = keys.getNextKey();
+		Statisable<M> result = map.get(key);
+
+		if (result == null) {
+			throw new UnfoundKeyException("key:" + key);
+		}
+
+		if (keys.hasNextKey()) {
+
+			if (result instanceof MapRetriever) {
+				return ((MapRetriever) result).getQpsValue(keys, type);
+			} else {
+				throw new IllegalArgumentException("has next key, but next is not Map type!!");
+			}
+
+		} else {
+			return result.getQpx(type);
 		}
 	}
 
@@ -272,11 +299,12 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 		return getKeys(keys, null);
 	}
 
-	public Object getValue(CasKeys keys) {
-
-		return getValue(keys, null);
-
-	}
+//	@Override
+//	public Statisable getValue(CasKeys keys) {
+//
+//		return getValue(keys, null);
+//
+//	}
 
 	@Override
 	public String toString() {
@@ -288,115 +316,5 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 
 		return JsonBinder.getNonEmptyBinder().toPrettyJson(map.get(key));
 	}
-
-//	@Override
-//	public void merge(Mergeable merge){
-//
-//		checkType(merge);
-//
-//		AbstractTotalMapStatisable<M,V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
-//
-//		if(hasTotal(this) && hasTotal(toMerge)){
-//
-//			getValue(MonitorData.TOTAL_KEY).merge(toMerge.map.get(MonitorData.TOTAL_KEY));
-//			return;
-//		}
-//
-//		for(java.util.Map.Entry<String, Statisable<M>> entry : toMerge.map.entrySet()){
-//
-//			String key = entry.getKey();
-//			Mergeable value = entry.getValue();
-//
-//			if(hasTotal(this)){
-//				getValue(MonitorData.TOTAL_KEY).merge(value);
-//				continue;
-//			}
-//			Statisable<M> myValue = getOrCreate(key);
-//			myValue.merge(value);
-//		}
-//	}
-
-	@Override
-	public void merge(Mergeable merge){
-
-		AbstractTotalMapStatisable<M,V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
-
-		for(java.util.Map.Entry<String, Statisable<M>> entry : toMerge.map.entrySet()){
-
-			String key = entry.getKey();
-			Mergeable value = entry.getValue();
-
-			Statisable<M> myValue = map.get(key);
-			if(myValue == null){
-				myValue= createValue();
-				map.put(key, myValue);
-			}
-			myValue.merge(value);
-		}
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-
-		AbstractTotalMapStatisable<M,V> newMap = (AbstractTotalMapStatisable<M,V>) super.clone();
-
-		for(java.util.Map.Entry<String, Statisable<M>> entry : map.entrySet()){
-
-			String key = entry.getKey();
-			Statisable<M> value = entry.getValue();
-			newMap.map.put(key, (Statisable<M>) value.clone());
-		}
-
-		return map;
-	}
-
-	@Override
-	public void merge(String key, KeyMergeable merge){
-
-		checkType(merge);
-
-		AbstractTotalMapStatisable<M,V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
-		Statisable<M> value = toMerge.map.get(key);
-		if( value == null){
-			logger.warn("[merge][value null]" + key + "," + merge );
-			return;
-		}
-
-		Statisable<M> myValue = getOrCreate(key);
-		if(myValue instanceof KeyMergeable && value instanceof KeyMergeable){
-
-			((KeyMergeable)myValue).merge(key, (KeyMergeable)value);
-		}else{
-
-			myValue.merge(value);
-		}
-	}
-
-	private void checkType(Object merge) {
-
-		if(!(merge instanceof AbstractTotalMapStatisable)){
-			throw new IllegalArgumentException("wrong type : " + merge.getClass());
-		}
-	}
-
-	private boolean hasTotal(AbstractTotalMapStatisable merge){
-
-		Set<String> keys = merge.map.keySet();
-		if(keys != null && keys.contains(MonitorData.TOTAL_KEY)){
-			return true;
-		}
-		return false;
-	}
-
-	private Statisable<M> getOrCreate(String key) {
-		Statisable<M> m = map.get(key);
-		if(m == null){
-			m= createValue();
-			map.put(key, m);
-		}
-		return m;
-	}
-
-	protected abstract Statisable<M> createValue();
 
 }

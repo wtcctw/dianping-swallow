@@ -18,10 +18,4 @@ public class ProducerTopicStatisData extends AbstractTotalMapStatisable<MessageI
 		return MessageInfoStatis.class;
 	}
 
-	@Override
-	protected Statisable<MessageInfo> createValue() {
-		return new MessageInfoStatis();
-	}
-
-
 }

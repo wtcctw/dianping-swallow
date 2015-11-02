@@ -1,8 +1,10 @@
 package com.dianping.swallow.web.monitor;
 
+import java.util.NavigableMap;
 import java.util.Set;
 
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
@@ -21,10 +23,14 @@ public interface MonitorDataRetriever extends Retriever {
 
 	Set<String> getKeys(CasKeys keys, StatisType type);
 
-	Object getValue(CasKeys keys, StatisType type);
+	//Object getValue(CasKeys keys, StatisType type);
 
 	Set<String> getKeys(CasKeys keys);
 
-	Object getValue(CasKeys keys);
+	//Object getValue(CasKeys keys);
+
+	NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type);
+
+	NavigableMap<Long, Statisable.QpxData> getQpsValue(CasKeys keys, StatisType type);
 
 }

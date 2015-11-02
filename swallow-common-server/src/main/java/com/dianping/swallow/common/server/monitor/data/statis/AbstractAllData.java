@@ -9,8 +9,6 @@ import com.dianping.swallow.common.server.monitor.data.StatisRetriever;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
 import java.util.*;
@@ -149,7 +147,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         checkSupported(type);
 
         NavigableMap<Long, QpxData> result = new ConcurrentSkipListMap<Long, QpxData>();
-        Statisable<?> statis;
+        Statisable<M> statis;
         for (S s : servers.values()) {
             statis = s.getValue(topic);
             if (statis != null) {
@@ -170,11 +168,11 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         }
 
         String key = keys.getNextKey();
-        if(MonitorData.TOTAL_KEY.equals(key)){
+        if (MonitorData.TOTAL_KEY.equals(key)) {
             Set<String> result = new HashSet<String>();
-            for(S s : servers.values()){
+            for (S s : servers.values()) {
                 Set<String> items = s.getKeys(keys, type);
-                if(items != null){
+                if (items != null) {
                     result.addAll(items);
                 }
                 keys.reset();
@@ -190,48 +188,16 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         return server.getKeys(keys, type);
     }
 
-    public Object getValue(CasKeys keys, StatisType type) {
-
-        if (!keys.hasNextKey()) {
-            throw new UnfoundKeyException(keys.toString());
-        }
-
-        String key = keys.getNextKey();
-        S server;
-        if(MonitorData.TOTAL_KEY.equals(key)){
-            server = (S) getTotalValue();
-        }else{
-            server = servers.get(key);
-        }
-
-        if (server == null) {
-            throw new UnfoundKeyException(key);
-        }
-
-        if (!keys.hasNextKey()) {
-            return server;
-        }
-        return server.getValue(keys, type);
-
-    }
-
-    private Object getTotalValue(){
-        S result = createValue();
-        for(S s : servers.values()){
-            result.merge(s);
-        }
-        return result;
-    }
-
     public Set<String> getKeys(CasKeys keys) {
 
         return getKeys(keys, null);
     }
 
-    public Object getValue(CasKeys keys) {
-
-        return getValue(keys, null);
-    }
+//    @Override
+//    public Statisable getValue(CasKeys keys) {
+//
+//        return getValue(keys, null);
+//    }
 
 
     private void checkSupported(StatisType type) {
@@ -314,12 +280,70 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException{
+    public Object clone() throws CloneNotSupportedException {
         AbstractAllData clone = (AbstractAllData) super.clone();
         clone.servers = new ConcurrentHashMap<String, S>(this.servers);
         return clone;
     }
 
-    public abstract S createValue();
+    @Override
+    public NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type) {
+        if (!keys.hasNextKey()) {
+            throw new UnfoundKeyException(keys.toString());
+        }
+
+        String key = keys.getNextKey();
+        S server;
+        if (MonitorData.TOTAL_KEY.equals(key)) {
+            NavigableMap<Long, Long> result = new ConcurrentSkipListMap<Long, Long>();
+            for (S s : servers.values()) {
+                NavigableMap<Long, Long> value = s.getDelayValue(keys, type);
+                MapUtil.mergeMapOfTypeLong(result, value);
+                keys.reset();
+            }
+            return result;
+        } else {
+            server = servers.get(key);
+        }
+
+        if (server == null) {
+            throw new UnfoundKeyException(key);
+        }
+
+        if (!keys.hasNextKey()) {
+            return server.getDelay(type);
+        }
+        return server.getDelayValue(keys, type);
+    }
+
+    @Override
+    public NavigableMap<Long, Statisable.QpxData> getQpsValue(CasKeys keys, StatisType type) {
+        if (!keys.hasNextKey()) {
+            throw new UnfoundKeyException(keys.toString());
+        }
+
+        String key = keys.getNextKey();
+        S server;
+        if (MonitorData.TOTAL_KEY.equals(key)) {
+            NavigableMap<Long, Statisable.QpxData> result = new ConcurrentSkipListMap<Long, Statisable.QpxData>();
+            for (S s : servers.values()) {
+                NavigableMap<Long, Statisable.QpxData> value = s.getQpsValue(keys, type);
+                MapUtil.mergeMap(result, value);
+                keys.reset();
+            }
+            return result;
+        } else {
+            server = servers.get(key);
+        }
+
+        if (server == null) {
+            throw new UnfoundKeyException(key);
+        }
+
+        if (!keys.hasNextKey()) {
+            return server.getQpx(type);
+        }
+        return server.getQpsValue(keys, type);
+    }
 
 }
