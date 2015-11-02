@@ -92,6 +92,7 @@
 			</bean>
 		</mvc:interceptor>
 	</mvc:interceptors>
+
 	<!--用户信息接口配置 -->
 	<bean id="baUserService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
 		init-method="init">

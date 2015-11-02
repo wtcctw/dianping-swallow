@@ -82,7 +82,7 @@ public class TopicApplyController {
 	private TopicCfgLionHandler topicCfgLionHandler;
 
 	private Object APPLY_TOPIC = new Object();
-	
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
