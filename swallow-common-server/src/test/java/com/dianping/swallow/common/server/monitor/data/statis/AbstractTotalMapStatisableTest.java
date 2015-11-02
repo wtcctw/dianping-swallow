@@ -25,16 +25,14 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author mingdongli
- * 15/10/27 下午3:56
+ *         15/10/27 下午3:56
  */
 
-public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
+public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
     private ConsumerAllData consumerAllData;
 
-    protected String[] consumerIds = { "id1", "id2" };
-
-    protected StatisType[] supportedTypes = new StatisType[] { StatisType.SEND, StatisType.ACK };
+    protected StatisType[] supportedTypes = new StatisType[]{StatisType.SEND, StatisType.ACK};
 
     private AtomicLong messageIdGenerator = new AtomicLong();
 
@@ -72,47 +70,55 @@ public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
     @Test
     public void testRetriever() {
 
-        String server = ips[0];
-        String topic = topics[0];
-        String consumerId = consumerIds[0];
-        String ip = ips[0];
+//        String server = ips[0];
+//        String topic = topics[0];
+//        String consumerId = consumerIds[0];
+//        String ip = ips[0];
+//
+//        method3("/Users/mingdongli/tmp/consumer/all.txt", consumerAllData.toString());
+//        method3("/Users/mingdongli/tmp/consumer/total.txt", consumerAllData.getKeys(new CasKeys("total")).toString());
 
-        method3("/Users/mingdongli/tmp/consumer/all.txt", consumerAllData.toString());
-        method3("/Users/mingdongli/tmp/consumer/total.txt", consumerAllData.getKeys(new CasKeys("total")).toString());
+//        System.out.println(consumerAllData.getKeys(new CasKeys()));
+//        System.out.println(consumerAllData.getKeys(new CasKeys(server)));
+//        System.out.println(consumerAllData.getKeys(new CasKeys(server, topic)));
+//        System.out.println(consumerAllData.getKeys(new CasKeys(server, topic, consumerId)));
+//        System.out.println(consumerAllData.getKeys(new CasKeys("total")));
+//        System.out.println(consumerAllData.getKeys(new CasKeys("total", topic)));
+//        System.out.println(consumerAllData.getKeys(new CasKeys("total", topic, consumerId)));
 
-        System.out.println(consumerAllData.getKeys(new CasKeys()));
-        System.out.println(consumerAllData.getKeys(new CasKeys(server)));
-        System.out.println(consumerAllData.getKeys(new CasKeys(server, topic)));
-        System.out.println(consumerAllData.getKeys(new CasKeys(server, topic, consumerId)));
-        System.out.println(consumerAllData.getKeys(new CasKeys("total")));
-        System.out.println(consumerAllData.getKeys(new CasKeys("total", topic)));
-        System.out.println(consumerAllData.getKeys(new CasKeys("total", topic, consumerId)));        System.out.println(consumerAllData.getKeys(new CasKeys()));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys(server), StatisType.ACK));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic), StatisType.ACK));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId), StatisType.ACK));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys("total"), StatisType.ACK));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic), StatisType.ACK));
 
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server), StatisType.ACK));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic), StatisType.ACK));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId), StatisType.ACK));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total"), StatisType.ACK));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic), StatisType.ACK));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic, consumerId), StatisType.ACK));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys(server),StatisType.SEND));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic),StatisType.SEND));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId),StatisType.SEND));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys("total"),StatisType.SEND));
+//        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic),StatisType.SEND));
+        long before = System.currentTimeMillis();
+        for (String t : topics) {
+            for (String id : consumerIds) {
+                consumerAllData.getDelayValue(new CasKeys("total", t, id), StatisType.ACK);
+                consumerAllData.getDelayValue(new CasKeys("total", t, id), StatisType.SEND);
+            }
+        }
+        long after = System.currentTimeMillis();
+        System.out.println(after - before);
 
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total"),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic, consumerId),StatisType.SEND));
 
-        NavigableMap<Long, Long> cisd = consumerAllData.getDelayValue(new CasKeys(server, topic,
-                consumerId), StatisType.ACK);
-        method3("/Users/mingdongli/tmp/consumer/cids.txt", cisd.toString());
-
-        method3("/Users/mingdongli/tmp/consumer/topic.txt", consumerAllData.getDelayValue(new CasKeys(server), StatisType.ACK).toString());
-        method3("/Users/mingdongli/tmp/consumer/cid.txt", consumerAllData.getDelayValue(new CasKeys(server, topic), StatisType.ACK).toString());
-        method3("/Users/mingdongli/tmp/consumer/ip.txt", consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId), StatisType.ACK).toString());
-        method3("/Users/mingdongli/tmp/consumer/iplevel.txt", consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId, ip), StatisType.ACK).toString());
-        method3("/Users/mingdongli/tmp/consumer/topicmerge.txt", consumerAllData.getDelayValue(new CasKeys("total"), StatisType.ACK).toString());
-        method3("/Users/mingdongli/tmp/consumer/cidmerge.txt", consumerAllData.getDelayValue(new CasKeys("total", topic), StatisType.ACK).toString());
-        method3("/Users/mingdongli/tmp/consumer/ipmerge.txt", consumerAllData.getDelayValue(new CasKeys("total", topic, consumerId), StatisType.ACK).toString());
+//        NavigableMap<Long, Long> cisd = consumerAllData.getDelayValue(new CasKeys(server, topic,
+//                consumerId), StatisType.ACK);
+//        method3("/Users/mingdongli/tmp/consumer/cids.txt", cisd.toString());
+//
+//        method3("/Users/mingdongli/tmp/consumer/topic.txt", consumerAllData.getDelayValue(new CasKeys(server), StatisType.ACK).toString());
+//        method3("/Users/mingdongli/tmp/consumer/cid.txt", consumerAllData.getDelayValue(new CasKeys(server, topic), StatisType.ACK).toString());
+//        method3("/Users/mingdongli/tmp/consumer/ip.txt", consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId), StatisType.ACK).toString());
+//        method3("/Users/mingdongli/tmp/consumer/iplevel.txt", consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId, ip), StatisType.ACK).toString());
+//        method3("/Users/mingdongli/tmp/consumer/topicmerge.txt", consumerAllData.getDelayValue(new CasKeys("total"), StatisType.ACK).toString());
+//        method3("/Users/mingdongli/tmp/consumer/cidmerge.txt", consumerAllData.getDelayValue(new CasKeys("total", topic), StatisType.ACK).toString());
+//        method3("/Users/mingdongli/tmp/consumer/ipmerge.txt", consumerAllData.getDelayValue(new CasKeys("total", topic, consumerId), StatisType.ACK).toString());
     }
 
     @Test
