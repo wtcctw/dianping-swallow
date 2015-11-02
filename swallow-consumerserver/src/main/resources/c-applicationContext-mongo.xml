@@ -17,4 +17,20 @@
     <bean id="mongoClusterFactory" class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory">
     </bean>
     
+
+    <bean id="ackDAO"
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoAckDAO">
+        <property name="mongoManager" ref="mongoManager"/>
+    </bean>
+
+    <bean id="messageDAO"
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO">
+        <property name="mongoManager" ref="mongoManager"/>
+    </bean>
+
+    <bean id="heartbeatDAO"
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoHeartbeatDAO">
+        <property name="mongoManager" ref="mongoManager"/>
+    </bean>
+
 </beans>

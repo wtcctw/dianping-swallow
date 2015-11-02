@@ -30,18 +30,6 @@
         class="com.dianping.swallow.consumerserver.impl.MongoHeartbeater">
     </bean>
 
-    <bean id="ackDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl">
-    </bean>
-
-    <bean id="messageDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
-    </bean>
-
-    <bean id="heartbeatDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl">
-    </bean>
-
     <bean id="messageRetriever"
         class="com.dianping.swallow.consumerserver.buffer.MongoDBMessageRetriever">
         <property name="fetchSize"><value>${mongodb.messagefetchSize}</value></property>
@@ -50,8 +38,8 @@
 	<bean id="clusterManager" class="com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager">
 		<property name="clusterFactories">
 			<list>
-				<value-ref="mongoClusterFactory"/>
-				<value-ref="kafkaClusterFactory"/>
+				<ref bean="mongoClusterFactory"/>
+				<ref bean="kafkaClusterFactory"/>
 			</list>
 		</property>
 		
