@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.config.impl;
 
 
+
 import java.util.Map;
 
 import org.junit.Assert;
@@ -10,7 +11,7 @@ import org.junit.Test;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.internal.config.LionUtil;
-import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 
 /**
@@ -77,7 +78,7 @@ public class SwallowConfigImplCentralTest extends AbstractTest {
 		try{
 			for(TopicConfig config : configs){
 				
-				String newConfigMongo = rawConfigMongo + ";" + topicName + "=" + config.getMongoUrl();
+				String newConfigMongo = rawConfigMongo + ";" + topicName + "=" + config.getStoreUrl();
 				String newConfigSize =  rawConfigSize + ";" + topicName + "=" +  config.getSize();
 				String newConfigMax =  rawConfigMax + ";" + topicName + "=" + config.getMax();
 				lionUtil.createOrSetConfig(SwallowConfigCentral.LION_KEY_MONGO_URLS, newConfigMongo);
@@ -86,9 +87,9 @@ public class SwallowConfigImplCentralTest extends AbstractTest {
 				
 				sleep(1000);
 				TopicConfig topicConfig = swallowConfig.getTopicConfig(topicName);
-				Assert.assertEquals(config.getMongoUrl(), topicConfig.getMongoUrl());
-				Assert.assertEquals(config.getMongoUrl(), topicConfig.getMongoUrl());
-				Assert.assertEquals(config.getMongoUrl(), topicConfig.getMongoUrl());
+				Assert.assertEquals(config.getStoreUrl(), topicConfig.getStoreUrl());
+				Assert.assertEquals(config.getStoreUrl(), topicConfig.getStoreUrl());
+				Assert.assertEquals(config.getStoreUrl(), topicConfig.getStoreUrl());
 			}
 		}finally{
 			//恢复老配置

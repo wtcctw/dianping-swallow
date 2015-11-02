@@ -1,7 +1,6 @@
-package com.dianping.swallow.common.internal.	dao.impl.mongodb;
+package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,15 +8,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-
-import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
-import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.SwallowConfigArgs;
-import com.dianping.swallow.common.internal.dao.MongoManager;
+import com.dianping.swallow.common.internal.dao.Cluster;
+import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.exception.SwallowAlertException;
-import com.dianping.swallow.common.internal.lifecycle.Ordered;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.monitor.ComponentMonitable;
 import com.dianping.swallow.common.internal.observer.Observable;
@@ -44,7 +41,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	public static final String BACKUP_MSG_PREFIX = "b_m#";
 	public static final String BACKUP_ACK_PREFIX = "b_a#";
 
-	private static final String MONGO_CONFIG_FILENAME = "swallow-mongo.properties";
 	private static final String DEFAULT_COLLECTION_NAME = "c";
 
 	private final Map<DB, Byte> collectionExistsSign = new ConcurrentHashMap<DB, Byte>();
@@ -55,37 +51,21 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 
 	private SwallowConfig swallowConfig;
 	
-	private String mongoConfigLionSuffix;
-
 	private MongoClientOptions mongoOptions;
 
 	private boolean messageCollectionCapped = true;
-	
-	private MongoContainer mongoContainer;
+
+	private ClusterManager clusterManager; 
 	
 	public DefaultMongoManager() {
-		this(null);
 	}
 
-	public DefaultMongoManager(String mongoConfigLionSuffix) {
-		this.mongoConfigLionSuffix = mongoConfigLionSuffix;
-	}
-
-	
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 
-		MongoConfig config = new MongoConfig(MONGO_CONFIG_FILENAME, mongoConfigLionSuffix);
-		mongoOptions = config.buildMongoOptions();
-		if (logger.isInfoEnabled()) {
-			logger.info("MongoOptions=" + mongoOptions.toString());
-		}
-		
-		mongoContainer = new MongoContainer(mongoOptions);
 		
 		swallowConfig.addObserver(this);
-		swallowConfig.initialize();
 		
 		loadSwallowConfig();
 	}
@@ -94,9 +74,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	@Override
 	protected void doDispose() throws Exception {
 
-		mongoContainer.closeAllMongo();
-		swallowConfig.dispose();
-		
 		super.doDispose();
 	}
 	
@@ -113,7 +90,15 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	private void createHeartbeatMongo() {
 
 		String serverURI = swallowConfig.getHeartBeatMongo();
-		heartbeatMongo = mongoContainer.getMongo(serverURI);
+		
+		
+		MongoCluster mongoCluster = (MongoCluster)clusterManager.getCluster(serverURI);
+		
+		if(mongoCluster == null){
+			throw new IllegalStateException("[createHeartbeatMongo][fail]" + serverURI);
+		}
+		
+		heartbeatMongo = mongoCluster.getMongoClient();
 		if (logger.isInfoEnabled()) {
 			logger.info("[createHeartbeatMongo]" + heartbeatMongo);
 		}
@@ -144,13 +129,20 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 	private void createTopicMongo(String topicName) {
 		
 		TopicConfig topicConfig = swallowConfig.getTopicConfig(topicName);
-		String uri = topicConfig.getMongoUrl();
+		String uri = topicConfig.getStoreUrl();
 		
 		if(StringUtils.isEmpty(uri)){
 			return;
 		}
 		
-		MongoClient mongo = mongoContainer.getMongo(uri);
+		
+		MongoCluster mongoCluster = (MongoCluster)clusterManager.getCluster(uri);
+		
+		if(mongoCluster == null){
+			throw new IllegalStateException("getCluster fail:" + topicName + "---" + uri);
+		}
+		
+		MongoClient mongo = mongoCluster.getMongoClient();
 		
 		@SuppressWarnings("unused")
 		MongoClient oldMongoClient = topicNameToMongoMap.put(topicName, mongo);
@@ -208,7 +200,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		Integer max = 0;
 		String dbName = getMessageDbName(topicName, consumerId);
 
-		index.add(new BasicDBObject(MessageDAOImpl.ID, -1));
+		index.add(new BasicDBObject(MongoMessageDAO.ID, -1));
 		if (consumerId == null) {
 			
 			TopicConfig config = swallowConfig.getTopicConfig(topicName);
@@ -217,7 +209,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 				max = getMax(config);
 			}
 		} else {
-			index.add(new BasicDBObject(MessageDAOImpl.ORIGINAL_ID, -1));
+			index.add(new BasicDBObject(MongoMessageDAO.ORIGINAL_ID, -1));
 			if (messageCollectionCapped) {
 				size = AbstractSwallowConfig.DEFAULT_BACKUP_CAPPED_COLLECTION_SIZE;
 				max = AbstractSwallowConfig.DEFAULT_BACKUP_CAPPED_COLLECTION_MAX_DOC_NUM;
@@ -333,7 +325,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		MongoClient mongo = getMongo(topicName);
 		String dbName = getAckDbName(topicName, consumerId, isBackup);
 
-		DBObject index = new BasicDBObject(AckDAOImpl.MSG_ID, -1);
+		DBObject index = new BasicDBObject(MongoAckDAO.MSG_ID, -1);
 		return getCollection(mongo, AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_SIZE, 
 									AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM, dbName, index);
 	}
@@ -343,7 +335,7 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		MongoClient mongo = this.heartbeatMongo;
 		return this.getCollection(mongo, AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_SIZE,
 				AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM, "heartbeat#" + ip,
-				new BasicDBObject(HeartbeatDAOImpl.TICK, -1));
+				new BasicDBObject(MongoHeartbeatDAO.TICK, -1));
 	}
 
 	private DBCollection getCollection(MongoClient mongo, Integer size,
@@ -449,12 +441,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		return mongoOptions;
 	}
 
-	@Override
-	public int getMongoCount() {
-
-		return mongoContainer.mongoSize();
-	}
-
 	public SwallowConfig getSwallowConfig() {
 		return swallowConfig;
 	}
@@ -463,15 +449,10 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		this.swallowConfig = swallowConfig;
 	}
 
-	public Collection<MongoClient> getAllMongo(){
-		
-		return mongoContainer.getAllMongo();
-	}
-	
 	@Override
 	public int getOrder() {
 		
-		return Ordered.FIRST;
+		return ORDER;
 	}
 	
 	@Override
@@ -486,5 +467,27 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 		}
 
 		return result;
+	}
+
+	public ClusterManager getClusterManager() {
+		return clusterManager;
+	}
+
+	public void setClusterManager(ClusterManager clusterManager) {
+		this.clusterManager = clusterManager;
+	}
+
+	@Override
+	public int getMongoCount() {
+		
+		int count = 0;
+		
+		for(Cluster cluster : clusterManager.allClusters()){
+			if(cluster instanceof MongoCluster){
+				count++;
+			}
+		}
+		
+		return count;
 	}
 }

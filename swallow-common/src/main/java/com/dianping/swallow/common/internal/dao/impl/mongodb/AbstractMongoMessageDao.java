@@ -2,7 +2,7 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
-import com.dianping.swallow.common.internal.dao.SwallowMongoException;
+import com.dianping.swallow.common.internal.dao.impl.AbstractMessageDao;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
@@ -13,7 +13,7 @@ import com.mongodb.WriteResult;
  *
  * 2015年3月26日 下午1:47:15
  */
-public abstract class AbstractMessageDao extends AbstractDao implements MessageDAO{
+public abstract class AbstractMongoMessageDao extends AbstractMessageDao implements MessageDAO{
 
 	protected static final String gt = "$gt";
 

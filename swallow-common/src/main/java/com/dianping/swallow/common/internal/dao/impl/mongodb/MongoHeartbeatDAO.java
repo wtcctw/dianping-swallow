@@ -3,15 +3,26 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 import java.util.Date;
 
 
+
+
 import com.dianping.swallow.common.internal.dao.HeartbeatDAO;
+import com.dianping.swallow.common.internal.dao.impl.AbstractDao;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class HeartbeatDAOImpl extends AbstractDao implements HeartbeatDAO {
+public class MongoHeartbeatDAO extends AbstractDao implements HeartbeatDAO {
 
 	public static final String  TICK = "t";
+
+	protected MongoManager mongoManager;
+
+	public void setMongoManager(DefaultMongoManager mongoManager) {
+		
+		this.mongoManager = mongoManager;
+	}
+
 
    @Override
    public Date updateLastHeartbeat(String ip) {

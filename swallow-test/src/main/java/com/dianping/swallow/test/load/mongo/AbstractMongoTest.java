@@ -10,11 +10,11 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
-import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.test.load.AbstractLoadTest;
 import com.mongodb.MongoClient;
@@ -45,7 +45,7 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 		mc.setSwallowConfig(new SwallowConfigImpl());
 		mc.initialize();
 		
-		MessageDAOImpl mdao = new MessageDAOImpl();
+		MongoMessageDAO mdao = new MongoMessageDAO();
 		mdao.setMongoManager(mc);
 		return mdao;
 	}
@@ -90,7 +90,7 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 
 		TopicConfig config = JsonBinder.getNonEmptyBinder().fromJson(topicToMongo, TopicConfig.class);
 		
-		String address = config.getMongoUrl().substring("mongodb://".length());
+		String address = config.getStoreUrl().substring("mongodb://".length());
 		String []ipPort = address.split(":");
 		return new ServerAddress(ipPort[0], Integer.parseInt(ipPort[1]));
 				

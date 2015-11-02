@@ -2,10 +2,9 @@ package com.dianping.swallow.common.internal.config;
 
 import java.util.Set;
 
-import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
+import com.dianping.swallow.common.internal.lifecycle.Ordered;
 import com.dianping.swallow.common.internal.observer.Observable;
-import com.dianping.swallow.common.internal.util.StringUtils;
 
 
 /**
@@ -14,6 +13,8 @@ import com.dianping.swallow.common.internal.util.StringUtils;
  * 2015年6月10日 下午4:38:54
  */
 public interface SwallowConfig extends Observable, Lifecycle{
+	
+	public static int ORDER = Ordered.FIRST;
 	
 	public static final String PROJECT="swallow";
 	
@@ -39,106 +40,4 @@ public interface SwallowConfig extends Observable, Lifecycle{
 	String getHeartBeatMongo();
 	
 	boolean isSupported();
-	
-	public static class TopicConfig implements Cloneable{
-		
-		private String mongoUrl;
-		private Integer size;
-		private Integer max;
-		
-		public TopicConfig(){
-			
-		}
-		
-		public TopicConfig(String mongoUrl, int size, int max){
-			
-			this.mongoUrl = StringUtils.trimToNull(mongoUrl);
-			this.size = size;
-			this.max = max;
-			
-		}
-
-		public String getMongoUrl() {
-			return mongoUrl;
-		}
-
-		public Integer getSize() {
-			return size;
-		}
-
-		public Integer getMax() {
-			return max;
-		}
-		
-		public boolean valid(){
-			
-			return !StringUtils.isEmpty(mongoUrl)
-					|| size != null && size > 0
-					|| max != null && max >0;
-		}
-		
-		public void merge(TopicConfig defaultConfig){
-			
-			if(StringUtils.isEmpty(mongoUrl)){
-				mongoUrl = defaultConfig.mongoUrl;
-			}
-			
-			if(size == null){
-				size = defaultConfig.size;
-			}
-			
-			if( max == null ){
-				max = defaultConfig.max;
-			}
-		}
-		
-		/**
-		 * 减法，减去默认配置，得到自身最小化的配置
-		 * @param config
-		 */
-		public void sub(TopicConfig config){
-			
-			if(mongoUrl != null && mongoUrl.equals(config.getMongoUrl())){
-				mongoUrl = null;
-			}
-			
-			if(size != null && size.equals(config.getSize())){
-				size = null;
-			}
-			
-			if(max != null && max.equals(config.getMax())){
-				max = null;
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return toJson();
-		}
-		
-		@Override
-		public Object clone() throws CloneNotSupportedException {
-			
-			TopicConfig topicCfg = (TopicConfig) super.clone();
-			
-			return topicCfg;
-		}
-		
-		public String toJson(){
-			return JsonBinder.getNonEmptyBinder().toJson(this);
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if(!(obj instanceof TopicConfig)){
-				return false;
-			}
-			TopicConfig cmp = (TopicConfig) obj;
-			
-			return (mongoUrl == null? cmp.mongoUrl == null : mongoUrl.equals(cmp.mongoUrl))
-					&& ( size == null ? cmp.size == null : size.equals(cmp.size))
-					&& ( max == null ? cmp.max == null : max.equals(cmp.max));
-		}
-	}
-
 }

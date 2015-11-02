@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.config.LionUtil;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
-import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.LionUtilImpl;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigCentral;
@@ -27,7 +27,7 @@ public class SwallowConfigChange {
 
 	protected LionUtil lionUtil = new LionUtilImpl();
 	
-	protected Map<String, TopicConfig> oldConfigs = new ConcurrentHashMap<String, SwallowConfig.TopicConfig>();
+	protected Map<String, TopicConfig> oldConfigs = new ConcurrentHashMap<String, TopicConfig>();
 	
 	protected boolean putLionConfig = Boolean.parseBoolean(System.getProperty("putLionConfig"));
 	
@@ -59,7 +59,7 @@ public class SwallowConfigChange {
 		SwallowConfigDistributed config = new SwallowConfigDistributed();
 		config.initialize();
 		
-		Map<String, TopicConfig>  newConfigs = new ConcurrentHashMap<String, SwallowConfig.TopicConfig>();
+		Map<String, TopicConfig>  newConfigs = new ConcurrentHashMap<String, TopicConfig>();
 		for(String topic : config.getCfgTopics()){
 			newConfigs.put(topic, config.getTopicConfig(topic));
 		}
@@ -105,7 +105,7 @@ public class SwallowConfigChange {
 			TopicConfig rawConfig = (TopicConfig) config.clone();
 			
 			oldConfigs.put(topic, rawConfig);
-			config.sub(defaultConfig);
+			sub(config, defaultConfig);
 			
 			if(!config.valid()){
 				logger.warn("[after sub, config invalid][" + topic + "]" + rawConfig + ":" + config);
@@ -115,6 +115,25 @@ public class SwallowConfigChange {
 			logger.info("[newconfig][" + topic + "]" + config);
 			putConfig(topic, config);
 		}
+	}
+	
+	private void sub(TopicConfig config, TopicConfig defaultConfig){
+
+			if(config.getStoreUrl() != null && config.getStoreUrl().equals(defaultConfig.getStoreUrl())){
+				config.setStoreUrl(null);
+			}
+			
+			if(config.getSize() != null && config.getSize().equals(defaultConfig.getSize())){
+				config.setSize(null);
+			}
+			
+			if(config.getMax() != null && config.getMax().equals(defaultConfig.getMax())){
+				config.setMax(null);
+			}
+			
+			if(config.getTopicType() != null && config.getTopicType().equals(defaultConfig.getTopicType())){
+				config.setTopicType(null);
+			}
 	}
 
 	private void putConfig(String topic, TopicConfig config) {

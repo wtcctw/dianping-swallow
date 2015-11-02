@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
-import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 
 /**
@@ -127,29 +127,29 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 		
 		TopicConfig config = swallowConfig.getTopicConfig(AbstractSwallowConfig.TOPICNAME_DEFAULT);
 		
-		Assert.assertEquals("mongodb://192.168.213.143:27018", config.getMongoUrl());
+		Assert.assertEquals("mongodb://192.168.213.143:27018", config.getStoreUrl());
 		Assert.assertEquals(new Integer(100), config.getMax());
 		Assert.assertEquals(new Integer(100), config.getSize());
 		
 
 		config = swallowConfig.getTopicConfig("topic1");
-		Assert.assertEquals(null, config.getMongoUrl());
+		Assert.assertEquals(null, config.getStoreUrl());
 		Assert.assertEquals(new Integer(100), config.getMax());
 		Assert.assertEquals(new Integer(100), config.getSize());
 
 		config = swallowConfig.getTopicConfig("topic2");
-		Assert.assertEquals(null, config.getMongoUrl());
+		Assert.assertEquals(null, config.getStoreUrl());
 		Assert.assertEquals(null, config.getMax());
 		Assert.assertEquals(null, config.getSize());
 		
 		config = swallowConfig.getTopicConfig("topic3");
-		Assert.assertEquals("mongodb://192.168.213.143:27118", config.getMongoUrl());
+		Assert.assertEquals("mongodb://192.168.213.143:27118", config.getStoreUrl());
 		Assert.assertEquals(new Integer(102), config.getMax());
 		Assert.assertEquals(new Integer(101), config.getSize());
 		
 		//检查配置是否因为default 的merge而更新
 		config = swallowConfig.getRawTopicConfig("topic2");
-		Assert.assertEquals(null, config.getMongoUrl());
+		Assert.assertEquals(null, config.getStoreUrl());
 		Assert.assertEquals(null, config.getMax());
 		Assert.assertEquals(null, config.getSize());
 		

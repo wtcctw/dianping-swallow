@@ -6,16 +6,16 @@ import org.junit.Before;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoAckDAO;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 
 public class AckDAOImplTest extends AbstractDAOImplTest {
 
-   private AckDAOImpl ackDAO;
+   private MongoAckDAO ackDAO;
    
    @Before
    public void beforeAckDAOImplTest(){
-	   ackDAO = getBean(AckDAOImpl.class);
+	   ackDAO = getBean(MongoAckDAO.class);
    }
 
    @Test

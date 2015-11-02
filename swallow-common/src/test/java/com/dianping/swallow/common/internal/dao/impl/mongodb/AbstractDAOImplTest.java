@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 
 import com.dianping.swallow.AbstractSpringTest;
-import com.dianping.swallow.common.internal.dao.MongoManager;
 
 public abstract class AbstractDAOImplTest extends AbstractSpringTest {
 

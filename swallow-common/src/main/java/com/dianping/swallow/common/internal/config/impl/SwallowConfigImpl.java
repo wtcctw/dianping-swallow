@@ -5,7 +5,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.dianping.swallow.common.internal.config.SwallowConfig;
-import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.observer.Observer;
 
@@ -14,7 +14,7 @@ import com.dianping.swallow.common.internal.observer.Observer;
  *
  * 2015年6月12日 下午6:14:29
  */
-public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfig, SelfManagement{
+public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfig{
 
 	protected Logger logger = Logger.getLogger(getClass());
 
@@ -89,5 +89,11 @@ public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfi
 	public TopicConfig defaultTopicConfig() {
 		
 		return config.defaultTopicConfig();
+	}
+	
+	
+	@Override
+	public int getOrder() {
+		return ORDER;
 	}
 }

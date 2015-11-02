@@ -4,6 +4,7 @@ package com.dianping.swallow.common.internal.config.impl;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.observer.impl.AbstractObservableLifecycle;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 
@@ -104,6 +105,12 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 		}
 	}
 
+	
+	@Override
+	public int getOrder() {
+		return ORDER;
+	}
+	
 	protected abstract boolean interested(String key);
 
 	protected abstract SwallowConfigArgs doOnConfigChange(String key, String value);
