@@ -55,18 +55,4 @@ public abstract class AbstractStatisable<V> implements Statisable<V>{
 		return key.equals(MonitorData.TOTAL_KEY);
 	}
 
-	@Override
-	public void merge(String key, KeyMergeable merge) {
-	}
-
-	@Override
-	public void merge(Mergeable merge) {
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		AbstractStatisable clone = (AbstractStatisable) super.clone();
-		return clone;
-	}
-
 }

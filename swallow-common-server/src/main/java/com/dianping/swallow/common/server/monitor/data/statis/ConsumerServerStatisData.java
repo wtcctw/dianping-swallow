@@ -30,28 +30,4 @@ public class ConsumerServerStatisData extends AbstractTotalMapStatisable<Consume
 		return ConsumerTopicStatisData.class;
 	}
 
-//	@Override
-//	public void merge(Mergeable merge){
-//
-//		AbstractTotalMapStatisable<ConsumerTopicData,ConsumerServerData> toMerge = (AbstractTotalMapStatisable<ConsumerTopicData, ConsumerServerData>) merge;
-//
-//		for(java.util.Map.Entry<String, Statisable<ConsumerTopicData>> entry : toMerge.map.entrySet()){
-//
-//			String key = entry.getKey();
-//			Mergeable value = entry.getValue();
-//
-//			Statisable<ConsumerTopicData> myValue = map.get(key);
-//			if(myValue == null){
-//				myValue= createValue();
-//				map.put(key, myValue);
-//			}
-//			myValue.merge(value);
-//		}
-//	}
-
-	@Override
-	protected Statisable<ConsumerTopicData> createValue() {
-		return new ConsumerTopicStatisData();
-	}
-
 }

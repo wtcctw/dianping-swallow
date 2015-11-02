@@ -59,7 +59,7 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 
 	@Override
 	protected Statisable<?> getValue(Object key) {
-		
+
 		throw new IllegalArgumentException("unsupported method");
 	}
 
@@ -104,19 +104,53 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 		}
 	}
 
+//	@Override
+//	public Object getValue(CasKeys keys, StatisType type) {
+//
+//		if(type == null){
+//			return sendMessages.getValue(keys, null);
+//		}
+//
+//		switch(type){
+//
+//			case SEND:
+//				return sendMessages.getValue(keys, type);
+//			case ACK:
+//				return ackMessages.getValue(keys, type);
+//			default:
+//				throw new IllegalStateException("unsupported type:" + type);
+//		}
+//	}
+
 	@Override
-	public Object getValue(CasKeys keys, StatisType type) {
+	public NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type){
+		if(type == null){
+			throw new IllegalStateException("unsupported type:" + type);
+		}
+
+		switch(type){
+
+			case SEND:
+				return sendMessages.getDelayValue(keys, type);
+			case ACK:
+				return ackMessages.getDelayValue(keys, type);
+			default:
+				throw new IllegalStateException("unsupported type:" + type);
+		}
+	}
+
+	public NavigableMap<Long, Statisable.QpxData> getQpsValue(CasKeys keys, StatisType type){
 
 		if(type == null){
-			return sendMessages.getValue(keys, null);
+			throw new IllegalStateException("unsupported type:" + type);
 		}
-		
+
 		switch(type){
-		
+
 			case SEND:
-				return sendMessages.getValue(keys, type);
+				return sendMessages.getQpsValue(keys, type);
 			case ACK:
-				return ackMessages.getValue(keys, type);
+				return ackMessages.getQpsValue(keys, type);
 			default:
 				throw new IllegalStateException("unsupported type:" + type);
 		}
@@ -127,44 +161,9 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 		return getKeys(keys, null);
 	}
 
-	@Override
-	public Object getValue(CasKeys keys) {
-		return getValue(keys, null);
-	}
+//	@Override
+//	public Object getValue(CasKeys keys) {
+//		return getValue(keys, null);
+//	}
 
-	@Override
-	public void merge(String key, KeyMergeable merge) {
-
-		checkType(merge);
-
-		ConsumerIdStatisData toMerge = (ConsumerIdStatisData) merge;
-		sendMessages.merge(key, toMerge.sendMessages);
-		ackMessages.merge(key, toMerge.ackMessages);
-	}
-
-	@Override
-	public void merge(Mergeable merge) {
-
-		checkType(merge);
-
-		ConsumerIdStatisData toMerge = (ConsumerIdStatisData) merge;
-
-
-		sendMessages.merge(toMerge.sendMessages);
-		ackMessages.merge(toMerge.ackMessages);
-	}
-
-	private void checkType(Mergeable merge) {
-		if(!(merge instanceof ConsumerIdStatisData)){
-			throw new IllegalArgumentException("wrong type " + merge.getClass());
-		}
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		ConsumerIdStatisData clone = (ConsumerIdStatisData) super.clone();
-		clone.sendMessages = (MessageInfoTotalMapStatis) sendMessages.clone();
-		clone.ackMessages = (MessageInfoTotalMapStatis) ackMessages.clone();
-		return clone;
-	}
 }
