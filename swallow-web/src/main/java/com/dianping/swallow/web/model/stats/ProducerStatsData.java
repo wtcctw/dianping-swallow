@@ -1,5 +1,11 @@
 package com.dianping.swallow.web.model.stats;
 
+import org.springframework.data.annotation.Transient;
+
+import com.dianping.swallow.web.model.event.EventType;
+import com.dianping.swallow.web.model.event.StatisType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * 
  * @author qiyin
@@ -8,7 +14,14 @@ package com.dianping.swallow.web.model.stats;
  */
 public abstract class ProducerStatsData extends StatsData {
 
+	public ProducerStatsData() {
+		eventType = EventType.PRODUCER;
+	}
+
 	private long qps;
+
+	@Transient
+	private long qpsTotal;
 
 	private long delay;
 
@@ -30,8 +43,25 @@ public abstract class ProducerStatsData extends StatsData {
 
 	@Override
 	public String toString() {
-		return "ProducerStatsData [qps=" + qps + ", delay=" + delay + "]"+ super.toString();
+		return "ProducerStatsData [qps=" + qps + ", delay=" + delay + "]" + super.toString();
 	}
 
-	
+	@JsonIgnore
+	public long getQpsTotal() {
+		return qpsTotal;
+	}
+
+	@JsonIgnore
+	public void setQpsTotal(long qpsTotal) {
+		this.qpsTotal = qpsTotal;
+	}
+
+	public boolean checkQpsPeak(long expectQps) {
+		return checkQpsPeak(this.getQps(), expectQps, StatisType.SENDQPS_PEAK);
+	}
+
+	public boolean checkQpsValley(long expectQps) {
+		return checkQpsValley(this.getQps(), expectQps, StatisType.SENDQPS_VALLEY);
+	}
+
 }

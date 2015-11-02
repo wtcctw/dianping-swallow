@@ -13,7 +13,7 @@ public interface MessageRetransmitService {
 	 * @param topicName	topic名称
 	 * @param mid		消息ID
 	 */
-	boolean doRetransmit(String topicName, long mid);
+	boolean retransmitMessage(String topicName, long mid);
 	
 	/**
 	 * 发送自定义消息

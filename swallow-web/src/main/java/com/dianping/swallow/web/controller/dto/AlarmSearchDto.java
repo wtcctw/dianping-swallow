@@ -5,11 +5,7 @@ package com.dianping.swallow.web.controller.dto;
  *
  * 2015年8月9日 下午4:11:00
  */
-public class AlarmSearchDto {
-	private int offset;
-
-	private int limit;
-
+public class AlarmSearchDto extends BaseQueryDto{
 	private String receiver;
 
 	private RelatedTypeDto relatedType;
@@ -36,16 +32,8 @@ public class AlarmSearchDto {
 		return relatedType;
 	}
 
-	public void setRelatedType(RelatedTypeDto relatedType) {
-		this.relatedType = relatedType;
-	}
-
 	public String getRelatedInfo() {
 		return relatedInfo;
-	}
-
-	public void setRelatedInfo(String relatedInfo) {
-		this.relatedInfo = relatedInfo;
 	}
 
 	public String getStartTime() {
@@ -62,22 +50,6 @@ public class AlarmSearchDto {
 
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
-	}
-
-	public int getOffset() {
-		return offset;
-	}
-
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
-
-	public int getLimit() {
-		return limit;
-	}
-
-	public void setLimit(int limit) {
-		this.limit = limit;
 	}
 
 }

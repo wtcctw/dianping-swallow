@@ -102,14 +102,6 @@ public class TopicResourceServiceTest {
 		System.out.println(producerServer3.toString());
 		Assert.assertNotNull(producerServer3);
 		
-		int delete = topicResourceService.remove("example2");
-		System.out.println("delete is " + delete);
-		Assert.assertEquals(delete, 1);
-
-		delete = topicResourceService.remove("default");
-		System.out.println("delete is " + delete);
-		Assert.assertEquals(delete, 1);
-		
 	}
 
 }

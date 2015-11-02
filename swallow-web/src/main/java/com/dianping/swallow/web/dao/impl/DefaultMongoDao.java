@@ -78,16 +78,8 @@ public class DefaultMongoDao extends AbstractWriteDao implements MongoDao {
 	}
 
 	@Override
-	public MongoResource findByCatalog(String catalog) {
-		
-		Query query = new Query(Criteria.where(CATALOG).is(catalog));
-		MongoResource mongoResource = mongoTemplate.findOne(query, MongoResource.class, MONGORESOURCE_COLLECTION);
-		return mongoResource;
-	}
-
-	@Override
 	public List<MongoResource> findByType(MongoType mongoType) {
-		
+
 		Query query = new Query(Criteria.where(TYPE).is(mongoType));
 		List<MongoResource> mongoResource = mongoTemplate.find(query, MongoResource.class, MONGORESOURCE_COLLECTION);
 		return mongoResource;
@@ -111,20 +103,13 @@ public class DefaultMongoDao extends AbstractWriteDao implements MongoDao {
 	}
 
 	@Override
-	public MongoResource findDefault() {
-		Query query = new Query(Criteria.where(CATALOG).is(DEFAULT));
-		MongoResource mongoResource = mongoTemplate.findOne(query, MongoResource.class, MONGORESOURCE_COLLECTION);
-		return mongoResource;
-	}
-
-	@Override
 	public Pair<Long, List<MongoResource>> findMongoResourcePage(int offset, int limit) {
 		Query query = new Query();
 
 		query.skip(offset)
 				.limit(limit)
-				.with(new Sort(new Sort.Order(Direction.ASC, TYPE), new Sort.Order(Direction.ASC, DISK), new Sort.Order(Direction.ASC, QPS), new Sort.Order(
-						Direction.ASC, CATALOG)));
+				.with(new Sort(new Sort.Order(Direction.ASC, TYPE), new Sort.Order(Direction.ASC, DISK),
+						new Sort.Order(Direction.ASC, QPS), new Sort.Order(Direction.ASC, CATALOG)));
 		List<MongoResource> ipResources = mongoTemplate.find(query, MongoResource.class, MONGORESOURCE_COLLECTION);
 		Long size = this.count();
 		return new Pair<Long, List<MongoResource>>(size, ipResources);

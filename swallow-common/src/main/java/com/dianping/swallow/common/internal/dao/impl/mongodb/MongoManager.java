@@ -4,7 +4,6 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
-import com.mongodb.MongoClientOptions;
 
 /**
  * @author mengwenchao
@@ -30,8 +29,6 @@ public interface MongoManager {
 	void cleanAckCollection(String topicName, String consumerId, boolean isBackup);
 	
 	Mongo getMongo(String topicName);
-	
-	MongoClientOptions getMongoOptions();
 	
 	int getMongoCount();
 }

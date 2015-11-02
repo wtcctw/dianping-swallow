@@ -59,4 +59,7 @@ public class MongoClusterFactory extends AbstractClusterFactory{
 		return false;
 	}
 
+	public MongoClientOptions getMongoOptions(){
+		return mongoOptions;
+	}
 }

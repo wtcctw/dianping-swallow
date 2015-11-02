@@ -10,12 +10,12 @@ import org.mockito.Spy;
 import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.model.event.Event;
-import com.dianping.swallow.web.model.event.EventFactory;
+import com.dianping.swallow.web.model.event.EventFactoryImpl;
 
 public class ProducerServerStatsDataTest extends MockTest {
 	
 	@Spy
-	private EventFactory eventFactory;
+	private EventFactoryImpl eventFactory;
 
 	@Mock
 	private EventReporter eventReporter;

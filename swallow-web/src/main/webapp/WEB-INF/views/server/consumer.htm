@@ -1,190 +1,286 @@
 <div class="main-content" ng-controller="ConsumerServerSettingController"
-	id="ConsumerServerSettingController">
-		<div class="breadcrumbs" id="breadcrumbs">
-		<script type="text/javascript"
-				src="${rc.contextPath}/static/js/swallow-consumerserversetting.js"></script>
-			<script type="text/javascript">
-				try {
-					ace.settings.check('breadcrumbs', 'fixed')
-				} catch (e) {
-				}
-			</script>
-			<ul class="breadcrumb">
-				<li class="active">consumer server设置</li>
-			</ul>
-			<a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
-				data-toggle="modal"><i class="icon-plus"></i></a>
-		</div>
-		<div class="page-content" id="container">
-			<div class="row">
-				<table
-					class="table table-bordered table-striped  table-condensed table-hover">
-					<tr>
-						<th style="text-align: left">序号</th>
-						<th style="text-align: left">ServerId</th>
-						<th style="text-align: left">主机名</th>
-						<th style="text-align: left">类型</th>
-						<th style="text-align: left">端口</th>
-						<th style="text-align: left">组ID</th>
-						<th style="text-align: left">发送峰值</th>
-						<th style="text-align: left">发送谷值</th>
-						<th style="text-align: left">发送波动</th>
-						<th style="text-align: left">发送波动基数</th>
-						<th style="text-align: left">确认峰值</th>
-						<th style="text-align: left">确认谷值</th>
-						<th style="text-align: left">确认波动</th>
-						<th style="text-align: left">确认波动基数</th>
-						<th style="text-align: left">启用</th>
-						<th style="text-align: left">告警</th>
-						<th style="text-align: left">操作</th>
-					</tr>
-					<tr ng-repeat="ad in searchPaginator.currentPageItems">
-						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left"><a style="cursor:pointer;"
-							ng-click="setConsumerIps(ad.ip)" ng-bind="ad.ip"></a></td>
-						<td style="text-align: left" ng-bind="ad.hostname"></td>
-						<td style="text-align: left" ng-bind="ad.type"></td>
-						<td style="text-align: left" ng-bind="ad.port"></td>
-						<td style="text-align: left" ng-bind="ad.groupId"></td>
-						<td style="text-align: left" ng-bind="ad.sendpeak"></td>
-						<td style="text-align: left" ng-bind="ad.sendvalley"></td>
-						<td style="text-align: left" ng-bind="ad.sendfluctuation"></td>
-						<td style="text-align: left" ng-bind="ad.sendfluctuationBase"></td>
-						<td style="text-align: left" ng-bind="ad.ackpeak"></td>
-						<td style="text-align: left" ng-bind="ad.ackvalley"></td>
-						<td style="text-align: left" ng-bind="ad.ackfluctuation"></td>
-						<td style="text-align: left" ng-bind="ad.ackfluctuationBase"></td>
-						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90"></small> <input
-								id="cactive{{$index}}" type="checkbox" ng-model="ad.active" ng-click="changeconsumeractive(ad.ip, $index)"
-								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
-						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90"></small> <input
-								id="calarm{{$index}}" type="checkbox" ng-model="ad.alarm" ng-click="changeconsumeralarm(ad.ip, $index)"
-								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
-						<td style="text-align: left"><a href="#myModal"
-							ng-click="setModalInput($index);" data-toggle="modal"
-							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
-								data-original-title="编辑配置值"></i></a> <a href ng-show="isdefault(ad.ip)"
-							ng-click="dialog(ad.ip);"
-							class="edit-config-btn"><i class="icon-remove" rel="tooltip"
-								data-original-title="删除配置项"></i></a></td>
-					</tr>
-				</table>
-			</div>
-		</div>
+     id="ConsumerServerSettingController">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/swallow-consumerserversetting.js"></script>
+        <script type="text/javascript">
+            try {
+                ace.settings.check('breadcrumbs', 'fixed')
+            } catch (e) {
+            }
+        </script>
+        <ul class="breadcrumb">
+            <li class="active">consumer server设置</li>
+        </ul>
+        <a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
+           data-toggle="modal"><i class="icon-plus"></i></a>
+    </div>
+    <div class="page-content" id="container">
+        <div class="row">
+            <table
+                    class="table table-bordered table-striped  table-condensed table-hover">
+                <tr>
+                    <th style="text-align: left">序号</th>
+                    <th style="text-align: left">ServerId</th>
+                    <th style="text-align: left">主机名</th>
+                    <th style="text-align: left">类型</th>
+                    <th style="text-align: left">端口</th>
+                    <th style="text-align: left">组ID</th>
+                    <th style="text-align: left">告警配置</th>
+                    <th style="text-align: left">启用</th>
+                    <th style="text-align: left">告警</th>
+                    <th style="text-align: left">操作</th>
+                </tr>
+                <tr ng-repeat="ad in searchPaginator.currentPageItems">
+                    <td style="text-align: left" ng-bind="$index+1"></td>
+                    <td style="text-align: left"><a style="cursor:pointer;" ng-click="setConsumerIps(ad.ip)" ng-bind="ad.ip"></a></td>
+                    <td style="text-align: left" ng-bind="ad.hostname"></td>
+                    <td style="text-align: left" ng-bind="ad.type"></td>
+                    <td style="text-align: left" ng-bind="ad.port"></td>
+                    <td style="text-align: left" ng-bind="ad.groupId"></td>
+                    <td style="text-align: left"><a href="#myModal1"
+                                                    ng-click="setModalInput($index);" data-toggle="modal">详情</a></td>
+                    <td style="text-align: left"><label class="pull-left inline">
+                        <small class="muted smaller-90"></small>
+                        <input
+                                id="cactive{{$index}}" type="checkbox" ng-model="ad.active"
+                                ng-click="changeconsumeractive(ad.ip, $index)"
+                                class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                    </label></td>
+                    <td style="text-align: left"><label class="pull-left inline">
+                        <small class="muted smaller-90"></small>
+                        <input
+                                id="calarm{{$index}}" type="checkbox" ng-model="ad.alarm"
+                                ng-click="changeconsumeralarm(ad.ip, $index)"
+                                class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                    </label></td>
+                    <td style="text-align: left"><a href="#myModal0"
+                                                    ng-click="setModalInput($index);" data-toggle="modal"
+                                                    class="edit-config-btn"><i class="icon-edit " rel="tooltip"
+                                                                               data-original-title="编辑配置值"></i></a> <a
+                            href ng-show="isdefault(ad.ip)"
+                            ng-click="dialog(ad.ip);"
+                            class="edit-config-btn"><i class="icon-remove" rel="tooltip"
+                                                       data-original-title="删除配置项"></i></a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
 
-		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">配置ConsumerServer</h4>
-					</div>
-					<div class="modal-body">
-						<form method="post" class="form-horizontal" name="myForm"
-							ng-submit="refreshpage(myForm)">
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>ServerId</b></label> <input
-										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
-										ng-model="consumerserverEntry.ip" id="serverId" ng-readonly="isReadOnly">
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>主机名</b></label> <input
-										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
-										ng-model="consumerserverEntry.hostname" id="hostname" >
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>类型</b></label> <select
-									class="form-control" ng-model="consumerserverEntry.type"
-									id="serverType" required>
-									<option ng-repeat="type in types"
-										value="{{type}}">{{type}}</option>
-								</select>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>端口</b></label> <input
-										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
-										ng-model="consumerserverEntry.port" id="prot" >
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>组ID</b></label> <input
-										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
-										ng-model="consumerserverEntry.groupId" id="groupId">
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">发送QPS</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text"
-											ng-model="consumerserverEntry.sendpeak" /> <label
-											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumerserverEntry.sendvalley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumerserverEntry.sendfluctuation" /> <label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="consumerserverEntry.sendfluctuationBase" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">确认QPS</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text"
-											ng-model="consumerserverEntry.ackpeak" /> <label
-											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumerserverEntry.ackvalley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumerserverEntry.ackfluctuation" /><label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="consumerserverEntry.ackfluctuationBase" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group" style="margin-top: 40px">
-								<div class="controls">
-									<button type="button" class="btn btn-default"
-										data-dismiss="modal">关闭</button>
-									<button type="submit" class="btn btn-success">提交</button>
-								</div>
-							</div>
-						</form>
-					</div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal0" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">配置ConsumerServer</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="form-horizontal" name="myForm0"
+                          ng-submit="refreshpage(myForm0, 0)">
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>ServerId</b></label> <input
+                                    type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                    ng-model="consumerserverEntry.ip" id="serverId" ng-readonly="isReadOnly">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>主机名</b></label> <input
+                                    type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                    ng-model="consumerserverEntry.hostname" id="hostname">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>类型</b></label> <select
+                                    class="form-control" ng-model="consumerserverEntry.type"
+                                    id="serverType" required>
+                                <option ng-repeat="type in types"
+                                        value="{{type}}">{{type}}
+                                </option>
+                            </select>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>端口</b></label> <input
+                                    type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                    ng-model="consumerserverEntry.port" id="prot">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>组ID</b></label> <input
+                                    type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                    ng-model="consumerserverEntry.groupId" id="groupId">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">发送QPS</label>
 
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
-	</div>
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;">
+                                <div class="col-sm-12">
+                                    <label class="col-sm-2 control-label">峰值</label> <input
+                                        class="col-sm-2" type="text"
+                                        ng-model="consumerserverEntry.sendAlarmSetting.peak"/> <label
+                                        class="col-sm-2 control-label">谷值</label><input type="text"
+                                                                                        class="col-sm-2"
+                                                                                        ng-model="consumerserverEntry.sendAlarmSetting.valley"/>
+                                    <label
+                                            class="col-sm-2 control-label">波动</label><input type="text"
+                                                                                            class="col-sm-2"
+                                                                                            ng-model="consumerserverEntry.sendAlarmSetting.fluctuation"/>
+                                    <label
+                                            class="col-sm-2 control-label">波动基数</label><input type="text"
+                                                                                              class="col-sm-2"
+                                                                                              ng-model="consumerserverEntry.sendAlarmSetting.fluctuationBase"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">确认QPS</label>
+
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;">
+                                <div class="col-sm-12">
+                                    <label class="col-sm-2 control-label">峰值</label> <input
+                                        class="col-sm-2" type="text"
+                                        ng-model="consumerserverEntry.ackAlarmSetting.peak"/> <label
+                                        class="col-sm-2 control-label">谷值</label><input type="text"
+                                                                                        class="col-sm-2"
+                                                                                        ng-model="consumerserverEntry.ackAlarmSetting.valley"/>
+                                    <label
+                                            class="col-sm-2 control-label">波动</label><input type="text"
+                                                                                            class="col-sm-2"
+                                                                                            ng-model="consumerserverEntry.ackAlarmSetting.fluctuation"/><label
+                                        class="col-sm-2 control-label">波动基数</label><input type="text"
+                                                                                          class="col-sm-2"
+                                                                                          ng-model="consumerserverEntry.ackAlarmSetting.fluctuationBase"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-top: 40px">
+                            <div class="controls">
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭
+                                </button>
+                                <button type="submit" class="btn btn-success">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
+
+
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">配置ConsumerServer</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="form-horizontal" name="myForm1"
+                          ng-submit="refreshpage(myForm1, 1)">
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>ServerId</b></label> <input
+                                    type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                    ng-model="consumerserverEntry.ip" id="serverId" ng-readonly="true">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>主机名</b></label> <input
+                                    type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                    ng-model="consumerserverEntry.hostname" id="hostname" ng-readonly="true">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">发送QPS</label>
+
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;">
+                                <div class="col-sm-12">
+                                    <label class="col-sm-2 control-label">峰值</label> <input
+                                        class="col-sm-2" type="text"
+                                        ng-model="consumerserverEntry.sendAlarmSetting.peak"/> <label
+                                        class="col-sm-2 control-label">谷值</label><input type="text"
+                                                                                        class="col-sm-2"
+                                                                                        ng-model="consumerserverEntry.sendAlarmSetting.valley"/>
+                                    <label
+                                            class="col-sm-2 control-label">波动</label><input type="text"
+                                                                                            class="col-sm-2"
+                                                                                            ng-model="consumerserverEntry.sendAlarmSetting.fluctuation"/>
+                                    <label
+                                            class="col-sm-2 control-label">波动基数</label><input type="text"
+                                                                                              class="col-sm-2"
+                                                                                              ng-model="consumerserverEntry.sendAlarmSetting.fluctuationBase"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">确认QPS</label>
+
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;">
+                                <div class="col-sm-12">
+                                    <label class="col-sm-2 control-label">峰值</label> <input
+                                        class="col-sm-2" type="text"
+                                        ng-model="consumerserverEntry.ackAlarmSetting.peak"/> <label
+                                        class="col-sm-2 control-label">谷值</label><input type="text"
+                                                                                        class="col-sm-2"
+                                                                                        ng-model="consumerserverEntry.ackAlarmSetting.valley"/>
+                                    <label
+                                            class="col-sm-2 control-label">波动</label><input type="text"
+                                                                                            class="col-sm-2"
+                                                                                            ng-model="consumerserverEntry.ackAlarmSetting.fluctuation"/><label
+                                        class="col-sm-2 control-label">波动基数</label><input type="text"
+                                                                                          class="col-sm-2"
+                                                                                          ng-model="consumerserverEntry.ackAlarmSetting.fluctuationBase"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-top: 40px">
+                            <div class="controls">
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭
+                                </button>
+                                <button type="submit" class="btn btn-success">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+</div>
 

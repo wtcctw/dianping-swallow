@@ -9,7 +9,7 @@ import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
  *
  * 2015年7月8日 下午6:09:14
  */
-public interface MapRetriever {
+public interface 	MapRetriever {
 
 	Set<String> getKeys(CasKeys keys, StatisType type);
 	

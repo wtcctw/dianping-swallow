@@ -2,9 +2,11 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
+import com.dianping.swallow.web.alarmer.TaskManager;
 
 /**
  * 
@@ -16,11 +18,17 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	protected static final String FUNCTION_DOALARM = "-doAlarm";
+	protected static final String DOALARM_FUNCTION = "-doAlarm";
+
+	@Autowired
+	protected TaskManager taskManager;
+
+	protected String alarmName;
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
+		alarmName = getClass().getSimpleName() + DOALARM_FUNCTION;
 	}
 
 	@Override
@@ -28,7 +36,7 @@ public abstract class AbstractAlarmer extends AbstractLifecycle implements Alarm
 		super.doStart();
 		logger.info("[doStart] {} start.", getClass().getSimpleName());
 	}
-	
+
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();

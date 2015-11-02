@@ -65,12 +65,6 @@ public class ApplicationResourceServiceImpl extends AbstractSwallowService imple
 	}
 
 	@Override
-	public ApplicationResource findDefault() {
-
-		return applicationResourceDao.findDefault();
-	}
-
-	@Override
 	public Pair<Long, List<ApplicationResource>> findApplicationResourcePage(int offset, int limit) {
 
 		return applicationResourceDao.findApplicationResourcePage(offset, limit);

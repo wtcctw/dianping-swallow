@@ -20,26 +20,14 @@ public class AlarmMetaBatchDto {
 		return metaIds;
 	}
 
-	public void setMetaIds(List<Integer> metaIds) {
-		this.metaIds = metaIds;
-	}
-
 	public UpdateType getUpdateType() {
 		return updateType;
-	}
-
-	public void setUpdateType(UpdateType updateType) {
-		this.updateType = updateType;
 	}
 
 	public boolean getIsOpen() {
 		return isOpen;
 	}
 
-	public void setIsOpen(boolean isOpen) {
-		this.isOpen = isOpen;
-	}
-	
 	public enum UpdateType{
 		SMS,WEIXIN,MAIL,SWALLOW,BUSINESS;
 	}

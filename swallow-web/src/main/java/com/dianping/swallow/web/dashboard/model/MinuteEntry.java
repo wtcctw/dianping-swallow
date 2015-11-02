@@ -1,11 +1,11 @@
 package com.dianping.swallow.web.dashboard.model;
 
-import java.util.Date;
-import java.util.List;
-
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -41,32 +41,16 @@ public class MinuteEntry {
 		return this;
 	}
 
-	public List<Entry> getComprehensiveList() {
-		return comprehensiveList;
-	}
-
 	public void setComprehensiveList(List<Entry> comprehensiveList) {
 		this.comprehensiveList = comprehensiveList;
-	}
-
-	public List<Entry> getSendList() {
-		return sendList;
 	}
 
 	public void setSendList(List<Entry> sendList) {
 		this.sendList = sendList;
 	}
 
-	public List<Entry> getAckList() {
-		return ackList;
-	}
-
 	public void setAckList(List<Entry> ackList) {
 		this.ackList = ackList;
-	}
-
-	public List<Entry> getAccuList() {
-		return accuList;
 	}
 
 	public void setAccuList(List<Entry> accuList) {

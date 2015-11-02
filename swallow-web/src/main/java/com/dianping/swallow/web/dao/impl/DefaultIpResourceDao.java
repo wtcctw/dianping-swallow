@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.IpResourceDao;
 import com.dianping.swallow.web.model.resource.IpResource;
-import com.mongodb.WriteResult;
 
 /**
  * @author mingdongli
@@ -47,14 +46,6 @@ public class DefaultIpResourceDao extends AbstractWriteDao implements IpResource
 	public boolean update(IpResource ipResource) {
 
 		return insert(ipResource);
-	}
-
-	@Override
-	public int remove(String ip) {
-
-		Query query = new Query(Criteria.where(IP).is(ip));
-		WriteResult result = mongoTemplate.remove(query, IpResource.class, IPRESOURCE_COLLECTION);
-		return result.getN();
 	}
 
 	@Override

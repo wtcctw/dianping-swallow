@@ -78,7 +78,7 @@ public class AppResourceManagerImpl implements AppResourceManager {
 		if (StringUtils.isBlank(ip)) {
 			return null;
 		}
-		List<IpResource> ipResources = ipResourceService.findByIp(ip);
+		List<IpResource> ipResources = ipResourceService.findByIps(ip);
 		if (ipResources != null && !ipResources.isEmpty()) {
 			List<String> appNames = new ArrayList<String>();
 			for (IpResource ipResource : ipResources) {
@@ -129,6 +129,18 @@ public class AppResourceManagerImpl implements AppResourceManager {
 			List<String> alarmIps = new ArrayList<String>();
 			for (IpInfo ipInfo : ipInfos) {
 				if (ipInfo.isActiveAndAlarm()) {
+					alarmIps.add(ipInfo.getIp());
+				}
+			}
+			if (alarmIps == null || alarmIps.isEmpty()) {
+				for (IpInfo ipInfo : ipInfos) {
+					if (ipInfo.isAlarm()) {
+						alarmIps.add(ipInfo.getIp());
+					}
+				}
+			}
+			if (alarmIps == null || alarmIps.isEmpty()) {
+				for (IpInfo ipInfo : ipInfos) {
 					alarmIps.add(ipInfo.getIp());
 				}
 			}

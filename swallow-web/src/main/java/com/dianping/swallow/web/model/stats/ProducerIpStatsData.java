@@ -1,80 +1,122 @@
 package com.dianping.swallow.web.model.stats;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.dianping.swallow.web.model.event.EventType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年9月6日 上午9:45:54
  */
 @Document(collection = "PRODUCER_IP_STATS_DATA")
-@CompoundIndexes({ @CompoundIndex(name = "IX_TOPICNAME_IP_TIMEKEY", def = "{'topicName': -1, 'ip': -1, 'timeKey': 1}") })
-public class ProducerIpStatsData extends ProducerStatsData {
+@CompoundIndexes({@CompoundIndex(name = "IX_TOPICNAME_IP_TIMEKEY", def = "{'topicName': -1, 'ip': -1, 'timeKey': 1}")})
+public class ProducerIpStatsData extends AbstractIpStatsData {
 
-	private String ip;
+    public ProducerIpStatsData() {
+        eventType = EventType.PRODUCER;
+    }
 
-	private String topicName;
+    private long qps;
 
-	public String getIp() {
-		return ip;
-	}
+    @Transient
+    private long qpsTotal;
 
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
+    private long delay;
 
-	public String getTopicName() {
-		return topicName;
-	}
+    public long getQps() {
+        return qps;
+    }
 
-	public void setTopicName(String topicName) {
-		this.topicName = topicName;
-	}
+    public void setQps(long qps) {
+        this.qps = qps;
+    }
 
-	public boolean checkPreStatsData(ProducerIpStatsData statsData) {
-		if (this.getQps() == 0L && this.getDelay() == 0L) {
-			if (statsData.getQps() != 0L || statsData.getDelay() != 0L) {
-				return false;
-			}
-		}
-		return true;
-	}
+    public long getDelay() {
+        return delay;
+    }
 
-	public boolean checkStatsData() {
-		if (this.getQps() == 0L) {
-			return false;
-		}
-		return true;
-	}
+    public void setDelay(long delay) {
+        this.delay = delay;
+    }
 
-	public boolean hasStatsData() {
-		if (this.getQps() <= 0L) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public String toString() {
+        return "ProducerIpStatsData [qps=" + qps + ", qpsTotal=" + qpsTotal + ", delay=" + delay + "]";
+    }
 
-	public boolean checkGroupStatsData(List<ProducerIpStatsData> statsDatas) {
-		if (this.getQps() == 0L) {
-			if (statsDatas != null && statsDatas.size() > 0) {
-				for (ProducerIpStatsData statsData : statsDatas) {
-					if (StringUtils.equals(statsData.getIp(), this.ip)) {
-						continue;
-					} else {
-						if (statsData.getQps() != 0L) {
-							return false;
-						}
-					}
-				}
-			}
-		}
-		return true;
-	}
+    @JsonIgnore
+    public long getQpsTotal() {
+        return qpsTotal;
+    }
+
+    @JsonIgnore
+    public void setQpsTotal(long qpsTotal) {
+        this.qpsTotal = qpsTotal;
+    }
+
+    public boolean hasStatsData() {
+        return hasStatsData(0L, 0L);
+    }
+
+    public boolean hasStatsData(long qpsThreshold, long totalThreshold) {
+        if (this.getQps() <= qpsThreshold && this.getQpsTotal() <= totalThreshold) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public IpStatsDataKey createStatsDataKey() {
+        return new ProducerIpStatsDataKey(this);
+    }
+
+    public static class ProducerIpStatsDataKey extends IpStatsDataKey {
+        public ProducerIpStatsDataKey(ProducerIpStatsData ipStatsData) {
+            super(ipStatsData);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((getTopicName() == null) ? 0 : getTopicName().hashCode());
+            result = prime * result + ((getIp() == null) ? 0 : getIp().hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ProducerIpStatsDataKey other = (ProducerIpStatsDataKey) obj;
+            if (getTopicName() == null) {
+                if (other.getTopicName() != null)
+                    return false;
+            } else if (!getTopicName().equals(other.getTopicName()))
+                return false;
+            if (getIp() == null) {
+                if (other.getIp() != null)
+                    return false;
+            } else if (!getIp().equals(other.getIp()))
+                return false;
+
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "ProducerIpStatsDataKey [" + super.toString() + "]";
+        }
+
+    }
 
 }

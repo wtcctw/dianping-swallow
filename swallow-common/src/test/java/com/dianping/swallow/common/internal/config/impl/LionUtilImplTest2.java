@@ -36,8 +36,25 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		
 	}
 
-	
 	@Test
+	public void testGetKey(){
+
+		String result = lionUtil.getValue("swallow.broker.notify.devMode");
+		System.out.println(result);
+		Assert.assertEquals(result, "true");
+
+		result = lionUtil.getValue("swallow.broker.notify.smsTo");
+		System.out.println(result);
+		Assert.assertEquals(result, "15921096896");
+
+		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "testenv");
+		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "alphapost","post", "alpha");
+		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "alphaget","get", "alpha");
+		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "testcreate","post", null);
+
+	}
+	
+	//@Test
 	public void testGetConfigs(){
 
 		String value = "swallow" + UUID.randomUUID().toString();
@@ -50,7 +67,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		
 		for(String addKey : newKeys){
 			
-			lionUtil.createOrSetConfig(TEST_KEY + addKey, value + addKey, "get");
+			lionUtil.createOrSetConfig(TEST_KEY + addKey, value + addKey, "get", null);
 		}
 		
 		Map<String, String> cfgs = lionUtil.getCfgs(TEST_KEY);
@@ -66,11 +83,11 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		
 	}
 	
-	@Test
+	//@Test
 	public void testCreateOrSetConfig(){
 		
 		String value = UUID.randomUUID().toString();
-		lionUtil.createOrSetConfig(TEST_KEY, value, "get");
+		lionUtil.createOrSetConfig(TEST_KEY, value, "get", null);
 
 		keyValue = cc.getProperty("swallow." + TEST_KEY);
 		
@@ -79,7 +96,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		
 		value = UUID.randomUUID().toString();
 		
-		lionUtil.createOrSetConfig(TEST_KEY, value, "post");
+		lionUtil.createOrSetConfig(TEST_KEY, value, "post", null);
 
 		sleep(100);
 		//configlistener
@@ -87,24 +104,24 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 
 	}
 	
-	@Test
+	//@Test
 	public void testPut(){
 		
 		String value = "put method "  + UUID.randomUUID().toString();
-		lionUtil.createOrSetConfig(TEST_KEY, value, "get");
+		lionUtil.createOrSetConfig(TEST_KEY, value, "get", null);
 
 		keyValue = cc.getProperty("swallow." + TEST_KEY);
 		
 		Assert.assertEquals(value, keyValue);
-		
-		
+
+
 		value = "put method " + UUID.randomUUID().toString();
 		try{
-			lionUtil.createOrSetConfig(TEST_KEY, value, "put");
+			lionUtil.createOrSetConfig(TEST_KEY, value, "put", null);
 		}catch(Exception e){
 			Assert.assertEquals(e.getMessage(), "illegal type :put");
 		}
-		
+
 	}
 	
 	@Test

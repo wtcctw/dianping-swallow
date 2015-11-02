@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
-import com.mongodb.WriteResult;
 
 /**
  * 
@@ -35,8 +34,6 @@ public class DefaultAlarmDao extends AbstractStatsDao implements AlarmDao {
 
 	private static final String EVENTID_FIELD = "eventId";
 
-	private static final String ID_FIELD = "id";
-
 	private static final String RELATED_FIELD = "related";
 
 	private static final String SUBRELATED_FIELD = "subRelated";
@@ -55,20 +52,6 @@ public class DefaultAlarmDao extends AbstractStatsDao implements AlarmDao {
 	@Override
 	public boolean update(Alarm alarm) {
 		return insert(alarm);
-	}
-
-	@Override
-	public int deleteById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, Alarm.class, ALARM_COLLECTION);
-		return result.getN();
-	}
-
-	@Override
-	public Alarm findById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		Alarm alarm = mongoTemplate.findOne(query, Alarm.class, ALARM_COLLECTION);
-		return alarm;
 	}
 
 	@Override

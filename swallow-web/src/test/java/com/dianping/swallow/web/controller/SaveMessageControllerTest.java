@@ -75,7 +75,7 @@ public class SaveMessageControllerTest {
 	public void testRetransmit() {
 		String topicName = "example";
 		long mid = 6156810622106337423L;
-		boolean res = saveMessageService.doRetransmit(topicName, mid);
+		boolean res = saveMessageService.retransmitMessage(topicName, mid);
 		assertEquals(res, Boolean.TRUE);
 	}
 

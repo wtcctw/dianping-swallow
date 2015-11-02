@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.controller.dto.BaseDto;
 import com.dianping.swallow.web.model.Administrator;
 import com.dianping.swallow.web.model.UserType;
 
@@ -20,7 +19,7 @@ public interface UserService {
 	 * @param offset  起始位置
 	 * @param limit	  偏移量
 	 */
-	Pair<Long, List<Administrator>> loadUserPage(BaseDto baseDto);
+	Pair<Long, List<Administrator>> loadUserPage(int offset, int limit);
 	
 
 	/**
@@ -49,7 +48,7 @@ public interface UserService {
 	 */
 	boolean updateUser(String name, UserType auth);
 
-	List<Administrator> loadUsers();
+	List<Administrator> findAll();
 	
 	Set<String> loadCachedAdministratorSet();
 

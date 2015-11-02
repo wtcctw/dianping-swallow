@@ -103,17 +103,18 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	});
 	
 	$scope.producerserverEntry = {};
+	$scope.producerserverEntry.saveAlarmSetting = {};
 	$scope.producerserverEntry.ip;
 	$scope.producerserverEntry.hostname;
 	$scope.producerserverEntry.alarm;
 	$scope.producerserverEntry.active;
-	$scope.producerserverEntry.sendpeak;
-	$scope.producerserverEntry.sendvalley;
-	$scope.producerserverEntry.sendfluctuation;
-	$scope.producerserverEntry.sendfluctuationBase;
-	
+	$scope.producerserverEntry.saveAlarmSetting.peak;
+	$scope.producerserverEntry.saveAlarmSetting.valley;
+	$scope.producerserverEntry.saveAlarmSetting.fluctuation;
+	$scope.producerserverEntry.saveAlarmSetting.fluctuationBase;
+
 	$scope.refreshpage = function(myForm){
-		if ($scope.producerserverEntry.sendpeak < $scope.producerserverEntry.sendvalley){
+		if ($scope.producerserverEntry.saveAlarmSetting.peak < $scope.producerserverEntry.saveAlarmSetting.valley){
 			alert("谷值不能小于峰值");
 			return;
 		}
@@ -134,16 +135,17 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.hostname = "";
 		$scope.producerserverEntry.alarm = true;
 		$scope.producerserverEntry.active = true;
-		$scope.producerserverEntry.sendpeak = "";
-		$scope.producerserverEntry.sendvalley = "";
-		$scope.producerserverEntry.sendfluctuation = "";
-		$scope.producerserverEntry.sendfluctuationBase = "";
-		
+		$scope.producerserverEntry.saveAlarmSetting.peak = "";
+		$scope.producerserverEntry.saveAlarmSetting.valley = "";
+		$scope.producerserverEntry.saveAlarmSetting.fluctuation = "";
+		$scope.producerserverEntry.saveAlarmSetting.fluctuationBase = "";
+
+
 		$http.get(window.contextPath + "/console/server/defaultpresource").success(function(data){
-			$scope.producerserverEntry.sendpeak = data.sendpeak;
-			$scope.producerserverEntry.sendvalley = data.sendvalley;
-			$scope.producerserverEntry.sendfluctuation = data.sendfluctuation;
-			$scope.producerserverEntry.sendfluctuationBase = data.sendfluctuationBase;
+			$scope.producerserverEntry.saveAlarmSetting.peak = data.saveAlarmSetting.peak;
+			$scope.producerserverEntry.saveAlarmSetting.valley = data.saveAlarmSetting.valley;
+			$scope.producerserverEntry.saveAlarmSetting.fluctuation = data.saveAlarmSetting.fluctuation;
+			$scope.producerserverEntry.saveAlarmSetting.fluctuationBase = data.saveAlarmSetting.fluctuationBase;
 		});
 	}
 	
@@ -152,10 +154,10 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.producerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.producerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
-		$scope.producerserverEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
-		$scope.producerserverEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
-		$scope.producerserverEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
-		$scope.producerserverEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
+		$scope.producerserverEntry.saveAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.peak;
+		$scope.producerserverEntry.saveAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.valley;
+		$scope.producerserverEntry.saveAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.fluctuation;
+		$scope.producerserverEntry.saveAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.fluctuationBase;
 	}
 	
 	$rootScope.removerecord = function(sid){

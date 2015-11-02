@@ -88,31 +88,34 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.entity);
 	
 	$scope.consumerserverEntry = {};
+	$scope.consumerserverEntry.sendAlarmSetting = {};
+	$scope.consumerserverEntry.ackAlarmSetting = {};
 	$scope.consumerserverEntry.id = null;
 	$scope.consumerserverEntry.ip = "";
 	$scope.consumerserverEntry.hostname = "";
 	$scope.consumerserverEntry.alarm = false;
 	$scope.consumerserverEntry.active = true;
-	$scope.consumerserverEntry.sendpeak = "";
-	$scope.consumerserverEntry.sendvalley = "";
-	$scope.consumerserverEntry.sendfluctuation = "";
-	$scope.consumerserverEntry.sendfluctuationBase = "";
-	$scope.consumerserverEntry.ackpeak = "";
-	$scope.consumerserverEntry.ackvalley = "";
-	$scope.consumerserverEntry.ackfluctuation = "";
-	$scope.consumerserverEntry.ackfluctuationBase = "";
+	$scope.consumerserverEntry.sendAlarmSetting.peak = "";
+	$scope.consumerserverEntry.sendAlarmSetting.valley = "";
+	$scope.consumerserverEntry.sendAlarmSetting.fluctuation = "";
+	$scope.consumerserverEntry.sendAlarmSetting.fluctuationBase = "";
+	$scope.consumerserverEntry.ackAlarmSetting.peak = "";
+	$scope.consumerserverEntry.ackAlarmSetting.valley = "";
+	$scope.consumerserverEntry.ackAlarmSetting.fluctuation = "";
+	$scope.consumerserverEntry.ackAlarmSetting.fluctuationBase = "";
 	$scope.consumerserverEntry.port = "";
 	$scope.consumerserverEntry.type = "";
 	$scope.consumerserverEntry.groupId = "";
 	
-	$scope.refreshpage = function(myForm){
+	$scope.refreshpage = function(myForm, index){
 		$scope.consumerserverEntry.type = $('#serverType').val();
-		if ($scope.consumerserverEntry.consumersendpeak < $scope.consumerserverEntry.consumersendvalley
-				|| $scope.consumerserverEntry.consumerackpeak < $scope.consumerserverEntry.consumerackvalley){
+		if ($scope.consumerserverEntry.sendAlarmSetting.peak < $scope.consumerserverEntry.sendAlarmSetting.valley
+				|| $scope.consumerserverEntry.ackAlarmSetting.peak < $scope.consumerserverEntry.ackAlarmSetting.valley){
 			alert("谷值不能小于峰值");
 			return;
 		}
-		$('#myModal').modal('hide');
+		var id = "#myModal" + index;
+		$(id).modal('hide');
 		var param = JSON.stringify($scope.consumerserverEntry);
     	
 		$http.post(window.contextPath + '/console/server/consumer/create', $scope.consumerserverEntry).success(function(response) {
@@ -170,26 +173,26 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.hostname = "";
 		$scope.consumerserverEntry.alarm = false;
 		$scope.consumerserverEntry.alarm = true;
-		$scope.consumerserverEntry.sendpeak = "";
-		$scope.consumerserverEntry.sendvalley = "";
-		$scope.consumerserverEntry.sendfluctuation = "";
-		$scope.consumerserverEntry.sendfluctuationBase = "";
-		$scope.consumerserverEntry.ackpeak = "";
-		$scope.consumerserverEntry.ackvalley = "";
-		$scope.consumerserverEntry.ackfluctuation = "";
-		$scope.consumerserverEntry.ackfluctuationBase = "";
+		$scope.consumerserverEntry.sendAlarmSetting.peak = "";
+		$scope.consumerserverEntry.sendAlarmSetting.valley = "";
+		$scope.consumerserverEntry.sendAlarmSetting.fluctuation = "";
+		$scope.consumerserverEntry.sendAlarmSetting.fluctuationBase = "";
+		$scope.consumerserverEntry.ackAlarmSetting.peak = "";
+		$scope.consumerserverEntry.ackAlarmSetting.valley = "";
+		$scope.consumerserverEntry.ackAlarmSetting.fluctuation = "";
+		$scope.consumerserverEntry.ackAlarmSetting.fluctuationBase = "";
 		$scope.consumerserverEntry.port = "";
 		$scope.consumerserverEntry.type = "";
 		$scope.consumerserverEntry.groupId = "";
 		$http.get(window.contextPath + "/console/server/defaultcresource").success(function(data){
-			$scope.consumerserverEntry.sendpeak = data.sendpeak;
-			$scope.consumerserverEntry.sendvalley = data.sendvalley;
-			$scope.consumerserverEntry.sendfluctuation = data.sendfluctuation;
-			$scope.consumerserverEntry.sendfluctuationBase = data.sendfluctuationBase;
-			$scope.consumerserverEntry.ackpeak = data.ackpeak;
-			$scope.consumerserverEntry.ackvalley = data.ackvalley;
-			$scope.consumerserverEntry.ackfluctuation = data.ackfluctuation;
-			$scope.consumerserverEntry.ackfluctuationBase = data.ackfluctuationBase;
+			$scope.consumerserverEntry.sendAlarmSetting.peak = data.sendAlarmSetting.peak;
+			$scope.consumerserverEntry.sendAlarmSetting.valley = data.sendAlarmSetting.valley;
+			$scope.consumerserverEntry.sendAlarmSetting.fluctuation = data.sendAlarmSetting.fluctuation;
+			$scope.consumerserverEntry.sendAlarmSetting.fluctuationBase = data.sendAlarmSetting.fluctuationBase;
+			$scope.consumerserverEntry.ackAlarmSetting.peak = data.ackAlarmSetting.peak;
+			$scope.consumerserverEntry.ackAlarmSetting.valley = data.ackAlarmSetting.valley;
+			$scope.consumerserverEntry.ackAlarmSetting.fluctuation = data.ackAlarmSetting.fluctuation;
+			$scope.consumerserverEntry.ackAlarmSetting.fluctuationBase = data.ackAlarmSetting.fluctuationBase;
 		});
 	}
 	
@@ -199,14 +202,14 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.consumerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.consumerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
-		$scope.consumerserverEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
-		$scope.consumerserverEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
-		$scope.consumerserverEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
-		$scope.consumerserverEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
-		$scope.consumerserverEntry.ackpeak = $scope.searchPaginator.currentPageItems[index].ackpeak;
-		$scope.consumerserverEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
-		$scope.consumerserverEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
-		$scope.consumerserverEntry.ackfluctuationBase = $scope.searchPaginator.currentPageItems[index].ackfluctuationBase;
+		$scope.consumerserverEntry.sendAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].sendAlarmSetting.peak;
+		$scope.consumerserverEntry.sendAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].sendAlarmSetting.valley;
+		$scope.consumerserverEntry.sendAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].sendAlarmSetting.fluctuation;
+		$scope.consumerserverEntry.sendAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].sendAlarmSetting.fluctuationBase;
+		$scope.consumerserverEntry.ackAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.peak;
+		$scope.consumerserverEntry.ackAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.valley;
+		$scope.consumerserverEntry.ackAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.fluctuation;
+		$scope.consumerserverEntry.ackAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.fluctuationBase;
 		$scope.consumerserverEntry.port = $scope.searchPaginator.currentPageItems[index].port;
 		$scope.consumerserverEntry.groupId = $scope.searchPaginator.currentPageItems[index].groupId;
 		

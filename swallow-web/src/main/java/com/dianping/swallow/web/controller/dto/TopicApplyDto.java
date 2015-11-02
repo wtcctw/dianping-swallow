@@ -1,11 +1,13 @@
 package com.dianping.swallow.web.controller.dto;
 
+import com.dianping.swallow.web.controller.handler.data.Treatable;
+
 /**
  * @author mingdongli
  *
  *         2015年9月7日上午11:17:49
  */
-public class TopicApplyDto {
+public class TopicApplyDto implements Treatable {
 
 	private String topic; // 1个
 
@@ -71,10 +73,6 @@ public class TopicApplyDto {
 
 	public String getApplicant() {
 		return applicant;
-	}
-
-	public void setApplicant(String applicant) {
-		this.applicant = applicant;
 	}
 
 }

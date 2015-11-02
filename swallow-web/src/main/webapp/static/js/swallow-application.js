@@ -84,6 +84,7 @@ module.controller('ApplicationResourceController', ['$rootScope', '$scope', '$ht
 			$scope.searchapplication = "";
 			
 			$scope.applicationEntry = {};
+			$scope.applicationEntry.id=null;
 			$scope.applicationEntry.application;
 			$scope.applicationEntry.email;
 			$scope.applicationEntry.opManager;
@@ -109,7 +110,7 @@ module.controller('ApplicationResourceController', ['$rootScope', '$scope', '$ht
 			$scope.clearModal = function(){
 				
 				$scope.isReadOnly = false;
-				$scope.applicationEntry.id = "";
+				$scope.applicationEntry.id = null;
 				$scope.applicationEntry.application = "";
 				$scope.applicationEntry.email = "";
 				$scope.applicationEntry.opManager = "";

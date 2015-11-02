@@ -1,15 +1,5 @@
 package com.dianping.swallow.web.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Component;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.dao.MessageDumpDao;
@@ -18,6 +8,15 @@ import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
 import com.mongodb.WriteResult;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -48,18 +47,6 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 			logger.error("Error when save message dump " + mdump, e);
 		}
 		return ResponseStatus.MONGOWRITE;
-	}
-
-	@Override
-	public Pair<Long, List<MessageDump>> loadMessageDumpPage(int offset, int limit) {
-		
-		Query query = new Query();
-		
-		query.skip(offset).limit(limit).with(new Sort(new Sort.Order(Direction.ASC, TOPIC)));
-		List<MessageDump> messageDumpList = mongoTemplate.find(query, MessageDump.class, MESSAGEDUMP_COLLECTION);
-		
-		Long messageDumpSize = this.count();
-		return new Pair<Long, List<MessageDump>>(messageDumpSize, messageDumpList);
 	}
 
 	@Override
@@ -94,13 +81,6 @@ public class DefaultMessageDumpDao extends AbstractWriteDao implements MessageDu
 	public long count() {
 		Query query = new Query();
 		return mongoTemplate.count(query, MESSAGEDUMP_COLLECTION);
-	}
-
-	@Override
-	public MessageDump loadMessageDump(String filename) {
-
-		Query query = new Query(Criteria.where(FILENAME).is(filename));
-		return mongoTemplate.findOne(query, MessageDump.class, MESSAGEDUMP_COLLECTION);
 	}
 
 	@Override

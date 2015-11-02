@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
  * 
  * @author qiyin
  *
+ *         2015年10月16日 上午10:09:39
  */
 public class IPDesc {
 

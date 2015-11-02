@@ -6,20 +6,11 @@ package com.dianping.swallow.web.controller.dto;
  *
  * 2015年8月19日上午11:43:32
  */
-public class UserQueryDto extends BaseDto{
+public class UserQueryDto extends BaseQueryDto{
 	
 	private String name;
 	
 	private String role; 
-	
-	public UserQueryDto(){
-		
-	}
-	
-	public UserQueryDto(String name, String role){
-		this.name = name;
-		this.role = role;
-	}
 	
 	public String getName() {
 		return name;
@@ -36,5 +27,4 @@ public class UserQueryDto extends BaseDto{
 	public void setRole(String role) {
 		this.role = role;
 	}
-	
 }

@@ -119,15 +119,6 @@ public class DefaultApplicationResourceDao extends AbstractWriteDao implements A
 	}
 
 	@Override
-	public ApplicationResource findDefault() {
-
-		Query query = new Query(Criteria.where(APPLICATION).is(DEFAULT));
-		ApplicationResource applicationResource = mongoTemplate.findOne(query, ApplicationResource.class,
-				APPLICATION_COLLECTION);
-		return applicationResource;
-	}
-
-	@Override
 	public Pair<Long, List<ApplicationResource>> findApplicationResourcePage(int offset, int limit) {
 		Query query = new Query();
 

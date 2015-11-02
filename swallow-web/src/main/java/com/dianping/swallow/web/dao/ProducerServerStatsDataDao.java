@@ -13,14 +13,8 @@ import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 public interface ProducerServerStatsDataDao {
 
 	boolean insert(ProducerServerStatsData serverStatsData);
-
-	boolean update(ProducerServerStatsData serverStatsData);
-
-	int deleteById(String id);
-
-	ProducerServerStatsData findById(String id);
-
-	ProducerServerStatsData findByTimeKey(String ip, long timeKey);
+	
+	boolean insert(List<ProducerServerStatsData> serverStatsDatas);
 
 	List<ProducerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 

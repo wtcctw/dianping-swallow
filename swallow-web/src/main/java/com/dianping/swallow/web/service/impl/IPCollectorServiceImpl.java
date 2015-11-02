@@ -55,12 +55,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private static final String SWALLOW_CONSUMER_MASTER_NAME = "swallow-consumermaster";
 
-	private static final String PRODUCER_SERVER_IPLIST_KEY = "swallow.producer.server.iplist";
-
-	private static final String CONSUMER_SERVER_MASTER_IPLIST_KEY = "swallow.consumer.server.master.iplist";
-
-	private static final String CONSUMER_SERVER_SLAVE_IPLIST_KEY = "swallow.consumer.server.slave.iplist";
-
 	private static final String CONSUMER_SERVER_MASTER_PORT_KEY = "swallow.consumer.server.master.port";
 
 	private static final String CONSUMER_SERVER_SLAVE_PORT_KEY = "swallow.consumer.server.slave.port";
@@ -71,8 +65,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 	private static final String FACTORY_NAME = "IpCollector";
 
-	private static final String IP_SPLIT = ",";
-
 	private static final String MASTER_NAME = "master";
 
 	private static final String SLAVE_NAME = "slave";
@@ -82,18 +74,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	private Map<String, Long> statisConsumerServerIps = new ConcurrentHashMap<String, Long>();
 
 	private Map<String, Long> statisProducerServerIps = new ConcurrentHashMap<String, Long>();
-
-	private volatile List<String> cmdbProducerIps = null;
-
-	private volatile List<String> cmdbConsumerSlaveIps = null;
-
-	private volatile List<String> cmdbConsumerMasterIps = null;
-
-	private volatile List<String> lionProducerIps = null;
-
-	private volatile List<String> lionConsumerSlaveIps = null;
-
-	private volatile List<String> lionConsumerMasterIps = null;
 
 	private volatile Map<String, String> cmdbProducerMap = null;
 
@@ -108,9 +88,9 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	@Autowired
 	private CmdbService cmdbService;
 
-	private int interval = 120;// 秒
+	private int interval = 300;// 秒
 
-	private int delay = 5;
+	private int delay = 30;
 
 	private static ScheduledExecutorService scheduled = Executors.newSingleThreadScheduledExecutor(ThreadFactoryUtils
 			.getThreadFactory(FACTORY_NAME));
@@ -128,37 +108,13 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	private void initLionConfig() {
 		try {
 			configCache = ConfigCache.getInstance();
-			String strProducerServerIp = configCache.getProperty(PRODUCER_SERVER_IPLIST_KEY);
-			String strConsumerMasterServerIp = configCache.getProperty(CONSUMER_SERVER_MASTER_IPLIST_KEY);
-			String strConsumerSlaveServerIp = configCache.getProperty(CONSUMER_SERVER_SLAVE_IPLIST_KEY);
 			masterPort = configCache.getIntProperty(CONSUMER_SERVER_MASTER_PORT_KEY);
 			slavePort = configCache.getIntProperty(CONSUMER_SERVER_SLAVE_PORT_KEY);
-			lionProducerIps = convertToList(strProducerServerIp);
-			if (StringUtils.isNotBlank(strProducerServerIp) && lionProducerIps != null) {
-				logger.info("[initLionConfig] strProducerIp= {}, producerIps= {}", strProducerServerIp, lionProducerIps);
-			}
-			lionConsumerMasterIps = convertToList(strConsumerMasterServerIp);
-			if (StringUtils.isNotBlank(strConsumerMasterServerIp) && lionConsumerMasterIps != null) {
-				logger.info("[initLionConfig] strConsumerMasterIp= {}, consumerMasterIps= {}",
-						strConsumerMasterServerIp, lionConsumerMasterIps);
-			}
-
-			lionConsumerSlaveIps = convertToList(strConsumerSlaveServerIp);
-			if (StringUtils.isNotBlank(strConsumerSlaveServerIp) && lionConsumerSlaveIps != null) {
-				logger.info("[initLionConfig] strConsumerSlaveIp= {}, consumerSlaveIps= {}", strConsumerSlaveServerIp,
-						lionConsumerSlaveIps);
-			}
 
 			configCache.addChange(new ConfigChange() {
 				@Override
 				public void onChange(String key, String value) {
-					if (key.equals(PRODUCER_SERVER_IPLIST_KEY)) {
-						lionProducerIps = convertToList(value);
-					} else if (key.equals(CONSUMER_SERVER_MASTER_IPLIST_KEY)) {
-						lionConsumerMasterIps = convertToList(value);
-					} else if (key.equals(CONSUMER_SERVER_SLAVE_IPLIST_KEY)) {
-						lionConsumerSlaveIps = convertToList(value);
-					} else if (key.equals(CONSUMER_SERVER_MASTER_PORT_KEY)) {
+					if (key.equals(CONSUMER_SERVER_MASTER_PORT_KEY)) {
 						masterPort = Integer.parseInt(value);
 					} else if (key.equals(CONSUMER_SERVER_SLAVE_PORT_KEY)) {
 						slavePort = Integer.parseInt(value);
@@ -170,23 +126,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		} catch (LionException e) {
 			logger.error("lion read producer and consumer server ips failed", e);
 		}
-	}
-
-	private List<String> convertToList(String strValue) {
-		if (StringUtils.isBlank(strValue)) {
-			return null;
-		}
-		String[] strArr = strValue.split(IP_SPLIT);
-		if (strArr != null) {
-			List<String> tempList = new ArrayList<String>();
-			for (String strTemp : strArr) {
-				if (StringUtils.isNotBlank(strTemp)) {
-					tempList.add(strTemp);
-				}
-			}
-			return tempList;
-		}
-		return null;
 	}
 
 	private void scheduleCmdbDataTask() {
@@ -223,10 +162,9 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 				producerIpsMap.put(envDevice.getHostName(), envDevice.getIp());
 				producerServers.add(new ProducerServer(envDevice.getIp(), envDevice.getHostName()));
 			}
-			this.cmdbProducerIps = producerIps;
 			this.cmdbProducerMap = producerIpsMap;
 			this.producerServers = producerServers;
-			logger.info("[doCmdbIpTask] cmdbProducerIps= {}, cmdbProducerMap= {}", cmdbProducerIps, cmdbProducerMap);
+			logger.info("[doCmdbIpTask]cmdbProducerMap= {}", cmdbProducerMap);
 		}
 	}
 
@@ -253,19 +191,16 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 
 						consumerMasterIpsMap.put(envMasterDevice.getHostName(), envMasterDevice.getIp());
 						consumerSlaveIpsMap.put(envSlaveDevice.getHostName(), envSlaveDevice.getIp());
+						break;
 					}
 				}
 			}
-			this.cmdbConsumerMasterIps = consumerMasterIps;
 			this.cmdbConsumerMasterMap = consumerMasterIpsMap;
-			logger.info("[doCmdbConsumerIpTask] cmdbConsumerMasterIps= {}, cmdbConsumerMasterMap= {}",
-					cmdbConsumerMasterIps, cmdbConsumerMasterMap);
+			logger.info("[doCmdbConsumerIpTask] cmdbConsumerMasterMap= {}", cmdbConsumerMasterMap);
 
-			this.cmdbConsumerSlaveIps = consumerSlaveIps;
 			this.cmdbConsumerSlaveMap = consumerSlaveIpsMap;
 
-			logger.info("[doCmdbConsumerIpTask] cmdbConsumerSlaveIps= {}, cmdbConsumerSlaveMap= {}",
-					cmdbConsumerSlaveIps, cmdbConsumerSlaveMap);
+			logger.info("[doCmdbConsumerIpTask] cmdbConsumerSlaveMap= {}", cmdbConsumerSlaveMap);
 
 			this.consumerServerPairs = consumerServerPairs;
 		}
@@ -351,6 +286,19 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 		map.put(data, System.currentTimeMillis());
 	}
 
+	public long getLastestStatsTimeByIp(String ip, boolean isProducer) {
+		if (isProducer) {
+			if (statisProducerServerIps.containsKey(ip)) {
+				return statisProducerServerIps.get(ip);
+			}
+		} else {
+			if (statisConsumerServerIps.containsKey(ip)) {
+				return statisConsumerServerIps.get(ip);
+			}
+		}
+		return 0L;
+	}
+
 	@Override
 	public Map<String, Long> getStatisConsumerServerIps() {
 		return copyMap(statisConsumerServerIps);
@@ -367,39 +315,6 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 			destMap.put(srcEntity.getKey(), srcEntity.getValue());
 		}
 		return destMap;
-	}
-
-	@Override
-	public List<String> getProducerServerIps() {
-		if (cmdbProducerIps != null && !cmdbProducerIps.isEmpty()) {
-			return Collections.unmodifiableList(cmdbProducerIps);
-		}
-		if (lionProducerIps != null) {
-			return Collections.unmodifiableList(lionProducerIps);
-		}
-		return null;
-	}
-
-	@Override
-	public List<String> getConsumerServerSlaveIps() {
-		if (cmdbConsumerSlaveIps != null && !cmdbConsumerSlaveIps.isEmpty()) {
-			return Collections.unmodifiableList(cmdbConsumerSlaveIps);
-		}
-		if (lionConsumerSlaveIps != null) {
-			return Collections.unmodifiableList(lionConsumerSlaveIps);
-		}
-		return null;
-	}
-
-	@Override
-	public List<String> getConsumerServerMasterIps() {
-		if (cmdbConsumerMasterIps != null && !cmdbConsumerMasterIps.isEmpty()) {
-			return Collections.unmodifiableList(cmdbConsumerMasterIps);
-		}
-		if (lionConsumerMasterIps != null) {
-			return Collections.unmodifiableList(lionConsumerMasterIps);
-		}
-		return null;
 	}
 
 	@Override
@@ -427,25 +342,15 @@ public class IPCollectorServiceImpl implements IPCollectorService {
 	}
 
 	@Override
-	public int getConsumerMasterPort() {
-		return masterPort;
-	}
-
-	@Override
-	public int getConsumerSlavePort() {
-		return slavePort;
-	}
-
-	@Override
 	public List<ConsumerServerPair> getConsumerServerPairs() {
 		if (consumerServerPairs != null) {
 			return Collections.unmodifiableList(consumerServerPairs);
 		}
 		return null;
 	}
-	
+
 	@Override
-	public List<ProducerServer> getProducerServers(){
+	public List<ProducerServer> getProducerServers() {
 		if (producerServers != null) {
 			return Collections.unmodifiableList(producerServers);
 		}

@@ -25,6 +25,11 @@ public class ConsumerIpStatsDataServiceImpl implements ConsumerIpStatsDataServic
 	public boolean insert(ConsumerIpStatsData ipStatsData) {
 		return consumerIpStatsDataDao.insert(ipStatsData);
 	}
+	
+	@Override
+	public boolean insert(List<ConsumerIpStatsData> ipStatsDatas) {
+		return consumerIpStatsDataDao.insert(ipStatsDatas);
+	}
 
 	@Override
 	public List<ConsumerIpStatsData> find(String topicName, String consumerId, String ip, long startKey, long endKey) {

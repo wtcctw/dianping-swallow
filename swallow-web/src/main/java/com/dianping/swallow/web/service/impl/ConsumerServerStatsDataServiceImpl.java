@@ -29,25 +29,10 @@ public class ConsumerServerStatsDataServiceImpl implements ConsumerServerStatsDa
 	public boolean insert(ConsumerServerStatsData serverStatsData) {
 		return consumerServerStatsDataDao.insert(serverStatsData);
 	}
-
+	
 	@Override
-	public boolean update(ConsumerServerStatsData serverStatsData) {
-		return consumerServerStatsDataDao.update(serverStatsData);
-	}
-
-	@Override
-	public int deleteById(String id) {
-		return consumerServerStatsDataDao.deleteById(id);
-	}
-
-	@Override
-	public ConsumerServerStatsData findById(String id) {
-		return consumerServerStatsDataDao.findById(id);
-	}
-
-	@Override
-	public ConsumerServerStatsData findByTimeKey(String ip, long timeKey) {
-		return consumerServerStatsDataDao.findByTimeKey(ip, timeKey);
+	public boolean insert(List<ConsumerServerStatsData> serverStatsDatas) {
+		return consumerServerStatsDataDao.insert(serverStatsDatas);
 	}
 
 	@Override
@@ -63,23 +48,6 @@ public class ConsumerServerStatsDataServiceImpl implements ConsumerServerStatsDa
 			totalQps += serverStatsData.getSendQps();
 		}
 		return totalQps;
-	}
-
-	@Override
-	public String findIdleConsumerServer(List<String> masterIps, long startKey, long endKey) {
-		if (masterIps == null) {
-			return null;
-		}
-		long minQps = Long.MAX_VALUE;
-		String idleIp = null;
-		for (String masterIp : masterIps) {
-			long tempQps = findQpsByServerIp(masterIp, startKey, endKey);
-			if (tempQps < minQps) {
-				minQps = tempQps;
-				idleIp = masterIp;
-			}
-		}
-		return idleIp;
 	}
 
 	@Override

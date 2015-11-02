@@ -50,7 +50,8 @@
 						<th style="text-align: left">序号</th>
 						<th style="text-align: left">Topic名称</th>
 						<th style="text-align: left">访问者白名单</th>
-						<th style="text-align: left">生产IP配置</th>
+						<th style="text-align: left"><a href="" data-toggle="tooltip"
+							ng-click="setInactive()" title="只显示包含不活动IP的Topic">生产IP配置</a>#if(${isadmin}) &nbsp; | 不活动IP个数&nbsp;:{{countinactive}} #end</th>
 						<th style="text-align: left">消费ID配置</th>
 						<th style="text-align: left">告警配置</th> #if(${isadmin})
 						<th style="text-align: left">发送告警</th>
@@ -152,14 +153,14 @@
 									<label class="control-label">发送QPS</label>
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text" ng-model="topicEntry.sendpeak" />
+											class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.peak" />
 										<label class="col-sm-2 control-label">谷值</label><input
-											type="text" class="col-sm-2" ng-model="topicEntry.sendvalley" />
+											type="text" class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.valley" />
 										<label class="col-sm-2 control-label">波动</label><input
 											type="text" class="col-sm-2"
-											ng-model="topicEntry.sendfluctuation" /><label
+											ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.sendfluctuationBase" />
+											class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase" />
 									</div>
 								</div>
 								<div class="form-group"
@@ -167,7 +168,7 @@
 									<label class="control-label">延迟</label>
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">发送</label> <input
-											class="col-sm-2" type="text" ng-model="topicEntry.delay" />
+											class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.delay" />
 									</div>
 								</div>
 							</div>
@@ -214,14 +215,14 @@
 									<label class="control-label">发送QPS</label>
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text" ng-model="topicEntry.sendpeak" />
+											class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.peak" />
 										<label class="col-sm-2 control-label">谷值</label><input
-											type="text" class="col-sm-2" ng-model="topicEntry.sendvalley" />
+											type="text" class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.valley" />
 										<label class="col-sm-2 control-label">波动</label><input
 											type="text" class="col-sm-2"
-											ng-model="topicEntry.sendfluctuation" /><label
+											ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.sendfluctuationBase" />
+											class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase" />
 									</div>
 								</div>
 								<div class="form-group"
@@ -229,7 +230,7 @@
 									<label class="control-label">延迟</label>
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">发送</label> <input
-											class="col-sm-2" type="text" ng-model="topicEntry.delay" />
+											class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.delay" />
 									</div>
 								</div>
 							</div>

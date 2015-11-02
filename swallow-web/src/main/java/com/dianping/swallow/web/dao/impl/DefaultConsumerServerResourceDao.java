@@ -85,15 +85,6 @@ public class DefaultConsumerServerResourceDao extends AbstractWriteDao implement
 	}
 
 	@Override
-	public ConsumerServerResource findByHostname(String hostname) {
-
-		Query query = new Query(Criteria.where(HOSTNAME).is(hostname));
-		ConsumerServerResource consumerServerResource = mongoTemplate.findOne(query, ConsumerServerResource.class,
-				CONSUMERSERVERRESOURCE_COLLECTION);
-		return consumerServerResource;
-	}
-
-	@Override
 	public ConsumerServerResource findDefault() {
 
 		Query query = new Query(Criteria.where(IP).is(DEFAULT));

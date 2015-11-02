@@ -2,15 +2,10 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 import com.dianping.swallow.web.model.resource.TopicResource;
@@ -38,7 +33,7 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
 	private ProducerTopicStatsDataService topicStatsDataService;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@Override
 	public void doInitialize() throws Exception {
@@ -48,27 +43,20 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
 
 	@Override
 	public void doAlarm() {
-		final List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(
-				getLastTimeKey(), false);
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				topicAlarm(topicStatsDatas);
-			}
-		});
+		topicAlarm();
 	}
 
-	private void topicAlarm(List<ProducerTopicStatsData> topicStatsDatas) {
-		if (topicStatsDatas == null) {
+	private void topicAlarm() {
+		List<ProducerTopicStatsData> topicStatsDatas = producerStatsDataWapper.getTopicStatsDatas(getLastTimeKey(),
+				false);
+		if (topicStatsDatas == null || topicStatsDatas.isEmpty()) {
 			return;
 		}
 		for (ProducerTopicStatsData topicStatsData : topicStatsDatas) {
 			try {
 				String topicName = topicStatsData.getTopicName();
 				TopicResource topicResource = resourceContainer.findTopicResource(topicName);
-				if (topicResource == null || !topicResource.isProducerAlarm()
-						|| StringUtils.equals(TOTAL_KEY, topicName)) {
+				if (topicResource == null || !topicResource.isProducerAlarm()) {
 					continue;
 				}
 				ProducerBaseAlarmSetting pBaseAlarmSetting = topicResource.getProducerAlarmSetting();

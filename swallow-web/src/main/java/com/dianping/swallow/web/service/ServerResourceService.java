@@ -12,8 +12,6 @@ public interface ServerResourceService {
 
 	ServerResource findByIp(String ip);
 
-	ServerResource findByHostname(String hostname);
-
 	ServerResource findDefault();
 
 }

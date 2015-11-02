@@ -27,7 +27,5 @@ public interface ApplicationResourceDao {
 	
 	List<ApplicationResource> findAll(String ... fields);
 
-	ApplicationResource findDefault();
-	
 	Pair<Long, List<ApplicationResource>> findApplicationResourcePage(int offset, int limit);
 }

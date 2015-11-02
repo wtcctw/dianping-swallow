@@ -26,11 +26,7 @@ public interface MessageDumpDao extends Dao{
 	
 	MessageDump loadUnfinishedMessageDump(String topic);
 
-	MessageDump loadMessageDump(String filename);
-
 	Pair<Long, List<MessageDump>> loadAllMessageDumps();
-
-	Pair<Long, List<MessageDump>> loadMessageDumpPage(int offset, int limit);
 
 	Pair<Long, List<MessageDump>> loadMessageDumpPageByTopic(TopicQueryDto topicQueryDto);
 }

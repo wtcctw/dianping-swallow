@@ -22,6 +22,7 @@ import com.dianping.swallow.common.server.monitor.data.ConsumerStatisRetriever;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
@@ -29,7 +30,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitor
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
@@ -72,11 +73,11 @@ public class DefaultConsumerDataRetriever
 	private AccumulationRetriever accumulationRetriever;
 
 	@Autowired
-	private AlarmResourceContainer resourceContainer;
+	private ResourceContainer resourceContainer;
 
 	@Override
 	public boolean dataExistInMemory(long start, long end) {
-		NavigableMap<Long, Long> qpxStatsData = statis.getQpx(StatisType.SEND);
+		NavigableMap<Long, Long> qpxStatsData = convertQpxData(statis.getQpx(StatisType.SEND));
 
 		if (qpxStatsData == null || qpxStatsData.isEmpty()) {
 			return false;
@@ -110,18 +111,18 @@ public class DefaultConsumerDataRetriever
 			}
 			Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topicName,
 					StatisType.SEND, false);
-			Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
+			Map<String, NavigableMap<Long, QpxData>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
 					StatisType.SEND, false);
 			Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topicName,
 					StatisType.ACK, false);
-			Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topicName, StatisType.ACK,
-					false);
+			Map<String, NavigableMap<Long, QpxData>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
+					StatisType.ACK, false);
 			if (sendDelays != null) {
 				for (Map.Entry<String, NavigableMap<Long, Long>> sendDelay : sendDelays.entrySet()) {
 					if (TOTAL_KEY.equals(sendDelay.getKey())) {
 						continue;
 					}
-					NavigableMap<Long, Long> sendQpx = sendQpxs.get(sendDelay.getKey());
+					NavigableMap<Long, Long> sendQpx = convertQpxData(sendQpxs.get(sendDelay.getKey()));
 					sendStatsData
 							.add(new OrderEntity(topicName, sendDelay.getKey(), getDelaySumStatsData(
 									sendDelay.getValue(), sendQpx, fromKey, toKey), getQpsSumStatsData(sendQpx,
@@ -134,7 +135,7 @@ public class DefaultConsumerDataRetriever
 					if (TOTAL_KEY.equals(ackDelay.getKey())) {
 						continue;
 					}
-					NavigableMap<Long, Long> ackQpx = ackQpxs.get(ackDelay.getKey());
+					NavigableMap<Long, Long> ackQpx = convertQpxData(ackQpxs.get(ackDelay.getKey()));
 					ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getDelaySumStatsData(
 							ackDelay.getValue(), ackQpx, fromKey, toKey), getQpsSumStatsData(ackQpx, fromKey, toKey)));
 				}
@@ -165,27 +166,27 @@ public class DefaultConsumerDataRetriever
 			if (TOTAL_KEY.equals(topicName)) {
 				continue;
 			}
-			Map<String, NavigableMap<Long, Long>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
+			Map<String, NavigableMap<Long, QpxData>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
 					StatisType.SEND, false);
-			Map<String, NavigableMap<Long, Long>> ackQpxs = retriever.getQpxForAllConsumerId(topicName, StatisType.ACK,
-					false);
+			Map<String, NavigableMap<Long, QpxData>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
+					StatisType.ACK, false);
 			if (sendQpxs != null) {
-				for (Map.Entry<String, NavigableMap<Long, Long>> sendQpx : sendQpxs.entrySet()) {
+				for (Map.Entry<String, NavigableMap<Long, QpxData>> sendQpx : sendQpxs.entrySet()) {
 					if (TOTAL_KEY.equals(sendQpx.getKey())) {
 						continue;
 					}
 					sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getQpsSumStatsData(
-							sendQpx.getValue(), fromKey, toKey), getQpsSampleCount(start, end)));
+							convertQpxData(sendQpx.getValue()), fromKey, toKey), getQpsSampleCount(start, end)));
 				}
 			}
 
 			if (ackQpxs != null) {
-				for (Map.Entry<String, NavigableMap<Long, Long>> ackQpx : ackQpxs.entrySet()) {
+				for (Map.Entry<String, NavigableMap<Long, QpxData>> ackQpx : ackQpxs.entrySet()) {
 					if (TOTAL_KEY.equals(ackQpx.getKey())) {
 						continue;
 					}
-					ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getQpsSumStatsData(ackQpx.getValue(),
-							fromKey, toKey), getQpsSampleCount(start, end)));
+					ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getQpsSumStatsData(
+							convertQpxData(ackQpx.getValue()), fromKey, toKey), getQpsSampleCount(start, end)));
 				}
 			}
 
@@ -343,8 +344,8 @@ public class DefaultConsumerDataRetriever
 	public List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, long start, long end) {
 
 		ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-		Map<String, NavigableMap<Long, Long>> sendQpxs = null;
-		Map<String, NavigableMap<Long, Long>> ackQpxs = null;
+		Map<String, NavigableMap<Long, QpxData>> sendQpxs = null;
+		Map<String, NavigableMap<Long, QpxData>> ackQpxs = null;
 		List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
 		long startKey = getKey(start);
 		long endKey = getKey(end);
@@ -352,11 +353,11 @@ public class DefaultConsumerDataRetriever
 			sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
 			ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
 			if (sendQpxs != null) {
-				for (Entry<String, NavigableMap<Long, Long>> entry : sendQpxs.entrySet()) {
+				for (Entry<String, NavigableMap<Long, QpxData>> entry : sendQpxs.entrySet()) {
 
 					String consumerId = entry.getKey();
-					NavigableMap<Long, Long> send = entry.getValue();
-					NavigableMap<Long, Long> ack = ackQpxs.get(consumerId);
+					NavigableMap<Long, Long> send = convertQpxData(entry.getValue());
+					NavigableMap<Long, Long> ack = convertQpxData(ackQpxs.get(consumerId));
 					if (send == null) {
 						continue;
 					}
@@ -633,23 +634,23 @@ public class DefaultConsumerDataRetriever
 					orderParam.getFromKey(), orderParam.getToKey());
 			long start = orderParam.getQpxSendStatsData().getStart();
 			long end = orderParam.getQpxSendStatsData().getEnd();
-			
+
 			long totalSendQps = postStatsData.getTotalSendQps() - preStatsData.getTotalSendQps();
 			orderParam.getQpxSendStatsData().add(
 					new OrderEntity(topicName, consumerId, totalSendQps, getQpsSampleCount(start, end)));
-			
+
 			long totalAckQps = postStatsData.getTotalAckQps() - preStatsData.getTotalAckQps();
 			orderParam.getQpxAckStatsData().add(
 					new OrderEntity(topicName, consumerId, totalAckQps, getQpsSampleCount(start, end)));
-			
+
 			orderParam.getDelaySendStatsData().add(
 					new OrderEntity(topicName, consumerId, postStatsData.getTotalSendDelay()
 							- preStatsData.getTotalSendDelay(), totalSendQps));
-			
+
 			orderParam.getDelayAckStatsData().add(
 					new OrderEntity(topicName, consumerId, postStatsData.getTotalAckDelay()
 							- preStatsData.getTotalAckDelay(), totalAckQps));
-			
+
 			orderParam.getAccuStatsData().add(
 					new OrderEntity(topicName, consumerId, postStatsData.getTotalAccumulation()
 							- preStatsData.getTotalAccumulation(), getOtherSampleCount(start, end)));

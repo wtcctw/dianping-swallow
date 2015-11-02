@@ -1,10 +1,10 @@
 package com.dianping.swallow.web.controller;
 
 
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 
 /**
  * @author mengwenchao

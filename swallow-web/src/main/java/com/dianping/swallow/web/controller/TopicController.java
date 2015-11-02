@@ -1,40 +1,14 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import jodd.util.StringUtil;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
-import com.dianping.swallow.web.controller.dto.TopicResourceDto;
-import com.dianping.swallow.web.controller.mapper.TopicResourceMapper;
-import com.dianping.swallow.web.controller.utils.IpInfoUtils;
+import com.dianping.swallow.web.controller.listener.ResourceListener;
+import com.dianping.swallow.web.controller.listener.ResourceObserver;
 import com.dianping.swallow.web.controller.utils.UserUtils;
-import com.dianping.swallow.web.model.Administrator;
+import com.dianping.swallow.web.model.resource.BaseResource;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.TopicResourceService;
@@ -42,402 +16,310 @@ import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
 import com.mongodb.MongoSocketException;
+import jodd.util.StringUtil;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * @author mingdongli
- *
+ *         <p/>
  *         2015年4月22日 下午1:50:20
  */
 @Controller
-public class TopicController extends AbstractMenuController {
+public class TopicController extends AbstractMenuController implements ResourceObserver {
 
-	private static final String DELIMITOR = ",";
+    private static final String DELIMITOR = ",";
 
-	private static final String POSTFIX = "@dianping.com";
+    private static final String POSTFIX = "@dianping.com";
 
-	public static final String DEFAULT = "default";
+    public static final String DEFAULT = "default";
 
-	@Resource(name = "userService")
-	private UserService userService;
+    @Resource(name = "userService")
+    private UserService userService;
 
-	@Resource(name = "topicResourceService")
-	private TopicResourceService topicResourceService;
+    @Resource(name = "topicResourceService")
+    private TopicResourceService topicResourceService;
 
-	@Autowired
-	private UserUtils userUtils;
+    @Autowired
+    private UserUtils userUtils;
 
-	@RequestMapping(value = "/console/topic")
-	public ModelAndView topicView(HttpServletRequest request, HttpServletResponse response) {
+    private List<ResourceListener> listeners = new ArrayList<ResourceListener>();
 
-		return new ModelAndView("topic/index", createViewMap());
-	}
+    @RequestMapping(value = "/console/topic")
+    public ModelAndView topicView() {
 
-	@RequestMapping(value = "/console/topic/list", method = RequestMethod.POST)
-	@ResponseBody
-	public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request,
-			HttpServletResponse response) {
+        return new ModelAndView("topic/index", createViewMap());
+    }
 
-		List<TopicResourceDto> result = new ArrayList<TopicResourceDto>();
-		Pair<Long, List<TopicResource>> pair = new Pair<Long, List<TopicResource>>();
-		String topic = topicQueryDto.getTopic();
-		String producerIp = topicQueryDto.getProducerServer();
-		int offset = topicQueryDto.getOffset();
-		int limit = topicQueryDto.getLimit();
+    @RequestMapping(value = "/console/topic/list", method = RequestMethod.POST)
+    @ResponseBody
+    public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request) {
 
-		boolean isAllEmpry = StringUtil.isAllBlank(topic, producerIp);
+        String topic = topicQueryDto.getTopic();
+        String producerIp = topicQueryDto.getProducerServer();
+        boolean inactive = topicQueryDto.isInactive();
+        int offset = topicQueryDto.getOffset();
+        int limit = topicQueryDto.getLimit();
 
-		if (isAllEmpry) {
-			String username = userUtils.getUsername(request);
-			boolean findAll = userUtils.isAdministrator(username);
-			if (findAll) {
-				pair = topicResourceService.findTopicResourcePage(offset, limit);
-			} else {
-				pair = topicResourceService.findByAdministrator(offset, limit, username);
-			}
-		} else {
-			pair = topicResourceService.find(offset, limit, topic, producerIp);
-		}
+        boolean isAllEmpty = StringUtil.isAllBlank(topic, producerIp) && inactive;
 
-		for (TopicResource topicResource : pair.getSecond()) {
-			result.add(TopicResourceMapper.toTopicResourceDto(topicResource));
-		}
-		return new Pair<Long, List<TopicResourceDto>>(pair.getFirst(), result);
-	}
+        if (isAllEmpty) {
+            String username = userUtils.getUsername(request);
+            boolean findAll = userUtils.isAdministrator(username);
+            if (findAll) {
+                return topicResourceService.findTopicResourcePage(offset, limit);
+            } else {
+                return topicResourceService.findByAdministrator(offset, limit, username);
+            }
+        } else {
+            return topicResourceService.find(offset, limit, topic, producerIp, inactive);
+        }
 
-	@RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
-	@ResponseBody
-	public Pair<List<String>, List<String>> topicName(HttpServletRequest request) {
+    }
 
-		String username = userUtils.getUsername(request);
-		boolean findAll = userUtils.isAdministrator(username);
-		Set<String> producerIp = new HashSet<String>();
+    @RequestMapping(value = "/console/topic/namelist", method = RequestMethod.GET)
+    @ResponseBody
+    public Pair<List<String>, List<String>> topicAndIp(HttpServletRequest request) {
 
-		Map<String, Set<String>> topicToWhiteList = topicResourceService.loadCachedTopicToAdministrator();
-		if (findAll) {
-			List<String> topics = new ArrayList<String>(topicToWhiteList.keySet());
-			List<TopicResource> topicResources = topicResourceService.findAll();
-			for (TopicResource topicResource : topicResources) {
-				List<IpInfo> tmpIpInfos = topicResource.getProducerIpInfos();
-				Set<String> tmpips = IpInfoUtils.extractIps(tmpIpInfos);
-				if (tmpips != null) {
-					producerIp.addAll(tmpips);
-				}
-			}
-			if (userUtils.isAdministrator(username, true)) {
-				topics.add(DEFAULT);
-			}
-			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
-		} else {
-			List<String> topics = new ArrayList<String>();
-			for (Map.Entry<String, Set<String>> entry : topicToWhiteList.entrySet()) {
-				if (entry.getValue().contains(username)) {
-					String topic = entry.getKey();
-					if (!topics.contains(topic)) {
-						topics.add(topic);
-					}
-				}
-			}
+        String username = userUtils.getUsername(request);
+        List<String> topics = userUtils.topicNames(username);
+        List<String> ips = userUtils.producerIps(username);
 
-			for (String topic : topics) {
-				List<IpInfo> tmpIpInfos = topicResourceService.findByTopic(topic).getProducerIpInfos();
-				Set<String> tmpips = IpInfoUtils.extractIps(tmpIpInfos);
-				if (tmpips != null) {
-					producerIp.addAll(tmpips);
-				}
-			}
-			return new Pair<List<String>, List<String>>(topics, new ArrayList<String>(producerIp));
-		}
-	}
+        return new Pair<List<String>, List<String>>(topics, ips);
+    }
 
-	@RequestMapping(value = "/console/topic/proposal", method = RequestMethod.GET)
-	@ResponseBody
-	public Object propName(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/console/topic/update", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean updateTopic(@RequestBody TopicResource topicResource) {
 
-		String username = userUtils.getUsername(request);
-		boolean findAll = userUtils.isAdministrator(username);
+        boolean result = topicResourceService.update(topicResource);
+        if (result) {
+            doUpdateNotify(topicResource);
+        }
+        return result;
+    }
 
-		Set<String> editProposal = new HashSet<String>();
-		List<TopicResource> topicResources = topicResourceService.findAll();
+    @RequestMapping(value = "/console/topic/auth/ip", method = RequestMethod.POST)
+    @ResponseBody
+    public Object queryProducerIp(@RequestBody TopicQueryDto topicQueryDto) {
 
-		if (findAll) {
-			for (TopicResource topicResource : topicResources) {
-				editProposal.addAll(getPropList(topicResource));
-			}
-		} else {
-			for (TopicResource topicResource : topicResources) {
-				Set<String> tmpprop = getPropList(topicResource);
-				if (tmpprop.contains(username)) {
-					editProposal.addAll(tmpprop);
-				}
-			}
+        String topic = topicQueryDto.getTopic();
+        return topicResourceService.findByTopic(topic);
+    }
 
-		}
+    @RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST)
+    @ResponseBody
+    public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
+                            @RequestParam(value = "time") String time, @RequestParam(value = "exec_user") String approver,
+                            HttpServletRequest request) {
 
-		List<Administrator> adminList = userService.loadUsers();
-		for (Administrator admin : adminList) {
-			editProposal.add(admin.getName());
-		}
+        String username = userUtils.getUsername(request);
+        TopicResource topicResource = null;
 
-		return new ArrayList<String>(editProposal);
-	}
+        username = StringUtils.isEmpty(username) ? approver : username;
 
-	@RequestMapping(value = "/console/topic/update", method = RequestMethod.POST)
-	@ResponseBody
-	public Object updateTopic(@RequestBody TopicResourceDto topicResourceDto) {
+        if (approver != null) {
+            if (!userService.loadCachedAdministratorSet().contains(approver)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info(String.format(
+                            "%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
+                            username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+                }
+                return ResponseStatus.UNAUTHENTICATION;
+            } else {
+                topicResource = topicResourceService.findByTopic(topic);
+                if (topicResource == null) {
+                    if (logger.isInfoEnabled()) {
+                        logger.info(String.format(
+                                "%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
+                                username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+                    }
+                    return ResponseStatus.INVALIDTOPIC;
+                }
+                String proposal = topicResource.getAdministrator();
+                prop = checkProposalName(prop);
+                if (StringUtils.isNotEmpty(proposal)) {
+                    StringBuffer sb = new StringBuffer();
+                    sb.append(proposal).append(DELIMITOR).append(prop);
+                    String[] propsals = sb.toString().split(DELIMITOR);
+                    Set<String> propsalSet = new HashSet<String>(Arrays.asList(propsals));
+                    prop = StringUtils.join(propsalSet, DELIMITOR);
+                }
+            }
+        }
 
-		TopicResource topicResource = TopicResourceMapper.toTopicResource(topicResourceDto);
-		boolean result = topicResourceService.update(topicResource);
+        boolean result = false;
 
-		if (result) {
-			return ResponseStatus.SUCCESS;
-		} else {
-			return ResponseStatus.MONGOWRITE;
-		}
-	}
+        Transaction producerTransaction = Cat.getProducer().newTransaction("TopicEdit", topic + ":" + username);
 
-	@RequestMapping(value = "/console/topic/auth/ip", method = RequestMethod.POST)
-	@ResponseBody
-	public Object queryProducerIp(@RequestBody TopicQueryDto topicQueryDto) {
+        try {
+            topicResource.setAdministrator(prop);
+            topicResource.setUpdateTime(new Date());
+            result = topicResourceService.update(topicResource);
+            if (result) {
+                doUpdateNotify(topicResource);
+            }
+            producerTransaction.setStatus(Message.SUCCESS);
+        } catch (MongoSocketException e) {
+            producerTransaction.setStatus(e);
+            Cat.getProducer().logError(e);
+        } catch (MongoException e) {
+            producerTransaction.setStatus(e);
+            Cat.getProducer().logError(e);
+        } finally {
+            producerTransaction.complete();
+        }
 
-		TopicResourceDto topicResourceDto = null;
-		String topic = topicQueryDto.getTopic();
-		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		if (topicResource != null) {
-			topicResourceDto = TopicResourceMapper.toTopicResourceDto(topicResource);
-		}
+        if (result) {
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
+                        username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+            }
+            return ResponseStatus.SUCCESS;
+        } else {
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format(
+                        "%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
+                        username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
+            }
+            return ResponseStatus.MONGOWRITE;
+        }
 
-		return topicResourceDto;
-	}
+    }
 
-	@RequestMapping(value = "/api/topic/edittopic", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public Object editTopic(@RequestParam(value = "topic") String topic, @RequestParam(value = "prop") String prop,
-			@RequestParam(value = "time") String time, @RequestParam(value = "exec_user") String approver,
-			HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/console/topic/producer/alarm", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm) {
 
-		String username = userUtils.getUsername(request);
-		TopicResource topicResource = null;
+        TopicResource topicResource = topicResourceService.findByTopic(topic);
+        topicResource.setProducerAlarm(alarm);
+        boolean result = topicResourceService.update(topicResource);
+        if (result) {
+            doUpdateNotify(topicResource);
+        }
+        return result;
+    }
 
-		username = StringUtils.isEmpty(username) ? approver : username;
+    @RequestMapping(value = "/console/topic/consumer/alarm", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean editConsumerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm) {
 
-		if (approver != null) {
-			if (!userService.loadCachedAdministratorSet().contains(approver)) {
-				if (logger.isInfoEnabled()) {
-					logger.info(String.format(
-							"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No authentication!",
-							username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-				}
-				return ResponseStatus.UNAUTHENTICATION;
-			} else {
-				topicResource = topicResourceService.findByTopic(topic);
-				if (topicResource == null) {
-					if (logger.isInfoEnabled()) {
-						logger.info(String.format(
-								"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed. No such topic!",
-								username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-					}
-					return ResponseStatus.INVALIDTOPIC;
-				}
-				String proposal = topicResource.getAdministrator();
-				prop = checkProposalName(prop);
-				if (StringUtils.isNotEmpty(proposal)) {
-					StringBuffer sb = new StringBuffer();
-					sb.append(proposal).append(DELIMITOR).append(prop);
-					String[] propsals = sb.toString().split(DELIMITOR);
-					Set<String> propsalSet = new HashSet<String>(Arrays.asList(propsals));
-					prop = StringUtils.join(propsalSet, DELIMITOR);
-				}
-			}
-		}
+        TopicResource topicResource = topicResourceService.findByTopic(topic);
+        topicResource.setConsumerAlarm(alarm);
+        boolean result = topicResourceService.update(topicResource);
+        if (result) {
+            doUpdateNotify(topicResource);
+        }
+        return result;
+    }
 
-		boolean result = false;
+    @RequestMapping(value = "/console/topic/administrator", method = RequestMethod.GET)
+    @ResponseBody
+    public Object loadAdministrators() {
 
-		Transaction producerTransaction = Cat.getProducer().newTransaction("TopicEdit", topic + ":" + username);
+        return userUtils.administrator();
+    }
 
-		try {
-			topicResource.setAdministrator(prop);
-			topicResource.setUpdateTime(new Date());
-			result = topicResourceService.update(topicResource);
-			producerTransaction.setStatus(Message.SUCCESS);
-		} catch (MongoSocketException e) {
-			producerTransaction.setStatus(e);
-			Cat.getProducer().logError(e);
-		} catch (MongoException e) {
-			producerTransaction.setStatus(e);
-			Cat.getProducer().logError(e);
-		} finally {
-			producerTransaction.complete();
-		}
+    @RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean setAlarm(String topic, String ip, boolean alarm) {
 
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] successfully.",
-						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-			}
-			return ResponseStatus.SUCCESS;
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format(
-						"%s update topic %s to [prop: %s ], [dept: %s ], [time: %s ] failed.Please try again.",
-						username, topic, prop, splitProps(prop.trim()).toString(), time.toString()));
-			}
-			return ResponseStatus.MONGOWRITE;
-		}
+        return doSetIpInfo(topic, ip, "alarm", alarm);
+    }
 
-	}
+    @RequestMapping(value = "/console/topic/alarm/ipinfo/active", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean setActive(String topic, String cid, String ip, boolean active) {
 
-	@RequestMapping(value = "/console/topic/producer/alarm", method = RequestMethod.GET)
-	@ResponseBody
-	public boolean editProducerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
-			HttpServletRequest request, HttpServletResponse response) {
+        return doSetIpInfo(topic, ip, "active", active);
+    }
 
-		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		topicResource.setProducerAlarm(alarm);
-		boolean result = topicResourceService.update(topicResource);
+    private boolean doSetIpInfo(String topic, String ip, String type, boolean value) {
 
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update producer alarm of %s to %b successfully", topic, alarm));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update producer alarm of %s to %b fail", topic, alarm));
-			}
-		}
+        TopicResource topicResource = topicResourceService.findByTopic(topic);
+        List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
+        if (ipInfos == null || ip == null || type == null) {
+            return false;
+        }
+        for (IpInfo ipInfo : ipInfos) {
+            if (ip.equals(ipInfo.getIp())) {
+                if (type.equals("alarm")) {
+                    ipInfo.setAlarm(value);
+                } else if (type.equals("active")) {
+                    ipInfo.setActive(value);
+                } else {
+                    return false;
+                }
+                topicResource.setProducerIpInfos(ipInfos);
+                boolean result = topicResourceService.insert(topicResource);
+                if (result) {
+                    doUpdateNotify(topicResource);
+                }
+                return result;
+            }
+        }
 
-		return result;
-	}
+        return false;
+    }
 
-	@RequestMapping(value = "/console/topic/consumer/alarm", method = RequestMethod.GET)
-	@ResponseBody
-	public boolean editConsumerAlarmSetting(@RequestParam String topic, @RequestParam boolean alarm,
-			HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/console/topic/alarm/ipinfo/count/inactive", method = RequestMethod.GET)
+    @ResponseBody
+    public long countInactive() {
 
-		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		topicResource.setConsumerAlarm(alarm);
-		boolean result = topicResourceService.update(topicResource);
+        return topicResourceService.countInactive();
+    }
 
-		if (result) {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update consumer alarm of %s to %b successfully", topic, alarm));
-			}
-		} else {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Update consumer alarm of %s to %b fail", topic, alarm));
-			}
-		}
+    private String checkProposalName(String proposal) {
 
-		return result;
-	}
+        if (proposal.contains(POSTFIX)) {
+            int index = proposal.indexOf(POSTFIX);
+            proposal = proposal.substring(0, index);
+        }
+        int index = proposal.indexOf("?");
+        if (index != -1) {
+            proposal = proposal + "，";
+            proposal = proposal.replaceAll("\\?", ",").replaceAll(" ", "").replaceAll("，", ",");
+        }
+        return proposal;
+    }
 
-	@RequestMapping(value = "/console/topic/administrator", method = RequestMethod.GET)
-	@ResponseBody
-	public Object loadAdministrators() {
+    private Set<String> splitProps(String props) {
+        String[] prop = props.split(DELIMITOR);
+        Set<String> lists = new HashSet<String>(Arrays.asList(prop));
 
-		Set<String> administrators = new HashSet<String>();
+        return lists;
+    }
 
-		List<Administrator> adminList = userService.loadUsers();
+    @Override
+    protected String getMenu() {
+        return "topic";
+    }
 
-		for (Administrator administrator : adminList) {
-			administrators.add(administrator.getName());
-		}
+    @Override
+    public void doRegister(ResourceListener listener) {
+        listeners.add(listener);
+    }
 
-		List<TopicResource> topicResources = topicResourceService.findAll();
-		for (TopicResource topicResource : topicResources) {
-			String whiteListString = topicResource.getAdministrator();
-			String[] whiteList = whiteListString.split(DELIMITOR);
-			for (String wl : whiteList) {
-				administrators.add(wl);
-			}
-		}
+    @Override
+    public void doUpdateNotify(BaseResource resource) {
+        for (ResourceListener listener : listeners) {
+            listener.doUpdateNotify(resource);
+        }
+    }
 
-		return administrators;
-	}
-	
-	@RequestMapping(value = "/console/topic/ipinfo/{topic}", method = RequestMethod.GET)
-	public ModelAndView alarmDetail(@PathVariable String topic) {
-		Map<String, Object> map = createViewMap();
-		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		map.put("topic", topic);
-		map.put("entity", topicResource.getProducerIpInfos());
-		return new ModelAndView("topic/ipinfo", map);
-	}
-	
-	@RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)
-	@ResponseBody
-	public boolean setAlarm(String topic, String ip, boolean alarm) {
+    @Override
+    public void doDeleteNotify(BaseResource resource) {
+        for (ResourceListener listener : listeners) {
+            listener.doDeleteNotify(resource);
+        }
+    }
 
-		return doSetIpInfo(topic, ip, "alarm", alarm);
-	}
-
-	@RequestMapping(value = "/console/topic/alarm/ipinfo/active", method = RequestMethod.GET)
-	@ResponseBody
-	public boolean setActive(String topic, String cid, String ip, boolean active) {
-
-		return doSetIpInfo(topic, ip, "active", active);
-	}
-	
-	private boolean doSetIpInfo(String topic, String ip, String type, boolean value){
-		
-		TopicResource topicResource = topicResourceService.findByTopic(topic);
-		List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
-		if(ipInfos == null || ip == null || type == null){
-			return false;
-		}
-		for(IpInfo ipInfo : ipInfos){
-			if(ip.equals(ipInfo.getIp())){
-				if(type.equals("alarm")){
-					ipInfo.setAlarm(value);
-				}else if(type.equals("active")){
-					ipInfo.setActive(value);
-				}else{
-					return false;
-				}
-				topicResource.setProducerIpInfos(ipInfos);
-				//修改ipinfo调用insert，其他的则调用update
-				return topicResourceService.insert(topicResource);
-			}
-		}
-		
-		return false;
-	}
-
-	private String checkProposalName(String proposal) {
-
-		if (proposal.contains(POSTFIX)) {
-			int index = proposal.indexOf(POSTFIX);
-			proposal = proposal.substring(0, index);
-		}
-		int index = proposal.indexOf("?");
-		if (index != -1) {
-			proposal = proposal + "，";
-			proposal = proposal.replaceAll("\\?", ",").replaceAll(" ", "").replaceAll("，", ",");
-		}
-		return proposal;
-	}
-
-	private Set<String> splitProps(String props) {
-		String[] prop = props.split(DELIMITOR);
-		Set<String> lists = new HashSet<String>(Arrays.asList(prop));
-
-		return lists;
-	}
-
-	private Set<String> getPropList(TopicResource topicResource) {
-		Set<String> props = new HashSet<String>();
-		String[] tmpprops = topicResource.getAdministrator().split(",");
-
-		for (String tmpProp : tmpprops) {
-			if (!StringUtils.isEmpty(tmpProp)) {
-				props.add(tmpProp);
-			}
-		}
-		return props;
-	}
-
-	@Override
-	protected String getMenu() {
-		return "topic";
-	}
 
 }

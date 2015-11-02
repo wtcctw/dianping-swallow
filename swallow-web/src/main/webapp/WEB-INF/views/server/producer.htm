@@ -35,10 +35,10 @@
 						<td style="text-align: left" ng-bind="$index+1"></td>
 						<td style="text-align: left" ng-bind="ad.ip"></td>
 						<td style="text-align: left" ng-bind="ad.hostname"></td>
-						<td style="text-align: left" ng-bind="ad.sendpeak"></td>
-						<td style="text-align: left" ng-bind="ad.sendvalley"></td>
-						<td style="text-align: left" ng-bind="ad.sendfluctuation"></td>
-						<td style="text-align: left" ng-bind="ad.sendfluctuationBase"></td>
+						<td style="text-align: left" ng-bind="ad.saveAlarmSetting.peak"></td>
+						<td style="text-align: left" ng-bind="ad.saveAlarmSetting.valley"></td>
+						<td style="text-align: left" ng-bind="ad.saveAlarmSetting.fluctuation"></td>
+						<td style="text-align: left" ng-bind="ad.saveAlarmSetting.fluctuationBase"></td>
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
 								id="pactive{{$index}}" type="checkbox" ng-model="ad.active" ng-click="changeproduceractive(ad.ip, $index)"
@@ -100,13 +100,13 @@
 									<div class="col-sm-12">
 										<label class="col-sm-2 control-label">峰值</label> <input
 											class="col-sm-2" type="text"
-											ng-model="producerserverEntry.sendpeak" /> <label
+											ng-model="producerserverEntry.saveAlarmSetting.peak" /> <label
 											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="producerserverEntry.sendvalley" /> <label
+											class="col-sm-2" ng-model="producerserverEntry.saveAlarmSetting.valley" /> <label
 											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="producerserverEntry.sendfluctuation" /><label
+											class="col-sm-2" ng-model="producerserverEntry.saveAlarmSetting.fluctuation" /><label
 											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="producerserverEntry.sendfluctuationBase" />
+											class="col-sm-2" ng-model="producerserverEntry.saveAlarmSetting.fluctuationBase" />
 									</div>
 								</div>
 							</div>

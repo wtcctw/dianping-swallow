@@ -29,27 +29,12 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 	}
 
 	@Override
-	public boolean update(ProducerTopicStatsData topicStatsData) {
-		return producerTopicStatsDataDao.update(topicStatsData);
+	public boolean insert(List<ProducerTopicStatsData> topicStatsDatas) {
+		return producerTopicStatsDataDao.insert(topicStatsDatas);
 	}
 
 	@Override
-	public int deleteById(String id) {
-		return producerTopicStatsDataDao.deleteById(id);
-	}
-
-	@Override
-	public ProducerTopicStatsData findById(String id) {
-		return producerTopicStatsDataDao.findById(id);
-	}
-
-	@Override
-	public List<ProducerTopicStatsData> findByTopic(String topicName) {
-		return producerTopicStatsDataDao.findByTopic(topicName);
-	}
-	
-	@Override
-	public List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit){
+	public List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit) {
 		return producerTopicStatsDataDao.findByTopic(topicName, offset, limit);
 	}
 
@@ -57,7 +42,7 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 	public List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
 		return producerTopicStatsDataDao.findSectionData(topicName, startKey, endKey);
 	}
-	
+
 	@Override
 	public NavigableMap<Long, Long> findSectionQpsData(String topicName, long startKey, long endKey) {
 		List<ProducerTopicStatsData> topicStatsDatas = producerTopicStatsDataDao.findSectionData(topicName, startKey,
@@ -87,8 +72,8 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 	}
 
 	@Override
-	public ProducerTopicStatsData findOneByTopicAndTime(String topicName, long startKey,long endKey, boolean isGt) {
-		return producerTopicStatsDataDao.findOneByTopicAndTime(topicName, startKey,endKey, isGt);
+	public ProducerTopicStatsData findOneByTopicAndTime(String topicName, long startKey, long endKey, boolean isGt) {
+		return producerTopicStatsDataDao.findOneByTopicAndTime(topicName, startKey, endKey, isGt);
 	}
 
 }

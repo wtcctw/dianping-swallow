@@ -67,64 +67,32 @@ public class AlarmMetaDto {
 		return levelType;
 	}
 
-	public void setLevelType(AlarmLevelType levelType) {
-		this.levelType = levelType;
-	}
-
 	public boolean getIsSmsMode() {
 		return isSmsMode;
-	}
-
-	public void setIsSmsMode(boolean isSmsMode) {
-		this.isSmsMode = isSmsMode;
 	}
 
 	public boolean getIsWeiXinMode() {
 		return isWeiXinMode;
 	}
 
-	public void setIsWeiXinMode(boolean isWeiXinMode) {
-		this.isWeiXinMode = isWeiXinMode;
-	}
-
 	public boolean getIsMailMode() {
 		return isMailMode;
-	}
-
-	public void setIsMailMode(boolean isMailMode) {
-		this.isMailMode = isMailMode;
 	}
 
 	public boolean getIsSendSwallow() {
 		return isSendSwallow;
 	}
 
-	public void setIsSendSwallow(boolean isSendSwallow) {
-		this.isSendSwallow = isSendSwallow;
-	}
-
 	public boolean getIsSendBusiness() {
 		return isSendBusiness;
-	}
-
-	public void setIsSendBusiness(boolean isSendBusiness) {
-		this.isSendBusiness = isSendBusiness;
 	}
 
 	public String getAlarmTitle() {
 		return alarmTitle;
 	}
 
-	public void setAlarmTitle(String alarmTitle) {
-		this.alarmTitle = alarmTitle;
-	}
-
 	public String getAlarmTemplate() {
 		return alarmTemplate;
-	}
-
-	public void setAlarmTemplate(String alarmTemplate) {
-		this.alarmTemplate = alarmTemplate;
 	}
 
 	public String getAlarmDetail() {
@@ -155,32 +123,16 @@ public class AlarmMetaDto {
 		return maxTimeSpan;
 	}
 
-	public void setMaxTimeSpan(int maxTimeSpan) {
-		this.maxTimeSpan = maxTimeSpan;
-	}
-	
 	public boolean getIsUpdate() {
 		return isUpdate;
-	}
-
-	public void setIsUpdate(boolean isUpdate) {
-		this.isUpdate = isUpdate;
 	}
 
 	public int getDaySpanBase() {
 		return daySpanBase;
 	}
 
-	public void setDaySpanBase(int daySpanBase) {
-		this.daySpanBase = daySpanBase;
-	}
-
 	public int getNightSpanBase() {
 		return nightSpanBase;
-	}
-
-	public void setNightSpanBase(int nightSpanBase) {
-		this.nightSpanBase = nightSpanBase;
 	}
 
 }

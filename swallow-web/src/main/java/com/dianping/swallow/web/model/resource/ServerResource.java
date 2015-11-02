@@ -53,12 +53,6 @@ public class ServerResource extends BaseResource {
 		this.active = active;
 	}
 
-	@Override
-	public String toString() {
-		return "ServerResource [ip=" + ip + ", hostname=" + hostname + ", alarm=" + alarm + ", active=" + active
-				+ ", toString()=" + super.toString() + "]";
-	}
-
 	@JsonIgnore
 	public boolean isDefault() {
 		if (DEFAULT_RECORD.equals(ip)) {

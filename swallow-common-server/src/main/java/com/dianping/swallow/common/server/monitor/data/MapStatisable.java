@@ -16,10 +16,10 @@ public interface MapStatisable<V> extends Statisable<V>, MapRetriever{
 	NavigableMap<Long, Long> getDelay(StatisType type, Object key);
 
 	@JsonIgnore
-	NavigableMap<Long, Long> getQpx(StatisType type, Object key);
+	NavigableMap<Long, QpxData> getQpx(StatisType type, Object key);
 	
 	Map<String, NavigableMap<Long, Long>> allDelay(StatisType type, boolean includeTotal);
 	
-	Map<String, NavigableMap<Long, Long>> allQpx(StatisType type, boolean includeTotal);
+	Map<String, NavigableMap<Long, QpxData>> allQpx(StatisType type, boolean includeTotal);
 
 }

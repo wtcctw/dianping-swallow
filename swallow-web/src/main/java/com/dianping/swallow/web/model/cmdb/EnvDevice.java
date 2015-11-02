@@ -4,6 +4,7 @@ package com.dianping.swallow.web.model.cmdb;
  * 
  * @author qiyin
  *
+ *         2015年10月16日 上午10:09:24
  */
 public class EnvDevice {
 

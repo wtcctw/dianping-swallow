@@ -59,9 +59,4 @@ public class Administrator {
 		return this;
 	}
 
-	@Override
-	public String toString() {
-		return "Administrator [id=" + id + ", name=" + name + ", role=" + role + ", date=" + date + "]";
-	}
-
 }

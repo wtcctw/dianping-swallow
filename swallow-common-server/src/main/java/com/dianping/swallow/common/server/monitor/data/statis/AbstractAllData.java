@@ -1,14 +1,6 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
@@ -17,250 +9,317 @@ import com.dianping.swallow.common.server.monitor.data.StatisRetriever;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * 服务器相关，存储server对应的监控数据
- * @author mengwenchao
  *
- * 2015年5月19日 下午4:45:31
+ * @author mengwenchao
+ *         <p/>
+ *         2015年5月19日 下午4:45:31
  */
-public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>, S extends AbstractTotalMapStatisable<M, T>, V extends MonitorData> 
-														extends AbstractStatisable<V> implements StatisRetriever{
+public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>, S extends AbstractTotalMapStatisable<M, T>, V extends MonitorData>
+        extends AbstractStatisable<V> implements StatisRetriever {
 
-	protected Map<String, S> servers = new ConcurrentHashMap<String, S>();
-	
-	@JsonIgnore
-	protected   S 			 total = null;
-	
-	protected final Set<StatisType> 	supportedTypes = new HashSet<StatisType>();
-	
-	public AbstractAllData(StatisType ... types){
-		
-		for(StatisType type : types){
-			supportedTypes.add(type);
-		}
-		total = MapUtil.getOrCreate(servers, MonitorData.TOTAL_KEY, getStatisClass());
-	}
+    protected Map<String, S> servers = new ConcurrentHashMap<String, S>();
 
-	
-	@Override
-	public Set<String> getTopics(boolean includeTotal){
-		return total.keySet(includeTotal);
-	}
+//	@JsonIgnore
+//	protected   S 			 total = null;
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void add(Long time, V added) {
-		
-		String serverIp = added.getSwallowServerIp();
-		
-		S statis = MapUtil.getOrCreate(servers, serverIp, getStatisClass());
-		
-		statis.add(time, (T) added.getServerData());
-		
-		total.add(time, (T) added.getServerData());
-	}
+    protected final Set<StatisType> supportedTypes = new HashSet<StatisType>();
 
-	protected abstract Class<? extends S> getStatisClass();
+    public AbstractAllData(StatisType... types) {
 
-	@Override
-	public void doRemoveBefore(Long time) {
-		
-		for(S s : servers.values()){
-			s.removeBefore(time);
-		}
-	}
-	
-	
-	@Override
-	protected Statisable<?> getValue(Object key){
-		return servers.get(key);
-	}
-	
-	@Override
-	public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
-		
-		for(Entry<String, S> entry : servers.entrySet()){
-			
-			String key = entry.getKey();
-			S 	   value =  entry.getValue();
-			if(logger.isDebugEnabled()){
-				logger.debug("[build][" +startKey + "," + endKey + "," + intervalCount + "]" + key + ","+ value);
-			}
-			value.build(qpx, startKey, endKey, intervalCount);
-		}
-		
-	}
-
-	@Override
-	public void cleanEmpty() {
-		for(Entry<String, S> entry : servers.entrySet()){
-			
-			String key = entry.getKey();
-			S 	   value = entry.getValue();
-			
-			value.cleanEmpty();
-			if(!isTotalKey(key) && value.isEmpty()){
-				if(logger.isInfoEnabled()){
-					logger.info("[clean]" + key);
-				}
-				servers.remove(key);
-			}
-		}
-	}
-
-	@Override
-	public boolean isEmpty() {
-		
-		for(S s : servers.values()){
-			if(!s.isEmpty()){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public NavigableMap<Long, Long> getDelay(StatisType type) {
-		
-		checkSupported(type);
-		return getDelayForTopic(MonitorData.TOTAL_KEY, type);
-	}
-
-	@Override
-	public NavigableMap<Long, Long> getQpx(StatisType type) {
-		
-		checkSupported(type);
-		return getQpxForTopic(MonitorData.TOTAL_KEY, type);
-	}
-
-	
-	@Override
-	public NavigableMap<Long, Long> getQpxForTopic(String topic, StatisType type) {
-		
-		checkSupported(type);
-		
-		Statisable<?> statis = total.getValue(topic);
-		if(statis != null){
-			return statis.getQpx(type);
-		}
-		return null;
-	}
-
-	
-	public Set<String> getKeys(CasKeys keys, StatisType type){
-		
-		if(!keys.hasNextKey()){
-			return new HashSet<String>(servers.keySet());
-		}
-		
-		String key = keys.getNextKey();
-		S server = servers.get(key);
-		
-		if(server == null){
-			throw new UnfoundKeyException(key);
-		}
-		
-		return server.getKeys(keys, type);
-	}
-	
-	public Object getValue(CasKeys keys, StatisType type){
-
-		if(!keys.hasNextKey()){
-			throw new UnfoundKeyException(keys.toString());
-		}
-		
-		String key = keys.getNextKey();
-		S server = servers.get(key);
-		
-		if(server == null){
-			throw new UnfoundKeyException(key);
-		}
-		
-		if(!keys.hasNextKey()){
-			return server;
-		}
-		return server.getValue(keys, type);
-
-	}
-	
-	
-	public Set<String> getKeys(CasKeys keys){
-	
-		return getKeys(keys, null);
-	}
-	
-	public Object getValue(CasKeys keys){
-		
-		return getValue(keys, null);
-	}
+        for (StatisType type : types) {
+            supportedTypes.add(type);
+        }
+        //total = MapUtil.getOrCreate(servers, MonitorData.TOTAL_KEY, getStatisClass());
+    }
 
 
-	private void checkSupported(StatisType type) {
-		if(!supportedTypes.contains(type)){
-			throw new IllegalArgumentException("unsupported type:" + type + ", class:" + getClass());
-		}
-	}
+    @Override
+    public Set<String> getTopics(boolean includeTotal) {
+        Set<String> topics = new HashSet<String>();
+        for (S s : servers.values()) {
+            Set<String> topicSet = s.keySet(includeTotal);
+            if (topicSet != null) {
+                topics.addAll(topicSet);
+            }
+        }
+        return topics;
+    }
 
-	
-	@Override
-	public NavigableMap<Long, Long> getDelayForTopic(String topic, StatisType type) {
-		
-		checkSupported(type);
-		
-		Statisable<?> statis = total.getValue(topic);
-		if(statis != null){
-			return statis.getDelay(type);
-		}
-		return null;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public void add(Long time, V added) {
 
-	@Override
-	public Map<String, NavigableMap<Long, Long>> getQpxForServers(StatisType type) {
-		
-		checkSupported(type);
-		HashMap<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long, Long>>();
-		for(Entry<String, S> entry : servers.entrySet()){
-			
-			String serverIp = entry.getKey();
-			S pssd = entry.getValue();
-			if(pssd == total){
-				continue;
-			}
-			result.put(serverIp, pssd.getQpx(type));
-		}
-		
-		return result;
-	}
+        String serverIp = added.getSwallowServerIp();
 
-	
-	protected Map<String, NavigableMap<Long, Long>> getAllQpx(StatisType type, String topic, boolean includeTotal) {
-		
-		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
-		
-		if(ctss == null){
-			return null;
-		}
-		
-		return ctss.allQpx(type, includeTotal);
-	}
+        S statis = MapUtil.getOrCreate(servers, serverIp, getStatisClass());
 
-	protected Map<String, NavigableMap<Long, Long>> getAllDelay(StatisType type, String topic, boolean includeTotal) {
-		
-		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
-		
-		if(ctss == null){
-			return null;
-		}
-		
-		return ctss.allDelay(type, includeTotal);
-	}
+        statis.add(time, (T) added.getServerData());
 
-	public String toString(String key){
-		
-		return JsonBinder.getNonEmptyBinder().toPrettyJson(servers.get(key));
-	}
+        //total.add(time, (T) added.getServerData());
+    }
+
+    protected abstract Class<? extends S> getStatisClass();
+
+    @Override
+    public void doRemoveBefore(Long time) {
+
+        for (S s : servers.values()) {
+            s.removeBefore(time);
+        }
+    }
+
+
+    @Override
+    protected Statisable<?> getValue(Object key) {
+        return servers.get(key);
+    }
+
+    @Override
+    public void build(QPX qpx, Long startKey, Long endKey, int intervalCount) {
+
+        for (Entry<String, S> entry : servers.entrySet()) {
+
+            String key = entry.getKey();
+            S value = entry.getValue();
+            if (logger.isDebugEnabled()) {
+                logger.debug("[build][" + startKey + "," + endKey + "," + intervalCount + "]" + key + "," + value);
+            }
+            value.build(qpx, startKey, endKey, intervalCount);
+        }
+
+    }
+
+    @Override
+    public void cleanEmpty() {
+        for (Entry<String, S> entry : servers.entrySet()) {
+
+            String key = entry.getKey();
+            S value = entry.getValue();
+
+            value.cleanEmpty();
+            if (!isTotalKey(key) && value.isEmpty()) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("[clean]" + key);
+                }
+                servers.remove(key);
+            }
+        }
+    }
+
+    @Override
+    public boolean isEmpty() {
+
+        for (S s : servers.values()) {
+            if (!s.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public NavigableMap<Long, Long> getDelay(StatisType type) {
+
+        checkSupported(type);
+        return getDelayForTopic(MonitorData.TOTAL_KEY, type);
+    }
+
+    @Override
+    public NavigableMap<Long, QpxData> getQpx(StatisType type) {
+
+        checkSupported(type);
+        return getQpxForTopic(MonitorData.TOTAL_KEY, type);
+    }
+
+
+    @Override
+    public NavigableMap<Long, QpxData> getQpxForTopic(String topic, StatisType type) {
+
+        checkSupported(type);
+
+        NavigableMap<Long, QpxData> result = new ConcurrentSkipListMap<Long, QpxData>();
+        Statisable<?> statis;
+        for (S s : servers.values()) {
+            statis = s.getValue(topic);
+            if (statis != null) {
+                NavigableMap<Long, QpxData> qps = statis.getQpx(type);
+                MapUtil.mergeMap(result, qps);
+            }
+        }
+
+        return result.isEmpty() ? null : result;
+
+    }
+
+
+    public Set<String> getKeys(CasKeys keys, StatisType type) {
+
+        if (!keys.hasNextKey()) {
+            return new HashSet<String>(servers.keySet());
+        }
+
+        String key = keys.getNextKey();
+        if(MonitorData.TOTAL_KEY.equals(key)){
+            Set<String> result = new HashSet<String>();
+            for(S s : servers.values()){
+                Set<String> items = s.getKeys(keys, type);
+                if(items != null){
+                    result.addAll(items);
+                }
+                keys.reset();
+            }
+            return result;
+        }
+        S server = servers.get(key);
+
+        if (server == null) {
+            throw new UnfoundKeyException(key);
+        }
+
+        return server.getKeys(keys, type);
+    }
+
+    public Object getValue(CasKeys keys, StatisType type) {
+
+        if (!keys.hasNextKey()) {
+            throw new UnfoundKeyException(keys.toString());
+        }
+
+        String key = keys.getNextKey();
+        S server;
+        if(MonitorData.TOTAL_KEY.equals(key)){
+            server = (S) getTotalValue();
+        }else{
+            server = servers.get(key);
+        }
+
+        if (server == null) {
+            throw new UnfoundKeyException(key);
+        }
+
+        if (!keys.hasNextKey()) {
+            return server;
+        }
+        return server.getValue(keys, type);
+
+    }
+
+    private Object getTotalValue(){
+        S result = createValue();
+        for(S s : servers.values()){
+            result.merge(s);
+        }
+        return result;
+    }
+
+    public Set<String> getKeys(CasKeys keys) {
+
+        return getKeys(keys, null);
+    }
+
+    public Object getValue(CasKeys keys) {
+
+        return getValue(keys, null);
+    }
+
+
+    private void checkSupported(StatisType type) {
+        if (!supportedTypes.contains(type)) {
+            throw new IllegalArgumentException("unsupported type:" + type + ", class:" + getClass());
+        }
+    }
+
+
+    @Override
+    public NavigableMap<Long, Long> getDelayForTopic(String topic, StatisType type) {
+
+        checkSupported(type);
+
+        NavigableMap<Long, Long> result = new ConcurrentSkipListMap<Long, Long>();
+        Statisable<?> statis;
+        for (S s : servers.values()) {
+            statis = s.getValue(topic);
+            if (statis != null) {
+                NavigableMap<Long, Long> qps = statis.getDelay(type);
+                MapUtil.mergeMapOfTypeLong(result, qps);
+            }
+        }
+
+        return result.isEmpty() ? null : result;
+    }
+
+    @Override
+    public Map<String, NavigableMap<Long, QpxData>> getQpxForServers(StatisType type) {
+
+        checkSupported(type);
+        HashMap<String, NavigableMap<Long, QpxData>> result = new HashMap<String, NavigableMap<Long, QpxData>>();
+        for (Entry<String, S> entry : servers.entrySet()) {
+
+            String serverIp = entry.getKey();
+            S pssd = entry.getValue();
+            result.put(serverIp, pssd.getQpx(type));
+        }
+
+        return result;
+    }
+
+
+    protected Map<String, NavigableMap<Long, QpxData>> getAllQpx(StatisType type, String topic, boolean includeTotal) {
+
+        ConsumerTopicStatisData ctss;
+        for (S s : servers.values()) {
+            ctss = (ConsumerTopicStatisData) s.getValue(topic);
+            if (ctss != null) {
+                return ctss.allQpx(type, includeTotal);
+            }
+
+        }
+        return null;
+    }
+
+    protected Map<String, NavigableMap<Long, Long>> getAllDelay(StatisType type, String topic, boolean includeTotal) {
+
+        ConsumerTopicStatisData ctss;
+        for (S s : servers.values()) {
+            ctss = (ConsumerTopicStatisData) s.getValue(topic);
+            if (ctss != null) {
+                return ctss.allDelay(type, includeTotal);
+            }
+
+        }
+        return null;
+//		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
+//
+//		if(ctss == null){
+//			return null;
+//		}
+//
+//		return ctss.allDelay(type, includeTotal);
+    }
+
+    public String toString(String key) {
+
+        return JsonBinder.getNonEmptyBinder().toPrettyJson(servers.get(key));
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException{
+        AbstractAllData clone = (AbstractAllData) super.clone();
+        clone.servers = new ConcurrentHashMap<String, S>(this.servers);
+        return clone;
+    }
+
+    public abstract S createValue();
 
 }

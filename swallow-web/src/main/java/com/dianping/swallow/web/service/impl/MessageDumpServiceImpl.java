@@ -1,23 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Service;
-
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.MessageDumpController;
@@ -30,6 +12,22 @@ import com.dianping.swallow.web.service.MessageService;
 import com.dianping.swallow.web.task.DumpMessageTask;
 import com.dianping.swallow.web.util.ResponseStatus;
 import com.mongodb.MongoException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author mingdongli
@@ -65,12 +63,6 @@ public class MessageDumpServiceImpl extends AbstractSwallowService implements Me
 		
 		return messageDumpDao.saveMessageDump(md);
 
-	}
-
-	@Override
-	public MessageDump loadDumpMessage(String filename) {
-
-		return messageDumpDao.loadMessageDump(filename);
 	}
 
 	@Override

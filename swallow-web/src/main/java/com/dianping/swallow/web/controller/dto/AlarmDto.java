@@ -84,10 +84,6 @@ public class AlarmDto {
 		this.related = related;
 	}
 
-	public String getRelatedUrl() {
-		return relatedUrl;
-	}
-
 	public void setRelatedUrl(String relatedUrl) {
 		this.relatedUrl = relatedUrl;
 	}
@@ -100,10 +96,6 @@ public class AlarmDto {
 		this.relatedType = relatedType;
 	}
 
-	public List<SendInfo> getSendInfos() {
-		return sendInfos;
-	}
-
 	public void setSendInfos(List<SendInfo> sendInfos) {
 		this.sendInfos = sendInfos;
 	}
@@ -114,10 +106,6 @@ public class AlarmDto {
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
-	}
-
-	public String getSourceIp() {
-		return sourceIp;
 	}
 
 	public void setSourceIp(String sourceIp) {

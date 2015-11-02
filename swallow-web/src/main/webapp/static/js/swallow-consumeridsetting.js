@@ -133,27 +133,31 @@ module
 							$scope.query.topic = $scope.topic;
 							$scope.query.consumerId = $scope.consumerId;
 							$scope.query.consumerIp = $scope.consumerIp;
+							$scope.query.inactive = true;
 							
 							$scope.consumeridEntry = {};
+							$scope.consumeridEntry.consumerAlarmSetting = {};
+							$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting = {};
+							$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting = {};
+							$scope.consumeridEntry.consumerAlarmSetting.sendDelay;
+							$scope.consumeridEntry.consumerAlarmSetting.ackDelay;
+							$scope.consumeridEntry.consumerAlarmSetting.accumulation;
+							$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak;
+							$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley;
+							$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation;
+							$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase;				$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak;
+							$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak;
+							$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley;
+							$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation;
+							$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase;
 							$scope.consumeridEntry.consumerId;
 							$scope.consumeridEntry.topic;
 							$scope.consumeridEntry.alarm;
 							$scope.consumeridEntry.consumerIpInfos;
-							$scope.consumeridEntry.senddelay;
-							$scope.consumeridEntry.ackdelay;
-							$scope.consumeridEntry.accumulation;
-							$scope.consumeridEntry.sendpeak;
-							$scope.consumeridEntry.sendvalley;
-							$scope.consumeridEntry.sendfluctuation;
-							$scope.consumeridEntry.sendfluctuationBase;
-							$scope.consumeridEntry.ackpeak;
-							$scope.consumeridEntry.ackvalley;
-							$scope.consumeridEntry.ackfluctuation;
-							$scope.consumeridEntry.ackfluctuationBase;
 
 							$scope.refreshpage = function(myForm, num) {
-								if ($scope.consumeridEntry.sendpeak < $scope.consumeridEntry.sendvalley
-										|| $scope.consumeridEntry.ackpeak < $scope.consumeridEntry.ackvalley) {
+								if ($scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak < $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley
+										|| $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak < $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley) {
 									alert("谷值不能小于峰值");
 									return;
 								}
@@ -185,17 +189,17 @@ module
 								$scope.consumeridEntry.topic = "";
 								$scope.consumeridEntry.alarm = true;
 								$scope.consumeridEntry.consumerIpInfos = "";
-								$scope.consumeridEntry.senddelay = "";
-								$scope.consumeridEntry.ackdelay = "";
-								$scope.consumeridEntry.accumulation = "";
-								$scope.consumeridEntry.sendpeak = "";
-								$scope.consumeridEntry.sendvalley = "";
-								$scope.consumeridEntry.sendfluctuation = "";
-								$scope.consumeridEntry.sendfluctuationBase = "";
-								$scope.consumeridEntry.ackpeak = "";
-								$scope.consumeridEntry.ackvalley = "";
-								$scope.consumeridEntry.ackfluctuation = "";
-								$scope.consumeridEntry.ackfluctuationBase = "";
+								$scope.consumeridEntry.consumerAlarmSetting.sendDelay = "";
+								$scope.consumeridEntry.consumerAlarmSetting.ackDelay = "";
+								$scope.consumeridEntry.consumerAlarmSetting.accumulation = "";
+								$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak = "";
+								$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley = "";
+								$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation = "";
+								$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase = "";				$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak;
+								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak = "";
+								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley = "";
+								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation = "";
+								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = "";
 							}
 
 							$scope.setModalInput = function(index) {
@@ -204,18 +208,26 @@ module
 								$scope.consumeridEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
 								$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerId;
 								$scope.consumeridEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
-								$scope.consumeridEntry.senddelay = $scope.searchPaginator.currentPageItems[index].senddelay;
-								$scope.consumeridEntry.ackdelay = $scope.searchPaginator.currentPageItems[index].ackdelay;
-								$scope.consumeridEntry.accumulation = $scope.searchPaginator.currentPageItems[index].accumulation;
-								$scope.consumeridEntry.sendpeak = $scope.searchPaginator.currentPageItems[index].sendpeak;
-								$scope.consumeridEntry.sendvalley = $scope.searchPaginator.currentPageItems[index].sendvalley;
-								$scope.consumeridEntry.sendfluctuation = $scope.searchPaginator.currentPageItems[index].sendfluctuation;
-								$scope.consumeridEntry.sendfluctuationBase = $scope.searchPaginator.currentPageItems[index].sendfluctuationBase;
-								$scope.consumeridEntry.ackpeak = $scope.searchPaginator.currentPageItems[index].ackpeak;
-								$scope.consumeridEntry.ackvalley = $scope.searchPaginator.currentPageItems[index].ackvalley;
-								$scope.consumeridEntry.ackfluctuation = $scope.searchPaginator.currentPageItems[index].ackfluctuation;
-								$scope.consumeridEntry.ackfluctuationBase = $scope.searchPaginator.currentPageItems[index].ackfluctuationBase;
+								$scope.consumeridEntry.consumerAlarmSetting.sendDelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendDelay;
+								$scope.consumeridEntry.consumerAlarmSetting.ackDelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackDelay;
+								$scope.consumeridEntry.consumerAlarmSetting.accumulation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.accumulation;
+								$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.peak;
+								$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.valley;
+								$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.fluctuation;
+								$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase;
+								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.peak;
+								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.valley;
+								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuation;
+								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase;
 								$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
+							}
+							
+							$scope.setInactive = function(){
+								$scope.query.inactive = !$scope.query.inactive;
+								$scope.query.topic = $("#searchtopic").val();
+								$scope.query.consumerIp = $("#searchconsumerip").val();
+								$scope.query.consumerId = $("#searchconsumerid").val();
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 							}
 							
 							//如果topic列表返回空，则不会执行initpage
@@ -296,6 +308,14 @@ module
 										
 									}).error(function(data, status, headers, config) {
 								});
+								 
+								 $http({
+									 method : 'GET',
+									 url : window.contextPath + '/console/consumerid/alarm/ipinfo/count/inactive'
+								 }).success(function(data, status, headers, config) {
+									 $scope.countinactive = data;
+								 }).error(function(data, status, headers, config) {
+								 });
 								 
 							}
 							

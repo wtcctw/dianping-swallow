@@ -1,18 +1,5 @@
 package com.dianping.swallow.web.monitor.collector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.NameValuePair;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.JavaType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.model.dom.MongoReport;
 import com.dianping.swallow.web.model.resource.MongoResource;
@@ -20,6 +7,17 @@ import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 import com.dianping.swallow.web.service.MongoResourceService;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.JavaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author mingdongli
@@ -27,7 +25,7 @@ import com.dianping.swallow.web.service.MongoResourceService;
  *         2015年9月18日上午9:58:52
  */
 @Component
-public class MongoResourceCollector extends AbstractResourceCollector {
+public class MongoResourceCollector extends AbstractRegularCollecter {
 
 	private static final String MONGO_REPORT = "http://dom.dp/db_daily/message";
 
@@ -156,8 +154,6 @@ public class MongoResourceCollector extends AbstractResourceCollector {
 		mongoResource.setDisk(mongoReport.getDisk());
 		mongoResource.setLoad(mongoReport.getLoad());
 		mongoResource.setQps(mongoReport.getQps());
-		mongoResource.setThreads(mongoReport.getThreads());
-		mongoResource.setDev_cnt(mongoReport.getDev_cnt());
 
 		return mongoResource;
 	}

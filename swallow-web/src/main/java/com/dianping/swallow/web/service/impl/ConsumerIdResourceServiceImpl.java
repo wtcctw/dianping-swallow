@@ -44,12 +44,6 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	}
 
 	@Override
-	public List<ConsumerIdResource> findByConsumerId(String consumerid) {
-
-		return consumerIdResourceDao.findByConsumerId(consumerid);
-	}
-
-	@Override
 	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam) {
 
 		return consumerIdResourceDao.findByTopic(consumerIdParam);
@@ -68,21 +62,9 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 	}
 
 	@Override
-	public ConsumerIdResource findDefault() {
-
-		return consumerIdResourceDao.findDefault();
-	}
-
-	@Override
 	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam) {
 
 		return consumerIdResourceDao.findConsumerIdResourcePage(consumerIdParam);
-	}
-
-	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam consumerIdParam) {
-
-		return consumerIdResourceDao.findByConsumerIp(consumerIdParam);
 	}
 
 	@Override
@@ -113,6 +95,12 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
 			consumerIdResource = buildConsumerIdResource(topic, consumerId);
 		}
 		return consumerIdResource;
+	}
+
+	@Override
+	public long countInactive() {
+
+		return consumerIdResourceDao.countInactive();
 	}
 
 }

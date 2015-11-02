@@ -1,7 +1,5 @@
 package com.dianping.swallow.web.model.resource;
 
-import java.util.List;
-
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -25,15 +23,7 @@ public class MongoResource extends BaseResource{
     
     private Float disk;
     
-    private String dba;
-    
-    private int threads;
-    
     private Integer qps;
-    
-    private int dev_cnt;
-    
-    private List<String> topics;
     
     private MongoType mongoType;
     
@@ -43,14 +33,6 @@ public class MongoResource extends BaseResource{
 
 	public void setMongoType(MongoType mongoType) {
 		this.mongoType = mongoType;
-	}
-
-	public List<String> getTopics() {
-		return topics;
-	}
-
-	public void setTopics(List<String> topics) {
-		this.topics = topics;
 	}
 
 	public String getIp() {
@@ -77,14 +59,6 @@ public class MongoResource extends BaseResource{
 		this.disk = disk;
 	}
 
-	public String getDba() {
-		return dba;
-	}
-
-	public void setDba(String dba) {
-		this.dba = dba;
-	}
-
 	public String getCatalog() {
 		return catalog;
 	}
@@ -93,28 +67,12 @@ public class MongoResource extends BaseResource{
 		this.catalog = catalog;
 	}
 
-	public int getThreads() {
-		return threads;
-	}
-
-	public void setThreads(int threads) {
-		this.threads = threads;
-	}
-
 	public Integer getQps() {
 		return qps;
 	}
 
 	public void setQps(Integer qps) {
 		this.qps = qps;
-	}
-
-	public int getDev_cnt() {
-		return dev_cnt;
-	}
-
-	public void setDev_cnt(int dev_cnt) {
-		this.dev_cnt = dev_cnt;
 	}
 
 	@Override

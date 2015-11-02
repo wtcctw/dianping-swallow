@@ -24,16 +24,18 @@
 		class="com.dianping.swallow.web.common.WebLifecycleComponentManager" />
 
 	<bean id="messageDAO"
-		class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
-		<property name="mongoManager">
-			<ref local="mongoManager" />
-		</property>
+		class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO">
+		<property name="mongoManager" ref="mongoManager"/>
 	</bean>
 
-	<bean id="mongoManager"
-		class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-		<constructor-arg value="web" index="0" />
-		<property name="swallowConfig" ref="swallowConfig" />
+
+	<bean id="clusterManager" class="com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager">
+		<property name="clusterFactories">
+			<list>
+				<ref bean="mongoClusterFactory"/>
+				<ref bean="kafkaClusterFactory"/>
+			</list>
+		</property>
 	</bean>
 
 	<bean id="swallowConfig"
@@ -92,6 +94,7 @@
 			</bean>
 		</mvc:interceptor>
 	</mvc:interceptors>
+
 	<!--用户信息接口配置 -->
 	<bean id="baUserService" class="com.dianping.dpsf.spring.ProxyBeanFactory"
 		init-method="init">
@@ -106,6 +109,7 @@
 
 	<import resource="applicationContext-utils.xml" />
 	<import resource="applicationContext-mongo.xml" />
+	<import resource="applicationContext-kafka.xml"/>
 	<import resource="applicationContext-springtask.xml" />
 	<import resource="applicationContext-aop.xml" />
 

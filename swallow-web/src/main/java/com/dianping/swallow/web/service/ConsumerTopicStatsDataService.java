@@ -14,9 +14,9 @@ import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsData
 public interface ConsumerTopicStatsDataService {
 	
 	boolean insert(ConsumerTopicStatsData topicStatsData);
-
-	List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
 	
+	boolean insert(List<ConsumerTopicStatsData> topicStatsDatas);
+
 	StatsDataMapPair findSectionDelayData(String topicName, long startKey, long endKey);
 	
 	StatsDataMapPair findSectionQpsData(String topicName, long startKey, long endKey);

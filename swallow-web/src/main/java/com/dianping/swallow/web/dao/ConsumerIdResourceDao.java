@@ -21,14 +21,10 @@ public interface ConsumerIdResourceDao extends Dao{
 	
 	long count();
 
-	List<ConsumerIdResource> findByConsumerId(String consumerid);
-	
 	ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId);
 
 	Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam);
 	
-	Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam consumerIdParam);
-
 	Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam  consumerIdParam);
 	
 	List<ConsumerIdResource> findAll(String ...fields );
@@ -36,6 +32,8 @@ public interface ConsumerIdResourceDao extends Dao{
 	ConsumerIdResource findDefault();
 	
 	Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam);
+	
+	long countInactive();
 	
 	public static class ConsumerIdParam{
 		
@@ -48,6 +46,8 @@ public interface ConsumerIdResourceDao extends Dao{
 		private String topic;
 		
 		private String consumerIp;
+		
+		private boolean inactive;
 
 		public int getOffset() {
 			return offset;
@@ -87,6 +87,14 @@ public interface ConsumerIdResourceDao extends Dao{
 
 		public void setConsumerIp(String consumerIp) {
 			this.consumerIp = consumerIp;
+		}
+
+		public boolean isInactive() {
+			return inactive;
+		}
+
+		public void setInactive(boolean inactive) {
+			this.inactive = inactive;
 		}
 		
 	}

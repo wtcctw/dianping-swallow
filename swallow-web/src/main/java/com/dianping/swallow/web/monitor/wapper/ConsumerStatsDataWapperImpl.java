@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
@@ -62,8 +63,8 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (serverStatisData == null) {
 				continue;
 			}
-			NavigableMap<Long, Long> sendQpx = serverStatisData.getQpx(StatisType.SEND);
-			NavigableMap<Long, Long> ackQpx = serverStatisData.getQpx(StatisType.ACK);
+			NavigableMap<Long, QpxData> sendQpx = serverStatisData.getQpx(StatisType.SEND);
+			NavigableMap<Long, QpxData> ackQpx = serverStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = serverStatisData.getDelay(StatisType.SEND);
 			NavigableMap<Long, Long> ackDelay = serverStatisData.getDelay(StatisType.ACK);
 			if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
@@ -82,13 +83,17 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			ConsumerServerStatsData serverStatsData = statsDataFactory.createConsumerServerStatsData();
 			serverStatsData.setTimeKey(timeKey);
 			serverStatsData.setIp(serverIp);
-			Long sendQpxValue = sendQpx.get(timeKey);
+			QpxData sendQpxValue = sendQpx.get(timeKey);
 			if (sendQpxValue != null) {
-				serverStatsData.setSendQps(sendQpxValue);
+				serverStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
+				serverStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
+						.longValue());
 			}
-			Long ackQpxValue = ackQpx.get(timeKey);
+			QpxData ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
-				serverStatsData.setAckQps(ackQpxValue.longValue());
+				serverStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
+				serverStatsData
+						.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal().longValue());
 			}
 
 			Long sendDelayValue = sendDelay.get(timeKey);
@@ -139,7 +144,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		int index = 0;
 		while (iterator.hasNext()) {
 			String consumerId = iterator.next();
-			if (!isTotal && TOTAL_KEY.equals(topicName)) {
+			if (!isTotal && TOTAL_KEY.equals(consumerId)) {
 				continue;
 			}
 			ConsumerIdStatsData consumerIdStatsData = statsDataFactory.createConsumerIdStatsData();
@@ -150,8 +155,8 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (consumerIdStatisData == null) {
 				continue;
 			}
-			NavigableMap<Long, Long> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
-			NavigableMap<Long, Long> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
+			NavigableMap<Long, QpxData> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
+			NavigableMap<Long, QpxData> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
 			NavigableMap<Long, Long> sendDelay = consumerIdStatisData.getDelay(StatisType.SEND);
 			NavigableMap<Long, Long> ackDelay = consumerIdStatisData.getDelay(StatisType.ACK);
 
@@ -168,14 +173,18 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				index++;
 			}
 			consumerIdStatsData.setTimeKey(timeKey);
-			Long sendQpxVlaue = sendQpx.get(timeKey);
-			if (sendQpxVlaue != null) {
-				consumerIdStatsData.setSendQps(sendQpxVlaue);
+			QpxData sendQpxValue = sendQpx.get(timeKey);
+			if (sendQpxValue != null) {
+				consumerIdStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
+				consumerIdStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
+						.longValue());
 			}
 
-			Long ackQpxValue = ackQpx.get(timeKey);
+			QpxData ackQpxValue = ackQpx.get(timeKey);
 			if (ackQpxValue != null) {
-				consumerIdStatsData.setAckQps(ackQpxValue.longValue());
+				consumerIdStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
+				consumerIdStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
+						.longValue());
 			}
 
 			Long sendDelayValue = sendDelay.get(timeKey);
@@ -258,13 +267,13 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			if (sendMStatisData == null && ackMStatisData == null) {
 				continue;
 			}
-			NavigableMap<Long, Long> sendQpx = null;
+			NavigableMap<Long, QpxData> sendQpx = null;
 			NavigableMap<Long, Long> sendDelay = null;
 			if (sendMStatisData != null) {
 				sendQpx = sendMStatisData.getQpx(StatisType.SEND);
 				sendDelay = sendMStatisData.getDelay(StatisType.SEND);
 			}
-			NavigableMap<Long, Long> ackQpx = null;
+			NavigableMap<Long, QpxData> ackQpx = null;
 			NavigableMap<Long, Long> ackDelay = null;
 			if (ackMStatisData != null) {
 				ackQpx = ackMStatisData.getQpx(StatisType.ACK);
@@ -289,10 +298,12 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 			consumerIpStatsData.setConsumerId(consumerId);
 			consumerIpStatsData.setIp(ip);
 			consumerIpStatsData.setTimeKey(timeKey);
-			Long sendQpxValue = sendQpx.get(timeKey);
+			QpxData sendQpxValue = sendQpx.get(timeKey);
 
 			if (sendQpxValue != null) {
-				consumerIpStatsData.setSendQps(sendQpxValue.longValue());
+				consumerIpStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
+				consumerIpStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
+						.longValue());
 			}
 
 			Long sendDelayValue = sendDelay.get(timeKey);
@@ -301,10 +312,12 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 				consumerIpStatsData.setSendDelay(sendDelayValue.longValue());
 			}
 
-			Long ackQpxValue = ackQpx.get(timeKey);
+			QpxData ackQpxValue = ackQpx.get(timeKey);
 
 			if (ackQpxValue != null) {
-				consumerIpStatsData.setAckQps(ackQpxValue.longValue());
+				consumerIpStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
+				consumerIpStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
+						.longValue());
 			}
 			Long ackDelayValue = ackDelay.get(timeKey);
 
@@ -362,7 +375,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 	public ConsumerIpGroupStatsData getIpGroupStatsDatas(String topicName, String consumerId, long timeKey,
 			boolean isTotal) {
 		ConsumerIpGroupStatsData ipGroupStatsData = new ConsumerIpGroupStatsData();
-		ipGroupStatsData.setConsumerIpStatsDatas(getIpStatsDatas(topicName, consumerId, timeKey, isTotal));
+		ipGroupStatsData.setIpStatsDatas(getIpStatsDatas(topicName, consumerId, timeKey, isTotal));
 		return ipGroupStatsData;
 	}
 
@@ -387,8 +400,8 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		if (consumerIdStatisData == null) {
 			return null;
 		}
-		NavigableMap<Long, Long> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
-		NavigableMap<Long, Long> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
+		NavigableMap<Long, QpxData> sendQpx = consumerIdStatisData.getQpx(StatisType.SEND);
+		NavigableMap<Long, QpxData> ackQpx = consumerIdStatisData.getQpx(StatisType.ACK);
 		NavigableMap<Long, Long> sendDelay = consumerIdStatisData.getDelay(StatisType.SEND);
 		NavigableMap<Long, Long> ackDelay = consumerIdStatisData.getDelay(StatisType.ACK);
 
@@ -402,14 +415,18 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 		}
 		timeKey = tempKey.longValue();
 		consumerTopicStatsData.setTimeKey(timeKey);
-		Long sendQpxVlaue = sendQpx.get(timeKey);
-		if (sendQpxVlaue != null) {
-			consumerTopicStatsData.setSendQps(sendQpxVlaue);
+		QpxData sendQpxValue = sendQpx.get(timeKey);
+		if (sendQpxValue != null) {
+			consumerTopicStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
+			consumerTopicStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
+					.longValue());
 		}
 
-		Long ackQpxValue = ackQpx.get(timeKey);
+		QpxData ackQpxValue = ackQpx.get(timeKey);
 		if (ackQpxValue != null) {
-			consumerTopicStatsData.setAckQps(ackQpxValue.longValue());
+			consumerTopicStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
+			consumerTopicStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
+					.longValue());
 		}
 
 		Long sendDelayValue = sendDelay.get(timeKey);

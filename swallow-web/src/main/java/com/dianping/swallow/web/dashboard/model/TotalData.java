@@ -55,10 +55,4 @@ public class TotalData {
 		return this;
 	}
 
-	@Override
-	public String toString() {
-		return "TotalData [server=" + server + ", listSend=" + listSend + ", listAck=" + listAck + ", listAccu="
-				+ listAccu + "]";
-	}
-
 }

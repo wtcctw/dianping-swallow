@@ -67,9 +67,6 @@ public class ProducerServerResourceServiceTest {
 		producerServerResource.setHostname("10.128.30.19");
 		result = producerServerResourceService.update(producerServerResource);
 		Assert.assertTrue(result);
-		ProducerServerResource producerServer1 = (ProducerServerResource) producerServerResourceService.findByHostname("10.128.30.19");
-		System.out.println(producerServer1.toString());
-		Assert.assertNotNull(producerServer1);
 		ProducerServerResource producerServer2 = (ProducerServerResource) producerServerResourceService.findByIp("127.0.0.1");
 		System.out.println(producerServer2.toString());
 		Assert.assertNotNull(producerServer2);

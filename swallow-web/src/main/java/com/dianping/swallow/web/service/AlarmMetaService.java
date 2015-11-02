@@ -16,11 +16,7 @@ public interface AlarmMetaService {
 
 	boolean update(AlarmMeta alarmMeta);
 
-	int deleteById(String id);
-
 	int deleteByMetaId(int metaId);
-
-	AlarmMeta findById(String id);
 
 	AlarmMeta findByMetaId(int metaId);
 

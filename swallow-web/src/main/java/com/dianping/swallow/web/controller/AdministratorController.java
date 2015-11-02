@@ -1,12 +1,10 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.dianping.swallow.web.controller.dto.UserQueryDto;
+import com.dianping.swallow.web.controller.utils.UserUtils;
+import com.dianping.swallow.web.model.Administrator;
+import com.dianping.swallow.web.model.UserType;
+import com.dianping.swallow.web.service.UserService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,12 +14,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dianping.swallow.web.controller.dto.BaseDto;
-import com.dianping.swallow.web.controller.dto.UserQueryDto;
-import com.dianping.swallow.web.controller.utils.UserUtils;
-import com.dianping.swallow.web.model.Administrator;
-import com.dianping.swallow.web.model.UserType;
-import com.dianping.swallow.web.service.UserService;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mingdongli 2015年5月5日 下午2:42:57
@@ -36,16 +31,16 @@ public class AdministratorController extends AbstractMenuController {
 	UserUtils extractUsernameUtils;
 
 	@RequestMapping(value = "/console/administrator")
-	public ModelAndView allApps(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView administrator() {
 
 		return new ModelAndView("admin/index", createViewMap());
 	}
 
 	@RequestMapping(value = "/console/admin/auth/userlist", method = RequestMethod.POST)
 	@ResponseBody
-	public Object adminDefault(@RequestBody UserQueryDto userQueryDto) {
+	public Object userList(@RequestBody UserQueryDto userQueryDto) {
 
-		return userService.loadUserPage(new BaseDto(userQueryDto.getOffset(), userQueryDto.getLimit()));
+		return userService.loadUserPage(userQueryDto.getOffset(), userQueryDto.getLimit());
 	}
 
 	@RequestMapping(value = "/console/admin/auth/createadmin", method = RequestMethod.POST)
@@ -54,11 +49,7 @@ public class AdministratorController extends AbstractMenuController {
 
 		String name = userQueryDto.getName();
 		UserType tpye = UserType.findByType(userQueryDto.getRole().trim());
-		if (userService.createUser(name, tpye)) {
-			logger.info(String.format("Create %s in administrator list successfully", name));
-		} else {
-			logger.info(String.format("Create %s in administrator list failed", name));
-		}
+		userService.createUser(name, tpye);
 	}
 
 	@RequestMapping(value = "/console/admin/auth/removeadmin", method = RequestMethod.POST)
@@ -66,18 +57,14 @@ public class AdministratorController extends AbstractMenuController {
 	public void removeAdmin(@RequestBody UserQueryDto userQueryDto) {
 
 		String name = userQueryDto.getName();
-		if (userService.removeUser(name)) {
-			logger.info(String.format("Remove %s from administrator list successfully", name));
-		} else {
-			logger.info(String.format("Remove %s from administrator list failed", name));
-		}
+		userService.removeUser(name);
 	}
 
 	@RequestMapping(value = "/console/admin/queryvisits", method = RequestMethod.GET)
 	@ResponseBody
-	public Object queryAllVisits(HttpServletRequest request, HttpServletResponse response) {
+	public Object queryAllVisits() {
 
-		List<Administrator> adminList = userService.loadUsers();
+		List<Administrator> adminList = userService.findAll();
 		List<String> users = new ArrayList<String>();
 		for (Administrator admin : adminList) {
 			String name = admin.getName();

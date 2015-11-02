@@ -16,11 +16,11 @@ public interface IpResourceService {
 
 	boolean update(IpResource ipResource);
 
-	int remove(String ip);
-
+	List<IpResource> findByIps(String... ips);
+	
+	IpResource findByIp(String ip, String appName);
+	
 	Pair<Long, List<IpResource>> findByIp(int offset, int limit, boolean admin, String... ips);
-
-	List<IpResource> findByIp(String ip);
 
 	Pair<Long, List<IpResource>> findByApplication(int offset, int limit, String application);
 
@@ -31,8 +31,4 @@ public interface IpResourceService {
 	IpResource findDefault();
 
 	Pair<Long, List<IpResource>> findIpResourcePage(int offset, int limit);
-
-	List<IpResource> findByIps(String... ips);
-
-	IpResource findByIp(String ip, String appName);
 }

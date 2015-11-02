@@ -49,12 +49,6 @@ public class ProducerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public ProducerServerResource findByHostname(String hostname) {
-
-		return producerServerResourceDao.findByHostname(hostname);
-	}
-
-	@Override
 	public ProducerServerResource findDefault() {
 
 		return producerServerResourceDao.findDefault();

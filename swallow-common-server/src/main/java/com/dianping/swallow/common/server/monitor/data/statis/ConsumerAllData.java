@@ -1,10 +1,5 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-
 import com.dianping.swallow.common.server.monitor.data.ConsumerStatisRetriever;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
@@ -12,12 +7,17 @@ import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerD
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.Set;
+
 /**
  * @author mengwenchao
  *
  * 2015年5月19日 下午4:45:46
  */
-public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, ConsumerServerData, ConsumerServerStatisData, ConsumerMonitorData> 
+public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, ConsumerServerData, ConsumerServerStatisData, ConsumerMonitorData>
 			implements ConsumerStatisRetriever{
 
 	public ConsumerAllData(){
@@ -37,7 +37,7 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(
+	public Map<String, NavigableMap<Long, QpxData>> getQpxForAllConsumerId(
 			String topic, StatisType type) {
 		
 		return getQpxForAllConsumerId(topic, type, true);
@@ -51,7 +51,7 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 	}
 
 	@Override
-	public Map<String, NavigableMap<Long, Long>> getQpxForAllConsumerId(
+	public Map<String, NavigableMap<Long, QpxData>> getQpxForAllConsumerId(
 			String topic, StatisType type, boolean includeTotal) {
 		
 		return getAllQpx(type, topic, includeTotal);
@@ -66,21 +66,28 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 
 	@Override
 	public Set<String> getConsumerIds(String topic, boolean includeTotal) {
-		
-		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
-		if(ctss == null){
-			return null;
+
+		Set<String> topics;
+		for(ConsumerServerStatisData csd : servers.values()){
+			if(csd != null){
+				topics =  csd.keySet(false);
+				if(topics != null && topics.contains(topic)){
+					ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) csd.getValue(topic);
+					if(ctss != null){
+						return ctss.keySet(includeTotal);
+					}
+				}
+			}
 		}
-		
-		return ctss.keySet(includeTotal);
+		return null;
 	}
 
 	@Override
 	public Map<String, Set<String>> getAllTopics() {
 		
 		Map<String, Set<String>> result = new HashMap<String, Set<String>>();
-		
-		Set<String> topics = total.keySet(false);
+
+		Set<String> topics = getTopics(false);
 		for(String topic : topics){
 			if(topic.equals(MonitorData.TOTAL_KEY)){
 				continue;
@@ -92,5 +99,15 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 		return result;
 	}
 
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+		ConsumerAllData clone = (ConsumerAllData) super.clone();
+		return clone;
+	}
+
+	@Override
+	public ConsumerServerStatisData createValue() {
+		return new ConsumerServerStatisData();
+	}
 
 }

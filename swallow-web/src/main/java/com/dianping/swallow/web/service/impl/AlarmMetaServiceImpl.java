@@ -38,18 +38,8 @@ public class AlarmMetaServiceImpl implements AlarmMetaService {
 	}
 
 	@Override
-	public int deleteById(String id) {
-		return alarmMetaDao.deleteById(id);
-	}
-
-	@Override
 	public int deleteByMetaId(int metaId) {
 		return alarmMetaDao.deleteByMetaId(metaId);
-	}
-
-	@Override
-	public AlarmMeta findById(String id) {
-		return alarmMetaDao.findById(id);
 	}
 
 	@Override

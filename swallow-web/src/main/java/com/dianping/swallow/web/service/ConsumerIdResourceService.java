@@ -20,21 +20,17 @@ public interface ConsumerIdResourceService {
 
 	int remove(String topic, String consumerid);
 	
-	List<ConsumerIdResource> findByConsumerId(String consumerid);
-
 	Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam);
 	
-	Pair<Long, List<ConsumerIdResource>> findByConsumerIp(ConsumerIdParam  consumerIdParam);
-
 	Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam  consumerIdParam);
 	
 	List<ConsumerIdResource> findAll(String ...fields );
 
-	ConsumerIdResource findDefault();
-	
 	Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam);
 	
 	ConsumerIdResource buildConsumerIdResource(String topic, String consumerId);
 
 	ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId);
+	
+	long countInactive();
 }

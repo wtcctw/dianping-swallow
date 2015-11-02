@@ -29,7 +29,7 @@ public class TopicResource extends BaseResource {
 	private List<IpInfo> producerIpInfos;
 
 	private List<String> producerApplications;
-
+	
 	private ProducerBaseAlarmSetting producerAlarmSetting;
 
 	public List<IpInfo> getProducerIpInfos() {
@@ -86,14 +86,6 @@ public class TopicResource extends BaseResource {
 
 	public void setProducerAlarmSetting(ProducerBaseAlarmSetting producerAlarmSetting) {
 		this.producerAlarmSetting = producerAlarmSetting;
-	}
-
-	@Override
-	public String toString() {
-		return "TopicResource [topic=" + topic + ", administrator=" + administrator + ", producerAlarm="
-				+ producerAlarm + ", consumerAlarm=" + consumerAlarm + ", producerIpInfos=" + producerIpInfos
-				+ ", producerApplications=" + producerApplications + ", producerAlarmSetting=" + producerAlarmSetting
-				+ ", toString()=" + super.toString() + "]";
 	}
 
 	@JsonIgnore

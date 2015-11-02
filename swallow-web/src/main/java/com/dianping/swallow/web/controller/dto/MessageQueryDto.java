@@ -8,7 +8,7 @@ import java.util.Date;
  *
  * 2015年8月17日下午7:47:27
  */
-public class MessageQueryDto extends BaseDto{
+public class MessageQueryDto extends BaseQueryDto{
 	
 	private String topic;
 	
@@ -34,32 +34,16 @@ public class MessageQueryDto extends BaseDto{
 		return messageId;
 	}
 
-	public void setMessageId(String messageId) {
-		this.messageId = messageId;
-	}
-
 	public Date getStartdt() {
 		return startdt;
-	}
-
-	public void setStartdt(Date startdt) {
-		this.startdt = startdt;
 	}
 
 	public Date getStopdt() {
 		return stopdt;
 	}
 
-	public void setStopdt(Date stopdt) {
-		this.stopdt = stopdt;
-	}
-
 	public String getBasemid() {
 		return basemid;
-	}
-
-	public void setBasemid(String basemid) {
-		this.basemid = basemid;
 	}
 
 	public boolean isSort() {

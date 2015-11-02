@@ -64,12 +64,6 @@ public class ConsumerServerResource extends ServerResource {
 		this.ackAlarmSetting = ackAlarmSetting;
 	}
 
-	@Override
-	public String toString() {
-		return "ConsumerServerResource [port=" + port + ", type=" + type + ", groupId=" + groupId + ", qps=" + qps
-				+ ", sendAlarmSetting=" + sendAlarmSetting + ", ackAlarmSetting=" + ackAlarmSetting + "]";
-	}
-
 	public long getQps() {
 		return qps;
 	}

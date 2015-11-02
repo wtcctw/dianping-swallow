@@ -42,7 +42,7 @@ public class MessageServiceImpl extends AbstractSwallowService implements Messag
 	private MessageDumpService messageDumpService;
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> getMessageFromSpecificTopic(MessageQueryDto messageQueryDto) {
+	public Map<String, Object> getMessageFromTopic(MessageQueryDto messageQueryDto) {
 		
 		long mid = -1;
 		String messageId = messageQueryDto.getMessageId();

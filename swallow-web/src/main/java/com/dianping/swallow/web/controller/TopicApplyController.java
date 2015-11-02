@@ -1,10 +1,25 @@
 package com.dianping.swallow.web.controller;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
+import com.dianping.swallow.web.controller.dto.TopicApplyDto;
+import com.dianping.swallow.web.controller.filter.FilterChainFactory;
+import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
+import com.dianping.swallow.web.controller.filter.validator.*;
+import com.dianping.swallow.web.controller.handler.HandlerChainFactory;
+import com.dianping.swallow.web.controller.handler.config.ConfigureHandlerChain;
+import com.dianping.swallow.web.controller.handler.config.ConsumerServerHandler;
+import com.dianping.swallow.web.controller.handler.config.MongoServerHandler;
+import com.dianping.swallow.web.controller.handler.config.QuoteHandler;
+import com.dianping.swallow.web.controller.handler.data.EmptyObject;
+import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
+import com.dianping.swallow.web.controller.handler.lion.ConsumerServerLionHandler;
+import com.dianping.swallow.web.controller.handler.lion.LionHandlerChain;
+import com.dianping.swallow.web.controller.handler.lion.TopicCfgLionHandler;
+import com.dianping.swallow.web.controller.handler.lion.TopicWhiteListLionHandler;
+import com.dianping.swallow.web.controller.handler.result.LionConfigureResult;
+import com.dianping.swallow.web.service.TopicResourceService;
+import com.dianping.swallow.web.util.ResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,29 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
-import com.dianping.swallow.web.controller.dto.TopicApplyDto;
-import com.dianping.swallow.web.controller.filter.FilterChainFactory;
-import com.dianping.swallow.web.controller.filter.config.ConfigureFilterChain;
-import com.dianping.swallow.web.controller.filter.config.ConsumerServerConfigureFilter;
-import com.dianping.swallow.web.controller.filter.config.MongoConfigureFilter;
-import com.dianping.swallow.web.controller.filter.config.QuoteConfigureFilter;
-import com.dianping.swallow.web.controller.filter.lion.ConsumerServerLionFilter;
-import com.dianping.swallow.web.controller.filter.lion.LionFilterChain;
-import com.dianping.swallow.web.controller.filter.lion.LionFilterEntity;
-import com.dianping.swallow.web.controller.filter.lion.TopicCfgLionFilter;
-import com.dianping.swallow.web.controller.filter.lion.TopicWhiteListLionFilter;
-import com.dianping.swallow.web.controller.filter.result.ConfigureFilterResult;
-import com.dianping.swallow.web.controller.filter.result.LionFilterResult;
-import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
-import com.dianping.swallow.web.controller.filter.validator.ApplicantValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.AuthenticationValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.NameValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.QuoteValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.TypeValidatorFilter;
-import com.dianping.swallow.web.controller.filter.validator.ValidatorFilterChain;
-import com.dianping.swallow.web.service.TopicResourceService;
-import com.dianping.swallow.web.util.ResponseStatus;
+import javax.annotation.Resource;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author mingdongli
@@ -48,10 +43,10 @@ public class TopicApplyController {
 	private TopicResourceService topicResourceService;
 
 	@Autowired
-	private TopicWhiteList topicWhiteList;
+	private FilterChainFactory filterChainFactory;
 
 	@Autowired
-	private FilterChainFactory filterChainFactory;
+	private HandlerChainFactory handlerChainFactory;
 
 	@Autowired
 	private AuthenticationValidatorFilter authenticationValidatorFilter;
@@ -69,30 +64,34 @@ public class TopicApplyController {
 	private ApplicantValidatorFilter applicantValidatorFilter;
 
 	@Autowired
-	private MongoConfigureFilter mongoConfigureFilter;
+	private MongoServerHandler mongoServerHandler;
 
 	@Autowired
-	private ConsumerServerConfigureFilter consumerServerConfigureFilter;
+	private ConsumerServerHandler consumerServerHandler;
 
 	@Autowired
-	private QuoteConfigureFilter quoteConfigureFilter;
-	
-	@Autowired
-	private TopicWhiteListLionFilter topicWhiteListLionFilter;
+	private QuoteHandler quoteHandler;
 
 	@Autowired
-	private ConsumerServerLionFilter consumerServerLionFilter;
+	private TopicWhiteListLionHandler topicWhiteListLionHandler;
 
 	@Autowired
-	private TopicCfgLionFilter topicCfgLionFilter;
-	
+	private ConsumerServerLionHandler consumerServerLionHandler;
+
+	@Autowired
+	private TopicCfgLionHandler topicCfgLionHandler;
+
+	private Object APPLY_TOPIC = new Object();
+
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+
 	@RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
 	@ResponseBody
 	public Object applyTopic(@RequestBody TopicApplyDto topicApplyDto) {
 
 		ValidatorFilterResult validatorFilterResult = new ValidatorFilterResult();
 		ValidatorFilterChain validatorFilterChain = filterChainFactory.createValidatorFilterChain();
-		
+
 		validatorFilterChain.addFilter(authenticationValidatorFilter);
 		validatorFilterChain.addFilter(nameValidatorFilter);
 		validatorFilterChain.addFilter(quoteValidatorFilter);
@@ -104,42 +103,47 @@ public class TopicApplyController {
 			return validatorFilterResult;
 		}
 
-		ConfigureFilterResult configureFilterResult = new ConfigureFilterResult();
-		ConfigureFilterChain configureFilterChain = filterChainFactory.createConfigureFilterChain();
-		
-		configureFilterChain.addFilter(mongoConfigureFilter);
-		configureFilterChain.addFilter(consumerServerConfigureFilter);
-		configureFilterChain.addFilter(quoteConfigureFilter);
-		configureFilterChain.doFilter(topicApplyDto, configureFilterResult, configureFilterChain);
+		LionConfigureResult lionConfigureResult = new LionConfigureResult();
+		ConfigureHandlerChain configureHandlerChain = handlerChainFactory.createConfigureHandlerChain();
 
-		if (configureFilterResult.getStatus() != 0) {
-			return configureFilterResult;
+		configureHandlerChain.addHandler(mongoServerHandler);
+		configureHandlerChain.addHandler(consumerServerHandler);
+		configureHandlerChain.addHandler(quoteHandler);
+		ResponseStatus status = configureHandlerChain.handle(topicApplyDto, lionConfigureResult);
+
+		if (status != ResponseStatus.SUCCESS) {
+			return status;
 		}
 
-		LionFilterResult lionFilterResult = new LionFilterResult();
-		LionFilterEntity lionFilterEntity = new LionFilterEntity();
+		EmptyObject emptyObject = new EmptyObject();
+		LionEditorEntity lionEditorEntity = new LionEditorEntity();
 		String topic = topicApplyDto.getTopic().trim();
 		boolean isTest = topicApplyDto.isTest();
 
-		lionFilterEntity.setTopic(topic);
-		lionFilterEntity.setTest(isTest);
-		lionFilterEntity.setLionConfigure(configureFilterResult.getLionConfigure());
-		
-		LionFilterChain lionFilterChain = filterChainFactory.createLionFilterChain();
+		lionEditorEntity.setTopic(topic);
+		lionEditorEntity.setTest(isTest);
+		lionEditorEntity.setMongoServer(lionConfigureResult.getMongoServer());
+		lionEditorEntity.setConsumerServer(lionConfigureResult.getConsumerServer());
+		lionEditorEntity.setSize4SevenDay(lionConfigureResult.getSize4SevenDay());
 
-		lionFilterChain.addFilter(topicWhiteListLionFilter);
-		lionFilterChain.addFilter(consumerServerLionFilter);
-		lionFilterChain.addFilter(topicCfgLionFilter);
-		lionFilterChain.doFilter(lionFilterEntity, lionFilterResult, lionFilterChain);
+		LionHandlerChain lionHandlerChain = handlerChainFactory.createLionHandlerChain();
+		lionHandlerChain.addHandler(topicWhiteListLionHandler);
+		lionHandlerChain.addHandler(consumerServerLionHandler);
+		lionHandlerChain.addHandler(topicCfgLionHandler);
+		status = lionHandlerChain.handle(lionEditorEntity, emptyObject);
 
-		if (lionFilterResult.getStatus() != 0) {
-			return lionFilterResult;
+		if (status != ResponseStatus.SUCCESS) {
+			return status;
 		}
 
 		String applicant = topicApplyDto.getApplicant();
 		Set<String> administrator = new HashSet<String>();
 		administrator.add(applicant.trim());
-		boolean isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
+
+		boolean isSuccess;
+		synchronized (APPLY_TOPIC) {
+			isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
+		}
 		return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
 	}
 

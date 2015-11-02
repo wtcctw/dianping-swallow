@@ -1,257 +1,141 @@
 package com.dianping.swallow.web.alarmer.impl;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
+import com.dianping.swallow.web.alarmer.container.IpResourceContainer;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.alarmer.container.AlarmResourceContainer;
 import com.dianping.swallow.web.model.event.ClientType;
-import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.event.EventType;
 import com.dianping.swallow.web.model.event.ProducerClientEvent;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
+import com.dianping.swallow.web.model.stats.ProducerIpStatsData.ProducerIpStatsDataKey;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
 import com.dianping.swallow.web.service.ProducerIpStatsDataService;
 
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年9月17日 下午8:25:05
  */
 @Component
-public class ProducerIpStatsAlarmer extends AbstractStatsAlarmer {
+public class ProducerIpStatsAlarmer extends
+        AbstractIpStatsAlarmer<ProducerIpStatsDataKey, ProducerIpStatsData, ProducerIpGroupStatsData> {
 
-	@Autowired
-	private ProducerDataRetriever producerDataRetriever;
+    @Autowired
+    private ProducerDataRetriever producerDataRetriever;
 
-	@Autowired
-	protected EventReporter eventReporter;
+    @Autowired
+    private ProducerStatsDataWapper pStatsDataWapper;
 
-	@Autowired
-	protected EventFactory eventFactory;
+    @Autowired
+    private ProducerIpStatsDataService pIpStatsDataService;
 
-	@Autowired
-	private ProducerStatsDataWapper pStatsDataWapper;
+    @Autowired
+    private IpResourceContainer ipResourceContainer;
 
-	@Autowired
-	private ProducerIpStatsDataService pIpStatsDataService;
+    @Override
+    public void doInitialize() throws Exception {
+        super.doInitialize();
+        checkInterval = 10 * 60 * 1000;
+        producerDataRetriever.registerListener(this);
+    }
 
-	@Autowired
-	private AlarmResourceContainer resourceContainer;
+    @Override
+    public void doAlarm() {
+        alarmIpData();
+    }
 
-	private Map<IpStatsDataKey, Long> firstCandidates = new ConcurrentHashMap<IpStatsDataKey, Long>();
+    public void alarmIpData() {
+        Set<String> topicNames = pStatsDataWapper.getTopics(false);
+        if (topicNames == null) {
+            return;
+        }
+        for (String topicName : topicNames) {
+            List<ProducerIpStatsData> ipStatsDatas = pStatsDataWapper.getIpStatsDatas(topicName,
+                    getLastTimeKey(), false);
+            Map<String,ProducerIpGroupStatsData> ipGroupStatsDatas =getIpGroupStatsData(ipStatsDatas);
+            if(ipGroupStatsDatas==null||ipGroupStatsDatas.isEmpty()){
+                continue;
+            }
+            for(Map.Entry<String,ProducerIpGroupStatsData> ipGroupStatsData :ipGroupStatsDatas.entrySet()) {
+                checkIpGroupStats(ipGroupStatsData.getValue());
+            }
+        }
+        alarmIpStatsData();
+    }
 
-	private Map<IpStatsDataKey, Long> secondCandidates = new ConcurrentHashMap<IpStatsDataKey, Long>();
+    @Override
+    protected void checkUnSureLastRecords(ProducerIpStatsDataKey statsDataKey) {
+        long avgQps = pIpStatsDataService.findAvgQps(statsDataKey.getTopicName(), statsDataKey.getIp(),
+                getTimeKey(getPreNDayKey(1, checkInterval)), getTimeKey(getPreNDayKey(1, 0)));
 
-	private Map<IpStatsDataKey, Long> whiteLists = new ConcurrentHashMap<IpStatsDataKey, Long>();
+        if (avgQps > 0) {
+            report(statsDataKey);
+        }
+    }
 
-	private static final long CHECK_TIMESPAN = 10 * 60 * 1000;
+    @Override
+    protected boolean isReport(ProducerIpStatsDataKey statsDataKey) {
+        TopicResource topicResource = resourceContainer.findTopicResource(statsDataKey.getTopicName());
+        if(topicResource==null){
+            return false;
+        }
+        if (topicResource.isProducerAlarm()) {
+            List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
+            if (ipInfos == null || ipInfos.isEmpty()) {
+                return true;
+            }
+            if (StringUtils.isNotBlank(statsDataKey.getIp())) {
+                for (IpInfo ipInfo : ipInfos) {
+                    if (statsDataKey.getIp().equals(ipInfo.getIp())) {
+                        return ipInfo.isActiveAndAlarm();
+                    }
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	@Override
-	public void doInitialize() throws Exception {
-		super.doInitialize();
-		producerDataRetriever.registerListener(this);
-	}
+    @Override
+    protected void report(ProducerIpStatsDataKey statsDataKey) {
+        if (isReport(statsDataKey)) {
+            ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
+            clientEvent.setTopicName(statsDataKey.getTopicName()).setIp(statsDataKey.getIp())
+                    .setClientType(ClientType.CLIENT_SENDER).setEventType(EventType.PRODUCER).setCreateTime(new Date())
+                    .setCheckInterval(checkInterval);
+            eventReporter.report(clientEvent);
+        }
+    }
 
-	@Override
-	public void doAlarm() {
-		final List<ProducerIpGroupStatsData> ipGroupStatsDatas = pStatsDataWapper.getIpGroupStatsDatas(
-				getLastTimeKey(), false);
-		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + FUNCTION_DOALARM);
-		catWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
-				alarmIpData(ipGroupStatsDatas);
-			}
-		});
-	}
-
-	public void alarmIpData(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
-		checkIpGroups(ipGroupStatsDatas);
-		alarmSureRecords();
-		alarmUnSureRecords();
-	}
-
-	public void checkIpGroups(final List<ProducerIpGroupStatsData> ipGroupStatsDatas) {
-		if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
-			return;
-		}
-		for (final ProducerIpGroupStatsData ipGroupStatsData : ipGroupStatsDatas) {
-			checkIpGroup(ipGroupStatsData);
-		}
-	}
-
-	public void checkIpGroup(ProducerIpGroupStatsData ipGroupStatsData) {
-		boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
-		List<ProducerIpStatsData> ipStatsDatas = ipGroupStatsData.getProducerIpStatsDatas();
-		if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
-			return;
-		}
-		for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
-			boolean hasStatsData = ipStatsData.checkStatsData();
-			IpStatsDataKey key = new IpStatsDataKey(ipStatsData);
-			if (hasStatsData) {
-				whiteLists.put(key, System.currentTimeMillis());
-			} else {
-				if (hasGroupStatsData) {
-					if (!firstCandidates.containsKey(key)) {
-						firstCandidates.put(key, System.currentTimeMillis());
-					} else {
-						if (whiteLists.containsKey(key) && whiteLists.get(key) > firstCandidates.get(key)) {
-							firstCandidates.put(key, System.currentTimeMillis());
-						}
-					}
-				} else {
-					if (ipStatsDatas.size() == 1) {
-						if (!secondCandidates.containsKey(key)) {
-							secondCandidates.put(key, System.currentTimeMillis());
-						} else {
-							if (whiteLists.containsKey(key) && whiteLists.get(key) > secondCandidates.get(key)) {
-								secondCandidates.put(key, System.currentTimeMillis());
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public void alarmSureRecords() {
-		Iterator<Entry<IpStatsDataKey, Long>> iterator = firstCandidates.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<IpStatsDataKey, Long> checkRecord = iterator.next();
-			IpStatsDataKey key = checkRecord.getKey();
-			long lastRecordTime = checkRecord.getValue();
-			if (System.currentTimeMillis() - lastRecordTime < CHECK_TIMESPAN) {
-				continue;
-			}
-			iterator.remove();
-			report(key.getTopicName(), key.getIp());
-		}
-	}
-
-	public void alarmUnSureRecords() {
-		Iterator<Entry<IpStatsDataKey, Long>> iterator = secondCandidates.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<IpStatsDataKey, Long> checkRecord = iterator.next();
-			IpStatsDataKey key = checkRecord.getKey();
-			long lastRecordTime = checkRecord.getValue();
-
-			if (System.currentTimeMillis() - lastRecordTime < CHECK_TIMESPAN) {
-				continue;
-			}
-			iterator.remove();
-			long avgQps = pIpStatsDataService.findAvgQps(key.getTopicName(), key.getIp(),
-					getTimeKey(getPreNDayKey(1, CHECK_TIMESPAN)), getTimeKey(getPreNDayKey(1, 0)));
-
-			if (avgQps > 0) {
-				report(key.getTopicName(), key.getIp());
-			}
-		}
-	}
-
-	private boolean isReport(String topicName, String ip) {
-		TopicResource topicResource = resourceContainer.findTopicResource(topicName);
-		if (topicResource.isProducerAlarm()) {
-			List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
-			if (ipInfos == null || ipInfos.isEmpty()) {
-				return true;
-			}
-			if (StringUtils.isNotBlank(ip)) {
-				for (IpInfo ipInfo : ipInfos) {
-					if (ip.equals(ipInfo.getIp())) {
-						return ipInfo.isActiveAndAlarm();
-					}
-				}
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private void report(String topicName, String ip) {
-		if (isReport(topicName, ip)) {
-
-			ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
-			clientEvent.setTopicName(topicName).setIp(ip).setClientType(ClientType.CLIENT_SENDER)
-					.setEventType(EventType.PRODUCER).setCreateTime(new Date()).setCheckInterval(CHECK_TIMESPAN);
-			eventReporter.report(clientEvent);
-		}
-	}
-
-	private static class IpStatsDataKey {
-
-		public IpStatsDataKey(ProducerIpStatsData ipStatsData) {
-			this.topicName = ipStatsData.getTopicName();
-			this.ip = ipStatsData.getIp();
-		}
-
-		private String topicName;
-
-		private String ip;
-
-		public String getTopicName() {
-			return topicName;
-		}
-
-		public String getIp() {
-			return ip;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
-			result = prime * result + ((ip == null) ? 0 : ip.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			IpStatsDataKey other = (IpStatsDataKey) obj;
-			if (topicName == null) {
-				if (other.topicName != null)
-					return false;
-			} else if (!topicName.equals(other.topicName))
-				return false;
-			if (ip == null) {
-				if (other.ip != null)
-					return false;
-			} else if (!ip.equals(other.ip))
-				return false;
-			return true;
-		}
-
-		@Override
-		public String toString() {
-			return "IpStatsDataKey [topicName=" + topicName + ", ip=" + ip + "]";
-		}
-
-	}
+    private Map<String, ProducerIpGroupStatsData> getIpGroupStatsData(List<ProducerIpStatsData> ipStatsDatas) {
+        if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
+            return null;
+        }
+        Map<String, ProducerIpGroupStatsData> ipStatsDataMap = new HashMap<String, ProducerIpGroupStatsData>();
+        for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
+            String appName = ipResourceContainer.getApplicationName(ipStatsData.getIp());
+            if (StringUtils.isBlank(appName)) {
+                continue;
+            }
+            ProducerIpGroupStatsData ipGroupStatsData = null;
+            if (ipStatsDataMap.containsKey(appName)) {
+                ipGroupStatsData = ipStatsDataMap.get(appName);
+            } else {
+                ipGroupStatsData = new ProducerIpGroupStatsData();
+                ipStatsDataMap.put(appName,ipGroupStatsData);
+            }
+            ipGroupStatsData.addIpStatsData(ipStatsData);
+        }
+        return ipStatsDataMap;
+    }
 
 }

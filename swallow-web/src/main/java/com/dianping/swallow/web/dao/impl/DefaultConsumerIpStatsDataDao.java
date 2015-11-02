@@ -34,7 +34,18 @@ public class DefaultConsumerIpStatsDataDao extends AbstractStatsDao implements C
 			mongoTemplate.save(ipStatsData, CONSUMERIPSTATSDATA_COLLECTION);
 			return true;
 		} catch (Exception e) {
-			logger.error("Error when save consumer ip stats dao " + ipStatsData, e);
+			logger.error("[insert] Error when save consumer ip statsdata." + ipStatsData, e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean insert(List<ConsumerIpStatsData> ipStatsDatas) {
+		try {
+			mongoTemplate.insert(ipStatsDatas, CONSUMERIPSTATSDATA_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("[insert] Error when save consumer ip statsdatas.", e);
 		}
 		return false;
 	}

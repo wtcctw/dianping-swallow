@@ -13,14 +13,8 @@ import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 public interface ConsumerServerStatsDataDao {
 
 	boolean insert(ConsumerServerStatsData serverStatsData);
-
-	boolean update(ConsumerServerStatsData serverStatsData);
-
-	int deleteById(String id);
-
-	ConsumerServerStatsData findById(String id);
-
-	ConsumerServerStatsData findByTimeKey(String ip, long timeKey);
+	
+	boolean insert(List<ConsumerServerStatsData> serverStatsDatas);
 
 	List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 	

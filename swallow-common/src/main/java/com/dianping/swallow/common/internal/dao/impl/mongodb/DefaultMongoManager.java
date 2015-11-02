@@ -25,7 +25,6 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoException;
 
 /**
@@ -51,8 +50,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 
 	private SwallowConfig swallowConfig;
 	
-	private MongoClientOptions mongoOptions;
-
 	private boolean messageCollectionCapped = true;
 
 	private ClusterManager clusterManager; 
@@ -434,11 +431,6 @@ public class DefaultMongoManager extends AbstractLifecycle implements MongoManag
 				throw e;
 			}
 		}
-	}
-
-	@Override
-	public MongoClientOptions getMongoOptions() {
-		return mongoOptions;
 	}
 
 	public SwallowConfig getSwallowConfig() {

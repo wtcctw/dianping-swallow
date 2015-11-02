@@ -17,8 +17,6 @@ public interface MessageDumpService {
 
 	Pair<Long, List<MessageDump>> loadDumpMessagePage(TopicQueryDto topicQueryDto);
 
-	MessageDump loadDumpMessage(String filename);
-
 	int removeDumpMessage(String filename) throws MongoException;
 
 	int updateDumpMessage(MessageDump messageDump);

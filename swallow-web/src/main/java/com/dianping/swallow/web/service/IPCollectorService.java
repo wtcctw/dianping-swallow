@@ -36,38 +36,7 @@ public interface IPCollectorService {
 	 */
 	Map<String, Long> getStatisProducerServerIps();
 
-	/**
-	 * get producer server ips
-	 * 
-	 * @return
-	 */
-	List<String> getProducerServerIps();
-
-	/**
-	 * get consumer server slave ips
-	 * 
-	 * @return
-	 */
-	List<String> getConsumerServerSlaveIps();
-
-	/**
-	 * get consumer server master ips
-	 * 
-	 * @return
-	 */
-	List<String> getConsumerServerMasterIps();
-
-	/**
-	 * 
-	 * @return
-	 */
-	int getConsumerMasterPort();
-
-	/**
-	 * 
-	 * @return
-	 */
-	int getConsumerSlavePort();
+	long getLastestStatsTimeByIp(String ip, boolean isProducer);
 
 	/**
 	 * get producer server ips
@@ -78,32 +47,31 @@ public interface IPCollectorService {
 
 	/**
 	 * get consumer server pair ips
-	 * 
+	 *
 	 * @return
 	 */
 	List<ConsumerServerPair> getConsumerServerPairs();
 
 	/**
 	 * get producer server master ips map
-	 * 
+	 *
 	 * @return
 	 */
 	Map<String, String> getProducerServerIpsMap();
 
 	/**
 	 * get consumer server master ips map
-	 * 
+	 *
 	 * @return
 	 */
 	Map<String, String> getConsumerServerMasterIpsMap();
 
 	/**
 	 * get consumer server slave ips map
-	 * 
+	 *
 	 * @return
 	 */
 	Map<String, String> getConsumerServerSlaveIpsMap();
-
 
 	public static class ConsumerServerPair {
 
@@ -134,28 +102,6 @@ public interface IPCollectorService {
 
 		public void setSlaveServer(ConsumerServer slaveServer) {
 			this.slaveServer = slaveServer;
-		}
-
-		public boolean equalsMasterIp(String masterIp) {
-			return this.masterServer.equalsIp(masterIp);
-		}
-
-		public boolean equalsSlaveIp(String slaveIp) {
-			return this.slaveServer.equalsIp(slaveIp);
-		}
-
-		public boolean equalsMasterServer(ConsumerServer consumerServer) {
-			if (this.masterServer.equals(consumerServer)) {
-				return true;
-			}
-			return false;
-		}
-
-		public boolean equalsSlaveServer(ConsumerServer consumerServer) {
-			if (this.slaveServer.equals(consumerServer)) {
-				return true;
-			}
-			return false;
 		}
 
 	}
@@ -258,6 +204,15 @@ public interface IPCollectorService {
 		public ProducerServer(String ip, String hostName) {
 			this.ip = ip;
 			this.hostName = hostName;
+		}
+
+		public boolean equalsIp(String ip) {
+			if (!StringUtils.isBlank(this.ip)) {
+				if (this.ip.equals(ip)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public String getIp() {

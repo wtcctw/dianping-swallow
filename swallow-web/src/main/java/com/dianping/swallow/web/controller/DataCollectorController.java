@@ -1,7 +1,14 @@
 package com.dianping.swallow.web.controller;
 
-import java.io.IOException;
-
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.ProducerDataRetriever;
+import com.dianping.swallow.web.service.IPCollectorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,17 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
-import com.dianping.swallow.web.dao.ConsumerMonitorDao;
-import com.dianping.swallow.web.dao.ProducerMonitorDao;
-import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
-import com.dianping.swallow.web.monitor.ProducerDataRetriever;
-import com.dianping.swallow.web.service.IPCollectorService;
+import java.io.IOException;
 
 
 /**
@@ -32,12 +29,6 @@ import com.dianping.swallow.web.service.IPCollectorService;
 @Controller
 public class DataCollectorController extends AbstractController{
 	
-	@Autowired
-	private ProducerMonitorDao  producerMonitorDataDao; 
-
-	@Autowired
-	private ConsumerMonitorDao  consumerMonitorDataDao; 
-
 	@Autowired
 	private ProducerDataRetriever producerDataRetriever;
 	
@@ -63,7 +54,6 @@ public class DataCollectorController extends AbstractController{
 			public void doAction() throws SwallowException {
 				producerDataRetriever.add(producerMonitorData);
 				ipCollectorService.addStatisIps(producerMonitorData);
-				//producerMonitorDataDao.saveProducerMonotorData(producerMonitorData);
 			}
 		});
 		
@@ -84,7 +74,6 @@ public class DataCollectorController extends AbstractController{
 				
 				consumerDataRetriever.add(consumerMonitorData);
 				ipCollectorService.addStatisIps(consumerMonitorData);
-				//consumerMonitorDataDao.saveConsumerMonotorData(consumerMonitorData);
 			}
 		});
 

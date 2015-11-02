@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,6 @@ import com.dianping.swallow.web.model.resource.ServerResource;
 import com.dianping.swallow.web.model.resource.ServerType;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
-import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
-import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 
 /**
@@ -37,12 +34,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 
 	@Autowired
 	private ConsumerServerResourceDao consumerServerResourceDao;
-
-	@Resource(name = "topicResourceService")
-	private TopicResourceService topicResourceService;
-
-	@Resource(name = "consumerServerStatsDataService")
-	private ConsumerServerStatsDataService consumerServerStatsDataService;
 
 	@Autowired
 	private LionDynamicConfig lionDynamicConfig;
@@ -87,18 +78,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	}
 
 	@Override
-	public ServerResource findByHostname(String hostname) {
-
-		return consumerServerResourceDao.findByHostname(hostname);
-	}
-
-	@Override
-	public List<ConsumerServerResource> findByGroupId(long groupId) {
-
-		return consumerServerResourceDao.findByGroupId(groupId);
-	}
-
-	@Override
 	public ServerResource findDefault() {
 
 		return consumerServerResourceDao.findDefault();
@@ -123,26 +102,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		serverResource.setType(serverType);
 		serverResource.setCreateTime(new Date());
 		serverResource.setUpdateTime(new Date());
-		ConsumerServerResource defaultResource = (ConsumerServerResource) findDefault();
-		if (defaultResource == null) {
-			serverResource.setAlarm(false);
-			serverResource.setSendAlarmSetting(new QPSAlarmSetting());
-			serverResource.setAckAlarmSetting(new QPSAlarmSetting());
-		} else {
-			serverResource.setSendAlarmSetting(defaultResource.getSendAlarmSetting());
-			serverResource.setAckAlarmSetting(defaultResource.getAckAlarmSetting());
-		}
-		return serverResource;
-	}
-
-	@Override
-	public ConsumerServerResource buildConsumerServerResource(String ip, int groupId) {
-		ConsumerServerResource serverResource = new ConsumerServerResource();
-		serverResource.setIp(ip);
-		serverResource.setAlarm(true);
-		serverResource.setCreateTime(new Date());
-		serverResource.setUpdateTime(new Date());
-		serverResource.setGroupId(groupId);
 		ConsumerServerResource defaultResource = (ConsumerServerResource) findDefault();
 		if (defaultResource == null) {
 			serverResource.setAlarm(false);
@@ -202,12 +161,6 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	public String loadConsumerServerLionConfig() {
 
 		return consumerServerLionConfig;
-	}
-
-	@Override
-	public synchronized void setConsumerServerLionConfig(String consumerServerLionConfig) {
-
-		this.consumerServerLionConfig = consumerServerLionConfig;
 	}
 
 	private boolean validateIpPort(String masterIp, int masterPort) {

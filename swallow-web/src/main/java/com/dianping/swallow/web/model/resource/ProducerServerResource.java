@@ -24,10 +24,4 @@ public class ProducerServerResource extends ServerResource{
 		this.saveAlarmSetting = saveAlarmSetting;
 	}
 
-	@Override
-	public String toString() {
-		return "ProducerServerResource [saveAlarmSetting=" + saveAlarmSetting + ", toString()=" + super.toString()
-				+ "]";
-	}
-
 }

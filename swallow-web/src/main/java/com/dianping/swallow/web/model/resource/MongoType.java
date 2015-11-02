@@ -43,8 +43,4 @@ public enum MongoType {
 		return type;
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(MongoType.GENERAL.name());
-		System.out.println(MongoType.findByType("一般消息队列"));
-	}
 }

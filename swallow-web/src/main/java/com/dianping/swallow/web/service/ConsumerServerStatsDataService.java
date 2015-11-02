@@ -15,14 +15,8 @@ import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 public interface ConsumerServerStatsDataService {
 
 	boolean insert(ConsumerServerStatsData serverStatsData);
-
-	boolean update(ConsumerServerStatsData serverStatsData);
-
-	int deleteById(String id);
-
-	ConsumerServerStatsData findById(String id);
-
-	ConsumerServerStatsData findByTimeKey(String ip, long timeKey);
+	
+	boolean insert(List<ConsumerServerStatsData> serverStatsDatas);
 
 	List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 
@@ -30,8 +24,6 @@ public interface ConsumerServerStatsDataService {
 	
 	long findQpsByServerIp(String ip, long startKey, long endKey);
 	
-	String findIdleConsumerServer(List<String> masterIps, long startKey, long endKey);
-
 	public static class StatsDataMapPair {
 		
 		private NavigableMap<Long, Long> sendStatsData;

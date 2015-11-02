@@ -21,8 +21,6 @@ public class DefaultAlarmMetaDao extends AbstractWriteDao implements AlarmMetaDa
 
 	private static final String ALARMMETA_COLLECTION = "ALARM_META";
 
-	private static final String ID_FIELD = "id";
-
 	private static final String METAID_FIELD = "metaId";
 
 	@Override
@@ -42,24 +40,10 @@ public class DefaultAlarmMetaDao extends AbstractWriteDao implements AlarmMetaDa
 	}
 
 	@Override
-	public int deleteById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		WriteResult result = mongoTemplate.remove(query, AlarmMeta.class, ALARMMETA_COLLECTION);
-		return result.getN();
-	}
-
-	@Override
 	public int deleteByMetaId(int metaId) {
 		Query query = new Query(Criteria.where(METAID_FIELD).is(metaId));
 		WriteResult result = mongoTemplate.remove(query, AlarmMeta.class, ALARMMETA_COLLECTION);
 		return result.getN();
-	}
-
-	@Override
-	public AlarmMeta findById(String id) {
-		Query query = new Query(Criteria.where(ID_FIELD).is(id));
-		AlarmMeta alarmMeta = mongoTemplate.findOne(query, AlarmMeta.class, ALARMMETA_COLLECTION);
-		return alarmMeta;
 	}
 
 	@Override

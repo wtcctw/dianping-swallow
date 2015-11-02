@@ -1,75 +1,25 @@
 package com.dianping.swallow.web.model.event;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
-import com.dianping.swallow.web.manager.AlarmReceiverManager;
-import com.dianping.swallow.web.service.AlarmService;
-
 /**
  * 
  * @author qiyin
  *
- *         2015年8月3日 上午11:13:05
+ *         2015年10月19日 上午9:34:21
  */
-@Service("eventFactory")
-public class EventFactory {
+public interface EventFactory {
 
-	@Autowired
-	private AlarmService alarmService;
+	TopicEvent createTopicEvent();
 
-	@Autowired
-	private AlarmReceiverManager receiverManager;
+	ServerEvent createServerEvent();
 
-	@Autowired
-	private AlarmMetaContainer alarmMetaContainer;
+	ServerStatisEvent createServerStatisEvent();
 
-	private void setComponent(Event event) {
-		event.setAlarmService(alarmService);
-		event.setAlarmReceiverManager(receiverManager);
-		event.setAlarmMetaContainer(alarmMetaContainer);
-	}
+	ConsumerIdEvent createConsumerIdEvent();
 
-	public TopicEvent createTopicEvent() {
-		TopicEvent topicEvent = new TopicEvent();
-		setComponent(topicEvent);
-		return topicEvent;
-	}
+	ConsumerClientEvent createCClientEvent();
 
-	public ServerEvent createServerEvent() {
-		ServerEvent serverEvent = new ServerEvent();
-		setComponent(serverEvent);
-		return serverEvent;
-	}
+	ProducerClientEvent createPClientEvent();
 
-	public ServerStatisEvent createServerStatisEvent() {
-		ServerStatisEvent serverStatisEvent = new ServerStatisEvent();
-		setComponent(serverStatisEvent);
-		return serverStatisEvent;
-	}
+	MongoConfigEvent createMongoConfigEvent();
 
-	public ConsumerIdEvent createConsumerIdEvent() {
-		ConsumerIdEvent consumerIdEvent = new ConsumerIdEvent();
-		setComponent(consumerIdEvent);
-		return consumerIdEvent;
-	}
-
-	public ConsumerClientEvent createCClientEvent() {
-		ConsumerClientEvent cClientEvent = new ConsumerClientEvent();
-		setComponent(cClientEvent);
-		return cClientEvent;
-	}
-
-	public ProducerClientEvent createPClientEvent() {
-		ProducerClientEvent pClientEvent = new ProducerClientEvent();
-		setComponent(pClientEvent);
-		return pClientEvent;
-	}
-	
-	public MongoConfigEvent createMongoConfigEvent() {
-		MongoConfigEvent configEvent = new MongoConfigEvent();
-		setComponent(configEvent);
-		return configEvent;
-	}
 }
