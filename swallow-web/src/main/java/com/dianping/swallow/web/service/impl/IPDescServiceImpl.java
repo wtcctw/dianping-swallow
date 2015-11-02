@@ -17,99 +17,84 @@ import com.dianping.swallow.web.model.cmdb.IPDesc;
 import com.dianping.swallow.web.service.IPDescService;
 
 /**
- * 
  * @author qiyin
- *
  */
 @Service("ipDescService")
 public class IPDescServiceImpl implements IPDescService {
 
-	private static final Logger logger = LoggerFactory.getLogger(IPDescServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(IPDescServiceImpl.class);
 
-	private static final String COMMA_SPLIT = ",";
+    private static final String COMMA_SPLIT = ",";
 
-	@Autowired
-	private UserService baUserService;
+    @Autowired
+    private UserService baUserService;
 
-	@Override
-	public void addEmail(IPDesc ipDesc) {
-		try {
-			if (ipDesc == null) {
-				return;
-			}
-			String strDpMobile = ipDesc.getDpMobile();
-			Set<String> dpEmails = getEmailsByStrMobile(strDpMobile);
+    @Override
+    public void addEmail(IPDesc ipDesc) {
+        try {
+            if (ipDesc == null) {
+                return;
+            }
+            String strDpMobile = ipDesc.getDpMobile();
+            Set<String> dpEmails = getEmailsByStrMobile(strDpMobile);
+            ipDesc.setEmail(getStrEmails(ipDesc.getEmail(), dpEmails));
 
-			String strOtherDpEmail = convertSetToEmail(dpEmails);
-			if (StringUtils.isNotBlank(strOtherDpEmail)) {
-				if (StringUtils.isNotBlank(ipDesc.getEmail())) {
-					ipDesc.setEmail(ipDesc.getEmail() + COMMA_SPLIT + strOtherDpEmail);
-				} else {
-					ipDesc.setEmail(strOtherDpEmail);
-				}
-			}
+            String strOpMobile = ipDesc.getOpMobile();
+            Set<String> opEmails = getEmailsByStrMobile(strOpMobile);
+            ipDesc.setOpEmail(getStrEmails(strOpMobile, opEmails));
+        } catch (Exception e) {
+            logger.error("[addEmail]", e);
+        }
+    }
 
-			String strOpMobile = ipDesc.getOpMobile();
-			Set<String> opEmails = getEmailsByStrMobile(strOpMobile);
-			String strOtherOpEmail = convertSetToEmail(opEmails);
-			if (StringUtils.isNotBlank(strOtherOpEmail)) {
-				if (StringUtils.isNotBlank(ipDesc.getOpEmail())) {
-					ipDesc.setOpEmail(ipDesc.getOpEmail() + COMMA_SPLIT + strOtherOpEmail);
-				} else {
-					ipDesc.setOpEmail(strOtherOpEmail);
-				}
-			}
-		} catch (Exception e) {
-			logger.error("[addEmail]", e);
-		}
-	}
+    private Set<String> getEmailsByStrMobile(String strMobile) {
+        String mobiles[] = null;
+        if (StringUtils.isNotBlank(strMobile)) {
+            mobiles = strMobile.split(COMMA_SPLIT);
+        }
+        Set<String> emails = null;
+        if (mobiles != null && mobiles.length > 0) {
+            emails = new HashSet<String>();
+            for (String mobile : mobiles) {
+                if (StringUtils.isNotBlank(mobile)) {
+                    emails.addAll(getEmailsByMobile(mobile.trim()));
+                }
+            }
+        }
+        return emails;
+    }
 
-	private String convertSetToEmail(Set<String> emails) {
-		String strEmail = StringUtils.EMPTY;
-		if (emails != null) {
-			Iterator<String> iterator = emails.iterator();
-			while (iterator.hasNext()) {
-				String email = iterator.next();
-				if (StringUtils.isNotBlank(email.trim())) {
-					strEmail += (email.trim() + COMMA_SPLIT);
-				}
+    private Set<String> getEmailsByMobile(String mobile) {
+        List<UserProfileDto> userInfos = baUserService.getEmployeeInfoByKeyword(mobile);
+        Set<String> emails = new HashSet<String>();
+        if (userInfos != null) {
+            for (UserProfileDto userInfo : userInfos) {
+                if (StringUtils.isNotBlank(userInfo.getEmail())) {
+                    emails.add(userInfo.getEmail().trim());
+                }
+            }
+        }
+        return emails;
+    }
 
-			}
-		}
-		if (StringUtils.isNotBlank(strEmail)) {
-			return strEmail.substring(0, strEmail.length() - 1);
-		}
-		return strEmail;
-	}
-
-	private Set<String> getEmailsByStrMobile(String strMobile) {
-		String mobiles[] = null;
-		if (StringUtils.isNotBlank(strMobile)) {
-			mobiles = strMobile.split(COMMA_SPLIT);
-		}
-		Set<String> emails = null;
-		if (mobiles != null && mobiles.length > 0) {
-			emails = new HashSet<String>();
-			for (String mobile : mobiles) {
-				if (StringUtils.isNotBlank(mobile)) {
-					emails.addAll(getEmailsByMobile(mobile.trim()));
-				}
-			}
-		}
-		return emails;
-	}
-
-	private Set<String> getEmailsByMobile(String mobile) {
-		List<UserProfileDto> userInfos = baUserService.getEmployeeInfoByKeyword(mobile);
-		Set<String> emails = new HashSet<String>();
-		if (userInfos != null) {
-			for (UserProfileDto userInfo : userInfos) {
-				if (StringUtils.isNotBlank(userInfo.getEmail())) {
-					emails.add(userInfo.getEmail().trim());
-				}
-			}
-		}
-		return emails;
-	}
+    private String getStrEmails(String strEmail, Set<String> mobileEmails) {
+        Set<String> emails = null;
+        if (mobileEmails == null) {
+            emails = new HashSet<String>();
+        } else {
+            emails = mobileEmails;
+        }
+        if (StringUtils.isNotBlank(strEmail)) {
+            String[] emailArr = StringUtils.split(strEmail, COMMA_SPLIT);
+            if (emailArr != null) {
+                for (String email : emailArr) {
+                    if (StringUtils.isNotBlank(email)) {
+                        emails.add(email.trim());
+                    }
+                }
+            }
+        }
+        return StringUtils.join(emails, COMMA_SPLIT);
+    }
 
 }
