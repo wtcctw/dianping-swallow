@@ -59,6 +59,7 @@
 						<th style="text-align: left"><a href="" data-toggle="tooltip"
 							ng-click="setInactive()" title="只显示包含不活动IP的Topic">消费IP配置</a>#if(${isadmin}) &nbsp; | 不活动IP个数&nbsp;:{{countinactive}} #end</th>
 						<th style="text-align: left">告警配置</th>
+						<th style="text-align: left">应用</th>
 						<th style="text-align: left">告警</th>
 						<th style="text-align: left">操作</th>
 					</tr>
@@ -77,6 +78,7 @@
 							ng-bind="ad.ips | limitTo : 25 "></a></td>
 						<td style="text-align: left"><a href="#myModal1"
 							ng-click="setModalInput($index);" data-toggle="modal">详情</a></td>
+						<td style="text-align: left" ng-bind="ad.consumerApplications | limitTo : 25 "></td>
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
 								id="alarm{{$index}}" type="checkbox" ng-model="ad.alarm"
@@ -137,6 +139,15 @@
 									<label class="control-label">Topic</label> <input type="text"
 										class="form-control" ng-model="consumeridEntry.topic"
 										id="topic" readonly> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>应用名</b></label> <input
+										type="text" class="form-control"
+										ng-model="consumeridEntry.consumerApplications" id="consumerApplications"
+										data-provide="typeahead" autocomplete="off"> </input>
 								</div>
 							</div>
 							<div class="control-group">
