@@ -227,6 +227,7 @@ public class DefaultProducerDataRetriever
                 }
                 statsDatas.put(key, getIpDelay(topic, key, start, end));
             }
+            return statsDatas;
         }
         return null;
     }
@@ -270,6 +271,7 @@ public class DefaultProducerDataRetriever
                     continue;
                 }
                 statsDatas.put(key, getIpQpx(topic, key, start, end));
+                return statsDatas;
             }
         }
         return null;

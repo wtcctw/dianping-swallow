@@ -447,10 +447,34 @@ module.controller('ConsumerOrderController', function ($scope, $http) {
     };
 });
 
-module.controller('AllIpStatsDataController', function ($scope, $http) {
+module.controller('ConsumerIpQpsController', function ($scope, $http) {
 
-    $scope.getProducerServerQps = function () {
-        renderGraph("/console/monitor/producerserver/qps/get", "container",
+    $scope.getConsumerIpQps = function (topicName) {
+        renderGraph("/console/monitor/consumer/" + topicName + "/ip/qps/get", "container",
+            $http);
+    };
+});
+
+module.controller('ConsumerIpDelayController', function ($scope, $http) {
+
+    $scope.getConsumerIpDelay = function (topicName) {
+        renderGraph("/console/monitor/consumer/" + topicName + "/ip/delay/get", "container",
+            $http);
+    };
+});
+
+module.controller('ProducerIpQpsController', function ($scope, $http) {
+
+    $scope.getProducerIpQps = function (topicName) {
+        renderGraph("/console/monitor/producer/" + topicName + "/ip/qps/get", "container",
+            $http);
+    };
+});
+
+module.controller('ProducerIpDelayController', function ($scope, $http) {
+
+    $scope.getProducerIpDelay = function (topicName) {
+        renderGraph("/console/monitor/producer/" + topicName + "/ip/delay/get", "container",
             $http);
     };
 });

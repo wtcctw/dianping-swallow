@@ -111,25 +111,25 @@ public class DataMonitorController extends AbstractMonitorController implements 
     @RequestMapping(value = "/console/monitor/consumer/{topic}/ip/qps", method = RequestMethod.GET)
     public ModelAndView viewConsumerIpQps(@PathVariable String topic) {
 
-        return new ModelAndView("monitor/allipsstatsdata", createViewMap("topic", "consumerqps"));
+        return new ModelAndView("monitor/consumeripqps", createViewMap("topic", "consumerqps"));
     }
 
     @RequestMapping(value = "/console/monitor/consumer/{topic}/ip/delay", method = RequestMethod.GET)
     public ModelAndView viewConsumerIpDelay(@PathVariable String topic) {
 
-        return new ModelAndView("monitor/allipsstatsdata", createViewMap("topic", "delay"));
+        return new ModelAndView("monitor/consumeripdelay", createViewMap("topic", "delay"));
     }
 
     @RequestMapping(value = "/console/monitor/producer/{topic}/ip/qps", method = RequestMethod.GET)
     public ModelAndView viewProducerIpQps(@PathVariable String topic) {
 
-        return new ModelAndView("monitor/allipsstatsdata", createViewMap("topic", "consumerqps"));
+        return new ModelAndView("monitor/produceripqps", createViewMap("topic", "consumerqps"));
     }
 
     @RequestMapping(value = "/console/monitor/producer/{topic}/ip/delay", method = RequestMethod.GET)
     public ModelAndView viewProducerIpDelay(@PathVariable String topic) {
 
-        return new ModelAndView("monitor/allipsstatsdata", createViewMap("topic", "delay"));
+        return new ModelAndView("monitor/produceripdelay", createViewMap("topic", "delay"));
     }
 
     @RequestMapping(value = "/console/monitor/consumer/{topic}/accu", method = RequestMethod.GET)
@@ -579,7 +579,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
             allStats.add(producerData);
             allStats.add(dataPair.getSendData());
             allStats.add(dataPair.getAckData());
-            result.add(ChartBuilder.getHighChart(getTopicDesc(topic), getConsumerIdDesc(currentConsumerId), yAxis,
+            result.add(ChartBuilder.getHighChart(getTopicDesc(topic, yAxis), getConsumerIdDesc(topic, currentConsumerId, yAxis), yAxis,
                     allStats));
         }
 
@@ -620,20 +620,33 @@ public class DataMonitorController extends AbstractMonitorController implements 
         return result;
     }
 
-    private String getConsumerIdDesc(String consumerId) {
+    private String getConsumerIdDesc(String topic, String consumerId, String yAxis) {
 
         if (consumerId.equals(MonitorData.TOTAL_KEY)) {
             return "所有consumerId";
         }
-        return consumerId;
+        String result = consumerId;
+        if (Y_AXIS_TYPE_QPS.equals(yAxis)) {
+            result = "<a href=\"/console/monitor/consumer/" + topic + "/ip/qps?cid=" + consumerId + "\">" + consumerId + "</a>";
+        } else {
+            result = "<a href=\"/console/monitor/consumer/" + topic + "/ip/delay?cid=" + consumerId + "\">" + consumerId + "</a>";
+        }
+
+        return result;
     }
 
-    private String getTopicDesc(String topic) {
+    private String getTopicDesc(String topic, String yAxis) {
 
         if (topic.equals(MonitorData.TOTAL_KEY)) {
             return "所有topic";
         }
-        return topic;
+        String result = topic;
+        if (Y_AXIS_TYPE_QPS.equals(yAxis)) {
+            result = "<a href=\"/console/monitor/producer/" + topic + "/ip/qps\">" + topic + "</a>";
+        } else {
+            result = "<a href=\"/console/monitor/producer/" + topic + "/ip/delay\">" + topic + "</a>";
+        }
+        return result;
     }
 
     private Object buildResponse(List<ResultEntry> entrys, String type) {
