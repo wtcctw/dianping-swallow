@@ -10,32 +10,32 @@ import com.dianping.swallow.web.model.resource.TopicResource;
 
 /**
  * @author mingdongli
- *
+ *         <p/>
  *         2015年8月18日下午7:12:18
  */
 public interface TopicResourceService extends ConfigChange {
 
-	boolean insert(TopicResource topicResource);
+    boolean insert(TopicResource topicResource);
 
-	boolean update(TopicResource topicResource);
+    boolean update(TopicResource topicResource);
 
-	TopicResource findByTopic(String topic);
+    TopicResource findByTopic(String topic);
 
-	Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator);
+    Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator);
 
-	Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, boolean inactive);
+    Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, String administrator, boolean inactive);
 
-	TopicResource findDefault();
+    TopicResource findDefault();
 
-	List<TopicResource> findAll();
+    List<TopicResource> findAll();
 
-	Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limit);
+    Pair<Long, List<TopicResource>> findTopicResourcePage(int offset, int limit);
 
-	Map<String, Set<String>> loadCachedTopicToAdministrator();
+    Map<String, Set<String>> loadCachedTopicToAdministrator();
 
-	TopicResource buildTopicResource(String topic, Set<String> adminSet);
+    TopicResource buildTopicResource(String topic, Set<String> adminSet);
 
-	boolean updateTopicAdministrator(String topic, Set<String> adminSet);
-	
-	long countInactive();
+    boolean updateTopicAdministrator(String topic, Set<String> adminSet);
+
+    long countInactive();
 }

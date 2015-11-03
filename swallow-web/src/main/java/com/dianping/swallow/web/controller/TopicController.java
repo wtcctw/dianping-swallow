@@ -64,11 +64,12 @@ public class TopicController extends AbstractMenuController implements ResourceO
 
         String topic = topicQueryDto.getTopic();
         String producerIp = topicQueryDto.getProducerServer();
+        String administrator = topicQueryDto.getAdministrator();
         boolean inactive = topicQueryDto.isInactive();
         int offset = topicQueryDto.getOffset();
         int limit = topicQueryDto.getLimit();
 
-        boolean isAllEmpty = StringUtil.isAllBlank(topic, producerIp) && inactive;
+        boolean isAllEmpty = StringUtil.isAllBlank(topic, producerIp, administrator) && inactive;
 
         if (isAllEmpty) {
             String username = userUtils.getUsername(request);
@@ -79,7 +80,7 @@ public class TopicController extends AbstractMenuController implements ResourceO
                 return topicResourceService.findByAdministrator(offset, limit, username);
             }
         } else {
-            return topicResourceService.find(offset, limit, topic, producerIp, inactive);
+            return topicResourceService.find(offset, limit, topic, producerIp,administrator, inactive);
         }
 
     }
@@ -222,9 +223,10 @@ public class TopicController extends AbstractMenuController implements ResourceO
 
     @RequestMapping(value = "/console/topic/administrator", method = RequestMethod.GET)
     @ResponseBody
-    public Object loadAdministrators() {
+    public Object loadAdministrators(HttpServletRequest request) {
 
-        return userUtils.administrator();
+        String username = userUtils.getUsername(request);
+        return userUtils.administrator(username);
     }
 
     @RequestMapping(value = "/console/topic/alarm/ipinfo/alarm", method = RequestMethod.GET)

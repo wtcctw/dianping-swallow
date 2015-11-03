@@ -154,9 +154,9 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
     }
 
     @Override
-    public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, boolean inactive) {
+    public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp,String administrator, boolean inactive) {
 
-        return topicResourceDao.find(offset, limit, topic, producerIp, inactive);
+        return topicResourceDao.find(offset, limit, topic, producerIp,administrator, inactive);
     }
 
     @Override
