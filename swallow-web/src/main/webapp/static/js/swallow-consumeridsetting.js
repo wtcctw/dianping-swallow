@@ -243,6 +243,10 @@ module
 								$scope.query.consumerId = $("#searchconsumerid").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
 							}
+
+							$scope.setApplication = function(application){
+								localStorage.setItem("application", application);
+							}
 							
 							//如果topic列表返回空，则不会执行initpage
 							$scope.initpage = function(){
