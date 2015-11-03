@@ -741,7 +741,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 ### 用户行为
 
-* 每个用户管理一个或者多个topic，可以查看、重发相应的topic的消息
+* 每个用户管理一个或者多个topic，可以查看、重发相应的topic的消息。
 
 ### Visitor行为
 
@@ -749,7 +749,12 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 ### 权限提升
 
-* 用户和Visitor如需提升权限，请联系对应的业务运维
+* 用户和Visitor如需提升权限，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请。
+![权限提升](http://swallow.dp/help/document/img/enhance_auth.png)
+
+* topic需要是已经通过swallow开发小组审批过的可用topic，否则请先申请相关topic。一次只能填写一个topic名称。
+
+* 预账号请填写申请人公司邮箱前缀，如邮箱为mingdong.li@dianping.com需填写mingdong.li。
 
 
 <span id="takeAttention"></span>
