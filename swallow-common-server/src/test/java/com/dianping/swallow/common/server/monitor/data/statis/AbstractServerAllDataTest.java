@@ -18,7 +18,7 @@ public class AbstractServerAllDataTest extends AbstractTest {
 
     protected List<String> ips = new ArrayList<String>();
 
-    protected Long startKey = 100L, endKey = 220L;
+    protected Long startKey = 100L, endKey = 140L;
 
     protected final long avergeDelay = 50;
     protected final long qpsPerUnit = 10;
