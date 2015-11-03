@@ -25,25 +25,38 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author mingdongli
- * 15/10/27 下午3:56
+ *         15/10/27 下午3:56
  */
 
-public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
+public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
     private ConsumerAllData consumerAllData;
 
-    protected String[] consumerIds = { "id1", "id2" };
-
-    protected StatisType[] supportedTypes = new StatisType[] { StatisType.SEND, StatisType.ACK };
+    protected StatisType[] supportedTypes = new StatisType[]{StatisType.SEND, StatisType.ACK};
 
     private AtomicLong messageIdGenerator = new AtomicLong();
 
     @Before
     public void beforeProducerServerDataTest() {
 
+        String topicpre = "topic";
+        String idpre = "id";
+        for(int i = 1; i < 10; ++i){
+            topics.add(topicpre + i);
+            consumerIds.add(idpre + i);
+            if(i < 16){
+                ips.add("127.0.0." + i);
+            }
+        }
+
         consumerAllData = new ConsumerAllData();
+        long beforea = System.currentTimeMillis();
         prepareData(consumerAllData);
+        long aftera = System.currentTimeMillis();
+        System.out.println(aftera - beforea);
         consumerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
+        long aftera2 = System.currentTimeMillis();
+        System.out.println(aftera2 - aftera);
     }
 
     public static void method3(String fileName, String content) {
@@ -70,13 +83,12 @@ public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
     }
 
     @Test
-    public void testRetriever() {
+    public void testKeyAndValue(){
 
-        String server = ips[0];
-        String topic = topics[0];
-        String consumerId = consumerIds[0];
-        String ip = ips[0];
-
+        String server = ips.get(0);
+        String topic = topics.get(0);
+        String consumerId = consumerIds.get(0);
+        String ip = ips.get(0);
         method3("/Users/mingdongli/tmp/consumer/all.txt", consumerAllData.toString());
         method3("/Users/mingdongli/tmp/consumer/total.txt", consumerAllData.getKeys(new CasKeys("total")).toString());
 
@@ -86,21 +98,19 @@ public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
         System.out.println(consumerAllData.getKeys(new CasKeys(server, topic, consumerId)));
         System.out.println(consumerAllData.getKeys(new CasKeys("total")));
         System.out.println(consumerAllData.getKeys(new CasKeys("total", topic)));
-        System.out.println(consumerAllData.getKeys(new CasKeys("total", topic, consumerId)));        System.out.println(consumerAllData.getKeys(new CasKeys()));
+        System.out.println(consumerAllData.getKeys(new CasKeys("total", topic, consumerId)));
 
         System.out.println(consumerAllData.getDelayValue(new CasKeys(server), StatisType.ACK));
         System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic), StatisType.ACK));
         System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId), StatisType.ACK));
         System.out.println(consumerAllData.getDelayValue(new CasKeys("total"), StatisType.ACK));
         System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic), StatisType.ACK));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic, consumerId), StatisType.ACK));
 
         System.out.println(consumerAllData.getDelayValue(new CasKeys(server),StatisType.SEND));
         System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic),StatisType.SEND));
         System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId),StatisType.SEND));
         System.out.println(consumerAllData.getDelayValue(new CasKeys("total"),StatisType.SEND));
         System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic, consumerId),StatisType.SEND));
 
         NavigableMap<Long, Long> cisd = consumerAllData.getDelayValue(new CasKeys(server, topic,
                 consumerId), StatisType.ACK);
@@ -113,9 +123,24 @@ public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
         method3("/Users/mingdongli/tmp/consumer/topicmerge.txt", consumerAllData.getDelayValue(new CasKeys("total"), StatisType.ACK).toString());
         method3("/Users/mingdongli/tmp/consumer/cidmerge.txt", consumerAllData.getDelayValue(new CasKeys("total", topic), StatisType.ACK).toString());
         method3("/Users/mingdongli/tmp/consumer/ipmerge.txt", consumerAllData.getDelayValue(new CasKeys("total", topic, consumerId), StatisType.ACK).toString());
+
     }
 
     @Test
+    public void testRetriever() {
+
+        long before = System.currentTimeMillis();
+        for (String t : topics) {
+            for (String id : consumerIds) {
+                System.out.println(consumerAllData.getDelayValue(new CasKeys("total", t, id), StatisType.ACK));
+                consumerAllData.getDelayValue(new CasKeys("total", t, id), StatisType.SEND);
+            }
+        }
+        long after = System.currentTimeMillis();
+        System.out.println(after - before);
+    }
+
+//    @Test
     public void testConsumerServerData() {
 
         int totalCount = (int) ((endKey - startKey) / intervalCount);
@@ -131,16 +156,16 @@ public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
                 NavigableMap<Long, QpxData> qpxs = consumerAllData.getQpxForTopic(topic, type);
 
                 expectedDelay(delays, totalCount, avergeDelay);
-                expectedQpx(qpxs, totalCount, qpsPerUnit * ips.length * consumerIds.length, qpsPerUnit * ips.length
-                        * consumerIds.length * intervalCount * AbstractCollector.SEND_INTERVAL);
+                expectedQpx(qpxs, totalCount, qpsPerUnit * ips.size() * consumerIds.size(), qpsPerUnit * ips.size()
+                        * consumerIds.size() * intervalCount * AbstractCollector.SEND_INTERVAL);
 
                 Map<String, NavigableMap<Long, Long>> allDelay = consumerAllData.getDelayForAllConsumerId(topic, type,
                         false);
                 Map<String, NavigableMap<Long, QpxData>> allQpx = consumerAllData.getQpxForAllConsumerId(topic, type,
                         false);
 
-                Assert.assertEquals(consumerIds.length, allDelay.size());
-                Assert.assertEquals(consumerIds.length, allQpx.size());
+                Assert.assertEquals(consumerIds.size(), allDelay.size());
+                Assert.assertEquals(consumerIds.size(), allQpx.size());
 
                 for (Entry<String, NavigableMap<Long, Long>> entry : allDelay.entrySet()) {
 
@@ -151,7 +176,7 @@ public class  AbstractTotalMapStatisableTest extends AbstractServerDataTest {
                 for (Entry<String, NavigableMap<Long, QpxData>> entry : allQpx.entrySet()) {
 
                     NavigableMap<Long, QpxData> consumerQpx = entry.getValue();
-                    expectedQpx(consumerQpx, totalCount, qpsPerUnit * ips.length, qpsPerUnit * ips.length
+                    expectedQpx(consumerQpx, totalCount, qpsPerUnit * ips.size(), qpsPerUnit * ips.size()
                             * intervalCount * AbstractCollector.SEND_INTERVAL);
                 }
 

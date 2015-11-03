@@ -19,7 +19,7 @@ public interface TopicResourceDao extends Dao{
 
 	long count();
 
-	Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerI, boolean inactive);
+	Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerI,String administrator, boolean inactive);
 
 	Pair<Long, List<TopicResource>> findByAdministrator(int offset, int limit, String administrator);
 	

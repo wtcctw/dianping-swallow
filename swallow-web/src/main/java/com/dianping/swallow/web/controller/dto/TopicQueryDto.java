@@ -11,13 +11,19 @@ public class TopicQueryDto extends BaseQueryDto{
 	private String topic;
 	
 	private String producerServer;
+
+	private String administrator;
 	
 	private boolean inactive;
 	
 	public TopicQueryDto(){
 		
 	}
-	
+
+	public String getAdministrator() {
+		return administrator;
+	}
+
 	public String getTopic() {
 		return topic;
 	}
