@@ -109,6 +109,14 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         return createStatsData(createDelayDesc(topic, type), rawData, start, end);
     }
 
+    protected StatsData getIpDelayInMemory(String topic, String ip, StatisType type, long start, long end) {
+        NavigableMap<Long, Long> rawData = statis.getDelayValue(new CasKeys(TOTAL_KEY, topic, ip), type);
+        if (rawData != null) {
+            rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+        }
+        return createStatsData(createDelayDesc(topic, type), rawData, start, end);
+    }
+
     protected StatsData getQpxInMemory(String topic, StatisType type, long start, long end) {
 
         NavigableMap<Long, Long> rawData = convertQpxData(statis.getQpxForTopic(topic, type));
@@ -116,6 +124,15 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
             rawData = rawData.subMap(getKey(start), true, getKey(end), true);
         }
         return createStatsData(createQpxDesc(topic, type), rawData, start, end);
+    }
+
+    protected StatsData getIpQpxInMemory(String topic, String ip, StatisType type, long start, long end) {
+        NavigableMap<Long, QpxData> ipQpx = statis.getQpsValue(new CasKeys(TOTAL_KEY, topic, ip), type);
+        NavigableMap<Long, Long> rawData = convertQpxData(ipQpx);
+        if (rawData != null) {
+            rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+        }
+        return createStatsData(createDelayDesc(topic, type), rawData, start, end);
     }
 
     protected Map<String, StatsData> getServerQpxInMemory(QPX qpx, StatisType type, long start, long end) {
@@ -142,6 +159,8 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
     protected abstract StatsDataDesc createServerDelayDesc(String serverIp, StatisType type);
 
     protected abstract StatsDataDesc createDelayDesc(String topic, StatisType type);
+
+    //protected abstract StatsDataDesc createDelayDesc(String topic, String ip, StatisType type);
 
     protected abstract StatsDataDesc createQpxDesc(String topic, StatisType type);
 

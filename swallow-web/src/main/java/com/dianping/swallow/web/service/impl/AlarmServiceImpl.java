@@ -167,7 +167,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
             return false;
         }
         String title = getTitle(alarm.getNumber(), alarm.getTitle());
-        ResultType resultType = sendMail(receiver, title, alarm.getBody());
+        ResultType resultType = sendMail(receiver, MESSAGE_HEAD + title, alarm.getBody());
         alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.MAIL));
         return resultType.isSuccess();
     }
