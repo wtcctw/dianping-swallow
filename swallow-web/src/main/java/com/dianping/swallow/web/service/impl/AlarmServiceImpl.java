@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -55,7 +56,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
     private static final String RIGHT_BRACKET = "]";
 
-    private static final String NEW_LINE_SIGN = "\n";
+    private static final String COLON_SIGN = "：";
 
     private static final String MESSAGE_HEAD = "Swallow告警信息：";
 
@@ -96,13 +97,17 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
     @Override
     public ResultType sendWeiXin(String email, String title, String content) {
-        List<NameValuePair> params = new ArrayList<NameValuePair>(3);
-        params.add(new BasicNameValuePair("keyword", email));
-        params.add(new BasicNameValuePair("title", title));
-        params.add(new BasicNameValuePair("content", content));
-        HttpResult result = httpService.httpPost(getWeiXinUrl(), params);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("keyword", email);
+            jsonObject.put("title", title);
+            jsonObject.put("content", content);
+        } catch (Exception e) {
+            logger.error("[sendWeiXin] jsonObject put error.",e);
+        }
+        HttpResult result = httpService.httpPost(getWeiXinUrl(), jsonObject);
         if (!result.isSuccess()) {
-            result = httpService.httpPost(getWeiXinUrl(), params);
+            result = httpService.httpPost(getWeiXinUrl(), jsonObject);
         }
         if (StringUtils.isNotBlank(result.getResponseBody())) {
             if (!result.getResponseBody().contains("true")) {
@@ -153,7 +158,7 @@ public class AlarmServiceImpl implements AlarmService, InitializingBean {
             return false;
         }
         String title = getTitle(alarm.getNumber(), alarm.getTitle());
-        ResultType resultType = sendWeiXin(receiver, title, MESSAGE_HEAD + title + NEW_LINE_SIGN + alarm.getBody());
+        ResultType resultType = sendWeiXin(receiver, title, MESSAGE_HEAD + title + COLON_SIGN + alarm.getBody());
         alarm.addSendInfo(new SendInfo().setReceiver(receiver).setResultType(resultType).setSendType(SendType.WEIXIN));
         return resultType.isSuccess();
     }

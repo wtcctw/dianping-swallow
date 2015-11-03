@@ -24,6 +24,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
@@ -33,6 +34,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.util.VersionInfo;
+import org.codehaus.jettison.json.JSONObject;
 import org.mortbay.jetty.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,6 +166,49 @@ public class HttpServiceImpl implements HttpService {
             logger.error("http get request failed. url = {}", url, e);
         } catch (ParseException e) {
             handleException(httpGet, result, ResultType.FAILED);
+            logger.error("http get request failed. url = {}", url, e);
+        }
+        return result;
+    }
+
+    @Override
+    public HttpResult httpPost(String url, JSONObject jsonObject) {
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
+        httpPost.addHeader("Accept", "application/json");
+        HttpResult result = new HttpResult();
+        try {
+            httpPost.setEntity(new StringEntity(jsonObject.toString(), UTF_8));
+        } catch (UnsupportedEncodingException e) {
+            logger.error("http post param encoded failed. ", e);
+        }
+        try {
+            HttpResponse response = httpClient.execute(httpPost);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
+                result.setResponseBody(EntityUtils.toString(response.getEntity()));
+                result.setResultType(ResultType.SUCCESS);
+                result.setSuccess(true);
+            } else {
+                handleException(httpPost, result, ResultType.FAILED);
+                logger.error("http post request failed. url = {}", url);
+            }
+        } catch (UnknownHostException e) {
+            handleException(httpPost, result, ResultType.FAILED_HOST_UNKNOWN);
+            logger.error("http post request failed. url = {}", url, e);
+        } catch (ConnectTimeoutException e) {
+            handleException(httpPost, result, ResultType.FAILED_CONNECTION_TIMEOUT);
+            logger.error("http post request failed. url = {}", url, e);
+        } catch (ConnectException e) {
+            handleException(httpPost, result, ResultType.FAILED_CONNECT);
+            logger.error("http post request failed. url = {}", url, e);
+        } catch (SocketTimeoutException e) {
+            handleException(httpPost, result, ResultType.FAILED_SOCKET_TIMEOUT);
+            logger.error("http post request failed. url = {}", url, e);
+        } catch (IOException e) {
+            handleException(httpPost, result, ResultType.FAILED);
+            logger.error("http post request failed. url = {}", url, e);
+        } catch (ParseException e) {
+            handleException(httpPost, result, ResultType.FAILED);
             logger.error("http get request failed. url = {}", url, e);
         }
         return result;
