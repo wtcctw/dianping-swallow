@@ -1,17 +1,20 @@
 package com.dianping.swallow.web.dashboard.wrapper;
 
-import java.util.Collections;
-import java.util.Set;
-
+import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable;
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
+import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import com.dianping.swallow.web.monitor.MonitorDataListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
-import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
-import com.dianping.swallow.web.monitor.MonitorDataListener;
+import java.util.Collections;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * @author mingdongli
@@ -33,14 +36,32 @@ public class ConsumerDataRetrieverWrapper {
 		return consumerDataRetriever.getKeys(new CasKeys(keys));
 	}
 
-	public ConsumerIdStatisData getValue(String... keys) {
+	public NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type) {
 
-		ConsumerIdStatisData consumerIdStatisData = (ConsumerIdStatisData) consumerDataRetriever.getValue(new CasKeys(
-				keys));
-		if(consumerIdStatisData == null){
-			consumerIdStatisData = new ConsumerIdStatisData();
+		NavigableMap<Long, Long> map = consumerDataRetriever.getDelayValue(keys, type);
+		if(map == null){
+			map = new ConcurrentSkipListMap<Long, Long>();
 		}
-		return consumerIdStatisData;
+		return map;
+	}
+
+	public NavigableMap<Long, Long> getQpsValue(CasKeys keys, StatisType type) {
+
+		NavigableMap<Long, Long> result = new ConcurrentSkipListMap<Long, Long>();
+		NavigableMap<Long, Statisable.QpxData> map = consumerDataRetriever.getQpsValue(keys, type);
+		if(map == null){
+			return result;
+		}
+
+		for(Map.Entry<Long, Statisable.QpxData> entry : map.entrySet()){
+			Statisable.QpxData qpsData = entry.getValue();
+			Long qps = 0L;
+			if(qpsData != null){
+				qps = qpsData.getQpx();
+			}
+			result.put(entry.getKey(), qps);
+		}
+		return result;
 	}
 
 	public Set<String> getKeyWithoutTotal(String... keys) {

@@ -154,6 +154,7 @@ module
 							$scope.consumeridEntry.topic;
 							$scope.consumeridEntry.alarm;
 							$scope.consumeridEntry.consumerIpInfos;
+							$scope.consumeridEntry.consumerApplications = [];
 
 							$scope.refreshpage = function(myForm, num) {
 								if ($scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak < $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley
@@ -172,11 +173,11 @@ module
 										$scope.consumeridEntry.consumerIpInfos[i].active = check;
 									}
 								}
-								
+								$scope.consumeridEntry.consumerApplications = $("#consumerApplications").val().split(",");
+
 								var id = "#myModal" + num;
 								$(id).modal('hide');
-								var param = JSON.stringify($scope.consumeridEntry);
-								
+
 								$http.post(window.contextPath + '/console/consumerid/update', $scope.consumeridEntry).success(function(response) {
 									$scope.query.topic = $scope.consumeridEntry.topic;
 									$scope.query.consumerId = $scope.consumeridEntry.consumerId;
@@ -189,6 +190,7 @@ module
 								$scope.consumeridEntry.topic = "";
 								$scope.consumeridEntry.alarm = true;
 								$scope.consumeridEntry.consumerIpInfos = "";
+								$scope.consumeridEntry.consumerApplications = "";
 								$scope.consumeridEntry.consumerAlarmSetting.sendDelay = "";
 								$scope.consumeridEntry.consumerAlarmSetting.ackDelay = "";
 								$scope.consumeridEntry.consumerAlarmSetting.accumulation = "";
@@ -203,6 +205,17 @@ module
 							}
 
 							$scope.setModalInput = function(index) {
+
+								if(typeof($scope.consumeridEntry.consumerApplications) != "undefined"){
+									var consumerApplications = $scope.searchPaginator.currentPageItems[index].consumerApplications;
+									$('#consumerApplications').tagsinput('removeAll');
+									if(consumerApplications != null && consumerApplications.length > 0){
+										for(var i = 0; i < consumerApplications.length; ++i)
+											$('#consumerApplications').tagsinput('add', consumerApplications[i]);
+									}
+								}else{
+									$('#consumerApplications').tagsinput('removeAll');
+								}
 								
 								$scope.consumeridEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 								$scope.consumeridEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
@@ -228,6 +241,10 @@ module
 								$scope.query.consumerIp = $("#searchconsumerip").val();
 								$scope.query.consumerId = $("#searchconsumerid").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+							}
+
+							$scope.setApplication = function(application){
+								localStorage.setItem("application", application);
 							}
 							
 							//如果topic列表返回空，则不会执行initpage
@@ -316,6 +333,20 @@ module
 									 $scope.countinactive = data;
 								 }).error(function(data, status, headers, config) {
 								 });
+
+								$http({
+									method : 'GET',
+									url : window.contextPath + '/console/application/applicationname'
+								}).success(function(data, status, headers, config) {
+									$('#consumerApplications').tagsinput({
+										typeahead: {
+											items: 16,
+											source: data,
+											displayText: function(item){ return item;}  //necessary
+										}
+									});
+								}).error(function(data, status, headers, config) {
+								});
 								 
 							}
 							

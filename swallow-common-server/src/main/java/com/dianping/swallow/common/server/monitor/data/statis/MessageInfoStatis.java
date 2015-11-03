@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  *
  *         2015年5月19日 下午5:46:28
  */
-public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implements Statisable<MessageInfo>, Mergeable {
+public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implements Statisable<MessageInfo> {
 
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -279,24 +279,4 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 		throw new UnsupportedOperationException("unsupported operation getValue()");
 	}
 
-	@Override
-	public void merge(Mergeable merge) {
-		if (!(merge instanceof MessageInfoStatis)) {
-			throw new IllegalArgumentException("not MessageInfo, but " + merge.getClass());
-		}
-		MessageInfoStatis messageInfoStatis = (MessageInfoStatis)merge;
-		MapUtil.mergeMap(this.col, messageInfoStatis.col);
-		MapUtil.mergeMap(this.qpxMap, messageInfoStatis.qpxMap);
-		MapUtil.mergeMapOfTypeLong(this.delayMap, messageInfoStatis.delayMap);
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-
-		MessageInfoStatis infoStatis = (MessageInfoStatis) super.clone();
-		infoStatis.col = new ConcurrentSkipListMap<Long, MessageInfo>(this.col);
-		infoStatis.qpxMap = new ConcurrentSkipListMap<Long, QpxData>(this.qpxMap);
-		infoStatis.delayMap = new ConcurrentSkipListMap<Long, Long>(this.delayMap);
-		return infoStatis;
-	}
 }

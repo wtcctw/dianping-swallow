@@ -97,7 +97,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 		};
 			$scope.topic = "";
 			$scope.searchip = "";
-			
+			$scope.searchadministrator = "";
+
 			$scope.suburl = "/console/topic/list";
 			$scope.topicnum = 30;
 			
@@ -189,6 +190,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				}
 				localStorage.clear();
 			}
+
+			$scope.query.administrator = $scope.searchadministrator;
 			$scope.query.producerServer = $scope.searchip;
 			$scope.query.inactive = true;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
@@ -214,7 +217,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								$scope.topic = c;
 								$scope.query.topic = $scope.topic;
 								$scope.query.producerServer = $("#searchip").val();
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
+								$scope.query.administrator = $("#searchadministrator").val();
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 								return c;
 							}
 						})
@@ -225,6 +229,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							updater : function(c) {
 								$scope.searchip = c;
 								$scope.query.producerServer = $scope.searchip;
+								$scope.query.administrator = $("#searchadministrator").val();
 								$scope.query.topic = $("#searchtopic").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
 								return c;
@@ -232,7 +237,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						})
 					}).error(function(data, status, headers, config) {
 					});
-				 
+
 					$http({
 						method : 'GET',
 						url : window.contextPath + '/console/topic/administrator'
@@ -245,6 +250,19 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
+
+						$("#searchadministrator").typeahead({
+							items: 16,
+							source : data,
+							updater : function(c) {
+								$scope.administrator = c;
+								$scope.query.administrator = $scope.administrator;
+								$scope.query.producerServer = $("#searchip").val();
+								$scope.query.topic = $("#searchtopic").val();
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
+								return c;
+							}
+						})
 					}).error(function(data, status, headers, config) {
 					});
 					

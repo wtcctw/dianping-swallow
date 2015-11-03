@@ -73,7 +73,7 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 	}
 
 	@Override
-	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp, boolean inactive) {
+	public Pair<Long, List<TopicResource>> find(int offset, int limit, String topic, String producerIp,String administrator, boolean inactive) {
 
 		Query query = new Query();
 
@@ -99,6 +99,9 @@ public class DefaultTopicResourceDao extends AbstractWriteDao implements TopicRe
 		}
 		if (StringUtil.isNotBlank(producerIp)) {
 			query.addCriteria(Criteria.where(PEODUCERIPS).is(producerIp));
+		}
+		if (StringUtil.isNotBlank(administrator)) {
+			query.addCriteria(Criteria.where(ADMINISTRATOR).regex(".*" + administrator + ".*"));
 		}
 
 		if(!inactive){
