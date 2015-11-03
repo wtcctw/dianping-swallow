@@ -177,8 +177,7 @@ module
 
 								var id = "#myModal" + num;
 								$(id).modal('hide');
-								var param = JSON.stringify($scope.consumeridEntry);
-								
+
 								$http.post(window.contextPath + '/console/consumerid/update', $scope.consumeridEntry).success(function(response) {
 									$scope.query.topic = $scope.consumeridEntry.topic;
 									$scope.query.consumerId = $scope.consumeridEntry.consumerId;
