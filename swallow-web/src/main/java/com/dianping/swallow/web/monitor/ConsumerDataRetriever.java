@@ -8,86 +8,94 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
 
 /**
  * @author mengwenchao
- *
+ *         <p/>
  *         2015年4月21日 上午10:38:07
  */
 public interface ConsumerDataRetriever extends MonitorDataRetriever {
 
-	boolean dataExistInMemory(long start, long end);
+    boolean dataExistInMemory(long start, long end);
 
-	List<OrderStatsData> getOrderForAllConsumerId(int size);
+    List<OrderStatsData> getOrderForAllConsumerId(int size);
 
-	List<OrderStatsData> getOrderForAllConsumerId(int size, long start, long end);
+    List<OrderStatsData> getOrderForAllConsumerId(int size, long start, long end);
 
-	List<ConsumerDataPair> getDelayForAllConsumerId(String topic, long start, long end);
+    List<ConsumerDataPair> getDelayForAllConsumerId(String topic, long start, long end);
 
-	List<ConsumerDataPair> getDelayForAllConsumerId(String topic) throws Exception;
+    List<ConsumerDataPair> getDelayForAllConsumerId(String topic) throws Exception;
 
-	List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, long start, long end);
+    List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, long start, long end);
 
-	List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx);
+    List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx);
 
-	Map<String, ConsumerDataPair> getServerQpx(QPX qpx, long start, long end);
+    Map<String, ConsumerDataPair> getServerQpx(QPX qpx, long start, long end);
 
-	Map<String, ConsumerDataPair> getServerQpx(QPX qpx);
+    Map<String, ConsumerDataPair> getServerQpx(QPX qpx);
 
-	Map<String, Set<String>> getAllTopics();
+    Map<String, Set<String>> getAllTopics();
 
-	public static class ConsumerDataPair {
+    Map<String, ConsumerDataPair> getAllIpQpx(String topic, String consumerId, long start, long end);
 
-		private String consumerId;
-		private StatsData sendData;
-		private StatsData ackData;
+    Map<String, ConsumerDataPair> getAllIpQpx(String topic, String consumerId);
 
-		public ConsumerDataPair(String consumerId, StatsData sendData, StatsData ackData) {
-			this.consumerId = consumerId;
-			this.sendData = sendData;
-			this.ackData = ackData;
-		}
+    Map<String, ConsumerDataPair> getAllIpDelay(String topic, String consumerId, long start, long end);
 
-		public String getConsumerId() {
-			return consumerId;
-		}
+    Map<String, ConsumerDataPair> getAllIpDelay(String topic, String consumerId);
 
-		public StatsData getSendData() {
-			return sendData;
-		}
+    public static class ConsumerDataPair {
 
-		public StatsData getAckData() {
-			return ackData;
-		}
-	}
+        private String consumerId;
+        private StatsData sendData;
+        private StatsData ackData;
 
-	public static class ConsumerOrderDataPair {
+        public ConsumerDataPair(String consumerId, StatsData sendData, StatsData ackData) {
+            this.consumerId = consumerId;
+            this.sendData = sendData;
+            this.ackData = ackData;
+        }
 
-		private OrderStatsData sendStatsData;
+        public String getConsumerId() {
+            return consumerId;
+        }
 
-		private OrderStatsData ackStatsData;
+        public StatsData getSendData() {
+            return sendData;
+        }
 
-		public ConsumerOrderDataPair() {
+        public StatsData getAckData() {
+            return ackData;
+        }
+    }
 
-		}
+    public static class ConsumerOrderDataPair {
 
-		public ConsumerOrderDataPair(OrderStatsData sendStatsData, OrderStatsData ackStatsData) {
-			this.sendStatsData = sendStatsData;
-			this.ackStatsData = ackStatsData;
-		}
+        private OrderStatsData sendStatsData;
 
-		public OrderStatsData getSendStatsData() {
-			return sendStatsData;
-		}
+        private OrderStatsData ackStatsData;
 
-		public void setSendStatsData(OrderStatsData sendStatsData) {
-			this.sendStatsData = sendStatsData;
-		}
+        public ConsumerOrderDataPair() {
 
-		public OrderStatsData getAckStatsData() {
-			return ackStatsData;
-		}
+        }
 
-		public void setAckStatsData(OrderStatsData ackStatsData) {
-			this.ackStatsData = ackStatsData;
-		}
-	}
+        public ConsumerOrderDataPair(OrderStatsData sendStatsData, OrderStatsData ackStatsData) {
+            this.sendStatsData = sendStatsData;
+            this.ackStatsData = ackStatsData;
+        }
+
+        public OrderStatsData getSendStatsData() {
+            return sendStatsData;
+        }
+
+        public void setSendStatsData(OrderStatsData sendStatsData) {
+            this.sendStatsData = sendStatsData;
+        }
+
+        public OrderStatsData getAckStatsData() {
+            return ackStatsData;
+        }
+
+        public void setAckStatsData(OrderStatsData ackStatsData) {
+            this.ackStatsData = ackStatsData;
+        }
+    }
 
 }

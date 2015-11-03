@@ -12,7 +12,6 @@
     <mvc:resources mapping="/static/**" location="/static/" />
     <mvc:resources mapping="/assets/**" location="/assets/" />
     <mvc:resources mapping="/help/**" location="/help/" />
-    <mvc:resources mapping="/document/**" location="/document/" />
 
     <bean id="velocityConfig"
         class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">

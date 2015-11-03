@@ -226,7 +226,7 @@
 * startMessageId 表示当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定。
 * longTaskAlertTime 当用户的onMessage业务逻辑过长时的报警时间间隔，单位毫秒  *0.7.0版本新增* 
 在业务处理时间过长时，会在cat上面生成长时间Transaction提示，如下图所示：
-![业务逻辑时间过长cat](http://swallow.dp/document/img/longtask.png)
+![业务逻辑时间过长cat](http://swallow.dp/help/document/img/longtask.png)
 
 属性|默认值
 -|-
@@ -522,39 +522,39 @@ product | http://swallow.dp
 1. 存储-发送延迟(swallow发出message与message存储到mongo的时间差值)
 1. 发送-ack延迟(swallow收到用户ack确认与swallow发出message的时间差值)
 
-![topic-consumer延时统计](http://swallow.dp/document/img/13.png)
+![topic-consumer延时统计](http://swallow.dp/help/document/img/13.png)
 
 * 在搜索栏中输入所要查询的topic，系统会返回topic与每个consumer在不同时间段的延时统计结果。
-![topic-consumer延时统计](http://swallow.dp/document/img/8.png)
+![topic-consumer延时统计](http://swallow.dp/help/document/img/8.png)
 
 #### 每秒消息(QPS)监控
 
 * 消息量监控从swallow服务器端统计消息发送频率(QPS)，分为三段进行统计，和上述延时分段对应。
 
 swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack频率统计每秒钟用户返回ack的消息数目。在某一时间段，如果系统一切工作正常，对应特定的consumerID，应该有消费者发送频率 = swallow发送频率 = 用户返回ack频率。如果出现不相等，请对比其他消费者是否正常，如果正常，则请查看客户端代码是否正确实现了功能。
-![每秒消息](http://swallow.dp/document/img/9.png)
+![每秒消息](http://swallow.dp/help/document/img/9.png)
 
 * 如果只想查看某一端的每秒钟统计量，只需点击右侧的图例即可切换显示和隐藏。
-![每秒消息](http://swallow.dp/document/img/10.png)
+![每秒消息](http://swallow.dp/help/document/img/10.png)
 
 #### 堆积量监控
 
 * 堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。
 
 * 如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。
-![每秒消息](http://swallow.dp/document/img/14.png)
+![每秒消息](http://swallow.dp/help/document/img/14.png)
 
 ### Swallow Server监控
 
 #### producer server监控
 
 * producer server统计用户发送频率，即每秒钟发动到producer server的消息数目。
-![producer server监控](http://swallow.dp/document/img/11.png)
+![producer server监控](http://swallow.dp/help/document/img/11.png)
 
 #### consumer server监控
 
 * consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。
-![consumer server监控](http://swallow.dp/document/img/12.png)
+![consumer server监控](http://swallow.dp/help/document/img/12.png)
 
 ## Swallow 告警
 
@@ -651,13 +651,13 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 3.	告警配置
 
 	根据业务自身的情况,可以设置对应topic的告警配置(需要有该topic的权限，若没有，可去workflow申请),可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置，另外波动基数，是指两次Qps至少有一个大于波动基数值，才进行波动比较。
-	![Topic报警参数](http://swallow.dp/document/img/topic-alarm-setting.png)
+	![Topic报警参数](http://swallow.dp/help/document/img/topic-alarm-setting.png)
 	
 	对topic告警还有开关设置，可以打开或关闭告警，如下图，对Topic告警开关，有发送告警、接收告警开关，分别针对Topic的发送端、和接收端异常告警的开关。
-	![Topic报警开关](http://swallow.dp/document/img/topic-alarm-switch.png)
+	![Topic报警开关](http://swallow.dp/help/document/img/topic-alarm-switch.png)
 	
 	另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个topic相关的发送ip不想要告警，也只可以设置这个topic某个ip的开关。如下图
-	![Topic ip报警开关](http://swallow.dp/document/img/topic-ip-alarm-switch.png)
+	![Topic ip报警开关](http://swallow.dp/help/document/img/topic-ip-alarm-switch.png)
 
 ### consumerId告警（针对消息的消费者）
 
@@ -691,13 +691,13 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 3.	告警配置
 
 	根据业务自身的情况,可以设置对应ConsumerId的告警配置(需要有相关topic的权限，若没有，可去workflow申请),可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置，另外波动基数，是指两次Qps至少有一个大于波动基数值，才进行波动比较。
-    ![ConsumerId报警参数](http://swallow.dp/document/img/consumerId-alarm-setting.png)
+    ![ConsumerId报警参数](http://swallow.dp/help/document/img/consumerId-alarm-setting.png)
     	
     另外对ConsumerId告警还有开关设置，可打开或关闭告警，如下图。
-    ![ConsumerId报警开关](http://swallow.dp/document/img/consumerId-alarm-switch.png)
+    ![ConsumerId报警开关](http://swallow.dp/help/document/img/consumerId-alarm-switch.png)
     
     另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个consumerId相关的发送ip不想要告警，也只可以设置这个consumerId的某个ip的开关。如下图
-    ![ConsumerId ip报警开关](http://swallow.dp/document/img/consumerId-ip-alarm-switch.png)
+    ![ConsumerId ip报警开关](http://swallow.dp/help/document/img/consumerId-ip-alarm-switch.png)
 
 ### IP告警
 
@@ -722,7 +722,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 ### 综合大盘
 
 * 综合大盘会显示消费者发送延迟,消费者确认延迟和消息堆积的综合统计数据.超过默认阈值的统计项会被标红.大盘会根据一分钟的统计量生成最终结果.
-![综合大盘](http://swallow.dp/document/img/17.png)
+![综合大盘](http://swallow.dp/help/document/img/17.png)
 
 ### 发送延迟,确认延迟和堆积大盘
 
@@ -781,13 +781,13 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 * 从[CAT](http://cat.dp/)中查看Swallow项目的Transaction，可以获得相应的信息（[传送门](http://cat.dp/cat/r/t?op=view&ampdomain=Swallow)）。
 * 以dp\_action这个topic为例（仅作示例，具体到自己的topic，请做相应变通），先找到In:dp_action这个type：
-![Swallow Transaction In CAT](http://swallow.dp/document/img/1.png)
+![Swallow Transaction In CAT](http://swallow.dp/help/document/img/1.png)
 * 上图右边对应的是当前该topic的producer生产的消息总量，点击In:dp_action链接，可以看到每个producer产生的消息数量：
-![Producer Count In CAT](http://swallow.dp/document/img/2.png)
+![Producer Count In CAT](http://swallow.dp/help/document/img/2.png)
 * 返回上一级，在同一级页面中，找到Out:dp_action这个type，对应从consumer server发出的消息数量：
-![Producer Count In CAT](http://swallow.dp/document/img/3.png)
+![Producer Count In CAT](http://swallow.dp/help/document/img/3.png)
 * Out:dp_action对应的数量为消费这个topic的所有consumer消费的消息总量，点击进入，可以看到每个消费者单台消费机的消费数量：
-![Producer Count In CAT](http://swallow.dp/document/img/4.png)
+![Producer Count In CAT](http://swallow.dp/help/document/img/4.png)
 * 对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp\_action的数量），如果消费的消息总量小于生产的消息总量，那么消费是有延迟的。
 
 ### Swallow Web端追踪
@@ -801,7 +801,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 ### Cat端追踪
 
 * 从[CAT](http://cat.dp/)中查看Consumer ID对应项目的Transaction，找到MsgConsumed和MsgConsumeTried这两个type：
-![Producer Count In CAT](http://swallow.dp/document/img/5.png)
+![Producer Count In CAT](http://swallow.dp/help/document/img/5.png)
 * MsgConsumed表示consumer server给这个consumer推送的消息数量，MsgConsumeTried表示consumer尝试消费消息的次数，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。
 * 右边的三列可以看出consumer调用onMessage回调函数耗费的最小最大以及平均时间，如果consumer消费状况一直良好，突然某个时刻开始有消费延时，可以观察一下这里的平均时间是不是比之前更高，如果平均消费时间比正常情况高出很多，可能会造成消费延时。
 
@@ -826,7 +826,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 * 其次确认是否该topic其他consumer都在消费，只有自己的consumer停止消费了。可以[参考](#problemDelay)，查看topic其他consumer的消费情况。
 	* _如果该topic其他consumer也都停止消费，且生产者正常工作，请及时联系swallow团队成员_。
 	* 如果该topic其他consumer消费正常，只有你自己的consumer消费堵住了，请查看consumer对应项目在CAT中的Problem，找到Heartbeat这个type，查询最新的线程堆栈，以确认Consumer的线程是否block在onMessage方法内，详细页面请参考下图：
-	![Producer Count In CAT](http://swallow.dp/document/img/6.png)
+	![Producer Count In CAT](http://swallow.dp/help/document/img/6.png)
 	* 如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因包括但不限于死循环、等待IO、死锁、数据库操作、依赖的服务超时等情况，请仔细检查这些情况，修复并重启consumer即可。
 	* 如果consumer的线程不存在block现象，请及时联系swallow团队成员。
 
@@ -837,10 +837,10 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 * 首先确认生产者是否正常启动，判别方法跟前述问题中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。
 * 在CAT上观察Producer对应项目的transaction，找到MsgProduced以及MsgProduceTried这两个Type，MsgProduced的数量表示程序产生的消息数量，MsgProduceTried表示Swallow的producer client尝试发送给producer server的次数，如果这两个数量相差过大，说明存在异常。
-![Producer Count In CAT](http://swallow.dp/document/img/7.png)
+![Producer Count In CAT](http://swallow.dp/help/document/img/7.png)
 * 正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，此时请联系swallow团队成员。
 
 ### Swallow Web端追踪
 
 * 从Swallow Web端[Message管理](http://swallow.dp/console/message)中查看相关topic下的message信息，检查消息是否正确发送。
-![consumer server监控](http://swallow.dp/document/img/16.png)
+![consumer server监控](http://swallow.dp/help/document/img/16.png)
