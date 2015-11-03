@@ -104,24 +104,6 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 		}
 	}
 
-//	@Override
-//	public Object getValue(CasKeys keys, StatisType type) {
-//
-//		if(type == null){
-//			return sendMessages.getValue(keys, null);
-//		}
-//
-//		switch(type){
-//
-//			case SEND:
-//				return sendMessages.getValue(keys, type);
-//			case ACK:
-//				return ackMessages.getValue(keys, type);
-//			default:
-//				throw new IllegalStateException("unsupported type:" + type);
-//		}
-//	}
-
 	@Override
 	public NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type){
 		if(type == null){
@@ -160,10 +142,5 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 	public Set<String> getKeys(CasKeys keys) {
 		return getKeys(keys, null);
 	}
-
-//	@Override
-//	public Object getValue(CasKeys keys) {
-//		return getValue(keys, null);
-//	}
 
 }

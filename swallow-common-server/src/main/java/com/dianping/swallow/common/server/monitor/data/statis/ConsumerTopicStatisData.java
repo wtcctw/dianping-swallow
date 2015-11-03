@@ -1,6 +1,5 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerIdData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;

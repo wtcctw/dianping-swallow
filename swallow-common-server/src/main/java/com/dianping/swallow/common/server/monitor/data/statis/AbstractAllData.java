@@ -28,9 +28,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
     protected Map<String, S> servers = new ConcurrentHashMap<String, S>();
 
-//	@JsonIgnore
-//	protected   S 			 total = null;
-
     protected final Set<StatisType> supportedTypes = new HashSet<StatisType>();
 
     public AbstractAllData(StatisType... types) {
@@ -38,7 +35,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         for (StatisType type : types) {
             supportedTypes.add(type);
         }
-        //total = MapUtil.getOrCreate(servers, MonitorData.TOTAL_KEY, getStatisClass());
     }
 
 
@@ -63,8 +59,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         S statis = MapUtil.getOrCreate(servers, serverIp, getStatisClass());
 
         statis.add(time, (T) added.getServerData());
-
-        //total.add(time, (T) added.getServerData());
     }
 
     protected abstract Class<? extends S> getStatisClass();
@@ -193,13 +187,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         return getKeys(keys, null);
     }
 
-//    @Override
-//    public Statisable getValue(CasKeys keys) {
-//
-//        return getValue(keys, null);
-//    }
-
-
     private void checkSupported(StatisType type) {
         if (!supportedTypes.contains(type)) {
             throw new IllegalArgumentException("unsupported type:" + type + ", class:" + getClass());
@@ -265,13 +252,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
         }
         return null;
-//		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
-//
-//		if(ctss == null){
-//			return null;
-//		}
-//
-//		return ctss.allDelay(type, includeTotal);
     }
 
     public String toString(String key) {
