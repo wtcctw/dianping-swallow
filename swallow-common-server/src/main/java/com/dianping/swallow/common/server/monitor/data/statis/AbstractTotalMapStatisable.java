@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -250,7 +251,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 		Statisable<M> result = map.get(key);
 
 		if (result == null) {
-			throw new UnfoundKeyException("key:" + key);
+			return new ConcurrentSkipListMap<Long, Long>();
 		}
 
 		if (keys.hasNextKey()) {
