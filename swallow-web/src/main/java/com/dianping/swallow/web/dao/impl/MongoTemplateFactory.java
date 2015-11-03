@@ -17,8 +17,6 @@ import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.util.MongoUtils;
-import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

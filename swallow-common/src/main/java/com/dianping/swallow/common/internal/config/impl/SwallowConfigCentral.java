@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.util.StringUtils;
 
 /**

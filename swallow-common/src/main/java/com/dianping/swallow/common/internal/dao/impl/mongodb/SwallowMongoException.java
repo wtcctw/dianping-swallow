@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.dao;
+package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 import com.dianping.swallow.common.internal.exception.SwallowRuntimeException;
 

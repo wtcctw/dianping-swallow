@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoStatus;
 import com.dianping.swallow.common.message.JsonDeserializedException;
 import com.dianping.swallow.web.alarmer.EventReporter;
@@ -168,7 +168,7 @@ public abstract class Server implements Sendable, Serviceable {
 		List<MongoAddress> defaultAddresses = null;
 		if (topicConfigs.containsKey(DEFAULT_TOPICCONFIG_NAME)) {
 			TopicConfig defaultConfig = topicConfigs.get(DEFAULT_TOPICCONFIG_NAME);
-			defaultAddresses = parseMongoUrl(defaultConfig.getMongoUrl());
+			defaultAddresses = parseMongoUrl(defaultConfig.getStoreUrl());
 		}
 
 		for (Map.Entry<String, TopicConfig> configEntry : topicConfigs.entrySet()) {
@@ -181,7 +181,7 @@ public abstract class Server implements Sendable, Serviceable {
 			}
 			MongoStatus mongoStatus = mongoStatuses.get(topic);
 			serverAddresses = mongoStatus.getServerAddressList();
-			mongoAddresses = parseMongoUrl(topicConfig.getMongoUrl());
+			mongoAddresses = parseMongoUrl(topicConfig.getStoreUrl());
 			if (mongoAddresses == null || mongoAddresses.isEmpty()) {
 				mongoAddresses = defaultAddresses;
 			}

@@ -27,7 +27,8 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.config.ObjectConfigChangeListener;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
-import com.dianping.swallow.common.internal.dao.MongoManager;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoManager;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
@@ -65,6 +66,9 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 	private MongoManager mongoManager;
 
 	@Autowired
+	private MongoClusterFactory mongoClusterFactory;
+
+	@Autowired
 	private WebConfig webConfig;
 
 	@Autowired
@@ -74,6 +78,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
 	@Autowired
 	private ConsumerIdStatsDataService consumerIdStatsDataService;
+	
 
 	@Override
 	protected void doInitialize() throws Exception {
@@ -81,7 +86,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 		super.doInitialize();
 
 		int corePoolSize = mongoManager.getMongoCount() * 10;
-		int maxPoolSize = mongoManager.getMongoCount() * mongoManager.getMongoOptions().getConnectionsPerHost();
+		int maxPoolSize = mongoManager.getMongoCount() * mongoClusterFactory.getMongoOptions().getConnectionsPerHost();
 		if (logger.isInfoEnabled()) {
 			logger.info("[postDefaultAccumulationRetriever]" + corePoolSize);
 		}
@@ -474,5 +479,10 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 			return null;
 		}
 		return consumerIdAccumulation.getAccumulations(getStorageIntervalCount());
+	}
+	
+	@Override
+	public int getOrder() {
+		return ORDER;
 	}
 }

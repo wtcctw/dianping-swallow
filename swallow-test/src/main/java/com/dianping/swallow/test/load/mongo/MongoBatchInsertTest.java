@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 /**
@@ -57,7 +57,7 @@ public class MongoBatchInsertTest extends AbstractMongoTest {
 
 	protected void saveMessge(String topicName) {
 
-		MessageDAOImpl impl = (MessageDAOImpl) dao;
+		MongoMessageDAO impl = (MongoMessageDAO) dao;
 		
 		List<SwallowMessage> messages = createMessages();
 		impl.saveMessage(topicName, messages);

@@ -20,5 +20,7 @@
 
 	<import resource="c-applicationContext-monitor.xml"/>
 	<import resource="c-applicationContext-consumerserver.xml"/>
+	<import resource="c-applicationContext-kafka.xml"/>
+	<import resource="c-applicationContext-mongo.xml"/>
 	
 </beans>

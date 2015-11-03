@@ -2,7 +2,7 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
@@ -277,7 +277,7 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
                     SwallowMessage message = createMessage();
                     message.setMessageId(messageIdGenerator.incrementAndGet());
-                    message.getInternalProperties().put(MessageDAOImpl.SAVE_TIME,
+                    message.getInternalProperties().put(MongoMessageDAO.SAVE_TIME,
                             String.valueOf(System.currentTimeMillis() - avergeDelay));
                     wrappers.add(new Wrapper(consumerInfo, ip, message));
 

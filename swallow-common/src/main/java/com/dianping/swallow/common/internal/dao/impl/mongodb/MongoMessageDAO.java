@@ -9,7 +9,6 @@ import java.util.Map;
 import org.bson.types.BSONTimestamp;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
-import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.BasicDBObject;
@@ -19,7 +18,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 
-public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
+public class MongoMessageDAO extends AbstractMongoMessageDao implements MessageDAO {
 
 	public static final String ID = "_id";
 	public static final String ORIGINAL_ID = "o_id";
@@ -31,15 +30,16 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 	public static final String INTERNAL_PROPERTIES = "_p";
 	public static final String TYPE = "t";
 	public static final String SOURCE_IP = "si";
+	
+	protected MongoManager mongoManager;
 
-	// internal properties
 	public static final String SAVE_TIME = "save_time";
 
-	public MessageDAOImpl() {
+	public MongoMessageDAO() {
 
 	}
 
-	public MessageDAOImpl(MongoManager mongoManager) {
+	public MongoMessageDAO(MongoManager mongoManager) {
 		this.mongoManager = mongoManager;
 
 	}
@@ -188,11 +188,6 @@ public class MessageDAOImpl extends AbstractMessageDao implements MessageDAO {
 		swallowMessage.setSha1((String) result.get(SHA1));// sha1
 		swallowMessage.setType((String) result.get(TYPE));// type
 		swallowMessage.setSourceIp((String) result.get(SOURCE_IP));// sourceIp
-	}
-
-	@Override
-	public void saveMessage(String topicName, SwallowMessage message) {
-		saveMessage(topicName, null, message);
 	}
 
 	public void saveMessage(String topicName, List<SwallowMessage> messages) {

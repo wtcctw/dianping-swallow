@@ -30,27 +30,21 @@
         class="com.dianping.swallow.consumerserver.impl.MongoHeartbeater">
     </bean>
 
-    <bean id="ackDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl">
-    </bean>
-
-    <bean id="messageDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
-    </bean>
-
-    <bean id="heartbeatDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl">
-    </bean>
-
     <bean id="messageRetriever"
         class="com.dianping.swallow.consumerserver.buffer.MongoDBMessageRetriever">
         <property name="fetchSize"><value>${mongodb.messagefetchSize}</value></property>
     </bean>
 
-    <bean id="mongoManager"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-        <property name="swallowConfig" ref="swallowConfig"/>
-    </bean>
+	<bean id="clusterManager" class="com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager">
+		<property name="clusterFactories">
+			<list>
+				<ref bean="mongoClusterFactory"/>
+				<ref bean="kafkaClusterFactory"/>
+			</list>
+		</property>
+		
+	</bean>
+
 	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
 
     <bean id="topicWhiteList"

@@ -77,6 +77,12 @@
 			<groupId>com.dianping.cat</groupId>
 			<artifactId>cat-client</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-common</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

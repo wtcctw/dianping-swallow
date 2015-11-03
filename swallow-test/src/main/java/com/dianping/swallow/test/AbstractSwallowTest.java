@@ -13,9 +13,15 @@ import org.junit.Before;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
+import com.dianping.swallow.common.internal.dao.ClusterFactory;
+import com.dianping.swallow.common.internal.dao.ClusterManager;
+import com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager;
+import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoAckDAO;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
+import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
@@ -47,30 +53,79 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	
 	protected List<Consumer> consumers = new LinkedList<Consumer>();
 
-	protected MessageDAOImpl mdao;
-	protected AckDAOImpl 	 ackdao;
+	protected MongoMessageDAO mdao;
+	protected MongoAckDAO 	 ackdao;
 
+	
+	private List<Lifecycle> lifecycle = new LinkedList<Lifecycle>();
+	
 	@Before
 	public void beforeSwallowAbstractTest() throws Exception{
 		
-		DefaultMongoManager mongoManager = new DefaultMongoManager("swallow.mongo.producerServerURI");
-		mongoManager.setSwallowConfig(new SwallowConfigImpl());
+		DefaultMongoManager mongoManager = new DefaultMongoManager();
+		
+		
+		ClusterManager clusterManager = createClusterManager();
+
+		mongoManager.setClusterManager(clusterManager);
+			
+				
+		SwallowConfigImpl swallowConfig = new SwallowConfigImpl();
+		swallowConfig.initialize();
+		
+		lifecycle.add(swallowConfig);
+		
+		mongoManager.setSwallowConfig(swallowConfig);
 		mongoManager.initialize();
-		mdao = new MessageDAOImpl();
+		
+		mdao = new MongoMessageDAO();
 		mdao.setMongoManager(mongoManager);
 		
-		ackdao = new AckDAOImpl();
+		ackdao = new MongoAckDAO();
 		ackdao.setMongoManager(mongoManager);
 	}
 
+	private ClusterManager createClusterManager() throws Exception {
+		
+		DefaultClusterManager clusterManager = new DefaultClusterManager();
+		
+		MongoClusterFactory mongoClusterFactory = new MongoClusterFactory();
+		mongoClusterFactory.initialize();
+
+		lifecycle.add(mongoClusterFactory);
+
+		KafkaClusterFactory kafkaClusterFactory = new KafkaClusterFactory();
+		kafkaClusterFactory.initialize();
+
+		lifecycle.add(kafkaClusterFactory);
+
+		
+		List<ClusterFactory> clusterFactories = new LinkedList<ClusterFactory>();
+		
+		clusterFactories.add(mongoClusterFactory);
+		clusterFactories.add(kafkaClusterFactory);
+		
+		clusterManager.setClusterFactories(clusterFactories);
+
+		lifecycle.add(clusterManager);
+
+		return clusterManager;
+	}
+
 	@After
-	public void afterAbstratTest(){
+	public void afterAbstratTest() throws Exception{
 		for(Consumer c : consumers){
 			c.close();
+		}
+		
+		for(int i = lifecycle.size() -1 ; i >= 0; i--){
+			lifecycle.get(i).dispose();
 		}
 		sleep(100);
 	}
 
+	
+	
 	
 	protected Long getMaxMessageId(String topicName){
 		return mdao.getMaxMessageId(topicName);

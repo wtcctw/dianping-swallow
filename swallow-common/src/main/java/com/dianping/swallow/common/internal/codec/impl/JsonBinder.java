@@ -2,6 +2,8 @@ package com.dianping.swallow.common.internal.codec.impl;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.SerializationUtils;
+
 import com.dianping.swallow.common.message.JsonDeserializedException;
 import com.dianping.swallow.common.message.JsonSerializedException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
@@ -47,7 +49,8 @@ public final class JsonBinder {
 	}
 
 	public ObjectMapper getObjectMapper() {
-		return mapper;
+		
+		return (ObjectMapper) SerializationUtils.clone(mapper);
 	}
 
 	/**

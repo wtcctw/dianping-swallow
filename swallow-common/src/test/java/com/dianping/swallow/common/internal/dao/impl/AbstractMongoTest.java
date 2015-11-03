@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal;
+package com.dianping.swallow.common.internal.dao.impl;
 
 import java.io.IOException;
 import java.util.List;

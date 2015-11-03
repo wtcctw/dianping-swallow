@@ -1,12 +1,8 @@
 package com.dianping.swallow.producerserver.impl;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dianping.cat.Cat;
-import com.dianping.cat.message.Message;
-import com.dianping.cat.message.Transaction;
 import com.dianping.cat.message.internal.MessageId;
 import com.dianping.dpsf.api.ServiceRegistry;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -16,9 +12,9 @@ import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.packet.PktSwallowPACK;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
 import com.dianping.swallow.common.internal.util.DateUtils;
-import com.dianping.swallow.common.internal.util.SHAUtil;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.ServerDaoException;
+import com.dianping.swallow.producerserver.MessageReceiver.VALID_STATUS;
 
 public class ProducerServerForClient extends AbstractProducerServer implements ProducerSwallowService {
 
@@ -76,68 +72,49 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
 			throw new IllegalArgumentException("Argument of remote service could not be null.");
 		}
 		
-		Packet pktRet = null;
 		SwallowMessage swallowMessage;
 		String topicName;
-		String sha1;
+		
+		Packet pktRet = null;
 		switch (pkt.getPacketType()) {
-		case PRODUCER_GREET:
-			if (logger.isInfoEnabled()) {
-				logger.info("[Got Greet][From=" + ((PktProducerGreet) pkt).getProducerIP() + "][Version="
-						+ ((PktProducerGreet) pkt).getProducerVersion() + "]");
-			}
-			// 返回ProducerServer地址
-			pktRet = new PktSwallowPACK(producerServerIP);
-			break;
-		case OBJECT_MSG:
-			topicName = ((PktMessage) pkt).getDestination().getName();
-
-			// 验证topicName是否在白名单里
-			boolean isValid = getTopicWhiteList().isValid(topicName);
-			if (!isValid) {
-				throw new IllegalArgumentException("Invalid topic(" + topicName
-						+ "), because it's not in whitelist, please contact swallow group for support.");
-			}
-
-			swallowMessage = ((PktMessage) pkt).getContent();
-			sha1 = SHAUtil.generateSHA(swallowMessage.getContent());
-			pktRet = new PktSwallowPACK(sha1);
-			// 设置swallowMessage的sha-1
-			swallowMessage.setSha1(sha1);
-
-			String parentDomain;
-			try {
-				parentDomain = MessageId.parse(((PktMessage) pkt).getCatEventID()).getDomain();
-			} catch (Exception e) {
-				parentDomain = "UnknownDomain";
-			}
-
-			Transaction producerServerTransaction = Cat.getProducer().newTransaction("In:" + topicName,
-					parentDomain + ":" + swallowMessage.getSourceIp());
-			// 将swallowMessage保存到mongodb
-			try {
-				Date generateTime = swallowMessage.getGeneratedTime() != null ? swallowMessage.getGeneratedTime() :  new Date(); 
-
-				getMessageDAO().saveMessage(topicName, swallowMessage);
-
-				producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, generateTime.getTime(),
-						System.currentTimeMillis());
-
-				producerServerTransaction.addData("sha1", swallowMessage.getSha1());
-				producerServerTransaction.setStatus(Message.SUCCESS);
-			} catch (Exception e) {
-				producerServerTransaction.addData(swallowMessage.toKeyValuePairs());
-				producerServerTransaction.setStatus(e);
-				Cat.getProducer().logError(e);
-				logger.error("[Save message to DB failed.]", e);
-				throw new ServerDaoException(e);
-			} finally {
-				producerServerTransaction.complete();
-			}
-			break;
-		default:
-			logger.warn("[Received unrecognized packet.]" + pkt);
-			break;
+		
+			case PRODUCER_GREET:
+				if (logger.isInfoEnabled()) {
+					logger.info("[Got Greet][From=" + ((PktProducerGreet) pkt).getProducerIP() + "][Version="
+							+ ((PktProducerGreet) pkt).getProducerVersion() + "]");
+				}
+				// 返回ProducerServer地址
+				pktRet = new PktSwallowPACK(producerServerIP);
+				break;
+			case OBJECT_MSG:
+				
+				topicName = ((PktMessage) pkt).getDestination().getName();
+	
+				VALID_STATUS validStatus = messageReceiver.isTopicNameValid(topicName);
+				if (!(validStatus == VALID_STATUS.SUCCESS)) {
+					throw new IllegalArgumentException("Invalid topic(" + topicName+ "), " + validStatus);
+				}
+	
+	
+				swallowMessage = ((PktMessage) pkt).getContent();
+				String sourceDomain = null;
+				try {
+					sourceDomain = MessageId.parse(((PktMessage) pkt).getCatEventID()).getDomain();
+				} catch (Exception e) {
+				}
+	
+				try {
+					
+					messageReceiver.receiveMessage(topicName, sourceDomain, swallowMessage);
+					pktRet = new PktSwallowPACK(swallowMessage.getSha1());		
+				} catch (Exception e) {
+					logger.error("[Save message to DB failed.]", e);
+					throw new ServerDaoException(e);
+				}
+				break;
+			default:
+				logger.warn("[Received unrecognized packet.]" + pkt);
+				break;
 		}
 		return pktRet;
 	}
@@ -164,17 +141,10 @@ public class ProducerServerForClient extends AbstractProducerServer implements P
 		this.remoteServiceName = remoteServiceName;
 	}
 
-	/**
-	 * @return the autoSelectPort
-	 */
 	public boolean isAutoSelectPort() {
 		return autoSelectPort;
 	}
 
-	/**
-	 * @param autoSelectPort
-	 *            the autoSelectPort to set
-	 */
 	public void setAutoSelectPort(boolean autoSelectPort) {
 		this.autoSelectPort = autoSelectPort;
 	}

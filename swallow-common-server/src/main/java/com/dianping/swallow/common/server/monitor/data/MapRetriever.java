@@ -14,11 +14,7 @@ public interface 	MapRetriever {
 
 	Set<String> getKeys(CasKeys keys, StatisType type);
 
-//	Object getValue(CasKeys keys, StatisType type);
-
 	Set<String> getKeys(CasKeys keys);
-
-//	Object getValue(CasKeys keys);
 
 	NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type);
 

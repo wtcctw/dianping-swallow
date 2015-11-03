@@ -5,6 +5,7 @@ import java.util.Date;
 import org.bson.types.BSONTimestamp;
 
 import com.dianping.swallow.common.internal.dao.AckDAO;
+import com.dianping.swallow.common.internal.dao.impl.AbstractDao;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -13,12 +14,20 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 
-public class AckDAOImpl extends AbstractDao implements AckDAO {
+public class MongoAckDAO extends AbstractDao implements AckDAO {
 
    public static final String  MSG_ID          = "_id";
    public static final String  SRC_CONSUMER_IP = "cip";
    public static final String  TICK            = "t";
 
+	protected MongoManager mongoManager;
+
+	public void setMongoManager(DefaultMongoManager mongoManager) {
+		
+		this.mongoManager = mongoManager;
+	}
+
+   
    @Override
    public Long getMaxMessageId(String topicName, String consumerId) {
       return getMaxMessageId(topicName, consumerId, false);

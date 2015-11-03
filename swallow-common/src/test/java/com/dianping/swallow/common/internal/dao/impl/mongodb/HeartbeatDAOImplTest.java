@@ -7,16 +7,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoHeartbeatDAO;
 
 public class HeartbeatDAOImplTest extends AbstractDAOImplTest {
 
-   private HeartbeatDAOImpl heartbeatDAO;
+   private MongoHeartbeatDAO heartbeatDAO;
    
    @Before
    public void beforeHeartbeatDAOImplTest(){
 
-	   heartbeatDAO = getBean(HeartbeatDAOImpl.class);
+	   heartbeatDAO = getBean(MongoHeartbeatDAO.class);
    }
 
    @Test
