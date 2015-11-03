@@ -101,6 +101,9 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 
 			$scope.suburl = "/console/topic/list";
 			$scope.topicnum = 30;
+
+			$scope.apps = [];
+			$scope.resultDict = {};
 			
 			$scope.topicEntry = {};
 			$scope.topicEntry.topic;
@@ -115,7 +118,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation;
 			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase;
 
-			$scope.setModalInput = function(index){
+			$scope.setModalInput = function(index, showApp){
 				if(typeof($scope.searchPaginator.currentPageItems[index].administrator) != "undefined"){
 					var administrator = $scope.searchPaginator.currentPageItems[index].administrator;
 					$('#administrator').tagsinput('removeAll');
@@ -127,6 +130,47 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				}else{
 					$('#administrator').tagsinput('removeAll');
 				}
+
+				if(showApp){
+					var length = $scope.searchPaginator.currentPageItems[index].producerIpInfos.length;
+					if(length > 0){
+						var ips = "";
+						for(var i = 0; i < length; ++i){
+							ips += $scope.searchPaginator.currentPageItems[index].producerIpInfos[i].ip;
+							if(i != length -1){
+								ips += ",";
+							}
+						}
+						var result = [];
+						$scope.ipEntry = {};
+						$scope.ipEntry.ip = ips;
+						$scope.ipEntry.alarm = true;
+						$scope.ipEntry.application = "";
+						$http.post(window.contextPath + '/console/ip/list', $scope.ipEntry).success(function(data) {
+							if(data.first > 0){
+								$scope.apps = data.second;
+							}
+							$scope.addToDict($scope.searchPaginator.currentPageItems[index].producerIpInfos);
+							if($scope.apps.length > 0){
+								$scope.addToDict($scope.apps);
+							}
+							for(var s in $scope.resultDict){
+								result.push($scope.resultDict[s]);
+							}
+
+							if(result.length == 0){
+								$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
+							}else{
+								$scope.topicEntry.producerIpInfos = result;
+							}
+							$scope.apps = [];
+							$scope.resultDict = {};
+						});
+					}
+
+				}else{
+					$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
+				}
 				
 				$scope.topicEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 				$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
@@ -137,7 +181,27 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuation;
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuationBase;
 				$scope.topicEntry.producerAlarmSetting.delay = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.delay;
-				$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
+			}
+
+			$scope.addToDict = function(arra) {
+				if (!arra instanceof Array) {
+					throw new Error("only support array!");
+				}
+				for (var i = 0; i < arra.length; i++) {
+					var currentElement = arra[i];
+					var ip = currentElement.ip;
+					var currentDict;
+
+					if (!(ip in $scope.resultDict)) {
+						$scope.resultDict[ip] = {};
+					}
+					currentDict = $scope.resultDict[ip];
+					for (var name in currentElement) {
+						if (currentElement.hasOwnProperty(name)) {
+							currentDict[name] = currentElement[name];
+						}
+					}
+				}
 			}
 			
 			$scope.refreshpage = function(myForm, index){

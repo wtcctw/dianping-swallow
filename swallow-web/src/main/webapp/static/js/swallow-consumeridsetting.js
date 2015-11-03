@@ -134,7 +134,10 @@ module
 							$scope.query.consumerId = $scope.consumerId;
 							$scope.query.consumerIp = $scope.consumerIp;
 							$scope.query.inactive = true;
-							
+
+							$scope.apps = [];
+							$scope.resultDict = {};
+
 							$scope.consumeridEntry = {};
 							$scope.consumeridEntry.consumerAlarmSetting = {};
 							$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting = {};
@@ -204,7 +207,7 @@ module
 								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = "";
 							}
 
-							$scope.setModalInput = function(index) {
+							$scope.setModalInput = function(index, showApp) {
 
 								if(typeof($scope.consumeridEntry.consumerApplications) != "undefined"){
 									var consumerApplications = $scope.searchPaginator.currentPageItems[index].consumerApplications;
@@ -216,7 +219,47 @@ module
 								}else{
 									$('#consumerApplications').tagsinput('removeAll');
 								}
-								
+
+								if(showApp){
+									var length = $scope.searchPaginator.currentPageItems[index].consumerIpInfos.length;
+									if(length > 0){
+										var ips = "";
+										for(var i = 0; i < length; ++i){
+											ips += $scope.searchPaginator.currentPageItems[index].consumerIpInfos[i].ip;
+											if(i != length -1){
+												ips += ",";
+											}
+										}
+										var result = [];
+										$scope.ipEntry = {};
+										$scope.ipEntry.ip = ips;
+										$scope.ipEntry.alarm = true;
+										$scope.ipEntry.application = "";
+										$http.post(window.contextPath + '/console/ip/list', $scope.ipEntry).success(function(data) {
+											if(data.first > 0){
+												$scope.apps = data.second;
+											}
+											$scope.addToDict($scope.searchPaginator.currentPageItems[index].consumerIpInfos);
+											if($scope.apps.length > 0){
+												$scope.addToDict($scope.apps);
+											}
+											for(var s in $scope.resultDict){
+												result.push($scope.resultDict[s]);
+											}
+
+											if(result.length == 0){
+												$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
+											}else{
+												$scope.consumeridEntry.consumerIpInfos = result;
+											}
+											$scope.apps = [];
+											$scope.resultDict = {};
+										});
+									}
+
+								}else{
+									$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
+								}
 								$scope.consumeridEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 								$scope.consumeridEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
 								$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerId;
@@ -232,7 +275,28 @@ module
 								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.valley;
 								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuation;
 								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase;
-								$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
+
+							}
+
+							$scope.addToDict = function(arra) {
+								if (!arra instanceof Array) {
+									throw new Error("only support array!");
+								}
+								for (var i = 0; i < arra.length; i++) {
+									var currentElement = arra[i];
+									var ip = currentElement.ip;
+									var currentDict;
+
+									if (!(ip in $scope.resultDict)) {
+										$scope.resultDict[ip] = {};
+									}
+									currentDict = $scope.resultDict[ip];
+									for (var name in currentElement) {
+										if (currentElement.hasOwnProperty(name)) {
+											currentDict[name] = currentElement[name];
+										}
+									}
+								}
 							}
 							
 							$scope.setInactive = function(){

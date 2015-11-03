@@ -76,13 +76,13 @@
 							ng-click="setTopic(t.topic)" ng-bind="t.topic"></a></td>
 						<td style="text-align: left" ng-bind="t.administrator"></td>
 						<td style="text-align: left"><a ng-href="#myModal2"
-							ng-click="setModalInput($index);" data-toggle="modal"
+							ng-click="setModalInput($index, true);" data-toggle="modal"
 							ng-bind="t.ips | limitTo : 25 "></a></td>
 						<td style="text-align: left"><a
 							ng-href="${rc.contextPath}/console/consumerid"
 							ng-click="setTopic(t.topic)">详情</a></td>
 						<td style="text-align: left"><a href="#myModal1"
-							ng-click="setModalInput($index);" data-toggle="modal">详情</a></td>
+							ng-click="setModalInput($index, false);" data-toggle="modal">详情</a></td>
 						#if(${isadmin})
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
@@ -97,7 +97,7 @@
 								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
 						</label></td>
 						<td style="text-align: left;"><a href="#myModal0"
-							ng-click="setModalInput($index);" data-toggle="modal"
+							ng-click="setModalInput($index, false);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit" rel="tooltip"
 								data-original-title="编辑配置值"></i></a></td> #end
 				</table>
@@ -126,7 +126,7 @@
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"
 							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">配置Topic</h4>
+						<h4 class="modal-title" id="myModalLabel0">配置Topic</h4>
 					</div>
 					<div class="modal-body">
 						<form method="post" class="form-horizontal" name="myForm0"
@@ -200,7 +200,7 @@
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"
 							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">配置Topic</h4>
+						<h4 class="modal-title" id="myModalLabel1">配置Topic</h4>
 					</div>
 					<div class="modal-body">
 						<form method="post" class="form-horizontal" name="myForm1"
@@ -282,14 +282,15 @@
 									<tr>
 										<th style="text-align: left">序号</th>
 										<th style="text-align: left">IP</th>
+										<th style="text-align: left">应用</th>
 										<th style="text-align: left">alarm</th>
 										<th style="text-align: left">active</th>
 									</tr>
 									<tr ng-repeat="ipinfo in topicEntry.producerIpInfos">
 										<td style="text-align: left" ng-bind="$index+1"></td>
-										<td style="text-align: left"><a
-							ng-href="${rc.contextPath}/console/ip"
-							ng-click="setIP(ipinfo.ip)" ng-bind="ipinfo.ip"></a></td>
+										<td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
+											ng-click="setIP(ipinfo.ip)" ng-bind="ipinfo.ip"></a></td>
+										<td style="text-align: left" ng-bind="ipinfo.application"></td>
 										<td style="text-align: left"><label
 											class="pull-left inline"> <small
 												class="muted smaller-90"></small> <input

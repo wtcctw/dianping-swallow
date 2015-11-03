@@ -74,10 +74,10 @@
 						<td style="text-align: left" ng-bind="ad.topic"></td>
 						<td style="text-align: left"><a
 							ng-href="#myModal2"
-							ng-click="setModalInput($index);" data-toggle="modal"
+							ng-click="setModalInput($index, true);" data-toggle="modal"
 							ng-bind="ad.ips | limitTo : 25 "></a></td>
 						<td style="text-align: left"><a href="#myModal1"
-							ng-click="setModalInput($index);" data-toggle="modal">详情</a></td>
+							ng-click="setModalInput($index, false);" data-toggle="modal">详情</a></td>
 						<td style="text-align: left" ><a href="/console/application"
 								  ng-click="setApplication(ad.consumerApplications);" ng-bind="ad.consumerApplications | limitTo : 25 "></a></td>
 						<td style="text-align: left"><label class="pull-left inline">
@@ -87,7 +87,7 @@
 								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
 						</label></td>
 						<td style="text-align: left"><a href="#myModal0"
-							ng-click="setModalInput($index);" data-toggle="modal"
+							ng-click="setModalInput($index, false);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
 								data-original-title="编辑配置值"></i></a> <a href
 							ng-show="isdefault(ad.consumerId)"
@@ -363,6 +363,7 @@
 									<tr>
 										<th style="text-align: left">序号</th>
 										<th style="text-align: left">IP</th>
+										<th style="text-align: left">应用</th>
 										<th style="text-align: left">alarm</th>
 										<th style="text-align: left">active</th>
 									</tr>
@@ -370,6 +371,7 @@
 									<td style="text-align: left" ng-bind="$index+1"></td>
 										<td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
 									ng-click="setIP(ipinfo.ip)" ng-bind="ipinfo.ip"></a></td>
+										<td style="text-align: left" ng-bind="ipinfo.application"></td>
 										<td style="text-align: left"><label
 											class="pull-left inline"> <small
 												class="muted smaller-90"></small> <input ng-click="changeipinfo(consumeridEntry.consumerId, consumeridEntry.topic,'alarm',$index,ipinfo.ip )"
