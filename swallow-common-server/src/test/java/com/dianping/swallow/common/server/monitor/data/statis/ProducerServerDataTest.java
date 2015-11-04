@@ -2,7 +2,9 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
+import com.dianping.swallow.common.server.monitor.data.Statisable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +39,11 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
 		String topic = topics[0];
 		String ip = ips[0];
 
-		System.out.println(producerAllData.getKeys(new CasKeys(server)));
-		System.out.println(producerAllData.getValue(new CasKeys(server, topic, ip)).getClass());
+		System.out.println(producerAllData.getKeys(new CasKeys(server, topic)));
+		System.out.println(producerAllData.getKeys(new CasKeys("total", topic)));
+		NavigableMap<Long, Statisable.QpxData> res1 = producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE);
+		NavigableMap<Long, Statisable.QpxData> res2= producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SEND);
+		System.out.println(producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE));
 
 	}
 
