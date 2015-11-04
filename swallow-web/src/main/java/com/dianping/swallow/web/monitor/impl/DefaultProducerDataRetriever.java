@@ -53,8 +53,6 @@ public class DefaultProducerDataRetriever
         AbstractMonitorDataRetriever<ProducerTopicData, ProducerServerData, ProducerServerStatisData, ProducerMonitorData>
         implements ProducerDataRetriever {
 
-    public static final String CAT_TYPE = "DefaultProducerDataRetriever";
-
     public static final String FACTORY_NAME = "ProducerOrderInDb";
 
     @Autowired

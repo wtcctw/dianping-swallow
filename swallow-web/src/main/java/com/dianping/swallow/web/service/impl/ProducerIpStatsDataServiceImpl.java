@@ -10,44 +10,43 @@ import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.service.ProducerIpStatsDataService;
 
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年9月15日 下午5:47:34
  */
 @Service("producerIpStatsDataService")
 public class ProducerIpStatsDataServiceImpl implements ProducerIpStatsDataService {
 
-	@Autowired
-	private ProducerIpStatsDataDao producerIpStatsDataDao;
+    @Autowired
+    private ProducerIpStatsDataDao producerIpStatsDataDao;
 
-	@Override
-	public boolean insert(ProducerIpStatsData ipStatsData) {
-		return producerIpStatsDataDao.insert(ipStatsData);
-	}
-	
-	@Override
-	public boolean insert(List<ProducerIpStatsData> ipStatsDatas) {
-		return producerIpStatsDataDao.insert(ipStatsDatas);
-	}
+    @Override
+    public boolean insert(ProducerIpStatsData ipStatsData) {
+        return producerIpStatsDataDao.insert(ipStatsData);
+    }
 
-	@Override
-	public List<ProducerIpStatsData> find(String topicName, String ip, long startKey, long endKey) {
-		return producerIpStatsDataDao.find(topicName, ip, startKey, endKey);
-	}
+    @Override
+    public boolean insert(List<ProducerIpStatsData> ipStatsDatas) {
+        return producerIpStatsDataDao.insert(ipStatsDatas);
+    }
 
-	@Override
-	public long findAvgQps(String topicName, String ip, long startKey, long endKey) {
-		List<ProducerIpStatsData> ipStatsDatas = producerIpStatsDataDao.find(topicName, ip, startKey, endKey);
-		long qps = 0L;
-		if (ipStatsDatas == null || ipStatsDatas.size() == 0) {
-			return qps;
-		}
-		int size = ipStatsDatas.size();
-		for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
-			qps += ipStatsData.getQps();
-		}
-		return qps / size;
-	}
+    @Override
+    public List<ProducerIpStatsData> find(String topicName, String ip, long startKey, long endKey) {
+        return producerIpStatsDataDao.find(topicName, ip, startKey, endKey);
+    }
+
+    @Override
+    public long findAvgQps(String topicName, String ip, long startKey, long endKey) {
+        List<ProducerIpStatsData> ipStatsDatas = producerIpStatsDataDao.find(topicName, ip, startKey, endKey);
+        long qps = 0L;
+        if (ipStatsDatas == null || ipStatsDatas.size() == 0) {
+            return qps;
+        }
+        int size = ipStatsDatas.size();
+        for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
+            qps += ipStatsData.getQps();
+        }
+        return qps / size;
+    }
 
 }
