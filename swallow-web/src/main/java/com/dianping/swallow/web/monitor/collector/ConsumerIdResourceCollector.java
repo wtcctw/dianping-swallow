@@ -123,7 +123,7 @@ public class ConsumerIdResourceCollector extends AbstractRealTimeCollector imple
 
     private void updateConsumerIdResource(String topicName, String consumerId) {
         ConsumerIdKey consumerIdKey = new ConsumerIdKey(topicName, consumerId);
-        ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId);
+        ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId, false);
         if (consumerIdResource != null) {
             List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(consumerIdKey, consumerIdResource.getConsumerIpInfos());
             if (ipStatusMonitor.isChanged(consumerIdResource.getConsumerIpInfos(), currentIpInfos)) {

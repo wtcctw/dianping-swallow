@@ -218,19 +218,28 @@ public class ResourceContainerImpl extends AbstractContainer implements Resource
     }
 
     @Override
-    public TopicResource findTopicResource(String topic) {
+    public TopicResource findTopicResource(String topic, boolean isDefault) {
         if (topicResources == null) {
             return null;
         }
         if (topicResources.containsKey(topic)) {
             return topicResources.get(topic);
         } else {
-            return topicResources.get(DEFAULT_RECORD);
+            TopicResource topicResource = topicResourceService.findByTopic(topic);
+            if (topicResource != null) {
+                topicResources.put(topic, topicResource);
+                return topicResources.get(topic);
+            }
+            if (isDefault) {
+                return topicResources.get(DEFAULT_RECORD);
+            }
+            return null;
         }
+
     }
 
     @Override
-    public ConsumerIdResource findConsumerIdResource(String topicName, String consumerId) {
+    public ConsumerIdResource findConsumerIdResource(String topicName, String consumerId, boolean isDefault) {
         if (consumerIdResources == null) {
             return null;
         }
@@ -238,7 +247,15 @@ public class ResourceContainerImpl extends AbstractContainer implements Resource
         if (consumerIdResources.containsKey(key)) {
             return consumerIdResources.get(key);
         } else {
-            return consumerIdResources.get(DEFAULT_DEFAULT_RECORD);
+            ConsumerIdResource consumerIdResource = consumerIdResourceService.findByConsumerIdAndTopic(topicName, consumerId);
+            if (consumerIdResource != null) {
+                consumerIdResources.put(key, consumerIdResource);
+                return consumerIdResources.get(key);
+            }
+            if (isDefault) {
+                return consumerIdResources.get(DEFAULT_DEFAULT_RECORD);
+            }
+            return null;
         }
     }
 
