@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
@@ -52,7 +56,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         for (K ipStatsData : ipStatsDatas) {
             boolean hasStatsData = ipStatsData.hasStatsData();
             @SuppressWarnings("unchecked")
-			T key = (T) ipStatsData.createStatsDataKey();
+            T key = (T) ipStatsData.createStatsDataKey();
             IpStatusData ipStatusData = ipStatusDatas.get(key);
             if (ipStatusData == null) {
                 ipStatusData = new IpStatusData();
@@ -79,23 +83,30 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
     }
 
     public void alarmIpStatsData() {
-        Iterator<Entry<T, IpStatusData>> itStatusData = ipStatusDatas.entrySet().iterator();
-        while (itStatusData.hasNext()) {
-            Entry<T, IpStatusData> statusDataEntry = itStatusData.next();
-            T statsDataKey = statusDataEntry.getKey();
-            IpStatusData ipStatusData = statusDataEntry.getValue();
-            if (ipStatusData.getNoDataCount() > 0) {
-                if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
-                    itStatusData.remove();
-                    report(statsDataKey);
-                }
-            } else if (ipStatusData.getSubNoDataCount() > 0) {
-                if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
-                    itStatusData.remove();
-                    checkUnSureLastRecords(statsDataKey);
+        SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName + "alarmIpStatsData");
+        catWrapper.doAction(new SwallowAction() {
+            @Override
+            public void doAction() throws SwallowException {
+                doAlarm();
+                Iterator<Entry<T, IpStatusData>> itStatusData = ipStatusDatas.entrySet().iterator();
+                while (itStatusData.hasNext()) {
+                    Entry<T, IpStatusData> statusDataEntry = itStatusData.next();
+                    T statsDataKey = statusDataEntry.getKey();
+                    IpStatusData ipStatusData = statusDataEntry.getValue();
+                    if (ipStatusData.getNoDataCount() > 0) {
+                        if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
+                            itStatusData.remove();
+                            report(statsDataKey);
+                        }
+                    } else if (ipStatusData.getSubNoDataCount() > 0) {
+                        if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
+                            itStatusData.remove();
+                            checkUnSureLastRecords(statsDataKey);
+                        }
+                    }
                 }
             }
-        }
+        });
     }
 
     protected abstract void checkUnSureLastRecords(T statsDataKey);
