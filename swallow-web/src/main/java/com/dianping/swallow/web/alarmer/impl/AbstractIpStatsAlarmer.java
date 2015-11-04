@@ -98,7 +98,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
                             report(statsDataKey);
                         }
                     } else if (ipStatusData.getSubNoDataCount() > 0) {
-                        if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
+                        if (getCurrentTimeMillis() - ipStatusData.getSubNoDataTime() > checkInterval) {
                             itStatusData.remove();
                             checkUnSureLastRecords(statsDataKey);
                         }
@@ -142,7 +142,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         }
 
         public IpStatusData updateSubNoDataTime(long currentTimeMillis) {
-            if (subNoDataCount == 0) {
+            if (subNoDataCount != 0) {
                 if (subNoDataTime < hasDataTime) {
                     subNoDataCount = 0;
                     subNoDataTime = currentTimeMillis;
