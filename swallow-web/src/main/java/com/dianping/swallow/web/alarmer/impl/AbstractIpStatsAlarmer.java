@@ -87,7 +87,6 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         catWrapper.doAction(new SwallowAction() {
             @Override
             public void doAction() throws SwallowException {
-                doAlarm();
                 Iterator<Entry<T, IpStatusData>> itStatusData = ipStatusDatas.entrySet().iterator();
                 while (itStatusData.hasNext()) {
                     Entry<T, IpStatusData> statusDataEntry = itStatusData.next();
