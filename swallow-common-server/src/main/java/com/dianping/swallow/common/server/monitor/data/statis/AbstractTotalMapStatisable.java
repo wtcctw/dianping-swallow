@@ -275,7 +275,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 		Statisable<M> result = map.get(key);
 
 		if (result == null) {
-			throw new UnfoundKeyException("key:" + key);
+			return new ConcurrentSkipListMap<Long, QpxData>();
 		}
 
 		if (keys.hasNextKey()) {
