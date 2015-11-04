@@ -271,8 +271,8 @@ public class DefaultProducerDataRetriever
                     continue;
                 }
                 statsDatas.put(key, getIpQpx(topic, key, start, end));
-                return statsDatas;
             }
+            return statsDatas;
         }
         return null;
     }

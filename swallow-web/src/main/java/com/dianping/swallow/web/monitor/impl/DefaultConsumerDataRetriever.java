@@ -370,8 +370,8 @@ public class DefaultConsumerDataRetriever
                     continue;
                 }
                 statsDatas.put(key, getIpDelay(topic, consumerId, key, start, end));
-                return statsDatas;
             }
+            return statsDatas;
         }
         return null;
     }
@@ -492,8 +492,8 @@ public class DefaultConsumerDataRetriever
                     continue;
                 }
                 statsDatas.put(key, getIpQpx(topic, consumerId, key, start, end));
-                return statsDatas;
             }
+            return statsDatas;
         }
         return null;
     }

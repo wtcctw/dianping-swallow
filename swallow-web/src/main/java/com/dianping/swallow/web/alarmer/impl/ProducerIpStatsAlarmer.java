@@ -60,11 +60,11 @@ public class ProducerIpStatsAlarmer extends
         for (String topicName : topicNames) {
             List<ProducerIpStatsData> ipStatsDatas = pStatsDataWapper.getIpStatsDatas(topicName,
                     getLastTimeKey(), false);
-            Map<String,ProducerIpGroupStatsData> ipGroupStatsDatas =getIpGroupStatsData(ipStatsDatas);
-            if(ipGroupStatsDatas==null||ipGroupStatsDatas.isEmpty()){
+            Map<String, ProducerIpGroupStatsData> ipGroupStatsDatas = getIpGroupStatsData(ipStatsDatas);
+            if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
                 continue;
             }
-            for(Map.Entry<String,ProducerIpGroupStatsData> ipGroupStatsData :ipGroupStatsDatas.entrySet()) {
+            for (Map.Entry<String, ProducerIpGroupStatsData> ipGroupStatsData : ipGroupStatsDatas.entrySet()) {
                 checkIpGroupStats(ipGroupStatsData.getValue());
             }
         }
@@ -84,7 +84,7 @@ public class ProducerIpStatsAlarmer extends
     @Override
     protected boolean isReport(ProducerIpStatsDataKey statsDataKey) {
         TopicResource topicResource = resourceContainer.findTopicResource(statsDataKey.getTopicName());
-        if(topicResource==null){
+        if (topicResource == null) {
             return false;
         }
         if (topicResource.isProducerAlarm()) {
@@ -131,7 +131,7 @@ public class ProducerIpStatsAlarmer extends
                 ipGroupStatsData = ipStatsDataMap.get(appName);
             } else {
                 ipGroupStatsData = new ProducerIpGroupStatsData();
-                ipStatsDataMap.put(appName,ipGroupStatsData);
+                ipStatsDataMap.put(appName, ipGroupStatsData);
             }
             ipGroupStatsData.addIpStatsData(ipStatsData);
         }
