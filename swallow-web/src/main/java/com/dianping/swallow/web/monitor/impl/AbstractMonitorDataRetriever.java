@@ -132,7 +132,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         if (rawData != null) {
             rawData = rawData.subMap(getKey(start), true, getKey(end), true);
         }
-        return createStatsData(createDelayDesc(topic, type), rawData, start, end);
+        return createStatsData(createQpxDesc(topic, type), rawData, start, end);
     }
 
     protected Map<String, StatsData> getServerQpxInMemory(QPX qpx, StatisType type, long start, long end) {
