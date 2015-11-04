@@ -1932,7 +1932,7 @@ public static void main(String[] args) {
 </li>
 <li>
 <p>告警配置</p>
-<p>根据业务自身的情况,可以设置对应topic的告警配置(需要有该topic的权限，若没有，可去workflow申请),可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置，另外波动基数，是指两次Qps至少有一个大于波动基数值，才进行波动比较。<br />
+<p>根据业务自身的情况,可以设置对应topic的告警配置(需要有该topic的权限，若没有，可通过<a href="http://workflow.dp/wfe/start/119">workflow</a>进行申请),可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置。其中峰值是指Qps的最高值，大于此值报警；谷值是指Qps的最低值，小于此值报警；波动是指当前Qps和前一天此时刻前后5分钟的Qps平均值之间的倍数大小，波动基数，前面两个Qps至少有一个大于波动基数值，才进行波动比较；延时是指存储延时，是指消息发出到存入Swallow这段时间差，超过设定的值，就会告警。<br />
 <img alt="Topic报警参数" src="http://swallow.dp/help/document/img/topic-alarm-setting.png" /></p>
 <p>对topic告警还有开关设置，可以打开或关闭告警，如下图，对Topic告警开关，有发送告警、接收告警开关，分别针对Topic的发送端、和接收端异常告警的开关。<br />
 <img alt="Topic报警开关" src="http://swallow.dp/help/document/img/topic-alarm-switch.png" /></p>
@@ -1981,7 +1981,7 @@ public static void main(String[] args) {
 </li>
 <li>
 <p>告警配置</p>
-<p>根据业务自身的情况,可以设置对应ConsumerId的告警配置(需要有相关topic的权限，若没有，可去workflow申请),可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置，另外波动基数，是指两次Qps至少有一个大于波动基数值，才进行波动比较。<br />
+<p>根据业务自身的情况,可以设置对应ConsumerId的告警配置(需要有相关topic的权限，若没有，可通过<a href="http://workflow.dp/wfe/start/119">workflow</a>进行申请),可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时、累积的参数设置。这里参数分为根据消息消费流程分成两段，发送过程（swallow从swallow存储拿数据到发送消息给消费端这段过程），Ack过程（swallow服务端发送消息到客户端收完消息给服务端回馈这段过程）。这两段分别有对应的峰值、谷值、波动、延时。这些含义类似于Topic告警参数，详情可看Topic告警参数，其中累积是指swallow服务端消息的累积量，若大于设定的值，则报警。<br />
 <img alt="ConsumerId报警参数" src="http://swallow.dp/help/document/img/consumerId-alarm-setting.png" /></p>
 <p>另外对ConsumerId告警还有开关设置，可打开或关闭告警，如下图。<br />
 <img alt="ConsumerId报警开关" src="http://swallow.dp/help/document/img/consumerId-alarm-switch.png" /></p>
