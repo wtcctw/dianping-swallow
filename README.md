@@ -650,10 +650,10 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 3.	告警配置
 
-	根据业务自身的情况,可以设置对应topic的告警配置（需要有该topic的权限，若没有，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置。其中峰值是指Qps的最高值，大于此值报警；谷值是指Qps的最低值，小于此值报警；波动是指当前Qps和前一天此时刻前后5分钟的Qps平均值之间的倍数大小，波动基数，前面两个Qps至少有一个大于波动基数值，才进行波动比较；延时是指存储延时，是指消息发出到存入Swallow这段时间差，超过设定的值，就会告警。
+	根据业务自身的情况，可以设置对应topic的告警配置（需要有该topic的权限，若没有，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置。其中峰值是指Qps的最高值，大于此值报警；谷值是指Qps的最低值，小于此值报警；波动是指当前Qps和前一天此时刻前后5分钟的Qps平均值之间的倍数大小；波动基数，前面两个Qps至少有一个大于波动基数值，才进行波动比较；延时是指存储延时，是指消息发出到存入Swallow这段时间差，超过设定的值，就会告警。
 	![Topic报警参数](http://swallow.dp/help/document/img/topic-alarm-setting.png)
 	
-	对topic告警还有开关设置，可以打开或关闭告警，如下图，对Topic告警开关，有发送告警、接收告警开关，分别针对Topic的发送端、和接收端异常告警的开关。
+	对topic告警还有开关设置，可以打开或关闭告警。如下图，对Topic告警开关，有发送告警（产生此topic消息的生产端）、接收告警（所有消费此topic的所有消费端）开关，分别针对Topic的发送端、接收端异常告警的开关。
 	![Topic报警开关](http://swallow.dp/help/document/img/topic-alarm-switch.png)
 	
 	另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个topic相关的发送ip不想要告警，也只可以设置这个topic某个ip的开关。如下图
@@ -690,13 +690,13 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 3.	告警配置
 
-	根据业务自身的情况,可以设置对应ConsumerId的告警配置（需要有相关topic的权限，若没有，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时、累积的参数设置。这里参数分为根据消息消费流程分成两段，发送过程（swallow从swallow存储拿数据到发送消息给消费端这段过程），Ack过程（swallow服务端发送消息到客户端收完消息给服务端回馈这段过程）。这两段分别有对应的峰值、谷值、波动、延时。这些含义类似于Topic告警参数，详情可看Topic告警参数，其中累积是指swallow服务端消息的累积量，若大于设定的值，则报警。
+	根据业务自身的情况，可以设置对应ConsumerId的告警配置（需要有相关topic的权限，若没有，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时、累积的参数设置。这些参数根据消息消费流程分成两个过程：发送过程（swallow从存储取消息到发送消息给消费端这段过程）；Ack过程（swallow服务端发送消息到客户端消费完消息给服务端回馈这段过程）。这两段分别有对应的峰值、谷值、波动、延时。这些含义类似于Topic告警参数，详情可看Topic告警参数，其中累积是指swallow服务端消息的累积量，若大于设定的值，则报警。
     ![ConsumerId报警参数](http://swallow.dp/help/document/img/consumerId-alarm-setting.png)
     	
-    另外对ConsumerId告警还有开关设置，可打开或关闭告警，如下图。
+    对ConsumerId告警还有开关设置，可打开或关闭告警，如下图。
     ![ConsumerId报警开关](http://swallow.dp/help/document/img/consumerId-alarm-switch.png)
     
-    另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个consumerId相关的发送ip不想要告警，也只可以设置这个consumerId的某个ip的开关。如下图
+    另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个consumerId相关的消费ip不想要告警，也只可以设置这个consumerId的某个ip的开关。如下图
     ![ConsumerId ip报警开关](http://swallow.dp/help/document/img/consumerId-ip-alarm-switch.png)
 
 ### IP告警
@@ -715,7 +715,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 3.	告警配置
 	
-	针对某个topic（生产端）或者某个consumerId（消费端）设置具体的相关ip可是否需要告警。如topic或consumerId告警配置中设置具体ip开关。
+	这些告警的ip都来源于某个topic（生产端）或者某个consumerId（消费端），因此可以到topic或者consumerId处设置相关ip可是否需要告警。设置过程如topic或consumerId告警配置中设置具体ip开关。
 
 ## Swallow 大盘
 
