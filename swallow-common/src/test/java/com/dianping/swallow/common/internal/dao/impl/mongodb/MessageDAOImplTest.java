@@ -5,7 +5,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.mongodb.MongoException;
 
@@ -16,6 +15,7 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 		return null;
 	}
 
+	
 	@Test
 	public void getAccumulation(){
 		
@@ -24,12 +24,10 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 		
 		Assert.assertEquals(0, size);
 		
-		AckDAO ackDao = getBean(AckDAO.class);
-
 		insertMessage(saveCount, topicName);
 		
 		SwallowMessage message = messageDAO.getMaxMessage(topicName);
-		ackDao.add(topicName, consumerId, message.getMessageId(), consumerId);
+		messageDAO.addAck(topicName, consumerId, message.getMessageId(), consumerId);
 
 		insertMessage(saveCount, topicName);
 		

@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 
+
 import jmockmongo.MockMongo;
 
 import org.junit.After;
@@ -12,8 +13,6 @@ import com.dianping.swallow.AbstractSpringTest;
 
 public abstract class AbstractDAOImplTest extends AbstractSpringTest {
 
-	protected MongoManager mongoManager;
-
 	private static MockMongo mock;
 
 	protected static final String IP = "127.0.0.1";
@@ -21,7 +20,6 @@ public abstract class AbstractDAOImplTest extends AbstractSpringTest {
 	@Before
 	public void beforeAbstractDAOImplTest(){
 		
-		mongoManager = getBean(MongoManager.class);
 	}
 	
 	
@@ -44,10 +42,6 @@ public abstract class AbstractDAOImplTest extends AbstractSpringTest {
 	
 	@After
 	public void afterAbstractDAOImplTest() throws Exception {
-		// 删除测试过程创建的Collection
-		mongoManager.getMessageCollection(topicName).drop();
-		mongoManager.getAckCollection(topicName, getConsumerId()).drop();
-		mongoManager.getHeartbeatCollection(IP.replace('.', '_')).drop();
 		mock.stop();
 	}
 

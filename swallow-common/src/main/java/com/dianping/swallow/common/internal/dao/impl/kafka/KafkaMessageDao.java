@@ -10,7 +10,11 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  *
  * 2015年11月1日 下午3:52:25
  */
-public class KafkaMessageDao extends AbstractMessageDao{
+public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
+
+	public KafkaMessageDao(KafkaCluster cluster) {
+		super(cluster);
+	}
 
 	@Override
 	public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
@@ -80,6 +84,24 @@ public class KafkaMessageDao extends AbstractMessageDao{
 	public long getAccumulation(String topicName, String consumerId) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void cleanAck(String topicName, String consumerId, boolean isBackup) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Long getAckMaxMessageId(String topicName, String consumerId, boolean isBackup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addAck(String topicName, String consumerId, Long messageId, String desc, boolean isBackup) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

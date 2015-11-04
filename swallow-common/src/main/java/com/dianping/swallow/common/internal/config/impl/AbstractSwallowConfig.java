@@ -25,7 +25,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 
 	public static final long MILLION = 1024 * 1024;
 	
-	private final String 	LION_CONFIG_FILENAME          = PropertiesUtils.getProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-mongo-lion.properties");
+	private final String 	LION_CONFIG_FILENAME          = PropertiesUtils.getProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-store-lion.properties");
 	
 	public static final String 	TOPICNAME_DEFAULT             = "default";
 
@@ -90,7 +90,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 				logger.info("[onConfigChange]" + key + ":" + value);
 			}
 			heartBeatMongo = value.trim();
-			args = new SwallowConfigArgs(CHANGED_ITEM.HEART_BEAT_MONGO);
+			args = new SwallowConfigArgs(CHANGED_ITEM.HEART_BEAT_STORE);
         }else{
         	if(interested(key)){
     			if(logger.isInfoEnabled()){
@@ -165,18 +165,18 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 		/**
 		 * 全部配置更新
 		 */
-		ALL_TOPIC_MONGO_MAPPING,
+		ALL_TOPIC_STORE_MAPPING,
 		
 		/**
 		 * 特定topic对应配置
 		 */
-		TOPIC_MONGO,
+		TOPIC_STORE,
 
 		
 		/**
 		 * 心跳配置更新 
 		 */
-		HEART_BEAT_MONGO
+		HEART_BEAT_STORE
 		
 	}
 

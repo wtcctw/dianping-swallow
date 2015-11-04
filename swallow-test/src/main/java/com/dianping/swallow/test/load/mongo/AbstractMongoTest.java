@@ -10,11 +10,11 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
+import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
+import com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.test.load.AbstractLoadTest;
 import com.mongodb.MongoClient;
@@ -27,7 +27,7 @@ import com.mongodb.ServerAddress;
  */
 public abstract class AbstractMongoTest extends AbstractLoadTest{
 	
-	protected MessageDAO dao;
+	protected MessageDAO<?> dao;
 	
 
 	@Override
@@ -38,16 +38,27 @@ public abstract class AbstractMongoTest extends AbstractLoadTest{
 		
 	};
 	
-	protected MessageDAO createDao() throws Exception {
+	protected MessageDAO<?> createDao() throws Exception {
 		
 		System.setProperty("lion.useLocal", "true");
-		DefaultMongoManager mc = new DefaultMongoManager();
-		mc.setSwallowConfig(new SwallowConfigImpl());
-		mc.initialize();
 		
-		MongoMessageDAO mdao = new MongoMessageDAO();
-		mdao.setMongoManager(mc);
-		return mdao;
+		DefaultMessageDaoFactory factory = new DefaultMessageDaoFactory();
+		
+		SwallowConfig swallowConfig = createSwallowConfig(); 
+		factory.setSwallowConfig(swallowConfig);
+		factory.setClusterManager(createClusterManager(swallowConfig));
+
+		MessageDAO<?> dao = factory.getObject();
+		return dao;
+	}
+
+
+	private SwallowConfig createSwallowConfig() throws Exception {
+		
+		SwallowConfig swallowConfig = new SwallowConfigImpl();
+		swallowConfig.initialize();
+		
+		return swallowConfig;
 	}
 
 	/**

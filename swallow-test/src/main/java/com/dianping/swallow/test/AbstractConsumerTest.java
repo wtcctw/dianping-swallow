@@ -24,8 +24,8 @@ public abstract class AbstractConsumerTest extends AbstractSwallowTest{
 			mdao.cleanMessage(topic, null);
 		}
 		
-		ackdao.clean(topic, getConsumerId());
-		ackdao.clean(topic, getConsumerId(), true);
+		mdao.cleanAck(topic, getConsumerId());
+		mdao.cleanAck(topic, getConsumerId(), true);
 		
 		//初始消息，解决由本地时间和服务器时间不一致照成的消息数量不一致的问题
 		sendMessage(1, topic);

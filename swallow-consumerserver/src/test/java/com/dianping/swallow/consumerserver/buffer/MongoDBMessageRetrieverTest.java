@@ -30,7 +30,7 @@ public class MongoDBMessageRetrieverTest extends AbstractConsumerServerSpringTes
 	@Test
 	public void testRetriveMessage(){
 		
-		Long messageId = dao.getMaxMessageId(topicName);
+		Long messageId = messageDao.getMaxMessageId(topicName);
 		
 		insertSwallowMessage(insertCount);
 		Assert.assertNotNull(messageId);
@@ -44,7 +44,7 @@ public class MongoDBMessageRetrieverTest extends AbstractConsumerServerSpringTes
 	@Test
 	public void testRetriveMessageFilter(){
 
-		Long messageId = dao.getMaxMessageId(topicName);
+		Long messageId = messageDao.getMaxMessageId(topicName);
 		int filterMessageCount = 50; 
 		String filter = "filter1";
 		
@@ -53,9 +53,9 @@ public class MongoDBMessageRetrieverTest extends AbstractConsumerServerSpringTes
 			SwallowMessage message = createMessage();
 			if(i < filterMessageCount){
 				message.setType(filter);
-				dao.saveMessage(topicName, message);
+				messageDao.saveMessage(topicName, message);
 			}else{
-				dao.saveMessage(topicName, message);
+				messageDao.saveMessage(topicName, message);
 			}
 		}
 		

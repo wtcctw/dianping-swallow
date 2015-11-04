@@ -2,6 +2,9 @@ package com.dianping.swallow.common.internal.dao;
 
 import java.util.Set;
 
+import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.dao.impl.ClusterCreateException;
+
 /**
  * @author mengwenchao
  *
@@ -9,9 +12,9 @@ import java.util.Set;
  */
 public interface ClusterManager {
 	
-	public static int ORDER = ClusterFactory.ORDER + 1;
+	public static int ORDER = Math.max(ClusterFactory.ORDER, SwallowConfig.ORDER) + 1;
 	
-	Cluster getCluster(String url);
+	Cluster getCluster(String url) throws ClusterCreateException;
 	
 	Set<Cluster> allClusters();
 

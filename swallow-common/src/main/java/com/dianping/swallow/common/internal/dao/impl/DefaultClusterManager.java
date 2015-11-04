@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
+import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
@@ -26,13 +26,15 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 	
 	private List<ClusterFactory> clusterFactories;
 	
+	private SwallowConfig swallowConfig;
+	
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 	}
 	
 	@Override
-	public Cluster getCluster(String url) {
+	public Cluster getCluster(String url) throws ClusterCreateException {
 		
 		Cluster cluster = clusterMap.get(url); 
 
@@ -43,13 +45,13 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 				if(cluster != null){
 					return cluster;
 				}
-				
-				try {
+				try{
 					cluster = createOrUseExistingCluster(url);
 					clusterSet.add(cluster);
 					clusterMap.put(url, cluster);
-				} catch (Exception e) {
+				}catch(Exception e){
 					logger.error("[getCluster]" + url, e);
+					throw new ClusterCreateException(url, e);
 				}
 			}
 		}
@@ -104,6 +106,7 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 		if(logger.isInfoEnabled()){
 			logger.info("[initializeCluster]" + cluster);
 		}
+		cluster.setSwallowConfig(swallowConfig);
 		cluster.initialize();
 	}
 
@@ -145,5 +148,13 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 	@Override
 	public int getOrder() {
 		return ORDER;
+	}
+
+	public SwallowConfig getSwallowConfig() {
+		return swallowConfig;
+	}
+
+	public void setSwallowConfig(SwallowConfig swallowConfig) {
+		this.swallowConfig = swallowConfig;
 	}
 }

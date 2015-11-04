@@ -16,30 +16,34 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
-import com.dianping.swallow.common.internal.dao.AckDAO;
-import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.message.Destination;
+import com.dianping.swallow.consumerserver.AbstractConsumerServerSpringTest;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager;
 
-public class ConsumerWorkerImplTest extends AbstractTest {
-    @Autowired
-    private AckDAO                ackDAO;
-    @Autowired
-    private MessageDAO            messageDAO;
-    @Autowired
+public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
+	
+	private String IP = "127.0.0.1";
+	
     private ConsumerWorkerManager consumerWorkerManager;
+    
     private Set<SwallowMessage>   messageSetChecker = new HashSet<SwallowMessage>();
 
     private Channel               channel;
+    
+    @Before
+    public void testConsumerWorkerImplTest(){
+    	
+    	consumerWorkerManager = getBean(ConsumerWorkerManager.class);
+    	
+    }
 
     private void makeMessages(Queue<SwallowMessage> messageQueue) {
         for (long i = 0; i < 50; i++) {
@@ -50,22 +54,9 @@ public class ConsumerWorkerImplTest extends AbstractTest {
 
     }
 
-    //    private Boolean check(int i) {
-    //        if (messageSetChecker.size() != i) {
-    //            return false;
-    //        }
-    //        Iterator<SwallowMessage> it = messageSetChecker.iterator();
-    //        while (it.hasNext()) {
-    //            SwallowMessage message = it.next();
-    //            if (message.getMessageId() >= i || message.getMessageId() < 0) {
-    //                return false;
-    //            }
-    //        }
-    //        return true;
-    //    }
-
     @Before
     public void mockDao() throws Exception {
+    	
         SwallowBuffer swallowBuffer = mock(SwallowBuffer.class);
         CloseableBlockingQueue<SwallowMessage> messageQueue = new MockedCloseableBlockingQueue<SwallowMessage>();
 
@@ -87,10 +78,10 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         //      when(messageDAO.getMaxMessageId(TOPIC_NAME)).thenReturn(234567L);
         //      when(messageDAO.getMaxMessageId(TOPIC_NAME2)).thenReturn(null);
         //准备数据
-        ackDAO.add(TOPIC_NAME, CONSUMER_ID, 123456L, IP);
+        messageDao.addAck(topicName, getConsumerId(), 123456L, IP);
         SwallowMessage message = new SwallowMessage();
         message.setContent("this is a SwallowMessage");
-        messageDAO.saveMessage(TOPIC_NAME, message);
+        messageDao.saveMessage(topicName, message);
 
         //      consumerWorkerManager.setAckDAO(ackDAO);
         //      consumerWorkerManager.setMessageDAO(messageDAO);
@@ -137,12 +128,9 @@ public class ConsumerWorkerImplTest extends AbstractTest {
      */
     @Test
     public void testHandleGreet_NON_DURABLE() throws InterruptedException {
-        //      mockChannel();
-        //      mockDao();
-        ConsumerInfo consumerInfo2 = new ConsumerInfo(CONSUMER_ID2, Destination.topic(TOPIC_NAME), ConsumerType.NON_DURABLE);
+    	
+        ConsumerInfo consumerInfo2 = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.NON_DURABLE);
         consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null, -1);
-//        Thread.sleep(3000);
-        //      Assert.assertTrue(check(50));
     }
 
     /**
@@ -150,12 +138,11 @@ public class ConsumerWorkerImplTest extends AbstractTest {
      * 
      * @throws InterruptedException
      */
-    @SuppressWarnings("deprecation")
     @Test
     public void testHandleGreet_topicFirst() throws InterruptedException {
         //      mockChannel();
         //      mockDao();
-        ConsumerInfo consumerInfo3 = new ConsumerInfo(CONSUMER_ID, Destination.topic(TOPIC_NAME2), ConsumerType.DURABLE_AT_MOST_ONCE);
+        ConsumerInfo consumerInfo3 = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
         consumerWorkerManager.handleGreet(channel, consumerInfo3, 50, null, -1);
         Thread.sleep(3000);
         //      Assert.assertTrue(check(50));
@@ -171,7 +158,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
     public void testHandleGreet_consumerFirst() throws InterruptedException {
         //      mockChannel();
         //      mockDao();
-        ConsumerInfo consumerInfo2 = new ConsumerInfo(CONSUMER_ID2, Destination.topic(TOPIC_NAME), ConsumerType.DURABLE_AT_MOST_ONCE);
+        ConsumerInfo consumerInfo2 = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_MOST_ONCE);
         consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null, -1);
         Thread.sleep(3000);
         //      Assert.assertTrue(check(50));
@@ -188,7 +175,7 @@ public class ConsumerWorkerImplTest extends AbstractTest {
         //      mockChannel();
         //      mockDao();
 
-        ConsumerInfo consumerInfo1 = new ConsumerInfo(CONSUMER_ID, Destination.topic(TOPIC_NAME), ConsumerType.DURABLE_AT_LEAST_ONCE);
+        ConsumerInfo consumerInfo1 = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
         consumerWorkerManager.handleGreet(channel, consumerInfo1, 30, null, -1);
         //        Thread.sleep(3000);
         //        Assert.assertTrue(check(30));

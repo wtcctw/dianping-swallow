@@ -11,12 +11,14 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.test.AbstractSwallowTest;
+
 /**
  * @author mengwenchao
  *
  * 2015年1月28日 下午7:10:54
  */
-public abstract class AbstractLoadTest {
+public abstract class AbstractLoadTest extends AbstractSwallowTest{
 	
     protected Logger logger       = LoggerFactory.getLogger(getClass());
 

@@ -1,5 +1,6 @@
 package com.dianping.swallow.consumerserver.worker.impl;
 
+
 import io.netty.channel.Channel;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -11,13 +12,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
-
-
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
-import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.lifecycle.LifecycleCallback;
 import com.dianping.swallow.common.internal.lifecycle.MasterSlaveComponent;
@@ -26,7 +24,6 @@ import com.dianping.swallow.common.internal.lifecycle.impl.DefaultLifecycleManag
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.MongoUtils;
-import com.dianping.swallow.common.internal.util.ProxyUtil;
 import com.dianping.swallow.common.internal.util.task.AbstractEternalTask;
 import com.dianping.swallow.common.server.monitor.collector.ConsumerCollector;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
@@ -46,9 +43,8 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     
     private final long                        MESSAGE_SEND_NONE_INTERVAL = ConfigManager.getInstance().getMessageSendNoneInterval();
 
-    private AckDAO                            ackDAO;
     private SwallowBuffer                     swallowBuffer;
-    private MessageDAO                        messageDAO;
+    private MessageDAO<?>                        messageDAO;
 
     private ConsumerAuthController            consumerAuthController;
 
@@ -76,12 +72,6 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     	lifecycleManager = new DefaultLifecycleManager(this);
     }
     
-    public void setAckDAO(AckDAO ackDAO) {
-        this.ackDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(ackDAO, ConfigManager.getInstance()
-                .getRetryIntervalWhenMongoException(), 
-                ConfigManager.getInstance().getRetryTimesWhenMongoException());
-    }
-
     public MQThreadFactory getThreadFactory() {
         return threadFactory;
     }
@@ -90,9 +80,8 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         this.swallowBuffer = swallowBuffer;
     }
 
-    public void setMessageDAO(MessageDAO messageDAO) {
-        this.messageDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(messageDAO, 
-        		ConfigManager.getInstance().getRetryIntervalWhenMongoException(), ConfigManager.getInstance().getRetryTimesWhenMongoException());
+    public void setMessageDAO(MessageDAO<?> messageDAO) {
+        this.messageDAO = messageDAO;
     }
 
     public void handleGreet(Channel channel, ConsumerInfo consumerInfo, int clientThreadCount,
@@ -220,7 +209,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 			ConsumerWorker worker) {
 		
 		if(consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
-			ackDAO.add(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), MongoUtils.getLongByCurTime(), "idReint", true);
+			messageDAO.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), MongoUtils.getLongByCurTime(), "idReint", true);
 		}
 	}
 
@@ -404,15 +393,11 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         consumerInfo2ConsumerWorker.remove(consumerInfo);
     }
 
-    public AckDAO getAckDAO() {
-        return ackDAO;
-    }
-
     public SwallowBuffer getSwallowBuffer() {
         return swallowBuffer;
     }
 
-    public MessageDAO getMessageDAO() {
+    public MessageDAO<?> getMessageDAO() {
         return messageDAO;
     }
 

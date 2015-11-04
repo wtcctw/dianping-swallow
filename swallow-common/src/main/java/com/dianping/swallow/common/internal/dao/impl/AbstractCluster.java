@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 
@@ -23,6 +24,8 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 
 	private String address;
 
+	protected SwallowConfig swallowConfig;
+	
 	public AbstractCluster(String address) {
 		
 		this.address = address;
@@ -33,6 +36,11 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 	public List<InetSocketAddress> getSeeds() {
 
 		return seeds;
+	}
+	
+	@Override
+	public String getAddress() {
+		return address;
 	}
 
 	protected abstract List<InetSocketAddress> build(String url);
@@ -53,4 +61,28 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 		return address;
 	}
 
+	
+	@Override
+	public void setSwallowConfig(SwallowConfig swallowConfig){
+		this.swallowConfig = swallowConfig;
+	}
+
+	
+	@Override
+	public boolean sameCluster(Cluster other) {
+		
+		if(!this.getClass().equals(other.getClass())){
+			return false;
+		}
+		
+		List<InetSocketAddress> thisServers = allServers();
+		List<InetSocketAddress> otherServers = other.allServers();
+
+		for(InetSocketAddress address : thisServers){
+			if(otherServers.contains(address)){
+				return true;
+			}
+		}
+		return false;
+	}
 }

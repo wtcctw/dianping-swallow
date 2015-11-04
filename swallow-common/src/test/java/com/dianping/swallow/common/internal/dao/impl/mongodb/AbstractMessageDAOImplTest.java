@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bson.types.BSONTimestamp;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -17,7 +18,7 @@ import com.dianping.swallow.common.internal.util.MongoUtils;
  */
 public abstract class AbstractMessageDAOImplTest extends AbstractDAOImplTest {
 
-	protected MessageDAO messageDAO;
+	protected MessageDAO<?> messageDAO;
 
 	protected String consumerId = "consumer1";
 
@@ -80,5 +81,34 @@ public abstract class AbstractMessageDAOImplTest extends AbstractDAOImplTest {
 		return message;
 
 	}
+
+	
+   @Test
+   public void testAdd() {
+      //添加一条记录
+      int time = (int) (System.currentTimeMillis() / 1000);
+      int inc = 1;
+      BSONTimestamp timestamp = new BSONTimestamp(time, inc);
+      Long expectedMessageId = MongoUtils.BSONTimestampToLong(timestamp);
+      messageDAO.addAck(topicName, getConsumerId(), MongoUtils.BSONTimestampToLong(timestamp), IP);
+      
+      //测试
+      Long maxMessageId = messageDAO.getAckMaxMessageId(topicName, getConsumerId());
+      Assert.assertEquals(expectedMessageId, maxMessageId);
+   }
+
+   @Test
+   public void testGetMaxMessageId() {
+	   
+      //添加一条记录
+      int time = (int) (System.currentTimeMillis() / 1000);
+      int inc = 1;
+      BSONTimestamp timestamp = new BSONTimestamp(time, inc);
+      Long expectedMessageId = MongoUtils.BSONTimestampToLong(timestamp);
+      messageDAO.addAck(topicName, getConsumerId(), MongoUtils.BSONTimestampToLong(timestamp), IP);
+      //测试
+      Long maxMessageId = messageDAO.getAckMaxMessageId(topicName, getConsumerId());
+      Assert.assertEquals(expectedMessageId, maxMessageId);
+   }
 
 }

@@ -35,7 +35,7 @@ public class DefaultClusterManagerTest extends AbstractDbTest{
 	
 	
 	@Test
-	public void testCreate(){
+	public void testCreate() throws ClusterCreateException{
 		
 		String url1 = "mongodb://127.0.0.1:27017,127.0.0.2:27018", url11 = "mongodb://127.0.0.2:27018,127.0.0.1:27017";
 		Cluster cluster1 = clusterManager.getCluster(url1);

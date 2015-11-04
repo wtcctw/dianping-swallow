@@ -23,7 +23,6 @@ import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
-import com.dianping.swallow.common.internal.dao.AckDAO;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatReceiver;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatReceiver;
@@ -56,8 +55,7 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 	private MessageFilter messageFilter;
 
 	private SwallowBuffer swallowBuffer;
-	private MessageDAO messageDao;
-	private AckDAO ackDao;
+	private MessageDAO<?> messageDao;
 
 	private CloseableBlockingQueue<SwallowMessage> messageQueue;
 	private ExecutorService ackExecutor;
@@ -100,7 +98,6 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 			ConsumerCollector consumerCollector) {
 
 		this.consumerInfo = consumerInfo;
-		this.ackDao = workerManager.getAckDAO();
 		this.messageDao = workerManager.getMessageDAO();
 		this.swallowBuffer = workerManager.getSwallowBuffer();
 		this.consumerThreadPoolManager = consumerThreadPoolManager;
@@ -503,7 +500,7 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 		String topicName = consumerInfo.getDest().getName();
 
 		if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-			maxMessageId = ackDao.getMaxMessageId(topicName, consumerInfo.getConsumerId(), isBakcup);
+			maxMessageId = messageDao.getAckMaxMessageId(topicName, consumerInfo.getConsumerId(), isBakcup);
 		}
 
 		if (maxMessageId == null) {
@@ -522,7 +519,7 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 			
 			if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
 				
-				ackDao.add(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), ackMessageId, desc, isBakcup);
+				messageDao.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), ackMessageId, desc, isBakcup);
 				
 				if(!isBakcup){
 					lastRecordedAckId = ackMessageId;

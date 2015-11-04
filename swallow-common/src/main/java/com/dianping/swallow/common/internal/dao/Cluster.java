@@ -3,6 +3,7 @@ package com.dianping.swallow.common.internal.dao;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 
 /**
@@ -13,5 +14,18 @@ import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 public interface Cluster extends Lifecycle{
 	
 	List<InetSocketAddress> getSeeds();
+	
+	List<InetSocketAddress> allServers();
+	
+	String getAddress();
+	
+	void setSwallowConfig(SwallowConfig swallowConfig);
+	
+	/**
+	 * 判断两个集群是否为同一个集群（只要有一个server相同，即为同一个）
+	 * @param other
+	 * @return
+	 */
+	boolean sameCluster(Cluster other);
 
 }

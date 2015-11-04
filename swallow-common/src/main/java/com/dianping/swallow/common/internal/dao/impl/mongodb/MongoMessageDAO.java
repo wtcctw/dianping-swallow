@@ -1,5 +1,6 @@
 package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,7 +9,6 @@ import java.util.Map;
 
 import org.bson.types.BSONTimestamp;
 
-import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.BasicDBObject;
@@ -16,9 +16,10 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MongoException;
 import com.mongodb.WriteResult;
 
-public class MongoMessageDAO extends AbstractMongoMessageDao implements MessageDAO {
+public class MongoMessageDAO extends AbstractMongoMessageDao {
 
 	public static final String ID = "_id";
 	public static final String ORIGINAL_ID = "o_id";
@@ -30,27 +31,21 @@ public class MongoMessageDAO extends AbstractMongoMessageDao implements MessageD
 	public static final String INTERNAL_PROPERTIES = "_p";
 	public static final String TYPE = "t";
 	public static final String SOURCE_IP = "si";
-	
-	protected MongoManager mongoManager;
-
 	public static final String SAVE_TIME = "save_time";
+	
+	
+	public static final String  SRC_CONSUMER_IP = "cip";
+	public static final String  TICK            = "t";
 
-	public MongoMessageDAO() {
+	
+	public MongoMessageDAO(MongoCluster mongoCluster) {
+		super(mongoCluster);
 
-	}
-
-	public MongoMessageDAO(MongoManager mongoManager) {
-		this.mongoManager = mongoManager;
-
-	}
-
-	public void setMongoManager(DefaultMongoManager mongoManager) {
-		this.mongoManager = mongoManager;
 	}
 
 	@Override
 	public SwallowMessage getMessage(String topicName, Long messageId) {
-		DBCollection collection = this.mongoManager.getMessageCollection(topicName);
+		DBCollection collection = cluster.getMessageCollection(topicName);
 
 		DBObject query = BasicDBObjectBuilder.start().add(ID, MongoUtils.longToBSONTimestamp(messageId)).get();
 		DBObject result = collection.findOne(query);
@@ -72,33 +67,13 @@ public class MongoMessageDAO extends AbstractMongoMessageDao implements MessageD
 		return getMaxMessageId(collection);
 	}
 
-	@Override
-	public Long getMaxMessageId(String topicName) {
-		return getMaxMessageId(topicName, null);
-	}
-
 	private DBCollection getCollection(String topicName, String consumerId) {
-		return this.mongoManager.getMessageCollection(topicName, consumerId);
-	}
-
-	private Long getMaxMessageId(DBCollection collection) {
-		DBObject fields = BasicDBObjectBuilder.start().add(ID, 1).get();
-		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
-		DBCursor cursor = collection.find(null, fields).sort(orderBy).limit(1);
-		try {
-			if (cursor.hasNext()) {
-				BSONTimestamp timestamp = (BSONTimestamp) cursor.next().get(ID);
-				return MongoUtils.BSONTimestampToLong(timestamp);
-			}
-		} finally {
-			cursor.close();
-		}
-		return null;
+		return cluster.getMessageCollection(topicName, consumerId);
 	}
 
 	@Override
 	public SwallowMessage getMaxMessage(String topicName) {
-		DBCollection collection = this.mongoManager.getMessageCollection(topicName);
+		DBCollection collection = cluster.getMessageCollection(topicName);
 
 		DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
 		DBCursor cursor = collection.find().sort(orderBy).limit(1);
@@ -131,7 +106,7 @@ public class MongoMessageDAO extends AbstractMongoMessageDao implements MessageD
 		if (logger.isInfoEnabled()) {
 			logger.info("[cleanMessage][topic, consumerId]" + topicName + "," + consumerId);
 		}
-		mongoManager.cleanMessageCollection(topicName, consumerId);
+		cluster.cleanMessageCollection(topicName, consumerId);
 	}
 
 	private List<SwallowMessage> getMessageGreaterThan(Long messageId, int size, DBCollection collection) {
@@ -341,11 +316,6 @@ public class MongoMessageDAO extends AbstractMongoMessageDao implements MessageD
 	}
 
 	@Override
-	public int deleteMessage(String topicName, Long messageId) {
-		return deleteMessage(topicName, null, messageId);
-	}
-
-	@Override
 	public int deleteMessage(String topicName, String consumerId, final Long messageId) {
 
 		final DBCollection collection = getCollection(topicName, consumerId);
@@ -376,7 +346,7 @@ public class MongoMessageDAO extends AbstractMongoMessageDao implements MessageD
 	@Override
 	public long getAccumulation(String topicName, String consumerId) {
 
-		DBCollection collection = mongoManager.getAckCollection(topicName, consumerId);
+		DBCollection collection = cluster.getAckCollection(topicName, consumerId);
 		DBCursor cursor = collection.find().sort(new BasicDBObject(ID, -1)).limit(1);
 
 		BSONTimestamp currentIndex = MongoUtils.getTimestampByCurTime();
@@ -389,5 +359,68 @@ public class MongoMessageDAO extends AbstractMongoMessageDao implements MessageD
 		DBCollection msgCollection = getCollection(topicName, null);
 		return msgCollection.count(new Query().gt(ID, currentIndex).build());
 	}
+
+	
+	
+
+	   @Override
+	   public Long getAckMaxMessageId(String topicName, String consumerId, boolean isBackup) {
+	      DBCollection collection = getAckCollection(topicName, consumerId, isBackup);
+	      return getMaxMessageId(collection);
+	   }
+
+	   private DBCollection getAckCollection(String topicName, String consumerId, boolean isBackup) {
+	      return cluster.getAckCollection(topicName, consumerId, isBackup);
+	   }
+
+	   private Long getMaxMessageId(DBCollection collection) {
+		   
+	      DBObject fields = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(1)).get();
+	      DBObject orderBy = BasicDBObjectBuilder.start().add(ID, Integer.valueOf(-1)).get();
+	      DBCursor cursor = collection.find(new BasicDBObject(), fields).sort(orderBy).limit(1);
+	      try {
+	         if (cursor.hasNext()) {
+	            DBObject result = cursor.next();
+	            BSONTimestamp timestamp = (BSONTimestamp) result.get(ID);
+	            return MongoUtils.BSONTimestampToLong(timestamp);
+	         }
+	      } finally {
+	         cursor.close();
+	      }
+	      return null;
+	   }
+
+		@Override
+		public void cleanAck(String topicName, String consumerId, boolean isBackup) {
+			
+			cluster.cleanAckCollection(topicName, consumerId, isBackup);;
+		}
+
+
+	   @Override
+	   public void addAck(String topicName, String consumerId, Long messageId, String sourceConsumerIp, boolean isBackup) {
+	      DBCollection collection = getAckCollection(topicName, consumerId, isBackup);
+	      addAck(messageId, sourceConsumerIp, collection);
+	   }
+
+	   private void addAck(Long messageId, String sourceConsumerIp, DBCollection collection) {
+	      BSONTimestamp timestamp = MongoUtils.longToBSONTimestamp(messageId);
+	      if(logger.isDebugEnabled()){
+	    	  logger.debug("[add][add ack id]" + timestamp);
+	      }
+	      Date curTime = new Date();
+	      try {
+	         DBObject add = BasicDBObjectBuilder.start().add(ID, timestamp).add(SRC_CONSUMER_IP, sourceConsumerIp)
+	               .add(TICK, curTime).get();
+	         collection.insert(add);
+	      } catch (MongoException e) {
+	         if (e.getMessage() != null && e.getMessage().indexOf("duplicate key") >= 0 || e.getCode() == 11000) {
+	            //_id already exists
+	            logger.warn(e.getMessage() + ": _id is " + timestamp);
+	         } else {
+	            throw e;
+	         }
+	      }
+	   }
 
 }

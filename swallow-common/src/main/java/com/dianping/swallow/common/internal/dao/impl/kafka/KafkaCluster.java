@@ -24,4 +24,10 @@ public class KafkaCluster extends AbstractCluster{
 		return null;
 	}
 
+	@Override
+	public List<InetSocketAddress> allServers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

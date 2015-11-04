@@ -12,13 +12,15 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 public class MongoDBMessageRetriever implements MessageRetriever {
+	
+	
    private static final Logger logger       = LoggerFactory.getLogger(MongoDBMessageRetriever.class);
 
    private int                 fetchSize = 500;
 
-   private MessageDAO          messageDAO;
+   private MessageDAO<?>          messageDAO;
 
-   public void setMessageDAO(MessageDAO messageDAO) {
+   public void setMessageDAO(MessageDAO<?> messageDAO) {
       this.messageDAO = messageDAO;
    }
 

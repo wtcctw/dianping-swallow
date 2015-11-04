@@ -3,6 +3,7 @@ package com.dianping.swallow.consumerserver;
 import org.junit.Before;
 
 import com.dianping.swallow.AbstractSpringTest;
+import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.consumerserver.buffer.MessageRetriever;
@@ -15,16 +16,21 @@ import com.dianping.swallow.consumerserver.buffer.MessageRetriever;
  */
 public class AbstractConsumerServerSpringTest extends AbstractSpringTest{
 
-	protected MessageDAO dao;
+
+	protected MessageDAO<?> messageDao;
 	
 	protected MessageRetriever messageRetriever;
-			
+	
+	protected ClusterManager clusterManager;
+	
 	@Before
 	public void beforeAbstractConsumerServerSpringTest(){
 		
-		dao = getBean(MessageDAO.class);
-		dao.cleanMessage(topicName, null);
-		dao.cleanMessage(topicName, getConsumerId());
+		messageDao = getBean(MessageDAO.class);
+		clusterManager = getBean(ClusterManager.class);
+		
+		messageDao.cleanMessage(topicName, null);
+		messageDao.cleanMessage(topicName, getConsumerId());
 		messageRetriever = getBean(MessageRetriever.class);
 		
 	}
@@ -43,7 +49,7 @@ public class AbstractConsumerServerSpringTest extends AbstractSpringTest{
 		for(int i=0;i<count;i++){
 			
 			SwallowMessage message = createMessage();
-			dao.saveMessage(topicName, message);
+			messageDao.saveMessage(topicName, message);
 		}
 		
 		sleep(100);//wait slave

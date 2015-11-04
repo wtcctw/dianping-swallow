@@ -1,6 +1,7 @@
 package com.dianping.swallow.test;
 
 
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -12,15 +13,15 @@ import org.junit.Before;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
+import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager;
+import com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory;
 import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoAckDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
@@ -53,41 +54,38 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	
 	protected List<Consumer> consumers = new LinkedList<Consumer>();
 
-	protected MongoMessageDAO mdao;
-	protected MongoAckDAO 	 ackdao;
+	protected MessageDAO<?> mdao;
 
 	
 	private List<Lifecycle> lifecycle = new LinkedList<Lifecycle>();
 	
 	@Before
 	public void beforeSwallowAbstractTest() throws Exception{
-		
-		DefaultMongoManager mongoManager = new DefaultMongoManager();
-		
-		
-		ClusterManager clusterManager = createClusterManager();
 
-		mongoManager.setClusterManager(clusterManager);
-			
-				
+		
 		SwallowConfigImpl swallowConfig = new SwallowConfigImpl();
 		swallowConfig.initialize();
-		
+
+		ClusterManager clusterManager = createClusterManager(swallowConfig);
+
 		lifecycle.add(swallowConfig);
 		
-		mongoManager.setSwallowConfig(swallowConfig);
-		mongoManager.initialize();
 		
-		mdao = new MongoMessageDAO();
-		mdao.setMongoManager(mongoManager);
+		DefaultMessageDaoFactory factory = new DefaultMessageDaoFactory();
+		factory.setClusterManager(clusterManager);
+		factory.setSwallowConfig(swallowConfig);
+		factory.initialize();
 		
-		ackdao = new MongoAckDAO();
-		ackdao.setMongoManager(mongoManager);
+		lifecycle.add(factory);
+		
+		mdao = factory.getObject();
 	}
 
-	private ClusterManager createClusterManager() throws Exception {
+	protected ClusterManager createClusterManager(SwallowConfig swallowConfig) throws Exception {
 		
 		DefaultClusterManager clusterManager = new DefaultClusterManager();
+		
+		clusterManager.setSwallowConfig(swallowConfig);
 		
 		MongoClusterFactory mongoClusterFactory = new MongoClusterFactory();
 		mongoClusterFactory.initialize();

@@ -33,7 +33,6 @@ public abstract class AbstractTest {
 
 	protected ScheduledExecutorService scheduledExecutors = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 	
-	
 	protected String topicName = "SwallowUnitTest";
 	
 	protected String baseConsumerId = "ut";

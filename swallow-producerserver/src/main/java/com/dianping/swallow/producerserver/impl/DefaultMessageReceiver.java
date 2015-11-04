@@ -28,7 +28,7 @@ public class DefaultMessageReceiver implements MessageReceiver{
 	
 	private TopicWhiteList topicWhiteList;
 
-    private MessageDAO messageDao;
+    private MessageDAO<?> messageDao;
 
 	private ProducerCollector producerCollector;
 
@@ -84,11 +84,11 @@ public class DefaultMessageReceiver implements MessageReceiver{
 		this.topicWhiteList = topicWhiteList;
 	}
 
-	public MessageDAO getMessageDao() {
+	public MessageDAO<?> getMessageDao() {
 		return messageDao;
 	}
 
-	public void setMessageDao(MessageDAO messageDao) {
+	public void setMessageDao(MessageDAO<?> messageDao) {
 		this.messageDao = messageDao;
 	}
 
