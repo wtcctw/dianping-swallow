@@ -84,12 +84,7 @@ Thumbs.db
 *.ipr
 *.iws
 .idea/
+out/
 #test
 config.online
 TODO
-<<<<<<< HEAD
-.idea/
-=======
-*.idea
-*.iml
->>>>>>> yq

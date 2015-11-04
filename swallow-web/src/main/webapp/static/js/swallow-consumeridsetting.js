@@ -292,7 +292,7 @@ module
 									}
 									currentDict = $scope.resultDict[ip];
 									for (var name in currentElement) {
-										if (currentElement.hasOwnProperty(name)) {
+										if (currentElement.hasOwnProperty(name) && !currentDict.hasOwnProperty(name)) {
 											currentDict[name] = currentElement[name];
 										}
 									}
