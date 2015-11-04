@@ -1,0 +1,144 @@
+<div class="main-content main-content-local" style="opacity: 1.0;"
+	ng-controller="IpResourceController">
+	<div class="breadcrumbs" id="breadcrumbs">
+		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/swallow-ipresource.js"></script>
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
+
+		<form class="bs-example bs-example-form-local" role="form">
+			<div class="input-group input-group-local">
+				<span class="input-group-addon">业务</span> <input type="text"
+					class="form-control" placeholder="业务名..." style="width: 150px"
+					id="searchapplication" ng-model='searchapplication'>
+				<ul class="typeahead dropdown-menu"
+					style="top: 28px; left: 0px; display: none;">
+				</ul>
+				<span class="input-group-addon">IP类型</span> <input type="text"
+					class="form-control" placeholder="CONSUMER..." style="width: 150px"
+					id="searchtype" ng-model='searchtype'>
+				<ul class="typeahead dropdown-menu"
+					style="top: 28px; left: 0px; display: none;">
+				</ul>
+			</div>
+		</form>
+
+		<!-- #nav-search -->
+		<div class="nav-search nav-search-local" id="nav-search">
+			<form class="form-search">
+				<span class="input-icon"> <input type="text"
+					placeholder="查找ip ..." style="width: 220px"
+					class="nav-search-input" id="searchip" autocomplete="off"
+					ng-model='searchip'>
+					<ul class="typeahead dropdown-menu"
+						style="top: 28px; left: 0px; display: none;">
+					</ul> <i class="icon-search nav-search-icon"></i>
+				</span>
+			</form>
+		</div>
+		<!-- end  breadcrumbs-->
+	</div>
+
+	<!-- page-content -->
+	<div class="page-content">
+		<!--page-header  -->
+		<div class="page-header">
+
+			<!--row  -->
+			<div class="row">
+				<table
+					class="table table-bordered table-striped  table-condensed table-hover">
+					<tr>
+						<th style="text-align: left">序号</th>
+						<th style="text-align: left; width: 15%">IP</th>
+						<th style="text-align: left">业务名</th>
+						<th style="text-align: left">告警</th>
+						<th style="text-align: left;">操作</th>
+					</tr>
+					<tr ng-repeat="t in searchPaginator.currentPageItems "
+						on-finish-render-filters>
+						<td style="text-align: left" ng-bind="$index+1"></td>
+						<td style="text-align: left" ng-bind="t.ip"></td>
+						<td style="text-align: left"><a
+							ng-href="${rc.contextPath}/console/application"
+							ng-click="setApplication(t.application)" ng-bind="t.application"></a></td>
+						<td style="text-align: left"><label class="pull-left inline">
+								<small class="muted smaller-90"></small> <input
+								id="alarm{{$index}}" type="checkbox" ng-model="t.alarm"
+								ng-click="changealarm(t.ip, $index)"
+								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
+						</label></td>
+						<td style="text-align: left;"><a href="#myModal"
+							ng-click="setModalInput($index);" data-toggle="modal"
+							class="edit-config-btn"><i class="icon-edit" rel="tooltip"
+								data-original-title="编辑配置值"></i></a></td>
+					</tr>
+				</table>
+
+				<ul style="margin-top: 20px;" class="pagination">
+					<li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+					<li><a href="" ng-click="searchPaginator.previous()"
+						ng-show="searchPaginator.hasPrevious()">上一页</a></li>
+					<li ng-repeat="p in searchPaginator.pages"><a href=""
+						ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
+					<li class="disabled"><a href="javascript:;">...</a></li>
+					<li><a href="" ng-click="searchPaginator.next()"
+						ng-show="searchPaginator.hasNext()">下一页</a></li>
+					<li><a href=""
+						ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+				</ul>
+			</div>
+			<!--end row  -->
+		</div>
+
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">配置IP</h4>
+					</div>
+					<div class="modal-body">
+						<form method="post" class="form-horizontal" name="myForm"
+							ng-submit="refreshpage(myForm)">
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>IP</b></label> <input
+										type="text" class="form-control" ng-model="ipEntry.ip" id="ip"
+										required> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>业务名</b></label> <input
+										type="text" class="form-control"
+										ng-model="ipEntry.application" id="application" data-provide="typeahead"> </input>
+								</div>
+							</div>
+							<div class="control-group" style="margin-top: 40px">
+								<div class="controls">
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">关闭</button>
+									<button type="submit" class="btn btn-success">提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+
+		<!--end page-header  -->
+	</div>
+	<!-- end page-content -->
+</div>

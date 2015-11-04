@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" monitorInterval="30">
+
+    <Appenders>
+
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
+        </Console>
+        <RollingFile name="fileAppender"
+                     fileName="/data/applogs/swallow/swallow-producerserver.log"
+                     filePattern="/data/applogs/swallow/swallow-producerserver.log.%d{yyyy-MM-dd}.gz">
+            <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
+            <TimeBasedTriggeringPolicy interval="1"
+                                       modulate="true"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <root level="INFO">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="fileAppender"/>
+            <!--<AppenderRef ref="catAppender"/>-->
+        </root>
+    </Loggers>
+</Configuration>

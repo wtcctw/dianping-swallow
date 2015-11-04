@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+
+	<display-name>SwallowWeb</display-name>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+				classpath*:config/spring/common/appcontext-*.xml
+				classpath*:config/spring/local/appcontext-*.xml
+				classpath*:applicationContext.xml
+		</param-value>
+	</context-param>
+
+	<!-- <listener> <listener-class>com.dianping.swallow.web.servlet.listener.LoggerContextLoaderListener</listener-class> 
+		</listener> -->
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>cat-filter</filter-name>
+		<filter-class>com.dianping.cat.servlet.CatFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>cat-filter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+
+ 	<filter>
+		<filter-name>sso-filter</filter-name>
+		<filter-class>com.dianping.swallow.web.filter.SSOControlFilter</filter-class>
+		<init-param>
+			<param-name>ssoenable</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>sso-filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!--for cas-server-->
+	<filter>
+		<filter-name>CAS Single Sign Out Filter</filter-name>
+		<filter-class>org.jasig.cas.client.session.SingleSignOutFilter</filter-class>
+		<init-param>
+			<param-name>artifactParameterName</param-name>
+			<param-value>SAMLart</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<filter-class>org.jasig.cas.client.authentication.Saml11AuthenticationFilter</filter-class>
+		<init-param>
+			<param-name>casServerLoginUrlLionKey</param-name>
+			<param-value>cas-server-webapp.loginUrl</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverNameLionKey</param-name>
+			<param-value>swallow.web.sso.url</param-value>
+		</init-param>
+		<init-param>
+			<param-name>safe</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>excludeURLs</param-name>
+			<param-value>/exclude,/api/*,/console/monitor/*,/static/*,/assets/*,/help/*,/console/message/randomstring,/console/alarm/*</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>CAS Validation Filter</filter-name>
+		<filter-class>org.jasig.cas.client.validation.Saml11TicketValidationFilter</filter-class>
+		<init-param>
+			<param-name>casServerUrlPrefixLionKey</param-name>
+			<param-value>cas-server-webapp.serverName</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverNameLionKey</param-name>
+			<param-value>swallow.web.sso.url</param-value>
+		</init-param>
+		<init-param>
+			<param-name>redirectAfterValidation</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>validateLionKey</param-name>
+			<param-value>cas-server-webapp.ticket.validate</param-value>
+		</init-param>
+		<init-param>
+			<param-name>tolerance</param-name>
+			<param-value>5000</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>
+	</filter>
+
+	<!--不要修改 filter-mapping的顺序-->
+
+	<filter-mapping>
+		<filter-name>CAS Single Sign Out Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CAS Validation Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>AuthenticationFilter</filter-name>
+		<filter-class>com.dianping.swallow.web.filter.AuthenticationFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>AuthenticationFilter</filter-name>
+		<url-pattern>/console/message/auth/*</url-pattern>
+		<url-pattern>/console/admin/auth/*</url-pattern>
+		<url-pattern>/console/download/auth/*</url-pattern>
+		<url-pattern>/console/setting/*</url-pattern>
+		<url-pattern>/console/topic/auth/*</url-pattern>
+		<url-pattern>/console/monitor/consumer/total/order/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>LogFilter</filter-name>
+		<filter-class>com.dianping.swallow.web.filter.LogFilter</filter-class>
+		<init-param>
+			<param-name>excludeURLs</param-name>
+			<param-value>/api/stats/*,/console/alarm/*,/static/*,/assets/*,/console/setting/alarmmeta/*,/console/setting/alarmmeta,/console/alarmmeta/*</param-value>
+		</init-param>
+		<init-param>
+			<param-name>includeURLs</param-name>
+			<param-value>create,update,remove,alarm,api,sendmessage</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>LogFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>appServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath*:/servlet-context.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>downloadServlet</servlet-name>
+		<servlet-class>com.dianping.swallow.web.servlet.FileDownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>downloadServlet</servlet-name>
+		<url-pattern>/console/download/file</url-pattern>
+	</servlet-mapping>
+</web-app>

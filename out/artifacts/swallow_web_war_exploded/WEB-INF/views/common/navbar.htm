@@ -1,0 +1,96 @@
+<div class="navbar navbar-default navbar-fixed-top" id="navbar">
+	<script type="text/javascript">
+		try {
+			ace.settings.check('navbar', 'fixed')
+		} catch (e) {
+		}
+	</script>
+
+	<div class="navbar-container" id="navbar-container">
+		<div class="navbar-header pull-left">
+			<a href="" class="navbar-brand"> <small> <i
+					class="icon-gift"></i> Swallow管理中心
+			</small>
+			</a>
+			#if(${isadmin})
+			<a href="${rc.contextPath}/console/server"
+				class="navbar-brand">
+				<button class="btn  #if(${menu}=='server')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
+					id="navbar-setting" >
+					<i class="icon-certificate align-top bigger-125 icon-on-right"></i> Server
+				</button>
+			</a>
+			#end
+			 <a href="${rc.contextPath}/console/topic" class="navbar-brand">
+				<button class="btn #if(${menu}=='topic')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
+					<i class="icon-globe align-top bigger-125 icon-on-right"></i>
+					Topic
+				</button>
+			</a> <a href="${rc.contextPath}/console/consumerid" class="navbar-brand">
+				<button class="btn #if(${menu}=='consumerid')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
+					<i class="icon-tasks align-top bigger-125 icon-on-right"></i>
+					消费ID
+				</button>
+			</a> <a href="${rc.contextPath}/console/ip" class="navbar-brand">
+				<button class="btn #if(${menu}=='ip')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
+					<i class="icon-list-alt align-top bigger-125 icon-on-right"></i>
+					IP
+				</button>
+			</a> <a href="${rc.contextPath}/console/application" class="navbar-brand">
+				<button class="btn #if(${menu}=='application')btn-purple #else btn-info#end  btn-xs swallow-nav-btn">
+					<i class="icon-th align-top bigger-125 icon-on-right"></i>
+					业务
+				</button>
+			</a> <a href="${rc.contextPath}/console/message" class="navbar-brand">
+				<button class="btn  #if(${menu}=='message')btn-purple #else btn-info#end btn-xs swallow-nav-btn">
+					<i class="icon-cloud  align-top bigger-125 icon-on-right"></i>
+					Message
+				</button>
+			</a> <a href="${rc.contextPath}/console/monitor/consumer/total/delay"
+				class="navbar-brand">
+				<button
+					class="btn  #if(${menu}=='monitor')btn-purple #else btn-info#end btn-xs">
+					<i class="icon-cloud-upload align-top bigger-125 icon-on-right"></i>
+					监控
+				</button>
+			</a> <a href="${rc.contextPath}/console/tool"
+				class="navbar-brand">
+				<button
+					class="btn  #if(${menu}=='tool')btn-purple #else btn-info#end btn-xs">
+					<i class="icon-briefcase align-top bigger-125 icon-on-right"></i>
+					工具
+				</button>
+			</a>
+			#if(${isadmin})
+			<a href="${rc.contextPath}/console/administrator"
+				class="navbar-brand">
+				<button class="btn  #if(${menu}=='admin')btn-purple #else btn-info#end btn-xs swallow-nav-btn"
+					id="navbar-admin">
+					<i class="icon-lock align-top bigger-125 icon-on-right"></i> 管理员
+				</button>
+			</a>
+			#end
+		</div>
+
+		<div class="navbar-header pull-right" role="navigation"
+			style="opacity: 1.0;">
+			<ul class="nav nav-pills" style="margin-top: 4px">
+				<li><a href="${rc.contextPath}/help"
+					style="background: white">帮助</a></li>
+				#if(${invisiable})
+				<li class="dropdown all-camera-dropdown"><a
+					class="dropdown-toggle" data-toggle="dropdown" href="#"
+					style="background: white">欢迎 ${username}<b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+						<li><a ng-href="${logouturl}">登出</a></li>
+					</ul></li>
+				#end
+			</ul>
+
+		</div>
+
+		<!-- /.navbar-header -->
+	</div>
+	<!-- /.container -->
+</div>

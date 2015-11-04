@@ -1,0 +1,86 @@
+<div class="main-content" ng-controller="DownloadController"
+	id="DownloadController">
+	<div class="report">
+		<div class="breadcrumbs" id="breadcrumbs">
+			<script type="text/javascript"
+				src="${rc.contextPath}/static/js/swallow-downloadfile.js"></script>
+			<script type="text/javascript">
+				try {
+					ace.settings.check('breadcrumbs', 'fixed')
+				} catch (e) {
+				}
+			</script>
+
+			<!-- #nav-search -->
+			<div class="nav-search nav-search-local pull-right" id="nav-search">
+				<form class="form-search">
+					<span class="input-icon"> <input type="text"
+						placeholder="根据topic查找文件..." style="width: 220px"
+						class="nav-search-input" name="a" id="searchname"
+						autocomplete="off" ng-model='name'>
+						<ul class="typeahead dropdown-menu" style="top: 28px; left: 0px;">
+						</ul> <i class="icon-search nav-search-icon"></i>
+					</span>
+				</form>
+			</div>
+
+		</div>
+
+		<!-- page-content -->
+		<div class="page-content">
+			<div>
+				<!--row  -->
+				<div class="row">
+					<table
+						class="table table-bordered table-striped  table-condensed table-hover">
+						<tr>
+							<th style="text-align: left">序号</th>
+							<th style="text-align: left">主题名称</th>
+							<th style="text-align: left">导出人</th>
+							<th style="text-align: left">导出时间</th>
+							<th style="text-align: left">查询起始时间</th>
+							<th style="text-align: left">查询结束时间</th>
+							<th style="text-align: left">文件</th>
+							<th style="text-align: left">导出量|实际量|最早时间|最晚时间</th>
+							<th style="text-align: left">状态</th>
+							<th style="text-align: left">操作</th>
+						</tr>
+						<tr ng-repeat="t in searchPaginator.currentPageItems"
+							on-finish-render-filters>
+							<td style="text-align: left" ng-bind="$index+1"></td>
+							<td style="text-align: left" ng-bind="t.topic"></a></td>
+							<td style="text-align: left" ng-bind="t.name"></td>
+							<td style="text-align: left" ng-bind="t.time | date : 'yyyy-MM-dd HH:mm:ss'"></td>
+							<td style="text-align: left" ng-bind="t.startdt | date : 'yyyy-MM-dd HH:mm:ss'"></td>
+							<td style="text-align: left" ng-bind="t.stopdt | date : 'yyyy-MM-dd HH:mm:ss'"></td>
+							<td style="text-align: left" ng-bind="t.filename"></td>
+							<td style="text-align: left" ng-bind="t.desc"></td>
+							<td style="text-align: left" ng-bind="t.finished"></td>
+							<td style="text-align: left" ng-show='t.finished=="已导出"'><a
+								href="/console/download/file?filename={{t.filename}}"
+								class="edit-config-btn"><i class="icon-download "
+									rel="tooltip" data-original-title="下载"></i></a> <a href=""
+								ng-click="dialog(t.filename);" class="edit-config-btn"><i
+									class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
+					</table>
+
+					<ul style="margin-top: 20px;" class="pagination">
+						<li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+						<li><a href="" ng-click="searchPaginator.previous()"
+							ng-show="searchPaginator.hasPrevious()">上一页</a></li>
+						<li ng-repeat="p in searchPaginator.pages"><a href=""
+							ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
+						<li class="disabled"><a href="javascript:;">...</a></li>
+
+						<li><a href="" ng-click="searchPaginator.next()"
+							ng-show="searchPaginator.hasNext()">下一页</a></li>
+
+						<li><a href=""
+							ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+					</ul>
+				</div>
+				<!--end row  -->
+			</div>
+		</div>
+	</div>
+</div>

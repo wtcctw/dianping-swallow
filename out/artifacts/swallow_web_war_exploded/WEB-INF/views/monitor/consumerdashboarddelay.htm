@@ -1,0 +1,78 @@
+<div class="main-content" ng-controller="ConsumerDashboardController"
+	id="ConsumerDashboardController">
+	<div style="padding-top: 2px; padding-left: 2px; padding-right: 8px;">
+		<div class="report">
+			<div class="breadcrumbs" id="breadcrumbs">
+				<script type="text/javascript">
+					try {
+						ace.settings.check('breadcrumbs', 'fixed')
+					} catch (e) {
+					}
+
+				</script>
+				<span class="text-danger title">【报表时间】</span><span
+					class="text-success">{{starttime | date : 'yyyy-MM-dd HH:mm:ss'}} to {{stoptime | date : 'yyyy-MM-dd HH:mm:ss'}}</span>
+				<div class="nav-search nav" id="nav-search">
+					<span class="text-danger switch"></span> &nbsp;[ <a href="#"
+						ng-click="setStep(-168)">-7d</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(-24)">-1d</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(-2)">-2h</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(-1)">-1h</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(1)">+1h</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(2)">+2h</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(24)">+1d</a> ] &nbsp;[ <a href="#"
+						ng-click="setStep(168)">+7d</a> ] &nbsp;[ <a href="#"
+						ng-click="setNow()">now</a> ]&nbsp;
+				</div>
+			</div>
+			<div class="report">
+				<div class="text-center">
+					<ul class="pagination" style="cursor: pointer">
+						<li id='minute{{$index}}' ng-repeat="page in pages"><a
+							ng-class="whatClassIsIt($index)"
+							ng-click="getDashboardDelay($index)" ng-bind="page"> </a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="page-content" id="container">
+				<div class="row" style="margin-bottom: 10px; height: 30px;">
+					<table>
+						<tr style="text-align: left">
+							<th><select class="selectpicker" ng-model="boardtype"
+								ng-change="onchanged()"
+								ng-options="item.type as item.type for item in boards"></select></th>
+						</tr>
+					</table>
+				</div>
+				<div>
+					<div class="row row-div-table">
+						<table ng-repeat="minuteEntry in minuteEntrys"
+							style="float: left;font-size=small;width=150px" border=1>
+							<tr>
+								<th colspan="2" class="text-danger" class="text-danger"><h6
+										ng-bind="minuteEntry.time | date : 'HH:mm'"></h6></th>
+							</tr>
+							<tr>
+								<th style="text-align: left; width: 120px">ConsumerID</th>
+								<th style="text-align: left; width: 40px">状态</th>
+							</tr>
+							<tr ng-repeat="entry in minuteEntry.result"
+								ng-class="{'alert-row': entry.numAlarm>0}" >
+								<td style="text-align: left; width: 120px; cursor: pointer;"><a href style="color:#000000" data-placement="top" 
+									 data-content="业务名: {{entry.name}} 开发: {{entry.dpMobile}}" data-trigger="hover" bs-popover ng-bind="entry.consumerId | limitTo : 15"></a></td>
+								<td style="text-align: left; width: 40px; cursor: pointer;">
+									<a href="" data-placement="top"
+									title="{{entry.topic}}" data-html="true"
+									data-content="<table><tr><th><a href='/console/monitor/consumer/{{entry.topic}}/delay?cid={{entry.consumerId}}'>发送延迟/s&nbsp;&nbsp;</a></th><th><a href='/console/monitor/consumer/{{entry.topic}}/delay?cid={{entry.consumerId}}'>ack延迟/s&nbsp;&nbsp;</th><th><a href='/console/monitor/consumer/{{entry.topic}}/accu?cid={{entry.consumerId}}'>消息堆积</th></tr><tr><td>{{entry.senddelay}}</td><td>{{entry.ackdelay}}</td><td>{{entry.accu}}</td></tr></table>"
+									data-auto-close="1"  bs-popover 
+									ng-bind="entry.numAlarm > 0 ? '异常' : '正常' "
+									></a>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

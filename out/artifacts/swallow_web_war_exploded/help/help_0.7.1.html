@@ -1,0 +1,2175 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>body {
+  width: 45em;
+  border: 1px solid #ddd;
+  outline: 1300px solid #fff;
+  margin: 16px auto;
+}
+
+body .markdown-body
+{
+  padding: 30px;
+}
+
+@font-face {
+  font-family: fontawesome-mini;
+  src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+
+@font-face {
+  font-family: octicons-anchor;
+  src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+
+.markdown-body {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  color: #333333;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.markdown-body a {
+  background: transparent;
+}
+
+.markdown-body a:active,
+.markdown-body a:hover {
+  outline: 0;
+}
+
+.markdown-body b,
+.markdown-body strong {
+  font-weight: bold;
+}
+
+.markdown-body mark {
+  background: #ff0;
+  color: #000;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.markdown-body sub,
+.markdown-body sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+.markdown-body sup {
+  top: -0.5em;
+}
+.markdown-body sub {
+  bottom: -0.25em;
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+.markdown-body img {
+  border: 0;
+}
+
+.markdown-body hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+
+.markdown-body pre {
+  overflow: auto;
+}
+
+.markdown-body code,
+.markdown-body kbd,
+.markdown-body pre,
+.markdown-body samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+.markdown-body input {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+.markdown-body html input[disabled] {
+  cursor: default;
+}
+
+.markdown-body input {
+  line-height: normal;
+}
+
+.markdown-body input[type="checkbox"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.markdown-body td,
+.markdown-body th {
+  padding: 0;
+}
+
+.markdown-body .codehilitetable {
+  border: 0;
+  border-spacing: 0;
+}
+
+.markdown-body .codehilitetable tr {
+  border: 0;
+}
+
+.markdown-body .codehilitetable pre,
+.markdown-body .codehilitetable div.codehilite {
+  margin: 0;
+}
+
+.markdown-body .linenos,
+.markdown-body .code,
+.markdown-body .codehilitetable td {
+  border: 0;
+  padding: 0;
+}
+
+.markdown-body td:not(.linenos) .linenodiv {
+  padding: 0 !important;
+}
+
+.markdown-body .code {
+  width: 100%;
+}
+
+.markdown-body .linenos div pre,
+.markdown-body .linenodiv pre,
+.markdown-body .linenodiv {
+  border: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -webkit-border-top-left-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+  -moz-border-radius-topleft: 3px;
+  -moz-border-radius-bottomleft: 3px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.markdown-body .code div pre,
+.markdown-body .code div {
+  border: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -webkit-border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  -moz-border-radius-topright: 3px;
+  -moz-border-radius-bottomright: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.markdown-body * {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown-body input {
+  font: 13px Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  line-height: 1.4;
+}
+
+.markdown-body a {
+  color: #4183c4;
+  text-decoration: none;
+}
+
+.markdown-body a:hover,
+.markdown-body a:focus,
+.markdown-body a:active {
+  text-decoration: underline;
+}
+
+.markdown-body hr {
+  height: 0;
+  margin: 15px 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.markdown-body hr:before,
+.markdown-body hr:after {
+  display: table;
+  content: " ";
+}
+
+.markdown-body hr:after {
+  clear: both;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  line-height: 1.1;
+}
+
+.markdown-body h1 {
+  font-size: 30px;
+}
+
+.markdown-body h2 {
+  font-size: 21px;
+}
+
+.markdown-body h3 {
+  font-size: 16px;
+}
+
+.markdown-body h4 {
+  font-size: 14px;
+}
+
+.markdown-body h5 {
+  font-size: 12px;
+}
+
+.markdown-body h6 {
+  font-size: 11px;
+}
+
+.markdown-body blockquote {
+  margin: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body ol ol,
+.markdown-body ul ol {
+  list-style-type: lower-roman;
+}
+
+.markdown-body ul ul ol,
+.markdown-body ul ol ol,
+.markdown-body ol ul ol,
+.markdown-body ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.markdown-body dd {
+  margin-left: 0;
+}
+
+.markdown-body code,
+.markdown-body pre,
+.markdown-body samp {
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
+}
+
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body kbd {
+  background-color: #e7e7e7;
+  background-image: -moz-linear-gradient(#fefefe, #e7e7e7);
+  background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
+  background-image: linear-gradient(#fefefe, #e7e7e7);
+  background-repeat: repeat-x;
+  border-radius: 2px;
+  border: 1px solid #cfcfcf;
+  color: #000;
+  padding: 3px 5px;
+  line-height: 10px;
+  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  display: inline-block;
+}
+
+.markdown-body>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown-body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+.markdown-body .headeranchor-link {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  padding-right: 6px;
+  padding-left: 30px;
+  margin-left: -30px;
+}
+
+.markdown-body .headeranchor-link:focus {
+  outline: none;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  position: relative;
+  margin-top: 1em;
+  margin-bottom: 16px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.markdown-body h1 .headeranchor,
+.markdown-body h2 .headeranchor,
+.markdown-body h3 .headeranchor,
+.markdown-body h4 .headeranchor,
+.markdown-body h5 .headeranchor,
+.markdown-body h6 .headeranchor {
+  display: none;
+  color: #000;
+  vertical-align: middle;
+}
+
+.markdown-body h1:hover .headeranchor-link,
+.markdown-body h2:hover .headeranchor-link,
+.markdown-body h3:hover .headeranchor-link,
+.markdown-body h4:hover .headeranchor-link,
+.markdown-body h5:hover .headeranchor-link,
+.markdown-body h6:hover .headeranchor-link {
+  height: 1em;
+  padding-left: 8px;
+  margin-left: -30px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.markdown-body h1:hover .headeranchor-link .headeranchor,
+.markdown-body h2:hover .headeranchor-link .headeranchor,
+.markdown-body h3:hover .headeranchor-link .headeranchor,
+.markdown-body h4:hover .headeranchor-link .headeranchor,
+.markdown-body h5:hover .headeranchor-link .headeranchor,
+.markdown-body h6:hover .headeranchor-link .headeranchor {
+  display: inline-block;
+}
+
+.markdown-body h1 {
+  padding-bottom: 0.3em;
+  font-size: 2.25em;
+  line-height: 1.2;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown-body h2 {
+  padding-bottom: 0.3em;
+  font-size: 1.75em;
+  line-height: 1.225;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown-body h3 {
+  font-size: 1.5em;
+  line-height: 1.43;
+}
+
+.markdown-body h4 {
+  font-size: 1.25em;
+}
+
+.markdown-body h5 {
+  font-size: 1em;
+}
+
+.markdown-body h6 {
+  font-size: 1em;
+  color: #777;
+}
+
+.markdown-body p,
+.markdown-body blockquote,
+.markdown-body ul,
+.markdown-body ol,
+.markdown-body dl,
+.markdown-body table,
+.markdown-body pre,
+.markdown-body .admonition {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown-body hr {
+  height: 4px;
+  padding: 0;
+  margin: 16px 0;
+  background-color: #e7e7e7;
+  border: 0 none;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+}
+
+.markdown-body ul ul,
+.markdown-body ul ol,
+.markdown-body ol ol,
+.markdown-body ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body li>p {
+  margin-top: 16px;
+}
+
+.markdown-body dl {
+  padding: 0;
+}
+
+.markdown-body dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.markdown-body dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.markdown-body blockquote {
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+
+.markdown-body blockquote>:first-child {
+  margin-top: 0;
+}
+
+.markdown-body blockquote>:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  word-break: normal;
+  word-break: keep-all;
+}
+
+.markdown-body table th {
+  font-weight: bold;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  padding: 6px 13px;
+  border: 1px solid #ddd;
+}
+
+.markdown-body table tr {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown-body code,
+.markdown-body samp {
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(0,0,0,0.04);
+  border-radius: 3px;
+}
+
+.markdown-body code:before,
+.markdown-body code:after {
+  letter-spacing: -0.2em;
+  content: "\00a0";
+}
+
+.markdown-body pre>code {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.markdown-body .codehilite {
+  margin-bottom: 16px;
+}
+
+.markdown-body .codehilite pre,
+.markdown-body pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+}
+
+.markdown-body .codehilite pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.markdown-body pre {
+  word-wrap: normal;
+}
+
+.markdown-body pre code {
+  display: inline;
+  max-width: initial;
+  padding: 0;
+  margin: 0;
+  overflow: initial;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+.markdown-body pre code:before,
+.markdown-body pre code:after {
+  content: normal;
+}
+
+/* Admonition */
+.markdown-body .admonition {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  position: relative;
+  border-radius: 3px;
+  border: 1px solid #e0e0e0;
+  border-left: 6px solid #333;
+  padding: 10px 10px 10px 30px;
+}
+
+.markdown-body .admonition table {
+  color: #333;
+}
+
+.markdown-body .admonition p {
+  padding: 0;
+}
+
+.markdown-body .admonition-title {
+  font-weight: bold;
+  margin: 0;
+}
+
+.markdown-body .admonition>.admonition-title {
+  color: #333;
+}
+
+.markdown-body .attention>.admonition-title {
+  color: #a6d796;
+}
+
+.markdown-body .caution>.admonition-title {
+  color: #d7a796;
+}
+
+.markdown-body .hint>.admonition-title {
+  color: #96c6d7;
+}
+
+.markdown-body .danger>.admonition-title {
+  color: #c25f77;
+}
+
+.markdown-body .question>.admonition-title {
+  color: #96a6d7;
+}
+
+.markdown-body .note>.admonition-title {
+  color: #d7c896;
+}
+
+.markdown-body .admonition:before,
+.markdown-body .attention:before,
+.markdown-body .caution:before,
+.markdown-body .hint:before,
+.markdown-body .danger:before,
+.markdown-body .question:before,
+.markdown-body .note:before {
+  font: normal normal 16px fontawesome-mini;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  line-height: 1.5;
+  color: #333;
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding-top: 10px;
+  padding-left: 10px;
+}
+
+.markdown-body .admonition:before {
+  content: "\f056\00a0";
+  color: 333;
+}
+
+.markdown-body .attention:before {
+  content: "\f058\00a0";
+  color: #a6d796;
+}
+
+.markdown-body .caution:before {
+  content: "\f06a\00a0";
+  color: #d7a796;
+}
+
+.markdown-body .hint:before {
+  content: "\f05a\00a0";
+  color: #96c6d7;
+}
+
+.markdown-body .danger:before {
+  content: "\f057\00a0";
+  color: #c25f77;
+}
+
+.markdown-body .question:before {
+  content: "\f059\00a0";
+  color: #96a6d7;
+}
+
+.markdown-body .note:before {
+  content: "\f040\00a0";
+  color: #d7c896;
+}
+
+.markdown-body .admonition::after {
+  content: normal;
+}
+
+.markdown-body .attention {
+  border-left: 6px solid #a6d796;
+}
+
+.markdown-body .caution {
+  border-left: 6px solid #d7a796;
+}
+
+.markdown-body .hint {
+  border-left: 6px solid #96c6d7;
+}
+
+.markdown-body .danger {
+  border-left: 6px solid #c25f77;
+}
+
+.markdown-body .question {
+  border-left: 6px solid #96a6d7;
+}
+
+.markdown-body .note {
+  border-left: 6px solid #d7c896;
+}
+
+.markdown-body .admonition>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown-body .admonition>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* progress bar*/
+.markdown-body .progress {
+  display: block;
+  width: 300px;
+  margin: 10px 0;
+  height: 24px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  background-color: #ededed;
+  position: relative;
+  box-shadow: inset -1px 1px 3px rgba(0, 0, 0, .1);
+}
+
+.markdown-body .progress-label {
+  position: absolute;
+  text-align: center;
+  font-weight: bold;
+  width: 100%; margin: 0;
+  line-height: 24px;
+  color: #333;
+  text-shadow: 1px 1px 0 #fefefe, -1px -1px 0 #fefefe, -1px 1px 0 #fefefe, 1px -1px 0 #fefefe, 0 1px 0 #fefefe, 0 -1px 0 #fefefe, 1px 0 0 #fefefe, -1px 0 0 #fefefe, 1px 1px 2px #000;
+  -webkit-font-smoothing: antialiased !important;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.markdown-body .progress-bar {
+  height: 24px;
+  float: left;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  background-color: #96c6d7;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -1px 0 rgba(0, 0, 0, .1);
+  background-size: 30px 30px;
+  background-image: -webkit-linear-gradient(
+    135deg, rgba(255, 255, 255, .4) 27%,
+    transparent 27%,
+    transparent 52%, rgba(255, 255, 255, .4) 52%,
+    rgba(255, 255, 255, .4) 77%,
+    transparent 77%, transparent
+  );
+  background-image: -moz-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, .4) 27%, transparent 27%,
+    transparent 52%, rgba(255, 255, 255, .4) 52%,
+    rgba(255, 255, 255, .4) 77%, transparent 77%,
+    transparent
+  );
+  background-image: -ms-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, .4) 27%, transparent 27%,
+    transparent 52%, rgba(255, 255, 255, .4) 52%,
+    rgba(255, 255, 255, .4) 77%, transparent 77%,
+    transparent
+  );
+  background-image: -o-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, .4) 27%, transparent 27%,
+    transparent 52%, rgba(255, 255, 255, .4) 52%,
+    rgba(255, 255, 255, .4) 77%, transparent 77%,
+    transparent
+  );
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, .4) 27%, transparent 27%,
+    transparent 52%, rgba(255, 255, 255, .4) 52%,
+    rgba(255, 255, 255, .4) 77%, transparent 77%,
+    transparent
+  );
+}
+
+.markdown-body .progress-100plus .progress-bar {
+  background-color: #a6d796;
+}
+
+.markdown-body .progress-80plus .progress-bar {
+  background-color: #c6d796;
+}
+
+.markdown-body .progress-60plus .progress-bar {
+  background-color: #d7c896;
+}
+
+.markdown-body .progress-40plus .progress-bar {
+  background-color: #d7a796;
+}
+
+.markdown-body .progress-20plus .progress-bar {
+  background-color: #d796a6;
+}
+
+.markdown-body .progress-0plus .progress-bar {
+  background-color: #c25f77;
+}
+
+.markdown-body .candystripe-animate .progress-bar{
+  -webkit-animation: animate-stripes 3s linear infinite;
+  -moz-animation: animate-stripes 3s linear infinite;
+  animation: animate-stripes 3s linear infinite;
+}
+
+@-webkit-keyframes animate-stripes {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 60px 0;
+  }
+}
+
+@-moz-keyframes animate-stripes {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 60px 0;
+  }
+}
+
+@keyframes animate-stripes {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 60px 0;
+  }
+}
+
+.markdown-body .gloss .progress-bar {
+  box-shadow:
+    inset 0 4px 12px rgba(255, 255, 255, .7),
+    inset 0 -12px 0 rgba(0, 0, 0, .05);
+}
+
+/* Multimarkdown Critic Blocks */
+.markdown-body .critic_mark {
+  background: #ff0;
+}
+
+.markdown-body .critic_delete {
+  color: #c82829;
+  text-decoration: line-through;
+}
+
+.markdown-body .critic_insert {
+  color: #718c00 ;
+  text-decoration: underline;
+}
+
+.markdown-body .critic_comment {
+  color: #8e908c;
+  font-style: italic;
+}
+
+.markdown-body .headeranchor {
+  font: normal normal 16px octicons-anchor;
+  line-height: 1;
+  display: inline-block;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.headeranchor:before {
+  content: '\f05c';
+}
+
+.markdown-body .task-list-item {
+  list-style-type: none;
+}
+
+.markdown-body .task-list-item+.task-list-item {
+  margin-top: 3px;
+}
+
+.markdown-body .task-list-item input {
+  margin: 0 4px 0.25em -20px;
+  vertical-align: middle;
+}
+
+/* Media */
+@media only screen and (min-width: 480px) {
+  .markdown-body {
+    font-size:14px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .markdown-body {
+    font-size:16px;
+  }
+}
+
+@media print {
+  .markdown-body * {
+    background: transparent !important;
+    color: black !important;
+    filter:none !important;
+    -ms-filter: none !important;
+  }
+
+  .markdown-body {
+    font-size:12pt;
+    max-width:100%;
+    outline:none;
+    border: 0;
+  }
+
+  .markdown-body a,
+  .markdown-body a:visited {
+    text-decoration: underline;
+  }
+
+  .markdown-body .headeranchor-link {
+    display: none;
+  }
+
+  .markdown-body a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  .markdown-body abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+
+  .markdown-body .ir a:after,
+  .markdown-body a[href^="javascript:"]:after,
+  .markdown-body a[href^="#"]:after {
+    content: "";
+  }
+
+  .markdown-body pre {
+    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .markdown-body pre,
+  .markdown-body blockquote {
+    border: 1px solid #999;
+    padding-right: 1em;
+    page-break-inside: avoid;
+  }
+
+  .markdown-body .progress,
+  .markdown-body .progress-bar {
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  .markdown-body .progress {
+    border: 1px solid #ddd;
+  }
+
+  .markdown-body .progress-bar {
+    height: 22px;
+    border-right: 1px solid #ddd;
+  }
+
+  .markdown-body tr,
+  .markdown-body img {
+    page-break-inside: avoid;
+  }
+
+  .markdown-body img {
+    max-width: 100% !important;
+  }
+
+  .markdown-body p,
+  .markdown-body h2,
+  .markdown-body h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .markdown-body h2,
+  .markdown-body h3 {
+    page-break-after: avoid;
+  }
+}
+</style><title>README</title></head><body>
+
+	<div style='width: 25%;'>
+		<ul id="tree" class="ztree" style='width: 100%'>
+
+		</ul>
+	</div>
+<article class="markdown-body"><p>注：<strong>本文针对Swallow0.7.1版本</strong>,下文中，${currentVersion}, currentVersion指0.7.1<br />
+使用之前，请仔细阅读<a href="#takeAttention">swallow使用注意事项</a></p>
+<div class="toc">
+<ul>
+<li><a href="#_1">基础概念</a><ul>
+<li><a href="#_2">功能介绍</a></li>
+<li><a href="#_3">名词解释</a></li>
+</ul>
+</li>
+<li><a href="#swallow">Swallow线下消息收发消息模拟平台</a><ul>
+<li><a href="#_4">生产者模拟平台</a></li>
+<li><a href="#_5">消费者模拟平台</a></li>
+</ul>
+</li>
+<li><a href="#swallow_1">Swallow系统接入流程</a><ul>
+<li><a href="#topic">申请Topic</a></li>
+</ul>
+</li>
+<li><a href="#swallow_2">Swallow客户端使用说明</a><ul>
+<li><a href="#swallow_3">使用swallow发送消息</a><ul>
+<li><a href="#_6">基本概念说明</a><ul>
+<li><a href="#producer">Producer配置信息详解</a></li>
+</ul>
+</li>
+<li><a href="#_7">代码示例</a><ul>
+<li><a href="#maven">添加maven依赖</a></li>
+<li><a href="#_8">生产者端代码实现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#swallow_4">使用Swallow接收消息</a><ul>
+<li><a href="#_9">基本概念</a><ul>
+<li><a href="#consumerconfig">ConsumerConfig配置详解</a></li>
+<li><a href="#_10">接收消息接口</a></li>
+</ul>
+</li>
+<li><a href="#_11">代码示例</a><ul>
+<li><a href="#maven-poxxml">Maven pox.xml中添加依赖</a></li>
+<li><a href="#messagelistener">消费者实现MessageListener接口</a></li>
+<li><a href="#_12">消费者端代码实现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#swallow-web">Swallow Web使用说明</a><ul>
+<li><a href="#topic_1">Topic查询</a><ul>
+<li><a href="#topic_2">根据Topic名称查询</a></li>
+</ul>
+</li>
+<li><a href="#message">Message查询与重发</a><ul>
+<li><a href="#topicmessage">查询Topic下所有Message</a></li>
+<li><a href="#message-id">根据Message ID精确查询</a></li>
+<li><a href="#_13">根据保存时间精确查询</a></li>
+<li><a href="#_14">导出消息</a></li>
+<li><a href="#message_1">Message重发</a><ul>
+<li><a href="#webmessage">web端重发已保存的message</a></li>
+<li><a href="#apimessage">通过api重发已保存的message</a></li>
+<li><a href="#_15">使用示范</a></li>
+<li><a href="#message_2">重发自定义message</a></li>
+<li><a href="#apimessage_1">通过api重发自定义的message</a></li>
+<li><a href="#_16">使用示范</a></li>
+</ul>
+</li>
+<li><a href="#swallow_5">查看Swallow消息</a></li>
+</ul>
+</li>
+<li><a href="#topicswallow-server">Topic监控和Swallow Server监控</a><ul>
+<li><a href="#topic_3">Topic监控</a><ul>
+<li><a href="#_17">基础概念</a></li>
+<li><a href="#_18">延时监控</a></li>
+<li><a href="#qps">每秒消息(QPS)监控</a></li>
+<li><a href="#_19">堆积量监控</a></li>
+</ul>
+</li>
+<li><a href="#swallow-server">Swallow Server监控</a><ul>
+<li><a href="#producer-server">producer server监控</a></li>
+<li><a href="#consumer-server">consumer server监控</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#swallow_6">Swallow 告警</a><ul>
+<li><a href="#serverswallow">server告警（针对swallow研发团队）</a></li>
+<li><a href="#topic_4">topic告警（针对消息的生产者）</a></li>
+<li><a href="#consumerid">consumerId告警（针对消息的消费者）</a></li>
+<li><a href="#ip">IP告警</a></li>
+</ul>
+</li>
+<li><a href="#swallow_7">Swallow 大盘</a><ul>
+<li><a href="#_20">综合大盘</a></li>
+<li><a href="#_21">发送延迟,确认延迟和堆积大盘</a></li>
+</ul>
+</li>
+<li><a href="#_22">权限管理</a><ul>
+<li><a href="#_23">管理员行为</a></li>
+<li><a href="#_24">用户行为</a></li>
+<li><a href="#visitor">Visitor行为</a></li>
+<li><a href="#_25">权限提升</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#swallow_8">Swallow使用注意事项</a></li>
+<li><a href="#swallow_9">Swallow常见问题以及处理</a><ul>
+<li><a href="#topicconsumer">如何查找某个topic对应的consumer</a></li>
+<li><a href="#_26">如何查看我的消费是否有延迟、延迟多少条消息？</a><ul>
+<li><a href="#cat">Cat端追踪</a></li>
+<li><a href="#swallow-web_1">Swallow Web端追踪</a></li>
+</ul>
+</li>
+<li><a href="#consumer">如何查看我的Consumer消费一条消息的平均时间？</a><ul>
+<li><a href="#cat_1">Cat端追踪</a></li>
+<li><a href="#swallow-web_2">Swallow Web端追踪</a></li>
+</ul>
+</li>
+<li><a href="#consumer_1">我的Consumer有延时，该怎么确认问题所在？</a></li>
+<li><a href="#consumer_2">我的Consumer堵了，该怎么确认问题所在？</a></li>
+<li><a href="#producer_1">如何确认我的Producer正常工作？</a><ul>
+<li><a href="#cat_2">Cat端追踪</a></li>
+<li><a href="#swallow-web_3">Swallow Web端追踪</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="_1"><a name="user-content-_1" href="#_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基础概念</h1>
+<h2 id="_2"><a name="user-content-_2" href="#_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>功能介绍</h2>
+<p>Swallow是一个<em>基于Topic的异步消息传送系统</em>，使用<em>发布/订阅</em>的消息模型，<em>消息发布者</em>指定Topic并发送消息到Swallow服务器，<em>消息订阅者</em>从Swallow服务器订阅消息。</p>
+<p>主要功能：</p>
+<ul>
+<li>系统解耦，解除消息生产者和消费者之间的强依赖关系</li>
+<li>峰值处理，短时间大量消息涌入，可以将消息写入消息队列，消费系统可以后续慢慢消费</li>
+<li>系统交互消息管理，查询系统之间的历史通讯记录、进行问题追溯以及故障查询工作</li>
+</ul>
+<h2 id="_3"><a name="user-content-_3" href="#_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>名词解释</h2>
+<ul>
+<li>Topic：表示消息的主题</li>
+<li>发布/订阅模型：同一个topic可以同时被多个订阅者订阅，订阅者在订阅时指定订阅ID(ConsumerId)。使用相同ConsumerId(例如Consumer A)的Consumer，将会视作同一个Consumer（同一个Consumer消费的Message将不会重复）。假设一个集群，有2台机器(主机1和主机2)，ConsumerId都是“Consumer-A”，那么<em>同一则Message，将要么被“主机1”获取，要么被“主机2”获取，不会被两者均获取</em>。</li>
+<li>Producer：表示生产消息的主体，将消息发送到目的Topic。</li>
+<li>Consumer：表示消费消息的主体，从Topic中获取消息。</li>
+<li>同步模式：发送方发出消息后，等待接收服务器成功、超时、异常时返回。</li>
+<li>异步模式：生产者发送消息时，先把消费存储到本地文件，同时启动后台发送消息线程将文件的消息读取出来发送到server。</li>
+</ul>
+<h1 id="swallow"><a name="user-content-swallow" href="#swallow" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow线下消息收发消息模拟平台</h1>
+<h2 id="_4"><a name="user-content-_4" href="#_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>生产者模拟平台</h2>
+<ul>
+<li>
+<p>生产者可以向某个Topic发送一条消息。</p>
+<ul>
+<li><a href="http://192.168.8.21:7070/rundemo/swallow-alpha-067#r=0&amp;j=17">alpha环境</a></li>
+<li><a href="http://192.168.8.21:7070/rundemo/swallow-qa-067#r=0&amp;j=17">qa环境</a></li>
+</ul>
+</li>
+<li>
+<p>在代码编辑框内，修改“Destination.topic(&ldquo;example&rdquo;)”为“Destination.topic(&ldquo;&lt;你的topic名称&gt;&rdquo;)”)。</p>
+</li>
+<li>点击右边绿色run按钮。</li>
+<li>在右边紫色控制台下方，输入消息的内容，按回车，即可发送。</li>
+</ul>
+<h2 id="_5"><a name="user-content-_5" href="#_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消费者模拟平台</h2>
+<ul>
+<li>
+<p>消费者接收消息  (在代码编辑框内，修改“Destination.topic(&ldquo;example&rdquo;)”为“Destination.topic(&ldquo;&lt;你的topic名称&gt;&rdquo;)”)，点击“run”，即可启动消费者。</p>
+<ul>
+<li><a href="http://192.168.8.21:7070/rundemo/swallow-alpha#r=0&amp;j=10">alpha环境</a></li>
+<li><a href="http://192.168.8.21:7070/rundemo/swallow-qa#r=0&amp;j=10">qa环境</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="swallow_1"><a name="user-content-swallow_1" href="#swallow_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow系统接入流程</h1>
+<h2 id="topic"><a name="user-content-topic" href="#topic" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>申请Topic</h2>
+<p>如果有新的Topic，请联系：李明冬/孟文超(<a href="mailto:mingdong.li@dianping.com">mingdong.li@dianping.com</a>, <a href="mailto:wenchao.meng@dianping.com">wenchao.meng@dianping.com</a>)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。</p>
+<p>联系时，<strong>请邮件里告知：</strong></p>
+<ul>
+<li>申请人所在业务部门 (例如：支付中心业务部门)</li>
+<li>使用Swallow解决的业务场景是什么   (例如：订单支付成功后，使用Swallow通知xxx付款成功的消息)</li>
+<li>topic名称(例如：dp_action)，不能包含点(.)，只使用字母和下划线，长度不超过25个字符</li>
+<li>生产者业务名，以及负责人姓名    (例如，pay-order, 林俊杰)</li>
+<li>消费者业务名，以及负责人姓名  (例如，mobile-api, 陆经天)</li>
+<li>计划上线时间</li>
+<li>每天大概的消息量  (例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成&rdquo;100&rdquo;)</li>
+</ul>
+<h1 id="swallow_2"><a name="user-content-swallow_2" href="#swallow_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow客户端使用说明</h1>
+<h2 id="swallow_3"><a name="user-content-swallow_3" href="#swallow_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用swallow发送消息</h2>
+<h3 id="_6"><a name="user-content-_6" href="#_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基本概念说明</h3>
+<h4 id="producer"><a name="user-content-producer" href="#producer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Producer配置信息详解</h4>
+<ul>
+<li>mode表示producer工作模式。</li>
+<li>asyncRetryTimes表示异步模式下发送失败重试次数。</li>
+<li>syncRetryTimes表示同步模式下发送失败重试次数。</li>
+<li>zipped表示是否对待发送消息进行压缩。当消息量很大时可以设置此标志，将消息压缩后再发送。</li>
+<li>threadPoolSize表示异步模式时，线程池大小。默认值是1，如果设置成多线程，那么会有多个线程同时从FileQueue获取消息并发送，这样的话发送的消息就无法保证其先后顺序。</li>
+<li>sendMsgLeftLastSession表示异步模式时，是否重启续传。</li>
+</ul>
+<table class="table table-bordered table-striped table-condensed" >
+   <tr>
+      <td>&#23646;&#24615;</td>
+      <td> &#40664;&#35748;&#20540;</td>
+   </tr>
+   <tr>
+      <td>mode </td>
+      <td>ProducerMode.ASYNC_MODE</td>
+   </tr>
+   <tr>
+      <td>asyncRetryTimes </td>
+      <td>10</td>
+   </tr>
+   <tr>
+      <td>syncRetryTimes </td>
+      <td>0</td>
+   </tr>
+   <tr>
+      <td>zipped </td>
+      <td>false</td>
+   </tr>
+   <tr>
+      <td>threadPoolSize </td>
+      <td>1</td>
+   </tr>
+   <tr>
+      <td>sendMsgLeftLastSession </td>
+      <td>true</td>
+   </tr>
+</table>
+
+<ul>
+<li>
+<p>Producer唯一定义了发送消息的方法sendMessage,下图列出了不同版本的sendMessage。对于需要发送的消息，如果是String类型，则直接发送；如果是其他类型则会被序列化为json字符串进行传输。开发时需要注意：</p>
+<ul>
+<li>请确保content对象的类型具有默认构造方法。<br></li>
+<li>尽量保证content对象是简单的类型(如String/基本类型包装类/POJO)。如果content是复杂的类型，建议在您的项目上线之前，在接收消息端做测试，验证是否能够将content正常反序列化。</li>
+<li>sendMessage消息发送失败会抛出SendFailedException异常，可能的原因包括：网络、数据库及FileQueue故障.</li>
+</ul>
+</li>
+</ul>
+<table class= "table table-bordered table-striped table-condensed">
+   <tr>
+      <td>&#26041;&#27861;</td>
+      <td>&#25551;&#36848;</td>
+   </tr>
+   <tr>
+      <td>String sendMessage(Object content)</td>
+      <td>content&#20026;&#21457;&#36865;&#30340;&#28040;&#24687;</td>
+   </tr>
+   <tr>
+      <td>String sendMessage(Object content,String messageType) </td>
+      <td>messageType&#29992;&#20110;&#25351;&#23450;&#36807;&#28388;&#30340;&#28040;&#24687;&#31867;&#22411;</td>
+   </tr>
+   <tr>
+      <td>String sendMessage(Object content, Map<String,String> properties)</td>
+      <td>properties&#25351;&#23450;&#28040;&#24687;&#23646;&#24615;</td>
+   </tr>
+   <tr>
+      <td>String sendMessage(Object content, Map<String, String> properties, String messageType)</td>
+      <td>&#21516;&#26102;&#25351;&#23450;&#36807;&#28388;&#30340;&#28040;&#24687;&#31867;&#22411;&#21644;&#28040;&#24687;&#23646;&#24615;</td>
+   </tr>
+</table>
+
+<h3 id="_7"><a name="user-content-_7" href="#_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>代码示例</h3>
+<h4 id="maven"><a name="user-content-maven" href="#maven" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>添加maven依赖</h4>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-beans&lt;/artifactId&gt;
+    &lt;version&gt;4.1.3.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-context&lt;/artifactId&gt;
+    &lt;version&gt;4.1.3.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-core&lt;/artifactId&gt;
+    &lt;version&gt;4.1.3.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.dianping.swallow&lt;/groupId&gt;
+    &lt;artifactId&gt;swallow-producerclient&lt;/artifactId&gt;
+    &lt;version&gt;${currentVersion}&lt;/version&gt; 
+&lt;/dependency&gt;
+&lt;!-- lion  请使用lion最新稳定版--&gt;
+&lt;dependency&gt;
+     &lt;groupId&gt;com.dianping.lion&lt;/groupId&gt;
+     &lt;artifactId&gt;lion-client&lt;/artifactId&gt;
+     &lt;version&gt;${lion.version}&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!--  如果你的应用在tomcat中启动，则此依赖无必要，否则，请添加
+&lt;dependency&gt;
+    &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+    &lt;artifactId&gt;servlet-api&lt;/artifactId&gt;
+    &lt;version&gt;2.5&lt;/version&gt;
+&lt;/dependency&gt;
+--&gt;
+&lt;!-- 监控  请使用cat最新稳定版--&gt;
+&lt;dependency&gt;
+     &lt;groupId&gt;com.dianping.cat&lt;/groupId&gt;
+     &lt;artifactId&gt;cat-core&lt;/artifactId&gt;
+     &lt;version&gt;${cat.version}&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!-- 远程调用Pigeon  请使用pigeon最新版本--&gt;
+&lt;dependency&gt;
+     &lt;groupId&gt;com.dianping.dpsf&lt;/groupId&gt;
+     &lt;artifactId&gt;dpsf-net&lt;/artifactId&gt;
+     &lt;version&gt;${pigeon.version}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h4 id="_8"><a name="user-content-_8" href="#_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>生产者端代码实现</h4>
+<pre><code>public class SyncProducerExample {
+    public static void main(String[] args) throws Exception {
+        producerConfig config = new ProducerConfig(); 
+        // 以下设置的值与默认配置一致，可以省略
+        config.setMode(ProducerMode.SYNC_MODE); 
+        config.setSyncRetryTimes(0);
+        config.setZipped(false);
+        config.setThreadPoolSize(5);
+        config.setSendMsgLeftLastSession(false);
+        Producer p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config); 
+        for (int i = 0; i &lt; 10; i++) {
+            String msg = "消息-" + i;
+            try{
+                p.sendMessage(msg); 
+                System.out.println("Sended msg:" + msg);
+            }catch(SendFailedException e){
+                System.out.println("Catch exception then do what you want to do.");
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="swallow_4"><a name="user-content-swallow_4" href="#swallow_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用Swallow接收消息</h2>
+<h3 id="_9"><a name="user-content-_9" href="#_9" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基本概念</h3>
+<p><span id="consumerConfig"></span></p>
+<h4 id="consumerconfig"><a name="user-content-consumerconfig" href="#consumerconfig" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>ConsumerConfig配置详解</h4>
+<p>使用Swallow接收消息时，首先需要对接收端进行配置，这由ConsumerConfig完成:</p>
+<ul>
+<li>threadPoolSize：consumer处理消息的线程池线程数，默认为1。Consumer接收到消息时，会调用用户实现的onMessage方法。默认情况下，Consumer内部使用单线程来调用，只有onMessage执行完并响应给服务器（即发送ack给服务器），服务器在收到ack后，才会推送下一个消息过来。<strong>如果希望并行地处理更多消息，可以通过设置threadPoolSize，实现多线程接收消息，但是如此一来，消息的时序则无法保证</strong></li>
+<li>messageFilter：consumer只消费“Message.type属性包含在指定集合中”的消息</li>
+<li>consumerType：consumer的类型，目前支持2种类型：<ul>
+<li>DURABLE_AT_LEAST_ONCE：保证消息最少消费一次，不出现消息丢失的情况。</li>
+<li>NON_DURABLE：临时的消费类型，从当前的消息开始消费，不会对消费状态进行持久化，Server重启后将重新开始</li>
+</ul>
+</li>
+<li>delayBaseOnBackoutMessageException：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最小的停顿时间。</li>
+<li>delayUpperboundOnBackoutMessageException：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，2次重试之间最大的停顿时间。</li>
+<li>retryCount：当MessageListener.onMessage(Message)抛出BackoutMessageException异常时，最多重试的次数。 <em>0.7.0版本新增</em></li>
+<li>startMessageId 表示当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定。</li>
+<li>longTaskAlertTime 当用户的onMessage业务逻辑过长时的报警时间间隔，单位毫秒  <em>0.7.0版本新增</em> <br />
+在业务处理时间过长时，会在cat上面生成长时间Transaction提示，如下图所示：<br />
+<img alt="业务逻辑时间过长cat" src="http://swallow.dp/help/document/img/longtask.png" /></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>threadPoolSize</td>
+<td>1</td>
+</tr>
+<tr>
+<td>messageFilter</td>
+<td>MessageFilter.AllMatchFilter</td>
+</tr>
+<tr>
+<td>consumerType</td>
+<td>ConsumerType.DURABLE_AT_LEAST_ONCE</td>
+</tr>
+<tr>
+<td>delayBaseOnBackoutMessageException</td>
+<td>100ms</td>
+</tr>
+<tr>
+<td>delayUpperboundOnBackoutMessageException</td>
+<td>3000ms</td>
+</tr>
+<tr>
+<td>retryCount</td>
+<td>5</td>
+</tr>
+<tr>
+<td>startMessageId</td>
+<td>1</td>
+</tr>
+<tr>
+<td>longTaskAlertTime</td>
+<td>5000</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_10"><a name="user-content-_10" href="#_10" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>接收消息接口</h4>
+<ul>
+<li><code>com.dianping.swallow.consumer.MessageListener</code> <br />
+用户实现此接口，只有在抛出<code>BackoutMessageException</code>异常时才会消息重发</li>
+<li><code>com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener</code> <em>0.7.0版本增加</em><br />
+用户实现此接口，只要onMessage抛出异常，即进行消息重发</li>
+</ul>
+<h3 id="_11"><a name="user-content-_11" href="#_11" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>代码示例</h3>
+<h4 id="maven-poxxml"><a name="user-content-maven-poxxml" href="#maven-poxxml" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Maven pox.xml中添加依赖</h4>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-beans&lt;/artifactId&gt;
+    &lt;version&gt;4.1.3.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-context&lt;/artifactId&gt;
+    &lt;version&gt;4.1.3.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-core&lt;/artifactId&gt;
+    &lt;version&gt;4.1.3.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.dianping.swallow&lt;/groupId&gt;
+    &lt;artifactId&gt;swallow-consumerclient&lt;/artifactId&gt;
+    &lt;version&gt;${currentVersion}&lt;/version&gt; 
+&lt;/dependency&gt;
+&lt;!-- lion  请使用lion最新稳定版--&gt;
+&lt;dependency&gt;
+     &lt;groupId&gt;com.dianping.lion&lt;/groupId&gt;
+     &lt;artifactId&gt;lion-client&lt;/artifactId&gt;
+     &lt;version&gt;${lion.version}&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;!-- 监控  请使用cat最新稳定版--&gt;
+&lt;dependency&gt;
+     &lt;groupId&gt;com.dianping.cat&lt;/groupId&gt;
+     &lt;artifactId&gt;cat-core&lt;/artifactId&gt;
+     &lt;version&gt;${cat.version}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>swallow-consumerclient的版本可以在<a href="http://mvn.dianpingoa.com/webapp/home.html">mvn repo</a>查询所有的发行版本。</li>
+</ul>
+<h4 id="messagelistener"><a name="user-content-messagelistener" href="#messagelistener" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消费者实现MessageListener接口</h4>
+<p>messageListener要自己实现<code>com.dianping.swallow.consumer.MessageListener</code>接口。下面列出MessageListenerImpl的实现供参考。</p>
+<pre><code>package com.dianping.swallow.example.consumer.spring.listener;
+
+import com.dianping.swallow.common.message.Message;
+import com.dianping.swallow.consumer.MessageListener;
+
+public class MessageListenerImpl implements MessageListener {
+
+    @Override
+    public void onMessage(Message swallowMessage) {
+
+        System.out.println(swallowMessage.getMessageId() + ":" + swallowMessage.getContent()+ ":" + swallowMessage.getType());
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            logger.error("Sleep interrupted.");
+        }
+    }
+}
+</code></pre>
+<h4 id="_12"><a name="user-content-_12" href="#_12" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消费者端代码实现</h4>
+<p>消息目的地的值example为消息种类，必须是在服务器白名单中的消息种类才能够连接服务器，否则会拒绝连接。如何申请参加<a href="#topic">申请Topic</a> </p>
+<pre><code>public class DurableConsumerExample {
+    public static void main(String[] args) {
+        ConsumerConfig config = new ConsumerConfig();  
+        //以下根据自己情况而定，默认是不需要配的
+        config.setThreadPoolSize(1);  
+        Consumer c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic("example"), "myId", config);  
+        c.setListener(new MessageListener() {  
+            @Override
+            public void onMessage(Message msg) {
+                System.out.println(msg.getContent());
+            }
+        });
+        c.start();  //(5)
+    }
+}
+</code></pre>
+<ul>
+<li>createConsumer函数接收3个参数,其中第二个参数表示consumerId.对于默认的消费类型DURABLE_AT_LEAST_ONCE,必需提供一个consumerId;如果消费类型为NON_DURABLE,则不需要设置consumerId.这里的&rdquo;myId&rdquo;即为消费者的consumerId.</li>
+</ul>
+<h1 id="swallow-web"><a name="user-content-swallow-web" href="#swallow-web" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web使用说明</h1>
+<p>各环境地址:</p>
+<ul>
+<li>alpha：<a href="http://alpha.swallow.dp/">http://alpha.swallow.dp/</a><br />
+默认密码：123456</li>
+<li>beta：<a href="http://beta.swallow.dp/">http://beta.swallow.dp/</a><br />
+默认密码：123456</li>
+<li>ppe：<a href="http://ppe.swallow.dp/">http://ppe.swallow.dp/</a><br />
+默认密码：112233</li>
+<li>线上：<a href="http://swallow.dp/">http://swallow.dp/</a></li>
+</ul>
+<h2 id="topic_1"><a name="user-content-topic_1" href="#topic_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic查询</h2>
+<h3 id="topic_2"><a name="user-content-topic_2" href="#topic_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据Topic名称查询</h3>
+<ul>
+<li>
+<p>在左侧搜索栏里输入所要查询的topic名称，系统会提示可以搜索到的与用户关联的topic，如果提示没有返回任何内容，则说明用户没有权限查询任何topic。</p>
+</li>
+<li>
+<p>对于每个topic，默认情况下除了管理员,其他人是没有权限查看topic下的message.如果有相应的需求,可以通过<a href="http://workflow.dp/wfe/start/119">workflow</a>申请相关topic的权限.</p>
+</li>
+</ul>
+<h2 id="message"><a name="user-content-message" href="#message" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Message查询与重发</h2>
+<h3 id="topicmessage"><a name="user-content-topicmessage" href="#topicmessage" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>查询Topic下所有Message</h3>
+<ul>
+<li>在左侧搜索栏里输入查询message所属的topic名称，系统会提示可以搜索到的与用户关联的topic，如果提示没有返回任何内容，则说明用户没有权限查询任何topic的message信息。</li>
+</ul>
+<h3 id="message-id"><a name="user-content-message-id" href="#message-id" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据Message ID精确查询</h3>
+<ul>
+<li>topic确定的前提下，在右侧搜索栏中输入message ID可精确查询相应message。</li>
+</ul>
+<h3 id="_13"><a name="user-content-_13" href="#_13" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>根据保存时间精确查询</h3>
+<ul>
+<li>topic确定的前提下，选择开始时间和结束时间可以查询出特定时间段发送的所有message。尽量缩小查找的时间段，减轻查询的时间开销。</li>
+</ul>
+<h3 id="_14"><a name="user-content-_14" href="#_14" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>导出消息</h3>
+<ul>
+<li>
+<p>根据时间查询的消息可以导出到文件并且下载到本地。消息导出后页面会自动跳转到下载页，点击链接即可下载文件。如果导出的数据量很大，则需要一定的时间等待任务执行完成。</p>
+</li>
+<li>
+<p>在消息大小不超过1KB的前提下，允许导出的最多100万条数据，如果消息大小大于1KB，则最多只能导出1G大小的消息。</p>
+</li>
+<li>
+<p>导出的消息保存7天后自动从磁盘删除。</p>
+</li>
+</ul>
+<h3 id="message_1"><a name="user-content-message_1" href="#message_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Message重发</h3>
+<h4 id="webmessage"><a name="user-content-webmessage" href="#webmessage" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>web端重发已保存的message</h4>
+<ul>
+<li>
+<p>对于已经存在于mongo中的消息，用户可以根据查询返回结果选择需要重发的message。</p>
+</li>
+<li>
+<p>对于重新发送的消息，其原始ID不为空，原始ID为重发消息的消息ID。</p>
+</li>
+</ul>
+<h4 id="apimessage"><a name="user-content-apimessage" href="#apimessage" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>通过api重发已保存的message</h4>
+<ul>
+<li>
+<p>联系运维人员获得重发消息的认证字符串(AuthenticationString)，该字符串每天更新一次。</p>
+</li>
+<li>
+<p>api接口为{swallow.web.sso.url}/api/message/sendmessageid，通过读取lion获得key为swallow.web.sso.url的值。也可根据运行环境固定服务器，下表列出swallow.web.sso.url在不同环境下值。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>环境</th>
+<th>swallow.web.sso.url</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alpha</td>
+<td><a href="http://alpha.swallow.dp">http://alpha.swallow.dp</a></td>
+</tr>
+<tr>
+<td>beta</td>
+<td><a href="http://beta.swallow.dp">http://beta.swallow.dp</a></td>
+</tr>
+<tr>
+<td>ppe</td>
+<td><a href="http://ppe.swallow.dp">http://ppe.swallow.dp</a></td>
+</tr>
+<tr>
+<td>product</td>
+<td><a href="http://swallow.dp">http://swallow.dp</a></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+<p>发送post请求，需要3个参数，topic(topic名称)，mid(消息ID)和authentication(认证字符串)。</p>
+</li>
+<li>
+<p>返回值为json字符串，包含2个键值对，status(状态码)，message(状态码对应的消息)。下表列出了不同状态码表示的意义。</p>
+<ul>
+<li>0表示操作成功。</li>
+<li>负的状态码表示不可重试的错误。</li>
+<li>正的状态码表示可以重试成功的错误。 </li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>状态码</th>
+<th>消息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-4</td>
+<td>empty content</td>
+</tr>
+<tr>
+<td>-3</td>
+<td>no authenticaton</td>
+</tr>
+<tr>
+<td>-2</td>
+<td>unauthorized</td>
+</tr>
+<tr>
+<td>-1</td>
+<td>write mongo error</td>
+</tr>
+<tr>
+<td>0</td>
+<td>success</td>
+</tr>
+<tr>
+<td>1</td>
+<td>read time out</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_15"><a name="user-content-_15" href="#_15" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用示范</h4>
+<pre><code>import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.PostMethod;
+private HttpMethod postMethod(String url) throws IOException {
+    PostMethod post = new PostMethod(url);
+    NameValuePair[] param = {
+            new NameValuePair("mid", "6161611639629021185"),
+            new NameValuePair("authentication", "lfimuqqxjlgvniueuiqooorkkyxdmwrm"),
+            new NameValuePair("topic", "example") }; //topic名称
+    post.setRequestBody(param);  //设置消息体
+    post.releaseConnection();
+    return post;
+}
+public static void main(String[] args) {
+    String host = null;
+    try {
+        ConfigCache configCache = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
+        host = configCache.getProperty("swallow.web.sso.url");
+    } catch (LionException e) {
+        logger.error("Error when using lion.", e);
+    }
+    String url = host + "/api/message/sendmessageid";
+    HttpClient httpClient = new HttpClient();
+    try {
+        HttpMethod method = postMethod(url);
+        httpClient.executeMethod(method);
+
+        String response = method.getResponseBodyAsString();
+        try {
+            JSONObject json = new JSONObject(response);
+            System.out.println(json.getInt("status"));
+            System.out.println(json.getString("message"));
+        } catch (JSONException e) {
+            logger.error("Error when parse json", e);
+        }
+    } catch (IOException e) {
+        logger.error("Error when execute http request.", e);
+    }
+}
+</code></pre>
+<h4 id="message_2"><a name="user-content-message_2" href="#message_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>重发自定义message</h4>
+<ul>
+<li>
+<p>对于不存在于mongo中的message，用户可以使用发送自定义消息功能批量发送message。批量发送时，如果消息有类型则输入相应的类型，否则可忽略；如果需要添加消息属性，可以输入形式如key1:value1,key2:value2的键值对字符串，分隔符有5个不同的选择，分别为&rsquo;:&rsquo;，&rsquo;;&rsquo;，&rsquo;,&rsquo;，&rsquo;_&rsquo;和&rsquo;#&rsquo;。如果键值对中包含了分隔符，则可以选择其他的分隔符以示区分。如果有多个属性键值对，可以点击Add添加属性，最多支持100个属性。文本框中输入消息体的内容。</p>
+</li>
+<li>
+<p>用户需要对所发的自定义消息负责，swallow web不检查消息内容的格式。</p>
+</li>
+</ul>
+<h4 id="apimessage_1"><a name="user-content-apimessage_1" href="#apimessage_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>通过api重发自定义的message</h4>
+<ul>
+<li>
+<p>联系运维人员获得重发消息的认证字符串(AuthenticationString)，该字符串每天更新一次。</p>
+</li>
+<li>
+<p>api接口为{swallow.web.sso.url}/api/message/sendmessage，通过读取lion获得key为swallow.web.sso.url的值。</p>
+</li>
+<li>
+<p>发送post请求，5个必选参数，topic(topic名称)，type(消息类型)，property(消息属性)，authentication(认证字符串)，content(消息体内容)和一个可选参数delimitor(property键值对分隔符)。</p>
+<ul>
+<li>
+<p>property键值对默认使用&rsquo;:&rsquo;作为分隔符，如果用户的键值中有&rsquo;:&rsquo;，可以在可选参数delimitor中设置分隔符字符串。</p>
+</li>
+<li>
+<p>content字符串，表示消息内容。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>返回值为json字符串，包含2个键值对，status(状态码)，message(状态码对应的消息)，与通过api重发已保存的message返回值意义一致。</p>
+</li>
+</ul>
+<h4 id="_16"><a name="user-content-_16" href="#_16" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用示范</h4>
+<pre><code>private HttpMethod postMethod(String url) throws IOException{
+    PostMethod post = new PostMethod(url);
+    String contents = "test group message api with type and property, No 1";
+    List&lt;NameValuePair&gt; nameValuePairs = new ArrayList&lt;NameValuePair&gt;();
+
+    nameValuePairs.add(new NameValuePair("content",contents));
+    nameValuePairs.add(new NameValuePair("topic", "example"));
+    nameValuePairs.add(new NameValuePair("type", "jiagou"));
+    nameValuePairs.add(new NameValuePair("property", "test:true::work:on"));  //::用于分割多个键值对
+    nameValuePairs.add(new NameValuePair("authentication", "lfimuqqxjlgvniueuiqooorkkyxdmwrm"));
+
+    NameValuePair[] array = new NameValuePair[nameValuePairs.size()];
+    nameValuePairs.toArray(array);
+    post.setRequestBody(array);  //设置消息体
+    post.releaseConnection();
+    return post;
+}
+</code></pre>
+<ul>
+<li>
+<p>与重发已保存的message相似，只需更改请求url和post参数。</p>
+</li>
+<li>
+<p>请求url: String url = host + &ldquo;/api/message/sendmessage&rdquo;。</p>
+</li>
+</ul>
+<h3 id="swallow_5"><a name="user-content-swallow_5" href="#swallow_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>查看Swallow消息</h3>
+<ul>
+<li>如果需要查看消息的详细内容，请点击更多选项，将会列出json格式的swallow消息内容，其中键值_id 表示保存消息的时间戳，c 表示消息体，v 表示swallow版本，s 表示消息体的sha1值， gt 表示消息的产生时间， p 表示用户设置的消息属性， _p 表示 swallow设置的消息内部属性， si 表示产生消息的主机ip。</li>
+</ul>
+<h2 id="topicswallow-server"><a name="user-content-topicswallow-server" href="#topicswallow-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic监控和Swallow Server监控</h2>
+<h3 id="topic_3"><a name="user-content-topic_3" href="#topic_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Topic监控</h3>
+<h4 id="_17"><a name="user-content-_17" href="#_17" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基础概念</h4>
+<h4 id="_18"><a name="user-content-_18" href="#_18" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>延时监控</h4>
+<p><span id="webDelay"></span><br />
+延时监控中监控时间被分为3段</p>
+<ol>
+<li>用户发送-存储延时(message存储到mongo与用户发出message的时间差值)</li>
+<li>存储-发送延迟(swallow发出message与message存储到mongo的时间差值)</li>
+<li>发送-ack延迟(swallow收到用户ack确认与swallow发出message的时间差值)</li>
+</ol>
+<p><img alt="topic-consumer延时统计" src="http://swallow.dp/help/document/img/13.png" /></p>
+<ul>
+<li>在搜索栏中输入所要查询的topic，系统会返回topic与每个consumer在不同时间段的延时统计结果。<br />
+<img alt="topic-consumer延时统计" src="http://swallow.dp/help/document/img/8.png" /></li>
+</ul>
+<h4 id="qps"><a name="user-content-qps" href="#qps" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>每秒消息(QPS)监控</h4>
+<ul>
+<li>消息量监控从swallow服务器端统计消息发送频率(QPS)，分为三段进行统计，和上述延时分段对应。</li>
+</ul>
+<p>swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack频率统计每秒钟用户返回ack的消息数目。在某一时间段，如果系统一切工作正常，对应特定的consumerID，应该有消费者发送频率 = swallow发送频率 = 用户返回ack频率。如果出现不相等，请对比其他消费者是否正常，如果正常，则请查看客户端代码是否正确实现了功能。<br />
+<img alt="每秒消息" src="http://swallow.dp/help/document/img/9.png" /></p>
+<ul>
+<li>如果只想查看某一端的每秒钟统计量，只需点击右侧的图例即可切换显示和隐藏。<br />
+<img alt="每秒消息" src="http://swallow.dp/help/document/img/10.png" /></li>
+</ul>
+<h4 id="_19"><a name="user-content-_19" href="#_19" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>堆积量监控</h4>
+<ul>
+<li>
+<p>堆积量表示某一时间段堆积在数据库中没有发送给消费者的消息数目。系统会列出topic所有消费者的堆积量统计值。</p>
+</li>
+<li>
+<p>如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。<br />
+<img alt="每秒消息" src="http://swallow.dp/help/document/img/14.png" /></p>
+</li>
+</ul>
+<h3 id="swallow-server"><a name="user-content-swallow-server" href="#swallow-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Server监控</h3>
+<h4 id="producer-server"><a name="user-content-producer-server" href="#producer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>producer server监控</h4>
+<ul>
+<li>producer server统计用户发送频率，即每秒钟发动到producer server的消息数目。<br />
+<img alt="producer server监控" src="http://swallow.dp/help/document/img/11.png" /></li>
+</ul>
+<h4 id="consumer-server"><a name="user-content-consumer-server" href="#consumer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumer server监控</h4>
+<ul>
+<li>consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。<br />
+<img alt="consumer server监控" src="http://swallow.dp/help/document/img/12.png" /></li>
+</ul>
+<h2 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 告警</h2>
+<h3 id="serverswallow"><a name="user-content-serverswallow" href="#serverswallow" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server告警（针对swallow研发团队）</h3>
+<ol>
+<li>
+<p>producer server服务告警</p>
+<p>服务告警目前只检测server pigeon服务的健康检测页面和发往web端的统计数据两个方面，四种告警类型：</p>
+<ul>
+<li>
+<p>[1]PRODUCER_SERVER_PIGEON_SERVICE，pigeon服务故障。</p>
+</li>
+<li>
+<p>[2]PRODUCER_SERVER_PIGEON_SERVICE_OK，pigeon服务故障恢复。</p>
+</li>
+<li>
+<p>[3]PRODUCER_SERVER_SENDER，统计数据未发送。</p>
+</li>
+<li>
+<p>[4]PRODUCER_SERVER_SENDER_OK，统计数据发送故障恢复。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>producer server统计数据告警</p>
+<p>服务告警目前只检测某台server QPS 峰值、谷值两个方面，四种告警类型：</p>
+<ul>
+<li>
+<p>[5]PRODUCER_SERVER_QPS_PEAK，QPS超过峰值。</p>
+</li>
+<li>
+<p>[6]PRODUCER_SERVER_QPS_VALLEY，QPS低于谷值。</p>
+</li>
+<li>
+<p>[8]PRODUCER_SERVER_QPS_OK，QPS恢复正常。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>consumer server服务告警</p>
+<p>服务告警目前只检测server 端口是否打开，发往web端的统计数据以及slave服务器服务是否开启三个方面，八种告警类型：</p>
+<ul>
+<li>
+<p>[9]CONSUMER_SERVER_SENDER，统计数据未发送。</p>
+</li>
+<li>
+<p>[10]CONSUMER_SERVER_SENDER_OK，统计数据发送故障恢复。</p>
+</li>
+<li>
+<p>[11]CONSUMER_SERVER_SLAVEPORT_OPENED，Master端口关闭，Slave端口打开。</p>
+</li>
+<li>
+<p>[12]CONSUMER_SERVER_BOTHPORT_OPENED，Master，Slave端口都打开。</p>
+</li>
+<li>
+<p>[13]CONSUMER_SERVER_BOTHPORT_UNOPENED，Master，Slave端口都未打开。</p>
+</li>
+<li>
+<p>[14]CONSUMER_SERVER_PORT_OPENED_OK，Master，Slave端口恢复正常状态。</p>
+</li>
+<li>
+<p>[15]CONSUMER_SERVER_SLAVESERVICE_STARTED，Slave服务未开启。</p>
+</li>
+<li>
+<p>[16]CONSUMER_SERVER_SLAVESERVICE_STARTED_OK，Slave服务恢复正常。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>consumer server统计数据告警</p>
+<p>服务告警目前只检测某台server 发送和确认QPS 峰值、谷值、波动六个方面，八种告警类型：</p>
+<ul>
+<li>
+<p>[17]CONSUMER_SERVER_SENDQPS_PEAK，发送QPS超过峰值。</p>
+</li>
+<li>
+<p>[18]CONSUMER_SERVER_SENDQPS_VALLEY，发送QPS低于谷值。</p>
+</li>
+<li>
+<p>[19]CONSUMER_SERVER_SENDQPS_FLUCTUATION，发送QPS与历史数据相比波动过大。</p>
+</li>
+<li>
+<p>[20]CONSUMER_SERVER_SENDQPS_OK，发送QPS恢复正常。</p>
+</li>
+<li>
+<p>[21]CONSUMER_SERVER_ACKQPS_PEAK，确认QPS超过峰值。</p>
+</li>
+<li>
+<p>[22]CONSUMER_SERVER_ACKQPS_VALLEY，确认QPS低于谷值。</p>
+</li>
+<li>
+<p>[23]CONSUMER_SERVER_ACKQPS_FLUCTUATION，确认QPS与历史数据相比波动过大。</p>
+</li>
+<li>
+<p>[24]CONSUMER_SERVER_ACKQPS_OK，确认QPS恢复正常。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>producer and consumer server配置一致性告警</p>
+<p>服务告警目前只检测mongo的配置，有两种告警类型：</p>
+<ul>
+<li>
+<p>[25]SERVER_MONGO_CONFIG，配置与lion上的mongo配置不一致。</p>
+</li>
+<li>
+<p>[26]SERVER_MONGO_CONFIG_OK，配置与lion上的mongo配置不一致。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="topic_4"><a name="user-content-topic_4" href="#topic_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>topic告警（针对消息的生产者）</h3>
+<ol>
+<li>
+<p>topic统计数据告警</p>
+<p>topic告警目前只检测producer topic QPS的峰值、谷值、波动以及topic message延时四个方面，四种告警类型：</p>
+<ul>
+<li>
+<p>[1001]PRODUCER_TOPIC_QPS_PEAK，Topic QPS超过峰值（生产端发送的qps过高，超过设定的峰值）。</p>
+</li>
+<li>
+<p>[1002]PRODUCER_TOPIC_QPS_VALLEY，Topic QPS低于谷值（生产端发送的qps过低，低于设定的谷值）。</p>
+</li>
+<li>
+<p>[1003]PRODUCER_TOPIC_QPS_FLUCTUATION，Topic QPS与历史数据相比波动过大（生产端发送的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。</p>
+</li>
+<li>
+<p>[1004]PRODUCER_TOPIC_MESSAGE_DELAY，Topic message存储延时（生产端发送到server端持久化的时间差过大，大于设定的延时阈值）。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>topic告警分析</p>
+<p>对于峰值、谷值、波动、延时告警都是对系统当前可能出现异常的一个提示，都可能是程序bug引起的问题，当然也可能没有问题。</p>
+</li>
+<li>
+<p>告警配置</p>
+<p>根据业务自身的情况，可以设置对应topic的告警配置（需要有该topic的权限，若没有，可通过<a href="http://workflow.dp/wfe/start/119">workflow</a>进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置。其中峰值是指Qps的最高值，大于此值报警；谷值是指Qps的最低值，小于此值报警；波动是指当前Qps和前一天此时刻前后5分钟的Qps平均值之间的倍数大小；波动基数，前面两个Qps至少有一个大于波动基数值，才进行波动比较；延时是指存储延时，是指消息发出到存入Swallow这段时间差，超过设定的值，就会告警。<br />
+<img alt="Topic报警参数" src="http://swallow.dp/help/document/img/topic-alarm-setting.png" /></p>
+<p>对topic告警还有开关设置，可以打开或关闭告警。如下图，对Topic告警开关，有发送告警（产生此topic消息的生产端）、接收告警（所有消费此topic的所有消费端）开关，分别针对Topic的发送端、接收端异常告警的开关。<br />
+<img alt="Topic报警开关" src="http://swallow.dp/help/document/img/topic-alarm-switch.png" /></p>
+<p>另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个topic相关的发送ip不想要告警，也只可以设置这个topic某个ip的开关。如下图<br />
+<img alt="Topic ip报警开关" src="http://swallow.dp/help/document/img/topic-ip-alarm-switch.png" /></p>
+</li>
+</ol>
+<h3 id="consumerid"><a name="user-content-consumerid" href="#consumerid" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumerId告警（针对消息的消费者）</h3>
+<ol>
+<li>
+<p>consumerId 统计数据告警</p>
+<p>consumerId告警目前只检测某consumerId发送和确认QPS 峰值、谷值、波动以及消费累积九个方面，九种告警类型：</p>
+<ul>
+<li>
+<p>[1013]CONSUMER_CONSUMERID_SENDQPS_PEAK，ConsumerId 发送QPS超过峰值（服务端发送到消费端的qps过高，超过设定的峰值）。</p>
+</li>
+<li>
+<p>[1014]CONSUMER_CONSUMERID_SENDQPS_VALLEY，ConsumerId 发送QPS低于谷值（服务端发送到消费端的qps过低，低于设定的谷值）。</p>
+</li>
+<li>
+<p>[1015]CONSUMER_CONSUMERID_SENDQPS_FLUCTUATION，ConsumerId 发送QPS与历史数据相比波动过大（服务端发送到消费端的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。</p>
+</li>
+<li>
+<p>[1016]CONSUMER_CONSUMERID_SENDMESSAGE_DELAY，ConsumerId 发送QPS延时（从服务端从存储取消息到发送到消费端这个过程时间差过大，大于设定的延时阈值）。</p>
+</li>
+<li>
+<p>[1017]CONSUMER_CONSUMERID_SENDMESSAGE_ACCUMULATION，ConsumerId message累积（服务端消息累积，累积量大于阈值）。</p>
+</li>
+<li>
+<p>[1018]CONSUMER_CONSUMERID_ACKQPS_PEAK，ConsumerId 确认QPS超过峰值（消费端确认消息的qps过高，超过设定的峰值）。</p>
+</li>
+<li>
+<p>[1019]CONSUMER_CONSUMERID_ACKQPS_VALLEY，ConsumerId 确认QPS低于谷值（消费端确认消息的qps过低，低于设定的谷值）。</p>
+</li>
+<li>
+<p>[1020]CONSUMER_CONSUMERID_ACKQPS_FLUCTUATION，ConsumerId 确认QPS与历史数据相比波动过大（消费端确认消息的qps与前一天这个时刻前后5分钟内qps的均值比较，超过波动基数和波动比例）。</p>
+</li>
+<li>
+<p>[1021]CONSUMER_CONSUMERID_ACKMESSAGE_DELAY，ConsumerId 确认QPS延时（从服务端发送成功到消费端确认消息的时间差过大，大于设定的延时阈值）。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>consumerId告警分析</p>
+<p>如果出现延时或者累积报警，先查看是否是消息接收端处理过慢（并发数过低、单条消息处理过慢，异常导致onMessage处理挂起），可以借助swallow管理平台上的监控和Cat监控，参见<a href="#commonProblems">Swallow常见问题以及处理</a>。</p>
+</li>
+<li>
+<p>告警配置</p>
+<p>根据业务自身的情况，可以设置对应ConsumerId的告警配置（需要有相关topic的权限，若没有，可通过<a href="http://workflow.dp/wfe/start/119">workflow</a>进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时、累积的参数设置。这些参数根据消息消费流程分成两个过程：发送过程（swallow从存储取消息到发送消息给消费端这段过程）；Ack过程（swallow服务端发送消息到客户端消费完消息给服务端回馈这段过程）。这两段分别有对应的峰值、谷值、波动、延时。这些含义类似于Topic告警参数，详情可看Topic告警参数，其中累积是指swallow服务端消息的累积量，若大于设定的值，则报警。<br />
+<img alt="ConsumerId报警参数" src="http://swallow.dp/help/document/img/consumerId-alarm-setting.png" /></p>
+<p>对ConsumerId告警还有开关设置，可打开或关闭告警，如下图。<br />
+<img alt="ConsumerId报警开关" src="http://swallow.dp/help/document/img/consumerId-alarm-switch.png" /></p>
+<p>另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个consumerId相关的消费ip不想要告警，也只可以设置这个consumerId的某个ip的开关。如下图<br />
+<img alt="ConsumerId ip报警开关" src="http://swallow.dp/help/document/img/consumerId-ip-alarm-switch.png" /></p>
+</li>
+</ol>
+<h3 id="ip"><a name="user-content-ip" href="#ip" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>IP告警</h3>
+<ol>
+<li>
+<p>producer ip告警（针对消息的生产者）</p>
+<p>producer ip告警定位到生产者主机，根据统计数据判断主机是否宕机，一种告警类型：</p>
+<ul>
+<li>[1022]PRODUCER_CLIENT_SENDER，producer client一段时间未发送消息。</li>
+</ul>
+</li>
+<li>
+<p>consumer ip告警（针对消息的消费者）</p>
+<p>consumer ip告警定位到消费者主机，根据统计数据判断主机是否宕机，一种告警类型：</p>
+<ul>
+<li>[1023]CONSUMER_CLIENT_RECEIVER，consumer client一段时间未接收消息。</li>
+</ul>
+</li>
+<li>
+<p>告警配置</p>
+<p>这些告警的ip都来源于某个topic（生产端）或者某个consumerId（消费端），因此可以到topic或者consumerId处设置相关ip可是否需要告警。设置过程如topic或consumerId告警配置中设置具体ip开关。</p>
+</li>
+</ol>
+<h2 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 大盘</h2>
+<h3 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>综合大盘</h3>
+<ul>
+<li>综合大盘会显示消费者发送延迟,消费者确认延迟和消息堆积的综合统计数据.超过默认阈值的统计项会被标红.大盘会根据一分钟的统计量生成最终结果.<br />
+<img alt="综合大盘" src="http://swallow.dp/help/document/img/17.png" /></li>
+</ul>
+<h3 id="_21"><a name="user-content-_21" href="#_21" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>发送延迟,确认延迟和堆积大盘</h3>
+<ul>
+<li>发送延迟大盘根据发送延迟统计量生成相应的大盘;确认延迟大盘根据确认延迟统计量生成相应的大盘;堆积大盘根据消息堆积量生成相应的大盘.</li>
+</ul>
+<h2 id="_22"><a name="user-content-_22" href="#_22" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限管理</h2>
+<h3 id="_23"><a name="user-content-_23" href="#_23" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>管理员行为</h3>
+<ul>
+<li>添加删除管理员名单的权限</li>
+<li>编辑topic关联人员名单</li>
+<li>查看访问swallow web的来访者信息</li>
+<li>查看、重发消息</li>
+</ul>
+<h3 id="_24"><a name="user-content-_24" href="#_24" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>用户行为</h3>
+<ul>
+<li>每个用户管理一个或者多个topic，可以查看、重发相应的topic的消息。</li>
+</ul>
+<h3 id="visitor"><a name="user-content-visitor" href="#visitor" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Visitor行为</h3>
+<ul>
+<li>Visitor表示没有关联任何topic,无法访问任何topic及其message的人员，只可以查看监控性能。</li>
+</ul>
+<h3 id="_25"><a name="user-content-_25" href="#_25" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限提升</h3>
+<ul>
+<li>
+<p>用户和Visitor如需提升权限，可通过<a href="http://workflow.dp/wfe/start/119">workflow</a>进行申请。<br />
+<img alt="权限提升" src="http://swallow.dp/help/document/img/enhance_auth.png" /></p>
+</li>
+<li>
+<p>topic需要是已经通过swallow开发小组审批过的可用topic，否则请先申请相关topic。一次只能填写一个topic名称。</p>
+</li>
+<li>
+<p>预账号请填写申请人公司邮箱前缀，<a href="mailto:如邮箱为mingdong.li@dianping.com需填写mingdong.li">如邮箱为mingdong.li@dianping.com需填写mingdong.li</a>。</p>
+</li>
+</ul>
+<p><span id="takeAttention"></span></p>
+<h1 id="swallow_8"><a name="user-content-swallow_8" href="#swallow_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用注意事项</h1>
+<p>以下是业务在swallow的过程中遇到的一些常见问题，希望大家仔细阅读，避免类似的问题发生</p>
+<ol>
+<li>swallow保证消息不丢，所以针对特定一条消息，可能会重复发送。<ul>
+<li>要求业务做幂等处理，尤其是支付相关的业务（当消息重复被投递的时候，多次处理结果是一样的）</li>
+</ul>
+</li>
+<li>consumer接收消息默认并发为1，如果业务处理速度过慢，可能会出现消息堆积（假设每条消息处理时间100ms，则一秒只能处理10条消息）<ul>
+<li>如果业务不要求时序，可以将并发至调高，建议并发值:50，设置方法参见<a href="#consumerConfig">consumer配置</a></li>
+</ul>
+</li>
+<li>swallow作为异步消息队列，正常情况下延时在秒级别。但是异常情况下（数据库升级等），可能会出现分钟级别的延时，如果业务对延时特别敏感，建议谨慎使用</li>
+</ol>
+<p><span id="commonProblems"></span></p>
+<h1 id="swallow_9"><a name="user-content-swallow_9" href="#swallow_9" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
+<p><span id="problemWhichConsumer"></span></p>
+<h2 id="topicconsumer"><a name="user-content-topicconsumer" href="#topicconsumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查找某个topic对应的consumer</h2>
+<ul>
+<li>从<a href="http://cat.dp">CAT</a>中，找到swallow项目<a href="http://cat.dp/cat/r/t?op=view&amp;domain=Swallow">Swallow</a></li>
+<li>找到<code>Out:topic</code>(topic即你关心的topic名字)，点开，即可看到consumer信息</li>
+</ul>
+<p><span id="problemDelay"></span></p>
+<h2 id="_26"><a name="user-content-_26" href="#_26" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查看我的消费是否有延迟、延迟多少条消息？</h2>
+<h3 id="cat"><a name="user-content-cat" href="#cat" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cat端追踪</h3>
+<ul>
+<li>从<a href="http://cat.dp/">CAT</a>中查看Swallow项目的Transaction，可以获得相应的信息（<a href="http://cat.dp/cat/r/t?op=view&amp;ampdomain=Swallow">传送门</a>）。</li>
+<li>以dp_action这个topic为例（仅作示例，具体到自己的topic，请做相应变通），先找到In:dp_action这个type：<br />
+<img alt="Swallow Transaction In CAT" src="http://swallow.dp/help/document/img/1.png" /></li>
+<li>上图右边对应的是当前该topic的producer生产的消息总量，点击In:dp_action链接，可以看到每个producer产生的消息数量：<br />
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/2.png" /></li>
+<li>返回上一级，在同一级页面中，找到Out:dp_action这个type，对应从consumer server发出的消息数量：<br />
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/3.png" /></li>
+<li>Out:dp_action对应的数量为消费这个topic的所有consumer消费的消息总量，点击进入，可以看到每个消费者单台消费机的消费数量：<br />
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/4.png" /></li>
+<li>对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp_action的数量），如果消费的消息总量小于生产的消息总量，那么消费是有延迟的。</li>
+</ul>
+<h3 id="swallow-web_1"><a name="user-content-swallow-web_1" href="#swallow-web_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
+<ul>
+<li>从Swallow Web端<a href="http://swallow.dp/console/monitor/consumer/total/delay">延时监控</a>中查询出topic的延时统计数据。如果消费者出现消费延时的情况，可以查看3段延时中主要哪一段导致了消费的延迟。</li>
+<li>通过查看其他消费者的发送-ack延迟是否正常，如果其他消费者消费正常，那么就需要查看客户端代码是否正确实现了功能。</li>
+</ul>
+<p><span id="problemAverageDelay"></span></p>
+<h2 id="consumer"><a name="user-content-consumer" href="#consumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查看我的Consumer消费一条消息的平均时间？</h2>
+<h3 id="cat_1"><a name="user-content-cat_1" href="#cat_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cat端追踪</h3>
+<ul>
+<li>从<a href="http://cat.dp/">CAT</a>中查看Consumer ID对应项目的Transaction，找到MsgConsumed和MsgConsumeTried这两个type：<br />
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/5.png" /></li>
+<li>MsgConsumed表示consumer server给这个consumer推送的消息数量，MsgConsumeTried表示consumer尝试消费消息的次数，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。</li>
+<li>右边的三列可以看出consumer调用onMessage回调函数耗费的最小最大以及平均时间，如果consumer消费状况一直良好，突然某个时刻开始有消费延时，可以观察一下这里的平均时间是不是比之前更高，如果平均消费时间比正常情况高出很多，可能会造成消费延时。</li>
+</ul>
+<h3 id="swallow-web_2"><a name="user-content-swallow-web_2" href="#swallow-web_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
+<ul>
+<li>参见<a href="#webDelay">延时监控</a>中发送-ack延时</li>
+</ul>
+<p><span id="problemConsumerDelay"></span></p>
+<h2 id="consumer_1"><a name="user-content-consumer_1" href="#consumer_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>我的Consumer有延时，该怎么确认问题所在？</h2>
+<ul>
+<li>首先观察consumer的平均消费时间是否存在异常，如果consumer的平均消费时间比正常情况高出许多，说明onMessage回调函数依赖的服务存在问题，可以考虑_最近的代码变更_，或询问_依赖的服务_是否存在故障。</li>
+<li>如果consumer的平均消费时间一直很高，说明consumer的消费线程数太少，可以考虑修改配置文件增加消费线程数，或者`扩容应用增加消费机。</li>
+<li>在cat中观察consumer的problem，如果swallow相关异常过多，请及时联系swallow团队成员。</li>
+<li>如果consumer的平均消费时间一直正常没有发生突变，则有可能是swallow的consumer server负载较高或存在其他故障，此时请及时联系swallow团队成员。</li>
+</ul>
+<h2 id="consumer_2"><a name="user-content-consumer_2" href="#consumer_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>我的Consumer堵了，该怎么确认问题所在？</h2>
+<ul>
+<li>首先确认consumer是否已经正确启动：<ul>
+<li>增加一些健康监测页面或其他机制以判断consumer是否正确启动。</li>
+<li>查看自己应用日志以及/data/applogs/tomcat/catalina.out日志，确认没有影响应用正常启动的异常出现。</li>
+</ul>
+</li>
+<li>确认topic是否有生产者在持续生产消息，连续查看swallow中的transaction，看是否存在数量变化，如果In:&lt;topic名称&gt;没有变化，说明没有新的消息产生，而不是consumer堵住了。</li>
+<li>确认consumer是否在持续消费消息，可以<a href="#problemAverageDelay">参考</a>，连续查看consumer对应项目的transaction，看MsgConsumed这个type是否数量增加，如果这个数量在增加，说明consumer消费没有堵住。</li>
+<li>其次确认是否该topic其他consumer都在消费，只有自己的consumer停止消费了。可以<a href="#problemDelay">参考</a>，查看topic其他consumer的消费情况。<ul>
+<li><em>如果该topic其他consumer也都停止消费，且生产者正常工作，请及时联系swallow团队成员</em>。</li>
+<li>如果该topic其他consumer消费正常，只有你自己的consumer消费堵住了，请查看consumer对应项目在CAT中的Problem，找到Heartbeat这个type，查询最新的线程堆栈，以确认Consumer的线程是否block在onMessage方法内，详细页面请参考下图：<br />
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/6.png" /></li>
+<li>如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因包括但不限于死循环、等待IO、死锁、数据库操作、依赖的服务超时等情况，请仔细检查这些情况，修复并重启consumer即可。</li>
+<li>如果consumer的线程不存在block现象，请及时联系swallow团队成员。</li>
+</ul>
+</li>
+</ul>
+<p><span id="problemProducer"></span></p>
+<h2 id="producer_1"><a name="user-content-producer_1" href="#producer_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何确认我的Producer正常工作？</h2>
+<h3 id="cat_2"><a name="user-content-cat_2" href="#cat_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cat端追踪</h3>
+<ul>
+<li>首先确认生产者是否正常启动，判别方法跟前述问题中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。</li>
+<li>在CAT上观察Producer对应项目的transaction，找到MsgProduced以及MsgProduceTried这两个Type，MsgProduced的数量表示程序产生的消息数量，MsgProduceTried表示Swallow的producer client尝试发送给producer server的次数，如果这两个数量相差过大，说明存在异常。<br />
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/7.png" /></li>
+<li>正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，此时请联系swallow团队成员。</li>
+</ul>
+<h3 id="swallow-web_3"><a name="user-content-swallow-web_3" href="#swallow-web_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
+<ul>
+<li>从Swallow Web端<a href="http://swallow.dp/console/message">Message管理</a>中查看相关topic下的message信息，检查消息是否正确发送。<br />
+<img alt="consumer server监控" src="http://swallow.dp/help/document/img/16.png" /></li>
+</ul></article></body></html>
+<script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>
+<script src="js/ztree_toc.js"></script>
+
+<link rel="stylesheet" href="css/zTreeStyle/zTreeStyle.css"
+	type="text/css" />
+<script type="text/javascript">
+<!--
+	$(document).ready(function() {
+		$('#tree').ztree_toc({
+			debug : false,
+			is_auto_number : true,
+			documment_selector : '.markdown-body',
+			ztreeStyle : {
+				width : '320px',
+				height : '100%',
+				overflow : 'auto',
+				position : 'fixed',
+				'z-index' : 2147483647,
+				border : '0px none',
+				left : '0px',
+				top : '0px'
+			}
+		});
+	});
+//-->
+</script>
+
+
