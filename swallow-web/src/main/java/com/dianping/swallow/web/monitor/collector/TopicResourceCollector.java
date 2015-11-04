@@ -120,10 +120,6 @@ public class TopicResourceCollector extends AbstractRealTimeCollector implements
         if (topicResource != null) {
             List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(topicName, topicResource.getProducerIpInfos());
             if (ipStatusMonitor.isChanged(topicResource.getProducerIpInfos(), currentIpInfos)) {
-                topicResource = topicResourceService.findByTopic(topicName);
-                if (topicResource == null) {
-                    return;
-                }
                 topicResource.setProducerIpInfos(currentIpInfos);
                 boolean result = topicResourceService.update(topicResource);
                 if (result) {

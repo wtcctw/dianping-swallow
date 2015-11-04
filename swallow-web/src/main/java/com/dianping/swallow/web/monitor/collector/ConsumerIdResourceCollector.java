@@ -124,28 +124,25 @@ public class ConsumerIdResourceCollector extends AbstractRealTimeCollector imple
     private void updateConsumerIdResource(String topicName, String consumerId) {
         ConsumerIdKey consumerIdKey = new ConsumerIdKey(topicName, consumerId);
         ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId, false);
-        if (consumerIdResource != null) {
-            List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(consumerIdKey, consumerIdResource.getConsumerIpInfos());
-            if (ipStatusMonitor.isChanged(consumerIdResource.getConsumerIpInfos(), currentIpInfos)) {
-                boolean result = false;
-                if (consumerIdResource == null) {
-                    consumerIdResource = cResourceService.buildConsumerIdResource(topicName, consumerId);
-                    consumerIdResource.setConsumerIpInfos(currentIpInfos);
-                    result = cResourceService.insert(consumerIdResource);
-                    logger.info("[updateConsumerIdResource] insert consumerIdResource {}", consumerIdResource.toString());
-                } else {
-                    consumerIdResource.setConsumerIpInfos(currentIpInfos);
-                    result = cResourceService.update(consumerIdResource);
-                    logger.info("[updateConsumerIdResource] update consumerIdResource {}", consumerIdResource.toString());
-                }
-                if (result) {
-                    doUpdateNotify(consumerIdResource);
-                }
+        List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(consumerIdKey, consumerIdResource.getConsumerIpInfos());
+        if (ipStatusMonitor.isChanged(consumerIdResource.getConsumerIpInfos(), currentIpInfos)) {
+            boolean result = false;
+            if (consumerIdResource == null) {
+                consumerIdResource = cResourceService.buildConsumerIdResource(topicName, consumerId);
+                consumerIdResource.setConsumerIpInfos(currentIpInfos);
+                result = cResourceService.insert(consumerIdResource);
+                logger.info("[updateConsumerIdResource] insert consumerIdResource {}", consumerIdResource.toString());
+            } else {
+                consumerIdResource.setConsumerIpInfos(currentIpInfos);
+                result = cResourceService.update(consumerIdResource);
+                logger.info("[updateConsumerIdResource] update consumerIdResource {}", consumerIdResource.toString());
             }
-        } else {
-            logger.info("[updateConsumerIdResource] resourceContainer no consumerIdResource {},{}", topicName, consumerId);
+            if (result) {
+                doUpdateNotify(consumerIdResource);
+            }
         }
     }
+
 
     @Override
     public void doRegister(ResourceListener listener) {
