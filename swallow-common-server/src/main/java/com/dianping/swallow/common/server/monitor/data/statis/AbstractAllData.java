@@ -3,6 +3,7 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
+import com.dianping.swallow.common.internal.monitor.impl.MapMergeableImpl;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisRetriever;
@@ -275,13 +276,13 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         String key = keys.getNextKey();
         S server;
         if (MonitorData.TOTAL_KEY.equals(key)) {
-            NavigableMap<Long, Long> result = new ConcurrentSkipListMap<Long, Long>();
+            MapMergeableImpl<Long, Long> mapMergeableImpl = new MapMergeableImpl<Long, Long>();
             for (S s : servers.values()) {
                 NavigableMap<Long, Long> value = s.getDelayValue(keys, type);
-                MapUtil.mergeMapOfTypeLong(result, value);
+                mapMergeableImpl.merge(value);
                 keys.reset();
             }
-            return result;
+            return mapMergeableImpl.getToMerge();
         } else {
             server = servers.get(key);
         }
@@ -305,13 +306,13 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         String key = keys.getNextKey();
         S server;
         if (MonitorData.TOTAL_KEY.equals(key)) {
-            NavigableMap<Long, Statisable.QpxData> result = new ConcurrentSkipListMap<Long, Statisable.QpxData>();
+            MapMergeableImpl<Long, Statisable.QpxData> mapMergeableImpl = new MapMergeableImpl<Long, Statisable.QpxData>();
             for (S s : servers.values()) {
                 NavigableMap<Long, Statisable.QpxData> value = s.getQpsValue(keys, type);
-                MapUtil.mergeMap(result, value);
+                mapMergeableImpl.merge(value);
                 keys.reset();
             }
-            return result;
+            return mapMergeableImpl.getToMerge();
         } else {
             server = servers.get(key);
         }
