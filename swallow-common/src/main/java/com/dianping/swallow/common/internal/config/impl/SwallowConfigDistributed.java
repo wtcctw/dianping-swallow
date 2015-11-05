@@ -115,7 +115,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 	 * @param topicKey
 	 * @param topicCfg
 	 */
-	private TopicConfig putConfig(String topicKey, TopicConfig topicCfg) {
+	public TopicConfig putConfig(String topicKey, TopicConfig topicCfg) {
 		
 		String topic = getTopicFromLionKey(topicKey);
 		TopicConfig oldConfig = null;
@@ -139,6 +139,15 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		
 		return key.startsWith(TOPIC_CFG_PREFIX);
 	}
+	
+	public static String topicKey(String topic){
+		
+		if(topic.startsWith(TOPIC_CFG_PREFIX)){
+			return topic;
+		}
+		
+		return StringUtils.join(",", TOPIC_CFG_PREFIX, topic);
+	}
 
 	@Override
 	protected SwallowConfigArgs doOnConfigChange(String key, String value) {
@@ -158,7 +167,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 			return null;
 		}
 		
-		return new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, topic);
+		return new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, topic, oldConfig);
 	}
 
 	private TopicConfig getConfigFromString(String config) {

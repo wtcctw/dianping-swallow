@@ -79,10 +79,6 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 	@Override
 	public void onConfigChange(String key, String value) {
 
-		if(logger.isDebugEnabled()){
-			logger.debug("[onConfigChange]" + key + ":" + value);
-		}
-		
 		SwallowConfigArgs args = null;
 		
 		if (LION_KEY_HEARTBEAT_SERVER_URI.equals(key)) {
@@ -123,14 +119,17 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 		private String  topic;
 		
 		private CHANGED_BEHAVIOR behavior = CHANGED_BEHAVIOR.UPDATE;
+		
+		private TopicConfig oldConfig = null;;
 
 		public SwallowConfigArgs(CHANGED_ITEM item){
 			this.item = item;
 		}
 
-		public SwallowConfigArgs(CHANGED_ITEM item, String topic){
+		public SwallowConfigArgs(CHANGED_ITEM item, String topic, TopicConfig oldConfig){
 			
 			this(item, topic, CHANGED_BEHAVIOR.UPDATE);
+			this.oldConfig = oldConfig;
 		}
 		
 		public SwallowConfigArgs(CHANGED_ITEM item, String topic, CHANGED_BEHAVIOR behavior){
@@ -153,6 +152,10 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 			return behavior;
 		}
 		
+		public TopicConfig getOldConfig() {
+			return oldConfig;
+		}
+
 		@Override
 		public String toString() {
 			return item + "," + topic + "," + behavior;

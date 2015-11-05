@@ -19,7 +19,6 @@ public class MongoClusterFactory extends AbstractClusterFactory{
 	private String mongoConfigLionSuffix;
 	
 	public MongoClusterFactory(){
-		
 	}
 	
 	public MongoClusterFactory(String mongoConfigLionSuffix) {

@@ -11,6 +11,8 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  */
 public abstract class AbstractMessageDao<T extends Cluster> extends AbstractDao<T> implements MessageDAO<T> {
 
+	private static final long serialVersionUID = 1L;
+
 	public AbstractMessageDao(T cluster) {
 		super(cluster);
 	}

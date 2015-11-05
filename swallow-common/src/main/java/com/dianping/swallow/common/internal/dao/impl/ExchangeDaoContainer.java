@@ -13,6 +13,8 @@ import com.dianping.swallow.common.internal.dao.DAO;
  */
 public class ExchangeDaoContainer<T extends DAO<?>> extends AbstractDaoContainer<T> implements Runnable{
 	
+	private static final long serialVersionUID = 1L;
+
 	private final T oldDao, newDao;
 	
 	private volatile boolean changeToNew = false;

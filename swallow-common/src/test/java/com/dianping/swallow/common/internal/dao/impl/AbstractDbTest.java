@@ -7,6 +7,9 @@ import java.util.Properties;
 import org.junit.Before;
 
 import com.dianping.swallow.AbstractTest;
+import com.dianping.swallow.common.internal.dao.ClusterFactory;
+import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory;
 
 /**
  * @author mengwenchao
@@ -16,6 +19,7 @@ import com.dianping.swallow.AbstractTest;
 public abstract class AbstractDbTest extends AbstractTest{
 	
 	
+	protected ClusterFactory []factorys = new ClusterFactory[]{new MongoClusterFactory(), new KafkaClusterFactory()};
 	
 	protected Properties serverProperties;
 

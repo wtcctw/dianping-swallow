@@ -14,6 +14,8 @@ import com.dianping.swallow.common.internal.dao.DAO;
  */
 public class AbstractDao<T extends Cluster> implements DAO<T>{
 
+	private static final long serialVersionUID = 1L;
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected T cluster;

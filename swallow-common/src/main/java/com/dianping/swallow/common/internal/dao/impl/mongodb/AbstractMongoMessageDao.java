@@ -16,6 +16,8 @@ import com.mongodb.WriteResult;
 public abstract class AbstractMongoMessageDao extends AbstractMessageDao<MongoCluster> implements MessageDAO<MongoCluster>{
 
 
+	private static final long serialVersionUID = 1L;
+
 	protected static final String gt = "$gt";
 	protected static final String gte = "$gte";
 	protected static final String lt = "$lt";

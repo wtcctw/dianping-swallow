@@ -14,6 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.mockito.MockitoAnnotations;
 
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -45,6 +46,10 @@ public abstract class AbstractTest {
 		if(logger.isInfoEnabled()){
 			logger.info("[-----------------][begin test]" + testName.getMethodName());
 		}
+		
+		System.setProperty("lion.useLocal", "true");
+		MockitoAnnotations.initMocks(this);
+				
 	}
 
 	

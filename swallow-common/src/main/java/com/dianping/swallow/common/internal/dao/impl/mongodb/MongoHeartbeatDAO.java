@@ -21,6 +21,8 @@ import com.mongodb.DBObject;
 
 public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements HeartbeatDAO<MongoCluster>, Observer, Lifecycle, ComponentMonitable{
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String  TICK = "t";
 
 	private SwallowConfig swallowConfig;

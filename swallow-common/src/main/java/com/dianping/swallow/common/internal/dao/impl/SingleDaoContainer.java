@@ -9,6 +9,8 @@ import com.dianping.swallow.common.internal.dao.DAO;
  */
 public class SingleDaoContainer<T extends DAO<?>> extends AbstractDaoContainer<T>{
 	
+	private static final long serialVersionUID = 1L;
+
 	private final T  dao; 
 	
 	public SingleDaoContainer(T dao){

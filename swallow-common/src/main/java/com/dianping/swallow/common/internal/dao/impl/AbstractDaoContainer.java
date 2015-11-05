@@ -13,6 +13,7 @@ import com.dianping.swallow.common.internal.dao.DAOContainer;
  */
 public abstract class AbstractDaoContainer<T extends DAO<?>> implements DAOContainer<T>{
 	
+	private static final long serialVersionUID = 1L;
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 

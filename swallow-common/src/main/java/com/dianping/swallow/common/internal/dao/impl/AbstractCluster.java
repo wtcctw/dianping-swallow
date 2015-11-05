@@ -70,19 +70,32 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 	
 	@Override
 	public boolean sameCluster(Cluster other) {
-		
-		if(!this.getClass().equals(other.getClass())){
-			return false;
+		return sameCluster(this, other);
+	}
+	
+	public static boolean sameCluster(Cluster cluster1, Cluster cluster2){
+
+		if(cluster1 == cluster2){
+			return true;
 		}
 		
-		List<InetSocketAddress> thisServers = allServers();
-		List<InetSocketAddress> otherServers = other.allServers();
+		if(cluster1 != null && cluster2 != null){
 
-		for(InetSocketAddress address : thisServers){
-			if(otherServers.contains(address)){
-				return true;
+			if(!cluster1.getClass().equals(cluster2.getClass())){
+				return false;
+			}
+			
+			List<InetSocketAddress> thisServers = cluster1.allServers();
+			List<InetSocketAddress> otherServers = cluster2.allServers();
+
+			for(InetSocketAddress address : thisServers){
+				if(otherServers.contains(address)){
+					return true;
+				}
 			}
 		}
+			
 		return false;
+
 	}
 }

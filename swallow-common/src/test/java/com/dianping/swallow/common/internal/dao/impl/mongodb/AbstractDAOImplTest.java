@@ -2,7 +2,6 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 
 
-import jmockmongo.MockMongo;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -13,7 +12,6 @@ import com.dianping.swallow.AbstractSpringTest;
 
 public abstract class AbstractDAOImplTest extends AbstractSpringTest {
 
-	private static MockMongo mock;
 
 	protected static final String IP = "127.0.0.1";
 
@@ -33,16 +31,10 @@ public abstract class AbstractDAOImplTest extends AbstractSpringTest {
 	@BeforeClass
 	public synchronized static void setUpClass() throws Exception {
 		
-		if (mock == null) {
-			mock = new MockMongo(24521);
-			mock.start();
-		}
-		
 	}
 	
 	@After
 	public void afterAbstractDAOImplTest() throws Exception {
-		mock.stop();
 	}
 
 	@AfterClass

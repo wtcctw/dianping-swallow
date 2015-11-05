@@ -147,7 +147,9 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 					createOrUpdateDao(args.getTopic(), false);
 					break;
 				case UPDATE:
-					createOrUpdateDao(args.getTopic(), true);
+					if(configChanges(args.getTopic(), args.getOldConfig())){
+						createOrUpdateDao(args.getTopic(), true);
+					}
 					break;
 				case DELETE:
 					deleteTopicDao(args.getTopic());
@@ -162,6 +164,31 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	}
 
 	
+	private boolean configChanges(String topicName, TopicConfig oldConfig) {
+		
+		TopicConfig newConfig =  swallowConfig.getTopicConfig(topicName);
+		
+		boolean result = true;
+		
+		String newStore = StringUtils.trimToNull(newConfig.getStoreUrl());
+		String oldStore = oldConfig == null ? null : StringUtils.trimToNull(oldConfig.getStoreUrl());
+		
+		if(StringUtils.isEmpty(newStore) && StringUtils.isEmpty(oldStore)){
+			result = false;
+		}else if(!StringUtils.isEmpty(newStore)  && !StringUtils.isEmpty(oldStore) && oldStore.equalsIgnoreCase(newStore)){
+			result  = false;
+		}
+		
+		if(!result){
+			if(logger.isInfoEnabled()){
+				logger.info("[configChanges][config not changed!!]" + oldConfig + "," + newConfig);
+			}
+		}
+		
+		return result;
+	}
+
+
 	@Override
 	public Class<?> getObjectType() {
 		return MessageDAO.class;
@@ -284,7 +311,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 		}else if(cluster instanceof KafkaCluster){
 			messageDao = new KafkaMessageDao((KafkaCluster) cluster);
 		}else{
-			throw new IllegalStateException("unknown cluster:" + cluster);
+			throw new IllegalStateException("unknown cluster:" + topicName + "," + cluster);
 		}
 	
 		return messageDao;
@@ -312,4 +339,13 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	public void setSwallowConfig(SwallowConfig swallowConfig) {
 		this.swallowConfig = swallowConfig;
 	}
+	
+	/**
+	 * for unit test
+	 * @return
+	 */
+	protected Map<String, DAOContainer<MessageDAO<?>>> getDaos(){
+		
+		return daos;
+	} 
 }

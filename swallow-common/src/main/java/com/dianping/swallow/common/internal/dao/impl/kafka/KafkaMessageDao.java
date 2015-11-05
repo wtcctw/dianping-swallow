@@ -12,6 +12,8 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  */
 public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 
+	private static final long serialVersionUID = 1L;
+
 	public KafkaMessageDao(KafkaCluster cluster) {
 		super(cluster);
 	}

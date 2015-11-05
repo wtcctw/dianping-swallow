@@ -21,6 +21,8 @@ import com.mongodb.WriteResult;
 
 public class MongoMessageDAO extends AbstractMongoMessageDao {
 
+	private static final long serialVersionUID = 1L;
+
 	public static final String ID = "_id";
 	public static final String ORIGINAL_ID = "o_id";
 	public static final String CONTENT = "c";
