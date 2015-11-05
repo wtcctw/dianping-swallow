@@ -86,34 +86,37 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	public void createAllTopicDao() {
 		
 		
-		try {
-			
-			Map<String, DAOContainer<MessageDAO<?>>> daos = new ConcurrentHashMap<String, DAOContainer<MessageDAO<?>>>();
-			
-			for (String topicName : swallowConfig.getCfgTopics()){
+		Map<String, DAOContainer<MessageDAO<?>>> daos = new ConcurrentHashMap<String, DAOContainer<MessageDAO<?>>>();
+		
+		for (String topicName : swallowConfig.getCfgTopics()){
 
-				try{
-					MessageDAO<?> messageDAO = createDao(topicName);
-					if(messageDAO != null){
-						daos.put(topicName, new SingleDaoContainer<MessageDAO<?>>(messageDAO));
-					}
-				} catch (ClusterCreateException e) {
-					logger.error("[createAllTopicDao]" + topicName, e);
+			try{
+				MessageDAO<?> messageDAO = createDao(topicName);
+				if(messageDAO != null){
+					daos.put(topicName, new SingleDaoContainer<MessageDAO<?>>(messageDAO));
 				}
+			} catch (ClusterCreateException e) {
+				logger.error("[createAllTopicDao]" + topicName, e);
 			}
-			
-			this.daos = daos;
-			
-			if(logger.isInfoEnabled()){
-				logger.info("[createAllTopicDao]" + daos);
-			}
-			
-		} catch (RuntimeException e) {
-			throw new IllegalArgumentException( e.getMessage(), e);
 		}
+
+		if(daos.get(AbstractSwallowConfig.TOPICNAME_DEFAULT) == null){
+			throw new IllegalStateException("default topic not exist!!" + daos.keySet());
+		}
+		
+		this.daos = daos;
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[createAllTopicDao]" + daos);
+		}
+			
 	}
 	
 	private void deleteTopicDao(String topicName) {
+		
+		if(AbstractSwallowConfig.TOPICNAME_DEFAULT.equals(topicName)){
+			throw new IllegalArgumentException("default topic can not be deleted!!" + topicName);
+		}
 		
 		DAOContainer<MessageDAO<?>> daoContainer = daos.remove(topicName);
 		
@@ -226,10 +229,11 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 				}
 				
 				if(daoContainer != null){
+					
 					if(logger.isInfoEnabled()){
 						logger.info("[createOrUpdateDao][old not null, remove that!]" + topicName);
 					}
-					daos.remove(topicName);
+					deleteTopicDao(topicName);
 				}
 				return;
 			}
@@ -244,6 +248,10 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 						logger.info("[createOrUpdateDao][cluster not change!]");
 					}
 					return;
+				}
+				
+				if(AbstractSwallowConfig.TOPICNAME_DEFAULT.equals(topicName)){
+					throw new UnsupportedOperationException("can not update default topic, not supported!!" + topicName + "," + messageDAO);
 				}
 				
 				result = new ExchangeDaoContainer<MessageDAO<?>>(daoContainer.getDao(), messageDAO);
