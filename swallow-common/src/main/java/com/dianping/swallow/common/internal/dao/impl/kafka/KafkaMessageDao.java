@@ -65,18 +65,6 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 	}
 
 	@Override
-	public int deleteMessage(String topicName, Long messageId) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int deleteMessage(String topicName, String consumerId, Long messageId) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public int count(String topicName, String consumerId) {
 		// TODO Auto-generated method stub
 		return 0;

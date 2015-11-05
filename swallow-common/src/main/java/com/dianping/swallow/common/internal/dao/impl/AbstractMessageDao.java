@@ -28,11 +28,6 @@ public abstract class AbstractMessageDao<T extends Cluster> extends AbstractDao<
 	}
 
 	@Override
-	public int deleteMessage(String topicName, Long messageId) {
-		return deleteMessage(topicName, null, messageId);
-	}
-
-	@Override
 	public Long getAckMaxMessageId(String topicName, String consumerId) {
 		return getAckMaxMessageId(topicName, consumerId, false);
 	}

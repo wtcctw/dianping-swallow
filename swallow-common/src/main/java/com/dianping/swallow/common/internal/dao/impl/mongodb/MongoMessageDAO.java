@@ -318,27 +318,6 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 	}
 
 	@Override
-	public int deleteMessage(String topicName, String consumerId, final Long messageId) {
-
-		final DBCollection collection = getCollection(topicName, consumerId);
-		if (collection.isCapped()) {
-			logger.error("[deleteMessage][capped collection, can not delete]" + topicName + "," + consumerId);
-			return 0;
-		}
-
-		WriteResult result = doAndCheckResult(new MongoAction() {
-			@Override
-			public WriteResult doAction() {
-
-				DBObject query = new Query().lt(ID, MongoUtils.longToBSONTimestamp(messageId)).build();
-				return collection.remove(query);
-			}
-		});
-
-		return result.getN();
-	}
-
-	@Override
 	public int count(String topicName, String consumerId) {
 
 		DBCollection collection = getCollection(topicName, consumerId);

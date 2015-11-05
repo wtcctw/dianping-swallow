@@ -31,33 +31,6 @@ public abstract class AbstractMessageDAOImplTest extends AbstractDAOImplTest {
 		messageDAO.cleanMessage(topicName, consumerId);
 	}
 
-//	@Test
-	//删除此测试，collection为capped
-	public void testDeleteMessage() {
-		
-		Assert.assertEquals(0, messageDAO.count(topicName, getConsumerId()));
-		
-		int count1 = 100, count2 = 150;
-		
-		insertMessage(count1, topicName, getConsumerId());
-		
-		Assert.assertEquals(count1, messageDAO.count(topicName, getConsumerId()));
-		
-		Long currentMaxId = messageDAO.getMaxMessageId(topicName, getConsumerId());
-		
-		insertMessage(count2, topicName, getConsumerId());
-		
-		Assert.assertEquals(count2 + count1, messageDAO.count(topicName, getConsumerId()));
-		
-		int del = messageDAO.deleteMessage(topicName, getConsumerId(), currentMaxId + 1);
-		
-		Assert.assertEquals(count1, del);
-		
-		Assert.assertEquals(count2, messageDAO.count(topicName, getConsumerId()));
-		
-	}
-
-
 	protected abstract String getConsumerId();
 
 	protected void insertMessage(int count, String topicName) {

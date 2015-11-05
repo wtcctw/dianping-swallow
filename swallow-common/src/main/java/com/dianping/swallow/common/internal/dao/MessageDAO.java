@@ -63,22 +63,6 @@ public interface MessageDAO<T extends Cluster> extends DAO<T>{
 	 */
 	void cleanMessage(String topicName, String consumerId);
 
-	/**
-	 * 删除messageId之前的消息
-	 * 
-	 * @param topicName
-	 * @param messageId
-	 */
-	int deleteMessage(String topicName, Long messageId);
-
-	/**
-	 * 删除messageId之前的消息
-	 * 
-	 * @param topicName
-	 * @param consumerId
-	 * @param messageId
-	 */
-	int deleteMessage(String topicName, String consumerId, Long messageId);
 
 	/**
 	 * 获取消息数目

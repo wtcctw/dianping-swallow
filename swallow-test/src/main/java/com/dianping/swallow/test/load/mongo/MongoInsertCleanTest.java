@@ -67,7 +67,7 @@ public class MongoInsertCleanTest extends AbstractMongoTest {
 					
 					String topic = getTopicName(topicName, i);
 					long start = System.currentTimeMillis();
-					int count = dao.deleteMessage(topic, id);
+//					int count = dao.deleteMessage(topic, id);
 					if(logger.isInfoEnabled()){
 						logger.info("[run][message delete]" + count + "," + (System.currentTimeMillis() - start)/1000 + "/s");
 					}
