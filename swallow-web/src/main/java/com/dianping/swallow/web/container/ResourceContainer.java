@@ -18,9 +18,9 @@ public interface ResourceContainer {
 
     ProducerServerResource findProducerServerResource(String ip);
 
-    TopicResource findTopicResource(String topic);
+    TopicResource findTopicResource(String topic, boolean isDefault);
 
-    ConsumerIdResource findConsumerIdResource(String topicName, String consumerId);
+    ConsumerIdResource findConsumerIdResource(String topicName, String consumerId, boolean isDefault);
 
     List<ConsumerServerResource> findConsumerServerResources(boolean isDefault);
 

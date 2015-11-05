@@ -83,7 +83,7 @@ public class ProducerIpStatsAlarmer extends
 
     @Override
     protected boolean isReport(ProducerIpStatsDataKey statsDataKey) {
-        TopicResource topicResource = resourceContainer.findTopicResource(statsDataKey.getTopicName());
+        TopicResource topicResource = resourceContainer.findTopicResource(statsDataKey.getTopicName(), true);
         if (topicResource == null) {
             return false;
         }

@@ -41,7 +41,7 @@ public class IPDescServiceImpl implements IPDescService {
 
             String strOpMobile = ipDesc.getOpMobile();
             Set<String> opEmails = getEmailsByStrMobile(strOpMobile);
-            ipDesc.setOpEmail(getStrEmails(strOpMobile, opEmails));
+            ipDesc.setOpEmail(getStrEmails(ipDesc.getOpEmail(), opEmails));
         } catch (Exception e) {
             logger.error("[addEmail]", e);
         }

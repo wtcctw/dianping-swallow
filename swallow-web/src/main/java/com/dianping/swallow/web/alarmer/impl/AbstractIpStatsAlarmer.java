@@ -83,29 +83,23 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
     }
 
     public void alarmIpStatsData() {
-        SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, alarmName + "alarmIpStatsData");
-        catWrapper.doAction(new SwallowAction() {
-            @Override
-            public void doAction() throws SwallowException {
-                Iterator<Entry<T, IpStatusData>> itStatusData = ipStatusDatas.entrySet().iterator();
-                while (itStatusData.hasNext()) {
-                    Entry<T, IpStatusData> statusDataEntry = itStatusData.next();
-                    T statsDataKey = statusDataEntry.getKey();
-                    IpStatusData ipStatusData = statusDataEntry.getValue();
-                    if (ipStatusData.getNoDataCount() > 0) {
-                        if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
-                            itStatusData.remove();
-                            report(statsDataKey);
-                        }
-                    } else if (ipStatusData.getSubNoDataCount() > 0) {
-                        if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
-                            itStatusData.remove();
-                            checkUnSureLastRecords(statsDataKey);
-                        }
-                    }
+        Iterator<Entry<T, IpStatusData>> itStatusData = ipStatusDatas.entrySet().iterator();
+        while (itStatusData.hasNext()) {
+            Entry<T, IpStatusData> statusDataEntry = itStatusData.next();
+            T statsDataKey = statusDataEntry.getKey();
+            IpStatusData ipStatusData = statusDataEntry.getValue();
+            if (ipStatusData.getNoDataCount() > 0) {
+                if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
+                    itStatusData.remove();
+                    report(statsDataKey);
+                }
+            } else if (ipStatusData.getSubNoDataCount() > 0) {
+                if (getCurrentTimeMillis() - ipStatusData.getSubNoDataTime() > checkInterval) {
+                    itStatusData.remove();
+                    checkUnSureLastRecords(statsDataKey);
                 }
             }
-        });
+        }
     }
 
     protected abstract void checkUnSureLastRecords(T statsDataKey);
@@ -142,7 +136,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         }
 
         public IpStatusData updateSubNoDataTime(long currentTimeMillis) {
-            if (subNoDataCount == 0) {
+            if (subNoDataCount != 0) {
                 if (subNoDataTime < hasDataTime) {
                     subNoDataCount = 0;
                     subNoDataTime = currentTimeMillis;
