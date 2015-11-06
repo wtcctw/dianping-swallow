@@ -1373,7 +1373,7 @@ body .markdown-body
 <li>startMessageId 表示当需要在建立连接的时候指定读取消息的位置，可以设置该参数指定。</li>
 <li>longTaskAlertTime 当用户的onMessage业务逻辑过长时的报警时间间隔，单位毫秒  <em>0.7.0版本新增</em> <br />
 在业务处理时间过长时，会在cat上面生成长时间Transaction提示，如下图所示：<br />
-<img alt="业务逻辑时间过长cat" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=QievF1rwJYLpSM0T8fSa1fjdx24Qovv3PoxV%2ftOxcg0%3d&amp;docid=07b20fc54a95f4ca8a9f8a42f5a096b86" /></li>
+<img alt="业务逻辑时间过长cat" src="http://swallow.dp/help/document/img/longtask.png" /></li>
 </ul>
 <table>
 <thead>
@@ -1761,20 +1761,20 @@ public static void main(String[] args) {
 <li>存储-发送延迟(swallow发出message与message存储到mongo的时间差值)</li>
 <li>发送-ack延迟(swallow收到用户ack确认与swallow发出message的时间差值)</li>
 </ol>
-<p><img alt="topic-consumer延时统计" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=WFWjx5Bs2rAoP52IJtVr5EUZlcySGLSarI1Daf%2byJbU%3d&amp;docid=06faa7eb4e9f2472fb1ecfcc5eb6fb5e6" /></p>
+<p><img alt="topic-consumer延时统计" src="http://swallow.dp/help/document/img/13.png" /></p>
 <ul>
 <li>在搜索栏中输入所要查询的topic，系统会返回topic与每个consumer在不同时间段的延时统计结果。<br />
-<img alt="topic-consumer延时统计" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=TEKVBoHBTDzizVix6VdKuyGT92W7owBlgreH99w3Clc%3d&amp;docid=0e994a4a230884aa0a8fa2f444596146b" /></li>
+<img alt="topic-consumer延时统计" src="http://swallow.dp/help/document/img/8.png" /></li>
 </ul>
 <h4 id="qps"><a name="user-content-qps" href="#qps" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>每秒消息(QPS)监控</h4>
 <ul>
 <li>消息量监控从swallow服务器端统计消息发送频率(QPS)，分为三段进行统计，和上述延时分段对应。</li>
 </ul>
 <p>swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack频率统计每秒钟用户返回ack的消息数目。在某一时间段，如果系统一切工作正常，对应特定的consumerID，应该有消费者发送频率 = swallow发送频率 = 用户返回ack频率。如果出现不相等，请对比其他消费者是否正常，如果正常，则请查看客户端代码是否正确实现了功能。<br />
-<img alt="每秒消息" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=p15aJWl%2fIFJaWoeX3jBNX2vx46DoxTcN65Pdp6rJu0c%3d&amp;docid=0daf0952a5f3542efa81abb4a4ff6cf41" /></p>
+<img alt="每秒消息" src="http://swallow.dp/help/document/img/9.png" /></p>
 <ul>
 <li>如果只想查看某一端的每秒钟统计量，只需点击右侧的图例即可切换显示和隐藏。<br />
-<img alt="每秒消息" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=uFhEEqIWjn2INN1Np0kAWQDX6rJpER8uataqIn6L4l4%3d&amp;docid=0af4789f1842f4810a259729f9372e226" /></li>
+<img alt="每秒消息" src="http://swallow.dp/help/document/img/10.png" /></li>
 </ul>
 <h4 id="_19"><a name="user-content-_19" href="#_19" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>堆积量监控</h4>
 <ul>
@@ -1783,19 +1783,19 @@ public static void main(String[] args) {
 </li>
 <li>
 <p>如果客户端工作正常并且及时处理消息,消息堆积将会在一定数值范围内波动。<br />
-<img alt="每秒消息" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=G%2berRFqK9mqIB4HTXRgRxMcbCn0Odgp%2fwa7Px%2byIj3o%3d&amp;docid=009fe3ffd13fc4c55b522e1f02b3f5da5" /></p>
+<img alt="每秒消息" src="http://swallow.dp/help/document/img/14.png" /></p>
 </li>
 </ul>
 <h3 id="swallow-server"><a name="user-content-swallow-server" href="#swallow-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Server监控</h3>
 <h4 id="producer-server"><a name="user-content-producer-server" href="#producer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>producer server监控</h4>
 <ul>
 <li>producer server统计用户发送频率，即每秒钟发动到producer server的消息数目。<br />
-<img alt="producer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=Jbq4JjeZ9b%2b4MN7vJY2ZYYMitHkYI7jH88tpjV3d%2b4s%3d&amp;docid=092d9ef4b807944f997e66fdb1f92a743" /></li>
+<img alt="producer server监控" src="http://swallow.dp/help/document/img/11.png" /></li>
 </ul>
 <h4 id="consumer-server"><a name="user-content-consumer-server" href="#consumer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumer server监控</h4>
 <ul>
 <li>consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。<br />
-<img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=C5RhmEkN8Q8PaQaD4sVy1cec%2b7fkmSFNaph0e5Cghbs%3d&amp;docid=014f1aa2503154f31879e4b422cf462ed" /></li>
+<img alt="consumer server监控" src="http://swallow.dp/help/document/img/12.png" /></li>
 </ul>
 <h2 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 告警</h2>
 <h3 id="serverswallow"><a name="user-content-serverswallow" href="#serverswallow" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server告警（针对swallow研发团队）</h3>
@@ -1932,7 +1932,12 @@ public static void main(String[] args) {
 </li>
 <li>
 <p>告警配置</p>
-<p>根据业务自身的情况,可以设置对应topic的告警配置,可以取消告警或者修改默认的告警配置值。</p>
+<p>根据业务自身的情况，可以设置对应topic的告警配置（需要有该topic的权限，若没有，可通过<a href="http://workflow.dp/wfe/start/119">workflow</a>进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置。其中峰值是指Qps的最高值，大于此值报警；谷值是指Qps的最低值，小于此值报警；波动是指当前Qps和前一天此时刻前后5分钟的Qps平均值之间的倍数大小；波动基数，前面两个Qps至少有一个大于波动基数值，才进行波动比较；延时是指存储延时，是指消息发出到存入Swallow这段时间差，超过设定的值，就会告警。<br />
+<img alt="Topic报警参数" src="http://swallow.dp/help/document/img/topic-alarm-setting.png" /></p>
+<p>对topic告警还有开关设置，可以打开或关闭告警。如下图，对Topic告警开关，有发送告警（产生此topic消息的生产端）、接收告警（所有消费此topic的所有消费端）开关，分别针对Topic的发送端、接收端异常告警的开关。<br />
+<img alt="Topic报警开关" src="http://swallow.dp/help/document/img/topic-alarm-switch.png" /></p>
+<p>另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个topic相关的发送ip不想要告警，也只可以设置这个topic某个ip的开关。如下图<br />
+<img alt="Topic ip报警开关" src="http://swallow.dp/help/document/img/topic-ip-alarm-switch.png" /></p>
 </li>
 </ol>
 <h3 id="consumerid"><a name="user-content-consumerid" href="#consumerid" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumerId告警（针对消息的消费者）</h3>
@@ -1976,7 +1981,12 @@ public static void main(String[] args) {
 </li>
 <li>
 <p>告警配置</p>
-<p>根据业务自身的情况,可以设置对应ConsumerId的告警配置,可以取消告警或者修改默认的告警配置值.</p>
+<p>根据业务自身的情况，可以设置对应ConsumerId的告警配置（需要有相关topic的权限，若没有，可通过<a href="http://workflow.dp/wfe/start/119">workflow</a>进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时、累积的参数设置。这些参数根据消息消费流程分成两个过程：发送过程（swallow从存储取消息到发送消息给消费端这段过程）；Ack过程（swallow服务端发送消息到客户端消费完消息给服务端回馈这段过程）。这两段分别有对应的峰值、谷值、波动、延时。这些含义类似于Topic告警参数，详情可看Topic告警参数，其中累积是指swallow服务端消息的累积量，若大于设定的值，则报警。<br />
+<img alt="ConsumerId报警参数" src="http://swallow.dp/help/document/img/consumerId-alarm-setting.png" /></p>
+<p>对ConsumerId告警还有开关设置，可打开或关闭告警，如下图。<br />
+<img alt="ConsumerId报警开关" src="http://swallow.dp/help/document/img/consumerId-alarm-switch.png" /></p>
+<p>另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个consumerId相关的消费ip不想要告警，也只可以设置这个consumerId的某个ip的开关。如下图<br />
+<img alt="ConsumerId ip报警开关" src="http://swallow.dp/help/document/img/consumerId-ip-alarm-switch.png" /></p>
 </li>
 </ol>
 <h3 id="ip"><a name="user-content-ip" href="#ip" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>IP告警</h3>
@@ -1995,12 +2005,16 @@ public static void main(String[] args) {
 <li>[1023]CONSUMER_CLIENT_RECEIVER，consumer client一段时间未接收消息。</li>
 </ul>
 </li>
+<li>
+<p>告警配置</p>
+<p>这些告警的ip都来源于某个topic（生产端）或者某个consumerId（消费端），因此可以到topic或者consumerId处设置相关ip可是否需要告警。设置过程如topic或consumerId告警配置中设置具体ip开关。</p>
+</li>
 </ol>
 <h2 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 大盘</h2>
 <h3 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>综合大盘</h3>
 <ul>
 <li>综合大盘会显示消费者发送延迟,消费者确认延迟和消息堆积的综合统计数据.超过默认阈值的统计项会被标红.大盘会根据一分钟的统计量生成最终结果.<br />
-<img alt="综合大盘" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=G%2fDYymV%2fCzo54UW3ewdoKhnpvBDwtWMT3TGTh8jeVr0%3d&amp;docid=08978bd2fd3284d008831ca1d9e506435" /></li>
+<img alt="综合大盘" src="http://swallow.dp/help/document/img/17.png" /></li>
 </ul>
 <h3 id="_21"><a name="user-content-_21" href="#_21" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>发送延迟,确认延迟和堆积大盘</h3>
 <ul>
@@ -2016,7 +2030,7 @@ public static void main(String[] args) {
 </ul>
 <h3 id="_24"><a name="user-content-_24" href="#_24" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>用户行为</h3>
 <ul>
-<li>每个用户管理一个或者多个topic，可以查看、重发相应的topic的消息</li>
+<li>每个用户管理一个或者多个topic，可以查看、重发相应的topic的消息。</li>
 </ul>
 <h3 id="visitor"><a name="user-content-visitor" href="#visitor" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Visitor行为</h3>
 <ul>
@@ -2024,7 +2038,16 @@ public static void main(String[] args) {
 </ul>
 <h3 id="_25"><a name="user-content-_25" href="#_25" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限提升</h3>
 <ul>
-<li>用户和Visitor如需提升权限，请联系对应的业务运维</li>
+<li>
+<p>用户和Visitor如需提升权限，可通过<a href="http://workflow.dp/wfe/start/119">workflow</a>进行申请。<br />
+<img alt="权限提升" src="http://swallow.dp/help/document/img/enhance_auth.png" /></p>
+</li>
+<li>
+<p>topic需要是已经通过swallow开发小组审批过的可用topic，否则请先申请相关topic。一次只能填写一个topic名称。</p>
+</li>
+<li>
+<p>预账号请填写申请人公司邮箱前缀，<a href="mailto:如邮箱为mingdong.li@dianping.com需填写mingdong.li">如邮箱为mingdong.li@dianping.com需填写mingdong.li</a>。</p>
+</li>
 </ul>
 <p><span id="takeAttention"></span></p>
 <h1 id="swallow_8"><a name="user-content-swallow_8" href="#swallow_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用注意事项</h1>
@@ -2054,13 +2077,13 @@ public static void main(String[] args) {
 <ul>
 <li>从<a href="http://cat.dp/">CAT</a>中查看Swallow项目的Transaction，可以获得相应的信息（<a href="http://cat.dp/cat/r/t?op=view&amp;ampdomain=Swallow">传送门</a>）。</li>
 <li>以dp_action这个topic为例（仅作示例，具体到自己的topic，请做相应变通），先找到In:dp_action这个type：<br />
-<img alt="Swallow Transaction In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=nNZxCU0aNpSP9auXeT5wSL2YMPMj63HXrNkVSUwks6I%3d&amp;docid=0fce2e89b5fc04bfe8138dcb41716deb0" /></li>
+<img alt="Swallow Transaction In CAT" src="http://swallow.dp/help/document/img/1.png" /></li>
 <li>上图右边对应的是当前该topic的producer生产的消息总量，点击In:dp_action链接，可以看到每个producer产生的消息数量：<br />
-<img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=XQqBt9NYDQhqw6Ih7psDwNkXp4hHAfsURXavZsbuQj0%3d&amp;docid=0d5352d0f28964e648afa31103baebd05" /></li>
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/2.png" /></li>
 <li>返回上一级，在同一级页面中，找到Out:dp_action这个type，对应从consumer server发出的消息数量：<br />
-<img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=x%2bbjCrZxxwIL%2bx5a529qLRCkKQPGkrVC%2f6DoqS1N3Mg%3d&amp;docid=09b664c69bc1f42d2a76975e4c82e4dd7" /></li>
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/3.png" /></li>
 <li>Out:dp_action对应的数量为消费这个topic的所有consumer消费的消息总量，点击进入，可以看到每个消费者单台消费机的消费数量：<br />
-<img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=pjSbpxdW21OsilhumHJpBaTGDdHicOI7Noq2YrAXYRE%3d&amp;docid=039c404696c4942828bb4be894448236b" /></li>
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/4.png" /></li>
 <li>对于一个consumer id来说，消费的消息总量，应该等于producer生产的消息总量（In:dp_action的数量），如果消费的消息总量小于生产的消息总量，那么消费是有延迟的。</li>
 </ul>
 <h3 id="swallow-web_1"><a name="user-content-swallow-web_1" href="#swallow-web_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
@@ -2073,7 +2096,7 @@ public static void main(String[] args) {
 <h3 id="cat_1"><a name="user-content-cat_1" href="#cat_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Cat端追踪</h3>
 <ul>
 <li>从<a href="http://cat.dp/">CAT</a>中查看Consumer ID对应项目的Transaction，找到MsgConsumed和MsgConsumeTried这两个type：<br />
-<img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=0QH8os%2fIyyQHtz77AR5t4TzV8v6mlwQXss8n8R3kjh8%3d&amp;docid=0426de8c2bfe84c219f857ad9a3b3b716" /></li>
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/5.png" /></li>
 <li>MsgConsumed表示consumer server给这个consumer推送的消息数量，MsgConsumeTried表示consumer尝试消费消息的次数，如果存在失败重试，则MsgConsumeTried数量可能会比MsgConsumed更多。</li>
 <li>右边的三列可以看出consumer调用onMessage回调函数耗费的最小最大以及平均时间，如果consumer消费状况一直良好，突然某个时刻开始有消费延时，可以观察一下这里的平均时间是不是比之前更高，如果平均消费时间比正常情况高出很多，可能会造成消费延时。</li>
 </ul>
@@ -2101,7 +2124,7 @@ public static void main(String[] args) {
 <li>其次确认是否该topic其他consumer都在消费，只有自己的consumer停止消费了。可以<a href="#problemDelay">参考</a>，查看topic其他consumer的消费情况。<ul>
 <li><em>如果该topic其他consumer也都停止消费，且生产者正常工作，请及时联系swallow团队成员</em>。</li>
 <li>如果该topic其他consumer消费正常，只有你自己的consumer消费堵住了，请查看consumer对应项目在CAT中的Problem，找到Heartbeat这个type，查询最新的线程堆栈，以确认Consumer的线程是否block在onMessage方法内，详细页面请参考下图：<br />
-<img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=vFNs7GHYywskM9LsejdM0Mko3IIzn8cMPhZ77JWBSEk%3d&amp;docid=0a6b63223125843d791b57dad311a79c0" /></li>
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/6.png" /></li>
 <li>如果consumer的线程block在onMessage方法内，说明onMessage方法内调用存在异常情况，可能原因包括但不限于死循环、等待IO、死锁、数据库操作、依赖的服务超时等情况，请仔细检查这些情况，修复并重启consumer即可。</li>
 <li>如果consumer的线程不存在block现象，请及时联系swallow团队成员。</li>
 </ul>
@@ -2113,13 +2136,13 @@ public static void main(String[] args) {
 <ul>
 <li>首先确认生产者是否正常启动，判别方法跟前述问题中第一点类似，增加检测页面，确保日志中没有影响正常启动的异常出现。</li>
 <li>在CAT上观察Producer对应项目的transaction，找到MsgProduced以及MsgProduceTried这两个Type，MsgProduced的数量表示程序产生的消息数量，MsgProduceTried表示Swallow的producer client尝试发送给producer server的次数，如果这两个数量相差过大，说明存在异常。<br />
-<img alt="Producer Count In CAT" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=OE0h%2fxsUP%2b3CveKDt0t5w%2f8Gjc1jTKZqV0zmmmMfvNc%3d&amp;docid=091aef7f093d24e04bee0c251551113f9" /></li>
+<img alt="Producer Count In CAT" src="http://swallow.dp/help/document/img/7.png" /></li>
 <li>正常情况下这两个type的数量是一一对应的，如果设置了重试，在发送失败的情况下，producer会重新尝试发送指定次数，此时MsgProduceTried的数量会大于MsgProduced的数量。如果一段时间内没有新消息发送成功，则可以认为没有新消息产生，或者Producer存在问题，此时请联系swallow团队成员。</li>
 </ul>
 <h3 id="swallow-web_3"><a name="user-content-swallow-web_3" href="#swallow-web_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow Web端追踪</h3>
 <ul>
 <li>从Swallow Web端<a href="http://swallow.dp/console/message">Message管理</a>中查看相关topic下的message信息，检查消息是否正确发送。<br />
-<img alt="consumer server监控" src="https://dper-my.sharepoint.cn/personal/wenchao_meng_dianping_com/_layouts/15/guestaccess.aspx?guestaccesstoken=mfGgnXyDnjxDzMW7VswO5i3Ar8qZvbXYolWzLedGsww%3d&amp;docid=063ccff6570ed4057850b59c81a00b488" /></li>
+<img alt="consumer server监控" src="http://swallow.dp/help/document/img/16.png" /></li>
 </ul></article></body></html>
 <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>

@@ -1,7 +1,6 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
 
-import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfo;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
@@ -17,11 +16,5 @@ public class ProducerTopicStatisData extends AbstractTotalMapStatisable<MessageI
 	protected Class<? extends Statisable<MessageInfo>> getStatisClass() {
 		return MessageInfoStatis.class;
 	}
-
-	@Override
-	protected Statisable<MessageInfo> createValue() {
-		return new MessageInfoStatis();
-	}
-
 
 }

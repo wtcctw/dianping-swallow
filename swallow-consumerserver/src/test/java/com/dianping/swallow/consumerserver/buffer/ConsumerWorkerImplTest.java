@@ -112,7 +112,7 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
                 return true;
             }
 
-			@Override
+			//@Override
 			public void describeMismatch(Object item,
 					Description mismatchDescription) {
 				// TODO Auto-generated method stub

@@ -5,77 +5,83 @@ import java.util.List;
 import org.apache.http.NameValuePair;
 
 import com.dianping.swallow.web.model.alarm.ResultType;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年8月17日 下午5:43:08
  */
 public interface HttpService {
 
-	/**
-	 * http post request
-	 * 
-	 * @param url
-	 * @param params
-	 * @return json
-	 */
-	HttpResult httpPost(String url, List<NameValuePair> params);
+    /**
+     * http post request
+     *
+     * @param url
+     * @param params
+     * @return json
+     */
+    HttpResult httpPost(String url, List<NameValuePair> params);
 
-	/**
-	 * http get request
-	 * 
-	 * @param url
-	 * @return json
-	 */
-	HttpResult httpGet(String url);
+    /**
+     *
+     * @param url
+     * @param jsonObject
+     * @return
+     */
+    HttpResult httpPost(String url, JSONObject jsonObject);
 
-	/**
-	 * 
-	 * http request result
-	 * 
-	 * @author qiyin
-	 *
-	 */
-	public static class HttpResult {
+    /**
+     * http get request
+     *
+     * @param url
+     * @return json
+     */
+    HttpResult httpGet(String url);
 
-		private boolean isSuccess;
+    /**
+     * http request result
+     *
+     * @author qiyin
+     */
+    public static class HttpResult {
 
-		private ResultType resultType;
+        private boolean isSuccess;
 
-		private String responseBody;
+        private ResultType resultType;
 
-		public boolean isSuccess() {
-			return isSuccess;
-		}
+        private String responseBody;
 
-		public void setSuccess(boolean isSuccess) {
-			this.isSuccess = isSuccess;
-		}
+        public boolean isSuccess() {
+            return isSuccess;
+        }
 
-		public ResultType getResultType() {
-			return resultType;
-		}
+        public void setSuccess(boolean isSuccess) {
+            this.isSuccess = isSuccess;
+        }
 
-		public void setResultType(ResultType resultType) {
-			this.resultType = resultType;
-		}
+        public ResultType getResultType() {
+            return resultType;
+        }
 
-		public String getResponseBody() {
-			return responseBody;
-		}
+        public void setResultType(ResultType resultType) {
+            this.resultType = resultType;
+        }
 
-		public void setResponseBody(String responseBody) {
-			this.responseBody = responseBody;
-		}
+        public String getResponseBody() {
+            return responseBody;
+        }
 
-		@Override
-		public String toString() {
-			return "HttpResult [isSuccess=" + isSuccess + ", resultType=" + resultType + ", responseBody="
-					+ responseBody + "]";
-		}
+        public void setResponseBody(String responseBody) {
+            this.responseBody = responseBody;
+        }
 
-	}
+        @Override
+        public String toString() {
+            return "HttpResult [isSuccess=" + isSuccess + ", resultType=" + resultType + ", responseBody="
+                    + responseBody + "]";
+        }
+
+    }
 
 }

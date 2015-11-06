@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
@@ -52,7 +56,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         for (K ipStatsData : ipStatsDatas) {
             boolean hasStatsData = ipStatsData.hasStatsData();
             @SuppressWarnings("unchecked")
-			T key = (T) ipStatsData.createStatsDataKey();
+            T key = (T) ipStatsData.createStatsDataKey();
             IpStatusData ipStatusData = ipStatusDatas.get(key);
             if (ipStatusData == null) {
                 ipStatusData = new IpStatusData();
@@ -90,7 +94,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
                     report(statsDataKey);
                 }
             } else if (ipStatusData.getSubNoDataCount() > 0) {
-                if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
+                if (getCurrentTimeMillis() - ipStatusData.getSubNoDataTime() > checkInterval) {
                     itStatusData.remove();
                     checkUnSureLastRecords(statsDataKey);
                 }
@@ -132,7 +136,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         }
 
         public IpStatusData updateSubNoDataTime(long currentTimeMillis) {
-            if (subNoDataCount == 0) {
+            if (subNoDataCount != 0) {
                 if (subNoDataTime < hasDataTime) {
                     subNoDataCount = 0;
                     subNoDataTime = currentTimeMillis;

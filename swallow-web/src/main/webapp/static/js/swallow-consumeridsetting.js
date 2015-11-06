@@ -134,7 +134,10 @@ module
 							$scope.query.consumerId = $scope.consumerId;
 							$scope.query.consumerIp = $scope.consumerIp;
 							$scope.query.inactive = true;
-							
+
+							$scope.apps = [];
+							$scope.resultDict = {};
+
 							$scope.consumeridEntry = {};
 							$scope.consumeridEntry.consumerAlarmSetting = {};
 							$scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting = {};
@@ -154,6 +157,7 @@ module
 							$scope.consumeridEntry.topic;
 							$scope.consumeridEntry.alarm;
 							$scope.consumeridEntry.consumerIpInfos;
+							$scope.consumeridEntry.consumerApplications = [];
 
 							$scope.refreshpage = function(myForm, num) {
 								if ($scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak < $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley
@@ -172,11 +176,11 @@ module
 										$scope.consumeridEntry.consumerIpInfos[i].active = check;
 									}
 								}
-								
+								$scope.consumeridEntry.consumerApplications = $("#consumerApplications").val().split(",");
+
 								var id = "#myModal" + num;
 								$(id).modal('hide');
-								var param = JSON.stringify($scope.consumeridEntry);
-								
+
 								$http.post(window.contextPath + '/console/consumerid/update', $scope.consumeridEntry).success(function(response) {
 									$scope.query.topic = $scope.consumeridEntry.topic;
 									$scope.query.consumerId = $scope.consumeridEntry.consumerId;
@@ -189,6 +193,7 @@ module
 								$scope.consumeridEntry.topic = "";
 								$scope.consumeridEntry.alarm = true;
 								$scope.consumeridEntry.consumerIpInfos = "";
+								$scope.consumeridEntry.consumerApplications = "";
 								$scope.consumeridEntry.consumerAlarmSetting.sendDelay = "";
 								$scope.consumeridEntry.consumerAlarmSetting.ackDelay = "";
 								$scope.consumeridEntry.consumerAlarmSetting.accumulation = "";
@@ -202,8 +207,59 @@ module
 								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = "";
 							}
 
-							$scope.setModalInput = function(index) {
-								
+							$scope.setModalInput = function(index, showApp) {
+
+								if(typeof($scope.consumeridEntry.consumerApplications) != "undefined"){
+									var consumerApplications = $scope.searchPaginator.currentPageItems[index].consumerApplications;
+									$('#consumerApplications').tagsinput('removeAll');
+									if(consumerApplications != null && consumerApplications.length > 0){
+										for(var i = 0; i < consumerApplications.length; ++i)
+											$('#consumerApplications').tagsinput('add', consumerApplications[i]);
+									}
+								}else{
+									$('#consumerApplications').tagsinput('removeAll');
+								}
+
+								if(showApp){
+									var length = $scope.searchPaginator.currentPageItems[index].consumerIpInfos.length;
+									if(length > 0){
+										var ips = "";
+										for(var i = 0; i < length; ++i){
+											ips += $scope.searchPaginator.currentPageItems[index].consumerIpInfos[i].ip;
+											if(i != length -1){
+												ips += ",";
+											}
+										}
+										var result = [];
+										$scope.ipEntry = {};
+										$scope.ipEntry.ip = ips;
+										$scope.ipEntry.alarm = true;
+										$scope.ipEntry.application = "";
+										$http.post(window.contextPath + '/console/ip/list', $scope.ipEntry).success(function(data) {
+											if(data.first > 0){
+												$scope.apps = data.second;
+											}
+											$scope.addToDict($scope.searchPaginator.currentPageItems[index].consumerIpInfos);
+											if($scope.apps.length > 0){
+												$scope.addToDict($scope.apps);
+											}
+											for(var s in $scope.resultDict){
+												result.push($scope.resultDict[s]);
+											}
+
+											if(result.length == 0){
+												$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
+											}else{
+												$scope.consumeridEntry.consumerIpInfos = result;
+											}
+											$scope.apps = [];
+											$scope.resultDict = {};
+										});
+									}
+
+								}else{
+									$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
+								}
 								$scope.consumeridEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 								$scope.consumeridEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
 								$scope.consumeridEntry.consumerId = $scope.searchPaginator.currentPageItems[index].consumerId;
@@ -219,7 +275,28 @@ module
 								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.valley;
 								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuation;
 								$scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase;
-								$scope.consumeridEntry.consumerIpInfos = $scope.searchPaginator.currentPageItems[index].consumerIpInfos;
+
+							}
+
+							$scope.addToDict = function(arra) {
+								if (!arra instanceof Array) {
+									throw new Error("only support array!");
+								}
+								for (var i = 0; i < arra.length; i++) {
+									var currentElement = arra[i];
+									var ip = currentElement.ip;
+									var currentDict;
+
+									if (!(ip in $scope.resultDict)) {
+										$scope.resultDict[ip] = {};
+									}
+									currentDict = $scope.resultDict[ip];
+									for (var name in currentElement) {
+										if (currentElement.hasOwnProperty(name) && !currentDict.hasOwnProperty(name)) {
+											currentDict[name] = currentElement[name];
+										}
+									}
+								}
 							}
 							
 							$scope.setInactive = function(){
@@ -228,6 +305,10 @@ module
 								$scope.query.consumerIp = $("#searchconsumerip").val();
 								$scope.query.consumerId = $("#searchconsumerid").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+							}
+
+							$scope.setApplication = function(application){
+								localStorage.setItem("application", application);
 							}
 							
 							//如果topic列表返回空，则不会执行initpage
@@ -316,6 +397,20 @@ module
 									 $scope.countinactive = data;
 								 }).error(function(data, status, headers, config) {
 								 });
+
+								$http({
+									method : 'GET',
+									url : window.contextPath + '/console/application/applicationname'
+								}).success(function(data, status, headers, config) {
+									$('#consumerApplications').tagsinput({
+										typeahead: {
+											items: 16,
+											source: data,
+											displayText: function(item){ return item;}  //necessary
+										}
+									});
+								}).error(function(data, status, headers, config) {
+								});
 								 
 							}
 							

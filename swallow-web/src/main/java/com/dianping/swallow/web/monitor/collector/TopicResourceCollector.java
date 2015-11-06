@@ -116,16 +116,12 @@ public class TopicResourceCollector extends AbstractRealTimeCollector implements
     }
 
     private void updateTopicResource(String topicName) {
-        TopicResource topicResource = resourceContainer.findTopicResource(topicName);
+        TopicResource topicResource = resourceContainer.findTopicResource(topicName, false);
         if (topicResource != null) {
             List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(topicName, topicResource.getProducerIpInfos());
             if (ipStatusMonitor.isChanged(topicResource.getProducerIpInfos(), currentIpInfos)) {
-                topicResource = topicResourceService.findByTopic(topicName);
-                if (topicResource == null) {
-                    return;
-                }
                 topicResource.setProducerIpInfos(currentIpInfos);
-                boolean result =  topicResourceService.update(topicResource);
+                boolean result = topicResourceService.update(topicResource);
                 if (result) {
                     doUpdateNotify(topicResource);
                 }

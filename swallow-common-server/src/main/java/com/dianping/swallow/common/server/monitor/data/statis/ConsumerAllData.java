@@ -99,15 +99,4 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 		return result;
 	}
 
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		ConsumerAllData clone = (ConsumerAllData) super.clone();
-		return clone;
-	}
-
-	@Override
-	public ConsumerServerStatisData createValue() {
-		return new ConsumerServerStatisData();
-	}
-
 }

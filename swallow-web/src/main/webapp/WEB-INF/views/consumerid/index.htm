@@ -59,6 +59,7 @@
 						<th style="text-align: left"><a href="" data-toggle="tooltip"
 							ng-click="setInactive()" title="只显示包含不活动IP的Topic">消费IP配置</a>#if(${isadmin}) &nbsp; | 不活动IP个数&nbsp;:{{countinactive}} #end</th>
 						<th style="text-align: left">告警配置</th>
+						<th style="text-align: left">应用</th>
 						<th style="text-align: left">告警</th>
 						<th style="text-align: left">操作</th>
 					</tr>
@@ -73,10 +74,12 @@
 						<td style="text-align: left" ng-bind="ad.topic"></td>
 						<td style="text-align: left"><a
 							ng-href="#myModal2"
-							ng-click="setModalInput($index);" data-toggle="modal"
+							ng-click="setModalInput($index, true);" data-toggle="modal"
 							ng-bind="ad.ips | limitTo : 25 "></a></td>
 						<td style="text-align: left"><a href="#myModal1"
-							ng-click="setModalInput($index);" data-toggle="modal">详情</a></td>
+							ng-click="setModalInput($index, false);" data-toggle="modal">详情</a></td>
+						<td style="text-align: left" ><a href="${rc.contextPath}/console/application"
+								  ng-click="setApplication(ad.consumerApplications);" ng-bind="ad.consumerApplications | limitTo : 25 "></a></td>
 						<td style="text-align: left"><label class="pull-left inline">
 								<small class="muted smaller-90"></small> <input
 								id="alarm{{$index}}" type="checkbox" ng-model="ad.alarm"
@@ -84,7 +87,7 @@
 								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
 						</label></td>
 						<td style="text-align: left"><a href="#myModal0"
-							ng-click="setModalInput($index);" data-toggle="modal"
+							ng-click="setModalInput($index, false);" data-toggle="modal"
 							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
 								data-original-title="编辑配置值"></i></a> <a href
 							ng-show="isdefault(ad.consumerId)"
@@ -118,7 +121,7 @@
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"
 							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">配置ConsumerId</h4>
+						<h4 class="modal-title" id="myModalLabel0">配置ConsumerId</h4>
 					</div>
 					<div class="modal-body">
 						<form method="post" class="form-horizontal" name="myForm0"
@@ -137,6 +140,15 @@
 									<label class="control-label">Topic</label> <input type="text"
 										class="form-control" ng-model="consumeridEntry.topic"
 										id="topic" readonly> </input>
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="form-group"
+									 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+									<label class="control-label"><b>应用名</b></label> <input
+										type="text" class="form-control"
+										ng-model="consumeridEntry.consumerApplications" id="consumerApplications"
+										data-provide="typeahead" autocomplete="off"> </input>
 								</div>
 							</div>
 							<div class="control-group">
@@ -225,7 +237,7 @@
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"
 							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">告警配置</h4>
+						<h4 class="modal-title" id="myModalLabel1">告警配置</h4>
 					</div>
 					<div class="modal-body">
 						<form method="post" class="form-horizontal" name="myForm1"
@@ -323,7 +335,7 @@
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal"
 							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">告警配置</h4>
+						<h4 class="modal-title" id="myModalLabel2">告警配置</h4>
 					</div>
 					<div class="modal-body">
 						<form method="post" class="form-horizontal" name="myForm2"
@@ -351,6 +363,7 @@
 									<tr>
 										<th style="text-align: left">序号</th>
 										<th style="text-align: left">IP</th>
+										<th style="text-align: left">应用</th>
 										<th style="text-align: left">alarm</th>
 										<th style="text-align: left">active</th>
 									</tr>
@@ -358,6 +371,7 @@
 									<td style="text-align: left" ng-bind="$index+1"></td>
 										<td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
 									ng-click="setIP(ipinfo.ip)" ng-bind="ipinfo.ip"></a></td>
+										<td style="text-align: left" ng-bind="ipinfo.application"></td>
 										<td style="text-align: left"><label
 											class="pull-left inline"> <small
 												class="muted smaller-90"></small> <input ng-click="changeipinfo(consumeridEntry.consumerId, consumeridEntry.topic,'alarm',$index,ipinfo.ip )"

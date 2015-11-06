@@ -42,6 +42,18 @@
 				if ($('#ConsumerDashboardController').length > 0) {
 					angular.element($('#ConsumerDashboardController')).scope().getDashboardDelay(-1);
 				}
+				if ($('#ConsumerIpQpsController').length > 0) {
+					angular.element($('#ConsumerIpQpsController')).scope().getConsumerIpQps('${topic}');
+				}
+				if ($('#ConsumerIpDelayController').length > 0) {
+					angular.element($('#ConsumerIpDelayController')).scope().getConsumerIpDelay('${topic}');
+				}
+				if ($('#ProducerIpQpsController').length > 0) {
+					angular.element($('#ProducerIpQpsController')).scope().getProducerIpQps('${topic}');
+				}
+				if ($('#ProducerIpDelayController').length > 0) {
+					angular.element($('#ProducerIpDelayController')).scope().getProducerIpDelay('${topic}');
+				}
 			});
 </script>
 

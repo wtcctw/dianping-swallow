@@ -19,8 +19,6 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
 
     private Map<T, ActiveIpData> activeIpDatas = new ConcurrentHashMap<T, ActiveIpData>();
 
-    private Map<T, List<IpInfo>> lastIpInfoDatas = new ConcurrentHashMap<T, List<IpInfo>>();
-
     private final long startTimestamp = System.currentTimeMillis();
 
     public static class ActiveIpData {
