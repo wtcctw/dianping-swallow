@@ -83,6 +83,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-kafka</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>

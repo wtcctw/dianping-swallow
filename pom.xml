@@ -30,6 +30,7 @@
 		<module>swallow-test</module>
 		<module>swallow-web</module>
 		<module>swallow-common-server</module>
+		<module>swallow-kafka</module>
 	</modules>
 
 	<description>swallow is a message service!</description>
@@ -96,6 +97,11 @@
 			<dependency>
 				<groupId>com.dianping.swallow</groupId>
 				<artifactId>swallow-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dianping.swallow</groupId>
+				<artifactId>swallow-kafka</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,9 +44,6 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 		return address;
 	}
 
-	protected abstract List<InetSocketAddress> build(String url);
-
-	
 	/**
 	 * 分割时考虑空白字符
 	 * @param split
@@ -96,6 +94,74 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 		}
 			
 		return false;
-
 	}
+
+	protected List<InetSocketAddress> build(final String address) {
+		
+		String url = address.trim();
+		String schema = getSchema();
+		
+		if(url.startsWith(schema)){
+			url.substring(schema.length());
+		}
+		
+		return buildAddress(url);
+	}
+
+	
+	protected abstract String getSchema();
+
+	protected List<InetSocketAddress> buildAddress(String address) {
+		
+		List<InetSocketAddress> result = new ArrayList<InetSocketAddress>();
+		String[] hostPortArr = address.split(splitSpaces(","));
+		
+		for (int i = 0; i < hostPortArr.length; i++) {
+			
+			String[] pair = hostPortArr[i].split(splitSpaces(":"));
+			if(pair.length != 2){
+				throw new IllegalArgumentException("bad address:" + address);
+			}
+			try {
+				result.add(new InetSocketAddress(pair[0].trim(), Integer.parseInt(pair[1].trim())));
+			} catch (Exception e) {
+				throw new IllegalArgumentException(
+						e.getMessage()
+								+ ". Bad format of store address："
+								+ address
+								+ ". The correct format is like " + addressExample(),
+						e);
+			}
+		}
+		
+		return result;
+	}
+
+	protected String addressExample() {
+		return getSchema() + "<host>:<port>,<host>:<port>";
+	}
+
+	
+	/**
+	 * ip:port,ip:port
+	 * @param seeds
+	 * @return
+	 */
+	protected String getAddressString(List<InetSocketAddress> seeds) {
+
+		StringBuilder sb = new StringBuilder();
+		
+		for(int i=0; i < seeds.size() ;i++){
+			
+			if(i > 0){
+				sb.append(",");
+			}
+			InetSocketAddress address = seeds.get(i);
+			sb.append(address.getHostName() + ":" + address.getPort());
+		}
+		
+		return sb.toString();
+	}
+
+
 }

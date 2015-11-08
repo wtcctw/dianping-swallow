@@ -81,37 +81,6 @@ public class MongoCluster extends AbstractCluster{
 	}
 
 	
-	@Override
-	protected List<InetSocketAddress> build(String address) {
-		
-		if (address.startsWith(schema)) {
-			address = address.substring(schema.length());
-		}
-		
-		String[] hostPortArr = address.split(splitSpaces(","));
-		
-		List<InetSocketAddress> result = new ArrayList<InetSocketAddress>();
-		
-		for (int i = 0; i < hostPortArr.length; i++) {
-			
-			String[] pair = hostPortArr[i].split(splitSpaces(":"));
-			if(pair.length != 2){
-				throw new IllegalArgumentException("bad mongo address:" + address);
-			}
-			try {
-				result.add(new InetSocketAddress(pair[0].trim(), Integer.parseInt(pair[1].trim())));
-			} catch (Exception e) {
-				throw new IllegalArgumentException(
-						e.getMessage()
-								+ ". Bad format of mongo address："
-								+ address
-								+ ". The correct format is mongodb://<host>:<port>,<host>:<port>",
-						e);
-			}
-		}
-		
-		return result;
-	}
 	
 	public MongoClient getMongoClient(){
 
@@ -356,6 +325,16 @@ public class MongoCluster extends AbstractCluster{
 		}
 		
 		return addresses;
+	}
+
+	@Override
+	protected String addressExample() {
+		return schema + "<host>:<port>,<host>:<port>";
+	}
+
+	@Override
+	protected String getSchema() {
+		return schema;
 	}
 
 }

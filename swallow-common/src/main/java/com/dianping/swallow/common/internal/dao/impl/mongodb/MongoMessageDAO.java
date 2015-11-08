@@ -33,7 +33,6 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 	public static final String INTERNAL_PROPERTIES = "_p";
 	public static final String TYPE = "t";
 	public static final String SOURCE_IP = "si";
-	public static final String SAVE_TIME = "save_time";
 	
 	
 	public static final String  SRC_CONSUMER_IP = "cip";
@@ -188,12 +187,12 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 				return collection.insert(mongoMessages);
 			}
 		});
-
 	}
 
+	
 	@Override
-	public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
-		
+	protected void doSaveMessage(String topicName, String consumerId, SwallowMessage message) {
+
 		final DBCollection collection = getCollection(topicName, consumerId);
 
 		final DBObject mongoMessage = createMongoMessage(topicName, consumerId, message);
@@ -233,13 +232,12 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 		if (properties != null && properties.size() > 0) {
 			builder.add(PROPERTIES, properties);
 		}
+		
 		// internalProperties
 		Map<String, String> internalProperties = message.getInternalProperties();
-		if (internalProperties == null) {
-			internalProperties = new HashMap<String, String>();
+		if(internalProperties != null && internalProperties.size() >0){
+			builder.add(INTERNAL_PROPERTIES, internalProperties);
 		}
-		addDefaultInternalProperties(internalProperties);
-		builder.add(INTERNAL_PROPERTIES, internalProperties);
 		// sha1
 		String sha1 = message.getSha1();
 		if (sha1 != null && !"".equals(sha1.trim())) {
@@ -311,10 +309,6 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 		}
 
 		collection.insert(builder.get());
-	}
-
-	private void addDefaultInternalProperties(Map<String, String> internalProperties) {
-		internalProperties.put(SAVE_TIME, String.valueOf(System.currentTimeMillis()));
 	}
 
 	@Override
@@ -403,5 +397,6 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 	         }
 	      }
 	   }
+
 
 }

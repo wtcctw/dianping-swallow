@@ -2,6 +2,9 @@ package com.dianping.swallow.common.internal.dao.impl.kafka;
 
 import java.util.List;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
 import com.dianping.swallow.common.internal.dao.impl.AbstractMessageDao;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
@@ -17,10 +20,22 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 	public KafkaMessageDao(KafkaCluster cluster) {
 		super(cluster);
 	}
-
+	
+	
 	@Override
-	public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
+	protected void doSaveMessage(String topicName, String consumerId, SwallowMessage message) {
 		
+		if(consumerId != null){
+			throw new IllegalArgumentException("consumerId != null, currently not supported!!");
+		}
+		
+		try {
+			KafkaProducer<String, SwallowMessage>  producer = cluster.getProducer(topicName);
+			ProducerRecord<String, SwallowMessage>  record = new ProducerRecord<String, SwallowMessage>(topicName, message);
+			producer.send(record).get();
+		} catch (Exception e) {
+			throw new SwallowKafkaException("save message faild:" + topicName, e);
+		}
 	}
 
 	@Override
@@ -93,5 +108,6 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }

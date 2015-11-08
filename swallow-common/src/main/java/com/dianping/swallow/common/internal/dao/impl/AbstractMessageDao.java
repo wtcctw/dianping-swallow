@@ -1,5 +1,8 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -13,6 +16,8 @@ public abstract class AbstractMessageDao<T extends Cluster> extends AbstractDao<
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String SAVE_TIME = "save_time";
+
 	public AbstractMessageDao(T cluster) {
 		super(cluster);
 	}
@@ -21,6 +26,28 @@ public abstract class AbstractMessageDao<T extends Cluster> extends AbstractDao<
 	public void saveMessage(String topicName, SwallowMessage message) {
 		saveMessage(topicName, null, message);
 	}
+	
+	public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
+		
+		
+		Map<String, String>  internalProperties = message.getInternalProperties();
+		
+		if(internalProperties == null){
+			internalProperties = new HashMap<String, String>();
+			message.setInternalProperties(internalProperties);
+		}
+		addDefaultInternalProperties(internalProperties);
+		
+		doSaveMessage(topicName, consumerId, message);
+	}
+
+	
+	protected void addDefaultInternalProperties(Map<String, String> internalProperties) {
+		
+		internalProperties.put(SAVE_TIME, String.valueOf(System.currentTimeMillis()));
+	}
+
+	protected abstract void doSaveMessage(String topicName, String consumerId, SwallowMessage message);
 
 	@Override
 	public Long getMaxMessageId(String topicName) {
