@@ -15,7 +15,6 @@ import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * 服务器相关，存储server对应的监控数据
@@ -141,16 +140,17 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
         checkSupported(type);
 
-        NavigableMap<Long, QpxData> result = new ConcurrentSkipListMap<Long, QpxData>();
+        MapMergeableImpl<Long, QpxData> mapMergeableImpl = new MapMergeableImpl<Long, QpxData>();
         Statisable<M> statis;
         for (S s : servers.values()) {
             statis = s.getValue(topic);
             if (statis != null) {
                 NavigableMap<Long, QpxData> qps = statis.getQpx(type);
-                MapUtil.mergeMap(result, qps);
+                mapMergeableImpl.merge(qps);
             }
         }
 
+        NavigableMap<Long, QpxData> result = mapMergeableImpl.getToMerge();
         return result.isEmpty() ? null : result;
 
     }
@@ -200,16 +200,17 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
         checkSupported(type);
 
-        NavigableMap<Long, Long> result = new ConcurrentSkipListMap<Long, Long>();
+        MapMergeableImpl<Long, Long> mapMergeableImpl = new MapMergeableImpl<Long, Long>();
         Statisable<?> statis;
         for (S s : servers.values()) {
             statis = s.getValue(topic);
             if (statis != null) {
-                NavigableMap<Long, Long> qps = statis.getDelay(type);
-                MapUtil.mergeMapOfTypeLong(result, qps);
+                NavigableMap<Long, Long> delay = statis.getDelay(type);
+                mapMergeableImpl.merge(delay);
             }
         }
 
+        NavigableMap<Long, Long> result = mapMergeableImpl.getToMerge();
         return result.isEmpty() ? null : result;
     }
 
@@ -231,28 +232,28 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
     protected Map<String, NavigableMap<Long, QpxData>> getAllQpx(StatisType type, String topic, boolean includeTotal) {
 
+        ConsumerTopicStatisData result = new ConsumerTopicStatisData();
         ConsumerTopicStatisData ctss;
         for (S s : servers.values()) {
             ctss = (ConsumerTopicStatisData) s.getValue(topic);
             if (ctss != null) {
-                return ctss.allQpx(type, includeTotal);
+                result.merge(ctss);
             }
-
         }
-        return null;
+        return result.isEmpty() ? null : result.allQpx(type, includeTotal);
     }
 
     protected Map<String, NavigableMap<Long, Long>> getAllDelay(StatisType type, String topic, boolean includeTotal) {
 
+        ConsumerTopicStatisData result = new ConsumerTopicStatisData();
         ConsumerTopicStatisData ctss;
         for (S s : servers.values()) {
             ctss = (ConsumerTopicStatisData) s.getValue(topic);
             if (ctss != null) {
-                return ctss.allDelay(type, includeTotal);
+                result.merge(ctss);
             }
-
         }
-        return null;
+        return result.isEmpty() ? null : result.allDelay(type, includeTotal);
     }
 
     public String toString(String key) {
@@ -262,9 +263,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        AbstractAllData clone = (AbstractAllData) super.clone();
-        clone.servers = new ConcurrentHashMap<String, S>(this.servers);
-        return clone;
+        throw new CloneNotSupportedException("clone not supported");
     }
 
     @Override
@@ -326,5 +325,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         }
         return server.getQpsValue(keys, type);
     }
+
+    protected abstract S createValue();
 
 }

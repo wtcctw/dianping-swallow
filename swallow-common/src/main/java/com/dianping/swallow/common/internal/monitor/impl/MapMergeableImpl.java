@@ -2,6 +2,7 @@ package com.dianping.swallow.common.internal.monitor.impl;
 
 import com.dianping.swallow.common.internal.monitor.MapMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
+import com.dianping.swallow.common.internal.util.MapUtil;
 
 import java.util.Map;
 import java.util.NavigableMap;
@@ -23,26 +24,21 @@ public class MapMergeableImpl<K, V> implements MapMergeable<K, V> {
         for (Map.Entry<K, V> entry : fromMerge.entrySet()) {
             K fromKey = entry.getKey();
             V fromValue = entry.getValue();
-            V toValue = toMerge.get(fromKey);
 
-            if (toValue == null) {
-                if (fromValue instanceof Mergeable || fromValue instanceof Long) {
-                    toMerge.put(fromKey, fromValue);
-                }else {
-                    throw new IllegalArgumentException("Unsupport value type");
+            if (fromValue instanceof Mergeable) {
+                V toValue = MapUtil.getOrCreate(toMerge, fromKey, (Class<? extends V>) fromValue.getClass());
+                ((Mergeable) toValue).merge((Mergeable) fromValue);
+            } else if (fromValue instanceof Long) {
+                Long fromLongValue = (Long) fromValue;
+                V toValue = toMerge.get(fromKey);
+                if(toValue == null){
+                    toValue = (V) new Long(0);
                 }
+                Long toLongValue = (Long) toValue;
+                Long newValue = fromLongValue + toLongValue;
+                toMerge.put(fromKey, (V) newValue);
             } else {
-                if (toValue instanceof Mergeable) {
-                    ((Mergeable) toValue).merge((Mergeable) fromValue);
-                    toMerge.put(fromKey, toValue);
-                } else if (toValue instanceof Long) {
-                    Long fromLongValue = (Long) fromValue;
-                    Long toLongValue = (Long) toValue;
-                    Long newValue = fromLongValue + toLongValue;
-                    toMerge.put(fromKey, (V) newValue);
-                } else {
-                    throw new IllegalArgumentException("Unsupport value type");
-                }
+                throw new IllegalArgumentException("Unsupport value type");
             }
         }
 

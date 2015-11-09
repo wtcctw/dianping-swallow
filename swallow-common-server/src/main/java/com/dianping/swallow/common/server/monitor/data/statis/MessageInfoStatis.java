@@ -1,5 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
+import com.dianping.swallow.common.internal.monitor.Mergeable;
+import com.dianping.swallow.common.internal.monitor.impl.MapMergeableImpl;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
@@ -18,7 +20,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  *
  *         2015年5月19日 下午5:46:28
  */
-public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implements Statisable<MessageInfo> {
+public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implements Statisable<MessageInfo> ,Mergeable {
 
 	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -275,6 +277,30 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 	protected Statisable<?> getValue(Object key) {
 
 		throw new UnsupportedOperationException("unsupported operation getValue()");
+	}
+
+	@Override
+	public void merge(Mergeable merge) {
+		if (!(merge instanceof MessageInfoStatis)) {
+			throw new IllegalArgumentException("not MessageInfo, but " + merge.getClass());
+		}
+		MessageInfoStatis messageInfoStatis = (MessageInfoStatis)merge;
+		MapMergeableImpl mapMergeableImpl = new MapMergeableImpl();
+		mapMergeableImpl.setToMerge(this.col);
+		mapMergeableImpl.merge(messageInfoStatis.col);
+		this.col = mapMergeableImpl.getToMerge();
+		mapMergeableImpl.setToMerge(this.qpxMap);
+		mapMergeableImpl.merge(messageInfoStatis.qpxMap);
+		this.qpxMap = mapMergeableImpl.getToMerge();
+		mapMergeableImpl.setToMerge(this.delayMap);
+		mapMergeableImpl.merge(messageInfoStatis.delayMap);
+		this.delayMap = mapMergeableImpl.getToMerge();
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+
+		throw new CloneNotSupportedException("clone not support");
 	}
 
 }

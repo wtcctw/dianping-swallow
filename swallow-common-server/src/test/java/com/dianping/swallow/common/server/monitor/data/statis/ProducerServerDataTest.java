@@ -1,7 +1,9 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.dianping.swallow.common.server.monitor.data.Statisable;
@@ -45,6 +47,46 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
 		NavigableMap<Long, Statisable.QpxData> res2= producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SEND);
 		System.out.println(producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE));
 
+	}
+
+	@Test
+	public void testGetAllDelay() {
+
+		//test merge and getDelayForTopic
+		String topic = topics[0];
+		NavigableMap<Long, Long> result = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
+		NavigableMap<Long, Long> value1 = producerAllData.getDelayValue(new CasKeys("total", topic), StatisType.SAVE);
+		Assert.assertEquals(result, value1);
+		NavigableMap<Long, Long> result2 = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
+		//not change origin data
+		Assert.assertEquals(result, result2);
+
+	}
+
+	@Test
+	public void testGetAllQps() {
+
+		//test merge and getQpxForTopic
+		String topic = topics[0];
+		NavigableMap<Long, Statisable.QpxData> result1 = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
+		NavigableMap<Long, Statisable.QpxData> result2 = producerAllData.getQpsValue(new CasKeys("total", topic), StatisType.SAVE);
+		Assert.assertEquals(result1.size(), result2.size());
+		for(Map.Entry<Long, Statisable.QpxData> entry : result1.entrySet()){
+			Long key = entry.getKey();
+			Statisable.QpxData value1 = entry.getValue();
+			Statisable.QpxData value2 = result2.get(key);
+			Assert.assertEquals(value1.getQpx(), value2.getQpx());
+			Assert.assertEquals(value1.getTotal(), value2.getTotal());
+		}
+		//not change origin data
+		NavigableMap<Long, Statisable.QpxData> result3 = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
+		for(Map.Entry<Long, Statisable.QpxData> entry : result1.entrySet()){
+			Long key = entry.getKey();
+			Statisable.QpxData value1 = entry.getValue();
+			Statisable.QpxData value3 = result3.get(key);
+			Assert.assertEquals(value1.getQpx(), value3.getQpx());
+			Assert.assertEquals(value1.getTotal(), value3.getTotal());
+		}
 	}
 
 	@Test

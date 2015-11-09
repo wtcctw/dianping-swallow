@@ -17,4 +17,9 @@ public class ProducerServerStatisData extends AbstractTotalMapStatisable<Produce
 		return ProducerTopicStatisData.class;
 	}
 
+	@Override
+	protected Statisable<ProducerTopicData> createValue() {
+		return new ProducerTopicStatisData();
+	}
+
 }

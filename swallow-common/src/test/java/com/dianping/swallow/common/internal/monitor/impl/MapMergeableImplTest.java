@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.monitor.impl;
 
 import com.dianping.swallow.common.internal.monitor.Mergeable;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,6 +32,7 @@ public class MapMergeableImplTest{
         }
     }
 
+
     @Test
     public void testEmpty(){
         System.out.println("testEmpty");
@@ -44,6 +46,37 @@ public class MapMergeableImplTest{
         NavigableMap<Long, QpxData> result2 = mapQpxDataMergeableImp.getToMerge();
         for(Map.Entry<Long, QpxData> entry : result2.entrySet()){
             System.out.println(entry.getKey() + " -> " + entry.getValue());
+
+        }
+        Assert.assertEquals(mapLongMergeableImp.getToMerge(), mapLongToMerge);
+    }
+
+    @Test
+    public void testNotModifyOriginalData(){
+        System.out.println("testEmpty");
+        mapLongMergeableImp.merge(mapLongToMerge);
+        mapLongMergeableImp.merge(mapLongToMerge);
+        System.out.println("mapLongToMerge is not change");
+        NavigableMap<Long, Long> result1 = mapLongMergeableImp.getToMerge();
+        for(Map.Entry<Long, Long> entry : result1.entrySet()){
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        }
+        Assert.assertNotEquals(mapLongMergeableImp.getToMerge(), mapLongToMerge);
+
+        System.out.println();
+        mapQpxDataMergeableImp.merge(mapQpxDataToMerge);
+        mapQpxDataMergeableImp.merge(mapQpxDataToMerge);
+        System.out.println("mapQpxDataToMerge is not changed");
+        NavigableMap<Long, QpxData> result2 = mapQpxDataMergeableImp.getToMerge();
+        for(Map.Entry<Long, QpxData> entry : result2.entrySet()){
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        }
+        for(Map.Entry<Long, QpxData> entry : result2.entrySet()){
+            Long key = entry.getKey();
+            QpxData value1 = entry.getValue();
+            QpxData value2 = mapQpxDataToMerge.get(key);
+            Assert.assertEquals(value1.getQpx().longValue(), value2.getQpx().longValue() * 2);
+            Assert.assertEquals(value1.getTotal().longValue(), value2.getTotal().longValue() * 2);
         }
     }
 
@@ -77,11 +110,15 @@ public class MapMergeableImplTest{
         mapIntegerMergeableImp.merge(mapIntegerToMerge);
     }
 
-    private static final class QpxData implements Mergeable{
+    public static class QpxData implements Mergeable{
 
         private Long qpx;
 
         private Long total;
+
+        public QpxData(){
+
+        }
 
         public QpxData(Long qpx, Long total) {
             this.qpx = qpx;
@@ -111,16 +148,14 @@ public class MapMergeableImplTest{
             }
 
             QpxData toMerge = (QpxData) merge;
+            if(total == null){
+                total = new Long(0);
+            }
             total += toMerge.getTotal();
+            if(qpx == null){
+                qpx = new Long(0);
+            }
             qpx += toMerge.getQpx();
-        }
-
-        @Override
-        public String toString() {
-            return "QpxData{" +
-                    "qpx=" + qpx +
-                    ", total=" + total +
-                    '}';
         }
 
         @Override

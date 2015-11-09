@@ -143,4 +143,37 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
 		return getKeys(keys, null);
 	}
 
+	@Override
+	public void merge(String key, KeyMergeable merge) {
+
+		checkType(merge);
+
+		ConsumerIdStatisData toMerge = (ConsumerIdStatisData) merge;
+		sendMessages.merge(key, toMerge.sendMessages);
+		ackMessages.merge(key, toMerge.ackMessages);
+	}
+
+	@Override
+	public void merge(Mergeable merge) {
+
+		checkType(merge);
+
+		ConsumerIdStatisData toMerge = (ConsumerIdStatisData) merge;
+
+
+		sendMessages.merge(toMerge.sendMessages);
+		ackMessages.merge(toMerge.ackMessages);
+	}
+
+	private void checkType(Mergeable merge) {
+		if(!(merge instanceof ConsumerIdStatisData)){
+			throw new IllegalArgumentException("wrong type " + merge.getClass());
+		}
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException("clone not support");
+	}
+
 }
