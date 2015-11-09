@@ -515,7 +515,7 @@ public class DefaultConsumerDataRetriever
         } else {
             StatsDataPair statsDataPair = getServerQpxInDb(qpx, start, end);
             sendQpxs = statsDataPair.getSendStatsDatas();
-            ackQpxs = statsDataPair.getSendStatsDatas();
+            ackQpxs = statsDataPair.getAckStatsDatas();
         }
 
         Map<String, ConsumerDataPair> result = new HashMap<String, ConsumerDataRetriever.ConsumerDataPair>();
@@ -550,7 +550,7 @@ public class DefaultConsumerDataRetriever
             NavigableMap<Long, Long> ackStatsData = null;
             if (statsDataMapPair != null) {
                 sendStatsData = statsDataMapPair.getSendStatsData();
-                ackStatsData = statsDataMapPair.getSendStatsData();
+                ackStatsData = statsDataMapPair.getAckStatsData();
             }
             sendStatsData = fillStatsData(sendStatsData, startKey, endKey);
             ackStatsData = fillStatsData(ackStatsData, startKey, endKey);
