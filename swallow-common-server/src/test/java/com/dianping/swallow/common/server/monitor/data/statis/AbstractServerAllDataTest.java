@@ -14,6 +14,8 @@ public class AbstractServerAllDataTest extends AbstractTest {
 
     protected List<String> topics = new ArrayList<String>();
 
+    protected List<String> topics2 = new ArrayList<String>();
+
     protected List<String> consumerIds = new ArrayList<String>();
 
     protected List<String> ips = new ArrayList<String>();
