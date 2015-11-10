@@ -125,6 +125,32 @@ public class MapMergeableImplTest{
         mapIntegerMergeableImp.merge(mapIntegerToMerge);
     }
 
+    @Test
+    public void testGetToMerge(){
+
+        MapMergeableImpl<Long, Long> result = new MapMergeableImpl<Long, Long>();
+        NavigableMap<Long, Long> aaa = new ConcurrentSkipListMap<Long, Long>(mapLongToMerge);
+        NavigableMap<Long, Long> bbb = new ConcurrentSkipListMap<Long, Long>(mapLongToMerge);
+        NavigableMap<Long, Long> ccc = new ConcurrentSkipListMap<Long, Long>(mapLongToMerge);
+        result.setToMerge(aaa);
+        result.merge(mapLongToMerge);
+        aaa = result.getToMerge();
+
+        result.setToMerge(bbb);
+        result.merge(mapLongToMerge);
+        result.merge(mapLongToMerge);
+        bbb = result.getToMerge();
+        Assert.assertNotEquals(aaa, bbb);
+
+        result.setToMerge(ccc);
+        result.merge(mapLongToMerge);
+        result.merge(mapLongToMerge);
+        result.merge(mapLongToMerge);
+        ccc = result.getToMerge();
+        Assert.assertNotEquals(ccc, bbb);
+
+    }
+
     public static class QpxData implements Mergeable{
 
         private Long qpx;
