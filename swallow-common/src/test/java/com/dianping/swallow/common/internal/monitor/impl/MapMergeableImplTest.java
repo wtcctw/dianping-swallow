@@ -98,6 +98,21 @@ public class MapMergeableImplTest{
         }
     }
 
+    @Test
+    public void testAdjustToMergeIfNecessaryTrue(){
+        mapLongMergeableImp.merge(mapLongToMerge);
+        mapLongMergeableImp.merge(mapLongToMerge);
+        NavigableMap<Long, Long> result = mapLongMergeableImp.adjustToMergeIfNecessary();
+        Assert.assertEquals(result, mapLongToMerge);
+    }
+
+    @Test
+    public void testAdjustToMergeIfNecessaryFalse(){
+        mapLongMergeableImp.merge(mapLongToMerge);
+        NavigableMap<Long, Long> result = mapLongMergeableImp.adjustToMergeIfNecessary();
+        Assert.assertEquals(result, mapLongToMerge);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testException(){
         System.out.println("testException");

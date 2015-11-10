@@ -289,9 +289,11 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 		mapMergeableImpl.setToMerge(this.col);
 		mapMergeableImpl.merge(messageInfoStatis.col);
 		this.col = mapMergeableImpl.getToMerge();
+
 		mapMergeableImpl.setToMerge(this.qpxMap);
 		mapMergeableImpl.merge(messageInfoStatis.qpxMap);
 		this.qpxMap = mapMergeableImpl.getToMerge();
+
 		mapMergeableImpl.setToMerge(this.delayMap);
 		mapMergeableImpl.merge(messageInfoStatis.delayMap);
 		this.delayMap = mapMergeableImpl.getToMerge();

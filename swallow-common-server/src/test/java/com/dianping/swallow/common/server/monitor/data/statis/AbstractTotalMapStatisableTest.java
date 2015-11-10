@@ -51,6 +51,9 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
             }
         }
 
+        topics2.add("topic3");
+        topics2.add("topic4");
+
         consumerAllData = new ConsumerAllData();
         long beforea = System.currentTimeMillis();
         prepareData(consumerAllData);
@@ -252,6 +255,9 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
         for (String ip : ips) {
 
+            if(ip.equals("127.0.0.2")){
+                topics = topics2;
+            }
             ConsumerMonitorData consumerMonitorData = new ConsumerMonitorData();
             consumerMonitorData.setSwallowServerIp(ip);
 

@@ -7,6 +7,7 @@ import com.dianping.swallow.common.internal.util.MapUtil;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Author   mingdongli
@@ -16,9 +17,11 @@ public class MapMergeableImpl<K, V> implements MapMergeable<K, V> {
 
     private NavigableMap<K, V> toMerge = new ConcurrentSkipListMap<K, V>();
 
+    private AtomicInteger mergeCount = new AtomicInteger(0);
+
     @Override
     public void merge(Map<K, V> fromMerge) {
-        if (fromMerge == null) {
+        if (fromMerge == null || fromMerge.isEmpty()) {
             return;
         }
         for (Map.Entry<K, V> entry : fromMerge.entrySet()) {
@@ -31,17 +34,17 @@ public class MapMergeableImpl<K, V> implements MapMergeable<K, V> {
             } else if (fromValue instanceof Long) {
                 Long fromLongValue = (Long) fromValue;
                 V toValue = toMerge.get(fromKey);
-                if(toValue == null){
+                if (toValue == null) {
                     toValue = (V) new Long(0);
                 }
                 Long toLongValue = (Long) toValue;
-                Long newValue = fromLongValue + toLongValue;
+                Long newValue = fromLongValue + toLongValue; // for delay
                 toMerge.put(fromKey, (V) newValue);
             } else {
                 throw new IllegalArgumentException("Unsupport value type");
             }
         }
-
+        mergeCount.getAndIncrement();
     }
 
     @Override
@@ -70,4 +73,26 @@ public class MapMergeableImpl<K, V> implements MapMergeable<K, V> {
     public void setToMerge(NavigableMap<K, V> toMerge) {
         this.toMerge = toMerge;
     }
+
+    public NavigableMap<K, V> adjustToMergeIfNecessary() {
+        if (toMerge == null || toMerge.isEmpty() || mergeCount.get() < 2) {
+            return toMerge;
+        }
+        NavigableMap<K, V> result = new ConcurrentSkipListMap<K, V>();
+        for (Map.Entry<K, V> entry : toMerge.entrySet()) {
+            K key = entry.getKey();
+            V value = entry.getValue();
+            if (value instanceof Long) {
+                Long newValue = (Long) value;
+                Long average = newValue / mergeCount.get();
+                result.put(key, (V) average);
+            }
+        }
+        return result.isEmpty() ? toMerge : result;
+    }
+
+    public void resetMergeCount(){
+        mergeCount.getAndSet(0);
+    }
+
 }

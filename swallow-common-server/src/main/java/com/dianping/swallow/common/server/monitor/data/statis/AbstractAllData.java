@@ -210,7 +210,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
             }
         }
 
-        NavigableMap<Long, Long> result = mapMergeableImpl.getToMerge();
+        NavigableMap<Long, Long> result = mapMergeableImpl.adjustToMergeIfNecessary();
         return result.isEmpty() ? null : result;
     }
 
@@ -228,7 +228,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
         return result;
     }
-
 
     protected Map<String, NavigableMap<Long, QpxData>> getAllQpx(StatisType type, String topic, boolean includeTotal) {
 
@@ -281,7 +280,7 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
                 mapMergeableImpl.merge(value);
                 keys.reset();
             }
-            return mapMergeableImpl.getToMerge();
+            return mapMergeableImpl.adjustToMergeIfNecessary();
         } else {
             server = servers.get(key);
         }
