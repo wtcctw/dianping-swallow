@@ -277,6 +277,12 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
             MapMergeableImpl<Long, Long> mapMergeableImpl = new MapMergeableImpl<Long, Long>();
             for (S s : servers.values()) {
                 NavigableMap<Long, Long> value = s.getDelayValue(keys, type);
+                Collection<Long> values = value.values();
+                Set<Long> set = new HashSet<Long>(values);
+                if(set.size() == 1 && set.contains(0L)){
+                    keys.reset();
+                    continue;
+                }
                 mapMergeableImpl.merge(value);
                 keys.reset();
             }
