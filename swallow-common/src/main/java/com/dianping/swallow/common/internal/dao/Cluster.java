@@ -27,5 +27,8 @@ public interface Cluster extends Lifecycle{
 	 * @return
 	 */
 	boolean sameCluster(Cluster other);
+	
+	
+	MessageDAO<?> createMessageDao();
 
 }

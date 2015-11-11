@@ -17,7 +17,7 @@ public class ExchangeDaoContainer<T extends DAO<?>> extends AbstractDaoContainer
 
 	private final T oldDao, newDao;
 	
-	private volatile boolean changeToNew = false;
+	private volatile boolean changeToNew = false, isFirst = true;
 	
 	private int timeoutSeconds = -1;
 	
@@ -54,6 +54,11 @@ public class ExchangeDaoContainer<T extends DAO<?>> extends AbstractDaoContainer
 		}
 		
 		if(changeToNew){
+			
+			if(isFirst){
+				isFirst = false;
+				throw new DaoExchangeException(oldDao.getCluster(), newDao.getCluster());
+			}
 			return newDao;
 		}
 		

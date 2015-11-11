@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
+import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.AbstractCluster;
 import com.dianping.swallow.common.internal.exception.SwallowAlertException;
 import com.mongodb.BasicDBObject;
@@ -335,6 +336,11 @@ public class MongoCluster extends AbstractCluster{
 	@Override
 	protected String getSchema() {
 		return schema;
+	}
+
+	@Override
+	public MessageDAO<?> createMessageDao() {
+		return new MongoMessageDAO(this);
 	}
 
 }

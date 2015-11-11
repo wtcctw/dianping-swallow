@@ -22,10 +22,6 @@ import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.dao.DAO;
 import com.dianping.swallow.common.internal.dao.DAOContainer;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
-import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaCluster;
-import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaMessageDao;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoCluster;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.observer.Observer;
@@ -305,14 +301,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 		
 		Cluster cluster = clusterManager.getCluster(topicConfig.getStoreUrl());
 		
-		MessageDAO<?> messageDao = null;
-		if(cluster instanceof MongoCluster){
-			messageDao = new MongoMessageDAO((MongoCluster) cluster); 
-		}else if(cluster instanceof KafkaCluster){
-			messageDao = new KafkaMessageDao((KafkaCluster) cluster);
-		}else{
-			throw new IllegalStateException("unknown cluster:" + topicName + "," + cluster);
-		}
+		MessageDAO<?> messageDao = cluster.createMessageDao();
 	
 		return messageDao;
 	}

@@ -12,6 +12,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import com.dianping.swallow.common.internal.config.TOPIC_TYPE;
 import com.dianping.swallow.common.internal.config.TopicConfig;
+import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.AbstractCluster;
 import com.dianping.swallow.common.internal.dao.impl.kafka.serialization.SwallowMessageSerializer;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -110,5 +111,10 @@ public class KafkaCluster extends AbstractCluster{
 		}
 		
 		return producers.get(topicType);
+	}
+
+	@Override
+	public MessageDAO<?> createMessageDao() {
+		return new KafkaMessageDao(this);
 	}
 }

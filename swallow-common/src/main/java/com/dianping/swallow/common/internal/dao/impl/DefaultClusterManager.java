@@ -11,14 +11,15 @@ import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
-import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
+import com.dianping.swallow.common.internal.observer.impl.AbstractObservableLifecycle;
+import com.dianping.swallow.common.internal.observer.impl.ElementAdded;
 
 /**
  * @author mengwenchao
  *
  * 2015年11月1日 下午9:24:35
  */
-public class DefaultClusterManager extends AbstractLifecycle implements ClusterManager{
+public class DefaultClusterManager extends AbstractObservableLifecycle implements ClusterManager{
 	
 	private Set<Cluster>  clusterSet = new HashSet<Cluster>(); 
 	
@@ -49,6 +50,7 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 					cluster = createOrUseExistingCluster(url);
 					clusterSet.add(cluster);
 					clusterMap.put(url, cluster);
+					updateObservers(new ElementAdded<Cluster>(cluster));
 				}catch(Exception e){
 					logger.error("[getCluster]" + url, e);
 					throw new ClusterCreateException(url, e);
@@ -58,6 +60,8 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 		
 		return cluster;
 	}
+	
+	
 
 	private Cluster createOrUseExistingCluster(String url) throws Exception {
 
@@ -157,4 +161,6 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 	public void setSwallowConfig(SwallowConfig swallowConfig) {
 		this.swallowConfig = swallowConfig;
 	}
+	
+	
 }

@@ -4,13 +4,14 @@ import java.util.Set;
 
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.dao.impl.ClusterCreateException;
+import com.dianping.swallow.common.internal.observer.Observable;
 
 /**
  * @author mengwenchao
  *
  * 2015年11月1日 下午9:24:08
  */
-public interface ClusterManager {
+public interface ClusterManager extends Observable{
 	
 	public static int ORDER = Math.max(ClusterFactory.ORDER, SwallowConfig.ORDER) + 1;
 	
