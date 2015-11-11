@@ -286,6 +286,9 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
                 mapMergeableImpl.merge(value);
                 keys.reset();
             }
+            if(type != StatisType.SAVE){
+                return mapMergeableImpl.getToMerge();
+            }
             return mapMergeableImpl.adjustToMergeIfNecessary();
         } else {
             server = servers.get(key);
