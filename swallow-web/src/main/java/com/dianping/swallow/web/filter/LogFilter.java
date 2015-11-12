@@ -1,5 +1,41 @@
 package com.dianping.swallow.web.filter;
 
+<<<<<<< Updated upstream
+=======
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.apache.logging.log4j.web.Log4jWebSupport;
+import org.apache.logging.log4j.web.WebLoggerContextUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+>>>>>>> Stashed changes
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.filter.wrapper.BufferedRequestWrapper;
 import com.dianping.swallow.web.filter.wrapper.ByteArrayPrintWriter;
