@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.TestSkipRule;
 
 /**
  * @author mengwenchao
@@ -40,6 +41,9 @@ public abstract class AbstractTest {
 
 	@Rule
 	public TestName  testName = new TestName();
+	
+	@Rule
+	public TestSkipRule testSkipRule = new TestSkipRule();
 
 	@Before
 	public void beforeAbstractTest(){
