@@ -10,8 +10,8 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Properties;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -21,7 +21,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class AbstractConfig {
 
-	protected final Logger logger = LogManager.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private String localFileName; 
 	

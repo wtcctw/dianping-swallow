@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.controller;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 /**
@@ -11,6 +11,6 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class AbstractController {
 
-	protected final Logger logger = LogManager.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 }

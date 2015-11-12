@@ -2,8 +2,8 @@ package com.dianping.swallow.producer.impl.internal;
 
 import java.io.IOException;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
@@ -26,7 +26,7 @@ import com.geekhua.filequeue.exception.FileQueueClosedException;
  * @author tong.song
  */
 public class HandlerAsynchroMode implements ProducerHandler {
-    private static final Logger          LOGGER            = LogManager.getLogger(HandlerAsynchroMode.class);
+    private static final Logger          LOGGER            = LoggerFactory.getLogger(HandlerAsynchroMode.class);
     private static final MQThreadFactory THREAD_FACTORY    = new MQThreadFactory();                             //从FileQueue中获取消息的线程池
 
     private static final int             DELAY_BASE_MULTI  = 5;                                                 //超时策略倍数

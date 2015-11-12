@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoStatus;
@@ -45,7 +45,7 @@ import com.mongodb.ServerAddress;
  */
 public abstract class Server implements Sendable, Serviceable {
 
-	protected Logger logger = LogManager.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static final long SENDER_INTERVAL = 20 * 1000;
 

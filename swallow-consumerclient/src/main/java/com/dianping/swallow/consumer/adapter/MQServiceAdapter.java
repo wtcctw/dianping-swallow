@@ -2,8 +2,8 @@ package com.dianping.swallow.consumer.adapter;
 
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
@@ -15,7 +15,7 @@ import com.dianping.swallow.impl.MongoMQService;
 
 public class MQServiceAdapter implements MQService {
 
-   private static final Logger logger = LogManager.getLogger(MQServiceAdapter.class);
+   private static final Logger logger = LoggerFactory.getLogger(MQServiceAdapter.class);
 
    private MongoMQService      oldMqService;
    private String              mongoUri;

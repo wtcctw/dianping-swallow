@@ -2,8 +2,8 @@ package com.dianping.swallow.test.load;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author mengwenchao
@@ -12,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class BitMarker {
 
-    protected Logger logger       = LogManager.getLogger(getClass());
+    protected Logger logger       = LoggerFactory.getLogger(getClass());
 
 	private long capacity;
 

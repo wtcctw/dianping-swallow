@@ -34,8 +34,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.util.VersionInfo;
 import org.mortbay.jetty.HttpStatus;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.CommonUtils;
@@ -50,7 +50,7 @@ import com.dianping.swallow.web.service.HttpService;
 @Service("httpService")
 public class HttpServiceImpl implements HttpService {
 
-	private static final Logger logger = LogManager.getLogger(HttpServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(HttpServiceImpl.class);
 
 	private static final String UTF_8 = "UTF-8";
 

@@ -3,8 +3,8 @@ package com.dianping.swallow.web.alarmer.container;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;
@@ -23,7 +23,7 @@ import com.dianping.swallow.web.alarmer.TaskManager;
  */
 public abstract class AbstractAlamerContainer extends AbstractLifecycle implements AlarmerLifecycle {
 
-	protected final Logger logger = LogManager.getLogger(this.getClass());
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected final static String CAT_TYPE = "DataContainer";
 

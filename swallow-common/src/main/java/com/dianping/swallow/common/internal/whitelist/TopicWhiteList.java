@@ -3,8 +3,8 @@ package com.dianping.swallow.common.internal.whitelist;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
@@ -18,7 +18,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
  */
 public class TopicWhiteList implements ConfigChangeListener {
 
-    private static final Logger logger              = LogManager.getLogger(TopicWhiteList.class);
+    private static final Logger logger              = LoggerFactory.getLogger(TopicWhiteList.class);
 
     private static final String TOPIC_SPLIT      = "\\s*(;|,)\\s*";
 

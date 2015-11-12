@@ -2,8 +2,8 @@ package com.dianping.swallow.web.task;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class AuthenticationStringGenerator {
 
 	private String authenticationString;
 
-	private final Logger logger = LogManager.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@PostConstruct
 	private void init() {

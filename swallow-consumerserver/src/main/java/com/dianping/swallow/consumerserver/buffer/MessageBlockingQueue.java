@@ -6,8 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
@@ -27,7 +27,7 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 
 	private static final long serialVersionUID = -633276713494338593L;
 	
-	private static final Logger logger = LogManager.getLogger(MessageBlockingQueue.class);
+	private static final Logger logger = LoggerFactory.getLogger(MessageBlockingQueue.class);
 
 	private final ConsumerInfo consumerInfo;
 

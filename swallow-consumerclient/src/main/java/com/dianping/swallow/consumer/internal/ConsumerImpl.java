@@ -17,8 +17,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
@@ -53,7 +53,7 @@ import com.dianping.swallow.consumer.internal.task.TaskChecker;
 
 public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
-	private static final Logger logger = LogManager.getLogger(ConsumerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
 
 	private String consumerId;
 

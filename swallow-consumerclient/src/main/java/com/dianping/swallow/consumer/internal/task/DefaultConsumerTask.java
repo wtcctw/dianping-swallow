@@ -2,8 +2,8 @@ package com.dianping.swallow.consumer.internal.task;
 
 import io.netty.channel.ChannelHandlerContext;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -25,7 +25,7 @@ import com.dianping.swallow.consumer.Consumer;
  */
 public class DefaultConsumerTask implements ConsumerTask{
 
-    private final Logger logger = LogManager.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final ChannelHandlerContext 	ctx;
 	private final String 					catNameStr;

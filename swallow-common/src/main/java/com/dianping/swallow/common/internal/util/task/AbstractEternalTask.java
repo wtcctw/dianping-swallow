@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.util.task;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * 封装task，持续运行，直到明确停止
@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class AbstractEternalTask implements Runnable{
 	
-	protected Logger logger = LogManager.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Override
 	public void run(){

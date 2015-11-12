@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.monitor.impl;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.monitor.ComponentMonitable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public abstract class AbstractComponentMonitorable implements ComponentMonitable{
 	
 	@JsonIgnore
-	protected final Logger logger     = LogManager.getLogger(getClass());
+	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public String getName() {

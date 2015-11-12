@@ -8,8 +8,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author mengwenchao
@@ -18,7 +18,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public abstract class AbstractLoadTest {
 	
-    protected Logger logger       = LogManager.getLogger(getClass());
+    protected Logger logger       = LoggerFactory.getLogger(getClass());
 
 	protected String topicName = "LoadTestTopic";
 	

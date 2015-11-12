@@ -1,7 +1,7 @@
 package com.dianping.swallow.producer;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Producer配置，默认构造函数生成的配置为：<br />
@@ -41,7 +41,7 @@ import org.apache.logging.log4j.LogManager;
  * @author tong.song
  */
 public class ProducerConfig {
-    private static final Logger LOGGER = LogManager.getLogger(ProducerConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProducerConfig.class);
 
     public static final int MAX_THREADPOOL_SIZE = 100; //线程池大小最大值
     public static final ProducerMode DEFAULT_PRODUCER_MODE = ProducerMode.ASYNC_MODE; //默认Producer工作模式

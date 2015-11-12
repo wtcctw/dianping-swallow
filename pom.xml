@@ -56,7 +56,7 @@
 		<!-- dianping -->
 
 		<file-queue.version>0.1.5</file-queue.version>
-		<slf4j.version>1.6.0</slf4j.version>
+		<slf4j.version>1.7.7</slf4j.version>
 		<spring.version>3.2.9.RELEASE</spring.version>
 		<spring.data.mongo.version>1.5.4.RELEASE</spring.data.mongo.version>
 		<jackson-databind.version>2.1.4</jackson-databind.version>
@@ -137,6 +137,12 @@
 				<groupId>com.dianping.lion</groupId>
 				<artifactId>lion-client</artifactId>
 				<version>${lion-client.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>slf4j-log4j12</artifactId>
+						<groupId>org.slf4j</groupId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.dianping.swallow</groupId>
@@ -208,14 +214,14 @@
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
+			<!--<dependency>-->
+				<!--<groupId>org.apache.logging.log4j</groupId>-->
+				<!--<artifactId>log4j-slf4j-impl</artifactId>-->
+				<!--<version>${slf4j.version}</version>-->
+			<!--</dependency>-->
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
@@ -417,10 +423,10 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.slf4j</groupId>-->
+			<!--<artifactId>slf4j-log4j12</artifactId>-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

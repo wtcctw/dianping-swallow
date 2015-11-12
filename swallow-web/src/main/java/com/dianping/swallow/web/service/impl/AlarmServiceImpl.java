@@ -11,8 +11,8 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ import com.dianping.swallow.web.util.NetUtil;
 @Service("alarmService")
 public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
-	private static final Logger logger = LogManager.getLogger(AlarmServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(AlarmServiceImpl.class);
 
 	private static final String AlARM_URL_FILE = "alarm-url.properties";
 

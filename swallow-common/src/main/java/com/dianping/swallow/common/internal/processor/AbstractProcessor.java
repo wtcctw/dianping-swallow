@@ -3,8 +3,8 @@ package com.dianping.swallow.common.internal.processor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
@@ -15,7 +15,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  */
 public abstract class AbstractProcessor implements Processor{
 	
-	protected final Logger    logger = LogManager.getLogger(getClass());
+	protected final Logger    logger = LoggerFactory.getLogger(getClass());
 
 	protected Map<String, String> getCreateInternalProperties(SwallowMessage message){
 		

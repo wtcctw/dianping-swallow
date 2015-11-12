@@ -7,8 +7,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -24,7 +24,7 @@ public class ProducerServerTextHandler extends ChannelInboundHandlerAdapter {
     public static final int     INVALID_TOPIC_NAME = 251;
     public static final int     SAVE_FAILED        = 252;
 
-	protected final Logger logger = LogManager.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private MessageDAO messageDao;
     

@@ -5,14 +5,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.types.BSONTimestamp;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.ServerAddress;
 
 public class MongoUtils {
 
-	protected static final Logger logger = LogManager
+	protected static final Logger logger = LoggerFactory
 			.getLogger(MongoUtils.class);
 
 	private MongoUtils() {

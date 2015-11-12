@@ -13,8 +13,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
@@ -91,7 +91,7 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 
 	private AtomicInteger	  messageToSend = new AtomicInteger();
 	
-	protected final Logger ackLogger = LogManager.getLogger("ackLogger");
+	protected final Logger ackLogger = LoggerFactory.getLogger("ackLogger");
 
 	@SuppressWarnings("deprecation")
 	public ConsumerWorkerImpl(ConsumerInfo consumerInfo, ConsumerWorkerManager workerManager,

@@ -5,8 +5,8 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
@@ -25,7 +25,7 @@ import com.dianping.swallow.web.service.TopicResourceService;
 @Component
 public class NameValidatorFilter implements Filter<TopicApplyDto, ValidatorFilterResult> {
 	
-	protected final Logger logger = LogManager.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Resource(name = "topicResourceService")
 	private TopicResourceService topicResourceService;

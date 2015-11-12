@@ -2,7 +2,7 @@
 <Configuration status="info" monitorInterval="30">
 
     <Appenders>
-        <!--<appender name="catAppender" class="com.dianping.cat.log4j.CatAppender"/>-->
+        <CatAppender name="catAppender"/>
 
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
@@ -27,20 +27,20 @@
     <Loggers>
         <Logger name="org.jasig.cas" level="ERROR"
                 additivity="true">
-            <AppenderRef ref="console" level="INFO"/>
+            <AppenderRef ref="console" level="ERROR"/>
         </Logger>
         <Logger name="org.springframework" level="WARN"
                 additivity="true">
-            <AppenderRef ref="console" level="INFO"/>
+            <AppenderRef ref="console" level="ERROR"/>
         </Logger>
         <Logger name="com.dianping.swallow.web.filter" level="INFO"
-                additivity="false">
+                additivity="true">
             <AppenderRef ref="logFilterFileAppender" level="INFO"/>
         </Logger>
         <root level="INFO">
             <AppenderRef ref="console"/>
             <AppenderRef ref="fileAppender"/>
-            <!--<AppenderRef ref="catAppender"/>-->
+            <AppenderRef ref="catAppender"/>
         </root>
     </Loggers>
 </Configuration>

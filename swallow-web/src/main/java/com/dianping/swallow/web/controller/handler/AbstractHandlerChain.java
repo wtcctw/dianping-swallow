@@ -2,8 +2,8 @@ package com.dianping.swallow.web.controller.handler;
 
 import com.dianping.swallow.web.controller.handler.data.Treatable;
 import com.dianping.swallow.web.controller.handler.result.Result;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public abstract class AbstractHandlerChain<T extends Treatable, R extends Result> implements HandlerChain<T, R> {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected List<Handler> handlers = new LinkedList<Handler>();
 

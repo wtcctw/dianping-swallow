@@ -13,8 +13,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author mengwenchao
@@ -25,7 +25,7 @@ public class DefaultHeartBeatReceiver implements HeartBeatReceiver, Runnable, Ch
 
 	private Map<Channel, Deque<HeartBeat>> heartBeats = new ConcurrentHashMap<Channel, Deque<HeartBeat>>();
 
-	private final Logger                          logger                     = LogManager.getLogger(getClass());
+	private final Logger                          logger                     = LoggerFactory.getLogger(getClass());
 	
 	private final int HEART_BEAT_SIZE = 10;
 	

@@ -93,7 +93,7 @@ public class SwallowConfigCentral extends AbstractSwallowConfig implements Swall
 	    	logger.info("[parseServerURIString][parse]" + serverURI);
 	    }
 	    if (result.get(TOPICNAME_DEFAULT) == null) {
-	    	throw new IllegalArgumentException("The config  " + configKey + "  property must contain 'default' topicName!");
+	    	//throw new IllegalArgumentException("The config  " + configKey + "  property must contain 'default' topicName!");
 	    }
 	    return result;
 	}

@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.config.LionUtil;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
@@ -23,7 +23,7 @@ import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed
  */
 public class SwallowConfigChange {
 	
-	protected Logger logger = LogManager.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected LionUtil lionUtil = new LionUtilImpl();
 	

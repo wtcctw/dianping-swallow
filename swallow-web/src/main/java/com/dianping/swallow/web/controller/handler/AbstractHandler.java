@@ -2,8 +2,8 @@ package com.dianping.swallow.web.controller.handler;
 
 import com.dianping.swallow.web.controller.handler.data.Treatable;
 import com.dianping.swallow.web.controller.handler.result.Result;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * @author mingdongli
@@ -11,6 +11,6 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class AbstractHandler<T extends Treatable, R extends Result> implements Handler<T, R>{
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 }

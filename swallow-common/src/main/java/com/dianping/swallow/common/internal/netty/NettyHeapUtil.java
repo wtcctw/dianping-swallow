@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.netty;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author mengwenchao
@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class NettyHeapUtil {
 	
-	protected static final Logger logger = LogManager.getLogger(NettyHeapUtil.class);
+	protected static final Logger logger = LoggerFactory.getLogger(NettyHeapUtil.class);
 
 
 	public static int directArenaCount(int expected, int pageSize, int maxOrder){

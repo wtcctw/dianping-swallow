@@ -2,8 +2,8 @@ package com.dianping.swallow.test.man;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.exception.SwallowAlertException;
 
@@ -15,7 +15,7 @@ import com.dianping.swallow.common.internal.exception.SwallowAlertException;
 public class AlertException {
 
 	
-	protected Logger logger = LogManager.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static int exceptionCount = 1;
 

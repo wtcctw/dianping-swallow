@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 
@@ -20,7 +20,7 @@ import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
  */
 public class DefaultRetriveStrategy implements RetriveStrategy{
 	
-	private  final Logger          logger  = LogManager.getLogger(getClass());
+	private  final Logger          logger  = LoggerFactory.getLogger(getClass());
 
 	private Deque<RetrieveStatus> status = new LinkedList<DefaultRetriveStrategy.RetrieveStatus>();
 	

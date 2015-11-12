@@ -2,8 +2,8 @@ package com.dianping.swallow.common.internal.observer.impl;
 
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.observer.Observer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class AbstractObservable implements Observable{
 	
 	private List<Observer> observers = new LinkedList<Observer>();
 
-	protected Logger logger = LogManager.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public synchronized void addObserver(Observer observer) {
