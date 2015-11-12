@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
+import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.*;
@@ -307,5 +308,79 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 
 		return JsonBinder.getNonEmptyBinder().toPrettyJson(map.get(key));
 	}
+
+	@Override
+	public void merge(Mergeable merge){
+
+		AbstractTotalMapStatisable<M,V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
+
+		for(java.util.Map.Entry<String, Statisable<M>> entry : toMerge.map.entrySet()){
+
+			String key = entry.getKey();
+			Mergeable value = entry.getValue();
+
+			Statisable<M> myValue = map.get(key);
+			if(myValue == null){
+				myValue= createValue();
+				map.put(key, myValue);
+			}
+			myValue.merge(value);
+		}
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+
+		throw new CloneNotSupportedException("clone not support");
+	}
+
+	@Override
+	public void merge(String key, KeyMergeable merge){
+
+		checkType(merge);
+
+		AbstractTotalMapStatisable<M,V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
+		Statisable<M> value = toMerge.map.get(key);
+		if( value == null){
+			logger.warn("[merge][value null]" + key + "," + merge );
+			return;
+		}
+
+		Statisable<M> myValue = getOrCreate(key);
+		if(myValue instanceof KeyMergeable && value instanceof KeyMergeable){
+
+			((KeyMergeable)myValue).merge(key, (KeyMergeable)value);
+		}else{
+
+			myValue.merge(value);
+		}
+	}
+
+	private void checkType(Object merge) {
+
+		if(!(merge instanceof AbstractTotalMapStatisable)){
+			throw new IllegalArgumentException("wrong type : " + merge.getClass());
+		}
+	}
+
+	private boolean hasTotal(AbstractTotalMapStatisable merge){
+
+		Set<String> keys = merge.map.keySet();
+		if(keys != null && keys.contains(MonitorData.TOTAL_KEY)){
+			return true;
+		}
+		return false;
+	}
+
+	private Statisable<M> getOrCreate(String key) {
+		Statisable<M> m = map.get(key);
+		if(m == null){
+			m= createValue();
+			map.put(key, m);
+		}
+		return m;
+	}
+
+	protected abstract Statisable<M> createValue();
 
 }

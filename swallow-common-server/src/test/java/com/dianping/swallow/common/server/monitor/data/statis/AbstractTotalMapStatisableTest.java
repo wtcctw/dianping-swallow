@@ -8,6 +8,7 @@ import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
+import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerIdData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
@@ -15,6 +16,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.validation.constraints.AssertTrue;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -41,13 +43,16 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
         String topicpre = "topic";
         String idpre = "id";
-        for(int i = 1; i < 10; ++i){
+        for(int i = 1; i < 3; ++i){
             topics.add(topicpre + i);
             consumerIds.add(idpre + i);
             if(i < 16){
                 ips.add("127.0.0." + i);
             }
         }
+
+        topics2.add("topic3");
+        topics2.add("topic4");
 
         consumerAllData = new ConsumerAllData();
         long beforea = System.currentTimeMillis();
@@ -83,14 +88,24 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
     }
 
     @Test
+    public void testGetQpxForServers(){
+        String server = ips.get(0);
+
+        NavigableMap<Long,QpxData > data = consumerAllData.getQpsValue(new CasKeys(server), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server), StatisType.ACK);
+    }
+
+    @Test
     public void testKeyAndValue(){
 
         String server = ips.get(0);
+        String server1 = ips.get(1);
         String topic = topics.get(0);
         String consumerId = consumerIds.get(0);
         String ip = ips.get(0);
-        method3("/Users/mingdongli/tmp/consumer/all.txt", consumerAllData.toString());
-        method3("/Users/mingdongli/tmp/consumer/total.txt", consumerAllData.getKeys(new CasKeys("total")).toString());
+        //method3("/Users/mingdongli/tmp/consumer/all.txt", consumerAllData.toString());
+        //method3("/Users/mingdongli/tmp/consumer/total.txt", consumerAllData.getKeys(new CasKeys("total")).toString());
 
         System.out.println(consumerAllData.getKeys(new CasKeys()));
         System.out.println(consumerAllData.getKeys(new CasKeys(server)));
@@ -106,11 +121,29 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
         System.out.println(consumerAllData.getDelayValue(new CasKeys("total"), StatisType.ACK));
         System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic), StatisType.ACK));
 
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total"),StatisType.SEND));
-        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic),StatisType.SEND));
+        System.out.println(consumerAllData.getDelayValue(new CasKeys(server), StatisType.SEND));
+        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic), StatisType.SEND));
+        System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic, consumerId), StatisType.SEND));
+        System.out.println(consumerAllData.getDelayValue(new CasKeys("total"), StatisType.SEND));
+        System.out.println(consumerAllData.getDelayValue(new CasKeys("total", topic), StatisType.SEND));
+
+        NavigableMap<Long,QpxData > data = consumerAllData.getQpsValue(new CasKeys(server), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server1), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server1), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server1), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server, topic), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys(server, topic, consumerId), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys("total"), StatisType.SEND);
+        data = consumerAllData.getQpsValue(new CasKeys("total", topic), StatisType.SEND);
+
+        System.out.println(consumerAllData.getQpsValue(new CasKeys(server), StatisType.ACK));
+        System.out.println(consumerAllData.getQpsValue(new CasKeys(server, topic), StatisType.ACK));
+        System.out.println(consumerAllData.getQpsValue(new CasKeys(server, topic, consumerId), StatisType.ACK));
+        System.out.println(consumerAllData.getQpsValue(new CasKeys("total"), StatisType.ACK));
+        System.out.println(consumerAllData.getQpsValue(new CasKeys("total", topic), StatisType.ACK));
 
         NavigableMap<Long, Long> cisd = consumerAllData.getDelayValue(new CasKeys(server, topic,
                 consumerId), StatisType.ACK);
@@ -127,6 +160,76 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
     }
 
     @Test
+    public void testGetAllDelay() {
+
+        String topic = topics.get(0);
+        Set<String> keys = consumerAllData.getKeys(new CasKeys("total", topic), StatisType.SEND);
+        Map<String, NavigableMap<Long, Long>> result = consumerAllData.getDelayForAllConsumerId(topic, StatisType.SEND, false);
+        Assert.assertEquals(keys.size(), result.size() + 1);  //total
+        for(Map.Entry<String, NavigableMap<Long, Long>> entry : result.entrySet()){
+            String key = entry.getKey();
+            NavigableMap<Long, Long> value1 = entry.getValue();
+            NavigableMap<Long, Long> value2 = consumerAllData.getDelayValue(new CasKeys("total", topic, key), StatisType.SEND);
+            Assert.assertEquals(value1, value2);
+        }
+
+        keys = consumerAllData.getKeys(new CasKeys("total", topic), StatisType.ACK);
+        result = consumerAllData.getDelayForAllConsumerId(topic, StatisType.ACK, false);
+        Assert.assertEquals(keys.size(), result.size() + 1);  //total
+        for(Map.Entry<String, NavigableMap<Long, Long>> entry : result.entrySet()){
+            String key = entry.getKey();
+            NavigableMap<Long, Long> value1 = entry.getValue();
+            NavigableMap<Long, Long> value2 = consumerAllData.getDelayValue(new CasKeys("total", topic, key), StatisType.ACK);
+            Assert.assertEquals(value1, value2);
+        }
+    }
+
+    @Test
+    public void testGetDelayValue(){
+        String topic = topics.get(0);
+        String id = "id1";
+        NavigableMap<Long, Long> value1 = consumerAllData.getAllDelay(StatisType.ACK, topic, false).get(id);
+        NavigableMap<Long, Long> value2 = consumerAllData.getDelayValue(new CasKeys("total", topic, id), StatisType.ACK);
+        Assert.assertEquals(value1, value2);
+    }
+
+    @Test
+    public void testGetAllQps() {
+
+        String topic = topics.get(0);
+        Set<String> keys = consumerAllData.getKeys(new CasKeys("total", topic), StatisType.SEND);
+        Map<String, NavigableMap<Long, QpxData>> result = consumerAllData.getQpxForAllConsumerId(topic, StatisType.SEND, false);
+        Assert.assertEquals(keys.size(), result.size() + 1);  //total
+        for(Map.Entry<String, NavigableMap<Long, QpxData>> entry : result.entrySet()){
+            String key = entry.getKey();
+            NavigableMap<Long, QpxData> value1 = entry.getValue();
+            NavigableMap<Long, QpxData> value2 = consumerAllData.getQpsValue(new CasKeys("total", topic, key), StatisType.SEND);
+            for(Map.Entry<Long, QpxData> entry1 : value1.entrySet()){
+                Long key1 = entry1.getKey();
+                QpxData value3 = entry1.getValue();
+                QpxData value4 = value2.get(key1);
+                Assert.assertEquals(value3.getQpx(), value4.getQpx());
+                Assert.assertEquals(value3.getTotal(), value4.getTotal());
+            }
+        }
+
+        result = consumerAllData.getQpxForAllConsumerId(topic, StatisType.ACK, false);
+        Assert.assertEquals(keys.size(), result.size() + 1);  //total
+        for(Map.Entry<String, NavigableMap<Long, QpxData>> entry : result.entrySet()){
+            String key = entry.getKey();
+            NavigableMap<Long, QpxData> value1 = entry.getValue();
+            NavigableMap<Long, QpxData> value2 = consumerAllData.getQpsValue(new CasKeys("total", topic, key), StatisType.ACK);
+            for(Map.Entry<Long, QpxData> entry1 : value1.entrySet()){
+                Long key1 = entry1.getKey();
+                QpxData value3 = entry1.getValue();
+                QpxData value4 = value2.get(key1);
+                Assert.assertEquals(value3.getQpx(), value4.getQpx());
+                Assert.assertEquals(value3.getTotal(), value4.getTotal());
+            }
+        }
+    }
+
+    @Test
     public void testRetriever() {
 
         long before = System.currentTimeMillis();
@@ -140,51 +243,6 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
         System.out.println(after - before);
     }
 
-//    @Test
-    public void testConsumerServerData() {
-
-        int totalCount = (int) ((endKey - startKey) / intervalCount);
-
-        for (String topic : topics) {
-            for (StatisType type : supportedTypes) {
-
-                if (logger.isInfoEnabled()) {
-                    logger.info("[testConsumerServerData]" + type);
-                }
-
-                NavigableMap<Long, Long> delays = consumerAllData.getDelayForTopic(topic, type);
-                NavigableMap<Long, QpxData> qpxs = consumerAllData.getQpxForTopic(topic, type);
-
-                expectedDelay(delays, totalCount, avergeDelay);
-                expectedQpx(qpxs, totalCount, qpsPerUnit * ips.size() * consumerIds.size(), qpsPerUnit * ips.size()
-                        * consumerIds.size() * intervalCount * AbstractCollector.SEND_INTERVAL);
-
-                Map<String, NavigableMap<Long, Long>> allDelay = consumerAllData.getDelayForAllConsumerId(topic, type,
-                        false);
-                Map<String, NavigableMap<Long, QpxData>> allQpx = consumerAllData.getQpxForAllConsumerId(topic, type,
-                        false);
-
-                Assert.assertEquals(consumerIds.size(), allDelay.size());
-                Assert.assertEquals(consumerIds.size(), allQpx.size());
-
-                for (Entry<String, NavigableMap<Long, Long>> entry : allDelay.entrySet()) {
-
-                    NavigableMap<Long, Long> consumerDelay = entry.getValue();
-                    expectedDelay(consumerDelay, totalCount, avergeDelay);
-                }
-
-                for (Entry<String, NavigableMap<Long, QpxData>> entry : allQpx.entrySet()) {
-
-                    NavigableMap<Long, QpxData> consumerQpx = entry.getValue();
-                    expectedQpx(consumerQpx, totalCount, qpsPerUnit * ips.size(), qpsPerUnit * ips.size()
-                            * intervalCount * AbstractCollector.SEND_INTERVAL);
-                }
-
-            }
-
-        }
-
-    }
 
     private void expectedDelay(NavigableMap<Long, Long> delays, int totalCount, long avergeDelay) {
 
@@ -202,24 +260,13 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
         }
     }
 
-    protected void expectedQpx(NavigableMap<Long, QpxData> data, int totalCount, Long resultQpx, Long resultTotal) {
-
-        if (logger.isInfoEnabled()) {
-            logger.info("[expected][" + avergeDelay + "]" + data);
-        }
-
-        Assert.assertEquals(totalCount, data.size());
-        for (QpxData value : data.values()) {
-
-            Assert.assertEquals(resultQpx, value.getQpx());
-            Assert.assertEquals(resultTotal, value.getTotal());
-        }
-    }
-
     public void prepareData(ConsumerAllData consumerAllData) {
 
         for (String ip : ips) {
 
+            if(ip.equals("127.0.0.2")){
+                topics = topics2;
+            }
             ConsumerMonitorData consumerMonitorData = new ConsumerMonitorData();
             consumerMonitorData.setSwallowServerIp(ip);
 
@@ -277,8 +324,15 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
                     SwallowMessage message = createMessage();
                     message.setMessageId(messageIdGenerator.incrementAndGet());
+
+                    long time;
+                    if("127.0.0.2".equals(ip)){
+                        time = System.currentTimeMillis() - avergeDelay;
+                    }else{
+                        time = 0L;
+                    }
                     message.getInternalProperties().put(MongoMessageDAO.SAVE_TIME,
-                            String.valueOf(System.currentTimeMillis() - avergeDelay));
+                            String.valueOf(time));
                     wrappers.add(new Wrapper(consumerInfo, ip, message));
 
                     consumerMonitorData.addSendData(consumerInfo, ip, message);

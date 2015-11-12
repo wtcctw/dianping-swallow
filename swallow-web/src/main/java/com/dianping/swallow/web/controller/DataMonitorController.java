@@ -45,8 +45,6 @@ public class DataMonitorController extends AbstractMonitorController implements 
 
     public static final String CAT_TYPE = "MONITOR";
 
-    public static final String ENTRYS = "entry";
-
     public static final String FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     private static final String STATSDATA_QUERY_TIMESPAN_KEY = "swallow.web.statsdata.query.timespan";

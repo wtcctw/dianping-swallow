@@ -1,11 +1,11 @@
 package com.dianping.swallow.common.internal.monitor.impl;
 
 import com.dianping.swallow.common.internal.monitor.Mergeable;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Map;
-import java.util.NavigableMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -31,6 +31,7 @@ public class MapMergeableImplTest{
         }
     }
 
+
     @Test
     public void testEmpty(){
         System.out.println("testEmpty");
@@ -44,6 +45,37 @@ public class MapMergeableImplTest{
         NavigableMap<Long, QpxData> result2 = mapQpxDataMergeableImp.getToMerge();
         for(Map.Entry<Long, QpxData> entry : result2.entrySet()){
             System.out.println(entry.getKey() + " -> " + entry.getValue());
+
+        }
+        Assert.assertEquals(mapLongMergeableImp.getToMerge(), mapLongToMerge);
+    }
+
+    @Test
+    public void testNotModifyOriginalData(){
+        System.out.println("testEmpty");
+        mapLongMergeableImp.merge(mapLongToMerge);
+        mapLongMergeableImp.merge(mapLongToMerge);
+        System.out.println("mapLongToMerge is not change");
+        NavigableMap<Long, Long> result1 = mapLongMergeableImp.getToMerge();
+        for(Map.Entry<Long, Long> entry : result1.entrySet()){
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        }
+        Assert.assertNotEquals(mapLongMergeableImp.getToMerge(), mapLongToMerge);
+
+        System.out.println();
+        mapQpxDataMergeableImp.merge(mapQpxDataToMerge);
+        mapQpxDataMergeableImp.merge(mapQpxDataToMerge);
+        System.out.println("mapQpxDataToMerge is not changed");
+        NavigableMap<Long, QpxData> result2 = mapQpxDataMergeableImp.getToMerge();
+        for(Map.Entry<Long, QpxData> entry : result2.entrySet()){
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        }
+        for(Map.Entry<Long, QpxData> entry : result2.entrySet()){
+            Long key = entry.getKey();
+            QpxData value1 = entry.getValue();
+            QpxData value2 = mapQpxDataToMerge.get(key);
+            Assert.assertEquals(value1.getQpx().longValue(), value2.getQpx().longValue() * 2);
+            Assert.assertEquals(value1.getTotal().longValue(), value2.getTotal().longValue() * 2);
         }
     }
 
@@ -65,6 +97,21 @@ public class MapMergeableImplTest{
         }
     }
 
+    @Test
+    public void testAdjustToMergeIfNecessaryTrue(){
+        mapLongMergeableImp.merge(mapLongToMerge);
+        mapLongMergeableImp.merge(mapLongToMerge);
+        NavigableMap<Long, Long> result = mapLongMergeableImp.adjustToMergeIfNecessary();
+        Assert.assertEquals(result, mapLongToMerge);
+    }
+
+    @Test
+    public void testAdjustToMergeIfNecessaryFalse(){
+        mapLongMergeableImp.merge(mapLongToMerge);
+        NavigableMap<Long, Long> result = mapLongMergeableImp.adjustToMergeIfNecessary();
+        Assert.assertEquals(result, mapLongToMerge);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testException(){
         System.out.println("testException");
@@ -77,11 +124,53 @@ public class MapMergeableImplTest{
         mapIntegerMergeableImp.merge(mapIntegerToMerge);
     }
 
-    private static final class QpxData implements Mergeable{
+    @Test
+    public void testGetToMerge(){
+
+        MapMergeableImpl<Long, Long> result = new MapMergeableImpl<Long, Long>();
+        NavigableMap<Long, Long> aaa = new ConcurrentSkipListMap<Long, Long>(mapLongToMerge);
+        NavigableMap<Long, Long> bbb = new ConcurrentSkipListMap<Long, Long>(mapLongToMerge);
+        NavigableMap<Long, Long> ccc = new ConcurrentSkipListMap<Long, Long>(mapLongToMerge);
+        result.setToMerge(aaa);
+        result.merge(mapLongToMerge);
+        aaa = result.getToMerge();
+
+        result.setToMerge(bbb);
+        result.merge(mapLongToMerge);
+        result.merge(mapLongToMerge);
+        bbb = result.getToMerge();
+        Assert.assertNotEquals(aaa, bbb);
+
+        result.setToMerge(ccc);
+        result.merge(mapLongToMerge);
+        result.merge(mapLongToMerge);
+        result.merge(mapLongToMerge);
+        ccc = result.getToMerge();
+        Assert.assertNotEquals(ccc, bbb);
+
+        Map<Long, Long> map = new HashMap<Long, Long>();
+        map.put(0L, 0L);
+        map.put(1L, 0L);
+        map.put(2L, 0L);
+        map.put(3L, 0L);
+        Collection<Long> set =  map.values();
+        Set<Long> newSet = new HashSet<Long>(set);
+        for(Long v : newSet){
+            System.out.println(v);
+        }
+        Assert.assertEquals(newSet.size(), 1);
+
+    }
+
+    public static class QpxData implements Mergeable{
 
         private Long qpx;
 
         private Long total;
+
+        public QpxData(){
+
+        }
 
         public QpxData(Long qpx, Long total) {
             this.qpx = qpx;
@@ -111,16 +200,14 @@ public class MapMergeableImplTest{
             }
 
             QpxData toMerge = (QpxData) merge;
+            if(total == null){
+                total = new Long(0);
+            }
             total += toMerge.getTotal();
+            if(qpx == null){
+                qpx = new Long(0);
+            }
             qpx += toMerge.getQpx();
-        }
-
-        @Override
-        public String toString() {
-            return "QpxData{" +
-                    "qpx=" + qpx +
-                    ", total=" + total +
-                    '}';
         }
 
         @Override

@@ -28,4 +28,9 @@ public class ConsumerServerStatisData extends AbstractTotalMapStatisable<Consume
 		return ConsumerTopicStatisData.class;
 	}
 
+	@Override
+	protected Statisable<ConsumerTopicData> createValue() {
+		return new ConsumerTopicStatisData();
+	}
+
 }

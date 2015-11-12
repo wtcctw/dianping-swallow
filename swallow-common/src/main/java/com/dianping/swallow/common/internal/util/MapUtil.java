@@ -1,7 +1,5 @@
 package com.dianping.swallow.common.internal.util;
 
-import com.dianping.swallow.common.internal.monitor.Mergeable;
-
 import java.util.Map;
 
 /**
@@ -28,42 +26,6 @@ public class MapUtil {
 			}
 		}
 		return ret;
-	}
-
-	public static <K, V extends Mergeable> void mergeMap(Map<K, V> toMerge, Map<K, V> fromMerge){
-		if(toMerge == null || fromMerge == null){
-			return;
-		}
-		for(Map.Entry<K, V> entry : fromMerge.entrySet()){
-			K fromKey = entry.getKey();
-			V fromValue = entry.getValue();
-			V toValue = toMerge.get(fromKey);
-
-			if(toValue == null){
-				toMerge.put(fromKey, fromValue);
-			}else{
-				toValue.merge(fromValue);
-				toMerge.put(fromKey, toValue);
-			}
-		}
-	}
-
-	public static void mergeMapOfTypeLong(Map<Long, Long> toMerge, Map<Long, Long> fromMerge){
-		if(toMerge == null || fromMerge == null){
-			return;
-		}
-		for(Map.Entry<Long, Long> entry : fromMerge.entrySet()){
-			Long fromKey = entry.getKey();
-			Long fromValue = entry.getValue();
-			Long toValue = toMerge.get(fromKey);
-
-			if(toValue == null){
-				toMerge.put(fromKey, fromValue);
-			}else{
-				toValue += fromValue;
-				toMerge.put(fromKey, toValue);
-			}
-		}
 	}
 
 }

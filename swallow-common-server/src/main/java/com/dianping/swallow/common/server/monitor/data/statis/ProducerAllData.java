@@ -25,4 +25,14 @@ public class ProducerAllData extends AbstractAllData<ProducerTopicData, Producer
 		return ProducerServerStatisData.class;
 	}
 
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException("clone not support");
+	}
+
+	@Override
+	public ProducerServerStatisData createValue() {
+		return new ProducerServerStatisData();
+	}
+
 }

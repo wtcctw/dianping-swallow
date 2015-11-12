@@ -121,7 +121,7 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
                 NavigableMap<Long, Long> senddelay = consumerDataRetrieverWrapper.getDelayValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid), StatisType.SEND);
                 List<Long> sendList = extractListFromMap(senddelay);
 
-                NavigableMap<Long, Long> ackdelay = consumerDataRetrieverWrapper.getQpsValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid), StatisType.ACK);
+                NavigableMap<Long, Long> ackdelay = consumerDataRetrieverWrapper.getDelayValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid), StatisType.ACK);
                 List<Long> ackList = extractListFromMap(ackdelay);
 
                 int sendListSize = sendList.size();
@@ -209,7 +209,7 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
     /**
      * 产生每个Entry
      *
-     * @param totalData
+     * @param entry
      * @throws Exception
      */
     private Entry doGenerateEntry(Map.Entry<TotalDataKey, TotalData> entry) {

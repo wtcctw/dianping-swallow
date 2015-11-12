@@ -99,4 +99,9 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 		return result;
 	}
 
+	@Override
+	public ConsumerServerStatisData createValue() {
+		return new ConsumerServerStatisData();
+	}
+
 }
