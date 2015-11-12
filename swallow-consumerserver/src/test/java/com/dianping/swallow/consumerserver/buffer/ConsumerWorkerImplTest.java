@@ -7,6 +7,7 @@ import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,7 +19,6 @@ import org.junit.Test;
 import org.mockito.Matchers;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
-import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
@@ -61,7 +61,7 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
         CloseableBlockingQueue<SwallowMessage> messageQueue = new MockedCloseableBlockingQueue<SwallowMessage>();
 
         makeMessages(messageQueue);
-        when(swallowBuffer.createMessageQueue(Matchers.any(ConsumerInfo.class), Matchers.anyLong(), Matchers.anyLong(), (MessageFilter) Matchers.anyObject())).thenReturn(messageQueue);
+        when(swallowBuffer.createMessageQueue(Matchers.any(ConsumerInfo.class), Matchers.anyLong())).thenReturn(messageQueue);
         //      AckDAO ackDAO = mock(AckDAO.class);
         //      //doReturn(print()).when(ackDAO).add(Matchers.anyString(), Matchers.anyString(), Matchers.anyLong(), Matchers.anyString());
         //      MessageDAO messageDAO = mock(MessageDAO.class);
@@ -244,6 +244,29 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
 
 		@Override
 		public void update(Observable observable, Object args) {
+		}
+
+		@Override
+		public void putMessage(List<SwallowMessage> messages) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setTailMessageId(Long tailId) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public Long getTailMessageId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setMessageRetriever(MessageRetriever messageRetriever) {
+			
 		}
 
     }

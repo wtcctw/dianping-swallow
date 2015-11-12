@@ -110,4 +110,10 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 	}
 
 
+	@Override
+	public Long getMessageEmptyAckId(String topicName) {
+		return -1L;
+	}
+
+
 }

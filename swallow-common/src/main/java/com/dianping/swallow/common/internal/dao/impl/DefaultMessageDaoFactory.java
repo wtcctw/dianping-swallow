@@ -201,7 +201,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 		if(method.getName().equals(DAO.GET_CLUSTER)){
 			return null;
 		}
-
+		
 		if(args.length == 0){
 			throw new IllegalArgumentException("wrong argument:" + args.length);
 		}

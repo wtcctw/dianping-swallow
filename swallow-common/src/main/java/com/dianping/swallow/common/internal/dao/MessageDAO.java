@@ -99,4 +99,10 @@ public interface MessageDAO<T extends Cluster> extends DAO<T>{
 
    void addAck(String topicName, String consumerId, Long messageId, String desc);
 
+   /**
+    * 在消息为空的情况下，默认的ackId
+	 * @return
+	 */
+   Long getMessageEmptyAckId(String topicName);
+   
 }

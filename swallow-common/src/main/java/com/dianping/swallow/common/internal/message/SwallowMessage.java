@@ -31,8 +31,6 @@ public class SwallowMessage implements Serializable, Message {
 
    private Long                backupMessageId;
 
-   private boolean             isBackup;
-
    @Override
    public Date getGeneratedTime() {
       return generatedTime;
@@ -142,11 +140,7 @@ public class SwallowMessage implements Serializable, Message {
    }
 
    public boolean isBackup() {
-      return isBackup;
-   }
-
-   public void setBackup(boolean isBackup) {
-      this.isBackup = isBackup;
+      return backupMessageId != null;
    }
 
    @Override
@@ -154,7 +148,7 @@ public class SwallowMessage implements Serializable, Message {
       return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", backupMessageId="
             + backupMessageId + ", properties=" + properties + ", internalProperties=" + internalProperties
             + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + ", content="
-            + content + ", isBackup=" + isBackup + "]";
+            + content + "]";
    }
 
    public String toKeyValuePairs() {
@@ -164,7 +158,7 @@ public class SwallowMessage implements Serializable, Message {
    public String toSuccessKeyValuePairs() {
       return "generatedTime=" + generatedTime + "&messageId=" + messageId + "&backupMessageId=" + backupMessageId
             + "&properties=" + properties + "&internalProperties=" + internalProperties + "&version=" + version
-            + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp + "&isBackup=" + isBackup;
+            + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp;
    }
 
    @Override
@@ -269,9 +263,6 @@ public class SwallowMessage implements Serializable, Message {
             return false;
          }
       } else if (!version.equals(other.version)) {
-         return false;
-      }
-      if (isBackup != other.isBackup) {
          return false;
       }
       return true;

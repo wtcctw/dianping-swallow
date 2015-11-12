@@ -136,16 +136,14 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 
 	@SuppressWarnings({ "unchecked" })
 	private void convert(DBObject result, SwallowMessage swallowMessage) {
+		
 		BSONTimestamp timestamp = (BSONTimestamp) result.get(ID);
 		BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(ORIGINAL_ID);
 
+		swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(timestamp));
+
 		if (originalTimestamp != null) {
-			swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(originalTimestamp));
-			swallowMessage.setBackupMessageId(MongoUtils.BSONTimestampToLong(timestamp));
-			swallowMessage.setBackup(true);
-		} else {
-			swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(timestamp));
-			swallowMessage.setBackup(false);
+			swallowMessage.setBackupMessageId(MongoUtils.BSONTimestampToLong(originalTimestamp));
 		}
 
 		swallowMessage.setContent(result.get(CONTENT));// content
@@ -397,6 +395,12 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 	         }
 	      }
 	   }
+
+	@Override
+	public Long getMessageEmptyAckId(String topicName) {
+
+		return MongoUtils.getLongByCurTime();
+	}
 
 
 }

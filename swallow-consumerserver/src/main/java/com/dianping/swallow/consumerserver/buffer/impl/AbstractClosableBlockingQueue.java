@@ -1,4 +1,5 @@
-package com.dianping.swallow.consumerserver.buffer;
+package com.dianping.swallow.consumerserver.buffer.impl;
+
 
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -9,11 +10,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.observer.Observable;
+import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
+import com.dianping.swallow.consumerserver.buffer.DefaultRetriveStrategy;
+import com.dianping.swallow.consumerserver.buffer.MessageRetriever;
+import com.dianping.swallow.consumerserver.buffer.RetriveStrategy;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerConfigChanged;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerImpl;
@@ -21,14 +25,15 @@ import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerImpl;
 /**
  * @author mengwenchao
  *
- * 2015年8月17日 下午3:37:55
+ * 2015年11月12日 下午7:28:19
  */
-public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMessage> implements CloseableBlockingQueue<SwallowMessage> {
+public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueue<SwallowMessage> implements CloseableBlockingQueue<SwallowMessage>{
 
-	private static final long serialVersionUID = -633276713494338593L;
+	private static final long serialVersionUID = 1L;
 	
 	private static final Logger logger = LoggerFactory.getLogger(MessageBlockingQueue.class);
 
+	
 	private final ConsumerInfo consumerInfo;
 
 	protected transient MessageRetriever messageRetriever;
@@ -44,20 +49,19 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 	private final int maxThreshold;
 
 	protected volatile Long tailMessageId;
-	protected volatile Long tailBackupMessageId;
 
 	private ExecutorService retrieverThreadPool;
 
-	private RetriveStrategy retriveStrategy, backupRetriveStrategy;
+	private RetriveStrategy retriveStrategy;
 	
 	private Object getTailMessageIdLock = new Object();
 
-	public MessageBlockingQueue(ConsumerInfo consumerInfo, int minThreshold,
-			int maxThreshold, int capacity, Long messageIdOfTailMessage,
-			Long tailBackupMessageId, MessageFilter messageFilter,
-			ExecutorService retrieverThreadPool) {
+	
+	public AbstractClosableBlockingQueue(ConsumerInfo consumerInfo, MessageFilter messageFilter, int minThreshold,
+			int maxThreshold, int capacity, Long messageIdOfTailMessage, ExecutorService retrieverThreadPool) {
 		// 能运行到这里，说明capacity>0
 		this.consumerInfo = consumerInfo;
+		this.messageFilter = messageFilter;
 		if (minThreshold < 0 || maxThreshold < 0 || minThreshold > maxThreshold) {
 			throw new IllegalArgumentException("wrong threshold: "
 					+ minThreshold + "," + maxThreshold);
@@ -68,19 +72,13 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 			throw new IllegalArgumentException("messageIdOfTailMessage is null.");
 		}
 		this.tailMessageId = messageIdOfTailMessage;
-		this.tailBackupMessageId = tailBackupMessageId;
-		this.messageFilter = messageFilter;
 		this.retrieverThreadPool = retrieverThreadPool;
 
 		this.retriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold, 
 				ConfigManager.getInstance().getMaxRetriverTaskCountPerConsumer());
-		this.backupRetriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getBackupMinRetrieveInterval(), this.maxThreshold,
-				ConfigManager.getInstance().getMaxRetriverTaskCountPerConsumer());
 	}
 
-	public void init() {
-	}
-
+	
 	@Override
 	public SwallowMessage poll() {
 
@@ -97,6 +95,7 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 
 	@Override
 	public SwallowMessage peek() {
+		
 		ensureLeftMessage();
 		SwallowMessage message = super.peek();
 		return message;
@@ -107,15 +106,12 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 	private void decreaseMessageCount(SwallowMessage message) {
 		if(message != null){
 			retriveStrategy.decreaseMessageCount();
-			backupRetriveStrategy.decreaseMessageCount();
-			
 			checkSendMessageSize.incrementAndGet();
 		}
 	}
 
 	private void increaseMessageCount() {
 		retriveStrategy.increaseMessageCount();
-		backupRetriveStrategy.increaseMessageCount();
 	}
 
 	/**
@@ -126,18 +122,16 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		if (retriveStrategy.messageCount() < minThreshold) {
 
 			if(retriveStrategy.canPutNewTask()){
-				retrieverThreadPool.execute(new MessageRetrieverTask(retriveStrategy, consumerInfo, messageRetriever, this, messageFilter));
+				retrieverThreadPool.execute(createMessageRetrieverTask(retriveStrategy, consumerInfo, messageRetriever, this, messageFilter));
 				retriveStrategy.offerNewTask();
-			}
-
-			if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-				if(backupRetriveStrategy.canPutNewTask()){
-					retrieverThreadPool.execute(new BackupMessageRetrieverTask(backupRetriveStrategy, consumerInfo, messageRetriever, this, messageFilter));
-					backupRetriveStrategy.offerNewTask();
-				}
 			}
 		}
 	}
+
+	protected abstract Runnable createMessageRetrieverTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo,
+			MessageRetriever messageRetriever, AbstractClosableBlockingQueue abstractClosableBlockingQueue,
+			MessageFilter messageFilter);
+
 
 	public void setMessageRetriever(MessageRetriever messageRetriever) {
 		this.messageRetriever = messageRetriever;
@@ -183,19 +177,6 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		}
 	}
 
-	public Long getTailBackupMessageId() {
-		return tailBackupMessageId;
-	}
-
-	public void setTailBackupMessageId(Long tailBackupMessageId) {
-		if(logger.isDebugEnabled()){
-			logger.debug("[setTailBackupMessageId]" + tailBackupMessageId);
-		}
-		synchronized (getTailMessageIdLock) {
-			this.tailBackupMessageId = tailBackupMessageId;
-		}
-	}
-
 	@Override
 	public Long getEmptyTailMessageId(boolean isBackup) {
 
@@ -203,9 +184,6 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 			
 			if(isEmpty()){
 				
-				if(isBackup){
-					return getTailBackupMessageId();
-				}
 				return getTailMessageId();
 			}
 		}
@@ -232,5 +210,4 @@ public final class MessageBlockingQueue extends ConcurrentLinkedQueue<SwallowMes
 		}
 		
 	}
-
 }

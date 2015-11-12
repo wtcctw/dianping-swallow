@@ -1,7 +1,9 @@
 package com.dianping.swallow.consumerserver.buffer;
 
+import java.util.List;
 import java.util.Queue;
 
+import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.observer.Observer;
 
 /**
@@ -28,5 +30,23 @@ public interface CloseableBlockingQueue<E> extends Queue<E>, Observer {
 	 * @return
 	 */
 	Long getEmptyTailMessageId(boolean isBackup);
+
+
+	void putMessage(List<SwallowMessage> messages);
+
+	/**
+	 * @param tailId
+	 */
+	void setTailMessageId(Long tailId);
+
+	/**
+	 * @return
+	 */
+	Long getTailMessageId();
+
+	/**
+	 * @param messageRetriever
+	 */
+	void setMessageRetriever(MessageRetriever messageRetriever);
 	
 }

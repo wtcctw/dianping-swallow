@@ -23,11 +23,11 @@ public abstract class AbstractRetrieveTask implements Runnable {
 	protected RetriveStrategy retriveStrategy;
 	protected ConsumerInfo consumerInfo;
 	protected MessageRetriever messageRetriever;
-	protected MessageBlockingQueue blockingQueue;
+	protected CloseableBlockingQueue<SwallowMessage> blockingQueue;
 	protected MessageFilter messageFilter;
 
 	public AbstractRetrieveTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo, MessageRetriever messageRetriever, 
-			MessageBlockingQueue blockingQueue, MessageFilter messageFilter) {
+			CloseableBlockingQueue<SwallowMessage> blockingQueue, MessageFilter messageFilter) {
 		this.retriveStrategy = retriveStrategy;
 		this.consumerInfo = consumerInfo;
 		this.messageRetriever = messageRetriever;
@@ -122,11 +122,14 @@ public abstract class AbstractRetrieveTask implements Runnable {
 		}
 	}
 
-	protected abstract void setTailId(Long tailId);
+	protected void setTailId(Long tailId) {
+		blockingQueue.setTailMessageId(tailId);
+	}
+
+	protected Long getTailId() {
+		return blockingQueue.getTailMessageId();
+	}
 
 	protected abstract String getConsumerId();
-
-	protected abstract Long getTailId();
-
 
 }

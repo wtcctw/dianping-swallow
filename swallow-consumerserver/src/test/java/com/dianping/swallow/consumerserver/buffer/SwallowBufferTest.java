@@ -52,7 +52,7 @@ public class SwallowBufferTest extends AbstractConsumerServerSpringTest {
         Set<String> messageTypeSet = new HashSet<String>();
         messageTypeSet.add(TYPE);
         ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
-        Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
+        Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
         SwallowMessage m;
         while ((m = queue.poll()) == null) {
@@ -67,7 +67,7 @@ public class SwallowBufferTest extends AbstractConsumerServerSpringTest {
         Set<String> messageTypeSet = new HashSet<String>();
         messageTypeSet.add(TYPE);
         ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
-        Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
+        Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
         SwallowMessage m = queue.poll();
         while (m == null) {
@@ -88,7 +88,7 @@ public class SwallowBufferTest extends AbstractConsumerServerSpringTest {
         Set<String> messageTypeSet = new HashSet<String>();
         messageTypeSet.add(myType);
         ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
-        Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
+        Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
         SwallowMessage m = queue.poll();
         while (m == null) {

@@ -1,0 +1,331 @@
+package com.dianping.swallow.consumerserver.worker.impl;
+
+import io.netty.channel.Channel;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.dianping.cat.message.Message;
+import com.dianping.cat.message.Transaction;
+import com.dianping.swallow.common.consumer.ConsumerType;
+import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
+import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.observer.Observable;
+import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
+import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
+import com.dianping.swallow.consumerserver.config.ConfigManager;
+import com.dianping.swallow.consumerserver.worker.SendAckManager;
+
+/**
+ * @author mengwenchao
+ * 
+ *         2015年11月12日 下午5:07:26
+ */
+public abstract class AbstractSendAckManager extends AbstractLifecycle implements SendAckManager {
+
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+	private final long WAIT_ACK_EXPIRED = ConfigManager.getInstance().getWaitAckExpiredSecond() * 1000;
+
+	private CloseableBlockingQueue<SwallowMessage> messageQueue;
+
+	private volatile ConsumerMessage maxAckedMessage;
+
+	private volatile long lastRecordedAckId = 0L;
+
+	protected MessageDAO<?> messageDao;
+
+	protected ConsumerInfo consumerInfo;
+
+	private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages = new ConcurrentSkipListMap<Long, ConsumerMessage>();
+
+	private AtomicInteger messageToSend = new AtomicInteger();
+
+	private SwallowBuffer swallowBuffer;
+	
+	public AbstractSendAckManager(ConsumerInfo consumerInfo, SwallowBuffer swallowBuffer, MessageDAO<?> messageDao){
+		
+		this.consumerInfo = consumerInfo;
+		this.swallowBuffer = swallowBuffer;
+		this.messageDao = messageDao;
+	}
+
+	
+	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+		
+		long idOfTailMessage = getBeginFetchId();
+		
+		messageQueue = createMessageQueue(swallowBuffer, idOfTailMessage);
+		
+		if (logger.isInfoEnabled()) {
+			logger.info("[doInitialize]" + idOfTailMessage);
+		}
+	}
+	
+	@Override
+	protected void doDispose() throws Exception {
+		super.doDispose();
+		
+		messageQueue.close();
+	}
+
+	protected abstract long getBeginFetchId();
+
+	/**
+	 * 有ackid，获取最大ackid；无则获取最大消息id
+	 * @return
+	 */
+	protected long getMaxAckIdOrMaxMessageId() {
+		
+		Long maxMessageId = null;
+		
+		String topicName = consumerInfo.getDest().getName();
+
+		if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+			
+			maxMessageId = messageDao.getAckMaxMessageId(topicName, consumerInfo.getConsumerId(), isBackcup());
+		}
+
+		if (maxMessageId == null) {
+			
+			maxMessageId = getMaxMessageId();
+			if (maxMessageId == null) {
+				maxMessageId = messageDao.getMessageEmptyAckId(consumerInfo.getDest().getName());
+			}
+			
+			if(consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
+				saveAckId(maxMessageId, "inited");
+			}
+		}
+		return maxMessageId;
+	}
+
+	protected abstract Long getMaxMessageId();
+
+	@Override
+	public ConsumerMessage send() {
+
+		return poolMessage();
+	}
+
+	
+	@Override
+	public void exceptionWhileSending(ConsumerMessage consumerMessage, Throwable th) {
+		
+	}
+
+	@Override
+	public ConsumerMessage ack(Long ackId) {
+
+		ConsumerMessage waitAckMessage = waitAckMessages.remove(ackId);
+
+		if (waitAckMessage == null) {
+			return null;
+		}
+
+		if (maxAckedMessage == null || waitAckMessage.getAckId() > maxAckedMessage.getAckId()) {
+			maxAckedMessage = waitAckMessage;
+		}
+
+		catTraceForAck(waitAckMessage);
+
+		return waitAckMessage;
+	}
+
+	protected abstract void catTraceForAck(ConsumerMessage consumerMessage);
+
+	@Override
+	public void recordAck() {
+		recordAck0(waitAckMessages, maxAckedMessage);
+	}
+	
+
+	@Override
+	public void destClosed(Channel channel) {
+		removeByChannel(channel, waitAckMessages);
+	}
+
+	private void removeByChannel(Channel channel, Map<Long, ConsumerMessage> waitAckMessages0) {
+		
+		Iterator<Entry<Long, ConsumerMessage>> it = waitAckMessages0.entrySet().iterator();
+		
+		while (it.hasNext()) {
+			
+			Entry<Long, ConsumerMessage> entry = (Entry<Long, ConsumerMessage>) it.next();
+			ConsumerMessage consumerMessage = entry.getValue();
+			
+			if (consumerMessage.getChannel().equals(channel)) {
+				
+				if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+					
+					backupMessage(consumerMessage);
+					
+					catTraceForBackupRecord(consumerMessage.getMessage());
+				}
+			}
+			it.remove();
+		}
+	}
+	
+
+	private ConsumerMessage poolMessage() {
+
+		messageToSend.incrementAndGet();
+
+		SwallowMessage swallowMessage = messageQueue.poll();
+
+		if (swallowMessage == null) {
+			messageToSend.decrementAndGet();
+			return null;
+		}
+
+		ConsumerMessage consumerMessage = createConsumerMessage(swallowMessage);
+		
+		waitAck(consumerMessage);
+		
+		return consumerMessage;
+	}
+	
+	
+	private void waitAck(ConsumerMessage consumerMessage) {
+		
+		waitAckMessages.put(consumerMessage.getAckId(), consumerMessage);
+		
+		messageToSend.decrementAndGet();
+	}
+
+
+
+	private ConsumerMessage createConsumerMessage(SwallowMessage message) {
+
+		ConsumerMessage consumerMessage = null;
+
+		if (message != null) {
+			consumerMessage = new ConsumerMessage(message, this);
+		}
+		return consumerMessage;
+	}
+
+	private void recordAck0(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages0, ConsumerMessage maxAckedMessage0) {
+
+		Entry<Long, ConsumerMessage> entry;
+		while ((entry = waitAckMessages0.firstEntry()) != null) {// 使用while，尽最大可能消除空洞ack
+																	// id
+			boolean overdue = false;// 是否超过阈值
+
+			ConsumerMessage minWaitAckMessage = entry.getValue();
+			Long minAckId = entry.getKey();
+
+			if (maxAckedMessage0 != null && minAckId < maxAckedMessage0.getAckId()) {// 大于最大ack
+																						// id（maxAckedMessageId）的消息，不算是空洞
+				if (System.currentTimeMillis() - minWaitAckMessage.getGmt() > WAIT_ACK_EXPIRED) {
+					overdue = true;
+				}
+			}
+
+			if (overdue && (minWaitAckMessage = waitAckMessages0.remove(minAckId)) != null) {
+				if (minWaitAckMessage != null) {
+					
+					backupMessage(minWaitAckMessage);
+					
+					catTraceForBackupRecord(minWaitAckMessage.getMessage());
+				}
+			} else {// 没有移除任何空洞，则不再迭代；否则需要继续迭代以尽量多地移除空洞。
+				break;
+			}
+		}
+
+		Long ackMessageId = null;
+		entry = waitAckMessages0.firstEntry();
+
+		if (entry != null) {
+			ackMessageId = entry.getValue().getAckId() - 1;
+		} else {
+
+			Long queueMaxId = getQueueEmptyMaxId(waitAckMessages0);
+
+			ackMessageId = Math.max(queueMaxId == null ? 0 : queueMaxId, maxAckedMessage0 == null ? 0L
+					: maxAckedMessage0.getAckId());
+		}
+
+		saveAckId(ackMessageId, "batch");
+	}
+
+	
+	private void backupMessage(ConsumerMessage consumerMessage) {
+		
+		if(this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
+			messageDao.saveMessage(this.consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), consumerMessage.getMessage());
+		}
+	}
+
+
+	/**
+	 * 主要处理消息设置filter，同时批量没有消息的情况，移动ack位置
+	 * @param isBackup
+	 * @param waitAckMessages0 
+	 * @return
+	 */
+	private Long getQueueEmptyMaxId(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages) {
+
+		Long tailMessageId = messageQueue.getEmptyTailMessageId(isBackcup());
+		
+		if(messageToSend.get() > 0 || !waitAckMessages.isEmpty()){
+			return 0L;
+		}
+		
+		return tailMessageId;
+	}
+
+	private void saveAckId(Long ackMessageId, String desc) {
+
+		if (ackMessageId != null && ackMessageId > 0 && ackMessageId > lastRecordedAckId) {
+
+			if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
+				
+				messageDao.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), ackMessageId, desc, isBackcup());
+				lastRecordedAckId = ackMessageId;
+			}
+		}
+	}
+
+	protected abstract boolean isBackcup();
+
+	protected void catTraceForBackupRecord(SwallowMessage message) {
+
+		Transaction transaction = createBakupTranaction();
+		if (message != null) {
+			transaction.addData("mid", message.getMessageId() + "," + message.getBackupMessageId());
+		}
+		transaction.setStatus(Message.SUCCESS);
+		transaction.complete();
+	}
+
+	protected abstract Transaction createBakupTranaction();
+
+	protected abstract CloseableBlockingQueue<SwallowMessage> createMessageQueue(SwallowBuffer swallowBuffer, long messageIdOfTailMessage);
+	
+
+	
+	@Override
+	public void update(Observable observable, Object args) {
+		messageQueue.update(observable, args);
+	}
+	
+	
+	@Override
+	public String toString() {
+		
+		return consumerInfo.toString();
+	}
+}

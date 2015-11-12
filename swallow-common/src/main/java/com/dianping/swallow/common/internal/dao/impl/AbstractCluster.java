@@ -102,7 +102,7 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 		String schema = getSchema();
 		
 		if(url.startsWith(schema)){
-			url.substring(schema.length());
+			url = url.substring(schema.length());
 		}
 		
 		return buildAddress(url);

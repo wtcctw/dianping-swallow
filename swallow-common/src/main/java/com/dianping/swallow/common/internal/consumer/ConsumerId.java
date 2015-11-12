@@ -13,7 +13,8 @@ public class ConsumerId {
 	private Destination dest;
 
 	public ConsumerId(String consumerId, Destination dest) {
-
+		this.consumerId = consumerId;
+		this.dest = dest;
 	}
 
 	public String getConsumerId() {

@@ -2,6 +2,7 @@ package com.dianping.swallow.consumerserver.buffer;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 /**
  * @author mengwenchao
@@ -11,7 +12,7 @@ import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 public class BackupMessageRetrieverTask extends AbstractRetrieveTask implements Runnable {
 
 	public BackupMessageRetrieverTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo,
-			MessageRetriever retriever, MessageBlockingQueue blockingQueue, MessageFilter messageFilter) {
+			MessageRetriever retriever, CloseableBlockingQueue<SwallowMessage> blockingQueue, MessageFilter messageFilter) {
 		super(retriveStrategy, consumerInfo, retriever, blockingQueue, messageFilter);
 	}
 
@@ -20,19 +21,5 @@ public class BackupMessageRetrieverTask extends AbstractRetrieveTask implements 
 	protected String getConsumerId() {
 		return consumerInfo.getConsumerId();
 	}
-
-
-	@Override
-	protected void setTailId(Long tailId) {
-		blockingQueue.setTailBackupMessageId(tailId);
-	}
-
-
-	@Override
-	protected Long getTailId() {
-		
-		return blockingQueue.getTailBackupMessageId();
-	}
-
 
 }

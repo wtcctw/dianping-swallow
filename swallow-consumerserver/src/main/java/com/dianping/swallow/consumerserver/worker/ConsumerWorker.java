@@ -3,7 +3,6 @@ package com.dianping.swallow.consumerserver.worker;
 
 import io.netty.channel.Channel;
 
-import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
@@ -48,12 +47,6 @@ public interface ConsumerWorker extends Lifecycle{
     */
    boolean allChannelDisconnected();
 
-   /**
-    * 获取ConsumerType
-    * 
-    * @return
-    */
-   ConsumerType getConsumerType();
 
    void recordAck();
 
