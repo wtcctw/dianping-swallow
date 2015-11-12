@@ -72,7 +72,7 @@ public class LoggerLoader {
         AppenderRef asyncConsoleErrorRef = AppenderRef.createAppenderRef("AsyncConsoleError", Level.ERROR, null);
 
         // console warn
-        Filter consoleWarnFilter = ThresholdFilter.createFilter(Level.ERROR, Result.DENY, Result.NEUTRAL);
+        Filter consoleWarnFilter = ThresholdFilter.createFilter(Level.WARN, Result.DENY, Result.NEUTRAL);
         Appender consoleWarnAppender = ConsoleAppender.createAppender(layout, consoleWarnFilter, "SYSTEM_OUT",
                 "ConsoleWarn", "false", "false");
         config.addAppender(consoleWarnAppender);
@@ -80,11 +80,21 @@ public class LoggerLoader {
         AppenderRef consoleWarnAppenderRef = AppenderRef
                 .createAppenderRef("ConsoleWarn", Level.WARN, consoleWarnFilter);
 
-        AppenderRef[] refs = new AppenderRef[]{asyncConsoleErrorRef, consoleWarnAppenderRef, fileInfoRef};
+        // console info
+        Filter consoleInfoFilter = ThresholdFilter.createFilter(Level.INFO, Result.DENY, Result.ACCEPT);
+        Appender consoleInfoAppender = ConsoleAppender.createAppender(layout, consoleInfoFilter, "SYSTEM_OUT",
+                "ConsoleInfo", "false", "false");
+        config.addAppender(consoleInfoAppender);
+        consoleInfoAppender.start();
+        AppenderRef consoleInfoAppenderRef = AppenderRef
+                .createAppenderRef("ConsoleInfo", Level.INFO, consoleInfoFilter);
+
+        AppenderRef[] refs = new AppenderRef[]{asyncConsoleErrorRef, consoleWarnAppenderRef, consoleInfoAppenderRef, fileInfoRef};
         LoggerConfig loggerConfig = LoggerConfig.createLogger("false", Level.INFO, PACKAGE, "true", refs,
                 null, config, null);
         loggerConfig.addAppender(asyncConsoleErrorAppender, Level.ERROR, null);
         loggerConfig.addAppender(consoleWarnAppender, Level.WARN, null);
+        loggerConfig.addAppender(consoleInfoAppender, Level.INFO, null);
         loggerConfig.addAppender(fileInfoAppender, Level.INFO, null);
 
         config.addLogger(PACKAGE, loggerConfig);

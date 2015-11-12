@@ -66,8 +66,7 @@
 		<swallow-client.version>0.5.4</swallow-client.version>
 		<lion-env.version>1.0.0</lion-env.version>
 		<log4j.version>1.2.17</log4j.version>
-		<log4j-core.version>2.3</log4j-core.version>
-		<log4j-api.version>2.3</log4j-api.version>
+		<log4j2.version>2.3</log4j2.version>
 		<logback-classic.version>1.0.12</logback-classic.version>
 		<dpsf-net.version>2.5.4</dpsf-net.version>
 		<cglib.version>2.1_3</cglib.version>
@@ -204,13 +203,18 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-api</artifactId>
-				<version>${log4j-api.version}</version>
+				<version>${log4j2.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-core</artifactId>
-				<version>${log4j-core.version}</version>
+				<version>${log4j2.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>

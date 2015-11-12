@@ -2,7 +2,11 @@
 <Configuration status="info" monitorInterval="30">
 
     <Appenders>
+<<<<<<< Updated upstream
         <CatAppender name="catAppender"/>
+=======
+        <!--<CatAppender name="catAppender" />-->
+>>>>>>> Stashed changes
 
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
@@ -27,6 +31,7 @@
     <Loggers>
         <Logger name="org.jasig.cas" level="ERROR"
                 additivity="true">
+<<<<<<< Updated upstream
             <AppenderRef ref="console" level="ERROR"/>
         </Logger>
         <Logger name="org.springframework" level="WARN"
@@ -36,6 +41,15 @@
         <Logger name="com.dianping.swallow.web.filter" level="INFO"
                 additivity="true">
             <AppenderRef ref="logFilterFileAppender" level="INFO"/>
+=======
+        </Logger>
+        <Logger name="org.springframework" level="WARN"
+                additivity="true">
+        </Logger>
+        <Logger name="com.dianping.swallow.web.filter" level="INFO"
+                additivity="false">
+            <AppenderRef ref="logFilterFileAppender"/>
+>>>>>>> Stashed changes
         </Logger>
         <root level="INFO">
             <AppenderRef ref="console"/>
