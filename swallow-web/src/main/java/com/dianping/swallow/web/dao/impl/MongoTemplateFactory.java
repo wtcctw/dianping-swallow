@@ -1,17 +1,5 @@
 package com.dianping.swallow.web.dao.impl;
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.WriteResultChecking;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
-
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
@@ -22,6 +10,17 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.WriteResultChecking;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @author mengwenchao

@@ -4,8 +4,8 @@ package com.dianping.swallow.web.monitor.charts;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper.PlotOption;

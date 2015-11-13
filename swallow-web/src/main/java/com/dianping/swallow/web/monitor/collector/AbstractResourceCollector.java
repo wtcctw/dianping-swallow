@@ -1,9 +1,8 @@
 package com.dianping.swallow.web.monitor.collector;
 
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 /**
  * 
  * @author qiyin

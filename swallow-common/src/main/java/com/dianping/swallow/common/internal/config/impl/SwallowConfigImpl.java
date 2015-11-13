@@ -1,13 +1,13 @@
 package com.dianping.swallow.common.internal.config.impl;
 
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.observer.Observer;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
+import java.util.Set;
 
 /**
  * @author mengwenchao
@@ -16,7 +16,7 @@ import com.dianping.swallow.common.internal.observer.Observer;
  */
 public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfig{
 
-	protected Logger logger = Logger.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private SwallowConfig config;
 	

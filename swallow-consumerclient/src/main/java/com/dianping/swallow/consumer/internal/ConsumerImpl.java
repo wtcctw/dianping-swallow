@@ -17,8 +17,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;

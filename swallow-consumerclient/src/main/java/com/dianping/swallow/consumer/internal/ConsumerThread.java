@@ -6,8 +6,8 @@ import io.netty.channel.ChannelFuture;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * ConsumerThread的作用是，它会不断的保持与ConsumerServer的连接(一个channel关闭后继续建立新的channel)<br>

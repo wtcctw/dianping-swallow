@@ -13,7 +13,7 @@ public abstract class AbstractServerDataTest extends AbstractTest{
 	
 	
 	protected Long startKey = 100L, endKey = 140L;
-	
+
 	protected String []topics = new String[]{"topic1", "topic2"};
 	
 	protected String []ips = new String[]{"127.0.0.1", "127.0.0.2"};

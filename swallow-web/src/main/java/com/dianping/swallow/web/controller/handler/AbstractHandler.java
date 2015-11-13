@@ -2,8 +2,8 @@ package com.dianping.swallow.web.controller.handler;
 
 import com.dianping.swallow.web.controller.handler.data.Treatable;
 import com.dianping.swallow.web.controller.handler.result.Result;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * @author mingdongli

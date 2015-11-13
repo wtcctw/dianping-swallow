@@ -2,8 +2,8 @@ package com.dianping.swallow.web.util;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoStatus;
 import com.dianping.swallow.common.message.JsonDeserializedException;

@@ -1,18 +1,16 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-import java.util.NavigableMap;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
-import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfo;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.NavigableMap;
 
 /**
  * @author mengwenchao
@@ -149,7 +147,7 @@ public class MessageInfoStatisTest extends AbstractTest {
 	private void expectQpx(NavigableMap<Long, QpxData> data, int expectCount, Long expectedQpx, Long expectedTotal) {
 
 		if (logger.isInfoEnabled()) {
-			logger.info(data);
+			logger.info(data.toString());
 		}
 
 		Assert.assertEquals(expectCount, data.size());
@@ -162,7 +160,7 @@ public class MessageInfoStatisTest extends AbstractTest {
 	private void expectDelay(NavigableMap<Long, Long> data, int expectCount, Long expectedData) {
 
 		if (logger.isInfoEnabled()) {
-			logger.info(data);
+			logger.info(data.toString());
 		}
 
 		Assert.assertEquals(expectCount, data.size());

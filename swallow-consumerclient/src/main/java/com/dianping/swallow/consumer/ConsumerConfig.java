@@ -3,8 +3,8 @@ package com.dianping.swallow.consumer;
 import java.util.Date;
 
 import org.bson.types.BSONTimestamp;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;

@@ -126,7 +126,9 @@ public class LogFilter implements Filter {
         log.setResult(result);
         log.setIp(ip);
 
-        logger.info(log.toString());
+        if (logger.isInfoEnabled()) {
+            logger.info(log.toString());
+        }
 
     }
 
