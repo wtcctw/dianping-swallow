@@ -15,6 +15,7 @@
  */
 package com.dianping.swallow.producer.impl;
 
+import com.dianping.swallow.common.internal.config.LoggerLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
    
    static{
 	   SwallowHelper.initialize();
+       LoggerLoader.init();
    }
    /**
     * Producer工厂类构造函数

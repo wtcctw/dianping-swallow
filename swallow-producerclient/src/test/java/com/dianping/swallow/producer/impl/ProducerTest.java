@@ -27,6 +27,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.dianping.swallow.producer.Producer;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
@@ -106,6 +110,36 @@ public class ProducerTest {
 
       when(exceptionRemoteService.sendMessage((Packet) anyObject())).thenThrow(new ServerDaoException(null));
 
+   }
+
+   @Test
+   public void testLog4j2(){
+
+      final Logger logger = LoggerFactory.getLogger(ProducerFactoryImpl.class);
+
+      ProducerConfig config = new ProducerConfig();
+      // 以下设置的值与默认配置一致，可以省略
+      config.setMode(ProducerMode.SYNC_MODE);
+      config.setSyncRetryTimes(0);
+      config.setZipped(false);
+      config.setThreadPoolSize(5);
+      config.setSendMsgLeftLastSession(false);
+      Producer p = null;
+      try {
+         p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
+      } catch (RemoteServiceInitFailedException e) {
+         e.printStackTrace();
+      }
+      for (int i = 0; i < 10; i++) {
+         String msg = "消息-" + i;
+         try{
+            p.sendMessage(msg);
+            logger.info("Sended msg:" + msg);
+            System.out.println("Sended msg:" + msg);
+         }catch(SendFailedException e){
+            System.out.println("Catch exception then do what you want to do.");
+         }
+      }
    }
 
    @Test
