@@ -109,8 +109,15 @@ public class LogFilter implements Filter {
             HttpServletRequest req = (HttpServletRequest) request;
             @SuppressWarnings("unchecked")
             Map<String, String[]> param = req.getParameterMap();
+            StringBuilder stringBuilder = new StringBuilder();
             if (param != null) {
-                requestContent = param.toString();
+                for (Map.Entry<String, String[]> entry : param.entrySet()) {
+                    stringBuilder.append(entry.getKey());
+                    stringBuilder.append(" : ");
+                    stringBuilder.append(entry.getValue()[0]);
+                    stringBuilder.append(" ");
+                }
+                requestContent = stringBuilder.toString();
             }
         }
         log.setParameter(requestContent);
@@ -133,9 +140,14 @@ public class LogFilter implements Filter {
             if (uri.contains(end)) {
                 int start = uri.indexOf(end);
                 if (start != 0) {
-                    if (uri.charAt(start - 1) == '/'){
-                        if(start + end.length() == uri.length() || uri.charAt(start + end.length()) == '/'){
+                    if (uri.charAt(start - 1) == '/') {
+                        if (start + end.length() == uri.length()) {
                             return true;
+                        } else {
+                            char c = uri.charAt(start + end.length());
+                            if (c == '/' || c == '?') {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -162,27 +174,5 @@ public class LogFilter implements Filter {
     public void setExtractUsernameUtils(UserUtils extractUsernameUtils) {
         this.extractUsernameUtils = extractUsernameUtils;
     }
-
-    public static void main(String[] args) {
-        Set<String> set = new HashSet<String>();
-        set.add("create");
-        set.add("update");
-        set.add("api");
-        String uri1 = "consumer/update";
-        String uri = "consumer/update/alarm";
-        for (String end : set) {
-            if (uri.contains(end)) {
-                int start = uri.indexOf(end);
-                if (start != 0) {
-                    if (uri.charAt(start - 1) == '/'){
-                        if(start + end.length() == uri.length() || uri.charAt(start + end.length()) == '/'){
-                            System.out.println("Yes");;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 
 }
