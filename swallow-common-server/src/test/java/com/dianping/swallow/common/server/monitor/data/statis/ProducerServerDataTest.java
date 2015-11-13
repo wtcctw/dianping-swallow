@@ -1,9 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.dianping.swallow.common.server.monitor.data.Statisable;
@@ -19,171 +17,235 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 
 /**
  * @author mengwenchao
- *
+ *         <p/>
  *         2015年5月21日 上午10:40:57
  */
 public class ProducerServerDataTest extends AbstractServerDataTest {
 
-	private ProducerAllData producerAllData;
+    private ProducerAllData producerAllData;
 
-	@Before
-	public void beforeProducerServerDataTest() {
 
-		producerAllData = new ProducerAllData();
-		prepareData(producerAllData);
-		producerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
-	}
+    private void prepareResource() {
+        List<String> topicList = new ArrayList<String>();
+        List<String> ipList = new ArrayList<String>();
+        for (int i = 0; i < 6; i++) {
+            ipList.add("127.0.0." + i);
+        }
+        for (int i = 0; i < 300; i++) {
+            topicList.add("topic" + i);
+        }
+        ips = ipList.toArray(new String[ipList.size()]);
+        topics = topicList.toArray(new String[topicList.size()]);
+        startKey = 0L;
+        endKey = 2160L;
+    }
 
-	@Test
-	public void testRetriever() {
+    @Before
+    public void beforeProducerServerDataTest() {
+        prepareResource();
+        producerAllData = new ProducerAllData();
+        prepareData(producerAllData);
+        producerAllData.build(QPX.SECOND, startKey, endKey, intervalCount);
+    }
 
-		String server = ips[0];
-		String topic = topics[0];
-		String ip = ips[0];
+    @Test
+    public void testRetriever() {
 
-		System.out.println(producerAllData.getKeys(new CasKeys(server, topic)));
-		System.out.println(producerAllData.getKeys(new CasKeys("total", topic)));
-		NavigableMap<Long, Statisable.QpxData> res1 = producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE);
-		NavigableMap<Long, Statisable.QpxData> res2= producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SEND);
-		System.out.println(producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE));
+        String server = ips[0];
+        String topic = topics[0];
+        String ip = ips[0];
 
-	}
+        System.out.println(producerAllData.getKeys(new CasKeys(server, topic)));
+        System.out.println(producerAllData.getKeys(new CasKeys("total", topic)));
+        NavigableMap<Long, Statisable.QpxData> res1 = producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE);
+        NavigableMap<Long, Statisable.QpxData> res2 = producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SEND);
+        System.out.println(producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE));
 
-	@Test
-	public void testGetAllDelay() {
+    }
 
-		//test merge and getDelayForTopic
-		String topic = topics[0];
-		NavigableMap<Long, Long> result = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
-		NavigableMap<Long, Long> value1 = producerAllData.getDelayValue(new CasKeys("total", topic), StatisType.SAVE);
-		Assert.assertEquals(result, value1);
-		NavigableMap<Long, Long> result2 = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
-		//not change origin data
-		Assert.assertEquals(result, result2);
+    @Test
+    public void testGetValueData() {
 
-	}
+        String server = ips[0];
+        String topic = topics[0];
+        String ip = ips[0];
 
-	@Test
-	public void testGetAllQps() {
+        System.out.println(producerAllData.getKeys(new CasKeys(server, topic)));
+        System.out.println(producerAllData.getKeys(new CasKeys("total", topic)));
+        System.out.println(producerAllData.getKeys(new CasKeys("total")));
 
-		//test merge and getQpxForTopic
-		String topic = topics[0];
-		NavigableMap<Long, Statisable.QpxData> result1 = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
-		NavigableMap<Long, Statisable.QpxData> result2 = producerAllData.getQpsValue(new CasKeys("total", topic), StatisType.SAVE);
-		Assert.assertEquals(result1.size(), result2.size());
-		for(Map.Entry<Long, Statisable.QpxData> entry : result1.entrySet()){
-			Long key = entry.getKey();
-			Statisable.QpxData value1 = entry.getValue();
-			Statisable.QpxData value2 = result2.get(key);
-			Assert.assertEquals(value1.getQpx(), value2.getQpx());
-			Assert.assertEquals(value1.getTotal(), value2.getTotal());
-		}
-		//not change origin data
-		NavigableMap<Long, Statisable.QpxData> result3 = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
-		for(Map.Entry<Long, Statisable.QpxData> entry : result1.entrySet()){
-			Long key = entry.getKey();
-			Statisable.QpxData value1 = entry.getValue();
-			Statisable.QpxData value3 = result3.get(key);
-			Assert.assertEquals(value1.getQpx(), value3.getQpx());
-			Assert.assertEquals(value1.getTotal(), value3.getTotal());
-		}
-	}
+        long startTimeMillis = System.currentTimeMillis();
+        NavigableMap<Long, Statisable.QpxData> resQps = producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE);
+        long endTimeMillis = System.currentTimeMillis();
+        System.out.println("timeSpan:" + (endTimeMillis - startTimeMillis));
+        System.out.println(resQps.size());
 
-	@Test
-	public void testProducerServerData() {
+        startTimeMillis = System.currentTimeMillis();
+        NavigableMap<Long, Long> resDelay = producerAllData.getDelayValue(new CasKeys("total", topic, ip), StatisType.SAVE);
+        endTimeMillis = System.currentTimeMillis();
+        System.out.println("timeSpan:" + (endTimeMillis - startTimeMillis));
+        System.out.println(resDelay.size());
 
-		int totalCount = (int) ((endKey - startKey) / intervalCount);
-		for (String topic : topics) {
+        startTimeMillis = System.currentTimeMillis();
+        for (String topic1 : topics) {
+            for (String ip1 : ips) {
+                NavigableMap<Long, Statisable.QpxData> qps = producerAllData.getQpsValue(new CasKeys("total", topic1, ip1), StatisType.SAVE);
+            }
+        }
 
-			NavigableMap<Long, Long> saveDelay = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
-			NavigableMap<Long, QpxData> saveQpx = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
+        endTimeMillis = System.currentTimeMillis();
+        System.out.println("timeSpan:" + (endTimeMillis - startTimeMillis));
+        startTimeMillis = System.currentTimeMillis();
+        for (String topic1 : topics) {
+            for (String ip1 : ips) {
+                NavigableMap<Long, Long> delay = producerAllData.getDelayValue(new CasKeys("total", topic1, ip1), StatisType.SAVE);
+            }
+        }
 
-			expectedDelay(saveDelay, totalCount, avergeDelay);
-			expectedQpx(saveQpx, totalCount, qpsPerUnit * ips.length, qpsPerUnit * ips.length
-					* AbstractCollector.SEND_INTERVAL * intervalCount);
-		}
+        endTimeMillis = System.currentTimeMillis();
+        System.out.println("timeSpan:" + (endTimeMillis - startTimeMillis));
+        NavigableMap<Long, Statisable.QpxData> res2 = producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SEND);
 
-		for (Entry<String, NavigableMap<Long, QpxData>> entry : producerAllData.getQpxForServers(StatisType.SAVE)
-				.entrySet()) {
+        System.out.println(producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE));
 
-			String ip = entry.getKey();
-			NavigableMap<Long, QpxData> value = entry.getValue();
+    }
 
-			if (logger.isInfoEnabled()) {
-				logger.info("[testProducerServerData]" + ip + "," + value);
-			}
-			expectedQpx(entry.getValue(), totalCount, qpsPerUnit * topics.length, qpsPerUnit * topics.length
-					* AbstractCollector.SEND_INTERVAL * intervalCount);
-		}
+    @Test
+    public void testGetAllDelay() {
 
-	}
+        //test merge and getDelayForTopic
+        String topic = topics[0];
+        NavigableMap<Long, Long> result = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
+        NavigableMap<Long, Long> value1 = producerAllData.getDelayValue(new CasKeys("total", topic), StatisType.SAVE);
+        Assert.assertEquals(result, value1);
+        NavigableMap<Long, Long> result2 = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
+        //not change origin data
+        Assert.assertEquals(result, result2);
 
-	/**
-	 * @param saveDelay
-	 * @param totalCount
-	 * @param avergeDelay2
-	 */
-	protected void expectedQpx(NavigableMap<Long, QpxData> data, int totalCount, Long resultQpx, Long resultTotal) {
+    }
 
-		Assert.assertEquals(totalCount, data.size());
-		for (QpxData value : data.values()) {
+    @Test
+    public void testGetAllQps() {
 
-			Assert.assertEquals(resultQpx, value.getQpx());
-			Assert.assertEquals(resultTotal, value.getTotal());
-		}
+        //test merge and getQpxForTopic
+        String topic = topics[0];
+        NavigableMap<Long, Statisable.QpxData> result1 = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
+        NavigableMap<Long, Statisable.QpxData> result2 = producerAllData.getQpsValue(new CasKeys("total", topic), StatisType.SAVE);
+        Assert.assertEquals(result1.size(), result2.size());
+        for (Map.Entry<Long, Statisable.QpxData> entry : result1.entrySet()) {
+            Long key = entry.getKey();
+            Statisable.QpxData value1 = entry.getValue();
+            Statisable.QpxData value2 = result2.get(key);
+            Assert.assertEquals(value1.getQpx(), value2.getQpx());
+            Assert.assertEquals(value1.getTotal(), value2.getTotal());
+        }
+        //not change origin data
+        NavigableMap<Long, Statisable.QpxData> result3 = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
+        for (Map.Entry<Long, Statisable.QpxData> entry : result1.entrySet()) {
+            Long key = entry.getKey();
+            Statisable.QpxData value1 = entry.getValue();
+            Statisable.QpxData value3 = result3.get(key);
+            Assert.assertEquals(value1.getQpx(), value3.getQpx());
+            Assert.assertEquals(value1.getTotal(), value3.getTotal());
+        }
+    }
 
-	}
+    @Test
+    public void testProducerServerData() {
 
-	/**
-	 * @param saveDelay
-	 * @param totalCount
-	 * @param avergeDelay2
-	 */
-	protected void expectedDelay(NavigableMap<Long, Long> data, int totalCount, Long result) {
+        int totalCount = (int) ((endKey - startKey) / intervalCount);
+        for (String topic : topics) {
 
-		Assert.assertEquals(totalCount, data.size());
-		for (Long value : data.values()) {
+            NavigableMap<Long, Long> saveDelay = producerAllData.getDelayForTopic(topic, StatisType.SAVE);
+            NavigableMap<Long, QpxData> saveQpx = producerAllData.getQpxForTopic(topic, StatisType.SAVE);
 
-			Assert.assertEquals(result, value);
-		}
+            expectedDelay(saveDelay, totalCount, avergeDelay);
+            expectedQpx(saveQpx, totalCount, qpsPerUnit * ips.length, qpsPerUnit * ips.length
+                    * AbstractCollector.SEND_INTERVAL * intervalCount);
+        }
 
-	}
+        for (Entry<String, NavigableMap<Long, QpxData>> entry : producerAllData.getQpxForServers(StatisType.SAVE)
+                .entrySet()) {
 
-	public void prepareData(ProducerAllData producerAllData) {
+            String ip = entry.getKey();
+            NavigableMap<Long, QpxData> value = entry.getValue();
 
-		for (String ip : ips) {
+            if (logger.isInfoEnabled()) {
+                logger.info("[testProducerServerData]" + ip + "," + value);
+            }
+            expectedQpx(entry.getValue(), totalCount, qpsPerUnit * topics.length, qpsPerUnit * topics.length
+                    * AbstractCollector.SEND_INTERVAL * intervalCount);
+        }
 
-			ProducerMonitorData producerMonitorData = new ProducerMonitorData();
-			producerMonitorData.setSwallowServerIp(ip);
+    }
 
-			for (Long i = startKey; i <= endKey; i++) {
+    /**
+     * @param saveDelay
+     * @param totalCount
+     * @param avergeDelay2
+     */
+    protected void expectedQpx(NavigableMap<Long, QpxData> data, int totalCount, Long resultQpx, Long resultTotal) {
 
-				producerMonitorData.setCurrentTime(i * AbstractCollector.SEND_INTERVAL * 1000);
-				sendData(producerMonitorData, i, ip);
-				producerMonitorData.buildTotal();
+        Assert.assertEquals(totalCount, data.size());
+        for (QpxData value : data.values()) {
 
-				try {
-					producerAllData
-							.add(producerMonitorData.getKey(), (ProducerMonitorData) producerMonitorData.clone());
-				} catch (CloneNotSupportedException e) {
-					logger.error("[prepareData]", e);
-				}
-			}
+            Assert.assertEquals(resultQpx, value.getQpx());
+            Assert.assertEquals(resultTotal, value.getTotal());
+        }
 
-		}
+    }
 
-	}
+    /**
+     * @param saveDelay
+     * @param totalCount
+     * @param avergeDelay2
+     */
+    protected void expectedDelay(NavigableMap<Long, Long> data, int totalCount, Long result) {
 
-	private ProducerMonitorData sendData(ProducerMonitorData producerMonitorData, Long key, String ip) {
+        Assert.assertEquals(totalCount, data.size());
+        for (Long value : data.values()) {
 
-		for (String topic : topics) {
+            Assert.assertEquals(result, value);
+        }
 
-			for (int i = 0; i < qpsPerUnit * AbstractCollector.SEND_INTERVAL; i++) {
-				Long current = System.currentTimeMillis();
-				producerMonitorData.addData(topic, ip, System.currentTimeMillis(), current - avergeDelay, current);
-			}
-		}
+    }
 
-		return producerMonitorData;
-	}
+    public void prepareData(ProducerAllData producerAllData) {
+
+        for (String ip : ips) {
+
+            ProducerMonitorData producerMonitorData = new ProducerMonitorData();
+            producerMonitorData.setSwallowServerIp(ip);
+
+            for (Long i = startKey; i <= endKey; i++) {
+
+                producerMonitorData.setCurrentTime(i * AbstractCollector.SEND_INTERVAL * 1000);
+                sendData(producerMonitorData);
+                producerMonitorData.buildTotal();
+
+                try {
+                    producerAllData
+                            .add(producerMonitorData.getKey(), (ProducerMonitorData) producerMonitorData.clone());
+                } catch (CloneNotSupportedException e) {
+                    logger.error("[prepareData]", e);
+                }
+            }
+
+        }
+
+    }
+
+    private ProducerMonitorData sendData(ProducerMonitorData producerMonitorData) {
+
+        for (String topic : topics) {
+            for (String ip : ips) {
+                for (int i = 0; i <  AbstractCollector.SEND_INTERVAL; i++) {
+                    Long current = System.currentTimeMillis();
+                    producerMonitorData.addData(topic, ip, System.currentTimeMillis(), current - avergeDelay, current);
+                }
+            }
+        }
+
+        return producerMonitorData;
+    }
 }
