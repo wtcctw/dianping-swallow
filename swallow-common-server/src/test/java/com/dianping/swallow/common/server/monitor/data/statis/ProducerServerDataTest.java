@@ -107,6 +107,7 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
         NavigableMap<Long, Statisable.QpxData> res2 = producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SEND);
 
         System.out.println(producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE));
+    }
 
     public void testGetDelayValue() {
         final String topic = topics[0];
@@ -245,9 +246,10 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
     }
 
     /**
-     * @param saveDelay
+     * @param data
      * @param totalCount
-     * @param avergeDelay2
+     * @param resultQpx
+     * @param resultTotal
      */
     protected void expectedQpx(NavigableMap<Long, QpxData> data, int totalCount, Long resultQpx, Long resultTotal) {
 
@@ -261,9 +263,9 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
     }
 
     /**
-     * @param saveDelay
+     * @param data
      * @param totalCount
-     * @param avergeDelay2
+     * @param result
      */
     protected void expectedDelay(NavigableMap<Long, Long> data, int totalCount, Long result) {
 
@@ -305,7 +307,7 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
 
         for (String topic : topics) {
             for (String ip : ips) {
-                for (int i = 0; i <  AbstractCollector.SEND_INTERVAL; i++) {
+                for (int i = 0; i < AbstractCollector.SEND_INTERVAL; i++) {
                     Long current = System.currentTimeMillis();
                     producerMonitorData.addData(topic, ip, System.currentTimeMillis(), current - avergeDelay, current);
                 }
