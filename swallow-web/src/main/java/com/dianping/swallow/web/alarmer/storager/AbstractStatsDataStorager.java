@@ -2,8 +2,8 @@ package com.dianping.swallow.web.alarmer.storager;
 
 import java.util.concurrent.Future;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.common.internal.action.SwallowAction;

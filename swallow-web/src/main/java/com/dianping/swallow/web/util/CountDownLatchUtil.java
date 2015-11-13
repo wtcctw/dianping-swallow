@@ -2,8 +2,8 @@ package com.dianping.swallow.web.util;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 /**
  * 
  * @author qiyin

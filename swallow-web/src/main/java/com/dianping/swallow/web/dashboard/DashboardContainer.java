@@ -2,8 +2,8 @@ package com.dianping.swallow.web.dashboard;
 
 import com.dianping.swallow.web.dashboard.model.MinuteEntry;
 import com.dianping.swallow.web.service.MinuteEntryService;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

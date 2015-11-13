@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
@@ -21,7 +22,7 @@ import com.dianping.swallow.consumer.internal.ConsumerImpl;
 
 public final class ConsumerFactoryImpl implements ConsumerFactory {
 
-	private Logger logger = Logger.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static final String LION_CONFIG_FILENAME = "swallow-consumerclient-lion.properties";
 

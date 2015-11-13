@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;

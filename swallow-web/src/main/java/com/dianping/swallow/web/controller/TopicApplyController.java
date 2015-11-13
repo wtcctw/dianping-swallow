@@ -18,8 +18,8 @@ import com.dianping.swallow.web.controller.handler.lion.TopicWhiteListLionHandle
 import com.dianping.swallow.web.controller.handler.result.LionConfigureResult;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;

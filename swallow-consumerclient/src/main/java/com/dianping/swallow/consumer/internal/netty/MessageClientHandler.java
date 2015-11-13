@@ -7,8 +7,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.nio.channels.ClosedChannelException;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;

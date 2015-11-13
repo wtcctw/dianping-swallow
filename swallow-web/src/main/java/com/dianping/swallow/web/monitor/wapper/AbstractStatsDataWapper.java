@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.monitor.wapper;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 

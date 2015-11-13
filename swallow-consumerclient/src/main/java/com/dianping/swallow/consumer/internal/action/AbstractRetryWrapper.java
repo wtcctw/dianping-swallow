@@ -1,7 +1,7 @@
 package com.dianping.swallow.consumer.internal.action;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.internal.action.SwallowAction;

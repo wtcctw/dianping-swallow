@@ -12,8 +12,8 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.BSONTimestamp;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;

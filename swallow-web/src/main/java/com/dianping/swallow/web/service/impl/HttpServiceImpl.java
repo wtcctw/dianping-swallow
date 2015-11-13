@@ -36,8 +36,8 @@ import org.apache.http.util.EntityUtils;
 import org.apache.http.util.VersionInfo;
 import org.codehaus.jettison.json.JSONObject;
 import org.mortbay.jetty.HttpStatus;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.common.internal.util.CommonUtils;
