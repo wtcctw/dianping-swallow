@@ -2,7 +2,7 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CountDownLatch;
 
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import org.junit.Assert;
@@ -108,6 +108,71 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
 
         System.out.println(producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE));
 
+    public void testGetDelayValue() {
+        final String topic = topics[0];
+        Set<String> ipSet = producerAllData.getKeys(new CasKeys("total", topic));
+        CountDownLatch begSignal = new CountDownLatch(1);
+        CountDownLatch endSignal = new CountDownLatch(5);
+
+        for (final String ip : ipSet) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NavigableMap<Long, Long> value1 = producerAllData.getDelayValue(new CasKeys("total", topic, ip), StatisType.SAVE);
+                    printOutMap(value1);
+                }
+            }).start();
+        }
+
+        try {
+            begSignal.countDown();
+            endSignal.await();
+            System.out.println("运行结束");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void testGetQpsValue() {
+        final String topic = topics[0];
+        Set<String> ipSet = producerAllData.getKeys(new CasKeys("total", topic));
+        CountDownLatch begSignal = new CountDownLatch(1);
+        CountDownLatch endSignal = new CountDownLatch(5);
+
+        for (final String ip : ipSet) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    NavigableMap<Long, Statisable.QpxData> value1 = producerAllData.getQpsValue(new CasKeys("total", topic, ip), StatisType.SAVE);
+                    printOutMerge(value1);
+                }
+            }).start();
+        }
+
+        try {
+            begSignal.countDown();
+            endSignal.await();
+            System.out.println("运行结束");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void printOutMap(NavigableMap<Long, Long> value) {
+        for (Map.Entry<Long, Long> entry : value.entrySet()) {
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        }
+        System.out.println();
+    }
+
+    private void printOutMerge(NavigableMap<Long, Statisable.QpxData> value) {
+        for (Map.Entry<Long, Statisable.QpxData> entry : value.entrySet()) {
+            System.out.println(entry.getKey() + " -> " + entry.getValue().getQpx());
+        }
+        System.out.println();
     }
 
     @Test
@@ -220,7 +285,9 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
             for (Long i = startKey; i <= endKey; i++) {
 
                 producerMonitorData.setCurrentTime(i * AbstractCollector.SEND_INTERVAL * 1000);
+
                 sendData(producerMonitorData);
+
                 producerMonitorData.buildTotal();
 
                 try {
@@ -232,7 +299,6 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
             }
 
         }
-
     }
 
     private ProducerMonitorData sendData(ProducerMonitorData producerMonitorData) {
@@ -245,7 +311,6 @@ public class ProducerServerDataTest extends AbstractServerDataTest {
                 }
             }
         }
-
         return producerMonitorData;
     }
 }
