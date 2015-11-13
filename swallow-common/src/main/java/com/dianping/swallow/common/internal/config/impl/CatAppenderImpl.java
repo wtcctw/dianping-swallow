@@ -26,7 +26,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-@Plugin(name = "MyCustomAppender", category = "Core", elementType = "appender", printObject = true)
+@Plugin(name = "CatAppender", category = "Core", elementType = "appender", printObject = true)
 public class CatAppenderImpl extends AbstractAppender {
 
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -63,6 +63,7 @@ public class CatAppenderImpl extends AbstractAppender {
     }
 
     private void logTrace(LogEvent event) {
+
         String type = "Log4j2";
         String name = event.getLevel().toString();
         Object message = event.getMessage();
@@ -100,8 +101,6 @@ public class CatAppenderImpl extends AbstractAppender {
         } finally {
             readLock.unlock();
         }
-
-
     }
 
     @PluginFactory

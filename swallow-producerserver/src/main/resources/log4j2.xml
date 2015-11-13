@@ -20,7 +20,7 @@
         <root level="INFO">
             <AppenderRef ref="console"/>
             <AppenderRef ref="fileAppender"/>
-            <AppenderRef ref="catAppender"/>
+            <!--<AppenderRef ref="catAppender"/>-->
         </root>
     </Loggers>
 </Configuration>
