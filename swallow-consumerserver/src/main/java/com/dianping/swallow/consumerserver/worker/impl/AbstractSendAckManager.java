@@ -65,7 +65,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 		messageQueue = createMessageQueue(swallowBuffer, idOfTailMessage);
 		
 		if (logger.isInfoEnabled()) {
-			logger.info("[doInitialize]" + idOfTailMessage);
+			logger.info("[doInitialize][tailMessageId]" + idOfTailMessage);
 		}
 	}
 	
@@ -313,6 +313,6 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 	@Override
 	public String toString() {
 		
-		return consumerInfo.toString();
+		return getClass().getSimpleName() + ":" + consumerInfo.toString();
 	}
 }
