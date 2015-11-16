@@ -70,4 +70,12 @@ public abstract class AbstractMessageDao<T extends Cluster> extends AbstractDao<
 		cleanAck(topicName, consumerId, false);
 	}
 
+	protected Long getOriginalMessageId(SwallowMessage message) {
+
+		if(message.getBackupMessageId() != null){
+			return message.getBackupMessageId();
+		}
+		
+		return message.getMessageId();
+	}
 }

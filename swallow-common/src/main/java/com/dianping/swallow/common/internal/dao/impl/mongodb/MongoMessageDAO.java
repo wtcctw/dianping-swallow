@@ -208,7 +208,7 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 		BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
 		// 如果有backupMessageId，则表示是备份消息，那么messageId则作为ORIGINAL_ID存起来
 		if (consumerId != null) {
-			builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(message.getMessageId()));
+			builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(getOriginalMessageId(message)));
 		}
 		// content
 		String content = message.getContent();

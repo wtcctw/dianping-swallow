@@ -11,10 +11,11 @@ import java.util.Map;
 public interface Message {
 
    /**
-    * 获取消息id
+    * 获取消息id。注意：Swallow系统内部使用，业务方不要把此id作为消息唯一性的判断标准
     * 
     * @return 消息id
     */
+	@Deprecated
    Long getMessageId();
 
    /**

@@ -8,14 +8,13 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.dianping.cat.message.Message;
-import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.consumer.ConsumerType;
+import com.dianping.swallow.common.internal.action.SwallowAction;
+import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
+import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.observer.Observable;
@@ -30,8 +29,6 @@ import com.dianping.swallow.consumerserver.worker.SendAckManager;
  *         2015年11月12日 下午5:07:26
  */
 public abstract class AbstractSendAckManager extends AbstractLifecycle implements SendAckManager {
-
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final long WAIT_ACK_EXPIRED = ConfigManager.getInstance().getWaitAckExpiredSecond() * 1000;
 
@@ -122,6 +119,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 	@Override
 	public void exceptionWhileSending(ConsumerMessage consumerMessage, Throwable th) {
 		
+		backupMessage(consumerMessage, "exception" + th.getMessage());
 	}
 
 	@Override
@@ -165,13 +163,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 			ConsumerMessage consumerMessage = entry.getValue();
 			
 			if (consumerMessage.getChannel().equals(channel)) {
-				
-				if (this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-					
-					backupMessage(consumerMessage);
-					
-					catTraceForBackupRecord(consumerMessage.getMessage());
-				}
+				backupMessage(consumerMessage, "channel removed:" + channel);
 			}
 			it.remove();
 		}
@@ -235,10 +227,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
 			if (overdue && (minWaitAckMessage = waitAckMessages0.remove(minAckId)) != null) {
 				if (minWaitAckMessage != null) {
-					
-					backupMessage(minWaitAckMessage);
-					
-					catTraceForBackupRecord(minWaitAckMessage.getMessage());
+					backupMessage(minWaitAckMessage, "ack timeout");
 				}
 			} else {// 没有移除任何空洞，则不再迭代；否则需要继续迭代以尽量多地移除空洞。
 				break;
@@ -262,10 +251,22 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 	}
 
 	
-	private void backupMessage(ConsumerMessage consumerMessage) {
+	private void backupMessage(final ConsumerMessage consumerMessage, String reason) {
 		
 		if(this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
-			messageDao.saveMessage(this.consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), consumerMessage.getMessage());
+			
+			String desc = String.format("[%d][%s]", isBackcup() ? 1 : 0, reason);
+			
+			SwallowActionWrapper actionWrapper = new CatActionWrapper("Backup:" + consumerInfo.getDest().getName(), desc + consumerInfo.getConsumerId());
+			
+			actionWrapper.doAction(new SwallowAction() {
+				
+				@Override
+				public void doAction() throws SwallowException {
+					
+					messageDao.saveMessage(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), consumerMessage.getMessage());
+				}
+			});
 		}
 	}
 
@@ -301,21 +302,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
 	protected abstract boolean isBackcup();
 
-	protected void catTraceForBackupRecord(SwallowMessage message) {
-
-		Transaction transaction = createBakupTranaction();
-		if (message != null) {
-			transaction.addData("mid", message.getMessageId() + "," + message.getBackupMessageId());
-		}
-		transaction.setStatus(Message.SUCCESS);
-		transaction.complete();
-	}
-
-	protected abstract Transaction createBakupTranaction();
-
 	protected abstract CloseableBlockingQueue<SwallowMessage> createMessageQueue(SwallowBuffer swallowBuffer, long messageIdOfTailMessage);
-	
-
 	
 	@Override
 	public void update(Observable observable, Object args) {

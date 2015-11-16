@@ -40,13 +40,6 @@ public class BackupSendAckManager extends AbstractSendAckManager{
 	}
 
 	@Override
-	protected Transaction createBakupTranaction() {
-		
-		return Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
-				"In-Again:" + consumerInfo.getConsumerId());
-	}
-
-	@Override
 	protected boolean isBackcup() {
 		return true;
 	}

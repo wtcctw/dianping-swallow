@@ -43,13 +43,6 @@ public class NormalSendAckManager extends AbstractSendAckManager{
 	}
 
 	@Override
-	protected Transaction createBakupTranaction() {
-		
-		return Cat.getProducer().newTransaction("Backup:" + consumerInfo.getDest().getName(),
-				"In:" + consumerInfo.getConsumerId());
-	}
-
-	@Override
 	protected boolean isBackcup() {
 		return false;
 	}
