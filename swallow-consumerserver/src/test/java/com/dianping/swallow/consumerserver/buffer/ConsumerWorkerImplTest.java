@@ -238,7 +238,7 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
         }
 
 		@Override
-		public Long getEmptyTailMessageId(boolean isBackup) {
+		public Long getEmptyTailMessageId() {
 			return null;
 		}
 

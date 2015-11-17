@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
-import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoConfig;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.mongodb.BasicDBObject;

@@ -279,7 +279,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 	 */
 	private Long getQueueEmptyMaxId(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages) {
 
-		Long tailMessageId = messageQueue.getEmptyTailMessageId(isBackcup());
+		Long tailMessageId = messageQueue.getEmptyTailMessageId();
 		
 		if(messageToSend.get() > 0 || !waitAckMessages.isEmpty()){
 			return 0L;

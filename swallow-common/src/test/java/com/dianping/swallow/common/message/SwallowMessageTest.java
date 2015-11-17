@@ -6,10 +6,51 @@ import java.util.HashMap;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 public class SwallowMessageTest {
 
+	
+	
+	@Test
+	public void testEfficiency(){
+		
+		int count = 1000000;
+		
+		JsonBinder binder = JsonBinder.getNonEmptyBinder();
+		
+		Long begin =   System.currentTimeMillis();
+		
+		for(int i=0;i < count; i++){
+			
+			SwallowMessage message = createMessage();
+			String json = binder.toJson(message);
+			SwallowMessage newMessage = binder.fromJson(json, SwallowMessage.class);
+		}
+		
+		Long end = System.currentTimeMillis();
+		
+		System.out.println("Total:" + (end - begin) + ", average(/ms):" + count/(end - begin));
+	}
+
+	
+	@Test
+	public void testJson(){
+		
+		
+		JsonBinder binder = JsonBinder.getNonEmptyBinder();
+		
+		
+		SwallowMessage message = createMessage();
+		String json = binder.toJson(message);
+		
+		System.out.println(json);
+		SwallowMessage newMessage = binder.fromJson(json, SwallowMessage.class);
+		
+		Assert.assertEquals(message, newMessage);
+	}
+	
     @Test
     public void testTransferContentToBean() throws Exception {
         //自定义bean

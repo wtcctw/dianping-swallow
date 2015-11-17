@@ -16,7 +16,7 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.AbstractCluster;
 import com.dianping.swallow.common.internal.dao.impl.kafka.serialization.SwallowMessageSerializer;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
-import com.dianping.swallow.kafka.zk.ZkUtils;
+import com.dianping.swallow.kafka.zookeeper.ZkUtils;
 
 /**
  * 

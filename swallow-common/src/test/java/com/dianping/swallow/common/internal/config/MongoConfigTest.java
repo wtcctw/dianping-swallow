@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.AbstractTest;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoConfig;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClientOptions;

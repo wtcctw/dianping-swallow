@@ -158,6 +158,7 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 			if(result){
 				increaseMessageCount();
 			}else{
+				//TODO
 				logger.warn("[putMessage][fail]");
 			}
 			if (logger.isDebugEnabled()) {
@@ -172,13 +173,15 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	}
 
 	public void setTailMessageId(Long tailMessageId) {
+		
 		synchronized (getTailMessageIdLock) {
+			
 			this.tailMessageId = tailMessageId;
 		}
 	}
 
 	@Override
-	public Long getEmptyTailMessageId(boolean isBackup) {
+	public Long getEmptyTailMessageId() {
 
 		synchronized (getTailMessageIdLock) {
 			

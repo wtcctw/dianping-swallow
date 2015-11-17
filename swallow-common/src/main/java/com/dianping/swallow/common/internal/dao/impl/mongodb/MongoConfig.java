@@ -1,8 +1,9 @@
-package com.dianping.swallow.common.internal.config;
+package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import com.dianping.swallow.common.internal.config.AbstractLionConfig;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;

@@ -14,6 +14,8 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  * 2015年11月1日 下午3:52:25
  */
 public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
+	
+	protected static final String DEFAULT_BACKUP_TOPIC = "SWALLOW_BACKUP";
 
 	private static final long serialVersionUID = 1L;
 
@@ -25,12 +27,14 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 	@Override
 	protected void doSaveMessage(String topicName, String consumerId, SwallowMessage message) {
 		
-		if(consumerId != null){
-			throw new IllegalArgumentException("consumerId != null, currently not supported!!");
-		}
-		
 		try {
-			KafkaProducer<String, SwallowMessage>  producer = cluster.getProducer(topicName);
+			KafkaProducer<String, SwallowMessage>  producer = null;
+			
+			if(consumerId != null){
+				 producer = cluster.getProducer(DEFAULT_BACKUP_TOPIC);
+			}else{
+				producer = cluster.getProducer(topicName);
+			}
 			ProducerRecord<String, SwallowMessage>  record = new ProducerRecord<String, SwallowMessage>(topicName, message);
 			producer.send(record).get();
 		} catch (Exception e) {
@@ -40,12 +44,12 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 
 	@Override
 	public void retransmitMessage(String topicName, SwallowMessage message) {
-		
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public SwallowMessage getMessage(String topicName, Long messageId) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

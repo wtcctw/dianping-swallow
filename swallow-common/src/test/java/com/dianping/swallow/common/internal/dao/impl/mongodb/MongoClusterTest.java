@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;

@@ -29,7 +29,7 @@ public interface CloseableBlockingQueue<E> extends Queue<E>, Observer {
 	 * @param isBackup
 	 * @return
 	 */
-	Long getEmptyTailMessageId(boolean isBackup);
+	Long getEmptyTailMessageId();
 
 
 	void putMessage(List<SwallowMessage> messages);

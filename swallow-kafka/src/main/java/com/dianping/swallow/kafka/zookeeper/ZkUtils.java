@@ -1,4 +1,5 @@
-package com.dianping.swallow.kafka.zk;
+package com.dianping.swallow.kafka.zookeeper;
+
 
 import java.net.InetSocketAddress;
 import java.util.LinkedList;
@@ -8,6 +9,8 @@ import kafka.cluster.Broker;
 import kafka.utils.ZKStringSerializer$;
 
 import org.I0Itec.zkclient.ZkClient;
+
+import com.dianping.swallow.kafka.TopicAndPartition;
 
 import scala.collection.JavaConversions;
 import scala.collection.Seq;
@@ -24,6 +27,8 @@ public class ZkUtils {
 	public static final int DEFAULT_SESSION_TIMEOUT = 5000;
 	
 	private ZkClient zkClient;
+	
+	public static String BACKUP_PATH = "/swallow_backup";
 	
 	public ZkUtils(String zkConnectionString){
 		this(zkConnectionString, DEFAULT_SESSION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
@@ -55,6 +60,28 @@ public class ZkUtils {
 		}
 		
 		return allAddress;
+	}
+	
+	public void saveBackupAck(TopicAndPartition tp, String groupId, Long ack){
+		
+		String path = getPath(tp, groupId);
+		zkClient.createPersistent(path, true);
+		zkClient.writeData(path, String.valueOf(ack));
+		
+	}
+
+	private String getPath(TopicAndPartition tp, String groupId) {
+		
+		return BACKUP_PATH + "/" + groupId + "/" + tp.getTopic() + "/" + tp.getPartition();
+	}
+
+	public Long getBackupAck(TopicAndPartition tp, String groupId){
+		
+		String value = zkClient.readData(getPath(tp, groupId), true);
+		if(value == null){
+			return null;
+		}
+		return Long.parseLong(value);
 	}
 	
 	
