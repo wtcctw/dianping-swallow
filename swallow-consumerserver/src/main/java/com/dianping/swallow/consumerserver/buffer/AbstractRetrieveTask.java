@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.EnvUtil;
-import com.dianping.swallow.consumerserver.buffer.MessageRetriever.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
+import com.dianping.swallow.common.internal.dao.impl.ReturnMessageWrapper;
 
 /**
  * @author mengwenchao

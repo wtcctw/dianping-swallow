@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.bson.types.BSONTimestamp;
 
+import com.dianping.swallow.common.internal.dao.impl.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.MongoUtils;
@@ -97,10 +98,14 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 	}
 
 	@Override
-	public List<SwallowMessage> getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size) {
+	public ReturnMessageWrapper getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size) {
 		DBCollection collection = getCollection(topicName, consumerId);
+		
 		List<SwallowMessage> list = getMessageGreaterThan(messageId, size, collection);
-		return list;
+		int rawMessageSize = list.size();
+		Long maxMessageId = rawMessageSize > 0? list.get(rawMessageSize -1).getMessageId() : -1; 
+		
+		return new ReturnMessageWrapper(list, rawMessageSize, maxMessageId);
 	}
 
 	@Override
@@ -306,9 +311,9 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 	}
 
 	@Override
-	public int count(String topicName, String consumerId) {
+	public int count(String topicName) {
 
-		DBCollection collection = getCollection(topicName, consumerId);
+		DBCollection collection = getCollection(topicName, null);
 		return collection.find().size();
 	}
 

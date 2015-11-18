@@ -13,6 +13,7 @@ import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 /**
  * @author mengwenchao
@@ -30,9 +31,18 @@ public class DefaultClusterManagerTest extends AbstractDbTest{
 		clusterManager = createClusterManager();
 		
 	}
-	
-	
-	
+
+	@Test
+	public void testEquals(){
+		
+		SwallowMessage message1 = createMessage();
+		message1.putInternalProperty("haha", "hahaha");
+		SwallowMessage message2 = createMessage();
+		
+		Assert.assertTrue(equals(message1, message2));
+		Assert.assertFalse(equals(message1, message2, true, true));
+		
+	}
 	
 	@Test
 	public void testCreate() throws ClusterCreateException{
@@ -53,11 +63,6 @@ public class DefaultClusterManagerTest extends AbstractDbTest{
 		
 	}
 	
-	
-	@Override
-	protected String getDbAddress() {
-		return null;
-	}
 	
 	
 

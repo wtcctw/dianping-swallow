@@ -44,7 +44,7 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 		messageDAO.saveMessage(topicName, expectedMessage);
 		// 查询消息是否正确
 		SwallowMessage actualMessage = messageDAO.getMaxMessage(topicName);
-		Assert.assertTrue(expectedMessage.equalsWithoutMessageId(actualMessage));
+		Assert.assertTrue(equals(expectedMessage, actualMessage, false, false));
 	}
 
 
@@ -53,8 +53,8 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 
 		int messageCount = 100;
 
-		Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(topicName, null, 0L, messageCount).size());
-		Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(topicName, consumerId, 0L, messageCount).size());
+		Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(topicName, null, 0L, messageCount).getMessages().size());
+		Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(topicName, consumerId, 0L, messageCount).getMessages().size());
 
 		for (int i = 0; i < messageCount; i++) {
 			if ((i & 1) == 1) {
@@ -64,16 +64,16 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 			}
 		}
 
-		Assert.assertEquals(messageCount / 2, messageDAO.getMessagesGreaterThan(topicName, null, 0L, messageCount)
+		Assert.assertEquals(messageCount / 2, messageDAO.getMessagesGreaterThan(topicName, null, 0L, messageCount).getMessages()
 				.size());
 		Assert.assertEquals(messageCount / 2,
-				messageDAO.getMessagesGreaterThan(topicName, consumerId, 0L, messageCount).size());
+				messageDAO.getMessagesGreaterThan(topicName, consumerId, 0L, messageCount).getMessages().size());
 
 		messageDAO.cleanMessage(topicName, null);
 
-		Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(topicName, null, 0L, messageCount).size());
+		Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(topicName, null, 0L, messageCount).getMessages().size());
 		Assert.assertEquals(messageCount / 2,
-				messageDAO.getMessagesGreaterThan(topicName, consumerId, 0L, messageCount).size());
+				messageDAO.getMessagesGreaterThan(topicName, consumerId, 0L, messageCount).getMessages().size());
 
 		messageDAO.cleanMessage(topicName, consumerId);
 
@@ -82,8 +82,8 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 		}
 
 		Assert.assertEquals(messageCount / 2, messageDAO.getMessagesGreaterThan(topicName, null, 0L, messageCount)
-				.size());
-		Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(topicName, consumerId, 0L, messageCount).size());
+				.getMessages().size());
+		Assert.assertEquals(0, messageDAO.getMessagesGreaterThan(topicName, consumerId, 0L, messageCount).getMessages().size());
 
 	}
 
@@ -96,7 +96,7 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 		// 查询消息是否正确
 		Long maxMessageId = messageDAO.getMaxMessageId(topicName);
 		SwallowMessage actualMessage = messageDAO.getMessage(topicName, maxMessageId);
-		Assert.assertTrue(expectedMessage.equalsWithoutMessageId(actualMessage));
+		Assert.assertTrue(equals(expectedMessage, actualMessage, false, false));
 	}
 
 	@Test(expected = MongoException.class)
@@ -127,11 +127,11 @@ public class MessageDAOImplTest extends AbstractMessageDAOImplTest {
 		
 		sleep(100);
 		// 查询messageId比指定id大的按messageId升序排序的2条消息
-		List<SwallowMessage> messagesGreaterThan = messageDAO.getMessagesGreaterThan(topicName, null, maxMessageId, 5);
+		List<SwallowMessage> messagesGreaterThan = messageDAO.getMessagesGreaterThan(topicName, null, maxMessageId, 5).getMessages();
 		Assert.assertNotNull(messagesGreaterThan);
 		Assert.assertEquals(2, messagesGreaterThan.size());
-		Assert.assertTrue(expectedMessage1.equalsWithoutMessageId(messagesGreaterThan.get(0)));
-		Assert.assertTrue(expectedMessage2.equalsWithoutMessageId(messagesGreaterThan.get(1)));
+		Assert.assertTrue(equals(expectedMessage1, messagesGreaterThan.get(0), false, false));
+		Assert.assertTrue(equals(expectedMessage2, messagesGreaterThan.get(1), false, false));
 	}
 
 }

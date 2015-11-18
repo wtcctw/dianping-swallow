@@ -8,16 +8,19 @@ import java.util.Properties;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import com.dianping.swallow.common.internal.config.TOPIC_TYPE;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.AbstractCluster;
+import com.dianping.swallow.common.internal.dao.impl.kafka.serialization.SwallowMessageDeserializer;
 import com.dianping.swallow.common.internal.dao.impl.kafka.serialization.SwallowMessageSerializer;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.kafka.KafkaConsumer;
+import com.dianping.swallow.kafka.TopicAndPartition;
 import com.dianping.swallow.kafka.consumer.simple.SimpleKafkaConsumer;
 import com.dianping.swallow.kafka.consumer.simple.SlaveKafkaConsumer;
 import com.dianping.swallow.kafka.zookeeper.ZkUtils;
@@ -125,9 +128,24 @@ public class KafkaCluster extends AbstractCluster{
 	}
 	
 	
+	public Deserializer<SwallowMessage> getDeserializer(String topicName){
+		
+		return new SwallowMessageDeserializer();
+	}
+	
 	public KafkaConsumer getConsumer(String topic){
 		
 		return kafkaConsumer;
+	}
+	
+	public void saveBackupAck(TopicAndPartition tp, String groupId, Long ack){
+		
+		zkUtils.saveBackupAck(tp, groupId, ack);
+		
+	}
+
+	public Long getBackupAck(TopicAndPartition tp, String groupId){
+		return zkUtils.getBackupAck(tp, groupId);
 	}
 	
 	

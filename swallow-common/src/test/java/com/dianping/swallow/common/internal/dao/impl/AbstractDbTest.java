@@ -22,6 +22,10 @@ public abstract class AbstractDbTest extends AbstractTest{
 	protected ClusterFactory []factorys = new ClusterFactory[]{new MongoClusterFactory(), new KafkaClusterFactory()};
 	
 	protected Properties serverProperties;
+	
+	private String mongoAddress;
+	
+	private String kafkaAddress;
 
 	@Before
 	public void beforeAbstractDbTest() throws IOException{
@@ -29,9 +33,22 @@ public abstract class AbstractDbTest extends AbstractTest{
 		serverProperties = new Properties();
 		InputStream ins = getClass().getClassLoader().getResourceAsStream("test-server.properties");
 		serverProperties.load(ins);
+		
+		
+		mongoAddress = serverProperties.getProperty("mongoAddress");
+		kafkaAddress = serverProperties.getProperty("kafkaAddress");
+
 
 	}
 	
-	protected abstract String getDbAddress();
+	protected String getMongoAddress(){
+		
+		return mongoAddress;
+	}
+
+	protected String getKafkaAddress(){
+		
+		return kafkaAddress;
+	}
 
 }

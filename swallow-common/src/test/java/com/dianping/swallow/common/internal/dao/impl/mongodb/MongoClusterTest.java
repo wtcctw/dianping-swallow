@@ -37,7 +37,7 @@ public class MongoClusterTest extends AbstractMongoTest{
 		
 		System.setProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-mongo-createmongo.properties");
 		
-		mongoCluster = new MongoCluster(new MongoConfig("swallow-mongo.properties").buildMongoOptions(), getDbAddress());
+		mongoCluster = new MongoCluster(new MongoConfig("swallow-mongo.properties").buildMongoOptions(), getMongoAddress());
 		
 		mongoCluster.setSwallowConfig(createSwallowConfig());
 		mongoCluster.initialize();

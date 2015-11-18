@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.consumer.MessageFilter.FilterType;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.dao.impl.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 public class MongoDBMessageRetriever implements MessageRetriever {
@@ -39,20 +40,14 @@ public class MongoDBMessageRetriever implements MessageRetriever {
    
    private ReturnMessageWrapper retrieveMessage(String topicName, String consumerId, Long messageId, MessageFilter messageFilter, int fetchSize) {
 	   
-	      List<SwallowMessage> messages = messageDAO.getMessagesGreaterThan(topicName, consumerId, messageId, fetchSize);
+	      ReturnMessageWrapper returnMessageWrapper = messageDAO.getMessagesGreaterThan(topicName, consumerId, messageId, fetchSize);
 	      
-	      int rawMessageSize = messages.size();
-	      Long maxMessageId = null;
+	      final int rawMessageSize = returnMessageWrapper.getRawMessageSize();
+	      final Long maxMessageId = returnMessageWrapper.getMaxMessageId();
 	      
+	      List<SwallowMessage> messages = returnMessageWrapper.getMessages();
 	      if (messages != null && messages.size() > 0) {
-	         //记录本次返回的最大那条消息的messageId
-	         SwallowMessage message = (SwallowMessage) messages.get(messages.size() - 1);
 
-	         if (message.getBackupMessageId() == null) {//正常消息队列
-	            maxMessageId = message.getMessageId();
-	         } else {//备份消息队列
-	            maxMessageId = message.getBackupMessageId();
-	         }
 	         //过滤type
 	         if (messageFilter != null && messageFilter.getType() == FilterType.InSet && messageFilter.getParam() != null
 	               && !messageFilter.getParam().isEmpty()) {

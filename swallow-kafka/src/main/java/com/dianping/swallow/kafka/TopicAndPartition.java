@@ -11,6 +11,10 @@ public class TopicAndPartition {
 	
 	private Integer partition;
 
+	public TopicAndPartition(String topic){
+		this(topic, 0);
+	}
+	
 	public TopicAndPartition(String topic, Integer partition){
 		
 		this.topic = topic;

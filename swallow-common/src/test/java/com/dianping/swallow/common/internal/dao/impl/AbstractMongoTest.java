@@ -1,9 +1,7 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
 
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.ServerAddress;
@@ -16,23 +14,8 @@ import com.mongodb.ServerAddress;
  */
 public class AbstractMongoTest extends AbstractDbTest{
 	
-	private String mongoAddress =  "mongodb://192.168.213.143:27018";
 	
-	@Before
-	public void beforeAbstractMongoTest() throws IOException{
-		
-		
-		mongoAddress = serverProperties.getProperty("mongoAddress");
-	}
-	
-	
-	@Override
-	protected java.lang.String getDbAddress() {
-		return mongoAddress;
-	}
-
-	
-	protected List<ServerAddress> getServerSeeds(){
+	protected List<ServerAddress> getServerSeeds(String mongoAddress){
 		
 		return MongoUtils.parseUriToAddressList(mongoAddress);
 	}

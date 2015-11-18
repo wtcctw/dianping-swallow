@@ -12,5 +12,9 @@ public class InternalProperties {
 	public static final String COMPRESS = "compress";
 	
 
+	
+	public static final String TOPIC = "topic";
+	public static final String CONSUMERID = "cid";
+	
 
 }

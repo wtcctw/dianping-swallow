@@ -201,7 +201,7 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 			if(currentOffset <= offset){
 				continue;
 			}
-			result.add(new KafkaMessage(message.offset(), message.message().payload()));
+			result.add(new KafkaMessage(tp, message.offset(), message.message().payload()));
 		}
 		
 		return result;

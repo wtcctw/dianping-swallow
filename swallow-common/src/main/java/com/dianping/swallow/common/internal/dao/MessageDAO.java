@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.dao;
 
-import java.util.List;
 
+import com.dianping.swallow.common.internal.dao.impl.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 public interface MessageDAO<T extends Cluster> extends DAO<T>{
@@ -33,7 +33,7 @@ public interface MessageDAO<T extends Cluster> extends DAO<T>{
 	 * @param consumerId
 	 *            consumerId为null时使用非backup队列
 	 */
-	List<SwallowMessage> getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size);
+	ReturnMessageWrapper getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size);
 
 	/**
 	 * 获取topic数据库的topicName集合/表里，最大的messageId字段
@@ -68,7 +68,7 @@ public interface MessageDAO<T extends Cluster> extends DAO<T>{
 	 * 获取消息数目
 	 * @return
 	 */
-	int count(String topicName, String consumerId);
+	int count(String topicName);
 	
 	/**
 	 * 获取当前consumerId还有多少堆积消息

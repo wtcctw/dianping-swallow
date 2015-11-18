@@ -239,9 +239,4 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 		
 		defaultMessageDaoFactory.createAllTopicDao();
 	}
-
-	@Override
-	protected String getDbAddress() {
-		return null;
-	}
 }

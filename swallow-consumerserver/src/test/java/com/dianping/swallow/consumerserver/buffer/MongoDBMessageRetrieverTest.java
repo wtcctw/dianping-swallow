@@ -8,9 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.dao.impl.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.consumerserver.AbstractConsumerServerSpringTest;
-import com.dianping.swallow.consumerserver.buffer.MessageRetriever.ReturnMessageWrapper;
 
 /**
  * @author mengwenchao

@@ -210,7 +210,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		}
 		
 		if(logger.isInfoEnabled()){
-			logger.info("[sendMessage][db data count]" + mdao.count(topic, null));
+			logger.info("[sendMessage][db data count]" + mdao.count(topic));
 			logger.info("[sendMessage][min message]" + mdao.getMessagesGreaterThan(topic, null, 0L, 1));
 		}
 	}
