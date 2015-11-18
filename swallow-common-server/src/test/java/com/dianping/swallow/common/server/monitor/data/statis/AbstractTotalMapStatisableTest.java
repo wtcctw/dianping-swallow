@@ -3,6 +3,7 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
+import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
@@ -12,11 +13,13 @@ import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerIdData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.validation.constraints.AssertTrue;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -331,8 +334,7 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
                     }else{
                         time = 0L;
                     }
-                    message.getInternalProperties().put(MongoMessageDAO.SAVE_TIME,
-                            String.valueOf(time));
+                    message.putInternalProperty(InternalProperties.SAVE_TIME, String.valueOf(time));
                     wrappers.add(new Wrapper(consumerInfo, ip, message));
 
                     consumerMonitorData.addSendData(consumerInfo, ip, message);

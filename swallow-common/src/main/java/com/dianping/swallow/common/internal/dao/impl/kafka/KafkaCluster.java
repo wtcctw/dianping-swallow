@@ -16,6 +16,10 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.AbstractCluster;
 import com.dianping.swallow.common.internal.dao.impl.kafka.serialization.SwallowMessageSerializer;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.IPUtil;
+import com.dianping.swallow.kafka.KafkaConsumer;
+import com.dianping.swallow.kafka.consumer.simple.SimpleKafkaConsumer;
+import com.dianping.swallow.kafka.consumer.simple.SlaveKafkaConsumer;
 import com.dianping.swallow.kafka.zookeeper.ZkUtils;
 
 /**
@@ -35,10 +39,15 @@ public class KafkaCluster extends AbstractCluster{
 	
 	public static final String ACKS_DURABLE = "-1";
 	
-	private Map<TOPIC_TYPE, KafkaProducer<String, SwallowMessage>>  producers = new HashMap<TOPIC_TYPE, KafkaProducer<String,SwallowMessage>>();   
+	private KafkaConfig kafkaConfig;
+	
+	private Map<TOPIC_TYPE, KafkaProducer<String, SwallowMessage>>  producers = new HashMap<TOPIC_TYPE, KafkaProducer<String,SwallowMessage>>();
+	
+	private KafkaConsumer kafkaConsumer;
 
-	public KafkaCluster(String address) {
+	public KafkaCluster(String address, KafkaConfig kafkaConfig) {
 		super(address);
+		this.kafkaConfig = kafkaConfig;
 	}
 
 	@Override
@@ -47,6 +56,16 @@ public class KafkaCluster extends AbstractCluster{
 		
 		zkUtils = new ZkUtils(getAddressString(getSeeds()));
 
+		if(kafkaConfig.isReadFromMaster()){
+			kafkaConsumer = new SimpleKafkaConsumer(allKafkaServers(), getClientId(), 
+					kafkaConfig.getSoTimeout()
+					, kafkaConfig.getFetchSize(), kafkaConfig.getMaxWait(), kafkaConfig.getFetchRetryCount());
+		}else{
+			kafkaConsumer = new SlaveKafkaConsumer(allKafkaServers(), getClientId(), 
+					kafkaConfig.getSoTimeout()
+					, kafkaConfig.getFetchSize(), kafkaConfig.getMaxWait(), kafkaConfig.getFetchRetryCount());
+			
+		}
 		
 		String address = getAddressString(allKafkaServers());
 		
@@ -67,6 +86,12 @@ public class KafkaCluster extends AbstractCluster{
 		
 	}
 	
+	private String getClientId() {
+		
+		String ip = IPUtil.getFirstNoLoopbackIP4Address();
+		return "client-" + ip;
+	}
+
 	private KafkaProducer<String, SwallowMessage> createKafkaProducer(String address, String acks) {
 		
 		Properties props = new Properties();
@@ -74,6 +99,7 @@ public class KafkaCluster extends AbstractCluster{
 		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, address);
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, SwallowMessageSerializer.class);
+		props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, kafkaConfig.getZip());
 		props.put(ProducerConfig.ACKS_CONFIG, acks);
 
 		KafkaProducer<String, SwallowMessage> producer = new KafkaProducer<String, SwallowMessage>(props);
@@ -93,11 +119,15 @@ public class KafkaCluster extends AbstractCluster{
 		return zkUtils.getAllBrokersInCluster();
 	}
 	
-	
-
 	@Override
 	protected String getSchema() {
 		return schema;
+	}
+	
+	
+	public KafkaConsumer getConsumer(String topic){
+		
+		return kafkaConsumer;
 	}
 	
 	

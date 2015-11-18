@@ -15,7 +15,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  */
 public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 	
-	protected static final String DEFAULT_BACKUP_TOPIC = "SWALLOW_BACKUP";
+	protected static final String BACKUP_TOPIC = "SWALLOW_BACKUP";
 
 	private static final long serialVersionUID = 1L;
 
@@ -23,22 +23,25 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 		super(cluster);
 	}
 	
-	
 	@Override
-	protected void doSaveMessage(String topicName, String consumerId, SwallowMessage message) {
-		
+	protected void doSaveMessage(final String topicName, String consumerId, SwallowMessage message) {
+
+		String sendTopic = topicName;
+
 		try {
+
 			KafkaProducer<String, SwallowMessage>  producer = null;
 			
 			if(consumerId != null){
-				 producer = cluster.getProducer(DEFAULT_BACKUP_TOPIC);
-			}else{
-				producer = cluster.getProducer(topicName);
+				 sendTopic = BACKUP_TOPIC;
 			}
-			ProducerRecord<String, SwallowMessage>  record = new ProducerRecord<String, SwallowMessage>(topicName, message);
+			
+			producer = cluster.getProducer(sendTopic);
+
+			ProducerRecord<String, SwallowMessage>  record = new ProducerRecord<String, SwallowMessage>(sendTopic, message);
 			producer.send(record).get();
 		} catch (Exception e) {
-			throw new SwallowKafkaException("save message faild:" + topicName, e);
+			throw new SwallowKafkaException("save message faild:" + sendTopic, e);
 		}
 	}
 
@@ -54,24 +57,16 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 
 	@Override
 	public List<SwallowMessage> getMessagesGreaterThan(String topicName, String consumerId, Long messageId, int size) {
+		
 		return null;
 	}
 
 	@Override
 	public Long getMaxMessageId(String topicName, String consumerId) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
-	@Override
-	public Long getMaxMessageId(String topicName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.dianping.swallow.common.internal.dao.MessageDAO#getMaxMessage(java.lang.String)
-	 */
 	@Override
 	public SwallowMessage getMaxMessage(String topicName) {
 		return null;
@@ -79,37 +74,32 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 
 	@Override
 	public void cleanMessage(String topicName, String consumerId) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public int count(String topicName, String consumerId) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public long getAccumulation(String topicName, String consumerId) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public void cleanAck(String topicName, String consumerId, boolean isBackup) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public Long getAckMaxMessageId(String topicName, String consumerId, boolean isBackup) {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
 	@Override
 	public void addAck(String topicName, String consumerId, Long messageId, String desc, boolean isBackup) {
-		// TODO Auto-generated method stub
 		
 	}
 

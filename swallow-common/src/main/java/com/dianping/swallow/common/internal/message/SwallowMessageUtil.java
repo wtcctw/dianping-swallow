@@ -1,8 +1,5 @@
 package com.dianping.swallow.common.internal.message;
 
-import java.util.Map;
-
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 
 /**
  * @author mengwenchao
@@ -13,13 +10,7 @@ public class SwallowMessageUtil {
 	
 	public static long getSaveTime(SwallowMessage message){
 		
-		Map<String, String> internalProperties = message.getInternalProperties();
-		
-		if(internalProperties == null){
-			return 0;
-		}
-		
-		String time = internalProperties.get(MongoMessageDAO.SAVE_TIME);
+		String time = message.getInternalProperty(InternalProperties.SAVE_TIME);
 		if(time == null){
 			return 0;
 		}

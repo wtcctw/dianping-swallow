@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.bson.types.BSONTimestamp;
 
+import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.mongodb.BasicDBObject;
@@ -138,10 +139,9 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 	private void convert(DBObject result, SwallowMessage swallowMessage) {
 		
 		BSONTimestamp timestamp = (BSONTimestamp) result.get(ID);
-		BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(ORIGINAL_ID);
-
 		swallowMessage.setMessageId(MongoUtils.BSONTimestampToLong(timestamp));
 
+		BSONTimestamp originalTimestamp = (BSONTimestamp) result.get(ORIGINAL_ID);
 		if (originalTimestamp != null) {
 			swallowMessage.setBackupMessageId(MongoUtils.BSONTimestampToLong(originalTimestamp));
 		}
@@ -156,8 +156,7 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 		}
 		Map<String, String> internalPropertiesBasicDBObject = (Map<String, String>) result.get(INTERNAL_PROPERTIES);// mongo返回是一个BasicDBObject，转化成jdk的HashMap，以免某些序列化方案在反序列化需要依赖BasicDBObject
 		if (internalPropertiesBasicDBObject != null) {
-			HashMap<String, String> properties = new HashMap<String, String>(internalPropertiesBasicDBObject);
-			swallowMessage.setInternalProperties(properties);// properties
+			swallowMessage.putInternalProperties(internalPropertiesBasicDBObject);// properties
 		}
 		swallowMessage.setSha1((String) result.get(SHA1));// sha1
 		swallowMessage.setType((String) result.get(TYPE));// type
@@ -206,9 +205,10 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 	private DBObject createMongoMessage(String topicName, String consumerId, SwallowMessage message) {
 		
 		BasicDBObjectBuilder builder = BasicDBObjectBuilder.start().add(ID, new BSONTimestamp());
-		// 如果有backupMessageId，则表示是备份消息，那么messageId则作为ORIGINAL_ID存起来
-		if (consumerId != null) {
-			builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(getOriginalMessageId(message)));
+		
+		Long backupMessageId = message.getBackupMessageId();
+		if (backupMessageId != null) {
+			builder.add(ORIGINAL_ID, MongoUtils.longToBSONTimestamp(backupMessageId));
 		}
 		// content
 		String content = message.getContent();
@@ -282,14 +282,10 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 			builder.add(PROPERTIES, properties);
 		}
 		// internalProperties
-		Map<String, String> internalProperties = message.getInternalProperties();
-		if (internalProperties == null) {
-			internalProperties = new HashMap<String, String>();
-		}
-		// 标记重发
-		internalProperties.put("retransmit", message.getMessageId().toString());
-		addDefaultInternalProperties(internalProperties);
-		builder.add(INTERNAL_PROPERTIES, internalProperties);
+		message.putInternalProperty(InternalProperties.RETRANSMIT, message.getMessageId().toString());
+		addDefaultInternalProperties(message);
+		
+		builder.add(INTERNAL_PROPERTIES, message.getInternalProperties());
 		// sha1
 		String sha1 = message.getSha1();
 		if (sha1 != null && !"".equals(sha1.trim())) {

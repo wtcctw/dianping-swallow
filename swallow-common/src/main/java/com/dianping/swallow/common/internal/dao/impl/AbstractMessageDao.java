@@ -1,10 +1,9 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
+import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 /**
@@ -15,8 +14,6 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 public abstract class AbstractMessageDao<T extends Cluster> extends AbstractDao<T> implements MessageDAO<T> {
 
 	private static final long serialVersionUID = 1L;
-
-	public static final String SAVE_TIME = "save_time";
 
 	public AbstractMessageDao(T cluster) {
 		super(cluster);
@@ -29,22 +26,19 @@ public abstract class AbstractMessageDao<T extends Cluster> extends AbstractDao<
 	
 	public void saveMessage(String topicName, String consumerId, SwallowMessage message) {
 		
+		addDefaultInternalProperties(message);
 		
-		Map<String, String>  internalProperties = message.getInternalProperties();
-		
-		if(internalProperties == null){
-			internalProperties = new HashMap<String, String>();
-			message.setInternalProperties(internalProperties);
+		if(consumerId != null){
+			message.setBackupMessageId(getOriginalMessageId(message));
 		}
-		addDefaultInternalProperties(internalProperties);
 		
 		doSaveMessage(topicName, consumerId, message);
 	}
 
 	
-	protected void addDefaultInternalProperties(Map<String, String> internalProperties) {
+	protected void addDefaultInternalProperties(SwallowMessage message) {
 		
-		internalProperties.put(SAVE_TIME, String.valueOf(System.currentTimeMillis()));
+		message.putInternalProperty(InternalProperties.SAVE_TIME, String.valueOf(System.currentTimeMillis()));
 	}
 
 	protected abstract void doSaveMessage(String topicName, String consumerId, SwallowMessage message);

@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
 
+import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.packet.Packet;
 import com.dianping.swallow.common.internal.packet.PacketType;
 import com.dianping.swallow.common.internal.packet.PktMessage;
@@ -83,13 +84,11 @@ public class ProducerTest {
             message = (PktMessage) arg0;
             assertEquals(PacketType.OBJECT_MSG, message.getPacketType());
             assertEquals(dest, message.getDestination());
-            if (message.getContent().getInternalProperties() != null) {
-               if ("gzip".equals(message.getContent().getInternalProperties().get("compress"))) {
-                  try {
-                     assertEquals(ZipUtil.zip(content), message.getContent().getContent());
-                  } catch (IOException e) {
-                  }
-               }
+           if ("gzip".equals(message.getContent().getInternalProperty(InternalProperties.COMPRESS))) {
+              try {
+                 assertEquals(ZipUtil.zip(content), message.getContent().getContent());
+              } catch (IOException e) {
+              }
             } else {
                assertEquals(content, message.getContent().getContent());
             }

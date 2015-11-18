@@ -26,6 +26,7 @@ public class SwallowMessageTest {
 			
 			SwallowMessage message = createMessage();
 			String json = binder.toJson(message);
+			@SuppressWarnings("unused")
 			SwallowMessage newMessage = binder.fromJson(json, SwallowMessage.class);
 		}
 		
@@ -135,7 +136,7 @@ public class SwallowMessageTest {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("property-key", "property-value");
         message.setProperties(map);
-        message.setInternalProperties(map);
+        message.putInternalProperties(map);
         message.setSha1("sha-1 string");
         message.setVersion("0.6.0");
         message.setType("feed");

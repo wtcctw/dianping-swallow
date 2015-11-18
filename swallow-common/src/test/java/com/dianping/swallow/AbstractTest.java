@@ -16,7 +16,7 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.mockito.MockitoAnnotations;
 
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
+import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.TestSkipRule;
 
@@ -80,9 +80,7 @@ public abstract class AbstractTest {
 		message.setType("feed");
 		message.setSourceIp("localhost");
 		
-		HashMap<String, String> internal = new HashMap<String, String>();
-		internal.put(MongoMessageDAO.SAVE_TIME, String.valueOf(System.currentTimeMillis() - 50));
-		message.setInternalProperties(internal);
+		message.putInternalProperty(InternalProperties.SAVE_TIME, String.valueOf(System.currentTimeMillis() - 50));
 		return message;
 	}
 

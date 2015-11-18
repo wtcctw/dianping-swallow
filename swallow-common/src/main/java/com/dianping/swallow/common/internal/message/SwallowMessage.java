@@ -2,6 +2,7 @@ package com.dianping.swallow.common.internal.message;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
@@ -17,7 +18,7 @@ public class SwallowMessage implements Serializable, Message {
 
    private Map<String, String> properties;
 
-   private Map<String, String> internalProperties;
+   private Map<String, String> internalProperties = new HashMap<String, String>();
 
    private String              version;
 
@@ -72,11 +73,22 @@ public class SwallowMessage implements Serializable, Message {
    }
 
    public Map<String, String> getInternalProperties() {
-      return internalProperties;
+      return new HashMap<String, String>(internalProperties);
    }
-
-   public void setInternalProperties(Map<String, String> internalProperties) {
-      this.internalProperties = internalProperties;
+   
+   public void putInternalProperty(String key, String value){
+	   this.internalProperties.put(key, value);
+   }
+   
+   public String getInternalProperty(String key){
+	   return internalProperties.get(key);
+   }
+   
+   public void putInternalProperties(Map<String, String> properties){
+	   
+	   if(properties != null){
+		   this.internalProperties.putAll(properties);
+	   }
    }
 
    @Override
@@ -146,7 +158,7 @@ public class SwallowMessage implements Serializable, Message {
    @Override
    public String toString() {
       return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", backupMessageId="
-            + backupMessageId + ", properties=" + properties + ", internalProperties=" + internalProperties
+            + backupMessageId + ", properties=" + properties + ", internalPropertiess=" + internalProperties
             + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + ", content="
             + content + "]";
    }
@@ -157,7 +169,7 @@ public class SwallowMessage implements Serializable, Message {
 
    public String toSuccessKeyValuePairs() {
       return "generatedTime=" + generatedTime + "&messageId=" + messageId + "&backupMessageId=" + backupMessageId
-            + "&properties=" + properties + "&internalProperties=" + internalProperties + "&version=" + version
+            + "&properties=" + properties + "&internalPropertiess=" + internalProperties + "&version=" + version
             + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp;
    }
 
