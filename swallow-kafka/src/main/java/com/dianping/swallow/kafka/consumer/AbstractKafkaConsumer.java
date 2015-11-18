@@ -144,18 +144,22 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 		FetchResponse response = null;
 		
 		for(int i=0; i <= fetchRetryCount; i++){
+			
+			try{
 		
-			SimpleConsumer consumer = getProperConsumer(tp);
-			
-			Map<kafka.common.TopicAndPartition, PartitionFetchInfo>  requestInfo = new HashMap<kafka.common.TopicAndPartition, PartitionFetchInfo>();
-			requestInfo.put(tp.toKafka(), new PartitionFetchInfo(offset + 1, fetchSize));
-			
-			
-			FetchRequest request = createFetchRequest(requestInfo);
-			
-			response = consumer.fetch(request);
-			
-			if(response.hasError()){
+				SimpleConsumer consumer = getProperConsumer(tp);
+				
+				Map<kafka.common.TopicAndPartition, PartitionFetchInfo>  requestInfo = new HashMap<kafka.common.TopicAndPartition, PartitionFetchInfo>();
+				requestInfo.put(tp.toKafka(), new PartitionFetchInfo(offset + 1, fetchSize));
+				
+				
+				FetchRequest request = createFetchRequest(requestInfo);
+				
+				response = consumer.fetch(request);
+				
+				if(!response.hasError()){
+					break;
+				}
 				
 				short errorCode = response.errorCode(tp.getTopic(), tp.getPartition());
 				
@@ -173,14 +177,15 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 				}else if(errorCode == ErrorMapping.NotLeaderForPartitionCode()){
 					
 					logger.warn("[getMessageGreatThan][not leader]" + tp + "," + offset);
-					getPartitionMetadata(tp, true);
 				}else{
 					logger.error("[getMessageGreatThan]" + tp + "," + offset, ErrorMapping.exceptionFor(errorCode));
 				}
-				continue;
+			}catch(Exception e){
+				logger.error("[getMessageGreatThan]" + tp + "," + offset, e);
 			}
 			
-			break;
+			getPartitionMetadata(tp, true);
+			
 		}
 		
 		

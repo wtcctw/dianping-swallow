@@ -2,7 +2,6 @@ package com.dianping.swallow.kafka.consumer;
 
 import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,7 +11,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-import org.junit.rules.TestRule;
 
 import com.dianping.swallow.kafka.AbstractKafkaTest;
 import com.dianping.swallow.kafka.TopicAndPartition;
@@ -61,17 +59,29 @@ public class AbstractKafkaConsumerTest extends AbstractKafkaTest{
 		for(int i =0; i < count ;i++){
 
 			try {
-				producer.send(new ProducerRecord<String, String>(topic, content)).get();
+				ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, content);
+				
+				beforeSend(record);
+				producer.send(record).get();
+				afterSend(record);
 			} catch (Exception e) {
-				throw new RuntimeException("error sending message", e);
+				i--;
+				logger.error("[error sending]" + count, e);
 			}
-			
 		}
-		
-		
 	}
 	
-	
+
+	protected void afterSend(ProducerRecord<String, String> record) {
+		
+	}
+
+
+	protected void beforeSend(ProducerRecord<String, String> record) {
+		
+	}
+
+
 	protected String randomString(){
 		
 		return UUID.randomUUID().toString();

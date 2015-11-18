@@ -2,6 +2,7 @@ package com.dianping.swallow.kafka.consumer.simple;
 
 import java.util.List;
 
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class SimpleKafkaConsumerTest extends AbstractKafkaConsumerTest{
 	
 	private TopicAndPartition getTopicAndPartition() {
 		
-		String topic = getTopicReplica1();
+		String topic = getTopicReplica2();
 		TopicAndPartition tp = new TopicAndPartition(topic, 0);
 		if(logger.isInfoEnabled()){
 			logger.info("[getTopicAndPartition]" + tp);
@@ -118,6 +119,38 @@ public class SimpleKafkaConsumerTest extends AbstractKafkaConsumerTest{
 		}
 		
 	}
+	
+	@Test
+	public void testMasterChange(){
 
+		int messageCount = 100;
+		TopicAndPartition tp = getTopicAndPartition();
+		String message = randomString();
+		
+		Long currentOffset = simpleKafkaConsumer.getMaxMessageId(tp);
+		
+		sendMessage(tp, messageCount,  message);
+		
+		
+		for(int i=0;i<1 << 30;i++){
+			
+			System.out.println("--------------begin fetch----------------");
+			List<KafkaMessage> messages = simpleKafkaConsumer.getMessageGreatThan(tp, currentOffset);
+			System.out.println(messages.size());
+			
+			sleep(1000);
+		}
+	}
+	
+	@Test
+	public void testSendingMessage(){
+		
+		sendMessage(getTopicAndPartition(), 1);
+	}
+
+	@Override
+	protected void afterSend(ProducerRecord<String, String> record) {
+//		sleep(10);
+	}
 
 }
