@@ -16,91 +16,96 @@ import com.dianping.swallow.web.service.ConsumerIdResourceService;
 
 /**
  * @author mingdongli
- *
+ *         <p/>
  *         2015年8月11日上午10:34:28
  */
 @Service("consumerIdResourceService")
 public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implements ConsumerIdResourceService {
 
-	@Autowired
-	private ConsumerIdResourceDao consumerIdResourceDao;
+    @Autowired
+    private ConsumerIdResourceDao consumerIdResourceDao;
 
-	@Override
-	public boolean insert(ConsumerIdResource consumerIdResource) {
+    @Override
+    public boolean insert(ConsumerIdResource consumerIdResource) {
 
-		return consumerIdResourceDao.insert(consumerIdResource);
-	}
+        return consumerIdResourceDao.insert(consumerIdResource);
+    }
 
-	@Override
-	public boolean update(ConsumerIdResource consumerIdResource) {
+    @Override
+    public boolean update(ConsumerIdResource consumerIdResource) {
 
-		return consumerIdResourceDao.update(consumerIdResource);
-	}
+        return consumerIdResourceDao.update(consumerIdResource);
+    }
 
-	@Override
-	public int remove(String topic, String consumerid) {
+    @Override
+    public int remove(String topic, String consumerid) {
 
-		return consumerIdResourceDao.remove(topic, consumerid);
-	}
+        return consumerIdResourceDao.remove(topic, consumerid);
+    }
 
-	@Override
-	public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam) {
+    @Override
+    public Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam) {
 
-		return consumerIdResourceDao.findByTopic(consumerIdParam);
-	}
+        return consumerIdResourceDao.findByTopic(consumerIdParam);
+    }
 
-	@Override
-	public Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam consumerIdParam) {
+    @Override
+    public List<ConsumerIdResource> findByTopic(String topic) {
+        return consumerIdResourceDao.findByTopic(topic);
+    }
 
-		return consumerIdResourceDao.find(consumerIdParam);
-	}
+    @Override
+    public Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam consumerIdParam) {
 
-	@Override
-	public List<ConsumerIdResource> findAll(String... fields) {
+        return consumerIdResourceDao.find(consumerIdParam);
+    }
 
-		return consumerIdResourceDao.findAll(fields);
-	}
+    @Override
+    public List<ConsumerIdResource> findAll(String... fields) {
 
-	@Override
-	public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam) {
+        return consumerIdResourceDao.findAll(fields);
+    }
 
-		return consumerIdResourceDao.findConsumerIdResourcePage(consumerIdParam);
-	}
+    @Override
+    public Pair<Long, List<ConsumerIdResource>> findConsumerIdResourcePage(ConsumerIdParam consumerIdParam) {
 
-	@Override
-	public ConsumerIdResource buildConsumerIdResource(String topic, String consumerId) {
+        return consumerIdResourceDao.findConsumerIdResourcePage(consumerIdParam);
+    }
 
-		ConsumerIdResource consumerIdResource = new ConsumerIdResource();
-		consumerIdResource.setAlarm(Boolean.TRUE);
-		consumerIdResource.setTopic(topic);
-		consumerIdResource.setConsumerId(consumerId);
+    @Override
+    public ConsumerIdResource buildConsumerIdResource(String topic, String consumerId) {
 
-		consumerIdResource.setConsumerIpInfos(new ArrayList<IpInfo>());
-		consumerIdResource.setConsumerApplications(new ArrayList<String>());
+        ConsumerIdResource consumerIdResource = new ConsumerIdResource();
+        consumerIdResource.setAlarm(Boolean.TRUE);
+        consumerIdResource.setTopic(topic);
+        consumerIdResource.setConsumerId(consumerId);
 
-		ConsumerIdResource defaultResource = consumerIdResourceDao.findDefault();
-		if (defaultResource == null) {
-			throw new RuntimeException("No default configuration for ConsumerIdResource");
-		}
-		consumerIdResource.setConsumerAlarmSetting(defaultResource.getConsumerAlarmSetting());
+        consumerIdResource.setConsumerIpInfos(new ArrayList<IpInfo>());
+        consumerIdResource.setConsumerApplications(new ArrayList<String>());
 
-		return consumerIdResource;
-	}
+        ConsumerIdResource defaultResource = consumerIdResourceDao.findDefault();
+        if (defaultResource == null) {
+            throw new RuntimeException("No default configuration for ConsumerIdResource");
+        }
+        consumerIdResource.setConsumerAlarmSetting(defaultResource.getConsumerAlarmSetting());
 
-	@Override
-	public ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId) {
+        return consumerIdResource;
+    }
 
-		ConsumerIdResource consumerIdResource = consumerIdResourceDao.findByConsumerIdAndTopic(topic, consumerId);
-		if (consumerIdResource == null) {
-			consumerIdResource = buildConsumerIdResource(topic, consumerId);
-		}
-		return consumerIdResource;
-	}
+    @Override
+    public ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId) {
 
-	@Override
-	public long countInactive() {
+        ConsumerIdResource consumerIdResource = consumerIdResourceDao.findByConsumerIdAndTopic(topic, consumerId);
+        if (consumerIdResource == null) {
+            consumerIdResource = buildConsumerIdResource(topic, consumerId);
+        }
+        return consumerIdResource;
+    }
 
-		return consumerIdResourceDao.countInactive();
-	}
+    @Override
+    public long countInactive() {
+
+        return consumerIdResourceDao.countInactive();
+    }
 
 }
