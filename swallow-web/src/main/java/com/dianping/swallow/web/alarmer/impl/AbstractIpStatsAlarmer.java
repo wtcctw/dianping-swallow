@@ -40,10 +40,6 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
 
     protected long checkInterval = 10 * 60 * 1000;
 
-    protected long qpsThreshold = 3;
-
-    protected long totalThreshold = 15;
-
     public void checkIpGroupStats(X ipGroupStatsData) {
         if (ipGroupStatsData == null) {
             return;
@@ -52,7 +48,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
             return;
         }
-        boolean hasGroupStatsData = ipGroupStatsData.hasStatsData(qpsThreshold, totalThreshold);
+        boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
         for (K ipStatsData : ipStatsDatas) {
             boolean hasStatsData = ipStatsData.hasStatsData();
             @SuppressWarnings("unchecked")
@@ -66,7 +62,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
                     ipStatusDatas.put(key, ipStatusData.updateNoDataTime(getCurrentTimeMillis()));
                 } else {
                     if (ipStatsDatas.size() > 1) {
-                        //都没有数据不考虑
+                        //不做处理
                     } else {
                         ipStatusDatas.put(key, ipStatusData.updateSubNoDataTime(getCurrentTimeMillis()));
                     }
@@ -91,7 +87,9 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
             if (ipStatusData.getNoDataCount() > 0) {
                 if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
                     itStatusData.remove();
-                    report(statsDataKey);
+                    if (ipStatusData.getNoDataCount() > 3L) {
+                        report(statsDataKey);
+                    }
                 }
             } else if (ipStatusData.getSubNoDataCount() > 0) {
                 if (getCurrentTimeMillis() - ipStatusData.getSubNoDataTime() > checkInterval) {
@@ -114,16 +112,16 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
 
         private long noDataTime;
 
-        private int noDataCount;
+        private long noDataCount;
 
         private long subNoDataTime;
 
-        private int subNoDataCount;
+        private long subNoDataCount;
 
         public IpStatusData updateNoDataTime(long currentTimeMillis) {
-            if (noDataCount != 0) {
+            if (noDataCount != 0L) {
                 if (noDataTime < hasDataTime) {
-                    noDataCount = 0;
+                    noDataCount = 0L;
                     noDataTime = currentTimeMillis;
                 } else {
                     noDataCount++;
@@ -132,13 +130,15 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
                 noDataCount++;
                 noDataTime = currentTimeMillis;
             }
+            subNoDataCount = 0L;
+            subNoDataTime = currentTimeMillis;
             return this;
         }
 
         public IpStatusData updateSubNoDataTime(long currentTimeMillis) {
-            if (subNoDataCount != 0) {
+            if (subNoDataCount != 0L) {
                 if (subNoDataTime < hasDataTime) {
-                    subNoDataCount = 0;
+                    subNoDataCount = 0L;
                     subNoDataTime = currentTimeMillis;
                 } else {
                     subNoDataCount++;
@@ -150,10 +150,6 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
             return this;
         }
 
-        public long getHasDataTime() {
-            return hasDataTime;
-        }
-
         public IpStatusData setHasDataTime(long hasDataTime) {
             this.hasDataTime = hasDataTime;
             return this;
@@ -163,37 +159,18 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
             return noDataTime;
         }
 
-        public IpStatusData setNoDataTime(long noDataTime) {
-            this.noDataTime = noDataTime;
-            return this;
-        }
-
-        public int getNoDataCount() {
+        public long getNoDataCount() {
             return noDataCount;
-        }
-
-        public IpStatusData setNoDataCount(int noDataCount) {
-            this.noDataCount = noDataCount;
-            return this;
         }
 
         public long getSubNoDataTime() {
             return subNoDataTime;
         }
 
-        public IpStatusData setSubNoDataTime(long subNoDataTime) {
-            this.subNoDataTime = subNoDataTime;
-            return this;
-        }
-
-        public int getSubNoDataCount() {
+        public long getSubNoDataCount() {
             return subNoDataCount;
         }
 
-        public IpStatusData setSubNoDataCount(int subNoDataCount) {
-            this.subNoDataCount = subNoDataCount;
-            return this;
-        }
     }
 
 }
