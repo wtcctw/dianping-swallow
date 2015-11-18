@@ -185,6 +185,15 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
     }
 
     @Test
+    public void testGetDelayValue(){
+        String topic = topics.get(0);
+        String id = "id1";
+        NavigableMap<Long, Long> value1 = consumerAllData.getAllDelay(StatisType.ACK, topic, false).get(id);
+        NavigableMap<Long, Long> value2 = consumerAllData.getDelayValue(new CasKeys("total", topic, id), StatisType.ACK);
+        Assert.assertEquals(value1, value2);
+    }
+
+    @Test
     public void testGetAllQps() {
 
         String topic = topics.get(0);
@@ -315,8 +324,15 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
                     SwallowMessage message = createMessage();
                     message.setMessageId(messageIdGenerator.incrementAndGet());
+
+                    long time;
+                    if("127.0.0.2".equals(ip)){
+                        time = System.currentTimeMillis() - avergeDelay;
+                    }else{
+                        time = 0L;
+                    }
                     message.getInternalProperties().put(MongoMessageDAO.SAVE_TIME,
-                            String.valueOf(System.currentTimeMillis() - avergeDelay));
+                            String.valueOf(time));
                     wrappers.add(new Wrapper(consumerInfo, ip, message));
 
                     consumerMonitorData.addSendData(consumerInfo, ip, message);

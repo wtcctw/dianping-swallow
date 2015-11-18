@@ -5,8 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Map;
-import java.util.NavigableMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -148,6 +147,18 @@ public class MapMergeableImplTest{
         result.merge(mapLongToMerge);
         ccc = result.getToMerge();
         Assert.assertNotEquals(ccc, bbb);
+
+        Map<Long, Long> map = new HashMap<Long, Long>();
+        map.put(0L, 0L);
+        map.put(1L, 0L);
+        map.put(2L, 0L);
+        map.put(3L, 0L);
+        Collection<Long> set =  map.values();
+        Set<Long> newSet = new HashSet<Long>(set);
+        for(Long v : newSet){
+            System.out.println(v);
+        }
+        Assert.assertEquals(newSet.size(), 1);
 
     }
 
