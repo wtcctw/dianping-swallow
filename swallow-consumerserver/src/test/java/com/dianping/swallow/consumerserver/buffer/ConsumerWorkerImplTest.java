@@ -78,10 +78,10 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
         //      when(messageDAO.getMaxMessageId(TOPIC_NAME)).thenReturn(234567L);
         //      when(messageDAO.getMaxMessageId(TOPIC_NAME2)).thenReturn(null);
         //准备数据
-        messageDao.addAck(topicName, getConsumerId(), 123456L, IP);
+        messageDao.addAck(getTopic(), getConsumerId(), 123456L, IP);
         SwallowMessage message = new SwallowMessage();
         message.setContent("this is a SwallowMessage");
-        messageDao.saveMessage(topicName, message);
+        messageDao.saveMessage(getTopic(), message);
 
         //      consumerWorkerManager.setAckDAO(ackDAO);
         //      consumerWorkerManager.setMessageDAO(messageDAO);
@@ -129,7 +129,7 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
     @Test
     public void testHandleGreet_NON_DURABLE() throws InterruptedException {
     	
-        ConsumerInfo consumerInfo2 = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.NON_DURABLE);
+        ConsumerInfo consumerInfo2 = new ConsumerInfo(getConsumerId(), Destination.topic(getTopic()), ConsumerType.NON_DURABLE);
         consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null, -1);
     }
 
@@ -142,7 +142,7 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
     public void testHandleGreet_topicFirst() throws InterruptedException {
         //      mockChannel();
         //      mockDao();
-        ConsumerInfo consumerInfo3 = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
+        ConsumerInfo consumerInfo3 = new ConsumerInfo(getConsumerId(), Destination.topic(getTopic()), ConsumerType.DURABLE_AT_LEAST_ONCE);
         consumerWorkerManager.handleGreet(channel, consumerInfo3, 50, null, -1);
         Thread.sleep(3000);
         //      Assert.assertTrue(check(50));
@@ -158,7 +158,7 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
     public void testHandleGreet_consumerFirst() throws InterruptedException {
         //      mockChannel();
         //      mockDao();
-        ConsumerInfo consumerInfo2 = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_MOST_ONCE);
+        ConsumerInfo consumerInfo2 = new ConsumerInfo(getConsumerId(), Destination.topic(getTopic()), ConsumerType.DURABLE_AT_MOST_ONCE);
         consumerWorkerManager.handleGreet(channel, consumerInfo2, 50, null, -1);
         Thread.sleep(3000);
         //      Assert.assertTrue(check(50));
@@ -175,7 +175,7 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
         //      mockChannel();
         //      mockDao();
 
-        ConsumerInfo consumerInfo1 = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
+        ConsumerInfo consumerInfo1 = new ConsumerInfo(getConsumerId(), Destination.topic(getTopic()), ConsumerType.DURABLE_AT_LEAST_ONCE);
         consumerWorkerManager.handleGreet(channel, consumerInfo1, 30, null, -1);
         //        Thread.sleep(3000);
         //        Assert.assertTrue(check(30));

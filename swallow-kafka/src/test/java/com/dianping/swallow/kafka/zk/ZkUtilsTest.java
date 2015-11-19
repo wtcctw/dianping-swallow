@@ -25,6 +25,13 @@ public class ZkUtilsTest extends AbstractKafkaTest{
 	
 	
 	@Test
+	public void testBackupGet(){
+		
+		System.out.println(zkUtils.getBackupAck(new TopicAndPartition("randomTopic"), "randomGroup"));
+		
+	}
+	
+	@Test
 	public void testBackup(){
 
 		TopicAndPartition tp = new TopicAndPartition(getTopic(), 0);

@@ -43,7 +43,7 @@ public class AbstractProducerServerTest extends AbstractTest{
 	private TopicWhiteList createTopicWhiteList() {
 		
         TopicWhiteList topicWhiteList = new TopicWhiteList();
-        topicWhiteList.addTopic(topicName);
+        topicWhiteList.addTopic(getTopic());
 		return topicWhiteList;
 	}
 

@@ -40,11 +40,11 @@ public class ProducerServerForClientTest extends AbstractProducerServerTest{
         PktProducerGreet pktProducerGreet = new PktProducerGreet("0.6.0", "Unit Test");
         //构造message
         SwallowMessage swallowMessage = new SwallowMessage();
-        swallowMessage.setContent(topicName);
+        swallowMessage.setContent(getTopic());
         swallowMessage.setGeneratedTime(new Date());
         swallowMessage.setSourceIp("192.168.32.194");
         swallowMessage.setVersion("0.6.0");
-        PktMessage pktMessage = new PktMessage(Destination.topic(topicName), swallowMessage);
+        PktMessage pktMessage = new PktMessage(Destination.topic(getTopic()), swallowMessage);
 
         PktSwallowPACK ACK = null;
         //发送greet

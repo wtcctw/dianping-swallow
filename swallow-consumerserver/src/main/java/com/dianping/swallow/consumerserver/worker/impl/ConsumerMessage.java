@@ -53,6 +53,16 @@ public class ConsumerMessage {
 		return gmt;
 	}
 	
+	public long getOriginalMessageId(){
+		
+		if(message.getBackupMessageId() != null){
+			return message.getBackupMessageId();
+		}
+		
+		return message.getMessageId();
+		
+	}
+	
 	public SwallowMessage getMessage(){
 		return message;
 	}
@@ -70,5 +80,9 @@ public class ConsumerMessage {
 
 	public void exceptionWhileSend(Throwable th){
 		this.sendAckManager.exceptionWhileSending(this, th);
+	}
+	
+	public void successSend(){
+		
 	}
 }

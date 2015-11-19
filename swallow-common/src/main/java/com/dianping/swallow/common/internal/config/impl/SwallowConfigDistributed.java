@@ -307,4 +307,9 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		
 		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return topicCfgs.toString();
+	}
 }

@@ -33,16 +33,16 @@ public class SwallowBufferTest extends AbstractConsumerServerSpringTest {
         //插入1条消息
         SwallowMessage firstMsg = createMessage();
         firstMsg.setContent("content1");
-        messageDao.saveMessage(topicName, firstMsg);
+        messageDao.saveMessage(getTopic(), firstMsg);
         //初始化tailMessageId
-        tailMessageId = messageDao.getMaxMessageId(topicName);
+        tailMessageId = messageDao.getMaxMessageId(getTopic());
         //添加9条Message
         int i = 2;
         while (i <= 10) {
             //插入消息
             SwallowMessage msg = createMessage();
             msg.setContent("content" + i++);
-            messageDao.saveMessage(topicName, msg);
+            messageDao.saveMessage(getTopic(), msg);
         }
     }
 
@@ -51,7 +51,7 @@ public class SwallowBufferTest extends AbstractConsumerServerSpringTest {
     	
         Set<String> messageTypeSet = new HashSet<String>();
         messageTypeSet.add(TYPE);
-        ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
+        ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(getTopic()), ConsumerType.DURABLE_AT_LEAST_ONCE);
         Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
         SwallowMessage m;
@@ -66,7 +66,7 @@ public class SwallowBufferTest extends AbstractConsumerServerSpringTest {
 		
         Set<String> messageTypeSet = new HashSet<String>();
         messageTypeSet.add(TYPE);
-        ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
+        ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(getTopic()), ConsumerType.DURABLE_AT_LEAST_ONCE);
         Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
         SwallowMessage m = queue.poll();
@@ -83,11 +83,11 @@ public class SwallowBufferTest extends AbstractConsumerServerSpringTest {
         String myType = TYPE + "_";
         SwallowMessage myTypeMsg = createMessage();
         myTypeMsg.setType(myType);
-        messageDao.saveMessage(topicName, myTypeMsg);
+        messageDao.saveMessage(getTopic(), myTypeMsg);
 
         Set<String> messageTypeSet = new HashSet<String>();
         messageTypeSet.add(myType);
-        ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(topicName), ConsumerType.DURABLE_AT_LEAST_ONCE);
+        ConsumerInfo consumerInfo = new ConsumerInfo(getConsumerId(), Destination.topic(getTopic()), ConsumerType.DURABLE_AT_LEAST_ONCE);
         Queue<SwallowMessage> queue = swallowBuffer.createMessageQueue(consumerInfo, tailMessageId, MessageFilter.createInSetMessageFilter(messageTypeSet));
 
         SwallowMessage m = queue.poll();

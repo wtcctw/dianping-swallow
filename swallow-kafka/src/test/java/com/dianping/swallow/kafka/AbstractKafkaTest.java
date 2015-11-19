@@ -35,7 +35,7 @@ public class AbstractKafkaTest {
 		return zkAddress;
 	}
 	
-	public String getKafkaAddress() {
+	protected String getKafkaAddress() {
 		return kafkaAddress;
 	}
 

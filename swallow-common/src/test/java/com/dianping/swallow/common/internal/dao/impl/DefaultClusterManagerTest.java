@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory;
@@ -20,7 +21,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  *
  * 2015年11月2日 下午6:59:01
  */
-public class DefaultClusterManagerTest extends AbstractDbTest{
+public class DefaultClusterManagerTest extends AbstractTest{
 
 	private DefaultClusterManager clusterManager;
 	

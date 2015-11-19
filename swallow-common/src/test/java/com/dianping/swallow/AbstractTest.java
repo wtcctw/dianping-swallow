@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.TestSkipRule;
 
 /**
@@ -31,13 +33,15 @@ public abstract class AbstractTest {
 	protected Logger logger = Logger.getLogger(getClass());
 
 	private final int localWebPort = 8080;
+	
+	private String localIp;
 
 	protected ExecutorService executors = Executors.newCachedThreadPool();
 
 	protected ScheduledExecutorService scheduledExecutors = Executors.newScheduledThreadPool(Runtime.getRuntime()
 			.availableProcessors());
 
-	protected String topicName = "SwallowUnitTest";
+	private String topicName = "SwallowUnitTest";
 
 	protected String baseConsumerId = "ut";
 
@@ -54,8 +58,14 @@ public abstract class AbstractTest {
 		}
 
 		System.setProperty("lion.useLocal", "true");
+		localIp = IPUtil.getFirstNoLoopbackIP4Address();
 		MockitoAnnotations.initMocks(this);
 
+	}
+
+	
+	protected String getTopic() {
+		return topicName;
 	}
 
 	protected void sleep(int miliSeconds) {
@@ -161,7 +171,7 @@ public abstract class AbstractTest {
 				
 				if(!(fieldValue1 == null ? fieldValue2 == null : fieldValue1.equals(fieldValue2))){
 					if(logger.isInfoEnabled()){
-						logger.info(field.getName() + ":" + fieldValue1 + "," + fieldValue2);
+						logger.info("[equals][" + field.getName() + "]:" + fieldValue1 + "," + fieldValue2);
 					}
 					return false;
 				}
@@ -171,5 +181,19 @@ public abstract class AbstractTest {
 		}
 		
 		return true;
+	}
+	
+	protected String randomString(){
+		
+		return UUID.randomUUID().toString();
+	}
+	
+	public String getLocalIp() {
+		return localIp;
+	}
+
+
+	protected Long randomLong() {
+		return (long) (Math.random() * Long.MAX_VALUE);
 	}
 }

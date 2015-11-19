@@ -21,7 +21,8 @@ public class SwallowMessageDeserializer extends AbstractSwallowMessageCodec impl
 	@Override
 	public SwallowMessage deserialize(String topic, byte[] data) {
 		
-		return jsonBinder.fromJson(new String(data, Codec.DEFAULT_CHARSET), SwallowMessage.class);
+		String buff = new String(data, Codec.DEFAULT_CHARSET);
+		return jsonBinder.fromJson(buff, SwallowMessage.class);
 	}
 
 	@Override

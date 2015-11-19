@@ -165,7 +165,6 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 			if (consumerMessage.getChannel().equals(channel)) {
 				backupMessage(consumerMessage, "channel removed:" + channel);
 			}
-			it.remove();
 		}
 	}
 	
@@ -225,10 +224,8 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 				}
 			}
 
-			if (overdue && (minWaitAckMessage = waitAckMessages0.remove(minAckId)) != null) {
-				if (minWaitAckMessage != null) {
-					backupMessage(minWaitAckMessage, "ack timeout");
-				}
+			if (overdue) {
+				backupMessage(minWaitAckMessage, "ack timeout");
 			} else {// 没有移除任何空洞，则不再迭代；否则需要继续迭代以尽量多地移除空洞。
 				break;
 			}
@@ -253,6 +250,8 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 	
 	private void backupMessage(final ConsumerMessage consumerMessage, String reason) {
 		
+		waitAckMessages.remove(consumerMessage.getAckId());
+
 		if(this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
 			
 			String desc = String.format("[%d][%s]", isBackcup() ? 1 : 0, reason);

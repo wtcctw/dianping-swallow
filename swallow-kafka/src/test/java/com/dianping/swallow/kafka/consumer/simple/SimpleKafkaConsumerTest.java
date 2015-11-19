@@ -32,6 +32,8 @@ public class SimpleKafkaConsumerTest extends AbstractKafkaConsumerTest{
 	@Test
 	public void testSaveAck(){
 		
+		System.out.println(simpleKafkaConsumer.getAck(new TopicAndPartition("SWALLOW_BACKUP", 0), "xxxxx"));
+		
 		TopicAndPartition tp = getTopicAndPartition();
 		String group = testName.getMethodName();
 		

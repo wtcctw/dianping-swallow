@@ -36,7 +36,6 @@ import scala.collection.JavaConversions;
 import com.dianping.swallow.kafka.KafkaConsumer;
 import com.dianping.swallow.kafka.KafkaMessage;
 import com.dianping.swallow.kafka.TopicAndPartition;
-import com.dianping.swallow.kafka.exception.KafkaRuntimeException;
 
 /**
  * @author mengwenchao
@@ -120,21 +119,27 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 	@Override
 	public Long getAck(TopicAndPartition tp, String groupId) {
 		
-		SimpleConsumer simpleConsumer = getProperConsumer(tp);
-		
-		List<kafka.common.TopicAndPartition> requestInfo = new LinkedList<kafka.common.TopicAndPartition>();
-		requestInfo.add(tp.toKafka());
-		
-		OffsetFetchRequest request = new OffsetFetchRequest(groupId, requestInfo, getCorRelationId(), clientId);
-		OffsetFetchResponse response = simpleConsumer.fetchOffsets(request);
-		
-		OffsetMetadataAndError offset = response.offsets().get(tp.toKafka());
-		
-		if(offset == null || offset.offset() == OffsetAndMetadata.InvalidOffset()){
-			return null;
+		try{
+			SimpleConsumer simpleConsumer = getProperConsumer(tp);
+			
+			List<kafka.common.TopicAndPartition> requestInfo = new LinkedList<kafka.common.TopicAndPartition>();
+			requestInfo.add(tp.toKafka());
+			
+			OffsetFetchRequest request = new OffsetFetchRequest(groupId, requestInfo, getCorRelationId(), clientId);
+			OffsetFetchResponse response = simpleConsumer.fetchOffsets(request);
+			
+			OffsetMetadataAndError offset = response.offsets().get(tp.toKafka());
+			
+			if(offset == null){
+				return null;
+			}
+			return offset.offset();
+		}catch(UnfoundMetaDataException e){
+			logger.error("[getAck]" + tp + "," + groupId, e);
 		}
 		
-		return offset.offset();
+		return null;
+		
 	}
 
 	
@@ -314,7 +319,7 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 		PartitionMetadata metaData = getPartitionMetadata(tp);
 		
 		if(metaData == null){
-			throw new KafkaRuntimeException("can not find meta data for partiton:" + tp);
+			throw new UnfoundMetaDataException(tp);
 		}
 		
 		return selectBrokerForPartition(tp, metaData);

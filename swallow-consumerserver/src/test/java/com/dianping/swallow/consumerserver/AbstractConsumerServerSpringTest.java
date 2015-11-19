@@ -29,8 +29,8 @@ public class AbstractConsumerServerSpringTest extends AbstractSpringTest{
 		messageDao = getBean(MessageDAO.class);
 		clusterManager = getBean(ClusterManager.class);
 		
-		messageDao.cleanMessage(topicName, null);
-		messageDao.cleanMessage(topicName, getConsumerId());
+		messageDao.cleanMessage(getTopic(), null);
+		messageDao.cleanMessage(getTopic(), getConsumerId());
 		messageRetriever = getBean(MessageRetriever.class);
 		
 	}
@@ -49,7 +49,7 @@ public class AbstractConsumerServerSpringTest extends AbstractSpringTest{
 		for(int i=0;i<count;i++){
 			
 			SwallowMessage message = createMessage();
-			messageDao.saveMessage(topicName, message);
+			messageDao.saveMessage(getTopic(), message);
 		}
 		
 		sleep(100);//wait slave

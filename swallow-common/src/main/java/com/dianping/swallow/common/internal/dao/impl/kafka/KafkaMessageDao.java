@@ -1,10 +1,15 @@
 package com.dianping.swallow.common.internal.dao.impl.kafka;
 
+
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Future;
+
+import kafka.common.OffsetAndMetadata;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.Deserializer;
 
 import com.dianping.swallow.common.internal.dao.impl.AbstractMessageDao;
@@ -22,9 +27,15 @@ import com.dianping.swallow.kafka.TopicAndPartition;
  */
 public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 	
-	protected static final String BACKUP_TOPIC = "SWALLOW_BACKUP";
+	public static final String BACKUP_TOPIC = "SWALLOW_BACKUP";
 
 	private static final long serialVersionUID = 1L;
+	
+
+	public static final long FROM_FIRST_ACK = -10000;//如果记录此ack，意味着消息从0开始
+
+	public static final long INVALID_ACK = OffsetAndMetadata.InvalidOffset();
+	
 
 	public KafkaMessageDao(KafkaCluster cluster) {
 		super(cluster);
@@ -47,8 +58,15 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 			producer = cluster.getProducer(sendTopic);
 
 			ProducerRecord<String, SwallowMessage>  record = new ProducerRecord<String, SwallowMessage>(sendTopic, message);
-			producer.send(record).get();
+			Future<RecordMetadata> future = producer.send(record);
+			RecordMetadata meta = future.get();
+			if(meta != null){
+				message.setMessageId(meta.offset());
+			}
 		} catch (Exception e) {
+			if(logger.isInfoEnabled()){
+				logger.info("[doSaveMessage]" + topicName + "," + consumerId, e);
+			}
 			throw new SwallowKafkaException("save message faild:" + sendTopic, e);
 		}
 	}
@@ -87,6 +105,8 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 		for(KafkaMessage kafkaMessage : messages){
 			
 			SwallowMessage message =  kafkaMessage.deserializer(deserializer);
+			message.setMessageId(kafkaMessage.getOffset());
+			
 			if(message.getMessageId() > maxMessageId){
 				maxMessageId = message.getMessageId();
 			}
@@ -125,12 +145,12 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 	}
 
 	@Override
-	public Long getMaxMessageId(String topicName, String consumerId) {
+	public Long getMaxMessageId(final String topicName, String consumerId) {
 		
 		String realTopic = getRealTopic(topicName, consumerId);
 		KafkaConsumer kafkaConsumer = cluster.getConsumer(realTopic);
 		
-		return kafkaConsumer.getMaxMessageId(new TopicAndPartition(topicName));
+		return kafkaConsumer.getMaxMessageId(new TopicAndPartition(realTopic));
 	}
 
 	@Override
@@ -188,7 +208,16 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 
 	@Override
 	public void cleanAck(String topicName, String consumerId, boolean isBackup) {
-		throw new UnsupportedOperationException();
+		
+		TopicAndPartition tp = new TopicAndPartition(topicName);
+		
+		if(!isBackup){
+			KafkaConsumer kafkaConsumer = cluster.getConsumer(topicName);
+			kafkaConsumer.saveAck(tp, consumerId, INVALID_ACK);
+			return;
+		}
+		
+		cluster.saveBackupAck(tp, consumerId, INVALID_ACK);
 	}
 
 	@Override
@@ -196,12 +225,28 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 
 		TopicAndPartition tp = new TopicAndPartition(topicName);
 		
+		Long ack = null;
 		if(!isBackup){
 			KafkaConsumer kafkaConsumer = cluster.getConsumer(topicName);
-			return kafkaConsumer.getAck(tp, consumerId);
+			ack = kafkaConsumer.getAck(tp, consumerId);
+		}else{
+			ack = cluster.getBackupAck(tp, consumerId); 
 		}
 		
-		return cluster.getBackupAck(tp, consumerId);
+		return realAck(ack);
+	}
+
+	private Long realAck(Long ack) {
+		
+		if(ack == null || ack == INVALID_ACK){
+			return null;
+		}
+		
+		if(ack == FROM_FIRST_ACK){
+			return -1L;
+		}
+		
+		return ack;
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import org.junit.Test;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
-import com.dianping.swallow.common.internal.dao.impl.AbstractMongoTest;
+import com.dianping.swallow.common.internal.dao.impl.AbstractDbTest;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.mongodb.CommandResult;
 import com.mongodb.DBCollection;
@@ -17,7 +17,7 @@ import com.mongodb.DBCollection;
  *
  * 2015年2月4日 下午4:38:10
  */
-public class MongoClusterTest extends AbstractMongoTest{
+public class MongoClusterTest extends AbstractDbTest{
 	
 	
 	private MongoCluster mongoCluster;

@@ -1,6 +1,8 @@
 package com.dianping.swallow.consumerserver.worker.impl;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -156,15 +158,20 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 				try {
 					String consumerIp = IPUtil.getIpFromChannel(channel);
 
-					if (ackLogger.isInfoEnabled()) {
-						ackLogger.info(consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
-								+ ackId + "," + IPUtil.simpleLogIp(connectedChannels.get(channel)));
-					}
 
 					ConsumerMessage message = removeWaitAckMessages(ackId);
+					
+					long realAckId = ackId;
 					if (message != null) {
 						consumerCollector.ackMessage(consumerInfo, consumerIp, message.getMessage());
+						realAckId = message.getOriginalMessageId();
 					}
+					
+					if (ackLogger.isInfoEnabled()) {
+						ackLogger.info(consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
+								+ realAckId + "," + IPUtil.simpleLogIp(connectedChannels.get(channel)));
+					}
+
 
 					if (ACKHandlerType.CLOSE_CHANNEL.equals(type)) {
 						if (logger.isInfoEnabled()) {
@@ -299,18 +306,21 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 
 		try {
 			
+
+			consumerCollector.sendMessage(consumerInfo, consumerIpPort, consumerMessage.getMessage());
+			consumerMessage.beginSend(channel);
+			
 			if (logger.isDebugEnabled()) {
 				logger.debug("[sendMessage][channel write]");
 			}
-
-			consumerCollector.sendMessage(consumerInfo, consumerIpPort, consumerMessage.getMessage());
-
-			channel.writeAndFlush(pktMessage);
-
+			
+			ChannelFuture future = channel.writeAndFlush(pktMessage);
+			
+			future.addListener(new SendChannelListener(consumerMessage));
+			
 			consumerServerTransaction.addData("mid", pktMessage.getContent().getMessageId());
 			consumerServerTransaction.setStatus(com.dianping.cat.message.Message.SUCCESS);
 		} catch (RuntimeException e) {
-			
 			
 			consumerMessage.exceptionWhileSend(e);
 			
@@ -379,4 +389,24 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 	}
 
 
+	
+	class SendChannelListener implements ChannelFutureListener{
+		
+		private ConsumerMessage consumerMessage;
+		
+		public SendChannelListener(ConsumerMessage consumerMessage) {
+			this.consumerMessage = consumerMessage;
+		}
+
+		@Override
+		public void operationComplete(ChannelFuture future) throws Exception {
+			
+			if(future.isSuccess()){
+				consumerMessage.successSend();
+			}else{
+				consumerMessage.exceptionWhileSend(future.cause());
+			}
+		}
+		
+	}
 }
