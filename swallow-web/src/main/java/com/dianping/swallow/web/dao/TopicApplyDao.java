@@ -15,7 +15,7 @@ public interface TopicApplyDao extends Dao{
 
     long count();
 
-    TopicApplyResource find(String topic);
+    List<TopicApplyResource> find(String topic, int offset, int limit);
 
     Pair<Long, List<TopicApplyResource>> findTopicApplyResourcePage(int offset, int limit);
 }

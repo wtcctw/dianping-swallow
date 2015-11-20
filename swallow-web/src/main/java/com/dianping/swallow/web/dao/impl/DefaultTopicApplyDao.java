@@ -43,9 +43,10 @@ public class DefaultTopicApplyDao extends AbstractWriteDao implements TopicApply
     }
 
     @Override
-    public TopicApplyResource find(String topic) {
+    public List<TopicApplyResource> find(String topic, int offset, int limit) {
         Query query = new Query(Criteria.where(TOPIC).is(topic));
-        TopicApplyResource topicApplyResource = mongoTemplate.findOne(query, TopicApplyResource.class, TOPICAPPLY_COLLECTION);
+        query.skip(offset).limit(limit);
+        List<TopicApplyResource> topicApplyResource = mongoTemplate.find(query, TopicApplyResource.class, TOPICAPPLY_COLLECTION);
         return topicApplyResource;
     }
 

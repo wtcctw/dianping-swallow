@@ -17,9 +17,11 @@ import com.dianping.swallow.web.controller.handler.lion.LionHandlerChain;
 import com.dianping.swallow.web.controller.handler.lion.TopicCfgLionHandler;
 import com.dianping.swallow.web.controller.handler.lion.TopicWhiteListLionHandler;
 import com.dianping.swallow.web.controller.handler.result.LionConfigureResult;
+import com.dianping.swallow.web.filter.LogFilter;
 import com.dianping.swallow.web.model.resource.TopicApplyResource;
 import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.service.TopicResourceService;
+import com.dianping.swallow.web.util.JsonUtil;
 import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -101,7 +103,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     @ResponseBody
     public Object applyTopic(@RequestBody TopicApplyDto topicApplyDto, HttpServletRequest request) {
 
-        TopicApplyResource topicApplyResource = (TopicApplyResource) request.getAttribute("topicApplyResource");
+        TopicApplyResource topicApplyResource = (TopicApplyResource) request.getAttribute(LogFilter.TOPIC_APPLY_ATTR);
         topicApplyResource.setTopic(topicApplyDto.getTopic());
         topicApplyResource.setTopicApplyDto(topicApplyDto);
 
@@ -117,7 +119,6 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 
         if (validatorFilterResult.getStatus() != 0) {
-            topicApplyResource.setResponseStatus(ResponseStatus.findByStatus(validatorFilterResult.getStatus()));
             return validatorFilterResult;
         }
 
@@ -132,7 +133,6 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         topicApplyResource.setLionConfigureResult(lionConfigureResult);
 
         if (status != ResponseStatus.SUCCESS) {
-            topicApplyResource.setResponseStatus(status);
             return status;
         }
 
@@ -166,13 +166,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
             isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
         }
 
-        if(isSuccess){
-            topicApplyResource.setResponseStatus(ResponseStatus.SUCCESS);
-            return ResponseStatus.SUCCESS;
-        }else{
-            topicApplyResource.setResponseStatus(ResponseStatus.MONGOWRITE);
-            return ResponseStatus.MONGOWRITE;
-        }
+        return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
     }
 
     @RequestMapping(value = "/console/topicapply")
@@ -193,7 +187,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         if (StringUtils.isBlank(topic)) {
             return topicApplyService.findTopicApplyResourcePage(offset, limit);
         } else {
-            return topicApplyService.find(topic);
+            return topicApplyService.find(topic, offset, limit);
         }
 
     }
@@ -215,5 +209,21 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     public String getSubSide() {
 
         return subSide;
+    }
+
+    public static void main(String[] args) {
+        ValidatorFilterResult validatorFilterResult = new ValidatorFilterResult();
+        validatorFilterResult.setMessage("hello");
+        validatorFilterResult.setStatus(30);
+        String json = JsonUtil.toJson(validatorFilterResult);
+        System.out.println(json);
+        ValidatorFilterResult status = JsonUtil.fromJson(json, ValidatorFilterResult.class);
+        System.out.println(status.getMessage());
+        System.out.println(status.getStatus());
+        json = JsonUtil.toJson(ResponseStatus.SUCCESS);
+        status = JsonUtil.fromJson(json, ValidatorFilterResult.class);
+        System.out.println(status.getMessage());
+        System.out.println(status.getStatus());
+
     }
 }

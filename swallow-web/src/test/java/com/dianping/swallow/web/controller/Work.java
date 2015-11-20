@@ -1,8 +1,5 @@
 package com.dianping.swallow.web.controller;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
@@ -11,6 +8,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 
 /**
@@ -40,7 +40,7 @@ public class Work implements Runnable {
         jsonParam.put("size", "10");
         jsonParam.put("amount", "5"); 
         jsonParam.put("applicant", "yapu.wang"); 
-        jsonParam.put("test", "false");  
+        jsonParam.put("test", "true");
         jsonParam.put("type", "一般消息队列");
           
         StringEntity entity = new StringEntity(jsonParam.toString(),"UTF-8");  

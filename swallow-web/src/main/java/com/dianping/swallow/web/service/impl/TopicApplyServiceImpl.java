@@ -25,8 +25,8 @@ public class TopicApplyServiceImpl implements TopicApplyService{
     }
 
     @Override
-    public TopicApplyResource find(String topic) {
-        return topicApplyDao.find(topic);
+    public List<TopicApplyResource> find(String topic, int offset, int limit) {
+        return topicApplyDao.find(topic, offset, limit);
     }
 
     @Override

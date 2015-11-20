@@ -15,6 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Author   mingdongli
@@ -65,14 +66,14 @@ public class TopicApplyServiceImplTest {
     @Test
     public void test() {
 
-        TopicApplyResource topicResource = topicApplyService.find("topic_apply");
-        if (topicResource == null) {
-            topicResource = createTopicApplyResource();
+        List<TopicApplyResource> topicResources = topicApplyService.find("topic_apply", 0, 30);
+        if (topicResources == null) {
+            TopicApplyResource topicResource = createTopicApplyResource();
             boolean result = topicApplyService.insert(topicResource);
             Assert.assertTrue(result);
         }else{
-            topicResource.setCreateTime(new Date());
-            boolean result = topicApplyService.insert(topicResource);
+            topicResources.get(0).setCreateTime(new Date());
+            boolean result = topicApplyService.insert(topicResources.get(0));
             Assert.assertTrue(result);
         }
 

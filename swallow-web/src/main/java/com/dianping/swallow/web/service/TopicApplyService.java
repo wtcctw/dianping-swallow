@@ -13,7 +13,7 @@ public interface TopicApplyService {
 
     boolean insert(TopicApplyResource topicApplyResource);
 
-    TopicApplyResource find(String topic);
+    List<TopicApplyResource> find(String topic, int offset, int limit);
 
     Pair<Long, List<TopicApplyResource>> findTopicApplyResourcePage(int offset, int limit);
 }
