@@ -52,6 +52,9 @@ public class TopicApplyController {
 	private AuthenticationValidatorFilter authenticationValidatorFilter;
 
 	@Autowired
+	private SwitchValidatorFilter switchValidatorFilter;
+
+	@Autowired
 	private NameValidatorFilter nameValidatorFilter;
 
 	@Autowired
@@ -92,6 +95,7 @@ public class TopicApplyController {
 		ValidatorFilterResult validatorFilterResult = new ValidatorFilterResult();
 		ValidatorFilterChain validatorFilterChain = filterChainFactory.createValidatorFilterChain();
 
+		validatorFilterChain.addFilter(switchValidatorFilter);
 		validatorFilterChain.addFilter(authenticationValidatorFilter);
 		validatorFilterChain.addFilter(nameValidatorFilter);
 		validatorFilterChain.addFilter(quoteValidatorFilter);
