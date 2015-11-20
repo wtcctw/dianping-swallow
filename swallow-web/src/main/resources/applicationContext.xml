@@ -67,6 +67,7 @@
 			<mvc:mapping path="/console/message" />
 			<mvc:mapping path="/console/administrator" />
 			<mvc:mapping path="/console/download" />
+			<mvc:mapping path="/console/topicapply" />
 			<mvc:mapping path="/console/setting" />
 			<mvc:mapping path="/console/server" />
 			<mvc:mapping path="/console/consumerid" />

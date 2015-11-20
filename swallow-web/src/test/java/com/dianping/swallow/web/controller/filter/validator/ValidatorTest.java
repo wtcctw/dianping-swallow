@@ -1,22 +1,21 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-
 import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.TopicResourceService;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -33,6 +32,8 @@ public class ValidatorTest extends MockTest{
 	private TopicResourceService topicResourceService;
 	
 	private TopicApplyDto topicApplyDto;
+
+	private SwitchValidatorFilter switchValidatorFilter = new SwitchValidatorFilter();
 	
 	private ValidatorFilterChain validatorFilterChain = new ValidatorFilterChain();
 
@@ -50,19 +51,22 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setTopic("swallow-test");
 		topicApplyDto.setApprover("hongjun.zhong");
 		topicApplyDto.setType(MongoType.GENERAL.toString());
-		
-		
+
+
 		TypeValidatorFilter typeValidator = new TypeValidatorFilter();
 		QuoteValidatorFilter quoteValidator = new QuoteValidatorFilter();
 		NameValidatorFilter nameValidator = new NameValidatorFilter();
 		AuthenticationValidatorFilter authenticationValidator = new AuthenticationValidatorFilter();
+		validatorFilterChain.addFilter(switchValidatorFilter);
 		validatorFilterChain.addFilter(authenticationValidator);
 		validatorFilterChain.addFilter(nameValidator);
 		validatorFilterChain.addFilter(quoteValidator);
 		validatorFilterChain.addFilter(typeValidator);
-		
+
+		switchValidatorFilter.setApplyTopicSwitch("true");
 		authenticationValidator.setUserUtils(userUtils);
 		nameValidator.setTopicResourceService(topicResourceService);
+
 		Mockito.doReturn(Boolean.TRUE).when(userUtils).isAdministrator(topicApplyDto.getApprover(), true);
 		Mockito.doReturn(topicToWhiltelist).when(topicResourceService).loadCachedTopicToAdministrator();
 	}
@@ -74,7 +78,14 @@ public class ValidatorTest extends MockTest{
 		/*-----------------------通过测试--------------------------*/
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == 0);
-		
+
+		/*-----------------------开关关闭--------------------------*/
+		validatorFilterChain.resetFilterChain();
+		switchValidatorFilter.setApplyTopicSwitch("false");
+		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
+		Assert.assertTrue(validatorFilterResult.getStatus() == -24);
+		switchValidatorFilter.setApplyTopicSwitch("true");
+
 		/*-----------------------配额太大--------------------------*/
 		validatorFilterChain.resetFilterChain();
 		topicApplyDto.setSize(20);

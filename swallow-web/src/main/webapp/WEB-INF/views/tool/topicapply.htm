@@ -1,0 +1,207 @@
+<div class="main-content" ng-controller="TopicApplyController"
+     id="TopicApplyController">
+    <div class="report">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <script type="text/javascript"
+                    src="${rc.contextPath}/static/js/swallow-topicapply.js?t=20151120"></script>
+            <script type="text/javascript">
+                try {
+                    ace.settings.check('breadcrumbs', 'fixed')
+                } catch (e) {
+                }
+            </script>
+
+            <!-- #nav-search -->
+            <div class="nav-search nav-search-local pull-right" id="nav-search">
+                <form class="form-search">
+					<span class="input-icon"> <input type="text"
+                                                     placeholder="根据topic查找申请信息..." style="width: 220px"
+                                                     class="nav-search-input" name="a" id="searchtopic"
+                                                     autocomplete="off" ng-model='name'>
+						<ul class="typeahead dropdown-menu" style="top: 28px; left: 0px;">
+                        </ul> <i class="icon-search nav-search-icon"></i>
+					</span>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- page-content -->
+        <div class="page-content">
+            <div>
+                <!--row  -->
+                <div class="row">
+                    <table
+                            class="table table-bordered table-striped  table-condensed table-hover">
+                        <tr>
+                            <th style="text-align: left">序号</th>
+                            <th style="text-align: left">名称</th>
+                            <th style="text-align: left">申请人</th>
+                            <th style="text-align: left">数量 万/天</th>
+                            <th style="text-align: left">类型</th>
+                            <th style="text-align: left">消费服务器</th>
+                            <th style="text-align: left">mongo服务器</th>
+                            <th style="text-align: left">分配空间/M</th>
+                            <th style="text-align: left">操作结果</th>
+                            <th style="text-align: left">申请时间</th>
+                        </tr>
+                        <tr ng-repeat="t in searchPaginator.currentPageItems"
+                            on-finish-render-filters>
+                            <td style="text-align: left" ng-bind="$index+1"></td>
+                            <td style="text-align: left" ng-bind="t.topic"></a></td>
+                            <td style="text-align: left" ng-bind="t.topicApplyDto.applicant"></a></td>
+                            <td style="text-align: left" ng-bind="t.topicApplyDto.amount"></a></td>
+                            <td style="text-align: left" ng-bind="t.topicApplyDto.type"></a></td>
+                            <td style="text-align: left" ng-bind="t.lionConfigureResult.consumerServer"></a></td>
+                            <td style="text-align: left" ng-bind="t.lionConfigureResult.mongoServer"></a></td>
+                            <td style="text-align: left" ng-bind="t.lionConfigureResult.size4SevenDay"></a></td>
+                            <td style="text-align: left" ng-bind="t.responseStatus.message"></td>
+                            <td style="text-align: left" ng-bind="t.createTime | date : 'yyyy-MM-dd HH:mm:ss'"></td>
+                        </tr>
+                    </table>
+
+                    <ul style="margin-top: 20px;" class="pagination">
+                        <li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+                        <li><a href="" ng-click="searchPaginator.previous()"
+                               ng-show="searchPaginator.hasPrevious()">上一页</a></li>
+                        <li ng-repeat="p in searchPaginator.pages"><a href=""
+                                                                      ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
+                        <li class="disabled"><a href="javascript:;">...</a></li>
+
+                        <li><a href="" ng-click="searchPaginator.next()"
+                               ng-show="searchPaginator.hasNext()">下一页</a></li>
+
+                        <li><a href=""
+                               ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+                    </ul>
+                </div>
+                <!--end row  -->
+            </div>
+
+            <!-- 模态框（Modal） -->
+            <div class="modal fade" id="myModal0" tabindex="-1" role="dialog"
+                 aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel0">申请信息</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" class="form-horizontal" name="myForm0"
+                                  ng-submit="refreshpage(myForm0,0)">
+                                <div class="control-group">
+                                    <div class="form-group"
+                                         style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                        <label class="control-label"><b>Topic</b></label> <input
+                                            type="text" class="form-control" ng-model="topicApplyEntry.topic"
+                                            id="topic" data-provide="typeahead" autocomplete="off"
+                                            readonly> </input>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label"><b>发送端设置</b></label>
+                                    <div class="form-group"
+                                         style="margin-right: 39px; margin-left: 40px;">
+                                        <label class="control-label">发送QPS</label>
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-2 control-label">峰值</label> <input
+                                                class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.peak" />
+                                            <label class="col-sm-2 control-label">谷值</label><input
+                                                type="text" class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.valley" />
+                                            <label class="col-sm-2 control-label">波动</label><input
+                                                type="text" class="col-sm-2"
+                                                ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation" /><label
+                                                class="col-sm-2 control-label">波动基数</label><input type="text"
+                                                                                                  class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group"
+                                         style="margin-right: 39px; margin-left: 40px;">
+                                        <label class="control-label">延迟</label>
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-2 control-label">发送</label> <input
+                                                class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.delay" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group" style="margin-top: 40px">
+                                    <div class="controls">
+                                        <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">关闭</button>
+                                        <button type="submit" class="btn btn-success">提交</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+
+            <!-- 模态框（Modal） -->
+            <div class="modal fade" id="myModal1" tabindex="-2" role="dialog"
+                 aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel1">配置Topic</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" class="form-horizontal" name="myForm1"
+                                  ng-submit="refreshpage(myForm1,1)">
+                                <div class="control-group">
+                                    <div class="form-group"
+                                         style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                        <label class="control-label"><b>Topic</b></label> <input
+                                            type="text" class="form-control" ng-model="topicEntry.topic"
+                                            id="topic" data-provide="typeahead" autocomplete="off"
+                                            readonly> </input>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label"><b>发送端设置</b></label>
+                                    <div class="form-group"
+                                         style="margin-right: 39px; margin-left: 40px;">
+                                        <label class="control-label">发送QPS</label>
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-2 control-label">峰值</label> <input
+                                                class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.peak" />
+                                            <label class="col-sm-2 control-label">谷值</label><input
+                                                type="text" class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.valley" />
+                                            <label class="col-sm-2 control-label">波动</label><input
+                                                type="text" class="col-sm-2"
+                                                ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation" /><label
+                                                class="col-sm-2 control-label">波动基数</label><input type="text"
+                                                                                                  class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group"
+                                         style="margin-right: 39px; margin-left: 40px;">
+                                        <label class="control-label">延迟</label>
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-2 control-label">发送</label> <input
+                                                class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.delay" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="control-group" style="margin-top: 40px">
+                                    <div class="controls">
+                                        <button type="button" class="btn btn-default"
+                                                data-dismiss="modal">关闭</button>
+                                        <button type="submit" class="btn btn-success">提交</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+
+        </div>
+    </div>
+</div>

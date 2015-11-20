@@ -78,10 +78,10 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
     public ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId) {
 
         Query query = new Query(Criteria.where(CONSUMERID).is(consumerId).andOperator(Criteria.where(TOPIC).is(topic)));
-        ConsumerIdResource consumerIdResources = mongoTemplate.findOne(query, ConsumerIdResource.class,
+        ConsumerIdResource consumerIdResource = mongoTemplate.findOne(query, ConsumerIdResource.class,
                 CONSUMERIDRESOURCE_COLLECTION);
 
-        return consumerIdResources;
+        return consumerIdResource;
     }
 
     @Override
@@ -109,6 +109,14 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
                 CONSUMERIDRESOURCE_COLLECTION);
 
         return new Pair<Long, List<ConsumerIdResource>>(size, consumerIdResources);
+    }
+
+    public List<ConsumerIdResource> findByTopic(String topic){
+        Query query = new Query(Criteria.where(TOPIC).is(topic));
+        List<ConsumerIdResource> consumerIdResources = mongoTemplate.find(query, ConsumerIdResource.class,
+                CONSUMERIDRESOURCE_COLLECTION);
+
+        return consumerIdResources;
     }
 
     @Override
