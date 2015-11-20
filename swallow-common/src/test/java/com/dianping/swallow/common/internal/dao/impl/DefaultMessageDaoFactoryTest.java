@@ -36,14 +36,20 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 
 	private DefaultMessageDaoFactory defaultMessageDaoFactory;
 
-	private SwallowConfigDistributed swallowConfig;
-
 	private String[] clusters = new String[]{"mongodb://192.168.213.143:27018,192.168.213.143:27118,192.168.213.143:27218", 
 			"mongodb://127.0.0.1:27018,127.0.0.1:27118,127.0.0.1:27218"};
 
 	@Mock
 	private ClusterManager clusterManager;
+	
+	
+	private SwallowConfigDistributed swallowConfig;
 
+	
+	@Override
+	protected void doBeforeAbstractDbTest() {
+		System.getProperties().setProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion-daofactory.properties");
+	}
 	/**
 	#192.168.31.178:27016
 	swallow.mongo.heartbeatServerURI=mongodb://192.168.213.143:27018
@@ -59,10 +65,7 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 		
 		defaultMessageDaoFactory = new DefaultMessageDaoFactory();
 		
-		System.getProperties().setProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-store-lion-daofactory.properties");
-		swallowConfig = new SwallowConfigDistributed();
-		swallowConfig.initialize();
-		
+		swallowConfig = (SwallowConfigDistributed) getSwallowConfig();
 		initClusterManager();
 		
 		defaultMessageDaoFactory.setSwallowConfig(swallowConfig);
@@ -187,6 +190,7 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 			}))).then(new Answer<Cluster>() {
 
 				@Override
+				@SuppressWarnings({ "rawtypes", "unchecked" })
 				public Cluster answer(InvocationOnMock invocation) throws Throwable {
 					
 					String url = (String) invocation.getArguments()[0];
@@ -199,6 +203,9 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 							
 							Cluster cluster = mock(real.getClass());
 							
+							MessageDAO messageDao = mock(MessageDAO.class);
+							
+							when(cluster.createMessageDao()).thenReturn(messageDao);
 							when(cluster.getSeeds()).thenReturn(real.getSeeds());
 							when(cluster.allServers()).thenReturn(allServers);
 							when(cluster.sameCluster((Cluster) anyObject())).then(new Answer<Boolean>() {
@@ -232,7 +239,7 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 
 		return result.getSeeds();
 	}
-
+	
 	
 	@Test
 	public void testCreateAllTopicDao(){

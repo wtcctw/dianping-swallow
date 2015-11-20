@@ -336,5 +336,10 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	protected Map<String, DAOContainer<MessageDAO<?>>> getDaos(){
 		
 		return daos;
-	} 
+	}
+	
+	@Override
+	public int getOrder() {
+		return ORDER;
+	}
 }

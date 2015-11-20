@@ -235,6 +235,9 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 				
 				checkAdd(new HashSet<String>(rawTopicSet), new HashSet<String>(currentTopicSet));
 				checkDelete(new HashSet<String>(rawTopicSet), new HashSet<String>(currentTopicSet));
+			}catch(InterruptedException e){
+				Thread.currentThread().interrupt();
+				logger.error("[run]", e);
 			}catch(Throwable th){
 				logger.error("[run]", th);
 			}

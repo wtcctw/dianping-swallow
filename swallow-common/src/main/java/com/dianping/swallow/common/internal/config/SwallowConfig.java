@@ -34,7 +34,7 @@ public interface SwallowConfig extends Observable, Lifecycle{
 	 * @return
 	 */
 	TopicConfig getTopicConfig(String topic);
-	
+
 	TopicConfig defaultTopicConfig();
 
 	String getHeartBeatMongo();

@@ -36,9 +36,9 @@ public class DefaultClusterManagerTest extends AbstractTest{
 	@Test
 	public void testEquals(){
 		
-		SwallowMessage message1 = createMessage();
+		SwallowMessage message1 = createMessage(1L);
 		message1.putInternalProperty("haha", "hahaha");
-		SwallowMessage message2 = createMessage();
+		SwallowMessage message2 = createMessage(1L);
 		
 		Assert.assertTrue(equals(message1, message2));
 		Assert.assertFalse(equals(message1, message2, true, true));

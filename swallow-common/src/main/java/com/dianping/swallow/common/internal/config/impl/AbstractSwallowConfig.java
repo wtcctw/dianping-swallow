@@ -25,7 +25,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 
 	public static final long MILLION = 1024 * 1024;
 	
-	private final String 	LION_CONFIG_FILENAME          = PropertiesUtils.getProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-store-lion.properties");
+	private final String 	LION_CONFIG_FILENAME          = PropertiesUtils.getProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion.properties");
 	
 	public static final String 	TOPICNAME_DEFAULT             = "default";
 

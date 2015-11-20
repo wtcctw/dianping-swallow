@@ -37,6 +37,8 @@ public abstract class AbstractDbTest extends AbstractTest{
 	@Before
 	public void beforeAbstractDbTest() throws Exception{
 		
+		doBeforeAbstractDbTest();
+		
 		serverProperties = new Properties();
 		InputStream ins = getClass().getClassLoader().getResourceAsStream("swallow-store-lion.properties");
 		serverProperties.load(ins);
@@ -52,6 +54,10 @@ public abstract class AbstractDbTest extends AbstractTest{
 
 	}
 	
+	protected void doBeforeAbstractDbTest() {
+		
+	}
+
 	private void loadDbAddress(Properties properties) {
 		
 		for( Entry<Object, Object>  entry : properties.entrySet()){

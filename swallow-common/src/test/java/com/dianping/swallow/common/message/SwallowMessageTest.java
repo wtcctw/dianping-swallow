@@ -104,18 +104,6 @@ public class SwallowMessageTest extends AbstractTest{
     }
 
     @Test
-    public void testEqualsWithoutMessageId() throws Exception {
-        SwallowMessage msg = createMessage();
-        msg.setGeneratedTime(null);
-        SwallowMessage msg2 = createMessage();
-        msg2.setGeneratedTime(null);
-        Assert.assertTrue(msg.equals(msg2));
-        msg2.setMessageId(2L);
-        Assert.assertFalse(msg.equals(msg2));
-        Assert.assertTrue(equalsWithoutMessageId(msg, msg2));
-    }
-
-    @Test
     public void testGetters() throws Exception {
         SwallowMessage msg = createMessage();
         Assert.assertEquals("this is a SwallowMessage", msg.getContent());

@@ -7,6 +7,7 @@
 		<version>0.7.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>swallow-kafka</artifactId>
+	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>

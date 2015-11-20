@@ -26,7 +26,7 @@ public class MessageRetransmitServiceImpl extends AbstractSwallowService impleme
 	private static final String RETRANSMIT = "retransmit";
 
 	@Autowired
-	private MessageDAO messageDAO;
+	private MessageDAO<?> messageDAO;
 
 	public boolean retransmitMessage(String topic, long mid) {
 		SwallowMessage sm = new SwallowMessage();
@@ -66,13 +66,7 @@ public class MessageRetransmitServiceImpl extends AbstractSwallowService impleme
 		sm.setGeneratedTime(new Date());
 
 		sm.setSourceIp(IPUtil.getFirstNoLoopbackIP4Address());
-		if (sm.getInternalProperties() != null)
-			sm.getInternalProperties().put(RETRANSMIT, "true");
-		else {
-			Map<String, String> map = new HashMap<String, String>();
-			map.put(RETRANSMIT, "true");
-			sm.setInternalProperties(map);
-		}
+		sm.putInternalProperty(RETRANSMIT, "true");
 	}
 
 }

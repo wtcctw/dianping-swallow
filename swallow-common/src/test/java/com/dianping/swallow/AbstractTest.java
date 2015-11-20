@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,6 +19,7 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.mockito.MockitoAnnotations;
 
+import com.dianping.lion.client.ConfigCache;
 import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
@@ -57,7 +59,11 @@ public abstract class AbstractTest {
 			logger.info("[-----------------][begin test]" + testName.getMethodName());
 		}
 
+		
 		System.setProperty("lion.useLocal", "true");
+		//清理残存配置信息
+		ConfigCache.getInstance().setPts(new Properties());
+		
 		localIp = IPUtil.getFirstNoLoopbackIP4Address();
 		MockitoAnnotations.initMocks(this);
 
@@ -77,10 +83,10 @@ public abstract class AbstractTest {
 		}
 	}
 
-	public SwallowMessage createMessage() {
-
+	public SwallowMessage createMessage(Long messageId) {
+		
 		SwallowMessage message = new SwallowMessage();
-		message.setMessageId(System.currentTimeMillis());
+		message.setMessageId(messageId);
 		message.setContent("this is a SwallowMessage");
 		message.setGeneratedTime(new Date());
 		HashMap<String, String> map = new HashMap<String, String>();
@@ -93,6 +99,10 @@ public abstract class AbstractTest {
 
 		message.putInternalProperty(InternalProperties.SAVE_TIME, String.valueOf(System.currentTimeMillis() - 50));
 		return message;
+	}
+
+	public SwallowMessage createMessage() {
+		return createMessage(System.currentTimeMillis());
 	}
 
 	protected boolean testLocalWebServer() {
