@@ -21,6 +21,8 @@ public interface ConsumerIdResourceService {
 	int remove(String topic, String consumerid);
 	
 	Pair<Long, List<ConsumerIdResource>> findByTopic(ConsumerIdParam consumerIdParam);
+
+	List<ConsumerIdResource> findByTopic(String topic);
 	
 	Pair<Long, List<ConsumerIdResource>> find(ConsumerIdParam  consumerIdParam);
 	
