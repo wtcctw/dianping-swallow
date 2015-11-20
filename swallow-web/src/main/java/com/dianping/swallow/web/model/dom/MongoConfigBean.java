@@ -8,6 +8,7 @@ package com.dianping.swallow.web.model.dom;
  */
 public class MongoConfigBean {
 
+	@SuppressWarnings("unused")
 	private String mongoUrl;
 	
 	private int size;

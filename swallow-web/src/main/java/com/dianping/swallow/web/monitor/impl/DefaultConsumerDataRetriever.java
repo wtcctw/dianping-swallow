@@ -1,50 +1,30 @@
 package com.dianping.swallow.web.monitor.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.NavigableMap;
-import java.util.Set;
-
-import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.dianping.swallow.common.internal.util.CommonUtils;
-import com.dianping.swallow.common.server.monitor.data.ConsumerStatisRetriever;
-import com.dianping.swallow.common.server.monitor.data.QPX;
-import com.dianping.swallow.common.server.monitor.data.StatisDetailType;
-import com.dianping.swallow.common.server.monitor.data.StatisType;
-import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
+import com.dianping.swallow.common.server.monitor.data.*;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
-import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.ConsumerServerData;
-import com.dianping.swallow.common.server.monitor.data.structure.ConsumerTopicData;
-import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.*;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
-import com.dianping.swallow.web.monitor.AccumulationRetriever;
-import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
-import com.dianping.swallow.web.monitor.OrderEntity;
-import com.dianping.swallow.web.monitor.OrderStatsData;
-import com.dianping.swallow.web.monitor.StatsData;
-import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.monitor.*;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsDataMapPair;
 import com.dianping.swallow.web.service.ConsumerTopicStatsDataService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mengwenchao
@@ -78,7 +58,7 @@ public class DefaultConsumerDataRetriever
 
     @Override
     public boolean dataExistInMemory(long start, long end) {
-        NavigableMap<Long, Long> qpxStatsData = convertQpxData(statis.getQpx(StatisType.SEND));
+        NavigableMap<Long, Long> qpxStatsData = convertData(statis.getQpx(StatisType.SEND), StatisFunctionType.QPX);
 
         if (qpxStatsData == null || qpxStatsData.isEmpty()) {
             return false;
@@ -112,18 +92,18 @@ public class DefaultConsumerDataRetriever
             }
             Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topicName,
                     StatisType.SEND, false);
-            Map<String, NavigableMap<Long, QpxData>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
+            Map<String, NavigableMap<Long, StatisData>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
                     StatisType.SEND, false);
             Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topicName,
                     StatisType.ACK, false);
-            Map<String, NavigableMap<Long, QpxData>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
+            Map<String, NavigableMap<Long, StatisData>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
                     StatisType.ACK, false);
             if (sendDelays != null) {
                 for (Map.Entry<String, NavigableMap<Long, Long>> sendDelay : sendDelays.entrySet()) {
                     if (TOTAL_KEY.equals(sendDelay.getKey())) {
                         continue;
                     }
-                    NavigableMap<Long, Long> sendQpx = convertQpxData(sendQpxs.get(sendDelay.getKey()));
+                    NavigableMap<Long, Long> sendQpx = convertData(sendQpxs.get(sendDelay.getKey()), StatisFunctionType.QPX);
                     sendStatsData
                             .add(new OrderEntity(topicName, sendDelay.getKey(), getDelaySumStatsData(
                                     sendDelay.getValue(), sendQpx, fromKey, toKey), getQpsSumStatsData(sendQpx,
@@ -136,7 +116,7 @@ public class DefaultConsumerDataRetriever
                     if (TOTAL_KEY.equals(ackDelay.getKey())) {
                         continue;
                     }
-                    NavigableMap<Long, Long> ackQpx = convertQpxData(ackQpxs.get(ackDelay.getKey()));
+                    NavigableMap<Long, Long> ackQpx = convertData(ackQpxs.get(ackDelay.getKey()), StatisFunctionType.QPX);
                     ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getDelaySumStatsData(
                             ackDelay.getValue(), ackQpx, fromKey, toKey), getQpsSumStatsData(ackQpx, fromKey, toKey)));
                 }
@@ -167,27 +147,27 @@ public class DefaultConsumerDataRetriever
             if (TOTAL_KEY.equals(topicName)) {
                 continue;
             }
-            Map<String, NavigableMap<Long, QpxData>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
+            Map<String, NavigableMap<Long, StatisData>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
                     StatisType.SEND, false);
-            Map<String, NavigableMap<Long, QpxData>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
+            Map<String, NavigableMap<Long, StatisData>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
                     StatisType.ACK, false);
             if (sendQpxs != null) {
-                for (Map.Entry<String, NavigableMap<Long, QpxData>> sendQpx : sendQpxs.entrySet()) {
+                for (Map.Entry<String, NavigableMap<Long, StatisData>> sendQpx : sendQpxs.entrySet()) {
                     if (TOTAL_KEY.equals(sendQpx.getKey())) {
                         continue;
                     }
                     sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getQpsSumStatsData(
-                            convertQpxData(sendQpx.getValue()), fromKey, toKey), getQpsSampleCount(start, end)));
+                            convertData(sendQpx.getValue(), StatisFunctionType.QPX), fromKey, toKey), getQpsSampleCount(start, end)));
                 }
             }
 
             if (ackQpxs != null) {
-                for (Map.Entry<String, NavigableMap<Long, QpxData>> ackQpx : ackQpxs.entrySet()) {
+                for (Map.Entry<String, NavigableMap<Long, StatisData>> ackQpx : ackQpxs.entrySet()) {
                     if (TOTAL_KEY.equals(ackQpx.getKey())) {
                         continue;
                     }
                     ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getQpsSumStatsData(
-                            convertQpxData(ackQpx.getValue()), fromKey, toKey), getQpsSampleCount(start, end)));
+                            convertData(ackQpx.getValue(), StatisFunctionType.QPX), fromKey, toKey), getQpsSampleCount(start, end)));
                 }
             }
 
@@ -384,8 +364,8 @@ public class DefaultConsumerDataRetriever
     public List<ConsumerDataPair> getQpxForAllConsumerId(String topic, QPX qpx, long start, long end) {
 
         ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-        Map<String, NavigableMap<Long, QpxData>> sendQpxs = null;
-        Map<String, NavigableMap<Long, QpxData>> ackQpxs = null;
+        Map<String, NavigableMap<Long, StatisData>> sendQpxs = null;
+        Map<String, NavigableMap<Long, StatisData>> ackQpxs = null;
         List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
         long startKey = getKey(start);
         long endKey = getKey(end);
@@ -393,11 +373,11 @@ public class DefaultConsumerDataRetriever
             sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
             ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
             if (sendQpxs != null) {
-                for (Entry<String, NavigableMap<Long, QpxData>> entry : sendQpxs.entrySet()) {
+                for (Entry<String, NavigableMap<Long, StatisData>> entry : sendQpxs.entrySet()) {
 
                     String consumerId = entry.getKey();
-                    NavigableMap<Long, Long> send = convertQpxData(entry.getValue());
-                    NavigableMap<Long, Long> ack = convertQpxData(ackQpxs.get(consumerId));
+                    NavigableMap<Long, Long> send = convertData(entry.getValue(), StatisFunctionType.QPX);
+                    NavigableMap<Long, Long> ack = convertData(ackQpxs.get(consumerId), StatisFunctionType.QPX);
                     if (send == null) {
                         continue;
                     }
@@ -463,10 +443,10 @@ public class DefaultConsumerDataRetriever
 
     protected ConsumerDataPair getIpQpxInMemory(String topic, String consumerId, String ip, long start, long end) {
         ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-        NavigableMap<Long, QpxData> sendQpxs = retriever.getQpsValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.SEND);
-        NavigableMap<Long, QpxData> ackQpxs = retriever.getQpsValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.ACK);
-        NavigableMap<Long, Long> send = convertQpxData(sendQpxs);
-        NavigableMap<Long, Long> ack = convertQpxData(ackQpxs);
+        NavigableMap<Long, StatisData> sendQpxs = retriever.getQpsValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.SEND);
+        NavigableMap<Long, StatisData> ackQpxs = retriever.getQpsValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.ACK);
+        NavigableMap<Long, Long> send = convertData(sendQpxs, StatisFunctionType.QPX);
+        NavigableMap<Long, Long> ack = convertData(ackQpxs, StatisFunctionType.QPX);
         StatsData sendStats = createStatsData(
                 createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND), send, start, end);
         StatsData ackStats = createStatsData(

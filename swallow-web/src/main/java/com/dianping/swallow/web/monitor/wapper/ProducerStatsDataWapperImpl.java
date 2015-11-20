@@ -1,27 +1,14 @@
 package com.dianping.swallow.web.monitor.wapper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NavigableMap;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
-import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
-import com.dianping.swallow.common.server.monitor.data.statis.ProducerTopicStatisData;
-import com.dianping.swallow.web.model.stats.ProducerIpGroupStatsData;
-import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
-import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
-import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
-import com.dianping.swallow.web.model.stats.StatsDataFactory;
+import com.dianping.swallow.web.model.stats.*;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * @author qiyin
@@ -71,7 +58,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             serverStatsData.setDelay(0);
             QpxData qpxValue = qpx.get(timeKey);
             if (qpxValue != null) {
-                serverStatsData.setQps(qpxValue.getQpx() == null ? 0L : qpxValue.getQpx().longValue());
+                serverStatsData.setQps(qpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : qpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
                 serverStatsData.setQpsTotal(qpxValue.getTotal() == null ? 0L : qpxValue.getTotal().longValue());
             }
 
@@ -116,7 +103,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
             QpxData topicQpx = topicQpxs.get(timeKey);
             if (topicQpx != null) {
-                producerTopicStatsData.setQps(topicQpx.getQpx() == null ? 0L : topicQpx.getQpx().longValue());
+                producerTopicStatsData.setQps(topicQpx.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : topicQpx.getQpx(DEFAULT_QPX_TYPE).longValue());
                 producerTopicStatsData.setQpsTotal(topicQpx.getTotal() == null ? 0L : topicQpx.getTotal().longValue());
             }
             Long delay = topicDelays.get(timeKey);
@@ -184,7 +171,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
             QpxData qps = ipQpxs.get(timeKey);
             if (qps != null) {
-                ipStatsData.setQps(qps.getQpx() == null ? 0L : qps.getQpx().longValue());
+                ipStatsData.setQps(qps.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : qps.getQpx(DEFAULT_QPX_TYPE).longValue());
                 ipStatsData.setQpsTotal(qps.getTotal() == null ? 0L : qps.getTotal().longValue());
             }
 

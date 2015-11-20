@@ -7,6 +7,7 @@ import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.StatisFunctionType;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
@@ -15,6 +16,7 @@ import com.dianping.swallow.common.server.monitor.data.statis.AbstractTotalMapSt
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.UnfoundKeyException;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
@@ -102,7 +104,8 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
     protected StatsData getDelayInMemory(String topic, StatisType type, long start, long end) {
 
-        NavigableMap<Long, Long> rawData = statis.getDelayForTopic(topic, type);
+        NavigableMap<Long, StatisData> statisData = statis.getStatisDataForTopic(topic, type);
+        NavigableMap<Long, Long> rawData = convertData(statisData, StatisFunctionType.DELAY);
         if (rawData != null) {
             rawData = rawData.subMap(getKey(start), true, getKey(end), true);
         }
@@ -119,7 +122,8 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
     protected StatsData getQpxInMemory(String topic, StatisType type, long start, long end) {
 
-        NavigableMap<Long, Long> rawData = convertQpxData(statis.getQpxForTopic(topic, type));
+        NavigableMap<Long, StatisData> statisData = statis.getStatisDataForTopic(topic, type);
+        NavigableMap<Long, Long> rawData = convertData(statisData, StatisFunctionType.QPX);
         if (rawData != null) {
             rawData = rawData.subMap(getKey(start), true, getKey(end), true);
         }
@@ -127,8 +131,8 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
     }
 
     protected StatsData getIpQpxInMemory(String topic, String ip, StatisType type, long start, long end) {
-        NavigableMap<Long, QpxData> ipQpx = statis.getQpsValue(new CasKeys(TOTAL_KEY, topic, ip), type);
-        NavigableMap<Long, Long> rawData = convertQpxData(ipQpx);
+        NavigableMap<Long, StatisData> statisData = statis.getQpsValue(new CasKeys(TOTAL_KEY, topic, ip), type);
+        NavigableMap<Long, Long> rawData = convertData(statisData, StatisFunctionType.QPX);
         if (rawData != null) {
             rawData = rawData.subMap(getKey(start), true, getKey(end), true);
         }
@@ -139,12 +143,12 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
         Map<String, StatsData> result = new HashMap<String, StatsData>();
 
-        Map<String, NavigableMap<Long, QpxData>> serversQpx = statis.getQpxForServers(type);
+        Map<String, NavigableMap<Long, StatisData>> serversQpx = statis.getQpxForServers(type);
 
-        for (Entry<String, NavigableMap<Long, QpxData>> entry : serversQpx.entrySet()) {
+        for (Entry<String, NavigableMap<Long, StatisData>> entry : serversQpx.entrySet()) {
 
             String serverIp = entry.getKey();
-            NavigableMap<Long, Long> serverQpx = convertQpxData(entry.getValue());
+            NavigableMap<Long, Long> serverQpx = convertData(entry.getValue(), StatisFunctionType.QPX);
             if (serverQpx != null) {
                 serverQpx = serverQpx.subMap(getKey(start), true, getKey(end), true);
             }
@@ -152,6 +156,28 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         }
 
         return result;
+    }
+
+//    protected NavigableMap<Long, Long> convertStatisDataToDelayVlaue(NavigableMap<Long, StatisData> map) {
+//        if (map == null) {
+//            return null;
+//        }
+//        NavigableMap<Long, Long> resultMap = new ConcurrentSkipListMap<Long, Long>();
+//        for (Map.Entry<Long, StatisData> entry : map.entrySet()) {
+//            resultMap.put(entry.getKey(), entry.getValue().getDelay());
+//        }
+//        return resultMap;
+//    }
+//
+    protected NavigableMap<Long, QpxData> convertStatisDataToQpxVlaue(NavigableMap<Long, StatisData> map) {
+        if (map == null) {
+            return null;
+        }
+        NavigableMap<Long, QpxData> resultMap = new ConcurrentSkipListMap<Long, QpxData>();
+        for (Map.Entry<Long, StatisData> entry : map.entrySet()) {
+            resultMap.put(entry.getKey(), new QpxData(entry.getValue()));
+        }
+        return resultMap;
     }
 
     protected abstract StatsDataDesc createServerQpxDesc(String serverIp, StatisType type);
@@ -237,7 +263,8 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
     public NavigableMap<Long, Statisable.QpxData> getQpsValue(CasKeys keys, StatisType type) {
 
         try {
-            return statis.getQpsValue(keys, type);
+            NavigableMap<Long, StatisData> qpxMap = statis.getQpsValue(keys, type);
+            return convertStatisDataToQpxVlaue(qpxMap);
         } catch (UnfoundKeyException e) {
             return null;
         }
@@ -248,13 +275,24 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         return getKeys(keys, null);
     }
 
-    protected NavigableMap<Long, Long> convertQpxData(NavigableMap<Long, QpxData> qpxDatas) {
+    protected NavigableMap<Long, Long> convertData(NavigableMap<Long, StatisData> qpxDatas, StatisFunctionType type) {
         if (qpxDatas != null) {
-            NavigableMap<Long, Long> qpxMap = new ConcurrentSkipListMap<Long, Long>();
-            for (Entry<Long, QpxData> entry : qpxDatas.entrySet()) {
-                qpxMap.put(entry.getKey(), entry.getValue().getQpx());
+            NavigableMap<Long, Long> result = new ConcurrentSkipListMap<Long, Long>();
+            if (StatisFunctionType.DELAY == type) {
+                for (Entry<Long, StatisData> entry : qpxDatas.entrySet()) {
+                    result.put(entry.getKey(), entry.getValue().getDelay());
+                }
+                return result;
+
+            } else if (StatisFunctionType.QPX == type) {
+                for (Entry<Long, StatisData> entry : qpxDatas.entrySet()) {
+                    result.put(entry.getKey(), entry.getValue().getQpx(QPX.SECOND));
+                }
+                return result;
+
+            } else {
+                throw new UnsupportedOperationException("nusupported type");
             }
-            return qpxMap;
         }
         return null;
     }

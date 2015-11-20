@@ -19,6 +19,7 @@ import com.dianping.swallow.web.dashboard.comparator.SendComparator;
 import com.dianping.swallow.web.dashboard.model.Entry;
 import com.dianping.swallow.web.dashboard.model.FixSizedPriorityQueue;
 
+@SuppressWarnings("deprecation")
 public class FixSizedPriorityQueueTest {
 	
 	private List<Comparator<Entry>> list = new ArrayList<Comparator<Entry>>();

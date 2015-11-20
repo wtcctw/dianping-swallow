@@ -36,9 +36,6 @@ import com.dianping.swallow.web.service.TopicResourceService;
 @WebAppConfiguration
 public class TopicControllerTest {
 
-	private static final String AUTHORIZATION = "Authorization";
-	private static final String USERNAME = "yapu.wang";
-
 	@Autowired
 	private WebApplicationContext wac;
 

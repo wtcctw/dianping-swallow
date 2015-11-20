@@ -12,7 +12,7 @@ import com.dianping.swallow.web.util.ResponseStatus;
  */
 public class LionHandlerChain extends AbstractHandlerChain<LionEditorEntity, EmptyObject>{
 
-    public LionHandlerChain(Handler... handlers) {
+    public LionHandlerChain(Handler<LionEditorEntity, EmptyObject>... handlers) {
         super(handlers);
     }
 
@@ -20,7 +20,7 @@ public class LionHandlerChain extends AbstractHandlerChain<LionEditorEntity, Emp
     public ResponseStatus handle(LionEditorEntity value, EmptyObject result) {
 
         ResponseStatus status;
-        for (Handler handler : handlers) {
+        for (Handler<LionEditorEntity, EmptyObject> handler : handlers) {
             status = (ResponseStatus) handler.handle(value, result);
             if (status != ResponseStatus.SUCCESS) {
                 return status;

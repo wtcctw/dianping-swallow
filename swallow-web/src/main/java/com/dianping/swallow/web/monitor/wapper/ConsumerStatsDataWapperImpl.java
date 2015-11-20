@@ -1,30 +1,15 @@
 package com.dianping.swallow.web.monitor.wapper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NavigableMap;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerTopicStatisData;
-import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
-import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
-import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
-import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
-import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
-import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
-import com.dianping.swallow.web.model.stats.StatsDataFactory;
+import com.dianping.swallow.web.model.stats.*;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * @author qiyin
@@ -80,13 +65,13 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             serverStatsData.setIp(serverIp);
             QpxData sendQpxValue = sendQpx.get(timeKey);
             if (sendQpxValue != null) {
-                serverStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
+                serverStatsData.setSendQps(sendQpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : sendQpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
                 serverStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
                         .longValue());
             }
             QpxData ackQpxValue = ackQpx.get(timeKey);
             if (ackQpxValue != null) {
-                serverStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
+                serverStatsData.setAckQps(ackQpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : ackQpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
                 serverStatsData
                         .setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal().longValue());
             }
@@ -166,14 +151,14 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             consumerIdStatsData.setTimeKey(timeKey);
             QpxData sendQpxValue = sendQpx.get(timeKey);
             if (sendQpxValue != null) {
-                consumerIdStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
+                consumerIdStatsData.setSendQps(sendQpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : sendQpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
                 consumerIdStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
                         .longValue());
             }
 
             QpxData ackQpxValue = ackQpx.get(timeKey);
             if (ackQpxValue != null) {
-                consumerIdStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
+                consumerIdStatsData.setAckQps(ackQpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : ackQpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
                 consumerIdStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
                         .longValue());
             }
@@ -280,7 +265,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             QpxData sendQpxValue = sendQpx.get(timeKey);
 
             if (sendQpxValue != null) {
-                consumerIpStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
+                consumerIpStatsData.setSendQps(sendQpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : sendQpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
                 consumerIpStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
                         .longValue());
             }
@@ -294,7 +279,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             QpxData ackQpxValue = ackQpx.get(timeKey);
 
             if (ackQpxValue != null) {
-                consumerIpStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
+                consumerIpStatsData.setAckQps(ackQpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : ackQpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
                 consumerIpStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
                         .longValue());
             }
@@ -396,14 +381,14 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
         consumerTopicStatsData.setTimeKey(timeKey);
         QpxData sendQpxValue = sendQpx.get(timeKey);
         if (sendQpxValue != null) {
-            consumerTopicStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
+            consumerTopicStatsData.setSendQps(sendQpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : sendQpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
             consumerTopicStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
                     .longValue());
         }
 
         QpxData ackQpxValue = ackQpx.get(timeKey);
         if (ackQpxValue != null) {
-            consumerTopicStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
+            consumerTopicStatsData.setAckQps(ackQpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : ackQpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
             consumerTopicStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
                     .longValue());
         }

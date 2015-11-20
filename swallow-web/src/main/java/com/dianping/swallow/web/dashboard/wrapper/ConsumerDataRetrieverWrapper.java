@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.dashboard.wrapper;
 
+import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
@@ -57,7 +58,7 @@ public class ConsumerDataRetrieverWrapper {
 			Statisable.QpxData qpsData = entry.getValue();
 			Long qps = 0L;
 			if(qpsData != null){
-				qps = qpsData.getQpx();
+				qps = qpsData.getQpx(QPX.SECOND);
 			}
 			result.put(entry.getKey(), qps);
 		}
