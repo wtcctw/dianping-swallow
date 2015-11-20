@@ -47,10 +47,10 @@ public enum ResponseStatus {
         return this;
     }
 
-    public static String findByStatus(int status) {
+    public static ResponseStatus findByStatus(int status) {
         for (ResponseStatus code : values()) {
             if (status == code.getStatus()) {
-                return code.getMessage();
+                return code;
             }
         }
         throw new RuntimeException("Error status : " + status);
