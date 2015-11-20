@@ -8,12 +8,9 @@ package com.dianping.swallow.web.model.dom;
  */
 public class MongoConfigBean {
 
-	private String mongoUrl;
-	
 	private int size;
 
 	public void setMongoUrl(String mongoUrl) {
-		this.mongoUrl = mongoUrl;
 	}
 
 	public int getSize() {

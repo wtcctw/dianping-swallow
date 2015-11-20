@@ -6,10 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.dianping.swallow.common.internal.action.SwallowAction;
-import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
-import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.web.alarmer.EventReporter;

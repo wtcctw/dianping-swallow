@@ -21,6 +21,7 @@ public class SpringMongoTest {
 	public void testCapped() throws UnknownHostException{
 		
 //		MongoTemplate mongoTemplate = new MongoTemplate(new Mongo("192.168.213.143", 27018), "swallow-web-test");
+		@SuppressWarnings("deprecation")
 		MongoTemplate mongoTemplate = new MongoTemplate(new Mongo("192.168.5.10", 27018), "swallow-web-test");
 		
 		mongoTemplate.dropCollection("test");

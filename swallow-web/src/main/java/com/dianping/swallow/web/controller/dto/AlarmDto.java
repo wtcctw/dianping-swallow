@@ -26,15 +26,9 @@ public class AlarmDto {
 
 	private String related;
 	
-	private String relatedUrl;
-
 	private RelatedType relatedType;
 
-	private List<SendInfo> sendInfos;
-
 	private Date createTime;
-
-	private String sourceIp;
 
 	public long getEventId() {
 		return eventId;
@@ -85,7 +79,6 @@ public class AlarmDto {
 	}
 
 	public void setRelatedUrl(String relatedUrl) {
-		this.relatedUrl = relatedUrl;
 	}
 
 	public RelatedType getRelatedType() {
@@ -97,7 +90,6 @@ public class AlarmDto {
 	}
 
 	public void setSendInfos(List<SendInfo> sendInfos) {
-		this.sendInfos = sendInfos;
 	}
 
 	public Date getCreateTime() {
@@ -109,7 +101,6 @@ public class AlarmDto {
 	}
 
 	public void setSourceIp(String sourceIp) {
-		this.sourceIp = sourceIp;
 	}
 
 }

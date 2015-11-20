@@ -24,8 +24,6 @@ public class DefaultApplicationResourceDao extends AbstractWriteDao implements A
 
 	private static final String APPLICATION = "application";
 
-	private static final String DEFAULT = "default";
-
 	@Override
 	public boolean insert(ApplicationResource applicationResource) {
 		try {
