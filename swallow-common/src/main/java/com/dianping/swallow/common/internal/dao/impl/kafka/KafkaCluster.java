@@ -60,11 +60,11 @@ public class KafkaCluster extends AbstractCluster{
 		zkUtils = new ZkUtils(getAddressString(getSeeds()));
 
 		if(kafkaConfig.isReadFromMaster()){
-			kafkaConsumer = new SimpleKafkaConsumer(allKafkaServers(), getClientId(), 
+			kafkaConsumer = new SimpleKafkaConsumer(allKafkaServers(), getClientId(), kafkaConfig.getMinBytes(), 
 					kafkaConfig.getSoTimeout()
 					, kafkaConfig.getFetchSize(), kafkaConfig.getMaxWait(), kafkaConfig.getFetchRetryCount());
 		}else{
-			kafkaConsumer = new SlaveKafkaConsumer(allKafkaServers(), getClientId(), 
+			kafkaConsumer = new SlaveKafkaConsumer(allKafkaServers(), getClientId(), kafkaConfig.getMinBytes(),
 					kafkaConfig.getSoTimeout()
 					, kafkaConfig.getFetchSize(), kafkaConfig.getMaxWait(), kafkaConfig.getFetchRetryCount());
 			

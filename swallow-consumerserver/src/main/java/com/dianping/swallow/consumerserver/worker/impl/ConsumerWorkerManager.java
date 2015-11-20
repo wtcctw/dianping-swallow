@@ -23,7 +23,6 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.lifecycle.impl.DefaultLifecycleManager;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
-import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.common.internal.util.task.AbstractEternalTask;
 import com.dianping.swallow.common.server.monitor.collector.ConsumerCollector;
 import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
@@ -209,7 +208,10 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 			ConsumerWorker worker) {
 		
 		if(consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
-			messageDAO.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), MongoUtils.getLongByCurTime(), "idReint", true);
+			
+			Long maxId = messageDAO.getMaxMessageId(consumerInfo.getDest().getName(), consumerInfo.getConsumerId());
+					
+			messageDAO.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), maxId, "idReint", true);
 		}
 	}
 

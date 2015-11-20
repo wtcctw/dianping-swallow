@@ -54,7 +54,7 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 	
 	private int fetchSize = 2 * 1024 * 1024; 
 	
-	private int minBytes = 10;
+	private int minBytes = 0;
 	
 	private int maxWait = 5000;
 	
@@ -65,10 +65,11 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 	private Map<InetSocketAddress, SimpleConsumer> allConsumers = new HashMap<InetSocketAddress, SimpleConsumer>(); 
 
 
-	public AbstractKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int soTimeout, int fetchSize, int maxWait, int fetchRetryCount) {
+	public AbstractKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int minBytes, int soTimeout, int fetchSize, int maxWait, int fetchRetryCount) {
 		
 		this.seedBrokers = seedBrokers;
 		this.clientId = clientId;
+		this.minBytes = minBytes;
 		this.maxWait = maxWait;
 		this.fetchRetryCount = fetchRetryCount;
 		this.soTimeout = soTimeout;
@@ -157,10 +158,15 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 				Map<kafka.common.TopicAndPartition, PartitionFetchInfo>  requestInfo = new HashMap<kafka.common.TopicAndPartition, PartitionFetchInfo>();
 				requestInfo.put(tp.toKafka(), new PartitionFetchInfo(offset + 1, fetchSize));
 				
-				
 				FetchRequest request = createFetchRequest(requestInfo);
 				
+				if(logger.isDebugEnabled()){
+					logger.debug("[getMessageGreatThan][begin]" + tp + "," + offset + "," + fetchSize);
+				}
 				response = consumer.fetch(request);
+				if(logger.isDebugEnabled()){
+					logger.debug("[getMessageGreatThan][end]" + tp + "," + offset + "," + fetchSize);
+				}
 				
 				if(!response.hasError()){
 					break;

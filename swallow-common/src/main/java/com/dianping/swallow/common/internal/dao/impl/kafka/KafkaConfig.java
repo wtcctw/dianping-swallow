@@ -13,10 +13,12 @@ public class KafkaConfig extends AbstractLionConfig{
 	private static final String KAFKA_CONIFG_BASIC_SUFFIX = "kafkaconfig";
 
 	private boolean readFromMaster = true;
+	private int minBytes = 0;
 	private int soTimeout = 5000;
 	private int fetchSize = 2*1024*1024;
 	private int maxWait = 5000;
 	private int fetchRetryCount = 3;
+	private int maxConnectionPerHost = 100;
 	private String zip = "gzip";
 
 	public KafkaConfig(String fileName, String suffix, boolean isUseLion) {
@@ -74,6 +76,22 @@ public class KafkaConfig extends AbstractLionConfig{
 
 	public void setZip(String zip) {
 		this.zip = zip;
+	}
+
+	public int getMinBytes() {
+		return minBytes;
+	}
+
+	public void setMinBytes(int minBytes) {
+		this.minBytes = minBytes;
+	}
+
+	public int getMaxConnectionPerHost() {
+		return maxConnectionPerHost;
+	}
+
+	public void setMaxConnectionPerHost(int maxConnectionPerHost) {
+		this.maxConnectionPerHost = maxConnectionPerHost;
 	}
 
 	

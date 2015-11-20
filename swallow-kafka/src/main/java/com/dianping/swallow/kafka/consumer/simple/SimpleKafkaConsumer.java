@@ -18,15 +18,15 @@ import kafka.javaapi.PartitionMetadata;
 public class SimpleKafkaConsumer extends AbstractKafkaConsumer{
 
 
-	public SimpleKafkaConsumer(String kafkaAddress, String clientId, int soTimeout, int fetchSize,
+	public SimpleKafkaConsumer(String kafkaAddress, String clientId, int minBytes, int soTimeout, int fetchSize,
 			int maxWait, int fetchRetryCount) {
-		this(getSeedBrokers(kafkaAddress), clientId, soTimeout, fetchSize, maxWait, fetchRetryCount);
+		this(getSeedBrokers(kafkaAddress), clientId, minBytes, soTimeout, fetchSize, maxWait, fetchRetryCount);
 	}
 	
 
-	public SimpleKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int soTimeout, int fetchSize,
+	public SimpleKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int minBytes, int soTimeout, int fetchSize,
 			int maxWait, int fetchRetryCount) {
-		super(seedBrokers, clientId, soTimeout, fetchSize, maxWait, fetchRetryCount);
+		super(seedBrokers, clientId, minBytes, soTimeout, fetchSize, maxWait, fetchRetryCount);
 	}
 
 	@Override

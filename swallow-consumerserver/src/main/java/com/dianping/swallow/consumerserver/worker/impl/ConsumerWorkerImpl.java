@@ -161,15 +161,20 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 
 					ConsumerMessage message = removeWaitAckMessages(ackId);
 					
-					long realAckId = ackId;
+					Long backupMessageId = null;
 					if (message != null) {
 						consumerCollector.ackMessage(consumerInfo, consumerIp, message.getMessage());
-						realAckId = message.getOriginalMessageId();
+						backupMessageId = message.getMessage().getBackupMessageId();
 					}
 					
+					String ackIdStr = ackId + ",";//为日志解析
+					if(backupMessageId != null){
+						ackIdStr +=  backupMessageId;
+					}
+
 					if (ackLogger.isInfoEnabled()) {
 						ackLogger.info(consumerInfo.getDest().getName() + "," + consumerInfo.getConsumerId() + ","
-								+ realAckId + "," + IPUtil.simpleLogIp(connectedChannels.get(channel)));
+								+ ackIdStr + "," + IPUtil.simpleLogIp(connectedChannels.get(channel)));
 					}
 
 

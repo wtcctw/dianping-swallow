@@ -38,7 +38,7 @@ public class GetFromSpecificTimeTest extends AbstractConsumerTest{
 		Assert.assertEquals(0, getConsumerMessageCount(consumer2));
 		
 		consumer.close();
-		waitForListernToComplete(messageCount*2);
+		waitForListernToComplete(messageCount*3);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer2));
 		

@@ -26,7 +26,7 @@ public class SimpleKafkaConsumerTest extends AbstractKafkaConsumerTest{
 	@Before
 	public void beforeSimpleKafkaConsumerTest(){
 		
-		simpleKafkaConsumer = new SimpleKafkaConsumer(getKafkaAddress(), "unittest", 5000, 1 << 20, 5000, 3);
+		simpleKafkaConsumer = new SimpleKafkaConsumer(getKafkaAddress(), "unittest", 0, 5000, 1 << 20, 5000, 3);
 	}
 	
 	@Test

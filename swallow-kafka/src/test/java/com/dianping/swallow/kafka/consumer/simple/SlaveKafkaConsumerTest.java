@@ -21,7 +21,7 @@ public class SlaveKafkaConsumerTest extends AbstractKafkaConsumerTest{
 	
 	@Before
 	public void beforeSlaveKafkaConsumerTest(){
-		slaveKafkaConsumer = new SlaveKafkaConsumer(getKafkaAddress(), "SlaveKafkaConsumerTest", 5000, 1024*1024, 5000, 3);
+		slaveKafkaConsumer = new SlaveKafkaConsumer(getKafkaAddress(), "SlaveKafkaConsumerTest", 0, 5000, 1024*1024, 5000, 3);
 		
 	}
 	
