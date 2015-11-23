@@ -52,18 +52,8 @@ public class DefaultProducerDataRetriever
     private ResourceContainer resourceContainer;
 
     @Override
-    public boolean dataExistInMemory(long start, long end) {
-        NavigableMap<Long, Long> qpxStatsData = convertData(statis.getQpx(StatisType.SAVE), StatisFunctionType.QPX);
-        if (qpxStatsData == null || qpxStatsData.isEmpty()) {
-            return false;
-        }
-        Long firstKey = statis.getQpx(StatisType.SAVE).firstKey();
-        if (firstKey != null) {
-            if (getKey(start) + getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
-                return true;
-            }
-        }
-        return false;
+    public boolean dataExistInMemory(CasKeys keys, long start, long end) {
+        return dataExistInMemory(keys, StatisType.SAVE, start, end);
     }
 
     public List<OrderStatsData> getOrder(int size) {
@@ -72,7 +62,7 @@ public class DefaultProducerDataRetriever
 
     public List<OrderStatsData> getOrder(int size, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
             return getOrderInMemory(size, start, end);
         }
 
@@ -138,7 +128,7 @@ public class DefaultProducerDataRetriever
     @Override
     public StatsData getSaveDelay(String topic, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
             return getDelayInMemory(topic, StatisType.SAVE, start, end);
         }
 
@@ -157,7 +147,7 @@ public class DefaultProducerDataRetriever
     }
 
     public StatsData getIpDelay(String topic, String ip, long start, long end) {
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic, ip), start, end)) {
             return getIpDelayInMemory(topic, ip, StatisType.SAVE, start, end);
         }
         return getIpDelayInMemory(topic, ip, StatisType.SAVE, start, end);
@@ -185,7 +175,7 @@ public class DefaultProducerDataRetriever
     @Override
     public StatsData getQpx(String topic, QPX qpx, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
             return getQpxInMemory(topic, StatisType.SAVE, start, end);
         }
         return getQpxInDb(topic, StatisType.SAVE, start, end);
@@ -202,7 +192,7 @@ public class DefaultProducerDataRetriever
     }
 
     public StatsData getIpQpx(String topic, String ip, long start, long end) {
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic, ip), start, end)) {
             return getIpQpxInMemory(topic, ip, StatisType.SAVE, start, end);
         }
         return getIpQpxInMemory(topic, ip, StatisType.SAVE, start, end);
@@ -230,7 +220,7 @@ public class DefaultProducerDataRetriever
     @Override
     public Map<String, StatsData> getServerQpx(QPX qpx, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
             return getServerQpxInMemory(qpx, StatisType.SAVE, start, end);
         }
 

@@ -42,6 +42,20 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
     private int intervalCount;
 
+    protected boolean dataExistInMemory(CasKeys keys, StatisType type, long start, long end) {
+        NavigableMap<Long, StatisData> firstData = statis.getFirstValue(keys, type);
+        if (firstData == null || firstData.isEmpty()) {
+            return false;
+        }
+        Long firstKey = firstData.firstKey();
+        if (firstKey != null) {
+            if (getKey(start) + getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @PostConstruct
     public void postAbstractMonitorDataStats() {
 
@@ -158,17 +172,6 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         return result;
     }
 
-    //    protected NavigableMap<Long, Long> convertStatisDataToDelayVlaue(NavigableMap<Long, StatisData> map) {
-//        if (map == null) {
-//            return null;
-//        }
-//        NavigableMap<Long, Long> resultMap = new ConcurrentSkipListMap<Long, Long>();
-//        for (Map.Entry<Long, StatisData> entry : map.entrySet()) {
-//            resultMap.put(entry.getKey(), entry.getValue().getDelay());
-//        }
-//        return resultMap;
-//    }
-//
     protected NavigableMap<Long, QpxData> convertStatisDataToQpxVlaue(NavigableMap<Long, StatisData> map) {
         if (map == null) {
             return null;

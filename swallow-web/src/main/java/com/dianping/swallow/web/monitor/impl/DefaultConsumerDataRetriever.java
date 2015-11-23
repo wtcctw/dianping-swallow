@@ -56,21 +56,10 @@ public class DefaultConsumerDataRetriever
     @Autowired
     private ResourceContainer resourceContainer;
 
+
     @Override
-    public boolean dataExistInMemory(long start, long end) {
-        NavigableMap<Long, Long> qpxStatsData = convertData(statis.getQpx(StatisType.SEND), StatisFunctionType.QPX);
-
-        if (qpxStatsData == null || qpxStatsData.isEmpty()) {
-            return false;
-        }
-
-        Long firstKey = statis.getQpx(StatisType.SEND).firstKey();
-        if (firstKey != null) {
-            if (getKey(start) + getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
-                return true;
-            }
-        }
-        return false;
+    public boolean dataExistInMemory(CasKeys keys, long start, long end) {
+        return dataExistInMemory(keys, StatisType.SEND, start, end);
     }
 
     @Override
@@ -81,7 +70,7 @@ public class DefaultConsumerDataRetriever
     @Override
     public List<OrderStatsData> getOrderForAllConsumerId(int size, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
             return getOrderInMemory(size, start, end);
         }
 
@@ -185,7 +174,7 @@ public class DefaultConsumerDataRetriever
         List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
         long startKey = getKey(start);
         long endKey = getKey(end);
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
             sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, false);
             ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, false);
             if (sendDelays != null) {
@@ -267,7 +256,7 @@ public class DefaultConsumerDataRetriever
     }
 
     protected ConsumerDataPair getIpDelay(String topic, String consumerId, String ip, long start, long end) {
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(topic, consumerId, ip), start, end)) {
             return getIpDelayInMemory(topic, consumerId, ip, start, end);
         }
         return getIpDelayInMemory(topic, consumerId, ip, start, end);
@@ -302,7 +291,7 @@ public class DefaultConsumerDataRetriever
         List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
         long startKey = getKey(start);
         long endKey = getKey(end);
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
             sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
             ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
             if (sendQpxs != null) {
@@ -389,7 +378,7 @@ public class DefaultConsumerDataRetriever
     }
 
     protected ConsumerDataPair getIpQpx(String topic, String consumerId, String ip, long start, long end) {
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(topic, consumerId, ip), start, end)) {
             return getIpQpxInMemory(topic, consumerId, ip, start, end);
         }
         return getIpQpxInMemory(topic, consumerId, ip, start, end);
@@ -422,7 +411,7 @@ public class DefaultConsumerDataRetriever
 
         Map<String, StatsData> ackQpxs = null;
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
             sendQpxs = getServerQpxInMemory(qpx, StatisType.SEND, start, end);
             ackQpxs = getServerQpxInMemory(qpx, StatisType.ACK, start, end);
         } else {
