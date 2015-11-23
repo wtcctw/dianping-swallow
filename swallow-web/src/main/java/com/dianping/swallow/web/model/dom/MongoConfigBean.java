@@ -10,9 +10,6 @@ public class MongoConfigBean {
 
 	private int size;
 
-	public void setMongoUrl(String mongoUrl) {
-	}
-
 	public int getSize() {
 		return size;
 	}

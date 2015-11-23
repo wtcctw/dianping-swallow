@@ -12,6 +12,7 @@ import com.dianping.swallow.web.model.alarm.SendInfo;
  *
  * 2015年8月9日 下午5:12:02
  */
+@SuppressWarnings("unused")
 public class AlarmDto {
 
 	private long eventId;

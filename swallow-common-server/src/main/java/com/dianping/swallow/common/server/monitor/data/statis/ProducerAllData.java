@@ -9,30 +9,30 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicDa
 
 /**
  * @author mengwenchao
- *
- * 2015年5月19日 下午4:46:41
+ *         <p/>
+ *         2015年5月19日 下午4:46:41
  */
-public class ProducerAllData extends AbstractAllData<ProducerTopicData, ProducerServerData, ProducerServerStatisData, ProducerMonitorData> 
-						implements ProducerStatisRetriever{
-	
-	public ProducerAllData(){
-			super(StatisType.SAVE);
-	}
+public class ProducerAllData extends AbstractAllData<ProducerTopicData, ProducerServerData, ProducerServerStatisData, ProducerMonitorData>
+        implements ProducerStatisRetriever {
 
-	@Override
-	protected Class<? extends ProducerServerStatisData> getStatisClass() {
-		
-		return ProducerServerStatisData.class;
-	}
+    public ProducerAllData() {
+        super(StatisType.SAVE);
+    }
 
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		throw new CloneNotSupportedException("clone not support");
-	}
+    @Override
+    protected Class<? extends ProducerServerStatisData> getStatisClass() {
 
-	@Override
-	public ProducerServerStatisData createValue() {
-		return new ProducerServerStatisData();
-	}
+        return ProducerServerStatisData.class;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("clone not support");
+    }
+
+    @Override
+    public ProducerServerStatisData createValue() {
+        return new ProducerServerStatisData();
+    }
 
 }

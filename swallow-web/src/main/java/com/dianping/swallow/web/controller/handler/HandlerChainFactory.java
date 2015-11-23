@@ -2,6 +2,7 @@ package com.dianping.swallow.web.controller.handler;
 
 import com.dianping.swallow.web.controller.handler.config.ConfigureHandlerChain;
 import com.dianping.swallow.web.controller.handler.lion.LionHandlerChain;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class HandlerChainFactory {
 
-    public LionHandlerChain createLionHandlerChain() {
+    @SuppressWarnings("unchecked")
+	public LionHandlerChain createLionHandlerChain() {
         return new LionHandlerChain();
     }
 

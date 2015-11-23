@@ -8,6 +8,7 @@ import com.dianping.swallow.web.controller.handler.data.EmptyObject;
 import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +45,8 @@ public class TopicWhiteListLionHandlerTest extends MockTest {
 
     private Set<String> topics;
 
-    private LionHandlerChain lionHandlerChain = new LionHandlerChain();
+    @SuppressWarnings("unchecked")
+	private LionHandlerChain lionHandlerChain = new LionHandlerChain();
 
     @Before
     public void setUp() throws Exception {

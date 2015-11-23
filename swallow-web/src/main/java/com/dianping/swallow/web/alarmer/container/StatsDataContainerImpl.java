@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
-import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 
@@ -25,8 +24,6 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 public class StatsDataContainerImpl implements StatsDataContainer {
 
 	private static final Logger logger = LoggerFactory.getLogger(StatsDataContainerImpl.class);
-
-	private static final int sampleInterval = AbstractRetriever.getStorageIntervalTime();
 
 	private Map<String, ConsumerIdStatsData> cStatsDataContainer = new ConcurrentHashMap<String, ConsumerIdStatsData>();
 
@@ -59,7 +56,7 @@ public class StatsDataContainerImpl implements StatsDataContainer {
 						lastStatsData = lastStatsDatas.get(0);
 					}
 				}
-				consumerIdStatsData.setTotalStatsDatas(lastStatsData, sampleInterval);
+				consumerIdStatsData.setTotalStatsDatas(lastStatsData);
 				cStatsDataContainer.put(uniquekey, consumerIdStatsData);
 			} catch (Exception e) {
 				logger.error("[setConsumerIdTotalRatio] setConsumerIdTotalRatio {} error.", consumerIdStatsData, e);
@@ -86,7 +83,7 @@ public class StatsDataContainerImpl implements StatsDataContainer {
 						lastStatsData = lastStatsDatas.get(0);
 					}
 				}
-				topicStatsData.setTotalStatsDatas(lastStatsData, sampleInterval);
+				topicStatsData.setTotalStatsDatas(lastStatsData);
 				pStatsDataContainer.put(topicName, topicStatsData);
 			} catch (Exception e) {
 				logger.error("[setProducerTopicTotalRatio] setProducerTopicTotalRatio {} error.", topicStatsData, e);
