@@ -21,7 +21,6 @@ import com.dianping.swallow.web.filter.LogFilter;
 import com.dianping.swallow.web.model.resource.TopicApplyResource;
 import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.service.TopicResourceService;
-import com.dianping.swallow.web.util.JsonUtil;
 import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -41,7 +40,6 @@ import java.util.Set;
 
 /**
  * @author mingdongli
- *         <p/>
  *         2015年9月9日下午12:04:31
  */
 @Controller
@@ -170,7 +168,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     }
 
     @RequestMapping(value = "/console/topicapply")
-    public ModelAndView topicapplyinfo() {
+    public ModelAndView topicApplyInfo() {
 
         return new ModelAndView("tool/topicapply", createViewMap());
     }
@@ -211,19 +209,4 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         return subSide;
     }
 
-    public static void main(String[] args) {
-        ValidatorFilterResult validatorFilterResult = new ValidatorFilterResult();
-        validatorFilterResult.setMessage("hello");
-        validatorFilterResult.setStatus(30);
-        String json = JsonUtil.toJson(validatorFilterResult);
-        System.out.println(json);
-        ValidatorFilterResult status = JsonUtil.fromJson(json, ValidatorFilterResult.class);
-        System.out.println(status.getMessage());
-        System.out.println(status.getStatus());
-        json = JsonUtil.toJson(ResponseStatus.SUCCESS);
-        status = JsonUtil.fromJson(json, ValidatorFilterResult.class);
-        System.out.println(status.getMessage());
-        System.out.println(status.getStatus());
-
-    }
 }

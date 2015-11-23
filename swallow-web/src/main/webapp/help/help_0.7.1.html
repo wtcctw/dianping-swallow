@@ -1030,17 +1030,16 @@ body .markdown-body
 <li><a href="#_3">名词解释</a></li>
 </ul>
 </li>
-<li><a href="#swallow">Swallow线下消息收发消息模拟平台</a><ul>
-<li><a href="#_4">生产者模拟平台</a></li>
-<li><a href="#_5">消费者模拟平台</a></li>
+<li><a href="#swallow">Swallow系统接入流程</a><ul>
+<li><a href="#topic">申请Topic</a><ul>
+<li><a href="#_4">自动申请</a></li>
+<li><a href="#_5">邮件申请</a></li>
 </ul>
 </li>
-<li><a href="#swallow_1">Swallow系统接入流程</a><ul>
-<li><a href="#topic">申请Topic</a></li>
 </ul>
 </li>
-<li><a href="#swallow_2">Swallow客户端使用说明</a><ul>
-<li><a href="#swallow_3">使用swallow发送消息</a><ul>
+<li><a href="#swallow_1">Swallow客户端使用说明</a><ul>
+<li><a href="#swallow_2">使用swallow发送消息</a><ul>
 <li><a href="#_6">基本概念说明</a><ul>
 <li><a href="#producer">Producer配置信息详解</a></li>
 </ul>
@@ -1052,7 +1051,7 @@ body .markdown-body
 </li>
 </ul>
 </li>
-<li><a href="#swallow_4">使用Swallow接收消息</a><ul>
+<li><a href="#swallow_3">使用Swallow接收消息</a><ul>
 <li><a href="#_9">基本概念</a><ul>
 <li><a href="#consumerconfig">ConsumerConfig配置详解</a></li>
 <li><a href="#_10">接收消息接口</a></li>
@@ -1087,7 +1086,7 @@ body .markdown-body
 <li><a href="#_16">使用示范</a></li>
 </ul>
 </li>
-<li><a href="#swallow_5">查看Swallow消息</a></li>
+<li><a href="#swallow_4">查看Swallow消息</a></li>
 </ul>
 </li>
 <li><a href="#topicswallow-server">Topic监控和Swallow Server监控</a><ul>
@@ -1105,14 +1104,14 @@ body .markdown-body
 </li>
 </ul>
 </li>
-<li><a href="#swallow_6">Swallow 告警</a><ul>
+<li><a href="#swallow_5">Swallow 告警</a><ul>
 <li><a href="#serverswallow">server告警（针对swallow研发团队）</a></li>
 <li><a href="#topic_4">topic告警（针对消息的生产者）</a></li>
 <li><a href="#consumerid">consumerId告警（针对消息的消费者）</a></li>
 <li><a href="#ip">IP告警</a></li>
 </ul>
 </li>
-<li><a href="#swallow_7">Swallow 大盘</a><ul>
+<li><a href="#swallow_6">Swallow 大盘</a><ul>
 <li><a href="#_20">综合大盘</a></li>
 <li><a href="#_21">发送延迟,确认延迟和堆积大盘</a></li>
 </ul>
@@ -1126,8 +1125,8 @@ body .markdown-body
 </li>
 </ul>
 </li>
-<li><a href="#swallow_8">Swallow使用注意事项</a></li>
-<li><a href="#swallow_9">Swallow常见问题以及处理</a><ul>
+<li><a href="#swallow_7">Swallow使用注意事项</a></li>
+<li><a href="#swallow_8">Swallow常见问题以及处理</a><ul>
 <li><a href="#topicconsumer">如何查找某个topic对应的consumer</a></li>
 <li><a href="#_26">如何查看我的消费是否有延迟、延迟多少条消息？</a><ul>
 <li><a href="#cat">Cat端追踪</a></li>
@@ -1168,35 +1167,32 @@ body .markdown-body
 <li>同步模式：发送方发出消息后，等待接收服务器成功、超时、异常时返回。</li>
 <li>异步模式：生产者发送消息时，先把消费存储到本地文件，同时启动后台发送消息线程将文件的消息读取出来发送到server。</li>
 </ul>
-<h1 id="swallow"><a name="user-content-swallow" href="#swallow" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow线下消息收发消息模拟平台</h1>
-<h2 id="_4"><a name="user-content-_4" href="#_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>生产者模拟平台</h2>
-<ul>
-<li>
-<p>生产者可以向某个Topic发送一条消息。</p>
-<ul>
-<li><a href="http://192.168.8.21:7070/rundemo/swallow-alpha-067#r=0&amp;j=17">alpha环境</a></li>
-<li><a href="http://192.168.8.21:7070/rundemo/swallow-qa-067#r=0&amp;j=17">qa环境</a></li>
-</ul>
-</li>
-<li>
-<p>在代码编辑框内，修改“Destination.topic(&ldquo;example&rdquo;)”为“Destination.topic(&ldquo;&lt;你的topic名称&gt;&rdquo;)”)。</p>
-</li>
-<li>点击右边绿色run按钮。</li>
-<li>在右边紫色控制台下方，输入消息的内容，按回车，即可发送。</li>
-</ul>
-<h2 id="_5"><a name="user-content-_5" href="#_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消费者模拟平台</h2>
-<ul>
-<li>
-<p>消费者接收消息  (在代码编辑框内，修改“Destination.topic(&ldquo;example&rdquo;)”为“Destination.topic(&ldquo;&lt;你的topic名称&gt;&rdquo;)”)，点击“run”，即可启动消费者。</p>
-<ul>
-<li><a href="http://192.168.8.21:7070/rundemo/swallow-alpha#r=0&amp;j=10">alpha环境</a></li>
-<li><a href="http://192.168.8.21:7070/rundemo/swallow-qa#r=0&amp;j=10">qa环境</a></li>
-</ul>
-</li>
-</ul>
-<h1 id="swallow_1"><a name="user-content-swallow_1" href="#swallow_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow系统接入流程</h1>
+<h1 id="swallow"><a name="user-content-swallow" href="#swallow" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow系统接入流程</h1>
 <h2 id="topic"><a name="user-content-topic" href="#topic" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>申请Topic</h2>
-<p>如果有新的Topic，请联系：李明冬/孟文超(<a href="mailto:mingdong.li@dianping.com">mingdong.li@dianping.com</a>, <a href="mailto:wenchao.meng@dianping.com">wenchao.meng@dianping.com</a>)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。</p>
+<h3 id="_4"><a name="user-content-_4" href="#_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>自动申请</h3>
+<ul>
+<li>
+<p>通过<a href="http://workflow.dp/wfe/start/126">workflow自动申请</a><br />
+<img alt="申请topic" src="http://swallow.dp/help/document/img/apply_topic.png" /></p>
+</li>
+<li>
+<p>预账号请填写申请人公司邮箱前缀，<a href="mailto:如邮箱为mingdong.li@dianping.com需填写mingdong.li">如邮箱为mingdong.li@dianping.com需填写mingdong.li</a>。</p>
+</li>
+<li>
+<p>消息大小默认为1KB，如果大于默认值可以在下拉列表中选择接近的值，如果超出范围请邮件联系swallow开发小组。</p>
+</li>
+<li>
+<p>每天消息量以高峰期间的值为准，如果超出所给选择范围请邮件联系swallow开发小组。</p>
+</li>
+<li>
+<p>支付和搜索请选择相应topic类型，其余都选择一般消息队列。</p>
+</li>
+<li>
+<p>注意区别<a href="#enhanceauth">权限提升</a>,此处是申请新topic，topic权限提升是提升用户对某个已经申请过的topic的访问级别。通过自动流程申请的topic，申请人自动获得查看此topic的权限。</p>
+</li>
+</ul>
+<h3 id="_5"><a name="user-content-_5" href="#_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>邮件申请</h3>
+<p>请联系：李明冬/孟文超(<a href="mailto:mingdong.li@dianping.com">mingdong.li@dianping.com</a>, <a href="mailto:wenchao.meng@dianping.com">wenchao.meng@dianping.com</a>)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。</p>
 <p>联系时，<strong>请邮件里告知：</strong></p>
 <ul>
 <li>申请人所在业务部门 (例如：支付中心业务部门)</li>
@@ -1206,9 +1202,10 @@ body .markdown-body
 <li>消费者业务名，以及负责人姓名  (例如，mobile-api, 陆经天)</li>
 <li>计划上线时间</li>
 <li>每天大概的消息量  (例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成&rdquo;100&rdquo;)</li>
+<li>建议首先通过workflow自动申请。</li>
 </ul>
-<h1 id="swallow_2"><a name="user-content-swallow_2" href="#swallow_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow客户端使用说明</h1>
-<h2 id="swallow_3"><a name="user-content-swallow_3" href="#swallow_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用swallow发送消息</h2>
+<h1 id="swallow_1"><a name="user-content-swallow_1" href="#swallow_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow客户端使用说明</h1>
+<h2 id="swallow_2"><a name="user-content-swallow_2" href="#swallow_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用swallow发送消息</h2>
 <h3 id="_6"><a name="user-content-_6" href="#_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基本概念说明</h3>
 <h4 id="producer"><a name="user-content-producer" href="#producer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Producer配置信息详解</h4>
 <ul>
@@ -1354,7 +1351,7 @@ body .markdown-body
     }
 }
 </code></pre>
-<h2 id="swallow_4"><a name="user-content-swallow_4" href="#swallow_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用Swallow接收消息</h2>
+<h2 id="swallow_3"><a name="user-content-swallow_3" href="#swallow_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>使用Swallow接收消息</h2>
 <h3 id="_9"><a name="user-content-_9" href="#_9" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>基本概念</h3>
 <p><span id="consumerConfig"></span></p>
 <h4 id="consumerconfig"><a name="user-content-consumerconfig" href="#consumerconfig" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>ConsumerConfig配置详解</h4>
@@ -1746,7 +1743,7 @@ public static void main(String[] args) {
 <p>请求url: String url = host + &ldquo;/api/message/sendmessage&rdquo;。</p>
 </li>
 </ul>
-<h3 id="swallow_5"><a name="user-content-swallow_5" href="#swallow_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>查看Swallow消息</h3>
+<h3 id="swallow_4"><a name="user-content-swallow_4" href="#swallow_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>查看Swallow消息</h3>
 <ul>
 <li>如果需要查看消息的详细内容，请点击更多选项，将会列出json格式的swallow消息内容，其中键值_id 表示保存消息的时间戳，c 表示消息体，v 表示swallow版本，s 表示消息体的sha1值， gt 表示消息的产生时间， p 表示用户设置的消息属性， _p 表示 swallow设置的消息内部属性， si 表示产生消息的主机ip。</li>
 </ul>
@@ -1797,7 +1794,7 @@ public static void main(String[] args) {
 <li>consumer server统计swallow发送频率和用户返回ack频率。正常情况下，swallow发送频率应该等于用户ack的频率。如果对于只有一个消费者的topic，理论上在消息正常发送收取时，用户发送频率应该等于swallow发送频率。如果消费者不只一个，那么swallow发送频率是同一个topic下的message发送给所有消费者数目之和。<br />
 <img alt="consumer server监控" src="http://swallow.dp/help/document/img/12.png" /></li>
 </ul>
-<h2 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 告警</h2>
+<h2 id="swallow_5"><a name="user-content-swallow_5" href="#swallow_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 告警</h2>
 <h3 id="serverswallow"><a name="user-content-serverswallow" href="#serverswallow" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server告警（针对swallow研发团队）</h3>
 <ol>
 <li>
@@ -2010,7 +2007,7 @@ public static void main(String[] args) {
 <p>这些告警的ip都来源于某个topic（生产端）或者某个consumerId（消费端），因此可以到topic或者consumerId处设置相关ip可是否需要告警。设置过程如topic或consumerId告警配置中设置具体ip开关。</p>
 </li>
 </ol>
-<h2 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 大盘</h2>
+<h2 id="swallow_6"><a name="user-content-swallow_6" href="#swallow_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow 大盘</h2>
 <h3 id="_20"><a name="user-content-_20" href="#_20" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>综合大盘</h3>
 <ul>
 <li>综合大盘会显示消费者发送延迟,消费者确认延迟和消息堆积的综合统计数据.超过默认阈值的统计项会被标红.大盘会根据一分钟的统计量生成最终结果.<br />
@@ -2036,6 +2033,7 @@ public static void main(String[] args) {
 <ul>
 <li>Visitor表示没有关联任何topic,无法访问任何topic及其message的人员，只可以查看监控性能。</li>
 </ul>
+<p><span id="enhanceauth"></span></p>
 <h3 id="_25"><a name="user-content-_25" href="#_25" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>权限提升</h3>
 <ul>
 <li>
@@ -2050,7 +2048,7 @@ public static void main(String[] args) {
 </li>
 </ul>
 <p><span id="takeAttention"></span></p>
-<h1 id="swallow_8"><a name="user-content-swallow_8" href="#swallow_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用注意事项</h1>
+<h1 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用注意事项</h1>
 <p>以下是业务在swallow的过程中遇到的一些常见问题，希望大家仔细阅读，避免类似的问题发生</p>
 <ol>
 <li>swallow保证消息不丢，所以针对特定一条消息，可能会重复发送。<ul>
@@ -2064,7 +2062,7 @@ public static void main(String[] args) {
 <li>swallow作为异步消息队列，正常情况下延时在秒级别。但是异常情况下（数据库升级等），可能会出现分钟级别的延时，如果业务对延时特别敏感，建议谨慎使用</li>
 </ol>
 <p><span id="commonProblems"></span></p>
-<h1 id="swallow_9"><a name="user-content-swallow_9" href="#swallow_9" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
+<h1 id="swallow_8"><a name="user-content-swallow_8" href="#swallow_8" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow常见问题以及处理</h1>
 <p><span id="problemWhichConsumer"></span></p>
 <h2 id="topicconsumer"><a name="user-content-topicconsumer" href="#topicconsumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>如何查找某个topic对应的consumer</h2>
 <ul>
