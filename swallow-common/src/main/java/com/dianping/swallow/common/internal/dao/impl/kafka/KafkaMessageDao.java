@@ -116,6 +116,10 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 			}
 		}
 		
+		if(logger.isDebugEnabled() && consumerId != null){
+			logger.debug("[getMessagesGreaterThan]" + topicName + "," + consumerId + "," + rawMessageSize + "," + result.size());
+		}
+		
 		return new ReturnMessageWrapper(result, rawMessageSize, maxMessageId);
 	}
 

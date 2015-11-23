@@ -32,6 +32,10 @@
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-common-server</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-kafka</artifactId>
+		</dependency>
 		<!-- dianping -->
 		<dependency>
 			<groupId>javax.servlet</groupId>

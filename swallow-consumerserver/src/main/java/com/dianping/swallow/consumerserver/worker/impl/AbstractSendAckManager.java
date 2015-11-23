@@ -144,7 +144,51 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
 	@Override
 	public void recordAck() {
-		recordAck0(waitAckMessages, maxAckedMessage);
+		
+		Entry<Long, ConsumerMessage> entry;
+		while ((entry = waitAckMessages.firstEntry()) != null) {// 使用while，尽最大可能消除空洞ack
+																	// id
+			boolean overdue = false;// 是否超过阈值
+
+			ConsumerMessage minWaitAckMessage = entry.getValue();
+			Long minAckId = entry.getKey();
+
+			if (maxAckedMessage != null && minAckId < maxAckedMessage.getAckId()) {// 大于最大ack
+																						// id（maxAckedMessageId）的消息，不算是空洞
+				if (System.currentTimeMillis() - minWaitAckMessage.getGmt() > WAIT_ACK_EXPIRED) {
+					overdue = true;
+				}
+			}
+
+			if (overdue) {
+				backupMessage(minWaitAckMessage, "ack timeout");
+			} else {// 没有移除任何空洞，则不再迭代；否则需要继续迭代以尽量多地移除空洞。
+				break;
+			}
+		}
+
+		Long ackMessageId = null;
+		entry = waitAckMessages.firstEntry();
+
+		if (entry != null) {
+			ackMessageId = entry.getValue().getAckId() - 1;
+		} else {
+
+			Long queueMaxId = getQueueEmptyMaxId(waitAckMessages);
+			
+			Long ackQueue = queueMaxId == null ? 0 : queueMaxId;
+			Long ackMaxMessage = maxAckedMessage == null ? 0L : maxAckedMessage.getAckId();
+
+			ackMessageId = Math.max(ackQueue, ackMaxMessage);
+			
+			if(ackQueue > ackMaxMessage && ackQueue > lastRecordedAckId){
+				if(logger.isInfoEnabled()){
+					logger.info("[recordAck][use queueMaxId]" + ackQueue + "," + consumerInfo);
+				}
+			}
+		}
+
+		saveAckId(ackMessageId, "batch");
 	}
 	
 
@@ -207,47 +251,6 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 		return consumerMessage;
 	}
 
-	private void recordAck0(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages0, ConsumerMessage maxAckedMessage0) {
-
-		Entry<Long, ConsumerMessage> entry;
-		while ((entry = waitAckMessages0.firstEntry()) != null) {// 使用while，尽最大可能消除空洞ack
-																	// id
-			boolean overdue = false;// 是否超过阈值
-
-			ConsumerMessage minWaitAckMessage = entry.getValue();
-			Long minAckId = entry.getKey();
-
-			if (maxAckedMessage0 != null && minAckId < maxAckedMessage0.getAckId()) {// 大于最大ack
-																						// id（maxAckedMessageId）的消息，不算是空洞
-				if (System.currentTimeMillis() - minWaitAckMessage.getGmt() > WAIT_ACK_EXPIRED) {
-					overdue = true;
-				}
-			}
-
-			if (overdue) {
-				backupMessage(minWaitAckMessage, "ack timeout");
-			} else {// 没有移除任何空洞，则不再迭代；否则需要继续迭代以尽量多地移除空洞。
-				break;
-			}
-		}
-
-		Long ackMessageId = null;
-		entry = waitAckMessages0.firstEntry();
-
-		if (entry != null) {
-			ackMessageId = entry.getValue().getAckId() - 1;
-		} else {
-
-			Long queueMaxId = getQueueEmptyMaxId(waitAckMessages0);
-
-			ackMessageId = Math.max(queueMaxId == null ? 0 : queueMaxId, maxAckedMessage0 == null ? 0L
-					: maxAckedMessage0.getAckId());
-		}
-
-		saveAckId(ackMessageId, "batch");
-	}
-
-	
 	private void backupMessage(final ConsumerMessage consumerMessage, String reason) {
 		
 		waitAckMessages.remove(consumerMessage.getAckId());
@@ -255,6 +258,11 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 		if(this.consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
 			
 			String desc = String.format("[%d][%s]", isBackcup() ? 1 : 0, reason);
+			
+			
+			if(logger.isInfoEnabled()){
+				logger.info("[backupMessage]" + desc + "," + consumerInfo + "," + consumerMessage);
+			}
 			
 			SwallowActionWrapper actionWrapper = new CatActionWrapper("Backup:" + consumerInfo.getDest().getName(), desc + consumerInfo.getConsumerId());
 			
