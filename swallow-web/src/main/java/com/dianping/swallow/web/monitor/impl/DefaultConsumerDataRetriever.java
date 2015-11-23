@@ -73,113 +73,6 @@ public class DefaultConsumerDataRetriever
         return false;
     }
 
-    public ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size, long start, long end) {
-        ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-        long fromKey = getKey(start);
-        long toKey = getKey(end);
-        OrderStatsData sendStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SEND), start, end);
-        OrderStatsData ackStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.ACK), start, end);
-        ConsumerOrderDataPair orderDataResult = new ConsumerOrderDataPair(sendStatsData, ackStatsData);
-        Set<String> topics = retriever.getTopics(false);
-        if (topics == null) {
-            return null;
-        }
-        Iterator<String> iterator = topics.iterator();
-        while (iterator.hasNext()) {
-            String topicName = iterator.next();
-            if (TOTAL_KEY.equals(topicName)) {
-                continue;
-            }
-            Map<String, NavigableMap<Long, Long>> sendDelays = retriever.getDelayForAllConsumerId(topicName,
-                    StatisType.SEND, false);
-            Map<String, NavigableMap<Long, StatisData>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
-                    StatisType.SEND, false);
-            Map<String, NavigableMap<Long, Long>> ackDelays = retriever.getDelayForAllConsumerId(topicName,
-                    StatisType.ACK, false);
-            Map<String, NavigableMap<Long, StatisData>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
-                    StatisType.ACK, false);
-            if (sendDelays != null) {
-                for (Map.Entry<String, NavigableMap<Long, Long>> sendDelay : sendDelays.entrySet()) {
-                    if (TOTAL_KEY.equals(sendDelay.getKey())) {
-                        continue;
-                    }
-                    NavigableMap<Long, Long> sendQpx = convertData(sendQpxs.get(sendDelay.getKey()), StatisFunctionType.QPX);
-                    sendStatsData
-                            .add(new OrderEntity(topicName, sendDelay.getKey(), getDelaySumStatsData(
-                                    sendDelay.getValue(), sendQpx, fromKey, toKey), getQpsSumStatsData(sendQpx,
-                                    fromKey, toKey)));
-                }
-            }
-
-            if (ackDelays != null) {
-                for (Map.Entry<String, NavigableMap<Long, Long>> ackDelay : ackDelays.entrySet()) {
-                    if (TOTAL_KEY.equals(ackDelay.getKey())) {
-                        continue;
-                    }
-                    NavigableMap<Long, Long> ackQpx = convertData(ackQpxs.get(ackDelay.getKey()), StatisFunctionType.QPX);
-                    ackStatsData.add(new OrderEntity(topicName, ackDelay.getKey(), getDelaySumStatsData(
-                            ackDelay.getValue(), ackQpx, fromKey, toKey), getQpsSumStatsData(ackQpx, fromKey, toKey)));
-                }
-            }
-
-        }
-        return orderDataResult;
-    }
-
-    public ConsumerOrderDataPair getDelayOrderForAllConsumerId(int size) {
-        return getDelayOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
-    }
-
-    public ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size, long start, long end) {
-        ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-        long fromKey = getKey(start);
-        long toKey = getKey(end);
-        OrderStatsData sendStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SEND), start, end);
-        OrderStatsData ackStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.ACK), start, end);
-        ConsumerOrderDataPair orderDataResult = new ConsumerOrderDataPair(sendStatsData, ackStatsData);
-        Set<String> topics = retriever.getTopics(false);
-        if (topics == null) {
-            return null;
-        }
-        Iterator<String> iterator = topics.iterator();
-        while (iterator.hasNext()) {
-            String topicName = iterator.next();
-            if (TOTAL_KEY.equals(topicName)) {
-                continue;
-            }
-            Map<String, NavigableMap<Long, StatisData>> sendQpxs = retriever.getQpxForAllConsumerId(topicName,
-                    StatisType.SEND, false);
-            Map<String, NavigableMap<Long, StatisData>> ackQpxs = retriever.getQpxForAllConsumerId(topicName,
-                    StatisType.ACK, false);
-            if (sendQpxs != null) {
-                for (Map.Entry<String, NavigableMap<Long, StatisData>> sendQpx : sendQpxs.entrySet()) {
-                    if (TOTAL_KEY.equals(sendQpx.getKey())) {
-                        continue;
-                    }
-                    sendStatsData.add(new OrderEntity(topicName, sendQpx.getKey(), getQpsSumStatsData(
-                            convertData(sendQpx.getValue(), StatisFunctionType.QPX), fromKey, toKey), getQpsSampleCount(start, end)));
-                }
-            }
-
-            if (ackQpxs != null) {
-                for (Map.Entry<String, NavigableMap<Long, StatisData>> ackQpx : ackQpxs.entrySet()) {
-                    if (TOTAL_KEY.equals(ackQpx.getKey())) {
-                        continue;
-                    }
-                    ackStatsData.add(new OrderEntity(topicName, ackQpx.getKey(), getQpsSumStatsData(
-                            convertData(ackQpx.getValue(), StatisFunctionType.QPX), fromKey, toKey), getQpsSampleCount(start, end)));
-                }
-            }
-
-        }
-
-        return orderDataResult;
-    }
-
-    public ConsumerOrderDataPair getQpxOrderForAllConsumerId(int size) {
-        return getQpxOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
-    }
-
     @Override
     public List<OrderStatsData> getOrderForAllConsumerId(int size) {
         return getOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
@@ -196,14 +89,58 @@ public class DefaultConsumerDataRetriever
     }
 
     public List<OrderStatsData> getOrderInMemory(int size, long start, long end) {
-        ConsumerOrderDataPair delayOrderPair = getDelayOrderForAllConsumerId(size, start, end);
-        ConsumerOrderDataPair qpxOrderPair = getQpxOrderForAllConsumerId(size, start, end);
         OrderStatsData accuStatsData = accumulationRetriever.getAccuOrderForAllConsumerId(size, start, end);
+        OrderStatsData qpxSendStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SEND), start, end);
+        OrderStatsData qpxAckStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.ACK), start, end);
+        OrderStatsData delaySendStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SEND), start, end);
+        OrderStatsData delayAckStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.ACK), start, end);
+        ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
+        Set<String> topics = retriever.getTopics(false);
+        if (topics == null) {
+            return null;
+        }
+        Iterator<String> iterator = topics.iterator();
+        long fromKey = getKey(start);
+        long toKey = getToKey(end);
+        while (iterator.hasNext()) {
+            String topicName = iterator.next();
+            if (TOTAL_KEY.equals(topicName)) {
+                continue;
+            }
+            Set<String> consumerIds = retriever.getConsumerIds(topicName, false);
+            if (consumerIds == null || consumerIds.isEmpty()) {
+                continue;
+            }
+            Iterator<String> itConsumerId = consumerIds.iterator();
+            while (itConsumerId.hasNext()) {
+                String consumerId = itConsumerId.next();
+                NavigableMap<Long, StatisData> lastSendDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, toKey - 5L, toKey);
+                NavigableMap<Long, StatisData> firstSendDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, fromKey, fromKey + 5L);
+                NavigableMap<Long, StatisData> lastAckDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, toKey - 5L, toKey);
+                NavigableMap<Long, StatisData> firstAckDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, fromKey, fromKey + 5L);
+                if (lastSendDatas != null && !lastSendDatas.isEmpty() && firstSendDatas != null && !firstSendDatas.isEmpty()) {
+                    StatisData lastData = lastSendDatas.lastEntry().getValue();
+                    StatisData firstData = firstSendDatas.lastEntry().getValue();
+                    long subTotalDelay = lastData.getTotalDelay() - lastData.getTotalDelay();
+                    long subTotalCount = lastData.getTotalCount() - lastData.getTotalCount();
+                    delaySendStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalDelay, subTotalCount));
+                    qpxSendStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalCount, getQpsSampleCount(start, end)));
+                }
+                if (lastAckDatas != null && !lastAckDatas.isEmpty() && firstAckDatas != null && !firstAckDatas.isEmpty()) {
+                    StatisData lastData = lastAckDatas.lastEntry().getValue();
+                    StatisData firstData = firstAckDatas.lastEntry().getValue();
+                    long subTotalDelay = lastData.getTotalDelay() - lastData.getTotalDelay();
+                    long subTotalCount = lastData.getTotalCount() - lastData.getTotalCount();
+                    delayAckStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalDelay, subTotalCount));
+                    qpxAckStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalCount, getQpsSampleCount(start, end)));
+                }
+            }
+        }
         List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-        orderStatsDatas.add(delayOrderPair.getSendStatsData());
-        orderStatsDatas.add(delayOrderPair.getAckStatsData());
-        orderStatsDatas.add(qpxOrderPair.getSendStatsData());
-        orderStatsDatas.add(qpxOrderPair.getAckStatsData());
+        orderStatsDatas.add(delaySendStatsData);
+        orderStatsDatas.add(delayAckStatsData);
+        orderStatsDatas.add(qpxSendStatsData);
+        orderStatsDatas.add(qpxAckStatsData);
         orderStatsDatas.add(accuStatsData);
         return orderStatsDatas;
     }
@@ -211,15 +148,11 @@ public class DefaultConsumerDataRetriever
     public List<OrderStatsData> getOrderInDb(int size, long start, long end) {
         long fromKey = getKey(start);
         long toKey = getKey(end);
-        OrderStatsData qpxSendStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SEND), start,
-                end);
+        OrderStatsData qpxSendStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SEND), start, end);
         OrderStatsData qpxAckStatsData = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.ACK), start, end);
-        OrderStatsData delaySendStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SEND),
-                start, end);
-        OrderStatsData delayAckStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.ACK), start,
-                end);
-        OrderStatsData accuStatsData = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY,
-                StatisDetailType.ACCUMULATION), start, end);
+        OrderStatsData delaySendStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SEND), start, end);
+        OrderStatsData delayAckStatsData = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.ACK), start, end);
+        OrderStatsData accuStatsData = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY, StatisDetailType.ACCUMULATION), start, end);
         List<ConsumerIdResource> consumerIdResources = resourceContainer.findConsumerIdResources(false);
         if (consumerIdResources != null && consumerIdResources.size() > 0) {
             QueryQrderTask queryQrderTask = new QueryQrderTask();

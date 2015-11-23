@@ -158,7 +158,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         return result;
     }
 
-//    protected NavigableMap<Long, Long> convertStatisDataToDelayVlaue(NavigableMap<Long, StatisData> map) {
+    //    protected NavigableMap<Long, Long> convertStatisDataToDelayVlaue(NavigableMap<Long, StatisData> map) {
 //        if (map == null) {
 //            return null;
 //        }
@@ -275,6 +275,18 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         return getKeys(keys, null);
     }
 
+    public NavigableMap<Long, StatisData> getLastStatisValue(CasKeys keys, StatisType type) {
+        return statis.getLastValue(keys, type);
+    }
+
+    public NavigableMap<Long, StatisData> getFirstStatisValue(CasKeys keys, StatisType type) {
+        return statis.getFirstValue(keys, type);
+    }
+
+    public NavigableMap<Long, StatisData> getStatisValue(CasKeys keys, StatisType type, Long startKey, Long endKey) {
+        return statis.getStatisData(keys, type, startKey, endKey);
+    }
+
     protected NavigableMap<Long, Long> convertData(NavigableMap<Long, StatisData> qpxDatas, StatisFunctionType type) {
         if (qpxDatas != null) {
             NavigableMap<Long, Long> result = new ConcurrentSkipListMap<Long, Long>();
@@ -295,5 +307,12 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
             }
         }
         return null;
+    }
+
+    protected Long getToKey(long end) {
+        if (end > lastBuildTime) {
+            return getKey(lastBuildTime);
+        }
+        return getKey(end);
     }
 }

@@ -3,6 +3,7 @@ package com.dianping.swallow.web.monitor.wapper;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
+import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.dianping.swallow.web.model.stats.*;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,37 +33,42 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
         }
         Iterator<String> iterator = serverKeys.iterator();
         List<ProducerServerStatsData> serverStatsDatas = new ArrayList<ProducerServerStatsData>();
-        int index = 0;
+        boolean isFirst = true;
         while (iterator.hasNext()) {
             String serverIp = iterator.next();
             if (!isTotal && TOTAL_KEY.equals(serverIp)) {
                 continue;
             }
-            NavigableMap<Long, QpxData> qpx = producerDataRetriever.getQpsValue(new CasKeys(serverIp), StatisType.SAVE);
-            if (qpx == null || qpx.isEmpty()) {
+            NavigableMap<Long, StatisData> statisDatas = null;
+            if (isFirst) {
+                statisDatas = producerDataRetriever.getLastStatisValue(new CasKeys(serverIp), StatisType.SAVE);
+            } else {
+                statisDatas = producerDataRetriever.getStatisValue(new CasKeys(serverIp), StatisType.SAVE, timeKey, timeKey);
+            }
+            if (statisDatas == null || statisDatas.isEmpty()) {
                 continue;
             }
-
-            if (index == 0) {
-                Long tempKey = timeKey == DEFAULT_VALUE ? qpx.lastKey() : qpx.higherKey(timeKey);
+            if (isFirst) {
+                if (statisDatas == null || statisDatas.isEmpty()) {
+                    continue;
+                }
+                Long tempKey = timeKey == DEFAULT_VALUE ? statisDatas.lastKey() : statisDatas.higherKey(timeKey);
                 if (tempKey == null) {
                     return null;
                 }
                 timeKey = tempKey.longValue();
-                index++;
+                isFirst = false;
             }
-
-            ProducerServerStatsData serverStatsData = statsDataFactory.createProducerServerStatsData();
-            serverStatsData.setTimeKey(timeKey);
-            serverStatsData.setIp(serverIp);
-            serverStatsData.setDelay(0);
-            QpxData qpxValue = qpx.get(timeKey);
-            if (qpxValue != null) {
-                serverStatsData.setQps(qpxValue.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : qpxValue.getQpx(DEFAULT_QPX_TYPE).longValue());
-                serverStatsData.setQpsTotal(qpxValue.getTotal() == null ? 0L : qpxValue.getTotal().longValue());
+            StatisData statisData = statisDatas.get(timeKey);
+            if (statisData != null) {
+                ProducerServerStatsData serverStatsData = statsDataFactory.createProducerServerStatsData();
+                serverStatsData.setTimeKey(timeKey);
+                serverStatsData.setIp(serverIp);
+                serverStatsData.setDelay(statisData.getDelay());
+                serverStatsData.setQps(statisData.getQpx(DEFAULT_QPX_TYPE));
+                serverStatsData.setQpsTotal(statisData.getCount());
+                serverStatsDatas.add(serverStatsData);
             }
-
-            serverStatsDatas.add(serverStatsData);
 
         }
         return serverStatsDatas;
@@ -76,41 +82,42 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
         }
         Iterator<String> iterator = topicKeys.iterator();
         List<ProducerTopicStatsData> producerTopicStatsDatas = new ArrayList<ProducerTopicStatsData>();
-        int index = 0;
+        boolean isFirst = true;
         while (iterator.hasNext()) {
             String topicName = String.valueOf(iterator.next());
             if (!isTotal && TOTAL_KEY.equals(topicName)) {
                 continue;
             }
-            NavigableMap<Long, QpxData> topicQpxs = producerDataRetriever.getQpsValue(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE);
-
-            if (topicQpxs == null || topicQpxs.isEmpty()) {
+            NavigableMap<Long, StatisData> statisDatas = null;
+            if (isFirst) {
+                statisDatas = producerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE);
+            } else {
+                statisDatas = producerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, timeKey, timeKey);
+            }
+            if (statisDatas == null || statisDatas.isEmpty()) {
                 continue;
             }
-            if (index == 0) {
-                Long tempKey = timeKey == DEFAULT_VALUE ? topicQpxs.lastKey() : topicQpxs.higherKey(timeKey);
+            if (isFirst) {
+                if (statisDatas == null || statisDatas.isEmpty()) {
+                    continue;
+                }
+                Long tempKey = timeKey == DEFAULT_VALUE ? statisDatas.lastKey() : statisDatas.higherKey(timeKey);
                 if (tempKey == null) {
                     return null;
                 }
                 timeKey = tempKey.longValue();
-                index++;
+                isFirst = false;
             }
-            ProducerTopicStatsData producerTopicStatsData = statsDataFactory.createTopicStatsData();
-            producerTopicStatsData.setTopicName(topicName);
-            producerTopicStatsData.setTimeKey(timeKey);
-
-            NavigableMap<Long, Long> topicDelays = producerDataRetriever.getDelayValue(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE);
-
-            QpxData topicQpx = topicQpxs.get(timeKey);
-            if (topicQpx != null) {
-                producerTopicStatsData.setQps(topicQpx.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : topicQpx.getQpx(DEFAULT_QPX_TYPE).longValue());
-                producerTopicStatsData.setQpsTotal(topicQpx.getTotal() == null ? 0L : topicQpx.getTotal().longValue());
+            StatisData statisData = statisDatas.get(timeKey);
+            if (statisData != null) {
+                ProducerTopicStatsData producerTopicStatsData = statsDataFactory.createTopicStatsData();
+                producerTopicStatsData.setTopicName(topicName);
+                producerTopicStatsData.setTimeKey(timeKey);
+                producerTopicStatsData.setQps(statisData.getQpx(DEFAULT_QPX_TYPE));
+                producerTopicStatsData.setQpsTotal(statisData.getCount());
+                producerTopicStatsData.setDelay(statisData.getDelay());
+                producerTopicStatsDatas.add(producerTopicStatsData);
             }
-            Long delay = topicDelays.get(timeKey);
-            if (delay != null) {
-                producerTopicStatsData.setDelay(delay.longValue());
-            }
-            producerTopicStatsDatas.add(producerTopicStatsData);
         }
         return producerTopicStatsDatas;
     }
@@ -141,45 +148,42 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
         if (ipKeys == null) {
             return null;
         }
-        int index = 0;
+        boolean isFirst = true;
         for (String ip : ipKeys) {
             if (!isTotal && TOTAL_KEY.equals(ip)) {
                 continue;
             }
-
-            NavigableMap<Long, QpxData> ipQpxs = producerDataRetriever.getQpsValue(new CasKeys(
-                    TOTAL_KEY, topicName, ip), StatisType.SAVE);
-            if (ipQpxs == null || ipQpxs.isEmpty()) {
+            NavigableMap<Long, StatisData> statisDatas = null;
+            if (isFirst) {
+                statisDatas = producerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName, ip), StatisType.SAVE);
+            } else {
+                statisDatas = producerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, ip), StatisType.SAVE, timeKey, timeKey);
+            }
+            if (statisDatas == null || statisDatas.isEmpty()) {
                 continue;
             }
-            if (index == 0) {
-                Long tempKey = timeKey == DEFAULT_VALUE ? ipQpxs.lastKey() : ipQpxs.higherKey(timeKey);
+            if (isFirst) {
+                if (statisDatas == null || statisDatas.isEmpty()) {
+                    continue;
+                }
+                Long tempKey = timeKey == DEFAULT_VALUE ? statisDatas.lastKey() : statisDatas.higherKey(timeKey);
                 if (tempKey == null) {
                     return null;
                 }
                 timeKey = tempKey.longValue();
-                index++;
+                isFirst = false;
             }
-
-            ProducerIpStatsData ipStatsData = statsDataFactory.createProducerIpStatsData();
-            ipStatsData.setTopicName(topicName);
-            ipStatsData.setTimeKey(timeKey);
-            ipStatsData.setIp(ip);
-            
-            NavigableMap<Long, Long> ipDelays = producerDataRetriever.getDelayValue(new CasKeys(
-                    TOTAL_KEY, topicName, ip), StatisType.SAVE);
-
-            QpxData qps = ipQpxs.get(timeKey);
-            if (qps != null) {
-                ipStatsData.setQps(qps.getQpx(DEFAULT_QPX_TYPE) == null ? 0L : qps.getQpx(DEFAULT_QPX_TYPE).longValue());
-                ipStatsData.setQpsTotal(qps.getTotal() == null ? 0L : qps.getTotal().longValue());
+            StatisData statisData = statisDatas.get(timeKey);
+            if (statisData != null) {
+                ProducerIpStatsData ipStatsData = statsDataFactory.createProducerIpStatsData();
+                ipStatsData.setTopicName(topicName);
+                ipStatsData.setTimeKey(timeKey);
+                ipStatsData.setIp(ip);
+                ipStatsData.setQps(statisData.getQpx(DEFAULT_QPX_TYPE));
+                ipStatsData.setQpsTotal(statisData.getCount());
+                ipStatsData.setDelay(statisData.getDelay());
+                ipStatsDatas.add(ipStatsData);
             }
-
-            Long delay = ipDelays.get(timeKey);
-            if (delay != null) {
-                ipStatsData.setDelay(delay.longValue());
-            }
-            ipStatsDatas.add(ipStatsData);
         }
 
         return ipStatsDatas;

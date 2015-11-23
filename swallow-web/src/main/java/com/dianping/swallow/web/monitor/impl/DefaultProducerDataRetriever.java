@@ -51,9 +51,6 @@ public class DefaultProducerDataRetriever
     @Autowired
     private ResourceContainer resourceContainer;
 
-    @Autowired
-    private ProducerMonitorDao producerMonitorDao;
-
     @Override
     public boolean dataExistInMemory(long start, long end) {
         NavigableMap<Long, Long> qpxStatsData = convertData(statis.getQpx(StatisType.SAVE), StatisFunctionType.QPX);
@@ -67,41 +64,6 @@ public class DefaultProducerDataRetriever
             }
         }
         return false;
-    }
-
-    public OrderStatsData getDelayOrder(int size, long start, long end) {
-        return getDelayOrderInMemory(size, StatisType.SAVE, start, end);
-    }
-
-    protected OrderStatsData getDelayOrderInMemory(int size, StatisType type, long start, long end) {
-        Set<String> topics = statis.getTopics(false);
-        if (topics == null) {
-            return null;
-        }
-        OrderStatsData orderResults = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, type), start, end);
-        long fromKey = getKey(start);
-        long toKey = getKey(end);
-        Iterator<String> iterator = topics.iterator();
-        while (iterator.hasNext()) {
-            String topicName = iterator.next();
-            if (TOTAL_KEY.equals(topicName)) {
-                continue;
-            }
-            NavigableMap<Long, StatisData> statisData = statis.getStatisDataForTopic(topicName, type);
-            NavigableMap<Long, Long> rawDatas = convertData(statisData, StatisFunctionType.DELAY);
-            NavigableMap<Long, Long> qpsRawDatas = convertData(statisData, StatisFunctionType.QPX);
-            orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getDelaySumStatsData(rawDatas, qpsRawDatas,
-                    fromKey, toKey), getQpsSumStatsData(qpsRawDatas, fromKey, toKey)));
-        }
-        return orderResults;
-    }
-
-    public OrderStatsData getDelayOrder(int size) {
-        return getDelayOrder(size, getDefaultStart(), getDefaultEnd());
-    }
-
-    public OrderStatsData getQpxOrder(int size, long start, long end) {
-        return getQpxOrderInMemory(size, StatisType.SAVE, start, end);
     }
 
     public List<OrderStatsData> getOrder(int size) {
@@ -118,11 +80,34 @@ public class DefaultProducerDataRetriever
     }
 
     public List<OrderStatsData> getOrderInMemory(int size, long start, long end) {
-        OrderStatsData delayOrderResult = getDelayOrderInMemory(size, StatisType.SAVE, start, end);
-        OrderStatsData qpxOrderResult = getQpxOrderInMemory(size, StatisType.SAVE, start, end);
+        Set<String> topics = statis.getTopics(false);
+        if (topics == null) {
+            return null;
+        }
+        OrderStatsData orderDelayResult = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SAVE), start, end);
+        OrderStatsData orderQpsResult = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SAVE), start, end);
+        long fromKey = getKey(start);
+        long toKey = getToKey(end);
+        Iterator<String> iterator = topics.iterator();
+        while (iterator.hasNext()) {
+            String topicName = iterator.next();
+            if (TOTAL_KEY.equals(topicName)) {
+                continue;
+            }
+            NavigableMap<Long, StatisData> lastDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, toKey - 5L, toKey);
+            NavigableMap<Long, StatisData> firstDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, fromKey, fromKey + 5L);
+            if (lastDatas != null && !lastDatas.isEmpty() && firstDatas != null && !firstDatas.isEmpty()) {
+                StatisData lastData = lastDatas.lastEntry().getValue();
+                StatisData firstData = firstDatas.lastEntry().getValue();
+                long subTotalDelay = lastData.getTotalDelay() - firstData.getTotalDelay();
+                long subTotalCount = lastData.getTotalCount() - firstData.getTotalCount();
+                orderDelayResult.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalDelay, subTotalCount));
+                orderQpsResult.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalCount, getQpsSampleCount(start, end)));
+            }
+        }
         List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-        orderStatsDatas.add(delayOrderResult);
-        orderStatsDatas.add(qpxOrderResult);
+        orderStatsDatas.add(orderDelayResult);
+        orderStatsDatas.add(orderQpsResult);
         return orderStatsDatas;
     }
 
@@ -148,31 +133,6 @@ public class DefaultProducerDataRetriever
         orderStatsDatas.add(delayOrderResult);
         orderStatsDatas.add(qpxOrderResult);
         return orderStatsDatas;
-    }
-
-    protected OrderStatsData getQpxOrderInMemory(int size, StatisType type, long start, long end) {
-        Set<String> topics = statis.getTopics(false);
-        if (topics == null) {
-            return null;
-        }
-        long fromKey = getKey(start);
-        long toKey = getKey(end);
-        OrderStatsData orderResults = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, type), start, end);
-        Iterator<String> iterator = topics.iterator();
-        while (iterator.hasNext()) {
-            String topicName = iterator.next();
-            if (TOTAL_KEY.equals(topicName)) {
-                continue;
-            }
-            NavigableMap<Long, Long> rawDatas = convertData(statis.getStatisDataForTopic(topicName, type), StatisFunctionType.QPX);
-            orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY,
-                    getQpsSumStatsData(rawDatas, fromKey, toKey), getQpsSampleCount(start, end)));
-        }
-        return orderResults;
-    }
-
-    public OrderStatsData getQpxOrder(int size) {
-        return getQpxOrder(size, getDefaultStart(), getDefaultEnd());
     }
 
     @Override
