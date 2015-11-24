@@ -10,9 +10,8 @@ import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Filter.Result;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.AsyncAppender;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.RollingRandomAccessFileAppender;
 import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
 import org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy;
 import org.apache.logging.log4j.core.config.AppenderRef;
@@ -50,26 +49,19 @@ public class LoggerLoader {
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         final Configuration config = ctx.getConfiguration();
         Layout<? extends Serializable> layout = PatternLayout.createLayout(
-                "%d[%-5p][%t][%c] %L %m%n", config, null, null, true, false,
+                "%d[%-5p][%t][%c] %m%n", config, null, null, true, false,
                 null, null);
 
         // asyn file info,  filter-same or more specific than
         Filter fileInfoFilter = ThresholdFilter.createFilter(Level.ERROR, Result.DENY, Result.ACCEPT);
-        Appender fileInfoAppender = RollingFileAppender.createAppender(LOG_ROOT + "/" + APP_NAME + "/" + APP_NAME + ".log",
-                LOG_ROOT + "/" + APP_NAME + "/" + APP_NAME + ".log.%d{yyyy-MM-dd}.gz", "true", "FileInfo", "true", "4000",
-                "false", TimeBasedTriggeringPolicy.createPolicy("1", "true"),
+        Appender fileInfoAppender = RollingRandomAccessFileAppender.createAppender(LOG_ROOT + "/" + APP_NAME + "/" + APP_NAME + ".log",
+                LOG_ROOT + "/" + APP_NAME + "/" + APP_NAME + ".log.%d{yyyy-MM-dd}.gz", "true", "FileInfo", "true", null,
+                TimeBasedTriggeringPolicy.createPolicy("1", "true"),
                 DefaultRolloverStrategy.createStrategy("30", "1", null, Deflater.DEFAULT_COMPRESSION + "", config),
                 layout, fileInfoFilter, "false", null, null, config);
         fileInfoAppender.start();
         config.addAppender(fileInfoAppender);
         AppenderRef fileInfoRef = AppenderRef.createAppenderRef("FileInfo", Level.INFO, null);
-
-        AsyncAppender asyncFileInfoAppender = AsyncAppender.createAppender(
-                new AppenderRef[]{fileInfoRef}, null, true, 5000, "AsyncFileInfo", true, null,
-                config, false);
-        config.addAppender(asyncFileInfoAppender);
-        asyncFileInfoAppender.start();
-        AppenderRef asyncFileInfoAppenderRef = AppenderRef.createAppenderRef("AsyncFileInfo", Level.INFO, null);
 
         // console error
         Appender consoleErrorAppender = ConsoleAppender.createAppender(layout, null, "SYSTEM_ERR", "ConsoleError",
@@ -87,17 +79,15 @@ public class LoggerLoader {
         AppenderRef consoleWarnAppenderRef = AppenderRef
                 .createAppenderRef("ConsoleWarn", Level.WARN, consoleWarnFilter);
 
-
-        AppenderRef[] refs = new AppenderRef[]{consoleErrorAppenderRef, consoleWarnAppenderRef, asyncFileInfoAppenderRef};
+        AppenderRef[] refs = new AppenderRef[]{consoleErrorAppenderRef, consoleWarnAppenderRef, fileInfoRef};
         LoggerConfig loggerConfig = LoggerConfig.createLogger("false", Level.INFO, PACKAGE, "true", refs,
                 null, config, null);
         loggerConfig.addAppender(consoleErrorAppender, Level.ERROR, null);
         loggerConfig.addAppender(consoleWarnAppender, Level.WARN, null);
-        loggerConfig.addAppender(asyncFileInfoAppender, Level.INFO, null);
+        loggerConfig.addAppender(fileInfoAppender, Level.INFO, null);
 
         config.addLogger(PACKAGE, loggerConfig);
 
         ctx.updateLoggers();
     }
 }
-

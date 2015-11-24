@@ -8,16 +8,16 @@
             <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
         </Console>
         <RollingRandomAccessFile name="fileAppender"
-                     fileName="/data/applogs/swallow-web/logs/swallow-web.log"
-                     filePattern="/data/applogs/swallow-web/logs/swallow-web.log.%d{yyyy-MM-dd}.gz">
+                                 fileName="/data/applogs/swallow/swallow-test.log"
+                                 filePattern="/data/applogs/swallow/swallow-test.log.%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
             <TimeBasedTriggeringPolicy interval="1"
                                        modulate="true"/>
         </RollingRandomAccessFile>
 
         <RollingRandomAccessFile name="logFilterFileAppender"
-                     fileName="/data/applogs/swallow-web/logs/logfilter/swallow-web.log"
-                     filePattern="/data/applogs/swallow-web/logs/logfilter/swallow-web.log.%d{yyyy-MM-dd}.gz">
+                                 fileName="/data/applogs/swallow-web/logs/logfilter/swallow-web.log"
+                                 filePattern="/data/applogs/swallow-web/logs/logfilter/swallow-web.log.%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
             <TimeBasedTriggeringPolicy interval="1"
                                        modulate="true"/>
@@ -33,9 +33,13 @@
                 additivity="true">
             <AppenderRef ref="console" level="ERROR"/>
         </Logger>
-        <Logger name="com.dianping.swallow.web.filter" level="INFO"
-                additivity="true">
-            <AppenderRef ref="logFilterFileAppender" level="INFO"/>
+        <Logger name="com.dianping.swallow.consumer.internal.task.DefaultConsumerTask" additivity="true" level="WARN">
+            <AppenderRef ref="console" level="ERROR"/>
+        </Logger>
+
+
+        <Logger name="com.dianping.swallow.test.other.LogTest" additivity="false">
+            <AppenderRef ref="fileAppender" level="INFO"/>
         </Logger>
         <root level="INFO">
             <AppenderRef ref="console"/>
