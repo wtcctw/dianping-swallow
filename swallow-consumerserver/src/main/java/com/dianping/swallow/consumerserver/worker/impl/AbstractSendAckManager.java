@@ -146,6 +146,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 	public void recordAck() {
 		
 		Entry<Long, ConsumerMessage> entry;
+		
 		while ((entry = waitAckMessages.firstEntry()) != null) {// 使用while，尽最大可能消除空洞ack
 																	// id
 			boolean overdue = false;// 是否超过阈值

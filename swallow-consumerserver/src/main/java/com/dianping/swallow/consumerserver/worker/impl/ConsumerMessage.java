@@ -1,5 +1,7 @@
 package com.dianping.swallow.consumerserver.worker.impl;
 
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +19,9 @@ public class ConsumerMessage {
 
 	protected final Logger logger     = LoggerFactory.getLogger(getClass());
 
-	private SwallowMessage message;
+	private final SwallowMessage message;
 
-	private long gmt;
+	private final long gmt;
 	
 	private Channel channel;
 	
@@ -33,7 +35,7 @@ public class ConsumerMessage {
 	
 	@Override
 	public String toString() {
-		return "ConsumerMessage [message=" + messageIdDesc() + ", gmt=" + gmt + ",channel:" + channel +"]";
+		return "ConsumerMessage [message=" + messageIdDesc() + ", gmt=" + new Date(gmt) + ",channel:" + channel +"]";
 	}
 
 	private String messageIdDesc() {
