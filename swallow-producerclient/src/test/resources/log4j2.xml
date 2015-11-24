@@ -7,14 +7,6 @@
 <Configuration status="WARN">
 <Appenders>
 
-    <!--<CatAppender name="catAppender"/>-->
-    <!-- Async Loggers will auto-flush in batches, so switch off immediateFlush. -->
-    <!--<RandomAccessFile name="RandomAccessFile" fileName="/data/applogs/swallow/async.log" immediateFlush="false" append="true">-->
-        <!--<PatternLayout>-->
-            <!--<Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>-->
-        <!--</PatternLayout>-->
-    <!--</RandomAccessFile>-->
-
     <RollingRandomAccessFile name="RandomAccessFile"
                  fileName="/data/applogs/swallow/async.log"
                  filePattern="/data/applogs/swallow/async.log.%d{yyyy-MM-dd}.gz">
@@ -26,7 +18,6 @@
 <Loggers>
     <Root level="info" includeLocation="false">
         <AppenderRef ref="RandomAccessFile"/>
-        <!--<AppenderRef ref="catAppender"/>-->
     </Root>
 </Loggers>
 </Configuration>
