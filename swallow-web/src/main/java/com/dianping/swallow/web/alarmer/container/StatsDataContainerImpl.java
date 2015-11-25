@@ -37,7 +37,6 @@ public class StatsDataContainerImpl implements StatsDataContainer {
 
 	@Override
 	public void setConsumerIdTotalRatio(List<ConsumerIdStatsData> consumerIdStatsDatas) {
-		logger.info("[setConsumerIdTotalRatio]");
 		if (consumerIdStatsDatas == null) {
 			return;
 		}
@@ -67,7 +66,6 @@ public class StatsDataContainerImpl implements StatsDataContainer {
 
 	@Override
 	public void setProducerTopicTotalRatio(List<ProducerTopicStatsData> topicStatsDatas) {
-		logger.info("[setProducerTopicTotalRatio]");
 		if (topicStatsDatas == null) {
 			return;
 		}

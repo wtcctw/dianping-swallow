@@ -174,9 +174,13 @@ public class DefaultConsumerDataRetriever
         List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
         long startKey = getKey(start);
         long endKey = getKey(end);
+        boolean isTotal = false;
+        if (MonitorData.TOTAL_KEY.equals(topic)) {
+            isTotal = true;
+        }
         if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
-            sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, false);
-            ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, false);
+            sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, isTotal);
+            ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, isTotal);
             if (sendDelays != null) {
 
                 for (Entry<String, NavigableMap<Long, Long>> entry : sendDelays.entrySet()) {
@@ -198,10 +202,6 @@ public class DefaultConsumerDataRetriever
             }
         } else {
             Map<String, StatsDataMapPair> statsDataResults = getTopicDelayInDb(topic, start, end);
-            boolean isTotal = false;
-            if (MonitorData.TOTAL_KEY.equals(topic)) {
-                isTotal = true;
-            }
             if (statsDataResults != null && !statsDataResults.isEmpty()) {
                 for (Map.Entry<String, StatsDataMapPair> statsDataResult : statsDataResults.entrySet()) {
                     if (!isTotal && MonitorData.TOTAL_KEY.equals(statsDataResult.getKey())) {
@@ -291,9 +291,13 @@ public class DefaultConsumerDataRetriever
         List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
         long startKey = getKey(start);
         long endKey = getKey(end);
+        boolean isTotal = false;
+        if (MonitorData.TOTAL_KEY.equals(topic)) {
+            isTotal = true;
+        }
         if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
-            sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
-            ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
+            sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, isTotal);
+            ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, isTotal);
             if (sendQpxs != null) {
                 for (Entry<String, NavigableMap<Long, StatisData>> entry : sendQpxs.entrySet()) {
 
@@ -315,10 +319,6 @@ public class DefaultConsumerDataRetriever
             }
         } else {
             Map<String, StatsDataMapPair> statsDataResults = getTopicQpxInDb(topic, qpx, start, end);
-            boolean isTotal = false;
-            if (MonitorData.TOTAL_KEY.equals(topic)) {
-                isTotal = true;
-            }
             if (statsDataResults != null && !statsDataResults.isEmpty()) {
                 for (Map.Entry<String, StatsDataMapPair> statsDataResult : statsDataResults.entrySet()) {
                     if (!isTotal && MonitorData.TOTAL_KEY.equals(statsDataResult.getKey())) {

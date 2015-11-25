@@ -135,7 +135,6 @@ public class DefaultProducerDataRetriever
         return getDelayInDb(topic, StatisType.SAVE, start, end);
     }
 
-    @Override
     protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
 
         long startKey = getKey(start);
@@ -181,7 +180,6 @@ public class DefaultProducerDataRetriever
         return getQpxInDb(topic, StatisType.SAVE, start, end);
     }
 
-    @Override
     protected StatsData getQpxInDb(String topic, StatisType type, long start, long end) {
         long startKey = getKey(start);
         long endKey = getKey(end);
