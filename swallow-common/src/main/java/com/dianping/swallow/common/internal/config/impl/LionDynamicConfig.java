@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.config.impl;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,7 +41,11 @@ public class LionDynamicConfig implements DynamicConfig {
 			cc = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
 			if (useLocal()) {
 				// 如果本地文件存在，则使用Lion本地文件
-				InputStream in = LionDynamicConfig.class.getClassLoader().getResourceAsStream(localConfigFileName);
+				URL resource = getClass().getClassLoader().getResource(localConfigFileName);
+				if(logger.isInfoEnabled()){
+					logger.info("[LionDynamicConfig]" + resource);
+				}
+				InputStream in = resource.openStream();
 				if (in != null) {
 					if (logger.isInfoEnabled()) {
 						logger.info("[loading]" + localConfigFileName);

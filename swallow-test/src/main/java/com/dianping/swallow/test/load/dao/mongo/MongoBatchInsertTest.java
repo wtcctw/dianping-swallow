@@ -1,21 +1,19 @@
-package com.dianping.swallow.test.load.mongo;
+package com.dianping.swallow.test.load.dao.mongo;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.test.load.dao.AbstractDaoTest;
 
 /**
  * @author mengwenchao
  * 
  *         2015年1月26日 下午9:55:10
  */
-public class MongoBatchInsertTest extends AbstractMongoTest {
+public class MongoBatchInsertTest extends AbstractDaoTest {
 
-	private static int concurrentCount = 100;
-	private static int topicCount = 2;
 	private static int batchSize = 10;
 	
 	/**
@@ -26,34 +24,12 @@ public class MongoBatchInsertTest extends AbstractMongoTest {
 		
 		int argIndex = 0;
 		if (args.length >= 1) {
-			topicCount  = Integer.parseInt(args[argIndex++]);
-		}
-		if (args.length >= 2) {
-			concurrentCount = Integer.parseInt(args[argIndex++]);
-		}
-		if (args.length >= 3) {
-			totalMessageCount = Integer.parseInt(args[argIndex++]);
-		}
-		if (args.length >= 4) {
 			batchSize = Integer.parseInt(args[argIndex++]);
 		}
-		if (args.length >= 5) {
-			messageSize = Integer.parseInt(args[argIndex++]);
-		}
-
 		
 		new MongoBatchInsertTest().start();
 	}
 
-	@Override
-	protected void doStart() throws InterruptedException, IOException {
-		
-		if(logger.isInfoEnabled()){
-			logger.info("batchSize:" + batchSize + ",messageSize" + messageSize);
-		}
-
-		sendMessage(topicCount, concurrentCount, totalMessageCount);
-	}
 
 	protected void saveMessge(String topicName) {
 

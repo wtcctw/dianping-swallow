@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.test.AbstractSwallowTest;
 
 /**
@@ -26,7 +27,10 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 	
 	protected String type 	  = "type";
 	
-	protected static int totalMessageCount = Integer.MAX_VALUE;
+	protected static 	int totalMessageCount = Integer.MAX_VALUE;
+	protected   static  	int concurrentCount = 10;
+	protected   static  	int topicCount = 1;
+	protected 	static		int topicStartIndex = 0;
 
     protected  AtomicLong count = new AtomicLong();
     protected AtomicLong preCount = new AtomicLong();
@@ -37,7 +41,7 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
     protected int zeroExit = 10;
     
     protected ScheduledExecutorService	scheduled = Executors.newScheduledThreadPool(4);
-    protected ExecutorService executors = Executors.newCachedThreadPool();
+    protected ExecutorService executors = Executors.newCachedThreadPool(new MQThreadFactory("LOAD-TEST-POOL"));
 
     public static int messageSize = 1000;
     public static String message;
@@ -60,9 +64,19 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 		return name + "-" + count;
 	}
     
-    
+	protected void getArgs() {
+		
+		totalMessageCount = Integer.parseInt(System.getProperty("totalMessageCount", String.valueOf(Integer.MAX_VALUE)));
+		concurrentCount   = Integer.parseInt(System.getProperty("concurrentCount", "1"));
+		topicCount   = Integer.parseInt(System.getProperty("topicCount", "1"));
+		topicStartIndex = Integer.parseInt(System.getProperty("topicStartIndex", "0"));
+		messageSize = Integer.parseInt(System.getProperty("messageSize", "1024"));
+	}
+
 	protected void start() throws Exception{
 
+		getArgs();
+		
 		createMessage();
 		
 		startFrequencyCounter();
@@ -80,9 +94,33 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 			}
 			exit();
 		}
+	}
+	
+	protected void doStart() throws InterruptedException, IOException, Exception{
 		
+		for(int i=topicStartIndex; i < topicCount; i++){
+			
+			String currentTopic = getTopicName(topicName, i);
+			
+			for(int j=0; j < concurrentCount; j++){
+				
+				if(logger.isInfoEnabled()){
+					logger.info("[doStart]" + currentTopic + "," + j);
+				}
+				
+				executors.execute(createLoadTask(currentTopic, j));
+			}
+		}
 	}
 
+	protected Runnable createLoadTask(String topicName, int concurrentIndex){
+		return null;
+	}
+
+
+	protected void doRun() {
+		
+	}
 
 	protected void exit() {
 		
@@ -104,9 +142,6 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 	protected boolean isExitOnExecutorsReturn() {
 		return true;
 	}
-
-
-	protected abstract void doStart() throws InterruptedException, IOException, Exception;
 
 	private void startFrequencyCounter() {
 		

@@ -341,13 +341,13 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             	if(logger.isDebugEnabled()){
             		logger.debug("[onMessage]" + msg);
             	}
-            	doOnMessage(msg);
             	int result = count.incrementAndGet();
             	if(result % 100 == 0 ){
             		if(logger.isInfoEnabled()){
             			logger.info("[onMessage]" + result);
             		}
             	}
+            	doOnMessage(msg);
             	sleep(sleepTime);
             }
         });

@@ -21,7 +21,7 @@ import com.dianping.swallow.test.load.BitMarker;
 
 /**
  * @author mengwenchao
- *
+ *G
  * 2015年9月7日 上午11:45:35
  */
 public class ConsumerRunner extends AbstractLoadTest{

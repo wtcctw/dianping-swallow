@@ -1,7 +1,8 @@
-package com.dianping.swallow.test.load.mongo;
+package com.dianping.swallow.test.load.dao.mongo;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import com.dianping.swallow.test.load.dao.AbstractDaoTest;
 
 
 
@@ -10,12 +11,8 @@ import java.util.concurrent.TimeUnit;
  * 
  *         2015年1月26日 下午9:55:10
  */
-public class MongoInsertCleanTest extends AbstractMongoTest {
+public class MongoInsertCleanTest extends AbstractDaoTest {
 
-	private static int messageCount = Integer.MAX_VALUE;
-	private static int concurrentCount = 100;
-	private static int topicCount = 2;
-	
 	private long[] lastMessageIds;
 	
 	
@@ -25,25 +22,16 @@ public class MongoInsertCleanTest extends AbstractMongoTest {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-		if (args.length >= 1) {
-			topicCount  = Integer.parseInt(args[0]);
-		}
-		if (args.length >= 2) {
-			concurrentCount = Integer.parseInt(args[1]);
-		}
-		if (args.length >= 3) {
-			messageCount = Integer.parseInt(args[2]);
-		}
-
 		new MongoInsertCleanTest().start();
 	}
 
 	@Override
-	protected void doStart() throws InterruptedException, IOException {
+	protected void doStart() throws Exception {
 
+		super.doStart();
+		
 		lastMessageIds = new long[topicCount];
 		
-		sendMessage(topicCount, concurrentCount, messageCount);
 		scheduled.scheduleAtFixedRate(new CleanDataTask(topicName), 5, 5, TimeUnit.SECONDS);
 	}
 

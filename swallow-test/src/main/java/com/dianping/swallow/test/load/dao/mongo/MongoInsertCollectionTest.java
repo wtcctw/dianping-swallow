@@ -1,21 +1,29 @@
-package com.dianping.swallow.test.load.mongo;
+package com.dianping.swallow.test.load.dao.mongo;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.UnknownHostException;
+import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.bson.types.BSONTimestamp;
 
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
+import com.dianping.swallow.common.internal.config.TopicConfig;
+import com.dianping.swallow.test.load.dao.AbstractDaoTest;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
 
 /**
  * @author mengwenchao
  * 
  *         2015年1月26日 下午9:55:10
  */
-public class MongoInsertCollectionTest extends AbstractMongoTest {
+public class MongoInsertCollectionTest extends AbstractDaoTest {
 
 	private static int concurrentCount = 100;
 	
@@ -112,4 +120,50 @@ public class MongoInsertCollectionTest extends AbstractMongoTest {
 		object.put("t1", System.currentTimeMillis());
 		return object;
 	}
+
+
+	/**
+	 * @return
+	 * @throws IOException 
+	 */
+	private String getTopicToMongo() throws IOException {
+		
+		Properties p = new Properties();
+		InputStream ins = getClass().getClassLoader().getResourceAsStream("swallow-store-lion.properties");
+		if(ins == null){
+			throw new IllegalStateException("file not found: swallow-store-lion.properties");
+		}
+		p.load(ins);
+		String result = p.getProperty("swallow.topiccfg.default");
+		if(StringUtils.isBlank(result)){
+			throw new IllegalStateException("swallow.mongo.producerServerURI not found!!!");
+		}
+		return result;
+	}
+
+	
+	protected MongoClient getMongo() throws IOException{
+		
+		String topicToMongo = getTopicToMongo();
+		ServerAddress address = getAddress(topicToMongo);
+		return new MongoClient(address);
+	}
+
+	/**
+	 * 获取默认地址
+	 * @param topicToMongo
+	 * @return
+	 * @throws UnknownHostException 
+	 * @throws NumberFormatException 
+	 */
+	private ServerAddress getAddress(String topicToMongo) throws NumberFormatException, UnknownHostException {
+
+		TopicConfig config = JsonBinder.getNonEmptyBinder().fromJson(topicToMongo, TopicConfig.class);
+		
+		String address = config.getStoreUrl().substring("mongodb://".length());
+		String []ipPort = address.split(":");
+		return new ServerAddress(ipPort[0], Integer.parseInt(ipPort[1]));
+				
+	}
+
 }
