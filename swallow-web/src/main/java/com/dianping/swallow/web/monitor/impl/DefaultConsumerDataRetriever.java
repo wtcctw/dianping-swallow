@@ -378,7 +378,7 @@ public class DefaultConsumerDataRetriever
     }
 
     protected ConsumerDataPair getIpQpx(String topic, String consumerId, String ip, long start, long end) {
-        if (dataExistInMemory(new CasKeys(topic, consumerId, ip), start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic, consumerId, ip), start, end)) {
             return getIpQpxInMemory(topic, consumerId, ip, start, end);
         }
         return getIpQpxInMemory(topic, consumerId, ip, start, end);
