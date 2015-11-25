@@ -12,11 +12,8 @@ import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -139,14 +136,22 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
         NavigableMap<Long, StatisData> map = new ConcurrentSkipListMap<Long, StatisData>();
         if (startKey == INFINITY) {
             if (stopKey != Long.MAX_VALUE) {
-                startKey = statisMap.firstKey();
+                try {
+                    startKey = statisMap.firstKey();
+                } catch (NoSuchElementException e) {
+                    return new ConcurrentSkipListMap();
+                }
             } else {
                 return onePointFromMap(DataSpan.RIGHTMARGIN);
             }
         }
         if (stopKey == INFINITY) {
             if (startKey != Long.MIN_VALUE) {
-                stopKey = statisMap.lastKey();
+                try {
+                    stopKey = statisMap.lastKey();
+                } catch (NoSuchElementException e) {
+                    return new ConcurrentSkipListMap();
+                }
             } else {
                 return onePointFromMap(DataSpan.LEFTMARGIN);
             }
@@ -170,9 +175,9 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
             }
         } else if (dataSpan == DataSpan.RIGHTMARGIN) {
             Set<Long> keys = statisMap.descendingKeySet();
-            for(Long key : keys){
+            for (Long key : keys) {
                 StatisData statisData = statisMap.get(key);
-                if(isValid(statisData)){
+                if (isValid(statisData)) {
                     result.put(key, statisData);
                     break;
                 }
