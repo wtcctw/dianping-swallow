@@ -1,46 +1,33 @@
 package com.dianping.swallow.web.monitor.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.StatisFunctionType;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
-import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
+import com.dianping.swallow.common.server.monitor.data.structure.*;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
-import com.dianping.swallow.web.monitor.OrderEntity;
-import com.dianping.swallow.web.monitor.OrderStatsData;
-import com.dianping.swallow.web.monitor.ProducerDataRetriever;
-import com.dianping.swallow.web.monitor.StatsData;
-import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.monitor.*;
 import com.dianping.swallow.web.service.ProducerServerStatsDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mengwenchao
@@ -64,56 +51,9 @@ public class DefaultProducerDataRetriever
     @Autowired
     private ResourceContainer resourceContainer;
 
-    @Autowired
-    private ProducerMonitorDao producerMonitorDao;
-
     @Override
-    public boolean dataExistInMemory(long start, long end) {
-        NavigableMap<Long, Long> qpxStatsData = convertQpxData(statis.getQpx(StatisType.SAVE));
-        if (qpxStatsData == null || qpxStatsData.isEmpty()) {
-            return false;
-        }
-        Long firstKey = statis.getQpx(StatisType.SAVE).firstKey();
-        if (firstKey != null) {
-            if (getKey(start) + getKey(OFFSET_TIMESPAN) >= firstKey.longValue()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public OrderStatsData getDelayOrder(int size, long start, long end) {
-        return getDelayOrderInMemory(size, StatisType.SAVE, start, end);
-    }
-
-    protected OrderStatsData getDelayOrderInMemory(int size, StatisType type, long start, long end) {
-        Set<String> topics = statis.getTopics(false);
-        if (topics == null) {
-            return null;
-        }
-        OrderStatsData orderResults = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, type), start, end);
-        long fromKey = getKey(start);
-        long toKey = getKey(end);
-        Iterator<String> iterator = topics.iterator();
-        while (iterator.hasNext()) {
-            String topicName = iterator.next();
-            if (TOTAL_KEY.equals(topicName)) {
-                continue;
-            }
-            NavigableMap<Long, Long> rawDatas = statis.getDelayForTopic(topicName, type);
-            NavigableMap<Long, Long> qpsRawDatas = convertQpxData(statis.getQpxForTopic(topicName, type));
-            orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY, getDelaySumStatsData(rawDatas, qpsRawDatas,
-                    fromKey, toKey), getQpsSumStatsData(qpsRawDatas, fromKey, toKey)));
-        }
-        return orderResults;
-    }
-
-    public OrderStatsData getDelayOrder(int size) {
-        return getDelayOrder(size, getDefaultStart(), getDefaultEnd());
-    }
-
-    public OrderStatsData getQpxOrder(int size, long start, long end) {
-        return getQpxOrderInMemory(size, StatisType.SAVE, start, end);
+    public boolean dataExistInMemory(CasKeys keys, long start, long end) {
+        return dataExistInMemory(keys, StatisType.SAVE, start, end);
     }
 
     public List<OrderStatsData> getOrder(int size) {
@@ -122,7 +62,7 @@ public class DefaultProducerDataRetriever
 
     public List<OrderStatsData> getOrder(int size, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
             return getOrderInMemory(size, start, end);
         }
 
@@ -130,11 +70,34 @@ public class DefaultProducerDataRetriever
     }
 
     public List<OrderStatsData> getOrderInMemory(int size, long start, long end) {
-        OrderStatsData delayOrderResult = getDelayOrderInMemory(size, StatisType.SAVE, start, end);
-        OrderStatsData qpxOrderResult = getQpxOrderInMemory(size, StatisType.SAVE, start, end);
+        Set<String> topics = statis.getTopics(false);
+        if (topics == null) {
+            return null;
+        }
+        OrderStatsData orderDelayResult = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SAVE), start, end);
+        OrderStatsData orderQpsResult = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SAVE), start, end);
+        long fromKey = getKey(start);
+        long toKey = getToKey(end);
+        Iterator<String> iterator = topics.iterator();
+        while (iterator.hasNext()) {
+            String topicName = iterator.next();
+            if (TOTAL_KEY.equals(topicName)) {
+                continue;
+            }
+            NavigableMap<Long, StatisData> lastDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, toKey - 5L, toKey);
+            NavigableMap<Long, StatisData> firstDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, fromKey, fromKey + 5L);
+            if (lastDatas != null && !lastDatas.isEmpty() && firstDatas != null && !firstDatas.isEmpty()) {
+                StatisData lastData = lastDatas.lastEntry().getValue();
+                StatisData firstData = firstDatas.lastEntry().getValue();
+                long subTotalDelay = lastData.getTotalDelay() - firstData.getTotalDelay();
+                long subTotalCount = lastData.getTotalCount() - firstData.getTotalCount();
+                orderDelayResult.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalDelay, subTotalCount));
+                orderQpsResult.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalCount, getQpsSampleCount(start, end)));
+            }
+        }
         List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-        orderStatsDatas.add(delayOrderResult);
-        orderStatsDatas.add(qpxOrderResult);
+        orderStatsDatas.add(orderDelayResult);
+        orderStatsDatas.add(orderQpsResult);
         return orderStatsDatas;
     }
 
@@ -162,35 +125,10 @@ public class DefaultProducerDataRetriever
         return orderStatsDatas;
     }
 
-    protected OrderStatsData getQpxOrderInMemory(int size, StatisType type, long start, long end) {
-        Set<String> topics = statis.getTopics(false);
-        if (topics == null) {
-            return null;
-        }
-        long fromKey = getKey(start);
-        long toKey = getKey(end);
-        OrderStatsData orderResults = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, type), start, end);
-        Iterator<String> iterator = topics.iterator();
-        while (iterator.hasNext()) {
-            String topicName = iterator.next();
-            if (TOTAL_KEY.equals(topicName)) {
-                continue;
-            }
-            NavigableMap<Long, Long> rawDatas = convertQpxData(statis.getQpxForTopic(topicName, type));
-            orderResults.add(new OrderEntity(topicName, StringUtils.EMPTY,
-                    getQpsSumStatsData(rawDatas, fromKey, toKey), getQpsSampleCount(start, end)));
-        }
-        return orderResults;
-    }
-
-    public OrderStatsData getQpxOrder(int size) {
-        return getQpxOrder(size, getDefaultStart(), getDefaultEnd());
-    }
-
     @Override
     public StatsData getSaveDelay(String topic, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
             return getDelayInMemory(topic, StatisType.SAVE, start, end);
         }
 
@@ -209,7 +147,7 @@ public class DefaultProducerDataRetriever
     }
 
     public StatsData getIpDelay(String topic, String ip, long start, long end) {
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic, ip), start, end)) {
             return getIpDelayInMemory(topic, ip, StatisType.SAVE, start, end);
         }
         return getIpDelayInMemory(topic, ip, StatisType.SAVE, start, end);
@@ -237,7 +175,7 @@ public class DefaultProducerDataRetriever
     @Override
     public StatsData getQpx(String topic, QPX qpx, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
             return getQpxInMemory(topic, StatisType.SAVE, start, end);
         }
         return getQpxInDb(topic, StatisType.SAVE, start, end);
@@ -254,7 +192,7 @@ public class DefaultProducerDataRetriever
     }
 
     public StatsData getIpQpx(String topic, String ip, long start, long end) {
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic, ip), start, end)) {
             return getIpQpxInMemory(topic, ip, StatisType.SAVE, start, end);
         }
         return getIpQpxInMemory(topic, ip, StatisType.SAVE, start, end);
@@ -282,7 +220,7 @@ public class DefaultProducerDataRetriever
     @Override
     public Map<String, StatsData> getServerQpx(QPX qpx, long start, long end) {
 
-        if (dataExistInMemory(start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
             return getServerQpxInMemory(qpx, StatisType.SAVE, start, end);
         }
 

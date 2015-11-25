@@ -1,30 +1,20 @@
 package com.dianping.swallow.web.monitor.wapper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NavigableMap;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dianping.swallow.common.server.monitor.data.StatisType;
-import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerIdStatisData;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerTopicStatisData;
-import com.dianping.swallow.common.server.monitor.data.statis.MessageInfoStatis;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
+import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * @author qiyin
@@ -51,57 +41,52 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
         }
         Iterator<String> iterator = serverKeys.iterator();
         List<ConsumerServerStatsData> serverStatsDatas = new ArrayList<ConsumerServerStatsData>();
-        int index = 0;
+        boolean isFirst = true;
         while (iterator.hasNext()) {
             String serverIp = iterator.next();
             if (!isTotal && TOTAL_KEY.equals(serverIp)) {
                 continue;
             }
-
-            NavigableMap<Long, QpxData> sendQpx = consumerDataRetriever.getQpsValue(new CasKeys(serverIp), StatisType.SEND);
-            NavigableMap<Long, QpxData> ackQpx = consumerDataRetriever.getQpsValue(new CasKeys(serverIp), StatisType.ACK);
-            NavigableMap<Long, Long> sendDelay = consumerDataRetriever.getDelayValue(new CasKeys(serverIp), StatisType.SEND);
-            NavigableMap<Long, Long> ackDelay = consumerDataRetriever.getDelayValue(new CasKeys(serverIp), StatisType.ACK);
-            if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
-                    || sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+            NavigableMap<Long, StatisData> sendStatisDatas = null;
+            NavigableMap<Long, StatisData> ackStatisDatas = null;
+            if (isFirst) {
+                sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(serverIp), StatisType.SEND);
+            } else {
+                sendStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(serverIp), StatisType.SEND, timeKey, timeKey);
+            }
+            if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
                 continue;
             }
-            if (index == 0) {
-                Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+            if (isFirst) {
+                if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
+                    continue;
+                }
+                Long tempKey = timeKey == DEFAULT_VALUE ? sendStatisDatas.lastKey() : sendStatisDatas.higherKey(timeKey);
                 if (tempKey == null) {
                     return null;
                 }
                 timeKey = tempKey.longValue();
-                index++;
+                isFirst = false;
             }
-
-            ConsumerServerStatsData serverStatsData = statsDataFactory.createConsumerServerStatsData();
-            serverStatsData.setTimeKey(timeKey);
-            serverStatsData.setIp(serverIp);
-            QpxData sendQpxValue = sendQpx.get(timeKey);
-            if (sendQpxValue != null) {
-                serverStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
-                serverStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
-                        .longValue());
+            ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(serverIp), StatisType.ACK, timeKey, timeKey);
+            StatisData sendStatisData = sendStatisDatas.get(timeKey);
+            StatisData ackStatisData = ackStatisDatas.get(timeKey);
+            if (sendStatisData != null || ackStatisData != null) {
+                ConsumerServerStatsData serverStatsData = statsDataFactory.createConsumerServerStatsData();
+                serverStatsData.setTimeKey(timeKey);
+                serverStatsData.setIp(serverIp);
+                if (sendStatisData != null) {
+                    serverStatsData.setSendQps(sendStatisData.getQpx(DEFAULT_QPX_TYPE));
+                    serverStatsData.setSendQpsTotal(sendStatisData.getCount());
+                    serverStatsData.setSendDelay(sendStatisData.getDelay());
+                }
+                if (ackStatisData != null) {
+                    serverStatsData.setAckQps(ackStatisData.getQpx(DEFAULT_QPX_TYPE));
+                    serverStatsData.setAckQpsTotal(ackStatisData.getCount());
+                    serverStatsData.setAckDelay(ackStatisData.getDelay());
+                }
+                serverStatsDatas.add(serverStatsData);
             }
-            QpxData ackQpxValue = ackQpx.get(timeKey);
-            if (ackQpxValue != null) {
-                serverStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
-                serverStatsData
-                        .setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal().longValue());
-            }
-
-            Long sendDelayValue = sendDelay.get(timeKey);
-            if (sendDelayValue != null) {
-                serverStatsData.setSendDelay(sendDelayValue.longValue());
-            }
-
-            Long ackDelayValue = ackDelay.get(timeKey);
-            if (ackDelayValue != null) {
-                serverStatsData.setAckDelay(ackDelayValue.longValue());
-            }
-
-            serverStatsDatas.add(serverStatsData);
         }
         return serverStatsDatas;
     }
@@ -136,61 +121,55 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
         }
         Iterator<String> iterator = consumerIdKeys.iterator();
         List<ConsumerIdStatsData> consumerIdStatsDatas = new ArrayList<ConsumerIdStatsData>();
-        int index = 0;
+        boolean isFirst = true;
         while (iterator.hasNext()) {
             String consumerId = iterator.next();
             if (!isTotal && TOTAL_KEY.equals(consumerId)) {
                 continue;
             }
-            ConsumerIdStatsData consumerIdStatsData = statsDataFactory.createConsumerIdStatsData();
-            consumerIdStatsData.setConsumerId(consumerId);
-            consumerIdStatsData.setTopicName(topicName);
-
-            NavigableMap<Long, QpxData> sendQpx = consumerDataRetriever.getQpsValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
-            NavigableMap<Long, QpxData> ackQpx = consumerDataRetriever.getQpsValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK);
-            NavigableMap<Long, Long> sendDelay = consumerDataRetriever.getDelayValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
-            NavigableMap<Long, Long> ackDelay = consumerDataRetriever.getDelayValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK);
-
-            if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
-                    || sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+            NavigableMap<Long, StatisData> sendStatisDatas = null;
+            NavigableMap<Long, StatisData> ackStatisDatas = null;
+            if (isFirst) {
+                sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
+            } else {
+                sendStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, timeKey, timeKey);
+            }
+            if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
                 continue;
             }
-            if (index == 0) {
-                Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+            if (isFirst) {
+                if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
+                    continue;
+                }
+                Long tempKey = timeKey == DEFAULT_VALUE ? sendStatisDatas.lastKey() : sendStatisDatas.higherKey(timeKey);
                 if (tempKey == null) {
                     return null;
                 }
                 timeKey = tempKey.longValue();
-                index++;
+                isFirst = false;
             }
-            consumerIdStatsData.setTimeKey(timeKey);
-            QpxData sendQpxValue = sendQpx.get(timeKey);
-            if (sendQpxValue != null) {
-                consumerIdStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
-                consumerIdStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
-                        .longValue());
+            ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, timeKey, timeKey);
+            StatisData sendStatisData = sendStatisDatas.get(timeKey);
+            StatisData ackStatisData = ackStatisDatas.get(timeKey);
+            if (sendStatisData != null || ackStatisData != null) {
+                ConsumerIdStatsData consumerIdStatsData = statsDataFactory.createConsumerIdStatsData();
+                consumerIdStatsData.setConsumerId(consumerId);
+                consumerIdStatsData.setTopicName(topicName);
+                consumerIdStatsData.setTimeKey(timeKey);
+                if (sendStatisData != null) {
+                    consumerIdStatsData.setSendQps(sendStatisData.getQpx(DEFAULT_QPX_TYPE));
+                    consumerIdStatsData.setSendQpsTotal(sendStatisData.getCount());
+                    consumerIdStatsData.setSendDelay(sendStatisData.getDelay());
+                }
+                if (ackStatisData != null) {
+                    consumerIdStatsData.setAckQps(ackStatisData.getQpx(DEFAULT_QPX_TYPE));
+                    consumerIdStatsData.setAckQpsTotal(ackStatisData.getCount());
+                    consumerIdStatsData.setAckDelay(ackStatisData.getDelay());
+                }
+                consumerIdStatsData.setAccumulation(getConsumerIdAccumulation(topicName, consumerId, timeKey));
+                consumerIdStatsDatas.add(consumerIdStatsData);
+
             }
-
-            QpxData ackQpxValue = ackQpx.get(timeKey);
-            if (ackQpxValue != null) {
-                consumerIdStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
-                consumerIdStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
-                        .longValue());
-            }
-
-            Long sendDelayValue = sendDelay.get(timeKey);
-            if (sendDelayValue != null) {
-                consumerIdStatsData.setSendDelay(sendDelayValue.longValue());
-            }
-
-            Long ackDelayValue = ackDelay.get(timeKey);
-            if (ackDelayValue != null) {
-                consumerIdStatsData.setAckDelay(ackDelayValue.longValue());
-            }
-
-            consumerIdStatsData.setAccumulation(getConsumerIdAccumulation(topicName, consumerId, timeKey));
-            consumerIdStatsDatas.add(consumerIdStatsData);
-
         }
         return consumerIdStatsDatas;
     }
@@ -238,73 +217,63 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
     }
 
     @Override
-    public List<ConsumerIpStatsData> getIpStatsDatas(String topicName, String consumerId, long timeKey, boolean isTotal) {
+    public List<ConsumerIpStatsData> getIpStatsDatas(String topicName, String consumerId, long timeKey,
+                                                     boolean isTotal) {
         Set<String> ipKeys = consumerDataRetriever.getKeys(new CasKeys(TOTAL_KEY, topicName, consumerId));
         if (ipKeys == null) {
             return null;
         }
-        int index = 0;
+        boolean isFirst = true;
         List<ConsumerIpStatsData> ipStatsDatas = new ArrayList<ConsumerIpStatsData>();
         for (String ip : ipKeys) {
             if (!isTotal && TOTAL_KEY.equals(ip)) {
                 continue;
             }
-            NavigableMap<Long, QpxData> sendQpx = consumerDataRetriever.getQpsValue(new CasKeys(
-                    TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND);
-            NavigableMap<Long, Long> sendDelay = consumerDataRetriever.getDelayValue(new CasKeys(
-                    TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND);
-
-            NavigableMap<Long, QpxData> ackQpx = consumerDataRetriever.getQpsValue(new CasKeys(
-                    TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK);
-            NavigableMap<Long, Long> ackDelay = consumerDataRetriever.getDelayValue(new CasKeys(
-                    TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK);
-
-            if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
-                    || sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+            NavigableMap<Long, StatisData> sendStatisDatas = null;
+            NavigableMap<Long, StatisData> ackStatisDatas = null;
+            if (isFirst) {
+                sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND);
+            } else {
+                sendStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND, timeKey, timeKey);
+                ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK, timeKey, timeKey);
+            }
+            if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
                 continue;
             }
-            if (index == 0) {
-                Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+            if (isFirst) {
+                if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
+                    continue;
+                }
+                Long tempKey = timeKey == DEFAULT_VALUE ? sendStatisDatas.lastKey() : sendStatisDatas.higherKey(timeKey);
                 if (tempKey == null) {
                     return null;
                 }
                 timeKey = tempKey.longValue();
-                index++;
+                isFirst = false;
+            }
+            ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK, timeKey, timeKey);
+            StatisData sendStatisData = sendStatisDatas.get(timeKey);
+            StatisData ackStatisData = ackStatisDatas.get(timeKey);
+            if (sendStatisData != null || ackStatisData != null) {
+                ConsumerIpStatsData consumerIpStatsData = statsDataFactory.createConsumerIpStatsData();
+                consumerIpStatsData.setTopicName(topicName);
+                consumerIpStatsData.setConsumerId(consumerId);
+                consumerIpStatsData.setIp(ip);
+                consumerIpStatsData.setTimeKey(timeKey);
+                if (sendStatisData != null) {
+                    consumerIpStatsData.setSendQps(sendStatisData.getQpx(DEFAULT_QPX_TYPE));
+                    consumerIpStatsData.setSendQpsTotal(sendStatisData.getCount());
+                    consumerIpStatsData.setSendDelay(sendStatisData.getDelay());
+                }
+                if (ackStatisData != null) {
+                    consumerIpStatsData.setAckQps(ackStatisData.getQpx(DEFAULT_QPX_TYPE));
+                    consumerIpStatsData.setAckQpsTotal(ackStatisData.getCount());
+                    consumerIpStatsData.setAckDelay(ackStatisData.getDelay());
+                }
+                consumerIpStatsData.setAccumulation(0L);
+                ipStatsDatas.add(consumerIpStatsData);
             }
 
-            ConsumerIpStatsData consumerIpStatsData = statsDataFactory.createConsumerIpStatsData();
-            consumerIpStatsData.setTopicName(topicName);
-            consumerIpStatsData.setConsumerId(consumerId);
-            consumerIpStatsData.setIp(ip);
-            consumerIpStatsData.setTimeKey(timeKey);
-            QpxData sendQpxValue = sendQpx.get(timeKey);
-
-            if (sendQpxValue != null) {
-                consumerIpStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
-                consumerIpStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
-                        .longValue());
-            }
-
-            Long sendDelayValue = sendDelay.get(timeKey);
-
-            if (sendDelayValue != null) {
-                consumerIpStatsData.setSendDelay(sendDelayValue.longValue());
-            }
-
-            QpxData ackQpxValue = ackQpx.get(timeKey);
-
-            if (ackQpxValue != null) {
-                consumerIpStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
-                consumerIpStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
-                        .longValue());
-            }
-            Long ackDelayValue = ackDelay.get(timeKey);
-
-            if (ackDelayValue != null) {
-                consumerIpStatsData.setAckDelay(ackDelayValue.longValue());
-            }
-            consumerIpStatsData.setAccumulation(0L);
-            ipStatsDatas.add(consumerIpStatsData);
         }
         return ipStatsDatas;
     }
@@ -372,54 +341,37 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
 
     @Override
     public ConsumerTopicStatsData getTotalTopicStatsData(long timeKey) {
-        ConsumerTopicStatsData consumerTopicStatsData = statsDataFactory.createConsumerTopicStatsData();
-        consumerTopicStatsData.setTopicName(TOTAL_KEY);
-
-        NavigableMap<Long, QpxData> sendQpx = consumerDataRetriever.getQpsValue(new CasKeys(TOTAL_KEY, TOTAL_KEY),
-                StatisType.SEND);
-        NavigableMap<Long, QpxData> ackQpx = consumerDataRetriever.getQpsValue(new CasKeys(TOTAL_KEY, TOTAL_KEY),
-                StatisType.ACK);
-        NavigableMap<Long, Long> sendDelay = consumerDataRetriever.getDelayValue(new CasKeys(TOTAL_KEY, TOTAL_KEY),
-                StatisType.SEND);
-        NavigableMap<Long, Long> ackDelay = consumerDataRetriever.getDelayValue(new CasKeys(TOTAL_KEY, TOTAL_KEY),
-                StatisType.ACK);
-
-        if (sendQpx == null || sendQpx.isEmpty() || ackQpx == null || ackQpx.isEmpty() || sendDelay == null
-                || sendDelay.isEmpty() || ackDelay == null || ackDelay.isEmpty()) {
+        NavigableMap<Long, StatisData> sendStatisDatas = null;
+        NavigableMap<Long, StatisData> ackStatisDatas = null;
+        sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, TOTAL_KEY), StatisType.SEND);
+        if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
             return null;
         }
-        Long tempKey = timeKey == DEFAULT_VALUE ? sendQpx.lastKey() : sendQpx.higherKey(timeKey);
+        Long tempKey = timeKey == DEFAULT_VALUE ? sendStatisDatas.lastKey() : sendStatisDatas.higherKey(timeKey);
         if (tempKey == null) {
             return null;
         }
         timeKey = tempKey.longValue();
-        consumerTopicStatsData.setTimeKey(timeKey);
-        QpxData sendQpxValue = sendQpx.get(timeKey);
-        if (sendQpxValue != null) {
-            consumerTopicStatsData.setSendQps(sendQpxValue.getQpx() == null ? 0L : sendQpxValue.getQpx().longValue());
-            consumerTopicStatsData.setSendQpsTotal(sendQpxValue.getTotal() == null ? 0L : sendQpxValue.getTotal()
-                    .longValue());
+        ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, TOTAL_KEY), StatisType.ACK, timeKey, timeKey);
+        StatisData sendStatisData = sendStatisDatas.get(timeKey);
+        StatisData ackStatisData = ackStatisDatas.get(timeKey);
+        ConsumerTopicStatsData consumerTopicStatsData = null;
+        if (sendStatisData != null || ackStatisData != null) {
+            consumerTopicStatsData = statsDataFactory.createConsumerTopicStatsData();
+            consumerTopicStatsData.setTopicName(TOTAL_KEY);
+            consumerTopicStatsData.setTimeKey(timeKey);
+            if (sendStatisData != null) {
+                consumerTopicStatsData.setSendQps(sendStatisData.getQpx(DEFAULT_QPX_TYPE));
+                consumerTopicStatsData.setSendQpsTotal(sendStatisData.getCount());
+                consumerTopicStatsData.setSendDelay(sendStatisData.getDelay());
+            }
+            if (ackStatisData != null) {
+                consumerTopicStatsData.setAckQps(ackStatisData.getQpx(DEFAULT_QPX_TYPE));
+                consumerTopicStatsData.setAckQpsTotal(ackStatisData.getCount());
+                consumerTopicStatsData.setAckDelay(ackStatisData.getDelay());
+            }
+            consumerTopicStatsData.setAccumulation(0L);
         }
-
-        QpxData ackQpxValue = ackQpx.get(timeKey);
-        if (ackQpxValue != null) {
-            consumerTopicStatsData.setAckQps(ackQpxValue.getQpx() == null ? 0L : ackQpxValue.getQpx().longValue());
-            consumerTopicStatsData.setAckQpsTotal(ackQpxValue.getTotal() == null ? 0L : ackQpxValue.getTotal()
-                    .longValue());
-        }
-
-        Long sendDelayValue = sendDelay.get(timeKey);
-        if (sendDelayValue != null) {
-            consumerTopicStatsData.setSendDelay(sendDelayValue.longValue());
-        }
-
-        Long ackDelayValue = ackDelay.get(timeKey);
-        if (ackDelayValue != null) {
-            consumerTopicStatsData.setAckDelay(ackDelayValue.longValue());
-        }
-
-        consumerTopicStatsData.setAccumulation(0L);
-
         return consumerTopicStatsData;
     }
 

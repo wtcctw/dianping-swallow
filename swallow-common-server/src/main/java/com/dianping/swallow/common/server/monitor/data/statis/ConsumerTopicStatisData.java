@@ -18,6 +18,7 @@ public class ConsumerTopicStatisData extends AbstractTotalMapStatisable<Consumer
 		return ConsumerIdStatisData.class;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void merge(Mergeable merge){
 

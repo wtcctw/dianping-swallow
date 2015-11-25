@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.dianping.swallow.common.server.monitor.data.QPX;
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 
 /**
  * @author mengwenchao
@@ -12,7 +13,7 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
  */
 public interface ProducerDataRetriever extends MonitorDataRetriever {
 
-    boolean dataExistInMemory(long start, long end);
+    boolean dataExistInMemory(CasKeys keys, long start, long end);
 
     StatsData getSaveDelay(String topic, long start, long end);
 

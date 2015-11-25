@@ -10,13 +10,15 @@ import com.dianping.swallow.web.util.ResponseStatus;
  * @author mingdongli
  *         15/10/23 下午2:42
  */
+@SuppressWarnings("rawtypes")
 public class ConfigureHandlerChain extends AbstractHandlerChain<TopicApplyDto, LionConfigureResult> {
 
     public ConfigureHandlerChain(Handler... handlers) {
         super(handlers);
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public ResponseStatus handle(TopicApplyDto value, LionConfigureResult result) {
 
         ResponseStatus status;

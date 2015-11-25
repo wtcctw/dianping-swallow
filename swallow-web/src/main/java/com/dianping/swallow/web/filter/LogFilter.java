@@ -1,9 +1,14 @@
 package com.dianping.swallow.web.filter;
 
+import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.filter.wrapper.BufferedRequestWrapper;
 import com.dianping.swallow.web.filter.wrapper.ByteArrayPrintWriter;
 import com.dianping.swallow.web.model.log.Log;
+import com.dianping.swallow.web.model.resource.TopicApplyResource;
+import com.dianping.swallow.web.service.TopicApplyService;
+import com.dianping.swallow.web.util.JsonUtil;
+import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +36,15 @@ public class LogFilter implements Filter {
 
     private UserUtils extractUsernameUtils;
 
+    private TopicApplyService topicApplyService;
+
     private List<Pattern> excludePatterns = new LinkedList<Pattern>();
 
     private Set<String> includePatterns = new HashSet<String>();
+
+    private static final String TOPIC_APPLY = "/api/topic/apply";
+
+    public static final String TOPIC_APPLY_ATTR = "topicApplyResource";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -42,6 +53,7 @@ public class LogFilter implements Filter {
         this.context = fConfig.getServletContext();
         ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
         this.extractUsernameUtils = ctx.getBean(UserUtils.class);
+        this.topicApplyService = ctx.getBean(TopicApplyService.class);
 
         String excludeUrl = fConfig.getInitParameter("excludeURLs");
         String[] excludeUrls = excludeUrl.split(",");
@@ -91,6 +103,13 @@ public class LogFilter implements Filter {
 
         };
 
+        TopicApplyResource topicApplyResource = null;
+        if (TOPIC_APPLY.equals(uri)) {
+            topicApplyResource = new TopicApplyResource();
+            topicApplyResource.setCreateTime(new Date());
+            requestWrapper.setAttribute(TOPIC_APPLY_ATTR, topicApplyResource);
+        }
+
         chain.doFilter(requestWrapper, responseWrapper);
 
         byte[] bytes = pw.toByteArray();
@@ -120,6 +139,13 @@ public class LogFilter implements Filter {
                 requestContent = stringBuilder.toString();
             }
         }
+
+        if (topicApplyResource != null) {
+            ValidatorFilterResult status = JsonUtil.fromJson(result, ValidatorFilterResult.class);
+            topicApplyResource.setResponseStatus(ResponseStatus.findByStatus(status.getStatus()));
+            topicApplyService.insert(topicApplyResource);
+        }
+
         log.setParameter(requestContent);
         log.setUrl(uri);
         log.setUser(username);

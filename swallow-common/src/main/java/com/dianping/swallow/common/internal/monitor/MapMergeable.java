@@ -1,12 +1,12 @@
 package com.dianping.swallow.common.internal.monitor;
 
-import java.util.Map;
+import java.util.NavigableMap;
 
 /**
  * Author   mingdongli
  * 15/11/5  下午6:16.
  */
-public interface MapMergeable<K, V> extends Mergeable{
+public interface MapMergeable<K, V extends Mergeable>{
 
-    void merge(Map<K, V> fromMerge);
+    void merge(NavigableMap<K, V> fromMerge);
 }

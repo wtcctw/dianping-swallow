@@ -75,4 +75,7 @@ public class TopicApplyDto implements Treatable {
 		return applicant;
 	}
 
+	public void setApplicant(String applicant) {
+		this.applicant = applicant;
+	}
 }
