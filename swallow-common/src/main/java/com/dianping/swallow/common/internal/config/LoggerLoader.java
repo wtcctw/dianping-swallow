@@ -68,7 +68,7 @@ public class LoggerLoader {
                 "false", "false");
         config.addAppender(consoleErrorAppender);
         consoleErrorAppender.start();
-        AppenderRef consoleErrorAppenderRef = AppenderRef.createAppenderRef("ConsoleError", Level.ERROR, null);
+        AppenderRef consoleErrorAppenderRef = AppenderRef.createAppenderRef("ConsoleError", Level.WARN, null);
 
         // console warn
         Filter consoleWarnFilter = ThresholdFilter.createFilter(Level.WARN, Result.DENY, Result.NEUTRAL);
