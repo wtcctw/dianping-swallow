@@ -133,7 +133,6 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
     @Override
     public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type, Long startKey, Long stopKey) {
-        NavigableMap<Long, StatisData> map = new ConcurrentSkipListMap<Long, StatisData>();
         if (startKey == INFINITY) {
             if (stopKey != Long.MAX_VALUE) {
                 try {
@@ -156,12 +155,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
                 return onePointFromMap(DataSpan.LEFTMARGIN);
             }
         }
-        SortedMap<Long, StatisData> subMap = statisMap.subMap(startKey, true, stopKey, true);
-        for (Entry<Long, StatisData> entry : subMap.entrySet()) {
-            map.put(entry.getKey(), entry.getValue());
-        }
-
-        return map;
+        return statisMap.subMap(startKey, true, stopKey, true);
     }
 
     private NavigableMap<Long, StatisData> onePointFromMap(DataSpan dataSpan) {
