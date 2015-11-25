@@ -122,8 +122,9 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
                 NavigableMap<Long, Long> ackdelay = consumerDataRetrieverWrapper.getDelayValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic, consumerid), StatisType.ACK);
                 List<Long> ackList = extractListFromMap(ackdelay);
 
-                while (sendList.size() < 2) {
-                    sendList.add(0L);
+                int sendListSize = sendList.size();
+                if (sendListSize < 2) {
+                    continue;
                 }
                 while (ackList.size() < 2) {
                     ackList.add(0L);
@@ -154,7 +155,6 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
                     td = new TotalData();
                 }
 
-                int sendListSize = sendList.size();
                 int ackListSize = ackList.size();
                 td.setListSend(sendList.subList(sendListSize - 2, sendListSize));
                 td.setListAck(ackList.subList(ackListSize - 2, ackListSize));
