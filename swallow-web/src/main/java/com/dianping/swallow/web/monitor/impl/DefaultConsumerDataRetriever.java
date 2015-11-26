@@ -110,18 +110,18 @@ public class DefaultConsumerDataRetriever
                 if (lastSendDatas != null && !lastSendDatas.isEmpty() && firstSendDatas != null && !firstSendDatas.isEmpty()) {
                     StatisData lastData = lastSendDatas.lastEntry().getValue();
                     StatisData firstData = firstSendDatas.lastEntry().getValue();
-                    long subTotalDelay = lastData.getTotalDelay() - lastData.getTotalDelay();
-                    long subTotalCount = lastData.getTotalCount() - lastData.getTotalCount();
-                    delaySendStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalDelay, subTotalCount));
-                    qpxSendStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalCount, getQpsSampleCount(start, end)));
+                    long subTotalDelay = lastData.getTotalDelay() - firstData.getTotalDelay();
+                    long subTotalCount = lastData.getTotalCount() - firstData.getTotalCount();
+                    delaySendStatsData.add(new OrderEntity(topicName, consumerId, subTotalDelay, subTotalCount));
+                    qpxSendStatsData.add(new OrderEntity(topicName, consumerId, subTotalCount, getQpsSampleCount(start, end)));
                 }
                 if (lastAckDatas != null && !lastAckDatas.isEmpty() && firstAckDatas != null && !firstAckDatas.isEmpty()) {
                     StatisData lastData = lastAckDatas.lastEntry().getValue();
                     StatisData firstData = firstAckDatas.lastEntry().getValue();
-                    long subTotalDelay = lastData.getTotalDelay() - lastData.getTotalDelay();
-                    long subTotalCount = lastData.getTotalCount() - lastData.getTotalCount();
-                    delayAckStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalDelay, subTotalCount));
-                    qpxAckStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalCount, getQpsSampleCount(start, end)));
+                    long subTotalDelay = lastData.getTotalDelay() - firstData.getTotalDelay();
+                    long subTotalCount = lastData.getTotalCount() - firstData.getTotalCount();
+                    delayAckStatsData.add(new OrderEntity(topicName, consumerId, subTotalDelay, subTotalCount));
+                    qpxAckStatsData.add(new OrderEntity(topicName, consumerId, subTotalCount, getQpsSampleCount(start, end)));
                 }
             }
         }
@@ -174,9 +174,13 @@ public class DefaultConsumerDataRetriever
         List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
         long startKey = getKey(start);
         long endKey = getKey(end);
+        boolean isTotal = false;
+        if (MonitorData.TOTAL_KEY.equals(topic)) {
+            isTotal = true;
+        }
         if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
-            sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, false);
-            ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, false);
+            sendDelays = retriever.getDelayForAllConsumerId(topic, StatisType.SEND, isTotal);
+            ackDelays = retriever.getDelayForAllConsumerId(topic, StatisType.ACK, isTotal);
             if (sendDelays != null) {
 
                 for (Entry<String, NavigableMap<Long, Long>> entry : sendDelays.entrySet()) {
@@ -198,10 +202,6 @@ public class DefaultConsumerDataRetriever
             }
         } else {
             Map<String, StatsDataMapPair> statsDataResults = getTopicDelayInDb(topic, start, end);
-            boolean isTotal = false;
-            if (MonitorData.TOTAL_KEY.equals(topic)) {
-                isTotal = true;
-            }
             if (statsDataResults != null && !statsDataResults.isEmpty()) {
                 for (Map.Entry<String, StatsDataMapPair> statsDataResult : statsDataResults.entrySet()) {
                     if (!isTotal && MonitorData.TOTAL_KEY.equals(statsDataResult.getKey())) {
@@ -256,7 +256,7 @@ public class DefaultConsumerDataRetriever
     }
 
     protected ConsumerDataPair getIpDelay(String topic, String consumerId, String ip, long start, long end) {
-        if (dataExistInMemory(new CasKeys(topic, consumerId, ip), start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic, consumerId, ip), start, end)) {
             return getIpDelayInMemory(topic, consumerId, ip, start, end);
         }
         return getIpDelayInMemory(topic, consumerId, ip, start, end);
@@ -291,9 +291,13 @@ public class DefaultConsumerDataRetriever
         List<ConsumerDataPair> result = new LinkedList<ConsumerDataRetriever.ConsumerDataPair>();
         long startKey = getKey(start);
         long endKey = getKey(end);
+        boolean isTotal = false;
+        if (MonitorData.TOTAL_KEY.equals(topic)) {
+            isTotal = true;
+        }
         if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
-            sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, false);
-            ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, false);
+            sendQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.SEND, isTotal);
+            ackQpxs = retriever.getQpxForAllConsumerId(topic, StatisType.ACK, isTotal);
             if (sendQpxs != null) {
                 for (Entry<String, NavigableMap<Long, StatisData>> entry : sendQpxs.entrySet()) {
 
@@ -315,10 +319,6 @@ public class DefaultConsumerDataRetriever
             }
         } else {
             Map<String, StatsDataMapPair> statsDataResults = getTopicQpxInDb(topic, qpx, start, end);
-            boolean isTotal = false;
-            if (MonitorData.TOTAL_KEY.equals(topic)) {
-                isTotal = true;
-            }
             if (statsDataResults != null && !statsDataResults.isEmpty()) {
                 for (Map.Entry<String, StatsDataMapPair> statsDataResult : statsDataResults.entrySet()) {
                     if (!isTotal && MonitorData.TOTAL_KEY.equals(statsDataResult.getKey())) {
@@ -378,7 +378,7 @@ public class DefaultConsumerDataRetriever
     }
 
     protected ConsumerDataPair getIpQpx(String topic, String consumerId, String ip, long start, long end) {
-        if (dataExistInMemory(new CasKeys(topic, consumerId, ip), start, end)) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic, consumerId, ip), start, end)) {
             return getIpQpxInMemory(topic, consumerId, ip, start, end);
         }
         return getIpQpxInMemory(topic, consumerId, ip, start, end);
