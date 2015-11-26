@@ -123,9 +123,11 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
                 List<Long> ackList = extractListFromMap(ackdelay);
 
                 int sendListSize = sendList.size();
-                int ackListSize = ackList.size();
-                if (sendListSize < 2 || ackListSize < 2) {
+                if (sendListSize < 2) {
                     continue;
+                }
+                while (ackList.size() < 2) {
+                    ackList.add(0L);
                 }
                 if (!timeSet) {
                     entryTime = getMinuteEntryTime(senddelay.lastKey());
@@ -153,6 +155,7 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
                     td = new TotalData();
                 }
 
+                int ackListSize = ackList.size();
                 td.setListSend(sendList.subList(sendListSize - 2, sendListSize));
                 td.setListAck(ackList.subList(ackListSize - 2, ackListSize));
                 td.setListAccu(accuList.subList(accuListSize - 2, accuListSize));

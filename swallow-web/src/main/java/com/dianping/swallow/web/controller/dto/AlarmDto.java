@@ -6,102 +6,111 @@ import java.util.List;
 import com.dianping.swallow.web.model.alarm.AlarmLevelType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.model.alarm.SendInfo;
+
 /**
- * 
  * @author qiyin
- *
- * 2015年8月9日 下午5:12:02
+ *         <p/>
+ *         2015年8月9日 下午5:12:02
  */
 @SuppressWarnings("unused")
 public class AlarmDto {
 
-	private long eventId;
+    private long eventId;
 
-	private int number;
+    private int number;
 
-	private AlarmLevelType type;
+    private AlarmLevelType type;
 
-	private String title;
+    private String title;
 
-	private String body;
+    private String body;
 
-	private String related;
-	
-	private RelatedType relatedType;
+    private String related;
 
-	private Date createTime;
+    private RelatedType relatedType;
 
-	public long getEventId() {
-		return eventId;
-	}
+    private Date createTime;
 
-	public void setEventId(long eventId) {
-		this.eventId = eventId;
-	}
+    private List<SendInfo> sendInfos;
 
-	public int getNumber() {
-		return number;
-	}
+    private String relatedUrl;
 
-	public void setNumber(int number) {
-		this.number = number;
-	}
+    private String sourceIp;
 
-	public AlarmLevelType getType() {
-		return type;
-	}
+    public long getEventId() {
+        return eventId;
+    }
 
-	public void setType(AlarmLevelType type) {
-		this.type = type;
-	}
+    public void setEventId(long eventId) {
+        this.eventId = eventId;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public int getNumber() {
+        return number;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setNumber(int number) {
+        this.number = number;
+    }
 
-	public String getBody() {
-		return body;
-	}
+    public AlarmLevelType getType() {
+        return type;
+    }
 
-	public void setBody(String body) {
-		this.body = body;
-	}
+    public void setType(AlarmLevelType type) {
+        this.type = type;
+    }
 
-	public String getRelated() {
-		return related;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setRelated(String related) {
-		this.related = related;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public void setRelatedUrl(String relatedUrl) {
-	}
+    public String getBody() {
+        return body;
+    }
 
-	public RelatedType getRelatedType() {
-		return relatedType;
-	}
+    public void setBody(String body) {
+        this.body = body;
+    }
 
-	public void setRelatedType(RelatedType relatedType) {
-		this.relatedType = relatedType;
-	}
+    public String getRelated() {
+        return related;
+    }
 
-	public void setSendInfos(List<SendInfo> sendInfos) {
-	}
+    public void setRelated(String related) {
+        this.related = related;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public void setRelatedUrl(String relatedUrl) {
+        this.relatedUrl = relatedUrl;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public RelatedType getRelatedType() {
+        return relatedType;
+    }
 
-	public void setSourceIp(String sourceIp) {
-	}
+    public void setRelatedType(RelatedType relatedType) {
+        this.relatedType = relatedType;
+    }
+
+    public void setSendInfos(List<SendInfo> sendInfos) {
+        this.sendInfos = sendInfos;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public void setSourceIp(String sourceIp) {
+        this.sourceIp = sourceIp;
+    }
 
 }

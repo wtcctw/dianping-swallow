@@ -84,8 +84,8 @@ public class DefaultProducerDataRetriever
             if (TOTAL_KEY.equals(topicName)) {
                 continue;
             }
-            NavigableMap<Long, StatisData> lastDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, toKey - 5L, toKey);
-            NavigableMap<Long, StatisData> firstDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, fromKey, fromKey + 5L);
+            NavigableMap<Long, StatisData> lastDatas = statis.getLastValueLessOrEqualThan(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, toKey);
+            NavigableMap<Long, StatisData> firstDatas = statis.getFirstValueGreaterOrEqualThan(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, fromKey);
             if (lastDatas != null && !lastDatas.isEmpty() && firstDatas != null && !firstDatas.isEmpty()) {
                 StatisData lastData = lastDatas.lastEntry().getValue();
                 StatisData firstData = firstDatas.lastEntry().getValue();
@@ -135,7 +135,6 @@ public class DefaultProducerDataRetriever
         return getDelayInDb(topic, StatisType.SAVE, start, end);
     }
 
-    @Override
     protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
 
         long startKey = getKey(start);
@@ -181,7 +180,6 @@ public class DefaultProducerDataRetriever
         return getQpxInDb(topic, StatisType.SAVE, start, end);
     }
 
-    @Override
     protected StatsData getQpxInDb(String topic, StatisType type, long start, long end) {
         long startKey = getKey(start);
         long endKey = getKey(end);

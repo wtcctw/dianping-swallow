@@ -106,16 +106,6 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
     protected abstract AbstractAllData<M, T, S, V> createServerStatis();
 
-    protected StatsData getQpxInDb(String topic, StatisType type, long start, long end) {
-
-        return getQpxInMemory(topic, type, start, end);
-    }
-
-    protected StatsData getDelayInDb(String topic, StatisType type, long start, long end) {
-
-        return getDelayInMemory(topic, type, start, end);
-    }
-
     protected StatsData getDelayInMemory(String topic, StatisType type, long start, long end) {
 
         NavigableMap<Long, StatisData> statisData = statis.getStatisDataForTopic(topic, type);
