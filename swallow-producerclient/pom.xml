@@ -19,100 +19,92 @@
         <env>dev</env>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <!-- use the Base64 codec function -->
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.geekhua</groupId>
-            <artifactId>file-queue</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>kryo</artifactId>
-                    <groupId>com.esotericsoftware.kryo</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.dianping.swallow</groupId>
-            <artifactId>swallow-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.dianping.swallow</groupId>
-            <artifactId>swallow-client</artifactId>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-        </dependency>
-        <!--<dependency>-->
-            <!--<groupId>javax.servlet</groupId>-->
-            <!--<artifactId>servlet-api</artifactId>-->
-            <!--<version>2.5</version>-->
-        <!--</dependency>-->
+	<dependencies>
+		<dependency>
+			<groupId>commons-codec</groupId><!-- use the Base64 codec function -->
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.geekhua</groupId>
+			<artifactId>file-queue</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>kryo</artifactId>
+					<groupId>com.esotericsoftware.kryo</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-client</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-log4j12</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+		</dependency>
+		<!-- pigeon -->
+		<dependency>
+			<groupId>com.dianping.dpsf</groupId>
+			<artifactId>dpsf-net</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!-- lion -->
+		<dependency>
+			<groupId>com.dianping.lion</groupId>
+			<artifactId>lion-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!-- 监控 -->
+		<dependency>
+			<groupId>com.dianping.cat</groupId>
+			<artifactId>cat-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!-- requestId项目的通用容器(基于ThreadLocal) -->
+		<dependency>
+			<groupId>com.dianping.platform</groupId>
+			<artifactId>phoenix-environment</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-common</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
-        <!-- pigeon -->
-        <dependency>
-            <groupId>com.dianping.dpsf</groupId>
-            <artifactId>dpsf-net</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- lion -->
-        <dependency>
-            <groupId>com.dianping.lion</groupId>
-            <artifactId>lion-client</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- 监控 -->
-        <dependency>
-            <groupId>com.dianping.cat</groupId>
-            <artifactId>cat-client</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- requestId项目的通用容器(基于ThreadLocal) -->
-        <dependency>
-            <groupId>com.dianping.platform</groupId>
-            <artifactId>phoenix-environment</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.dianping.swallow</groupId>
-            <artifactId>swallow-common</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>**/*.backup</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/*.properties</exclude>
+						<exclude>**/*.backup</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -128,15 +128,19 @@ public class LogFilter implements Filter {
             HttpServletRequest req = (HttpServletRequest) request;
             @SuppressWarnings("unchecked")
             Map<String, String[]> param = req.getParameterMap();
-            StringBuilder stringBuilder = new StringBuilder();
             if (param != null) {
+                StringBuilder content = new StringBuilder(" {");
                 for (Map.Entry<String, String[]> entry : param.entrySet()) {
-                    stringBuilder.append(entry.getKey());
-                    stringBuilder.append(" : ");
-                    stringBuilder.append(entry.getValue()[0]);
-                    stringBuilder.append(" ");
+                    String[] value = entry.getValue();
+                    content.append(entry.getKey()).append(" = ").append(StringUtils.join(value, ",")).append(" ,");
                 }
-                requestContent = stringBuilder.toString();
+                int length = content.length();
+
+                if(length >1){
+                    requestContent = content.substring(0, length - 2) + " }";
+                }else{
+                    requestContent = content.toString() + " }";
+                }
             }
         }
 

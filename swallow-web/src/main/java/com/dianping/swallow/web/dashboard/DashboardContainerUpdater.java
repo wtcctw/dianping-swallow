@@ -247,7 +247,6 @@ public class DashboardContainerUpdater extends AbstractLifecycle implements Moni
                 } else {
                     consumerBaseAlarmSetting = loadDefaultConfiguration();
                 }
-
             } else {
                 alarm = false;
             }

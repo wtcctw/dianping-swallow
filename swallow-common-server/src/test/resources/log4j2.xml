@@ -2,25 +2,23 @@
 <Configuration status="info" monitorInterval="30">
 
     <Appenders>
-        <CatAppender name="catAppender"/>
-
         <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c{1}] %m%n"/>
+            <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c] %m%n"/>
         </Console>
         <RollingRandomAccessFile name="fileAppender"
-                     fileName="/data/applogs/swallow/swallow-producerserver.log"
-                     filePattern="/data/applogs/swallow/swallow-producerserver.log.%d{yyyy-MM-dd}.gz">
-            <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c{1}] %m%n"/>
+                                 fileName="/data/applogs/swallow/swallow-common-server-test.log"
+                                 filePattern="/data/applogs/swallow/swallow-common-server-test.log.%d{yyyy-MM-dd}.gz">
+            <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c] %m%n"/>
             <TimeBasedTriggeringPolicy interval="1"
                                        modulate="true"/>
         </RollingRandomAccessFile>
+
     </Appenders>
 
     <Loggers>
         <root level="INFO">
             <AppenderRef ref="console"/>
             <AppenderRef ref="fileAppender"/>
-            <AppenderRef ref="catAppender"/>
         </root>
     </Loggers>
 </Configuration>

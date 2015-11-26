@@ -24,11 +24,6 @@
         <listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
     </listener>
 
-    <!--<context-param>-->
-        <!--<param-name>log4jConfiguration</param-name>-->
-        <!--<param-value>classpath:/log4j2.xml</param-value>-->
-    <!--</context-param>-->
-
     <filter>
         <filter-name>log4jServletFilter</filter-name>
         <filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>

@@ -1,12 +1,12 @@
 /**
  * Project: swallow-producerclient
- * 
+ * <p/>
  * File Created at 2012-6-27
  * $Id$
- * 
+ * <p/>
  * Copyright 2010 dianping.com.
  * All rights reserved.
- *
+ * <p/>
  * This software is the confidential and proprietary information of
  * Dianping Company. ("Confidential Information").  You shall not
  * disclose such Confidential Information and shall use it only in
@@ -14,28 +14,6 @@
  * with dianping.com.
  */
 package com.dianping.swallow.producer.impl;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.dianping.swallow.producer.Producer;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.mockito.Matchers;
 
 import com.dianping.swallow.common.internal.packet.Packet;
 import com.dianping.swallow.common.internal.packet.PacketType;
@@ -49,327 +27,345 @@ import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.SendFailedException;
 import com.dianping.swallow.common.producer.exceptions.ServerDaoException;
+import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.internal.ProducerImpl;
 import com.dianping.swallow.producer.impl.internal.SwallowPigeonConfiguration;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.mockito.Matchers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Producer的单元测试，包含了对ProducerFactoryImpl和ProducerImpl类的测试
- * 
+ *
  * @author tong.song
  */
 public class ProducerTest {
-   public static final ProducerSwallowService normalRemoteService    = mock(ProducerSwallowService.class);
-   public static final ProducerSwallowService exceptionRemoteService = mock(ProducerSwallowService.class);
-   public static final Destination            dest                   = Destination.topic("UnitTest");
-   public static final String                 content                = "Hello UnitTest.";
-   public static final String                 producerIP             = "127.0.0.1";
-   public static final String                 producerVersion        = "0.6.0";
-   public static final PktSwallowPACK         ack                    = new PktSwallowPACK("MockACK");
+    public static final ProducerSwallowService normalRemoteService = mock(ProducerSwallowService.class);
+    public static final ProducerSwallowService exceptionRemoteService = mock(ProducerSwallowService.class);
+    public static final Destination dest = Destination.topic("UnitTest");
+    public static final String content = "Hello UnitTest.";
+    public static final String producerIP = "127.0.0.1";
+    public static final String producerVersion = "0.6.0";
+    public static final PktSwallowPACK ack = new PktSwallowPACK("MockACK");
 
-   @BeforeClass
-   public static void init() {
+    @BeforeClass
+    public static void init() {
 
-      when(normalRemoteService.sendMessage(Matchers.argThat(new Matcher<Packet>() {
-         PktMessage message;
+        when(normalRemoteService.sendMessage(Matchers.argThat(new Matcher<Packet>() {
+            PktMessage message;
 
-         @Override
-         public void describeTo(Description arg0) {
-         }
-
-         @Override
-         public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
-         }
-
-         @Override
-         public boolean matches(Object arg0) {
-            message = (PktMessage) arg0;
-            assertEquals(PacketType.OBJECT_MSG, message.getPacketType());
-            assertEquals(dest, message.getDestination());
-            if (message.getContent().getInternalProperties() != null) {
-               if ("gzip".equals(message.getContent().getInternalProperties().get("compress"))) {
-                  try {
-                     assertEquals(ZipUtil.zip(content), message.getContent().getContent());
-                  } catch (IOException e) {
-                  }
-               }
-            } else {
-               assertEquals(content, message.getContent().getContent());
+            @Override
+            public void describeTo(Description arg0) {
             }
-            return true;
-         }
 
-		@Override
-		public void describeMismatch(Object item,
-				Description mismatchDescription) {
-			// TODO Auto-generated method stub
-			
-		}
-      }))).thenReturn(ack);
+            @Override
+            public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
+            }
 
-      when(exceptionRemoteService.sendMessage((Packet) anyObject())).thenThrow(new ServerDaoException(null));
+            @Override
+            public boolean matches(Object arg0) {
+                message = (PktMessage) arg0;
+                assertEquals(PacketType.OBJECT_MSG, message.getPacketType());
+                assertEquals(dest, message.getDestination());
+                if (message.getContent().getInternalProperties() != null) {
+                    if ("gzip".equals(message.getContent().getInternalProperties().get("compress"))) {
+                        try {
+                            assertEquals(ZipUtil.zip(content), message.getContent().getContent());
+                        } catch (IOException e) {
+                        }
+                    }
+                } else {
+                    assertEquals(content, message.getContent().getContent());
+                }
+                return true;
+            }
 
-   }
+            @Override
+            public void describeMismatch(Object item,
+                                         Description mismatchDescription) {
+                // TODO Auto-generated method stub
 
-   @Test
-   public void testLog4j2(){
+            }
+        }))).thenReturn(ack);
 
-      final Logger logger = LoggerFactory.getLogger(ProducerFactoryImpl.class);
+        when(exceptionRemoteService.sendMessage((Packet) anyObject())).thenThrow(new ServerDaoException(null));
 
-      ProducerConfig config = new ProducerConfig();
-      // 以下设置的值与默认配置一致，可以省略
-      config.setMode(ProducerMode.SYNC_MODE);
-      config.setSyncRetryTimes(0);
-      config.setZipped(false);
-      config.setThreadPoolSize(5);
-      config.setSendMsgLeftLastSession(false);
-      Producer p = null;
-      try {
-         p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
-      } catch (RemoteServiceInitFailedException e) {
-         e.printStackTrace();
-      }
-      for (int i = 0; i < 10; i++) {
-         String msg = "消息-" + i;
-         try{
-            p.sendMessage(msg);
-            logger.info("Sended msg:" + msg);
-            System.out.println("Sended msg:" + msg);
-         }catch(SendFailedException e){
-            System.out.println("Catch exception then do what you want to do.");
-         }
-      }
-   }
+    }
 
-   @Test
-   public void testSyncProducerSendMessage() throws SendFailedException {
-      ProducerConfig config = new ProducerConfig();
+    @Test
+    public void testLog4j2() throws InterruptedException {
 
-      config.setMode(ProducerMode.SYNC_MODE);
-      config.setAsyncRetryTimes(1);
-      config.setZipped(true);
+        final Logger logger = LoggerFactory.getLogger(ProducerFactoryImpl.class);
 
-      
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
-      String ret = producer.sendMessage(content);
-      assertEquals(ack.getShaInfo(), ret);
+        ProducerConfig config = new ProducerConfig();
+        // 以下设置的值与默认配置一致，可以省略
+        config.setMode(ProducerMode.SYNC_MODE);
+        config.setSyncRetryTimes(0);
+        config.setZipped(false);
+        config.setThreadPoolSize(5);
+        config.setSendMsgLeftLastSession(false);
+        Producer p = null;
+        try {
+            p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
+        } catch (RemoteServiceInitFailedException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < 10000; i++) {
+            String msg = "消息-" + i;
+            try {
+                p.sendMessage(msg);
+                logger.info("Sended msg:" + msg);
+                System.out.println("Sended msg:" + msg);
+                Thread.sleep(500);
+            } catch (SendFailedException e) {
+                System.out.println("Catch exception then do what you want to do.");
+            }
+        }
+    }
 
-      ProducerImpl expectionProducer = new ProducerImpl(dest, config, producerIP, producerVersion,
-            exceptionRemoteService, 500,1, 500, createProducerProcessor(config));
-      try {
-         expectionProducer.sendMessage(content);
-         fail();
-      } catch (Exception e) {
-      }
-   }
+    @Test
+    public void testSyncProducerSendMessage() throws SendFailedException {
+        ProducerConfig config = new ProducerConfig();
 
-	private ProducerProcessor createProducerProcessor(ProducerConfig config) {
-		
-		return new DefaultMessageProcessorTemplate(config.isZipped());
-	}
+        config.setMode(ProducerMode.SYNC_MODE);
+        config.setAsyncRetryTimes(1);
+        config.setZipped(true);
 
-@Test
-   public void testExceptionAsyncProducerSendMessage() throws SendFailedException {
 
-      ProducerConfig config = new ProducerConfig();
+        ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
+        String ret = producer.sendMessage(content);
+        assertEquals(ack.getShaInfo(), ret);
 
-      config.setMode(ProducerMode.ASYNC_MODE);
-      config.setAsyncRetryTimes(2);
-      config.setZipped(false);
-      config.setSendMsgLeftLastSession(false);
-      config.setThreadPoolSize(2);
+        ProducerImpl expectionProducer = new ProducerImpl(dest, config, producerIP, producerVersion,
+                exceptionRemoteService, 500, 1, 500, createProducerProcessor(config));
+        try {
+            expectionProducer.sendMessage(content);
+            fail();
+        } catch (Exception e) {
+        }
+    }
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, exceptionRemoteService, 5000, 1, 5000, createProducerProcessor(config));
+    private ProducerProcessor createProducerProcessor(ProducerConfig config) {
 
-      for (int i = 0; i < 500; i++) {
-         String ret = producer.sendMessage(content);
-         assertNull(ret);
-      }
-      try {
-         Thread.sleep(2000);
-      } catch (Exception e) {
-      }
-   }
+        return new DefaultMessageProcessorTemplate(config.isZipped());
+    }
 
-   @Test
-   public void testNomalAsyncProducerSendMessageWithoutTypeAndProperties() throws SendFailedException {
+    @Test
+    public void testExceptionAsyncProducerSendMessage() throws SendFailedException {
 
-      ProducerConfig config = new ProducerConfig();
+        ProducerConfig config = new ProducerConfig();
 
-      config.setMode(ProducerMode.ASYNC_MODE);
-      config.setAsyncRetryTimes(2);
-      config.setZipped(false);
-      config.setSendMsgLeftLastSession(false);
-      config.setThreadPoolSize(2);
+        config.setMode(ProducerMode.ASYNC_MODE);
+        config.setAsyncRetryTimes(2);
+        config.setZipped(false);
+        config.setSendMsgLeftLastSession(false);
+        config.setThreadPoolSize(2);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
+        ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, exceptionRemoteService, 5000, 1, 5000, createProducerProcessor(config));
 
-      for (int i = 0; i < 5; i++) {
-         String ret = producer.sendMessage(content);
-         assertNull(ret);
-      }
-      try {
-         Thread.sleep(2000);
-      } catch (Exception e) {
-      }
-   }
+        for (int i = 0; i < 500; i++) {
+            String ret = producer.sendMessage(content);
+            assertNull(ret);
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+        }
+    }
 
-   @Test
-   public void testNormalAsyncProducerSendMessageWithTypeAndPropertiesWhileZippedIsOn() throws SendFailedException {
+    @Test
+    public void testNomalAsyncProducerSendMessageWithoutTypeAndProperties() throws SendFailedException {
 
-      ProducerConfig config = new ProducerConfig();
+        ProducerConfig config = new ProducerConfig();
 
-      config.setMode(ProducerMode.ASYNC_MODE);
-      config.setAsyncRetryTimes(2);
-      config.setZipped(true);
-      config.setSendMsgLeftLastSession(true);
-      config.setThreadPoolSize(2);
+        config.setMode(ProducerMode.ASYNC_MODE);
+        config.setAsyncRetryTimes(2);
+        config.setZipped(false);
+        config.setSendMsgLeftLastSession(false);
+        config.setThreadPoolSize(2);
 
-      ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
+        ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
 
-      Map<String, String> properties = new HashMap<String, String>();
-      properties.put("Hello", "World");
-      properties.put("小猫", "你好");
+        for (int i = 0; i < 5; i++) {
+            String ret = producer.sendMessage(content);
+            assertNull(ret);
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+        }
+    }
 
-      for (int i = 0; i < 5; i++) {
-         String ret = producer.sendMessage(content, properties, "UnitTest");
-         assertNull(ret);
-      }
-      try {
-         Thread.sleep(2000);
-      } catch (Exception e) {
-      }
-   }
+    @Test
+    public void testNormalAsyncProducerSendMessageWithTypeAndPropertiesWhileZippedIsOn() throws SendFailedException {
 
-   //测试ProducerFactory
-   @Test
-   public void testProducerFactoryCreateProducer() throws RemoteServiceInitFailedException {
+        ProducerConfig config = new ProducerConfig();
 
-      ProducerFactoryImpl producerFactory = null;
-      //获取Producer工厂实例
-      try {
-         producerFactory = ProducerFactoryImpl.getInstance();
-      } catch (RemoteServiceInitFailedException e) {
-         throw e;
-      }
-      assertNotNull(producerFactory);
+        config.setMode(ProducerMode.ASYNC_MODE);
+        config.setAsyncRetryTimes(2);
+        config.setZipped(true);
+        config.setSendMsgLeftLastSession(true);
+        config.setThreadPoolSize(2);
 
-      //设置Producer选项
-      ProducerImpl producer = null;
-      ProducerConfig config = new ProducerConfig();
+        ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, normalRemoteService, 5000, 1, 5000, createProducerProcessor(config));
 
-      //传入的config为null
-      producer = (ProducerImpl) producerFactory.createProducer(dest, null);
-      assertNotNull(producer);
-      assertEquals(ProducerConfig.DEFAULT_PRODUCER_MODE, producer.getProducerConfig().getMode());
-      assertEquals(ProducerConfig.DEFAULT_ASYNC_RETRY_TIMES, producer.getProducerConfig().getAsyncRetryTimes());
-      assertEquals(ProducerConfig.DEFAULT_SYNC_RETRY_TIMES, producer.getProducerConfig().getSyncRetryTimes());
-      assertEquals(ProducerConfig.DEFAULT_ZIPPED, producer.getProducerConfig().isZipped());
-      assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producer.getProducerConfig().getThreadPoolSize());
-      assertEquals(ProducerConfig.DEFAULT_SEND_MSG_LEFT_LAST_SESSION, producer.getProducerConfig()
-            .isSendMsgLeftLastSession());
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put("Hello", "World");
+        properties.put("小猫", "你好");
 
-      config.setSyncRetryTimes(12);
-      producer = (ProducerImpl) producerFactory.createProducer(dest, config);
-      assertNotNull(producer);
-      assertEquals(ProducerMode.ASYNC_MODE, producer.getProducerConfig().getMode());
-      assertEquals(12, producer.getProducerConfig().getSyncRetryTimes());
-      assertEquals(false, producer.getProducerConfig().isZipped());
-      assertEquals(1, producer.getProducerConfig().getThreadPoolSize());
-      assertEquals(true, producer.getProducerConfig().isSendMsgLeftLastSession());
+        for (int i = 0; i < 5; i++) {
+            String ret = producer.sendMessage(content, properties, "UnitTest");
+            assertNull(ret);
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+        }
+    }
 
-      //测试创建异步模式的Producer
-      producer = null;
+    //测试ProducerFactory
+    @Test
+    public void testProducerFactoryCreateProducer() throws RemoteServiceInitFailedException {
 
-      config.setMode(ProducerMode.ASYNC_MODE);
-      config.setAsyncRetryTimes(7);
-      config.setZipped(true);
-      config.setSendMsgLeftLastSession(true);
-      config.setThreadPoolSize(100);
+        ProducerFactoryImpl producerFactory = null;
+        //获取Producer工厂实例
+        try {
+            producerFactory = ProducerFactoryImpl.getInstance();
+        } catch (RemoteServiceInitFailedException e) {
+            throw e;
+        }
+        assertNotNull(producerFactory);
 
-      producer = (ProducerImpl) producerFactory.createProducer(dest, config);
-      assertNotNull(producer);
-      assertEquals(ProducerMode.ASYNC_MODE, producer.getProducerConfig().getMode());
-      assertEquals(7, producer.getProducerConfig().getAsyncRetryTimes());
-      assertEquals(true, producer.getProducerConfig().isZipped());
-      assertEquals(100, producer.getProducerConfig().getThreadPoolSize());
-      assertEquals(true, producer.getProducerConfig().isSendMsgLeftLastSession());
-   }
+        //设置Producer选项
+        ProducerImpl producer = null;
+        ProducerConfig config = new ProducerConfig();
 
-   @Test
-   public void testProducerConfig() {
+        //传入的config为null
+        producer = (ProducerImpl) producerFactory.createProducer(dest, null);
+        assertNotNull(producer);
+        assertEquals(ProducerConfig.DEFAULT_PRODUCER_MODE, producer.getProducerConfig().getMode());
+        assertEquals(ProducerConfig.DEFAULT_ASYNC_RETRY_TIMES, producer.getProducerConfig().getAsyncRetryTimes());
+        assertEquals(ProducerConfig.DEFAULT_SYNC_RETRY_TIMES, producer.getProducerConfig().getSyncRetryTimes());
+        assertEquals(ProducerConfig.DEFAULT_ZIPPED, producer.getProducerConfig().isZipped());
+        assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producer.getProducerConfig().getThreadPoolSize());
+        assertEquals(ProducerConfig.DEFAULT_SEND_MSG_LEFT_LAST_SESSION, producer.getProducerConfig()
+                .isSendMsgLeftLastSession());
 
-      ProducerConfig producerConfig = new ProducerConfig();
+        config.setSyncRetryTimes(12);
+        producer = (ProducerImpl) producerFactory.createProducer(dest, config);
+        assertNotNull(producer);
+        assertEquals(ProducerMode.ASYNC_MODE, producer.getProducerConfig().getMode());
+        assertEquals(12, producer.getProducerConfig().getSyncRetryTimes());
+        assertEquals(false, producer.getProducerConfig().isZipped());
+        assertEquals(1, producer.getProducerConfig().getThreadPoolSize());
+        assertEquals(true, producer.getProducerConfig().isSendMsgLeftLastSession());
 
-      //测试默认值
-      assertEquals(ProducerConfig.DEFAULT_PRODUCER_MODE, producerConfig.getMode());
-      assertEquals(ProducerConfig.DEFAULT_ASYNC_RETRY_TIMES, producerConfig.getAsyncRetryTimes());
-      assertEquals(ProducerConfig.DEFAULT_SYNC_RETRY_TIMES, producerConfig.getSyncRetryTimes());
-      assertEquals(ProducerConfig.DEFAULT_ZIPPED, producerConfig.isZipped());
-      assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producerConfig.getThreadPoolSize());
-      assertEquals(ProducerConfig.DEFAULT_SEND_MSG_LEFT_LAST_SESSION, producerConfig.isSendMsgLeftLastSession());
+        //测试创建异步模式的Producer
+        producer = null;
 
-      //测试设置值
-      producerConfig.setMode(ProducerMode.ASYNC_MODE);
-      producerConfig.setAsyncRetryTimes(6);
-      producerConfig.setZipped(true);
-      producerConfig.setThreadPoolSize(6);
-      producerConfig.setSendMsgLeftLastSession(true);
+        config.setMode(ProducerMode.ASYNC_MODE);
+        config.setAsyncRetryTimes(7);
+        config.setZipped(true);
+        config.setSendMsgLeftLastSession(true);
+        config.setThreadPoolSize(100);
 
-      assertEquals(ProducerMode.ASYNC_MODE, producerConfig.getMode());
-      assertEquals(6, producerConfig.getAsyncRetryTimes());
-      assertEquals(true, producerConfig.isZipped());
-      assertEquals(6, producerConfig.getThreadPoolSize());
-      assertEquals(true, producerConfig.isSendMsgLeftLastSession());
+        producer = (ProducerImpl) producerFactory.createProducer(dest, config);
+        assertNotNull(producer);
+        assertEquals(ProducerMode.ASYNC_MODE, producer.getProducerConfig().getMode());
+        assertEquals(7, producer.getProducerConfig().getAsyncRetryTimes());
+        assertEquals(true, producer.getProducerConfig().isZipped());
+        assertEquals(100, producer.getProducerConfig().getThreadPoolSize());
+        assertEquals(true, producer.getProducerConfig().isSendMsgLeftLastSession());
+    }
 
-      //测试非法值
-      producerConfig.setAsyncRetryTimes(-1);
-      assertEquals(Integer.MAX_VALUE, producerConfig.getAsyncRetryTimes());
+    @Test
+    public void testProducerConfig() {
 
-      producerConfig.setSyncRetryTimes(-1);
-      assertEquals(Integer.MAX_VALUE, producerConfig.getSyncRetryTimes());
+        ProducerConfig producerConfig = new ProducerConfig();
 
-      producerConfig.setThreadPoolSize(0);
-      assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producerConfig.getThreadPoolSize());
+        //测试默认值
+        assertEquals(ProducerConfig.DEFAULT_PRODUCER_MODE, producerConfig.getMode());
+        assertEquals(ProducerConfig.DEFAULT_ASYNC_RETRY_TIMES, producerConfig.getAsyncRetryTimes());
+        assertEquals(ProducerConfig.DEFAULT_SYNC_RETRY_TIMES, producerConfig.getSyncRetryTimes());
+        assertEquals(ProducerConfig.DEFAULT_ZIPPED, producerConfig.isZipped());
+        assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producerConfig.getThreadPoolSize());
+        assertEquals(ProducerConfig.DEFAULT_SEND_MSG_LEFT_LAST_SESSION, producerConfig.isSendMsgLeftLastSession());
 
-      producerConfig.setThreadPoolSize(101);
-      assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producerConfig.getThreadPoolSize());
-   }
+        //测试设置值
+        producerConfig.setMode(ProducerMode.ASYNC_MODE);
+        producerConfig.setAsyncRetryTimes(6);
+        producerConfig.setZipped(true);
+        producerConfig.setThreadPoolSize(6);
+        producerConfig.setSendMsgLeftLastSession(true);
 
-   @Test
-   public void testSwallowPigeonConfiguration() {
+        assertEquals(ProducerMode.ASYNC_MODE, producerConfig.getMode());
+        assertEquals(6, producerConfig.getAsyncRetryTimes());
+        assertEquals(true, producerConfig.isZipped());
+        assertEquals(6, producerConfig.getThreadPoolSize());
+        assertEquals(true, producerConfig.isSendMsgLeftLastSession());
 
-      SwallowPigeonConfiguration defaultConfig = new SwallowPigeonConfiguration();
+        //测试非法值
+        producerConfig.setAsyncRetryTimes(-1);
+        assertEquals(Integer.MAX_VALUE, producerConfig.getAsyncRetryTimes());
 
-      //测试默认值
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, defaultConfig.getSerialize());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_SERVICE_NAME, defaultConfig.getServiceName());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_TIMEOUT, defaultConfig.getTimeout());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_RETRY_BASE_INTERVAL, defaultConfig.getRetryBaseInterval());
-      assertNotNull(defaultConfig.toString());
-      
-      defaultConfig.setSerialize("what");
-      defaultConfig.setServiceName("hello");
-      defaultConfig.setTimeout(2222);
-      defaultConfig.setRetryBaseInterval(1000);
+        producerConfig.setSyncRetryTimes(-1);
+        assertEquals(Integer.MAX_VALUE, producerConfig.getSyncRetryTimes());
 
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, defaultConfig.getSerialize());
-      assertEquals("hello", defaultConfig.getServiceName());
-      assertEquals(2222, defaultConfig.getTimeout());
-      assertEquals(1000, defaultConfig.getRetryBaseInterval());
+        producerConfig.setThreadPoolSize(0);
+        assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producerConfig.getThreadPoolSize());
 
-      //测试正常文件读取
-      SwallowPigeonConfiguration normalConfig = new SwallowPigeonConfiguration("normalPigeon.properties");
-      assertEquals("java", normalConfig.getSerialize());
-      assertEquals("helloworld", normalConfig.getServiceName());
-      assertEquals(200, normalConfig.getTimeout());
-      assertEquals(600, normalConfig.getRetryBaseInterval());
+        producerConfig.setThreadPoolSize(101);
+        assertEquals(ProducerConfig.DEFAULT_THREADPOOL_SIZE, producerConfig.getThreadPoolSize());
+    }
 
-      //测试格式错误文件读取
-      SwallowPigeonConfiguration wrongConfig = new SwallowPigeonConfiguration("wrongPigeon.properties");
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, wrongConfig.getSerialize());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_TIMEOUT, wrongConfig.getTimeout());
-      assertEquals(SwallowPigeonConfiguration.DEFAULT_RETRY_BASE_INTERVAL, wrongConfig.getRetryBaseInterval());
-   }
+    @Test
+    public void testSwallowPigeonConfiguration() {
+
+        SwallowPigeonConfiguration defaultConfig = new SwallowPigeonConfiguration();
+
+        //测试默认值
+        assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, defaultConfig.getSerialize());
+        assertEquals(SwallowPigeonConfiguration.DEFAULT_SERVICE_NAME, defaultConfig.getServiceName());
+        assertEquals(SwallowPigeonConfiguration.DEFAULT_TIMEOUT, defaultConfig.getTimeout());
+        assertEquals(SwallowPigeonConfiguration.DEFAULT_RETRY_BASE_INTERVAL, defaultConfig.getRetryBaseInterval());
+        assertNotNull(defaultConfig.toString());
+
+        defaultConfig.setSerialize("what");
+        defaultConfig.setServiceName("hello");
+        defaultConfig.setTimeout(2222);
+        defaultConfig.setRetryBaseInterval(1000);
+
+        assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, defaultConfig.getSerialize());
+        assertEquals("hello", defaultConfig.getServiceName());
+        assertEquals(2222, defaultConfig.getTimeout());
+        assertEquals(1000, defaultConfig.getRetryBaseInterval());
+
+        //测试正常文件读取
+        SwallowPigeonConfiguration normalConfig = new SwallowPigeonConfiguration("normalPigeon.properties");
+        assertEquals("java", normalConfig.getSerialize());
+        assertEquals("helloworld", normalConfig.getServiceName());
+        assertEquals(200, normalConfig.getTimeout());
+        assertEquals(600, normalConfig.getRetryBaseInterval());
+
+        //测试格式错误文件读取
+        SwallowPigeonConfiguration wrongConfig = new SwallowPigeonConfiguration("wrongPigeon.properties");
+        assertEquals(SwallowPigeonConfiguration.DEFAULT_SERIALIZE, wrongConfig.getSerialize());
+        assertEquals(SwallowPigeonConfiguration.DEFAULT_TIMEOUT, wrongConfig.getTimeout());
+        assertEquals(SwallowPigeonConfiguration.DEFAULT_RETRY_BASE_INTERVAL, wrongConfig.getRetryBaseInterval());
+    }
 }
