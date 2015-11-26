@@ -54,8 +54,8 @@ public class LoggerLoader {
 
         // asyn file info,  filter-same or more specific than
         Filter fileInfoFilter = ThresholdFilter.createFilter(Level.ERROR, Result.DENY, Result.ACCEPT);
-        Appender fileInfoAppender = RollingRandomAccessFileAppender.createAppender(LOG_ROOT + "/" + APP_NAME + "/" + APP_NAME + ".log",
-                LOG_ROOT + "/" + APP_NAME + "/" + APP_NAME + ".log.%d{yyyy-MM-dd}.gz", "true", "FileInfo", "true", null,
+        Appender fileInfoAppender = RollingRandomAccessFileAppender.createAppender(LOG_ROOT + "/swallow." + APP_NAME + ".log",
+                LOG_ROOT + "/swallow." + APP_NAME + ".log.%d{yyyy-MM-dd}.gz", "true", "FileInfo", "true", null,
                 TimeBasedTriggeringPolicy.createPolicy("1", "true"),
                 DefaultRolloverStrategy.createStrategy("30", "1", null, Deflater.DEFAULT_COMPRESSION + "", config),
                 layout, fileInfoFilter, "false", null, null, config);

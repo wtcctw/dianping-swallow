@@ -1,15 +1,7 @@
 package com.dianping.swallow.consumer.impl;
 
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 import com.dianping.swallow.common.internal.config.DynamicConfig;
+import com.dianping.swallow.common.internal.config.LoggerLoader;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
@@ -19,6 +11,14 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class ConsumerFactoryImpl implements ConsumerFactory {
 
@@ -34,6 +34,7 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
 
 	static {
 		SwallowHelper.initialize();
+		LoggerLoader.init();
 	}
 
 	private ConsumerFactoryImpl() {
