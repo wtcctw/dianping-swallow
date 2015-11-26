@@ -17,6 +17,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,441 +49,440 @@ import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 
 /**
  * @author mengwenchao
- *
+ *         <p/>
  *         2015年5月28日 下午3:06:46
  */
 @Component
 public class DefaultAccumulationRetriever extends AbstractRetriever implements AccumulationRetriever,
-		ObjectConfigChangeListener {
+        ObjectConfigChangeListener {
 
-	private List<AccumulationListener> accumulationListeners = new ArrayList<AccumulationListener>();
+    private List<AccumulationListener> accumulationListeners = new ArrayList<AccumulationListener>();
 
-	private Map<String, TopicAccumulation> topics = new ConcurrentHashMap<String, DefaultAccumulationRetriever.TopicAccumulation>();
+    private Map<String, TopicAccumulation> topics = new ConcurrentHashMap<String, DefaultAccumulationRetriever.TopicAccumulation>();
 
-	@Autowired
-	private MessageDAO messageDao;
+    @Autowired
+    private MessageDAO messageDao;
 
-	@Autowired
-	private MongoManager mongoManager;
+    @Autowired
+    private MongoManager mongoManager;
 
-	@Autowired
-	private MongoClusterFactory mongoClusterFactory;
+    @Autowired
+    private MongoClusterFactory mongoClusterFactory;
 
-	@Autowired
-	private WebConfig webConfig;
+    @Autowired
+    private WebConfig webConfig;
 
-	@Autowired
-	private ConsumerDataRetriever consumerDataRetriever;
+    @Autowired
+    private ConsumerDataRetriever consumerDataRetriever;
 
-	private ExecutorService executors;
+    private ExecutorService executors;
 
-	@Autowired
-	private ConsumerIdStatsDataService consumerIdStatsDataService;
-	
+    @Autowired
+    private ConsumerIdStatsDataService consumerIdStatsDataService;
 
-	@Override
-	protected void doInitialize() throws Exception {
 
-		super.doInitialize();
+    @Override
+    protected void doInitialize() throws Exception {
 
-		int corePoolSize = mongoManager.getMongoCount() * 10;
-		int maxPoolSize = mongoManager.getMongoCount() * mongoClusterFactory.getMongoOptions().getConnectionsPerHost();
-		if (logger.isInfoEnabled()) {
-			logger.info("[postDefaultAccumulationRetriever]" + corePoolSize);
-		}
-		
-		executors = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 30, 
-				TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
-				new MQThreadFactory("ACCUMULATION_RETRIEVER-"), new ThreadPoolExecutor.CallerRunsPolicy());
-		webConfig.addChangeListener(this);
+        super.doInitialize();
 
-	}
+        int corePoolSize = mongoManager.getMongoCount() * 10;
+        int maxPoolSize = mongoManager.getMongoCount() * mongoClusterFactory.getMongoOptions().getConnectionsPerHost();
+        if (logger.isInfoEnabled()) {
+            logger.info("[postDefaultAccumulationRetriever]" + corePoolSize);
+        }
 
-	@Override
-	protected void doBuild() {
+        executors = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 30,
+                TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+                new MQThreadFactory("ACCUMULATION_RETRIEVER-"), new ThreadPoolExecutor.CallerRunsPolicy());
+        webConfig.addChangeListener(this);
 
-		SwallowActionWrapper actionWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doBuild");
+    }
 
-		actionWrapper.doAction(new SwallowAction() {
-			@Override
-			public void doAction() throws SwallowException {
+    @Override
+    protected void doBuild() {
 
-				buildAllAccumulations();
-			}
-		});
+        SwallowActionWrapper actionWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doBuild");
 
-		// 通知监听者
-		doChangeNotify();
-	}
+        actionWrapper.doAction(new SwallowAction() {
+            @Override
+            public void doAction() throws SwallowException {
 
-	protected void buildAllAccumulations() {
+                buildAllAccumulations();
+            }
+        });
 
-		Map<String, Set<String>> topics = consumerDataRetriever.getAllTopics();
+        // 通知监听者
+        doChangeNotify();
+    }
 
-		if (logger.isInfoEnabled()) {
-			logger.info("[buildAllAccumulations][begin]");
-		}
+    protected void buildAllAccumulations() {
 
-		final CountDownLatch latch = new CountDownLatch(latchSize(topics));
-		for (Entry<String, Set<String>> entry : topics.entrySet()) {
+        Map<String, Set<String>> topics = consumerDataRetriever.getAllTopics();
 
-			final String topicName = entry.getKey();
-			final Set<String> consumerIds = entry.getValue();
+        if (logger.isInfoEnabled()) {
+            logger.info("[buildAllAccumulations][begin]");
+        }
 
-			executors.execute(new Runnable() {
+        final CountDownLatch latch = new CountDownLatch(latchSize(topics));
+        for (Entry<String, Set<String>> entry : topics.entrySet()) {
 
-				@Override
-				public void run() {
-					try {
-						putAccumulation(topicName, consumerIds);
-					} finally {
-						latch.countDown();
-					}
-				}
-			});
-		}
-		try {
-			boolean result = latch.await(getBuildInterval(), TimeUnit.SECONDS);
-			if (!result) {
-				logger.error("[buildAllAccumulations][wait returned, but task has not finished yet!]");
-			}
-		} catch (InterruptedException e) {
-			logger.error("[buildAllAccumulations]", e);
-		}
-	}
+            final String topicName = entry.getKey();
+            final Set<String> consumerIds = entry.getValue();
 
-	private int latchSize(Map<String, Set<String>> topics) {
+            executors.execute(new Runnable() {
 
-		return topics.size();
-	}
-
-	private void putAccumulation(final String topicName, final Set<String> consumerIds) {
-
-		CatActionWrapper catAction = new CatActionWrapper("putAccumulationTopic", topicName);
-
-		catAction.doAction(new SwallowAction() {
+                @Override
+                public void run() {
+                    try {
+                        putAccumulation(topicName, consumerIds);
+                    } finally {
+                        latch.countDown();
+                    }
+                }
+            });
+        }
+        try {
+            boolean result = latch.await(getBuildInterval(), TimeUnit.SECONDS);
+            if (!result) {
+                logger.error("[buildAllAccumulations][wait returned, but task has not finished yet!]");
+            }
+        } catch (InterruptedException e) {
+            logger.error("[buildAllAccumulations]", e);
+        }
+    }
 
-			@Override
-			public void doAction() throws SwallowException {
+    private int latchSize(Map<String, Set<String>> topics) {
 
-				for (String consumerId : consumerIds) {
-
-					putAccumulation(topicName, consumerId);
-					TopicAccumulation topic = topics.get(topicName);
-					if (topic != null) {
-						topic.retain(consumerIds);
-					}
-				}
-			}
-		});
-	}
-
-	protected void putAccumulation(final String topicName, final String consumerId) {
-
-		if (ConsumerIdUtil.isNonDurableConsumerId(consumerId)) {
-			return;
-		}
-
-		CatActionWrapper catAction = new CatActionWrapper("putAccumulationConsumerId", topicName + ":" + consumerId);
-
-		catAction.doAction(new SwallowAction() {
-
-			@Override
-			public void doAction() throws SwallowException {
-
-				long size = 0;
-				try {
-					size = messageDao.getAccumulation(topicName, consumerId);
-				} catch (Exception e) {
-					logger.error("[putAccumulation]" + topicName + "," + consumerId, e);
-				}
-				TopicAccumulation topicAccumulation = MapUtil.getOrCreate(topics, topicName, TopicAccumulation.class);
-				topicAccumulation.addConsumerId(consumerId, size);
-			}
-		});
-
-	}
-
-	@Override
-	protected void doRemove(long toKey) {
-
-		for (TopicAccumulation topicAccumulation : topics.values()) {
-			topicAccumulation.removeBefore(toKey);
-		}
-	}
-
-	@Override
-	protected Set<String> getTopicsInMemory(long start, long end) {
-
-		return topics.keySet();
-	}
-
-	@Override
-	public OrderStatsData getAccuOrderForAllConsumerId(int size) {
-		return getAccuOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
-	}
-
-	@Override
-	public OrderStatsData getAccuOrderForAllConsumerId(int size, long start, long end) {
-		return getAccuOrderForAllConsumerIdInMemory(size, start, end);
-	}
-
-	protected OrderStatsData getAccuOrderForAllConsumerIdInMemory(int size, long start, long end) {
-		long fromKey = getKey(start);
-		long toKey = getKey(end);
-
-		OrderStatsData orderResults = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY,
-				StatisDetailType.ACCUMULATION), start, end);
-
-		for (Map.Entry<String, TopicAccumulation> topicAccumulation : topics.entrySet()) {
-			String topicName = topicAccumulation.getKey();
-			Map<String, ConsumerIdAccumulation> consumerIdAccus = topicAccumulation.getValue().consumers();
-			for (Map.Entry<String, ConsumerIdAccumulation> consumerIdAccu : consumerIdAccus.entrySet()) {
-				NavigableMap<Long, Long> rawDatas = consumerIdAccu.getValue()
-						.getAccumulations(getSampleIntervalCount());
-				orderResults.add(new OrderEntity(topicName, consumerIdAccu.getKey(), getSumStatsData(rawDatas, fromKey,
-						toKey), getOtherSampleCount(start, end)));
-			}
-		}
-		return orderResults;
-	}
+        return topics.size();
+    }
+
+    private void putAccumulation(final String topicName, final Set<String> consumerIds) {
+
+        CatActionWrapper catAction = new CatActionWrapper("putAccumulationTopic", topicName);
+
+        catAction.doAction(new SwallowAction() {
 
-	@Override
-	public boolean dataExistInMemory(long start, long end) {
-		return consumerDataRetriever.dataExistInMemory(start, end);
-	}
+            @Override
+            public void doAction() throws SwallowException {
 
-	@Override
-	public Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end) {
+                for (String consumerId : consumerIds) {
+
+                    putAccumulation(topicName, consumerId);
+                    TopicAccumulation topic = topics.get(topicName);
+                    if (topic != null) {
+                        topic.retain(consumerIds);
+                    }
+                }
+            }
+        });
+    }
+
+    protected void putAccumulation(final String topicName, final String consumerId) {
+
+        if (ConsumerIdUtil.isNonDurableConsumerId(consumerId)) {
+            return;
+        }
+
+        CatActionWrapper catAction = new CatActionWrapper("putAccumulationConsumerId", topicName + ":" + consumerId);
+
+        catAction.doAction(new SwallowAction() {
+
+            @Override
+            public void doAction() throws SwallowException {
+
+                long size = 0;
+                try {
+                    size = messageDao.getAccumulation(topicName, consumerId);
+                } catch (Exception e) {
+                    logger.error("[putAccumulation]" + topicName + "," + consumerId, e);
+                }
+                TopicAccumulation topicAccumulation = MapUtil.getOrCreate(topics, topicName, TopicAccumulation.class);
+                topicAccumulation.addConsumerId(consumerId, size);
+            }
+        });
+
+    }
+
+    @Override
+    protected void doRemove(long toKey) {
+
+        for (TopicAccumulation topicAccumulation : topics.values()) {
+            topicAccumulation.removeBefore(toKey);
+        }
+    }
+
+    @Override
+    protected Set<String> getTopicsInMemory(long start, long end) {
+
+        return topics.keySet();
+    }
+
+    @Override
+    public OrderStatsData getAccuOrderForAllConsumerId(int size) {
+        return getAccuOrderForAllConsumerId(size, getDefaultStart(), getDefaultEnd());
+    }
+
+    @Override
+    public OrderStatsData getAccuOrderForAllConsumerId(int size, long start, long end) {
+        return getAccuOrderForAllConsumerIdInMemory(size, start, end);
+    }
+
+    protected OrderStatsData getAccuOrderForAllConsumerIdInMemory(int size, long start, long end) {
+        long fromKey = getKey(start);
+        long toKey = getKey(end);
+
+        OrderStatsData orderResults = new OrderStatsData(size, new ConsumerStatsDataDesc(TOTAL_KEY,
+                StatisDetailType.ACCUMULATION), start, end);
+
+        for (Map.Entry<String, TopicAccumulation> topicAccumulation : topics.entrySet()) {
+            String topicName = topicAccumulation.getKey();
+            Map<String, ConsumerIdAccumulation> consumerIdAccus = topicAccumulation.getValue().consumers();
+            for (Map.Entry<String, ConsumerIdAccumulation> consumerIdAccu : consumerIdAccus.entrySet()) {
+                NavigableMap<Long, Long> rawDatas = consumerIdAccu.getValue()
+                        .getAccumulations(getSampleIntervalCount());
+                orderResults.add(new OrderEntity(topicName, consumerIdAccu.getKey(), getSumStatsData(rawDatas, fromKey,
+                        toKey), getOtherSampleCount(start, end)));
+            }
+        }
+        return orderResults;
+    }
 
-		if (dataExistInMemory(start, end)) {
-			return getAccumulationForAllConsumerIdInMemory(topic, start, end);
-		}
+    public boolean dataExistInMemory(CasKeys keys, long start, long end) {
+        return consumerDataRetriever.dataExistInMemory(keys, start, end);
+    }
 
-		return getAccumulationForAllConsumerIdInDb(topic, start, end);
+    @Override
+    public Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end) {
 
-	}
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, topic), start, end)) {
+            return getAccumulationForAllConsumerIdInMemory(topic, start, end);
+        }
 
-	private Map<String, StatsData> getAccumulationForAllConsumerIdInDb(String topic, long start, long end) {
-		long startKey = getKey(start);
-		long endKey = getKey(end);
-		Map<String, NavigableMap<Long, Long>> accuStatsDatas = consumerIdStatsDataService.findSectionAccuData(topic,
-				startKey, endKey);
-		Map<String, StatsData> result = new HashMap<String, StatsData>();
-		if (accuStatsDatas != null && !accuStatsDatas.isEmpty()) {
-			for (Map.Entry<String, NavigableMap<Long, Long>> accuStatsData : accuStatsDatas.entrySet()) {
-				String consumerId = accuStatsData.getKey();
-				if (MonitorData.TOTAL_KEY.equals(consumerId)) {
-					continue;
-				}
-				StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
-				NavigableMap<Long, Long> accuRawData = accuStatsData.getValue();
-				accuRawData = fillStatsData(accuRawData, startKey, endKey);
-				StatsData statsData = new StatsData(desc, getValue(accuRawData), getStartTime(accuRawData, start, end),
-						getStorageIntervalTime());
-				result.put(consumerId, statsData);
-			}
-		}
-		return result;
-	}
+        return getAccumulationForAllConsumerIdInDb(topic, start, end);
 
-	private Map<String, StatsData> getAccumulationForAllConsumerIdInMemory(String topic, long start, long end) {
+    }
 
-		Map<String, StatsData> result = new HashMap<String, StatsData>();
-		TopicAccumulation topicAccumulation = topics.get(topic);
-		if (topicAccumulation == null) {
-			return result;
-		}
-		for (Entry<String, ConsumerIdAccumulation> entry : topicAccumulation.consumers.entrySet()) {
+    private Map<String, StatsData> getAccumulationForAllConsumerIdInDb(String topic, long start, long end) {
+        long startKey = getKey(start);
+        long endKey = getKey(end);
+        Map<String, NavigableMap<Long, Long>> accuStatsDatas = consumerIdStatsDataService.findSectionAccuData(topic,
+                startKey, endKey);
+        Map<String, StatsData> result = new HashMap<String, StatsData>();
+        if (accuStatsDatas != null && !accuStatsDatas.isEmpty()) {
+            for (Map.Entry<String, NavigableMap<Long, Long>> accuStatsData : accuStatsDatas.entrySet()) {
+                String consumerId = accuStatsData.getKey();
+                if (MonitorData.TOTAL_KEY.equals(consumerId)) {
+                    continue;
+                }
+                StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
+                NavigableMap<Long, Long> accuRawData = accuStatsData.getValue();
+                accuRawData = fillStatsData(accuRawData, startKey, endKey);
+                StatsData statsData = new StatsData(desc, getValue(accuRawData), getStartTime(accuRawData, start, end),
+                        getStorageIntervalTime());
+                result.put(consumerId, statsData);
+            }
+        }
+        return result;
+    }
 
-			String consumerId = entry.getKey();
-			ConsumerIdAccumulation consumerIdAccumulation = entry.getValue();
+    private Map<String, StatsData> getAccumulationForAllConsumerIdInMemory(String topic, long start, long end) {
 
-			StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
+        Map<String, StatsData> result = new HashMap<String, StatsData>();
+        TopicAccumulation topicAccumulation = topics.get(topic);
+        if (topicAccumulation == null) {
+            return result;
+        }
+        for (Entry<String, ConsumerIdAccumulation> entry : topicAccumulation.consumers.entrySet()) {
 
-			NavigableMap<Long, Long> rawData = consumerIdAccumulation.getAccumulations(getSampleIntervalCount());
-			rawData = rawData.subMap(getKey(start), true, getKey(end), true);
-			result.put(consumerId, createStatsData(desc, rawData, start, end));
-		}
+            String consumerId = entry.getKey();
+            ConsumerIdAccumulation consumerIdAccumulation = entry.getValue();
 
-		return result;
-	}
+            StatsDataDesc desc = new ConsumerStatsDataDesc(topic, consumerId, StatisDetailType.ACCUMULATION);
 
-	@Override
-	public Map<String, StatsData> getAccumulationForAllConsumerId(String topic) {
+            NavigableMap<Long, Long> rawData = consumerIdAccumulation.getAccumulations(getSampleIntervalCount());
+            rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+            result.put(consumerId, createStatsData(desc, rawData, start, end));
+        }
 
-		return getAccumulationForAllConsumerId(topic, getDefaultStart(), getDefaultEnd());
-	}
+        return result;
+    }
 
-	public static class TopicAccumulation {
+    @Override
+    public Map<String, StatsData> getAccumulationForAllConsumerId(String topic) {
 
-		private Map<String, ConsumerIdAccumulation> consumers = new ConcurrentHashMap<String, DefaultAccumulationRetriever.ConsumerIdAccumulation>();
+        return getAccumulationForAllConsumerId(topic, getDefaultStart(), getDefaultEnd());
+    }
 
-		public void addConsumerId(String consumerId, long accumulation) {
+    public static class TopicAccumulation {
 
-			ConsumerIdAccumulation consumerIdAccumulation = MapUtil.getOrCreate(consumers, consumerId,
-					ConsumerIdAccumulation.class);
-			consumerIdAccumulation.add(accumulation);
-		}
+        private Map<String, ConsumerIdAccumulation> consumers = new ConcurrentHashMap<String, DefaultAccumulationRetriever.ConsumerIdAccumulation>();
 
-		public void retain(Set<String> consumerIds) {
+        public void addConsumerId(String consumerId, long accumulation) {
 
-			Set<String> currentIds = new HashSet<String>(consumers.keySet());
-			currentIds.removeAll(consumerIds);
+            ConsumerIdAccumulation consumerIdAccumulation = MapUtil.getOrCreate(consumers, consumerId,
+                    ConsumerIdAccumulation.class);
+            consumerIdAccumulation.add(accumulation);
+        }
 
-			for (String removeId : currentIds) {
+        public void retain(Set<String> consumerIds) {
 
-				consumers.remove(removeId);
-			}
-		}
+            Set<String> currentIds = new HashSet<String>(consumers.keySet());
+            currentIds.removeAll(consumerIds);
 
-		public void removeBefore(Long toKey) {
+            for (String removeId : currentIds) {
 
-			for (ConsumerIdAccumulation consumer : consumers.values()) {
+                consumers.remove(removeId);
+            }
+        }
 
-				consumer.removeBefore(toKey);
-			}
-		}
+        public void removeBefore(Long toKey) {
 
-		public void remove(String consumerId) {
+            for (ConsumerIdAccumulation consumer : consumers.values()) {
 
-			consumers.remove(consumerId);
-		}
+                consumer.removeBefore(toKey);
+            }
+        }
 
-		public Map<String, ConsumerIdAccumulation> consumers() {
-			return consumers;
-		}
-	}
+        public void remove(String consumerId) {
 
-	public static class ConsumerIdAccumulation {
+            consumers.remove(consumerId);
+        }
 
-		private NavigableMap<Long, Long> accumulations = new ConcurrentSkipListMap<Long, Long>();
+        public Map<String, ConsumerIdAccumulation> consumers() {
+            return consumers;
+        }
+    }
 
-		protected final Logger logger = LoggerFactory.getLogger(getClass());
+    public static class ConsumerIdAccumulation {
 
-		protected long lastInsertTime = System.currentTimeMillis();
+        private NavigableMap<Long, Long> accumulations = new ConcurrentSkipListMap<Long, Long>();
 
-		public void add(long accumulation) {
+        protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-			Long key = getKey(System.currentTimeMillis());
-			if (logger.isDebugEnabled()) {
-				logger.debug("[add]" + key + ":" + accumulation);
-			}
-			accumulations.put(key, accumulation);
-		}
+        protected long lastInsertTime = System.currentTimeMillis();
 
-		/**
-		 * For unit test
-		 * 
-		 * @param key
-		 * @param accumulation
-		 */
-		@Deprecated
-		public void add(Long key, long accumulation) {
+        public void add(long accumulation) {
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("[add]" + key + ":" + accumulation);
-			}
-			accumulations.put(key, accumulation);
-		}
-
-		private void ajustData(int intervalCount) {
-
-			Long current = System.currentTimeMillis();
-
-			Long lastKey = getKey(lastInsertTime);
-			Long currentKey = getKey(current);
-
-			NavigableMap<Long, Long> sub = accumulations.subMap(lastKey, true, currentKey, false);
-
-			Long last = -1L;
-
-			for (Long key : sub.keySet()) {
-
-				if (last != -1) {
-					Long add = (key - last) / intervalCount - 1;
-
-					for (int i = 0; i < add; i++) {
-						accumulations.put(last + intervalCount, 0L);
-					}
-				}
-				last = key;
-			}
-
-			lastInsertTime = current;
-		}
-
-		public NavigableMap<Long, Long> getAccumulations(int intervalCount) {
-
-			ajustData(intervalCount);
-			return accumulations;
-		}
-
-		public List<Long> data() {
-
-			List<Long> result = new LinkedList<Long>();
-			result.addAll(accumulations.values());
-			return result;
-		}
-
-		public void removeBefore(Long toKey) {
-
-			Map<Long, Long> toDelete = accumulations.headMap(toKey);
-			for (Long key : toDelete.keySet()) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("[removeBefore]" + key);
-				}
-				accumulations.remove(key);
-			}
-		}
-	}
-
-	@Override
-	protected long getBuildInterval() {
-
-		return webConfig.getAccumulationBuildInterval();
-	}
-
-	@Override
-	protected int getSampleIntervalTime() {
-
-		return webConfig.getAccumulationBuildInterval();
-	}
-
-	@Override
-	public void onChange(Object config, String key) throws Exception {
-
-		if (key.equals(DefaultWebConfig.FIELD_ACCUMULATION)) {
-			stop();
-			start();
-		}
-	}
-
-	@Override
-	public void registerListener(AccumulationListener listener) {
-		accumulationListeners.add(listener);
-	}
-
-	protected void doChangeNotify() {
-		for (AccumulationListener accumulationListener : accumulationListeners) {
-			accumulationListener.achieveAccumulation();
-		}
-	}
-
-	public NavigableMap<Long, Long> getConsumerIdAccumulation(String topic, String consumerId) {
-		TopicAccumulation topicAccumulation = topics.get(topic);
-		if (topicAccumulation == null) {
-			return null;
-		}
-		ConsumerIdAccumulation consumerIdAccumulation = topicAccumulation.consumers().get(consumerId);
-		if (consumerIdAccumulation == null) {
-			return null;
-		}
-		return consumerIdAccumulation.getAccumulations(getStorageIntervalCount());
-	}
-	
-	@Override
-	public int getOrder() {
-		return ORDER;
-	}
+            Long key = getKey(System.currentTimeMillis());
+            if (logger.isDebugEnabled()) {
+                logger.debug("[add]" + key + ":" + accumulation);
+            }
+            accumulations.put(key, accumulation);
+        }
+
+        /**
+         * For unit test
+         *
+         * @param key
+         * @param accumulation
+         */
+        @Deprecated
+        public void add(Long key, long accumulation) {
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("[add]" + key + ":" + accumulation);
+            }
+            accumulations.put(key, accumulation);
+        }
+
+        private void ajustData(int intervalCount) {
+
+            Long current = System.currentTimeMillis();
+
+            Long lastKey = getKey(lastInsertTime);
+            Long currentKey = getKey(current);
+
+            NavigableMap<Long, Long> sub = accumulations.subMap(lastKey, true, currentKey, false);
+
+            Long last = -1L;
+
+            for (Long key : sub.keySet()) {
+
+                if (last != -1) {
+                    Long add = (key - last) / intervalCount - 1;
+
+                    for (int i = 0; i < add; i++) {
+                        accumulations.put(last + intervalCount, 0L);
+                    }
+                }
+                last = key;
+            }
+
+            lastInsertTime = current;
+        }
+
+        public NavigableMap<Long, Long> getAccumulations(int intervalCount) {
+
+            ajustData(intervalCount);
+            return accumulations;
+        }
+
+        public List<Long> data() {
+
+            List<Long> result = new LinkedList<Long>();
+            result.addAll(accumulations.values());
+            return result;
+        }
+
+        public void removeBefore(Long toKey) {
+
+            Map<Long, Long> toDelete = accumulations.headMap(toKey);
+            for (Long key : toDelete.keySet()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("[removeBefore]" + key);
+                }
+                accumulations.remove(key);
+            }
+        }
+    }
+
+    @Override
+    protected long getBuildInterval() {
+
+        return webConfig.getAccumulationBuildInterval();
+    }
+
+    @Override
+    protected int getSampleIntervalTime() {
+
+        return webConfig.getAccumulationBuildInterval();
+    }
+
+    @Override
+    public void onChange(Object config, String key) throws Exception {
+
+        if (key.equals(DefaultWebConfig.FIELD_ACCUMULATION)) {
+            stop();
+            start();
+        }
+    }
+
+    @Override
+    public void registerListener(AccumulationListener listener) {
+        accumulationListeners.add(listener);
+    }
+
+    protected void doChangeNotify() {
+        for (AccumulationListener accumulationListener : accumulationListeners) {
+            accumulationListener.achieveAccumulation();
+        }
+    }
+
+    public NavigableMap<Long, Long> getConsumerIdAccumulation(String topic, String consumerId) {
+        TopicAccumulation topicAccumulation = topics.get(topic);
+        if (topicAccumulation == null) {
+            return null;
+        }
+        ConsumerIdAccumulation consumerIdAccumulation = topicAccumulation.consumers().get(consumerId);
+        if (consumerIdAccumulation == null) {
+            return null;
+        }
+        return consumerIdAccumulation.getAccumulations(getStorageIntervalCount());
+    }
+
+    @Override
+    public int getOrder() {
+        return ORDER;
+    }
 }

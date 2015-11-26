@@ -25,31 +25,27 @@
 * 同步模式：发送方发出消息后，等待接收服务器成功、超时、异常时返回。
 * 异步模式：生产者发送消息时，先把消费存储到本地文件，同时启动后台发送消息线程将文件的消息读取出来发送到server。
 
-# Swallow线下消息收发消息模拟平台
-
-## 生产者模拟平台
-
-* 生产者可以向某个Topic发送一条消息。
-
-	* [alpha环境](http://192.168.8.21:7070/rundemo/swallow-alpha-067#r=0&j=17)
-	* [qa环境](http://192.168.8.21:7070/rundemo/swallow-qa-067#r=0&j=17)
-
-* 在代码编辑框内，修改“Destination.topic("example")”为“Destination.topic("<你的topic名称>")”)。
-* 点击右边绿色run按钮。
-* 在右边紫色控制台下方，输入消息的内容，按回车，即可发送。
-
-## 消费者模拟平台
-
-* 消费者接收消息  (在代码编辑框内，修改“Destination.topic("example")”为“Destination.topic("<你的topic名称>")”)，点击“run”，即可启动消费者。
-
-	* [alpha环境](http://192.168.8.21:7070/rundemo/swallow-alpha#r=0&j=10 )
-	* [qa环境](http://192.168.8.21:7070/rundemo/swallow-qa#r=0&j=10)
-
 # Swallow系统接入流程
 
 ## 申请Topic
 
-如果有新的Topic，请联系：李明冬/孟文超(mingdong.li@dianping.com, wenchao.meng@dianping.com)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。
+### 自动申请
+
+* 通过[workflow自动申请](http://workflow.dp/wfe/start/126)
+![申请topic](http://swallow.dp/help/document/img/apply_topic.png)
+
+* 预账号请填写申请人公司邮箱前缀，如邮箱为mingdong.li@dianping.com需填写mingdong.li。
+
+* 消息大小默认为1KB，如果大于默认值可以在下拉列表中选择接近的值，如果超出范围请邮件联系swallow开发小组。
+
+* 每天消息量以高峰期间的值为准，如果超出所给选择范围请邮件联系swallow开发小组。
+
+* 支付和搜索请选择相应topic类型，其余都选择一般消息队列。
+
+* 注意区别[权限提升](#enhanceauth),此处是申请新topic，topic权限提升是提升用户对某个已经申请过的topic的访问级别。通过自动流程申请的topic，申请人自动获得查看此topic的权限。
+
+### 邮件申请
+请联系：李明冬/孟文超(mingdong.li@dianping.com, wenchao.meng@dianping.com)，待帮您配置后，方可使用（线下和线上均可以使用），未申请的topic使用时会遇到拒绝连接的异常。
 
 联系时，**请邮件里告知：**
 
@@ -60,6 +56,7 @@
 * 消费者业务名，以及负责人姓名  (例如，mobile-api, 陆经天)
 * 计划上线时间
 * 每天大概的消息量	(例如，5万条 ， 请注意不要写错，比如每日100万消息，应该写“100万”，不要写错成"100")
+* 建议首先通过workflow自动申请。
 
 # Swallow客户端使用说明
 ## 使用swallow发送消息
@@ -747,6 +744,7 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 * Visitor表示没有关联任何topic,无法访问任何topic及其message的人员，只可以查看监控性能。
 
+<span id="enhanceauth"></span>
 ### 权限提升
 
 * 用户和Visitor如需提升权限，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请。

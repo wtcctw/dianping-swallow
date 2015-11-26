@@ -93,6 +93,7 @@ public class SimpleServerTest extends AbstractTest{
 				InputStream ins = socket.getInputStream();
 				DataInputStream dis = new DataInputStream(ins);
 				while(true){
+					@SuppressWarnings("deprecation")
 					String line = dis.readLine();
 					if( line == null ){
 						break;

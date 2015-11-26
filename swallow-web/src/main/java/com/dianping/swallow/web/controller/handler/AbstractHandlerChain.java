@@ -12,19 +12,22 @@ import java.util.List;
  * @author mingdongli
  *         15/10/23 下午3:41
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractHandlerChain<T extends Treatable, R extends Result> implements HandlerChain<T, R> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected List<Handler> handlers = new LinkedList<Handler>();
+	protected List<Handler<T, R>> handlers = new LinkedList<Handler<T, R>>();
 
-    public AbstractHandlerChain(Handler ... handlers){
-        for(Handler handler : handlers){
+    @SuppressWarnings("unchecked")
+	public AbstractHandlerChain(Handler ... handlers){
+        for(Handler<T, R> handler : handlers){
             this.handlers.add(handler);
         }
     }
 
-    public void addHandler(Handler handler){
+    @SuppressWarnings("unchecked")
+	public void addHandler(Handler handler){
         handlers.add(handler);
     }
 

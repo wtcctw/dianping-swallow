@@ -1,10 +1,10 @@
 package com.dianping.swallow.common.server.monitor.data;
 
+import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
-
-import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 
 
 /**
@@ -15,13 +15,13 @@ import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 public interface ConsumerStatisRetriever extends StatisRetriever{
 
 
-	Map<String, NavigableMap<Long, QpxData>> getQpxForAllConsumerId(String topic, StatisType type);
+	Map<String, NavigableMap<Long, StatisData>> getQpxForAllConsumerId(String topic, StatisType type);
 	
 	Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(String topic, StatisType type);
 
 	Set<String>  getConsumerIds(String topic);
 
-	Map<String, NavigableMap<Long, QpxData>> getQpxForAllConsumerId(String topic, StatisType type, boolean includeTotal);
+	Map<String, NavigableMap<Long, StatisData>> getQpxForAllConsumerId(String topic, StatisType type, boolean includeTotal);
 	
 	Map<String, NavigableMap<Long, Long>> getDelayForAllConsumerId(String topic, StatisType type, boolean includeTotal);
 

@@ -7,6 +7,7 @@ import com.dianping.swallow.web.controller.handler.data.EmptyObject;
 import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
 import com.dianping.swallow.web.service.impl.TopicResourceServiceImpl;
 import com.dianping.swallow.web.util.ResponseStatus;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,8 @@ public class TopicWhiteListLionHandler extends AbstractLionHandler {
         String topic = lionEditorEntity.getTopic();
         boolean isTest = lionEditorEntity.isTest();
 
-        Set<String> newTopics = (Set<String>)getValue(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, Boolean.TRUE);
+        @SuppressWarnings("unchecked")
+		Set<String> newTopics = (Set<String>)getValue(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, Boolean.TRUE);
         Set<String> oldTopics = topicWhiteList.getTopics();
         if(newTopics == null || oldTopics == null || (oldTopics.size() - newTopics.size()) > TopicWhiteList.MAX_TOPIC_WHILTE_LIST_DECREASE){
             return ResponseStatus.INVALIDLENGTH;

@@ -11,10 +11,13 @@ public class MapUtil {
 
 	public static <K, V> V getOrCreate(Map<K, V> map, K key, Class<? extends V> clazz){
 
-		V ret  = null;
+		V ret  = map.get(key);
+		
+		if(ret != null){
+			return ret;
+		}
 
-		Object syn = key instanceof String ? ((String)key).intern() : key ;
-		synchronized (syn) {
+		synchronized (map) {
 			ret = (V) map.get(key);
 			if(ret == null){
 				try {

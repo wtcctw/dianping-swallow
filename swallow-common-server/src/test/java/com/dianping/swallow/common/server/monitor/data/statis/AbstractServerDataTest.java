@@ -16,7 +16,8 @@ public abstract class AbstractServerDataTest extends AbstractTest{
 
 	protected String []topics = new String[]{"topic1", "topic2"};
 	
-	protected String []ips = new String[]{"127.0.0.1", "127.0.0.2"};
+	
+	protected String []ips = new String[]{"127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4"};
 	
 	protected final long avergeDelay = 50;
 	protected final long qpsPerUnit = 10;

@@ -9,7 +9,7 @@ import com.dianping.swallow.web.controller.handler.result.Result;
  */
 public interface HandlerChain<T extends Treatable, R extends Result> extends Handler<T, R>{
 
-     void addHandler(Handler handler);
+     void addHandler(Handler<T, R> handler);
 
-     void removeHandler(Handler handler);
+     void removeHandler(Handler<T, R> handler);
 }
