@@ -84,7 +84,7 @@ Thumbs.db
 *.ipr
 *.iws
 .idea/
+out/
 #test
 config.online
 TODO
-.idea/

@@ -26,6 +26,8 @@ public class DefaultProducerIpStatsDataDao extends AbstractStatsDao implements P
 
 	private static final String TOPICNAME_FIELD = "topicName";
 
+	private static final String IP_FIELD = "ip";
+
 	@Override
 	public boolean insert(ProducerIpStatsData ipStatsData) {
 		try {
@@ -50,7 +52,7 @@ public class DefaultProducerIpStatsDataDao extends AbstractStatsDao implements P
 
 	@Override
 	public List<ProducerIpStatsData> find(String topicName, String ip, long startKey, long endKey) {
-		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)
+		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(IP_FIELD).is(ip).and(TIMEKEY_FIELD).gte(startKey)
 				.lte(endKey)).with(new Sort(new Sort.Order(Direction.ASC, TIMEKEY_FIELD)));
 		List<ProducerIpStatsData> statisDatas = mongoTemplate.find(query, ProducerIpStatsData.class,
 				PRODUCERIPSTATSDATA_COLLECTION);

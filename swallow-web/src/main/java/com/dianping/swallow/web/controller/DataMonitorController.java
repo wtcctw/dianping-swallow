@@ -31,651 +31,757 @@ import java.util.concurrent.Callable;
 
 /**
  * @author mengwenchao
- *
+ *         <p/>
  *         2015年4月14日 下午9:24:38
  */
 @Controller
 public class DataMonitorController extends AbstractMonitorController implements InitializingBean {
 
-	public static final String Y_AXIS_TYPE_QPS = "QPS";
+    public static final String Y_AXIS_TYPE_QPS = "QPS";
 
-	public static final String Y_AXIS_TYPE_DELAY = "延时(毫秒)";
+    public static final String Y_AXIS_TYPE_DELAY = "延时(毫秒)";
 
-	public static final String Y_AXIS_TYPE_ACCUMULATION = "堆积消息数";
+    public static final String Y_AXIS_TYPE_ACCUMULATION = "堆积消息数";
 
-	public static final String CAT_TYPE = "MONITOR";
+    public static final String CAT_TYPE = "MONITOR";
 
-	public static final String ENTRYS = "entry";
+    public static final String FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-	public static final String FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private static final String STATSDATA_QUERY_TIMESPAN_KEY = "swallow.web.statsdata.query.timespan";
 
-	private static final String STATSDATA_QUERY_TIMESPAN_KEY = "swallow.web.statsdata.query.timespan";
+    private static final long TIMESPAN_UNIT = 60 * 60 * 1000;
 
-	private static final long TIMESPAN_UNIT = 60 * 60 * 1000;
+    private static final long maxOrderTimeSpan = 3 * TIMESPAN_UNIT;
 
-	private static final long maxOrderTimeSpan = 3 * TIMESPAN_UNIT;
+    private volatile Integer queryTimeSpan;
 
-	private volatile Integer queryTimeSpan;
+    @Autowired
+    private ProducerDataRetriever producerDataRetriever;
 
-	@Autowired
-	private ProducerDataRetriever producerDataRetriever;
+    @Autowired
+    private ConsumerDataRetriever consumerDataRetriever;
 
-	@Autowired
-	private ConsumerDataRetriever consumerDataRetriever;
+    @Autowired
+    private AccumulationRetriever accumulationRetriever;
 
-	@Autowired
-	private AccumulationRetriever accumulationRetriever;
+    ConfigCache configCache;
 
-	ConfigCache configCache;
+    @Resource(name = "minuteEntryService")
+    private MinuteEntryService minuteEntryService;
 
-	@Resource(name = "minuteEntryService")
-	private MinuteEntryService minuteEntryService;
+    private void initLionConfig() {
+        try {
+            configCache = ConfigCache.getInstance();
+            queryTimeSpan = configCache.getIntProperty(STATSDATA_QUERY_TIMESPAN_KEY);
+            configCache.addChange(new ConfigChange() {
+                @Override
+                public void onChange(String key, String value) {
+                    if (STATSDATA_QUERY_TIMESPAN_KEY.equals(key)) {
+                        if (StringUtils.isNotBlank(value)) {
+                            queryTimeSpan = Integer.valueOf(value);
+                        }
+                    }
+                }
+            });
+        } catch (LionException e) {
+            logger.error("lion read producer and consumer server ips failed", e);
+        }
+    }
 
-	private void initLionConfig() {
-		try {
-			configCache = ConfigCache.getInstance();
-			queryTimeSpan = configCache.getIntProperty(STATSDATA_QUERY_TIMESPAN_KEY);
-			configCache.addChange(new ConfigChange() {
-				@Override
-				public void onChange(String key, String value) {
-					if (STATSDATA_QUERY_TIMESPAN_KEY.equals(key)) {
-						if (StringUtils.isNotBlank(value)) {
-							queryTimeSpan = Integer.valueOf(value);
-						}
-					}
-				}
-			});
-		} catch (LionException e) {
-			logger.error("lion read producer and consumer server ips failed", e);
-		}
-	}
+    @RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
+    public ModelAndView viewConsumerServerQps() {
 
-	@RequestMapping(value = "/console/monitor/consumerserver/qps", method = RequestMethod.GET)
-	public ModelAndView viewConsumerServerQps() {
+        return new ModelAndView("monitor/consumerserverqps", createViewMap("server", "consumerserverqps"));
+    }
 
-		return new ModelAndView("monitor/consumerserverqps", createViewMap("server", "consumerserverqps"));
-	}
+    @RequestMapping(value = "/console/monitor/producerserver/qps", method = RequestMethod.GET)
+    public ModelAndView viewProducerServerQps() {
 
-	@RequestMapping(value = "/console/monitor/producerserver/qps", method = RequestMethod.GET)
-	public ModelAndView viewProducerServerQps() {
+        return new ModelAndView("monitor/producerserverqps", createViewMap("server", "producerserverqps"));
+    }
 
-		return new ModelAndView("monitor/producerserverqps", createViewMap("server", "producerserverqps"));
-	}
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
+    public ModelAndView viewTopicQps(@PathVariable String topic) {
 
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
-	public ModelAndView viewTopicQps(@PathVariable String topic) {
+        return new ModelAndView("monitor/consumerqps", createViewMap("topic", "consumerqps"));
+    }
 
-		return new ModelAndView("monitor/consumerqps", createViewMap("topic", "consumerqps"));
-	}
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/ip/qps", method = RequestMethod.GET)
+    public ModelAndView viewConsumerIpQps(@PathVariable String topic) {
 
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu", method = RequestMethod.GET)
-	public ModelAndView viewTopicAccumulation(@PathVariable String topic, HttpServletRequest request) {
-		if (topic.equals(MonitorData.TOTAL_KEY)) {
-			String firstTopic = getFirstTopic(accumulationRetriever.getTopics());
-			if (!firstTopic.equals(MonitorData.TOTAL_KEY)) {
-				return new ModelAndView("redirect:/console/monitor/consumer/" + firstTopic + "/accu", createViewMap(
-						"topic", "consumeraccu"));
-			}
-		}
-		return new ModelAndView("monitor/consumeraccu", createViewMap("topic", "consumeraccu"));
-	}
+        return new ModelAndView("monitor/consumeripqps", createViewMap("topic", "consumerqps"));
+    }
 
-	@RequestMapping(value = "/console/monitor/dashboard", method = RequestMethod.GET)
-	public ModelAndView viewTopicdashboarddelay() {
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/ip/delay", method = RequestMethod.GET)
+    public ModelAndView viewConsumerIpDelay(@PathVariable String topic) {
 
-		return new ModelAndView("monitor/consumerdashboarddelay", createViewMap("dashboard", "dashboarddelay"));
-	}
+        return new ModelAndView("monitor/consumeripdelay", createViewMap("topic", "delay"));
+    }
 
-	@RequestMapping(value = "/console/monitor/dashboard/delay/minute", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getConsumerIdDelayDashboard(@RequestParam("date") String date, @RequestParam("step") int step,
-			@RequestParam("type") String type) throws Exception {
+    @RequestMapping(value = "/console/monitor/producer/{topic}/ip/qps", method = RequestMethod.GET)
+    public ModelAndView viewProducerIpQps(@PathVariable String topic) {
 
-		Date stop = adjustTimeByStep(date, step);
+        return new ModelAndView("monitor/produceripqps", createViewMap("topic", "consumerqps"));
+    }
 
-		Date start = calStartTime(stop);
+    @RequestMapping(value = "/console/monitor/producer/{topic}/ip/delay", method = RequestMethod.GET)
+    public ModelAndView viewProducerIpDelay(@PathVariable String topic) {
 
-		List<ResultEntry> entrys = minuteEntryService.loadMinuteEntryPage(start, stop, type);
+        return new ModelAndView("monitor/produceripdelay", createViewMap("topic", "delay"));
+    }
 
-		return buildResponse(entrys, type.trim());
-
-	}
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/accu", method = RequestMethod.GET)
+    public ModelAndView viewTopicAccumulation(@PathVariable String topic, HttpServletRequest request) {
+        if (topic.equals(MonitorData.TOTAL_KEY)) {
+            String firstTopic = getFirstTopic(accumulationRetriever.getTopics());
+            if (!firstTopic.equals(MonitorData.TOTAL_KEY)) {
+                return new ModelAndView("redirect:/console/monitor/consumer/" + firstTopic + "/accu", createViewMap(
+                        "topic", "consumeraccu"));
+            }
+        }
+        return new ModelAndView("monitor/consumeraccu", createViewMap("topic", "consumeraccu"));
+    }
 
-	private String getFirstTopic(Set<String> topics) {
-
-		if (topics == null || topics.size() == 0) {
+    @RequestMapping(value = "/console/monitor/dashboard", method = RequestMethod.GET)
+    public ModelAndView viewTopicdashboarddelay() {
 
-			return MonitorData.TOTAL_KEY;
-		}
-		return topics.toArray(new String[0])[0];
-	}
+        return new ModelAndView("monitor/consumerdashboarddelay", createViewMap("dashboard", "dashboarddelay"));
+    }
 
-	@RequestMapping(value = "/console/monitor/producer/{topic}/savedelay", method = RequestMethod.GET)
-	public ModelAndView viewProducerDelayMonitor(@PathVariable String topic) throws IOException {
+    @RequestMapping(value = "/console/monitor/dashboard/delay/minute", method = RequestMethod.GET)
+    @ResponseBody
+    public Object getConsumerIdDelayDashboard(@RequestParam("date") String date, @RequestParam("step") int step,
+                                              @RequestParam("type") String type) throws Exception {
 
-		Map<String, Object> map = createViewMap("topic", "delay");
-		return new ModelAndView("monitor/producerdelay", map);
-
-	}
+        Date stop = adjustTimeByStep(date, step);
 
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay", method = RequestMethod.GET)
-	public ModelAndView viewConsumerDelayMonitor(@PathVariable String topic) throws IOException {
-
-		Map<String, Object> map = createViewMap("topic", "delay");
-		return new ModelAndView("monitor/consumerdelay", map);
-	}
+        Date start = calStartTime(stop);
 
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/order", method = RequestMethod.GET)
-	public ModelAndView viewConsumerOrder(@PathVariable String topic) {
-
-		return new ModelAndView("monitor/consumerorder", createViewMap("topic", "consumerorder"));
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/debug/{server}", method = RequestMethod.GET)
-	@ResponseBody
-	public String getConsumerDebug(@PathVariable String server) {
-
-		if (logger.isInfoEnabled()) {
-			logger.info("[getConsumerDebug]" + server);
-			logger.info(consumerDataRetriever.getDebugInfo(server));
-		}
-		return "ok";
-	}
+        List<ResultEntry> entrys = minuteEntryService.loadMinuteEntryPage(start, stop, type);
 
-	@RequestMapping(value = "/console/monitor/producer/debug/{server}", method = RequestMethod.GET)
-	@ResponseBody
-	public String getProducerDebug(@PathVariable String server) {
+        return buildResponse(entrys, type.trim());
 
-		if (logger.isInfoEnabled()) {
-			logger.info("[getProducerDebug]" + server);
-			logger.info(producerDataRetriever.getDebugInfo(server));
-		}
-		return "ok";
-	}
-
-	@RequestMapping(value = "/console/monitor/consumerserver/qps/get", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getConsumerServerQps() {
-
-		Map<String, ConsumerDataPair> serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND);
-
-		return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
-	}
-
-	@RequestMapping(value = "/console/monitor/consumerserver/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getConsumerServerQps(@PathVariable String startTime, @PathVariable String endTime) {
-		Map<String, ConsumerDataPair> serverQpx = null;
-		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
-			return getConsumerServerQps();
-		}
-		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
-				* TIMESPAN_UNIT);
-
-		serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
-		return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
-	}
-
-	@RequestMapping(value = "/console/monitor/producerserver/qps/get", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getProducerServerQps() {
-
-		Map<String, StatsData> serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND);
+    }
 
-		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
-	}
-
-	@RequestMapping(value = "/console/monitor/producerserver/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getProducerServerQps(@PathVariable String startTime, @PathVariable String endTime) {
-		Map<String, StatsData> serverQpx = null;
-		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
-			return getProducerServerQps();
-		}
-		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
-				* TIMESPAN_UNIT);
-		serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
-
-		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps/get", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getTopicQps(@PathVariable String topic,
-			@RequestParam(value = "cid", required = false) String consumerIds) {
+    private String getFirstTopic(Set<String> topics) {
 
-		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
-		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND);
-		List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND);
-
-		return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData, interestConsumerIds);
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getTopicQps(@PathVariable String topic,
-			@RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
-			@PathVariable String endTime) {
+        if (topics == null || topics.size() == 0) {
 
-		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
-			return getTopicQps(topic, consumerIds);
-		}
-
-		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
-
-		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
-				* TIMESPAN_UNIT);
-		StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND, searchTime.getStartTime(),
-				searchTime.getEndTime());
-		List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND,
-				searchTime.getStartTime(), searchTime.getEndTime());
-
-		return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData, interestConsumerIds);
-	}
-
-	private Set<String> getConsumerIds(String consumerIds) {
-
-		if (consumerIds == null) {
-			return null;
-		}
-
-		Set<String> result = new HashSet<String>();
-		String[] split = consumerIds.split("\\s*,\\s*");
-		for (String consumerId : split) {
+            return MonitorData.TOTAL_KEY;
+        }
+        return topics.toArray(new String[0])[0];
+    }
 
-			if (StringUtils.isEmpty(consumerId)) {
-				continue;
-			}
-			result.add(consumerId.trim());
-		}
+    @RequestMapping(value = "/console/monitor/producer/{topic}/savedelay", method = RequestMethod.GET)
+    public ModelAndView viewProducerDelayMonitor(@PathVariable String topic) throws IOException {
 
-		if (logger.isInfoEnabled()) {
-			logger.info("[getConsumerIds]" + result);
-		}
-		return result;
-	}
+        Map<String, Object> map = createViewMap("topic", "delay");
+        return new ModelAndView("monitor/producerdelay", map);
 
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu/get", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getTopicAccumulation(@PathVariable String topic,
-			@RequestParam(value = "cid", required = false) String consumerIds) {
+    }
 
-		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/delay", method = RequestMethod.GET)
+    public ModelAndView viewConsumerDelayMonitor(@PathVariable String topic) throws IOException {
 
-		Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
+        Map<String, Object> map = createViewMap("topic", "delay");
+        return new ModelAndView("monitor/consumerdelay", map);
+    }
 
-		if (interestConsumerIds != null) {
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/order", method = RequestMethod.GET)
+    public ModelAndView viewConsumerOrder(@PathVariable String topic) {
 
-			List<String> remove = new LinkedList<String>();
-			for (String consumerId : statsData.keySet()) {
-				if (!interestConsumerIds.contains(consumerId)) {
-					remove.add(consumerId);
-				}
-			}
+        return new ModelAndView("monitor/consumerorder", createViewMap("topic", "consumerorder"));
+    }
 
-			for (String consumerId : remove) {
-				statsData.remove(consumerId);
-			}
-		}
+    @RequestMapping(value = "/console/monitor/consumer/debug/{server}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getConsumerDebug(@PathVariable String server) {
 
-		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_ACCUMULATION, statsData);
-	}
+        if (logger.isInfoEnabled()) {
+            logger.info("[getConsumerDebug]" + server);
+            logger.info(consumerDataRetriever.getDebugInfo(server));
+        }
+        return "ok";
+    }
 
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/accu/get/{startTime}/{endTime}", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getTopicAccumulation(@PathVariable String topic,
-			@RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
-			@PathVariable String endTime) {
+    @RequestMapping(value = "/console/monitor/producer/debug/{server}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getProducerDebug(@PathVariable String server) {
 
-		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
-			return getTopicAccumulation(topic, consumerIds);
-		}
+        if (logger.isInfoEnabled()) {
+            logger.info("[getProducerDebug]" + server);
+            logger.info(producerDataRetriever.getDebugInfo(server));
+        }
+        return "ok";
+    }
 
-		Set<String> interestConsumerIds = getConsumerIds(consumerIds);
+    @RequestMapping(value = "/console/monitor/consumerserver/qps/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getConsumerServerQps() {
 
-		final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
-				* TIMESPAN_UNIT);
+        Map<String, ConsumerDataPair> serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND);
 
-		Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic,
-				searchTime.getStartTime(), searchTime.getEndTime());
+        return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+    }
 
-		if (interestConsumerIds != null) {
+    @RequestMapping(value = "/console/monitor/consumerserver/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getConsumerServerQps(@PathVariable String startTime, @PathVariable String endTime) {
+        Map<String, ConsumerDataPair> serverQpx = null;
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getConsumerServerQps();
+        }
+        SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+                * TIMESPAN_UNIT);
 
-			List<String> remove = new LinkedList<String>();
-			for (String consumerId : statsData.keySet()) {
-				if (!interestConsumerIds.contains(consumerId)) {
-					remove.add(consumerId);
-				}
-			}
-
-			for (String consumerId : remove) {
-				statsData.remove(consumerId);
-			}
-		}
-
-		return buildStatsHighChartsWrapper(Y_AXIS_TYPE_ACCUMULATION, statsData);
-	}
-
-	@RequestMapping(value = "/console/monitor/topiclist/get", method = RequestMethod.POST)
-	@ResponseBody
-	public Set<String> getProducerDelayMonitor() throws IOException {
-		return allTopics();
-	}
-
-	private Set<String> allTopics() {
-
-		Set<String> producerTopics = producerDataRetriever.getTopics();
-		Set<String> consumerTopics = consumerDataRetriever.getTopics();
-		producerTopics.addAll(consumerTopics);
-		return producerTopics;
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic,
-			@RequestParam(value = "cid", required = false) String consumerIds) throws Exception {
-
-		final Set<String> interestConsumerIds = getConsumerIds(consumerIds);
+        serverQpx = consumerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
+        return buildConsumerHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+    }
 
-		SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(
-				CAT_TYPE, "getConsumerDelayMonitor");
+    @RequestMapping(value = "/console/monitor/producerserver/qps/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getProducerServerQps() {
 
-		return wrapper.doCallable(new Callable<List<HighChartsWrapper>>() {
+        Map<String, StatsData> serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND);
 
-			@Override
-			public List<HighChartsWrapper> call() throws Exception {
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+    }
 
-				StatsData producerData = producerDataRetriever.getSaveDelay(topic);
-				List<ConsumerDataPair> consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic);
-
-				return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay,
-						interestConsumerIds);
-			}
-		});
-
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get/{startTime}/{endTime}", method = RequestMethod.POST)
-	@ResponseBody
-	public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic,
-			@RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
-			@PathVariable String endTime) throws Exception {
+    @RequestMapping(value = "/console/monitor/producerserver/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getProducerServerQps(@PathVariable String startTime, @PathVariable String endTime) {
+        Map<String, StatsData> serverQpx = null;
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getProducerServerQps();
+        }
+        SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+                * TIMESPAN_UNIT);
+        serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
 
-		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
-			return getConsumerDelayMonitor(topic, consumerIds);
-		}
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+    }
 
-		final Set<String> interestConsumerIds = getConsumerIds(consumerIds);
+    @RequestMapping(value = "/console/monitor/producer/{topic}/ip/qps/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getTopicIpQps(@PathVariable String topic) {
+        Map<String, StatsData> statsDatas = producerDataRetriever.getAllIpQpx(topic);
 
-		final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
-				* TIMESPAN_UNIT);
+        return buildProducerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, statsDatas);
+    }
 
-		SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(
-				CAT_TYPE, "getConsumerDelayMonitor");
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/ip/qps/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getConsumerIdIpQpx(@PathVariable final String topic,
+                                                      @RequestParam(value = "cid", required = true) String consumerId) throws Exception {
+        Map<String, ConsumerDataPair> consumerQpx = consumerDataRetriever.getAllIpQpx(topic, consumerId);
 
-		return wrapper.doCallable(new Callable<List<HighChartsWrapper>>() {
+        return buildConsumerHighChartsWrapper(consumerId, Y_AXIS_TYPE_QPS, consumerQpx);
 
-			@Override
-			public List<HighChartsWrapper> call() throws Exception {
+    }
 
-				StatsData producerData = producerDataRetriever.getSaveDelay(topic, searchTime.getStartTime(),
-						searchTime.getEndTime());
-				List<ConsumerDataPair> consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic,
-						searchTime.getStartTime(), searchTime.getEndTime());
-
-				return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay,
-						interestConsumerIds);
-			}
-		});
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/qps/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getTopicQps(@PathVariable String topic,
+                                               @RequestParam(value = "cid", required = false) String consumerIds) {
 
-	}
+        Set<String> interestConsumerIds = getConsumerIds(consumerIds);
+        StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND);
+        List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND);
 
-	@RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}", method = RequestMethod.POST)
-	@ResponseBody
-	public Object getConsumerOrderMonitor(@PathVariable final int size) throws Exception {
-		List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size);
-		List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size);
-		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-		orderStatsDatas.addAll(pOrderStatsDatas);
-		orderStatsDatas.addAll(cOrderStatsDatas);
-		return orderStatsDatas;
-	}
-
-	@RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}/{startTime}/{endTime}", method = RequestMethod.POST)
-	@ResponseBody
-	public Object getConsumerOrderMonitor(@PathVariable final int size, @PathVariable String startTime,
-			@PathVariable String endTime) throws Exception {
-		if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
-			return getConsumerOrderMonitor(size);
-		}
-		SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, false, maxOrderTimeSpan);
-		List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size, searchTime.getStartTime(),
-				searchTime.getEndTime());
-		List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size,
-				searchTime.getStartTime(), searchTime.getEndTime());
-		List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
-		orderStatsDatas.addAll(pOrderStatsDatas);
-		orderStatsDatas.addAll(cOrderStatsDatas);
-		return orderStatsDatas;
-	}
+        return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData, interestConsumerIds);
+    }
 
-	private List<HighChartsWrapper> buildStatsHighChartsWrapper(String yAxis, Map<String, StatsData> stats) {
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getTopicQps(@PathVariable String topic,
+                                               @RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
+                                               @PathVariable String endTime) {
 
-		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(stats.size());
-		for (Entry<String, StatsData> entry : stats.entrySet()) {
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getTopicQps(topic, consumerIds);
+        }
 
-			String key = entry.getKey();
-			StatsData statsData = entry.getValue();
+        Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-			result.add(ChartBuilder.getHighChart(key, "", yAxis, statsData));
+        SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+                * TIMESPAN_UNIT);
+        StatsData producerData = producerDataRetriever.getQpx(topic, QPX.SECOND, searchTime.getStartTime(),
+                searchTime.getEndTime());
+        List<ConsumerDataPair> consumerData = consumerDataRetriever.getQpxForAllConsumerId(topic, QPX.SECOND,
+                searchTime.getStartTime(), searchTime.getEndTime());
 
-		}
+        return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData, interestConsumerIds);
+    }
 
-		return result;
-	}
+    private Set<String> getConsumerIds(String consumerIds) {
 
-	private List<HighChartsWrapper> buildConsumerHighChartsWrapper(String yAxis, Map<String, ConsumerDataPair> serverQpx) {
+        if (consumerIds == null) {
+            return null;
+        }
 
-		int size = serverQpx.size();
-		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
+        Set<String> result = new HashSet<String>();
+        String[] split = consumerIds.split("\\s*,\\s*");
+        for (String consumerId : split) {
 
-		for (Entry<String, ConsumerDataPair> entry : serverQpx.entrySet()) {
+            if (StringUtils.isEmpty(consumerId)) {
+                continue;
+            }
+            result.add(consumerId.trim());
+        }
 
-			String ip = entry.getKey();
-			ConsumerDataPair dataPair = entry.getValue();
-			List<StatsData> allStats = new LinkedList<StatsData>();
-			if (isEmpty(dataPair.getSendData()) && isEmpty(dataPair.getAckData())) {
-				continue;
-			}
-			allStats.add(dataPair.getSendData());
-			allStats.add(dataPair.getAckData());
-			result.add(ChartBuilder.getHighChart(ip, "", yAxis, allStats));
-		}
+        if (logger.isInfoEnabled()) {
+            logger.info("[getConsumerIds]" + result);
+        }
+        return result;
+    }
 
-		return result;
-	}
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/accu/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getTopicAccumulation(@PathVariable String topic,
+                                                        @RequestParam(value = "cid", required = false) String consumerIds) {
 
-	private boolean isEmpty(StatsData sendData) {
+        Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		return sendData == null || sendData.getArrayData() == null || sendData.getArrayData().length == 0;
-	}
+        Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic);
 
-	private List<HighChartsWrapper> buildConsumerHighChartsWrapper(String topic, String yAxis, StatsData producerData,
-			List<ConsumerDataPair> consumerData, Set<String> interestConsumerIds) {
+        if (interestConsumerIds != null) {
 
-		int size = consumerData.size();
-		List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
+            List<String> remove = new LinkedList<String>();
+            for (String consumerId : statsData.keySet()) {
+                if (!interestConsumerIds.contains(consumerId)) {
+                    remove.add(consumerId);
+                }
+            }
 
-		for (int i = 0; i < consumerData.size(); i++) {
+            for (String consumerId : remove) {
+                statsData.remove(consumerId);
+            }
+        }
 
-			ConsumerDataPair dataPair = consumerData.get(i);
-			String currentConsumerId = dataPair.getConsumerId();
-			if (interestConsumerIds != null && !interestConsumerIds.contains(currentConsumerId)) {
-				continue;
-			}
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_ACCUMULATION, statsData);
+    }
 
-			List<StatsData> allStats = new LinkedList<StatsData>();
-			allStats.add(producerData);
-			allStats.add(dataPair.getSendData());
-			allStats.add(dataPair.getAckData());
-			result.add(ChartBuilder.getHighChart(getTopicDesc(topic), getConsumerIdDesc(currentConsumerId), yAxis,
-					allStats));
-		}
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/accu/get/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getTopicAccumulation(@PathVariable String topic,
+                                                        @RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
+                                                        @PathVariable String endTime) {
 
-		return result;
-	}
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getTopicAccumulation(topic, consumerIds);
+        }
 
-	private String getConsumerIdDesc(String consumerId) {
+        Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		if (consumerId.equals(MonitorData.TOTAL_KEY)) {
-			return "所有consumerId";
-		}
-		return consumerId;
-	}
+        final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+                * TIMESPAN_UNIT);
 
-	private String getTopicDesc(String topic) {
+        Map<String, StatsData> statsData = accumulationRetriever.getAccumulationForAllConsumerId(topic,
+                searchTime.getStartTime(), searchTime.getEndTime());
 
-		if (topic.equals(MonitorData.TOTAL_KEY)) {
-			return "所有topic";
-		}
-		return topic;
-	}
+        if (interestConsumerIds != null) {
 
-	private Object buildResponse(List<ResultEntry> entrys, String type) {
+            List<String> remove = new LinkedList<String>();
+            for (String consumerId : statsData.keySet()) {
+                if (!interestConsumerIds.contains(consumerId)) {
+                    remove.add(consumerId);
+                }
+            }
 
-		Map<String, Object> result = new HashMap<String, Object>();
+            for (String consumerId : remove) {
+                statsData.remove(consumerId);
+            }
+        }
 
-		if (!entrys.isEmpty()) {
-			Date first = entrys.get(0).getTime();
-			result = addTime(first);
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_ACCUMULATION, statsData);
+    }
 
-			result.put("entry", entrys);
+    @RequestMapping(value = "/console/monitor/topiclist/get", method = RequestMethod.POST)
+    @ResponseBody
+    public Set<String> getProducerDelayMonitor() throws IOException {
+        return allTopics();
+    }
 
-			return result;
-		}
+    private Set<String> allTopics() {
 
-		return addTime(new Date());
-	}
+        Set<String> producerTopics = producerDataRetriever.getTopics();
+        Set<String> consumerTopics = consumerDataRetriever.getTopics();
+        producerTopics.addAll(consumerTopics);
+        return producerTopics;
+    }
 
-	private Map<String, Object> addTime(Date first) {
+    @RequestMapping(value = "/console/monitor/producer/{topic}/ip/delay/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getTopicIpDelay(@PathVariable String topic) {
+        Map<String, StatsData> statsDatas = producerDataRetriever.getAllIpDelay(topic);
 
-		Map<String, Object> result = new HashMap<String, Object>();
+        return buildProducerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, statsDatas);
+    }
 
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(first);
-		calendar.clear(Calendar.MINUTE);
-		calendar.clear(Calendar.SECOND);
-		Date starttime = calendar.getTime();
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/ip/delay/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getConsumerIdIpDelay(@PathVariable final String topic,
+                                                        @RequestParam(value = "cid", required = true) String consumerId) throws Exception {
+        Map<String, ConsumerDataPair> consumerDelay = consumerDataRetriever.getAllIpDelay(topic, consumerId);
 
-		calendar.add(Calendar.MINUTE, 59);
-		calendar.add(Calendar.SECOND, 59);
-		Date stoptime = calendar.getTime();
+        return buildConsumerHighChartsWrapper(consumerId, Y_AXIS_TYPE_DELAY, consumerDelay);
 
-		result.put("starttime", starttime);
-		result.put("stoptime", stoptime);
+    }
 
-		return result;
-	}
 
-	private Date adjustTimeByStep(String date, int step) throws Exception {
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic,
+                                                           @RequestParam(value = "cid", required = false) String consumerIds) throws Exception {
 
-		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
-		String transferDate = date.replaceAll("Z", "+0800").replaceAll("\"", "");
-		Date newdate = formatter.parse(transferDate);
+        final Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(newdate);
-		calendar.add(Calendar.HOUR_OF_DAY, step);
+        SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(
+                CAT_TYPE, "getConsumerDelayMonitor");
 
-		return calendar.getTime();
-	}
+        return wrapper.doCallable(new Callable<List<HighChartsWrapper>>() {
 
-	private Date calStartTime(Date stop) {
+            @Override
+            public List<HighChartsWrapper> call() throws Exception {
 
-		Calendar calendarstart = Calendar.getInstance();
-		calendarstart.setTime(stop);
-		calendarstart.add(Calendar.MINUTE, -11);
-		calendarstart.clear(Calendar.SECOND);
-		calendarstart.clear(Calendar.MILLISECOND);
-		Date start = calendarstart.getTime();
+                StatsData producerData = producerDataRetriever.getSaveDelay(topic);
+                List<ConsumerDataPair> consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic);
 
-		return start;
-	}
+                return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay,
+                        interestConsumerIds);
+            }
+        });
 
-	@Override
-	public String getSide() {
-		return "delay";
-	}
+    }
 
-	private String subSide = "delay";
+    @RequestMapping(value = "/console/monitor/consumer/{topic}/delay/get/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getConsumerDelayMonitor(@PathVariable final String topic,
+                                                           @RequestParam(value = "cid", required = false) String consumerIds, @PathVariable String startTime,
+                                                           @PathVariable String endTime) throws Exception {
 
-	@Override
-	public String getSubSide() {
-		return subSide;
-	}
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getConsumerDelayMonitor(topic, consumerIds);
+        }
 
-	private static class SearchTime {
+        final Set<String> interestConsumerIds = getConsumerIds(consumerIds);
 
-		private long startTime;
+        final SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+                * TIMESPAN_UNIT);
 
-		private long endTime;
+        SwallowCallableWrapper<List<HighChartsWrapper>> wrapper = new CatCallableWrapper<List<HighChartsWrapper>>(
+                CAT_TYPE, "getConsumerDelayMonitor");
 
-		public long getStartTime() {
-			return startTime;
-		}
+        return wrapper.doCallable(new Callable<List<HighChartsWrapper>>() {
 
-		public void setStartTime(long startTime) {
-			this.startTime = startTime;
-		}
+            @Override
+            public List<HighChartsWrapper> call() throws Exception {
 
-		public long getEndTime() {
-			return endTime;
-		}
+                StatsData producerData = producerDataRetriever.getSaveDelay(topic, searchTime.getStartTime(),
+                        searchTime.getEndTime());
+                List<ConsumerDataPair> consumerDelay = consumerDataRetriever.getDelayForAllConsumerId(topic,
+                        searchTime.getStartTime(), searchTime.getEndTime());
 
-		public void setEndTime(long endTime) {
-			this.endTime = endTime;
-		}
+                return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, producerData, consumerDelay,
+                        interestConsumerIds);
+            }
+        });
 
-		public SearchTime getSearchTime(String startTime, String endTime, boolean isLimited, long maxTimeSpan) {
+    }
 
-			if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+    @RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}", method = RequestMethod.POST)
+    @ResponseBody
+    public Object getConsumerOrderMonitor(@PathVariable final int size) throws Exception {
+        List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size);
+        List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size);
+        List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+        orderStatsDatas.addAll(pOrderStatsDatas);
+        orderStatsDatas.addAll(cOrderStatsDatas);
+        return orderStatsDatas;
+    }
 
-				this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
-				this.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
-				if (isLimited) {
-					if (this.getEndTime() - this.getStartTime() > maxTimeSpan) {
-						this.setEndTime(this.getStartTime() + maxTimeSpan);
-					}
-				}
+    @RequestMapping(value = "/console/monitor/consumer/total/order/get/{size}/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public Object getConsumerOrderMonitor(@PathVariable final int size, @PathVariable String startTime,
+                                          @PathVariable String endTime) throws Exception {
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getConsumerOrderMonitor(size);
+        }
+        SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, false, maxOrderTimeSpan);
+        List<OrderStatsData> pOrderStatsDatas = producerDataRetriever.getOrder(size, searchTime.getStartTime(),
+                searchTime.getEndTime());
+        List<OrderStatsData> cOrderStatsDatas = consumerDataRetriever.getOrderForAllConsumerId(size,
+                searchTime.getStartTime(), searchTime.getEndTime());
+        List<OrderStatsData> orderStatsDatas = new ArrayList<OrderStatsData>();
+        orderStatsDatas.addAll(pOrderStatsDatas);
+        orderStatsDatas.addAll(cOrderStatsDatas);
+        return orderStatsDatas;
+    }
 
-			} else {
-				if (StringUtils.isBlank(startTime) && StringUtils.isNotBlank(endTime)) {
-					this.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
-					this.setStartTime(this.getEndTime() - maxTimeSpan);
-				} else if (StringUtils.isNotBlank(startTime) && StringUtils.isBlank(endTime)) {
-					this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
-					if (isLimited) {
-						this.setEndTime(this.getStartTime() + maxTimeSpan);
-					} else {
-						this.setEndTime(System.currentTimeMillis());
-					}
-				}
-			}
-			return this;
-		}
+    private List<HighChartsWrapper> buildStatsHighChartsWrapper(String yAxis, Map<String, StatsData> stats) {
 
-	}
+        List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(stats.size());
+        for (Entry<String, StatsData> entry : stats.entrySet()) {
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		initLionConfig();
-	}
+            String key = entry.getKey();
+            StatsData statsData = entry.getValue();
 
-	public int getQueryTimeSpan() {
-		if (queryTimeSpan != null) {
-			return queryTimeSpan.intValue();
-		}
-		return 3;
-	}
+            result.add(ChartBuilder.getHighChart(key, "", yAxis, statsData));
+
+        }
+
+        return result;
+    }
+
+    private List<HighChartsWrapper> buildConsumerHighChartsWrapper(String yAxis, Map<String, ConsumerDataPair> serverQpx) {
+
+        int size = serverQpx.size();
+        List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
+
+        for (Entry<String, ConsumerDataPair> entry : serverQpx.entrySet()) {
+
+            String ip = entry.getKey();
+            ConsumerDataPair dataPair = entry.getValue();
+            List<StatsData> allStats = new LinkedList<StatsData>();
+            if (isEmpty(dataPair.getSendData()) && isEmpty(dataPair.getAckData())) {
+                continue;
+            }
+            allStats.add(dataPair.getSendData());
+            allStats.add(dataPair.getAckData());
+            result.add(ChartBuilder.getHighChart(ip, "", yAxis, allStats));
+        }
+
+        return result;
+    }
+
+    private boolean isEmpty(StatsData sendData) {
+
+        return sendData == null || sendData.getArrayData() == null || sendData.getArrayData().length == 0;
+    }
+
+    private List<HighChartsWrapper> buildConsumerHighChartsWrapper(String topic, String yAxis, StatsData producerData,
+                                                                   List<ConsumerDataPair> consumerData, Set<String> interestConsumerIds) {
+
+        int size = consumerData.size();
+        List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
+
+        for (int i = 0; i < consumerData.size(); i++) {
+
+            ConsumerDataPair dataPair = consumerData.get(i);
+            String currentConsumerId = dataPair.getConsumerId();
+            if (interestConsumerIds != null && !interestConsumerIds.contains(currentConsumerId)) {
+                continue;
+            }
+
+            List<StatsData> allStats = new LinkedList<StatsData>();
+            allStats.add(producerData);
+            allStats.add(dataPair.getSendData());
+            allStats.add(dataPair.getAckData());
+            result.add(ChartBuilder.getHighChart(getTopicDesc(topic, yAxis), getConsumerIdDesc(topic, currentConsumerId, yAxis), yAxis,
+                    allStats));
+        }
+
+        return result;
+    }
+
+    private List<HighChartsWrapper> buildProducerHighChartsWrapper(String topic, String yAxis, Map<String, StatsData> statsDatas) {
+        int size = statsDatas.size();
+        List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
+
+        for (Entry<String, StatsData> entry : statsDatas.entrySet()) {
+
+            String ip = entry.getKey();
+            StatsData statsData = entry.getValue();
+            result.add(ChartBuilder.getHighChart(topic, ip, yAxis, statsData));
+        }
+
+        return result;
+    }
+
+    private List<HighChartsWrapper> buildConsumerHighChartsWrapper(String consumerId, String yAxis, Map<String, ConsumerDataPair> statsDataPairs) {
+        int size = statsDataPairs.size();
+        List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
+
+        for (Entry<String, ConsumerDataPair> entry : statsDataPairs.entrySet()) {
+
+            String ip = entry.getKey();
+            ConsumerDataPair dataPair = entry.getValue();
+            List<StatsData> allStats = new LinkedList<StatsData>();
+            if (isEmpty(dataPair.getSendData()) && isEmpty(dataPair.getAckData())) {
+                continue;
+            }
+            allStats.add(dataPair.getSendData());
+            allStats.add(dataPair.getAckData());
+            result.add(ChartBuilder.getHighChart(consumerId, ip, yAxis, allStats));
+        }
+
+        return result;
+    }
+
+    private String getConsumerIdDesc(String topic, String consumerId, String yAxis) {
+
+        if (consumerId.equals(MonitorData.TOTAL_KEY)) {
+            return "所有consumerId";
+        }
+        String result = consumerId;
+        if (Y_AXIS_TYPE_QPS.equals(yAxis)) {
+            result = "<a href=\"/console/monitor/consumer/" + topic + "/ip/qps?cid=" + consumerId + "\">" + consumerId + "</a>";
+        } else {
+            result = "<a href=\"/console/monitor/consumer/" + topic + "/ip/delay?cid=" + consumerId + "\">" + consumerId + "</a>";
+        }
+
+        return result;
+    }
+
+    private String getTopicDesc(String topic, String yAxis) {
+
+        if (topic.equals(MonitorData.TOTAL_KEY)) {
+            return "所有topic";
+        }
+        String result = topic;
+        if (Y_AXIS_TYPE_QPS.equals(yAxis)) {
+            result = "<a href=\"/console/monitor/producer/" + topic + "/ip/qps\">" + topic + "</a>";
+        } else {
+            result = "<a href=\"/console/monitor/producer/" + topic + "/ip/delay\">" + topic + "</a>";
+        }
+        return result;
+    }
+
+    private Object buildResponse(List<ResultEntry> entrys, String type) {
+
+        Map<String, Object> result = new HashMap<String, Object>();
+
+        if (!entrys.isEmpty()) {
+            Date first = entrys.get(0).getTime();
+            result = addTime(first);
+
+            result.put("entry", entrys);
+
+            return result;
+        }
+
+        return addTime(new Date());
+    }
+
+    private Map<String, Object> addTime(Date first) {
+
+        Map<String, Object> result = new HashMap<String, Object>();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(first);
+        calendar.clear(Calendar.MINUTE);
+        calendar.clear(Calendar.SECOND);
+        Date starttime = calendar.getTime();
+
+        calendar.add(Calendar.MINUTE, 59);
+        calendar.add(Calendar.SECOND, 59);
+        Date stoptime = calendar.getTime();
+
+        result.put("starttime", starttime);
+        result.put("stoptime", stoptime);
+
+        return result;
+    }
+
+    private Date adjustTimeByStep(String date, int step) throws Exception {
+
+        SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+        String transferDate = date.replaceAll("Z", "+0800").replaceAll("\"", "");
+        Date newdate = formatter.parse(transferDate);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(newdate);
+        calendar.add(Calendar.HOUR_OF_DAY, step);
+
+        return calendar.getTime();
+    }
+
+    private Date calStartTime(Date stop) {
+
+        Calendar calendarstart = Calendar.getInstance();
+        calendarstart.setTime(stop);
+        calendarstart.add(Calendar.MINUTE, -11);
+        calendarstart.clear(Calendar.SECOND);
+        calendarstart.clear(Calendar.MILLISECOND);
+        Date start = calendarstart.getTime();
+
+        return start;
+    }
+
+    @Override
+    public String getSide() {
+        return "delay";
+    }
+
+    private String subSide = "delay";
+
+    @Override
+    public String getSubSide() {
+        return subSide;
+    }
+
+    private static class SearchTime {
+
+        private long startTime;
+
+        private long endTime;
+
+        public long getStartTime() {
+            return startTime;
+        }
+
+        public void setStartTime(long startTime) {
+            this.startTime = startTime;
+        }
+
+        public long getEndTime() {
+            return endTime;
+        }
+
+        public void setEndTime(long endTime) {
+            this.endTime = endTime;
+        }
+
+        public SearchTime getSearchTime(String startTime, String endTime, boolean isLimited, long maxTimeSpan) {
+
+            if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+
+                this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
+                this.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
+                if (isLimited) {
+                    if (this.getEndTime() - this.getStartTime() > maxTimeSpan) {
+                        this.setEndTime(this.getStartTime() + maxTimeSpan);
+                    }
+                }
+
+            } else {
+                if (StringUtils.isBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+                    this.setEndTime(DateUtil.convertStrToDate(endTime).getTime());
+                    this.setStartTime(this.getEndTime() - maxTimeSpan);
+                } else if (StringUtils.isNotBlank(startTime) && StringUtils.isBlank(endTime)) {
+                    this.setStartTime(DateUtil.convertStrToDate(startTime).getTime());
+                    if (isLimited) {
+                        this.setEndTime(this.getStartTime() + maxTimeSpan);
+                    } else {
+                        this.setEndTime(System.currentTimeMillis());
+                    }
+                }
+            }
+            return this;
+        }
+
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        initLionConfig();
+    }
+
+    public int getQueryTimeSpan() {
+        if (queryTimeSpan != null) {
+            return queryTimeSpan.intValue();
+        }
+        return 3;
+    }
 
 }

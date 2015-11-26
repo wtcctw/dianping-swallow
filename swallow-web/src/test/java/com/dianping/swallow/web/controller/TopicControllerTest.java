@@ -1,11 +1,9 @@
 package com.dianping.swallow.web.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import java.io.IOException;
-
-import javax.annotation.Resource;
-
+import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.LionException;
+import com.dianping.swallow.web.service.TopicResourceService;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.NameValuePair;
@@ -21,10 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.dianping.lion.EnvZooKeeperConfig;
-import com.dianping.lion.client.ConfigCache;
-import com.dianping.lion.client.LionException;
-import com.dianping.swallow.web.service.TopicResourceService;
+import javax.annotation.Resource;
+import java.io.IOException;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
  * @author mingdongli
@@ -35,9 +33,6 @@ import com.dianping.swallow.web.service.TopicResourceService;
 @ContextConfiguration(locations = { "classpath:applicationContext.xml" })
 @WebAppConfiguration
 public class TopicControllerTest {
-
-	private static final String AUTHORIZATION = "Authorization";
-	private static final String USERNAME = "yapu.wang";
 
 	@Autowired
 	private WebApplicationContext wac;

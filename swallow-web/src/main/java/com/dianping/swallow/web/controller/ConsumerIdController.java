@@ -2,8 +2,11 @@ package com.dianping.swallow.web.controller;
 
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.ConsumerIdQueryDto;
+import com.dianping.swallow.web.controller.listener.ResourceListener;
+import com.dianping.swallow.web.controller.listener.ResourceObserver;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
+import com.dianping.swallow.web.model.resource.BaseResource;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
@@ -15,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,13 +28,15 @@ import java.util.Map;
  *         2015年8月27日下午3:33:36
  */
 @Controller
-public class ConsumerIdController extends AbstractMenuController {
+public class ConsumerIdController extends AbstractMenuController implements ResourceObserver {
 
     @Resource(name = "consumerIdResourceService")
     private ConsumerIdResourceService consumerIdResourceService;
 
     @Autowired
     private UserUtils userUtils;
+
+    private List<ResourceListener> listeners = new ArrayList<ResourceListener>();
 
     @RequestMapping(value = "/console/consumerid")
     public ModelAndView topicView() {
@@ -63,9 +69,13 @@ public class ConsumerIdController extends AbstractMenuController {
 
     @RequestMapping(value = "/console/consumerid/update", method = RequestMethod.POST)
     @ResponseBody
-    public Boolean updateTopic(@RequestBody ConsumerIdResource consumerIdResource){
+    public Boolean updateTopic(@RequestBody ConsumerIdResource consumerIdResource) {
 
-        return consumerIdResourceService.update(consumerIdResource);
+        boolean result = consumerIdResourceService.update(consumerIdResource);
+        if (result) {
+            doUpdateNotify(consumerIdResource);
+        }
+        return result;
     }
 
     @RequestMapping(value = "/console/consumerid/alarm", method = RequestMethod.GET)
@@ -81,7 +91,11 @@ public class ConsumerIdController extends AbstractMenuController {
         if (consumerIdResourceList != null && !consumerIdResourceList.isEmpty()) {
             ConsumerIdResource consumerIdResource = consumerIdResourceList.get(0);
             consumerIdResource.setAlarm(alarm);
-            return consumerIdResourceService.update(consumerIdResource);
+            boolean result = consumerIdResourceService.update(consumerIdResource);
+            if (result) {
+                doUpdateNotify(consumerIdResource);
+            }
+            return result;
         }
 
         return Boolean.FALSE;
@@ -94,6 +108,10 @@ public class ConsumerIdController extends AbstractMenuController {
 
         int result = consumerIdResourceService.remove(topic, consumerId);
         if (result > 0) {
+            ConsumerIdResource consumerIdResource = new ConsumerIdResource();
+            consumerIdResource.setTopic(topic);
+            consumerIdResource.setConsumerId(consumerId);
+            doDeleteNotify(consumerIdResource);
             return ResponseStatus.SUCCESS.getStatus();
         } else {
             return ResponseStatus.MONGOWRITE.getStatus();
@@ -160,7 +178,11 @@ public class ConsumerIdController extends AbstractMenuController {
                     return false;
                 }
                 consumerIdResource.setConsumerIpInfos(ipInfos);
-                return consumerIdResourceService.insert(consumerIdResource);
+                boolean result = consumerIdResourceService.insert(consumerIdResource);
+                if (result) {
+                    doUpdateNotify(consumerIdResource);
+                }
+                return result;
             }
         }
 
@@ -177,5 +199,24 @@ public class ConsumerIdController extends AbstractMenuController {
     @Override
     protected String getMenu() {
         return "consumerid";
+    }
+
+    @Override
+    public void doRegister(ResourceListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void doUpdateNotify(BaseResource resource) {
+        for (ResourceListener listener : listeners) {
+            listener.doUpdateNotify(resource);
+        }
+    }
+
+    @Override
+    public void doDeleteNotify(BaseResource resource) {
+        for (ResourceListener listener : listeners) {
+            listener.doDeleteNotify(resource);
+        }
     }
 }

@@ -1,10 +1,8 @@
 package com.dianping.swallow.web.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import java.io.IOException;
-
+import com.dianping.lion.EnvZooKeeperConfig;
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.LionException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.NameValuePair;
@@ -24,9 +22,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.dianping.lion.EnvZooKeeperConfig;
-import com.dianping.lion.client.ConfigCache;
-import com.dianping.lion.client.LionException;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
  * @author mingdongli
@@ -45,7 +44,7 @@ public class TopicApplyControllerTest {
 
 	private boolean autotest;
 
-	private String json = "{\"topic\":\"lmdyyh_swallow_test\",\"approver\":\"hongjun.zhong\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":false,\"type\":\"一般消息队列\"}";
+	private String json = "{\"topic\":\"lmdyyh_swallow_test\",\"approver\":\"hongjun.zhong\",\"size\":1,\"amount\":50,\"applicant\":\"yapu.wang\",\"test\":true,\"type\":\"一般消息队列\"}";
 
 	@Before
 	public void setUp() throws Exception {

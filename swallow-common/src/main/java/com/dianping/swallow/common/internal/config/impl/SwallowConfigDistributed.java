@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
-import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.exception.SwallowAlertException;
 import com.dianping.swallow.common.internal.util.StringUtils;
 
@@ -20,7 +20,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 	
 	public static final String TOPIC_CFG_PREFIX = "swallow.topiccfg";//swallow.topiccfg.topc1='';
 	
-	private Map<String, TopicConfig> topicCfgs = new ConcurrentHashMap<String, SwallowConfig.TopicConfig>();
+	private Map<String, TopicConfig> topicCfgs = new ConcurrentHashMap<String, TopicConfig>();
 	
 	private JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
 	

@@ -1,8 +1,10 @@
 package com.dianping.swallow.common.server.monitor.data;
 
-import java.util.Set;
-
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
+import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+
+import java.util.NavigableMap;
+import java.util.Set;
 
 /**
  * @author mengwenchao
@@ -12,11 +14,11 @@ import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 public interface 	MapRetriever {
 
 	Set<String> getKeys(CasKeys keys, StatisType type);
-	
-	Object getValue(CasKeys keys, StatisType type);
 
 	Set<String> getKeys(CasKeys keys);
-	
-	Object getValue(CasKeys keys);
+
+	NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType type);
+
+	NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType type, Long startKey, Long stopKey);
 
 }

@@ -7,9 +7,9 @@ import org.bson.types.BSONTimestamp;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
-import com.dianping.swallow.common.internal.dao.MongoManager;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoManager;
 import com.dianping.swallow.common.internal.util.DateUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mongodb.BasicDBObject;
@@ -40,8 +40,8 @@ public class AbstractMongoUtil {
 	
 	public AbstractMongoUtil(){
 		
-		mongoManager = new DefaultMongoManager("swallow.mongo.consumerServerURI");
-		dao = new MessageDAOImpl(mongoManager);
+		mongoManager = new DefaultMongoManager();
+		dao = new MongoMessageDAO(mongoManager);
 	}
 		
 	public long count(String topic, Date start, Date end, String type){

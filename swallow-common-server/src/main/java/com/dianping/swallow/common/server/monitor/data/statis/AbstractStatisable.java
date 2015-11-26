@@ -57,16 +57,17 @@ public abstract class AbstractStatisable<V> implements Statisable<V>{
 
 	@Override
 	public void merge(String key, KeyMergeable merge) {
+		throw new UnsupportedOperationException("merge not supprot");
 	}
 
 	@Override
 	public void merge(Mergeable merge) {
+		throw new UnsupportedOperationException("merge not supprot");
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException{
-		AbstractStatisable clone = (AbstractStatisable) super.clone();
-		return clone;
+		throw new CloneNotSupportedException("clone not supprot");
 	}
 
 }

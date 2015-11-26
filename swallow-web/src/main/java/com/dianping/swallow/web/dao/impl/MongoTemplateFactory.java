@@ -94,6 +94,7 @@ public class MongoTemplateFactory {
 		return new MongoTemplate(new SimMongoDbFactory(mongo, statsDataMongoDbName));
 	}
 
+	@SuppressWarnings("unused")
 	private synchronized void createCappedCollection(MongoTemplate mongoTemplate, String collectionName, long size,
 			long max) {
 
@@ -126,6 +127,7 @@ public class MongoTemplateFactory {
 		return new MongoTemplate(new SimMongoDbFactory(mongo, webMongoDbName));
 	}
 
+	@SuppressWarnings("unused")
 	private MongoTemplate createMongoTemplate(String mongoDbName) {
 
 		if (logger.isInfoEnabled()) {

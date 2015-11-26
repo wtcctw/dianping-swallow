@@ -3,14 +3,12 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
+import com.dianping.swallow.common.internal.monitor.impl.AbstractMapMergeable;
+import com.dianping.swallow.common.internal.monitor.impl.MapMergeableImpl;
 import com.dianping.swallow.common.internal.util.MapUtil;
-import com.dianping.swallow.common.server.monitor.data.QPX;
-import com.dianping.swallow.common.server.monitor.data.StatisRetriever;
-import com.dianping.swallow.common.server.monitor.data.StatisType;
-import com.dianping.swallow.common.server.monitor.data.Statisable;
+import com.dianping.swallow.common.server.monitor.data.*;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerServerData;
-import com.dianping.swallow.common.server.monitor.data.structure.ProducerTopicData;
+import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 
 import java.util.*;
@@ -30,9 +28,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
 
     protected Map<String, S> servers = new ConcurrentHashMap<String, S>();
 
-//	@JsonIgnore
-//	protected   S 			 total = null;
-
     protected final Set<StatisType> supportedTypes = new HashSet<StatisType>();
 
     public AbstractAllData(StatisType... types) {
@@ -40,7 +35,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         for (StatisType type : types) {
             supportedTypes.add(type);
         }
-        //total = MapUtil.getOrCreate(servers, MonitorData.TOTAL_KEY, getStatisClass());
     }
 
 
@@ -65,8 +59,6 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         S statis = MapUtil.getOrCreate(servers, serverIp, getStatisClass());
 
         statis.add(time, (T) added.getServerData());
-
-        //total.add(time, (T) added.getServerData());
     }
 
     protected abstract Class<? extends S> getStatisClass();
@@ -131,37 +123,49 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
     @Override
     public NavigableMap<Long, Long> getDelay(StatisType type) {
 
-        checkSupported(type);
-        return getDelayForTopic(MonitorData.TOTAL_KEY, type);
+        return convertStatisData(getDelayAndQps(type));
     }
 
     @Override
-    public NavigableMap<Long, QpxData> getQpx(StatisType type) {
+    public NavigableMap<Long, StatisData> getQpx(StatisType type) {
 
-        checkSupported(type);
-        return getQpxForTopic(MonitorData.TOTAL_KEY, type);
+        return getDelayAndQps(type);
     }
 
+    @Override
+    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type) {
+        return getDelayAndQps(type, INFINITY, INFINITY);
+    }
 
     @Override
-    public NavigableMap<Long, QpxData> getQpxForTopic(String topic, StatisType type) {
+    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type, Long startKey, Long stopKey) {
+        return getStatisDataForTopic(MonitorData.TOTAL_KEY, type, startKey, stopKey);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getStatisDataForTopic(String topic, StatisType type) {
+
+        return getStatisDataForTopic(topic, type, INFINITY, INFINITY);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getStatisDataForTopic(String topic, StatisType type, Long startKey, Long stopKey) {
 
         checkSupported(type);
 
-        NavigableMap<Long, QpxData> result = new ConcurrentSkipListMap<Long, QpxData>();
+        AbstractMapMergeable<Long, StatisData> mapMergeableImpl = new MapMergeableImpl<Long, StatisData>();
         Statisable<?> statis;
         for (S s : servers.values()) {
             statis = s.getValue(topic);
             if (statis != null) {
-                NavigableMap<Long, QpxData> qps = statis.getQpx(type);
-                MapUtil.mergeMap(result, qps);
+                NavigableMap<Long, StatisData> delay = statis.getDelayAndQps(type, startKey, stopKey);
+                mapMergeableImpl.merge(delay);
             }
         }
 
+        NavigableMap<Long, StatisData> result = mapMergeableImpl.getToMerge();
         return result.isEmpty() ? null : result;
-
     }
-
 
     public Set<String> getKeys(CasKeys keys, StatisType type) {
 
@@ -170,11 +174,11 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         }
 
         String key = keys.getNextKey();
-        if(MonitorData.TOTAL_KEY.equals(key)){
+        if (MonitorData.TOTAL_KEY.equals(key)) {
             Set<String> result = new HashSet<String>();
-            for(S s : servers.values()){
+            for (S s : servers.values()) {
                 Set<String> items = s.getKeys(keys, type);
-                if(items != null){
+                if (items != null) {
                     result.addAll(items);
                 }
                 keys.reset();
@@ -190,49 +194,10 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         return server.getKeys(keys, type);
     }
 
-    public Object getValue(CasKeys keys, StatisType type) {
-
-        if (!keys.hasNextKey()) {
-            throw new UnfoundKeyException(keys.toString());
-        }
-
-        String key = keys.getNextKey();
-        S server;
-        if(MonitorData.TOTAL_KEY.equals(key)){
-            server = (S) getTotalValue();
-        }else{
-            server = servers.get(key);
-        }
-
-        if (server == null) {
-            throw new UnfoundKeyException(key);
-        }
-
-        if (!keys.hasNextKey()) {
-            return server;
-        }
-        return server.getValue(keys, type);
-
-    }
-
-    private Object getTotalValue(){
-        S result = createValue();
-        for(S s : servers.values()){
-            result.merge(s);
-        }
-        return result;
-    }
-
     public Set<String> getKeys(CasKeys keys) {
 
         return getKeys(keys, null);
     }
-
-    public Object getValue(CasKeys keys) {
-
-        return getValue(keys, null);
-    }
-
 
     private void checkSupported(StatisType type) {
         if (!supportedTypes.contains(type)) {
@@ -240,72 +205,19 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         }
     }
 
-
     @Override
-    public NavigableMap<Long, Long> getDelayForTopic(String topic, StatisType type) {
+    public Map<String, NavigableMap<Long, StatisData>> getQpxForServers(StatisType type) {
 
         checkSupported(type);
-
-        NavigableMap<Long, Long> result = new ConcurrentSkipListMap<Long, Long>();
-        Statisable<?> statis;
-        for (S s : servers.values()) {
-            statis = s.getValue(topic);
-            if (statis != null) {
-                NavigableMap<Long, Long> qps = statis.getDelay(type);
-                MapUtil.mergeMapOfTypeLong(result, qps);
-            }
-        }
-
-        return result.isEmpty() ? null : result;
-    }
-
-    @Override
-    public Map<String, NavigableMap<Long, QpxData>> getQpxForServers(StatisType type) {
-
-        checkSupported(type);
-        HashMap<String, NavigableMap<Long, QpxData>> result = new HashMap<String, NavigableMap<Long, QpxData>>();
+        HashMap<String, NavigableMap<Long, StatisData>> result = new HashMap<String, NavigableMap<Long, StatisData>>();
         for (Entry<String, S> entry : servers.entrySet()) {
 
             String serverIp = entry.getKey();
             S pssd = entry.getValue();
-            result.put(serverIp, pssd.getQpx(type));
+            result.put(serverIp, pssd.getDelayAndQps(type));
         }
 
         return result;
-    }
-
-
-    protected Map<String, NavigableMap<Long, QpxData>> getAllQpx(StatisType type, String topic, boolean includeTotal) {
-
-        ConsumerTopicStatisData ctss;
-        for (S s : servers.values()) {
-            ctss = (ConsumerTopicStatisData) s.getValue(topic);
-            if (ctss != null) {
-                return ctss.allQpx(type, includeTotal);
-            }
-
-        }
-        return null;
-    }
-
-    protected Map<String, NavigableMap<Long, Long>> getAllDelay(StatisType type, String topic, boolean includeTotal) {
-
-        ConsumerTopicStatisData ctss;
-        for (S s : servers.values()) {
-            ctss = (ConsumerTopicStatisData) s.getValue(topic);
-            if (ctss != null) {
-                return ctss.allDelay(type, includeTotal);
-            }
-
-        }
-        return null;
-//		ConsumerTopicStatisData ctss = (ConsumerTopicStatisData) total.getValue(topic);
-//
-//		if(ctss == null){
-//			return null;
-//		}
-//
-//		return ctss.allDelay(type, includeTotal);
     }
 
     public String toString(String key) {
@@ -314,12 +226,107 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException{
-        AbstractAllData clone = (AbstractAllData) super.clone();
-        clone.servers = new ConcurrentHashMap<String, S>(this.servers);
-        return clone;
+    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType type, Long startKey, Long stopKey) {
+        if (!keys.hasNextKey()) {
+            throw new UnfoundKeyException(keys.toString());
+        }
+
+        String key = keys.getNextKey();
+        S server;
+        if (MonitorData.TOTAL_KEY.equals(key)) {
+            AbstractMapMergeable<Long, StatisData> mapMergeableImpl = new MapMergeableImpl<Long, StatisData>();
+            for (S s : servers.values()) {
+                NavigableMap<Long, StatisData> value = s.getStatisData(keys, type, startKey, stopKey);
+                mapMergeableImpl.merge(value);
+                keys.reset();
+            }
+            return mapMergeableImpl.getToMerge();
+        } else {
+            server = servers.get(key);
+        }
+
+        if (server == null) {
+            throw new UnfoundKeyException(key);
+        }
+
+        if (!keys.hasNextKey()) {
+            return server.getDelayAndQps(type, startKey, stopKey);
+        }
+        return server.getStatisData(keys, type, startKey, stopKey);
     }
 
-    public abstract S createValue();
+    @Override
+    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType type) {
+        return getStatisData(keys, type, INFINITY, INFINITY);
+    }
+
+    @Override
+    public NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type) {
+        return getDelayValue(keys, type, INFINITY, INFINITY);
+    }
+
+    @Override
+    public NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type, Long startKey, Long stopKey) {
+        NavigableMap<Long, StatisData> statisData = getStatisData(keys, type, startKey, stopKey);
+        return convertStatisData(statisData);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getQpsValue(CasKeys keys, StatisType type) {
+        return getQpsValue(keys, type, INFINITY, INFINITY);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getQpsValue(CasKeys keys, StatisType type, Long startKey, Long stopKey) {
+        return getStatisData(keys, type, startKey, stopKey);
+    }
+
+    private NavigableMap<Long, StatisData> getMarginValue(CasKeys keys, StatisType type, DataSpan dataSpan){
+        if (DataSpan.LEFTMARGIN == dataSpan) {
+            return getStatisData(keys, type, Long.MIN_VALUE, INFINITY);
+        } else if (DataSpan.RIGHTMARGIN == dataSpan) {
+            return getStatisData(keys, type, INFINITY, Long.MAX_VALUE);
+        }else{
+            throw new UnsupportedOperationException("unsupported type");
+        }
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getFirstValue(CasKeys keys, StatisType type){
+        return getMarginValue(keys, type, DataSpan.LEFTMARGIN);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getLastValue(CasKeys keys, StatisType type){
+        return getMarginValue(keys, type, DataSpan.RIGHTMARGIN);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getFirstValueGreaterOrEqualThan(CasKeys keys, StatisType type, Long startKey){
+        return getStatisData(keys, type, startKey, Long.MAX_VALUE);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getLastValueLessOrEqualThan(CasKeys keys, StatisType type, Long stopKey){
+        return getStatisData(keys, type, Long.MIN_VALUE, stopKey);
+    }
+
+    protected abstract S createValue();
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("clone not supported");
+    }
+
+    protected NavigableMap<Long, Long> convertStatisData(NavigableMap<Long, StatisData> map) {
+        if (map == null) {
+            return null;
+        }
+        NavigableMap<Long, Long> resultMap = new ConcurrentSkipListMap<Long, Long>();
+        for (Map.Entry<Long, StatisData> entry : map.entrySet()) {
+            resultMap.put(entry.getKey(), entry.getValue().getDelay());
+        }
+        return resultMap;
+    }
 
 }

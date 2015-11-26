@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.config.LionUtil;
-import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
+import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionUtilImpl;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.server.ConsumerHAServer;

@@ -13,6 +13,7 @@ import java.util.Date;
  *
  * 2015年4月22日 上午12:06:15
  */
+@SuppressWarnings("unused")
 public class Message implements Comparable<Message> {
 
 	@Id
@@ -25,14 +26,7 @@ public class Message implements Comparable<Message> {
    private  String        					p;
    private  String							_p;
    private  String        					t;
-   private  String        					si;  //SOURCE_IP
-   private  String          				mo_id; //message ID
    private  String          				mid; //message ID
-   private  String     						gtstring;
-   private  String     						ststring;
-   private  String							retransmit;
-   
-
    public static final String  				TIMEFORMAT      = "yyyy-MM-dd HH:mm:ss";  //H means 24 hours
   
    
@@ -70,7 +64,7 @@ public class Message implements Comparable<Message> {
 	
 	public Message setMo_id(BSONTimestamp ts) {
 		long tmp = MongoUtils.BSONTimestampToLong(ts);
-		this.mo_id = Long.toString(tmp);
+		Long.toString(tmp);
 		return this;
 	}
 
@@ -139,24 +133,22 @@ public class Message implements Comparable<Message> {
 	}
 	
 	public Message setSi(String si) {
-		this.si = si;
 		return this;
 	}
 	
 	public Message setStstring(BSONTimestamp ts) {
 		int seconds = ts.getTime();
 		long millions = new Long(seconds)*1000;
-		this.ststring = new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
+		new SimpleDateFormat(TIMEFORMAT).format(new Date(millions));
 		return this;
 	}
 	
 	public Message setGtstring(Date gt) {
-		this.gtstring = new SimpleDateFormat(TIMEFORMAT).format(gt);
+		new SimpleDateFormat(TIMEFORMAT).format(gt);
 		return this;
 	}
 	
 	public Message setRetransmit(String retransmit) {
-		this.retransmit = retransmit;
 		return this;
 	}
 

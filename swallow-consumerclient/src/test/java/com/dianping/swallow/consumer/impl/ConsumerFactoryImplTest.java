@@ -14,6 +14,7 @@ import org.junit.Test;
 public class ConsumerFactoryImplTest {
 	
 	private ConsumerFactoryImpl consumerFactoryImpl = (ConsumerFactoryImpl) ConsumerFactoryImpl.getInstance();
+		
 	
 	@Test
 	public void testlionValue2Map(){

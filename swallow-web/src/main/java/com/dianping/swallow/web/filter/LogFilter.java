@@ -1,9 +1,14 @@
 package com.dianping.swallow.web.filter;
 
+import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.filter.wrapper.BufferedRequestWrapper;
 import com.dianping.swallow.web.filter.wrapper.ByteArrayPrintWriter;
 import com.dianping.swallow.web.model.log.Log;
+import com.dianping.swallow.web.model.resource.TopicApplyResource;
+import com.dianping.swallow.web.service.TopicApplyService;
+import com.dianping.swallow.web.util.JsonUtil;
+import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,17 +36,24 @@ public class LogFilter implements Filter {
 
     private UserUtils extractUsernameUtils;
 
+    private TopicApplyService topicApplyService;
+
     private List<Pattern> excludePatterns = new LinkedList<Pattern>();
 
     private Set<String> includePatterns = new HashSet<String>();
 
-    private Logger logger = LoggerFactory.getLogger(LogFilter.class);
+    private static final String TOPIC_APPLY = "/api/topic/apply";
+
+    public static final String TOPIC_APPLY_ATTR = "topicApplyResource";
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void init(FilterConfig fConfig) throws ServletException {
 
         this.context = fConfig.getServletContext();
         ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
         this.extractUsernameUtils = ctx.getBean(UserUtils.class);
+        this.topicApplyService = ctx.getBean(TopicApplyService.class);
 
         String excludeUrl = fConfig.getInitParameter("excludeURLs");
         String[] excludeUrls = excludeUrl.split(",");
@@ -91,6 +103,13 @@ public class LogFilter implements Filter {
 
         };
 
+        TopicApplyResource topicApplyResource = null;
+        if (TOPIC_APPLY.equals(uri)) {
+            topicApplyResource = new TopicApplyResource();
+            topicApplyResource.setCreateTime(new Date());
+            requestWrapper.setAttribute(TOPIC_APPLY_ATTR, topicApplyResource);
+        }
+
         chain.doFilter(requestWrapper, responseWrapper);
 
         byte[] bytes = pw.toByteArray();
@@ -111,14 +130,26 @@ public class LogFilter implements Filter {
             Map<String, String[]> param = req.getParameterMap();
             if (param != null) {
                 StringBuilder content = new StringBuilder(" {");
-                for(Map.Entry<String, String[]> entry : param.entrySet()){
+                for (Map.Entry<String, String[]> entry : param.entrySet()) {
                     String[] value = entry.getValue();
                     content.append(entry.getKey()).append(" = ").append(StringUtils.join(value, ",")).append(" ,");
                 }
                 int length = content.length();
-                requestContent = content.substring(0, length - 2) + " }";
+
+                if(length >1){
+                    requestContent = content.substring(0, length - 2) + " }";
+                }else{
+                    requestContent = content.toString() + " }";
+                }
             }
         }
+
+        if (topicApplyResource != null) {
+            ValidatorFilterResult status = JsonUtil.fromJson(result, ValidatorFilterResult.class);
+            topicApplyResource.setResponseStatus(ResponseStatus.findByStatus(status.getStatus()));
+            topicApplyService.insert(topicApplyResource);
+        }
+
         log.setParameter(requestContent);
         log.setUrl(uri);
         log.setUser(username);
@@ -132,13 +163,26 @@ public class LogFilter implements Filter {
     }
 
     public void destroy() {
+        // ignore
     }
 
     private boolean matchIncludeUrl(String uri) {
 
         for (String end : includePatterns) {
             if (uri.contains(end)) {
-                return true;
+                int start = uri.indexOf(end);
+                if (start != 0) {
+                    if (uri.charAt(start - 1) == '/') {
+                        if (start + end.length() == uri.length()) {
+                            return true;
+                        } else {
+                            char c = uri.charAt(start + end.length());
+                            if (c == '/' || c == '?') {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -149,7 +193,7 @@ public class LogFilter implements Filter {
         Iterator<Pattern> patternIter = excludePatterns.iterator();
 
         while (patternIter.hasNext()) {
-            Pattern p = (Pattern) patternIter.next();
+            Pattern p = patternIter.next();
             Matcher m = p.matcher(uri);
             if (m.matches()) {
                 return true;

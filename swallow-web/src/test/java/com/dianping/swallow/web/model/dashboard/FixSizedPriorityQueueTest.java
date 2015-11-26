@@ -1,24 +1,23 @@
 package com.dianping.swallow.web.model.dashboard;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-
-import junit.framework.Assert;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 import com.dianping.swallow.web.dashboard.comparator.AccuComparator;
 import com.dianping.swallow.web.dashboard.comparator.AckComparator;
 import com.dianping.swallow.web.dashboard.comparator.ConprehensiveComparator;
 import com.dianping.swallow.web.dashboard.comparator.SendComparator;
 import com.dianping.swallow.web.dashboard.model.Entry;
 import com.dianping.swallow.web.dashboard.model.FixSizedPriorityQueue;
+import junit.framework.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
+
+@SuppressWarnings("deprecation")
 public class FixSizedPriorityQueueTest {
 	
 	private List<Comparator<Entry>> list = new ArrayList<Comparator<Entry>>();

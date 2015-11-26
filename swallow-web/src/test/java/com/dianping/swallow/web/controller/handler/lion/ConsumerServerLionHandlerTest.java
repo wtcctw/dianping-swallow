@@ -8,6 +8,7 @@ import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.impl.ConsumerServerResourceServiceImpl;
 import com.dianping.swallow.web.util.ResponseStatus;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +39,8 @@ public class ConsumerServerLionHandlerTest extends MockTest {
 
     private EmptyObject result;
 
-    private LionHandlerChain lionHandlerChain = new LionHandlerChain();
+    @SuppressWarnings("unchecked")
+	private LionHandlerChain lionHandlerChain = new LionHandlerChain();
 
     @Before
     public void setUp() throws Exception {

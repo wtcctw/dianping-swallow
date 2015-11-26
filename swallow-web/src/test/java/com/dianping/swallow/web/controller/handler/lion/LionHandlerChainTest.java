@@ -11,6 +11,7 @@ import com.dianping.swallow.web.model.dom.MongoConfigBean;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.service.impl.ConsumerServerResourceServiceImpl;
 import com.dianping.swallow.web.util.ResponseStatus;
+
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -55,7 +56,8 @@ public class LionHandlerChainTest extends MockTest {
 
     private Set<String> topics;
 
-    private LionHandlerChain lionHandlerChain = new LionHandlerChain();
+    @SuppressWarnings("unchecked")
+	private LionHandlerChain lionHandlerChain = new LionHandlerChain();
 
     @Before
     public void setUp() throws Exception {

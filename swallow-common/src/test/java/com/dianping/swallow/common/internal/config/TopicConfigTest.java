@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
-import com.dianping.swallow.common.internal.config.SwallowConfig.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionUtilImpl.LionRet;
 
 /**
@@ -14,21 +13,23 @@ import com.dianping.swallow.common.internal.config.impl.LionUtilImpl.LionRet;
  */
 public class TopicConfigTest {
 
-	
-	
+
 	@Test
-	public void testSub(){
+	public void testOldMongo(){
+	
 		
-		TopicConfig config1 = new TopicConfig("mongodb://192.168.213.143:27018", 1, 2);
+		String mongo = "mongodb://10.1.115.11:27018,10.1.115.12:27018";
+		Integer size = 1000, max = 2000;
+				
+		String mongoConfig = "{\"mongoUrl\":\""+mongo+"\",\"size\":" +size+ ", \"max\" : " + max + "}";
 		
-		TopicConfig config2 = new TopicConfig("mongodb://192.168.213.143:27018", 1, 2);
+		TopicConfig config = TopicConfig.fromJson(mongoConfig);
 		
-		config1.sub(config2);
+		System.out.println(config);
 		
-		Assert.assertNull(config1.getMongoUrl());
-		Assert.assertNull(config1.getMax());
-		Assert.assertNull(config1.getSize());
-		
+		Assert.assertEquals(mongo, config.getStoreUrl());
+		Assert.assertEquals(max, config.getMax());
+		Assert.assertEquals(size, config.getSize());
 	}
 	
 	
@@ -40,6 +41,19 @@ public class TopicConfigTest {
 		Assert.assertEquals(new TopicConfig(), config);
 		config = jsonBinder.fromJson(null, TopicConfig.class);
 		Assert.assertNull(config);
+		
+		
+		config = new TopicConfig("mongodb://url", 100, 200, TOPIC_TYPE.EFFICIENCY_FIRST);
+		
+		String json = config.toJson();
+		System.out.println(json);
+		
+		TopicConfig configBack = TopicConfig.fromJson(json);
+		
+		Assert.assertEquals(config, configBack);
+				
+		
+		
 	}
 	
 	@Test

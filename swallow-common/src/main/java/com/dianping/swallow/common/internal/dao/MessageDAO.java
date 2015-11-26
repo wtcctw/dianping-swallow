@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
-public interface MessageDAO {
+public interface MessageDAO extends DAO{
 	/**
 	 * 往topic数据库的topicName集合/表里，插入一条信息
 	 * 

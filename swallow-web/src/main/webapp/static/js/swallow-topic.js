@@ -97,9 +97,13 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 		};
 			$scope.topic = "";
 			$scope.searchip = "";
-			
+			$scope.searchadministrator = "";
+
 			$scope.suburl = "/console/topic/list";
 			$scope.topicnum = 30;
+
+			$scope.apps = [];
+			$scope.resultDict = {};
 			
 			$scope.topicEntry = {};
 			$scope.topicEntry.topic;
@@ -114,7 +118,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation;
 			$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase;
 
-			$scope.setModalInput = function(index){
+			$scope.setModalInput = function(index, showApp){
 				if(typeof($scope.searchPaginator.currentPageItems[index].administrator) != "undefined"){
 					var administrator = $scope.searchPaginator.currentPageItems[index].administrator;
 					$('#administrator').tagsinput('removeAll');
@@ -126,6 +130,47 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				}else{
 					$('#administrator').tagsinput('removeAll');
 				}
+
+				if(showApp){
+					var length = $scope.searchPaginator.currentPageItems[index].producerIpInfos.length;
+					if(length > 0){
+						var ips = "";
+						for(var i = 0; i < length; ++i){
+							ips += $scope.searchPaginator.currentPageItems[index].producerIpInfos[i].ip;
+							if(i != length -1){
+								ips += ",";
+							}
+						}
+						var result = [];
+						$scope.ipEntry = {};
+						$scope.ipEntry.ip = ips;
+						$scope.ipEntry.alarm = true;
+						$scope.ipEntry.application = "";
+						$http.post(window.contextPath + '/console/ip/list', $scope.ipEntry).success(function(data) {
+							if(data.first > 0){
+								$scope.apps = data.second;
+							}
+							$scope.addToDict($scope.searchPaginator.currentPageItems[index].producerIpInfos);
+							if($scope.apps.length > 0){
+								$scope.addToDict($scope.apps);
+							}
+							for(var s in $scope.resultDict){
+								result.push($scope.resultDict[s]);
+							}
+
+							if(result.length == 0){
+								$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
+							}else{
+								$scope.topicEntry.producerIpInfos = result;
+							}
+							$scope.apps = [];
+							$scope.resultDict = {};
+						});
+					}
+
+				}else{
+					$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
+				}
 				
 				$scope.topicEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 				$scope.topicEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
@@ -136,7 +181,27 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuation;
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuationBase;
 				$scope.topicEntry.producerAlarmSetting.delay = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.delay;
-				$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
+			}
+
+			$scope.addToDict = function(arra) {
+				if (!arra instanceof Array) {
+					throw new Error("only support array!");
+				}
+				for (var i = 0; i < arra.length; i++) {
+					var currentElement = arra[i];
+					var ip = currentElement.ip;
+					var currentDict;
+
+					if (!(ip in $scope.resultDict)) {
+						$scope.resultDict[ip] = {};
+					}
+					currentDict = $scope.resultDict[ip];
+					for (var name in currentElement) {
+						if (currentElement.hasOwnProperty(name) && !currentDict.hasOwnProperty(name)) {
+							currentDict[name] = currentElement[name];
+						}
+					}
+				}
 			}
 			
 			$scope.refreshpage = function(myForm, index){
@@ -189,6 +254,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				}
 				localStorage.clear();
 			}
+
+			$scope.query.administrator = $scope.searchadministrator;
 			$scope.query.producerServer = $scope.searchip;
 			$scope.query.inactive = true;
 			$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
@@ -214,7 +281,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								$scope.topic = c;
 								$scope.query.topic = $scope.topic;
 								$scope.query.producerServer = $("#searchip").val();
-								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
+								$scope.query.administrator = $("#searchadministrator").val();
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
 								return c;
 							}
 						})
@@ -225,6 +293,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							updater : function(c) {
 								$scope.searchip = c;
 								$scope.query.producerServer = $scope.searchip;
+								$scope.query.administrator = $("#searchadministrator").val();
 								$scope.query.topic = $("#searchtopic").val();
 								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);		
 								return c;
@@ -232,7 +301,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						})
 					}).error(function(data, status, headers, config) {
 					});
-				 
+
 					$http({
 						method : 'GET',
 						url : window.contextPath + '/console/topic/administrator'
@@ -245,6 +314,19 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 								  displayText: function(item){ return item;}  //necessary
 							  }
 						});
+
+						$("#searchadministrator").typeahead({
+							items: 16,
+							source : data,
+							updater : function(c) {
+								$scope.administrator = c;
+								$scope.query.administrator = $scope.administrator;
+								$scope.query.producerServer = $("#searchip").val();
+								$scope.query.topic = $("#searchtopic").val();
+								$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
+								return c;
+							}
+						})
 					}).error(function(data, status, headers, config) {
 					});
 					

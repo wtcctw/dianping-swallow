@@ -10,13 +10,11 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
-import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.internal.util.SHAUtil;
-import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
-import com.dianping.swallow.common.server.monitor.collector.ProducerCollector;
+import com.dianping.swallow.producerserver.MessageReceiver;
+import com.dianping.swallow.producerserver.MessageReceiver.VALID_STATUS;
 
 public class ProducerServerTextHandler extends ChannelInboundHandlerAdapter {
     //TextHandler状态代码
@@ -26,18 +24,11 @@ public class ProducerServerTextHandler extends ChannelInboundHandlerAdapter {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private MessageDAO messageDao;
+    private MessageReceiver messageReceiver;
     
-    private TopicWhiteList topicWhiteList;
-    
-    private ProducerCollector producerCollector;
-    
-    
-    public ProducerServerTextHandler(MessageDAO messageDAO, TopicWhiteList topicWhiteList, ProducerCollector producerCollector) {
+    public ProducerServerTextHandler(MessageReceiver messageReceiver) {
     	
-    	this.messageDao = messageDAO;
-    	this.topicWhiteList = topicWhiteList;
-    	this.producerCollector = producerCollector;
+    	this.messageReceiver = messageReceiver;
     }
 
     
@@ -55,44 +46,50 @@ public class ProducerServerTextHandler extends ChannelInboundHandlerAdapter {
         swallowMessage.setSha1(SHAUtil.generateSHA(swallowMessage.getContent()));
         swallowMessage.setSourceIp(IPUtil.getIpFromChannel(channel));
 
-        //初始化ACK对象
         TextACK textAck = new TextACK();
         textAck.setStatus(OK);
-        //TopicName非法，返回失败ACK，reason是"TopicName is not valid."
+        
         String topicName = textObject.getTopic();
-        if (!NameCheckUtil.isTopicNameValid(topicName)) {
-            logger.error("[Incorrect topic name.][From=" + channel.remoteAddress() + "][Content=" + textObject + "]");
-            textAck.setStatus(INVALID_TOPIC_NAME);
-            textAck.setInfo("TopicName is invalid.");
+
+        
+        VALID_STATUS validStatus = messageReceiver.isTopicNameValid(topicName);
+        switch(validStatus){
+        
+        	case SUCCESS:
+        		break;
+        		
+        	case TOPIC_NAME_INVALID:
+        		
+                logger.error("[Incorrect topic name.][From=" + channel.remoteAddress() + "][Content=" + textObject + "][invalid]");
+        		textAck.setStatus(INVALID_TOPIC_NAME);
+                textAck.setInfo("TopicName is invalid.");
+                
+        	case TOPIC_NAME_NOT_IN_WHITELIST:
+        		
+                logger.error("[Incorrect topic name.][From=" + channel.remoteAddress() + "][Content=" + textObject + "][not in whitelist]");
+                
+                textAck.setStatus(INVALID_TOPIC_NAME);
+                channel.writeAndFlush(textAck);
+        	default:
+                logger.error("[Incorrect topic name.][From=" + channel.remoteAddress() + "][Content=" + textObject + "][unknown state]" + validStatus);
+                textAck.setStatus(INVALID_TOPIC_NAME);
+                channel.writeAndFlush(textAck);
+                return;
+        }
+        		
+        //success
+        try {
+            messageReceiver.receiveMessage(topicName, null, swallowMessage);
+            textAck.setInfo(swallowMessage.getSha1());
+        } catch (Exception e1) {
+            logger.error("[Save message to DB failed.]", e1);
+            textAck.setStatus(SAVE_FAILED);
+            textAck.setInfo("Can not save message.");
+        }
+            
+        if (textObject.isACK()) {
             //返回ACK
             channel.writeAndFlush(textAck);
-        } else {
-            //验证topicName是否在白名单里
-            boolean isValid = topicWhiteList.isValid(topicName);
-            if (!isValid) {
-                textAck.setStatus(INVALID_TOPIC_NAME);
-                textAck.setInfo("Invalid topic(" + topicName + "), because it's not in whitelist, please contact swallow group for support.");
-            } else {
-                //调用DAO层将SwallowMessage存入DB
-                try {
-    				Date generateTime = swallowMessage.getGeneratedTime() != null ? swallowMessage.getGeneratedTime() :  new Date(); 
-                	
-                    messageDao.saveMessage(topicName, swallowMessage);
-                    producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, generateTime.getTime(), System.currentTimeMillis());                    
-                    textAck.setInfo(swallowMessage.getSha1());
-                } catch (Exception e1) {
-                    //记录异常，返回失败ACK，reason是“Can not save message”
-                    logger.error("[Save message to DB failed.]", e1);
-                    textAck.setStatus(SAVE_FAILED);
-                    textAck.setInfo("Can not save message.");
-                }
-            }
-
-            //如果不要ACK，立刻返回
-            if (textObject.isACK()) {
-                //返回ACK
-                channel.writeAndFlush(textAck);
-            }
         }
 	}
 

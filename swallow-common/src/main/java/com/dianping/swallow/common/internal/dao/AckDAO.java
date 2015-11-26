@@ -1,6 +1,6 @@
 package com.dianping.swallow.common.internal.dao;
 
-public interface AckDAO {
+public interface AckDAO extends DAO{
 
 	void clean(String topicName, String consumerId, boolean isBackup);
 	

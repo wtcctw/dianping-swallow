@@ -52,6 +52,27 @@ public class IpInfo {
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		IpInfo ipInfo = (IpInfo) o;
+
+		if (alarm != ipInfo.alarm) return false;
+		if (active != ipInfo.active) return false;
+		return !(ip != null ? !ip.equals(ipInfo.ip) : ipInfo.ip != null);
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = ip != null ? ip.hashCode() : 0;
+		result = 31 * result + (alarm ? 1 : 0);
+		result = 31 * result + (active ? 1 : 0);
+		return result;
+	}
+
+	@Override
 	public String toString() {
 		return "IpInfo [ip=" + ip + ", alarm=" + alarm + ", active=" + active + "]";
 	}

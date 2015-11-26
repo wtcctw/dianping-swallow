@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.dao.impl;
 
 
-import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
 
 /**
  * @author mingdongli
@@ -47,9 +45,5 @@ public class DefaultWebMongoManager implements WebMongoManager {
 		return mongoManager.getMongo(topicName);
 	}
 
-	@Override
-	public Collection<MongoClient> getAllReadMongo() {
-		return mongoManager.getAllMongo();
-	}
 
 }

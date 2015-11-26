@@ -1,10 +1,10 @@
 package com.dianping.swallow.common.server.monitor.data;
 
-import java.util.NavigableMap;
-
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
-import com.dianping.swallow.common.internal.monitor.Mergeable;
+import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.NavigableMap;
 
 
 /**
@@ -12,7 +12,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年5月19日 下午5:04:56
  */
-public interface Statisable<V> extends KeyMergeable{
+public interface Statisable<V> extends KeyMergeable {
+
+	Long INFINITY = -1L;
 
 	void add(Long time, V added);
 	
@@ -28,67 +30,34 @@ public interface Statisable<V> extends KeyMergeable{
 	 * @param startKey
 	 * @param endKey
 	 * @param intervalCount
-	 * @param step for debug log
 	 */
 	void build(QPX qpx, Long startKey, Long endKey, int intervalCount);
 	
 	@JsonIgnore
 	boolean isEmpty();
 
+	@JsonIgnore
+	NavigableMap<Long, StatisData> getDelayAndQps(StatisType type);
 
 	@JsonIgnore
-	NavigableMap<Long, Long> getDelay(StatisType type);
-
-	@JsonIgnore
-	NavigableMap<Long, QpxData> getQpx(StatisType type);
+	NavigableMap<Long, StatisData> getDelayAndQps(StatisType type, Long startKey, Long stopKey);
 
 	String toString(String key);
 	
-	public static class QpxData implements Mergeable{
+	public static class QpxData {
 
-		private Long qpx;
+		private StatisData statisData;
 
-		private Long total;
-
-		public QpxData(Long qpx, Long total) {
-			this.qpx = qpx;
-			this.total = total;
+		public QpxData(StatisData statisData) {
+			this.statisData = statisData;
 		}
 
-		public Long getQpx() {
-			return qpx;
-		}
-
-		public void setQpx(Long qpx) {
-			this.qpx = qpx;
+		public Long getQpx(QPX qpx) {
+			return statisData.getQpx(qpx);
 		}
 
 		public Long getTotal() {
-			return total;
-		}
-
-		public void setTotal(Long total) {
-			this.total = total;
-		}
-
-		@Override
-		public void merge(Mergeable merge) {
-			if(!(merge instanceof QpxData)){
-				throw new IllegalArgumentException("wrong type " + merge.getClass());
-			}
-
-			QpxData toMerge = (QpxData) merge;
-			total += toMerge.getTotal();
-			qpx += toMerge.getQpx();
-		}
-
-		@Override
-		public Object clone() throws CloneNotSupportedException {
-
-			QpxData info = (QpxData) super.clone();
-			info.setQpx(this.qpx);
-			info.setTotal(this.total);
-			return info;
+			return statisData.getCount();
 		}
 	}
 

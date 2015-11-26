@@ -1,24 +1,8 @@
 package com.dianping.swallow.common.server.monitor.data.statis;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
@@ -27,6 +11,19 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerIdData;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerMonitorData;
+import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author mengwenchao
@@ -80,13 +77,13 @@ public class ConsumerServerDataTest extends AbstractServerDataTest {
 		String server = ips[0];
 		String topic = topics[0];
 		String consumerId = consumerIds[0];
-		String ip = ips[0];
 
 		System.out.println(consumerAllData.getKeys(new CasKeys()));
-		ConsumerIdStatisData cisd = (ConsumerIdStatisData) consumerAllData.getValue(new CasKeys(server, topic,
-				consumerId));
+		NavigableMap<Long, Long> cisd =  consumerAllData.getDelayValue(new CasKeys(server, topic,
+				consumerId), StatisType.SEND);
+		System.out.println(cisd);
 
-		System.out.println(consumerAllData.getValue(new CasKeys(server, topic)));
+		System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic), StatisType.SEND));
 	}
 
 	@Test
@@ -122,8 +119,13 @@ public class ConsumerServerDataTest extends AbstractServerDataTest {
 					logger.info("[testConsumerServerData]" + type);
 				}
 
-				NavigableMap<Long, Long> delays = consumerAllData.getDelayForTopic(topic, type);
-				NavigableMap<Long, QpxData> qpxs = consumerAllData.getQpxForTopic(topic, type);
+				NavigableMap<Long, StatisData> statisData = consumerAllData.getStatisDataForTopic(topic, type);
+				NavigableMap<Long, Long> delays = new ConcurrentSkipListMap<Long, Long>();
+				NavigableMap<Long, QpxData> qpxs = new ConcurrentSkipListMap<Long, QpxData>();
+				for(Map.Entry<Long, StatisData> entry : statisData.entrySet()){
+					qpxs.put(entry.getKey(), new QpxData(entry.getValue()));
+					delays.put(entry.getKey(), entry.getValue().getDelay());
+				}
 
 				expectedDelay(delays, totalCount, avergeDelay);
 				expectedQpx(qpxs, totalCount, qpsPerUnit * ips.length * consumerIds.length, qpsPerUnit * ips.length
@@ -131,7 +133,7 @@ public class ConsumerServerDataTest extends AbstractServerDataTest {
 
 				Map<String, NavigableMap<Long, Long>> allDelay = consumerAllData.getDelayForAllConsumerId(topic, type,
 						false);
-				Map<String, NavigableMap<Long, QpxData>> allQpx = consumerAllData.getQpxForAllConsumerId(topic, type,
+				Map<String, NavigableMap<Long, StatisData>> allQpx = consumerAllData.getQpxForAllConsumerId(topic, type,
 						false);
 
 				Assert.assertEquals(consumerIds.length, allDelay.size());
@@ -143,9 +145,12 @@ public class ConsumerServerDataTest extends AbstractServerDataTest {
 					expectedDelay(consumerDelay, totalCount, avergeDelay);
 				}
 
-				for (Entry<String, NavigableMap<Long, QpxData>> entry : allQpx.entrySet()) {
-
-					NavigableMap<Long, QpxData> consumerQpx = entry.getValue();
+				for (Entry<String, NavigableMap<Long, StatisData>> entry : allQpx.entrySet()) {
+					NavigableMap<Long, QpxData> consumerQpx = new ConcurrentSkipListMap<Long, QpxData>();
+					NavigableMap<Long, StatisData> sd = entry.getValue();
+					for(Map.Entry<Long, StatisData> entry1 : sd.entrySet()){
+						consumerQpx.put(entry1.getKey(), new QpxData(entry1.getValue()));
+					}
 					expectedQpx(consumerQpx, totalCount, qpsPerUnit * ips.length, qpsPerUnit * ips.length
 							* intervalCount * AbstractCollector.SEND_INTERVAL);
 				}
@@ -181,7 +186,7 @@ public class ConsumerServerDataTest extends AbstractServerDataTest {
 		Assert.assertEquals(totalCount, data.size());
 		for (QpxData value : data.values()) {
 
-			Assert.assertEquals(resultQpx, value.getQpx());
+			Assert.assertEquals(resultQpx, value.getQpx(QPX.SECOND));
 			Assert.assertEquals(resultTotal, value.getTotal());
 		}
 	}
@@ -247,8 +252,7 @@ public class ConsumerServerDataTest extends AbstractServerDataTest {
 
 					SwallowMessage message = createMessage();
 					message.setMessageId(messageIdGenerator.incrementAndGet());
-					message.getInternalProperties().put(MessageDAOImpl.SAVE_TIME,
-							String.valueOf(System.currentTimeMillis() - avergeDelay));
+					message.getInternalProperties().put(MongoMessageDAO.SAVE_TIME, String.valueOf(System.currentTimeMillis() - avergeDelay));
 					wrappers.add(new Wrapper(consumerInfo, ip, message));
 
 					consumerMonitorData.addSendData(consumerInfo, ip, message);

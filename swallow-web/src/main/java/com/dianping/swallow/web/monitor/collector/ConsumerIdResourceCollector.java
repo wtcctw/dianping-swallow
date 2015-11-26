@@ -3,9 +3,13 @@ package com.dianping.swallow.web.monitor.collector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CountDownLatch;
 
+import com.dianping.swallow.web.container.ResourceContainer;
+import com.dianping.swallow.web.controller.listener.ResourceListener;
+import com.dianping.swallow.web.controller.listener.ResourceObserver;
+import com.dianping.swallow.web.model.resource.BaseResource;
+import com.dianping.swallow.web.util.CountDownLatchUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,17 +25,15 @@ import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
-import com.dianping.swallow.web.util.ThreadFactoryUtils;
 
 /**
- * @author mingdongli
- *
- *         2015年8月31日下午8:14:56
+ * @author qiyin
+ *         <p/>
+ *         2015年10月8日 上午11:06:00
  */
 @Component
-public class ConsumerIdResourceCollector extends AbstractResourceCollector implements MonitorDataListener {
-
-	private static final String FACTORY_NAME = "ResourceCollector-ConsumerIdIpMonitor";
+public class ConsumerIdResourceCollector extends AbstractRealTimeCollector implements MonitorDataListener,
+		ResourceObserver {
 
 	@Autowired
 	private ConsumerStatsDataWapper cStatsDataWapper;
@@ -40,20 +42,20 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 	private ConsumerDataRetriever consumerDataRetriever;
 
 	@Autowired
-	private ConsumerIdResourceService consumerIdResourceService;
+	private ConsumerIdResourceService cResourceService;
 
-	private ExecutorService executor = null;
+	@Autowired
+	private ResourceContainer resourceContainer;
 
-	private IpStatusMonitor<ConsumerIdKey> activeIpManager = new IpStatusMonitor<ConsumerIdKey>();
+	private IpStatusMonitor<ConsumerIdKey, ConsumerIpStatsData> ipStatusMonitor = new IpStatusMonitorImpl<ConsumerIdKey, ConsumerIpStatsData>();
+
+	private List<ResourceListener> listeners = new ArrayList<ResourceListener>();
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		collectorName = getClass().getSimpleName();
-		collectorInterval = 20;
-		collectorDelay = 3;
 		consumerDataRetriever.registerListener(this);
-		executor = Executors.newSingleThreadExecutor(ThreadFactoryUtils.getThreadFactory(FACTORY_NAME));
 	}
 
 	@Override
@@ -65,115 +67,99 @@ public class ConsumerIdResourceCollector extends AbstractResourceCollector imple
 				catWrapper.doAction(new SwallowAction() {
 					@Override
 					public void doAction() throws SwallowException {
-						doIpDataMonitor();
+						doCollector();
 					}
 				});
 			}
 		});
 	}
 
-	private void doIpDataMonitor() {
-		Set<String> topicNames = cStatsDataWapper.getTopics(false);
-		if (topicNames == null) {
-			return;
-		}
-		for (String topicName : topicNames) {
-			Set<String> consumerIds = cStatsDataWapper.getConsumerIds(topicName, false);
-			if (consumerIds == null) {
-				continue;
-			}
-			for (String consumerId : consumerIds) {
-				List<ConsumerIpStatsData> ipStatsDatas = cStatsDataWapper.getIpStatsDatas(topicName, consumerId, -1,
-						false);
-				if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
-					continue;
-				}
-				for (ConsumerIpStatsData ipStatsData : ipStatsDatas) {
-					activeIpManager.putActiveIpData(
-							new ConsumerIdKey(ipStatsData.getTopicName(), ipStatsData.getConsumerId()),
-							ipStatsData.getIp(), ipStatsData.hasStatsData());
-				}
-			}
-		}
+	private void doIpDataMonitor(String topicName, String consumerId) {
+		List<ConsumerIpStatsData> ipStatsDatas = cStatsDataWapper.getIpStatsDatas(topicName, consumerId, -1, false);
+		ipStatusMonitor.putActiveIpDatas(new ConsumerIdKey(topicName, consumerId), ipStatsDatas);
+		updateConsumerIdResource(topicName, consumerId);
 	}
 
 	@Override
 	public void doCollector() {
 		logger.info("[doCollector] start collect consumerIdResource.");
-		doConsumerIdCollector();
-	}
-
-	private void doConsumerIdCollector() {
 		Set<String> topicNames = cStatsDataWapper.getTopics(false);
 		if (topicNames == null || topicNames.isEmpty()) {
 			return;
 		}
-		for (String topicName : topicNames) {
+		for (final String topicName : topicNames) {
+			if (StringUtils.isBlank(topicName)) {
+				continue;
+			}
 			Set<String> consumerIds = cStatsDataWapper.getConsumerIds(topicName, false);
 			if (consumerIds == null || consumerIds.isEmpty()) {
 				continue;
 			}
-			for (String consumerId : consumerIds) {
-				updateConsumerIdResource(topicName, consumerId);
+			final CountDownLatch downLatch = CountDownLatchUtil.createCountDownLatch(consumerIds.size());
+			for (final String consumerId : consumerIds) {
+				try {
+					executor.submit(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								doIpDataMonitor(topicName, consumerId);
+							} catch (Throwable t) {
+								logger.error("[run] server {} doIpDataMonitor error.", topicName, t);
+							} finally {
+								downLatch.countDown();
+							}
+						}
+					});
+				} catch (Throwable t) {
+					logger.error("[submit] [doCollector] executor thread submit error.", t);
+				} finally {
+					downLatch.countDown();
+				}
 			}
+			CountDownLatchUtil.await(downLatch);
 		}
-
 	}
 
 	private void updateConsumerIdResource(String topicName, String consumerId) {
-		try {
-			if (StringUtils.isBlank(topicName) && StringUtils.isBlank(consumerId)) {
-				return;
+		ConsumerIdKey consumerIdKey = new ConsumerIdKey(topicName, consumerId);
+		ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId, false);
+		boolean result = false;
+		if (consumerIdResource == null) {
+			List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(consumerIdKey, null);
+			consumerIdResource = cResourceService.buildConsumerIdResource(topicName, consumerId);
+			consumerIdResource.setConsumerIpInfos(currentIpInfos);
+			result = cResourceService.insert(consumerIdResource);
+			logger.info("[updateConsumerIdResource] insert consumerIdResource {}", consumerIdResource.toString());
+		} else {
+			List<IpInfo> currentIpInfos = ipStatusMonitor.getRelatedIpInfo(consumerIdKey,
+					consumerIdResource.getConsumerIpInfos());
+			if (ipStatusMonitor.isChanged(consumerIdResource.getConsumerIpInfos(), currentIpInfos)) {
+				consumerIdResource.setConsumerIpInfos(currentIpInfos);
+				result = cResourceService.update(consumerIdResource);
+				logger.info("[updateConsumerIdResource] update consumerIdResource {}", consumerIdResource.toString());
 			}
-			ConsumerIdResource consumerIdResource = consumerIdResourceService.findByConsumerIdAndTopic(topicName,
-					consumerId);
-			if (consumerIdResource == null) {
-
-				consumerIdResource = consumerIdResourceService.buildConsumerIdResource(topicName, consumerId);
-				Set<String> consumerIdIps = cStatsDataWapper.getConsumerIdIps(topicName, consumerId, false);
-				if (consumerIdIps != null && !consumerIdIps.isEmpty()) {
-					List<IpInfo> ipInfos = new ArrayList<IpInfo>();
-					for (String consumerIdIp : consumerIdIps) {
-						ipInfos.add(new IpInfo(consumerIdIp, true, true));
-					}
-					consumerIdResource.setConsumerIpInfos(ipInfos);
-				}
-				consumerIdResourceService.insert(consumerIdResource);
-				logger.info("[updateConsumerIdResource] consumerIdResource {}", consumerIdResource.toString());
-			} else {
-				updateConsumerIdIpInfos(consumerIdResource);
-				consumerIdResourceService.update(consumerIdResource);
-				logger.info("[updateConsumerIdResource] consumerIdResource {}", consumerIdResource.toString());
-			}
-		} catch (Exception e) {
-			logger.error("[doConsumerIdCollector] collect consumerId resource error.", e);
+		}
+		if (result) {
+			doUpdateNotify(consumerIdResource);
 		}
 	}
 
-	private void updateConsumerIdIpInfos(ConsumerIdResource consumerIdResource) {
-		String topicName = consumerIdResource.getTopic();
-		String consumerId = consumerIdResource.getConsumerId();
-		List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
-		Set<String> consumerIdIps = cStatsDataWapper.getConsumerIdIps(topicName, consumerId, false);
-		ipInfos = activeIpManager.getRelatedIpInfo(new ConsumerIdKey(topicName, consumerId), ipInfos, consumerIdIps);
-		consumerIdResource.setConsumerIpInfos(ipInfos);
+	@Override
+	public void doRegister(ResourceListener listener) {
+		listeners.add(listener);
 	}
 
 	@Override
-	public int getCollectorDelay() {
-		return collectorDelay;
+	public void doUpdateNotify(BaseResource resource) {
+		for (ResourceListener listener : listeners) {
+			listener.doUpdateNotify(resource);
+		}
 	}
 
 	@Override
-	public int getCollectorInterval() {
-		return collectorInterval;
-	}
-
-	@Override
-	protected void doDispose() throws Exception {
-		super.doDispose();
-		if (executor != null && !executor.isShutdown()) {
-			executor.shutdown();
+	public void doDeleteNotify(BaseResource resource) {
+		for (ResourceListener listener : listeners) {
+			listener.doDeleteNotify(resource);
 		}
 	}
 

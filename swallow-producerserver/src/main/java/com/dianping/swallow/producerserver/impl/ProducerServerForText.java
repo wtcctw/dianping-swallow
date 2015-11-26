@@ -14,11 +14,9 @@ import java.net.InetSocketAddress;
 
 import com.dianping.swallow.common.internal.codec.Codec;
 import com.dianping.swallow.common.internal.codec.impl.JsonCodec;
-import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.netty.channel.CodecServerChannelFactory;
 import com.dianping.swallow.common.internal.netty.handler.CodecHandler;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
-import com.dianping.swallow.common.internal.whitelist.TopicWhiteList;
 
 /**
  * @author mengwenchao
@@ -30,10 +28,6 @@ public class ProducerServerForText extends AbstractProducerServer {
 	private static final int DEFAULT_PORT = 8000;
 	private int port = DEFAULT_PORT;
 
-	private MessageDAO messageDAO;
-
-	private TopicWhiteList topicWhiteList;
-	
 	private NioEventLoopGroup bossGroup;
 	
 	private NioEventLoopGroup workerGroup;
@@ -69,7 +63,7 @@ public class ProducerServerForText extends AbstractProducerServer {
 			      
 			      pipeline.addLast("jsonDecoder", new CodecHandler(codec));
 
-			      pipeline.addLast("handler", new ProducerServerTextHandler(messageDAO, topicWhiteList, producerCollector));
+			      pipeline.addLast("handler", new ProducerServerTextHandler(messageReceiver));
 
 
 			}
@@ -101,10 +95,6 @@ public class ProducerServerForText extends AbstractProducerServer {
 
 	public void setPort(int port) {
 		this.port = port;
-	}
-
-	public void setMessageDAO(MessageDAO messageDAO) {
-		this.messageDAO = messageDAO;
 	}
 
 }
