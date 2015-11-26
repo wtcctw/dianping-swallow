@@ -301,6 +301,16 @@ public abstract class AbstractAllData<M extends Mergeable, T extends TotalMap<M>
         return getMarginValue(keys, type, DataSpan.RIGHTMARGIN);
     }
 
+    @Override
+    public NavigableMap<Long, StatisData> getFirstValueGreaterOrEqualThan(CasKeys keys, StatisType type, Long startKey){
+        return getStatisData(keys, type, startKey, Long.MAX_VALUE);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getLastValueLessOrEqualThan(CasKeys keys, StatisType type, Long stopKey){
+        return getStatisData(keys, type, Long.MIN_VALUE, stopKey);
+    }
+
     protected abstract S createValue();
 
     @Override

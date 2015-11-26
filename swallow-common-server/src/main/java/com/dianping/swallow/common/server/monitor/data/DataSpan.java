@@ -7,5 +7,7 @@ package com.dianping.swallow.common.server.monitor.data;
 public enum DataSpan {
 
     LEFTMARGIN,
-    RIGHTMARGIN
+    RIGHTMARGIN,
+    LEFTMARGINGREATERTHAN,
+    RIGHTMARGINLESSTHAN
 }

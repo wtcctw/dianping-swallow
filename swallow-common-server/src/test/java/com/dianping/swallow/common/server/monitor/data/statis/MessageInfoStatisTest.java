@@ -267,12 +267,44 @@ public class MessageInfoStatisTest extends AbstractTest {
 		Assert.assertEquals(106, data.lastKey().longValue());
 		System.out.println(data.toString());
 
+		data = mnfoStatis.getDelayAndQps(StatisType.SEND, 101L, Long.MAX_VALUE);
+		Assert.assertEquals(1, data.size());
+		Assert.assertEquals(102L, data.lastKey().longValue());
+		System.out.println(data.toString());
+
+		data = mnfoStatis.getDelayAndQps(StatisType.SEND, 107L, Long.MAX_VALUE);
+		Assert.assertEquals(1, data.size());
+		Assert.assertEquals(107L, data.lastKey().longValue());
+		System.out.println(data.toString());
+
 		data = getStatisData(DataSpan.RIGHTMARGIN);
 		//mnfoStatis.setStatisMap(data);
 		data = mnfoStatis.getDelayAndQps(StatisType.SEND, -1L, Long.MAX_VALUE);
 		Assert.assertEquals(1, data.size());
 		Assert.assertEquals(111, data.lastKey().longValue());
 		System.out.println(data.toString());
+
+		data = mnfoStatis.getDelayAndQps(StatisType.SEND, Long.MIN_VALUE, 106L);
+		Assert.assertEquals(1, data.size());
+		Assert.assertEquals(106L, data.lastKey().longValue());
+		System.out.println(data.toString());
+
+		data = mnfoStatis.getDelayAndQps(StatisType.SEND, Long.MIN_VALUE, 114L);
+		Assert.assertEquals(1, data.size());
+		Assert.assertEquals(113L, data.lastKey().longValue());
+		System.out.println(data.toString());
+//----------------------------------------------------
+		data = mnfoStatis.getDelayAndQps(StatisType.SEND, 110L, Long.MAX_VALUE);
+		Assert.assertEquals(1, data.size());
+		Assert.assertEquals(111L, data.lastKey().longValue());
+		System.out.println(data.toString());
+
+		data = mnfoStatis.getDelayAndQps(StatisType.SEND, Long.MIN_VALUE, 110L);
+		Assert.assertEquals(1, data.size());
+		Assert.assertEquals(109L, data.lastKey().longValue());
+		System.out.println(data.toString());
+
+
 	}
 
 	private NavigableMap<Long, StatisData> getStatisData(DataSpan dataSpan) {
@@ -280,16 +312,25 @@ public class MessageInfoStatisTest extends AbstractTest {
 		NavigableMap<Long, StatisData> data = new ConcurrentSkipListMap<Long, StatisData>();
 		if (DataSpan.LEFTMARGIN == dataSpan) {
 			for (; i < 106; ++i) {
+				if(i == 101L){
+					continue;
+				}
 				data.put(i, new StatisData());
 
 			}
 		}
 		i = 106L;
 		for(; i < 112; ++i){
+			if(i == 110){
+				continue;
+			}
 			data.put(i, new StatisData(10L + i, 20L + i, 100L + i, 200L + i, (byte) 6));
 		}
 		if (DataSpan.RIGHTMARGIN == dataSpan) {
 			for (; i < 118; ++i) {
+				if(i == 114){
+					continue;
+				}
 				data.put(i, new StatisData());
 			}
 		}

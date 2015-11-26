@@ -144,7 +144,10 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
             } else {
                 return onePointFromMap(DataSpan.RIGHTMARGIN);
             }
+        } else if (startKey == Long.MIN_VALUE && stopKey != INFINITY) {
+            return onePointFromMap(stopKey, DataSpan.RIGHTMARGINLESSTHAN);
         }
+
         if (stopKey == INFINITY) {
             if (startKey != Long.MIN_VALUE) {
                 try {
@@ -155,7 +158,10 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
             } else {
                 return onePointFromMap(DataSpan.LEFTMARGIN);
             }
+        } else if (stopKey == Long.MAX_VALUE && startKey != INFINITY) {
+            return onePointFromMap(startKey, DataSpan.LEFTMARGINGREATERTHAN);
         }
+
         SortedMap<Long, StatisData> subMap = statisMap.subMap(startKey, true, stopKey, true);
         for (Entry<Long, StatisData> entry : subMap.entrySet()) {
             map.put(entry.getKey(), entry.getValue());
@@ -184,6 +190,24 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
             }
         } else {
             throw new UnsupportedOperationException("unsupport type");
+        }
+        return result;
+    }
+
+    private NavigableMap<Long, StatisData> onePointFromMap(Long key, DataSpan dataSpan) {
+        NavigableMap<Long, StatisData> result = new ConcurrentSkipListMap<Long, StatisData>();
+        Long rightKey;
+
+        if (dataSpan == DataSpan.LEFTMARGINGREATERTHAN) {
+            rightKey = statisMap.ceilingKey(key);
+        } else if (dataSpan == DataSpan.RIGHTMARGINLESSTHAN) {
+            rightKey = statisMap.floorKey(key);
+        } else {
+            throw new UnsupportedOperationException("unsupport type");
+        }
+
+        if (rightKey != null) {
+            result.put(rightKey, statisMap.get(rightKey));
         }
         return result;
     }
@@ -332,5 +356,4 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
         throw new CloneNotSupportedException("clone not support");
     }
-
 }

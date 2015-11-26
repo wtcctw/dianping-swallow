@@ -31,6 +31,10 @@ public interface StatisRetriever extends MapRetriever{
 
 	NavigableMap<Long, StatisData> getLastValue(CasKeys keys, StatisType type);
 
+	NavigableMap<Long, StatisData> getFirstValueGreaterOrEqualThan(CasKeys keys, StatisType type, Long startKey);
+
+	NavigableMap<Long, StatisData> getLastValueLessOrEqualThan(CasKeys keys, StatisType type, Long stopKey);
+
 	//user-friendly,no need to change code
 	NavigableMap<Long, Long> getDelay(StatisType type);
 

@@ -262,6 +262,27 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
     }
 
     @Test
+    public void testGetFirstValueGreaterOrEqualThan() {
+
+        String topic = "topic4";
+        String id = consumerIds.get(0);
+        NavigableMap<Long, StatisData> value1 = consumerAllData.getStatisData(new CasKeys("total", topic, id), StatisType.SEND);
+        NavigableMap<Long, StatisData> value2 = consumerAllData.getFirstValueGreaterOrEqualThan(new CasKeys("total", topic, id), StatisType.SEND, 108L);
+        NavigableMap<Long, StatisData> value3 = consumerAllData.getLastValueLessOrEqualThan(new CasKeys("total", topic, id), StatisType.SEND, 108L);
+        Assert.assertEquals(value2.size(), 1);
+        Assert.assertEquals(value3.size(), 1);
+        Assert.assertEquals(value2.firstKey().longValue(), 112L);
+        Assert.assertEquals(value3.firstKey().longValue(), 106L);
+
+        NavigableMap<Long, StatisData> value4 = consumerAllData.getFirstValueGreaterOrEqualThan(new CasKeys("total", topic, id), StatisType.SEND, 98L);
+        NavigableMap<Long, StatisData> value5 = consumerAllData.getLastValueLessOrEqualThan(new CasKeys("total", topic, id), StatisType.SEND, 200L);
+        Assert.assertEquals(value4.size(), 1);
+        Assert.assertEquals(value5.size(), 1);
+        Assert.assertEquals(value4.firstKey().longValue(), 100L);
+        Assert.assertEquals(value5.firstKey().longValue(), 130L);
+    }
+
+    @Test
     public void testGetAllQps() {
 
         String topic = topics.get(0);
