@@ -110,18 +110,18 @@ public class DefaultConsumerDataRetriever
                 if (lastSendDatas != null && !lastSendDatas.isEmpty() && firstSendDatas != null && !firstSendDatas.isEmpty()) {
                     StatisData lastData = lastSendDatas.lastEntry().getValue();
                     StatisData firstData = firstSendDatas.lastEntry().getValue();
-                    long subTotalDelay = lastData.getTotalDelay() - lastData.getTotalDelay();
-                    long subTotalCount = lastData.getTotalCount() - lastData.getTotalCount();
-                    delaySendStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalDelay, subTotalCount));
-                    qpxSendStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalCount, getQpsSampleCount(start, end)));
+                    long subTotalDelay = lastData.getTotalDelay() - firstData.getTotalDelay();
+                    long subTotalCount = lastData.getTotalCount() - firstData.getTotalCount();
+                    delaySendStatsData.add(new OrderEntity(topicName, consumerId, subTotalDelay, subTotalCount));
+                    qpxSendStatsData.add(new OrderEntity(topicName, consumerId, subTotalCount, getQpsSampleCount(start, end)));
                 }
                 if (lastAckDatas != null && !lastAckDatas.isEmpty() && firstAckDatas != null && !firstAckDatas.isEmpty()) {
                     StatisData lastData = lastAckDatas.lastEntry().getValue();
                     StatisData firstData = firstAckDatas.lastEntry().getValue();
-                    long subTotalDelay = lastData.getTotalDelay() - lastData.getTotalDelay();
-                    long subTotalCount = lastData.getTotalCount() - lastData.getTotalCount();
-                    delayAckStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalDelay, subTotalCount));
-                    qpxAckStatsData.add(new OrderEntity(topicName, StringUtils.EMPTY, subTotalCount, getQpsSampleCount(start, end)));
+                    long subTotalDelay = lastData.getTotalDelay() - firstData.getTotalDelay();
+                    long subTotalCount = lastData.getTotalCount() - firstData.getTotalCount();
+                    delayAckStatsData.add(new OrderEntity(topicName, consumerId, subTotalDelay, subTotalCount));
+                    qpxAckStatsData.add(new OrderEntity(topicName, consumerId, subTotalCount, getQpsSampleCount(start, end)));
                 }
             }
         }
