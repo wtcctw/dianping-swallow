@@ -3,7 +3,6 @@ package com.dianping.swallow.common.internal.util;
 import java.io.File;
 
 import com.dianping.cat.Cat;
-import com.dianping.swallow.common.internal.config.LoggerLoader;
 import com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler;
 
 /**

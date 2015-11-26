@@ -89,7 +89,7 @@ public class ConsumerRunner extends AbstractLoadTest {
 
                         count.incrementAndGet();
                         if(count.get()>=19999){
-                            System.out.println(System.currentTimeMillis());
+                            System.out.println(System.currentTimeMillis() - before);
                         }
                         return;
                     }

@@ -138,7 +138,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
                 try {
                     startKey = statisMap.firstKey();
                 } catch (NoSuchElementException e) {
-                    return new ConcurrentSkipListMap();
+                    return new ConcurrentSkipListMap<Long, StatisData>();
                 }
             } else {
                 return onePointFromMap(DataSpan.RIGHTMARGIN);
@@ -152,7 +152,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
                 try {
                     stopKey = statisMap.lastKey();
                 } catch (NoSuchElementException e) {
-                    return new ConcurrentSkipListMap();
+                    return new ConcurrentSkipListMap<Long, StatisData>();
                 }
             } else {
                 return onePointFromMap(DataSpan.LEFTMARGIN);

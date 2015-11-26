@@ -30,7 +30,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Plugin(name = "CatAppender", category = "Core", elementType = "appender", printObject = true)
 public final class CatAppenderImpl extends AbstractAppender {
 
-    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+	private static final long serialVersionUID = 2334282734703590228L;
+
+	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     private final Lock readLock = rwLock.readLock();
 

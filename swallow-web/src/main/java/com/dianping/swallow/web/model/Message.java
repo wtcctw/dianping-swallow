@@ -13,7 +13,6 @@ import java.util.Date;
  *
  * 2015年4月22日 上午12:06:15
  */
-@SuppressWarnings("unused")
 public class Message implements Comparable<Message> {
 
 	@Id
