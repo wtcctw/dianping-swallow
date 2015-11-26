@@ -90,7 +90,7 @@ public class DefaultConsumerDataRetriever
         }
         Iterator<String> iterator = topics.iterator();
         long fromKey = getKey(start);
-        long toKey = getToKey(end);
+        long toKey = getKey(end);
         while (iterator.hasNext()) {
             String topicName = iterator.next();
             if (TOTAL_KEY.equals(topicName)) {
@@ -103,10 +103,10 @@ public class DefaultConsumerDataRetriever
             Iterator<String> itConsumerId = consumerIds.iterator();
             while (itConsumerId.hasNext()) {
                 String consumerId = itConsumerId.next();
-                NavigableMap<Long, StatisData> lastSendDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, toKey - 5L, toKey);
-                NavigableMap<Long, StatisData> firstSendDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, fromKey, fromKey + 5L);
-                NavigableMap<Long, StatisData> lastAckDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, toKey - 5L, toKey);
-                NavigableMap<Long, StatisData> firstAckDatas = statis.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, fromKey, fromKey + 5L);
+                NavigableMap<Long, StatisData> lastSendDatas = statis.getLastValueLessOrEqualThan(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, toKey);
+                NavigableMap<Long, StatisData> firstSendDatas = statis.getFirstValueGreaterOrEqualThan(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, fromKey);
+                NavigableMap<Long, StatisData> lastAckDatas = statis.getLastValueLessOrEqualThan(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, toKey);
+                NavigableMap<Long, StatisData> firstAckDatas = statis.getFirstValueGreaterOrEqualThan(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, fromKey);
                 if (lastSendDatas != null && !lastSendDatas.isEmpty() && firstSendDatas != null && !firstSendDatas.isEmpty()) {
                     StatisData lastData = lastSendDatas.lastEntry().getValue();
                     StatisData firstData = firstSendDatas.lastEntry().getValue();
