@@ -129,28 +129,32 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
             if (lastIpInfos != null) {
                 ipInfos.addAll(lastIpInfos);
             }
-            Set<String> allIps = this.getAllIps(key);
-            if (allIps != null && !allIps.isEmpty()) {
-                for (String statsDataIp : allIps) {
-                    boolean isHasIp = false;
-                    for (IpInfo ipInfo : ipInfos) {
-                        if (statsDataIp.equals(ipInfo.getIp())) {
-                            isHasIp = true;
-                            break;
-                        }
-                    }
-                    if (!isHasIp) {
-                        ipInfos.add(new IpInfo(statsDataIp, true, true));
+
+        } else {
+            if (lastIpInfos != null) {
+                for (IpInfo ipInfo : lastIpInfos) {
+                    if (!ipInfo.isAlarm()) {
+                        ipInfos.add(ipInfo);
                     }
                 }
             }
-        } else {
-            Set<String> allIps = this.getAllIps(key);
-            if (allIps != null && !allIps.isEmpty()) {
-                for (String statsDataIp : allIps) {
+        }
+        Set<String> allIps = this.getAllIps(key);
+        if (allIps != null && !allIps.isEmpty()) {
+            for (String statsDataIp : allIps) {
+                boolean isHasIp = false;
+                for (IpInfo ipInfo : ipInfos) {
+                    if (statsDataIp.equals(ipInfo.getIp())) {
+                        isHasIp = true;
+                        break;
+                    }
+                }
+                if (!isHasIp) {
                     ipInfos.add(new IpInfo(statsDataIp, true, true));
                 }
             }
+        }
+        if (this.isValid()) {
             for (IpInfo ipInfo : ipInfos) {
                 ipInfo.setActive(false);
             }
@@ -166,6 +170,7 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
                 }
             }
         }
+
         return ipInfos;
     }
 
