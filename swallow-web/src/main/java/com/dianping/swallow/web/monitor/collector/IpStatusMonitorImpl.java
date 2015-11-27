@@ -31,11 +31,11 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
             }
         }
 
-        public boolean isIpInActive(String ip) {
+        public boolean isIpActive(String ip) {
             if (activeDatas.containsKey(ip)) {
-                return System.currentTimeMillis() - activeDatas.get(ip) > ACTIVE_TIMESPAN;
+                return System.currentTimeMillis() - activeDatas.get(ip) < ACTIVE_TIMESPAN;
             }
-            return true;
+            return false;
         }
     }
 
@@ -89,22 +89,22 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
         }
     }
 
-    public Set<String> getInActiveIps(T key) {
-        Set<String> inActiveIps = new HashSet<String>();
+    public Set<String> getActiveIps(T key) {
+        Set<String> activeIps = new HashSet<String>();
         if (activeIpDatas.containsKey(key)) {
             ActiveIpData activeIpData = activeIpDatas.get(key);
             if (activeIpData != null) {
                 for (String ip : activeIpData.activeDatas.keySet()) {
                     if (StringUtils.isNotBlank(ip)) {
-                        if (activeIpData.isIpInActive(ip)) {
-                            inActiveIps.add(ip);
+                        if (activeIpData.isIpActive(ip)) {
+                            activeIps.add(ip);
                         }
                     }
                 }
 
             }
         }
-        return inActiveIps;
+        return activeIps;
     }
 
     public Set<String> getAllIps(T key) {
@@ -125,34 +125,41 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
 
     public List<IpInfo> getRelatedIpInfo(T key, List<IpInfo> lastIpInfos) {
         List<IpInfo> ipInfos = new ArrayList<IpInfo>();
-        if (lastIpInfos != null) {
-            ipInfos.addAll(lastIpInfos);
-        }
-        Set<String> allIps = this.getAllIps(key);
-        if (allIps != null && !allIps.isEmpty()) {
-            for (String statsDataIp : allIps) {
-                boolean isHasIp = false;
-                for (IpInfo ipInfo : ipInfos) {
-                    if (statsDataIp.equals(ipInfo.getIp())) {
-                        isHasIp = true;
-                        break;
+        if (!this.isValid()) {
+            if (lastIpInfos != null) {
+                ipInfos.addAll(lastIpInfos);
+            }
+            Set<String> allIps = this.getAllIps(key);
+            if (allIps != null && !allIps.isEmpty()) {
+                for (String statsDataIp : allIps) {
+                    boolean isHasIp = false;
+                    for (IpInfo ipInfo : ipInfos) {
+                        if (statsDataIp.equals(ipInfo.getIp())) {
+                            isHasIp = true;
+                            break;
+                        }
+                    }
+                    if (!isHasIp) {
+                        ipInfos.add(new IpInfo(statsDataIp, true, true));
                     }
                 }
-                if (!isHasIp) {
+            }
+        } else {
+            Set<String> allIps = this.getAllIps(key);
+            if (allIps != null && !allIps.isEmpty()) {
+                for (String statsDataIp : allIps) {
                     ipInfos.add(new IpInfo(statsDataIp, true, true));
                 }
             }
-        }
-        if (this.isValid()) {
             for (IpInfo ipInfo : ipInfos) {
-                ipInfo.setActive(true);
+                ipInfo.setActive(false);
             }
-            Set<String> inActiveIps = this.getInActiveIps(key);
-            if (inActiveIps != null && !inActiveIps.isEmpty()) {
-                for (String inActiveIp : inActiveIps) {
+            Set<String> activeIps = this.getActiveIps(key);
+            if (activeIps != null && !activeIps.isEmpty()) {
+                for (String activeIp : activeIps) {
                     for (IpInfo ipInfo : ipInfos) {
-                        if (inActiveIp.equals(ipInfo.getIp())) {
-                            ipInfo.setActive(false);
+                        if (activeIp.equals(ipInfo.getIp())) {
+                            ipInfo.setActive(true);
                             break;
                         }
                     }
