@@ -245,6 +245,9 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
         StatisData statisData = new StatisData(delay, totalDelay, count, totalCount, intervalCount);
         statisMap.put(startKey, statisData);
+        if(logger.isInfoEnabled()){
+            logger.info(String.format("Put key %d to sttisMap", startKey));
+        }
     }
 
     private void buildStatisData(SortedMap<Long, MessageInfo> rawData, int intervalCount) {
