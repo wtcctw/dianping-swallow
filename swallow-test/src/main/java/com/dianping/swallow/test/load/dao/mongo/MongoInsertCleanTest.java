@@ -57,7 +57,7 @@ public class MongoInsertCleanTest extends AbstractDaoTest {
 					long start = System.currentTimeMillis();
 //					int count = dao.deleteMessage(topic, id);
 					if(logger.isInfoEnabled()){
-						logger.info("[run][message delete]" + count + "," + (System.currentTimeMillis() - start)/1000 + "/s");
+						logger.info("[run][message delete]" + getCurrentCount() + "," + (System.currentTimeMillis() - start)/1000 + "/s");
 					}
 					id = dao.getMaxMessageId(topic);
 					if(logger.isInfoEnabled()){

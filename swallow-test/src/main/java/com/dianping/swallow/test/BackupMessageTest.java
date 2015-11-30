@@ -36,9 +36,9 @@ public class BackupMessageTest extends AbstractConsumerTest{
 
 		latch = new CountDownLatch(messageCount);
 				
-		Consumer consumer = addListener(topic, getConsumerId(), messageCount);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), messageCount);
 		
-		sendMessage(messageCount, topic);
+		sendMessage(messageCount, getTopic());
 
 		latch.await();
 		sleep(waitAckExpiredSecond * 1000);

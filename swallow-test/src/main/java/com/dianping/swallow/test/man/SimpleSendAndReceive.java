@@ -25,13 +25,13 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 	public void eternalSend() throws SendFailedException, RemoteServiceInitFailedException, InterruptedException{
 
 		for(int i = 0; i < 1;i++){
-//			addListener(topic, "id" + i, 10, 0);
+//			addListener(getTopic(), "id" + i, 10, 0);
 		}
-//		addListener(topic);
+//		addListener(getTopic());
 		
-//		sendMessage(topic, 200, 0);
+//		sendMessage(getTopic(), 200, 0);
 
-		sendMessage(topic, 200, 0);
+		sendMessage(getTopic(), 200, 0);
 
 		TimeUnit.SECONDS.sleep(10000);
 	}
@@ -50,16 +50,16 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 		Set<String> filters = new HashSet<String>();
 		filters.add(type);
 		@SuppressWarnings("unused")
-		Consumer consumer = addListener(topic, getConsumerId(), filters);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), filters);
 		
-		sendMessage(10, topic, type);
+		sendMessage(10, getTopic(), type);
 
 		for(int i=0;i<600;i++){
-			sendMessage(10, topic);
+			sendMessage(10, getTopic());
 			TimeUnit.SECONDS.sleep(1);
 		}
 		
-		sendMessage(10, topic, type);
+		sendMessage(10, getTopic(), type);
 	
 		
 		sleep(1000000);
@@ -74,7 +74,7 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 			@Override
 			public void run() {
 				try {
-					sendMessage(10000, topic);
+					sendMessage(10000, getTopic());
 				} catch (SendFailedException e) {
 					e.printStackTrace();
 				} catch (RemoteServiceInitFailedException e) {
@@ -83,7 +83,7 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 			}
 		}).start();
 	
-		Consumer consumer = addListener(topic);
+		Consumer consumer = addListener(getTopic());
 		TimeUnit.SECONDS.sleep(5);
 		
 		System.out.println("begin close ");

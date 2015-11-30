@@ -84,9 +84,6 @@ public abstract class AbstractDaoTest extends AbstractLoadTest{
 				
 				while(true){
 					try{
-						if(count.get() > totalMessageCount){
-							exit();
-						}
 						saveMessge(topicName);
 					}catch(Exception e){
 						logger.error("error save message", e);
@@ -101,8 +98,7 @@ public abstract class AbstractDaoTest extends AbstractLoadTest{
 	protected void saveMessge(String topicName) {
 		
 		dao.saveMessage(topicName, createMessage(message));
-		count.incrementAndGet();
-		
+		increaseAndGetCurrentCount();
 	}
 
 }

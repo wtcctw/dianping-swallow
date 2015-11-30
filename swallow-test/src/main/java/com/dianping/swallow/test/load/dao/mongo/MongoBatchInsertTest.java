@@ -37,8 +37,8 @@ public class MongoBatchInsertTest extends AbstractDaoTest {
 		
 		List<SwallowMessage> messages = createMessages();
 		impl.saveMessage(topicName, messages);
-		
-		count.addAndGet(batchSize);
+
+		addAndGetCurrentCount(batchSize);
 	}
 
 	private List<SwallowMessage> createMessages() {

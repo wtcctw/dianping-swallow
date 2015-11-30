@@ -21,7 +21,7 @@ import com.dianping.swallow.test.load.BitMarker;
 
 /**
  * @author mengwenchao
- *G
+ *
  * 2015年9月7日 上午11:45:35
  */
 public class ConsumerRunner extends AbstractLoadTest{
@@ -93,7 +93,7 @@ public class ConsumerRunner extends AbstractLoadTest{
                     public void onMessage(Message msg) {
                     	
                     	count(msg, bitMarker);
-                    	count.incrementAndGet();
+                    	increaseAndGetCurrentCount();
                     }
                 });
                 c.start();
@@ -130,16 +130,6 @@ public class ConsumerRunner extends AbstractLoadTest{
 		return "myid-" + format.format(new Date());
 	}
 
-	@Override
-	protected boolean isExit() {
-		
-		if(totalMessageCount >0 && count.get() > totalMessageCount){
-			logger.info("[isExit][message size exceed total count, exit]" + count.get());
-			return true;
-		}
-		
-		return false;
-	}
 	
 	@Override
 	protected void doOnExit() {

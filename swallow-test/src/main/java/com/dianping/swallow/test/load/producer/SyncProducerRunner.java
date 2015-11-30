@@ -9,7 +9,6 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
 	
     public static void main(String[] args) throws Exception {
     	
-    	parseArgs(args);
     	new SyncProducerRunner().start();
     	
     }

@@ -36,6 +36,7 @@ import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
 import com.dianping.swallow.test.AbstractTest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -45,18 +46,20 @@ import com.dianping.swallow.test.AbstractTest;
  */
 public abstract class AbstractSwallowTest extends AbstractTest{
 
-	protected String topic = "swallow-test-integrated";
+	private String topic = "swallow-test-integrated";
 	
 
 	protected ConcurrentHashMap<String, AtomicInteger> sendMessageCount = new ConcurrentHashMap<String, AtomicInteger>();
 
 	protected ConcurrentHashMap<Consumer, AtomicInteger> getMessageCount = new ConcurrentHashMap<Consumer, AtomicInteger>();
 	
+	@JsonIgnore
 	protected List<Consumer> consumers = new LinkedList<Consumer>();
 
+	@JsonIgnore
 	protected MessageDAO<?> mdao;
 
-	
+	@JsonIgnore
 	private List<Lifecycle> lifecycle = new LinkedList<Lifecycle>();
 	
 	@Before
@@ -386,6 +389,10 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected void doOnMessage(Message msg) {
 		
+	}
+	
+	public String getTopic() {
+		return topic;
 	}
 
 

@@ -11,8 +11,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.test.AbstractSwallowTest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mengwenchao
@@ -21,18 +23,21 @@ import com.dianping.swallow.test.AbstractSwallowTest;
  */
 public abstract class AbstractLoadTest extends AbstractSwallowTest{
 	
+	@JsonIgnore
     protected Logger logger       = LoggerFactory.getLogger(getClass());
 
 	protected String topicName = "LoadTestTopic";
 	
 	protected String type 	  = "type";
 	
-	protected static 	int totalMessageCount = Integer.MAX_VALUE;
-	protected   static  	int concurrentCount = 10;
-	protected   static  	int topicCount = 1;
-	protected 	static		int topicStartIndex = 0;
+	protected  	long totalMessageCount = Long.parseLong(System.getProperty("totalMessageCount", String.valueOf(Long.MAX_VALUE)));;
+	protected   int concurrentCount = Integer.parseInt(System.getProperty("concurrentCount", "1"));
+	protected   int topicCount = Integer.parseInt(System.getProperty("topicCount", "1"));;
+	protected 	int topicStartIndex = Integer.parseInt(System.getProperty("topicStartIndex", "0"));;
 
-    protected  AtomicLong count = new AtomicLong();
+	protected 	static		int maxRunMinutes = Integer.parseInt(System.getProperty("maxRunMinutes", "10080"));;
+
+    private  AtomicLong count = new AtomicLong();
     protected AtomicLong preCount = new AtomicLong();
     protected long preTime;
     protected long startTime;
@@ -40,10 +45,13 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
     protected int zeroCount = 0;
     protected int zeroExit = 10;
     
+    @JsonIgnore
     protected ScheduledExecutorService	scheduled = Executors.newScheduledThreadPool(4);
+    
+    @JsonIgnore
     protected ExecutorService executors = Executors.newCachedThreadPool(new MQThreadFactory("LOAD-TEST-POOL"));
 
-    public static int messageSize = 1000;
+    public static int messageSize = Integer.parseInt(System.getProperty("messageSize", "1024"));;
     public static String message;
     
 
@@ -64,13 +72,20 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 		return name + "-" + count;
 	}
     
-	protected void getArgs() {
+	protected boolean isLastTopic(String currentTopicName) {
 		
-		totalMessageCount = Integer.parseInt(System.getProperty("totalMessageCount", String.valueOf(Integer.MAX_VALUE)));
-		concurrentCount   = Integer.parseInt(System.getProperty("concurrentCount", "1"));
-		topicCount   = Integer.parseInt(System.getProperty("topicCount", "1"));
-		topicStartIndex = Integer.parseInt(System.getProperty("topicStartIndex", "0"));
-		messageSize = Integer.parseInt(System.getProperty("messageSize", "1024"));
+		int index = Integer.parseInt(currentTopicName.substring(topicName.length() + 1));
+		
+		return index == topicCount + topicStartIndex - 1;
+	}
+
+
+    
+	protected void getArgs() {
+		if(totalMessageCount <= 0){
+			totalMessageCount = Long.MAX_VALUE;
+		}
+		
 	}
 
 	protected void start() throws Exception{
@@ -84,23 +99,30 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 		startTime = System.currentTimeMillis();
 		
 		doStart();
-		
-		executors.shutdown();
-		executors.awaitTermination(7, TimeUnit.DAYS);
-		
-		if(isExitOnExecutorsReturn()){
-			if(logger.isInfoEnabled()){
-				logger.info("[start][time exceed return]");
+
+		scheduled.schedule(new Runnable(){
+
+			@Override
+			public void run() {
+
+				if(logger.isInfoEnabled()){
+					logger.info("[start][time exceed return]");
+				}
+				if(isExitOnExecutorsReturn()){
+					exit();
+				}
 			}
-			exit();
-		}
+			
+		}, maxRunMinutes, TimeUnit.MINUTES);
 	}
 	
 	protected void doStart() throws InterruptedException, IOException, Exception{
 		
-		for(int i=topicStartIndex; i < topicCount; i++){
+		logger.info("[doStart][args]" + JsonBinder.getNonEmptyBinder().toJson(this));
+		
+		for(int i=0; i < topicCount; i++){
 			
-			String currentTopic = getTopicName(topicName, i);
+			String currentTopic = getTopicName(topicName, topicStartIndex + i);
 			
 			for(int j=0; j < concurrentCount; j++){
 				
@@ -108,7 +130,12 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 					logger.info("[doStart]" + currentTopic + "," + j);
 				}
 				
-				executors.execute(createLoadTask(currentTopic, j));
+				Runnable task = createLoadTask(currentTopic, j);
+				if(task != null){
+					executors.execute(task);
+				}else{
+					logger.warn("task null" + currentTopic);
+				}
 			}
 		}
 	}
@@ -160,6 +187,12 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 					logger.info("[run]" + "current rate:" + (currentCount - preCount.get())/((currentTime - preTime)/1000));
 					logger.info("[run]" + "total rate:" + (currentCount)/((currentTime - startTime)/1000));
 					logger.info("[run]" + "message count:" + currentCount);
+					
+					
+					if(currentCount > totalMessageCount){
+						logger.info("[run][currentCount > totalMessageCount][exit]" + currentCount + "," + totalMessageCount);
+						exit();
+					}
 	
 					if(currentCount - preCount.get() == 0){
 						zeroCount++;
@@ -206,8 +239,26 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 		} catch (InterruptedException e) {
 			logger.error("[sleep]", e);
 		}
-		
-		
+	}
+	
+	protected long increaseAndGetCurrentCount(){
+		long current = count.incrementAndGet();
+		if(current >  totalMessageCount){
+			throw new CountExceedException("current:" + current);
+		}
+		return current;
+	}
+	
+	protected long getCurrentCount(){
+		return count.get();
+	}
+
+	protected long addAndGetCurrentCount(long delta){
+		long current = count.addAndGet(delta);
+		if(current >  totalMessageCount){
+			throw new CountExceedException("current:" + current);
+		}
+		return current;
 	}
 
 }

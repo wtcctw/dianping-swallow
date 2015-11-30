@@ -21,15 +21,15 @@ import kafka.javaapi.PartitionMetadata;
 public class SlaveKafkaConsumer extends AbstractKafkaConsumer{
 
 
-	public SlaveKafkaConsumer(String seedBrokers, String clientId, int minBytes, int soTimeout, int fetchSize,
-			int maxWait, int fetchRetryCount) {
-		super(getSeedBrokers(seedBrokers), clientId, minBytes, soTimeout, fetchSize, maxWait, fetchRetryCount);
+	public SlaveKafkaConsumer(String seedBrokers, String clientId, int minBytes, int soTimeout, int fetchSize, int maxWait, int fetchRetryCount, 
+			int maxTotalPerKey, int maxIdlePerKey, boolean blockWhenExhausted, int maxWaitMillis) {
+		super(getSeedBrokers(seedBrokers), clientId, minBytes, soTimeout, fetchSize, maxWait, fetchRetryCount, maxWaitMillis, maxWaitMillis, blockWhenExhausted, maxWaitMillis);
 	}
 
 	
-	public SlaveKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int minBytes, int soTimeout, int fetchSize,
-			int maxWait, int fetchRetryCount) {
-		super(seedBrokers, clientId, soTimeout, minBytes, fetchSize, maxWait, fetchRetryCount);
+	public SlaveKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int minBytes, int soTimeout, int fetchSize, int maxWait, int fetchRetryCount, 
+			int maxTotalPerKey, int maxIdlePerKey, boolean blockWhenExhausted, int maxWaitMillis) {
+		super(seedBrokers, clientId, soTimeout, minBytes, fetchSize, maxWait, fetchRetryCount, maxWaitMillis, maxWaitMillis, blockWhenExhausted, maxWaitMillis);
 	}
 
 	@Override

@@ -12,6 +12,8 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 /**
  * @author mengwenchao
@@ -21,8 +23,10 @@ import org.slf4j.LoggerFactory;
 public class AbstractTest {
 	
 	
+	@JsonIgnore
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	@JsonIgnore
 	protected ExecutorService executors = Executors.newCachedThreadPool();
 
 

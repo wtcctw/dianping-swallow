@@ -9,6 +9,7 @@ import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
+import com.dianping.swallow.test.load.AbstractLoadTask;
 import com.dianping.swallow.test.load.AbstractLoadTest;
 
 /**
@@ -18,64 +19,35 @@ import com.dianping.swallow.test.load.AbstractLoadTest;
  */
 public abstract class AbstractProducerLoadTest extends AbstractLoadTest{
 
-    private static int      topicCount    = 1;
-    private static int      producerCount = 1;
-    private static int  	totalCount = 100;
-    private static int 		sendMessageInterval = 0;
-
-	protected static void parseArgs(String[] args) {
-		
-    	if(args.length >= 1){
-    		topicCount = Integer.parseInt(args[0]);
-    	}
-    	if(args.length >= 2){
-    		producerCount = Integer.parseInt(args[1]);
-    	}
-    	if(args.length >= 3){
-    		totalCount = Integer.parseInt(args[2]);
-    	}
-    	
-    	if(args.length >= 4){
-    		sendMessageInterval = Integer.parseInt(args[3]);
-    	}
-		
-	}
+    private static int 		sendMessageInterval = Integer.parseInt(System.getProperty("sendMessageInterval", "0"));
 
 	protected ProducerMode getProducerMode() {
 		
 		return ProducerMode.SYNC_MODE;
 	}
     
-    
-    @Override
-	protected void doStart() throws InterruptedException {
-		    	
-    	logger.info("[doStart][args]" + topicCount + "," + producerCount + "," + totalCount + "," + sendMessageInterval);
-    	
-        for (int i = 0; i < topicCount; i++) {
-            String topic = getTopicName(topicName, i);
-            for (int j = 0; j < producerCount; j++) {
-                ProduceRunner runner = new ProduceRunner(topic, type);
-                executors.execute(runner);
-            }
-        }
-        		
+	@Override
+	protected Runnable createLoadTask(String topicName, int concurrentIndex) {
+		
+		String messageType = isLastTopic(topicName) ? type : null;
+		
+		logger.info("[createLoadTask][messageType]" + messageType);
+		
+		return new ProduceRunner(topicName, concurrentIndex, messageType);
 	}
+    
 
-	class ProduceRunner implements Runnable {
 
-    	private String topic;
+	class ProduceRunner  extends AbstractLoadTask {
+
     	private String type;
-        private ProduceRunner(String topic, String type) {
-            this.topic = topic;
+        private ProduceRunner(String topic, int concurrentIndex, String type) {
+        	super(topic, concurrentIndex);
             this.type = type;
-        }
-        private ProduceRunner(String topic) {
-            this.topic = topic;
         }
 
         @Override
-        public void run() {
+        public void doRun() {
             try {
             	
                 ProducerConfig config = new ProducerConfig();
@@ -84,13 +56,10 @@ public abstract class AbstractProducerLoadTest extends AbstractLoadTest{
                 	logger.info("[run]" + mode);
                 }
                 config.setMode(mode);
-                Producer producer = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topic), config);
+                Producer producer = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topicName), config);
 
-                for (int i = 0; i < Integer.MAX_VALUE; i++) {
-                    if(count.get() >= totalCount){
-                    	break;
-                    }
-                    long currentCount = count.incrementAndGet();
+                while(true){
+                    long currentCount = increaseAndGetCurrentCount();
 
                     boolean retry = false;
                     int retryCount = 0;

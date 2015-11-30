@@ -1,5 +1,8 @@
 package com.dianping.swallow.test.load;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author mengwenchao
  *
@@ -7,6 +10,8 @@ package com.dianping.swallow.test.load;
  */
 public abstract class AbstractLoadTask implements Runnable{
 	
+	protected Logger logger = LoggerFactory.getLogger(getClass());
+
 	protected String topicName;
 	
 	protected int concurrentIndex;
@@ -20,8 +25,12 @@ public abstract class AbstractLoadTask implements Runnable{
 
 	@Override
 	public void run() {
-		
-		doRun();
+
+		try{
+			doRun();
+		}catch (CountExceedException e){
+			logger.info("[run]" + e.getMessage());
+		}
 		
 	}
 

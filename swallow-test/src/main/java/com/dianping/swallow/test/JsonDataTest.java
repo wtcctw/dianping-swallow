@@ -26,7 +26,7 @@ public class JsonDataTest extends AbstractConsumerTest {
 		final AtomicReference<Data> realData = new AtomicReference<JsonDataTest.Data>();
 		final AtomicReference<Throwable> result = new AtomicReference<Throwable>();
 
-		Consumer c = createConsumer(topic, getConsumerId());
+		Consumer c = createConsumer(getTopic(), getConsumerId());
 		c.setListener(new MessageListener() {
 			
 			@Override
@@ -44,7 +44,7 @@ public class JsonDataTest extends AbstractConsumerTest {
 		});
 		c.start();
 
-		sendMessage(topic, data);
+		sendMessage(getTopic(), data);
 
 		waitForListernToComplete(1);
 		if(result.get() != null){

@@ -25,6 +25,11 @@ public class KafkaConfigTest {
 		Assert.assertEquals(4, config.getFetchRetryCount());
 		Assert.assertEquals(2*1024*1024 + 1, config.getFetchSize());
 		Assert.assertEquals(5001, config.getMaxWait());
+		
+		Assert.assertEquals(101, config.getMaxConnectionPerHost());
+		Assert.assertEquals(51, config.getMaxIdlePerHost());
+		Assert.assertEquals(false, config.isBlockWhenExhausted());
+		Assert.assertEquals(1001, config.getMaxWaitMillis());
 	}
 	
 	

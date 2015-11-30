@@ -26,13 +26,16 @@ public class SimpleKafkaConsumerTest extends AbstractKafkaConsumerTest{
 	@Before
 	public void beforeSimpleKafkaConsumerTest(){
 		
-		simpleKafkaConsumer = new SimpleKafkaConsumer(getKafkaAddress(), "unittest", 0, 5000, 1 << 20, 5000, 3);
+		simpleKafkaConsumer = new SimpleKafkaConsumer(getKafkaAddress(), "unittest", 0, 5000, 1 << 20, 5000, 3, 8, 8, true, 1000);
 	}
 	
 	@Test
 	public void testSaveAck(){
 		
-		System.out.println(simpleKafkaConsumer.getAck(new TopicAndPartition("SWALLOW_BACKUP", 0), "xxxxx"));
+		if(logger.isInfoEnabled()){
+			logger.info("%d", simpleKafkaConsumer.getAck(new TopicAndPartition("SWALLOW_BACKUP", 0), "xxxxx"));
+		}
+		
 		
 		TopicAndPartition tp = getTopicAndPartition();
 		String group = testName.getMethodName();
@@ -134,14 +137,23 @@ public class SimpleKafkaConsumerTest extends AbstractKafkaConsumerTest{
 		sendMessage(tp, messageCount,  message);
 		
 		
-		for(int i=0;i<1 << 30;i++){
+		for(int i=0;i<1 << 1;i++){
 			
-			System.out.println("--------------begin fetch----------------");
+			if(logger.isInfoEnabled()){
+				logger.info("--------------begin fetch----------------");
+			}
 			List<KafkaMessage> messages = simpleKafkaConsumer.getMessageGreatThan(tp, currentOffset);
-			System.out.println(messages.size());
+			if(logger.isInfoEnabled()){
+				logger.info("%d", messages.size());
+			}
 			
 			sleep(1000);
 		}
+	}
+	
+	@Test
+	public void test(){
+		logger.info("%{1}", 100);
 	}
 	
 	@Test

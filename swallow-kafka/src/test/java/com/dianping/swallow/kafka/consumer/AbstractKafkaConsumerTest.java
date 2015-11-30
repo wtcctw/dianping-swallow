@@ -54,19 +54,26 @@ public class AbstractKafkaConsumerTest extends AbstractKafkaTest{
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 		props.put(ProducerConfig.ACKS_CONFIG, "-1");
 
-		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
+		KafkaProducer<String, String> producer = null; 
 		
-		for(int i =0; i < count ;i++){
-
-			try {
-				ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, content);
-				
-				beforeSend(record);
-				producer.send(record).get();
-				afterSend(record);
-			} catch (Exception e) {
-				i--;
-				logger.error("[error sending]" + count, e);
+		try{
+			producer = new KafkaProducer<String, String>(props);
+			for(int i =0; i < count ;i++){
+	
+				try {
+					ProducerRecord<String, String> record = new ProducerRecord<String, String>(topic, content);
+					
+					beforeSend(record);
+					producer.send(record).get();
+					afterSend(record);
+				} catch (Exception e) {
+					i--;
+					logger.error("[error sending]" + count, e);
+				}
+			}
+		}finally{
+			if(producer != null){
+				producer.close();
 			}
 		}
 	}

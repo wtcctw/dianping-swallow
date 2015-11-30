@@ -18,8 +18,12 @@ public class KafkaConfig extends AbstractLionConfig{
 	private int fetchSize = 2*1024*1024;
 	private int maxWait = 5000;
 	private int fetchRetryCount = 3;
+	private String zip = "lz4";
+	
 	private int maxConnectionPerHost = 100;
-	private String zip = "gzip";
+	private int maxIdlePerHost = 100;
+	private boolean blockWhenExhausted = true;
+	private int maxWaitMillis = 1000;
 
 	public KafkaConfig(String fileName, String suffix, boolean isUseLion) {
 		super(fileName, StringUtils.join(SPLIT, KAFKA_CONIFG_BASIC_SUFFIX, suffix), isUseLion);
@@ -94,5 +98,29 @@ public class KafkaConfig extends AbstractLionConfig{
 		this.maxConnectionPerHost = maxConnectionPerHost;
 	}
 
+
+	public boolean isBlockWhenExhausted() {
+		return blockWhenExhausted;
+	}
+
+	public void setBlockWhenExhausted(boolean blockWhenExhausted) {
+		this.blockWhenExhausted = blockWhenExhausted;
+	}
+
+	public int getMaxWaitMillis() {
+		return maxWaitMillis;
+	}
+
+	public void setMaxWaitMillis(int maxWaitMillis) {
+		this.maxWaitMillis = maxWaitMillis;
+	}
+
+	public int getMaxIdlePerHost() {
+		return maxIdlePerHost;
+	}
+
+	public void setMaxIdlePerHost(int maxIdlePerHost) {
+		this.maxIdlePerHost = maxIdlePerHost;
+	}
 	
 }

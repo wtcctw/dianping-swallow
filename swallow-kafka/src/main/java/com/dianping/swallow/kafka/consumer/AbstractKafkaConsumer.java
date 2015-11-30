@@ -28,6 +28,9 @@ import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
 
+import org.apache.commons.pool2.KeyedObjectPool;
+import org.apache.commons.pool2.impl.GenericKeyedObjectPool;
+import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,10 @@ import scala.collection.JavaConversions;
 import com.dianping.swallow.kafka.KafkaConsumer;
 import com.dianping.swallow.kafka.KafkaMessage;
 import com.dianping.swallow.kafka.TopicAndPartition;
+import com.dianping.swallow.kafka.consumer.simple.KafkaGetElemetFailException;
+import com.dianping.swallow.kafka.consumer.simple.SimpleKafkaConsumerFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author mengwenchao
@@ -62,10 +69,17 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 	
 	private Map<TopicAndPartition, PartitionMetadata> partitionMap = new ConcurrentHashMap<TopicAndPartition, PartitionMetadata>();
 	
-	private Map<InetSocketAddress, SimpleConsumer> allConsumers = new HashMap<InetSocketAddress, SimpleConsumer>(); 
+	
+	private int maxTotalPerKey = 100;
+	private int maxIdlePerKey = 100;
+	private boolean blockWhenExhausted = true;
+	private int maxWaitMillis = 1000;
+	
+	private KeyedObjectPool<InetSocketAddress, SimpleConsumer>  consumerPool;
 
 
-	public AbstractKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int minBytes, int soTimeout, int fetchSize, int maxWait, int fetchRetryCount) {
+	public AbstractKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int minBytes, int soTimeout, 
+			int fetchSize, int maxWait, int fetchRetryCount, int maxTotalPerKey, int maxIdlePerKey, boolean blockWhenExhausted, int maxWaitMillis) {
 		
 		this.seedBrokers = seedBrokers;
 		this.clientId = clientId;
@@ -75,53 +89,102 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 		this.soTimeout = soTimeout;
 		this.fetchSize = fetchSize;
 		
-		initConsumers();
+		//for object pool
+		this.maxTotalPerKey = maxTotalPerKey;
+		this.maxIdlePerKey = maxIdlePerKey;
+		this.blockWhenExhausted = blockWhenExhausted;
+		this.maxWaitMillis = maxWaitMillis;
+		
+		consumerPool = createConsumerPool();
+		
 	}
 	
+	private KeyedObjectPool<InetSocketAddress, SimpleConsumer> createConsumerPool() {
+		
+		GenericKeyedObjectPoolConfig config = new GenericKeyedObjectPoolConfig();
+		
+		config.setMaxIdlePerKey(maxIdlePerKey);
+		config.setMaxTotalPerKey(maxTotalPerKey);
+		config.setBlockWhenExhausted(blockWhenExhausted);
+		config.setMaxWaitMillis(maxWaitMillis);
+		
+		if(logger.isInfoEnabled()){
+			ObjectMapper objectMapper = new ObjectMapper();
+			try {
+				logger.info("[createConsumerPool]" + objectMapper.writeValueAsString(config));
+			} catch (JsonProcessingException e) {
+				logger.info("[createConsumerPool]", e);
+			}
+		}
+		
+		KeyedObjectPool<InetSocketAddress, SimpleConsumer> consumerPool =  new GenericKeyedObjectPool<InetSocketAddress, SimpleConsumer>(
+				new SimpleKafkaConsumerFactory(soTimeout, fetchSize, clientId), config);
+		return consumerPool;
+	}
+
 	@Override
 	public Long getMaxMessageId(TopicAndPartition tp) {
 		
-		SimpleConsumer simpleConsumer = getProperConsumer(tp);
-		return getMaxMessageId(simpleConsumer, tp) - 1;
+		SimpleConsumer simpleConsumer = null;
+		try{
+			simpleConsumer = getProperConsumer(tp);
+			return getMaxMessageId(simpleConsumer, tp) - 1;
+		}finally{
+			returnConsumer(simpleConsumer);
+		}
 	}
 
 	@Override
 	public Long getMinMessageId(TopicAndPartition tp) {
 		
-		return getMiniMessageId(getProperConsumer(tp), tp);
+		SimpleConsumer simpleConsumer = null;
+		try{
+			simpleConsumer = getProperConsumer(tp);
+			return getMiniMessageId(simpleConsumer, tp);
+		}finally{
+			returnConsumer(simpleConsumer);
+		}
 	}
 	
 	
 	private SimpleConsumer getProperConsumer(TopicAndPartition tp){
 		
 		Broker broker = getProperBroker(tp);
-		SimpleConsumer consumer = getOrCreateConsumer(broker);
+		InetSocketAddress address = new InetSocketAddress(broker.host(), broker.port());
+		SimpleConsumer consumer = getConsumer(address);
 		return consumer;
 	}
 	
 	@Override
 	public void saveAck(TopicAndPartition tp, String groupId, Long ack) {
 	
-		SimpleConsumer simpleConsumer = getProperConsumer(tp);
+		SimpleConsumer simpleConsumer = null;
 		
-		Map<kafka.common.TopicAndPartition, OffsetAndMetadata> requestInfo = new HashMap<kafka.common.TopicAndPartition, OffsetAndMetadata>();
-		requestInfo.put(tp.toKafka(), new OffsetAndMetadata(ack, "ack", System.currentTimeMillis()));
-		
-		 
-		OffsetCommitRequest request = new OffsetCommitRequest(groupId, requestInfo, getCorRelationId(), clientId);
-				
-		OffsetCommitResponse response = simpleConsumer.commitOffsets(request);
-		
-		if(response.hasError()){
-			logger.error("[saveAck]" + tp + "," + groupId + "," + ack, ErrorMapping.exceptionFor(response.errorCode(tp.toKafka())));
+		try{
+			simpleConsumer = getProperConsumer(tp);
+			
+			Map<kafka.common.TopicAndPartition, OffsetAndMetadata> requestInfo = new HashMap<kafka.common.TopicAndPartition, OffsetAndMetadata>();
+			requestInfo.put(tp.toKafka(), new OffsetAndMetadata(ack, "ack", System.currentTimeMillis()));
+			
+			 
+			OffsetCommitRequest request = new OffsetCommitRequest(groupId, requestInfo, getCorRelationId(), clientId);
+					
+			OffsetCommitResponse response = simpleConsumer.commitOffsets(request);
+			
+			if(response.hasError()){
+				logger.error("[saveAck]" + tp + "," + groupId + "," + ack, ErrorMapping.exceptionFor(response.errorCode(tp.toKafka())));
+			}
+		}finally{
+			returnConsumer(simpleConsumer);
 		}
 	}
 
 	@Override
 	public Long getAck(TopicAndPartition tp, String groupId) {
 		
+		SimpleConsumer simpleConsumer = null;
 		try{
-			SimpleConsumer simpleConsumer = getProperConsumer(tp);
+			simpleConsumer = getProperConsumer(tp);
 			
 			List<kafka.common.TopicAndPartition> requestInfo = new LinkedList<kafka.common.TopicAndPartition>();
 			requestInfo.add(tp.toKafka());
@@ -137,6 +200,8 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 			return offset.offset();
 		}catch(UnfoundMetaDataException e){
 			logger.error("[getAck]" + tp + "," + groupId, e);
+		}finally{
+			returnConsumer(simpleConsumer);
 		}
 		
 		return null;
@@ -151,9 +216,10 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 		
 		for(int i=0; i <= fetchRetryCount; i++){
 			
+			SimpleConsumer simpleConsumer = null;
 			try{
 		
-				SimpleConsumer consumer = getProperConsumer(tp);
+				simpleConsumer = getProperConsumer(tp);
 				
 				Map<kafka.common.TopicAndPartition, PartitionFetchInfo>  requestInfo = new HashMap<kafka.common.TopicAndPartition, PartitionFetchInfo>();
 				requestInfo.put(tp.toKafka(), new PartitionFetchInfo(offset + 1, fetchSize));
@@ -163,7 +229,7 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 				if(logger.isDebugEnabled()){
 					logger.debug("[getMessageGreatThan][begin]" + tp + "," + offset + "," + fetchSize);
 				}
-				response = consumer.fetch(request);
+				response = simpleConsumer.fetch(request);
 				if(logger.isDebugEnabled()){
 					logger.debug("[getMessageGreatThan][end]" + tp + "," + offset + "," + fetchSize);
 				}
@@ -179,7 +245,7 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 					if(logger.isInfoEnabled()){
 						logger.info("[getMessageGreatThan][offset not right]" + tp + "," + offset);
 					}
-					Long minId = getMiniMessageId(consumer, tp);
+					Long minId = getMiniMessageId(simpleConsumer, tp);
 					if(offset < minId){
 						offset = minId - 1;
 					}else{
@@ -193,6 +259,8 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 				}
 			}catch(Exception e){
 				logger.error("[getMessageGreatThan]" + tp + "," + offset, e);
+			}finally{
+				returnConsumer(simpleConsumer);
 			}
 			
 			getPartitionMetadata(tp, true);
@@ -287,37 +355,29 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 		return 0;
 	}
 
-	private SimpleConsumer getOrCreateConsumer(Broker broker) {
-		
-		InetSocketAddress address = new InetSocketAddress(broker.host(), broker.port());
-		SimpleConsumer consumer = allConsumers.get(address);
-		if(consumer != null){
-			return consumer;
+	private SimpleConsumer getConsumer(InetSocketAddress address) {
+		SimpleConsumer consumer;
+		try {
+			consumer = consumerPool.borrowObject(address);
+		} catch (Exception e) {
+			throw new KafkaGetElemetFailException(address, e);
 		}
-		
-		synchronized (allConsumers) {
-			consumer = allConsumers.get(address);
-			if(consumer == null){
-				consumer = createConsumer(address);
-			}
-		}
-		
 		return consumer;
 	}
-
-	private void initConsumers() {
+	
+	private void returnConsumer(SimpleConsumer simpleConsumer){
 		
-		for(InetSocketAddress seed : seedBrokers){
-			
-			createConsumer(seed);
+		if(simpleConsumer == null){
+			logger.warn("[returnConsumer]" + simpleConsumer);
+			return;
 		}
-	}
-
-	private SimpleConsumer createConsumer(InetSocketAddress seed) {
 		
-		SimpleConsumer consumer = new SimpleConsumer(seed.getHostName(), seed.getPort(), soTimeout, fetchSize, clientId);
-		this.allConsumers.put(seed, consumer);
-		return consumer;
+		InetSocketAddress address = new InetSocketAddress(simpleConsumer.host(), simpleConsumer.port());
+		try {
+			consumerPool.returnObject(address, simpleConsumer);
+		} catch (Exception e) {
+			logger.error("[returnConsumer][fail]"  + simpleConsumer + "," + address);
+		}
 	}
 
 	private Broker getProperBroker(TopicAndPartition tp){
@@ -363,34 +423,34 @@ public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 	
 	private PartitionMetadata getPartitionMetadata_(TopicAndPartition tp) {
 		
-		PartitionMetadata returnMetadata = null;
-		loop: for (SimpleConsumer consumer : allConsumers.values()) {
+		for(InetSocketAddress broker : seedBrokers){
+			
+			SimpleConsumer simpleConsumer = null;
 			try {
+				simpleConsumer = getConsumer(broker);
 				List<String> topics = Collections.singletonList(tp.getTopic());
 				TopicMetadataRequest req = new TopicMetadataRequest(topics);
-				kafka.javaapi.TopicMetadataResponse resp = consumer.send(req);
+				kafka.javaapi.TopicMetadataResponse resp = simpleConsumer.send(req);
 
 				List<TopicMetadata> metaData = resp.topicsMetadata();
 				for (TopicMetadata item : metaData) {
 					for (PartitionMetadata part : item.partitionsMetadata()) {
 						if (part.partitionId() == tp.getPartition()) {
-							returnMetadata = part;
-							break loop;
+							if(logger.isInfoEnabled()){
+								logger.info("[getPartitionMetadata_]" + tp + "," + part);
+							}
+							return part;
 						}
 					}
 				}
 			} catch (Exception e) {
-				logger.error("[error]" + consumer, e);
+				logger.error("[error]" + simpleConsumer, e);
 			} finally {
-				if (consumer != null)
-					consumer.close();
+				returnConsumer(simpleConsumer);
 			}
 		}
 		
-		if(logger.isInfoEnabled()){
-			logger.info("[getPartitionMetadata_]" + tp + "," + returnMetadata);
-		}
-		return returnMetadata;
+		return null;
 	}
 
 	public static List<InetSocketAddress> getSeedBrokers(String kafkaAddress) {

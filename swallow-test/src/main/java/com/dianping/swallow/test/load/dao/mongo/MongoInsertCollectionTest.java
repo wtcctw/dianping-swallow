@@ -37,22 +37,11 @@ public class MongoInsertCollectionTest extends AbstractDaoTest {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-		totalMessageCount = 1000;
-		
 		if (args.length >= 1) {
 			dbCount  = Integer.parseInt(args[0]);
 		}
 		if (args.length >= 2) {
 			collectionCount = Integer.parseInt(args[1]);
-		}
-		if (args.length >= 3) {
-			concurrentCount = Integer.parseInt(args[2]);
-		}
-		if (args.length >= 4) {
-			totalMessageCount = Integer.parseInt(args[3]);
-		}
-		if (args.length >= 5) {
-			messageSize = Integer.parseInt(args[4]);
 		}
 
 		
@@ -99,14 +88,8 @@ public class MongoInsertCollectionTest extends AbstractDaoTest {
 		public void run() {
 			
 			while(true){
-				if(count.get() > totalMessageCount){
-					if(logger.isInfoEnabled()){
-						logger.info("[run] total message count " + totalMessageCount);
-					}
-					exit();
-				}
 				collection.save(createSimpleDataObject());
-				count.incrementAndGet();
+				increaseAndGetCurrentCount();
 			}
 		}
 	}

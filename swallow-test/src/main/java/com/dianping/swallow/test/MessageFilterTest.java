@@ -31,9 +31,9 @@ public class MessageFilterTest extends AbstractConsumerTest{
 		
 		Set<String> filters = new HashSet<String>();
 		filters.add(type);
-		Consumer consumer = addListener(topic, getConsumerId(), filters);
-		sendMessage(messageCount/2, topic);
-		sendMessage(messageCount/2, topic, type);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), filters);
+		sendMessage(messageCount/2, getTopic());
+		sendMessage(messageCount/2, getTopic(), type);
 		
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount/2, getConsumerMessageCount(consumer));
@@ -59,10 +59,10 @@ public class MessageFilterTest extends AbstractConsumerTest{
 			logger.info(types.toString());
 		}
 		
-		Consumer consumer = addListener(topic, getConsumerId(), filters);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), filters);
 		
-		sendMessage(messageCount/2, topic, type);
-		sendMessage(messageCount/2, topic, type2);
+		sendMessage(messageCount/2, getTopic(), type);
+		sendMessage(messageCount/2, getTopic(), type2);
 		
 		waitForListernToComplete(messageCount);
 		System.out.println(types + "," + types.size());
@@ -71,9 +71,9 @@ public class MessageFilterTest extends AbstractConsumerTest{
 		types.clear();
 		filters.remove(type);
 		
-		Consumer consumer2 = addListener(topic, getConsumerId(), filters);
-		sendMessage(messageCount/2, topic, type);
-		sendMessage(messageCount/2, topic, type2);
+		Consumer consumer2 = addListener(getTopic(), getConsumerId(), filters);
+		sendMessage(messageCount/2, getTopic(), type);
+		sendMessage(messageCount/2, getTopic(), type2);
 	
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(1, types.size());
@@ -102,25 +102,25 @@ public class MessageFilterTest extends AbstractConsumerTest{
 		Set<String> filters = new HashSet<String>();
 		filters.add(type);
 		@SuppressWarnings("unused")
-		Consumer consumer = addListener(topic, getConsumerId(), filters);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), filters);
 		
-		sendMessage(10, topic, type);
+		sendMessage(10, getTopic(), type);
 
 		for(int i=0;i<20;i++){
-			sendMessage(10, topic);
+			sendMessage(10, getTopic());
 			sleep(100);
 		}
 
-		Long maxMessageId = mdao.getMaxMessageId(topic);
+		Long maxMessageId = mdao.getMaxMessageId(getTopic());
 		sleep(2000);
-		Long maxAck = mdao.getAckMaxMessageId(topic, getConsumerId());
+		Long maxAck = mdao.getAckMaxMessageId(getTopic(), getConsumerId());
 		
 		Assert.assertEquals(maxMessageId, maxAck);
-		sendMessage(10, topic, type);
+		sendMessage(10, getTopic(), type);
 		
 		sleep(2000);
-		maxMessageId = mdao.getMaxMessageId(topic);
-		maxAck = mdao.getAckMaxMessageId(topic, getConsumerId());
+		maxMessageId = mdao.getMaxMessageId(getTopic());
+		maxAck = mdao.getAckMaxMessageId(getTopic(), getConsumerId());
 		Assert.assertEquals(maxMessageId, maxAck);
 		
 	}
@@ -131,11 +131,11 @@ public class MessageFilterTest extends AbstractConsumerTest{
 		String type = "type";
 		Set<String> filters = new HashSet<String>();
 		filters.add(type);
-		Consumer consumer = addListener(topic, getConsumerId(), filters);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), filters);
 		
 		SwallowMessage rightMessage = createSwallowMessage();
 		rightMessage.setType(type);
-		rightMessage.putInternalProperty(InternalProperties.TOPIC, topic);
+		rightMessage.putInternalProperty(InternalProperties.TOPIC, getTopic());
 		rightMessage.putInternalProperty(InternalProperties.CONSUMERID, getConsumerId());
 
 		SwallowMessage wrongMessage = createSwallowMessage();
@@ -144,34 +144,34 @@ public class MessageFilterTest extends AbstractConsumerTest{
 		//some right message
 		int rightCount = 10, wrongCount = 1000;
 		for(int i=0;i<rightCount;i++){
-			mdao.saveMessage(topic, getConsumerId(), rightMessage);
+			mdao.saveMessage(getTopic(), getConsumerId(), rightMessage);
 		}
 		sleep(3000);
 		Assert.assertEquals(rightCount, getConsumerMessageCount(consumer));
 		
 		//wrong message jump
 		for(int i=0;i<wrongCount;i++){
-			mdao.saveMessage(topic, getConsumerId(), wrongMessage);
+			mdao.saveMessage(getTopic(), getConsumerId(), wrongMessage);
 			sleep(1);
 		}
 		sleep(1000);
 		Assert.assertEquals(rightCount, getConsumerMessageCount(consumer));
 		
-		Long maxMessageId =  mdao.getMaxMessageId(topic, getConsumerId());
-		Long maxAckMessageId = mdao.getAckMaxMessageId(topic, getConsumerId(), true);
+		Long maxMessageId =  mdao.getMaxMessageId(getTopic(), getConsumerId());
+		Long maxAckMessageId = mdao.getAckMaxMessageId(getTopic(), getConsumerId(), true);
 		
 		Assert.assertEquals(maxMessageId, maxAckMessageId);
 		
 
 		//right message
 		for(int i=0;i<rightCount;i++){
-			mdao.saveMessage(topic, getConsumerId(), rightMessage);
+			mdao.saveMessage(getTopic(), getConsumerId(), rightMessage);
 		}
 		sleep(2000);
 		Assert.assertEquals(rightCount*2, getConsumerMessageCount(consumer));
 		
-		maxMessageId =  mdao.getMaxMessageId(topic, getConsumerId());
-		maxAckMessageId = mdao.getAckMaxMessageId(topic, getConsumerId(), true);
+		maxMessageId =  mdao.getMaxMessageId(getTopic(), getConsumerId());
+		maxAckMessageId = mdao.getAckMaxMessageId(getTopic(), getConsumerId(), true);
 		
 		Assert.assertEquals(maxMessageId, maxAckMessageId);
 	}

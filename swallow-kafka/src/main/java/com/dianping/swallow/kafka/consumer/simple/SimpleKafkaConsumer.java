@@ -19,14 +19,14 @@ public class SimpleKafkaConsumer extends AbstractKafkaConsumer{
 
 
 	public SimpleKafkaConsumer(String kafkaAddress, String clientId, int minBytes, int soTimeout, int fetchSize,
-			int maxWait, int fetchRetryCount) {
-		this(getSeedBrokers(kafkaAddress), clientId, minBytes, soTimeout, fetchSize, maxWait, fetchRetryCount);
+			int maxWait, int fetchRetryCount, int maxTotalPerKey, int maxIdlePerKey, boolean blockWhenExhausted, int maxWaitMillis) {
+		this(getSeedBrokers(kafkaAddress), clientId, minBytes, soTimeout, fetchSize, maxWait, fetchRetryCount, maxWaitMillis, maxWaitMillis, blockWhenExhausted, maxWaitMillis);
 	}
 	
 
 	public SimpleKafkaConsumer(List<InetSocketAddress> seedBrokers, String clientId, int minBytes, int soTimeout, int fetchSize,
-			int maxWait, int fetchRetryCount) {
-		super(seedBrokers, clientId, minBytes, soTimeout, fetchSize, maxWait, fetchRetryCount);
+			int maxWait, int fetchRetryCount, int maxTotalPerKey, int maxIdlePerKey, boolean blockWhenExhausted, int maxWaitMillis) {
+		super(seedBrokers, clientId, minBytes, soTimeout, fetchSize, maxWait, fetchRetryCount, maxWaitMillis, maxWaitMillis, blockWhenExhausted, maxWaitMillis);
 	}
 
 	@Override

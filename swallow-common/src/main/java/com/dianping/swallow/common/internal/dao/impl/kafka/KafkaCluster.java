@@ -61,12 +61,12 @@ public class KafkaCluster extends AbstractCluster{
 
 		if(kafkaConfig.isReadFromMaster()){
 			kafkaConsumer = new SimpleKafkaConsumer(allKafkaServers(), getClientId(), kafkaConfig.getMinBytes(), 
-					kafkaConfig.getSoTimeout()
-					, kafkaConfig.getFetchSize(), kafkaConfig.getMaxWait(), kafkaConfig.getFetchRetryCount());
+					kafkaConfig.getSoTimeout() , kafkaConfig.getFetchSize(), kafkaConfig.getMaxWait(), kafkaConfig.getFetchRetryCount(), 
+					kafkaConfig.getMaxConnectionPerHost(), kafkaConfig.getMaxIdlePerHost(), kafkaConfig.isBlockWhenExhausted(), kafkaConfig.getMaxWaitMillis());
 		}else{
 			kafkaConsumer = new SlaveKafkaConsumer(allKafkaServers(), getClientId(), kafkaConfig.getMinBytes(),
-					kafkaConfig.getSoTimeout()
-					, kafkaConfig.getFetchSize(), kafkaConfig.getMaxWait(), kafkaConfig.getFetchRetryCount());
+					kafkaConfig.getSoTimeout(), kafkaConfig.getFetchSize(), kafkaConfig.getMaxWait(), kafkaConfig.getFetchRetryCount(),
+					kafkaConfig.getMaxConnectionPerHost(), kafkaConfig.getMaxIdlePerHost(), kafkaConfig.isBlockWhenExhausted(), kafkaConfig.getMaxWaitMillis());
 			
 		}
 		
