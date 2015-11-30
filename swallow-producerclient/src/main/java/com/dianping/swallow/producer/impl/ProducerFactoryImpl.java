@@ -15,10 +15,6 @@
  */
 package com.dianping.swallow.producer.impl;
 
-import com.dianping.swallow.common.internal.config.LoggerLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.dpsf.api.ProxyFactory;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
@@ -27,8 +23,8 @@ import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.processor.DefaultMessageProcessorTemplate;
 import com.dianping.swallow.common.internal.processor.ProducerProcessor;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
-import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.internal.util.IPUtil;
+import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.producer.Producer;
@@ -36,6 +32,8 @@ import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerFactory;
 import com.dianping.swallow.producer.impl.internal.ProducerImpl;
 import com.dianping.swallow.producer.impl.internal.SwallowPigeonConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 实现ProducerFactory接口的工厂类
@@ -55,12 +53,11 @@ public final class ProducerFactoryImpl implements ProducerFactory {
    private ProducerSwallowService           remoteService;                                                        //远程调用对象
    
    static{
-	   SwallowHelper.initialize();
-       LoggerLoader.init();
+	   SwallowHelper.clientInitialize();
    }
    /**
     * Producer工厂类构造函数
-    * 
+    *
     * @throws RemoteServiceInitFailedException 远程调用服务（pigeon）初始化失败
     */
    private ProducerFactoryImpl() throws RemoteServiceInitFailedException {

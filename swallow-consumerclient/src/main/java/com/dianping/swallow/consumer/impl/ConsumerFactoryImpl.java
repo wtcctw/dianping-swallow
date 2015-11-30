@@ -1,7 +1,6 @@
 package com.dianping.swallow.consumer.impl;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
-import com.dianping.swallow.common.internal.config.LoggerLoader;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
@@ -33,8 +32,7 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
 	private HeartBeatSender heartBeatSender = new DefaultHeartBeatSender();
 
 	static {
-		SwallowHelper.initialize();
-		LoggerLoader.init();
+		SwallowHelper.clientInitialize();
 	}
 
 	private ConsumerFactoryImpl() {
