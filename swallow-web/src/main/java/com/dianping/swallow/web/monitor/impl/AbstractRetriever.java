@@ -251,7 +251,7 @@ public abstract class AbstractRetriever extends AbstractLifecycle implements Ret
                     Long higherKey = statsDatas.higherKey(tempKey);
                     if (higherKey != null) {
                         long pointKey = higherKey.longValue();
-                        while (pointKey - tempKey > getStorageIntervalCount()) {
+                        while (pointKey - tempKey >= getStorageIntervalCount()) {
                             statsDatas.put(tempKey, 0L);
                             tempKey += getStorageIntervalCount();
                         }
