@@ -25,20 +25,20 @@ public class GetFromSpecificTimeTest extends AbstractConsumerTest{
 	@Test
 	public void testFromSpecificTime() throws SendFailedException, RemoteServiceInitFailedException, InterruptedException{
 		
-		Long currentMessageId = getMaxMessageId(topic);
+		Long currentMessageId = getMaxMessageId(getTopic());
 		
 		startMessageId = currentMessageId;
-		sendMessage(messageCount, topic);
+		sendMessage(messageCount, getTopic());
 
-		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
-		Consumer consumer2 = addListener(topic, getConsumerId(), concurrentCount);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), concurrentCount);
+		Consumer consumer2 = addListener(getTopic(), getConsumerId(), concurrentCount);
 		
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		Assert.assertEquals(0, getConsumerMessageCount(consumer2));
 		
 		consumer.close();
-		waitForListernToComplete(messageCount*2);
+		waitForListernToComplete(messageCount*3);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer2));
 		
@@ -60,12 +60,12 @@ public class GetFromSpecificTimeTest extends AbstractConsumerTest{
 	@Test
 	public void testRestartFromSpecificTime() throws SendFailedException, RemoteServiceInitFailedException{
 
-		Long currentMessageId = getMaxMessageId(topic);
+		Long currentMessageId = getMaxMessageId(getTopic());
 		
-		sendMessage(messageCount, topic);
+		sendMessage(messageCount, getTopic());
 
 		startMessageId = currentMessageId;
-		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), concurrentCount);
 		
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
@@ -74,8 +74,8 @@ public class GetFromSpecificTimeTest extends AbstractConsumerTest{
 			
 			closeConsumer(consumer);
 			sleep(10000);
-			consumer = addListener(topic, getConsumerId(), concurrentCount);
-			sendMessage(10, topic);
+			consumer = addListener(getTopic(), getConsumerId(), concurrentCount);
+			sendMessage(10, getTopic());
 			waitForListernToComplete(messageCount);
 			Assert.assertEquals(messageCount + 10, getConsumerMessageCount(consumer));
 		}

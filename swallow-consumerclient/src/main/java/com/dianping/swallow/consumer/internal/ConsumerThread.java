@@ -59,6 +59,9 @@ public class ConsumerThread extends Thread {
             	   }
                   future = bootstrap.connect(remoteAddress);
                   future.await();
+	           	  if(logger.isDebugEnabled()){
+	           		  logger.debug("[run][await finished][" + getDesc() + "]" + remoteAddress);
+	           	  }
                   if (future.channel().isActive()) {
                      SocketAddress localAddress = future.channel().localAddress();
                      if(logger.isInfoEnabled()){

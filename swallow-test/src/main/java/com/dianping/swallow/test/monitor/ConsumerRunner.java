@@ -82,8 +82,7 @@ public class ConsumerRunner extends AbstractLoadTest {
 				c.setListener(new MessageListener() {
 					@Override
 					public void onMessage(Message msg) {
-
-						count.incrementAndGet();
+						increaseAndGetCurrentCount();
 					}
 				});
 				c.start();
@@ -99,16 +98,5 @@ public class ConsumerRunner extends AbstractLoadTest {
 
 		SimpleDateFormat format = new SimpleDateFormat("HH-mm-ss");
 		return "myid-" + format.format(new Date());
-	}
-
-	@Override
-	protected boolean isExit() {
-
-		if (totalMessageCount > 0 && count.get() > totalMessageCount) {
-			logger.info("[isExit][message size exceed total count, exit]" + count.get());
-			return true;
-		}
-
-		return false;
 	}
 }

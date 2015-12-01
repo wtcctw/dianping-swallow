@@ -42,7 +42,10 @@
 				<ref bean="kafkaClusterFactory"/>
 			</list>
 		</property>
-		
+	</bean>
+
+	<bean id="messageDAO"
+		class="com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory">
 	</bean>
 
 	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>

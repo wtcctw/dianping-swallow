@@ -41,8 +41,8 @@ public class AsyncTest extends AbstractConsumerTest{
 		
 		FileUtils.deleteDirectory(new File(fileQueueBaseDir));
 		
-		queue = new File(fileQueueBaseDir, topic);
-		FileQueueHolder.removeQueue(topic);
+		queue = new File(fileQueueBaseDir, getTopic());
+		FileQueueHolder.removeQueue(getTopic());
 	}
 	
 	@Test
@@ -117,7 +117,7 @@ public class AsyncTest extends AbstractConsumerTest{
 		
 		mode = ProducerMode.ASYNC_SEPARATELY_MODE;
 		
-		File retryFile = new File(fileQueueBaseDir, topic + HandlerAsynchroSeparatelyMode.RETRY_QUEUE_SUFFIX);
+		File retryFile = new File(fileQueueBaseDir, getTopic() + HandlerAsynchroSeparatelyMode.RETRY_QUEUE_SUFFIX);
 		Assert.assertFalse(retryFile.exists());
 		
 		runAsync();
@@ -129,8 +129,8 @@ public class AsyncTest extends AbstractConsumerTest{
 		
 		Assert.assertFalse(queue.exists());
 		
-		Consumer consumer = addListener(topic);
-		sendMessage(messageCount, topic, sendMessageSize);
+		Consumer consumer = addListener(getTopic());
+		sendMessage(messageCount, getTopic(), sendMessageSize);
 		
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));

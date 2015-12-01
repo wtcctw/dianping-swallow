@@ -38,10 +38,15 @@ public class TopicConfigTest {
 		
 		JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
 		TopicConfig config = jsonBinder.fromJson("{}", TopicConfig.class);
+		
 		Assert.assertEquals(new TopicConfig(), config);
+		
 		config = jsonBinder.fromJson(null, TopicConfig.class);
 		Assert.assertNull(config);
-		
+
+		config = jsonBinder.fromJson("", TopicConfig.class);
+		Assert.assertNull(config);
+
 		
 		config = new TopicConfig("mongodb://url", 100, 200, TOPIC_TYPE.EFFICIENCY_FIRST);
 		

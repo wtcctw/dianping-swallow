@@ -3,6 +3,7 @@ package com.dianping.swallow.consumerserver.buffer;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
+import com.dianping.swallow.consumerserver.buffer.impl.MessageBlockingQueue;
 
 /**
  * @author mengwenchao
@@ -17,19 +18,10 @@ public class MessageRetrieverTask extends AbstractRetrieveTask implements Runnab
 	}
 
 	@Override
-	protected void setTailId(Long tailId) {
-		blockingQueue.setTailMessageId(tailId);
-	}
-
-	@Override
 	protected String getConsumerId() {
 		return null;
 	}
 
-	@Override
-	protected Long getTailId() {
-		return blockingQueue.getTailMessageId();
-	}
 
 
 }

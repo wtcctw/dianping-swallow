@@ -16,7 +16,6 @@ public class AsyncProducerRunner extends AbstractProducerLoadTest{
 	
 	public static void main(String []argc) throws Exception{
 		
-		parseArgs(argc);
 		new AsyncProducerRunner().start();
 		
 	}

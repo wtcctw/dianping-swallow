@@ -258,7 +258,7 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
 	@Override
 	public String toString() {
-		return String.format("ConsumerImpl [consumerId=%s, dest=%s, masterAddress=%s, slaveAddress=%s, config=%s]",
+		return String.format("ConsumerImpl@%#X[consumerId=%s, dest=%s, masterAddress=%s, slaveAddress=%s, config=%s]", this.hashCode(),
 				consumerId, dest, masterAddress, slaveAddress, config);
 	}
 

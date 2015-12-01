@@ -1,8 +1,12 @@
 package com.dianping.swallow.test;
 
 
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,15 +16,15 @@ import org.junit.Before;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
+import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager;
+import com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory;
 import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoAckDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
@@ -34,7 +38,8 @@ import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
-import com.dianping.swallow.test.AbstractTest;
+import com.dianping.swallow.test.AbstractUnitTest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -42,62 +47,81 @@ import com.dianping.swallow.test.AbstractTest;
  *
  * 2015年3月23日 下午4:27:18
  */
-public abstract class AbstractSwallowTest extends AbstractTest{
+public abstract class AbstractSwallowTest extends AbstractUnitTest{
 
-	protected String topic = "swallow-test-integrated";
-	
+	private String topic = "swallow-test-integrated";
 
 	protected ConcurrentHashMap<String, AtomicInteger> sendMessageCount = new ConcurrentHashMap<String, AtomicInteger>();
 
 	protected ConcurrentHashMap<Consumer, AtomicInteger> getMessageCount = new ConcurrentHashMap<Consumer, AtomicInteger>();
 	
+	@JsonIgnore
 	protected List<Consumer> consumers = new LinkedList<Consumer>();
 
-	protected MongoMessageDAO mdao;
-	protected MongoAckDAO 	 ackdao;
+	@JsonIgnore
+	protected MessageDAO<?> mdao;
 
-	
+	@JsonIgnore
 	private List<Lifecycle> lifecycle = new LinkedList<Lifecycle>();
 	
 	@Before
 	public void beforeSwallowAbstractTest() throws Exception{
-		
-		DefaultMongoManager mongoManager = new DefaultMongoManager();
-		
-		
-		ClusterManager clusterManager = createClusterManager();
 
-		mongoManager.setClusterManager(clusterManager);
-			
-				
+		topic = getTestTopic();
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[beforeSwallowAbstractTest][topic]" + topic);
+		}
+		
 		SwallowConfigImpl swallowConfig = new SwallowConfigImpl();
 		swallowConfig.initialize();
+
+		ClusterManager clusterManager = createClusterManager(swallowConfig);
 		
+		if(clusterManager instanceof Lifecycle){
+			lifecycle.add((Lifecycle) clusterManager);
+		}
 		lifecycle.add(swallowConfig);
 		
-		mongoManager.setSwallowConfig(swallowConfig);
-		mongoManager.initialize();
 		
-		mdao = new MongoMessageDAO();
-		mdao.setMongoManager(mongoManager);
+		DefaultMessageDaoFactory factory = new DefaultMessageDaoFactory();
+		factory.setClusterManager(clusterManager);
+		factory.setSwallowConfig(swallowConfig);
+		factory.initialize();
 		
-		ackdao = new MongoAckDAO();
-		ackdao.setMongoManager(mongoManager);
+		lifecycle.add(factory);
+		
+		mdao = factory.getObject();
 	}
 
-	private ClusterManager createClusterManager() throws Exception {
+	private String getTestTopic() {
+		
+		String fileName = "swallow-test.properties";
+		InputStream ins = getClass().getClassLoader().getResourceAsStream(fileName);
+		if(ins == null){
+			return topic;
+		}
+		Properties properties = new Properties();
+		try {
+			properties.load(ins);
+		} catch (IOException e) {
+			logger.error("load " + fileName, e);
+		}
+		
+		return properties.getProperty("topic.test", topic);
+	}
+
+	public static ClusterManager createClusterManager(SwallowConfig swallowConfig) throws Exception {
 		
 		DefaultClusterManager clusterManager = new DefaultClusterManager();
+		
+		clusterManager.setSwallowConfig(swallowConfig);
 		
 		MongoClusterFactory mongoClusterFactory = new MongoClusterFactory();
 		mongoClusterFactory.initialize();
 
-		lifecycle.add(mongoClusterFactory);
-
 		KafkaClusterFactory kafkaClusterFactory = new KafkaClusterFactory();
 		kafkaClusterFactory.initialize();
-
-		lifecycle.add(kafkaClusterFactory);
 
 		
 		List<ClusterFactory> clusterFactories = new LinkedList<ClusterFactory>();
@@ -107,7 +131,6 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		
 		clusterManager.setClusterFactories(clusterFactories);
 
-		lifecycle.add(clusterManager);
 
 		return clusterManager;
 	}
@@ -212,7 +235,7 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		}
 		
 		if(logger.isInfoEnabled()){
-			logger.info("[sendMessage][db data count]" + mdao.count(topic, null));
+			logger.info("[sendMessage][db data count]" + mdao.count(topic));
 			logger.info("[sendMessage][min message]" + mdao.getMessagesGreaterThan(topic, null, 0L, 1));
 		}
 	}
@@ -343,13 +366,13 @@ public abstract class AbstractSwallowTest extends AbstractTest{
             	if(logger.isDebugEnabled()){
             		logger.debug("[onMessage]" + msg);
             	}
-            	doOnMessage(msg);
             	int result = count.incrementAndGet();
             	if(result % 100 == 0 ){
             		if(logger.isInfoEnabled()){
             			logger.info("[onMessage]" + result);
             		}
             	}
+            	doOnMessage(msg);
             	sleep(sleepTime);
             }
         });
@@ -388,6 +411,10 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 
 	protected void doOnMessage(Message msg) {
 		
+	}
+	
+	public String getTopic() {
+		return topic;
 	}
 
 

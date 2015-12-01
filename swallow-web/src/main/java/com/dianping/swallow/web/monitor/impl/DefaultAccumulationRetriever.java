@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor.impl;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,9 +28,9 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.config.ObjectConfigChangeListener;
+import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoManager;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.ConsumerIdUtil;
@@ -60,14 +61,14 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
     private Map<String, TopicAccumulation> topics = new ConcurrentHashMap<String, DefaultAccumulationRetriever.TopicAccumulation>();
 
-    @Autowired
-    private MessageDAO messageDao;
+	@Autowired
+	private MessageDAO<?> messageDao;
 
-    @Autowired
-    private MongoManager mongoManager;
-
-    @Autowired
-    private MongoClusterFactory mongoClusterFactory;
+	@Autowired
+	private ClusterManager clusterManager;
+	
+	@Autowired
+	private MongoClusterFactory mongoClusterFactory;
 
     @Autowired
     private WebConfig webConfig;
@@ -86,17 +87,17 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
         super.doInitialize();
 
-        int corePoolSize = mongoManager.getMongoCount() * 10;
-        int maxPoolSize = mongoManager.getMongoCount() * mongoClusterFactory.getMongoOptions().getConnectionsPerHost();
-        if (logger.isInfoEnabled()) {
-            logger.info("[postDefaultAccumulationRetriever]" + corePoolSize);
-        }
-
-        executors = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 30,
-                TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
-                new MQThreadFactory("ACCUMULATION_RETRIEVER-"), new ThreadPoolExecutor.CallerRunsPolicy());
-        webConfig.addChangeListener(this);
-
+        int clusterCount = clusterManager.allClusters().size();
+		int corePoolSize = clusterCount * 10;
+		int maxPoolSize = clusterCount * mongoClusterFactory.getMongoOptions().getConnectionsPerHost();
+		if (logger.isInfoEnabled()) {
+			logger.info("[postDefaultAccumulationRetriever]" + corePoolSize);
+		}
+		
+		executors = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 30, 
+				TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+				new MQThreadFactory("ACCUMULATION_RETRIEVER-"), new ThreadPoolExecutor.CallerRunsPolicy());
+		webConfig.addChangeListener(this);
     }
 
     @Override

@@ -8,18 +8,20 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 /**
  * @author mengwenchao
  *
  * 2015年11月2日 下午6:59:01
  */
-public class DefaultClusterManagerTest extends AbstractDbTest{
+public class DefaultClusterManagerTest extends AbstractTest{
 
 	private DefaultClusterManager clusterManager;
 	
@@ -30,12 +32,21 @@ public class DefaultClusterManagerTest extends AbstractDbTest{
 		clusterManager = createClusterManager();
 		
 	}
-	
-	
-	
+
+	@Test
+	public void testEquals(){
+		
+		SwallowMessage message1 = createMessage(1L);
+		message1.putInternalProperty("haha", "hahaha");
+		SwallowMessage message2 = createMessage(1L);
+		
+		Assert.assertTrue(equals(message1, message2));
+		Assert.assertFalse(equals(message1, message2, true, true));
+		
+	}
 	
 	@Test
-	public void testCreate(){
+	public void testCreate() throws ClusterCreateException{
 		
 		String url1 = "mongodb://127.0.0.1:27017,127.0.0.2:27018", url11 = "mongodb://127.0.0.2:27018,127.0.0.1:27017";
 		Cluster cluster1 = clusterManager.getCluster(url1);
@@ -53,11 +64,6 @@ public class DefaultClusterManagerTest extends AbstractDbTest{
 		
 	}
 	
-	
-	@Override
-	protected String getDbAddress() {
-		return null;
-	}
 	
 	
 

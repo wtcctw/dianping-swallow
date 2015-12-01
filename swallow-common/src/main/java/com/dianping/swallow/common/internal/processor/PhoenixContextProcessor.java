@@ -1,6 +1,5 @@
 package com.dianping.swallow.common.internal.processor;
 
-import java.util.Map;
 
 import com.dianping.phoenix.environment.PhoenixContext;
 import com.dianping.swallow.common.internal.exception.SwallowException;
@@ -16,8 +15,6 @@ public class PhoenixContextProcessor extends AbstractProcessor{
 	@Override
 	public void beforeSend(SwallowMessage message) throws SwallowException {
 		
-		Map<String, String> internalProperties = getCreateInternalProperties(message);
-		
         try {
             Class.forName("com.dianping.phoenix.environment.PhoenixContext");
             //requestId和referRequestId
@@ -25,13 +22,13 @@ public class PhoenixContextProcessor extends AbstractProcessor{
             String referRequestId = PhoenixContext.getInstance().getReferRequestId();
             String guid = PhoenixContext.getInstance().getGuid();
             if (requestId != null) {
-                internalProperties.put(PhoenixContext.REQUEST_ID, requestId);
+                message.putInternalProperty(PhoenixContext.REQUEST_ID, requestId);
             }
             if (referRequestId != null) {
-                internalProperties.put(PhoenixContext.REFER_REQUEST_ID, referRequestId);
+            	message.putInternalProperty(PhoenixContext.REFER_REQUEST_ID, referRequestId);
             }
             if (requestId != null) {
-                internalProperties.put(PhoenixContext.GUID, guid);
+            	message.putInternalProperty(PhoenixContext.GUID, guid);
             }
         } catch (ClassNotFoundException e1) {
         	if(logger.isDebugEnabled()){
@@ -44,27 +41,25 @@ public class PhoenixContextProcessor extends AbstractProcessor{
 
 	@Override
 	public void beforeOnMessage(SwallowMessage message) throws SwallowException {
-		Map<String, String> internalProperties = message.getInternalProperties();
-        if (internalProperties != null) {
-            try {
-                Class.forName("com.dianping.phoenix.environment.PhoenixContext");
-                String requestId = internalProperties.get(PhoenixContext.REQUEST_ID);
-                String referRequestId = internalProperties.get(PhoenixContext.REFER_REQUEST_ID);
-                String guid = internalProperties.get(PhoenixContext.GUID);
-                if (requestId != null) {
-                    PhoenixContext.getInstance().setRequestId(requestId);
-                }
-                if (referRequestId != null) {
-                    PhoenixContext.getInstance().setReferRequestId(referRequestId);
-                }
-                if (guid != null) {
-                    PhoenixContext.getInstance().setGuid(guid);
-                }
-            } catch (ClassNotFoundException e1) {
-            	if(logger.isDebugEnabled()){
-            		logger.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
-            	}
+		
+        try {
+            Class.forName("com.dianping.phoenix.environment.PhoenixContext");
+            String requestId = message.getInternalProperty(PhoenixContext.REQUEST_ID);
+            String referRequestId = message.getInternalProperty(PhoenixContext.REFER_REQUEST_ID);
+            String guid = message.getInternalProperty(PhoenixContext.GUID);
+            if (requestId != null) {
+                PhoenixContext.getInstance().setRequestId(requestId);
             }
+            if (referRequestId != null) {
+                PhoenixContext.getInstance().setReferRequestId(referRequestId);
+            }
+            if (guid != null) {
+                PhoenixContext.getInstance().setGuid(guid);
+            }
+        } catch (ClassNotFoundException e1) {
+        	if(logger.isDebugEnabled()){
+        		logger.debug("Class com.dianping.phoenix.environment.PhoenixContext not found, phoenix env setting is skiped.");
+        	}
         }
 	}
 

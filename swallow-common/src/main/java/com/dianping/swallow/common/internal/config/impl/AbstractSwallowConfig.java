@@ -25,7 +25,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 
 	public static final long MILLION = 1024 * 1024;
 	
-	private final String 	LION_CONFIG_FILENAME          = PropertiesUtils.getProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-mongo-lion.properties");
+	private final String 	LION_CONFIG_FILENAME          = PropertiesUtils.getProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion.properties");
 	
 	public static final String 	TOPICNAME_DEFAULT             = "default";
 
@@ -79,10 +79,6 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 	@Override
 	public void onConfigChange(String key, String value) {
 
-		if(logger.isDebugEnabled()){
-			logger.debug("[onConfigChange]" + key + ":" + value);
-		}
-		
 		SwallowConfigArgs args = null;
 		
 		if (LION_KEY_HEARTBEAT_SERVER_URI.equals(key)) {
@@ -90,7 +86,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 				logger.info("[onConfigChange]" + key + ":" + value);
 			}
 			heartBeatMongo = value.trim();
-			args = new SwallowConfigArgs(CHANGED_ITEM.HEART_BEAT_MONGO);
+			args = new SwallowConfigArgs(CHANGED_ITEM.HEART_BEAT_STORE);
         }else{
         	if(interested(key)){
     			if(logger.isInfoEnabled()){
@@ -123,14 +119,17 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 		private String  topic;
 		
 		private CHANGED_BEHAVIOR behavior = CHANGED_BEHAVIOR.UPDATE;
+		
+		private TopicConfig oldConfig = null;;
 
 		public SwallowConfigArgs(CHANGED_ITEM item){
 			this.item = item;
 		}
 
-		public SwallowConfigArgs(CHANGED_ITEM item, String topic){
+		public SwallowConfigArgs(CHANGED_ITEM item, String topic, TopicConfig oldConfig){
 			
 			this(item, topic, CHANGED_BEHAVIOR.UPDATE);
+			this.oldConfig = oldConfig;
 		}
 		
 		public SwallowConfigArgs(CHANGED_ITEM item, String topic, CHANGED_BEHAVIOR behavior){
@@ -153,6 +152,10 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 			return behavior;
 		}
 		
+		public TopicConfig getOldConfig() {
+			return oldConfig;
+		}
+
 		@Override
 		public String toString() {
 			return item + "," + topic + "," + behavior;
@@ -165,18 +168,18 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 		/**
 		 * 全部配置更新
 		 */
-		ALL_TOPIC_MONGO_MAPPING,
+		ALL_TOPIC_STORE_MAPPING,
 		
 		/**
 		 * 特定topic对应配置
 		 */
-		TOPIC_MONGO,
+		TOPIC_STORE,
 
 		
 		/**
 		 * 心跳配置更新 
 		 */
-		HEART_BEAT_MONGO
+		HEART_BEAT_STORE
 		
 	}
 

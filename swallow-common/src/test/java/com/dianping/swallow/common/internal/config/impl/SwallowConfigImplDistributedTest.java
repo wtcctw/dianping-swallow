@@ -25,7 +25,7 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 	@Before
 	public void beforeSwallowConfigImplDistributedTest() throws Exception {
 
-		System.setProperty("SWALLOW.MONGO.LION.CONFFILE", "swallow-mongo-lion-1.properties");
+		System.setProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion-1.properties");
 		swallowConfig = new SwallowConfigDistributed();
 		swallowConfig.initialize();
 	}

@@ -1,6 +1,5 @@
 package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
-import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.impl.AbstractClusterFactory;
 import com.mongodb.MongoClientOptions;
@@ -19,7 +18,6 @@ public class MongoClusterFactory extends AbstractClusterFactory{
 	private String mongoConfigLionSuffix;
 	
 	public MongoClusterFactory(){
-		
 	}
 	
 	public MongoClusterFactory(String mongoConfigLionSuffix) {
