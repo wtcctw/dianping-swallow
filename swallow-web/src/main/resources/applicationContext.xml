@@ -112,6 +112,14 @@
 		<property name="timeout" value="5000" />
 	</bean>
 
+	<bean id="elasticSearchService" class="com.dianping.dpsf.spring.ProxyBeanFactory" init-method="init">
+		<property name="serviceName" value="http://service.dianping.com/logcenter/access" />
+		<property name="iface" value="com.dianping.elasticsearch.services.ElasticSearchService" />
+		<property name="serialize" value="hessian" />
+		<property name="callMethod" value="sync" />
+		<property name="timeout" value="5000" />
+	</bean>
+
 	<import resource="applicationContext-utils.xml" />
 	<import resource="applicationContext-mongo.xml" />
 	<import resource="applicationContext-kafka.xml"/>
