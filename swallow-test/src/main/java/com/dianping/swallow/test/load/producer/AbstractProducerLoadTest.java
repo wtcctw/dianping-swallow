@@ -67,7 +67,7 @@ public abstract class AbstractProducerLoadTest extends AbstractLoadTest{
 	                    try {
 	                    	
 	                        String msg = currentCount + ";" + new Date() + message;
-	                        if(type == null || currentCount%100000 >= 10){
+	                        if(type == null || currentCount%100000 > 10){
 	                        	producer.sendMessage(msg);
 	                        }else{
 	                        	

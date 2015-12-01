@@ -13,9 +13,6 @@ import com.dianping.swallow.common.producer.exceptions.SendFailedException;
  */
 public abstract class AbstractConsumerTest extends AbstractSwallowTest{
 
-	private String consumerId = "st";
-	
-	
 	@Before
 	public void beforeAbstractConsumerTest() throws SendFailedException, RemoteServiceInitFailedException{
 		
@@ -46,8 +43,12 @@ public abstract class AbstractConsumerTest extends AbstractSwallowTest{
 
 	protected String getConsumerId() {
 		
-		return consumerId + "-" + testName.getMethodName();
+		String methodName = testName.getMethodName();
+		if(methodName.startsWith("test")){
+			return methodName.substring("test".length());
+		}
+		
+		return methodName;
 	}
-
 	
 }

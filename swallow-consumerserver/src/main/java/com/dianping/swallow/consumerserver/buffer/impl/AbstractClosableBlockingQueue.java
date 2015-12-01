@@ -59,7 +59,7 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	
 	public AbstractClosableBlockingQueue(ConsumerInfo consumerInfo, MessageFilter messageFilter, int minThreshold,
 			int maxThreshold, int capacity, Long messageIdOfTailMessage, ExecutorService retrieverThreadPool) {
-		// 能运行到这里，说明capacity>0
+
 		this.consumerInfo = consumerInfo;
 		this.messageFilter = messageFilter;
 		if (minThreshold < 0 || maxThreshold < 0 || minThreshold > maxThreshold) {

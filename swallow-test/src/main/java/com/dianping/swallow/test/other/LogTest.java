@@ -7,14 +7,14 @@ import org.junit.Test;
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.test.AbstractTest;
+import com.dianping.swallow.test.AbstractUnitTest;
 
 /**
  * @author mengwenchao
  * 
  *         2015年7月20日 下午3:46:34
  */
-public class LogTest extends AbstractTest {
+public class LogTest extends AbstractUnitTest {
 
 	@Test
 	public void testLog() {

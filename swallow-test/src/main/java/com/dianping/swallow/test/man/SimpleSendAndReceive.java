@@ -51,6 +51,8 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 		filters.add(type);
 		@SuppressWarnings("unused")
 		Consumer consumer = addListener(getTopic(), getConsumerId(), filters);
+		@SuppressWarnings("unused")
+		Consumer consumer1 = addListener(getTopic(), getConsumerId() + "-all", null);
 		
 		sendMessage(10, getTopic(), type);
 

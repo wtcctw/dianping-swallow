@@ -46,7 +46,7 @@ public class MongoTemplateFactory {
 
 	public static final String SWALLOW_STATS_MONGO_URL_KEY = "swallow.mongourl";
 
-	public static final String SWALLOW_MONGO_ADDRESS_FILE = "swallow-mongo-lion.properties";
+	public static final String SWALLOW_MONGO_ADDRESS_FILE = "swallow-store-lion.properties";
 
 	public static final String SWALLOW_MONGO_CONFIG_FILE = "swallow-web-mongo.properties";
 

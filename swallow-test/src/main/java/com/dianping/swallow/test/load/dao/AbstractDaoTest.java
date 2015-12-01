@@ -9,6 +9,7 @@ import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.test.AbstractSwallowTest;
 import com.dianping.swallow.test.load.AbstractLoadTask;
 import com.dianping.swallow.test.load.AbstractLoadTest;
 
@@ -38,7 +39,7 @@ public abstract class AbstractDaoTest extends AbstractLoadTest{
 		
 		SwallowConfig swallowConfig = createSwallowConfig(); 
 		factory.setSwallowConfig(swallowConfig);
-		factory.setClusterManager(createClusterManager(swallowConfig));
+		factory.setClusterManager(AbstractSwallowTest.createClusterManager(swallowConfig));
 		
 		factory.initialize();
 

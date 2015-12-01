@@ -42,14 +42,12 @@ public class LionDynamicConfig implements DynamicConfig {
 			if (useLocal()) {
 				// 如果本地文件存在，则使用Lion本地文件
 				URL resource = getClass().getClassLoader().getResource(localConfigFileName);
-				if(logger.isInfoEnabled()){
-					logger.info("[LionDynamicConfig]" + resource);
-				}
-				InputStream in = resource.openStream();
-				if (in != null) {
-					if (logger.isInfoEnabled()) {
-						logger.info("[loading]" + localConfigFileName);
+				
+				if (resource != null) {
+					if(logger.isInfoEnabled()){
+						logger.info("[LionDynamicConfig]" + resource);
 					}
+					InputStream in = resource.openStream();
 					try {
 						Properties props = new Properties();
 						props.load(in);

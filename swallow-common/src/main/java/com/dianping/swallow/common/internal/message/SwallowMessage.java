@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.message.Message;
@@ -108,10 +109,32 @@ public class SwallowMessage implements Serializable, Message {
 
    public long size(){
 	   //估算，非严格
-	   return (long) (content.length()*2*1.2);
+	   long size = 0;
+	   size += contentLength();
+	   size += propertiesLength();
+	   return size;
    }
    
-   @Override
+	private long propertiesLength() {
+		if(properties == null){
+			return 0;
+		}
+		long length = 0;
+		for(Entry<String, String> property : properties.entrySet()){
+			length += property.getKey().length()*2;
+			length += property.getValue().length()*2;
+		}
+		return length;
+	}
+
+	private long contentLength() {
+		if(content == null){
+			return 0;
+		}
+		return content.length() * 2;
+	}
+
+@Override
    public String getContent() {
       return content;
    }

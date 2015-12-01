@@ -210,7 +210,10 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 		if(consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
 			
 			Long maxId = messageDAO.getMaxMessageId(consumerInfo.getDest().getName(), consumerInfo.getConsumerId());
-					
+			
+			if(maxId == null){
+				maxId = messageDAO.getMessageEmptyAckId(consumerInfo.getDest().getName());
+			}
 			messageDAO.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), maxId, "idReint", true);
 		}
 	}

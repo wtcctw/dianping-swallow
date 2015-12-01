@@ -1,27 +1,21 @@
 package com.dianping.swallow.test;
 
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
 /**
+ * 同时供压力测试和单元测试
  * @author mengwenchao
  *
- * 2015年2月13日 下午1:29:16
+ * 2015年11月30日 下午7:29:25
  */
-public class AbstractTest {
-	
+public abstract class AbstractTest {
 	
 	@JsonIgnore
 	protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -29,20 +23,6 @@ public class AbstractTest {
 	@JsonIgnore
 	protected ExecutorService executors = Executors.newCachedThreadPool();
 
-
-	@Rule
-	public TestName  testName = new TestName();
-
-	
-	@Before
-	public void beforeAbstractTest(){
-		if(logger.isInfoEnabled()){
-			logger.info("[beforeAbstractTest]----------------------------------" + testName.getMethodName());
-		}
-		
-	}
-
-	
 	protected String createMessage(int size) {
 		StringBuilder sb = new StringBuilder();
 		for(int i=0;i<size;i++){
@@ -51,13 +31,6 @@ public class AbstractTest {
 		return sb.toString();
 	}
 	
-	
-	@After
-	public void afterAbstractTest(){
-		if(logger.isInfoEnabled()){
-			logger.info("[afterAbstractTest]----------------------------------" + testName.getMethodName());
-		}
-	}
 
 	protected void sleep(int miliSeconds) {
 		
@@ -71,5 +44,6 @@ public class AbstractTest {
 			e.printStackTrace();
 		}
 	}
+
 
 }

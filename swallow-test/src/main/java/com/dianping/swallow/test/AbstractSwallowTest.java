@@ -2,8 +2,11 @@ package com.dianping.swallow.test;
 
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,7 +38,7 @@ import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
-import com.dianping.swallow.test.AbstractTest;
+import com.dianping.swallow.test.AbstractUnitTest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -44,10 +47,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年3月23日 下午4:27:18
  */
-public abstract class AbstractSwallowTest extends AbstractTest{
+public abstract class AbstractSwallowTest extends AbstractUnitTest{
 
 	private String topic = "swallow-test-integrated";
-	
 
 	protected ConcurrentHashMap<String, AtomicInteger> sendMessageCount = new ConcurrentHashMap<String, AtomicInteger>();
 
@@ -65,12 +67,20 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 	@Before
 	public void beforeSwallowAbstractTest() throws Exception{
 
+		topic = getTestTopic();
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[beforeSwallowAbstractTest][topic]" + topic);
+		}
 		
 		SwallowConfigImpl swallowConfig = new SwallowConfigImpl();
 		swallowConfig.initialize();
 
 		ClusterManager clusterManager = createClusterManager(swallowConfig);
-
+		
+		if(clusterManager instanceof Lifecycle){
+			lifecycle.add((Lifecycle) clusterManager);
+		}
 		lifecycle.add(swallowConfig);
 		
 		
@@ -84,7 +94,24 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		mdao = factory.getObject();
 	}
 
-	protected ClusterManager createClusterManager(SwallowConfig swallowConfig) throws Exception {
+	private String getTestTopic() {
+		
+		String fileName = "swallow-test.properties";
+		InputStream ins = getClass().getClassLoader().getResourceAsStream(fileName);
+		if(ins == null){
+			return topic;
+		}
+		Properties properties = new Properties();
+		try {
+			properties.load(ins);
+		} catch (IOException e) {
+			logger.error("load " + fileName, e);
+		}
+		
+		return properties.getProperty("topic.test", topic);
+	}
+
+	public static ClusterManager createClusterManager(SwallowConfig swallowConfig) throws Exception {
 		
 		DefaultClusterManager clusterManager = new DefaultClusterManager();
 		
@@ -93,12 +120,8 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		MongoClusterFactory mongoClusterFactory = new MongoClusterFactory();
 		mongoClusterFactory.initialize();
 
-		lifecycle.add(mongoClusterFactory);
-
 		KafkaClusterFactory kafkaClusterFactory = new KafkaClusterFactory();
 		kafkaClusterFactory.initialize();
-
-		lifecycle.add(kafkaClusterFactory);
 
 		
 		List<ClusterFactory> clusterFactories = new LinkedList<ClusterFactory>();
@@ -108,7 +131,6 @@ public abstract class AbstractSwallowTest extends AbstractTest{
 		
 		clusterManager.setClusterFactories(clusterFactories);
 
-		lifecycle.add(clusterManager);
 
 		return clusterManager;
 	}

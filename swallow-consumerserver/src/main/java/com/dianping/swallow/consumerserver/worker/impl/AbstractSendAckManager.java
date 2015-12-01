@@ -91,6 +91,9 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 		if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
 			
 			maxMessageId = messageDao.getAckMaxMessageId(topicName, consumerInfo.getConsumerId(), isBackcup());
+			if(logger.isInfoEnabled()){
+				logger.info("[getMaxAckIdOrMaxMessageId][use AckMaxMessageId]" + consumerInfo);
+			}
 		}
 
 		if (maxMessageId == null) {
@@ -98,6 +101,13 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 			maxMessageId = getMaxMessageId();
 			if (maxMessageId == null) {
 				maxMessageId = messageDao.getMessageEmptyAckId(consumerInfo.getDest().getName());
+				if(logger.isInfoEnabled()){
+					logger.info("[getMaxAckIdOrMaxMessageId][use MessageEmptyAckId]" + consumerInfo);
+				}
+			}else{
+				if(logger.isInfoEnabled()){
+					logger.info("[getMaxAckIdOrMaxMessageId][use MaxMessageId]" + consumerInfo);
+				}
 			}
 			
 			if(consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){

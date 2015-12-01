@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
-import com.dianping.swallow.test.AbstractSwallowTest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -21,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * 2015年1月28日 下午7:10:54
  */
-public abstract class AbstractLoadTest extends AbstractSwallowTest{
+public abstract class AbstractLoadTest{
 	
 	@JsonIgnore
     protected Logger logger       = LoggerFactory.getLogger(getClass());
@@ -118,7 +117,7 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 	
 	protected void doStart() throws InterruptedException, IOException, Exception{
 		
-		logger.info("[doStart][args]" + JsonBinder.getNonEmptyBinder().toJson(this));
+		logger.info("[doStart][args]" + this);
 		
 		for(int i=0; i < topicCount; i++){
 			
@@ -244,6 +243,7 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 	protected long increaseAndGetCurrentCount(){
 		long current = count.incrementAndGet();
 		if(current >  totalMessageCount){
+			count.decrementAndGet();
 			throw new CountExceedException("current:" + current);
 		}
 		return current;
@@ -261,4 +261,8 @@ public abstract class AbstractLoadTest extends AbstractSwallowTest{
 		return current;
 	}
 
+	@Override
+	public String toString() {
+		return JsonBinder.getNonEmptyBinder().toJson(this);
+	}
 }
