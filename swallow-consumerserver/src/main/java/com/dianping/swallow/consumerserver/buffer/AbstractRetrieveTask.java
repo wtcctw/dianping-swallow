@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.EnvUtil;
-import com.dianping.swallow.consumerserver.buffer.MessageRetriever.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
+import com.dianping.swallow.common.internal.dao.impl.ReturnMessageWrapper;
 
 /**
  * @author mengwenchao
@@ -23,11 +23,11 @@ public abstract class AbstractRetrieveTask implements Runnable {
 	protected RetriveStrategy retriveStrategy;
 	protected ConsumerInfo consumerInfo;
 	protected MessageRetriever messageRetriever;
-	protected MessageBlockingQueue blockingQueue;
+	protected CloseableBlockingQueue<SwallowMessage> blockingQueue;
 	protected MessageFilter messageFilter;
 
 	public AbstractRetrieveTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo, MessageRetriever messageRetriever, 
-			MessageBlockingQueue blockingQueue, MessageFilter messageFilter) {
+			CloseableBlockingQueue<SwallowMessage> blockingQueue, MessageFilter messageFilter) {
 		this.retriveStrategy = retriveStrategy;
 		this.consumerInfo = consumerInfo;
 		this.messageRetriever = messageRetriever;
@@ -122,11 +122,14 @@ public abstract class AbstractRetrieveTask implements Runnable {
 		}
 	}
 
-	protected abstract void setTailId(Long tailId);
+	protected void setTailId(Long tailId) {
+		blockingQueue.setTailMessageId(tailId);
+	}
+
+	protected Long getTailId() {
+		return blockingQueue.getTailMessageId();
+	}
 
 	protected abstract String getConsumerId();
-
-	protected abstract Long getTailId();
-
 
 }

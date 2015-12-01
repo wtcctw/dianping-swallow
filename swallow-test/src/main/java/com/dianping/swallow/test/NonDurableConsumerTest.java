@@ -28,14 +28,14 @@ public class NonDurableConsumerTest extends AbstractConsumerTest{
 	@Test
 	public void testPrepareDpsf() throws SendFailedException, RemoteServiceInitFailedException {
 		
-		sendMessage(1, topic);
+		sendMessage(1, getTopic());
 	}
 
 	@Test
 	public void testNoneDurableReceiveMessage() throws SendFailedException, RemoteServiceInitFailedException{
 		
-		Consumer consumer = addListener(topic, concurrentCount);
-		sendMessage(messageCount, topic);
+		Consumer consumer = addListener(getTopic(), concurrentCount);
+		sendMessage(messageCount, getTopic());
 		
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));

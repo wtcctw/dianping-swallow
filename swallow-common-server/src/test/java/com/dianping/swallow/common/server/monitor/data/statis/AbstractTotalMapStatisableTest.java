@@ -2,7 +2,7 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO;
+import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
@@ -266,7 +266,8 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
         String topic = "topic4";
         String id = consumerIds.get(0);
-        NavigableMap<Long, StatisData> value1 = consumerAllData.getStatisData(new CasKeys("total", topic, id), StatisType.SEND);
+        @SuppressWarnings("unused")
+		NavigableMap<Long, StatisData> value1 = consumerAllData.getStatisData(new CasKeys("total", topic, id), StatisType.SEND);
         NavigableMap<Long, StatisData> value2 = consumerAllData.getFirstValueGreaterOrEqualThan(new CasKeys("total", topic, id), StatisType.SEND, 108L);
         NavigableMap<Long, StatisData> value3 = consumerAllData.getLastValueLessOrEqualThan(new CasKeys("total", topic, id), StatisType.SEND, 108L);
         Assert.assertEquals(value2.size(), 1);
@@ -421,8 +422,7 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
                     } else {
                         time = 0L;
                     }
-                    message.getInternalProperties().put(MongoMessageDAO.SAVE_TIME,
-                            String.valueOf(time));
+                    message.putInternalProperty(InternalProperties.SAVE_TIME, String.valueOf(time));
                     wrappers.add(new Wrapper(consumerInfo, ip, message));
 
                     consumerMonitorData.addSendData(consumerInfo, ip, message);

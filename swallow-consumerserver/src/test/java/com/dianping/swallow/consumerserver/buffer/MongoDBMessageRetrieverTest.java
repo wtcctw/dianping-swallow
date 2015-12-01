@@ -8,9 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.dao.impl.ReturnMessageWrapper;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.consumerserver.AbstractConsumerServerSpringTest;
-import com.dianping.swallow.consumerserver.buffer.MessageRetriever.ReturnMessageWrapper;
 
 /**
  * @author mengwenchao
@@ -30,12 +30,12 @@ public class MongoDBMessageRetrieverTest extends AbstractConsumerServerSpringTes
 	@Test
 	public void testRetriveMessage(){
 		
-		Long messageId = dao.getMaxMessageId(topicName);
+		Long messageId = messageDao.getMaxMessageId(getTopic());
 		
 		insertSwallowMessage(insertCount);
 		Assert.assertNotNull(messageId);
 		
-		ReturnMessageWrapper wrapper = messageRetriever.retrieveMessage(topicName, messageId);
+		ReturnMessageWrapper wrapper = messageRetriever.retrieveMessage(getTopic(), messageId);
 		
 		Assert.assertEquals(insertCount, wrapper.getRawMessageSize());
 		
@@ -44,7 +44,7 @@ public class MongoDBMessageRetrieverTest extends AbstractConsumerServerSpringTes
 	@Test
 	public void testRetriveMessageFilter(){
 
-		Long messageId = dao.getMaxMessageId(topicName);
+		Long messageId = messageDao.getMaxMessageId(getTopic());
 		int filterMessageCount = 50; 
 		String filter = "filter1";
 		
@@ -53,9 +53,9 @@ public class MongoDBMessageRetrieverTest extends AbstractConsumerServerSpringTes
 			SwallowMessage message = createMessage();
 			if(i < filterMessageCount){
 				message.setType(filter);
-				dao.saveMessage(topicName, message);
+				messageDao.saveMessage(getTopic(), message);
 			}else{
-				dao.saveMessage(topicName, message);
+				messageDao.saveMessage(getTopic(), message);
 			}
 		}
 		
@@ -63,26 +63,26 @@ public class MongoDBMessageRetrieverTest extends AbstractConsumerServerSpringTes
 		hashFilter.add(filter);
 		
 		MessageFilter messageFilter = MessageFilter.createInSetMessageFilter(hashFilter);
-		ReturnMessageWrapper wrapper = messageRetriever.retrieveMessage(topicName, null, messageId, messageFilter);
+		ReturnMessageWrapper wrapper = messageRetriever.retrieveMessage(getTopic(), null, messageId, messageFilter);
 		Assert.assertEquals(insertCount, wrapper.getRawMessageSize());
 		Assert.assertEquals(filterMessageCount, wrapper.getMessages().size());
 
 	
 		hashFilter.add("newFilter");
 		messageFilter = MessageFilter.createInSetMessageFilter(hashFilter);
-		wrapper = messageRetriever.retrieveMessage(topicName, null, messageId, messageFilter);
+		wrapper = messageRetriever.retrieveMessage(getTopic(), null, messageId, messageFilter);
 		Assert.assertEquals(insertCount, wrapper.getRawMessageSize());
 		Assert.assertEquals(filterMessageCount, wrapper.getMessages().size());
 
 		hashFilter.clear();
 		messageFilter = MessageFilter.createInSetMessageFilter(hashFilter);
-		wrapper = messageRetriever.retrieveMessage(topicName, null, messageId, messageFilter);
+		wrapper = messageRetriever.retrieveMessage(getTopic(), null, messageId, messageFilter);
 		Assert.assertEquals(insertCount, wrapper.getRawMessageSize());
 		Assert.assertEquals(insertCount, wrapper.getMessages().size());
 		
 		hashFilter.add("nonexist");
 		messageFilter = MessageFilter.createInSetMessageFilter(hashFilter);
-		wrapper = messageRetriever.retrieveMessage(topicName, null, messageId, messageFilter);
+		wrapper = messageRetriever.retrieveMessage(getTopic(), null, messageId, messageFilter);
 		Assert.assertEquals(insertCount, wrapper.getRawMessageSize());
 		Assert.assertEquals(0, wrapper.getMessages().size());
 

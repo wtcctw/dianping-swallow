@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
-import com.dianping.swallow.common.internal.config.MongoConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoConfig;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
 import com.mongodb.BasicDBObject;
@@ -46,7 +46,7 @@ public class MongoTemplateFactory {
 
 	public static final String SWALLOW_STATS_MONGO_URL_KEY = "swallow.mongourl";
 
-	public static final String SWALLOW_MONGO_ADDRESS_FILE = "swallow-mongo-lion.properties";
+	public static final String SWALLOW_MONGO_ADDRESS_FILE = "swallow-store-lion.properties";
 
 	public static final String SWALLOW_MONGO_CONFIG_FILE = "swallow-web-mongo.properties";
 

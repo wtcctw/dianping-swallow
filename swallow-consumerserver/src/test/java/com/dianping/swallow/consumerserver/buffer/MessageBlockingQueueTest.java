@@ -13,6 +13,7 @@ import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.message.Destination;
+import com.dianping.swallow.consumerserver.buffer.impl.MessageBlockingQueue;
 
 /**
  * @author mengwenchao
@@ -23,8 +24,8 @@ public class MessageBlockingQueueTest extends AbstractTest{
 
 	private MessageBlockingQueue queue =  
 				new MessageBlockingQueue(
-						new ConsumerInfo("UNIT_TEST", Destination.topic("UNIT_TEST_MessageBlockingQueueTest"), ConsumerType.DURABLE_AT_LEAST_ONCE), 
-				10, 100, Integer.MAX_VALUE, 0L, 0L, null, Executors.newCachedThreadPool());
+						new ConsumerInfo("UNIT_TEST", Destination.topic("UNIT_TEST_MessageBlockingQueueTest"), ConsumerType.DURABLE_AT_LEAST_ONCE), null,  
+				10, 100, Integer.MAX_VALUE, 0L, Executors.newCachedThreadPool());
 	
 
 	private AtomicInteger putCount = new AtomicInteger();

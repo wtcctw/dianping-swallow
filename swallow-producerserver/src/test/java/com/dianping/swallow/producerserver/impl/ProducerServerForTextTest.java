@@ -31,7 +31,7 @@ public class ProducerServerForTextTest extends AbstractProducerServerTest{
         final TextObject textObj = new TextObject();
         textObj.setACK(true);
         textObj.setContent("This is a Mock Text content.");
-        textObj.setTopic(topicName);
+        textObj.setTopic(getTopic());
 
         SocketAddress socketAddress = new InetSocketAddress("127.0.0.1", 8000);
 

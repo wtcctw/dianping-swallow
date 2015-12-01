@@ -24,10 +24,10 @@
 		class="com.dianping.swallow.web.common.WebLifecycleComponentManager" />
 
 	<bean id="messageDAO"
-		class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoMessageDAO">
-		<property name="mongoManager" ref="mongoManager"/>
+		class="com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory">
+		<property name="swallowConfig" ref="swallowConfig"/>
+		<property name="clusterManager" ref="clusterManager"/>
 	</bean>
-
 
 	<bean id="clusterManager" class="com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager">
 		<property name="clusterFactories">

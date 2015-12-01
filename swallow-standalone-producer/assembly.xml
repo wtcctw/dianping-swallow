@@ -48,6 +48,7 @@
 			<outputDirectory>lib/swallow</outputDirectory>
 			<scope>runtime</scope>
 			<includes>
+				<include>com.dianping.swallow:swallow-kafka</include>
 				<include>com.dianping.swallow:swallow-common</include>
 				<include>com.dianping.swallow:swallow-common-server</include>
 				<include>com.dianping.swallow:swallow-consumerserver</include>
@@ -74,6 +75,7 @@
 				<exclude>com.dianping.cat:cat-client</exclude>
 				<exclude>com.dianping.dpsf:dpsf-net</exclude>
 				<exclude>com.dianping.platform:phoenix-environment</exclude>
+				<exclude>com.dianping.swallow:swallow-kafka</exclude>
 				<exclude>com.dianping.swallow:swallow-common</exclude>
 				<exclude>com.dianping.swallow:swallow-common-server</exclude>
 				<exclude>com.dianping.swallow:swallow-consumerserver</exclude>

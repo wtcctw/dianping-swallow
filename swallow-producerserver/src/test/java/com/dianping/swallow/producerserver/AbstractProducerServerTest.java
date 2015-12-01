@@ -43,18 +43,18 @@ public class AbstractProducerServerTest extends AbstractTest{
 	private TopicWhiteList createTopicWhiteList() {
 		
         TopicWhiteList topicWhiteList = new TopicWhiteList();
-        topicWhiteList.addTopic(topicName);
+        topicWhiteList.addTopic(getTopic());
 		return topicWhiteList;
 	}
 
-	private MessageDAO createMessageDao() {
+	private MessageDAO<?> createMessageDao() {
 		
 		return mock(MessageDAO.class);
 	}
 
 	protected void replaceExceptionDao() {
 		
-        MessageDAO messageDao = mock(MessageDAO.class);
+        MessageDAO<?> messageDao = mock(MessageDAO.class);
         doThrow(new RuntimeException()).when(messageDao).saveMessage(Matchers.anyString(), (SwallowMessage) Matchers.anyObject());
         
         ((DefaultMessageReceiver)messageReceiver).setMessageDao(messageDao);

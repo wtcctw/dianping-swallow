@@ -1,9 +1,9 @@
 package com.dianping.swallow.common.internal.processor;
 
 import java.io.IOException;
-import java.util.Map;
 
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 
@@ -29,12 +29,9 @@ public class GZipProcessor extends AbstractProcessor implements Processor{
 	public void beforeOnMessage(SwallowMessage message) throws SwallowException {
 		
         try {
-	        Map<String, String> internalProperties = message.getInternalProperties();
-	        if (internalProperties != null) {
-	            if ("gzip".equals(message.getInternalProperties().get("compress"))) {
-						message.setContent(ZipUtil.unzip(message.getContent()));
-	            }
-	        }
+            if ("gzip".equals(message.getInternalProperty(InternalProperties.COMPRESS))) {
+					message.setContent(ZipUtil.unzip(message.getContent()));
+            }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -52,13 +49,12 @@ public class GZipProcessor extends AbstractProcessor implements Processor{
 		if(!gzipBeforeSend){
 			return;
 		}
-		Map<String, String> internalProperties = getCreateInternalProperties(message);
         try {
             message.setContent(ZipUtil.zip(message.getContent()));
-            internalProperties.put("compress", "gzip");
+            message.putInternalProperty(InternalProperties.COMPRESS, "gzip");
         } catch (Exception e) {
             logger.warn("Compress message failed.Content=" + message.getContent(), e);
-            internalProperties.put("compress", "failed");
+            message.putInternalProperty(InternalProperties.COMPRESS, "failed");
         }
 	}
 

@@ -1,15 +1,61 @@
 package com.dianping.swallow.common.message;
 
-import java.util.Date;
+
 import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.dianping.swallow.AbstractTest;
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 
-public class SwallowMessageTest {
+public class SwallowMessageTest extends AbstractTest{
 
+	
+	
+	@Test
+	public void testEfficiency(){
+		
+		int count = 1;
+		
+		JsonBinder binder = JsonBinder.getNonEmptyBinder();
+		
+		Long begin =   System.currentTimeMillis();
+		
+		for(int i=0;i < count; i++){
+			
+			SwallowMessage message = createMessage();
+			String json = binder.toJson(message);
+			@SuppressWarnings("unused")
+			SwallowMessage newMessage = binder.fromJson(json, SwallowMessage.class);
+		}
+		
+		Long end = System.currentTimeMillis();
+		
+		System.out.println("Total:" + (end - begin));
+	}
+
+	
+	@Test
+	public void testJson(){
+		
+		JsonBinder binder = JsonBinder.getNonEmptyBinder();
+		
+		
+		SwallowMessage message = createMessage();
+		
+		String json = binder.toJson(message);
+		
+		SwallowMessage newMessage = binder.fromJson(json, SwallowMessage.class);
+
+		
+		Assert.assertEquals(message, newMessage);
+	
+		Assert.assertTrue(equalsWithoutMessageId(message, newMessage));
+		Assert.assertEquals(message.getInternalProperties(), newMessage.getInternalProperties());
+	}
+	
     @Test
     public void testTransferContentToBean() throws Exception {
         //自定义bean
@@ -32,7 +78,6 @@ public class SwallowMessageTest {
         demoBean.b = "b";
         msg.setGeneratedTime(null);
         msg.setContent(demoBean);
-        Assert.assertEquals(32, msg.hashCode());
     }
 
     @Test
@@ -59,18 +104,6 @@ public class SwallowMessageTest {
     }
 
     @Test
-    public void testEqualsWithoutMessageId() throws Exception {
-        SwallowMessage msg = createMessage();
-        msg.setGeneratedTime(null);
-        SwallowMessage msg2 = createMessage();
-        msg2.setGeneratedTime(null);
-        Assert.assertTrue(msg.equals(msg2));
-        msg2.setMessageId(2L);
-        Assert.assertFalse(msg.equals(msg2));
-        Assert.assertTrue(msg.equalsWithoutMessageId(msg2));
-    }
-
-    @Test
     public void testGetters() throws Exception {
         SwallowMessage msg = createMessage();
         Assert.assertEquals("this is a SwallowMessage", msg.getContent());
@@ -81,26 +114,7 @@ public class SwallowMessageTest {
         Assert.assertNotNull(msg.getGeneratedTime());
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("property-key", "property-value");
-        Assert.assertEquals(map, msg.getInternalProperties());
-        Assert.assertEquals(Long.valueOf(1L), msg.getMessageId());
         Assert.assertEquals(map, msg.getProperties());
-    }
-
-    private static SwallowMessage createMessage() {
-        SwallowMessage message = new SwallowMessage();
-        message.setMessageId(1L);
-        message.setContent("this is a SwallowMessage");
-        message.setGeneratedTime(new Date());
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("property-key", "property-value");
-        message.setProperties(map);
-        message.setInternalProperties(map);
-        message.setSha1("sha-1 string");
-        message.setVersion("0.6.0");
-        message.setType("feed");
-        message.setSourceIp("localhost");
-        return message;
-
     }
 
     static class DemoBean {

@@ -13,12 +13,6 @@
             http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
             ">
 
-	<bean id="mongoManager"
-		class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-		<property name="swallowConfig" ref="swallowConfig" />
-		<property name="clusterManager" ref="clusterManager" />
-	</bean>
-
 	<bean id="mongoClusterFactory"
 		class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory">
 		<constructor-arg value="web" index="0" />

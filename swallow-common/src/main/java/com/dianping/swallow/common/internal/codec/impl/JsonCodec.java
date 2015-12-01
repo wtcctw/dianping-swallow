@@ -17,13 +17,19 @@ public class JsonCodec implements Codec{
 	
 	public JsonCodec(Class<?> decodeClass){
 		
-		this.decodeClass = decodeClass;
+		this(null, decodeClass, true);
 	}
 	
 	public JsonCodec(Class<?> encodeClass, Class<?> decodeClass){
+		this(encodeClass, decodeClass, true);
+		
+	}
+	
+	public JsonCodec(Class<?> encodeClass, Class<?> decodeClass, boolean toBytes){
 		
 		this.encodeClass = encodeClass;
 		this.decodeClass = decodeClass;
+		this.toBytes = toBytes;
 	}
 
 	@Override

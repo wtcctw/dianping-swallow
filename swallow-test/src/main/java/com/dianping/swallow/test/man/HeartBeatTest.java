@@ -22,14 +22,14 @@ public class HeartBeatTest extends AbstractConsumerTest{
 	@Test
 	public void testNoHeartBeat(){
 		((ConsumerFactoryImpl)ConsumerFactoryImpl.getInstance()).setHeartBeatSender(new HeartBeatSenderOnce());
-		addListener(topic, "id1", concurrentCount);
+		addListener(getTopic(), "id1", concurrentCount);
 		sleep(3000000);
 	}
 
 	@Test
 	public void testTwo(){
 		
-		addListener(topic, "id1", concurrentCount);
+		addListener(getTopic(), "id1", concurrentCount);
 		sleep(3000000);
 	}
 	

@@ -4,14 +4,14 @@ import org.junit.Test;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-import com.dianping.swallow.test.AbstractTest;
+import com.dianping.swallow.test.AbstractUnitTest;
 
 /**
  * @author mengwenchao
  * 
  *         2015年4月10日 下午2:21:04
  */
-public class CatTest extends AbstractTest {
+public class CatTest extends AbstractUnitTest {
 	
 	
 	@Test

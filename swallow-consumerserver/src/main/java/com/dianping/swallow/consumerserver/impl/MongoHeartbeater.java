@@ -16,12 +16,12 @@ public class MongoHeartbeater extends AbstractLifecycle implements Heartbeater {
 
    private static final Logger logger           = LoggerFactory.getLogger(MongoHeartbeater.class);
    
-   private HeartbeatDAO        heartbeatDAO;
+   private HeartbeatDAO<?>        heartbeatDAO;
    private ConfigManager       configManager = ConfigManager.getInstance();
    
    private Thread 			   heartbeatThread;
 
-   public void setHeartbeatDAO(HeartbeatDAO heartbeatDAO) {
+   public void setHeartbeatDAO(HeartbeatDAO<?> heartbeatDAO) {
       this.heartbeatDAO = ProxyUtil.createMongoDaoProxyWithRetryMechanism(heartbeatDAO,
     		  configManager.getRetryIntervalWhenMongoException(), configManager.getRetryTimesWhenMongoException());
    }

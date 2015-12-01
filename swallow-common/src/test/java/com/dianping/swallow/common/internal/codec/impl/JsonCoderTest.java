@@ -51,7 +51,7 @@ public class JsonCoderTest {
       HashMap<String, String> map = new HashMap<String, String>();
       map.put("property-key", "property-value");
       msg.setContent("content");
-      JsonCodec jsonEncoder = new JsonCodec(SwallowMessage.class, SwallowMessage.class);
+      JsonCodec jsonEncoder = new JsonCodec(SwallowMessage.class, SwallowMessage.class, false);
       String result = (String) jsonEncoder.encode(msg);
       //解码
       JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();

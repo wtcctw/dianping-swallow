@@ -13,22 +13,23 @@ import com.dianping.swallow.common.producer.exceptions.SendFailedException;
  */
 public abstract class AbstractConsumerTest extends AbstractSwallowTest{
 
-	private String consumerId = "st";
-	
-	
 	@Before
 	public void beforeAbstractConsumerTest() throws SendFailedException, RemoteServiceInitFailedException{
 		
 		if(isCleanData()){
-			mdao.cleanMessage(topic, getConsumerId());
-			mdao.cleanMessage(topic, null);
+			try{
+				mdao.cleanMessage(getTopic(), getConsumerId());
+				mdao.cleanMessage(getTopic(), null);
+			}catch(UnsupportedOperationException e){
+				
+			}
 		}
 		
-		ackdao.clean(topic, getConsumerId());
-		ackdao.clean(topic, getConsumerId(), true);
+		mdao.cleanAck(getTopic(), getConsumerId());
+		mdao.cleanAck(getTopic(), getConsumerId(), true);
 		
 		//初始消息，解决由本地时间和服务器时间不一致照成的消息数量不一致的问题
-		sendMessage(1, topic);
+		sendMessage(1, getTopic());
 		cleanSendMessageCount();
 	}
 
@@ -42,8 +43,12 @@ public abstract class AbstractConsumerTest extends AbstractSwallowTest{
 
 	protected String getConsumerId() {
 		
-		return consumerId + "-" + testName.getMethodName();
+		String methodName = testName.getMethodName();
+		if(methodName.startsWith("test")){
+			return methodName.substring("test".length());
+		}
+		
+		return methodName;
 	}
-
 	
 }

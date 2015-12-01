@@ -13,17 +13,21 @@ import com.mongodb.WriteResult;
  *
  * 2015年3月26日 下午1:47:15
  */
-public abstract class AbstractMongoMessageDao extends AbstractMessageDao implements MessageDAO{
+public abstract class AbstractMongoMessageDao extends AbstractMessageDao<MongoCluster> implements MessageDAO<MongoCluster>{
+
+
+	private static final long serialVersionUID = 1L;
 
 	protected static final String gt = "$gt";
-
 	protected static final String gte = "$gte";
-
 	protected static final String lt = "$lt";
-
 	protected static final String lte = "$lte";
-
 	protected static final String ne = "$ne";
+
+	public AbstractMongoMessageDao(MongoCluster cluster) {
+		super(cluster);
+	}
+	
 
 	protected WriteResult doAndCheckResult(MongoAction mongoAction) throws SwallowMongoException {
 
@@ -35,7 +39,6 @@ public abstract class AbstractMongoMessageDao extends AbstractMessageDao impleme
 		}
 		return result;
 	}
-	
 	
 	
 	protected static interface MongoAction{
@@ -78,5 +81,5 @@ public abstract class AbstractMongoMessageDao extends AbstractMessageDao impleme
 			return query;
 		}
 	}
-	
+
 }

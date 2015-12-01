@@ -75,6 +75,7 @@ public class SwallowConfigImplCentralTest extends AbstractTest {
 		String rawConfigSize = cache.getProperty(SwallowConfigCentral.LION_KEY_MSG_CAPPED_COLLECTION_SIZE);
 		String rawConfigMax = cache.getProperty(SwallowConfigCentral.LION_KEY_MSG_CAPPED_COLLECTION_MAX_DOC_NUM);
 		
+		String topicName = getTopic();
 		try{
 			for(TopicConfig config : configs){
 				

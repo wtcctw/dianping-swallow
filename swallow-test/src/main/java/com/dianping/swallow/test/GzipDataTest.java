@@ -25,7 +25,7 @@ public class GzipDataTest extends AbstractConsumerTest {
 		String dataToSend = UUID.randomUUID().toString() + createMessage(1024*1024);
 		final AtomicReference<String> data = new AtomicReference<String>();
 		
-		Consumer c = createConsumer(topic, getConsumerId());
+		Consumer c = createConsumer(getTopic(), getConsumerId());
 		c.setListener(new MessageListener() {
 			
 			@Override
@@ -35,7 +35,7 @@ public class GzipDataTest extends AbstractConsumerTest {
 		});
 		c.start();
 
-		sendMessage(topic, dataToSend, true);
+		sendMessage(getTopic(), dataToSend, true);
 
 		waitForListernToComplete(1);
 		

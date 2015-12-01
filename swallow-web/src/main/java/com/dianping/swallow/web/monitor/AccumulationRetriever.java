@@ -1,9 +1,10 @@
 package com.dianping.swallow.web.monitor;
 
+
 import java.util.Map;
 import java.util.NavigableMap;
 
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoManager;
+import com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory;
 
 
 /**
@@ -14,7 +15,7 @@ import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoManager;
  */
 public interface AccumulationRetriever extends Retriever{
 	
-	public static int ORDER = MongoManager.ORDER + 1;
+	public static int ORDER = DefaultMessageDaoFactory.ORDER + 1;
 
 	Map<String, StatsData> getAccumulationForAllConsumerId(String topic, long start, long end);
 	
