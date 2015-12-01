@@ -30,8 +30,8 @@ public class LogSearchServiceImpl implements LogSearchService {
         ESSearch search = elasticSearchService.buildSearch("dpods_log_swallow-consumer")
                 .addCondition(Conditions.term("topic", topic))
                 .addCondition(Conditions.term("cid", cid))
-                .addCondition(Conditions.term("mid", mid));
-                //.addCondition(Conditions.term("bmid", mid));
+                .addCondition(Conditions.or(Conditions.term("mid", mid),
+                        Conditions.term("bmid", mid)));
 
         List<Map<String, Object>> tempResults = elasticSearchService.search(search);
         if (tempResults != null && !tempResults.isEmpty()) {
