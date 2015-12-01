@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.model;
 
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.web.util.BSONTimestampSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.bson.types.BSONTimestamp;
 import org.springframework.data.annotation.Id;
 
@@ -13,6 +15,7 @@ import java.util.Date;
  *
  * 2015年4月22日 上午12:06:15
  */
+@SuppressWarnings("unused")
 public class Message implements Comparable<Message> {
 
 	@Id
@@ -39,6 +42,7 @@ public class Message implements Comparable<Message> {
 	public Message() {
 	}
 
+	@JsonSerialize(using=BSONTimestampSerializer.class)
 	public BSONTimestamp get_id() {
 		return _id;
 	}
@@ -49,6 +53,7 @@ public class Message implements Comparable<Message> {
 	}
 
 
+	@JsonSerialize(using=BSONTimestampSerializer.class)
 	public BSONTimestamp getO_id() {
 		return o_id;
 	}
@@ -143,6 +148,10 @@ public class Message implements Comparable<Message> {
 		return this;
 	}
 
+	public String getSi() {
+		return si;
+	}
+
 	public Message setStstring(BSONTimestamp ts) {
 		int seconds = ts.getTime();
 		long millions = new Long(seconds)*1000;
@@ -153,6 +162,10 @@ public class Message implements Comparable<Message> {
 	public Message setGtstring(Date gt) {
 		this.gtstring = new SimpleDateFormat(TIMEFORMAT).format(gt);
 		return this;
+	}
+
+	public String getGtstring() {
+		return gtstring;
 	}
 
 	public Message setRetransmit(String retransmit) {
