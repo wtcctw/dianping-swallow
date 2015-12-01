@@ -30,6 +30,7 @@
 	</bean>
 
 	<bean id="clusterManager" class="com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager">
+		<property name="swallowConfig" ref="swallowConfig"/>
 		<property name="clusterFactories">
 			<list>
 				<ref bean="mongoClusterFactory"/>
