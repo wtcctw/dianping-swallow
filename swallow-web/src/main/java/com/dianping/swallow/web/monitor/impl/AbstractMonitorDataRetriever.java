@@ -147,6 +147,9 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
         Map<String, StatsData> result = new HashMap<String, StatsData>();
 
+        long startKey = getKey(start);
+        long endKey = getKey(end);
+
         Map<String, NavigableMap<Long, StatisData>> serversQpx = statis.getQpxForServers(type);
 
         for (Entry<String, NavigableMap<Long, StatisData>> entry : serversQpx.entrySet()) {
@@ -154,7 +157,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
             String serverIp = entry.getKey();
             NavigableMap<Long, Long> serverQpx = convertData(entry.getValue(), StatisFunctionType.QPX);
             if (serverQpx != null) {
-                serverQpx = serverQpx.subMap(getKey(start), true, getKey(end), true);
+                serverQpx = serverQpx.subMap(startKey, true, endKey, true);
             }
             result.put(serverIp, createStatsData(createServerQpxDesc(serverIp, type), serverQpx, start, end));
         }
@@ -301,11 +304,5 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         }
         return null;
     }
-
-    protected Long getToKey(long end) {
-        if (end > lastBuildTime) {
-            return getKey(lastBuildTime);
-        }
-        return getKey(end);
-    }
+    
 }
