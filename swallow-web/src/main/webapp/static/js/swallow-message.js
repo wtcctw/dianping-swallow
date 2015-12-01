@@ -203,6 +203,9 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
                 }
             }).success(function (data) {
                 delete data.id;
+                if(data.o_id == null){
+                    delete data.o_id;
+                }
                 $scope.formatres3(data);
             });
         },
