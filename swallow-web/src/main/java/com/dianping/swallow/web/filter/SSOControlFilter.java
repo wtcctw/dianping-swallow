@@ -1,16 +1,13 @@
 package com.dianping.swallow.web.filter;
 
-import java.io.IOException;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
+import com.dianping.swallow.web.common.WebComponentConfig;
 import jodd.util.StringUtil;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * @author mingdongli
@@ -19,12 +16,19 @@ import jodd.util.StringUtil;
  */
 public class SSOControlFilter implements Filter {
 
-	private String ssoenable;
+	private ServletContext context;
+
+	private boolean ssoenable;
+
+	private WebComponentConfig webComponentConfig;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 
-		ssoenable = filterConfig.getInitParameter("ssoenable");
+		this.context = filterConfig.getServletContext();
+		ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
+		this.webComponentConfig = ctx.getBean(WebComponentConfig.class);
+		ssoenable = webComponentConfig.isSsoEnable();
 
 	}
 
@@ -32,7 +36,7 @@ public class SSOControlFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
 
-		if ("false".equals(ssoenable)) {
+		if (!ssoenable) {
 			HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 			String path = httpServletRequest.getServletPath();
 			String info = httpServletRequest.getPathInfo();

@@ -1,10 +1,9 @@
 package com.dianping.swallow.web.common;
 
-import javax.annotation.PostConstruct;
-
+import com.dianping.swallow.common.internal.config.AbstractConfig;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.common.internal.config.AbstractConfig;
+import javax.annotation.PostConstruct;
 
 /**
  * 
@@ -24,6 +23,7 @@ public class WebComponentConfig extends AbstractConfig {
 
 	private boolean isJobTask = true;
 	private boolean isServiceTask = true;
+	private boolean isSsoEnable = true;
 
 	public WebComponentConfig() {
 		super(COMPONENT_SWITCH_FILE);
@@ -86,4 +86,11 @@ public class WebComponentConfig extends AbstractConfig {
 		this.isServiceTask = isServiceTask;
 	}
 
+	public boolean isSsoEnable() {
+		return isSsoEnable;
+	}
+
+	public void setIsSsoEnable(boolean isSsoEnable) {
+		this.isSsoEnable = isSsoEnable;
+	}
 }

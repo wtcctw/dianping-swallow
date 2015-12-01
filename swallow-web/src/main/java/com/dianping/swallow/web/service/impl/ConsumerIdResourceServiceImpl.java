@@ -1,11 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
@@ -13,6 +7,11 @@ import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ConsumerIdResourceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -95,11 +94,7 @@ public class ConsumerIdResourceServiceImpl extends AbstractSwallowService implem
     @Override
     public ConsumerIdResource findByConsumerIdAndTopic(String topic, String consumerId) {
 
-        ConsumerIdResource consumerIdResource = consumerIdResourceDao.findByConsumerIdAndTopic(topic, consumerId);
-        if (consumerIdResource == null) {
-            consumerIdResource = buildConsumerIdResource(topic, consumerId);
-        }
-        return consumerIdResource;
+        return consumerIdResourceDao.findByConsumerIdAndTopic(topic, consumerId);
     }
 
     @Override
