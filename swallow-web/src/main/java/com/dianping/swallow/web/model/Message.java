@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model;
 
 import com.dianping.swallow.common.internal.util.MongoUtils;
+import com.dianping.swallow.web.util.BSONTimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.bson.types.BSONTimestamp;
 import org.springframework.data.annotation.Id;
@@ -41,6 +42,7 @@ public class Message implements Comparable<Message> {
 	public Message() {
 	}
 
+	@JsonSerialize(using=BSONTimestampSerializer.class)
 	public BSONTimestamp get_id() {
 		return _id;
 	}
@@ -51,6 +53,7 @@ public class Message implements Comparable<Message> {
 	}
 
 
+	@JsonSerialize(using=BSONTimestampSerializer.class)
 	public BSONTimestamp getO_id() {
 		return o_id;
 	}
