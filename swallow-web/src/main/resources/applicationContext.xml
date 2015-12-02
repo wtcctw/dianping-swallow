@@ -30,6 +30,7 @@
 	</bean>
 
 	<bean id="clusterManager" class="com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager">
+		<property name="swallowConfig" ref="swallowConfig"/>
 		<property name="clusterFactories">
 			<list>
 				<ref bean="mongoClusterFactory"/>
@@ -107,6 +108,14 @@
 			value="http://service.dianping.com/ba/base/organizationalstructure/UserService_1.0.0" />
 		<property name="iface"
 			value="com.dianping.ba.base.organizationalstructure.api.user.UserService" />
+		<property name="serialize" value="hessian" />
+		<property name="callMethod" value="sync" />
+		<property name="timeout" value="5000" />
+	</bean>
+
+	<bean id="elasticSearchService" class="com.dianping.dpsf.spring.ProxyBeanFactory" init-method="init">
+		<property name="serviceName" value="http://service.dianping.com/logcenter/access" />
+		<property name="iface" value="com.dianping.elasticsearch.services.ElasticSearchService" />
 		<property name="serialize" value="hessian" />
 		<property name="callMethod" value="sync" />
 		<property name="timeout" value="5000" />

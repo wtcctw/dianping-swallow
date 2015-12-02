@@ -111,7 +111,10 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         NavigableMap<Long, StatisData> statisData = statis.getStatisDataForTopic(topic, type);
         NavigableMap<Long, Long> rawData = convertData(statisData, StatisFunctionType.DELAY);
         if (rawData != null) {
-            rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+            long startKey = getKey(start);
+            long endKey = getKey(end);
+            rawData = rawData.subMap(startKey, true, endKey, true);
+            rawData = fillStatsData(rawData, startKey, endKey);
         }
         return createStatsData(createDelayDesc(topic, type), rawData, start, end);
     }
@@ -119,7 +122,10 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
     protected StatsData getIpDelayInMemory(String topic, String ip, StatisType type, long start, long end) {
         NavigableMap<Long, Long> rawData = statis.getDelayValue(new CasKeys(TOTAL_KEY, topic, ip), type);
         if (rawData != null) {
-            rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+            long startKey = getKey(start);
+            long endKey = getKey(end);
+            rawData = rawData.subMap(startKey, true, endKey, true);
+            rawData = fillStatsData(rawData, startKey, endKey);
         }
         return createStatsData(createDelayDesc(topic, type), rawData, start, end);
     }
@@ -129,7 +135,10 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         NavigableMap<Long, StatisData> statisData = statis.getStatisDataForTopic(topic, type);
         NavigableMap<Long, Long> rawData = convertData(statisData, StatisFunctionType.QPX);
         if (rawData != null) {
-            rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+            long startKey = getKey(start);
+            long endKey = getKey(end);
+            rawData = rawData.subMap(startKey, true, endKey, true);
+            rawData = fillStatsData(rawData, startKey, endKey);
         }
         return createStatsData(createQpxDesc(topic, type), rawData, start, end);
     }
@@ -138,7 +147,10 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         NavigableMap<Long, StatisData> statisData = statis.getQpsValue(new CasKeys(TOTAL_KEY, topic, ip), type);
         NavigableMap<Long, Long> rawData = convertData(statisData, StatisFunctionType.QPX);
         if (rawData != null) {
-            rawData = rawData.subMap(getKey(start), true, getKey(end), true);
+            long startKey = getKey(start);
+            long endKey = getKey(end);
+            rawData = rawData.subMap(startKey, true, endKey, true);
+            rawData = fillStatsData(rawData, startKey, endKey);
         }
         return createStatsData(createQpxDesc(topic, type), rawData, start, end);
     }
@@ -158,6 +170,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
             NavigableMap<Long, Long> serverQpx = convertData(entry.getValue(), StatisFunctionType.QPX);
             if (serverQpx != null) {
                 serverQpx = serverQpx.subMap(startKey, true, endKey, true);
+                serverQpx = fillStatsData(serverQpx, startKey, endKey);
             }
             result.put(serverIp, createStatsData(createServerQpxDesc(serverIp, type), serverQpx, start, end));
         }
@@ -304,5 +317,5 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
         }
         return null;
     }
-    
+
 }
