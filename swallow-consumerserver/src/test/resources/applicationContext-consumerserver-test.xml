@@ -7,6 +7,21 @@
            http://www.springframework.org/schema/context/spring-context-3.0.xsd"
     default-autowire="byName">
 
+	<bean id="lifecycleComponentManager" class="com.dianping.swallow.common.server.lifecycle.LifecycleComponentManager">
+	</bean>
+
+	<bean id="consumerCollector" class="com.dianping.swallow.common.server.monitor.collector.DefaultConsumerCollector">
+		<property name="turnOff">
+			<value>true</value>
+		</property>
+	</bean>
+
+    <bean id="swallowBuffer"
+        class="com.dianping.swallow.consumerserver.buffer.SwallowBuffer">
+        <property name="minThresholdOfQueue"><value>${minThresholdOfQueue}</value></property>
+        <property name="maxThresholdOfQueue"><value>${maxThresholdOfQueue}</value></property>
+    </bean>
+
     <bean
         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
@@ -21,16 +36,12 @@
         class="com.dianping.swallow.consumerserver.impl.MongoHeartbeater">
     </bean>
 
-    <bean id="ackDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.AckDAOImpl">
-    </bean>
-
-    <bean id="messageDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MessageDAOImpl">
-    </bean>
+	<bean id="messageDAO"
+		class="com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory">
+	</bean>
 
     <bean id="heartbeatDAO"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl">
+        class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoHeartbeatDAO">
     </bean>
 
     <bean id="messageRetriever"
@@ -38,11 +49,37 @@
         <property name="fetchSize"><value>${mongodb.messagefetchSize}</value></property>
     </bean>
 
-    <bean id="mongoManager"
-        class="com.dianping.swallow.common.internal.dao.impl.mongodb.DefaultMongoManager">
-        <constructor-arg>
-            <value>swallow.mongo.consumerServerURI</value>
-        </constructor-arg>
+
+    <bean id="consumerWorkerManager"
+        class="com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager">
+    </bean>
+
+    <bean id="consumerAuthController"
+        class="com.dianping.swallow.consumerserver.auth.impl.ConsumerAuthControllerImpl"
+        init-method="init">
+        <property name="lionDynamicConfig" ref="lionDynamicConfig"></property>
+    </bean>
+
+
+	<bean id="clusterManager" class="com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager">
+		<property name="clusterFactories">
+			<list>
+				<ref bean="mongoClusterFactory"/>
+				<ref bean="kafkaClusterFactory"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
+		
+
+    <bean id="kafkaClusterFactory" class="com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory">
+    </bean>
+    
+    <bean id="mongoClusterFactory" class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClusterFactory">
+    </bean>
+    
+    <bean id="consumerThreadPoolManager" class="com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManagerImpl">
     </bean>
 
     <bean id="topicWhiteList"
@@ -64,6 +101,4 @@
         </constructor-arg>
     </bean>
     
-	<bean id="defaultThreadException" class="com.dianping.swallow.common.internal.pool.DefaultThreadException">
-	</bean>
 </beans>

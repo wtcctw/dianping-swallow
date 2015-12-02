@@ -1,5 +1,6 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 public abstract class AbstractClusterFactory extends AbstractLifecycle implements ClusterFactory{
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-
+	
 	protected String getTypeDesc(String url) {
 		
 		int index = url.indexOf("://");
@@ -29,5 +30,6 @@ public abstract class AbstractClusterFactory extends AbstractLifecycle implement
 	public int getOrder() {
 		return ORDER;
 	}
+
 
 }

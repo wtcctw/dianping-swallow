@@ -34,7 +34,7 @@ public class LongAlertTest extends AbstractConsumerTest {
 		ConsumerConfig config = new ConsumerConfig();
 		config.setLongTaskAlertTime(1000);
 		
-        c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(topic), getConsumerId(), config);
+        c = ConsumerFactoryImpl.getInstance().createConsumer(Destination.topic(getTopic()), getConsumerId(), config);
         TaskChecker taskChecker =  ((ConsumerImpl)c).getTaskChecker();
 		
 		c.setListener(new MessageListener() {
@@ -50,7 +50,7 @@ public class LongAlertTest extends AbstractConsumerTest {
 		});
 		c.start();
 		
-		sendMessage(1, topic);
+		sendMessage(1, getTopic());
 
 		TimeUnit.SECONDS.sleep(5);
 		

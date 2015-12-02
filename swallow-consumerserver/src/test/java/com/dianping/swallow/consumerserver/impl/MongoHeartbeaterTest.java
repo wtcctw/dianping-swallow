@@ -22,7 +22,8 @@ public class MongoHeartbeaterTest {
 
    @Test
    public void testWaitUntilMasterDown() throws Exception {
-      HeartbeatDAO hbDao = mock(HeartbeatDAO.class);
+	   
+      HeartbeatDAO<?> hbDao = mock(HeartbeatDAO.class);
       when(hbDao.findLastHeartbeat(Mockito.anyString())).then(new Answer<Date>() {
 
          Date d =new Date();
@@ -58,7 +59,8 @@ public class MongoHeartbeaterTest {
    
    @Test
    public void testwaitUntilMasterUp() throws Exception {
-      HeartbeatDAO hbDao = mock(HeartbeatDAO.class);
+	   
+      HeartbeatDAO<?> hbDao = mock(HeartbeatDAO.class);
       when(hbDao.findLastHeartbeat(Mockito.anyString())).then(new Answer<Date>() {
 
          Date d =new Date((new Date()).getTime() - 300);

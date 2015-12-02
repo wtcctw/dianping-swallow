@@ -1,8 +1,5 @@
 package com.dianping.swallow.test.monitor;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.Consumer;
@@ -10,6 +7,9 @@ import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.dianping.swallow.test.load.AbstractLoadTest;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @rundemo_name 生产者例子(同步)
@@ -82,8 +82,7 @@ public class ConsumerRunner extends AbstractLoadTest {
 				c.setListener(new MessageListener() {
 					@Override
 					public void onMessage(Message msg) {
-
-						count.incrementAndGet();
+						increaseAndGetCurrentCount();
 					}
 				});
 				c.start();
@@ -99,16 +98,5 @@ public class ConsumerRunner extends AbstractLoadTest {
 
 		SimpleDateFormat format = new SimpleDateFormat("HH-mm-ss");
 		return "myid-" + format.format(new Date());
-	}
-
-	@Override
-	protected boolean isExit() {
-
-		if (totalMessageCount > 0 && count.get() > totalMessageCount) {
-			logger.info("[isExit][message size exceed total count, exit]" + count.get());
-			return true;
-		}
-
-		return false;
 	}
 }

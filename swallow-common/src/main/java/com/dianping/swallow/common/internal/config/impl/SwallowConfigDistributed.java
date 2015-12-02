@@ -115,7 +115,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 	 * @param topicKey
 	 * @param topicCfg
 	 */
-	private TopicConfig putConfig(String topicKey, TopicConfig topicCfg) {
+	public TopicConfig putConfig(String topicKey, TopicConfig topicCfg) {
 		
 		String topic = getTopicFromLionKey(topicKey);
 		TopicConfig oldConfig = null;
@@ -139,6 +139,15 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		
 		return key.startsWith(TOPIC_CFG_PREFIX);
 	}
+	
+	public static String topicKey(String topic){
+		
+		if(topic.startsWith(TOPIC_CFG_PREFIX)){
+			return topic;
+		}
+		
+		return StringUtils.join(",", TOPIC_CFG_PREFIX, topic);
+	}
 
 	@Override
 	protected SwallowConfigArgs doOnConfigChange(String key, String value) {
@@ -158,7 +167,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 			return null;
 		}
 		
-		return new SwallowConfigArgs(CHANGED_ITEM.TOPIC_MONGO, topic);
+		return new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, topic, oldConfig);
 	}
 
 	private TopicConfig getConfigFromString(String config) {
@@ -226,6 +235,9 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 				
 				checkAdd(new HashSet<String>(rawTopicSet), new HashSet<String>(currentTopicSet));
 				checkDelete(new HashSet<String>(rawTopicSet), new HashSet<String>(currentTopicSet));
+			}catch(InterruptedException e){
+				Thread.currentThread().interrupt();
+				logger.error("[run]", e);
 			}catch(Throwable th){
 				logger.error("[run]", th);
 			}
@@ -262,7 +274,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 			if(cfg == null){
 				logger.warn("[checkDelete][config not exist]" + topic);
 			}
-			updateObservers(new SwallowConfigArgs(CHANGED_ITEM.TOPIC_MONGO, getTopicFromLionKey(topic), CHANGED_BEHAVIOR.DELETE));
+			updateObservers(new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, getTopicFromLionKey(topic), CHANGED_BEHAVIOR.DELETE));
 		}
 		
 	}
@@ -284,7 +296,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 
 		for(String topicKey : currentTopicSet){
 			putConfig(topicKey);
-			updateObservers(new SwallowConfigArgs(CHANGED_ITEM.TOPIC_MONGO, getTopicFromLionKey(topicKey), CHANGED_BEHAVIOR.ADD));
+			updateObservers(new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, getTopicFromLionKey(topicKey), CHANGED_BEHAVIOR.ADD));
 		}
 	}
 
@@ -297,5 +309,10 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return topicCfgs.toString();
 	}
 }

@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import org.junit.Before;
 
-import com.dianping.swallow.test.AbstractTest;
+import com.dianping.swallow.test.AbstractUnitTest;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 
@@ -17,7 +17,7 @@ import com.mongodb.ServerAddress;
  *
  * 2015年3月23日 下午3:55:36
  */
-public class AbstractMongoTest extends AbstractTest{
+public class AbstractMongoTest extends AbstractUnitTest{
 
 	protected MongoClient mongo; 
 	

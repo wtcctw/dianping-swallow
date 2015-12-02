@@ -24,8 +24,8 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 	@Test
 	public void testBigMessage() throws SendFailedException, RemoteServiceInitFailedException{
 		
-		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
-		sendMessage(1, topic, 1024);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), concurrentCount);
+		sendMessage(1, getTopic(), 1024);
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(1, getConsumerMessageCount(consumer));
 	}
@@ -34,8 +34,8 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 	@Test
 	public void testDurableMessage() throws SendFailedException, RemoteServiceInitFailedException{
 		
-		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
-		sendMessage(messageCount, topic);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), concurrentCount);
+		sendMessage(messageCount, getTopic());
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, getConsumerMessageCount(consumer));
 		
@@ -44,9 +44,9 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 	@Test
 	public void testDurationClose() throws SendFailedException, RemoteServiceInitFailedException{
 		
-		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), concurrentCount);
 		closeConsumer(consumer);
-		sendMessage(messageCount, topic);
+		sendMessage(messageCount, getTopic());
 		
 		startConsumer(consumer);
 		waitForListernToComplete(messageCount);
@@ -62,8 +62,8 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 	 */
 	public void testRestartMessage() throws SendFailedException, RemoteServiceInitFailedException{
 
-		Consumer consumer = addListener(topic, getConsumerId(), concurrentCount);
-		sendMessage(messageCount, topic);
+		Consumer consumer = addListener(getTopic(), getConsumerId(), concurrentCount);
+		sendMessage(messageCount, getTopic());
 		
 		waitForListernToComplete(messageCount);
 		int currentConsumerCount = getConsumerMessageCount(consumer); 
@@ -72,11 +72,11 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 		
 		for(int i=0;i<5;i++){
 			
-			int concurrentSendMessageCount = getSendMessageCount(topic);
+			int concurrentSendMessageCount = getSendMessageCount(getTopic());
 			
 			//关闭consumer
 			closeConsumer(consumer);
-			sendMessage(messageCount, topic);
+			sendMessage(messageCount, getTopic());
 	
 			//理论上应该不会收到消息
 			currentConsumerCount = getConsumerMessageCount(consumer); 
@@ -85,7 +85,7 @@ public class DurableConsumerTest extends AbstractConsumerTest{
 			startConsumer(consumer);
 			waitForListernToComplete(messageCount);
 		
-			concurrentSendMessageCount = getSendMessageCount(topic);
+			concurrentSendMessageCount = getSendMessageCount(getTopic());
 			currentConsumerCount = getConsumerMessageCount(consumer); 
 			Assert.assertEquals(concurrentSendMessageCount, currentConsumerCount);
 		}

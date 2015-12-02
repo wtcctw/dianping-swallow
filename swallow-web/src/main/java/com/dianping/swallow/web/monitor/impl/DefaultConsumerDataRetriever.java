@@ -193,6 +193,8 @@ public class DefaultConsumerDataRetriever
                     }
                     send = send.subMap(startKey, true, endKey, true);
                     ack = ack.subMap(startKey, true, endKey, true);
+                    send = fillStatsData(send, startKey, endKey);
+                    ack = fillStatsData(ack, startKey, endKey);
                     StatsData sendStatis = createStatsData(
                             createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), send, start, end);
                     StatsData ackStatis = createStatsData(createConsumerIdDelayDesc(topic, consumerId, StatisType.ACK),
@@ -247,6 +249,10 @@ public class DefaultConsumerDataRetriever
         ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
         NavigableMap<Long, Long> sendDelays = retriever.getDelayValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.SEND);
         NavigableMap<Long, Long> ackDelays = retriever.getDelayValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.ACK);
+        long startKey = getKey(start);
+        long endKey = getKey(end);
+        sendDelays = fillStatsData(sendDelays, startKey, endKey);
+        ackDelays = fillStatsData(ackDelays, startKey, endKey);
         StatsData sendStatis = createStatsData(
                 createConsumerIdDelayDesc(topic, consumerId, StatisType.SEND), sendDelays, start, end);
         StatsData ackStatis = createStatsData(
@@ -309,6 +315,8 @@ public class DefaultConsumerDataRetriever
                     }
                     send = send.subMap(startKey, true, endKey, true);
                     ack = ack.subMap(startKey, true, endKey, true);
+                    send = fillStatsData(send, startKey, endKey);
+                    ack = fillStatsData(ack, startKey, endKey);
                     StatsData sendStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND),
                             send, start, end);
                     StatsData ackStatis = createStatsData(createConsumerIdQpxDesc(topic, consumerId, StatisType.ACK),
@@ -369,6 +377,10 @@ public class DefaultConsumerDataRetriever
         NavigableMap<Long, StatisData> ackQpxs = retriever.getQpsValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.ACK);
         NavigableMap<Long, Long> send = convertData(sendQpxs, StatisFunctionType.QPX);
         NavigableMap<Long, Long> ack = convertData(ackQpxs, StatisFunctionType.QPX);
+        long startKey = getKey(start);
+        long endKey = getKey(end);
+        send = fillStatsData(send, startKey, endKey);
+        ack = fillStatsData(ack, startKey, endKey);
         StatsData sendStats = createStatsData(
                 createConsumerIdQpxDesc(topic, consumerId, StatisType.SEND), send, start, end);
         StatsData ackStats = createStatsData(

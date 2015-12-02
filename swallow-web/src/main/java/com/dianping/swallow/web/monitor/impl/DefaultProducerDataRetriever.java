@@ -75,7 +75,7 @@ public class DefaultProducerDataRetriever
         OrderStatsData orderDelayResult = new OrderStatsData(size, createDelayDesc(TOTAL_KEY, StatisType.SAVE), start, end);
         OrderStatsData orderQpsResult = new OrderStatsData(size, createQpxDesc(TOTAL_KEY, StatisType.SAVE), start, end);
         long fromKey = getKey(start);
-        long toKey = getToKey(end);
+        long toKey = getKey(end);
         Iterator<String> iterator = topics.iterator();
         while (iterator.hasNext()) {
             String topicName = iterator.next();

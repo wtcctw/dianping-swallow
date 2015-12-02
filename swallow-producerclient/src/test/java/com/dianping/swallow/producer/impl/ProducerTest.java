@@ -1,12 +1,12 @@
 /**
  * Project: swallow-producerclient
- * <p/>
+ *
  * File Created at 2012-6-27
  * $Id$
- * <p/>
+ *
  * Copyright 2010 dianping.com.
  * All rights reserved.
- * <p/>
+ *
  * This software is the confidential and proprietary information of
  * Dianping Company. ("Confidential Information").  You shall not
  * disclose such Confidential Information and shall use it only in
@@ -15,6 +15,25 @@
  */
 package com.dianping.swallow.producer.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.mockito.Matchers;
+
+import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.packet.Packet;
 import com.dianping.swallow.common.internal.packet.PacketType;
 import com.dianping.swallow.common.internal.packet.PktMessage;
@@ -27,27 +46,10 @@ import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.producer.exceptions.RemoteServiceInitFailedException;
 import com.dianping.swallow.common.producer.exceptions.SendFailedException;
 import com.dianping.swallow.common.producer.exceptions.ServerDaoException;
-import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.internal.ProducerImpl;
 import com.dianping.swallow.producer.impl.internal.SwallowPigeonConfiguration;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.mockito.Matchers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Producer的单元测试，包含了对ProducerFactoryImpl和ProducerImpl类的测试
@@ -55,13 +57,13 @@ import static org.mockito.Mockito.when;
  * @author tong.song
  */
 public class ProducerTest {
-    public static final ProducerSwallowService normalRemoteService = mock(ProducerSwallowService.class);
+    public static final ProducerSwallowService normalRemoteService    = mock(ProducerSwallowService.class);
     public static final ProducerSwallowService exceptionRemoteService = mock(ProducerSwallowService.class);
-    public static final Destination dest = Destination.topic("UnitTest");
-    public static final String content = "Hello UnitTest.";
-    public static final String producerIP = "127.0.0.1";
-    public static final String producerVersion = "0.6.0";
-    public static final PktSwallowPACK ack = new PktSwallowPACK("MockACK");
+    public static final Destination            dest                   = Destination.topic("UnitTest");
+    public static final String                 content                = "Hello UnitTest.";
+    public static final String                 producerIP             = "127.0.0.1";
+    public static final String                 producerVersion        = "0.6.0";
+    public static final PktSwallowPACK         ack                    = new PktSwallowPACK("MockACK");
 
     @BeforeClass
     public static void init() {
@@ -82,12 +84,10 @@ public class ProducerTest {
                 message = (PktMessage) arg0;
                 assertEquals(PacketType.OBJECT_MSG, message.getPacketType());
                 assertEquals(dest, message.getDestination());
-                if (message.getContent().getInternalProperties() != null) {
-                    if ("gzip".equals(message.getContent().getInternalProperties().get("compress"))) {
-                        try {
-                            assertEquals(ZipUtil.zip(content), message.getContent().getContent());
-                        } catch (IOException e) {
-                        }
+                if ("gzip".equals(message.getContent().getInternalProperty(InternalProperties.COMPRESS))) {
+                    try {
+                        assertEquals(ZipUtil.zip(content), message.getContent().getContent());
+                    } catch (IOException e) {
                     }
                 } else {
                     assertEquals(content, message.getContent().getContent());
@@ -108,37 +108,6 @@ public class ProducerTest {
     }
 
     @Test
-    public void testLog4j2() throws InterruptedException {
-
-        final Logger logger = LoggerFactory.getLogger(ProducerFactoryImpl.class);
-
-        ProducerConfig config = new ProducerConfig();
-        // 以下设置的值与默认配置一致，可以省略
-        config.setMode(ProducerMode.SYNC_MODE);
-        config.setSyncRetryTimes(0);
-        config.setZipped(false);
-        config.setThreadPoolSize(5);
-        config.setSendMsgLeftLastSession(false);
-        Producer p = null;
-        try {
-            p = ProducerFactoryImpl.getInstance().createProducer(Destination.topic("example"), config);
-        } catch (RemoteServiceInitFailedException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < 10000; i++) {
-            String msg = "消息-" + i;
-            try {
-                p.sendMessage(msg);
-                logger.info("Sended msg:" + msg);
-                System.out.println("Sended msg:" + msg);
-                Thread.sleep(500);
-            } catch (SendFailedException e) {
-                System.out.println("Catch exception then do what you want to do.");
-            }
-        }
-    }
-
-    @Test
     public void testSyncProducerSendMessage() throws SendFailedException {
         ProducerConfig config = new ProducerConfig();
 
@@ -152,7 +121,7 @@ public class ProducerTest {
         assertEquals(ack.getShaInfo(), ret);
 
         ProducerImpl expectionProducer = new ProducerImpl(dest, config, producerIP, producerVersion,
-                exceptionRemoteService, 500, 1, 500, createProducerProcessor(config));
+                exceptionRemoteService, 500,1, 500, createProducerProcessor(config));
         try {
             expectionProducer.sendMessage(content);
             fail();
@@ -178,7 +147,7 @@ public class ProducerTest {
 
         ProducerImpl producer = new ProducerImpl(dest, config, producerIP, producerVersion, exceptionRemoteService, 5000, 1, 5000, createProducerProcessor(config));
 
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 5; i++) {
             String ret = producer.sendMessage(content);
             assertNull(ret);
         }

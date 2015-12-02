@@ -31,7 +31,7 @@ public class RetryTest extends AbstractConsumerTest {
 	public void testRetryOnBackout() throws Throwable{
 		
 		createRetryConsumerListener(true, retryCount);
-		sendMessage(messageCount, topic);
+		sendMessage(messageCount, getTopic());
 
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals((retryCount + 1) * messageCount, count.get());
@@ -42,7 +42,7 @@ public class RetryTest extends AbstractConsumerTest {
 		
 		createRetryConsumerListener(false, retryCount);
 
-		sendMessage(messageCount, topic);
+		sendMessage(messageCount, getTopic());
 
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals(messageCount, count.get());
@@ -53,7 +53,7 @@ public class RetryTest extends AbstractConsumerTest {
 				
 		createRetryConsumerListener(true, retryCount, true);
 		
-		sendMessage(messageCount, topic);
+		sendMessage(messageCount, getTopic());
 
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals((retryCount + 1) * messageCount, count.get());
@@ -65,7 +65,7 @@ public class RetryTest extends AbstractConsumerTest {
 				
 		createRetryConsumerListener(false, retryCount, true);
 		
-		sendMessage(messageCount, topic);
+		sendMessage(messageCount, getTopic());
 
 		waitForListernToComplete(messageCount);
 		Assert.assertEquals((retryCount + 1) * messageCount, count.get());
@@ -78,7 +78,7 @@ public class RetryTest extends AbstractConsumerTest {
 
 	
 	private void createRetryConsumerListener(final boolean throwBackout, int retryCount, boolean isAllRetryListener) {
-		c = createConsumer(topic, getConsumerId(), retryCount);
+		c = createConsumer(getTopic(), getConsumerId(), retryCount);
 		if(!isAllRetryListener){
 			c.setListener(new MessageListener() {
 				

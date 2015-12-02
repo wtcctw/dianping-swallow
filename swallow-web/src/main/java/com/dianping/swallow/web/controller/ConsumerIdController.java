@@ -64,7 +64,11 @@ public class ConsumerIdController extends AbstractMenuController implements Reso
 
         String topic = consumerIdQueryDto.getTopic();
         String consumerId = consumerIdQueryDto.getConsumerId();
-        return consumerIdResourceService.findByConsumerIdAndTopic(topic, consumerId);
+        ConsumerIdResource consumerIdResource = consumerIdResourceService.findByConsumerIdAndTopic(topic, consumerId);
+        if(consumerIdResource == null){
+            consumerIdResource = consumerIdResourceService.buildConsumerIdResource(topic, consumerId);
+        }
+        return consumerIdResource;
     }
 
     @RequestMapping(value = "/console/consumerid/update", method = RequestMethod.POST)

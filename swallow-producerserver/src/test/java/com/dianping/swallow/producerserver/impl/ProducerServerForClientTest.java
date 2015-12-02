@@ -4,8 +4,6 @@ package com.dianping.swallow.producerserver.impl;
 
 import java.util.Date;
 
-import jmockmongo.MockMongo;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -22,11 +20,6 @@ import com.dianping.swallow.common.producer.exceptions.ServerDaoException;
 import com.dianping.swallow.producerserver.AbstractProducerServerTest;
 
 public class ProducerServerForClientTest extends AbstractProducerServerTest{
-
-    static MockMongo            mockMongo;
-    static MockMongo            mockMongo2;
-    
-    
 
     @Test
     public void testProducerServerForClient() throws Exception {
@@ -47,11 +40,11 @@ public class ProducerServerForClientTest extends AbstractProducerServerTest{
         PktProducerGreet pktProducerGreet = new PktProducerGreet("0.6.0", "Unit Test");
         //构造message
         SwallowMessage swallowMessage = new SwallowMessage();
-        swallowMessage.setContent(topicName);
+        swallowMessage.setContent(getTopic());
         swallowMessage.setGeneratedTime(new Date());
         swallowMessage.setSourceIp("192.168.32.194");
         swallowMessage.setVersion("0.6.0");
-        PktMessage pktMessage = new PktMessage(Destination.topic(topicName), swallowMessage);
+        PktMessage pktMessage = new PktMessage(Destination.topic(getTopic()), swallowMessage);
 
         PktSwallowPACK ACK = null;
         //发送greet
@@ -80,17 +73,10 @@ public class ProducerServerForClientTest extends AbstractProducerServerTest{
 
 	@BeforeClass
     public static void beforeClass() {
-        mockMongo = new MockMongo(27010);
-        mockMongo.start();
-
-        mockMongo2 = new MockMongo(27011);
-        mockMongo2.start();
     }
 
     @AfterClass
     public static void afterClass() {
-        mockMongo.stop();
-        mockMongo2.stop();
     }
 
 }

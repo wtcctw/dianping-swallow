@@ -2,12 +2,6 @@ package com.dianping.swallow.test.load.consumer;
 
 
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 import com.dianping.swallow.common.message.Destination;
@@ -18,6 +12,13 @@ import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.dianping.swallow.test.load.AbstractLoadTest;
 import com.dianping.swallow.test.load.BitMarker;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author mengwenchao
@@ -26,40 +27,24 @@ import com.dianping.swallow.test.load.BitMarker;
  */
 public class ConsumerRunner extends AbstractLoadTest{
 
-	private static int topicCount    = 2;
-    private static int consumerCount = 10;
-    private static int threadPoolSize = 2;
-    private static int totalMessageCount = -1;
+    private int consumerCount = Integer.parseInt(System.getProperty("consumerCount", "10"));
     
-    private Map<String, BitMarker> messageCount = new ConcurrentHashMap<String, BitMarker>(); 
-    private static boolean differentConsumerId = true;
+    @JsonIgnore
+    private Map<String, BitMarker> messageCount = new ConcurrentHashMap<String, BitMarker>();
+    
+    private boolean differentConsumerId = Boolean.parseBoolean(System.getProperty("differentConsumerId", "true"));
     
     private String consumerIdPrefix = PropertiesUtils.getProperty("consumerIdPrefix", "myid");
     
     public static void main(String[] args) throws Exception {
     	
-    	if(args.length >= 1){
-    		topicCount = Integer.parseInt(args[0]);
-    	}
-    	if(args.length >= 2){
-    		consumerCount = Integer.parseInt(args[1]);
-    	}
-    	if(args.length >= 3){
-    		threadPoolSize = Integer.parseInt(args[2]);
-    	}
-    	if(args.length >= 4){
-    		totalMessageCount = Integer.parseInt(args[3]);
-    	}
-    	
-    	differentConsumerId = Boolean.parseBoolean(System.getProperty("differentConsumerId"));
     	new ConsumerRunner().start();
     }
 
     @Override
 	protected void doStart() {
     	if(logger.isInfoEnabled()){
-    		logger.info("[doStart][topicCount, consumerCount, threadPoolSize, totalMessageCount, differentConsumerId]" + 
-    				topicCount + "," + consumerCount + "," + threadPoolSize + "," + totalMessageCount + "," + differentConsumerId);
+    		logger.info("[doStart]" + this);
     	}
 		startReceiver();
 	}
@@ -74,13 +59,13 @@ public class ConsumerRunner extends AbstractLoadTest{
         String rawConsumerId = getConsumerId();
 
         for (int i = 0; i < topicCount; i++) {
-            final String topic = getTopicName(topicName, i);
+            final String topic = getTopicName(topicName, topicStartIndex + i);
             for (int j = 0; j < consumerCount; j++) {
                 ConsumerConfig config = new ConsumerConfig();
                 if(j == (consumerCount - 1)){
                 	config.setMessageFilter(MessageFilter.createInSetMessageFilter(type));
                 }
-                config.setThreadPoolSize(threadPoolSize);
+                config.setThreadPoolSize(concurrentCount);
                 config.setRetryCountOnBackoutMessageException(0);
                 
                 final String consumerId = differentConsumerId? (rawConsumerId + "-" + j): rawConsumerId;
@@ -93,7 +78,7 @@ public class ConsumerRunner extends AbstractLoadTest{
                     public void onMessage(Message msg) {
                     	
                     	count(msg, bitMarker);
-                    	count.incrementAndGet();
+                    	increaseAndGetCurrentCount();
                     }
                 });
                 c.start();
@@ -130,16 +115,6 @@ public class ConsumerRunner extends AbstractLoadTest{
 		return "myid-" + format.format(new Date());
 	}
 
-	@Override
-	protected boolean isExit() {
-		
-		if(totalMessageCount >0 && count.get() > totalMessageCount){
-			logger.info("[isExit][message size exceed total count, exit]" + count.get());
-			return true;
-		}
-		
-		return false;
-	}
 	
 	@Override
 	protected void doOnExit() {

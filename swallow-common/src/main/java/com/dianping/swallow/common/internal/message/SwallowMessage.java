@@ -2,7 +2,9 @@ package com.dianping.swallow.common.internal.message;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.message.Message;
@@ -17,7 +19,7 @@ public class SwallowMessage implements Serializable, Message {
 
    private Map<String, String> properties;
 
-   private Map<String, String> internalProperties;
+   private Map<String, String> internalProperties = new HashMap<String, String>();
 
    private String              version;
 
@@ -30,8 +32,6 @@ public class SwallowMessage implements Serializable, Message {
    private String              sourceIp;
 
    private Long                backupMessageId;
-
-   private boolean             isBackup;
 
    @Override
    public Date getGeneratedTime() {
@@ -74,11 +74,22 @@ public class SwallowMessage implements Serializable, Message {
    }
 
    public Map<String, String> getInternalProperties() {
-      return internalProperties;
+      return new HashMap<String, String>(internalProperties);
    }
-
-   public void setInternalProperties(Map<String, String> internalProperties) {
-      this.internalProperties = internalProperties;
+   
+   public void putInternalProperty(String key, String value){
+	   this.internalProperties.put(key, value);
+   }
+   
+   public String getInternalProperty(String key){
+	   return internalProperties.get(key);
+   }
+   
+   public void putInternalProperties(Map<String, String> properties){
+	   
+	   if(properties != null){
+		   this.internalProperties.putAll(properties);
+	   }
    }
 
    @Override
@@ -98,10 +109,32 @@ public class SwallowMessage implements Serializable, Message {
 
    public long size(){
 	   //估算，非严格
-	   return (long) (content.length()*2*1.2);
+	   long size = 0;
+	   size += contentLength();
+	   size += propertiesLength();
+	   return size;
    }
    
-   @Override
+	private long propertiesLength() {
+		if(properties == null){
+			return 0;
+		}
+		long length = 0;
+		for(Entry<String, String> property : properties.entrySet()){
+			length += property.getKey().length()*2;
+			length += property.getValue().length()*2;
+		}
+		return length;
+	}
+
+	private long contentLength() {
+		if(content == null){
+			return 0;
+		}
+		return content.length() * 2;
+	}
+
+@Override
    public String getContent() {
       return content;
    }
@@ -142,19 +175,15 @@ public class SwallowMessage implements Serializable, Message {
    }
 
    public boolean isBackup() {
-      return isBackup;
-   }
-
-   public void setBackup(boolean isBackup) {
-      this.isBackup = isBackup;
+      return backupMessageId != null;
    }
 
    @Override
    public String toString() {
       return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", backupMessageId="
-            + backupMessageId + ", properties=" + properties + ", internalProperties=" + internalProperties
+            + backupMessageId + ", properties=" + properties + ", internalPropertiess=" + internalProperties
             + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + ", content="
-            + content + ", isBackup=" + isBackup + "]";
+            + content + "]";
    }
 
    public String toKeyValuePairs() {
@@ -163,8 +192,8 @@ public class SwallowMessage implements Serializable, Message {
 
    public String toSuccessKeyValuePairs() {
       return "generatedTime=" + generatedTime + "&messageId=" + messageId + "&backupMessageId=" + backupMessageId
-            + "&properties=" + properties + "&internalProperties=" + internalProperties + "&version=" + version
-            + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp + "&isBackup=" + isBackup;
+            + "&properties=" + properties + "&internalPropertiess=" + internalProperties + "&version=" + version
+            + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp;
    }
 
    @Override
@@ -196,91 +225,4 @@ public class SwallowMessage implements Serializable, Message {
       }
       return true;
    }
-
-   /**
-    * 在不比较MessageId的情况下，判断消息是否相等。
-    */
-   public boolean equalsWithoutMessageId(Object obj) {
-      if (this == obj) {
-         return true;
-      }
-      if (obj == null) {
-         return false;
-      }
-      if (!(obj instanceof SwallowMessage)) {
-         return false;
-      }
-      SwallowMessage other = (SwallowMessage) obj;
-      if (backupMessageId == null) {
-         if (other.backupMessageId != null) {
-            return false;
-         }
-      } else if (backupMessageId.compareTo(other.backupMessageId) != 0) {
-         return false;
-      }
-      if (content == null) {
-         if (other.content != null) {
-            return false;
-         }
-      } else if (!content.equals(other.content)) {
-         return false;
-      }
-      if (generatedTime == null) {
-         if (other.generatedTime != null) {
-            return false;
-         }
-      } else if (!generatedTime.equals(other.generatedTime)) {
-         return false;
-      }
-      if (properties == null) {
-         if (other.properties != null) {
-            return false;
-         }
-      } else if (!properties.equals(other.properties)) {
-         return false;
-      }
-      
-      if(!compareInternalPropeties(other)){
-    	  return false;
-      }
-      if (sha1 == null) {
-         if (other.sha1 != null) {
-            return false;
-         }
-      } else if (!sha1.equals(other.sha1)) {
-         return false;
-      }
-      if (sourceIp == null) {
-         if (other.sourceIp != null) {
-            return false;
-         }
-      } else if (!sourceIp.equals(other.sourceIp)) {
-         return false;
-      }
-      if (type == null) {
-         if (other.type != null) {
-            return false;
-         }
-      } else if (!type.equals(other.type)) {
-         return false;
-      }
-      if (version == null) {
-         if (other.version != null) {
-            return false;
-         }
-      } else if (!version.equals(other.version)) {
-         return false;
-      }
-      if (isBackup != other.isBackup) {
-         return false;
-      }
-      return true;
-   }
-
-	private boolean compareInternalPropeties(SwallowMessage other) {
-		//内部信息认为相等
-		//因为可能会在服务端自动写入信息比如save_time
-		return true;
-	}
-
 }

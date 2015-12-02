@@ -1,24 +1,21 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-
+import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
-import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
+import com.dianping.swallow.common.internal.observer.impl.AbstractObservableLifecycle;
+import com.dianping.swallow.common.internal.observer.impl.ElementAdded;
+
+import java.net.InetSocketAddress;
+import java.util.*;
 
 /**
  * @author mengwenchao
  *
  * 2015年11月1日 下午9:24:35
  */
-public class DefaultClusterManager extends AbstractLifecycle implements ClusterManager{
+public class DefaultClusterManager extends AbstractObservableLifecycle implements ClusterManager{
 	
 	private Set<Cluster>  clusterSet = new HashSet<Cluster>(); 
 	
@@ -26,13 +23,15 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 	
 	private List<ClusterFactory> clusterFactories;
 	
+	private SwallowConfig swallowConfig;
+	
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 	}
 	
 	@Override
-	public Cluster getCluster(String url) {
+	public Cluster getCluster(String url) throws ClusterCreateException {
 		
 		Cluster cluster = clusterMap.get(url); 
 
@@ -43,19 +42,22 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 				if(cluster != null){
 					return cluster;
 				}
-				
-				try {
+				try{
 					cluster = createOrUseExistingCluster(url);
 					clusterSet.add(cluster);
 					clusterMap.put(url, cluster);
-				} catch (Exception e) {
+					updateObservers(new ElementAdded<Cluster>(cluster));
+				}catch(Exception e){
 					logger.error("[getCluster]" + url, e);
+					throw new ClusterCreateException(url, e);
 				}
 			}
 		}
 		
 		return cluster;
 	}
+	
+	
 
 	private Cluster createOrUseExistingCluster(String url) throws Exception {
 
@@ -104,6 +106,7 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 		if(logger.isInfoEnabled()){
 			logger.info("[initializeCluster]" + cluster);
 		}
+		cluster.setSwallowConfig(swallowConfig);
 		cluster.initialize();
 	}
 
@@ -146,4 +149,14 @@ public class DefaultClusterManager extends AbstractLifecycle implements ClusterM
 	public int getOrder() {
 		return ORDER;
 	}
+
+	public SwallowConfig getSwallowConfig() {
+		return swallowConfig;
+	}
+
+	public void setSwallowConfig(SwallowConfig swallowConfig) {
+		this.swallowConfig = swallowConfig;
+	}
+	
+	
 }

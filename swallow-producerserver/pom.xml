@@ -20,6 +20,7 @@
     </properties>
 
 	<dependencies>
+	
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
@@ -47,6 +48,10 @@
 		<dependency>
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.dianping.swallow</groupId>

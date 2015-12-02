@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.config.impl;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,18 +33,21 @@ public class LionDynamicConfig implements DynamicConfig {
 
 	private ConfigCache cc;
 
+	boolean useLocal = Boolean.parseBoolean(PropertiesUtils.getProperty("lion.useLocal", "false"));
+
 	public LionDynamicConfig(String localConfigFileName) {
 
 		try {
 			cc = ConfigCache.getInstance(EnvZooKeeperConfig.getZKAddress());
-			boolean useLocal = Boolean.parseBoolean(PropertiesUtils.getProperty("lion.useLocal", "false"));
-			if (EnvUtil.isDev() || useLocal) {
+			if (useLocal()) {
 				// 如果本地文件存在，则使用Lion本地文件
-				InputStream in = LionDynamicConfig.class.getClassLoader().getResourceAsStream(localConfigFileName);
-				if (in != null) {
-					if (logger.isInfoEnabled()) {
-						logger.info("[loading]" + localConfigFileName);
+				URL resource = getClass().getClassLoader().getResource(localConfigFileName);
+				
+				if (resource != null) {
+					if(logger.isInfoEnabled()){
+						logger.info("[LionDynamicConfig]" + resource);
 					}
+					InputStream in = resource.openStream();
 					try {
 						Properties props = new Properties();
 						props.load(in);
@@ -64,6 +68,11 @@ public class LionDynamicConfig implements DynamicConfig {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private boolean useLocal() {
+		
+		return EnvUtil.isDev() || useLocal;
 	}
 
 	@Override
@@ -108,7 +117,7 @@ public class LionDynamicConfig implements DynamicConfig {
 	@Override
 	public Map<String, String> getProperties(String prefix) {
 
-		if (EnvUtil.isDev()) {
+		if (useLocal()) {
 
 			Map<String, String> result = new HashMap<String, String>();
 			for (Entry<Object, Object> entry : cc.getPts().entrySet()) {

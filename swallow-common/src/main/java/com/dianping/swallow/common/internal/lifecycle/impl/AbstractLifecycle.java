@@ -97,4 +97,9 @@ public abstract class AbstractLifecycle extends AbstractComponentMonitorable imp
 	public String getLifecyclePhase() {
 		return lifecycleManager.getCurrentPhaseName();
 	}
+	
+	
+	protected LifecycleManager getLifecycleManager(){
+		return lifecycleManager;
+	}
 }

@@ -82,7 +82,7 @@ public final class CatAppenderImpl extends AbstractAppender {
     }
 
     private void logTrace(LogEvent event) {
-        String type = "Log4j";
+        String type = "Log4j2";
         String name = event.getLevel().toString();
         Object message = event.getMessage();
         String data;

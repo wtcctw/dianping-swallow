@@ -180,7 +180,7 @@ public class SwallowConfigCentral extends AbstractSwallowConfig implements Swall
 
         if (LION_KEY_MONGO_URLS.equals(key)) {
             topicNameToMongo = parseServerURIString(value, LION_KEY_MONGO_URLS);
-            return new SwallowConfigArgs(CHANGED_ITEM.ALL_TOPIC_MONGO_MAPPING);
+            return new SwallowConfigArgs(CHANGED_ITEM.ALL_TOPIC_STORE_MAPPING);
          } else if (LION_KEY_MSG_CAPPED_COLLECTION_SIZE.equals(key)) {
             topicNameToSizes = parseSizeOrDocNum(value, LION_KEY_MSG_CAPPED_COLLECTION_SIZE);
          } else if (LION_KEY_MSG_CAPPED_COLLECTION_MAX_DOC_NUM.equals(key)) {
