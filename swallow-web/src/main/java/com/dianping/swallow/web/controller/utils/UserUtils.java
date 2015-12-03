@@ -1,33 +1,19 @@
 package com.dianping.swallow.web.controller.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import com.dianping.swallow.web.model.Administrator;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Component;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.TopicController;
 import com.dianping.swallow.web.dao.ConsumerIdResourceDao.ConsumerIdParam;
 import com.dianping.swallow.web.dao.impl.DefaultConsumerIdResourceDao;
-import com.dianping.swallow.web.model.resource.ApplicationResource;
-import com.dianping.swallow.web.model.resource.ConsumerIdResource;
-import com.dianping.swallow.web.model.resource.IpInfo;
-import com.dianping.swallow.web.model.resource.IpResource;
-import com.dianping.swallow.web.model.resource.TopicResource;
-import com.dianping.swallow.web.service.ApplicationResourceService;
-import com.dianping.swallow.web.service.ConsumerIdResourceService;
-import com.dianping.swallow.web.service.IpResourceService;
-import com.dianping.swallow.web.service.TopicResourceService;
-import com.dianping.swallow.web.service.UserService;
+import com.dianping.swallow.web.filter.sso.decorator.SSOSwitchFilter;
+import com.dianping.swallow.web.model.Administrator;
+import com.dianping.swallow.web.model.resource.*;
+import com.dianping.swallow.web.service.*;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * @author mingdongli
@@ -64,6 +50,9 @@ public class UserUtils {
         String tmpusername = request.getRemoteUser();
 
         if (tmpusername == null) {
+            if(request.getAttribute(SSOSwitchFilter.ADMINISTRATOR) != null){
+                return SSOSwitchFilter.ADMINISTRATOR;
+            }
             return "";
         } else {
             String[] userinfo = tmpusername.split(LOGINDELIMITOR);

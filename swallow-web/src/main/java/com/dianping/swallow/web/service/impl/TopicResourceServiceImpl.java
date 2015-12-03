@@ -1,24 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-
-import com.dianping.swallow.web.service.ServiceLifecycle;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.common.internal.action.SwallowAction;
@@ -31,10 +12,20 @@ import com.dianping.swallow.web.dao.TopicResourceDao;
 import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.service.AbstractSwallowService;
+import com.dianping.swallow.web.service.ServiceLifecycle;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
-
 import freemarker.template.utility.StringUtil;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mingdongli
@@ -66,7 +57,7 @@ public class TopicResourceServiceImpl extends AbstractSwallowService implements 
     @PostConstruct
     public void executeCacheTopicToAdministrator() {
 
-        scheduledExecutorService.scheduleAtFixedRate(this, 5, 5, TimeUnit.MINUTES);
+        scheduledExecutorService.scheduleAtFixedRate(this, 0, 5, TimeUnit.MINUTES);
         logger.info("Init configCache successfully.");
     }
 
