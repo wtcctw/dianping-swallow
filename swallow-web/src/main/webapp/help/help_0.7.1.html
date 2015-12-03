@@ -2051,8 +2051,9 @@ public static void main(String[] args) {
 <h1 id="swallow_7"><a name="user-content-swallow_7" href="#swallow_7" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>Swallow使用注意事项</h1>
 <p>以下是业务在swallow的过程中遇到的一些常见问题，希望大家仔细阅读，避免类似的问题发生</p>
 <ol>
-<li>swallow保证消息不丢，所以针对特定一条消息，可能会重复发送。<ul>
+<li>swallow保证消息不丢，所以针对特定一条消息，在异常情况下(网络异常，服务器重启，用户onMessage代码挂死)，可能会重复发送。<ul>
 <li>要求业务做幂等处理，尤其是支付相关的业务（当消息重复被投递的时候，多次处理结果是一样的）</li>
+<li>为了保证线上业务运行正常，同时方便大家进行消息幂等处理测试，<strong>beta</strong>环境的swallow会对消息进行多次重发；其它环境行为<strong>保持不变</strong>。</li>
 </ul>
 </li>
 <li>consumer接收消息默认并发为1，如果业务处理速度过慢，可能会出现消息堆积（假设每条消息处理时间100ms，则一秒只能处理10条消息）<ul>
