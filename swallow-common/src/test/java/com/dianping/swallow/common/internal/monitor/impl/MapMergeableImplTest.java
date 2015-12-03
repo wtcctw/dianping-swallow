@@ -115,14 +115,14 @@ public class MapMergeableImplTest {
         result.merge(mapStatisDataToMerge);
         result.merge(mapStatisDataToMerge);
         bbb = result.getToMerge();
-        Assert.assertNotEquals(aaa, bbb);
+        Assert.assertEquals(aaa, bbb);
 
         result.setToMerge(ccc);
         result.merge(mapStatisDataToMerge);
         result.merge(mapStatisDataToMerge);
         result.merge(mapStatisDataToMerge);
         ccc = result.getToMerge();
-        Assert.assertNotEquals(ccc, bbb);
+        Assert.assertEquals(ccc, bbb);
 
         Map<Long, Long> map = new HashMap<Long, Long>();
         map.put(0L, 0L);
