@@ -1,7 +1,10 @@
 package com.dianping.swallow.kafka.compress.algo;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -17,11 +20,16 @@ public class GzipCompressor extends AbstractCompressor{
 		GZIPOutputStream gous = new GZIPOutputStream(result);
 		return gous;
 	}
-	
-	public static void main(String []argc) throws IOException{
-		
-		GzipCompressor gzip = new GzipCompressor();
-		gzip.compressRate();
-		
+
+	@Override
+	public String desc() {
+		return "gzip";
 	}
+
+	@Override
+	protected InputStream getInputStream(byte[] input) throws IOException {
+
+		return new GZIPInputStream(new ByteArrayInputStream(input));
+	}
+	
 }

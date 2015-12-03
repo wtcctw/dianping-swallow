@@ -1,8 +1,11 @@
 package com.dianping.swallow.kafka.compress.algo;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.xerial.snappy.SnappyInputStream;
 import org.xerial.snappy.SnappyOutputStream;
 
 /**
@@ -17,12 +20,14 @@ public class SnappyCompressor extends AbstractCompressor{
 		return new SnappyOutputStream(result);
 	}
 
-	
-	public static void main(String []argc) throws IOException{
-		
-		SnappyCompressor compressor = new SnappyCompressor();
-		compressor.compressRate();
-		
+	@Override
+	public String desc() {
+		return "snappy";
+	}
+
+	@Override
+	protected InputStream getInputStream(byte[] input) throws IOException {
+		return new SnappyInputStream(new ByteArrayInputStream(input));
 	}
 
 }

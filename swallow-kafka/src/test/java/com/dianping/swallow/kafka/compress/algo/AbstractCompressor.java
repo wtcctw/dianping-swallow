@@ -1,7 +1,9 @@
 package com.dianping.swallow.kafka.compress.algo;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.slf4j.Logger;
@@ -12,7 +14,7 @@ import org.slf4j.LoggerFactory;
  *
  * 2015年11月25日 下午4:10:07
  */
-public abstract class AbstractCompressor {
+public abstract class AbstractCompressor implements Compressor{
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -21,56 +23,56 @@ public abstract class AbstractCompressor {
 	}
 	
 	
-	
-	public String randomMessage(int length){
+	public byte [] decompress(byte []input){
 		
-		StringBuilder sb = new StringBuilder();
-		
-		for(int i=0; i < length;i++){
-			int random = (int) ((double)26 * Math.random());
-			sb.append((char)('a' + random));
+		try {
+			DataInputStream dis = new DataInputStream(getInputStream(input));
+			byte []result = new byte[1024];
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			while(true){
+				int len = dis.read(result);
+				if(len == -1 ){
+					break;
+				}
+				baos.write(result, 0, len);
+			}
+			return baos.toByteArray();
+		} catch (IOException e) {
+			logger.error("[decompress]", e);
 		}
 		
-		return sb.toString();
-		
+		return null;
 	}
+
 	
-	public void compressRate() throws IOException{
-		
-		int messageSize = 1 << 20;
-		
-		String message = randomMessage(messageSize);
-		byte[] bytes = message.getBytes();
-		
+	public byte[] compress(byte[] input) {
+
 		OutputStream ous = null;
 		try{
 			ByteArrayOutputStream baous = new ByteArrayOutputStream();
 			ous = getOutputStream(baous);
-			ous.write(bytes);
+			ous.write(input);
+			ous.flush();
+			ous.close();
 			byte []result  = baous.toByteArray();
+			return result;
 
-			int i = result.length - 1;
-			for( ; i >= 0; i--){
-				if(result[i] != 0){
-					break;
-				}
-			}
-			i++;
-			
-			if(logger.isInfoEnabled()){
-				logger.info("[compressRate]" + (double)bytes.length/result.length);
-			}
-			
+		} catch (IOException e) {
+			logger.error("[compress]", e);
 		}finally{
 			if(ous != null){
-				ous.close();
+				try {
+					ous.close();
+				} catch (IOException e) {
+					logger.error("[compress]", e);
+				}
 			}
 		}
+		return null;
 	}
 	
-	
-
-
-
 	protected abstract OutputStream getOutputStream(OutputStream result) throws IOException;
+	
+	protected abstract InputStream getInputStream(byte []input) throws IOException;
+
 }
