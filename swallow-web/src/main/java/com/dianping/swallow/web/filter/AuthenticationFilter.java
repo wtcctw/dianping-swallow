@@ -1,32 +1,25 @@
 package com.dianping.swallow.web.filter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
+import com.dianping.swallow.common.internal.util.IOUtilsWrapper;
+import com.dianping.swallow.web.controller.MessageRetransmitController;
+import com.dianping.swallow.web.controller.utils.UserUtils;
+import com.dianping.swallow.web.filter.sso.decorator.SSOSwitchFilter;
+import com.dianping.swallow.web.filter.wrapper.BodyReaderHttpServletRequestWrapper;
+import com.dianping.swallow.web.service.AuthenticationService;
+import com.dianping.swallow.web.service.impl.AuthenticationServiceImpl;
+import com.dianping.swallow.web.util.ResponseStatus;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.dianping.swallow.common.internal.util.IOUtilsWrapper;
-import com.dianping.swallow.web.controller.MessageRetransmitController;
-import com.dianping.swallow.web.controller.utils.UserUtils;
-import com.dianping.swallow.web.filter.wrapper.BodyReaderHttpServletRequestWrapper;
-import com.dianping.swallow.web.service.AuthenticationService;
-import com.dianping.swallow.web.service.impl.AuthenticationServiceImpl;
-import com.dianping.swallow.web.util.ResponseStatus;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author mingdongli
@@ -77,6 +70,10 @@ public class AuthenticationFilter implements Filter {
 			}
 
 			boolean isPassed = authenticationService.isValid(username, topicname, uri);
+
+			if(request.getAttribute(SSOSwitchFilter.ADMINISTRATOR) != null){
+				isPassed = true;
+			}
 
 			if (isPassed) {
 				chain.doFilter(requestWrapper, response);
