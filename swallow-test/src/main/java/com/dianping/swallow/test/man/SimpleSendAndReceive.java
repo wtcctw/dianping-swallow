@@ -24,14 +24,15 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 	@Test
 	public void eternalSend() throws SendFailedException, RemoteServiceInitFailedException, InterruptedException{
 
+		addListener(getTopic(), "notexist", 10, 0);
+
 		for(int i = 0; i < 1;i++){
-//			addListener(getTopic(), "id" + i, 10, 0);
 		}
 //		addListener(getTopic());
 		
 //		sendMessage(getTopic(), 200, 0);
 
-		sendMessage(getTopic(), 200, 0);
+//		sendMessage(getTopic(), 200, 0);
 
 		TimeUnit.SECONDS.sleep(10000);
 	}
