@@ -261,7 +261,7 @@ public class MessageInfoStatisTest extends AbstractTest {
 	public void testGetMarginValue(){
 		MessageInfoStatis mnfoStatis = new MessageInfoStatis();
 		NavigableMap<Long, StatisData> data = getStatisData(DataSpan.LEFTMARGIN);
-		//mnfoStatis.setStatisMap(data);
+		mnfoStatis.setStatisMap(data);
 		data = mnfoStatis.getDelayAndQps(StatisType.SEND, Long.MIN_VALUE, -1L);
 		Assert.assertEquals(1, data.size());
 		Assert.assertEquals(106, data.lastKey().longValue());
@@ -278,7 +278,7 @@ public class MessageInfoStatisTest extends AbstractTest {
 		System.out.println(data.toString());
 
 		data = getStatisData(DataSpan.RIGHTMARGIN);
-		//mnfoStatis.setStatisMap(data);
+		mnfoStatis.setStatisMap(data);
 		data = mnfoStatis.getDelayAndQps(StatisType.SEND, -1L, Long.MAX_VALUE);
 		Assert.assertEquals(1, data.size());
 		Assert.assertEquals(111, data.lastKey().longValue());

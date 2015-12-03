@@ -42,6 +42,7 @@ public abstract class AbstractRetryWrapper implements SwallowCatActionWrapper{
             } catch (Throwable e) {
             	
                 CatUtil.logException(e);
+                logger.error("[doAction]", e);
             	
             	Class<?> exceptionClass = getExceptionRetryClass();
             	if(exceptionClass.isInstance(e)){

@@ -24,7 +24,8 @@ public abstract class AbstractLoadTest{
 	
 	protected String type 	  = "type";
 	
-	protected  	long totalMessageCount = Long.parseLong(System.getProperty("totalMessageCount", String.valueOf(Long.MAX_VALUE)));;
+	protected   long messageStartIndex =  Long.parseLong(System.getProperty("messageStartIndex", "0"));
+	protected  	long totalMessageCount = Long.parseLong(System.getProperty("totalMessageCount", String.valueOf(Long.MAX_VALUE)));
 	protected   int concurrentCount = Integer.parseInt(System.getProperty("concurrentCount", "1"));
 	protected   int topicCount = Integer.parseInt(System.getProperty("topicCount", "1"));;
 	protected 	int topicStartIndex = Integer.parseInt(System.getProperty("topicStartIndex", "0"));;
@@ -49,11 +50,13 @@ public abstract class AbstractLoadTest{
     public static String message;
     
 
-	private void createMessage() {
+	protected void createMessage() {
 		
 		StringBuilder sb = new StringBuilder();
 		for(int i=0;i<messageSize;i++){
-			sb.append("c");
+			
+			int random = (int) (Math.random() * ('a' - 'A'));
+			sb.append((char)('A' + random));
 		}
 		message = sb.toString();
 		
@@ -94,6 +97,11 @@ public abstract class AbstractLoadTest{
 		
 		doStart();
 
+		
+		if(maxRunMinutes <= 0){
+			return;
+		}
+		
 		scheduled.schedule(new Runnable(){
 
 			@Override
@@ -241,19 +249,26 @@ public abstract class AbstractLoadTest{
 			count.decrementAndGet();
 			throw new CountExceedException("current:" + current);
 		}
-		return current;
+		return base(current);
 	}
 	
+	private long base(long current) {
+		
+		return messageStartIndex + current;
+	}
+
+
 	protected long getCurrentCount(){
-		return count.get();
+		return base(count.get());
 	}
 
 	protected long addAndGetCurrentCount(long delta){
 		long current = count.addAndGet(delta);
 		if(current >  totalMessageCount){
-			throw new CountExceedException("current:" + current);
+			count.addAndGet(-delta);
+			throw new CountExceedException("currentCount:" + current);
 		}
-		return current;
+		return base(current);
 	}
 
 	@Override

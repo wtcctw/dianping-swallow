@@ -336,12 +336,12 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
         }
         MessageInfoStatis messageInfoStatis = (MessageInfoStatis) merge;
         AbstractMapMergeable<Long, MessageInfo> colMapMergeable = new MapMergeableImpl<Long, MessageInfo>();
-        colMapMergeable.setToMerge(this.col);
+        colMapMergeable.merge(this.col);
         colMapMergeable.merge(messageInfoStatis.col);
         this.col = colMapMergeable.getToMerge();
 
         AbstractMapMergeable<Long, StatisData> statisDataMapMergeable = new MapMergeableImpl<Long, StatisData>();
-        statisDataMapMergeable.setToMerge(this.statisMap);
+        statisDataMapMergeable.merge(this.statisMap);
         statisDataMapMergeable.merge(messageInfoStatis.statisMap);
         this.statisMap = statisDataMapMergeable.getToMerge();
 
@@ -351,5 +351,9 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
     public Object clone() throws CloneNotSupportedException {
 
         throw new CloneNotSupportedException("clone not support");
+    }
+
+    protected void setStatisMap(NavigableMap<Long, StatisData> statisMap) {
+        this.statisMap = statisMap;
     }
 }

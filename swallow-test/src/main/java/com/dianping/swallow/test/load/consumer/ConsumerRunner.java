@@ -36,16 +36,21 @@ public class ConsumerRunner extends AbstractLoadTest{
     
     private String consumerIdPrefix = PropertiesUtils.getProperty("consumerIdPrefix", "myid");
     
+    private boolean supportType = Boolean.parseBoolean(System.getProperty("supportType", "true"));
+    
     public static void main(String[] args) throws Exception {
     	
     	new ConsumerRunner().start();
     }
 
+    
+    
     @Override
 	protected void doStart() {
     	if(logger.isInfoEnabled()){
     		logger.info("[doStart]" + this);
     	}
+    	
 		startReceiver();
 	}
     @Override
@@ -62,7 +67,8 @@ public class ConsumerRunner extends AbstractLoadTest{
             final String topic = getTopicName(topicName, topicStartIndex + i);
             for (int j = 0; j < consumerCount; j++) {
                 ConsumerConfig config = new ConsumerConfig();
-                if(j == (consumerCount - 1)){
+                
+                if(j == (consumerCount - 1) && supportType){
                 	config.setMessageFilter(MessageFilter.createInSetMessageFilter(type));
                 }
                 config.setThreadPoolSize(concurrentCount);
@@ -77,7 +83,11 @@ public class ConsumerRunner extends AbstractLoadTest{
                     @Override
                     public void onMessage(Message msg) {
                     	
-                    	count(msg, bitMarker);
+                    	try{
+                    		count(msg, bitMarker);
+                    	}catch(Exception e){
+                    		logger.error("[onMessage]", e);
+                    	}
                     	increaseAndGetCurrentCount();
                     }
                 });

@@ -8,8 +8,9 @@ public class SyncProducerRunner extends AbstractProducerLoadTest{
 	
 	
     public static void main(String[] args) throws Exception {
-    	
-    	new SyncProducerRunner().start();
+
+    	SyncProducerRunner runner = new SyncProducerRunner();
+    	runner.start();
     	
     }
 

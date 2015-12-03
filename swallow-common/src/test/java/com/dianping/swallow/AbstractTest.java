@@ -1,5 +1,18 @@
 package com.dianping.swallow;
 
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.swallow.common.internal.message.InternalProperties;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.IPUtil;
+import com.dianping.swallow.common.internal.util.TestSkipRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
+import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.Socket;
@@ -11,20 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.mockito.MockitoAnnotations;
-
-import com.dianping.lion.client.ConfigCache;
-import com.dianping.swallow.common.internal.message.InternalProperties;
-import com.dianping.swallow.common.internal.message.SwallowMessage;
-import com.dianping.swallow.common.internal.util.IPUtil;
-import com.dianping.swallow.common.internal.util.TestSkipRule;
 
 /**
  * @author mengwenchao
@@ -197,6 +196,17 @@ public abstract class AbstractTest {
 	protected String randomString(){
 		
 		return UUID.randomUUID().toString();
+	}
+
+	protected String randomString(int length){
+
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<length;i++){
+			
+			int random = (int) (Math.random() * ('a' - 'A'));
+			sb.append((char)('A' + random));
+		}
+		return sb.toString();
 	}
 	
 	public String getLocalIp() {
