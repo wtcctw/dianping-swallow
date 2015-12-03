@@ -19,7 +19,8 @@ import com.dianping.swallow.test.load.AbstractLoadTest;
  */
 public abstract class AbstractProducerLoadTest extends AbstractLoadTest{
 
-    private static int 		sendMessageInterval = Integer.parseInt(System.getProperty("sendMessageInterval", "0"));
+    private int 		sendMessageInterval = Integer.parseInt(System.getProperty("sendMessageInterval", "0"));
+    private boolean		zipped = Boolean.parseBoolean(System.getProperty("zipped", "false"));
 
 	protected ProducerMode getProducerMode() {
 		
@@ -56,6 +57,7 @@ public abstract class AbstractProducerLoadTest extends AbstractLoadTest{
                 	logger.info("[run]" + mode);
                 }
                 config.setMode(mode);
+                config.setZipped(zipped);
                 Producer producer = ProducerFactoryImpl.getInstance().createProducer(Destination.topic(topicName), config);
 
                 while(true){

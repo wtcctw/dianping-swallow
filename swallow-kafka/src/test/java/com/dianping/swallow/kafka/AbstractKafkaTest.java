@@ -49,4 +49,26 @@ public class AbstractKafkaTest {
 		return topic;
 	}
 
+	public String randomMessage(int length){
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for(int i=0; i < length;i++){
+			int random = (int) ((double)26 * Math.random());
+			sb.append((char)('a' + random));
+		}
+		
+		return sb.toString();
+	}
+	
+	public String commonString(int length){
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for(int i=0; i < length;i++){
+			sb.append('a');
+		}
+		
+		return sb.toString();
+	}
 }
