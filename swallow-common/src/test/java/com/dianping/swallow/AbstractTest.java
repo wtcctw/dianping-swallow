@@ -197,6 +197,17 @@ public abstract class AbstractTest {
 		
 		return UUID.randomUUID().toString();
 	}
+
+	protected String randomString(int length){
+
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<length;i++){
+			
+			int random = (int) (Math.random() * ('a' - 'A'));
+			sb.append((char)('A' + random));
+		}
+		return sb.toString();
+	}
 	
 	public String getLocalIp() {
 		return localIp;

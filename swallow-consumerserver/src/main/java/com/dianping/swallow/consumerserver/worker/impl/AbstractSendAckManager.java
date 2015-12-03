@@ -65,7 +65,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 		messageQueue = createMessageQueue(swallowBuffer, idOfTailMessage);
 		
 		if (logger.isInfoEnabled()) {
-			logger.info("[doInitialize][tailMessageId]" + idOfTailMessage);
+			logger.info("[doInitialize][tailMessageId]" + consumerInfo + "," + idOfTailMessage);
 		}
 	}
 	
@@ -91,7 +91,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 		if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
 			
 			maxMessageId = messageDao.getAckMaxMessageId(topicName, consumerInfo.getConsumerId(), isBackcup());
-			if(logger.isInfoEnabled()){
+			if(logger.isInfoEnabled() && maxMessageId != null){
 				logger.info("[getMaxAckIdOrMaxMessageId][use AckMaxMessageId]" + consumerInfo);
 			}
 		}
