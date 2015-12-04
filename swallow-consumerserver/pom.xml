@@ -77,6 +77,10 @@
         </dependency>
         <dependency>
             <groupId>com.dianping.swallow</groupId>
+            <artifactId>swallow-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.dianping.swallow</groupId>
             <artifactId>swallow-common-server</artifactId>
         </dependency>
         <dependency>
@@ -100,16 +104,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.dianping</groupId>-->
-            <!--<artifactId>jmockmongo-patched</artifactId>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>netty</artifactId>-->
-                    <!--<groupId>io.netty</groupId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>
