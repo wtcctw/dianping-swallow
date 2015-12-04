@@ -49,10 +49,10 @@ public class LoggerLoader {
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         final Configuration config = ctx.getConfiguration();
         Layout<? extends Serializable> layout = PatternLayout.createLayout(
-                "%d[%-5p][%t][%c] %m%n", config, null, null, true, false,
+                "[%d{ISO8601}][%-5p][%-25c] %m%n", config, null, null, true, false,
                 null, null);
 
-        // asyn file info,  filter-same or more specific than
+        // syn file info,  filter-same or more specific than
         Filter fileInfoFilter = ThresholdFilter.createFilter(Level.ERROR, Result.DENY, Result.ACCEPT);
         Appender fileInfoAppender = RollingRandomAccessFileAppender.createAppender(LOG_ROOT + "/swallow." + APP_NAME + ".log",
                 LOG_ROOT + "/swallow." + APP_NAME + ".log.%d{yyyy-MM-dd}.gz", "true", "FileInfo", "true", null,
