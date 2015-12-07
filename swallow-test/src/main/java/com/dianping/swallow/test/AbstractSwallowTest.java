@@ -367,7 +367,7 @@ public abstract class AbstractSwallowTest extends AbstractUnitTest{
             		logger.debug("[onMessage]" + msg);
             	}
             	int result = count.incrementAndGet();
-            	if(result % 100 == 0 ){
+            	if(result % consumerPrintCount() == 0 ){
             		if(logger.isInfoEnabled()){
             			logger.info("[onMessage]" + result);
             		}
@@ -417,5 +417,8 @@ public abstract class AbstractSwallowTest extends AbstractUnitTest{
 		return topic;
 	}
 
+	protected int consumerPrintCount() {
+		return 100;
+	}
 
 }

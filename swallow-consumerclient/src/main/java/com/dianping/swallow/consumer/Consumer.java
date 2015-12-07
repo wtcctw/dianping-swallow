@@ -1,8 +1,11 @@
 package com.dianping.swallow.consumer;
 
+
+
+import com.dianping.swallow.common.internal.observer.Observer;
 import com.dianping.swallow.common.message.Destination;
 
-public interface Consumer {
+public interface Consumer extends Observer{
 
 	/**
 	 * 获取消息目的

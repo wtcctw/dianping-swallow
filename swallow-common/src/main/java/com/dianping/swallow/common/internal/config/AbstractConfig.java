@@ -139,7 +139,7 @@ public class AbstractConfig {
 				field.set(this, Boolean.parseBoolean(value));
 			}
 		} catch (Exception e) {
-			logger.error("can not parse property " + key, e);
+			logger.error("can not parse property " + key +"," + value, e);
 		}
 		
 	}
