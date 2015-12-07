@@ -17,6 +17,8 @@ public interface ConsumerTopicStatsDataService {
 	
 	boolean insert(List<ConsumerTopicStatsData> topicStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	StatsDataMapPair findSectionDelayData(String topicName, long startKey, long endKey);
 	
 	StatsDataMapPair findSectionQpsData(String topicName, long startKey, long endKey);

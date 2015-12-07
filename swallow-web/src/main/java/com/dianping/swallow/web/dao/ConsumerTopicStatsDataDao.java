@@ -16,6 +16,8 @@ public interface ConsumerTopicStatsDataDao {
 	
 	boolean insert(List<ConsumerTopicStatsData> topicStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
 
 }

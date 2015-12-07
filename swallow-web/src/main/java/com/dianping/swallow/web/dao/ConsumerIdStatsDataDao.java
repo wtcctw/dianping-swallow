@@ -16,6 +16,8 @@ public interface ConsumerIdStatsDataDao {
 	
 	boolean insert(List<ConsumerIdStatsData> consumerIdStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit);
 
 	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, String consumerId, long startKey,

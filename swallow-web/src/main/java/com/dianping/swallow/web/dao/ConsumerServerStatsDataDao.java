@@ -16,6 +16,8 @@ public interface ConsumerServerStatsDataDao {
 	
 	boolean insert(List<ConsumerServerStatsData> serverStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 	
 	List<ConsumerServerStatsData> findSectionData(long startKey, long endKey);

@@ -16,6 +16,8 @@ public interface ProducerTopicStatsDataDao {
 	
 	boolean insert(List<ProducerTopicStatsData> topicStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	ProducerTopicStatsData findOneByTopicAndTime(String topicName, long startKey, long endKey, boolean isGt);
 
 	List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit);

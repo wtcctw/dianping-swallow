@@ -13,7 +13,6 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
-import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.resource.ServerType;
 import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
@@ -28,11 +27,7 @@ import com.dianping.swallow.web.util.DateUtil;
  *         2015年9月25日 下午2:13:47
  */
 @Component
-public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLifecycle {
-
-	private static final Logger logger = LoggerFactory.getLogger(ConsumerServerQpsTask.class);
-
-	private static final String CAT_TYPE = "ConsumerServerQpsTask";
+public class ConsumerServerQpsTask extends AbstractJobTask {
 
 	private static final long STATS_TIMESPAN = 24 * 60 * 60;
 
@@ -42,23 +37,9 @@ public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLife
 	@Autowired
 	private ConsumerServerStatsDataService cServerStatsDataService;
 
-	private volatile boolean isOpen = false;
-
-	@Override
-	protected void doInitialize() throws Exception {
-		super.doInitialize();
-		isOpen = true;
-	}
-
-	@Override
-	protected void doStart() throws Exception {
-		super.doStart();
-		isOpen = true;
-	}
-
 	@Scheduled(cron = "0 5 0 ? * *")
 	public void findQpsTask() {
-		if (!isOpen) {
+		if (!isOpened()) {
 			return;
 		}
 		SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-findQpsTask");

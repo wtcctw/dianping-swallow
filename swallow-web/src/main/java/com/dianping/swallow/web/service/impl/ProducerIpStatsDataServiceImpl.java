@@ -31,6 +31,11 @@ public class ProducerIpStatsDataServiceImpl implements ProducerIpStatsDataServic
     }
 
     @Override
+    public boolean removeLessThanTimeKey(long timeKey) {
+        return producerIpStatsDataDao.removeLessThanTimeKey(timeKey);
+    }
+
+    @Override
     public List<ProducerIpStatsData> find(String topicName, String ip, long startKey, long endKey) {
         return producerIpStatsDataDao.find(topicName, ip, startKey, endKey);
     }

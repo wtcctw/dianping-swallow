@@ -18,5 +18,7 @@ public interface ProducerServerStatsDataService {
 	
 	boolean insert(List<ProducerServerStatsData> serverStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	Map<String, NavigableMap<Long, Long>> findSectionQpsData(long startKey, long endKey);
 }

@@ -16,6 +16,8 @@ public interface ProducerIpStatsDataService {
 	
 	boolean insert(List<ProducerIpStatsData> ipStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	List<ProducerIpStatsData> find(String topicName, String ip, long startKey, long endKey);
 	
 	long findAvgQps(String topicName, String ip, long startKey, long endKey);

@@ -18,6 +18,8 @@ public interface ConsumerServerStatsDataService {
 	
 	boolean insert(List<ConsumerServerStatsData> serverStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 
 	Map<String, StatsDataMapPair> findSectionQpsData(long startKey, long endKey);

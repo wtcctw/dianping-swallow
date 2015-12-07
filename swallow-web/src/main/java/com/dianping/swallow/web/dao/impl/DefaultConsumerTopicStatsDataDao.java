@@ -48,6 +48,17 @@ public class DefaultConsumerTopicStatsDataDao extends AbstractStatsDao implement
 		return false;
 	}
 
+	public boolean removeLessThanTimeKey(long timeKey) {
+		try {
+			Query query = new Query(Criteria.where(TIMEKEY_FIELD).lt(timeKey));
+			mongoTemplate.remove(query, CONSUMERTOPICSTATSDATA_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("[removeLessThanTimeKey] remove less than timeKey error.", e);
+		}
+		return false;
+	}
+
 	@Override
 	public List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey) {
 		Query query = new Query(Criteria.where(TOPICNAME_FIELD).is(topicName).and(TIMEKEY_FIELD).gte(startKey)

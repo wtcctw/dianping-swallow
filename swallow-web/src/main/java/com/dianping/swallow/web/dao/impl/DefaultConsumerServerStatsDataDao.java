@@ -48,6 +48,17 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 		return false;
 	}
 
+	public boolean removeLessThanTimeKey(long timeKey) {
+		try {
+			Query query = new Query(Criteria.where(TIMEKEY_FIELD).lt(timeKey));
+			mongoTemplate.remove(query, CONSUMERSERVERSTATSDATA_COLLECTION);
+			return true;
+		} catch (Exception e) {
+			logger.error("[removeLessThanTimeKey] remove less than timeKey error.", e);
+		}
+		return false;
+	}
+
 	@Override
 	public List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey) {
 		Query query = new Query(Criteria.where(IP_FIELD).is(ip).and(TIMEKEY_FIELD).gte(startKey).lte(endKey));

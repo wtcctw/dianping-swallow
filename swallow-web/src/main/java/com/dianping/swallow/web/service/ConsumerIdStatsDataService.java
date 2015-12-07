@@ -19,6 +19,8 @@ public interface ConsumerIdStatsDataService {
 	
 	boolean insert(List<ConsumerIdStatsData> consumerIdStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit);
 
 	List<ConsumerIdStatsData> findSectionData(String topicName, String consumerId, long startKey, long endKey);

@@ -32,6 +32,11 @@ public class ConsumerIpStatsDataServiceImpl implements ConsumerIpStatsDataServic
 	}
 
 	@Override
+	public boolean removeLessThanTimeKey(long timeKey) {
+		return consumerIpStatsDataDao.removeLessThanTimeKey(timeKey);
+	}
+
+	@Override
 	public List<ConsumerIpStatsData> find(String topicName, String consumerId, String ip, long startKey, long endKey) {
 		return consumerIpStatsDataDao.find(topicName, consumerId, ip, startKey, endKey);
 	}
