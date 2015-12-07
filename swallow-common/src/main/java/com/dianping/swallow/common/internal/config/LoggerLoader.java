@@ -33,6 +33,10 @@ public class LoggerLoader {
 
     private static final String PACKAGE = "com.dianping.swallow";
 
+    private static final String DEFAULT_CONSUMER_TASK = "com.dianping.swallow.consumer.internal.task.DefaultConsumerTask";
+
+    private static final String DEFAULT_CONSUMER_TASK_PROPERTY = "consumertask";
+
     private static final String DEFAULT_APP_NAME = "swallow-app";
 
     private static String APP_NAME = Environment.getAppName();
@@ -87,6 +91,25 @@ public class LoggerLoader {
         loggerConfig.addAppender(fileInfoAppender, Level.INFO, null);
 
         config.addLogger(PACKAGE, loggerConfig);
+
+        //switch for DefaultConsumerTask
+        String isLoggerConsumerTask = System.getProperty(DEFAULT_CONSUMER_TASK_PROPERTY, "true");
+        if("false".equalsIgnoreCase(isLoggerConsumerTask)){
+            Appender fileWarnAppender = RollingRandomAccessFileAppender.createAppender(LOG_ROOT + "/swallow." + APP_NAME + ".consumertask.log",
+                    LOG_ROOT + "/swallow." + APP_NAME + ".consumertask.log.%d{yyyy-MM-dd}.gz", "true", "FileWarn", "true", null,
+                    TimeBasedTriggeringPolicy.createPolicy("1", "true"),
+                    DefaultRolloverStrategy.createStrategy("30", "1", null, Deflater.DEFAULT_COMPRESSION + "", config),
+                    layout, null, "false", null, null, config);
+            fileWarnAppender.start();
+            config.addAppender(fileWarnAppender);
+
+            AppenderRef fileWarnRef = AppenderRef.createAppenderRef("FileWarn", Level.WARN, null);
+            AppenderRef[] warnRefs = new AppenderRef[]{fileWarnRef};
+            LoggerConfig loggerWarnConfig = LoggerConfig.createLogger("false", Level.WARN, DEFAULT_CONSUMER_TASK, "true", warnRefs,
+                    null, config, null);
+            loggerWarnConfig.addAppender(fileWarnAppender, Level.WARN, null);
+            config.addLogger(DEFAULT_CONSUMER_TASK, loggerWarnConfig);
+        }
 
         ctx.updateLoggers();
     }
