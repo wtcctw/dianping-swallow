@@ -138,6 +138,24 @@ public class MapMergeableImplTest {
 
     }
 
+    @Test
+    public void testSetAndMerge(){
+
+        MapMergeableImpl<Long, StatisData> result1 = new MapMergeableImpl<Long, StatisData>();
+        MapMergeableImpl<Long, StatisData> result2 = new MapMergeableImpl<Long, StatisData>();
+        result1.setToMerge(mapStatisDataToMerge);
+        result2.merge(mapStatisDataToMerge);
+        Assert.assertEquals(result1.getToMerge().toString(), result2.getToMerge().toString());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMergeSubMap(){
+
+        MapMergeableImpl<Long, StatisData> result = new MapMergeableImpl<Long, StatisData>();
+        result.setToMerge(mapStatisDataToMerge.subMap(3L, true, 6L, true));
+        result.merge(mapStatisDataToMerge.subMap(2L, true, 5L, true));
+    }
+
     public static class QpxData implements Mergeable {
 
         private Long qpx;
