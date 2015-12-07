@@ -51,7 +51,7 @@ public class MongoConfigEvent extends ServerEvent {
 
     @Override
     public boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta) {
-        String key = getIp() + KEY_SPLIT + topicName + alarmType.getNumber();
+        String key = getIp() + KEY_SPLIT + topicName + KEY_SPLIT + alarmType.getNumber();
         return isAlarm(lastAlarms, key, alarmMeta);
     }
 
