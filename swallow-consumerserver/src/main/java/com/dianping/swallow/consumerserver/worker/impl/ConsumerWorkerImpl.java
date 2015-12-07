@@ -1,13 +1,16 @@
 package com.dianping.swallow.consumerserver.worker.impl;
 
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -412,6 +415,23 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 				consumerMessage.exceptionWhileSend(future.cause());
 			}
 		}
+	}
+
+
+	@Override
+	public MessageFilter getMessageFilter() {
 		
+		return this.messageFilter.clone();
+	}
+
+
+	@Override
+	public Set<Channel> connectedChannels() {
+		return new HashSet<Channel>(connectedChannels.keySet());
+	}
+
+	@Override
+	public ConsumerWorkerStatus getStatus() {
+		return new ConsumerWorkerStatus(this);
 	}
 }

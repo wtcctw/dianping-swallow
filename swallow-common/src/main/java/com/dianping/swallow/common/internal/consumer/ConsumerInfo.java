@@ -28,7 +28,7 @@ public class ConsumerInfo extends ConsumerId{
 
    @Override
    public String toString() {
-      return "ConsumerInfo [consumerId=" + getConsumerId() + ", dest=" + getDest() + ", consumerType=" + consumerType + "]";
+      return "ConsumerInfo [cid=" + getConsumerId() + ", dest=" + getDest() + ", type=" + consumerType + "]";
    }
 
 }

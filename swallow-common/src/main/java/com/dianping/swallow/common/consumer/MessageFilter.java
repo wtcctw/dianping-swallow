@@ -11,7 +11,7 @@ import java.util.Set;
  * 
  * @author kezhu.wu
  */
-public final class MessageFilter implements Serializable {
+public final class MessageFilter implements Serializable, Cloneable{
 
 	private static final long serialVersionUID = 5643819915814285301L;
 
@@ -51,7 +51,10 @@ public final class MessageFilter implements Serializable {
 	}
 
 	public Set<String> getParam() {
-		return param;
+		if(param == null){
+			return null;
+		}
+		return new HashSet<String>(param);
 	}
 
 	@Override
@@ -98,6 +101,18 @@ public final class MessageFilter implements Serializable {
 	@Override
 	public String toString() {
 		return "MessageFilter [param=" + param + ", type=" + type + "]";
+	}
+	
+	@Override
+	public MessageFilter clone() {
+		try {
+			MessageFilter messageFilter = (MessageFilter) super.clone();
+			return messageFilter;
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 }

@@ -127,8 +127,8 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
 		List<InetSocketAddress> tempAddress = new ArrayList<InetSocketAddress>();
 		tempAddress.add(new InetSocketAddress(masterIp, masterPort));
 		tempAddress.add(new InetSocketAddress(slaveIp, slavePort));
-		if (logger.isInfoEnabled()) {
-			logger.info("[string2Map][topic, address]" + topicName + "," + tempAddress);
+		if (logger.isDebugEnabled()) {
+			logger.debug("[string2Map][topic, address]" + topicName + "," + tempAddress);
 		}
 		topicName2Address.put(topicName, tempAddress);
 	}
