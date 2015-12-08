@@ -1014,38 +1014,128 @@ body .markdown-body
     page-break-after: avoid;
   }
 }
-</style><title>UPGRADE</title></head><body><article class="markdown-body"><div class="toc">
+</style><title>UPGRADE</title></head><body>
+
+	<div style='width: 25%;'>
+		<ul id="tree" class="ztree" style='width: 100%'>
+
+		</ul>
+	</div>
+<article class="markdown-body"><div class="toc">
 <ul>
+<li><a href="#09-to-be-released">0.9 (to be released)</a><ul>
+<li><a href="#topic-partition">支持topic partition</a></li>
+<li><a href="#consumer-server">支持consumer server横向扩展</a></li>
+<li><a href="#producer-server">支持producer server横向扩展</a></li>
+</ul>
+</li>
+<li><a href="#082to-be-released">0.8.2(to be released)</a><ul>
+<li><a href="#exactly_once">消息EXACTLY_ONCE</a></li>
+<li><a href="#_1">消息时序</a></li>
+</ul>
+</li>
+<li><a href="#081to-be-released">0.8.1(to be released)</a><ul>
+<li><a href="#client">client</a><ul>
+<li><a href="#client-log">client log不跟随业务日志</a></li>
+</ul>
+</li>
+<li><a href="#server">server</a><ul>
+<li><a href="#_2">支持存储迁移</a></li>
+<li><a href="#_3">支持消息缓存</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#080">0.8.0</a><ul>
+<li><a href="#client_1">client:</a><ul>
+<li><a href="#netty4">netty4升级</a></li>
+<li><a href="#topicconsumer-server">支持topic对应的consumer server迁移</a></li>
+</ul>
+</li>
+<li><a href="#server_1">server:</a><ul>
+<li><a href="#kafka">支持kafka，性能提升</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#071">0.7.1</a><ul>
 <li><a href="#heartbeat">heartbeat线程命名</a></li>
-<li><a href="#_1">客户端日志格式调整</a></li>
+<li><a href="#_4">客户端日志格式调整</a></li>
 <li><a href="#devlion">非dev环境默认使用lion配置</a></li>
 </ul>
 </li>
 <li><a href="#070">0.7.0</a><ul>
-<li><a href="#client">client</a><ul>
+<li><a href="#client_2">client</a><ul>
 <li><a href="#consumer">consumer客户端增加心跳</a></li>
 <li><a href="#consumer_1">consumer增加接收消息接口</a></li>
-<li><a href="#_2">增加超时监测</a></li>
-<li><a href="#_3">升级依赖的中间件版本</a></li>
+<li><a href="#_5">增加超时监测</a></li>
+<li><a href="#_6">升级依赖的中间件版本</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </div>
+<h1 id="09-to-be-released"><a name="user-content-09-to-be-released" href="#09-to-be-released" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>0.9 (to be released)</h1>
+<h2 id="topic-partition"><a name="user-content-topic-partition" href="#topic-partition" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>支持topic partition</h2>
+<h2 id="consumer-server"><a name="user-content-consumer-server" href="#consumer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>支持consumer server横向扩展</h2>
+<h2 id="producer-server"><a name="user-content-producer-server" href="#producer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>支持producer server横向扩展</h2>
+<h1 id="082to-be-released"><a name="user-content-082to-be-released" href="#082to-be-released" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>0.8.2(to be released)</h1>
+<h2 id="exactly_once"><a name="user-content-exactly_once" href="#exactly_once" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消息EXACTLY_ONCE</h2>
+<h2 id="_1"><a name="user-content-_1" href="#_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>消息时序</h2>
+<h1 id="081to-be-released"><a name="user-content-081to-be-released" href="#081to-be-released" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>0.8.1(to be released)</h1>
+<h2 id="client"><a name="user-content-client" href="#client" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>client</h2>
+<h3 id="client-log"><a name="user-content-client-log" href="#client-log" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>client log不跟随业务日志</h3>
+<h2 id="server"><a name="user-content-server" href="#server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server</h2>
+<h3 id="_2"><a name="user-content-_2" href="#_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>支持存储迁移</h3>
+<h3 id="_3"><a name="user-content-_3" href="#_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>支持消息缓存</h3>
+<h1 id="080"><a name="user-content-080" href="#080" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>0.8.0</h1>
+<h2 id="client_1"><a name="user-content-client_1" href="#client_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>client:</h2>
+<h3 id="netty4"><a name="user-content-netty4" href="#netty4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>netty4升级</h3>
+<h3 id="topicconsumer-server"><a name="user-content-topicconsumer-server" href="#topicconsumer-server" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>支持topic对应的consumer server迁移</h3>
+<h2 id="server_1"><a name="user-content-server_1" href="#server_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>server:</h2>
+<h3 id="kafka"><a name="user-content-kafka" href="#kafka" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>支持kafka，性能提升</h3>
 <h1 id="071"><a name="user-content-071" href="#071" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>0.7.1</h1>
 <h3 id="heartbeat"><a name="user-content-heartbeat" href="#heartbeat" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>heartbeat线程命名</h3>
-<h3 id="_1"><a name="user-content-_1" href="#_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>客户端日志格式调整</h3>
+<h3 id="_4"><a name="user-content-_4" href="#_4" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>客户端日志格式调整</h3>
 <h3 id="devlion"><a name="user-content-devlion" href="#devlion" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>非dev环境默认使用lion配置</h3>
 <h1 id="070"><a name="user-content-070" href="#070" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>0.7.0</h1>
-<h2 id="client"><a name="user-content-client" href="#client" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>client</h2>
+<h2 id="client_2"><a name="user-content-client_2" href="#client_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>client</h2>
 <h3 id="consumer"><a name="user-content-consumer" href="#consumer" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumer客户端增加心跳</h3>
 <h3 id="consumer_1"><a name="user-content-consumer_1" href="#consumer_1" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>consumer增加接收消息接口</h3>
 <pre><code>增加接口:``com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener``，户实现此接口的话，如果``onMessage``抛出异常，即进行重试。
 在旧的接口``com.dianping.swallow.consumer.MessageListener``中，只有在抛出``BackoutMessageException``异常时才会重试。
 </code></pre>
-<h3 id="_2"><a name="user-content-_2" href="#_2" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>增加超时监测</h3>
+<h3 id="_5"><a name="user-content-_5" href="#_5" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>增加超时监测</h3>
 <pre><code>当用户``onMessage``内的业务逻辑运行时间过长的话，在cat中显示超时Transaction信息
 </code></pre>
-<h3 id="_3"><a name="user-content-_3" href="#_3" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>升级依赖的中间件版本</h3></article></body></html>
+<h3 id="_6"><a name="user-content-_6" href="#_6" class="headeranchor-link" aria-hidden="true"><span class="headeranchor"></span></a>升级依赖的中间件版本</h3></article></body></html>
+<script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>
+<script src="js/ztree_toc.js"></script>
+
+<link rel="stylesheet" href="css/zTreeStyle/zTreeStyle.css"
+	type="text/css" />
+<script type="text/javascript">
+<!--
+	$(document).ready(function() {
+		$('#tree').ztree_toc({
+			debug : false,
+			is_auto_number : true,
+			documment_selector : '.markdown-body',
+			ztreeStyle : {
+				width : '320px',
+				height : '100%',
+				overflow : 'auto',
+				position : 'fixed',
+				'z-index' : 2147483647,
+				border : '0px none',
+				left : '0px',
+				top : '0px'
+			}
+		});
+	});
+//-->
+</script>
+
+

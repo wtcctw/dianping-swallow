@@ -1,4 +1,4 @@
-注：**本文针对Swallow0.7.1版本**,下文中，${currentVersion}, currentVersion指0.7.1
+注：**本文针对Swallow0.8.0版本**,下文中，${currentVersion}, currentVersion指0.8.0
 使用之前，请仔细阅读[swallow使用注意事项](#takeAttention)
 
 [TOC]
