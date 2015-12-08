@@ -2,6 +2,7 @@ package com.dianping.swallow;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -15,6 +16,27 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  */
 public class SimpleTest extends AbstractTest{
 
+	@Test
+	public void testProperty(){
+		
+		Properties properties = (Properties) System.getProperties().clone();
+		
+		System.out.println(properties);
+		
+		System.setProperty("test", "test");
+		
+		
+		System.out.println(System.getProperties());
+		
+		
+		System.setProperties(properties);
+		System.out.println(System.getProperties());
+		
+		
+		
+	}
+	
+	
 	@Test
 	public void testSwallowMessage(){
 		
