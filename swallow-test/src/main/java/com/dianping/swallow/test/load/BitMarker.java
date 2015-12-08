@@ -27,12 +27,19 @@ public class BitMarker {
 	
 	public BitMarker(long capacity){
 		
+		
 		if(capacity < 0 || getArraySize(capacity) > Integer.MAX_VALUE){
 			throw new IllegalArgumentException("cacacity error:" + capacity);
 		}
 		
 		this.capacity = capacity;
-		marker = new int[(int) getArraySize(capacity)];
+		int size = (int) getArraySize(capacity);
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[marker size]" + (size *4/(1<<20)) + " MB");
+		}
+				
+		marker = new int[size];
 	}
 	
 	private long getArraySize(long capacity) {
@@ -104,7 +111,7 @@ public class BitMarker {
 			bm.mark(i);
 		}
 		bm.mark(100);
-		
+		System.out.println();
 		System.out.println(bm.realCount());
 		System.out.println(bm.noRepetCount());
 	}
