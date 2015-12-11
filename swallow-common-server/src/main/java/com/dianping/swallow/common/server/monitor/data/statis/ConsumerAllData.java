@@ -128,7 +128,7 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
 
                 if (tmpResult.get(cid) == null) {
                     AbstractMapMergeable<Long, StatisData> mapMergeableImpl = new MapMergeableImpl<Long, StatisData>();
-                    mapMergeableImpl.setToMerge(qpsValue);
+                    mapMergeableImpl.merge(qpsValue);
                     tmpResult.put(cid, mapMergeableImpl);
                 } else {
                     AbstractMapMergeable<Long, StatisData> originalQpsValue = tmpResult.get(cid);

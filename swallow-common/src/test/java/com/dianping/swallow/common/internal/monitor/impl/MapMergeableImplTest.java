@@ -115,14 +115,14 @@ public class MapMergeableImplTest {
         result.merge(mapStatisDataToMerge);
         result.merge(mapStatisDataToMerge);
         bbb = result.getToMerge();
-        Assert.assertNotEquals(aaa, bbb);
+        Assert.assertEquals(aaa, bbb);
 
         result.setToMerge(ccc);
         result.merge(mapStatisDataToMerge);
         result.merge(mapStatisDataToMerge);
         result.merge(mapStatisDataToMerge);
         ccc = result.getToMerge();
-        Assert.assertNotEquals(ccc, bbb);
+        Assert.assertEquals(ccc, bbb);
 
         Map<Long, Long> map = new HashMap<Long, Long>();
         map.put(0L, 0L);
@@ -136,6 +136,24 @@ public class MapMergeableImplTest {
         }
         Assert.assertEquals(newSet.size(), 1);
 
+    }
+
+    @Test
+    public void testSetAndMerge(){
+
+        MapMergeableImpl<Long, StatisData> result1 = new MapMergeableImpl<Long, StatisData>();
+        MapMergeableImpl<Long, StatisData> result2 = new MapMergeableImpl<Long, StatisData>();
+        result1.setToMerge(mapStatisDataToMerge);
+        result2.merge(mapStatisDataToMerge);
+        Assert.assertEquals(result1.getToMerge().toString(), result2.getToMerge().toString());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMergeSubMap(){
+
+        MapMergeableImpl<Long, StatisData> result = new MapMergeableImpl<Long, StatisData>();
+        result.setToMerge(mapStatisDataToMerge.subMap(3L, true, 6L, true));
+        result.merge(mapStatisDataToMerge.subMap(2L, true, 5L, true));
     }
 
     public static class QpxData implements Mergeable {

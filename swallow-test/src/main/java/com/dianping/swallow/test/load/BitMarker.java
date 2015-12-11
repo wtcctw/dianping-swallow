@@ -22,7 +22,7 @@ public class BitMarker {
 	
 	public BitMarker(){
 		
-		this(200000000L);
+		this(1000000000L);
 	}
 	
 	public BitMarker(long capacity){
