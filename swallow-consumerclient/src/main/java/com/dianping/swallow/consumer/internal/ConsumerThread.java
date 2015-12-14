@@ -1,6 +1,7 @@
 package com.dianping.swallow.consumer.internal;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
 import java.net.InetSocketAddress;
@@ -8,6 +9,7 @@ import java.net.SocketAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * ConsumerThread的作用是，它会不断的保持与ConsumerServer的连接(一个channel关闭后继续建立新的channel)<br>
@@ -19,81 +21,134 @@ import org.slf4j.LoggerFactory;
  */
 public class ConsumerThread extends Thread {
 
-   private static final Logger logger = LoggerFactory.getLogger(ConsumerThread.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConsumerThread.class);
 
-   private Bootstrap     bootstrap;
+	private Bootstrap bootstrap;
 
-   private InetSocketAddress   remoteAddress;
+	private volatile InetSocketAddress remoteAddress;
+	private volatile boolean remoteAddressChanged = false;
 
-   private long                interval;
+	private long interval;
 
-   private ConsumerImpl consumerImpl;
-   
-   public ConsumerThread(ConsumerImpl consumerImpl) {
-	   
-	   this.consumerImpl = consumerImpl;
-   }
+	private ConsumerImpl consumerImpl;
+	
+	private Channel channel;
+	
+	public ConsumerThread(ConsumerImpl consumerImpl) {
 
-	public void setBootstrap(Bootstrap bootstrap) {
-      this.bootstrap = bootstrap;
+		this.consumerImpl = consumerImpl;
 	}
 
-   public void setRemoteAddress(InetSocketAddress remoteAddress) {
-      this.remoteAddress = remoteAddress;
-   }
+	public void setBootstrap(Bootstrap bootstrap) {
+		this.bootstrap = bootstrap;
+	}
 
-   public void setInterval(long interval) {
-      this.interval = interval;
-   }
+	public void setRemoteAddress(InetSocketAddress remoteAddress) {
 
-   @Override
-   public void run() {
-	   
-      ChannelFuture future = null;
-      while (!Thread.currentThread().isInterrupted()) {
-         synchronized (bootstrap) {
-            if (!Thread.currentThread().isInterrupted()) {
-               try {
-            	   if(logger.isInfoEnabled()){
-            		   logger.info("[run][connecting][" + getDesc() + "]" + remoteAddress);
-            	   }
-                  future = bootstrap.connect(remoteAddress);
-                  future.await();
-	           	  if(logger.isDebugEnabled()){
-	           		  logger.debug("[run][await finished][" + getDesc() + "]" + remoteAddress);
-	           	  }
-                  if (future.channel().isActive()) {
-                     SocketAddress localAddress = future.channel().localAddress();
-                     if(logger.isInfoEnabled()){
-                    	 logger.info("[run][connected][" + getDesc() + "]" + localAddress + "->" + remoteAddress);
-                     }
-                     future.channel().closeFuture().await();//等待channel关闭，否则一直阻塞！
-                     if(logger.isInfoEnabled()){
-                    	 logger.info("[run][closed   ][" + getDesc() + "]" + localAddress + "->" + remoteAddress);
-                     }
-                  }
-               } catch (InterruptedException e) {
-                  Thread.currentThread().interrupt();
-               } catch (RuntimeException e) {
-                  logger.error(e.getMessage(), e);
-               }
-            }
-         }
-         try {
-            Thread.sleep(interval);
-         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-         }
-      }
-      
-      if(future!=null && future.channel()!=null){
-          future.channel().close();//线程被中断了，主动关闭连接
-      }
-      
-      if(logger.isInfoEnabled()){
-    	  logger.info("ConsumerThread(remoteAddress=" + remoteAddress + ") done.");
-      }
-   }
+		if(this.remoteAddress == null){
+			this.remoteAddress = remoteAddress;
+			return;
+		}
+
+		if(this.remoteAddress.equals(remoteAddress)){
+			logger.warn("[setRemoteAddress][address equal]" + this.remoteAddress + "," + remoteAddress);
+			return;
+		}
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[setRemoteAddress][address changed]" + this.remoteAddress + "->" + remoteAddress);
+		}
+		this.remoteAddress = remoteAddress;
+		remoteAddressChanged = true;
+		disConnect();
+		
+		
+	}
+
+	private void disConnect() {
+		
+		if(channel != null && channel.isActive()){
+			if(logger.isInfoEnabled()){
+				logger.info("[disConnect]" + channel);
+			}
+			channel.close();
+		}
+	}
+
+	public void setInterval(long interval) {
+		this.interval = interval;
+	}
+
+	@Override
+	public void run() {
+
+		ChannelFuture future = null;
+		while (!Thread.currentThread().isInterrupted()) {
+			synchronized (bootstrap) {
+				try {
+					if (logger.isInfoEnabled()) {
+						logger.info("[run][connecting][" + getDesc() + "]" + remoteAddress);
+					}
+					future = bootstrap.connect(remoteAddress);
+					future.await();
+					if (logger.isDebugEnabled()) {
+						logger.debug("[run][await finished][" + getDesc() + "]" + remoteAddress);
+					}
+					
+					channel = future.channel();
+					if (channel.isActive()) {
+
+						SocketAddress localAddress = channel.localAddress();
+						if (logger.isInfoEnabled()) {
+							logger.info(
+									"[run][connected][" + getDesc() + "]" + localAddress + "->" + remoteAddress);
+						}
+
+						if(!channel.remoteAddress().equals(remoteAddress)){
+							if(logger.isInfoEnabled()){
+								logger.info("[run][remote address not equal]" + channel.remoteAddress() + "," + remoteAddress);
+							}
+							disConnect();
+						}
+						
+						channel.closeFuture().await();// 等待channel关闭，否则一直阻塞！
+						if (logger.isInfoEnabled()) {
+							logger.info(
+									"[run][closed   ][" + getDesc() + "]" + localAddress + "->" + remoteAddress);
+						}
+					}
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				} catch (RuntimeException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
+			sleepIfNecessary(interval);
+		}
+
+		if (future != null && future.channel() != null) {
+			future.channel().close();// 线程被中断了，主动关闭连接
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("ConsumerThread(remoteAddress=" + remoteAddress + ") done.");
+		}
+	}
+
+	private void sleepIfNecessary(long interval) {
+		
+		if(remoteAddressChanged){
+			remoteAddressChanged = false;
+			return;
+		}
+
+		try {
+			sleep(interval);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
 
 	private String getDesc() {
 		return consumerImpl.toString() + "@" + toString();

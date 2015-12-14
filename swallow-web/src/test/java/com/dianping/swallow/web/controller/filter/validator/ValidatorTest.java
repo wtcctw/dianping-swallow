@@ -51,13 +51,16 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setTopic("swallow-test");
 		topicApplyDto.setApprover("hongjun.zhong");
 		topicApplyDto.setType(MongoType.GENERAL.toString());
+		topicApplyDto.setApplicant("mingdong.li");
 
 
 		TypeValidatorFilter typeValidator = new TypeValidatorFilter();
 		QuoteValidatorFilter quoteValidator = new QuoteValidatorFilter();
 		NameValidatorFilter nameValidator = new NameValidatorFilter();
 		AuthenticationValidatorFilter authenticationValidator = new AuthenticationValidatorFilter();
+		ApplicantValidatorFilter applicantValidatorFilter = new ApplicantValidatorFilter();
 		validatorFilterChain.addFilter(switchValidatorFilter);
+		validatorFilterChain.addFilter(applicantValidatorFilter);
 		validatorFilterChain.addFilter(authenticationValidator);
 		validatorFilterChain.addFilter(nameValidator);
 		validatorFilterChain.addFilter(quoteValidator);
@@ -79,8 +82,15 @@ public class ValidatorTest extends MockTest{
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == 0);
 
+		/*-----------------------域名称写成EMAIL--------------------------*/
+		validatorFilterChain.resetFilterChain();
+		topicApplyDto.setApplicant(" mingdong.li@dianping.com ");
+		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
+		Assert.assertTrue(validatorFilterResult.getStatus() == 0);
+
 		/*-----------------------开关关闭--------------------------*/
 		validatorFilterChain.resetFilterChain();
+		topicApplyDto.setApplicant("mingdong.li");
 		switchValidatorFilter.setApplyTopicSwitch("false");
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == -24);
@@ -119,8 +129,7 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setType("general1");
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == -20);
-		
-		
+
 	}
 
 }

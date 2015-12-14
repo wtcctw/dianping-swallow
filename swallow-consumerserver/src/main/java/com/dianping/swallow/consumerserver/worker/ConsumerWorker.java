@@ -3,9 +3,14 @@ package com.dianping.swallow.consumerserver.worker;
 
 import io.netty.channel.Channel;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
+import com.dianping.swallow.common.internal.util.IPUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public interface ConsumerWorker extends Lifecycle{
 	
@@ -51,5 +56,39 @@ public interface ConsumerWorker extends Lifecycle{
    void recordAck();
 
    void handleHeartBeat(Channel channel);
+   
+
+   
+   MessageFilter getMessageFilter();
+   
+   Set<Channel> connectedChannels();
+   
+   ConsumerWorkerStatus getStatus();
+   
+   
+	public static class ConsumerWorkerStatus{
+		
+		@JsonIgnore
+		private ConsumerWorker  consumerWorker;
+		
+		public ConsumerWorkerStatus(ConsumerWorker consumerWorker){
+			this.consumerWorker = consumerWorker;
+		}
+
+		public MessageFilter getMessageFilter(){
+			return consumerWorker.getMessageFilter();
+		}
+		
+		public Set<String> getConnectedChannel(){
+			
+			Set<String> channels = new HashSet<String>();
+			
+			for(Channel channel : consumerWorker.connectedChannels()){
+				channels.add(IPUtil.getIpFromChannel(channel));
+			}
+			return channels; 
+		}
+	}
+
    
 }

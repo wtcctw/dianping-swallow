@@ -1,5 +1,8 @@
 package com.dianping.swallow.consumer;
 
+import java.net.InetSocketAddress;
+import java.util.List;
+
 import com.dianping.swallow.common.message.Destination;
 
 public interface ConsumerFactory {
@@ -35,4 +38,9 @@ public interface ConsumerFactory {
     */
    Consumer createConsumer(Destination dest);
    
+   
+   List<InetSocketAddress> getTopicAddress(String topic);
+
+   List<InetSocketAddress> getOrDefaultTopicAddress(String topic);
+
 }
