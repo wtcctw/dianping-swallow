@@ -312,9 +312,13 @@ public class MongoCluster extends AbstractCluster{
 
 	@Override
 	public List<InetSocketAddress> allServers() {
-		
-		List<ServerAddress> allAddresses = mongoClient.getServerAddressList();
-		return toInetSocketAddress(allAddresses);
+		try{
+			List<ServerAddress> allAddresses = mongoClient.getServerAddressList();
+			return toInetSocketAddress(allAddresses);
+		}catch(MongoException e){
+			logger.error("[allServers]" + getSeeds(), e);
+			return getSeeds();
+		}
 	}
 
 	private List<InetSocketAddress> toInetSocketAddress(List<ServerAddress> allAddresses) {

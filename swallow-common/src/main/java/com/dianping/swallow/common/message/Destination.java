@@ -94,7 +94,7 @@ public final class Destination implements Serializable {
 
    @Override
    public String toString() {
-      return String.format("Destination [name=%s, type=%s]", name, type);
+      return String.format("[topic=%s, type=%s]", name, type);
    }
 
    @Override

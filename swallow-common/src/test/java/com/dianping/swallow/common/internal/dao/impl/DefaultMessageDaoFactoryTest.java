@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +50,11 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 	@Override
 	protected void doBeforeAbstractDbTest() {
 		System.getProperties().setProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion-daofactory.properties");
+	}
+	
+	@After
+	public void afterDefaultMessageDaoFactoryTest(){
+		
 	}
 	/**
 	#192.168.31.178:27016

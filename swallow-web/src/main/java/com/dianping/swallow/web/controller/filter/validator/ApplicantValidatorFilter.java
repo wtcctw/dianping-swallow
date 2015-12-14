@@ -19,6 +19,8 @@ import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 @Component
 public class ApplicantValidatorFilter implements  Filter<TopicApplyDto, ValidatorFilterResult>{
 
+	public static final String MAIL_POSTFIX = "@dianping.com";
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Override
@@ -28,8 +30,14 @@ public class ApplicantValidatorFilter implements  Filter<TopicApplyDto, Validato
 		String applicant = topicApplyDto.getApplicant();
 		
 		if(StringUtils.isNotBlank(applicant)){
-			if(logger.isInfoEnabled()){
-				logger.info("Pass ApplicantValidatorFilter");
+			String trimedApplicant = applicant.trim();
+			int index = trimedApplicant.indexOf(MAIL_POSTFIX);
+			if(index != -1){
+				String fixedApplicant = trimedApplicant.substring(0, index);
+				topicApplyDto.setApplicant(fixedApplicant);
+				if (logger.isWarnEnabled()) {
+					logger.warn(String.format("Modify approver name %s to %s", applicant, fixedApplicant));
+				}
 			}
 			validatorChain.doFilter(topicApplyDto, result, validatorChain);
 			

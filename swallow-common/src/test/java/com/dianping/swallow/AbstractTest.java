@@ -52,6 +52,8 @@ public abstract class AbstractTest {
 
 	@Rule
 	public TestSkipRule testSkipRule = new TestSkipRule();
+	
+	private Properties properties;
 
 	@Before
 	public void beforeAbstractTest() {
@@ -59,8 +61,13 @@ public abstract class AbstractTest {
 			logger.info("[-----------------][begin test]" + testName.getMethodName());
 		}
 
-		
 		System.setProperty("lion.useLocal", "true");
+		
+		
+		//缓存属性信息，after之后恢复
+		properties = (Properties) System.getProperties().clone();
+		
+		
 		//清理残存配置信息
 		ConfigCache.getInstance().setPts(new Properties());
 		
@@ -138,6 +145,7 @@ public abstract class AbstractTest {
 			logger.info("[-----------------][end test]" + testName.getMethodName());
 		}
 
+		System.setProperties(properties);
 		executors.shutdownNow();
 		scheduledExecutors.shutdownNow();
 	}
@@ -217,4 +225,6 @@ public abstract class AbstractTest {
 	protected Long randomLong() {
 		return (long) (Math.random() * Long.MAX_VALUE);
 	}
+	
+	
 }

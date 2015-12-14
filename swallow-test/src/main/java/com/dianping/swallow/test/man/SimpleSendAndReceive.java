@@ -19,7 +19,16 @@ import com.dianping.swallow.test.AbstractConsumerTest;
  * 2015年5月26日 下午3:15:31
  */
 public class SimpleSendAndReceive extends AbstractConsumerTest{
+
 	
+	@Test
+	public void simpleTest() throws SendFailedException, RemoteServiceInitFailedException{
+
+		addListener(getTopic());
+
+		sendMessage(getTopic(), 10000, 5000);
+		
+	}
 	
 	@Test
 	public void eternalSend() throws SendFailedException, RemoteServiceInitFailedException, InterruptedException{
@@ -36,6 +45,8 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 
 		TimeUnit.SECONDS.sleep(10000);
 	}
+	
+	
 	
 	
 	@Override
@@ -105,5 +116,10 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 			System.out.println(total);
 		}
 	}
+
 	
+	@Override
+	protected int consumerPrintCount() {
+		return 1;
+	}
 }

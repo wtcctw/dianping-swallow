@@ -2,10 +2,13 @@ package com.dianping.swallow.consumerserver.worker.impl;
 
 
 import io.netty.channel.Channel;
+
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +33,7 @@ import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.pool.ConsumerThreadPoolManager;
 import com.dianping.swallow.consumerserver.worker.ConsumerWorker;
+import com.dianping.swallow.consumerserver.worker.ConsumerWorker.ConsumerWorkerStatus;
 
 /**
  * @author mengwenchao
@@ -473,4 +477,20 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
             }
 		}
 	}
+	
+	@Override
+	public Object getStatus() {
+		
+		Map<ConsumerInfo, ConsumerWorkerStatus> status = new HashMap<ConsumerInfo, ConsumerWorker.ConsumerWorkerStatus>();
+		
+		for(Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()){
+			
+			status.put(entry.getKey(), entry.getValue().getStatus());
+		}
+		
+		return status;
+	}
+
+	
+	
 }

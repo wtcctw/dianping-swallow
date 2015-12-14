@@ -302,14 +302,19 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
     @Override
     public boolean isEmpty() {
-        if (!statisMap.isEmpty()) {
-            StatisData statisData = statisMap.lastEntry().getValue();
-            if (statisData != null && (statisData.getTotalCount() > 0 || statisData.getTotalDelay() > 0)) {
+        for(StatisData statisData : statisMap.values()){
+            if(statisData.getCount() > 0){
                 return false;
             }
+        }
 
+        for(MessageInfo info : col.values()){
+            if(!info.isEmpty()){
+                return false;
+            }
         }
         return true;
+
     }
 
     @Override

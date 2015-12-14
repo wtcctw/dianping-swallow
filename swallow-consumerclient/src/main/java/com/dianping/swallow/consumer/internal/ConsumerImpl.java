@@ -1,5 +1,6 @@
 package com.dianping.swallow.consumer.internal;
 
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -12,6 +13,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,6 +30,7 @@ import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
 import com.dianping.swallow.common.internal.netty.channel.CodecChannelFactory;
 import com.dianping.swallow.common.internal.netty.handler.CodecHandler;
 import com.dianping.swallow.common.internal.netty.handler.LengthPrepender;
+import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.processor.ConsumerProcessor;
@@ -41,6 +44,7 @@ import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
+import com.dianping.swallow.consumer.ConsumerFactory;
 import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener;
 import com.dianping.swallow.consumer.internal.action.RetryOnAllExceptionActionWrapper;
@@ -125,6 +129,7 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
 	}
 
+	
 	@Override
 	public void start() {
 		if (listener == null) {
@@ -164,6 +169,10 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 				pipeline.addLast("handler", handler);
 			}
 		});
+		
+		if(logger.isInfoEnabled()){
+			logger.info("[startListener]" + dest + "," + consumerId + "," + masterAddress + "," + slaveAddress);
+		}
 		// 启动连接master的线程
 		masterConsumerThread = new ConsumerThread(this);
 		masterConsumerThread.setBootstrap(bootstrap);
@@ -301,5 +310,38 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 	
 	public TaskChecker getTaskChecker(){
 		return taskChecker;
+	}
+
+	@Override
+	public void update(Observable observable, Object args) {
+		
+		if(observable instanceof ConsumerFactory){
+			
+			ConsumerFactory consumerFactory = (ConsumerFactory) observable;
+			List<InetSocketAddress> addresses = consumerFactory.getOrDefaultTopicAddress(dest.getName());
+			if(addresses.size() != 2){
+				throw new IllegalStateException("addresses size != 2," + dest + "," + addresses);
+			}
+			InetSocketAddress newMaster = addresses.get(0);
+			InetSocketAddress newSlave = addresses.get(1);
+			
+			if(!newMaster.equals(masterAddress)){
+				if(logger.isInfoEnabled()){
+					logger.info("[update][master changed]" + dest + "," + consumerId + "," + masterAddress + "->" + newMaster);
+				}
+				masterAddress = newMaster;
+				masterConsumerThread.setRemoteAddress(newMaster);
+			}
+			
+			if(!newSlave.equals(slaveAddress)){
+				if(logger.isInfoEnabled()){
+					logger.info("[update][slave changed]" + dest + "," + consumerId + "," + slaveAddress + "->" + newSlave);
+				}
+				slaveAddress = newSlave;
+				slaveConsumerThread.setRemoteAddress(newSlave);
+			}
+			
+			
+		}
 	}
 }
