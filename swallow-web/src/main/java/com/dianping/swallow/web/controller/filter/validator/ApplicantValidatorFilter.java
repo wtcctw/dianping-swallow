@@ -21,6 +21,8 @@ public class ApplicantValidatorFilter implements  Filter<TopicApplyDto, Validato
 
 	public static final String MAIL_POSTFIX = "@dianping.com";
 
+	public static final String APPLICANT_BLANK = "申请人不能为空！";
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Override
@@ -45,7 +47,7 @@ public class ApplicantValidatorFilter implements  Filter<TopicApplyDto, Validato
 			if(logger.isInfoEnabled()){
 				logger.info("Fail ApplicantValidatorFilter");
 			}
-			result.setMessage("Applicant must not be blank");
+			result.setMessage(APPLICANT_BLANK);
 			result.setStatus(-4);
 			return;
 		}

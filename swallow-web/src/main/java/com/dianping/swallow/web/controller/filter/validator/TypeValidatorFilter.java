@@ -21,6 +21,8 @@ public class TypeValidatorFilter implements Filter<TopicApplyDto, ValidatorFilte
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+	private static final String INVALID_TYPE = "mongo类型不存在，请选择正确的mongo类型，如有问题请联系mingdong.li@dianping.com";
+
 	@Override
 	public void doFilter(TopicApplyDto topicApplyDto, ValidatorFilterResult result,
 			FilterChain<TopicApplyDto, ValidatorFilterResult> validatorChain) {
@@ -28,9 +30,9 @@ public class TypeValidatorFilter implements Filter<TopicApplyDto, ValidatorFilte
 		String type = topicApplyDto.getType();
 		if (StringUtils.isBlank(type)) {
 			if (logger.isInfoEnabled()) {
-				logger.info("Fail TypeFilter");
+				logger.info(INVALID_TYPE);
 			}
-			result.setMessage("invalid mongo type");
+			result.setMessage(INVALID_TYPE);
 			result.setStatus(-20);
 			return;
 		}
@@ -44,9 +46,9 @@ public class TypeValidatorFilter implements Filter<TopicApplyDto, ValidatorFilte
 
 		} catch (Exception e) {
 			if (logger.isInfoEnabled()) {
-				logger.info("Fail TypeFilter");
+				logger.info(INVALID_TYPE);
 			}
-			result.setMessage("invalid mongo type");
+			result.setMessage(INVALID_TYPE);
 			result.setStatus(-20);
 			return;
 		}

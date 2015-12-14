@@ -19,7 +19,9 @@ import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 public class QuoteValidatorFilter implements Filter<TopicApplyDto, ValidatorFilterResult> {
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	
+
+	private static final String EXCEED_QUOTA = "申请量太大，请减小每天消息数量或者消息大小，如不行请发送邮件到mingdong.li@dianping.com进行申请。";
+
 	@Override
 	public void doFilter(TopicApplyDto topicApplyDto, ValidatorFilterResult result, FilterChain<TopicApplyDto, ValidatorFilterResult> validatorChain) {
 		
@@ -43,7 +45,7 @@ public class QuoteValidatorFilter implements Filter<TopicApplyDto, ValidatorFilt
 			if(logger.isInfoEnabled()){
 				logger.info("Fail QuoteValidator");
 			}
-			result.setMessage("exceed quota");
+			result.setMessage(EXCEED_QUOTA);
 			result.setStatus(-12);
 			return;
 		}
