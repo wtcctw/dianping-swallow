@@ -51,20 +51,20 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setTopic("swallow-test");
 		topicApplyDto.setApprover("hongjun.zhong");
 		topicApplyDto.setType(MongoType.GENERAL.toString());
+		topicApplyDto.setApplicant("mingdong.li");
 
 
 		TypeValidatorFilter typeValidator = new TypeValidatorFilter();
 		QuoteValidatorFilter quoteValidator = new QuoteValidatorFilter();
 		NameValidatorFilter nameValidator = new NameValidatorFilter();
-		AuthenticationValidatorFilter authenticationValidator = new AuthenticationValidatorFilter();
+		ApplicantValidatorFilter applicantValidatorFilter = new ApplicantValidatorFilter();
 		validatorFilterChain.addFilter(switchValidatorFilter);
-		validatorFilterChain.addFilter(authenticationValidator);
+		validatorFilterChain.addFilter(applicantValidatorFilter);
 		validatorFilterChain.addFilter(nameValidator);
 		validatorFilterChain.addFilter(quoteValidator);
 		validatorFilterChain.addFilter(typeValidator);
 
 		switchValidatorFilter.setApplyTopicSwitch("true");
-		authenticationValidator.setUserUtils(userUtils);
 		nameValidator.setTopicResourceService(topicResourceService);
 
 		Mockito.doReturn(Boolean.TRUE).when(userUtils).isAdministrator(topicApplyDto.getApprover(), true);
@@ -79,8 +79,15 @@ public class ValidatorTest extends MockTest{
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == 0);
 
+		/*-----------------------域名称写成EMAIL--------------------------*/
+		validatorFilterChain.resetFilterChain();
+		topicApplyDto.setApplicant(" mingdong.li@dianping.com ");
+		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
+		Assert.assertTrue(validatorFilterResult.getStatus() == 0);
+
 		/*-----------------------开关关闭--------------------------*/
 		validatorFilterChain.resetFilterChain();
+		topicApplyDto.setApplicant("mingdong.li");
 		switchValidatorFilter.setApplyTopicSwitch("false");
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == -24);
@@ -99,13 +106,6 @@ public class ValidatorTest extends MockTest{
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == -11);
 
-		/*-----------------------审批人没有权限--------------------------*/
-		validatorFilterChain.resetFilterChain();
-		topicApplyDto.setTopic("swallow-test");
-		topicApplyDto.setApprover("dp.wang");
-		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
-		Assert.assertTrue(validatorFilterResult.getStatus() == -2);
-
 		/*-----------------------topic已经申请--------------------------*/
 		validatorFilterChain.resetFilterChain();
 		topicApplyDto.setApprover("hongjun.zhong");
@@ -119,8 +119,7 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setType("general1");
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == -20);
-		
-		
+
 	}
 
 }
