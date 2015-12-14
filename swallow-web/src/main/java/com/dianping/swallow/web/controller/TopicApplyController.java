@@ -55,9 +55,6 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     private HandlerChainFactory handlerChainFactory;
 
     @Autowired
-    private AuthenticationValidatorFilter authenticationValidatorFilter;
-
-    @Autowired
     private SwitchValidatorFilter switchValidatorFilter;
 
     @Autowired
@@ -109,7 +106,6 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         ValidatorFilterChain validatorFilterChain = filterChainFactory.createValidatorFilterChain();
 
         validatorFilterChain.addFilter(switchValidatorFilter);
-        validatorFilterChain.addFilter(authenticationValidatorFilter);
         validatorFilterChain.addFilter(nameValidatorFilter);
         validatorFilterChain.addFilter(quoteValidatorFilter);
         validatorFilterChain.addFilter(typeValidatorFilter);
