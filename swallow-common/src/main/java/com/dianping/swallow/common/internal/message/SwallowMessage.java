@@ -104,7 +104,7 @@ public class SwallowMessage implements Serializable, Message {
    @Override
    public <T> T transferContentToBean(Class<T> clazz) {
       JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
-      return jsonBinder.fromJson(content, clazz);
+      return jsonBinder.fromJson(getContent(), clazz);
    }
 
    public long size(){
@@ -127,7 +127,8 @@ public class SwallowMessage implements Serializable, Message {
 		return length;
 	}
 
-	private long contentLength() {
+	protected long contentLength() {
+		String content = getContent();
 		if(content == null){
 			return 0;
 		}
@@ -183,11 +184,11 @@ public class SwallowMessage implements Serializable, Message {
       return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", backupMessageId="
             + backupMessageId + ", properties=" + properties + ", internalPropertiess=" + internalProperties
             + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + ", content="
-            + content + "]";
+            + getContent() + "]";
    }
 
    public String toKeyValuePairs() {
-      return toSuccessKeyValuePairs() + "&content=" + content;
+      return toSuccessKeyValuePairs() + "&content=" + getContent();
    }
 
    public String toSuccessKeyValuePairs() {
