@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
-import com.dianping.swallow.common.internal.config.impl.LionUtilImpl.LionRet;
+import com.dianping.swallow.common.message.JsonDeserializedException;
 
 /**
  * @author mengwenchao
@@ -31,6 +31,14 @@ public class TopicConfigTest {
 		Assert.assertEquals(max, config.getMax());
 		Assert.assertEquals(size, config.getSize());
 	}
+
+	@Test( expected = JsonDeserializedException.class)
+	public void testBadJson(){
+		
+		JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
+		jsonBinder.fromJson("{\"xx\" : xx\"}", TopicConfig.class);
+	}
+
 	
 	
 	@Test
@@ -61,13 +69,22 @@ public class TopicConfigTest {
 		
 	}
 	
+
 	@Test
-	public void testMerge(){
+	public void testAllValid(){
 		
-		LionRet ret = JsonBinder.getNonEmptyBinder().fromJson("{}", LionRet.class);
-		System.out.println(ret);
+		TopicConfig topicConfig = new TopicConfig();
+		Assert.assertFalse(topicConfig.allValid());
 		
-	}
+		topicConfig.setMax(1);
+		Assert.assertFalse(topicConfig.allValid());
+
+		topicConfig.setSize(1);
+		Assert.assertFalse(topicConfig.allValid());
+		
+		topicConfig.setStoreUrl("mongodb://10.1.1.1");
+		Assert.assertTrue(topicConfig.allValid());
+	} 
 	
 	
 	@Test

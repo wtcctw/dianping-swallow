@@ -144,7 +144,7 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 	}
 	
 	@Test
-	public void testUpdate() throws ClusterCreateException{
+	public void testUpdate() throws Exception{
 		
 		
 		System.out.println(clusterManager.getCluster("mongodb://127.0.0.1:27018").allServers());

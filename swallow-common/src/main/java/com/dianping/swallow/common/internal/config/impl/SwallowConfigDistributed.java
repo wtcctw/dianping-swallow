@@ -78,11 +78,14 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		}
 		
 		for(String topicKey : cfgs.keySet()){
-			
-			putConfig(topicKey);
+			try {
+				putConfig(topicKey);
+			} catch (SwallowConfigException e) {
+				logger.error("[doLoadConfig]" + topicKey, e);
+			}
 		}
 		
-		if(topicCfgs.get(TOPICNAME_DEFAULT) == null || !topicCfgs.get(TOPICNAME_DEFAULT).valid()){
+		if(topicCfgs.get(TOPICNAME_DEFAULT) == null || !topicCfgs.get(TOPICNAME_DEFAULT).allValid()){
 			throw new IllegalArgumentException("wrong config, no defalut or default is invalid");
 		}
 		
@@ -93,7 +96,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		checkNewConfig.start();
 	}
 
-	private TopicConfig putConfig(String topicKey) {
+	private TopicConfig putConfig(String topicKey) throws SwallowConfigException {
 		
 		String value = dynamicConfig.get(getLionKeyFromTopic(topicKey));//从lion获取，在lion更新的时候通知
 		
@@ -150,7 +153,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 	}
 
 	@Override
-	protected SwallowConfigArgs doOnConfigChange(String key, String value) {
+	protected SwallowConfigArgs doOnConfigChange(String key, String value) throws SwallowConfigException {
 		
 		String topic = getTopicFromLionKey(key);
 		if(topic == null){
@@ -170,12 +173,11 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		return new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, topic, oldConfig);
 	}
 
-	private TopicConfig getConfigFromString(String config) {
+	private TopicConfig getConfigFromString(String config) throws SwallowConfigException {
 		try{
 			return jsonBinder.fromJson(config, TopicConfig.class);
 		}catch(Exception e){
-			logger.error("[getConfigFromString][config]" + config, e);
-			return null;
+			throw new SwallowConfigException(config, e);
 		}
 	}
 
@@ -295,8 +297,13 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		}
 
 		for(String topicKey : currentTopicSet){
-			putConfig(topicKey);
-			updateObservers(new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, getTopicFromLionKey(topicKey), CHANGED_BEHAVIOR.ADD));
+			
+			try {
+				putConfig(topicKey);
+				updateObservers(new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, getTopicFromLionKey(topicKey), CHANGED_BEHAVIOR.ADD));
+			} catch (SwallowConfigException e) {
+				logger.error("[checkAdd]" + topicKey, e);
+			}
 		}
 	}
 

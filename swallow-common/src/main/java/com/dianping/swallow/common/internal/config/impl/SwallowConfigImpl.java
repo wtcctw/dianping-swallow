@@ -90,7 +90,11 @@ public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfi
 		
 		return config.defaultTopicConfig();
 	}
-	
+
+	@Override
+	public String toString() {
+		return config.toString();
+	}
 	
 	@Override
 	public int getOrder() {
