@@ -48,7 +48,7 @@ public class SwitchValidatorFilter implements Filter<TopicApplyDto, ValidatorFil
             if(logger.isInfoEnabled()){
                 logger.info("Fail SwitchValidator");
             }
-            result.setMessage("Switch of apply topic automatically turned off, please contact mingdong.li@dianping.com to apply topic.");
+            result.setMessage("自动申请topic功能已关闭，请发送邮件到mingdong.li@dianping.com申请topic。");
             result.setStatus(-24);
             return;
         }

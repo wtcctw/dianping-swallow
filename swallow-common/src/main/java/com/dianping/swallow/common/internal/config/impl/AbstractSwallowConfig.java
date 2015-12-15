@@ -77,7 +77,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 	}
 
 	@Override
-	public void onConfigChange(String key, String value) {
+	public void onConfigChange(String key, String value) throws Exception {
 
 		SwallowConfigArgs args = null;
 		
@@ -109,7 +109,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 	
 	protected abstract boolean interested(String key);
 
-	protected abstract SwallowConfigArgs doOnConfigChange(String key, String value);
+	protected abstract SwallowConfigArgs doOnConfigChange(String key, String value) throws SwallowConfigException;
 
 
 	public static class SwallowConfigArgs{

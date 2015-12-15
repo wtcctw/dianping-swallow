@@ -97,7 +97,11 @@ public class LionDynamicConfig implements DynamicConfig {
 
 			@Override
 			public void onChange(String key, String value) {
-				listener.onConfigChange(key, value);
+				try{
+					listener.onConfigChange(key, value);
+				}catch(Exception e){
+					logger.error("[onChange]" + key + "," + value, e);
+				}
 			}
 		};
 

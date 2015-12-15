@@ -37,9 +37,12 @@ public class MonitorServer extends AbstractLifecycle implements ApplicationConte
 		rc.register(JacksonFeature.class);
 		rc.register(JacksonProvider.class);
 		registerUserClasses(rc);
+	    if(logger.isInfoEnabled()){
+	    	logger.info("[doInitialize][begin][monitor server start at]" + port);
+	    }
 	    server = SimpleContainerFactory.create(getUri(), rc);
 	    if(logger.isInfoEnabled()){
-	    	logger.info("[doInitialize][monitor server start at]" + port);
+	    	logger.info("[doInitialize][end][monitor server start at]" + port);
 	    }
 	}
 

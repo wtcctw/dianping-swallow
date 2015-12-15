@@ -30,6 +30,11 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 		swallowConfig.initialize();
 	}
 
+	@Override
+	protected boolean useLocal() {
+		return false;
+	}
+	
 	
 	@Test
 	public void testAdd() throws InterruptedException{
@@ -69,6 +74,33 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 
 
 	@Test
+	public void testUpdateWrong() throws InterruptedException{
+		
+		if(!EnvUtil.isAlpha()){
+			return;
+		}
+
+		TopicConfig config = new TopicConfig("mongodb://127.0.0.1:27018", 111, 11);
+		String topicName = UUID.randomUUID().toString();
+		
+		try{
+			addOrUpdateConfig(topicName, config);
+			TimeUnit.SECONDS.sleep(SwallowConfigDistributed.CHECK_NEW_CONFIG_INTERVAL + 2);
+			TopicConfig realConfig = swallowConfig.getTopicConfig(topicName);
+			Assert.assertTrue(realConfig.equals(config));
+			
+			addOrUpdateConfig(topicName, "{\"xx : \"xx\"}");
+			sleep(1000);
+			realConfig = swallowConfig.getTopicConfig(topicName);
+			Assert.assertTrue(realConfig.equals(config));
+		}finally{
+			removeConfig(topicName);
+		}
+
+	}
+	
+	
+	@Test
 	public void testUpdate() throws InterruptedException{
 		if(!EnvUtil.isAlpha()){
 			return;
@@ -95,7 +127,7 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 			addOrUpdateConfig(topicName, "");
 			TimeUnit.SECONDS.sleep(1);
 			realConfig = swallowConfig.getTopicConfig(topicName);
-			Assert.assertTrue(!realConfig.valid());
+			Assert.assertTrue(realConfig.getStoreUrl() == null && realConfig.getMax() == null && realConfig.getSize() == null);
 			
 		}finally{
 			removeConfig(topicName);
