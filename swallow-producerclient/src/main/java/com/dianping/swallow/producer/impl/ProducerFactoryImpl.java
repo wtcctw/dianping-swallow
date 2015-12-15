@@ -53,7 +53,13 @@ public final class ProducerFactoryImpl implements ProducerFactory {
    private ProducerSwallowService           remoteService;                                                        //远程调用对象
    
    static{
-	   SwallowHelper.clientInitialize();
+      String log4j2Enable = System.getProperty("Log4j2Enable", "true");
+
+      if ("true".equalsIgnoreCase(log4j2Enable)) {
+         SwallowHelper.clientInitialize();
+      } else {
+         SwallowHelper.initialize();
+      }
    }
    /**
     * Producer工厂类构造函数
