@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import org.springframework.web.servlet.view.velocity.VelocityLayoutView;
 import org.springframework.web.servlet.view.velocity.VelocityViewResolver;
@@ -22,7 +22,7 @@ import org.springframework.web.servlet.view.velocity.VelocityViewResolver;
  */
 public class VelocityMultipleLayoutViewResolver extends VelocityViewResolver {
 
-	private static final Logger logger = LoggerFactory.getLogger( VelocityMultipleLayoutViewResolver.class );
+	private static final Logger logger = LogManager.getLogger( VelocityMultipleLayoutViewResolver.class );
 
 	private Map<String, String> mappings = new HashMap<String, String>();
 

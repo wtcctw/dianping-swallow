@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.FactoryBean;
 
 import com.dianping.swallow.common.internal.config.SwallowConfig;
@@ -36,7 +36,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	
 	public static final int ORDER = ClusterManager.ORDER + 1;
 
-	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+	protected final Logger logger     = LogManager.getLogger(getClass());
 	
 	private Map<String, DAOContainer<MessageDAO<?>>> daos = new ConcurrentHashMap<String, DAOContainer<MessageDAO<?>>>();
 	

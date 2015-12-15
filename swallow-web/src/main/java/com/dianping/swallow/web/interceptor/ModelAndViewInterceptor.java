@@ -14,8 +14,8 @@ import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.AuthenticationService;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author mingdongli
@@ -40,7 +40,7 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 	@Autowired
 	UserUtils extractUsernameUtils;
 	
-	private static final Logger logger = LoggerFactory
+	private static final Logger logger = LogManager
 			.getLogger(ModelAndViewInterceptor.class);
 
 	@Override

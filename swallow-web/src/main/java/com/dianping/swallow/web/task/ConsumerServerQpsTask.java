@@ -3,8 +3,8 @@ package com.dianping.swallow.web.task;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ import com.dianping.swallow.web.util.DateUtil;
 @Component
 public class ConsumerServerQpsTask extends AbstractLifecycle implements TaskLifecycle {
 
-	private static final Logger logger = LoggerFactory.getLogger(ConsumerServerQpsTask.class);
+	private static final Logger logger = LogManager.getLogger(ConsumerServerQpsTask.class);
 
 	private static final String CAT_TYPE = "ConsumerServerQpsTask";
 

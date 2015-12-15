@@ -3,8 +3,8 @@ package com.dianping.swallow.test.load;
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.util.concurrent.*;
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class AbstractLoadTest{
 	
 	@JsonIgnore
-    protected Logger logger       = LoggerFactory.getLogger(getClass());
+    protected Logger logger       = LogManager.getLogger(getClass());
 
 	protected String topicName = "LoadTestTopic";
 	

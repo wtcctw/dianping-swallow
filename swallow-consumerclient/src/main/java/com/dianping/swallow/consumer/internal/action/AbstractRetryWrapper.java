@@ -1,7 +1,7 @@
 package com.dianping.swallow.consumer.internal.action;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.dianping.cat.message.Transaction;
 import com.dianping.swallow.common.internal.action.SwallowAction;
@@ -16,7 +16,7 @@ import com.dianping.swallow.common.internal.util.CatUtil;
  */
 public abstract class AbstractRetryWrapper implements SwallowCatActionWrapper{
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LogManager.getLogger(getClass());
 
 	private int totalRetryCount;
 

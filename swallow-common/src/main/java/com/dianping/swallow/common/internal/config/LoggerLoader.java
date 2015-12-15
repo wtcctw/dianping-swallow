@@ -35,7 +35,7 @@ public class LoggerLoader {
 
     private static final String DEFAULT_CONSUMER_TASK = "com.dianping.swallow.consumer.internal.task.DefaultConsumerTask";
 
-    private static final String DEFAULT_CONSUMER_TASK_PROPERTY = "consumertask";
+    private static final String DEFAULT_CONSUMER_TASK_PROPERTY = "ConsumerTask";
 
     private static final String DEFAULT_APP_NAME = "swallow-app";
 
@@ -43,7 +43,7 @@ public class LoggerLoader {
 
     private static final String LOG_ROOT = System.getProperty("swallow.log.path", "/data/applogs/swallow/log/");
 
-    public static synchronized void init() {
+    public static synchronized void init(){
 
         if (StringUtils.isBlank(APP_NAME)) {
             APP_NAME = DEFAULT_APP_NAME;
@@ -95,19 +95,10 @@ public class LoggerLoader {
         //switch for DefaultConsumerTask
         String isLoggerConsumerTask = System.getProperty(DEFAULT_CONSUMER_TASK_PROPERTY, "true");
         if("false".equalsIgnoreCase(isLoggerConsumerTask)){
-            Appender fileWarnAppender = RollingRandomAccessFileAppender.createAppender(LOG_ROOT + "/swallow." + APP_NAME + ".consumertask.log",
-                    LOG_ROOT + "/swallow." + APP_NAME + ".consumertask.log.%d{yyyy-MM-dd}.gz", "true", "FileWarn", "true", null,
-                    TimeBasedTriggeringPolicy.createPolicy("1", "true"),
-                    DefaultRolloverStrategy.createStrategy("30", "1", null, Deflater.DEFAULT_COMPRESSION + "", config),
-                    layout, null, "false", null, null, config);
-            fileWarnAppender.start();
-            config.addAppender(fileWarnAppender);
-
-            AppenderRef fileWarnRef = AppenderRef.createAppenderRef("FileWarn", Level.WARN, null);
-            AppenderRef[] warnRefs = new AppenderRef[]{fileWarnRef};
+            AppenderRef[] warnRefs = new AppenderRef[]{fileInfoRef};
             LoggerConfig loggerWarnConfig = LoggerConfig.createLogger("false", Level.WARN, DEFAULT_CONSUMER_TASK, "true", warnRefs,
                     null, config, null);
-            loggerWarnConfig.addAppender(fileWarnAppender, Level.WARN, null);
+            loggerWarnConfig.addAppender(fileInfoAppender, Level.WARN, null);
             config.addLogger(DEFAULT_CONSUMER_TASK, loggerWarnConfig);
         }
 

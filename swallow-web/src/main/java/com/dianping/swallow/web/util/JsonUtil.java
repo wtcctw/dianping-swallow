@@ -2,8 +2,8 @@ package com.dianping.swallow.web.util;
 
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoStatus;
 import com.dianping.swallow.common.message.JsonDeserializedException;
@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
  */
 public class JsonUtil {
 
-	private static final Logger logger = LoggerFactory.getLogger(JsonUtil.class);
+	private static final Logger logger = LogManager.getLogger(JsonUtil.class);
 
 	private static ObjectMapper om = new ObjectMapper();
 

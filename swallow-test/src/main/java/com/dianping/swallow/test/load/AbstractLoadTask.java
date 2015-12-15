@@ -1,7 +1,7 @@
 package com.dianping.swallow.test.load;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author mengwenchao
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractLoadTask implements Runnable{
 	
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LogManager.getLogger(getClass());
 
 	protected String topicName;
 	

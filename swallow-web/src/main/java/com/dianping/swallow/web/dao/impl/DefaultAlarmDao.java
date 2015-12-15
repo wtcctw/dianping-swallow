@@ -3,8 +3,8 @@ package com.dianping.swallow.web.dao.impl;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.AlarmDao;
 import com.dianping.swallow.web.model.alarm.Alarm;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -23,7 +23,7 @@ import java.util.List;
 @Service("alarmDao")
 public class DefaultAlarmDao extends AbstractStatsDao implements AlarmDao {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultAlarmDao.class);
+	private static final Logger logger = LogManager.getLogger(DefaultAlarmDao.class);
 
 	private static final String ALARM_COLLECTION = "ALARM";
 

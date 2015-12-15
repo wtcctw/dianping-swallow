@@ -7,8 +7,8 @@ import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.dianping.swallow.test.load.AbstractLoadTest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,7 +17,7 @@ import java.util.Date;
  * @rundemo_name 生产者例子(同步)
  */
 public class ConsumerRunner extends AbstractLoadTest {
-    private static Logger logger = LoggerFactory.getLogger(ConsumerFactoryImpl.class);
+    private static Logger logger = LogManager.getLogger(ConsumerFactoryImpl.class);
 
     private static long before = System.currentTimeMillis();
     private static int topicCount = 1;

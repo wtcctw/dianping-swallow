@@ -9,8 +9,8 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfo;
 import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  */
 public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implements Statisable<MessageInfo>, Mergeable {
 
-    protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+    protected transient final Logger logger = LogManager.getLogger(getClass());
 
     private NavigableMap<Long, MessageInfo> col = new ConcurrentSkipListMap<Long, MessageInfo>();
 

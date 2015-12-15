@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -25,7 +25,7 @@ import com.dianping.swallow.common.internal.lifecycle.SelfManagement;
  */
 public class LifecycleComponentManager implements ApplicationContextAware, InitializingBean, DisposableBean{
 
-	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+	protected final Logger logger     = LogManager.getLogger(getClass());
 	
 	private ApplicationContext applicationContext;
 

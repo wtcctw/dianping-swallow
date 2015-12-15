@@ -6,8 +6,8 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 
@@ -19,7 +19,7 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
  */
 public class DefaultThreadProfile implements ThreadProfile{
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LogManager.getLogger(getClass());
 
 	private final int cpuCount = Runtime.getRuntime().availableProcessors();
 	

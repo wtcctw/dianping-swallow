@@ -27,15 +27,15 @@
     <Loggers>
         <Logger name="org.jasig.cas" level="ERROR"
                 additivity="true">
-            <AppenderRef ref="console" level="ERROR"/>
+            <AppenderRef ref="console"/>
         </Logger>
         <Logger name="org.springframework" level="WARN"
                 additivity="true">
-            <AppenderRef ref="console" level="ERROR"/>
+            <AppenderRef ref="console" />
         </Logger>
         <Logger name="com.dianping.swallow.web.filter" level="INFO"
                 additivity="true">
-            <AppenderRef ref="logFilterFileAppender" level="INFO"/>
+            <AppenderRef ref="logFilterFileAppender"/>
         </Logger>
         <root level="INFO">
             <AppenderRef ref="console"/>

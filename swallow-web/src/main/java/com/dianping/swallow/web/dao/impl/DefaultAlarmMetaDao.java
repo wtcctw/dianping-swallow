@@ -3,8 +3,8 @@ package com.dianping.swallow.web.dao.impl;
 import com.dianping.swallow.web.dao.AlarmMetaDao;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.mongodb.WriteResult;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,7 +16,7 @@ import java.util.List;
 @Service("alarmMetaDao")
 public class DefaultAlarmMetaDao extends AbstractWriteDao implements AlarmMetaDao {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultAlarmMetaDao.class);
+	private static final Logger logger = LogManager.getLogger(DefaultAlarmMetaDao.class);
 
 	private static final String ALARMMETA_COLLECTION = "ALARM_META";
 

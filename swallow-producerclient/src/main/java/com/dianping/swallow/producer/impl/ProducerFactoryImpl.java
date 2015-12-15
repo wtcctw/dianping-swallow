@@ -32,8 +32,8 @@ import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerFactory;
 import com.dianping.swallow.producer.impl.internal.ProducerImpl;
 import com.dianping.swallow.producer.impl.internal.SwallowPigeonConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * 实现ProducerFactory接口的工厂类
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public final class ProducerFactoryImpl implements ProducerFactory {
 
    private static ProducerFactoryImpl       instance;                                                             //Producer工厂类单例
-   private static final Logger              logger           = LoggerFactory.getLogger(ProducerFactoryImpl.class);
+   private static final Logger              logger           = LogManager.getLogger(ProducerFactoryImpl.class);
 
    private static final String              CONFIG_FILE_NAME = "swallow-producerclient-pigeon.properties";        //配置文件名称
 

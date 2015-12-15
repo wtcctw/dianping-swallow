@@ -50,16 +50,6 @@
 			<groupId>com.dianping.swallow</groupId>
 			<artifactId>swallow-client</artifactId>
 			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-log4j12</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
 		</dependency>
 		<!-- pigeon -->
 		<dependency>

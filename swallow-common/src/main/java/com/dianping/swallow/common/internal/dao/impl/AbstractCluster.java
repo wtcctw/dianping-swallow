@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
@@ -19,7 +19,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
  */
 public abstract class AbstractCluster extends AbstractLifecycle implements Cluster{
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	private List<InetSocketAddress>  seeds = new LinkedList<InetSocketAddress>();
 

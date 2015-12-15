@@ -17,8 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.codehaus.jettison.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ import java.util.*;
 @Service("alarmService")
 public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlarmServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(AlarmServiceImpl.class);
 
     private static final String AlARM_URL_FILE = "alarm-url.properties";
 

@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.data.annotation.Transient;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
@@ -29,7 +29,7 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
 	public static final String ACK_DELAY_FOR_UNIT_KEY = "ACK_DELAY_FOR_UNIT_KEY"; 
 
 	@Transient
-	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+	protected transient final Logger logger = LogManager.getLogger(getClass());
 
 	private MessageInfoTotalMap  sendMessages  = new MessageInfoTotalMap();
 	private MessageInfoTotalMap  ackMessages  = new MessageInfoTotalMap();

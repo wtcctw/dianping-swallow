@@ -10,8 +10,8 @@ import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.util.JsonUtil;
 import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -46,7 +46,7 @@ public class LogFilter implements Filter {
 
     public static final String TOPIC_APPLY_ATTR = "topicApplyResource";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogManager.getLogger(getClass());
 
     public void init(FilterConfig fConfig) throws ServletException {
 

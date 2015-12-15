@@ -6,8 +6,8 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author mingdongli
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
  */
 public class ConsumerImplTest {
 
-    private static Logger logger = LoggerFactory.getLogger(ConsumerImplTest.class);
+    private static Logger logger = LogManager.getLogger(ConsumerImplTest.class);
 
     public static void main(String[] args) {
         ConsumerConfig config = new ConsumerConfig();

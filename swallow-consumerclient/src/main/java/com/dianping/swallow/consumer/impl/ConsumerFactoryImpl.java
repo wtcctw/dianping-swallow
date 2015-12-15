@@ -12,15 +12,15 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.net.InetSocketAddress;
 import java.util.*;
 
 public final class ConsumerFactoryImpl extends AbstractObservable implements ConsumerFactory, ConfigChangeListener {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LogManager.getLogger(getClass());
 
     private static final String LION_CONFIG_FILENAME = "swallow-consumerclient-lion.properties";
 

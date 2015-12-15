@@ -6,8 +6,8 @@ import org.apache.commons.pool2.BaseKeyedPooledObjectFactory;
 import org.apache.commons.pool2.KeyedPooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import kafka.javaapi.consumer.SimpleConsumer;
 
@@ -18,7 +18,7 @@ import kafka.javaapi.consumer.SimpleConsumer;
  */
 public class SimpleKafkaConsumerFactory extends  BaseKeyedPooledObjectFactory<InetSocketAddress, SimpleConsumer>  implements KeyedPooledObjectFactory<InetSocketAddress, SimpleConsumer>{
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	private int soTimeout;
 	private int bufferSize;

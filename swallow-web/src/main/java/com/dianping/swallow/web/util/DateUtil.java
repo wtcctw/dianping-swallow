@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -18,7 +18,7 @@ import org.slf4j.Logger;
  */
 public class DateUtil {
 
-	private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
+	private static final Logger logger = LogManager.getLogger(DateUtil.class);
 
 	private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("GMT+8:00");
 

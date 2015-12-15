@@ -9,8 +9,8 @@ import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitor
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.service.IPCollectorService;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,7 +38,7 @@ public class DataCollectorController extends AbstractController{
 	@Autowired
 	private IPCollectorService ipCollectorService;
 	
-	private static final Logger logger = LoggerFactory.getLogger(DataCollectorController.class);
+	private static final Logger logger = LogManager.getLogger(DataCollectorController.class);
 	
 	@RequestMapping(value = "/api/stats/producer", method = RequestMethod.POST)
 	@ResponseBody

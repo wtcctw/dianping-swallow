@@ -6,12 +6,12 @@ import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class SyncProducerRunner {
 
-    private static Logger logger = LoggerFactory.getLogger(ProducerFactoryImpl.class);
+    private static Logger logger = LogManager.getLogger(ProducerFactoryImpl.class);
 
     public static void main(String[] args) {
 

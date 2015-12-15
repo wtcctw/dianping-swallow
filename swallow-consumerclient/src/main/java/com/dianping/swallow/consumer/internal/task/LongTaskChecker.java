@@ -6,8 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -19,7 +19,7 @@ import com.dianping.cat.message.Transaction;
  */
 public class LongTaskChecker implements TaskChecker, Runnable{
 	
-	private static final Logger logger = LoggerFactory.getLogger(LongTaskChecker.class);
+	private static final Logger logger = LogManager.getLogger(LongTaskChecker.class);
 
 	private final String CAT_TYPE = "SwallowLongTask";
 

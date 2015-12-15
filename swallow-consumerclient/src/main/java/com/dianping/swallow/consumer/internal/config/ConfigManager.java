@@ -6,8 +6,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Properties;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 该类用于设置Consumer的选项，所有Consumer共用一个ConsumerConfig。 <br>
@@ -18,7 +18,7 @@ import org.slf4j.Logger;
  */
 public final class ConfigManager {
 
-   private static final Logger  logger                   = LoggerFactory.getLogger(ConfigManager.class);
+   private static final Logger  logger                   = LogManager.getLogger(ConfigManager.class);
 
    private static ConfigManager ins                   = new ConfigManager();
    // 连接master的间隔，下面是连接slave的间隔

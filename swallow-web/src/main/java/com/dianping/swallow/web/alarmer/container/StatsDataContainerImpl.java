@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 @Component("statsDataContainer")
 public class StatsDataContainerImpl implements StatsDataContainer {
 
-	private static final Logger logger = LoggerFactory.getLogger(StatsDataContainerImpl.class);
+	private static final Logger logger = LogManager.getLogger(StatsDataContainerImpl.class);
 
 	private Map<String, ConsumerIdStatsData> cStatsDataContainer = new ConcurrentHashMap<String, ConsumerIdStatsData>();
 

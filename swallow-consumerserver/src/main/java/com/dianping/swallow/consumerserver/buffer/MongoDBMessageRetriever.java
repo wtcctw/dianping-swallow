@@ -3,8 +3,8 @@ package com.dianping.swallow.consumerserver.buffer;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.consumer.MessageFilter.FilterType;
@@ -15,7 +15,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 public class MongoDBMessageRetriever implements MessageRetriever {
 	
 	
-   private static final Logger logger       = LoggerFactory.getLogger(MongoDBMessageRetriever.class);
+   private static final Logger logger       = LogManager.getLogger(MongoDBMessageRetriever.class);
 
    private int                 fetchSize = 500;
 

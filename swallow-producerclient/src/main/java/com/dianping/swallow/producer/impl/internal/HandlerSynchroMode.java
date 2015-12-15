@@ -1,7 +1,7 @@
 package com.dianping.swallow.producer.impl.internal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
@@ -27,7 +27,7 @@ public class HandlerSynchroMode implements ProducerHandler {
     private ProducerSwallowService remoteService;
     private final String           producerIP;
     private static final int       DELAY_BASE_MULTI = 5; //超时策略倍数
-    private Logger logger = 	   LoggerFactory.getLogger(getClass());
+    private Logger logger = 	   LogManager.getLogger(getClass());
 
     public HandlerSynchroMode(ProducerImpl producer) {
         this.sendTimes = producer.getProducerConfig().getSyncRetryTimes() == Integer.MAX_VALUE ? Integer.MAX_VALUE

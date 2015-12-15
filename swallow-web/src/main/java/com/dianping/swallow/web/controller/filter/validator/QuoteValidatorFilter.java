@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
@@ -18,7 +18,7 @@ import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 @Component
 public class QuoteValidatorFilter implements Filter<TopicApplyDto, ValidatorFilterResult> {
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	private static final String EXCEED_QUOTA = "申请量太大，请减小每天消息数量或者消息大小，如不行请发送邮件到mingdong.li@dianping.com进行申请。";
 

@@ -1,8 +1,8 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
@@ -23,7 +23,7 @@ public class ApplicantValidatorFilter implements  Filter<TopicApplyDto, Validato
 
 	public static final String APPLICANT_BLANK = "申请人不能为空！";
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 	
 	@Override
 	public void doFilter(TopicApplyDto topicApplyDto, ValidatorFilterResult result,

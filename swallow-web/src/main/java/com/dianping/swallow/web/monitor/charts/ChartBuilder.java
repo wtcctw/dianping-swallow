@@ -4,8 +4,8 @@ package com.dianping.swallow.web.monitor.charts;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper.PlotOption;
@@ -21,7 +21,7 @@ import com.dianping.swallow.web.monitor.charts.HighChartsWrapper.Series;
  */
 public class ChartBuilder {
 	
-	protected static final Logger logger     = LoggerFactory.getLogger(ChartBuilder.class);
+	protected static final Logger logger     = LogManager.getLogger(ChartBuilder.class);
 
 	public static HighChartsWrapper getHighChart(String title, String subTitle, String yAxisTitle, StatsData... data) {
 		

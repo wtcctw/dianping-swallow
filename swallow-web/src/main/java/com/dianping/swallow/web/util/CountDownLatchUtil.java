@@ -2,8 +2,8 @@ package com.dianping.swallow.web.util;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 /**
  * 
  * @author qiyin
@@ -12,7 +12,7 @@ import org.slf4j.Logger;
  */
 public class CountDownLatchUtil {
 
-	private static final Logger logger = LoggerFactory.getLogger(CountDownLatchUtil.class);
+	private static final Logger logger = LogManager.getLogger(CountDownLatchUtil.class);
 
 	public static CountDownLatch createCountDownLatch(int totalCount) {
 		return new CountDownLatch(totalCount);

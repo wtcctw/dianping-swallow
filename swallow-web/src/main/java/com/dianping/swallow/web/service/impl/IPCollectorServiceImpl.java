@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +47,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
 @Service("ipCollectorService")
 public class IPCollectorServiceImpl implements IPCollectorService {
 
-	private static final Logger logger = LoggerFactory.getLogger(IPCollectorServiceImpl.class);
+	private static final Logger logger = LogManager.getLogger(IPCollectorServiceImpl.class);
 
 	private static final String SWALLOW_PRODUCER_NAME = "swallow-producer";
 

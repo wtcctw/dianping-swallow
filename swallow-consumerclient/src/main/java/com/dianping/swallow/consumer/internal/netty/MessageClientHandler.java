@@ -7,8 +7,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.nio.channels.ClosedChannelException;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
@@ -26,7 +26,7 @@ import com.dianping.swallow.consumer.internal.task.TaskChecker;
  */
 public class MessageClientHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(MessageClientHandler.class);
+    private static final Logger logger = LogManager.getLogger(MessageClientHandler.class);
 
     private final ConsumerImpl  			consumer;
     private ConsumerProcessor 				processor;
