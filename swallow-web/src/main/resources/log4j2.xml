@@ -27,7 +27,7 @@
     <Loggers>
         <Logger name="org.jasig.cas" level="ERROR"
                 additivity="true">
-            <AppenderRef ref="console"/>
+            <AppenderRef ref="console" />
         </Logger>
         <Logger name="org.springframework" level="WARN"
                 additivity="true">
