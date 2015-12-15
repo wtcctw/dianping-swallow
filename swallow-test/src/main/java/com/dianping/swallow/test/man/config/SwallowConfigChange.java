@@ -14,6 +14,7 @@ import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.LionUtilImpl;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigCentral;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
+import com.dianping.swallow.common.internal.util.StringUtils;
 
 
 /**
@@ -107,7 +108,7 @@ public class SwallowConfigChange {
 			oldConfigs.put(topic, rawConfig);
 			sub(config, defaultConfig);
 			
-			if(!config.valid()){
+			if(allNull(config)){
 				logger.warn("[after sub, config invalid][" + topic + "]" + rawConfig + ":" + config);
 				continue;
 			}
@@ -117,6 +118,16 @@ public class SwallowConfigChange {
 		}
 	}
 	
+	
+	public boolean allNull(TopicConfig topicConfig) {
+		
+		return StringUtils.isEmpty(topicConfig.getStoreUrl())
+			   && topicConfig.getSize() == null
+			   && topicConfig.getMax()  == null
+			   && topicConfig.getTopicType() == null;
+	}
+
+
 	private void sub(TopicConfig config, TopicConfig defaultConfig){
 
 			if(config.getStoreUrl() != null && config.getStoreUrl().equals(defaultConfig.getStoreUrl())){
