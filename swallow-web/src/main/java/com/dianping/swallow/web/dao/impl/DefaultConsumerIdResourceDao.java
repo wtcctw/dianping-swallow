@@ -1,21 +1,19 @@
 package com.dianping.swallow.web.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
+import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+import com.dianping.swallow.web.model.resource.IpInfo;
+import com.mongodb.WriteResult;
 import jodd.util.StringUtil;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.dao.ConsumerIdResourceDao;
-import com.dianping.swallow.web.model.resource.ConsumerIdResource;
-import com.dianping.swallow.web.model.resource.IpInfo;
-import com.mongodb.WriteResult;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -173,6 +171,9 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 
         int offset = consumerIdParam.getOffset();
         int limit = consumerIdParam.getLimit();
+        if(limit < 1){
+            limit = 1;
+        }
 
         query.skip(offset).limit(limit)
                 .with(new Sort(new Sort.Order(Direction.ASC, TOPIC), new Sort.Order(Direction.ASC, CONSUMERID)));
