@@ -181,17 +181,14 @@ public class SwallowMessage implements Serializable, Message {
 
    @Override
    public String toString() {
-      return "SwallowMessage [generatedTime=" + generatedTime + ", messageId=" + messageId + ", backupMessageId="
-            + backupMessageId + ", properties=" + properties + ", internalPropertiess=" + internalProperties
-            + ", version=" + version + ", sha1=" + sha1 + ", type=" + type + ", sourceIp=" + sourceIp + ", content="
-            + getContent() + "]";
+      return "SwallowMessage [ " +toSuccessKeyValuePairs()+ "&content=" + getContent() + "]";
    }
 
    public String toKeyValuePairs() {
       return toSuccessKeyValuePairs() + "&content=" + getContent();
    }
 
-   public String toSuccessKeyValuePairs() {
+   protected String toSuccessKeyValuePairs() {
       return "generatedTime=" + generatedTime + "&messageId=" + messageId + "&backupMessageId=" + backupMessageId
             + "&properties=" + properties + "&internalPropertiess=" + internalProperties + "&version=" + version
             + "&sha1=" + sha1 + "&type=" + type + "&sourceIp=" + sourceIp;

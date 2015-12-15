@@ -26,7 +26,7 @@ import com.geekhua.filequeue.exception.FileQueueClosedException;
  * @author kezhu.wu
  */
 public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
-    private static final Logger          LOGGER                = LoggerFactory
+    private static final Logger          logger                = LoggerFactory
                                                                        .getLogger(HandlerAsynchroSeparatelyMode.class);
 
     /**
@@ -128,7 +128,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
             @Override
             public void run() {
                 try {
-                    LOGGER.info("Swallow async(separately) producer stoping...");
+                    logger.info("Swallow async(separately) producer stoping...");
                     closed = true;
                     //稍微等待线程执行
                     if (asyncThreads != null) {
@@ -158,7 +158,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                         retryThread.join();
                     }
 
-                    LOGGER.info("Swallow async(separately) producer stoped.");
+                    logger.info("Swallow async(separately) producer stoped.");
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -222,7 +222,7 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                     Cat.getProducer().logError(e);
                     fileQueueGetFailedTransaction.complete();
 
-                    LOGGER.error("Can not get msg from fileQueue, retry to get msg...", e);
+                    logger.error("Can not get msg from fileQueue, retry to get msg...", e);
 
                     fileQueueStrategy.fail(true);
 
@@ -244,11 +244,9 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                         failedMessageQueue.add(message);
 
                         msgProduceTransaction.setStatus(e);
-                        Cat.getProducer().logError(e);
-                        msgProduceTransaction.addData("content", ((PktMessage) message).getContent().toKeyValuePairs());
-
-                        LOGGER.error("Message sent failed, this message will be retryed in a separately FileQueue: "
-                                + message.toString(), e);
+                        Cat.logError(e);
+                        
+                        logger.error("Message sent failed, this message will be retryed in a separately FileQueue: " + message.toString(), e);
 
                     } catch (Exception e1) {
                         //file queue add 失败的打点
@@ -256,12 +254,16 @@ public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
                                 FILE_QUEUE_ADD_FAILED,
                                 producer.getDestination().getName() + ":" + producer.getProducerIP());
                         fileQueueAddFailedTransaction.setStatus(e1);
-                        Cat.getProducer().logError(e1);
-                        fileQueueAddFailedTransaction.addData("content", ((PktMessage) message).getContent()
-                                .toKeyValuePairs());
+                        Cat.logError(e1);
+                        
+                        String content = ((PktMessage) message).getContent().toKeyValuePairs();
+                        fileQueueAddFailedTransaction.addData("content", content);
+                        logger.warn("[run][fail message]" + content);
+                        
+                        
                         fileQueueAddFailedTransaction.complete();
 
-                        LOGGER.error("Message add to FileQueue failed, this message is skiped: " + message.toString(),
+                        logger.error("Message add to FileQueue failed, this message is skiped: " + message.toString(),
                                 e1);
                     }
 

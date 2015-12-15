@@ -2,6 +2,7 @@ package com.dianping.swallow.common.internal.message;
 
 import java.nio.charset.Charset;
 
+import com.dianping.swallow.common.internal.util.ByteUtil;
 import com.dianping.swallow.common.message.BytesMessage;
 
 /**
@@ -41,5 +42,16 @@ public class BytesSwallowMessage extends SwallowMessage implements BytesMessage{
 	@Override
 	protected long contentLength() {
 		return content.length;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return "BytesSwallowMessage[ " +toSuccessKeyValuePairs()+ "&content=" + content + "]";
+	}
+	
+	@Override
+	public String toKeyValuePairs() {
+		return toSuccessKeyValuePairs() + "&content=" + ByteUtil.toHexString(content);
 	}
 }
