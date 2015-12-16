@@ -56,6 +56,16 @@
 			<groupId>com.sun.tools.btrace</groupId>
 			<artifactId>btrace-client</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-common-nuclear</artifactId>
+			<version>0.8.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dianping.swallow</groupId>
+			<artifactId>swallow-consumerclient-nuclear</artifactId>
+			<version>0.8.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>

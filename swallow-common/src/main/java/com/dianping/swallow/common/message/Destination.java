@@ -25,7 +25,7 @@ import com.dianping.swallow.common.internal.util.NameCheckUtil;
  * 
  * @author qing.gu
  */
-public final class Destination implements Serializable {
+public class Destination implements Serializable {
 
    private static final long serialVersionUID = 3571573051999434062L;
 
@@ -37,10 +37,14 @@ public final class Destination implements Serializable {
       TOPIC
    };
 
-   private Destination() {
+   protected Destination() {
    }
 
-   private Destination(String name, Type type) {
+   protected Destination(String name) {
+      this(name,Type.TOPIC);
+   }
+
+   protected Destination(String name, Type type) {
       this.name = name.trim();
       this.type = type;
    }
