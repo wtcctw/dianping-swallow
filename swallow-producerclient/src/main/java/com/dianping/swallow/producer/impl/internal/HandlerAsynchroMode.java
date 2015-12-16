@@ -26,7 +26,7 @@ import com.geekhua.filequeue.exception.FileQueueClosedException;
  * @author tong.song
  */
 public class HandlerAsynchroMode implements ProducerHandler {
-    private static final Logger          LOGGER            = LogManager.getLogger(HandlerAsynchroMode.class);
+    private static final Logger          logger            = LogManager.getLogger(HandlerAsynchroMode.class);
     private static final MQThreadFactory THREAD_FACTORY    = new MQThreadFactory();                             //从FileQueue中获取消息的线程池
 
     private static final int             DELAY_BASE_MULTI  = 5;                                                 //超时策略倍数
@@ -94,7 +94,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
             @Override
             public void run() {
                 try {
-                    LOGGER.info("Swallow async producer stoping...");
+                    logger.info("Swallow async producer stoping...");
                     closed = true;
                     if (asyncThreads != null) {
                         for (Thread asyncThread : asyncThreads) {
@@ -111,7 +111,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                             asyncThread.join();//确保线程执行完毕
                         }
                     }
-                    LOGGER.info("Swallow async producer stoped.");
+                    logger.info("Swallow async producer stoped.");
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -163,7 +163,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                     produceTransaction = Cat.getProducer().newTransaction(MSG_PRODUCE_TRIED,
                             producer.getDestination().getName() + ":" + producer.getProducerIP());
                 } catch (InterruptedException e) {
-                	LOGGER.error("[run]", e);
+                	logger.error("[run]", e);
                     Thread.currentThread().interrupt();
                     continue;
                 } catch (Exception e) {
@@ -178,7 +178,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                     produceTransaction.setStatus(e);
                     Cat.getProducer().logError(e);
                     produceTransaction.complete();
-                    LOGGER.error("[run][Can not get msg from fileQueue].", e);
+                    logger.error("[run][Can not get msg from fileQueue].", e);
 
                     fileQueueStrategy.fail(true);
 
@@ -195,7 +195,7 @@ public class HandlerAsynchroMode implements ProducerHandler {
                         produceTransaction.setStatus(Message.SUCCESS);
                     } catch (Exception e) {
                         //如果剩余重试次数>0且未关闭，则重试
-                    	LOGGER.error("[run][send message exception]", e);
+                    	logger.error("[run][send message exception]", e);
                         if (leftRetryTimes > 0 && !closed) {
                             Transaction retryTransaction = Cat.getProducer().newTransaction(MSG_PRODUCE_TRIED,
                                     producer.getDestination().getName() + ":" + producer.getProducerIP());
@@ -206,20 +206,24 @@ public class HandlerAsynchroMode implements ProducerHandler {
                             retryTransaction.addData("Retry", retryCount);
                             retryTransaction.setStatus(e);
                             retryTransaction.complete();
-                            LOGGER.warn("Retry sending message(cause '" + e.getMessage() + "') " + retryCount
+                            logger.warn("Retry sending message(cause '" + e.getMessage() + "') " + retryCount
                                     + " times:" + message.toString());
                             //发送失败，重发
                             continue;
                         }
                         Transaction failedTransaction = Cat.getProducer().newTransaction(MSG_ASYNC_FAILED,
                                 producer.getDestination().getName() + ":" + producer.getProducerIP());
-                        failedTransaction.addData("content", ((PktMessage) message).getContent().toKeyValuePairs());
+                        
+                        String content = ((PktMessage) message).getContent().toKeyValuePairs();
+                        failedTransaction.addData("content", content);
+                        logger.warn("[run][fail message]" + content);
+                        
                         failedTransaction.setStatus(Message.SUCCESS);
                         failedTransaction.complete();
 
                         produceTransaction.setStatus(e);
                         Cat.getProducer().logError(e);
-                        LOGGER.error("Message sent failed: " + message.toString(), e);
+                        logger.error("Message sent failed: " + message.toString(), e);
                     }
 
                     //如果发送成功或失败，不能重试了，则跳出循环

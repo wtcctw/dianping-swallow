@@ -1,13 +1,13 @@
 package com.dianping.swallow.common.server.monitor.data.structure;
 
-import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.TimeException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author mengwenchao
@@ -92,6 +92,7 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 		return JsonBinder.getNonEmptyBinder().toJson(this);
 	}
 
+	/*不足以判断是否为空，因为数据是累加的*/
 	@JsonIgnore
 	public boolean isEmpty() {
 		if(total.get() > 0 || totalDelay.get() > 0){

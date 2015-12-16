@@ -71,7 +71,12 @@ public class HandlerSynchroMode implements ProducerHandler {
                     //重置超时
                     Transaction failedTransaction = Cat.getProducer().newTransaction("MsgSyncFailed",
                             destination.getName() + ":" + producerIP);
-                    failedTransaction.addData("content", ((PktMessage) pkt).getContent().toKeyValuePairs());
+                    
+                    String content = ((PktMessage) pkt).getContent().toKeyValuePairs();
+                    
+                    failedTransaction.addData("content", content);
+                    logger.warn("[doSendMsg][fail message]" + content);
+                    
                     failedTransaction.setStatus(Message.SUCCESS);
                     failedTransaction.complete();
 
