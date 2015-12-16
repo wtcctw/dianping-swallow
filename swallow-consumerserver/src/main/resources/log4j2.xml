@@ -28,6 +28,9 @@
         <Logger name="ackLogger" level="INFO" >
             <AppenderRef ref="ackFileAppender" />
         </Logger>
+        <Logger name="io.netty" level="WARN" >
+            <AppenderRef ref="console" />
+        </Logger>
         <Root level="INFO">
             <AppenderRef ref="console"/>
             <AppenderRef ref="fileAppender"/>

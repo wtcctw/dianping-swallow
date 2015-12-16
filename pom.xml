@@ -57,7 +57,6 @@
 		<!-- dianping -->
 		<kafka-clients.version>0.8.2.2</kafka-clients.version>
 		<file-queue.version>0.1.5</file-queue.version>
-		<slf4j.version>1.7.7</slf4j.version>
 		<spring.version>3.2.9.RELEASE</spring.version>
 		<spring.data.mongo.version>1.5.4.RELEASE</spring.data.mongo.version>
 		<jackson-databind.version>2.1.4</jackson-databind.version>
