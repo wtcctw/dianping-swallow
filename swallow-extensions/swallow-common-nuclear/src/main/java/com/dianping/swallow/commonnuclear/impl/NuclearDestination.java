@@ -9,7 +9,7 @@ import com.dianping.swallow.common.message.Destination;
  */
 public class NuclearDestination extends Destination {
 
-    private static final String DESTINATION_START_PREFIX = "NUCLEARMQ:";
+    private static final String NAME_PREFIX = "NUCLEARMQ:";
 
     private NuclearDestination(String name) {
         super(name);
@@ -17,16 +17,16 @@ public class NuclearDestination extends Destination {
 
     public static Destination topic(String name) {
         if (!StringUtils.isEmpty(name)) {
-            if (name.startsWith(DESTINATION_START_PREFIX)) {
-                Destination destination = new NuclearDestination(name.substring(DESTINATION_START_PREFIX.length()));
+            if (name.startsWith(NAME_PREFIX)) {
+                Destination destination = new NuclearDestination(name.substring(NAME_PREFIX.length()));
                 return destination;
             }
         }
         throw new IllegalArgumentException("Topic name is illegal");
     }
 
-    public static String getPrefix() {
-        return DESTINATION_START_PREFIX;
+    public static String getNamePrefix() {
+        return NAME_PREFIX;
     }
 
 }

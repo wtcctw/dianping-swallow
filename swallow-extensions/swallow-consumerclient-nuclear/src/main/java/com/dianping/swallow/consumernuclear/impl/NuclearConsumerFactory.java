@@ -58,7 +58,7 @@ public class NuclearConsumerFactory implements ConsumerFactory {
                 return true;
             }
             if (!StringUtils.isEmpty(dest.getName())) {
-                if (dest.getName().startsWith(NuclearDestination.getPrefix())) {
+                if (dest.getName().startsWith(NuclearDestination.getNamePrefix())) {
                     return true;
                 }
             }

@@ -1,13 +1,11 @@
 package com.dianping.swallow.test.client.consumer;
 
-import com.dianping.swallow.common.internal.message.BytesSwallowMessage;
 import com.dianping.swallow.common.message.BytesMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.commonnuclear.impl.NuclearDestination;
 import com.dianping.swallow.consumer.*;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
-import org.junit.Test;
 
 /**
  * @author qi.yin
@@ -29,6 +27,7 @@ public class NuclearConsumerClientTest {
                 }
             }
         });
+
         consumer.start();
     }
 

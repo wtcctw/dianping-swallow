@@ -33,6 +33,7 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
         ConsumerFactory consumerFactory = findConsumerFactory(dest);
 
         if (consumerFactory == null) {
+
             consumerFactory = DefaultConsumerFactory.getInstance();
             dest = Destination.topic(dest.getName());
         }
@@ -84,9 +85,10 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
         List<ConsumerFactory> factories = ServiceLoaderUtil.loadServices(ConsumerFactory.class);
 
         if (factories != null && !factories.isEmpty()) {
-            for (ConsumerFactory factory : factories) {
 
+            for (ConsumerFactory factory : factories) {
                 if (factory.isSupported(dest)) {
+
                     if (logger.isInfoEnabled()) {
                         logger.info("[findConsumerFactory] find consumerFactory.");
                     }

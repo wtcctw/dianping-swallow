@@ -1,8 +1,11 @@
 package com.dianping.swallow.consumernuclear.impl;
 
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
+import com.dianping.swallow.common.internal.config.SwallowClientConfig;
+import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
+import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
@@ -13,10 +16,14 @@ import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener;
 import com.dianping.swallow.consumer.internal.action.RetryOnAllExceptionActionWrapper;
 import com.dianping.swallow.consumer.internal.action.RetryOnBackoutMessageExceptionActionWrapper;
+import com.dianping.swallow.consumer.internal.task.LongTaskChecker;
+import com.dianping.swallow.consumer.internal.task.TaskChecker;
 import com.meituan.nuclearmq.client.error.MQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -27,9 +34,9 @@ public class NuclearConsumer implements Consumer {
 
     private static final Logger logger = LoggerFactory.getLogger(NuclearConsumer.class);
 
-    private static final String SWALLOW_APPKEY = "swallow";
+    //private static final String SWALLOW_APPKEY = "swallow";
 
-    //private static final String SWALLOW_APPKEY = "mtpoiop";
+    private static final String SWALLOW_APPKEY = "mtpoiop";
 
     private com.meituan.nuclearmq.client.Consumer consumer = null;
 
@@ -41,7 +48,11 @@ public class NuclearConsumer implements Consumer {
 
     private MessageListener listener;
 
+    private TaskChecker taskChecker;
+
     private PullStrategy pullStrategy;
+
+    private ExecutorService helperExecutors;
 
     private volatile AtomicBoolean started = new AtomicBoolean(false);
 
@@ -56,11 +67,18 @@ public class NuclearConsumer implements Consumer {
         consumer.setAppkey(SWALLOW_APPKEY);
         consumer.setTopic(dest.getName());
         consumer.setGroup(consumerId);
-        consumer.setIsAsync(false);
-        consumer.setIsOnline(EnvUtil.isProduct());
+
+        SwallowClientConfig clientConfig = SwallowClientConfigImpl.getInstance();
+        consumer.setIsAsync(clientConfig.isConsumerAsync());
+        boolean isProduct = EnvUtil.isProduct();
+        consumer.setIsOnline(isProduct ? isProduct : clientConfig.isConsumerOnline());
+
         this.pullStrategy = new DefaultPullStrategy(config.getDelayBaseOnBackoutMessageException(),
                 config.getDelayUpperboundOnBackoutMessageException());
-        consumer.setCallback(new NuclearMessageListener(this, createRetryWrapper()));
+
+        this.taskChecker = new LongTaskChecker(config.getLongTaskAlertTime(), "Nuclear_SwallowLongTask");
+
+        consumer.setCallback(new NuclearConsumerTask(this, createRetryWrapper(), taskChecker));
     }
 
     @Override
@@ -80,15 +98,37 @@ public class NuclearConsumer implements Consumer {
                     "MessageListener is null, MessageListener should be set(use setListener()) before start.");
         }
         if (started.compareAndSet(false, true)) {
+
             if (logger.isInfoEnabled()) {
                 logger.info("Starting " + this.toString());
             }
             try {
+
                 consumer.start();
+                startHelpers();
+                startShutdownHook();
             } catch (MQException e) {
                 logger.error("[start] consumer start failed.", e);
             }
         }
+    }
+
+    private void startShutdownHook() {
+        Thread hook = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (logger.isInfoEnabled()) {
+                    logger.info("Swallow nuclearmq consumer stoping...");
+                }
+                close();
+                if (logger.isInfoEnabled()) {
+                    logger.info("Swallow nuclearmq consumer stoped.");
+                }
+            }
+        });
+        hook.setDaemon(true);
+        hook.setName("Swallow-ShutdownHook-NuclearMQ-" + this.dest.getName());
+        Runtime.getRuntime().addShutdownHook(hook);
     }
 
     @Override
@@ -111,6 +151,7 @@ public class NuclearConsumer implements Consumer {
             consumer.stop();
             consumer.join();
             consumer.close();
+            closeHelpers();
         }
     }
 
@@ -137,6 +178,16 @@ public class NuclearConsumer implements Consumer {
             return new RetryOnAllExceptionActionWrapper(pullStrategy, config.getRetryCount());
         }
         return new RetryOnBackoutMessageExceptionActionWrapper(pullStrategy, config.getRetryCount());
+    }
+
+    private void startHelpers() {
+        helperExecutors = Executors.newCachedThreadPool(new MQThreadFactory("Swallow-Helper-"));
+        helperExecutors.execute(taskChecker);
+    }
+
+    private void closeHelpers(){
+        helperExecutors.shutdown();
+        taskChecker.close();
     }
 
     @Override

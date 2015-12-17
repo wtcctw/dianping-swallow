@@ -30,7 +30,9 @@ public class ServiceLoaderUtil {
     }
 
     public static <T> List<T> loadServices(Class<T> clazz) {
+
         if (!servicesMap.containsKey(clazz)) {
+
             ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
             List<T> services = new ArrayList<T>();
             if (serviceLoader != null) {

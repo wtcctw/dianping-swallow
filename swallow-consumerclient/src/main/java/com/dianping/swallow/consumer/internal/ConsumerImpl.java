@@ -16,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -200,7 +201,7 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 	}
 	
 	private void startHelper() {
-		
+
 		consumerHelperExecutors = Executors.newCachedThreadPool(new MQThreadFactory("Swallow-Helper-"));
 		consumerHelperExecutors.execute(taskChecker);
 	}	
