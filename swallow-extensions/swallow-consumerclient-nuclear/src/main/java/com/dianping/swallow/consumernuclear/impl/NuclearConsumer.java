@@ -76,7 +76,7 @@ public class NuclearConsumer implements Consumer {
         this.pullStrategy = new DefaultPullStrategy(config.getDelayBaseOnBackoutMessageException(),
                 config.getDelayUpperboundOnBackoutMessageException());
 
-        this.taskChecker = new LongTaskChecker(config.getLongTaskAlertTime(), "Nuclear_SwallowLongTask");
+        this.taskChecker = new LongTaskChecker(config.getLongTaskAlertTime(), "NuclearMQ.SwallowLongTask");
 
         consumer.setCallback(new NuclearConsumerTask(this, createRetryWrapper(), taskChecker));
     }
@@ -181,7 +181,7 @@ public class NuclearConsumer implements Consumer {
     }
 
     private void startHelpers() {
-        helperExecutors = Executors.newCachedThreadPool(new MQThreadFactory("Swallow-Helper-"));
+        helperExecutors = Executors.newCachedThreadPool(new MQThreadFactory("Swallow-NuclearMQ-Helper-"));
         helperExecutors.execute(taskChecker);
     }
 

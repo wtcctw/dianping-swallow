@@ -14,6 +14,8 @@ import com.meituan.nuclearmq.client.ConsumerCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author qi.yin
  *         2015/12/14  下午5:28.
@@ -77,7 +79,7 @@ public class NuclearConsumerTask implements ConsumerCallback, ConsumerTask {
 
     private Transaction createConsumerClientTransaction(long messageId) {
 
-        Transaction transaction = Cat.getProducer().newTransaction("Nuclear_MsgConsumed", catNameStr);
+        Transaction transaction = Cat.getProducer().newTransaction("NuclearMQ.MsgConsumed", catNameStr);
 
         transaction.addData("mid", messageId);
 

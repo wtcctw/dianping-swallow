@@ -1,11 +1,15 @@
 package com.dianping.swallow.test.client.consumer;
 
+import com.dianping.cat.Cat;
 import com.dianping.swallow.common.message.BytesMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.commonnuclear.impl.NuclearDestination;
 import com.dianping.swallow.consumer.*;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
+import jodd.datetime.TimeUtil;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author qi.yin
