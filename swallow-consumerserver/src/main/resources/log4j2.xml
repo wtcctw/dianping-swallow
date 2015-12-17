@@ -8,14 +8,14 @@
             <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c{1}] %m%n"/>
         </Console>
 
-        <RollingRandomAccessFile name="fileAppender"
+        <RollingRandomAccessFile name="fileAppender" immediateFlush="false"
                      fileName="/data/applogs/swallow/swallow-consumerserver-${sys:master.or.slave}.log"
                      filePattern="/data/applogs/swallow/swallow-consumerserver-${sys:master.or.slave}.log.%d{yyyy-MM-dd}.gz">
         <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c{1}] %m%n"/>
         <TimeBasedTriggeringPolicy interval="1"
                                    modulate="true"/>
         </RollingRandomAccessFile>
-        <RollingRandomAccessFile name="ackFileAppender"
+        <RollingRandomAccessFile name="ackFileAppender" immediateFlush="false"
                      fileName="/data/applogs/swallow/swallow-consumerserver-${sys:master.or.slave}-consumerworker.log"
                      filePattern="/data/applogs/swallow/swallow-consumerserver-${sys:master.or.slave}-consumerworker.log.%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d{ddHHmmss},%m%n"/>
@@ -25,10 +25,10 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="ackLogger" level="INFO" >
+        <Logger name="ackLogger" level="INFO" additivity="false">
             <AppenderRef ref="ackFileAppender" />
         </Logger>
-        <Logger name="io.netty" level="WARN" >
+        <Logger name="io.netty" level="WARN" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
         <Root level="INFO">

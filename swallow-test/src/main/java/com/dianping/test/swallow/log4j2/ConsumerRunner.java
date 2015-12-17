@@ -17,7 +17,7 @@ import java.util.Date;
  * @rundemo_name 生产者例子(同步)
  */
 public class ConsumerRunner extends AbstractLoadTest {
-    private static Logger logger = LogManager.getLogger(ConsumerFactoryImpl.class);
+    private static Logger logger = LogManager.getLogger(ConsumerRunner.class);
 
     private static long before = System.currentTimeMillis();
     private static int topicCount = 1;

@@ -7,7 +7,7 @@
 <Configuration status="WARN">
 <Appenders>
 
-    <RollingRandomAccessFile name="RandomAccessFile"
+    <RollingRandomAccessFile name="RandomAccessFile" immediateFlush="false"
                  fileName="/data/applogs/swallow/async.log"
                  filePattern="/data/applogs/swallow/async.log.%d{yyyy-MM-dd}.gz">
         <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
