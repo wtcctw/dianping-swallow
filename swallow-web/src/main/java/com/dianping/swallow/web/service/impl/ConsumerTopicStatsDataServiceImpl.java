@@ -59,6 +59,11 @@ public class ConsumerTopicStatsDataServiceImpl implements ConsumerTopicStatsData
 	}
 
 	@Override
+	public ConsumerTopicStatsData findOldestData() {
+		return consumerTopicStatsDataDao.findOldestData();
+	}
+
+	@Override
 	public StatsDataMapPair findSectionDelayData(String topicName, long startKey, long endKey) {
 		List<ConsumerTopicStatsData> topicStatsDatas = consumerTopicStatsDataDao.findSectionData(topicName, startKey,
 				endKey);

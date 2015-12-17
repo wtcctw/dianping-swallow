@@ -146,4 +146,9 @@ public class ConsumerIdStatsDataServiceImpl implements ConsumerIdStatsDataServic
 		return consumerIdStatsDataDao.findOneByTopicAndTimeAndConsumerId(topicName, consumerId, startKey, endKey, isGt);
 	}
 
+	@Override
+	public ConsumerIdStatsData findOldestData() {
+		return consumerIdStatsDataDao.findOldestData();
+	}
+
 }

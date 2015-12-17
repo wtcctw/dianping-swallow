@@ -21,4 +21,6 @@ public interface ProducerServerStatsDataService {
 	boolean removeLessThanTimeKey(long timeKey);
 
 	Map<String, NavigableMap<Long, Long>> findSectionQpsData(long startKey, long endKey);
+
+	ProducerServerStatsData findOldestData();
 }

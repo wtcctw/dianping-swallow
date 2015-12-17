@@ -25,6 +25,8 @@ public interface ConsumerServerStatsDataService {
 	Map<String, StatsDataMapPair> findSectionQpsData(long startKey, long endKey);
 	
 	long findQpsByServerIp(String ip, long startKey, long endKey);
+
+	ConsumerServerStatsData findOldestData();
 	
 	public static class StatsDataMapPair {
 		

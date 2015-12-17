@@ -15,6 +15,7 @@ public abstract class AbstractJobTask extends AbstractLifecycle implements TaskL
     protected static final String CAT_TYPE = "JobTask";
 
     private volatile boolean isOpened = false;
+
     @Override
     protected void doInitialize() throws Exception {
         super.doInitialize();

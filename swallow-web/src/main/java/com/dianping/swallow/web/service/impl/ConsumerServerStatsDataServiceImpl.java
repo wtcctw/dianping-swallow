@@ -56,6 +56,11 @@ public class ConsumerServerStatsDataServiceImpl implements ConsumerServerStatsDa
 	}
 
 	@Override
+	public ConsumerServerStatsData findOldestData() {
+		return consumerServerStatsDataDao.findOldestData();
+	}
+
+	@Override
 	public Map<String, StatsDataMapPair> findSectionQpsData(long startKey, long endKey) {
 		List<ConsumerServerStatsData> serverStatsDatas = consumerServerStatsDataDao.findSectionData(startKey, endKey);
 		Map<String, StatsDataMapPair> serverStatsDataMaps = null;

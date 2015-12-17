@@ -29,4 +29,6 @@ public interface ProducerTopicStatsDataService {
 
 	ProducerTopicStatsData findOneByTopicAndTime(String topicName, long startKey, long endKey, boolean isGt);
 
+	ProducerTopicStatsData findOldestData();
+
 }

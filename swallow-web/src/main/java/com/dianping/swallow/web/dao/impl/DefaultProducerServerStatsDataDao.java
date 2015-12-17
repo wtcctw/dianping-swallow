@@ -74,4 +74,14 @@ public class DefaultProducerServerStatsDataDao extends AbstractStatsDao implemen
                 PRODUCERSERVERSTATSDATA_COLLECTION);
         return serverStatisDatas;
     }
+
+    @Override
+    public ProducerServerStatsData findOldestData() {
+        Query query = new Query();
+        query.skip(0).limit(1).with(new Sort(new Sort.Order(Direction.ASC, TIMEKEY_FIELD)));
+        ProducerServerStatsData statsData = mongoTemplate.findOne(query, ProducerServerStatsData.class,
+                PRODUCERSERVERSTATSDATA_COLLECTION);
+        return statsData;
+    }
+
 }

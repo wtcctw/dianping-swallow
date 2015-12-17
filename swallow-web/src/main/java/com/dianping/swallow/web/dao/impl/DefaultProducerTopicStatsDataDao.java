@@ -87,4 +87,13 @@ public class DefaultProducerTopicStatsDataDao extends AbstractStatsDao implement
         return statsData;
     }
 
+    @Override
+    public ProducerTopicStatsData findOldestData() {
+        Query query = new Query();
+        query.skip(0).limit(1).with(new Sort(new Sort.Order(Direction.ASC, TIMEKEY_FIELD)));
+        ProducerTopicStatsData statsData = mongoTemplate.findOne(query, ProducerTopicStatsData.class,
+                TOPICSTATSDATA_COLLECTION);
+        return statsData;
+    }
+
 }

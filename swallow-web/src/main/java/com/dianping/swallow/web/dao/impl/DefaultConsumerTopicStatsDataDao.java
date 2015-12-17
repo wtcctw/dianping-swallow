@@ -68,4 +68,13 @@ public class DefaultConsumerTopicStatsDataDao extends AbstractStatsDao implement
 		return statisDatas;
 	}
 
+	@Override
+	public ConsumerTopicStatsData findOldestData() {
+		Query query = new Query();
+		query.skip(0).limit(1).with(new Sort(new Sort.Order(Direction.ASC, TIMEKEY_FIELD)));
+		ConsumerTopicStatsData statsData = mongoTemplate.findOne(query, ConsumerTopicStatsData.class,
+				CONSUMERTOPICSTATSDATA_COLLECTION);
+		return statsData;
+	}
+
 }

@@ -22,5 +22,7 @@ public interface ConsumerTopicStatsDataService {
 	StatsDataMapPair findSectionDelayData(String topicName, long startKey, long endKey);
 	
 	StatsDataMapPair findSectionQpsData(String topicName, long startKey, long endKey);
+
+	ConsumerTopicStatsData findOldestData();
 	
 }

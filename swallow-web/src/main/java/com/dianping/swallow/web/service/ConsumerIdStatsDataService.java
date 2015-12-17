@@ -35,4 +35,6 @@ public interface ConsumerIdStatsDataService {
 
 	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, String consumerId, long startKey,
 			long endKey, boolean isGt);
+
+	ConsumerIdStatsData findOldestData();
 }

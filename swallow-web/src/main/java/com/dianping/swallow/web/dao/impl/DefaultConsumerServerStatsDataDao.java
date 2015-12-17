@@ -76,4 +76,13 @@ public class DefaultConsumerServerStatsDataDao extends AbstractStatsDao implemen
 		return serverStatisDatas;
 	}
 
+	@Override
+	public ConsumerServerStatsData findOldestData() {
+		Query query = new Query();
+		query.skip(0).limit(1).with(new Sort(new Sort.Order(Direction.ASC, TIMEKEY_FIELD)));
+		ConsumerServerStatsData statsData = mongoTemplate.findOne(query, ConsumerServerStatsData.class,
+				CONSUMERSERVERSTATSDATA_COLLECTION);
+		return statsData;
+	}
+
 }
