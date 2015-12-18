@@ -39,9 +39,9 @@ public interface ConsumerIdResourceDao extends Dao{
 	
 	public static class ConsumerIdParam{
 		
-		private int offset;
+		private int offset = 0;
 		
-		private int limit;
+		private int limit = 1;
 		
 		private String consumerId;
 		
