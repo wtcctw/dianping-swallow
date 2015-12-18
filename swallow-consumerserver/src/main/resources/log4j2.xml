@@ -8,20 +8,20 @@
             <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c{1}] %m%n"/>
         </Console>
 
-        <RollingRandomAccessFile name="fileAppender" immediateFlush="false"
+        <TimeRollingRandomAccessFile name="fileAppender" immediateFlush="false"
                      fileName="/data/applogs/swallow/swallow-consumerserver-${sys:master.or.slave}.log"
                      filePattern="/data/applogs/swallow/swallow-consumerserver-${sys:master.or.slave}.log.%d{yyyy-MM-dd}.gz">
         <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c{1}] %m%n"/>
         <TimeBasedTriggeringPolicy interval="1"
                                    modulate="true"/>
-        </RollingRandomAccessFile>
-        <RollingRandomAccessFile name="ackFileAppender" immediateFlush="false"
+        </TimeRollingRandomAccessFile>
+        <TimeRollingRandomAccessFile name="ackFileAppender" immediateFlush="false"
                      fileName="/data/applogs/swallow/swallow-consumerserver-${sys:master.or.slave}-consumerworker.log"
                      filePattern="/data/applogs/swallow/swallow-consumerserver-${sys:master.or.slave}-consumerworker.log.%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d{ddHHmmss},%m%n"/>
             <TimeBasedTriggeringPolicy interval="1"
                                        modulate="true"/>
-        </RollingRandomAccessFile>
+        </TimeRollingRandomAccessFile>
     </Appenders>
 
     <Loggers>

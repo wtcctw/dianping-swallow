@@ -67,6 +67,7 @@
 		<lion-env.version>1.0.0</lion-env.version>
 		<log4j.version>1.2.17</log4j.version>
 		<log4j2.version>2.3</log4j2.version>
+		<lmax.version>3.2.1</lmax.version>
 		<logback-classic.version>1.0.12</logback-classic.version>
 		<dpsf-net.version>2.5.4</dpsf-net.version>
 		<cglib.version>2.1_3</cglib.version>
@@ -213,6 +214,11 @@
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-core</artifactId>
 				<version>${log4j2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.lmax</groupId>
+				<artifactId>disruptor</artifactId>
+				<version>${lmax.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
