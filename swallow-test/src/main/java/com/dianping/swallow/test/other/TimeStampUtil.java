@@ -31,6 +31,10 @@ public class TimeStampUtil {
 		
 		Long cur = MongoUtils.getLongByCurTime();
 		print(cur);
+		
+		System.out.println(MongoUtils.BSONTimestampToLong(new BSONTimestamp(1450311064, 122)));
+		System.out.println((long)1450310913 << 32 );
+		System.out.println((long)1450310913 * 256 * 256 * 256 * 256);
 	}
 	
 	
@@ -39,6 +43,7 @@ public class TimeStampUtil {
 		
 		Date date = DateUtils.fromSimpleFormat("20150706134900");
 		System.out.println(date.getTime()/5000L);
+		
 		
 	}
 
