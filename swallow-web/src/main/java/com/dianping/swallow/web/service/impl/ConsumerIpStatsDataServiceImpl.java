@@ -2,6 +2,7 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.List;
 
+import com.dianping.swallow.web.model.stats.StatsData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,5 +56,10 @@ public class ConsumerIpStatsDataServiceImpl implements ConsumerIpStatsDataServic
 			ackQps += ipStatsData.getAckQps();
 		}
 		return new ConsumerIpQpsPair(sendQps / size, ackQps / size);
+	}
+
+	@Override
+	public StatsData findOldestData() {
+		throw new UnsupportedOperationException();
 	}
 }

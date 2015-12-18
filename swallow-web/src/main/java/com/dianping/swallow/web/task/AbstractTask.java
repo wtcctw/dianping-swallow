@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
  * @author qi.yin
  *         2015/12/07  上午11:22.
  */
-public abstract class AbstractJobTask extends AbstractLifecycle implements TaskLifecycle {
+public abstract class AbstractTask extends AbstractLifecycle implements TaskLifecycle {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 

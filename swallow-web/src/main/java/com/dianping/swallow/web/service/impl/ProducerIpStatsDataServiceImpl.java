@@ -2,6 +2,7 @@ package com.dianping.swallow.web.service.impl;
 
 import java.util.List;
 
+import com.dianping.swallow.web.model.stats.StatsData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,11 @@ public class ProducerIpStatsDataServiceImpl implements ProducerIpStatsDataServic
     @Override
     public boolean removeLessThanTimeKey(long timeKey) {
         return producerIpStatsDataDao.removeLessThanTimeKey(timeKey);
+    }
+
+    @Override
+    public StatsData findOldestData() {
+       throw new UnsupportedOperationException();
     }
 
     @Override

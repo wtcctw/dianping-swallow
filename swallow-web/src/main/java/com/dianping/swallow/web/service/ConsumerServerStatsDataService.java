@@ -12,13 +12,11 @@ import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
  *
  *         2015年8月3日 下午2:40:15
  */
-public interface ConsumerServerStatsDataService {
+public interface ConsumerServerStatsDataService extends StatsDataService{
 
 	boolean insert(ConsumerServerStatsData serverStatsData);
 	
 	boolean insert(List<ConsumerServerStatsData> serverStatsDatas);
-
-	boolean removeLessThanTimeKey(long timeKey);
 
 	List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 
@@ -26,8 +24,6 @@ public interface ConsumerServerStatsDataService {
 	
 	long findQpsByServerIp(String ip, long startKey, long endKey);
 
-	ConsumerServerStatsData findOldestData();
-	
 	public static class StatsDataMapPair {
 		
 		private NavigableMap<Long, Long> sendStatsData;

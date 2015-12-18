@@ -10,13 +10,11 @@ import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
  *
  *         2015年9月15日 下午5:39:55
  */
-public interface ConsumerIpStatsDataService {
+public interface ConsumerIpStatsDataService extends StatsDataService{
 
 	boolean insert(ConsumerIpStatsData ipStatsData);
 	
 	boolean insert(List<ConsumerIpStatsData> ipStatsDatas);
-
-	boolean removeLessThanTimeKey(long timeKey);
 
 	List<ConsumerIpStatsData> find(String topicName, String consumerId, String ip, long startKey, long endKey);
 

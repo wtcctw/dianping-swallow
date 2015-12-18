@@ -11,18 +11,14 @@ import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsData
  *
  *         2015年8月24日 下午12:59:51
  */
-public interface ConsumerTopicStatsDataService {
+public interface ConsumerTopicStatsDataService extends StatsDataService{
 	
 	boolean insert(ConsumerTopicStatsData topicStatsData);
 	
 	boolean insert(List<ConsumerTopicStatsData> topicStatsDatas);
 
-	boolean removeLessThanTimeKey(long timeKey);
-
 	StatsDataMapPair findSectionDelayData(String topicName, long startKey, long endKey);
 	
 	StatsDataMapPair findSectionQpsData(String topicName, long startKey, long endKey);
 
-	ConsumerTopicStatsData findOldestData();
-	
 }

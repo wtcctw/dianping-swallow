@@ -12,15 +12,12 @@ import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
  *
  *         2015年8月3日 下午2:39:51
  */
-public interface ProducerServerStatsDataService {
+public interface ProducerServerStatsDataService extends StatsDataService {
 
 	boolean insert(ProducerServerStatsData serverStatsData);
-	
-	boolean insert(List<ProducerServerStatsData> serverStatsDatas);
 
-	boolean removeLessThanTimeKey(long timeKey);
+	boolean insert(List<ProducerServerStatsData> serverStatsDatas);
 
 	Map<String, NavigableMap<Long, Long>> findSectionQpsData(long startKey, long endKey);
 
-	ProducerServerStatsData findOldestData();
 }

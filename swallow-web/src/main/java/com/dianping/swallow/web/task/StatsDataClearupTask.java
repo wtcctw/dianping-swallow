@@ -16,19 +16,22 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author qi.yin
  *         2015/12/07  上午11:16.
  */
 @Component
-public class StatsDataClearupTask extends AbstractJobTask {
+public class StatsDataClearupTask extends AbstractTask {
 
-    private int saveDays = 60;
+    private volatile AtomicBoolean isTasking = new AtomicBoolean(false);
+
+    private int saveDays = 90;
 
     private static final String STATSDATA_SAVE_DAYS_KEY = "swallow.web.statsdata.save.days";//天
 
-    private static final long STATS_DATA_TIMESPAN = AbstractRetriever.getKey(6 * 60 * 60 * 1000);
+    private static final long STATSDATA_CLEARUP_TIMEUNIT = AbstractRetriever.getKey(10 * 60 * 1000);
 
     @Autowired
     private ProducerServerStatsDataService pServerStatsDataService;
@@ -59,6 +62,7 @@ public class StatsDataClearupTask extends AbstractJobTask {
                     if (STATSDATA_SAVE_DAYS_KEY.equals(key)) {
                         saveDays = Integer.getInteger(value);
                     }
+
                 }
             });
         } catch (LionException e) {
@@ -69,6 +73,10 @@ public class StatsDataClearupTask extends AbstractJobTask {
     @Scheduled(cron = "0 10 0 ? * *")
     public void doClearupTask() {
         if (!isOpened()) {
+            return;
+        }
+
+        if (!isTasking.compareAndSet(false, true)) {
             return;
         }
 
@@ -83,153 +91,50 @@ public class StatsDataClearupTask extends AbstractJobTask {
                 long timeMillis = DateUtil.getEndPreNDays(saveDays);
                 long timeKey = AbstractRetriever.getKey(timeMillis);
 
-                doClearUpProducerServerStatsData(timeKey);
-
-                doClearUpProducerTopicStatsData(timeKey);
-
-                doClearUpConsumerServerStatsData(timeKey);
-
-                doClearUpConsumerTopicStatsData(timeKey);
-
-                doClearUpConsumerIdStatsData(timeKey);
+                doClearUpStatsData(timeKey, pServerStatsDataService, "-doClearUpProducerServerStatsData");
+                doClearUpStatsData(timeKey, pTopicStatsDataService, "-doClearUpProducerTopicStatsData");
+                doClearUpStatsData(timeKey, cServerStatsDataService, "-doClearUpConsumerServerStatsData");
+                doClearUpStatsData(timeKey, cTopicStatsDataService, "-doClearUpConsumerTopicStatsData");
+                doClearUpStatsData(timeKey, cIdStatsDataService, "-doClearUpConsumerIdStatsData");
             }
         });
+
+        isTasking.compareAndSet(true, false);
     }
 
-    private void doClearUpProducerServerStatsData(final long timeKey) {
-        ProducerServerStatsData serverStatsData = pServerStatsDataService.findOldestData();
-        long oldestKey = serverStatsData.getTimeKey();
-        long currentKey = oldestKey;
-        while (currentKey < timeKey) {
-
-            long tempKey = oldestKey + STATS_DATA_TIMESPAN;
-            currentKey = tempKey > timeKey ? timeKey : tempKey;
-            final long removeKey = currentKey;
-            SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doClearUpProducerServerStatsData");
-
-            catWrapper.doAction(new SwallowAction() {
-
-                @Override
-                public void doAction() throws SwallowException {
-
-                    logger.info("[doClearupTask] executor doClearUp ProducerServerStatsData.");
-                    pServerStatsDataService.removeLessThanTimeKey(removeKey);
-                }
-            });
-
-            sleep(1);
-        }
-
-    }
-
-    private void doClearUpProducerTopicStatsData(final long timeKey) {
-        ProducerTopicStatsData topicStatsData = pTopicStatsDataService.findOldestData();
-        long oldestKey = topicStatsData.getTimeKey();
-        long currentKey = oldestKey;
-        while (currentKey < timeKey) {
-
-            long tempKey = oldestKey + STATS_DATA_TIMESPAN;
-            currentKey = tempKey > timeKey ? timeKey : tempKey;
-            final long removeKey = currentKey;
-            SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doClearUpProducerTopicStatsData");
-
-            catWrapper.doAction(new SwallowAction() {
-
-                @Override
-                public void doAction() throws SwallowException {
-                    logger.info("[doClearupTask] executor doClearUp ProducerTopicStatsData.");
-                    pTopicStatsDataService.removeLessThanTimeKey(removeKey);
-                }
-            });
-
-            sleep(1);
-        }
-    }
-
-    private void doClearUpConsumerServerStatsData(final long timeKey) {
-        ConsumerServerStatsData serverStatsData = cServerStatsDataService.findOldestData();
-        long oldestKey = serverStatsData.getTimeKey();
+    private void doClearUpStatsData(long timeKey, final StatsDataService statsDataService, final String catName) {
+        StatsData statsData = statsDataService.findOldestData();
+        long oldestKey = statsData.getTimeKey();
         long currentKey = oldestKey;
 
         while (currentKey < timeKey) {
 
-            long tempKey = oldestKey + STATS_DATA_TIMESPAN;
+            long tempKey = oldestKey + STATSDATA_CLEARUP_TIMEUNIT;
             currentKey = tempKey > timeKey ? timeKey : tempKey;
             final long removeKey = currentKey;
-            SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doClearUpConsumerTopicStatsData");
+
+            SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + catName);
 
             catWrapper.doAction(new SwallowAction() {
                 @Override
                 public void doAction() throws SwallowException {
 
-                    logger.info("[doClearupTask] executor doClearUp ConsumerServerStatsData.");
-                    cServerStatsDataService.removeLessThanTimeKey(removeKey);
+                    logger.info("[doClearupTask] executor doClearUp " + catName);
+                    statsDataService.removeLessThanTimeKey(removeKey);
                 }
             });
 
-            sleep(1);
+            sleep(5);
         }
+
     }
 
-    private void doClearUpConsumerTopicStatsData(final long timeKey) {
-        ConsumerTopicStatsData topicStatsData = cTopicStatsDataService.findOldestData();
-        long oldestKey = topicStatsData.getTimeKey();
-        long currentKey = oldestKey;
-
-        while (currentKey < timeKey) {
-
-            long tempKey = oldestKey + STATS_DATA_TIMESPAN;
-            currentKey = tempKey > timeKey ? timeKey : tempKey;
-            final long removeKey = currentKey;
-            SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doClearupTask");
-
-            catWrapper.doAction(new SwallowAction() {
-                @Override
-                public void doAction() throws SwallowException {
-
-                    logger.info("[doClearupTask] executor doClearUp ConsumerTopicStatsData.");
-                    cTopicStatsDataService.removeLessThanTimeKey(removeKey);
-                }
-            });
-            sleep(1);
-        }
-    }
-
-    private void doClearUpConsumerIdStatsData(final long timeKey) {
-        ConsumerIdStatsData consumerIdStatsData = cIdStatsDataService.findOldestData();
-        long oldestKey = consumerIdStatsData.getTimeKey();
-        long currentKey = oldestKey;
-
-        while (currentKey < timeKey) {
-
-            long tempKey = oldestKey + STATS_DATA_TIMESPAN;
-            currentKey = tempKey > timeKey ? timeKey : tempKey;
-            final long removeKey = currentKey;
-
-            SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doClearUpConsumerIdStatsData");
-
-            catWrapper.doAction(new SwallowAction() {
-                @Override
-                public void doAction() throws SwallowException {
-
-                    logger.info("[doClearupTask] executor doClearUp ConusmerIdStatsData.");
-                    cIdStatsDataService.removeLessThanTimeKey(removeKey);
-                }
-            });
-            sleep(1);
-        }
-    }
-
-    private void sleep(int minutes) {
+    private void sleep(int seconds) {
         try {
-            TimeUnit.MINUTES.sleep(minutes);
+            TimeUnit.SECONDS.sleep(seconds);
         } catch (InterruptedException e) {
             logger.info("[sleep] interrupted.");
         }
     }
 
-    public static void main(String[] args) {
-        StatsDataClearupTask task = new StatsDataClearupTask();
-        task.doClearUpConsumerIdStatsData(288190000);
-    }
 }
