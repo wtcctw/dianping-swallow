@@ -97,7 +97,8 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<excludes>
-						<exclude>**/*.properties</exclude>
+						<exclude>**/swallow*.properties</exclude>
+						<exclude>**/log4j.properties</exclude>
 						<exclude>**/*.backup</exclude>
 						<exclude>**/*.sh</exclude>
 					</excludes>

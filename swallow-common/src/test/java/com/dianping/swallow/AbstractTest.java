@@ -61,7 +61,9 @@ public abstract class AbstractTest {
 			logger.info("[-----------------][begin test]" + testName.getMethodName());
 		}
 
-		System.setProperty("lion.useLocal", "true");
+		if(useLocal()){
+			System.setProperty("lion.useLocal", "true");
+		}
 		
 		
 		//缓存属性信息，after之后恢复
@@ -76,7 +78,11 @@ public abstract class AbstractTest {
 
 	}
 
-	
+	protected boolean useLocal() {
+		return true;
+	}
+
+
 	protected String getTopic() {
 		return topicName;
 	}

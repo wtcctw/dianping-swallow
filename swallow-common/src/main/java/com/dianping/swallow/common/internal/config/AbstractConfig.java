@@ -13,6 +13,9 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dianping.swallow.common.internal.util.StringUtils;
+
+
 
 /**
  * @author mengwenchao
@@ -111,16 +114,29 @@ public class AbstractConfig {
 		}
 	}
 
-	protected void setFieldValue(String key, String value) {
+	protected void setFieldValue(final String rawKey, final String rawValue) {
 		
 		if(logger.isInfoEnabled()){
-			logger.info("[setFieldValue]" + key + ":" + value);
+			logger.info("[setFieldValue]" + rawKey + ":" + rawValue);
+		}
+		
+		String key = StringUtils.trimToNull(rawKey);
+		if(key == null){
+			throw new IllegalArgumentException("key empty:" + rawKey);
+		}
+		
+		String value = StringUtils.trimToNull(rawValue);
+		if(value == null){
+			if(logger.isInfoEnabled()){
+				logger.info("[setFieldValue][value empty, return!]" );
+			}
+			return;
 		}
 		
 		Class<?> clazz = this.getClass();
 		Field field = null;
 		try {
-			field = clazz.getDeclaredField(key.trim());
+			field = clazz.getDeclaredField(key);
 		} catch (Exception e) {
 			logger.error("unknown property found: " + key);
 			return;

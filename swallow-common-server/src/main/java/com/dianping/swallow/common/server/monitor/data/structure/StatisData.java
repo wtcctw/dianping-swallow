@@ -11,12 +11,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class StatisData implements Mergeable {
 
+    /*时间段内的的延迟总数*/
     private Long delay = 0L;
 
+    /*从运行开始后的延迟总数*/
     private Long totalDelay = 0L;
 
+    /*时间段内的消息数*/
     private Long count = 0L;
 
+    /*从运行开始后的消息总条数*/
     private Long totalCount = 0L;
 
     @JsonIgnore

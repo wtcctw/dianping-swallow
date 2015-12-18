@@ -38,12 +38,16 @@ public class TopicConfig implements Cloneable{
 	}
 
 	
-	public boolean valid(){
+	/**
+	 * 所有选项皆有效
+	 * @return
+	 */
+	public boolean allValid(){
 		
 		return !StringUtils.isEmpty(storeUrl)
-				|| size != null && size > 0
-				|| max != null && max > 0
-				|| topicType!= null;
+				&&( size != null && size > 0)
+				&& (max != null && max > 0)
+				&& topicType != null;
 	}
 	
 	@Override
@@ -121,5 +125,6 @@ public class TopicConfig implements Cloneable{
 	public void setTopicType(TOPIC_TYPE topicType) {
 		this.topicType = topicType;
 	}
+
 
 }

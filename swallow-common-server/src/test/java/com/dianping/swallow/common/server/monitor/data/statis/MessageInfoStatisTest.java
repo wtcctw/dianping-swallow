@@ -146,7 +146,7 @@ public class MessageInfoStatisTest extends AbstractTest {
 		}
 
 		expectQpx(qpx.headMap(endKey + 1, true), 2, 0L, 0L);
-		expectQpx(qpx.tailMap(endKey + 2, true), addCount - 2, 0L, expectedQpx * intervalCount
+		expectQpx(qpx.tailMap(endKey + 2, true), addCount - 2, 2L, expectedQpx * intervalCount
 				* AbstractCollector.SEND_INTERVAL);
 
 		expectDelay(delay.headMap(endKey + 1, true), 2, 0L);
