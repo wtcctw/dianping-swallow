@@ -2,7 +2,6 @@ package com.dianping.swallow.consumerserver.buffer;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -31,8 +30,8 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 	/*上次读取消息数值小于此值，间隔一定时间再取*/
 	private int minRetrieveCount = 10;
 	
-	private int minRetrieveInterval = 100;//如果上次读取的数据小于minRetrieveCount，则在此时间内不读取数据
-	private long maxRetrieveInterval = TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS);
+	private int minRetrieveInterval = 20;//如果上次读取的数据小于minRetrieveCount，则在此时间内不读取数据
+	private long maxRetrieveInterval = 500;
 	/**
 	 * 如果读取消息一直为0，不停延时
 	 */
