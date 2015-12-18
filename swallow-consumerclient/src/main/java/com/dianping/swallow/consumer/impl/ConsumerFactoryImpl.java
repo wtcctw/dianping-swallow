@@ -17,6 +17,7 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
 
     private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
 
+    private ConsumerFactory realFactory;
     static {
         SwallowHelper.initialize();
     }
@@ -33,10 +34,15 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
         ConsumerFactory consumerFactory = findConsumerFactory(dest);
 
         if (consumerFactory == null) {
-
             consumerFactory = DefaultConsumerFactory.getInstance();
-            dest = Destination.topic(dest.getName());
+
+            if (logger.isInfoEnabled()) {
+                logger.info("[findConsumerFactory] use destination: " + dest.toString() + " consumerFactory: default.");
+            }
+
         }
+
+        realFactory = consumerFactory;
 
         Consumer consumer = consumerFactory.createConsumer(dest, consumerId, config);
         return consumer;
@@ -66,12 +72,12 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
      */
     @Override
     public List<InetSocketAddress> getTopicAddress(String topic) {
-        return null;
+        return realFactory.getTopicAddress(topic);
     }
 
     @Override
     public List<InetSocketAddress> getOrDefaultTopicAddress(String topic) {
-        return null;
+        return realFactory.getOrDefaultTopicAddress(topic);
     }
 
     @Override
@@ -90,15 +96,11 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
                 if (factory.isSupported(dest)) {
 
                     if (logger.isInfoEnabled()) {
-                        logger.info("[findConsumerFactory] find consumerFactory.");
+                        logger.info("[findConsumerFactory] destination: " + dest.toString() + " consumerFactory: " + factory.getClass().getSimpleName());
                     }
                     return factory;
                 }
             }
-        }
-
-        if (logger.isInfoEnabled()) {
-            logger.info("[findConsumerFactory] use default consumerFactory.");
         }
 
         return null;

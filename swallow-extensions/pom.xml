@@ -17,7 +17,6 @@
 </properties>
     <modules>
         <module>swallow-consumerclient-nuclear</module>
-        <module>swallow-producerclient-nuclear</module>
         <module>swallow-common-nuclear</module>
     </modules>
     <dependencyManagement>

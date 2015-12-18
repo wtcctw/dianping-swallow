@@ -10,6 +10,7 @@ import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
+import com.dianping.swallow.commonnuclear.impl.NuclearDestination;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
@@ -166,6 +167,9 @@ public class NuclearConsumer implements Consumer {
     }
 
     private void checkArgument(Destination dest, String consumerId, ConsumerConfig consumerConfig) {
+        if (!dest.getClass().equals(NuclearDestination.class)) {
+            throw new IllegalArgumentException("Destination must be NuclearDestination class");
+        }
 
         if (StringUtils.isEmpty(consumerId)) {
             throw new IllegalArgumentException("ConsumerId should not be null.");

@@ -1,5 +1,6 @@
 package com.dianping.swallow.commonnuclear.impl;
 
+import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
 
@@ -7,7 +8,7 @@ import com.dianping.swallow.common.message.Destination;
  * @author qi.yin
  *         2015/12/14  下午7:53.
  */
-public class NuclearDestination extends Destination {
+public final class NuclearDestination extends Destination {
 
     private static final String NAME_PREFIX = "NUCLEARMQ:";
 

@@ -18,9 +18,6 @@ public class NuclearConsumerFactory implements ConsumerFactory {
 
     @Override
     public Consumer createConsumer(Destination dest, String consumerId, ConsumerConfig config) {
-        if (!(dest instanceof NuclearDestination)) {
-            dest = NuclearDestination.topic(dest.getName());
-        }
         Consumer consumer = new NuclearConsumer(dest, consumerId, config);
         return consumer;
     }
@@ -56,11 +53,6 @@ public class NuclearConsumerFactory implements ConsumerFactory {
         if (dest != null) {
             if (dest instanceof NuclearDestination) {
                 return true;
-            }
-            if (!StringUtils.isEmpty(dest.getName())) {
-                if (dest.getName().startsWith(NuclearDestination.getNamePrefix())) {
-                    return true;
-                }
             }
         }
         return false;

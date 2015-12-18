@@ -58,291 +58,296 @@ import com.dianping.swallow.consumer.internal.task.TaskChecker;
 
 public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
 
-	private String consumerId;
+    private String consumerId;
 
-	private Destination dest;
+    private Destination dest;
 
-	private MessageListener listener;
+    private MessageListener listener;
 
-	private InetSocketAddress masterAddress;
+    private InetSocketAddress masterAddress;
 
-	private InetSocketAddress slaveAddress;
+    private InetSocketAddress slaveAddress;
 
-	private volatile AtomicBoolean started = new AtomicBoolean(false);
+    private volatile AtomicBoolean started = new AtomicBoolean(false);
 
-	private ConsumerConfig config;
+    private ConsumerConfig config;
 
-	private final String consumerIP = IPUtil.getFirstNoLoopbackIP4Address();
-	
-	private static AtomicInteger consumerCount = new AtomicInteger();
+    private final String consumerIP = IPUtil.getFirstNoLoopbackIP4Address();
 
-	private ExecutorService service;
+    private static AtomicInteger consumerCount = new AtomicInteger();
 
-	private ConsumerThread masterConsumerThread;
+    private ExecutorService service;
 
-	private ConsumerThread slaveConsumerThread;
-	
-    private static EventLoopGroup group = new NioEventLoopGroup(CommonUtils.getCpuCount() * 2, new MQThreadFactory("Swallow-Netty-Client-" + consumerCount.incrementAndGet() + "-"));;
-    private static ByteBufAllocator allocator = new PooledByteBufAllocator(true, CommonUtils.getCpuCount(), CommonUtils.getCpuCount(), 8 *1024, 10);
+    private ConsumerThread masterConsumerThread;
 
-	private ConsumerProcessor processor;
+    private ConsumerThread slaveConsumerThread;
 
-	private PullStrategy pullStrategy;
+    private static EventLoopGroup group = new NioEventLoopGroup(CommonUtils.getCpuCount() * 2, new MQThreadFactory("Swallow-Netty-Client-" + consumerCount.incrementAndGet() + "-"));
+    ;
+    private static ByteBufAllocator allocator = new PooledByteBufAllocator(true, CommonUtils.getCpuCount(), CommonUtils.getCpuCount(), 8 * 1024, 10);
 
-	private ExecutorService consumerHelperExecutors;
+    private ConsumerProcessor processor;
 
-	private TaskChecker taskChecker;
-	
-	private HeartBeatSender heartBeatSender;
+    private PullStrategy pullStrategy;
 
-	public ConsumerImpl(Destination dest, ConsumerConfig config, InetSocketAddress masterAddress,
-			InetSocketAddress slaveAddress, HeartBeatSender heartBeatManager) {
-		this(dest, null, config, masterAddress, slaveAddress, heartBeatManager);
-	}
+    private ExecutorService consumerHelperExecutors;
 
-	public ConsumerImpl(Destination dest, String consumerId, ConsumerConfig config, InetSocketAddress masterAddress,
-			InetSocketAddress slaveAddress, HeartBeatSender heartBeatSender) {
+    private TaskChecker taskChecker;
 
-		checkArgument(config, consumerId);
-		
-		// ack#<topic>#<cid>长度不超过63字节(mongodb对数据库名的长度限制是63字节)
-		int length = 0;
-		length += dest.getName().length();
-		length += consumerId != null ? consumerId.length() : 0;
-		if (length > 58) {
-			throw new IllegalArgumentException(
-					"TopicName and consumerId's summary length must less or equals 58 ：topicName is " + dest.getName()
-							+ ", consumerId is " + consumerId);
-		}
+    private HeartBeatSender heartBeatSender;
 
-		this.dest = dest;
-		this.consumerId = consumerId;
-		this.config = config == null ? new ConsumerConfig() : config;
-		this.masterAddress = masterAddress;
-		this.slaveAddress = slaveAddress;
-		this.processor = new DefaultMessageProcessorTemplate();
-		this.taskChecker = new LongTaskChecker(config.getLongTaskAlertTime());
-		this.pullStrategy = new DefaultPullStrategy(config.getDelayBaseOnBackoutMessageException(),
-				config.getDelayUpperboundOnBackoutMessageException());
-		this.heartBeatSender = heartBeatSender;
+    public ConsumerImpl(Destination dest, ConsumerConfig config, InetSocketAddress masterAddress,
+                        InetSocketAddress slaveAddress, HeartBeatSender heartBeatManager) {
+        this(dest, null, config, masterAddress, slaveAddress, heartBeatManager);
+    }
 
-	}
+    public ConsumerImpl(Destination dest, String consumerId, ConsumerConfig config, InetSocketAddress masterAddress,
+                        InetSocketAddress slaveAddress, HeartBeatSender heartBeatSender) {
 
-	
-	@Override
-	public void start() {
-		if (listener == null) {
-			throw new IllegalArgumentException(
-					"MessageListener is null, MessageListener should be set(use setListener()) before start.");
-		}
-		if (started.compareAndSet(false, true)) {
+        checkArgument(dest, config, consumerId);
 
-			if (logger.isInfoEnabled()) {
-				logger.info("Starting " + this.toString());
-			}
-			service = Executors.newFixedThreadPool(this.getConfig().getThreadPoolSize(), new MQThreadFactory("swallow-consumer-client-" + consumerId + "-"));
-			startListener();
-			startHelper();
-		}
-	}
+        // ack#<topic>#<cid>长度不超过63字节(mongodb对数据库名的长度限制是63字节)
+        int length = 0;
+        length += dest.getName().length();
+        length += consumerId != null ? consumerId.length() : 0;
+        if (length > 58) {
+            throw new IllegalArgumentException(
+                    "TopicName and consumerId's summary length must less or equals 58 ：topicName is " + dest.getName()
+                            + ", consumerId is " + consumerId);
+        }
 
-	private void startListener() {
-		
-		Bootstrap bootstrap = new Bootstrap();
+        this.dest = dest;
+        this.consumerId = consumerId;
+        this.config = config == null ? new ConsumerConfig() : config;
+        this.masterAddress = masterAddress;
+        this.slaveAddress = slaveAddress;
+        this.processor = new DefaultMessageProcessorTemplate();
+        this.taskChecker = new LongTaskChecker(config.getLongTaskAlertTime());
+        this.pullStrategy = new DefaultPullStrategy(config.getDelayBaseOnBackoutMessageException(),
+                config.getDelayUpperboundOnBackoutMessageException());
+        this.heartBeatSender = heartBeatSender;
+
+    }
+
+
+    @Override
+    public void start() {
+        if (listener == null) {
+            throw new IllegalArgumentException(
+                    "MessageListener is null, MessageListener should be set(use setListener()) before start.");
+        }
+        if (started.compareAndSet(false, true)) {
+
+            if (logger.isInfoEnabled()) {
+                logger.info("Starting " + this.toString());
+            }
+            service = Executors.newFixedThreadPool(this.getConfig().getThreadPoolSize(), new MQThreadFactory("swallow-consumer-client-" + consumerId + "-"));
+            startListener();
+            startHelper();
+        }
+    }
+
+    private void startListener() {
+
+        Bootstrap bootstrap = new Bootstrap();
         final Codec codec = new JsonCodec(PktConsumerMessage.class, PktMessage.class);
-		bootstrap.group(group)
-		.channelFactory(new CodecChannelFactory(codec))
-		.option(ChannelOption.ALLOCATOR, allocator)
-		.handler(new ChannelInitializer<Channel>() {
+        bootstrap.group(group)
+                .channelFactory(new CodecChannelFactory(codec))
+                .option(ChannelOption.ALLOCATOR, allocator)
+                .handler(new ChannelInitializer<Channel>() {
 
-			@Override
-			protected void initChannel(Channel ch) throws Exception {
-				
-				MessageClientHandler handler = new MessageClientHandler(ConsumerImpl.this, processor, taskChecker,
-						createRetryWrapper(), ConsumerImpl.this);
-				
-				ChannelPipeline pipeline = ch.pipeline();
-				pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-				pipeline.addLast("frameEncoder", new LengthPrepender());
-				pipeline.addLast("jsonDecoder", new CodecHandler(codec));
-				pipeline.addLast("handler", handler);
-			}
-		});
-		
-		if(logger.isInfoEnabled()){
-			logger.info("[startListener]" + dest + "," + consumerId + "," + masterAddress + "," + slaveAddress);
-		}
-		// 启动连接master的线程
-		masterConsumerThread = new ConsumerThread(this);
-		masterConsumerThread.setBootstrap(bootstrap);
-		masterConsumerThread.setRemoteAddress(masterAddress);
-		masterConsumerThread.setInterval(ConfigManager.getInstance().getConnectMasterInterval());
-		masterConsumerThread.setName("masterConsumerThread");
-		masterConsumerThread.start();
-		// 启动连接slave的线程
-		slaveConsumerThread = new ConsumerThread(this);
-		slaveConsumerThread.setBootstrap(bootstrap);
-		slaveConsumerThread.setRemoteAddress(slaveAddress);
-		slaveConsumerThread.setInterval(ConfigManager.getInstance().getConnectSlaveInterval());
-		slaveConsumerThread.setName("slaveConsumerThread");
-		slaveConsumerThread.start();
-	}
+                    @Override
+                    protected void initChannel(Channel ch) throws Exception {
 
-	@Override
-	public void onChannelConnected(Channel channel) {
-		heartBeatSender.addChannel(channel);
-	}
+                        MessageClientHandler handler = new MessageClientHandler(ConsumerImpl.this, processor, taskChecker,
+                                createRetryWrapper(), ConsumerImpl.this);
 
-	@Override
-	public void onChannelDisconnected(Channel channel) {
-		heartBeatSender.removeChannel(channel);
-	}
-	
-	private void startHelper() {
+                        ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+                        pipeline.addLast("frameEncoder", new LengthPrepender());
+                        pipeline.addLast("jsonDecoder", new CodecHandler(codec));
+                        pipeline.addLast("handler", handler);
+                    }
+                });
 
-		consumerHelperExecutors = Executors.newCachedThreadPool(new MQThreadFactory("Swallow-Helper-"));
-		consumerHelperExecutors.execute(taskChecker);
-	}	
+        if (logger.isInfoEnabled()) {
+            logger.info("[startListener]" + dest + "," + consumerId + "," + masterAddress + "," + slaveAddress);
+        }
+        // 启动连接master的线程
+        masterConsumerThread = new ConsumerThread(this);
+        masterConsumerThread.setBootstrap(bootstrap);
+        masterConsumerThread.setRemoteAddress(masterAddress);
+        masterConsumerThread.setInterval(ConfigManager.getInstance().getConnectMasterInterval());
+        masterConsumerThread.setName("masterConsumerThread");
+        masterConsumerThread.start();
+        // 启动连接slave的线程
+        slaveConsumerThread = new ConsumerThread(this);
+        slaveConsumerThread.setBootstrap(bootstrap);
+        slaveConsumerThread.setRemoteAddress(slaveAddress);
+        slaveConsumerThread.setInterval(ConfigManager.getInstance().getConnectSlaveInterval());
+        slaveConsumerThread.setName("slaveConsumerThread");
+        slaveConsumerThread.start();
+    }
 
-	private SwallowCatActionWrapper createRetryWrapper() {
+    @Override
+    public void onChannelConnected(Channel channel) {
+        heartBeatSender.addChannel(channel);
+    }
 
-		if (listener instanceof MessageRetryOnAllExceptionListener) {
-			return new RetryOnAllExceptionActionWrapper(pullStrategy, config.getRetryCount());
-		}
-		return new RetryOnBackoutMessageExceptionActionWrapper(pullStrategy, config.getRetryCount());
-	}
+    @Override
+    public void onChannelDisconnected(Channel channel) {
+        heartBeatSender.removeChannel(channel);
+    }
 
-	@Override
-	public void close() {
-		if (started.compareAndSet(true, false)) {
+    private void startHelper() {
 
-			if (logger.isInfoEnabled()) {
-				logger.info("Closing " + this.toString());
-			}
-			service.shutdown();
-			closeListerner();
-			closeHelpers();
+        consumerHelperExecutors = Executors.newCachedThreadPool(new MQThreadFactory("Swallow-Helper-"));
+        consumerHelperExecutors.execute(taskChecker);
+    }
 
-		}
-	}
+    private SwallowCatActionWrapper createRetryWrapper() {
 
-	private void closeHelpers() {
-		consumerHelperExecutors.shutdown();
-		taskChecker.close();
-	}
+        if (listener instanceof MessageRetryOnAllExceptionListener) {
+            return new RetryOnAllExceptionActionWrapper(pullStrategy, config.getRetryCount());
+        }
+        return new RetryOnBackoutMessageExceptionActionWrapper(pullStrategy, config.getRetryCount());
+    }
 
-	private void closeListerner() {
-		
-		masterConsumerThread.interrupt();
-		slaveConsumerThread.interrupt();
-	}
+    @Override
+    public void close() {
+        if (started.compareAndSet(true, false)) {
 
-	public void submit(Runnable task) {
-		if (!isClosed() && this.service != null && !this.service.isShutdown()) {
-			try {
-				this.service.execute(task);
-			} catch (RuntimeException e) {
-				logger.warn("Error when submiting task, task is ignored（message will retry by server later）: "
-						+ e.getMessage());
-			}
-		}
-	}
+            if (logger.isInfoEnabled()) {
+                logger.info("Closing " + this.toString());
+            }
+            service.shutdown();
+            closeListerner();
+            closeHelpers();
 
-	private void checkArgument(ConsumerConfig config, String consumerId) {
-		
-		if (ConsumerType.NON_DURABLE == config.getConsumerType()) {// 非持久类型，不能有consumerId
-			if (consumerId != null) {
-				throw new IllegalArgumentException("ConsumerId should be null when consumer type is NON_DURABLE");
-			}
-		} else {// 持久类型，需要验证consumerId
-			if (!NameCheckUtil.isConsumerIdValid(consumerId)) {
-				throw new IllegalArgumentException(
-						"ConsumerId is invalid, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-30 long："
-								+ consumerId);
-			}
-		}
+        }
+    }
 
-	}
+    private void closeHelpers() {
+        consumerHelperExecutors.shutdown();
+        taskChecker.close();
+    }
 
-	@Override
-	public String toString() {
-		return String.format("ConsumerImpl@%#X[consumerId=%s, dest=%s, masterAddress=%s, slaveAddress=%s, config=%s]", this.hashCode(),
-				consumerId, dest, masterAddress, slaveAddress, config);
-	}
+    private void closeListerner() {
 
-	public String getConsumerIP() {
-		return consumerIP;
-	}
+        masterConsumerThread.interrupt();
+        slaveConsumerThread.interrupt();
+    }
 
-	public boolean isClosed() {
-		return !started.get();
-	}
+    public void submit(Runnable task) {
+        if (!isClosed() && this.service != null && !this.service.isShutdown()) {
+            try {
+                this.service.execute(task);
+            } catch (RuntimeException e) {
+                logger.warn("Error when submiting task, task is ignored（message will retry by server later）: "
+                        + e.getMessage());
+            }
+        }
+    }
 
-	public String getConsumerId() {
-		return consumerId;
-	}
+    private void checkArgument(Destination dest, ConsumerConfig config, String consumerId) {
 
-	public void setConsumerId(String consumerId) {
-		this.consumerId = consumerId;
-	}
+        if (!dest.getClass().equals(Destination.class)) {
+            throw new IllegalArgumentException("Destination must be Destination class");
+        }
 
-	public Destination getDest() {
-		return dest;
-	}
+        if (ConsumerType.NON_DURABLE == config.getConsumerType()) {// 非持久类型，不能有consumerId
+            if (consumerId != null) {
+                throw new IllegalArgumentException("ConsumerId should be null when consumer type is NON_DURABLE");
+            }
+        } else {// 持久类型，需要验证consumerId
+            if (!NameCheckUtil.isConsumerIdValid(consumerId)) {
+                throw new IllegalArgumentException(
+                        "ConsumerId is invalid, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-30 long："
+                                + consumerId);
+            }
+        }
 
-	public void setDest(Destination dest) {
-		this.dest = dest;
-	}
+    }
 
-	public MessageListener getListener() {
-		return listener;
-	}
+    @Override
+    public String toString() {
+        return String.format("ConsumerImpl@%#X[consumerId=%s, dest=%s, masterAddress=%s, slaveAddress=%s, config=%s]", this.hashCode(),
+                consumerId, dest, masterAddress, slaveAddress, config);
+    }
 
-	@Override
-	public void setListener(MessageListener listener) {
-		this.listener = listener;
-	}
+    public String getConsumerIP() {
+        return consumerIP;
+    }
 
-	public ConsumerConfig getConfig() {
-		return config;
-	}
-	
-	public TaskChecker getTaskChecker(){
-		return taskChecker;
-	}
+    public boolean isClosed() {
+        return !started.get();
+    }
 
-	@Override
-	public void update(Observable observable, Object args) {
-		
-		if(observable instanceof ConsumerFactory){
-			
-			ConsumerFactory consumerFactory = (ConsumerFactory) observable;
-			List<InetSocketAddress> addresses = consumerFactory.getOrDefaultTopicAddress(dest.getName());
-			if(addresses.size() != 2){
-				throw new IllegalStateException("addresses size != 2," + dest + "," + addresses);
-			}
-			InetSocketAddress newMaster = addresses.get(0);
-			InetSocketAddress newSlave = addresses.get(1);
-			
-			if(!newMaster.equals(masterAddress)){
-				if(logger.isInfoEnabled()){
-					logger.info("[update][master changed]" + dest + "," + consumerId + "," + masterAddress + "->" + newMaster);
-				}
-				masterAddress = newMaster;
-				masterConsumerThread.setRemoteAddress(newMaster);
-			}
-			
-			if(!newSlave.equals(slaveAddress)){
-				if(logger.isInfoEnabled()){
-					logger.info("[update][slave changed]" + dest + "," + consumerId + "," + slaveAddress + "->" + newSlave);
-				}
-				slaveAddress = newSlave;
-				slaveConsumerThread.setRemoteAddress(newSlave);
-			}
-			
-			
-		}
-	}
+    public String getConsumerId() {
+        return consumerId;
+    }
+
+    public void setConsumerId(String consumerId) {
+        this.consumerId = consumerId;
+    }
+
+    public Destination getDest() {
+        return dest;
+    }
+
+    public void setDest(Destination dest) {
+        this.dest = dest;
+    }
+
+    public MessageListener getListener() {
+        return listener;
+    }
+
+    @Override
+    public void setListener(MessageListener listener) {
+        this.listener = listener;
+    }
+
+    public ConsumerConfig getConfig() {
+        return config;
+    }
+
+    public TaskChecker getTaskChecker() {
+        return taskChecker;
+    }
+
+    @Override
+    public void update(Observable observable, Object args) {
+
+        if (observable instanceof ConsumerFactory) {
+
+            ConsumerFactory consumerFactory = (ConsumerFactory) observable;
+            List<InetSocketAddress> addresses = consumerFactory.getOrDefaultTopicAddress(dest.getName());
+            if (addresses.size() != 2) {
+                throw new IllegalStateException("addresses size != 2," + dest + "," + addresses);
+            }
+            InetSocketAddress newMaster = addresses.get(0);
+            InetSocketAddress newSlave = addresses.get(1);
+
+            if (!newMaster.equals(masterAddress)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("[update][master changed]" + dest + "," + consumerId + "," + masterAddress + "->" + newMaster);
+                }
+                masterAddress = newMaster;
+                masterConsumerThread.setRemoteAddress(newMaster);
+            }
+
+            if (!newSlave.equals(slaveAddress)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("[update][slave changed]" + dest + "," + consumerId + "," + slaveAddress + "->" + newSlave);
+                }
+                slaveAddress = newSlave;
+                slaveConsumerThread.setRemoteAddress(newSlave);
+            }
+
+
+        }
+    }
 }
