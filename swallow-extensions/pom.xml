@@ -14,7 +14,7 @@
     <properties>
         <skip_maven_deploy>true</skip_maven_deploy>
         <nuclearmq-client.version>0.1.8-keepalive-bm1.6</nuclearmq-client.version>
-</properties>
+    </properties>
     <modules>
         <module>swallow-consumerclient-nuclear</module>
         <module>swallow-common-nuclear</module>

@@ -257,6 +257,8 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
             throw new IllegalArgumentException("Destination must be Destination class");
         }
 
+        dest.checkName();
+
         if (ConsumerType.NON_DURABLE == config.getConsumerType()) {// 非持久类型，不能有consumerId
             if (consumerId != null) {
                 throw new IllegalArgumentException("ConsumerId should be null when consumer type is NON_DURABLE");

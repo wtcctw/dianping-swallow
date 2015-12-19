@@ -17,17 +17,22 @@ public final class NuclearDestination extends Destination {
     }
 
     public static Destination topic(String name) {
+        return createDestination(name);
+    }
+
+    public static Destination destination(Destination dest) {
+        return createDestination(dest.getName());
+    }
+
+    private static  Destination createDestination(String name){
         if (!StringUtils.isEmpty(name)) {
             if (name.startsWith(NAME_PREFIX)) {
                 Destination destination = new NuclearDestination(name.substring(NAME_PREFIX.length()));
                 return destination;
             }
         }
-        throw new IllegalArgumentException("Topic name is illegal");
-    }
+        throw new IllegalArgumentException("Topic name is illegal,Nuclear Topic name should be start with NUCLEARMQ:");
 
-    public static String getNamePrefix() {
-        return NAME_PREFIX;
     }
 
 }

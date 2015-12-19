@@ -167,8 +167,8 @@ public class NuclearConsumer implements Consumer {
     }
 
     private void checkArgument(Destination dest, String consumerId, ConsumerConfig consumerConfig) {
-        if (!dest.getClass().equals(NuclearDestination.class)) {
-            throw new IllegalArgumentException("Destination must be NuclearDestination class");
+        if (!(dest instanceof NuclearDestination)) {
+            NuclearDestination.destination(dest);
         }
 
         if (StringUtils.isEmpty(consumerId)) {
@@ -189,7 +189,7 @@ public class NuclearConsumer implements Consumer {
         helperExecutors.execute(taskChecker);
     }
 
-    private void closeHelpers(){
+    private void closeHelpers() {
         helperExecutors.shutdown();
         taskChecker.close();
     }

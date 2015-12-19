@@ -9,7 +9,7 @@ import com.dianping.swallow.common.internal.config.SwallowClientConfig;
  */
 public class SwallowClientConfigImpl extends AbstractConfig implements SwallowClientConfig {
 
-    private static final String CLIENT_CONFIG_FILE_NAME = "META-INF/swallow-client.properties";
+    private static final String CLIENT_CONFIG_FILE_NAME = "swallow-client.properties";
 
     private boolean isConsumerOnline = false;
 

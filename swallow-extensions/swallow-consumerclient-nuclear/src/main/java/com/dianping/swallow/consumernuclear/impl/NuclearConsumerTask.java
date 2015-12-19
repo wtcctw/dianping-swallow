@@ -41,17 +41,18 @@ public class NuclearConsumerTask implements ConsumerCallback, ConsumerTask {
     }
 
     @Override
-    public void onHandle(long l, byte[] bytes, Object o) {
+    public void onHandle(long messageId, byte[] bytes, Object o) {
 
         final BytesSwallowMessage message = new BytesSwallowMessage();
         message.setBytesContent(bytes);
+        message.setMessageId(messageId);
 
-        Transaction consumerClientTransaction = createConsumerClientTransaction(l);
+        Transaction consumerClientTransaction = createConsumerClientTransaction(messageId);
 
         try {
 
             if (logger.isInfoEnabled()) {
-                logger.info("[onHandle][begin]" + l);
+                logger.info("[onHandle][begin]" + messageId);
             }
             taskChecker.addTask(this);
 
@@ -67,7 +68,7 @@ public class NuclearConsumerTask implements ConsumerCallback, ConsumerTask {
             taskChecker.removeTask(this);
 
             if (logger.isInfoEnabled()) {
-                logger.info("[onHandle][end]" + l);
+                logger.info("[onHandle][end]" + messageId);
             }
 
             consumerClientTransaction.complete();

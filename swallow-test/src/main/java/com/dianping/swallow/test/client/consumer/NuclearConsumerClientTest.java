@@ -8,6 +8,8 @@ import com.dianping.swallow.commonnuclear.impl.NuclearDestination;
 import com.dianping.swallow.consumer.*;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import jodd.datetime.TimeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +19,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class NuclearConsumerClientTest {
 
-    public void createConsumerTest() {
+    private static final Logger logger = LoggerFactory.getLogger(NuclearConsumerClientTest.class);
+
+    public void consume() {
         ConsumerFactory consumerFactory = ConsumerFactoryImpl.getInstance();
         Destination dest = NuclearDestination.topic("NUCLEARMQ:test_for_shanghai1");
         String consumerId = "mtpoiop.test_for_shanghai1.d1";
@@ -27,7 +31,6 @@ public class NuclearConsumerClientTest {
             public void onMessage(Message msg) throws BackoutMessageException {
                 if(msg instanceof BytesMessage) {
                     BytesMessage byteMsg = (BytesMessage) msg;
-                    System.out.println(new String(byteMsg.getBytesContent()));
                 }
             }
         });
@@ -36,7 +39,19 @@ public class NuclearConsumerClientTest {
     }
 
     public static void main(String[] args) {
-        NuclearConsumerClientTest test = new NuclearConsumerClientTest();
-        test.createConsumerTest();
+        final NuclearConsumerClientTest clientTest = new NuclearConsumerClientTest();
+
+        for (int i = 0; i < 10; i++) {
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    clientTest.consume();
+                }
+            });
+            thread.setDaemon(false);
+            thread.setName("ConsumerClient-" + i);
+            thread.start();
+        }
     }
 }
