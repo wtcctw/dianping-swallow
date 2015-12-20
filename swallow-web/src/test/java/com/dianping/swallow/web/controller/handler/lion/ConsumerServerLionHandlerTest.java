@@ -60,7 +60,7 @@ public class ConsumerServerLionHandlerTest extends MockTest {
         lionEditor.setTopicResourceService(topicResourceService);
         lionEditor.setLionConfigManager(lionConfigManager);
 
-        String consumerServerConfig = "default=3.3.3.3:8000,4.4.4.4:8001;\nswallow-hao=5.5.5.5:8000,6.6.6.6:8001";
+        String consumerServerConfig = "default=3.3.3.3:8000,4.4.4.4:8001;\nswallow-hao=5.5.5.5:8000,6.6.6.6:8001;";
         Mockito.doReturn(consumerServerConfig).when(consumerServerResourceService).loadConsumerServerLionConfig();
         int length = 10;
         Mockito.doReturn(length).when(lionConfigManager).getConsumerServerUriLength();

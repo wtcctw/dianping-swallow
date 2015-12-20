@@ -1,9 +1,9 @@
 package com.dianping.swallow.web.dao;
 
-import java.util.List;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
+
+import java.util.List;
 
 
 /**
@@ -39,9 +39,9 @@ public interface ConsumerIdResourceDao extends Dao{
 	
 	public static class ConsumerIdParam{
 		
-		private int offset;
+		private int offset = 0;
 		
-		private int limit;
+		private int limit = 1;
 		
 		private String consumerId;
 		
@@ -49,7 +49,7 @@ public interface ConsumerIdResourceDao extends Dao{
 		
 		private String consumerIp;
 		
-		private boolean inactive;
+		private boolean inactive = true;
 
 		public int getOffset() {
 			return offset;

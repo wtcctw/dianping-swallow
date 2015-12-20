@@ -33,6 +33,9 @@ public class ConsumerServerLionHandler extends AbstractLionHandler{
         StringBuilder stringBuilder = new StringBuilder();
 
         String consumerServerConfig = (String) getValue(TopicResourceServiceImpl.SWALLOW_CONSUMER_SERVER_URI, Boolean.FALSE);
+        if(consumerServerConfig != null && consumerServerConfig.endsWith(";")){
+            consumerServerConfig = consumerServerConfig.substring(0, consumerServerConfig.length() - 1);
+        }
         String defaultConfig = loadDefaultConfig(consumerServerConfig);
         if (StringUtils.isBlank(defaultConfig)) {
             return ResponseStatus.NODEFAULT;
