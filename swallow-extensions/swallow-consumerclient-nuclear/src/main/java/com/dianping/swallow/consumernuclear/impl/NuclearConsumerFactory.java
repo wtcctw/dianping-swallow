@@ -50,11 +50,6 @@ public class NuclearConsumerFactory implements ConsumerFactory {
 
     @Override
     public boolean isSupported(Destination dest) {
-        if (dest != null) {
-            if (dest instanceof NuclearDestination) {
-                return true;
-            }
-        }
-        return false;
+        return NuclearDestination.supportedDestination(dest);
     }
 }

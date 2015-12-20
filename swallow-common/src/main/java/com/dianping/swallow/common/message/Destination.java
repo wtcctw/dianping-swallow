@@ -65,23 +65,30 @@ public class Destination implements Serializable {
     /***
      * 创建Topic类型的消息目的地<br>
      * 注意：如果name含有点“.”字符，会被替换成下划线“_”，因为swallow使用topic名称作为mongo数据库名，而Mongo数据库名不允许“.”字符。
+     *
      * @param name Topic名称
      * @return 消息目的地实例
      */
     public static Destination topic(String name) {
-        //将name中的点替换成下划线
-        if (name != null) {
-            name = name.replace('.', '_');
-        }
-
         return new Destination(name, Type.TOPIC);
     }
 
-    public final void checkName() {
-        if (!NameCheckUtil.isTopicNameValid(name)) {
-            throw new IllegalArgumentException(
-                    "Topic name is illegal, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-50 long:\"" + name + "\"");
+
+    public static Destination destination(Destination dest) {
+        if (!dest.getClass().equals(Destination.class)) {
+            throw new IllegalArgumentException("Destination must be Destination class");
         }
+
+        //将name中的点替换成下划线
+        if (dest.getName() != null) {
+            dest = new Destination(dest.getName().replace('.', '_'));
+        }
+
+        if (!NameCheckUtil.isTopicNameValid(dest.getName())) {
+            throw new IllegalArgumentException(
+                    "Topic name is illegal, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-50 long:\"" + dest.getName() + "\"");
+        }
+        return dest;
     }
 
     /**

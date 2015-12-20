@@ -59,7 +59,10 @@ public class NuclearConsumer implements Consumer {
 
     public NuclearConsumer(Destination dest, String consumerId, ConsumerConfig config) {
 
+        dest = NuclearDestination.destination(dest);
+
         checkArgument(dest, consumerId, config);
+
         this.dest = dest;
         this.consumerId = consumerId;
         this.config = config;
@@ -167,9 +170,6 @@ public class NuclearConsumer implements Consumer {
     }
 
     private void checkArgument(Destination dest, String consumerId, ConsumerConfig consumerConfig) {
-        if (!(dest instanceof NuclearDestination)) {
-            NuclearDestination.destination(dest);
-        }
 
         if (StringUtils.isEmpty(consumerId)) {
             throw new IllegalArgumentException("ConsumerId should not be null.");

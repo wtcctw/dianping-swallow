@@ -106,17 +106,9 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
     public ConsumerImpl(Destination dest, String consumerId, ConsumerConfig config, InetSocketAddress masterAddress,
                         InetSocketAddress slaveAddress, HeartBeatSender heartBeatSender) {
 
-        checkArgument(dest, config, consumerId);
+        dest = Destination.destination(dest);
 
-        // ack#<topic>#<cid>长度不超过63字节(mongodb对数据库名的长度限制是63字节)
-        int length = 0;
-        length += dest.getName().length();
-        length += consumerId != null ? consumerId.length() : 0;
-        if (length > 58) {
-            throw new IllegalArgumentException(
-                    "TopicName and consumerId's summary length must less or equals 58 ：topicName is " + dest.getName()
-                            + ", consumerId is " + consumerId);
-        }
+        checkArgument(dest, config, consumerId);
 
         this.dest = dest;
         this.consumerId = consumerId;
@@ -253,22 +245,29 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
     private void checkArgument(Destination dest, ConsumerConfig config, String consumerId) {
 
-        if (!dest.getClass().equals(Destination.class)) {
-            throw new IllegalArgumentException("Destination must be Destination class");
-        }
-
-        dest.checkName();
-
-        if (ConsumerType.NON_DURABLE == config.getConsumerType()) {// 非持久类型，不能有consumerId
+        if (ConsumerType.NON_DURABLE == config.getConsumerType())
+        {// 非持久类型，不能有consumerId
             if (consumerId != null) {
                 throw new IllegalArgumentException("ConsumerId should be null when consumer type is NON_DURABLE");
             }
-        } else {// 持久类型，需要验证consumerId
+        } else
+
+        {// 持久类型，需要验证consumerId
             if (!NameCheckUtil.isConsumerIdValid(consumerId)) {
                 throw new IllegalArgumentException(
                         "ConsumerId is invalid, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-30 long："
                                 + consumerId);
             }
+        }
+
+        // ack#<topic>#<cid>长度不超过63字节(mongodb对数据库名的长度限制是63字节)
+        int length = 0;
+        length += dest.getName().length();
+        length += consumerId != null ? consumerId.length() : 0;
+        if (length > 58) {
+            throw new IllegalArgumentException(
+                    "TopicName and consumerId's summary length must less or equals 58 ：topicName is " + dest.getName()
+                            + ", consumerId is " + consumerId);
         }
 
     }

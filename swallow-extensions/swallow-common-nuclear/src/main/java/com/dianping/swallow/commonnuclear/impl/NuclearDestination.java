@@ -21,18 +21,43 @@ public final class NuclearDestination extends Destination {
     }
 
     public static Destination destination(Destination dest) {
-        return createDestination(dest.getName());
+        if (!(dest instanceof NuclearDestination)) {
+            return createDestination(dest.getName());
+        } else {
+            return dest;
+        }
+
     }
 
-    private static  Destination createDestination(String name){
-        if (!StringUtils.isEmpty(name)) {
-            if (name.startsWith(NAME_PREFIX)) {
-                Destination destination = new NuclearDestination(name.substring(NAME_PREFIX.length()));
-                return destination;
-            }
+    private static Destination createDestination(String name) {
+
+        if (validateName(name)) {
+            Destination destination = new NuclearDestination(name.substring(NAME_PREFIX.length()));
+
+            return destination;
         }
         throw new IllegalArgumentException("Topic name is illegal,Nuclear Topic name should be start with NUCLEARMQ:");
 
+    }
+
+    private static boolean validateName(String name) {
+        if (!StringUtils.isEmpty(name)) {
+            if (name.startsWith(NAME_PREFIX)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean supportedDestination(Destination dest) {
+        if (dest != null) {
+            if (dest instanceof NuclearDestination) {
+                return true;
+            } else {
+                return validateName(dest.getName());
+            }
+        }
+        return false;
     }
 
 }
