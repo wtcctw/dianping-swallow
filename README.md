@@ -243,7 +243,7 @@ longTaskAlertTime | 5000
 用户实现此接口，只要onMessage抛出异常，即进行消息重发
 
 ### 代码示例
-#### Maven pox.xml中添加依赖
+#### Maven pom.xml中添加依赖
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-beans</artifactId>
@@ -324,6 +324,64 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 	}
 
 * createConsumer函数接收3个参数,其中第二个参数表示consumerId.对于默认的消费类型DURABLE_AT_LEAST_ONCE,必需提供一个consumerId;如果消费类型为NON_DURABLE,则不需要设置consumerId.这里的"myId"即为消费者的consumerId.
+
+### 接收NuclearMQ消息
+#### 基本概念
+##### ConsumerConfig配置详解
+
+使用Swallow接收NuclearMQ消息时，对接收端进行配置，这由ConsumerConfig与Swallow接收消息的ConsumerConfig几乎是一样的，主要是没有threadPoolSize、messageFilter、consumerType、startMessageId这几项的设置，因为nuclearmq本身的接口就没有这几项。其中consumerType默认就是DURABLE_AT_LEAST_ONCE；startMessageId
+
+##### 接收消息接口
+这个跟Swallow接收消息的接口一样，没有变化。
+
+#### 代码示例
+##### Maven pom.xml中添加依赖
+依赖除了Swallow接收消息的pom.xml中的依赖，还有一下内容
+   <dependency>
+            <groupId>com.dianping.swallow</groupId>
+            <artifactId>swallow-common-nuclear</artifactId>
+            <version>${currentVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dianping.swallow</groupId>
+            <artifactId>swallow-consumerclient-nuclear</artifactId>
+            <version>${currentVersion}</version>
+        </dependency>
+
+##### 消费者实现MessageListener接口
+onMessage接口方法没有变，主要是Message有变化，接收到NuclearMQ的消息都是byte数组，所以需要用户自己对byte数组进行处理。
+		@Override
+        public void onMessage(Message msg) throws BackoutMessageException {
+            if(msg instanceof BytesMessage) {
+                BytesMessage byteMsg = (BytesMessage) msg;
+                byte[] content = byteMsg.getBytesContent();
+                long messageId =byteMsg.getMessageId();
+                }
+        }
+##### 消费者端代码实现
+使用上跟接收Swallow 消息没什么区别，主要是topic名称需要加上NUCLEARMQ:这个前缀。
+	public void consume() {
+        ConsumerFactory consumerFactory = ConsumerFactoryImpl.getInstance();
+        Destination dest = Destination.topic("NUCLEARMQ:test_for_shanghai1");
+        String consumerId = "mtpoiop.test_for_shanghai1.d1";
+        Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new ConsumerConfig());
+        consumer.setListener(new MessageListener() {
+            @Override
+            public void onMessage(Message msg) throws BackoutMessageException {
+                if(msg instanceof BytesMessage) {
+                    BytesMessage byteMsg = (BytesMessage) msg;
+                }
+            }
+        });
+
+        consumer.start();
+    }
+另外，NuclearMQ消费客户端提供了线上线下和同步异步接口，Swallow接收端为了兼容，提供了swallow-client.properties配置文件，放在classpath路径下即可，内容设置例如
+isConsumerOnline=true
+isConsumerAsync=true
+isConsumerOnline是指topic是线上环境，还是线下环境，默认为false，假设用户在点评线下环境想要使用NuclearMQ线上环境的topic，设置为true即可。若当前为点评线上环境，则设置参数无效，强制为true。
+isConsumerAsync是指同步消费，还是异步消费，默认为false是同步消费，反之异步消费。
+
 
 # Swallow Web使用说明
 

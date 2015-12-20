@@ -31,6 +31,8 @@ public class NuclearConsumerClientTest {
             public void onMessage(Message msg) throws BackoutMessageException {
                 if(msg instanceof BytesMessage) {
                     BytesMessage byteMsg = (BytesMessage) msg;
+                    byte[] content = byteMsg.getBytesContent();
+                    long messageId =byteMsg.getMessageId();
                 }
             }
         });
