@@ -26,7 +26,7 @@ public class SimpleSendAndReceive extends AbstractConsumerTest{
 
 		addListener(getTopic());
 
-		sendMessage(getTopic(), 10000, 5000);
+//		sendMessage(getTopic(), 10000, 5000);
 		
 	}
 	
