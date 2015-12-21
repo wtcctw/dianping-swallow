@@ -16,32 +16,42 @@ public class ServiceLoaderUtil {
 
     private static Map<Class<?>, List<?>> servicesMap = new ConcurrentHashMap<Class<?>, List<?>>();
 
-    public static <T> T getService(Class<T> clazz) {
+	@SuppressWarnings("unchecked")
+	public static <T> T getService(Class<T> clazz) {
+		
         if (!serviceMap.containsKey(clazz)) {
+        	
             ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
+            
             if (serviceLoader != null) {
+            	
                 for (T service : serviceLoader) {
                     serviceMap.put(clazz, service);
                     break;
                 }
             }
         }
+        
         return (T) serviceMap.get(clazz);
     }
 
-    public static <T> List<T> getServices(Class<T> clazz) {
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> getServices(Class<T> clazz) {
 
         if (!servicesMap.containsKey(clazz)) {
 
             ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
             List<T> services = new ArrayList<T>();
+            
             if (serviceLoader != null) {
                 for (T service : serviceLoader) {
                     services.add(service);
                 }
             }
+            
             servicesMap.put(clazz, services);
         }
+        
         return (List<T>) servicesMap.get(clazz);
     }
 

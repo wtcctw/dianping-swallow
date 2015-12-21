@@ -1,6 +1,5 @@
-package com.dianping.swallow.commonnuclear.impl;
+package com.dianping.swallow.consumer.nuclear.common.impl;
 
-import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
 
@@ -58,6 +57,21 @@ public final class NuclearDestination extends Destination {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode(){
+        return super.hashCode();
+    }
+
+    @Override
+    public String toString(){
+        return super.toString();
     }
 
 }

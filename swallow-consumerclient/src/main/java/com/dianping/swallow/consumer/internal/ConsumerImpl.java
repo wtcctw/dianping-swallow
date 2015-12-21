@@ -1,28 +1,6 @@
 package com.dianping.swallow.consumer.internal;
 
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
 import com.dianping.swallow.common.internal.codec.Codec;
@@ -43,11 +21,7 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.NameCheckUtil;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.consumer.Consumer;
-import com.dianping.swallow.consumer.ConsumerConfig;
-import com.dianping.swallow.consumer.ConsumerFactory;
-import com.dianping.swallow.consumer.MessageListener;
-import com.dianping.swallow.consumer.MessageRetryOnAllExceptionListener;
+import com.dianping.swallow.consumer.*;
 import com.dianping.swallow.consumer.internal.action.RetryOnAllExceptionActionWrapper;
 import com.dianping.swallow.consumer.internal.action.RetryOnBackoutMessageExceptionActionWrapper;
 import com.dianping.swallow.consumer.internal.config.ConfigManager;
@@ -55,6 +29,21 @@ import com.dianping.swallow.consumer.internal.netty.ConsumerConnectionListener;
 import com.dianping.swallow.consumer.internal.netty.MessageClientHandler;
 import com.dianping.swallow.consumer.internal.task.LongTaskChecker;
 import com.dianping.swallow.consumer.internal.task.TaskChecker;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 

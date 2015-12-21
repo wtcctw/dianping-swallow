@@ -80,6 +80,7 @@
         <commons-digester.version>2.1</commons-digester.version>
         <commons-pool2.version>2.4.2</commons-pool2.version>
         <gson.version>2.2.2</gson.version>
+        <httpcore.version>4.4.1</httpcore.version>
         <httpclient.version>4.5</httpclient.version>
         <httpmime.version>4.2.2</httpmime.version>
         <velocity.version>1.7</velocity.version>
@@ -137,6 +138,16 @@
             <dependency>
                 <groupId>com.dianping.swallow</groupId>
                 <artifactId>swallow-consumerserver</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.dianping.swallow</groupId>
+                <artifactId>swallow-common-nuclear</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.dianping.swallow</groupId>
+                <artifactId>swallow-consumerclient-nuclear</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -326,6 +337,11 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${httpcore.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>

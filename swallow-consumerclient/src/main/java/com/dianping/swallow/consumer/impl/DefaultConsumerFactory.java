@@ -6,8 +6,8 @@ import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
 import com.dianping.swallow.common.internal.observer.impl.AbstractObservable;
-import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.message.Destination;
+import com.dianping.swallow.consumer.AbstractConsumerFactory;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
@@ -21,7 +21,7 @@ import java.util.*;
  * @author qi.yin
  *         2015/12/15  上午11:11.
  */
-public class DefaultConsumerFactory extends AbstractObservable implements ConsumerFactory, ConfigChangeListener {
+public class DefaultConsumerFactory extends AbstractConsumerFactory implements ConsumerFactory, ConfigChangeListener {
 
     private Logger logger = Logger.getLogger(getClass());
 
@@ -49,21 +49,6 @@ public class DefaultConsumerFactory extends AbstractObservable implements Consum
         addObserver(consumer);
         return consumer;
 
-    }
-
-    @Override
-    public Consumer createConsumer(Destination dest, String consumerId) {
-        return createConsumer(dest, consumerId, new ConsumerConfig());
-    }
-
-    @Override
-    public Consumer createConsumer(Destination dest, ConsumerConfig config) {
-        return createConsumer(dest, null, config);
-    }
-
-    @Override
-    public Consumer createConsumer(Destination dest) {
-        return createConsumer(dest, new ConsumerConfig());
     }
 
     private void getSwallowCAddress() {
@@ -181,8 +166,4 @@ public class DefaultConsumerFactory extends AbstractObservable implements Consum
         }
     }
 
-    @Override
-    public boolean isSupported(Destination dest){
-        throw new UnsupportedOperationException("[isSupported] NuclearMQ unsupported this operation.");
-    }
 }

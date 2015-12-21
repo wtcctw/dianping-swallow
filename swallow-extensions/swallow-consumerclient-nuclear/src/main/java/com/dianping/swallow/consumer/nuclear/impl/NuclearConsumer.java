@@ -1,4 +1,4 @@
-package com.dianping.swallow.consumernuclear.impl;
+package com.dianping.swallow.consumer.nuclear.impl;
 
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
 import com.dianping.swallow.common.internal.config.SwallowClientConfig;
@@ -10,7 +10,7 @@ import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.commonnuclear.impl.NuclearDestination;
+import com.dianping.swallow.consumer.nuclear.common.impl.NuclearDestination;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
@@ -34,8 +34,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NuclearConsumer implements Consumer {
 
     private static final Logger logger = LoggerFactory.getLogger(NuclearConsumer.class);
-
-    //private static final String SWALLOW_APPKEY = "swallow";
 
     private static final String SWALLOW_APPKEY = "mtpoiop";
 

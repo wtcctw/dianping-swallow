@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 import com.dianping.swallow.common.internal.util.ServiceLoaderUtil;
+import com.dianping.swallow.consumer.AbstractConsumerFactory;
 import org.apache.log4j.Logger;
 import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.message.Destination;
@@ -11,7 +12,7 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
 
-public final class ConsumerFactoryImpl implements ConsumerFactory {
+public final class ConsumerFactoryImpl extends AbstractConsumerFactory {
 
     private Logger logger = Logger.getLogger(getClass());
 
@@ -49,22 +50,6 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
         return consumer;
     }
 
-    @Override
-    public Consumer createConsumer(Destination dest, String consumerId) {
-        return createConsumer(dest, consumerId, null);
-    }
-
-    @Override
-    public Consumer createConsumer(Destination dest, ConsumerConfig config) {
-        return createConsumer(dest, null, config);
-    }
-
-    @Override
-    public Consumer createConsumer(Destination dest) {
-        return createConsumer(dest, null, null);
-    }
-
-
     /**
      * for unittest
      *
@@ -79,12 +64,6 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
     @Override
     public List<InetSocketAddress> getOrDefaultTopicAddress(String topic) {
         return realFactory.getOrDefaultTopicAddress(topic);
-    }
-
-    @Override
-    public boolean isSupported(Destination dest) {
-
-        throw new UnsupportedOperationException("[isSupported] unsupported this operation.");
     }
 
     private ConsumerFactory findConsumerFactory(Destination dest) {

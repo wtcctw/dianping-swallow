@@ -1,4 +1,4 @@
-package com.dianping.swallow.consumernuclear.impl;
+package com.dianping.swallow.consumer.nuclear.impl;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -30,6 +30,8 @@ public class NuclearConsumerTask implements ConsumerCallback, ConsumerTask {
 
     private TaskChecker taskChecker;
 
+    private volatile long messageId;
+
     public NuclearConsumerTask(Consumer consumer, SwallowCatActionWrapper actionWrapper, TaskChecker taskChecker) {
         this.consumer = consumer;
         this.actionWrapper = actionWrapper;
@@ -53,6 +55,8 @@ public class NuclearConsumerTask implements ConsumerCallback, ConsumerTask {
                 logger.info("[onHandle][begin]" + messageId);
             }
             taskChecker.addTask(this);
+
+            this.messageId = messageId;
 
             actionWrapper.doAction(consumerClientTransaction, new SwallowAction() {
                 @Override
@@ -84,5 +88,12 @@ public class NuclearConsumerTask implements ConsumerCallback, ConsumerTask {
 
         return transaction;
     }
+
+    @Override
+    public String toString() {
+        return catNameStr + "," + messageId;
+    }
+
+
 }
 
