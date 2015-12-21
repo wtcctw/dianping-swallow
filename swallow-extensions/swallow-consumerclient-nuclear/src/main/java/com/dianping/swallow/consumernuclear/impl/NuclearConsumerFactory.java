@@ -1,6 +1,5 @@
 package com.dianping.swallow.consumernuclear.impl;
 
-import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.commonnuclear.impl.NuclearDestination;
 import com.dianping.swallow.consumer.Consumer;

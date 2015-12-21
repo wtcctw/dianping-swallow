@@ -61,7 +61,7 @@ public class NuclearConsumer implements Consumer {
 
         dest = NuclearDestination.destination(dest);
 
-        checkArgument(dest, consumerId, config);
+        checkArgument(consumerId);
 
         this.dest = dest;
         this.consumerId = consumerId;
@@ -169,10 +169,10 @@ public class NuclearConsumer implements Consumer {
         throw new UnsupportedOperationException();
     }
 
-    private void checkArgument(Destination dest, String consumerId, ConsumerConfig consumerConfig) {
+    private void checkArgument(String consumerId) {
 
         if (StringUtils.isEmpty(consumerId)) {
-            throw new IllegalArgumentException("ConsumerId should not be null.");
+            throw new IllegalArgumentException("ConsumerId should not be empty.");
         }
     }
 

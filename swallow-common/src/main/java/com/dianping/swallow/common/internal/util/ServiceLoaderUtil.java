@@ -16,7 +16,7 @@ public class ServiceLoaderUtil {
 
     private static Map<Class<?>, List<?>> servicesMap = new ConcurrentHashMap<Class<?>, List<?>>();
 
-    public static <T> T loadService(Class<T> clazz) {
+    public static <T> T getService(Class<T> clazz) {
         if (!serviceMap.containsKey(clazz)) {
             ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
             if (serviceLoader != null) {
@@ -29,7 +29,7 @@ public class ServiceLoaderUtil {
         return (T) serviceMap.get(clazz);
     }
 
-    public static <T> List<T> loadServices(Class<T> clazz) {
+    public static <T> List<T> getServices(Class<T> clazz) {
 
         if (!servicesMap.containsKey(clazz)) {
 

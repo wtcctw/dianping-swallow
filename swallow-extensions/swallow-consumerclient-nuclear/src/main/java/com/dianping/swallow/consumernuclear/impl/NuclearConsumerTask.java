@@ -14,8 +14,6 @@ import com.meituan.nuclearmq.client.ConsumerCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author qi.yin
  *         2015/12/14  下午5:28.

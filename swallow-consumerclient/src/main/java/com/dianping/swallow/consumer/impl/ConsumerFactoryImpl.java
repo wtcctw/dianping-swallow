@@ -18,6 +18,7 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
     private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
 
     private ConsumerFactory realFactory;
+
     static {
         SwallowHelper.initialize();
     }
@@ -83,12 +84,12 @@ public final class ConsumerFactoryImpl implements ConsumerFactory {
     @Override
     public boolean isSupported(Destination dest) {
 
-        throw new UnsupportedOperationException("[isSupported] NuclearMQ unsupported this operation.");
+        throw new UnsupportedOperationException("[isSupported] unsupported this operation.");
     }
 
     private ConsumerFactory findConsumerFactory(Destination dest) {
 
-        List<ConsumerFactory> factories = ServiceLoaderUtil.loadServices(ConsumerFactory.class);
+        List<ConsumerFactory> factories = ServiceLoaderUtil.getServices(ConsumerFactory.class);
 
         if (factories != null && !factories.isEmpty()) {
 
