@@ -151,6 +151,11 @@
 				<artifactId>cat-client</artifactId>
 				<version>${cat.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.dianping.cat</groupId>
+				<artifactId>cat-core</artifactId>
+				<version>${cat.version}</version>
+			</dependency>
 			<!-- requestId项�??????????��?��??(??��??ThreadLocal) -->
 			<dependency>
 				<groupId>com.dianping.dpsf</groupId>
