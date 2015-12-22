@@ -118,7 +118,7 @@ public class StatsDataClearupTask extends AbstractTask {
                 @Override
                 public void doAction() throws SwallowException {
 
-                    logger.info("[doClearupTask] executor doClearUp " + catName);
+                    logger.info("[doClearupTask] executor doClearUp " + catName + " less than timeKey: " + removeKey);
                     statsDataService.removeLessThanTimeKey(removeKey);
                 }
             });
