@@ -80,7 +80,7 @@ public class NuclearConsumer implements Consumer {
 
         this.taskChecker = new LongTaskChecker(config.getLongTaskAlertTime(), "NuclearMQ.SwallowLongTask");
 
-        consumer.setCallback(new NuclearConsumerTask(this, createRetryWrapper(), taskChecker));
+        consumer.setCallback(new NuclearConsumerCallBack(this, createRetryWrapper(), taskChecker, new NuclearConsumerProcessor()));
     }
 
     @Override
