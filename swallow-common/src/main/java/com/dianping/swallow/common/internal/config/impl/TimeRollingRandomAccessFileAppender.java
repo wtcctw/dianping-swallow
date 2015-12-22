@@ -64,18 +64,17 @@ public class TimeRollingRandomAccessFileAppender extends AbstractOutputStreamApp
         long current = System.currentTimeMillis();
         boolean isEndOfBatch = event.isEndOfBatch();
 
-        if(isEndOfBatch){
-            timeOfLastFlush = current;
+    if(isEndOfBatch){
+        timeOfLastFlush = current;
+        return Boolean.TRUE;
+    }else{
+        if(current - this.timeOfLastFlush >= this.flushInterval){
+            this.timeOfLastFlush = current;
             return Boolean.TRUE;
-        }else{
-            if(current - this.timeOfLastFlush >= this.flushInterval){
-                this.timeOfLastFlush = current;
-                System.out.println("Time is up");
-                return Boolean.TRUE;
-            }
-            return Boolean.FALSE;
         }
+        return Boolean.FALSE;
     }
+}
 
     @Override
     public void append(final LogEvent event) {
