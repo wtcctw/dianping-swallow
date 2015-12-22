@@ -108,12 +108,14 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.producerserverEntry.hostname;
 	$scope.producerserverEntry.alarm;
 	$scope.producerserverEntry.active;
+	$scope.producerserverEntry.groupName;
 	$scope.producerserverEntry.saveAlarmSetting.peak;
 	$scope.producerserverEntry.saveAlarmSetting.valley;
 	$scope.producerserverEntry.saveAlarmSetting.fluctuation;
 	$scope.producerserverEntry.saveAlarmSetting.fluctuationBase;
 
 	$scope.refreshpage = function(myForm){
+		$scope.producerserverEntry.groupName = $('#groupName').val();
 		if ($scope.producerserverEntry.saveAlarmSetting.peak < $scope.producerserverEntry.saveAlarmSetting.valley){
 			alert("谷值不能小于峰值");
 			return;
@@ -135,6 +137,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.producerserverEntry.hostname = "";
 		$scope.producerserverEntry.alarm = true;
 		$scope.producerserverEntry.active = true;
+		$scope.producerserverEntry.groupName = "";
 		$scope.producerserverEntry.saveAlarmSetting.peak = "";
 		$scope.producerserverEntry.saveAlarmSetting.valley = "";
 		$scope.producerserverEntry.saveAlarmSetting.fluctuation = "";
@@ -150,9 +153,12 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
+		$('#groupName').val($scope.searchPaginator.currentPageItems[index].groupName);
 		$scope.isReadOnly = true;
 		$scope.producerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.producerserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
+		$scope.producerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
+		$scope.producerserverEntry.active = $scope.searchPaginator.currentPageItems[index].active;
 		$scope.producerserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
 		$scope.producerserverEntry.saveAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.peak;
 		$scope.producerserverEntry.saveAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.valley;
@@ -194,6 +200,14 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
 				return c;
 			}
 		})
+	}).error(function(data, status, headers, config) {
+	});
+
+	$http({
+		method : 'GET',
+		url : window.contextPath + '/console/server/grouptype'
+	}).success(function(data) {
+		$scope.types = data;
 	}).error(function(data, status, headers, config) {
 	});
 	

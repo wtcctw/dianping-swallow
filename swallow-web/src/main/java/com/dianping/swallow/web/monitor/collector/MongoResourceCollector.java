@@ -82,9 +82,9 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 							mongoResource.setIp(ips);
 							MongoResource mongoResourceOld = mongoResourceService.findByIp(ips);
 							if (mongoResourceOld != null) {
-								MongoType mongoType = mongoResourceOld.getMongoType();
+								String mongoType = mongoResourceOld.getGroupName();
 								if (mongoType != null) {
-									mongoResource.setMongoType(mongoType);
+									mongoResource.setGroupName(mongoType);
 								}
 								mongoResource.setId(mongoResourceOld.getId());
 							}
@@ -149,7 +149,7 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 			mongoType = MongoType.GENERAL;
 		}
 
-		mongoResource.setMongoType(mongoType);
+		mongoResource.setGroupName(mongoType.toString());
 		mongoResource.setCatalog(catalog);
 		mongoResource.setDisk(mongoReport.getDisk());
 		mongoResource.setLoad(mongoReport.getLoad());

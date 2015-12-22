@@ -44,7 +44,7 @@ public class ConfigureHandlerChainTest extends MockTest {
 
         MongoResource mongoResource = new MongoResource();
         mongoResource.setIp("1.1.1.1");
-        mongoResource.setMongoType(MongoType.GENERAL);
+        mongoResource.setGroupName(MongoType.GENERAL.toString());
 
         Pair<String, ResponseStatus> pair = new Pair<String, ResponseStatus>();
         pair.setFirst("2.2.2.2");

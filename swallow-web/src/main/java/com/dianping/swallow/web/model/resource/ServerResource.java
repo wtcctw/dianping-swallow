@@ -21,6 +21,8 @@ public class ServerResource extends BaseResource {
 	
 	private boolean active;
 
+	private String groupName;
+
 	public String getIp() {
 		return ip;
 	}
@@ -51,6 +53,14 @@ public class ServerResource extends BaseResource {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
 
 	@JsonIgnore
