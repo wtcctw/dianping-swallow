@@ -70,7 +70,7 @@ public class StatsDataClearupTask extends AbstractTask {
         }
     }
 
-    @Scheduled(cron = "0 10 0 ? * *")
+    @Scheduled(cron = "0 40 0 ? * *")
     public void doClearupTask() {
         if (!isOpened()) {
             return;
@@ -106,10 +106,9 @@ public class StatsDataClearupTask extends AbstractTask {
         StatsData statsData = statsDataService.findOldestData();
         long oldestKey = statsData.getTimeKey();
         long currentKey = oldestKey;
-
         while (currentKey < timeKey) {
 
-            long tempKey = oldestKey + STATSDATA_CLEARUP_TIMEUNIT;
+            long tempKey = currentKey + STATSDATA_CLEARUP_TIMEUNIT;
             currentKey = tempKey > timeKey ? timeKey : tempKey;
             final long removeKey = currentKey;
 
