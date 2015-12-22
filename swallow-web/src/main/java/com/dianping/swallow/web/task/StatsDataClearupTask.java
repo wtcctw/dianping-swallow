@@ -31,7 +31,7 @@ public class StatsDataClearupTask extends AbstractTask {
 
     private static final String STATSDATA_SAVE_DAYS_KEY = "swallow.web.statsdata.save.days";//天
 
-    private static final long STATSDATA_CLEARUP_TIMEUNIT = AbstractRetriever.getKey(10 * 60 * 1000);
+    private static final long STATSDATA_CLEARUP_TIMEUNIT = AbstractRetriever.getKey(20 * 60 * 1000);
 
     @Autowired
     private ProducerServerStatsDataService pServerStatsDataService;
