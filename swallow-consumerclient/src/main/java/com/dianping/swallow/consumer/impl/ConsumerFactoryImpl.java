@@ -18,7 +18,7 @@ public final class ConsumerFactoryImpl extends AbstractConsumerFactory {
 
     private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
 
-    private ConsumerFactory realFactory;
+    private ConsumerFactory consumerFactory;
 
     static {
         SwallowHelper.initialize();
@@ -33,37 +33,24 @@ public final class ConsumerFactoryImpl extends AbstractConsumerFactory {
 
     @Override
     public Consumer createConsumer(Destination dest, String consumerId, ConsumerConfig config) {
-        ConsumerFactory consumerFactory = findConsumerFactory(dest);
+        consumerFactory = findConsumerFactory(dest);
 
-        if (consumerFactory == null) {
-            consumerFactory = DefaultConsumerFactory.getInstance();
-
-            if (logger.isInfoEnabled()) {
-                logger.info("[findConsumerFactory] use destination: " + dest.toString() + " consumerFactory: default.");
-            }
-
+        if (logger.isInfoEnabled()) {
+            logger.info("[findConsumerFactory] destination: " + dest.toString() + " consumerFactory: " + consumerFactory.getClass().getSimpleName());
         }
-
-        realFactory = consumerFactory;
 
         Consumer consumer = consumerFactory.createConsumer(dest, consumerId, config);
         return consumer;
     }
 
-    /**
-     * for unittest
-     *
-     * @param topic
-     * @return
-     */
     @Override
     public List<InetSocketAddress> getTopicAddress(String topic) {
-        return realFactory.getTopicAddress(topic);
+        return consumerFactory.getTopicAddress(topic);
     }
 
     @Override
     public List<InetSocketAddress> getOrDefaultTopicAddress(String topic) {
-        return realFactory.getOrDefaultTopicAddress(topic);
+        return consumerFactory.getOrDefaultTopicAddress(topic);
     }
 
     private ConsumerFactory findConsumerFactory(Destination dest) {
@@ -75,15 +62,12 @@ public final class ConsumerFactoryImpl extends AbstractConsumerFactory {
             for (ConsumerFactory factory : factories) {
                 if (factory.isSupported(dest)) {
 
-                    if (logger.isInfoEnabled()) {
-                        logger.info("[findConsumerFactory] destination: " + dest.toString() + " consumerFactory: " + factory.getClass().getSimpleName());
-                    }
                     return factory;
                 }
             }
         }
 
-        return null;
+        return DefaultConsumerFactory.getInstance();
     }
 
 }

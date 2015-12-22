@@ -6,11 +6,8 @@ package com.dianping.swallow.common.internal.config;
  */
 public interface SwallowClientConfig {
 
-    boolean isOnMessageEnabled();
+    boolean isOnMessageLogEnabled();
 
-    boolean isLog4j2Enabled();
+    boolean isLog4j2AsyncEnabled();
 
-    boolean isConsumerAsync();
-
-    boolean isConsumerOnline();
 }

@@ -35,7 +35,7 @@ public class NuclearConsumer implements Consumer {
 
     private static final Logger logger = LoggerFactory.getLogger(NuclearConsumer.class);
 
-    private static final String SWALLOW_APPKEY = "mtpoiop";
+    private static final String APPKEY_PREFIX = "com.dianping.swallow.";//mtpoiop
 
     private com.meituan.nuclearmq.client.Consumer consumer = null;
 
@@ -55,7 +55,7 @@ public class NuclearConsumer implements Consumer {
 
     private volatile AtomicBoolean started = new AtomicBoolean(false);
 
-    public NuclearConsumer(Destination dest, String consumerId, ConsumerConfig config) {
+    public NuclearConsumer(String appKey, Destination dest, String consumerId, ConsumerConfig config) {
 
         dest = NuclearDestination.destination(dest);
 
@@ -66,14 +66,18 @@ public class NuclearConsumer implements Consumer {
         this.config = config;
         consumer = com.meituan.nuclearmq.client.Consumer.Factory.create();
 
-        consumer.setAppkey(SWALLOW_APPKEY);
+        consumer.setAppkey(APPKEY_PREFIX + appKey);
         consumer.setTopic(dest.getName());
         consumer.setGroup(consumerId);
 
-        SwallowClientConfig clientConfig = SwallowClientConfigImpl.getInstance();
-        consumer.setIsAsync(clientConfig.isConsumerAsync());
-        boolean isProduct = EnvUtil.isProduct();
-        consumer.setIsOnline(isProduct ? isProduct : clientConfig.isConsumerOnline());
+        if (config instanceof NuclearConsumerConfig) {
+            NuclearConsumerConfig nuclearConfig = (NuclearConsumerConfig) config;
+            consumer.setIsAsync(nuclearConfig.isAsync());
+            consumer.setIsOnline(nuclearConfig.isOnline());
+        } else {
+            consumer.setIsAsync(false);
+            consumer.setIsOnline(EnvUtil.isProduct() ? true : false);
+        }
 
         this.pullStrategy = new DefaultPullStrategy(config.getDelayBaseOnBackoutMessageException(),
                 config.getDelayUpperboundOnBackoutMessageException());

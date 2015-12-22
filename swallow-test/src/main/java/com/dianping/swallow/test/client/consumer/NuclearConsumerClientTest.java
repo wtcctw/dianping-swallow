@@ -6,6 +6,7 @@ import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.nuclear.common.impl.NuclearDestination;
 import com.dianping.swallow.consumer.*;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
+import com.dianping.swallow.consumer.nuclear.impl.NuclearConsumerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,15 +21,15 @@ public class NuclearConsumerClientTest {
     public void consume() {
         ConsumerFactory consumerFactory = ConsumerFactoryImpl.getInstance();
         Destination dest = NuclearDestination.topic("NUCLEARMQ:test_for_shanghai1");
-        String consumerId = "mtpoiop.test_for_shanghai1.d2";
+        String consumerId = "com.dianping.swallow.swallow-test.test_for_shanghai1.d0";
         Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new ConsumerConfig());
         consumer.setListener(new MessageListener() {
             @Override
             public void onMessage(Message msg) throws BackoutMessageException {
-                if(msg instanceof BytesMessage) {
+                if (msg instanceof BytesMessage) {
                     BytesMessage byteMsg = (BytesMessage) msg;
                     byte[] content = byteMsg.getBytesContent();
-                    long messageId =byteMsg.getMessageId();
+                    long messageId = byteMsg.getMessageId();
                 }
             }
         });
