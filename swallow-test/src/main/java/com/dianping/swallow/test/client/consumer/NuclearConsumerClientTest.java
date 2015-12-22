@@ -20,9 +20,9 @@ public class NuclearConsumerClientTest {
 
     public void consume() {
         ConsumerFactory consumerFactory = ConsumerFactoryImpl.getInstance();
-        Destination dest = NuclearDestination.topic("NUCLEARMQ:test_for_shanghai1");
+        Destination dest = Destination.topic("NUCLEARMQ:test_for_shanghai1");
         String consumerId = "com.dianping.swallow.swallow-test.test_for_shanghai1.d0";
-        Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new ConsumerConfig());
+        Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new NuclearConsumerConfig(true,true));
         consumer.setListener(new MessageListener() {
             @Override
             public void onMessage(Message msg) throws BackoutMessageException {

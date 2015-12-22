@@ -29,8 +29,7 @@ public abstract class AbstractConsumerFactory extends AbstractObservable impleme
 
     @Override
     public boolean isSupported(Destination dest) {
-
-        throw new UnsupportedOperationException("[isSupported] unsupported this operation.");
+        return true;
     }
 
     @Override

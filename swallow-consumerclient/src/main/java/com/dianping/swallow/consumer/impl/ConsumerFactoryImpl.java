@@ -33,10 +33,18 @@ public final class ConsumerFactoryImpl extends AbstractConsumerFactory {
 
     @Override
     public Consumer createConsumer(Destination dest, String consumerId, ConsumerConfig config) {
-        consumerFactory = findConsumerFactory(dest);
+
+        if (this.consumerFactory == null) {
+            this.consumerFactory = findConsumerFactory(dest);
+        } else {
+
+            if (!this.consumerFactory.isSupported(dest)) {
+                throw new IllegalArgumentException("[createConsumer] consumerFactory:" + consumerFactory.getClass().getSimpleName() + "is not supported destination: " + dest.toString());
+            }
+        }
 
         if (logger.isInfoEnabled()) {
-            logger.info("[findConsumerFactory] destination: " + dest.toString() + " consumerFactory: " + consumerFactory.getClass().getSimpleName());
+            logger.info("[createConsumer] destination: " + dest.toString() + " consumerFactory: " + consumerFactory.getClass().getSimpleName());
         }
 
         Consumer consumer = consumerFactory.createConsumer(dest, consumerId, config);
