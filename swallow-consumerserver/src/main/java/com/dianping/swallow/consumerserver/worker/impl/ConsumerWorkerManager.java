@@ -98,8 +98,12 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
                 ConsumerWorker consumerWorker = findOrCreateConsumerWorker(consumerInfo, startMessageId, channel);
                 if(consumerWorker != null){
                 	consumerWorker.handleGreet(channel, clientThreadCount, messageFilter);
+                }else{
+                	if(logger.isInfoEnabled()){
+                		logger.info("[handleGreet][consumerWorker null, close channel]" + consumerInfo + "," + clientThreadCount + "," + messageFilter + "," + startMessageId);
+                	}
+                	channel.close();
                 }
-                		
 			}
         }
     }
@@ -195,13 +199,16 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
             synchronized (consumerInfo.getConsumerId().intern()) {
             	
                 if ((worker = findConsumerWorker(consumerInfo)) == null) {
-                    worker = new ConsumerWorkerImpl(consumerInfo, this, consumerAuthController, consumerThreadPoolManager, startMessageId, consumerCollector);
+                	
+                	
                     try {
+                    	worker = new ConsumerWorkerImpl(consumerInfo, this, consumerAuthController, consumerThreadPoolManager, startMessageId, consumerCollector);
 						worker.initialize();
+	                    consumerInfo2ConsumerWorker.put(consumerInfo, worker);
 					} catch (Exception e) {
 						logger.error("[findOrCreateConsumerWorker][init error]", e);
+						return null;
 					}
-                    consumerInfo2ConsumerWorker.put(consumerInfo, worker);
                 }
             }
         }
