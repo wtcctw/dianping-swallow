@@ -70,4 +70,9 @@ public class ProducerServerStatsDataServiceImpl implements ProducerServerStatsDa
     public ProducerServerStatsData findOldestData() {
         return producerServerStatsDataDao.findOldestData();
     }
+
+    @Override
+    public Class<?> getStatsDataClass() {
+        return ProducerServerStatsData.class;
+    }
 }

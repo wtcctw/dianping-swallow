@@ -38,7 +38,7 @@ public class ProducerIpStatsDataServiceImpl implements ProducerIpStatsDataServic
 
     @Override
     public StatsData findOldestData() {
-       throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -58,6 +58,11 @@ public class ProducerIpStatsDataServiceImpl implements ProducerIpStatsDataServic
             qps += ipStatsData.getQps();
         }
         return qps / size;
+    }
+
+    @Override
+    public Class<?> getStatsDataClass() {
+        return ProducerIpStatsData.class;
     }
 
 }
