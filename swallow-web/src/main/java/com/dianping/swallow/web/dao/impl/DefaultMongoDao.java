@@ -1,19 +1,17 @@
 package com.dianping.swallow.web.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.dao.MongoDao;
+import com.dianping.swallow.web.model.resource.MongoResource;
+import com.mongodb.WriteResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.dao.MongoDao;
-import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
-import com.mongodb.WriteResult;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mingdongli
