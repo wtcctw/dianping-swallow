@@ -37,7 +37,7 @@
 					<td style="text-align: left" ng-bind="ad.disk | number : 2"></td>
 					<td style="text-align: left" ng-bind="ad.load | number : 2"></td>
 					<td style="text-align: left" ng-bind="ad.qps"></td>
-					<td style="text-align: left" ng-bind="ad.mongoType"></td>
+					<td style="text-align: left" ng-bind="ad.groupName"></td>
 					<!-- 						<td style="text-align: left" ng-bind="ad.topics"></td>
  -->
 					<td style="text-align: left"><a href="#myModal"
@@ -120,8 +120,8 @@
 							<div class="form-group"
 								style="margin-right: 39px; margin-left: 0px;; width: 50%;">
 								<label class="control-label"><b>分组</b></label> <select
-									class="form-control" ng-model="mongoserverEntry.mongoType"
-									id="mongoType" required>
+									class="form-control" ng-model="mongoserverEntry.groupName"
+									id="groupName" required>
 									<option ng-repeat="type in types"
 										value="{{type}}">{{type}}</option>
 								</select>

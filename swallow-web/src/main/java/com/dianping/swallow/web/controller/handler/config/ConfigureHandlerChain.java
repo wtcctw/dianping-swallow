@@ -24,7 +24,7 @@ public class ConfigureHandlerChain extends AbstractHandlerChain<TopicApplyDto, L
         ResponseStatus status;
         for (Handler handler : handlers) {
             status = (ResponseStatus) handler.handle(value, result);
-            if (status != ResponseStatus.SUCCESS) {
+            if (!ResponseStatus.SUCCESS.equals(status)) {
                 return status;
             }
         }

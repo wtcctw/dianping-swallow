@@ -22,7 +22,7 @@ public class LionHandlerChain extends AbstractHandlerChain<LionEditorEntity, Emp
         ResponseStatus status;
         for (Handler<LionEditorEntity, EmptyObject> handler : handlers) {
             status = (ResponseStatus) handler.handle(value, result);
-            if (status != ResponseStatus.SUCCESS) {
+            if (!ResponseStatus.SUCCESS.equals(status)) {
                 return status;
             }
         }

@@ -4,7 +4,7 @@ import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 import com.dianping.swallow.web.controller.utils.UserUtils;
-import com.dianping.swallow.web.model.resource.MongoType;
+import com.dianping.swallow.web.service.GroupResourceService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,10 +12,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -30,6 +27,9 @@ public class ValidatorTest extends MockTest{
 	
 	@Mock
 	private TopicResourceService topicResourceService;
+
+	@Mock
+	private GroupResourceService groupResourceService;
 	
 	private TopicApplyDto topicApplyDto;
 
@@ -41,6 +41,11 @@ public class ValidatorTest extends MockTest{
 	public void setUp() throws Exception {
 		 
 		Map<String, Set<String>> topicToWhiltelist = new HashMap<String, Set<String>>();
+		List<String> groupNames = new ArrayList<String>();
+		groupNames.add("一般消息队列");
+		groupNames.add("下单消息队列");
+		groupNames.add("搜索消息队列");
+
 		Set<String> topics = new HashSet<String>();
 		topicToWhiltelist.put("example", topics);
 		topicToWhiltelist.put("example1", topics);
@@ -50,7 +55,7 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setSize(1);
 		topicApplyDto.setTopic("swallow-test");
 		topicApplyDto.setApprover("hongjun.zhong");
-		topicApplyDto.setType(MongoType.GENERAL.toString());
+		topicApplyDto.setType("一般消息队列");
 		topicApplyDto.setApplicant("mingdong.li");
 
 
@@ -67,8 +72,11 @@ public class ValidatorTest extends MockTest{
 		switchValidatorFilter.setApplyTopicSwitch("true");
 		nameValidator.setTopicResourceService(topicResourceService);
 
+		typeValidator.setGroupResourceService(groupResourceService);
+
 		Mockito.doReturn(Boolean.TRUE).when(userUtils).isAdministrator(topicApplyDto.getApprover(), true);
 		Mockito.doReturn(topicToWhiltelist).when(topicResourceService).loadCachedTopicToAdministrator();
+		Mockito.doReturn(groupNames).when(groupResourceService).findAllGroupName();
 	}
 
 	@Test

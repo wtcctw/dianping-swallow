@@ -24,7 +24,8 @@ public class ConsumerServerHandler extends AbstractHandler<TopicApplyDto,LionCon
     @Override
     public Object handle(TopicApplyDto value, LionConfigureResult result) {
 
-        Pair<String, ResponseStatus> pair = consumerServerResourceService.loadIdleConsumerServer();
+        String groupName = value.getType().trim();
+        Pair<String, ResponseStatus> pair = consumerServerResourceService.loadIdleConsumerServer(groupName);
         if(result == null){
             result = new LionConfigureResult();
         }

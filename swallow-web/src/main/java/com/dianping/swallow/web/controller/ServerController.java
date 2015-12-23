@@ -4,10 +4,7 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.BaseQueryDto;
 import com.dianping.swallow.web.dao.impl.DefaultMongoDao;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
-import com.dianping.swallow.web.model.resource.ConsumerServerResource;
-import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
-import com.dianping.swallow.web.model.resource.ProducerServerResource;
+import com.dianping.swallow.web.model.resource.*;
 import com.dianping.swallow.web.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,9 @@ public class ServerController extends AbstractSidebarBasedController {
 
     @Resource(name = "mongoResourceService")
     private MongoResourceService mongoResourceService;
+
+    @Resource(name = "groupResourceService")
+    private GroupResourceService groupResourceService;
 
     @Resource(name = "ipCollectorService")
     private IPCollectorService ipCollectorService;
@@ -325,22 +325,43 @@ public class ServerController extends AbstractSidebarBasedController {
 
     }
 
-    @RequestMapping(value = "/console/server/mongotype", method = RequestMethod.GET)
+    @RequestMapping(value = "/console/server/grouptype", method = RequestMethod.GET)
     @ResponseBody
-    public Object loadMongoServerType() {
+    public Object loadGroupType() {
 
-        List<MongoType> list = new ArrayList<MongoType>();
+        return groupResourceService.findAllGroupName();
 
-        List<MongoResource> mongoResources = mongoResourceService.findAll(DefaultMongoDao.TYPE);
-        for (MongoResource mongoResource : mongoResources) {
-            MongoType type = mongoResource.getMongoType();
-            if (!list.contains(type)) {
-                list.add(type);
-            }
-        }
+    }
 
-        return list;
+    @RequestMapping(value = "/console/server/group")
+    public ModelAndView groupSetting(HttpServletRequest request, HttpServletResponse response) {
 
+        subSide = "group";
+        return new ModelAndView("server/group", createViewMap());
+    }
+
+    @RequestMapping(value = "/console/server/group/list", method = RequestMethod.POST)
+    @ResponseBody
+    public Object groupList(@RequestBody BaseQueryDto dto) {
+
+        int offset = dto.getOffset();
+        int limit = dto.getLimit();
+        return groupResourceService.findGroupResourcePage(offset, limit);
+
+    }
+
+    @RequestMapping(value = "/console/server/group/create", method = RequestMethod.POST)
+    @ResponseBody
+    public Boolean groupResourceCreate(@RequestBody GroupResource groupResource) {
+
+        return groupResourceService.update(groupResource);
+    }
+
+    @RequestMapping(value = "/console/server/group/remove", method = RequestMethod.GET)
+    @ResponseBody
+    public int remvoeGroupResource(@RequestParam(value = "groupName") String groupName) {
+
+        return groupResourceService.remove(groupName);
     }
 
     public static Map<String, Set<String>> parseServerURIString(String value) {

@@ -26,6 +26,7 @@
                     <th style="text-align: left">类型</th>
                     <th style="text-align: left">端口</th>
                     <th style="text-align: left">组ID</th>
+                    <th style="text-align: left">分组</th>
                     <th style="text-align: left">告警配置</th>
                     <th style="text-align: left">启用</th>
                     <th style="text-align: left">告警</th>
@@ -38,6 +39,7 @@
                     <td style="text-align: left" ng-bind="ad.type"></td>
                     <td style="text-align: left" ng-bind="ad.port"></td>
                     <td style="text-align: left" ng-bind="ad.groupId"></td>
+                    <td style="text-align: left" ng-bind="ad.groupName"></td>
                     <td style="text-align: left"><a href="#myModal1"
                                                     ng-click="setModalInput($index);" data-toggle="modal">详情</a></td>
                     <td style="text-align: left"><label class="pull-left inline">
@@ -127,6 +129,17 @@
                                     type="text" class="form-control" data-provide="typeahead" autocomplete="off"
                                     ng-model="consumerserverEntry.groupId" id="groupId">
                                 </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>分组</b></label> <select
+                                    class="form-control" ng-model="consumerserverEntry.groupName"
+                                    id="groupName" required>
+                                <option ng-repeat="type in groups"
+                                        value="{{type}}">{{type}}</option>
+                            </select>
                             </div>
                         </div>
                         <div class="control-group">

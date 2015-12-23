@@ -55,7 +55,7 @@ public class TopicWhiteListLionHandler extends AbstractLionHandler {
             for(String env : envs){
                 status	=  doEditLion(TopicResourceServiceImpl.SWALLOW_TOPIC_WHITELIST_KEY, topicJoin,
                         StringUtils.join(newTopics, ";"), isTest, env);
-                if(status != ResponseStatus.SUCCESS){
+                if(!ResponseStatus.SUCCESS.equals(status)){
                     return ResponseStatus.LIONEXCEPTION;
                 }
             }
