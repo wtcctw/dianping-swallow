@@ -329,17 +329,7 @@ public class ServerController extends AbstractSidebarBasedController {
     @ResponseBody
     public Object loadGroupType() {
 
-        List<String> list = new ArrayList<String>();
-
-        List<GroupResource> groupResources = groupResourceService.findAll();
-        for (GroupResource groupResource : groupResources) {
-            String groupName = groupResource.getGroupName();
-            if (!list.contains(groupName)) {
-                list.add(groupName);
-            }
-        }
-
-        return list;
+        return groupResourceService.findAllGroupName();
 
     }
 

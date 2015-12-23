@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
 import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.MongoResourceService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,17 +54,17 @@ public class MongoResourceServiceImplTest {
 	@Test
 	public void test() {
 		
-		MongoResource mr =  mongoResourceService.findIdleMongoByType(MongoType.GENERAL.toString());
+		MongoResource mr =  mongoResourceService.findIdleMongoByType("一般消息队列");
 		Float disk = mr.getDisk();
 		System.out.println("disk is " + disk);
 		Assert.assertTrue(disk == 27.3043003082275391f);
 
-		mr =  mongoResourceService.findIdleMongoByType(MongoType.PAYMENT.toString());
+		mr =  mongoResourceService.findIdleMongoByType("下单消息队列");
 		disk = mr.getDisk();
 		System.out.println("disk is " + disk);
 		Assert.assertTrue(disk == 33.5612983703613281f);
 
-		mr =  mongoResourceService.findIdleMongoByType(MongoType.SEARCH.toString());
+		mr =  mongoResourceService.findIdleMongoByType("搜索消息队列");
 		disk = mr.getDisk();
 		System.out.println("disk is " + disk);
 		Assert.assertTrue(disk == 27.3043003082275391f);

@@ -8,6 +8,7 @@ import com.dianping.swallow.web.service.GroupResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,8 +42,18 @@ public class GroupResourceServiceImpl extends AbstractSwallowService implements 
     }
 
     @Override
-    public List<GroupResource> findAll(){
-        return groupResourceDao.findAll();
+    public List<String> findAllGroupName(){
+        List<GroupResource> groupResources = groupResourceDao.findAll();
+        List<String> list = new ArrayList<String>();
+
+        for (GroupResource groupResource : groupResources) {
+            String groupName = groupResource.getGroupName();
+            if (!list.contains(groupName)) {
+                list.add(groupName);
+            }
+        }
+
+        return list;
     }
 
     @Override

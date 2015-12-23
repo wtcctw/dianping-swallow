@@ -5,7 +5,6 @@ import com.dianping.swallow.web.controller.handler.AbstractHandler;
 import com.dianping.swallow.web.controller.handler.Handler;
 import com.dianping.swallow.web.controller.handler.result.LionConfigureResult;
 import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.MongoResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
@@ -26,8 +25,7 @@ public class MongoServerHandler extends AbstractHandler<TopicApplyDto,LionConfig
     @Override
     public Object handle(TopicApplyDto value, LionConfigureResult result) {
 
-        String type = value.getType();
-        String groupName = MongoType.findString(type);
+        String groupName = value.getType().trim();
         MongoResource mongoResource = mongoResourceService.findIdleMongoByType(groupName);
         if(mongoResource != null){
             String mongoChosen = mongoResource.getIp();
