@@ -9,6 +9,10 @@ import com.dianping.swallow.common.message.Destination;
  */
 public final class NuclearDestination extends Destination {
 
+    private NuclearDestination(){
+
+    }
+
     private NuclearDestination(String name) {
         super(name);
     }
