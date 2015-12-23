@@ -232,14 +232,11 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
     private void checkArgument(Destination dest, ConsumerConfig config, String consumerId) {
 
-        if (ConsumerType.NON_DURABLE == config.getConsumerType())
-        {// 非持久类型，不能有consumerId
+        if (ConsumerType.NON_DURABLE == config.getConsumerType()) {// 非持久类型，不能有consumerId
             if (consumerId != null) {
                 throw new IllegalArgumentException("ConsumerId should be null when consumer type is NON_DURABLE");
             }
-        } else
-
-        {// 持久类型，需要验证consumerId
+        } else {// 持久类型，需要验证consumerId
             if (!NameCheckUtil.isConsumerIdValid(consumerId)) {
                 throw new IllegalArgumentException(
                         "ConsumerId is invalid, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-30 long："
@@ -334,7 +331,6 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
                 slaveAddress = newSlave;
                 slaveConsumerThread.setRemoteAddress(newSlave);
             }
-
 
         }
     }
