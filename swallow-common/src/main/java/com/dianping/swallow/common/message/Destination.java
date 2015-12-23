@@ -70,25 +70,15 @@ public class Destination implements Serializable {
      * @return 消息目的地实例
      */
     public static Destination topic(String name) {
-        return new Destination(name, Type.TOPIC);
-    }
-
-
-    public static Destination destination(Destination dest) {
-        if (!dest.getClass().equals(Destination.class)) {
-            throw new IllegalArgumentException("Destination must be Destination class");
-        }
-
         //将name中的点替换成下划线
-        if (dest.getName() != null) {
-            dest = new Destination(dest.getName().replace('.', '_'));
+        if (name != null) {
+            name = name.replace('.', '_');
         }
-
-        if (!NameCheckUtil.isTopicNameValid(dest.getName())) {
+        if (!NameCheckUtil.isTopicNameValid(name)) {
             throw new IllegalArgumentException(
-                    "Topic name is illegal, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-50 long:\"" + dest.getName() + "\"");
+                    "Topic name is illegal, should be [0-9,a-z,A-Z,'_','-'], begin with a letter, and length is 2-50 long:\"" + name+"\"");
         }
-        return dest;
+        return new Destination(name, Type.TOPIC);
     }
 
     /**

@@ -9,69 +9,19 @@ import com.dianping.swallow.common.message.Destination;
  */
 public final class NuclearDestination extends Destination {
 
-    private static final String NAME_PREFIX = "NUCLEARMQ:";
-
     private NuclearDestination(String name) {
         super(name);
     }
 
+    /***
+     * 创建Topic类型的消息目的地<br>
+     *
+     * @param name Topic名称
+     * @return 消息目的地实例
+     */
     public static Destination topic(String name) {
-        return createDestination(name);
-    }
 
-    public static Destination destination(Destination dest) {
-        if (!(dest instanceof NuclearDestination)) {
-            return createDestination(dest.getName());
-        } else {
-            return dest;
-        }
-
-    }
-
-    private static Destination createDestination(String name) {
-
-        if (validateName(name)) {
-            Destination destination = new NuclearDestination(name.substring(NAME_PREFIX.length()));
-
-            return destination;
-        }
-        throw new IllegalArgumentException("Topic name is illegal,Nuclear Topic name should be start with NUCLEARMQ:");
-
-    }
-
-    private static boolean validateName(String name) {
-        if (!StringUtils.isEmpty(name)) {
-            if (name.startsWith(NAME_PREFIX)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean supportedDestination(Destination dest) {
-        if (dest != null) {
-            if (dest instanceof NuclearDestination) {
-                return true;
-            } else {
-                return validateName(dest.getName());
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean equals(Object obj){
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode(){
-        return super.hashCode();
-    }
-
-    @Override
-    public String toString(){
-        return super.toString();
+        return new NuclearDestination(name);
     }
 
 }

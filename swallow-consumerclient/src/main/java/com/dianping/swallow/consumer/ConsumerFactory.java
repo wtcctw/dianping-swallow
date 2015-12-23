@@ -48,6 +48,4 @@ public interface ConsumerFactory {
 
     List<InetSocketAddress> getOrDefaultTopicAddress(String topic);
 
-    boolean isSupported(Destination dest);
-
 }

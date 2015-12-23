@@ -10,8 +10,6 @@ import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.internal.task.AbstractConsumerTask;
 import com.dianping.swallow.consumer.internal.task.TaskChecker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author qi.yin

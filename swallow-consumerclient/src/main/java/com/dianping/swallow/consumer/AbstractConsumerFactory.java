@@ -28,11 +28,6 @@ public abstract class AbstractConsumerFactory extends AbstractObservable impleme
     }
 
     @Override
-    public boolean isSupported(Destination dest) {
-        return true;
-    }
-
-    @Override
     public List<InetSocketAddress> getTopicAddress(String topic) {
         throw new UnsupportedOperationException("[getTopicAddress] unsupported this operation.");
     }

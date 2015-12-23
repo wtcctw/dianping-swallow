@@ -1,13 +1,10 @@
 package com.dianping.swallow.consumer.nuclear.impl;
 
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
-import com.dianping.swallow.common.internal.config.SwallowClientConfig;
-import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.threadfactory.DefaultPullStrategy;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
-import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumer.nuclear.common.impl.NuclearDestination;
@@ -35,7 +32,7 @@ public class NuclearConsumer implements Consumer {
 
     private static final Logger logger = LoggerFactory.getLogger(NuclearConsumer.class);
 
-    private static final String APPKEY_PREFIX = "com.dianping.swallow.";//mtpoiop
+    private static final String APPKEY_PREFIX = "com.dianping.swallow.";
 
     private com.meituan.nuclearmq.client.Consumer consumer = null;
 
@@ -55,9 +52,7 @@ public class NuclearConsumer implements Consumer {
 
     private volatile AtomicBoolean started = new AtomicBoolean(false);
 
-    public NuclearConsumer(String appKey, Destination dest, String consumerId, ConsumerConfig config) {
-
-        dest = NuclearDestination.destination(dest);
+    public NuclearConsumer(String appKey, Destination dest, String consumerId, boolean isOnline, ConsumerConfig config) {
 
         checkArgument(consumerId);
 
@@ -69,14 +64,12 @@ public class NuclearConsumer implements Consumer {
         consumer.setAppkey(APPKEY_PREFIX + appKey);
         consumer.setTopic(dest.getName());
         consumer.setGroup(consumerId);
-
+        consumer.setIsOnline(isOnline);
         if (config instanceof NuclearConsumerConfig) {
             NuclearConsumerConfig nuclearConfig = (NuclearConsumerConfig) config;
             consumer.setIsAsync(nuclearConfig.isAsync());
-            consumer.setIsOnline(nuclearConfig.isOnline());
         } else {
             consumer.setIsAsync(false);
-            consumer.setIsOnline(EnvUtil.isProduct() ? true : false);
         }
 
         this.pullStrategy = new DefaultPullStrategy(config.getDelayBaseOnBackoutMessageException(),
@@ -84,7 +77,7 @@ public class NuclearConsumer implements Consumer {
 
         this.taskChecker = new LongTaskChecker(config.getLongTaskAlertTime(), "NuclearMQ.SwallowLongTask");
 
-        consumer.setCallback(new NuclearConsumerCallBack(this, createRetryWrapper(), taskChecker, new NuclearConsumerProcessor()));
+        consumer.setCallback(new NuclearConsumerCallback(this, createRetryWrapper(), taskChecker, new NuclearConsumerProcessor()));
     }
 
     @Override

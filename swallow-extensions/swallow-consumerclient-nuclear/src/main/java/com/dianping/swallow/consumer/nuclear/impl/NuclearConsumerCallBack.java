@@ -12,7 +12,7 @@ import com.meituan.nuclearmq.client.ConsumerCallback;
  * @author qi.yin
  *         2015/12/22  上午10:28.
  */
-public class NuclearConsumerCallBack implements ConsumerCallback {
+public class NuclearConsumerCallback implements ConsumerCallback {
 
     private Consumer consumer;
 
@@ -22,7 +22,7 @@ public class NuclearConsumerCallBack implements ConsumerCallback {
 
     private ConsumerProcessor consumserProcessor;
 
-    public NuclearConsumerCallBack(Consumer consumer, SwallowCatActionWrapper actionWrapper, TaskChecker taskChecker, ConsumerProcessor consumserProcessor) {
+    public NuclearConsumerCallback(Consumer consumer, SwallowCatActionWrapper actionWrapper, TaskChecker taskChecker, ConsumerProcessor consumserProcessor) {
 
         this.consumer = consumer;
         this.actionWrapper = actionWrapper;

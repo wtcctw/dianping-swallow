@@ -1,6 +1,5 @@
 package com.dianping.swallow.consumer.nuclear.impl;
 
-import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.consumer.ConsumerConfig;
 
 /**
@@ -9,25 +8,14 @@ import com.dianping.swallow.consumer.ConsumerConfig;
  */
 public class NuclearConsumerConfig extends ConsumerConfig {
 
-
     public NuclearConsumerConfig() {
         super();
     }
 
-    public NuclearConsumerConfig(boolean isOnline, boolean isAsync) {
-        this.isOnline = isOnline;
+    public NuclearConsumerConfig(boolean isAsync) {
+        super();
         this.isAsync = isAsync;
     }
-
-    public boolean isOnline() {
-        return isOnline;
-    }
-
-    public void setIsOnline(boolean isOnline) {
-        this.isOnline = isOnline;
-    }
-
-    private boolean isOnline = EnvUtil.isProduct() ? true : false;
 
     public boolean isAsync() {
         return isAsync;
@@ -38,6 +26,5 @@ public class NuclearConsumerConfig extends ConsumerConfig {
     }
 
     private boolean isAsync = false;
-
 
 }

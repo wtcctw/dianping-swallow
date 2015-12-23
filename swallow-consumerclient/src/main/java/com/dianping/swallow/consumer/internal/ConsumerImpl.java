@@ -95,8 +95,6 @@ public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
     public ConsumerImpl(Destination dest, String consumerId, ConsumerConfig config, InetSocketAddress masterAddress,
                         InetSocketAddress slaveAddress, HeartBeatSender heartBeatSender) {
 
-        dest = Destination.destination(dest);
-
         checkArgument(dest, config, consumerId);
 
         this.dest = dest;
