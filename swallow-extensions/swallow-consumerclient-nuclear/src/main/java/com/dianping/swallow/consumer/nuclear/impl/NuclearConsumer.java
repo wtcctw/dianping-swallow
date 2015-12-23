@@ -66,8 +66,7 @@ public class NuclearConsumer implements Consumer {
         consumer.setGroup(consumerId);
         consumer.setIsOnline(isOnline);
         if (config instanceof NuclearConsumerConfig) {
-            NuclearConsumerConfig nuclearConfig = (NuclearConsumerConfig) config;
-            consumer.setIsAsync(nuclearConfig.isAsync());
+            consumer.setIsAsync(((NuclearConsumerConfig) config).isAsync());
         } else {
             consumer.setIsAsync(false);
         }

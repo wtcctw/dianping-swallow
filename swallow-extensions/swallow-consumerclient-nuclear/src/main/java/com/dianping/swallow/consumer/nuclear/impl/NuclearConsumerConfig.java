@@ -8,12 +8,12 @@ import com.dianping.swallow.consumer.ConsumerConfig;
  */
 public class NuclearConsumerConfig extends ConsumerConfig {
 
+    private boolean isAsync = false;
+
     public NuclearConsumerConfig() {
-        super();
     }
 
     public NuclearConsumerConfig(boolean isAsync) {
-        super();
         this.isAsync = isAsync;
     }
 
@@ -25,6 +25,6 @@ public class NuclearConsumerConfig extends ConsumerConfig {
         this.isAsync = isAsync;
     }
 
-    private boolean isAsync = false;
+
 
 }

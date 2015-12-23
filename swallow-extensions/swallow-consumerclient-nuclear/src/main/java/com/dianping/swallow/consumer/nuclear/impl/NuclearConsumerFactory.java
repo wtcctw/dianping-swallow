@@ -44,6 +44,11 @@ public class NuclearConsumerFactory extends AbstractConsumerFactory implements C
     }
 
     @Override
+    public Consumer createConsumer(Destination dest, String consumerId) {
+        return createConsumer(dest, consumerId, new NuclearConsumerConfig());
+    }
+
+    @Override
     public Consumer createConsumer(Destination dest, ConsumerConfig config) {
         throw new UnsupportedOperationException("[createConsumer] unsupported this operation.");
     }
