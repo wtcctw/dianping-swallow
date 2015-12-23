@@ -82,4 +82,8 @@ public class ConsumerTopicStatsDataServiceImpl implements ConsumerTopicStatsData
 		return statsDataResult;
 	}
 
+	@Override
+	public Class<?> getStatsDataClass(){
+		return ConsumerTopicStatsData.class;
+	}
 }

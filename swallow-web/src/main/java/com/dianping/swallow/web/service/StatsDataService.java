@@ -11,4 +11,6 @@ public interface StatsDataService {
     boolean removeLessThanTimeKey(long timeKey);
 
     StatsData findOldestData();
+
+    Class<?> getStatsDataClass();
 }

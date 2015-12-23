@@ -86,4 +86,8 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 		return producerTopicStatsDataDao.findOldestData();
 	}
 
+	@Override
+	public Class<?> getStatsDataClass() {
+		return ProducerTopicStatsData.class;
+	}
 }
