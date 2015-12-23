@@ -13,11 +13,13 @@ import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsData
  *
  *         2015年8月3日 下午2:40:22
  */
-public interface ConsumerIdStatsDataService {
+public interface ConsumerIdStatsDataService extends StatsDataService{
 
 	boolean insert(ConsumerIdStatsData consumerIdStatsData);
 	
 	boolean insert(List<ConsumerIdStatsData> consumerIdStatsDatas);
+
+	boolean removeLessThanTimeKey(long timeKey);
 
 	List<ConsumerIdStatsData> findByTopicAndConsumerId(String topicName, String consumerId, int offset, int limit);
 
@@ -33,4 +35,6 @@ public interface ConsumerIdStatsDataService {
 
 	ConsumerIdStatsData findOneByTopicAndTimeAndConsumerId(String topicName, String consumerId, long startKey,
 			long endKey, boolean isGt);
+
+	ConsumerIdStatsData findOldestData();
 }

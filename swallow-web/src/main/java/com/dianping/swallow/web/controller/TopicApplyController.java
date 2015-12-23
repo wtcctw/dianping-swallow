@@ -126,7 +126,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
 
         topicApplyResource.setLionConfigureResult(lionConfigureResult);
 
-        if (status != ResponseStatus.SUCCESS) {
+        if (!ResponseStatus.SUCCESS.equals(status)) {
             return status;
         }
 
@@ -147,7 +147,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         lionHandlerChain.addHandler(topicCfgLionHandler);
         status = lionHandlerChain.handle(lionEditorEntity, emptyObject);
 
-        if (status != ResponseStatus.SUCCESS) {
+        if (!ResponseStatus.SUCCESS.equals(status)) {
             return status;
         }
 

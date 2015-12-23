@@ -16,7 +16,11 @@ public interface ProducerServerStatsDataDao {
 	
 	boolean insert(List<ProducerServerStatsData> serverStatsDatas);
 
+	boolean removeLessThanTimeKey(long timeKey);
+
 	List<ProducerServerStatsData> findSectionData(String ip, long startKey, long endKey);
 
 	List<ProducerServerStatsData> findSectionData(long startKey, long endKey);
+
+	ProducerServerStatsData findOldestData();
 }

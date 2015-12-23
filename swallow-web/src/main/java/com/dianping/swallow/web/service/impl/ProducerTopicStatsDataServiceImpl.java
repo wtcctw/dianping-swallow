@@ -34,6 +34,11 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 	}
 
 	@Override
+	public boolean removeLessThanTimeKey(long timeKey) {
+		return producerTopicStatsDataDao.removeLessThanTimeKey(timeKey);
+	}
+
+	@Override
 	public List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit) {
 		return producerTopicStatsDataDao.findByTopic(topicName, offset, limit);
 	}
@@ -76,4 +81,13 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 		return producerTopicStatsDataDao.findOneByTopicAndTime(topicName, startKey, endKey, isGt);
 	}
 
+	@Override
+	public ProducerTopicStatsData findOldestData() {
+		return producerTopicStatsDataDao.findOldestData();
+	}
+
+	@Override
+	public Class<?> getStatsDataClass() {
+		return ProducerTopicStatsData.class;
+	}
 }

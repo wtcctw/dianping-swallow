@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.model.dom;
 
 
-
 /**
  * @author mingdongli
  *
@@ -20,6 +19,16 @@ public class MongoReport implements Comparable<MongoReport>{
     private Integer qps;
     
     private String ip;
+
+	private String create_date;
+
+	private String dba;
+
+	private int threads;
+
+	private int dev_cnt;
+
+	private int _id;
 
 	public String getIp() {
 		return ip;
@@ -67,6 +76,47 @@ public class MongoReport implements Comparable<MongoReport>{
 
 	public void setQps(int qps) {
 		this.qps = qps;
+	}
+
+	//在反序列化中使用，不要删除
+	public String getCreate_date() {
+		return create_date;
+	}
+
+	public void setCreate_date(String create_date) {
+		this.create_date = create_date;
+	}
+
+	public String getDba() {
+		return dba;
+	}
+
+	public void setDba(String dba) {
+		this.dba = dba;
+	}
+
+	public int getThreads() {
+		return threads;
+	}
+
+	public void setThreads(int threads) {
+		this.threads = threads;
+	}
+
+	public int getDev_cnt() {
+		return dev_cnt;
+	}
+
+	public void setDev_cnt(int dev_cnt) {
+		this.dev_cnt = dev_cnt;
+	}
+
+	public int get_id() {
+		return _id;
+	}
+
+	public void set_id(int _id) {
+		this._id = _id;
 	}
 
 	@Override

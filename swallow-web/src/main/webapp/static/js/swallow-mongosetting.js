@@ -96,10 +96,10 @@ module.controller('MongoServerSettingController', ['$rootScope', '$scope', '$htt
 	$scope.mongoserverEntry.load;
 	$scope.mongoserverEntry.qps;
 	$scope.mongoserverEntry.topics;
-	$scope.mongoserverEntry.mongoType;
+	$scope.mongoserverEntry.groupName;
 	
 	$scope.refreshpage = function(myForm){
-		$scope.mongoserverEntry.mongoType = $('#mongoType').val();
+		$scope.mongoserverEntry.groupName = $('#groupName').val();
 		$('#myModal').modal('hide');
 		var param = JSON.stringify($scope.mongoserverEntry);
 		
@@ -118,7 +118,7 @@ module.controller('MongoServerSettingController', ['$rootScope', '$scope', '$htt
 		$scope.mongoserverEntry.load = "";
 		$scope.mongoserverEntry.qps = "";
 		$scope.mongoserverEntry.topics = "";
-		$scope.mongoserverEntry.mongoType = "";
+		$scope.mongoserverEntry.groupName = "";
 	}
 	
 	$scope.setModalInput = function(index){
@@ -135,7 +135,7 @@ module.controller('MongoServerSettingController', ['$rootScope', '$scope', '$htt
 			$('#topics').tagsinput('removeAll');
 		}
 		
-		$('#mongoType').val($scope.searchPaginator.currentPageItems[index].mongoType);
+		$('#groupName').val($scope.searchPaginator.currentPageItems[index].groupName);
 		$scope.mongoserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
 		$scope.mongoserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
 		$scope.mongoserverEntry.catalog = $scope.searchPaginator.currentPageItems[index].catalog;
@@ -160,8 +160,14 @@ module.controller('MongoServerSettingController', ['$rootScope', '$scope', '$htt
 	}).error(function(data, status, headers, config) {
 	});
 
-	$scope.types = ["GENERAL","PAYMENT","SEARCH"];
-	
+	$http({
+		method : 'GET',
+		url : window.contextPath + '/console/server/grouptype'
+	}).success(function(data) {
+		$scope.types = data;
+	}).error(function(data, status, headers, config) {
+	});
+
 	$rootScope.removerecord = function(catalog){
 		$http.get(window.contextPath + "/console/server/mongo/remove", {
 			params : {

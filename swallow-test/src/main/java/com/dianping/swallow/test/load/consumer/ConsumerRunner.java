@@ -1,7 +1,6 @@
 package com.dianping.swallow.test.load.consumer;
 
 
-
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 import com.dianping.swallow.common.message.Destination;
@@ -16,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -103,10 +103,20 @@ public class ConsumerRunner extends AbstractLoadTest{
 		BitMarker bitMarker = messageCount.get(key);
 		
 		if(bitMarker == null){
-			bitMarker = new BitMarker();
+			bitMarker = createBitMarker();
 			messageCount.put(key, bitMarker);
 		}	return bitMarker;
 	}
+
+	private BitMarker createBitMarker() {
+		
+		if(totalMessageCount == Long.MAX_VALUE){
+			return new BitMarker();
+		}
+		return new BitMarker(totalMessageCount);
+	}
+
+
 
 	private void count(Message msg, BitMarker bm) {
 
@@ -133,6 +143,10 @@ public class ConsumerRunner extends AbstractLoadTest{
 
 			BitMarker bitMarker = entry.getValue();
 			logger.info("[doOnExit]" + entry.getKey() + "," + bitMarker.realCount() + "," + bitMarker.noRepetCount());
+			List<Long> lack = bitMarker.lackPoints();
+			if(!lack.isEmpty()){
+				logger.info("[doOnExit][lack points]" + lack);
+			}
 		}
 	}
 }

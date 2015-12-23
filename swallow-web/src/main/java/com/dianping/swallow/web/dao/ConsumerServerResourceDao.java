@@ -1,9 +1,9 @@
 package com.dianping.swallow.web.dao;
 
-import java.util.List;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.resource.ConsumerServerResource;
+
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -30,7 +30,7 @@ public interface ConsumerServerResourceDao extends ServerResourceDao {
 
 	Pair<Long, List<ConsumerServerResource>> findConsumerServerResourcePage(int offset, int limit);
 
-	ConsumerServerResource loadIdleConsumerServer();
+	ConsumerServerResource loadIdleConsumerServer(String groupName);
 
 	int getMaxGroupId();
 }

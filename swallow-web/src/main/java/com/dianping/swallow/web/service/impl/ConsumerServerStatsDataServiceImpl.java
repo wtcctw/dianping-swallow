@@ -14,71 +14,85 @@ import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年8月3日 下午3:17:42
  */
 @Service("consumerServerStatsDataService")
 public class ConsumerServerStatsDataServiceImpl implements ConsumerServerStatsDataService {
 
-	@Autowired
-	private ConsumerServerStatsDataDao consumerServerStatsDataDao;
+    @Autowired
+    private ConsumerServerStatsDataDao consumerServerStatsDataDao;
 
-	@Override
-	public boolean insert(ConsumerServerStatsData serverStatsData) {
-		return consumerServerStatsDataDao.insert(serverStatsData);
-	}
-	
-	@Override
-	public boolean insert(List<ConsumerServerStatsData> serverStatsDatas) {
-		return consumerServerStatsDataDao.insert(serverStatsDatas);
-	}
+    @Override
+    public boolean insert(ConsumerServerStatsData serverStatsData) {
+        return consumerServerStatsDataDao.insert(serverStatsData);
+    }
 
-	@Override
-	public List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey) {
-		return consumerServerStatsDataDao.findSectionData(ip, startKey, endKey);
-	}
+    @Override
+    public boolean insert(List<ConsumerServerStatsData> serverStatsDatas) {
+        return consumerServerStatsDataDao.insert(serverStatsDatas);
+    }
 
-	@Override
-	public long findQpsByServerIp(String ip, long startKey, long endKey) {
-		List<ConsumerServerStatsData> serverStatsDatas = findSectionData(ip, startKey, endKey);
-		long totalQps = 0;
-		for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
-			totalQps += serverStatsData.getSendQps();
-		}
-		return totalQps;
-	}
+    @Override
+    public boolean removeLessThanTimeKey(long timeKey) {
+        return consumerServerStatsDataDao.removeLessThanTimeKey(timeKey);
+    }
 
-	@Override
-	public Map<String, StatsDataMapPair> findSectionQpsData(long startKey, long endKey) {
-		List<ConsumerServerStatsData> serverStatsDatas = consumerServerStatsDataDao.findSectionData(startKey, endKey);
-		Map<String, StatsDataMapPair> serverStatsDataMaps = null;
+    @Override
+    public List<ConsumerServerStatsData> findSectionData(String ip, long startKey, long endKey) {
+        return consumerServerStatsDataDao.findSectionData(ip, startKey, endKey);
+    }
 
-		if (serverStatsDatas != null) {
-			serverStatsDataMaps = new HashMap<String, StatsDataMapPair>();
+    @Override
+    public long findQpsByServerIp(String ip, long startKey, long endKey) {
+        List<ConsumerServerStatsData> serverStatsDatas = findSectionData(ip, startKey, endKey);
+        long totalQps = 0;
+        for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
+            totalQps += serverStatsData.getSendQps();
+        }
+        return totalQps;
+    }
 
-			for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
+    @Override
+    public ConsumerServerStatsData findOldestData() {
+        return consumerServerStatsDataDao.findOldestData();
+    }
 
-				if (serverStatsDataMaps.containsKey(serverStatsData.getIp())) {
+    @Override
+    public Map<String, StatsDataMapPair> findSectionQpsData(long startKey, long endKey) {
+        List<ConsumerServerStatsData> serverStatsDatas = consumerServerStatsDataDao.findSectionData(startKey, endKey);
+        Map<String, StatsDataMapPair> serverStatsDataMaps = null;
 
-					StatsDataMapPair statsDataResult = serverStatsDataMaps.get(serverStatsData.getIp());
-					statsDataResult.getSendStatsData().put(serverStatsData.getTimeKey(), serverStatsData.getSendQps());
-					statsDataResult.getAckStatsData().put(serverStatsData.getTimeKey(), serverStatsData.getAckQps());
-					serverStatsDataMaps.put(serverStatsData.getIp(), statsDataResult);
-				} else {
-					StatsDataMapPair statsDataResult = new StatsDataMapPair();
-					NavigableMap<Long, Long> sendStatsData = new TreeMap<Long, Long>();
-					sendStatsData.put(serverStatsData.getTimeKey(), serverStatsData.getSendQps());
-					NavigableMap<Long, Long> ackStatsData = new TreeMap<Long, Long>();
-					sendStatsData.put(serverStatsData.getTimeKey(), serverStatsData.getAckQps());
-					statsDataResult.setSendStatsData(sendStatsData);
-					statsDataResult.setAckStatsData(ackStatsData);
-					serverStatsDataMaps.put(serverStatsData.getIp(), statsDataResult);
-				}
-			}
-		}
-		return serverStatsDataMaps;
-	}
+        if (serverStatsDatas != null) {
+            serverStatsDataMaps = new HashMap<String, StatsDataMapPair>();
+
+            for (ConsumerServerStatsData serverStatsData : serverStatsDatas) {
+
+                if (serverStatsDataMaps.containsKey(serverStatsData.getIp())) {
+
+                    StatsDataMapPair statsDataResult = serverStatsDataMaps.get(serverStatsData.getIp());
+                    statsDataResult.getSendStatsData().put(serverStatsData.getTimeKey(), serverStatsData.getSendQps());
+                    statsDataResult.getAckStatsData().put(serverStatsData.getTimeKey(), serverStatsData.getAckQps());
+                    serverStatsDataMaps.put(serverStatsData.getIp(), statsDataResult);
+                } else {
+                    StatsDataMapPair statsDataResult = new StatsDataMapPair();
+                    NavigableMap<Long, Long> sendStatsData = new TreeMap<Long, Long>();
+                    sendStatsData.put(serverStatsData.getTimeKey(), serverStatsData.getSendQps());
+                    NavigableMap<Long, Long> ackStatsData = new TreeMap<Long, Long>();
+                    sendStatsData.put(serverStatsData.getTimeKey(), serverStatsData.getAckQps());
+                    statsDataResult.setSendStatsData(sendStatsData);
+                    statsDataResult.setAckStatsData(ackStatsData);
+                    serverStatsDataMaps.put(serverStatsData.getIp(), statsDataResult);
+                }
+            }
+        }
+        return serverStatsDataMaps;
+    }
+
+    @Override
+    public Class<?> getStatsDataClass() {
+        return ConsumerServerStatsData.class;
+    }
 
 }
