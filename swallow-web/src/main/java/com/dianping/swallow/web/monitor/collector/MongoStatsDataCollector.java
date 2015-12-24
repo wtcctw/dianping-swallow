@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 15/12/23  下午3:56.
  */
 @Component
-public class MongoStatsDataCollector extends AbstractRealTimeCollector implements MonitorDataListener, Observer ,ApplicationContextAware{
+public class MongoStatsDataCollector extends AbstractRealTimeCollector implements MonitorDataListener, Observer, ApplicationContextAware {
 
     private static final String MONGO_PREFIX = "mongodb://";
 
@@ -70,7 +70,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         NavigableMap<Long, StatisData> lastData;
         Set<String> topics = producerDataRetriever.getTopics();
         for (String topic : topics) {
-            if(ConsumerDataRetrieverWrapper.TOTAL.equalsIgnoreCase(topic)){
+            if (ConsumerDataRetrieverWrapper.TOTAL.equalsIgnoreCase(topic)) {
                 continue;
             }
             lastData = producerDataRetriever.getLastStatisValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic), StatisType.SAVE);
@@ -78,14 +78,18 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
                 String mongoIp = topicToMongo.get(topic);
                 if (StringUtils.isBlank(mongoIp)) {
                     TopicConfig topicConfig = swallowConfig.getTopicConfig(topic);
+
                     if (topicConfig == null || (topicConfig != null && StringUtils.isBlank(topicConfig.getStoreUrl()))) {
-                        topicConfig = swallowConfig.defaultTopicConfig();
-                    }
-                    mongoIp = doExtractMongoIp(topicConfig);
-                    if (StringUtils.isNotBlank(mongoIp)) {
-                        topicToMongo.put(topic, mongoIp);
+                        topicToMongo.put(topic, loadDefaultConfigIp());
                         addMongoStatsData(mongoIp, lastData);
+                    } else {
+                        mongoIp = doExtractMongoIp(topicConfig);
+                        if (StringUtils.isNotBlank(mongoIp)) {
+                            topicToMongo.put(topic, mongoIp);
+                            addMongoStatsData(mongoIp, lastData);
+                        }
                     }
+
                 } else {
                     addMongoStatsData(mongoIp, lastData);
                 }
@@ -95,7 +99,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         Set<String> ips = mongoStatsDataMap.keySet();
         for (String ip : ips) {
             MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(ip);
-            if(mongoStatsDataContainer.isUpToMaxSize() && mongoStatsDataContainer.isEmpty()){
+            if (mongoStatsDataContainer.isUpToMaxSize() && mongoStatsDataContainer.isEmpty()) {
                 mongoStatsDataMap.remove(ip);
                 continue;
             }
@@ -107,7 +111,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
     private void addMongoStatsData(String mongoIp, NavigableMap<Long, StatisData> lastData) {
 
         MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(mongoIp);
-        if(mongoStatsDataContainer == null){
+        if (mongoStatsDataContainer == null) {
             mongoStatsDataContainer = applicationContext.getBean(MongoStatsDataContainer.class);
             mongoStatsDataMap.put(mongoIp, mongoStatsDataContainer);
         }
@@ -167,15 +171,26 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         }
     }
 
-    private void createOrUpdateTopicToMongo(AbstractSwallowConfig.SwallowConfigArgs args){
+    private void createOrUpdateTopicToMongo(AbstractSwallowConfig.SwallowConfigArgs args) {
 
         String ip = extractMongoIp(args);
         if (StringUtils.isNotBlank(ip)) {
             topicToMongo.put(args.getTopic(), ip);
+        } else {
+            topicToMongo.put(args.getTopic(), loadDefaultConfigIp());
         }
     }
 
-    private void removeFromTopicToMongo(AbstractSwallowConfig.SwallowConfigArgs args){
+    private String loadDefaultConfigIp() {
+        TopicConfig topicConfig = swallowConfig.defaultTopicConfig();
+        String defaultIp = doExtractMongoIp(topicConfig);
+        if (StringUtils.isBlank(defaultIp)) {
+            throw new RuntimeException("swallow.topiccfg.default 没有配置");
+        }
+        return defaultIp;
+    }
+
+    private void removeFromTopicToMongo(AbstractSwallowConfig.SwallowConfigArgs args) {
 
         String ip = extractMongoIp(args);
         if (StringUtils.isNotBlank(ip)) {
@@ -183,7 +198,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         }
     }
 
-    private String extractMongoIp(AbstractSwallowConfig.SwallowConfigArgs args){
+    private String extractMongoIp(AbstractSwallowConfig.SwallowConfigArgs args) {
 
         String topic = args.getTopic();
         TopicConfig topicConfig = swallowConfig.getTopicConfig(topic);
@@ -200,9 +215,9 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         if (StringUtils.isNotBlank(storeUrl) && storeUrl.startsWith(MONGO_PREFIX)) {
             String ipAddrs = storeUrl.substring(MONGO_PREFIX.length());
 
-            if(ipAddrs.indexOf(":") != -1){
+            if (ipAddrs.indexOf(":") != -1) {
                 return ipAddrs.split(":")[0];
-            }else{
+            } else {
                 return ipAddrs;
             }
         }
