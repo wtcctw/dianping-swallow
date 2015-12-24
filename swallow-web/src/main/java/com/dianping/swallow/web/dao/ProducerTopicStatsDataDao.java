@@ -24,4 +24,6 @@ public interface ProducerTopicStatsDataDao {
 
 	List<ProducerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
 
+	ProducerTopicStatsData findOldestData();
+
 }

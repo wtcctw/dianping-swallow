@@ -1,19 +1,17 @@
 package com.dianping.swallow.web.dao.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.dao.MongoDao;
+import com.dianping.swallow.web.model.resource.MongoResource;
+import com.mongodb.WriteResult;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.dianping.swallow.web.common.Pair;
-import com.dianping.swallow.web.dao.MongoDao;
-import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
-import com.mongodb.WriteResult;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -27,7 +25,7 @@ public class DefaultMongoDao extends AbstractWriteDao implements MongoDao {
 
 	private static final String CATALOG = "catalog";
 
-	public static final String TYPE = "mongoType";
+	public static final String TYPE = "groupName";
 
 	public static final String IP = "ip";
 
@@ -78,7 +76,7 @@ public class DefaultMongoDao extends AbstractWriteDao implements MongoDao {
 	}
 
 	@Override
-	public List<MongoResource> findByType(MongoType mongoType) {
+	public List<MongoResource> findByType(String mongoType) {
 
 		Query query = new Query(Criteria.where(TYPE).is(mongoType));
 		List<MongoResource> mongoResource = mongoTemplate.find(query, MongoResource.class, MONGORESOURCE_COLLECTION);

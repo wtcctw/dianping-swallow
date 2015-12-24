@@ -1,16 +1,14 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.MongoDao;
 import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.MongoResourceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author mingdongli
@@ -56,7 +54,7 @@ public class MongoResourceServiceImpl extends AbstractSwallowService implements 
 	}
 
 	@Override
-	public MongoResource findIdleMongoByType(MongoType mongoType) {
+	public MongoResource findIdleMongoByType(String mongoType) {
 
 		List<MongoResource> mongoResources = mongoDao.findByType(mongoType);
 		return loadIdleMongo(mongoResources);

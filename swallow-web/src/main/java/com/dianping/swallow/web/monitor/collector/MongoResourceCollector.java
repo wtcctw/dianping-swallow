@@ -3,7 +3,7 @@ package com.dianping.swallow.web.monitor.collector;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.model.dom.MongoReport;
 import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
+import com.dianping.swallow.web.service.GroupResourceService;
 import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 import com.dianping.swallow.web.service.MongoResourceService;
@@ -37,8 +37,13 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 
 	private static final String MESSAGE = "message";
 
+	private static final String GENETAL = "一般消息队列";
+
 	@Resource(name = "mongoResourceService")
 	private MongoResourceService mongoResourceService;
+
+	@Resource(name = "groupResourceService")
+	private GroupResourceService groupResourceService;
 
 	@Autowired
 	private HttpService httpSerivice;
@@ -54,7 +59,7 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 	@Override
 	public void doCollector() {
 
-		if(!EnvUtil.isProduct()){
+		if(!EnvUtil.isProduct() && !EnvUtil.isQa()){
 			return;
 		}
 		if(logger.isInfoEnabled()){
@@ -77,14 +82,14 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 					String catalog = mongoResource.getCatalog();
 					if (catalogToIp != null) {
 						List<String> ipList = catalogToIp.get(catalog);
-						if (ipList != null && ipList.size() == 2) {
+						if (ipList != null && ipList.size() > 1) {
 							String ips = StringUtils.join(ipList, ",");
 							mongoResource.setIp(ips);
 							MongoResource mongoResourceOld = mongoResourceService.findByIp(ips);
 							if (mongoResourceOld != null) {
-								MongoType mongoType = mongoResourceOld.getMongoType();
+								String mongoType = mongoResourceOld.getGroupName();
 								if (mongoType != null) {
-									mongoResource.setMongoType(mongoType);
+									mongoResource.setGroupName(mongoType);
 								}
 								mongoResource.setId(mongoResourceOld.getId());
 							}
@@ -142,14 +147,16 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 
 		MongoResource mongoResource = new MongoResource();
 		String catalog = mongoReport.getCatalog();
-		MongoType mongoType;
-		try {
-			mongoType = MongoType.findByType(catalog);
-		} catch (Exception e) {
-			mongoType = MongoType.GENERAL;
+		String mongoType = GENETAL;
+		List<String> groupNames = groupResourceService.findAllGroupName();
+
+		for(String gn : groupNames){
+			if(gn != null && gn.startsWith(catalog)){
+				mongoType = gn;
+			}
 		}
 
-		mongoResource.setMongoType(mongoType);
+		mongoResource.setGroupName(mongoType);
 		mongoResource.setCatalog(catalog);
 		mongoResource.setDisk(mongoReport.getDisk());
 		mongoResource.setLoad(mongoReport.getLoad());
@@ -177,4 +184,11 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 		return collectorInterval;
 	}
 
+	public void setMongoResourceService(MongoResourceService mongoResourceService) {
+		this.mongoResourceService = mongoResourceService;
+	}
+
+	public void setHttpSerivice(HttpService httpSerivice) {
+		this.httpSerivice = httpSerivice;
+	}
 }

@@ -1,10 +1,9 @@
 package com.dianping.swallow.web.dao;
 
-import java.util.List;
-
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
+
+import java.util.List;
 
 
 /**
@@ -24,7 +23,7 @@ public interface MongoDao extends Dao{
 
 	MongoResource findByIp(String ip); 
 
-	List<MongoResource> findByType(MongoType mongoType);
+	List<MongoResource> findByType(String mongoType);
 
 	List<MongoResource> findAll(String ... fields);
 

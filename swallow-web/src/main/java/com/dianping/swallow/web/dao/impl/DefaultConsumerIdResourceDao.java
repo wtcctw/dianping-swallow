@@ -171,9 +171,6 @@ public class DefaultConsumerIdResourceDao extends AbstractWriteDao implements Co
 
         int offset = consumerIdParam.getOffset();
         int limit = consumerIdParam.getLimit();
-        if(limit < 1){
-            limit = 1;
-        }
 
         query.skip(offset).limit(limit)
                 .with(new Sort(new Sort.Order(Direction.ASC, TOPIC), new Sort.Order(Direction.ASC, CONSUMERID)));

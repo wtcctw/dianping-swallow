@@ -11,13 +11,11 @@ import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
  *
  *         2015年8月3日 下午2:39:30
  */
-public interface ProducerTopicStatsDataService {
+public interface ProducerTopicStatsDataService extends StatsDataService {
 
 	boolean insert(ProducerTopicStatsData topicStatsData);
 	
 	boolean insert(List<ProducerTopicStatsData> topicStatsDatas);
-
-	boolean removeLessThanTimeKey(long timeKey);
 
 	List<ProducerTopicStatsData> findByTopic(String topicName, int offset, int limit);
 

@@ -5,7 +5,6 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.handler.result.LionConfigureResult;
 import com.dianping.swallow.web.model.resource.MongoResource;
-import com.dianping.swallow.web.model.resource.MongoType;
 import com.dianping.swallow.web.service.impl.ConsumerServerResourceServiceImpl;
 import com.dianping.swallow.web.service.impl.MongoResourceServiceImpl;
 import com.dianping.swallow.web.util.ResponseStatus;
@@ -40,11 +39,11 @@ public class ConfigureHandlerChainTest extends MockTest {
         topicApplyDto.setSize(1);
         topicApplyDto.setTopic("swallow-test");
         topicApplyDto.setApprover("hongjun.zhong");
-        topicApplyDto.setType(MongoType.GENERAL.toString());
+        topicApplyDto.setType("一般消息队列");
 
         MongoResource mongoResource = new MongoResource();
         mongoResource.setIp("1.1.1.1");
-        mongoResource.setMongoType(MongoType.GENERAL);
+        mongoResource.setGroupName("一般消息队列");
 
         Pair<String, ResponseStatus> pair = new Pair<String, ResponseStatus>();
         pair.setFirst("2.2.2.2");
@@ -60,8 +59,8 @@ public class ConfigureHandlerChainTest extends MockTest {
 
         mongoServerHandler.setMongoResourceService(mongoResourceService);
         consumerServerHandler.setConsumerServerResourceService(consumerServerResourceService);
-        Mockito.doReturn(mongoResource).when(mongoResourceService).findIdleMongoByType(MongoType.findByType(topicApplyDto.getType()));
-        Mockito.doReturn(pair).when(consumerServerResourceService).loadIdleConsumerServer();
+        Mockito.doReturn(mongoResource).when(mongoResourceService).findIdleMongoByType(topicApplyDto.getType());
+        Mockito.doReturn(pair).when(consumerServerResourceService).loadIdleConsumerServer(topicApplyDto.getType());
 
     }
 

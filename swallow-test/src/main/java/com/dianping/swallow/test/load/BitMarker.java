@@ -1,9 +1,12 @@
 package com.dianping.swallow.test.load;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * @author mengwenchao
@@ -52,6 +55,31 @@ public class BitMarker {
 		return  result + 1;
 	}
 
+	public List<Long> lackPoints(){
+		
+		long max = capacity;
+		for( ; max>=0 ; max--){
+			if(exist(max - 1)){
+				break;
+			}
+		}
+		return lackPoints(0, max);
+	}
+	
+	
+	public List<Long> lackPoints(long from, long end){
+		
+		List<Long> result = new LinkedList<Long>();
+		for(long i = from; i < end ;i++){
+			if(!exist(i)){
+				result.add(i);
+			}
+		}
+		
+		return result;
+		
+	}
+	
 	public synchronized void mark(long num){
 		
 		realCount.incrementAndGet();
@@ -114,6 +142,14 @@ public class BitMarker {
 		System.out.println();
 		System.out.println(bm.realCount());
 		System.out.println(bm.noRepetCount());
+		
+		
+		BitMarker m2 = new BitMarker();
+		m2.mark(1);
+		m2.mark(10);
+		
+		System.out.println(m2.lackPoints(1, 11));
+		
 	}
 
 }

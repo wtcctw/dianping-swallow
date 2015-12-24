@@ -100,6 +100,12 @@ public class DataMonitorController extends AbstractMonitorController implements 
         return new ModelAndView("monitor/producerserverqps", createViewMap("server", "producerserverqps"));
     }
 
+    @RequestMapping(value = "/console/monitor/mongo/qps", method = RequestMethod.GET)
+    public ModelAndView viewMongoServerQps() {
+
+        return new ModelAndView("monitor/mongoqps", createViewMap("server", "mongoqps"));
+    }
+
     @RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
     public ModelAndView viewTopicQps(@PathVariable String topic) {
 
@@ -257,6 +263,29 @@ public class DataMonitorController extends AbstractMonitorController implements 
         SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
                 * TIMESPAN_UNIT);
         serverQpx = producerDataRetriever.getServerQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
+
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+    }
+
+    @RequestMapping(value = "/console/monitor/mongo/qps/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getMongoQps() {
+
+        Map<String, StatsData> serverQpx = producerDataRetriever.getMongoQpx(QPX.SECOND);
+
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+    }
+
+    @RequestMapping(value = "/console/monitor/mongo/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getMongoQps(@PathVariable String startTime, @PathVariable String endTime) {
+        Map<String, StatsData> serverQpx = null;
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getProducerServerQps();
+        }
+        SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
+                * TIMESPAN_UNIT);
+        serverQpx = producerDataRetriever.getMongoQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
 
         return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
     }
@@ -581,6 +610,10 @@ public class DataMonitorController extends AbstractMonitorController implements 
                     allStats));
         }
 
+        if (result == null || result.isEmpty()) {
+            result.add(ChartBuilder.getHighChart(getTopicDesc(topic, yAxis), "", yAxis, producerData));
+        }
+
         return result;
     }
 
@@ -622,6 +655,9 @@ public class DataMonitorController extends AbstractMonitorController implements 
 
         if (consumerId.equals(MonitorData.TOTAL_KEY)) {
             return "所有consumerId";
+        }
+        if (StringUtils.isEmpty(consumerId)) {
+            return StringUtils.EMPTY;
         }
         String result = consumerId;
         if (Y_AXIS_TYPE_QPS.equals(yAxis)) {

@@ -108,6 +108,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	$scope.consumerserverEntry.groupId = "";
 	
 	$scope.refreshpage = function(myForm, index){
+		$scope.consumerserverEntry.groupName = $('#groupName').val();
 		$scope.consumerserverEntry.type = $('#serverType').val();
 		if ($scope.consumerserverEntry.sendAlarmSetting.peak < $scope.consumerserverEntry.sendAlarmSetting.valley
 				|| $scope.consumerserverEntry.ackAlarmSetting.peak < $scope.consumerserverEntry.ackAlarmSetting.valley){
@@ -172,7 +173,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ip = "";
 		$scope.consumerserverEntry.hostname = "";
 		$scope.consumerserverEntry.alarm = false;
-		$scope.consumerserverEntry.alarm = true;
+		$scope.consumerserverEntry.active = true;
 		$scope.consumerserverEntry.sendAlarmSetting.peak = "";
 		$scope.consumerserverEntry.sendAlarmSetting.valley = "";
 		$scope.consumerserverEntry.sendAlarmSetting.fluctuation = "";
@@ -197,6 +198,7 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.setModalInput = function(index){
+		$('#groupName').val($scope.searchPaginator.currentPageItems[index].groupName);
 		$('#serverType').val($scope.searchPaginator.currentPageItems[index].type);
 		$scope.isReadOnly = true;
 		$scope.consumerserverEntry.id = $scope.searchPaginator.currentPageItems[index].id;
@@ -212,6 +214,8 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 		$scope.consumerserverEntry.ackAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.fluctuationBase;
 		$scope.consumerserverEntry.port = $scope.searchPaginator.currentPageItems[index].port;
 		$scope.consumerserverEntry.groupId = $scope.searchPaginator.currentPageItems[index].groupId;
+		$scope.consumerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
+		$scope.consumerserverEntry.active = $scope.searchPaginator.currentPageItems[index].active;
 		
 	}
 	
@@ -246,6 +250,14 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
 	}
 	
 	$scope.types = ["MASTER","SLAVE"];
+
+	$http({
+		method : 'GET',
+		url : window.contextPath + '/console/server/grouptype'
+	}).success(function(data) {
+		$scope.groups = data;
+	}).error(function(data, status, headers, config) {
+	});
 	
 	$scope.changeconsumeralarm = function(ip, index){
 		var id = "#calarm" + index;

@@ -20,4 +20,5 @@ public interface ConsumerTopicStatsDataDao {
 
 	List<ConsumerTopicStatsData> findSectionData(String topicName, long startKey, long endKey);
 
+	ConsumerTopicStatsData findOldestData();
 }

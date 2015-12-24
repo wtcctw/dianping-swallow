@@ -81,4 +81,13 @@ public class ProducerTopicStatsDataServiceImpl implements ProducerTopicStatsData
 		return producerTopicStatsDataDao.findOneByTopicAndTime(topicName, startKey, endKey, isGt);
 	}
 
+	@Override
+	public ProducerTopicStatsData findOldestData() {
+		return producerTopicStatsDataDao.findOldestData();
+	}
+
+	@Override
+	public Class<?> getStatsDataClass() {
+		return ProducerTopicStatsData.class;
+	}
 }

@@ -28,7 +28,7 @@ public interface ConsumerServerResourceService extends ServerResourceService, Co
     ConsumerServerResource buildConsumerServerResource(String ip, String hostName, int port, int groupId,
                                                        ServerType serverType);
 
-    Pair<String, ResponseStatus> loadIdleConsumerServer();
+    Pair<String, ResponseStatus> loadIdleConsumerServer(String groupName);
 
     int getNextGroupId();
 
