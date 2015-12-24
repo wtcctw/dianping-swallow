@@ -7,7 +7,6 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.threadfactory.PullStrategy;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
-import com.dianping.swallow.consumer.nuclear.common.impl.NuclearDestination;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;

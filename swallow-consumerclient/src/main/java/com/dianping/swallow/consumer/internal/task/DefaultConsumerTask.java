@@ -2,14 +2,11 @@ package com.dianping.swallow.consumer.internal.task;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
-import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
-import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.processor.ConsumerProcessor;
-import com.dianping.swallow.common.internal.util.CatUtil;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.consumer.Consumer;
 import io.netty.channel.ChannelHandlerContext;
