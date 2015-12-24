@@ -80,8 +80,9 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
                     TopicConfig topicConfig = swallowConfig.getTopicConfig(topic);
 
                     if (topicConfig == null || (topicConfig != null && StringUtils.isBlank(topicConfig.getStoreUrl()))) {
-                        topicToMongo.put(topic, loadDefaultConfigIp());
-                        addMongoStatsData(mongoIp, lastData);
+                        String defaultIp = loadDefaultConfigIp();
+                        topicToMongo.put(topic, defaultIp);
+                        addMongoStatsData(defaultIp, lastData);
                     } else {
                         mongoIp = doExtractMongoIp(topicConfig);
                         if (StringUtils.isNotBlank(mongoIp)) {
