@@ -336,11 +336,11 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 ##### NuclearConsumerConfig配置详解
 
 使用Swallow接收NuclearMQ消息时，需要对接收端进行配置。目前只有参数delayBaseOnBackoutMessageException、delayUpperboundOnBackoutMessageException、retryCount、longTaskAlertTime、isAsync
-其中只有isAsync跟ConsumerConfig不一样。isAsync是接受端使用同步还是异步方式，true为异步，false为同步，默认为false。
+其中只有isAsync跟接收swallow消息的ConsumerConfig不一样。isAsync是接受端使用同步还是异步方式，true为异步，false为同步，默认为false。
 
 ##### 接收消息接口
 
-这个跟Swallow接收消息的接口一样，没有变化。
+这个跟接收Swallow消息的接口一样，没有变化。
 
 #### 代码示例
 ##### Maven pom.xml中添加依赖
@@ -360,7 +360,7 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 ##### 消费者实现MessageListener接口
 
-onMessage接口方法没有变，但获取的消息是BytesMessage，目前只有两个数据项，messageId、bytesContent，其中bytesContent是个byte数组，需要业务自己处理成想要的对象。
+onMessage接口方法没有变，但获取的消息是BytesMessage，目前只有两个数据项，messageId、bytesContent，其中bytesContent是个byte数组，需要业务自己处理。
 		
 		@Override
         public void onMessage(Message msg) throws BackoutMessageException {
@@ -373,9 +373,9 @@ onMessage接口方法没有变，但获取的消息是BytesMessage，目前只�
 
 使用上跟接收Swallow消息代码风格是一样的，按照一下步骤：
 
-*  创建NuclearConsumerFactory，Factory有两个参数appKey和isOnline。默认appKey是从META-INF/app.properties读取app.name的值，建议自己设置；isOnline设置的是环境，false表示线下，true线上环境，上海的环境alpha，beta，ppe对应北京的线下环境，product对应线上环境，因此isOnline默认值是Env.isProduct（alpha、beta、ppe为false，product为true）。注意在使用时appKey只需填写申请时com.dianping.swallow.后面的部分，前面com.dianping.swallow.有swallow自动加上。
+*  创建NuclearConsumerFactory，Factory有两个参数appKey和isOnline。默认appKey是从META-INF/app.properties读取app.name的值，建议自己设置；isOnline设置的是环境，false表示线下，true线上环境，上海的环境alpha，beta，ppe对应北京的线下环境，product对应线上环境，因此isOnline默认值是Env.isProduct（alpha、beta、ppe为false，product为true）。注意在使用时appKey只需填写申请时com.dianping.swallow.后面的部分，前面com.dianping.swallow.由swallow自动加上。
 *  创建NuclearDestination，如下例，test_for_shanghai1为订阅的topic。
-*  填写consumerId。
+*  填写consumerId，consumerId必须填写。
 *  创建Consumer，其中NuclearConsumerConfig参数，请看Consumer配置详解。
 *  注册监听consumer.setListener()。
 *  开始消费consumer.start()。
