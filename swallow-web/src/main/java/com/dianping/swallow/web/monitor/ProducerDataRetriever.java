@@ -1,10 +1,10 @@
 package com.dianping.swallow.web.monitor;
 
-import java.util.List;
-import java.util.Map;
-
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author mengwenchao
@@ -34,6 +34,10 @@ public interface ProducerDataRetriever extends MonitorDataRetriever {
     Map<String, StatsData> getServerQpx(QPX qpx, long start, long end);
 
     Map<String, StatsData> getServerQpx(QPX qpx);
+
+    Map<String, StatsData> getMongoQpx(QPX qpx, long start, long end);
+
+    Map<String, StatsData> getMongoQpx(QPX qpx);
 
     List<OrderStatsData> getOrder(int size);
 

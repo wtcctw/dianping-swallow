@@ -54,6 +54,10 @@ public class StatisData implements Mergeable {
         return totalCount;
     }
 
+    public Byte getIntervalCount() {
+        return intervalCount;
+    }
+
     public Long getQpx(QPX qpx) {
         if(intervalCount <= 0){
             throw new RuntimeException("intervalCount should be positive");

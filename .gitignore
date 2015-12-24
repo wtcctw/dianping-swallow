@@ -85,6 +85,7 @@ Thumbs.db
 *.iws
 .idea/
 out/
+*/swallow-store-lion.properties
 #test
 config.online
 TODO

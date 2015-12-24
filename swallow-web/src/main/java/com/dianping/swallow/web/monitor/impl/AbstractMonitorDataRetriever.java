@@ -191,6 +191,8 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
     protected abstract StatsDataDesc createServerQpxDesc(String serverIp, StatisType type);
 
+    protected abstract StatsDataDesc createMongoQpxDesc(String serverIp, StatisType type);
+
     protected abstract StatsDataDesc createServerDelayDesc(String serverIp, StatisType type);
 
     protected abstract StatsDataDesc createDelayDesc(String topic, StatisType type);
