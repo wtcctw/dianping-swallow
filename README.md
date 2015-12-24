@@ -347,16 +347,16 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 依赖除了Swallow接收消息的pom.xml中的依赖，还有一下内容
 
-  <dependency>
-      <groupId>com.dianping.swallow</groupId>
-      <artifactId>swallow-common-nuclear</artifactId>
-      <version>${currentVersion}</version>
-      </dependency>
-  <dependency>
-      <groupId>com.dianping.swallow</groupId>
-      <artifactId>swallow-consumerclient-nuclear</artifactId>
-      <version>${currentVersion}</version>
-  </dependency>
+	 <dependency>
+		  <groupId>com.dianping.swallow</groupId>
+		  <artifactId>swallow-common-nuclear</artifactId>
+		  <version>${currentVersion}</version>
+		  </dependency>
+	 <dependency>
+		  <groupId>com.dianping.swallow</groupId>
+		  <artifactId>swallow-consumerclient-nuclear</artifactId>
+		  <version>${currentVersion}</version>
+	 </dependency>
 
 ##### 消费者实现MessageListener接口
 
@@ -379,23 +379,23 @@ onMessage接口方法没有变，但获取的消息是BytesMessage，目前只�
 *  创建Consumer，其中NuclearConsumerConfig参数，请看Consumer配置详解。
 *  注册监听consumer.setListener()。
 *  开始消费consumer.start()。
-	 
-	 public void consume() {
-            ConsumerFactory consumerFactory = new NuclearConsumerFactory("swallow-test",true);
-            Destination dest = NuclearDestination.topic("test_for_shanghai1");
-            String consumerId = "com.dianping.swallow.swallow-test.test_for_shanghai1.d0";
-            Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new NuclearConsumerConfig(true));
-            consumer.setListener(new MessageListener() {
-                @Override
-                public void onMessage(Message msg) throws BackoutMessageException {
-                    BytesMessage byteMsg = (BytesMessage) msg;
-                    byte[] content = byteMsg.getBytesContent();
-                    long messageId = byteMsg.getMessageId();
-                }
-            });
-    
+
+        public void consume() {
+            ConsumerFactory consumerFactory = new NuclearConsumerFactory(true);
+                Destination dest = NuclearDestination.topic("test_for_shanghai1");
+                String consumerId = "com.dianping.swallow.swallow-test.test_for_shanghai1.d0";
+                Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new NuclearConsumerConfig(true));
+                consumer.setListener(new MessageListener() {
+                    @Override
+                    public void onMessage(Message msg) throws BackoutMessageException {
+                        BytesMessage byteMsg = (BytesMessage) msg;
+                        byte[] content = byteMsg.getBytesContent();
+                        long messageId = byteMsg.getMessageId();
+                    }
+                });
             consumer.start();
-     }
+        }
+
 
 
 # Swallow Web使用说明
