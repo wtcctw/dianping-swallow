@@ -610,6 +610,10 @@ public class DataMonitorController extends AbstractMonitorController implements 
                     allStats));
         }
 
+        if (result == null || result.isEmpty()) {
+            result.add(ChartBuilder.getHighChart(getTopicDesc(topic, yAxis), "", yAxis, producerData));
+        }
+
         return result;
     }
 
@@ -651,6 +655,9 @@ public class DataMonitorController extends AbstractMonitorController implements 
 
         if (consumerId.equals(MonitorData.TOTAL_KEY)) {
             return "所有consumerId";
+        }
+        if (StringUtils.isEmpty(consumerId)) {
+            return StringUtils.EMPTY;
         }
         String result = consumerId;
         if (Y_AXIS_TYPE_QPS.equals(yAxis)) {
