@@ -530,6 +530,11 @@ public class DefaultConsumerDataRetriever
     }
 
     @Override
+    protected StatsDataDesc createMongoQpxDesc(String serverIp, StatisType type) {
+        throw new UnsupportedOperationException("not support");
+    }
+
+    @Override
     protected StatsDataDesc createServerDelayDesc(String serverIp, StatisType type) {
 
         return new ConsumerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getDelayDetailType());

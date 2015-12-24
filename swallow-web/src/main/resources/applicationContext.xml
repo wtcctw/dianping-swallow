@@ -59,7 +59,6 @@
 	</bean>
 
 	<context:component-scan base-package="com.dianping.swallow.web" />
-	<context:annotation-config />
 
 	<mvc:interceptors>
 		<mvc:interceptor>
@@ -93,6 +92,7 @@
 			<mvc:mapping path="/console/consumerid/ipinfo/*/*" />
 			<mvc:mapping path="/console/topic/ipinfo/*" />
 			<mvc:mapping path="/console/monitor/producer/*" />
+			<mvc:mapping path="/console/monitor/mongo/*" />
 			<mvc:mapping path="/console/monitor/producer/*/ip/*" />
 			<mvc:mapping path="/console/monitor/consumer/*" />
 			<mvc:mapping path="/console/monitor/consumer/*/ip/*" />

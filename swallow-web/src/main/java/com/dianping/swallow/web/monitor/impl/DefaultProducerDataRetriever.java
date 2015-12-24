@@ -4,7 +4,6 @@ import com.dianping.swallow.common.internal.action.SwallowCallableWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
-import com.dianping.swallow.common.server.monitor.data.StatisFunctionType;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
@@ -12,10 +11,11 @@ import com.dianping.swallow.common.server.monitor.data.statis.ProducerAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.*;
 import com.dianping.swallow.web.container.ResourceContainer;
-import com.dianping.swallow.web.dao.ProducerMonitorDao;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.*;
+import com.dianping.swallow.web.monitor.collector.MongoStatsDataCollector;
+import com.dianping.swallow.web.service.MongoStatsDataService;
 import com.dianping.swallow.web.service.ProducerServerStatsDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
@@ -50,6 +50,12 @@ public class DefaultProducerDataRetriever
 
     @Autowired
     private ResourceContainer resourceContainer;
+
+    @Autowired
+    private MongoStatsDataCollector mongoStatsDataCollector;
+
+    @Autowired
+    private MongoStatsDataService mongoStatsDataService;
 
     @Override
     public boolean dataExistInMemory(CasKeys keys, long start, long end) {
@@ -280,6 +286,61 @@ public class DefaultProducerDataRetriever
         return getServerQpx(qpx, getDefaultStart(), getDefaultEnd());
     }
 
+    @Override
+    public Map<String, StatsData> getMongoQpx(QPX qpx, long start, long end) {
+        if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
+            return getMongoQpxInMemory(qpx, StatisType.SAVE, start, end);
+        }
+
+        return getMongoQpxInDb(qpx, StatisType.SAVE, start, end);
+    }
+
+    protected Map<String, StatsData> getMongoQpxInMemory(QPX qpx, StatisType type, long start, long end) {
+
+        Map<String, StatsData> result = new HashMap<String, StatsData>();
+
+        long startKey = getKey(start);
+        long endKey = getKey(end);
+
+        Map<String, NavigableMap<Long, Long>> mongoQpxs = mongoStatsDataCollector.retrieveAllQpx(qpx);
+
+        for (Map.Entry<String, NavigableMap<Long, Long>> entry : mongoQpxs.entrySet()) {
+
+            String mongoIp = entry.getKey();
+            NavigableMap<Long, Long> mongoQpx = entry.getValue();
+            if (mongoQpx != null) {
+                mongoQpx = mongoQpx.subMap(startKey, true, endKey, true);
+                mongoQpx = fillStatsData(mongoQpx, startKey, endKey);
+            }
+            result.put(mongoIp, createStatsData(createMongoQpxDesc(mongoIp, type), mongoQpx, start, end));
+        }
+
+        return result;
+    }
+
+    protected Map<String, StatsData> getMongoQpxInDb(QPX qpx, StatisType type, long start, long end) {
+        Map<String, StatsData> result = new HashMap<String, StatsData>();
+
+        long startKey = getKey(start);
+        long endKey = getKey(end);
+        Map<String, NavigableMap<Long, Long>> statsDataMaps = mongoStatsDataService.findSectionQpsData(qpx, startKey, endKey);
+
+        for (Map.Entry<String, NavigableMap<Long, Long>> statsDataMap : statsDataMaps.entrySet()) {
+            String serverIp = statsDataMap.getKey();
+
+            NavigableMap<Long, Long> statsData = statsDataMap.getValue();
+            statsData = fillStatsData(statsData, startKey, endKey);
+            result.put(serverIp, createStatsData(createMongoQpxDesc(serverIp, type), statsData, start, end));
+
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, StatsData> getMongoQpx(QPX qpx) {
+        return getMongoQpx(qpx, getDefaultStart(), getDefaultEnd());
+    }
+
     protected StatsDataDesc createDelayDesc(String topic, String ip, StatisType type) {
         return new ProducerIpStatsDataDesc(topic, ip, type.getDelayDetailType());
     }
@@ -304,6 +365,11 @@ public class DefaultProducerDataRetriever
     protected StatsDataDesc createServerQpxDesc(String serverIp, StatisType type) {
 
         return new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getQpxDetailType());
+    }
+
+    @Override
+    protected StatsDataDesc createMongoQpxDesc(String serverIp, StatisType type) {
+        return new MongoStatsDataDesc(serverIp, type.getQpxDetailType());
     }
 
     @Override
