@@ -329,10 +329,11 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 #### 申请权限
 
 申请权限包括申请appKey以及申请订阅某topic的消息，请联系北京的闫志强(yanzhiqiang02)，抄送 ：程真强(chengzhenqiang) ，黄斌强(huangbinqiang)，岳小均（yuexiaojun）,王延宾（wangyanbin）。
-申请时appKey使用com.dianping.swallow.打头，比如应用为swallow-test，申请时使用com.dianping.swallow.swallow-test为appKey进行申请。
-有了相关的权限可以去nuclearmq管理端（线下环境 http://release.mtmq.test.sankuai.info/ 线上环境 http://mtmq.sankuai.com/。 ）自行申请订阅某topic消息。
+申请时appKey使用com.dianping.swallow.开头，比如应用为swallow-test，使用com.dianping.swallow.swallow-test为appKey进行申请。
+有了相关的权限可以去nuclearmq管理端（线下环境 http://release.mtmq.test.sankuai.info/ 线上环境 http://mtmq.sankuai.com/ ）自行申请订阅某topic消息。
 
 #### 基本概念
+<span id="nuclearConsumerConfig"></span>
 ##### NuclearConsumerConfig配置详解
 
 使用Swallow接收NuclearMQ消息时，需要对接收端进行配置。目前只有参数delayBaseOnBackoutMessageException、delayUpperboundOnBackoutMessageException、retryCount、longTaskAlertTime、isAsync
@@ -345,7 +346,7 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 #### 代码示例
 ##### Maven pom.xml中添加依赖
 
-依赖除了Swallow接收消息的pom.xml中的依赖，还有一下内容
+除了依赖接收Swallow消息的pom.xml中的依赖，还有以下依赖
 
 	 <dependency>
 		  <groupId>com.dianping.swallow</groupId>
@@ -371,12 +372,12 @@ onMessage接口方法没有变，但获取的消息是BytesMessage，目前只�
         
 ##### 消费者端代码实现
 
-使用上跟接收Swallow消息代码风格是一样的，按照一下步骤：
+使用上跟接收Swallow消息代码风格是一样的，按照以下步骤：
 
-*  创建NuclearConsumerFactory，Factory有两个参数appKey和isOnline。默认appKey是从META-INF/app.properties读取app.name的值，建议自己设置；isOnline设置的是环境，false表示线下，true线上环境，上海的环境alpha，beta，ppe对应北京的线下环境，product对应线上环境，因此isOnline默认值是Env.isProduct（alpha、beta、ppe为false，product为true）。注意在使用时appKey只需填写申请时com.dianping.swallow.后面的部分，前面com.dianping.swallow.由swallow自动加上。
+*  创建NuclearConsumerFactory，Factory有两个参数appKey和isOnline。默认appKey是从META-INF/app.properties读取app.name的值，建议自己设置；isOnline设置的是环境，false表示线下，true线上环境，上海的环境alpha，beta，ppe对应北京的线下环境，product对应线上环境，因此isOnline默认值是Env.isProduct（alpha、beta、ppe为false，product为true）。注意:在使用时appKey只需填写申请时com.dianping.swallow.后面的部分，前面com.dianping.swallow.由swallow自动加上。
 *  创建NuclearDestination，如下例，test_for_shanghai1为订阅的topic。
 *  填写consumerId，consumerId必须填写。
-*  创建Consumer，其中NuclearConsumerConfig参数，请看Consumer配置详解。
+*  创建Consumer，其中NuclearConsumerConfig参数。[NuclearConsumerConfig配置详解](#nuclearConsumerConfig)。
 *  注册监听consumer.setListener()。
 *  开始消费consumer.start()。
 
