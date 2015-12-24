@@ -81,7 +81,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
                     if (topicConfig == null || (topicConfig != null && StringUtils.isBlank(topicConfig.getStoreUrl()))) {
                         topicConfig = swallowConfig.defaultTopicConfig();
                     }
-                    mongoIp = extractMongoIp(topicConfig);
+                    mongoIp = doExtractMongoIp(topicConfig);
                     if (StringUtils.isNotBlank(mongoIp)) {
                         topicToMongo.put(topic, mongoIp);
                         addMongoStatsData(mongoIp, lastData);
@@ -151,13 +151,12 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
                 switch (args.getBehavior()) {
 
+                    case ADD:
                     case UPDATE:
-                        String topic = args.getTopic();
-                        TopicConfig topicConfig = swallowConfig.getTopicConfig(topic);
-                        String ip = extractMongoIp(topicConfig);
-                        if (StringUtils.isNotBlank(ip)) {
-                            topicToMongo.put(topic, ip);
-                        }
+                        createOrUpdateTopicToMongo(args);
+                        break;
+                    case DELETE:
+                        removeFromTopicToMongo(args);
                         break;
                     default:
                         logger.warn("[update][unknown behavior]" + args.getBehavior());
@@ -168,7 +167,30 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         }
     }
 
-    private String extractMongoIp(TopicConfig topicConfig) {
+    private void createOrUpdateTopicToMongo(AbstractSwallowConfig.SwallowConfigArgs args){
+
+        String ip = extractMongoIp(args);
+        if (StringUtils.isNotBlank(ip)) {
+            topicToMongo.put(args.getTopic(), ip);
+        }
+    }
+
+    private void removeFromTopicToMongo(AbstractSwallowConfig.SwallowConfigArgs args){
+
+        String ip = extractMongoIp(args);
+        if (StringUtils.isNotBlank(ip)) {
+            topicToMongo.remove(ip);
+        }
+    }
+
+    private String extractMongoIp(AbstractSwallowConfig.SwallowConfigArgs args){
+
+        String topic = args.getTopic();
+        TopicConfig topicConfig = swallowConfig.getTopicConfig(topic);
+        return doExtractMongoIp(topicConfig);
+    }
+
+    private String doExtractMongoIp(TopicConfig topicConfig) {
 
         if (topicConfig == null) {
             return StringUtils.EMPTY;
