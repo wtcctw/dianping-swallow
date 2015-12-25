@@ -58,11 +58,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.dianping.swallow</groupId>
-			<artifactId>swallow-common-nuclear</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.dianping.swallow</groupId>
-			<artifactId>swallow-consumerclient-nuclear</artifactId>
+			<artifactId>swallow-client-nuclear</artifactId>
 		</dependency>
 	</dependencies>
 
