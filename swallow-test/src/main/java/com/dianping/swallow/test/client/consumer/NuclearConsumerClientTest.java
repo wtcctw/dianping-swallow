@@ -4,10 +4,9 @@ import com.dianping.swallow.common.message.BytesMessage;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.*;
-import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.dianping.swallow.consumer.nuclear.common.impl.NuclearDestination;
-import com.dianping.swallow.consumer.nuclear.impl.NuclearConsumerConfig;
-import com.dianping.swallow.consumer.nuclear.impl.NuclearConsumerFactory;
+import com.dianping.swallow.client.nuclear.impl.NuclearConsumerConfig;
+import com.dianping.swallow.client.nuclear.impl.NuclearConsumerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

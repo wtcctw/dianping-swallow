@@ -1,4 +1,4 @@
-package com.dianping.swallow.consumer.nuclear.impl;
+package com.dianping.swallow.client.nuclear.impl;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;

@@ -16,17 +16,10 @@
         <nuclearmq-client.version>0.1.8-keepalive-bm1.6</nuclearmq-client.version>
     </properties>
     <modules>
-        <module>swallow-consumerclient-nuclear</module>
-        <module>swallow-common-nuclear</module>
+        <module>swallow-client-nuclear</module>
     </modules>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.dianping.swallow</groupId>
-                <artifactId>swallow-common-nuclear</artifactId>
-                <version>${project.version}</version>
-
-            </dependency>
             <dependency>
                 <groupId>com.meituan.nuclearmq</groupId>
                 <artifactId>nuclearmq-client</artifactId>

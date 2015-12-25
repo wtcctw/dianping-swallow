@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>swallow-consumerclient-nuclear</artifactId>
+    <artifactId>swallow-client-nuclear</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -30,10 +30,6 @@
             <groupId>com.dianping.cat</groupId>
             <artifactId>cat-client</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.dianping.swallow</groupId>
-            <artifactId>swallow-common-nuclear</artifactId>
         </dependency>
     </dependencies>
     <build>

@@ -1,4 +1,4 @@
-package com.dianping.swallow.consumer.nuclear.impl;
+package com.dianping.swallow.client.nuclear.impl;
 
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.message.Destination;
