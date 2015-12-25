@@ -3,6 +3,7 @@ package com.dianping.swallow.web.service.impl;
 import com.dianping.elasticsearch.conditions.Conditions;
 import com.dianping.elasticsearch.query.ESSearch;
 import com.dianping.elasticsearch.services.ElasticSearchService;
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.service.LogSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +29,9 @@ public class LogSearchServiceImpl implements LogSearchService {
     @Override
     public List<SearchResult> search(String topic, String cid, long mid) {
         List<SearchResult> results = null;
+        String indexName = EnvUtil.isProduct() ? "dpods_log_swallow-consumermaster" : "dpods_log_swallow-consumer";
         try {
-            ESSearch search = elasticSearchService.buildSearch("dpods_log_swallow-consumer")
+            ESSearch search = elasticSearchService.buildSearch(indexName)
                     .addCondition(Conditions.term("topic", topic))
                     .addCondition(Conditions.term("cid", cid))
                     .addCondition(Conditions.or(Conditions.term("mid", mid),
@@ -63,8 +65,8 @@ public class LogSearchServiceImpl implements LogSearchService {
                 }
 
             }
-        }catch (Exception e){
-            logger.error("[search] failed.",e);
+        } catch (Exception e) {
+            logger.error("[search] failed.", e);
         }
         return results;
     }
