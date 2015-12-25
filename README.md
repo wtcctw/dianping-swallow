@@ -350,12 +350,7 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 
 	 <dependency>
 		  <groupId>com.dianping.swallow</groupId>
-		  <artifactId>swallow-common-nuclear</artifactId>
-		  <version>${currentVersion}</version>
-		  </dependency>
-	 <dependency>
-		  <groupId>com.dianping.swallow</groupId>
-		  <artifactId>swallow-consumerclient-nuclear</artifactId>
+		  <artifactId>swallow-client-nuclear</artifactId>
 		  <version>${currentVersion}</version>
 	 </dependency>
 
