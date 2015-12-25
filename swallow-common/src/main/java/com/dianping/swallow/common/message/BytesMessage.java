@@ -11,6 +11,8 @@ public interface BytesMessage extends Message{
 	
 	byte[] getBytesContent();
 
+
+
 	void setEncoding(Charset charset);
 	
 }

@@ -1,14 +1,5 @@
 package com.dianping.swallow.consumer.impl;
 
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
@@ -21,168 +12,174 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
+import org.apache.log4j.Logger;
 
-public final class ConsumerFactoryImpl extends AbstractObservable implements ConsumerFactory, ConfigChangeListener {
+import java.net.InetSocketAddress;
+import java.util.*;
 
-	private Logger logger = Logger.getLogger(getClass());
+/**
+ * @author qi.yin
+ *         2015/12/15  上午11:11.
+ */
+public class ConsumerFactoryImpl extends AbstractObservable implements ConsumerFactory, ConfigChangeListener {
 
-	private static final String LION_CONFIG_FILENAME = "swallow-consumerclient-lion.properties";
+    private Logger logger = Logger.getLogger(getClass());
 
-	private static final String TOPICNAME_DEFAULT = "default";
-	private final static String LION_KEY_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
-	private Map<String, List<InetSocketAddress>> topicName2Address = new HashMap<String, List<InetSocketAddress>>();
-	private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
-	private HeartBeatSender heartBeatSender = new DefaultHeartBeatSender();
+    private static final String LION_CONFIG_FILENAME = "swallow-consumerclient-lion.properties";
 
-	static {
-		SwallowHelper.initialize();
-	}
+    private static final String TOPICNAME_DEFAULT = "default";
+    private final static String LION_KEY_CONSUMER_SERVER_URI = "swallow.consumer.consumerServerURI";
+    private Map<String, List<InetSocketAddress>> topicName2Address = new HashMap<String, List<InetSocketAddress>>();
+    private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
+    private HeartBeatSender heartBeatSender = new DefaultHeartBeatSender();
 
-	private ConsumerFactoryImpl() {
-		getSwallowCAddress();
-	}
+    private ConsumerFactoryImpl() {
+        getSwallowCAddress();
+    }
 
-	public static ConsumerFactory getInstance() {
-		return instance;
-	}
+    static {
+        SwallowHelper.initialize();
+    }
 
-	@Override
-	public Consumer createConsumer(Destination dest, String consumerId, ConsumerConfig config) {
-		
-		List<InetSocketAddress> addresses = getOrDefaultTopicAddress(dest.getName());
-		Consumer consumer =  new ConsumerImpl(dest, consumerId, config, addresses.get(0), addresses.get(1), heartBeatSender);
-		addObserver(consumer);
-		return consumer;
+    public static ConsumerFactory getInstance() {
+        return instance;
+    }
 
-	}
+    @Override
+    public Consumer createConsumer(Destination dest, String consumerId, ConsumerConfig config) {
 
-	@Override
-	public Consumer createConsumer(Destination dest, String consumerId) {
-		return createConsumer(dest, consumerId, new ConsumerConfig());
-	}
+        List<InetSocketAddress> addresses = getOrDefaultTopicAddress(dest.getName());
+        Consumer consumer =  new ConsumerImpl(dest, consumerId, config, addresses.get(0), addresses.get(1), heartBeatSender);
+        addObserver(consumer);
+        return consumer;
 
-	@Override
-	public Consumer createConsumer(Destination dest, ConsumerConfig config) {
-		return createConsumer(dest, null, config);
-	}
+    }
 
-	@Override
-	public Consumer createConsumer(Destination dest) {
-		return createConsumer(dest, new ConsumerConfig());
-	}
+    @Override
+    public Consumer createConsumer(Destination dest, String consumerId) {
+        return createConsumer(dest, consumerId, new ConsumerConfig());
+    }
 
-	private void getSwallowCAddress() {
-		DynamicConfig dynamicConfig = new LionDynamicConfig(LION_CONFIG_FILENAME);
-		String lionValue = dynamicConfig.get(LION_KEY_CONSUMER_SERVER_URI);
-		dynamicConfig.addConfigChangeListener(this);
-		topicName2Address = lionValue2Map(lionValue);
-	}
+    @Override
+    public Consumer createConsumer(Destination dest, ConsumerConfig config) {
+        return createConsumer(dest, null, config);
+    }
 
-	/**
-	 * 
-	 * @param lionValue
-	 *            swallow.consumer.consumerServerURI=default=127.0.0.1:8081,
-	 *            127.0
-	 *            .0.1:8082;feed,topicForUnitTest=127.0.0.1:8083,127.0.0.1:8084
-	 * @return 
-	 * @return
-	 */
-	protected Map<String, List<InetSocketAddress>> lionValue2Map(String lionValue) {
+    @Override
+    public Consumer createConsumer(Destination dest) {
+        return createConsumer(dest, new ConsumerConfig());
+    }
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("[lionValue2Map][config]" + lionValue);
-		}
-		
-		Map<String, List<InetSocketAddress>> topicName2Address = new HashMap<String, List<InetSocketAddress>>();
-		
+    private void getSwallowCAddress() {
+        DynamicConfig dynamicConfig = new LionDynamicConfig(LION_CONFIG_FILENAME);
+        String lionValue = dynamicConfig.get(LION_KEY_CONSUMER_SERVER_URI);
+        dynamicConfig.addConfigChangeListener(this);
+        topicName2Address = lionValue2Map(lionValue);
+    }
 
-		for (String topicNameToAddress : lionValue.split(getSplitWithSpace(";"))) {
-			String[] splits = topicNameToAddress.split("=");
-			if (splits.length != 2) {
-				throw new IllegalStateException("wrong swallow.consumer.consumerServerURI:" + topicNameToAddress);
-			}
-			String topicNames = splits[0].trim();
-			String swallowCAddress = splits[1].trim();
+    /**
+     *
+     * @param lionValue
+     *            swallow.consumer.consumerServerURI=default=127.0.0.1:8081,
+     *            127.0
+     *            .0.1:8082;feed,topicForUnitTest=127.0.0.1:8083,127.0.0.1:8084
+     * @return
+     * @return
+     */
+    protected Map<String, List<InetSocketAddress>> lionValue2Map(String lionValue) {
 
-			List<InetSocketAddress>  address =  string2SocketAddress(swallowCAddress);
-			
-			for (String topicName : topicNames.split(getSplitWithSpace(","))) {
-				topicName2Address.put(topicName.trim(), address);
-			}
-		}
-		
-		return topicName2Address;
-	}
-	
-	private String getSplitWithSpace(String split){
-		return "\\s*" + split + "\\s*";
-	}
+        if (logger.isDebugEnabled()) {
+            logger.debug("[lionValue2Map][config]" + lionValue);
+        }
 
-	private List<InetSocketAddress> string2SocketAddress(String swallowCAddress) {
-
-		String[] ipAndPorts = swallowCAddress.split(getSplitWithSpace(","));
-
-		if (ipAndPorts.length != 2) {
-			throw new IllegalArgumentException("bad swallowAddress:" + swallowCAddress);
-		}
-
-		String []masterConfig = ipAndPorts[0].split(getSplitWithSpace(":")); 
-		String masterIp = masterConfig[0];
-		int masterPort = Integer.parseInt(masterConfig[1]);
-
-		String []slaveConfig = ipAndPorts[1].split(getSplitWithSpace(":")); 
-		String slaveIp = slaveConfig[0];
-		int slavePort = Integer.parseInt(slaveConfig[1]);
-		
-		List<InetSocketAddress> tempAddress = new ArrayList<InetSocketAddress>();
-		tempAddress.add(new InetSocketAddress(masterIp, masterPort));
-		tempAddress.add(new InetSocketAddress(slaveIp, slavePort));
-	
-		return tempAddress;
-	
-	}
+        Map<String, List<InetSocketAddress>> topicName2Address = new HashMap<String, List<InetSocketAddress>>();
 
 
-	/**
-	 * for unittest
-	 * @param topic
-	 * @return
-	 */
-	@Override
-	public List<InetSocketAddress> getTopicAddress(String topic){
-		
-		List<InetSocketAddress> addresses = topicName2Address.get(topic);
-		if(addresses == null){
-			return null;
-		}
-		
-	   return new LinkedList<InetSocketAddress>(addresses); 
-   }
+        for (String topicNameToAddress : lionValue.split(getSplitWithSpace(";"))) {
+            String[] splits = topicNameToAddress.split("=");
+            if (splits.length != 2) {
+                throw new IllegalStateException("wrong swallow.consumer.consumerServerURI:" + topicNameToAddress);
+            }
+            String topicNames = splits[0].trim();
+            String swallowCAddress = splits[1].trim();
 
-	@Override
-	public List<InetSocketAddress> getOrDefaultTopicAddress(String topic) {
+            List<InetSocketAddress>  address =  string2SocketAddress(swallowCAddress);
 
-		List<InetSocketAddress> addresses = getTopicAddress(topic);
-		if(addresses == null){
-			addresses = getTopicAddress(TOPICNAME_DEFAULT);
-		}
-		return addresses;
-	}
-	
-	
+            for (String topicName : topicNames.split(getSplitWithSpace(","))) {
+                topicName2Address.put(topicName.trim(), address);
+            }
+        }
 
-	
-	public void setHeartBeatSender(HeartBeatSender heartBeatSender) {
-		this.heartBeatSender = heartBeatSender;
-	}
+        return topicName2Address;
+    }
 
-	@Override
-	public void onConfigChange(String key, String value) {
-		
-		if(LION_KEY_CONSUMER_SERVER_URI.equals(key)){
-			
-			topicName2Address = lionValue2Map(value);
-			updateObservers(null);
-		}
-	}
+    private String getSplitWithSpace(String split){
+        return "\\s*" + split + "\\s*";
+    }
+
+    private List<InetSocketAddress> string2SocketAddress(String swallowCAddress) {
+
+        String[] ipAndPorts = swallowCAddress.split(getSplitWithSpace(","));
+
+        if (ipAndPorts.length != 2) {
+            throw new IllegalArgumentException("bad swallowAddress:" + swallowCAddress);
+        }
+
+        String []masterConfig = ipAndPorts[0].split(getSplitWithSpace(":"));
+        String masterIp = masterConfig[0];
+        int masterPort = Integer.parseInt(masterConfig[1]);
+
+        String []slaveConfig = ipAndPorts[1].split(getSplitWithSpace(":"));
+        String slaveIp = slaveConfig[0];
+        int slavePort = Integer.parseInt(slaveConfig[1]);
+
+        List<InetSocketAddress> tempAddress = new ArrayList<InetSocketAddress>();
+        tempAddress.add(new InetSocketAddress(masterIp, masterPort));
+        tempAddress.add(new InetSocketAddress(slaveIp, slavePort));
+
+        return tempAddress;
+
+    }
+
+
+    /**
+     * for unittest
+     * @param topic
+     * @return
+     */
+    @Override
+    public List<InetSocketAddress> getTopicAddress(String topic){
+
+        List<InetSocketAddress> addresses = topicName2Address.get(topic);
+        if(addresses == null){
+            return null;
+        }
+
+        return new LinkedList<InetSocketAddress>(addresses);
+    }
+
+    @Override
+    public List<InetSocketAddress> getOrDefaultTopicAddress(String topic) {
+
+        List<InetSocketAddress> addresses = getTopicAddress(topic);
+        if(addresses == null){
+            addresses = getTopicAddress(TOPICNAME_DEFAULT);
+        }
+        return addresses;
+    }
+
+    public void setHeartBeatSender(HeartBeatSender heartBeatSender) {
+        this.heartBeatSender = heartBeatSender;
+    }
+
+    @Override
+    public void onConfigChange(String key, String value) {
+
+        if(LION_KEY_CONSUMER_SERVER_URI.equals(key)){
+
+            topicName2Address = lionValue2Map(value);
+            updateObservers(null);
+        }
+    }
+
 }
