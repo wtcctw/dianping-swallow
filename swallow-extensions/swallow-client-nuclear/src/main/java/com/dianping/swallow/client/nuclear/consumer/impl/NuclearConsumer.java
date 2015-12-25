@@ -1,4 +1,4 @@
-package com.dianping.swallow.client.nuclear.impl;
+package com.dianping.swallow.client.nuclear.consumer.impl;
 
 import com.dianping.swallow.common.internal.action.SwallowCatActionWrapper;
 import com.dianping.swallow.common.internal.observer.Observable;

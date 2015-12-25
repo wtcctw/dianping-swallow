@@ -1,4 +1,4 @@
-package com.dianping.swallow.client.nuclear.impl;
+package com.dianping.swallow.client.nuclear.consumer.impl;
 
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
