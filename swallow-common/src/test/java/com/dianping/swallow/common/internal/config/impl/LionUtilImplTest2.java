@@ -11,6 +11,7 @@ import com.dianping.lion.Constants;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.swallow.AbstractTest;
+import com.dianping.swallow.common.internal.util.http.HttpMethod;
 
 /**
  * @author mengwenchao
@@ -48,9 +49,10 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		Assert.assertEquals(result, "15921096896");
 
 		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "testenv");
-		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "alphapost","post", "alpha");
-		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "alphaget","get", "alpha");
-		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "testcreate","post", null);
+		sleep(10);
+		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "alphapost",HttpMethod.POST, "alpha");
+		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "alphaget",HttpMethod.GET, "alpha");
+		lionUtil.createOrSetConfig("swallow.topiccfg1.lionapi-get-alpha-apply-topic0", "testcreate",HttpMethod.POST, null);
 
 	}
 	
@@ -67,7 +69,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		
 		for(String addKey : newKeys){
 			
-			lionUtil.createOrSetConfig(TEST_KEY + addKey, value + addKey, "get", null);
+			lionUtil.createOrSetConfig(TEST_KEY + addKey, value + addKey, HttpMethod.GET, null);
 		}
 		
 		Map<String, String> cfgs = lionUtil.getCfgs(TEST_KEY);
@@ -87,7 +89,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 	public void testCreateOrSetConfig(){
 		
 		String value = UUID.randomUUID().toString();
-		lionUtil.createOrSetConfig(TEST_KEY, value, "get", null);
+		lionUtil.createOrSetConfig(TEST_KEY, value, HttpMethod.GET, null);
 
 		keyValue = cc.getProperty("swallow." + TEST_KEY);
 		
@@ -96,7 +98,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 		
 		value = UUID.randomUUID().toString();
 		
-		lionUtil.createOrSetConfig(TEST_KEY, value, "post", null);
+		lionUtil.createOrSetConfig(TEST_KEY, value, HttpMethod.POST, null);
 
 		sleep(100);
 		//configlistener
@@ -108,7 +110,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 	public void testPut(){
 		
 		String value = "put method "  + UUID.randomUUID().toString();
-		lionUtil.createOrSetConfig(TEST_KEY, value, "get", null);
+		lionUtil.createOrSetConfig(TEST_KEY, value, HttpMethod.GET, null);
 
 		keyValue = cc.getProperty("swallow." + TEST_KEY);
 		
@@ -117,7 +119,7 @@ public class LionUtilImplTest2 extends AbstractTest implements ConfigChange{
 
 		value = "put method " + UUID.randomUUID().toString();
 		try{
-			lionUtil.createOrSetConfig(TEST_KEY, value, "put", null);
+			lionUtil.createOrSetConfig(TEST_KEY, value, HttpMethod.PUT, null);
 		}catch(Exception e){
 			Assert.assertEquals(e.getMessage(), "illegal type :put");
 		}

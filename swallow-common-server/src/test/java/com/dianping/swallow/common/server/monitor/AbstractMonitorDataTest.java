@@ -125,7 +125,7 @@ public abstract class AbstractMonitorDataTest extends AbstractTest{
 			logger.info("[createPost]" + json);
 		}
 		StringEntity request = new StringEntity(json, HTTP.UTF_8);
-		request.setContentType(ContentType.APPLICATION_JSON);
+		request.setContentType(ContentTypeDesc.APPLICATION_JSON);
 		post.setEntity(request);
 		return post;
 	}
