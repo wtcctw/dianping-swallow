@@ -39,14 +39,13 @@ public class MongoStatsDataContainerImpl implements MongoStatsDataContainer{
     @Override
     public synchronized void add(Long time, MongoStatsData mongoStatsData) {
 
-        while(isUpToMaxSize()){
-            Long firstKey = mongoStatsDataMap.firstKey();
-            mongoStatsDataMap.remove(firstKey);
-        }
-
         MongoStatsData value = mongoStatsDataMap.get(time);
 
         if(value == null){
+            while(isUpToMaxSize()){
+                Long firstKey = mongoStatsDataMap.firstKey();
+                mongoStatsDataMap.remove(firstKey);
+            }
             mongoStatsDataMap.put(time, mongoStatsData);
         }else{
             value.merge(mongoStatsData);

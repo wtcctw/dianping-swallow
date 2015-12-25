@@ -15,6 +15,7 @@ import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.*;
 import com.dianping.swallow.web.monitor.collector.MongoStatsDataCollector;
+import com.dianping.swallow.web.monitor.collector.MongoStatsDataContainer;
 import com.dianping.swallow.web.service.MongoStatsDataService;
 import com.dianping.swallow.web.service.ProducerServerStatsDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
@@ -339,6 +340,23 @@ public class DefaultProducerDataRetriever
     @Override
     public Map<String, StatsData> getMongoQpx(QPX qpx) {
         return getMongoQpx(qpx, getDefaultStart(), getDefaultEnd());
+    }
+
+    @Override
+    public String getMongoDebugInfo(String server) {
+        Map<String, MongoStatsDataContainer> mongoStatsDataMap = mongoStatsDataCollector.getMongoStatsDataMap();
+        String mongoStatsDataString = "";
+        if(mongoStatsDataMap != null){
+            mongoStatsDataString = mongoStatsDataMap.toString();
+        }
+        Map<String, String> topicToMongo = mongoStatsDataCollector.getTopicToMongo();
+        String topicToMongoString = "";
+        if(topicToMongo != null){
+            topicToMongoString = topicToMongo.toString();
+        }
+
+        return mongoStatsDataString + "\n----------------\n" + topicToMongoString;
+
     }
 
     protected StatsDataDesc createDelayDesc(String topic, String ip, StatisType type) {

@@ -199,6 +199,17 @@ public class DataMonitorController extends AbstractMonitorController implements 
         return new ModelAndView("monitor/consumerorder", createViewMap("topic", "consumerorder"));
     }
 
+    @RequestMapping(value = "/console/monitor/mongo/debug/{server}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getMongoDebug(@PathVariable String server) {
+
+        if (logger.isInfoEnabled()) {
+            logger.info("[getMongoDebug]" + server);
+            logger.info(producerDataRetriever.getMongoDebugInfo(server));
+        }
+        return "ok";
+    }
+
     @RequestMapping(value = "/console/monitor/consumer/debug/{server}", method = RequestMethod.GET)
     @ResponseBody
     public String getConsumerDebug(@PathVariable String server) {

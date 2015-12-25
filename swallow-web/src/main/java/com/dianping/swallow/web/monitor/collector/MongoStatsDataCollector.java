@@ -6,6 +6,7 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
+import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoCluster;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.observer.Observer;
@@ -37,8 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 public class MongoStatsDataCollector extends AbstractRealTimeCollector implements MonitorDataListener, Observer, ApplicationContextAware {
-
-    private static final String MONGO_PREFIX = "mongodb://";
 
     @Autowired
     private ProducerDataRetriever producerDataRetriever;
@@ -212,8 +211,8 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         }
 
         String storeUrl = topicConfig.getStoreUrl();
-        if (StringUtils.isNotBlank(storeUrl) && storeUrl.startsWith(MONGO_PREFIX)) {
-            String ipAddrs = storeUrl.substring(MONGO_PREFIX.length());
+        if (StringUtils.isNotBlank(storeUrl) && storeUrl.startsWith(MongoCluster.schema)) {
+            String ipAddrs = storeUrl.substring(MongoCluster.schema.length());
 
             if (ipAddrs.indexOf(":") != -1) {
                 return ipAddrs.split(":")[0];
@@ -237,6 +236,14 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         }
 
         return result;
+    }
+
+    public Map<String, MongoStatsDataContainer> getMongoStatsDataMap() {
+        return mongoStatsDataMap;
+    }
+
+    public Map<String, String> getTopicToMongo() {
+        return topicToMongo;
     }
 
     @Override

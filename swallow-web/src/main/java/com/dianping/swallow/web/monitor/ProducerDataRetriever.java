@@ -39,6 +39,8 @@ public interface ProducerDataRetriever extends MonitorDataRetriever {
 
     Map<String, StatsData> getMongoQpx(QPX qpx);
 
+    String getMongoDebugInfo(String server);
+
     List<OrderStatsData> getOrder(int size);
 
     List<OrderStatsData> getOrder(int size, long start, long end);
