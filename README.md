@@ -369,7 +369,7 @@ onMessage接口方法没有变，但获取的消息是BytesMessage，目前只�
 
 使用上跟接收Swallow消息代码风格是一样的，按照以下步骤：
 
-*  创建NuclearConsumerFactory，Factory有两个参数appKey和isOnline。默认appKey是从META-INF/app.properties读取app.name的值，建议自己设置；isOnline设置的是环境，false表示线下，true线上环境，上海的环境alpha，beta，ppe对应北京的线下环境，product对应线上环境，因此isOnline默认值是Env.isProduct（alpha、beta、ppe为false，product为true）。注意:在使用时appKey只需填写申请时com.dianping.swallow.后面的部分，前面com.dianping.swallow.由swallow自动加上。
+*  创建NuclearConsumerFactory，Factory有两个参数appKey和isOnline。默认appKey是从META-INF/app.properties读取app.name的值，建议自己设置；isOnline设置的是环境，false表示线下，true线上环境，上海的环境alpha，beta，ppe对应北京的线下环境，product对应线上环境，因此isOnline默认值是Env.isProduct（alpha、beta、ppe为false，product为true），上海这边建议不设置此值。注意:在使用时appKey只需填写申请时com.dianping.swallow.后面的部分，前面com.dianping.swallow.由swallow自动加上。
 *  创建NuclearDestination，如下例，test_for_shanghai1为订阅的topic。
 *  填写consumerId，consumerId必须填写。
 *  创建Consumer，其中NuclearConsumerConfig参数。[NuclearConsumerConfig配置详解](#nuclearConsumerConfig)。
@@ -377,10 +377,10 @@ onMessage接口方法没有变，但获取的消息是BytesMessage，目前只�
 *  开始消费consumer.start()。
 
         public void consume() {
-            ConsumerFactory consumerFactory = new NuclearConsumerFactory(true);
-                Destination dest = NuclearDestination.topic("test_for_shanghai1");
-                String consumerId = "com.dianping.swallow.swallow-test.test_for_shanghai1.d0";
-                Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new NuclearConsumerConfig(true));
+            ConsumerFactory consumerFactory = new NuclearConsumerFactory("swallow-test");
+            Destination dest = NuclearDestination.topic("test_for_shanghai1");
+            String consumerId = "com.dianping.swallow.swallow-test.test_for_shanghai1.d0";
+            Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new NuclearConsumerConfig(true));
                 consumer.setListener(new MessageListener() {
                     @Override
                     public void onMessage(Message msg) throws BackoutMessageException {
@@ -399,11 +399,11 @@ onMessage接口方法没有变，但获取的消息是BytesMessage，目前只�
 各环境地址:
 
 *  alpha：http://alpha.swallow.dp/
-默认密码：123456
+默认密码：Ceshi123
 *  beta：http://beta.swallow.dp/
-默认密码：123456
+默认密码：Ceshi123
 *  ppe：http://ppe.swallow.dp/
-默认密码：112233
+默认密码：Ceshi123
 *  线上：http://swallow.dp/
 
 ## Topic查询

@@ -19,7 +19,7 @@ public class NuclearConsumerClientTest {
     private static final Logger logger = LoggerFactory.getLogger(NuclearConsumerClientTest.class);
 
     public void consume() {
-        ConsumerFactory consumerFactory = new NuclearConsumerFactory(true);
+        ConsumerFactory consumerFactory = new NuclearConsumerFactory("swallow-test", true);
         Destination dest = NuclearDestination.topic("test_for_shanghai1");
         String consumerId = "com.dianping.swallow.swallow-test.test_for_shanghai1.d0";
         Consumer consumer = consumerFactory.createConsumer(dest, consumerId, new NuclearConsumerConfig(true));
