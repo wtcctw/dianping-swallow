@@ -8,8 +8,8 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.processor.ConsumerProcessor;
 import com.dianping.swallow.common.internal.util.CatUtil;
 import com.dianping.swallow.consumer.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author qi.yin
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractConsumerTask implements ConsumerTask {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    protected Logger logger = LogManager.getLogger(getClass());
 
     private SwallowCatActionWrapper actionWrapper;
     protected Consumer consumer;

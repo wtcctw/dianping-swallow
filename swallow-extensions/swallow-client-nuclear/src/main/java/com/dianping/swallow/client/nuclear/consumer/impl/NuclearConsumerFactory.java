@@ -5,8 +5,8 @@ import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +20,7 @@ import java.util.Properties;
  */
 public class NuclearConsumerFactory implements ConsumerFactory {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    protected Logger logger = LogManager.getLogger(getClass());
 
     private static final String APP_FILENAME = "META-INF/app.properties";
 

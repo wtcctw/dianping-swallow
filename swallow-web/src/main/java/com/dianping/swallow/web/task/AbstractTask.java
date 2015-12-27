@@ -1,8 +1,8 @@
 package com.dianping.swallow.web.task;
 
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author qi.yin
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractTask extends AbstractLifecycle implements TaskLifecycle {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     protected static final String CAT_TYPE = "JobTask";
 

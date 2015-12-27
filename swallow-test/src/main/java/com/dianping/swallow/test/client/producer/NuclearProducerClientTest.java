@@ -3,8 +3,8 @@ package com.dianping.swallow.test.client.producer;
 import com.meituan.nuclearmq.client.Producer;
 import com.meituan.nuclearmq.client.error.MQException;
 import com.meituan.nuclearmq.client.util.UtilCommon;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NuclearProducerClientTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(NuclearProducerClientTest.class);
+    private static final Logger logger = LogManager.getLogger(NuclearProducerClientTest.class);
 
     public void produce(String[] args) {
         Producer producer = Producer.Factory.create();
