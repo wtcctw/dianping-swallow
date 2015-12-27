@@ -17,8 +17,8 @@ public class BytesSwallowMessage extends SwallowMessage implements BytesMessage{
 	private Charset charset = Charset.forName("utf-8");
 	
 	private byte []content;
-	
-	
+
+
 	public void setBytesContent(byte []content){
 		this.content = content;
 	}

@@ -177,11 +177,7 @@ public class HttpServiceImpl implements HttpService {
         httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
         httpPost.addHeader("Accept", "application/json");
         HttpResult result = new HttpResult();
-        try {
-            httpPost.setEntity(new StringEntity(jsonObject.toString(), UTF_8));
-        } catch (UnsupportedEncodingException e) {
-            logger.error("http post param encoded failed. ", e);
-        }
+        httpPost.setEntity(new StringEntity(jsonObject.toString(), UTF_8));
         try {
             HttpResponse response = httpClient.execute(httpPost);
             if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {

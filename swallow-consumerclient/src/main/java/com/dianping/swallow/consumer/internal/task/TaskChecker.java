@@ -7,9 +7,9 @@ package com.dianping.swallow.consumer.internal.task;
  */
 public interface TaskChecker extends Runnable{
 
-	void addTask(Runnable task);
+	void addTask(ConsumerTask task);
 	
-	void removeTask(Runnable task);
+	void removeTask(ConsumerTask task);
 
 	void close();
 

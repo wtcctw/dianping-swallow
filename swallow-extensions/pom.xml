@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>swallow-parent</artifactId>
+        <groupId>com.dianping.swallow</groupId>
+        <version>0.8.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>swallow-extensions</artifactId>
+    <packaging>pom</packaging>
+    <properties>
+        <skip_maven_deploy>true</skip_maven_deploy>
+        <nuclearmq-client.version>0.1.8-keepalive-bm1.6</nuclearmq-client.version>
+    </properties>
+    <modules>
+        <module>swallow-client-nuclear</module>
+    </modules>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.meituan.nuclearmq</groupId>
+                <artifactId>nuclearmq-client</artifactId>
+                <version>${nuclearmq-client.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-simple</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

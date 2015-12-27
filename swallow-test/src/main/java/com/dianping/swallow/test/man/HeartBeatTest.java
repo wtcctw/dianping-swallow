@@ -4,10 +4,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import org.junit.Test;
 
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
-import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.dianping.swallow.test.AbstractConsumerTest;
 
 /**
@@ -21,7 +21,7 @@ public class HeartBeatTest extends AbstractConsumerTest{
 	
 	@Test
 	public void testNoHeartBeat(){
-		((ConsumerFactoryImpl)ConsumerFactoryImpl.getInstance()).setHeartBeatSender(new HeartBeatSenderOnce());
+		((ConsumerFactoryImpl) ConsumerFactoryImpl.getInstance()).setHeartBeatSender(new HeartBeatSenderOnce());
 		addListener(getTopic(), "id1", concurrentCount);
 		sleep(3000000);
 	}

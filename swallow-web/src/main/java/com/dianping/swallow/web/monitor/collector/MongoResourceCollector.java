@@ -59,7 +59,7 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 	@Override
 	public void doCollector() {
 
-		if(!EnvUtil.isProduct()){
+		if(!EnvUtil.isProduct() && !EnvUtil.isQa()){
 			return;
 		}
 		if(logger.isInfoEnabled()){

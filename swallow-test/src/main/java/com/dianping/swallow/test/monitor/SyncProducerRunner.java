@@ -1,14 +1,14 @@
 package com.dianping.swallow.test.monitor;
 
-import java.util.Date;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.producer.Producer;
 import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerMode;
 import com.dianping.swallow.producer.impl.ProducerFactoryImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Date;
 
 public class SyncProducerRunner {
 

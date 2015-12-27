@@ -17,12 +17,12 @@ public class SwallowHelper {
 
 		new DefaultThreadExceptionHandler();
 		Cat.initialize(new File(Cat.getCatHome(), "client.xml"));
+	}
 
-		String log4j2Enable = System.getProperty("Log4j2Enable", "true");
+	public static void clientInitialize(){
 
-		if ("true".equalsIgnoreCase(log4j2Enable)) {
-			LoggerLoader.init();
-		}
+		initialize();
+		LoggerLoader.init();
 	}
 
 }

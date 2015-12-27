@@ -12,13 +12,17 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.InetSocketAddress;
 import java.util.*;
 
-public final class ConsumerFactoryImpl extends AbstractObservable implements ConsumerFactory, ConfigChangeListener {
+/**
+ * @author qi.yin
+ *         2015/12/15  上午11:11.
+ */
+public class ConsumerFactoryImpl extends AbstractObservable implements ConsumerFactory, ConfigChangeListener {
 
     private Logger logger = LogManager.getLogger(getClass());
 
@@ -30,13 +34,18 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
     private static ConsumerFactoryImpl instance = new ConsumerFactoryImpl();
     private HeartBeatSender heartBeatSender = new DefaultHeartBeatSender();
 
-    static {
-
-            SwallowHelper.initialize();
-    }
-
     private ConsumerFactoryImpl() {
         getSwallowCAddress();
+    }
+
+    static {
+        String log4j2Enable = System.getProperty("Log4j2Enable", "true");
+
+        if ("true".equalsIgnoreCase(log4j2Enable)) {
+            SwallowHelper.clientInitialize();
+        } else {
+            SwallowHelper.initialize();
+        }
     }
 
     public static ConsumerFactory getInstance() {
@@ -47,7 +56,7 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
     public Consumer createConsumer(Destination dest, String consumerId, ConsumerConfig config) {
 
         List<InetSocketAddress> addresses = getOrDefaultTopicAddress(dest.getName());
-        Consumer consumer = new ConsumerImpl(dest, consumerId, config, addresses.get(0), addresses.get(1), heartBeatSender);
+        Consumer consumer =  new ConsumerImpl(dest, consumerId, config, addresses.get(0), addresses.get(1), heartBeatSender);
         addObserver(consumer);
         return consumer;
 
@@ -76,9 +85,12 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
     }
 
     /**
-     * @param lionValue swallow.consumer.consumerServerURI=default=127.0.0.1:8081,
-     *                  127.0
-     *                  .0.1:8082;feed,topicForUnitTest=127.0.0.1:8083,127.0.0.1:8084
+     *
+     * @param lionValue
+     *            swallow.consumer.consumerServerURI=default=127.0.0.1:8081,
+     *            127.0
+     *            .0.1:8082;feed,topicForUnitTest=127.0.0.1:8083,127.0.0.1:8084
+     * @return
      * @return
      */
     protected Map<String, List<InetSocketAddress>> lionValue2Map(String lionValue) {
@@ -98,7 +110,7 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
             String topicNames = splits[0].trim();
             String swallowCAddress = splits[1].trim();
 
-            List<InetSocketAddress> address = string2SocketAddress(swallowCAddress);
+            List<InetSocketAddress>  address =  string2SocketAddress(swallowCAddress);
 
             for (String topicName : topicNames.split(getSplitWithSpace(","))) {
                 topicName2Address.put(topicName.trim(), address);
@@ -108,7 +120,7 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
         return topicName2Address;
     }
 
-    private String getSplitWithSpace(String split) {
+    private String getSplitWithSpace(String split){
         return "\\s*" + split + "\\s*";
     }
 
@@ -120,11 +132,11 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
             throw new IllegalArgumentException("bad swallowAddress:" + swallowCAddress);
         }
 
-        String[] masterConfig = ipAndPorts[0].split(getSplitWithSpace(":"));
+        String []masterConfig = ipAndPorts[0].split(getSplitWithSpace(":"));
         String masterIp = masterConfig[0];
         int masterPort = Integer.parseInt(masterConfig[1]);
 
-        String[] slaveConfig = ipAndPorts[1].split(getSplitWithSpace(":"));
+        String []slaveConfig = ipAndPorts[1].split(getSplitWithSpace(":"));
         String slaveIp = slaveConfig[0];
         int slavePort = Integer.parseInt(slaveConfig[1]);
 
@@ -139,15 +151,14 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
 
     /**
      * for unittest
-     *
      * @param topic
      * @return
      */
     @Override
-    public List<InetSocketAddress> getTopicAddress(String topic) {
+    public List<InetSocketAddress> getTopicAddress(String topic){
 
         List<InetSocketAddress> addresses = topicName2Address.get(topic);
-        if (addresses == null) {
+        if(addresses == null){
             return null;
         }
 
@@ -158,12 +169,11 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
     public List<InetSocketAddress> getOrDefaultTopicAddress(String topic) {
 
         List<InetSocketAddress> addresses = getTopicAddress(topic);
-        if (addresses == null) {
+        if(addresses == null){
             addresses = getTopicAddress(TOPICNAME_DEFAULT);
         }
         return addresses;
     }
-
 
     public void setHeartBeatSender(HeartBeatSender heartBeatSender) {
         this.heartBeatSender = heartBeatSender;
@@ -172,10 +182,11 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
     @Override
     public void onConfigChange(String key, String value) {
 
-        if (LION_KEY_CONSUMER_SERVER_URI.equals(key)) {
+        if(LION_KEY_CONSUMER_SERVER_URI.equals(key)){
 
             topicName2Address = lionValue2Map(value);
             updateObservers(null);
         }
     }
+
 }

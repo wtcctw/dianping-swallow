@@ -3,12 +3,17 @@ package com.dianping.swallow.web.service.impl;
 import com.dianping.elasticsearch.conditions.Conditions;
 import com.dianping.elasticsearch.query.ESSearch;
 import com.dianping.elasticsearch.services.ElasticSearchService;
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.lion.client.ConfigChange;
+import com.dianping.lion.client.LionException;
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.service.LogSearchService;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +27,41 @@ public class LogSearchServiceImpl implements LogSearchService {
 
     private static final Logger logger = LogManager.getLogger(LogSearchServiceImpl.class);
 
+    private static final String INDEX_NAME = "swallow.consumelog.search.index";
+
     @Autowired
     private ElasticSearchService elasticSearchService;
+
+    private ConfigCache configCache;
+
+    private volatile String indexName = EnvUtil.isProduct() ? "dpods_log_swallow-consumermaster" : "dpods_log_swallow-consumer";
+
+    @PostConstruct
+    private void initLionConfig() {
+        try {
+            configCache = ConfigCache.getInstance();
+            indexName = configCache.getProperty(INDEX_NAME);
+
+            configCache.addChange(new ConfigChange() {
+                @Override
+                public void onChange(String key, String value) {
+                    if (key.equals(INDEX_NAME)) {
+                        indexName = configCache.getProperty(INDEX_NAME);
+                    }
+                    logger.info("[initLionConfig] onChange key= {}, value= {}", key, value);
+                }
+
+            });
+        } catch (LionException e) {
+            logger.error("lion read producer and consumer server ips failed", e);
+        }
+    }
 
     @Override
     public List<SearchResult> search(String topic, String cid, long mid) {
         List<SearchResult> results = null;
         try {
-            ESSearch search = elasticSearchService.buildSearch("dpods_log_swallow-consumer")
+            ESSearch search = elasticSearchService.buildSearch(indexName)
                     .addCondition(Conditions.term("topic", topic))
                     .addCondition(Conditions.term("cid", cid))
                     .addCondition(Conditions.or(Conditions.term("mid", mid),
@@ -63,8 +95,8 @@ public class LogSearchServiceImpl implements LogSearchService {
                 }
 
             }
-        }catch (Exception e){
-            logger.error("[search] failed.",e);
+        } catch (Exception e) {
+            logger.error("[search] failed.", e);
         }
         return results;
     }
