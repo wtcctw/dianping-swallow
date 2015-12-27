@@ -1,25 +1,5 @@
 package com.dianping.swallow.consumerserver.bootstrap;
 	
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.dianping.swallow.common.internal.codec.Codec;
 import com.dianping.swallow.common.internal.codec.impl.JsonCodec;
 import com.dianping.swallow.common.internal.lifecycle.MasterSlaveComponent;
@@ -40,6 +20,20 @@ import com.dianping.swallow.consumerserver.auth.ConsumerAuthController;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.netty.MessageServerHandler;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author mengwenchao
@@ -63,7 +57,8 @@ public abstract class AbstractBootStrap {
 	protected final Logger logger = LogManager.getLogger(getClass());
 
 	static{
-		   SwallowHelper.initialize();
+
+			SwallowHelper.initialize();
 	}
 
 	protected ServerBootstrap startNetty(int port){

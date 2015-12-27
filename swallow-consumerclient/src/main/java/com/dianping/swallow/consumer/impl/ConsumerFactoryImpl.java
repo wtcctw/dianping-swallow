@@ -31,14 +31,8 @@ public final class ConsumerFactoryImpl extends AbstractObservable implements Con
     private HeartBeatSender heartBeatSender = new DefaultHeartBeatSender();
 
     static {
-        String log4j2Enable = System.getProperty("Log4j2Enable", "true");
 
-        if ("true".equalsIgnoreCase(log4j2Enable)) {
-            SwallowHelper.clientInitialize();
-        } else {
             SwallowHelper.initialize();
-        }
-
     }
 
     private ConsumerFactoryImpl() {
