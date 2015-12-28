@@ -83,6 +83,11 @@ public class MongoStatsData extends StatsData implements Mergeable{
     }
 
     @Override
+    public String toString() {
+        return String.valueOf(count);
+    }
+
+    @Override
     public Object clone() throws CloneNotSupportedException{
         throw new UnsupportedOperationException("clone not support");
     }

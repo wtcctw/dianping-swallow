@@ -88,4 +88,11 @@ public class MongoStatsDataContainerImpl implements MongoStatsDataContainer{
         Long time = mongoStatsDataMap.lastKey();
         mongoStatsDataService.insert(mongoStatsDataMap.get(time));
     }
+
+    @Override
+    public String toString() {
+        return '{' +
+                "mongoStatsDataMap=" + mongoStatsDataMap +
+                '}';
+    }
 }

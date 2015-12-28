@@ -61,6 +61,8 @@ public abstract class Server implements Sendable, Serviceable {
 
     private static final String MONGO_STORE_PREFIX = "mongodb://";
 
+    private static final String IP_REGEX = "(\\d{1,3}\\.){3}\\d{1,3}(:\\d{1,})?";
+
     protected String ip;
 
     protected ServerConfig serverConfig;
@@ -231,12 +233,12 @@ public abstract class Server implements Sendable, Serviceable {
         return messageDaoInfos;
     }
 
-    private List<StoreAddress> parseMessageDaoInfo(String messageDaoInfo) {
+    public List<StoreAddress> parseMessageDaoInfo(String messageDaoInfo) {
         List<StoreAddress> storeAddresses = null;
         if (StringUtils.isNotEmpty(messageDaoInfo)) {
-            int index = messageDaoInfo.indexOf(MONGO_STORE_PREFIX);
+            int index = messageDaoInfo.lastIndexOf(MONGO_STORE_PREFIX);
             if (index < 0) {
-                index = messageDaoInfo.indexOf(KAFKA_STORE_PREFIX);
+                index = messageDaoInfo.lastIndexOf(KAFKA_STORE_PREFIX);
             }
             if (index > 0) {
                 String storeUrl = StringUtils.substring(messageDaoInfo, index);
@@ -247,7 +249,7 @@ public abstract class Server implements Sendable, Serviceable {
     }
 
 
-    private List<StoreAddress> parseStoreUrl(String mongoUrl) {
+    public List<StoreAddress> parseStoreUrl(String mongoUrl) {
         List<StoreAddress> storeAddresses = new ArrayList<StoreAddress>();
         final String urlSplit = ",";
         if (StringUtils.isNotBlank(mongoUrl)) {
@@ -262,7 +264,9 @@ public abstract class Server implements Sendable, Serviceable {
                         String tempStart = temp.substring(KAFKA_STORE_PREFIX.length());
                         storeAddress = splitStoreAddress(tempStart);
                     } else {
-                        storeAddress = splitStoreAddress(temp);
+                        if (temp.matches(IP_REGEX)) {
+                            storeAddress = splitStoreAddress(temp);
+                        }
                     }
                     if (storeAddress != null) {
                         storeAddresses.add(storeAddress);
@@ -327,6 +331,5 @@ public abstract class Server implements Sendable, Serviceable {
             return false;
         }
     }
-
 
 }
