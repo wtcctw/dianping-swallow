@@ -5,8 +5,8 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * 监听端口，当接收到匹配的命令时触发给定的CloseHook
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CloseMonitor {
 
-   private static final Logger logger                  = LoggerFactory.getLogger(CloseMonitor.class);
+   private static final Logger logger                  = LogManager.getLogger(CloseMonitor.class);
 
    private final static String DEFAULT_SHUTDOWN_CMD = "shutdown";
 

@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.dao.DAO;
 import com.dianping.swallow.common.internal.dao.DAOContainer;
@@ -15,7 +15,7 @@ public abstract class AbstractDaoContainer<T extends DAO<?>> implements DAOConta
 	
 	private static final long serialVersionUID = 1L;
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	@Override
 	public T getDao() {

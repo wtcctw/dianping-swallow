@@ -3,8 +3,8 @@ package com.dianping.swallow.common.internal.netty.channel;
 import java.nio.channels.SocketChannel;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.codec.Codec;
 
@@ -17,7 +17,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
  */
 public class CodecServerSocketChannel extends NioServerSocketChannel{
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 	
 	private Codec codec;
 	

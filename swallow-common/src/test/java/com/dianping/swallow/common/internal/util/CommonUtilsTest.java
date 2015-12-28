@@ -15,7 +15,7 @@ public class CommonUtilsTest extends AbstractTest{
 	public void testRealCpuCount(){
 		
 		if(logger.isInfoEnabled()){
-			logger.info(CommonUtils.getCpuCount());
+			logger.info(String.valueOf(CommonUtils.getCpuCount()));
 		}
 	}
 

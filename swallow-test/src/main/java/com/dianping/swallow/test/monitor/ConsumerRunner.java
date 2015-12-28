@@ -1,8 +1,5 @@
 package com.dianping.swallow.test.monitor;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
 import com.dianping.swallow.consumer.Consumer;
@@ -10,6 +7,9 @@ import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.dianping.swallow.test.load.AbstractLoadTest;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @rundemo_name 生产者例子(同步)

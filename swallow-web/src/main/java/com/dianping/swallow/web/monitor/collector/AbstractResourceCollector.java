@@ -1,9 +1,8 @@
 package com.dianping.swallow.web.monitor.collector;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 /**
  * 
  * @author qiyin
@@ -12,7 +11,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
  */
 public abstract class AbstractResourceCollector extends AbstractLifecycle implements CollectorLifecycle {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LogManager.getLogger(getClass());
 
 	protected final static String CAT_TYPE = "ResourceCollector";
 

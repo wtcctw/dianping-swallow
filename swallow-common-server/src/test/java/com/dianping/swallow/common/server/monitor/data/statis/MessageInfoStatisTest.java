@@ -169,7 +169,7 @@ public class MessageInfoStatisTest extends AbstractTest {
 	private void expectQpx(NavigableMap<Long, QpxData> data, int expectCount, Long expectedQpx, Long expectedTotal) {
 
 		if (logger.isInfoEnabled()) {
-			logger.info(data);
+			logger.info(data.toString());
 		}
 
 		Assert.assertEquals(expectCount, data.size());
@@ -182,7 +182,7 @@ public class MessageInfoStatisTest extends AbstractTest {
 	private void expectDelay(NavigableMap<Long, Long> data, int expectCount, Long expectedData) {
 
 		if (logger.isInfoEnabled()) {
-			logger.info(data);
+			logger.info(data.toString());
 		}
 
 		Assert.assertEquals(expectCount, data.size());

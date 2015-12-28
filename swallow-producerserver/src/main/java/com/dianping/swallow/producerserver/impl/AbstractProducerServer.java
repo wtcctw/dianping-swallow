@@ -1,8 +1,8 @@
 package com.dianping.swallow.producerserver.impl;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.lifecycle.Ordered;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
@@ -16,7 +16,7 @@ import com.dianping.swallow.producerserver.MessageReceiver;
  */
 public class AbstractProducerServer extends AbstractLifecycle{
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 	
 	protected MessageReceiver messageReceiver;
 

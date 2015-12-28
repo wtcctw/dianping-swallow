@@ -2,8 +2,8 @@ package com.dianping.swallow.producer.impl.internal;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
@@ -26,7 +26,7 @@ import com.geekhua.filequeue.exception.FileQueueClosedException;
  * @author kezhu.wu
  */
 public class HandlerAsynchroSeparatelyMode implements ProducerHandler {
-    private static final Logger          logger                = LoggerFactory
+    private static final Logger          logger                = LogManager
                                                                        .getLogger(HandlerAsynchroSeparatelyMode.class);
 
     /**

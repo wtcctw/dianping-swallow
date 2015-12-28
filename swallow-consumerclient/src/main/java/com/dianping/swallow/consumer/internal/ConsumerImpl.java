@@ -35,8 +35,8 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConsumerImpl implements Consumer, ConsumerConnectionListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConsumerImpl.class);
+	private static final Logger logger = LogManager.getLogger(ConsumerImpl.class);
 
     private String consumerId;
 

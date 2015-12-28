@@ -1,5 +1,13 @@
 package com.dianping.swallow.common.internal.util;
 
+import com.dianping.cat.Cat;
+import com.dianping.swallow.common.internal.config.LoggerLoader;
+import com.dianping.swallow.common.internal.config.SwallowClientConfig;
+import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
+import com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -8,28 +16,32 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
-
-import com.dianping.cat.Cat;
-import com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler;
-
 /**
  * @author mengwenchao
  *
  * 2015年3月10日 下午4:12:49
  */
 public class SwallowHelper {
-	
-	private static Logger logger = Logger.getLogger(SwallowHelper.class);
+
+	private static Logger logger = LogManager.getLogger(SwallowHelper.class);
 	
 	private static String version = null;
 	
 	public static void initialize(){
-		
+
 		new DefaultThreadExceptionHandler();
 		Cat.initialize(new File(Cat.getCatHome(), "client.xml"));
 	}
-	
+
+	public static void clientInitialize(){
+
+		initialize();
+		SwallowClientConfig swallowClientConfig = SwallowClientConfigImpl.getInstance();
+
+		if (swallowClientConfig.isLog4j2AsyncEnabled()) {
+			LoggerLoader.init();
+		}
+	}
 	
 	public static String getVersion(){
 
@@ -116,7 +128,6 @@ public class SwallowHelper {
 		
 		return version;
 	}
-
 
 	private static String extractVersion(String line) {
 		

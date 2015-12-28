@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.threadfactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * 失败时累加failCnt，sleep(min(delayBase * failCnt, delayUpperbound))，成功时清零failCnt
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultPullStrategy implements PullStrategy {
 
-    private static Logger log     = LoggerFactory.getLogger(DefaultPullStrategy.class);
+    private static Logger log     = LogManager.getLogger(DefaultPullStrategy.class);
 
     private int           failCnt = 0;
     private final int     delayBase;

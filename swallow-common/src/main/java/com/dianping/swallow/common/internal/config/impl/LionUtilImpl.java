@@ -7,6 +7,8 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 import com.dianping.swallow.common.internal.util.StringUtils;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import com.dianping.swallow.common.internal.util.http.ContentTypeDesc;
 import com.dianping.swallow.common.internal.util.http.HttpManager;
 import com.dianping.swallow.common.internal.util.http.HttpMethod;
@@ -17,8 +19,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URLEncoder;
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class LionUtilImpl implements LionUtil{
 
-	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+	protected final Logger logger     = LogManager.getLogger(getClass());
 
 	private Long userId = PropertiesUtils.getLongProperty("lion.id", 76L);
 	

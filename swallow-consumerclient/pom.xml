@@ -37,6 +37,7 @@
 			<artifactId>swallow-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
 		<!-- lion -->
 		<dependency>
 			<groupId>com.dianping.lion</groupId>

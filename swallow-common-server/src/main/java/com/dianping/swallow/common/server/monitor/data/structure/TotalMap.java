@@ -2,8 +2,8 @@ package com.dianping.swallow.common.server.monitor.data.structure;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
@@ -23,7 +23,7 @@ public abstract class TotalMap<V extends Mergeable> extends ConcurrentHashMap<St
 
 	private static final long serialVersionUID = 1L;
 	
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LogManager.getLogger(getClass());
 		
 	public TotalMap(){
 		super();

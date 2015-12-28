@@ -4,7 +4,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -15,6 +14,8 @@ import com.dianping.lion.client.LionException;
 import com.dianping.swallow.web.controller.utils.UserUtils;
 import com.dianping.swallow.web.service.UserService;
 import com.dianping.swallow.web.service.AuthenticationService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author mingdongli
@@ -39,7 +40,7 @@ public class ModelAndViewInterceptor extends HandlerInterceptorAdapter {
 	@Autowired
 	UserUtils extractUsernameUtils;
 	
-	private static final Logger logger = Logger
+	private static final Logger logger = LogManager
 			.getLogger(ModelAndViewInterceptor.class);
 
 	@Override

@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Transaction;
@@ -70,7 +70,7 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 
 	private ConsumerCollector consumerCollector;
 	
-	protected final Logger ackLogger = LoggerFactory.getLogger("ackLogger");
+	protected final Logger ackLogger = LogManager.getLogger("ackLogger");
 	
 	private MessageDAO<?> messageDao;
 	

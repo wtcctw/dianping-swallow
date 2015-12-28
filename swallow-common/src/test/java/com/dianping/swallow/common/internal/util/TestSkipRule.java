@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -16,7 +17,7 @@ public class TestSkipRule implements TestRule{
 	
 	public static final String TEST_SWIMELINE = "test";
 	
-	protected Logger logger = Logger.getLogger(getClass());
+	protected Logger logger = LogManager.getLogger(getClass());
 	
 	@Override
 	public Statement apply(final Statement base, Description description) {

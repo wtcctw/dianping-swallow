@@ -7,8 +7,8 @@ import io.netty.channel.ChannelFuture;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ConsumerThread extends Thread {
 
-	private static final Logger logger = LoggerFactory.getLogger(ConsumerThread.class);
+	private static final Logger logger = LogManager.getLogger(ConsumerThread.class);
 
 	private Bootstrap bootstrap;
 

@@ -7,8 +7,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 
@@ -19,7 +19,7 @@ import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
  */
 public class DirectBuffPrinter extends AbstractLifecycle implements Runnable {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1);
 	

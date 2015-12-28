@@ -6,8 +6,8 @@ import com.dianping.swallow.web.controller.filter.FilterChain;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 import com.dianping.swallow.web.service.GroupResourceService;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class TypeValidatorFilter implements Filter<TopicApplyDto, ValidatorFilterResult> {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     private static final String INVALID_TYPE = "mongo类型不存在，请选择正确的mongo类型，如有问题请联系mingdong.li@dianping.com";
 

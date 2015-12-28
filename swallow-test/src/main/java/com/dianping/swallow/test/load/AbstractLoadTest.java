@@ -1,19 +1,14 @@
 package com.dianping.swallow.test.load;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
+import java.io.IOException;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author mengwenchao
@@ -23,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public abstract class AbstractLoadTest{
 	
 	@JsonIgnore
-    protected Logger logger       = LoggerFactory.getLogger(getClass());
+    protected Logger logger       = LogManager.getLogger(getClass());
 
 	protected String topicName = "LoadTestTopic";
 	
@@ -37,7 +32,7 @@ public abstract class AbstractLoadTest{
 
 	protected 	static		int maxRunMinutes = Integer.parseInt(System.getProperty("maxRunMinutes", "10080"));;
 
-    private  AtomicLong count = new AtomicLong();
+    protected   AtomicLong count = new AtomicLong();
     protected AtomicLong preCount = new AtomicLong();
     protected long preTime;
     protected long startTime;

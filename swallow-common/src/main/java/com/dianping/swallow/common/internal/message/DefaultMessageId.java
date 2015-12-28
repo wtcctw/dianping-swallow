@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.message;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.dao.TopicPartition;
 import com.dianping.swallow.common.message.MessageId;
@@ -13,7 +13,7 @@ import com.dianping.swallow.common.message.MessageId;
  */
 public class DefaultMessageId implements MessageId{
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 	
 	private TopicPartition topicPartition;
 	

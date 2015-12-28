@@ -8,7 +8,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.dianping.swallow.common.internal.packet.PacketType;
 import com.dianping.swallow.common.internal.packet.PktConsumerMessage;
@@ -22,7 +23,7 @@ import com.dianping.swallow.common.internal.util.CommonUtils;
  */
 public class DefaultHeartBeatSender implements HeartBeatSender{
 	
-	private Logger logger = Logger.getLogger(getClass());
+	private Logger logger = LogManager.getLogger(getClass());
 
 	private ConcurrentHashMap<Channel, ScheduledFuture<?>>  channels = new ConcurrentHashMap<Channel, ScheduledFuture<?>>();
 	

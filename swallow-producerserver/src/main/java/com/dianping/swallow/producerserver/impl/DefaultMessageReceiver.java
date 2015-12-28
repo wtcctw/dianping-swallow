@@ -2,8 +2,8 @@ package com.dianping.swallow.producerserver.impl;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.cat.Cat;
 import com.dianping.cat.message.Message;
@@ -24,7 +24,7 @@ import com.dianping.swallow.producerserver.MessageReceiver;
 public class DefaultMessageReceiver implements MessageReceiver{
 	
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 	
 	private TopicWhiteList topicWhiteList;
 

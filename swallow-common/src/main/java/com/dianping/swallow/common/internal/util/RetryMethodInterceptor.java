@@ -5,8 +5,8 @@ import java.lang.reflect.Method;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.mongodb.MongoException;
 
@@ -18,7 +18,7 @@ import com.mongodb.MongoException;
  */
 @SuppressWarnings("rawtypes")
 class RetryMethodInterceptor implements MethodInterceptor {
-   private static final Logger logger = LoggerFactory.getLogger(RetryMethodInterceptor.class);
+   private static final Logger logger = LogManager.getLogger(RetryMethodInterceptor.class);
    private long                retryIntervalWhenException;
    private int 				   retryTimesWhenMongoException;
    private Object              target;

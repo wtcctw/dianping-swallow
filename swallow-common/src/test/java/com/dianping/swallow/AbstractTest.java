@@ -1,5 +1,18 @@
 package com.dianping.swallow;
 
+import com.dianping.lion.client.ConfigCache;
+import com.dianping.swallow.common.internal.message.InternalProperties;
+import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.IPUtil;
+import com.dianping.swallow.common.internal.util.TestSkipRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
+import org.mockito.MockitoAnnotations;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.Socket;
@@ -12,19 +25,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.mockito.MockitoAnnotations;
-
-import com.dianping.lion.client.ConfigCache;
-import com.dianping.swallow.common.internal.message.InternalProperties;
-import com.dianping.swallow.common.internal.message.SwallowMessage;
-import com.dianping.swallow.common.internal.util.IPUtil;
-import com.dianping.swallow.common.internal.util.TestSkipRule;
-
 /**
  * @author mengwenchao
  * 
@@ -32,8 +32,8 @@ import com.dianping.swallow.common.internal.util.TestSkipRule;
  */
 public abstract class AbstractTest {
 
-	protected Logger logger = Logger.getLogger(getClass());
-
+	protected Logger logger = LogManager.getLogger(getClass());
+	
 	private final int localWebPort = 8080;
 	
 	private String localIp;
