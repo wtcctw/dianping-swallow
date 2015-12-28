@@ -2,6 +2,8 @@ package com.dianping.swallow.common.internal.util;
 
 import com.dianping.cat.Cat;
 import com.dianping.swallow.common.internal.config.LoggerLoader;
+import com.dianping.swallow.common.internal.config.SwallowClientConfig;
+import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler;
 
 import java.io.File;
@@ -22,7 +24,11 @@ public class SwallowHelper {
 	public static void clientInitialize(){
 
 		initialize();
-		LoggerLoader.init();
+		SwallowClientConfig swallowClientConfig = SwallowClientConfigImpl.getInstance();
+
+		if (swallowClientConfig.isLog4j2AsyncEnabled()) {
+			LoggerLoader.init();
+		}
 	}
 
 }

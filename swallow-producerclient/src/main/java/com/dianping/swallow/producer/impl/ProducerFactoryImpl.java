@@ -1,9 +1,9 @@
 /**
  * Project: swallow-producerclient
- * 
+ *
  * File Created at 2012-6-25
  * $Id$
- * 
+ *
  * Copyright 2010 dianping.com.
  * All rights reserved.
  *
@@ -19,8 +19,6 @@ import com.dianping.dpsf.api.ProxyFactory;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.pigeon.remoting.common.util.Constants;
-import com.dianping.swallow.common.internal.config.SwallowClientConfig;
-import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.processor.DefaultMessageProcessorTemplate;
 import com.dianping.swallow.common.internal.processor.ProducerProcessor;
@@ -34,12 +32,12 @@ import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerFactory;
 import com.dianping.swallow.producer.impl.internal.ProducerImpl;
 import com.dianping.swallow.producer.impl.internal.SwallowPigeonConfiguration;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 实现ProducerFactory接口的工厂类
- * 
+ *
  * @author tong.song
  */
 public final class ProducerFactoryImpl implements ProducerFactory {
@@ -53,16 +51,10 @@ public final class ProducerFactoryImpl implements ProducerFactory {
    private final String                     producerVersion  = "0.7.1";                                           //Producer版本号
    private final SwallowPigeonConfiguration pigeonConfigure;                                                      //ProducerFactory配置类
    private ProducerSwallowService           remoteService;                                                        //远程调用对象
-   
+
    static{
 
-      SwallowClientConfig swallowClientConfig = SwallowClientConfigImpl.getInstance();
-
-      if (swallowClientConfig.isLog4j2AsyncEnabled()) {
          SwallowHelper.clientInitialize();
-      } else {
-         SwallowHelper.initialize();
-      }
    }
    /**
     * Producer工厂类构造函数
@@ -77,7 +69,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
 
    /**
     * 初始化远程调用服务（pigeon）
-    * 
+    *
     * @param pigeonConfigure ProducerFactory配置对象
     * @return 实现MQService接口的类，此版本中为pigeon返回的一个远程调用服务代理
     * @throws RemoteServiceInitFailedException 远程调用服务（pigeon）初始化失败
@@ -110,7 +102,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
 
    /**
     * 获取Producer工厂类单例的函数
-    * 
+    *
     * @return Producer工程类单例
     * @throws RemoteServiceInitFailedException 远程调用服务（pigeon）初始化失败
     */
@@ -144,7 +136,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
       producerImpl = new ProducerImpl(dest, config, producerIP, producerVersion, remoteService,
             pigeonConfigure.getRetryBaseInterval(), pigeonConfigure.getFailedBaseInterval(), pigeonConfigure.getFileQueueFailedBaseInterval(),
             producerProcessor);
-      
+
       if(logger.isInfoEnabled()){
     	  logger.info("New producer:[TopicName=" + dest.getName() + "; " + producerImpl.getProducerConfig().toString()+ "]");
       }
