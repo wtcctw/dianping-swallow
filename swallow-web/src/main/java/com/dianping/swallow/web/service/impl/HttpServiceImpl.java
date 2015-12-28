@@ -1,12 +1,8 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.List;
-
+import com.dianping.swallow.common.internal.util.CommonUtils;
+import com.dianping.swallow.web.model.alarm.ResultType;
+import com.dianping.swallow.web.service.HttpService;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
@@ -40,9 +36,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.dianping.swallow.common.internal.util.CommonUtils;
-import com.dianping.swallow.web.model.alarm.ResultType;
-import com.dianping.swallow.web.service.HttpService;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.util.List;
 
 /**
  * @author qiyin
@@ -177,8 +176,8 @@ public class HttpServiceImpl implements HttpService {
         httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
         httpPost.addHeader("Accept", "application/json");
         HttpResult result = new HttpResult();
-        httpPost.setEntity(new StringEntity(jsonObject.toString(), UTF_8));
         try {
+            httpPost.setEntity(new StringEntity(jsonObject.toString(), UTF_8));
             HttpResponse response = httpClient.execute(httpPost);
             if (response.getStatusLine().getStatusCode() == HttpStatus.ORDINAL_200_OK) {
                 result.setResponseBody(EntityUtils.toString(response.getEntity()));

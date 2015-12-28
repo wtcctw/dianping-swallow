@@ -7,16 +7,10 @@ import com.dianping.swallow.web.monitor.StatsDataDesc;
  * Author   mingdongli
  * 15/12/23  下午8:24.
  */
-public class MongoStatsDataDesc extends AbstractStatsDataDesc implements StatsDataDesc {
+public class MongoStatsDataDesc extends AbstractServerDataDesc implements StatsDataDesc {
 
-    public MongoStatsDataDesc(String ip) {
-
-        super(ip, StatisDetailType.SAVE_QPX);
+    public MongoStatsDataDesc(String catalog, String ip, StatisDetailType dt) {
+        super(catalog, ip, dt);
     }
-
-    public MongoStatsDataDesc(String ip, StatisDetailType dt) {
-        super(ip, dt);
-    }
-
 
 }
