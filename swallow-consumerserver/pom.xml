@@ -109,7 +109,7 @@
 				<configuration>
 					<excludes>
 						<exclude>**/swallow*.properties</exclude>
-						<exclude>**/log4j.properties</exclude>
+						<exclude>**/log4j2.xml</exclude>
 						<exclude>**/*.backup</exclude>
 						<exclude>**/*.sh</exclude>
 					</excludes>

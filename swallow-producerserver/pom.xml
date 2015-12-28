@@ -66,12 +66,20 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.lmax</groupId>
-			<artifactId>disruptor</artifactId>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
 		</dependency>
 		<!-- 监控 -->
 		<dependency>
@@ -94,7 +102,7 @@
 				<configuration>
 					<excludes>
 						<exclude>**/swallow*.properties</exclude>
-						<exclude>**/log4j.properties</exclude>
+						<exclude>**/log4j2.xml</exclude>
 						<exclude>**/*.backup</exclude>
 						<exclude>**/*.sh</exclude>
 					</excludes>
