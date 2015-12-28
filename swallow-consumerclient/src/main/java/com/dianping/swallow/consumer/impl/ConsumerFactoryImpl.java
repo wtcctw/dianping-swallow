@@ -2,7 +2,9 @@ package com.dianping.swallow.consumer.impl;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
+import com.dianping.swallow.common.internal.config.SwallowClientConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
 import com.dianping.swallow.common.internal.observer.impl.AbstractObservable;
@@ -39,9 +41,9 @@ public class ConsumerFactoryImpl extends AbstractObservable implements ConsumerF
     }
 
     static {
-        String log4j2Enable = System.getProperty("Log4j2Enable", "true");
+        SwallowClientConfig swallowClientConfig = SwallowClientConfigImpl.getInstance();
 
-        if ("true".equalsIgnoreCase(log4j2Enable)) {
+        if (swallowClientConfig.isLog4j2AsyncEnabled()) {
             SwallowHelper.clientInitialize();
         } else {
             SwallowHelper.initialize();

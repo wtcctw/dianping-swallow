@@ -19,6 +19,8 @@ import com.dianping.dpsf.api.ProxyFactory;
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.pigeon.remoting.common.util.Constants;
+import com.dianping.swallow.common.internal.config.SwallowClientConfig;
+import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.processor.DefaultMessageProcessorTemplate;
 import com.dianping.swallow.common.internal.processor.ProducerProcessor;
@@ -54,9 +56,9 @@ public final class ProducerFactoryImpl implements ProducerFactory {
    
    static{
 
-      String log4j2Enable = System.getProperty("Log4j2Enable", "true");
+      SwallowClientConfig swallowClientConfig = SwallowClientConfigImpl.getInstance();
 
-      if ("true".equalsIgnoreCase(log4j2Enable)) {
+      if (swallowClientConfig.isLog4j2AsyncEnabled()) {
          SwallowHelper.clientInitialize();
       } else {
          SwallowHelper.initialize();

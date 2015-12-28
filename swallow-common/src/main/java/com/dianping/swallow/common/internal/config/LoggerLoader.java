@@ -2,6 +2,7 @@ package com.dianping.swallow.common.internal.config;
 
 
 import com.dianping.lion.Environment;
+import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -93,8 +94,9 @@ public class LoggerLoader {
         config.addLogger(PACKAGE, loggerConfig);
 
         //switch for DefaultConsumerTask
-        String isLoggerConsumerTask = System.getProperty(DEFAULT_CONSUMER_TASK_PROPERTY, "true");
-        if("false".equalsIgnoreCase(isLoggerConsumerTask)){
+        SwallowClientConfig swallowClientConfig = SwallowClientConfigImpl.getInstance();
+
+        if (!swallowClientConfig.isOnMessageLogEnabled()) {
             AppenderRef[] warnRefs = new AppenderRef[]{fileInfoRef};
             LoggerConfig loggerWarnConfig = LoggerConfig.createLogger("false", Level.WARN, DEFAULT_CONSUMER_TASK, "true", warnRefs,
                     null, config, null);
