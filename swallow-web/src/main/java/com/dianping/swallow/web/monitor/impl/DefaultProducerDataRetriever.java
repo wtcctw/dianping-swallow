@@ -288,7 +288,7 @@ public class DefaultProducerDataRetriever
     }
 
     @Override
-    public Map<String, StatsData> getMongoQpx(QPX qpx, long start, long end) {
+    public Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> getMongoQpx(QPX qpx, long start, long end) {
         if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
             return getMongoQpxInMemory(qpx, StatisType.SAVE, start, end);
         }
@@ -296,18 +296,18 @@ public class DefaultProducerDataRetriever
         return getMongoQpxInDb(qpx, StatisType.SAVE, start, end);
     }
 
-    protected Map<String, StatsData> getMongoQpxInMemory(QPX qpx, StatisType type, long start, long end) {
+    protected Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> getMongoQpxInMemory(QPX qpx, StatisType type, long start, long end) {
 
-        Map<String, StatsData> result = new HashMap<String, StatsData>();
+        Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> result = new HashMap<MongoStatsDataCollector.MongoStatsDataKey, StatsData>();
 
         long startKey = getKey(start);
         long endKey = getKey(end);
 
-        Map<String, NavigableMap<Long, Long>> mongoQpxs = mongoStatsDataCollector.retrieveAllQpx(qpx);
+        Map<MongoStatsDataCollector.MongoStatsDataKey, NavigableMap<Long, Long>> mongoQpxs = mongoStatsDataCollector.retrieveAllQpx(qpx);
 
-        for (Map.Entry<String, NavigableMap<Long, Long>> entry : mongoQpxs.entrySet()) {
+        for (Map.Entry<MongoStatsDataCollector.MongoStatsDataKey, NavigableMap<Long, Long>> entry : mongoQpxs.entrySet()) {
 
-            String mongoIp = entry.getKey();
+            MongoStatsDataCollector.MongoStatsDataKey mongoIp = entry.getKey();
             NavigableMap<Long, Long> mongoQpx = entry.getValue();
             if (mongoQpx != null) {
                 mongoQpx = mongoQpx.subMap(startKey, true, endKey, true);
@@ -319,8 +319,8 @@ public class DefaultProducerDataRetriever
         return result;
     }
 
-    protected Map<String, StatsData> getMongoQpxInDb(QPX qpx, StatisType type, long start, long end) {
-        Map<String, StatsData> result = new HashMap<String, StatsData>();
+    protected Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> getMongoQpxInDb(QPX qpx, StatisType type, long start, long end) {
+        Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> result = new HashMap<MongoStatsDataCollector.MongoStatsDataKey, StatsData>();
 
         long startKey = getKey(start);
         long endKey = getKey(end);
@@ -331,20 +331,21 @@ public class DefaultProducerDataRetriever
 
             NavigableMap<Long, Long> statsData = statsDataMap.getValue();
             statsData = fillStatsData(statsData, startKey, endKey);
-            result.put(serverIp, createStatsData(createMongoQpxDesc(serverIp, type), statsData, start, end));
+            MongoStatsDataCollector.MongoStatsDataKey mongoStatsDataKey = mongoStatsDataCollector.generateMongoStatsDataKey(serverIp);
+            result.put(mongoStatsDataKey, createStatsData(createMongoQpxDesc(mongoStatsDataKey, type), statsData, start, end));
 
         }
         return result;
     }
 
     @Override
-    public Map<String, StatsData> getMongoQpx(QPX qpx) {
+    public Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> getMongoQpx(QPX qpx) {
         return getMongoQpx(qpx, getDefaultStart(), getDefaultEnd());
     }
 
     @Override
     public String getMongoDebugInfo(String server) {
-        Map<String, MongoStatsDataContainer> mongoStatsDataMap = mongoStatsDataCollector.getMongoStatsDataMap();
+        Map<MongoStatsDataCollector.MongoStatsDataKey, MongoStatsDataContainer> mongoStatsDataMap = mongoStatsDataCollector.getMongoStatsDataMap();
         String mongoStatsDataString = "";
         if(mongoStatsDataMap != null){
             mongoStatsDataString = mongoStatsDataMap.toString();
@@ -386,8 +387,8 @@ public class DefaultProducerDataRetriever
     }
 
     @Override
-    protected StatsDataDesc createMongoQpxDesc(String serverIp, StatisType type) {
-        return new MongoStatsDataDesc(serverIp, type.getQpxDetailType());
+    protected StatsDataDesc createMongoQpxDesc(MongoStatsDataCollector.MongoStatsDataKey server, StatisType type) {
+        return new MongoStatsDataDesc(server.getCatalog(), server.getIp(), type.getQpxDetailType());
     }
 
     @Override
