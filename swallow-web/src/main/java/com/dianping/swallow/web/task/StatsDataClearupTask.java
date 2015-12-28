@@ -48,11 +48,13 @@ public class StatsDataClearupTask extends AbstractTask {
     @Autowired
     private ConsumerIdStatsDataService cIdStatsDataService;
 
+    private ConfigCache configCache = null;
+
     @Override
     protected void doInitialize() throws Exception {
         super.doInitialize();
         try {
-            ConfigCache configCache = ConfigCache.getInstance();
+            configCache = ConfigCache.getInstance();
             saveDays = configCache.getIntProperty(STATSDATA_SAVE_DAYS_KEY);
 
             configCache.addChange(new ConfigChange() {
@@ -61,6 +63,9 @@ public class StatsDataClearupTask extends AbstractTask {
 
                     if (STATSDATA_SAVE_DAYS_KEY.equals(key)) {
                         saveDays = Integer.getInteger(value);
+                        if (logger.isInfoEnabled()) {
+                            logger.info("[onChange] " + STATSDATA_SAVE_DAYS_KEY + " newValue:" + saveDays);
+                        }
                     }
 
                 }
