@@ -27,7 +27,7 @@ public class StatsDataClearupTask extends AbstractTask {
 
     private volatile AtomicBoolean isTasking = new AtomicBoolean(false);
 
-    private int saveDays = 90;
+    private volatile int saveDays = 90;
 
     private static final String STATSDATA_SAVE_DAYS_KEY = "swallow.web.statsdata.save.days";//天
 
@@ -62,7 +62,7 @@ public class StatsDataClearupTask extends AbstractTask {
                 public void onChange(String key, String value) {
 
                     if (STATSDATA_SAVE_DAYS_KEY.equals(key)) {
-                        saveDays = Integer.getInteger(value);
+                        saveDays = Integer.parseInt(value);
                         if (logger.isInfoEnabled()) {
                             logger.info("[onChange] " + STATSDATA_SAVE_DAYS_KEY + " newValue:" + saveDays);
                         }
