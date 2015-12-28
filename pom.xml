@@ -80,9 +80,9 @@
 		<commons-digester.version>2.1</commons-digester.version>
 		<commons-pool2.version>2.4.2</commons-pool2.version>
 		<gson.version>2.2.2</gson.version>
-		<httpmime.version>4.2.2</httpmime.version>
 		<httpcore.version>4.4.1</httpcore.version>
 		<httpclient.version>4.5</httpclient.version>
+		<httpmime.version>4.2.2</httpmime.version>
 		<velocity.version>1.7</velocity.version>
 		<velocity-tools.version>2.0</velocity-tools.version>
 		<oro.version>2.0.8</oro.version>
@@ -337,6 +337,11 @@
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
 				<version>${httpclient.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>${httpcore.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
