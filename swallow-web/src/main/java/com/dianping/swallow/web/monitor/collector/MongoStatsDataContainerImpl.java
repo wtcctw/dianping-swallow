@@ -2,6 +2,7 @@ package com.dianping.swallow.web.monitor.collector;
 
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.web.model.stats.MongoStatsData;
+import com.dianping.swallow.web.monitor.impl.AbstractRetriever;
 import com.dianping.swallow.web.service.MongoStatsDataService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -23,7 +24,7 @@ public class MongoStatsDataContainerImpl implements MongoStatsDataContainer{
 
     private long maxSize;
 
-    NavigableMap<Long, MongoStatsData> mongoStatsDataMap = new ConcurrentSkipListMap<Long, MongoStatsData>();
+    private NavigableMap<Long, MongoStatsData> mongoStatsDataMap = new ConcurrentSkipListMap<Long, MongoStatsData>();
 
     @Value("${swallow.web.monitor.keepinmemory}")
     public int keepInMemoryHour = 3;
@@ -32,8 +33,8 @@ public class MongoStatsDataContainerImpl implements MongoStatsDataContainer{
     private MongoStatsDataService mongoStatsDataService;
 
     @PostConstruct
-    public void initMaxSize(){
-        maxSize = keepInMemoryHour * 60 * 2;
+    public void initMembers(){
+        maxSize = keepInMemoryHour * 60 * (60 / AbstractRetriever.DEFAULT_INTERVAL);
     }
 
     @Override

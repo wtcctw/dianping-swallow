@@ -1,17 +1,28 @@
 package com.dianping.swallow.common.internal.config.impl;
 
+import com.dianping.swallow.common.internal.codec.Codec;
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.LionUtil;
+import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import com.dianping.swallow.common.internal.util.http.ContentTypeDesc;
+import com.dianping.swallow.common.internal.util.http.HttpManager;
+import com.dianping.swallow.common.internal.util.http.HttpMethod;
+import com.dianping.swallow.common.internal.util.http.SimpleHttpResponse;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -29,6 +40,12 @@ public class LionUtilImpl implements LionUtil{
 		
 	private static final String PROJECT = "swallow";
 	
+	private HttpManager httpManager = new HttpManager(5000, 5000, CommonUtils.getCpuCount());
+	
+	private Charset charset = Codec.DEFAULT_CHARSET;
+	
+	private int retryCount = 3;
+	
 	public LionUtilImpl(){
 		
 	}
@@ -45,7 +62,7 @@ public class LionUtilImpl implements LionUtil{
 		String url = BASIC_LION_CONFIG_URL + "/create?" + args;
 		url += "&" + keyValue("key", getRealKey(key));
 		
-		LionRetResultString ret = executeGet(url, LionRetResultString.class, "get");
+		LionRetResultString ret = executeRequest(url, LionRetResultString.class);
 		return ret.isSuccess() || ret.getMessage().contains("exists");
 	
 	}
@@ -57,7 +74,7 @@ public class LionUtilImpl implements LionUtil{
 		String url = BASIC_LION_CONFIG_URL + "/get?" + args;
 		url += "&" + keyValue("prefix", getRealKey(prefix));
 
-		LionRetResultMap ret = executeGet(url, LionRetResultMap.class, "get");
+		LionRetResultMap ret = executeRequest(url, LionRetResultMap.class);
 		return ret.getResult();
 	}
 
@@ -68,7 +85,7 @@ public class LionUtilImpl implements LionUtil{
 		String url = BASIC_LION_CONFIG_URL + "/get?" + args;
 		url += "&" + keyValue("key", getRealKey(key));
 
-		LionRetResultString ret = executeGet(url, LionRetResultString.class, "get");
+		LionRetResultString ret = executeRequest(url, LionRetResultString.class);
 		return ret.getResult();
 	}
 
@@ -92,56 +109,50 @@ public class LionUtilImpl implements LionUtil{
 		return result;
 	}
 
-	private <T extends LionRet> T executeGet(String urlAddress, Class<T> clazz, String type) {
+	private <T extends LionRet> T executeRequest(String urlAddress, Class<T> clazz) {
+		return executeRequest(urlAddress, clazz, HttpMethod.GET);
+	}
+	
+	private <T extends LionRet> T executeRequest(String urlAddress, Class<T> clazz, HttpMethod httpMethod) {
 		
 		if(logger.isDebugEnabled()){
 			logger.debug("[executeGet]" + urlAddress);
 		}
 		
-		URL url;
-		StringBuffer result = new StringBuffer();
-		HttpURLConnection connection = null;
-		try {
-			if("get".equals(type)){
-				url = new URL(urlAddress);
-				connection = (HttpURLConnection) url.openConnection();
-			}else if("post".equals(type)){
-				String[] urlParam = urlAddress.split("\\?");
-				if (urlParam.length != 2) {
-					throw new IllegalArgumentException("illegal urlAddress :" + urlAddress);
-				}
-				url = new URL(urlParam[0]);
-				connection = (HttpURLConnection) url.openConnection();
-				connection.setDoOutput(true);
-				connection.setUseCaches(false);
-				connection.setRequestMethod("POST");
-
-				OutputStream os = connection.getOutputStream();
-				os.write(urlParam[1].getBytes("UTF-8"));
-				os.flush();
-				os.close();
-			}else{
-				throw new IllegalArgumentException("illegal type : " + type);
-			}
-			connection.setConnectTimeout(5000);
-			connection.setReadTimeout(3000);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		IOException exception = null;
+		
+		for(int i=0; i <= retryCount; i++){
 			
-			String line = null;
-			while((line = reader.readLine()) != null){
-				result.append(line);
-			}
-		} catch (IOException e) {
-			logger.error("[executeGet]" + urlAddress, e);
-			throw new IllegalStateException("io exception", e);
-		}finally{
-			if(connection != null){
-				connection.disconnect();
+			HttpUriRequest request = null;
+			try {
+				switch(httpMethod){
+					case GET:
+						request = new HttpGet(urlAddress);
+						break;
+					case POST:
+						String[] urlParam = urlAddress.split("\\?");
+						if (urlParam.length != 2) {
+							throw new IllegalArgumentException("illegal urlAddress :" + urlAddress);
+						}
+						HttpPost post = new HttpPost(urlParam[0]);
+						StringEntity entity = new StringEntity(urlParam[1], ContentType.create(ContentTypeDesc.FORM_URLENCODED, charset));
+						post.setEntity(entity);
+						
+						request  = post;
+						break;
+					default:
+						throw new IllegalArgumentException("illegal httpMethod : " + httpMethod);
+				}
+				
+				SimpleHttpResponse<String> response = httpManager.executeReturnString(request);
+				return JsonBinder.getNonEmptyBinder().fromJson(response.getContent(), clazz);
+			} catch (IOException e) {
+				logger.error("[executeRequest]" + urlAddress, e);
+				exception = e;
 			}
 		}
 		
-		return JsonBinder.getNonEmptyBinder().fromJson(result.toString(), clazz);
-		
+		throw new IllegalStateException("io exception", exception);
 	}
 
 	public static String getRealKey(String key) {
@@ -166,46 +177,39 @@ public class LionUtilImpl implements LionUtil{
 	}
 	private String encode(String value) {
 		try {
-			return URLEncoder.encode(value, "utf-8");
+			return URLEncoder.encode(value, charset.displayName());
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
 		}
 		return value;
 	}
 
-	public void setValue(String key, String value, String type, String env) {
+	public void setValue(String key, String value, HttpMethod httpMethod, String env) {
 		
 		String args = getBasicArgs("topic配置信息", env);
 		String url = BASIC_LION_CONFIG_URL + "/set?" + args;
 		url += "&" + keyValue("key", key)
 				+ "&" + keyValue("value", value);
 		
-		LionRetResultString ret = executeGet(url, LionRetResultString.class, type);
+		LionRetResultString ret = executeRequest(url, LionRetResultString.class, httpMethod);
 		if(ret ==null || !ret.isSuccess()){
 			throw new IllegalStateException("[setValue][set value failed][" + key + ":" + value + "]" + ret);
 		}
-
 	}
 
 	@Override
 	public void createOrSetConfig(String key, String value) {
-		
-		if(StringUtils.isEmpty(key)){
-			throw new IllegalArgumentException("key null:" + key);
-		}
-		if(value == null){
-			throw new IllegalArgumentException("value null:" + key);
-		}
-		
-		key = key.trim();
-		value = value.trim();
-		
-		createConfig(key, null);
-		setValue(key, value, "get", null);
+
+		createOrSetConfig(key, value, HttpMethod.GET, null);
 	}
+
+	@Override
+	public void createOrSetConfig(String key, String value, HttpMethod httpMethod) {
+		createOrSetConfig(key, value, httpMethod, null);
+	}
+
 	
 	@Override
-	public void createOrSetConfig(String key, String value, String type, String env) {
+	public void createOrSetConfig(String key, String value, HttpMethod httpMethod, String env) {
 		
 		if(StringUtils.isEmpty(key)){
 			throw new IllegalArgumentException("key null:" + key);
@@ -218,7 +222,7 @@ public class LionUtilImpl implements LionUtil{
 		value = value.trim();
 		
 		createConfig(key, env);
-		setValue(key, value, type, env);
+		setValue(key, value, httpMethod, env);
 		
 	}
 

@@ -15,9 +15,11 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
+import com.dianping.swallow.web.model.resource.MongoResource;
 import com.dianping.swallow.web.model.stats.MongoStatsData;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
+import com.dianping.swallow.web.service.MongoResourceService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +28,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -45,11 +44,16 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
     @Resource(name = "swallowConfig")
     private SwallowConfig swallowConfig;
 
+    @Resource(name = "mongoResourceService")
+    private MongoResourceService mongoResourceService;
+
     private ApplicationContext applicationContext;
+
+    private Map<String, String> ipToCatalog = new ConcurrentHashMap<String, String>();
 
     private Map<String, String> topicToMongo = new ConcurrentHashMap<String, String>();
 
-    private Map<String, MongoStatsDataContainer> mongoStatsDataMap = new ConcurrentHashMap<String, MongoStatsDataContainer>();
+    private Map<MongoStatsDataKey, MongoStatsDataContainer> mongoStatsDataMap = new ConcurrentHashMap<MongoStatsDataKey, MongoStatsDataContainer>();
 
     @Override
     protected void doInitialize() throws Exception {
@@ -57,6 +61,12 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         collectorName = getClass().getSimpleName();
         producerDataRetriever.registerListener(this);
         swallowConfig.addObserver(this);
+
+        List<MongoResource> mongoResources = mongoResourceService.findAll();
+        for(MongoResource mr : mongoResources){
+            updateIpToCatalog(mr);
+        }
+        mongoResourceService.addObserver(this);
     }
 
     @Override
@@ -96,8 +106,8 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
             }
         }
 
-        Set<String> ips = mongoStatsDataMap.keySet();
-        for (String ip : ips) {
+        Set<MongoStatsDataKey> ips = mongoStatsDataMap.keySet();
+        for (MongoStatsDataKey ip : ips) {
             MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(ip);
             if (mongoStatsDataContainer.isUpToMaxSize() && mongoStatsDataContainer.isEmpty()) {
                 mongoStatsDataMap.remove(ip);
@@ -113,7 +123,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(mongoIp);
         if (mongoStatsDataContainer == null) {
             mongoStatsDataContainer = applicationContext.getBean(MongoStatsDataContainer.class);
-            mongoStatsDataMap.put(mongoIp, mongoStatsDataContainer);
+            mongoStatsDataMap.put(generateMongoStatsDataKey(mongoIp), mongoStatsDataContainer);
         }
         Long time = lastData.firstKey();
         StatisData statisData = lastData.get(time);
@@ -142,6 +152,12 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
     @Override
     public void update(Observable observable, Object rawArgs) {
+
+        if(observable instanceof MongoResourceService){
+            MongoResource  mongoResource = ( MongoResource)rawArgs;
+            updateIpToCatalog(mongoResource);
+            return;
+        }
 
         AbstractSwallowConfig.SwallowConfigArgs args = (AbstractSwallowConfig.SwallowConfigArgs) rawArgs;
 
@@ -213,24 +229,18 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
         String storeUrl = topicConfig.getStoreUrl();
         if (StringUtils.isNotBlank(storeUrl) && storeUrl.startsWith(MongoCluster.schema)) {
-            String ipAddrs = storeUrl.substring(MongoCluster.schema.length());
-
-            if (ipAddrs.indexOf(":") != -1) {
-                return ipAddrs.split(":")[0];
-            } else {
-                return ipAddrs;
-            }
+            return storeUrl.substring(MongoCluster.schema.length());
         }
 
         return StringUtils.EMPTY;
 
     }
 
-    public Map<String, NavigableMap<Long, Long>> retrieveAllQpx(QPX qpx) {
+    public Map<MongoStatsDataKey, NavigableMap<Long, Long>> retrieveAllQpx(QPX qpx) {
 
-        Map<String, NavigableMap<Long, Long>> result = new HashMap<String, NavigableMap<Long, Long>>();
-        for (Map.Entry<String, MongoStatsDataContainer> entry : mongoStatsDataMap.entrySet()) {
-            String ip = entry.getKey();
+        Map<MongoStatsDataKey, NavigableMap<Long, Long>> result = new HashMap<MongoStatsDataKey, NavigableMap<Long, Long>>();
+        for (Map.Entry<MongoStatsDataKey, MongoStatsDataContainer> entry : mongoStatsDataMap.entrySet()) {
+            MongoStatsDataKey ip = entry.getKey();
             MongoStatsDataContainer mongoStatsDataContainer = entry.getValue();
             NavigableMap<Long, Long> mongoQpx = mongoStatsDataContainer.retrieve(qpx);
             result.put(ip, mongoQpx);
@@ -239,7 +249,12 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         return result;
     }
 
-    public Map<String, MongoStatsDataContainer> getMongoStatsDataMap() {
+    public MongoStatsDataKey generateMongoStatsDataKey(String ip){
+        String catalog = ipToCatalog.get(ip);
+        return new MongoStatsDataKey(ip, catalog);
+    }
+
+    public Map<MongoStatsDataKey, MongoStatsDataContainer> getMongoStatsDataMap() {
         return mongoStatsDataMap;
     }
 
@@ -251,5 +266,56 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 
         this.applicationContext = applicationContext;
+    }
+
+    private void updateIpToCatalog(MongoResource mr){
+        String ip = mr.getIp();
+        if(StringUtils.isNotBlank(ip)){
+            ipToCatalog.put(ip, mr.getCatalog());
+        }
+    }
+
+    public static class MongoStatsDataKey{
+
+        private String ip;
+
+        private String catalog;
+
+        public MongoStatsDataKey(){
+
+        }
+
+        public MongoStatsDataKey(String ip, String catalog){
+            this.ip = ip;
+            this.catalog = catalog;
+        }
+
+
+        public String getIp() {
+            return ip;
+        }
+
+        public String getCatalog() {
+            return catalog;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            MongoStatsDataKey that = (MongoStatsDataKey) o;
+
+            if (ip != null ? !ip.equals(that.ip) : that.ip != null) return false;
+            return !(catalog != null ? !catalog.equals(that.catalog) : that.catalog != null);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = ip != null ? ip.hashCode() : 0;
+            result = 31 * result + (catalog != null ? catalog.hashCode() : 0);
+            return result;
+        }
     }
 }

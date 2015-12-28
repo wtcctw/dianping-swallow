@@ -1,20 +1,5 @@
 package com.dianping.swallow.web.monitor.impl;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.springframework.beans.factory.annotation.Value;
-
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.DateUtils;
@@ -23,6 +8,13 @@ import com.dianping.swallow.web.monitor.Retriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mengwenchao
@@ -31,7 +23,7 @@ import com.dianping.swallow.web.util.ThreadFactoryUtils;
  */
 public abstract class AbstractRetriever extends AbstractLifecycle implements Retriever {
 
-    protected static final int DEFAULT_INTERVAL = 30;// 每隔多少秒采样
+    public static final int DEFAULT_INTERVAL = 30;// 每隔多少秒采样
 
     protected final int BUILD_TIMES_AGEO = 15000;// 每次构建时，构建此时间(ms)以前的数据
 

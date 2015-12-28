@@ -1,5 +1,6 @@
 package com.dianping.swallow.common.server.monitor.collector;
 
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
@@ -11,24 +12,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.params.ConnManagerParams;
-import org.apache.http.conn.params.ConnPerRouteBean;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
@@ -42,6 +29,8 @@ import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.internal.util.StringUtils;
+import com.dianping.swallow.common.internal.util.http.HttpManager;
+import com.dianping.swallow.common.internal.util.http.SimpleHttpResponse;
 import com.dianping.swallow.common.server.monitor.MonitorActionWrapper;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 
@@ -64,7 +53,8 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	
 	private ScheduledFuture<?> future; 
 	
-	private HttpClient httpClient;
+	
+	private HttpManager httpManager;
 	protected final int maxWaitConnectionTime = 5000;
 	protected final int soTimeout = 5000;
 	
@@ -80,7 +70,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	public void doInitialize() throws Exception {
 		
 		scheduled = Executors.newScheduledThreadPool(CommonUtils.getCpuCount(), new MQThreadFactory(THREAD_POOL_NAME));
-		createHttpClient();
+		createHttpManager();
 		
 		configCache = ConfigCache.getInstance();
 		configCache.addChange(this);
@@ -116,17 +106,9 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 		return excludeTopics;
 	}
 
-	private void createHttpClient() {
-		
-        HttpParams params = new BasicHttpParams();
-        ConnManagerParams.setMaxConnectionsPerRoute(params, new ConnPerRouteBean(CommonUtils.getCpuCount()));
-        ConnManagerParams.setTimeout(params, maxWaitConnectionTime);
-        HttpConnectionParams.setSoTimeout(params, soTimeout);
-        
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        ClientConnectionManager connectionManager = new ThreadSafeClientConnManager(params, schemeRegistry);
-        httpClient = new DefaultHttpClient(connectionManager, params); 
+	private void createHttpManager() {
+
+		httpManager = new HttpManager(soTimeout, maxWaitConnectionTime, CommonUtils.getCpuCount(), true);
 		
 	}
 
@@ -161,6 +143,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	@Override
 	public void doDispose() throws Exception {
 		
+		httpManager.close();
 		scheduled.shutdownNow();
 	}
 	
@@ -190,7 +173,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 			
 			HttpPost post = createPost();
 			try{
-				HttpResponse response = httpClient.execute(post);
+				SimpleHttpResponse<String> response = httpManager.executeReturnString(post);
 				success = checkResponse(response);
 			}catch(Exception e){
 				post.abort();
@@ -232,17 +215,15 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 		}
 	}
 
-	private boolean checkResponse(HttpResponse response) throws ParseException, IOException {
+	private boolean checkResponse(SimpleHttpResponse<String> response) throws ParseException, IOException {
 		
-		String result = EntityUtils.toString(response.getEntity());
-
-		if(response.getStatusLine().getStatusCode() == 200){
+		if(response.getStatusCode() == 200){
 			if(logger.isDebugEnabled()){
-				logger.debug("[checkResponse]" + response.getStatusLine() + "," + result);
+				logger.debug("[checkResponse]" + response);
 			}
 			return true;
 		}
-		logger.error("[checkResponse][error]" + response.getStatusLine() + "," + result);
+		logger.error("[checkResponse][error]" + response);
 		return false;
 	}
 
@@ -256,8 +237,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 		if(logger.isDebugEnabled()){
 			logger.debug("[createPost]" + json);
 		}
-		StringEntity request = new StringEntity(json, HTTP.UTF_8);
-		request.setContentType(ContentType.APPLICATION_JSON);
+		StringEntity request = new StringEntity(json, ContentType.APPLICATION_JSON);
 		post.setEntity(request);
 		return post;
 	}

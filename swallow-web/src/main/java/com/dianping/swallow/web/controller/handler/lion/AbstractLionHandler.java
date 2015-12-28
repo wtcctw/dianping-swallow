@@ -1,15 +1,18 @@
 package com.dianping.swallow.web.controller.handler.lion;
 
 import com.dianping.swallow.common.internal.config.LionUtil;
+import com.dianping.swallow.common.internal.util.http.HttpMethod;
 import com.dianping.swallow.web.controller.handler.AbstractHandler;
 import com.dianping.swallow.web.controller.handler.data.EmptyObject;
 import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +47,7 @@ public abstract class AbstractLionHandler extends AbstractHandler<LionEditorEnti
 
         try {
             if(!test){
-                lionUtil.createOrSetConfig(key, newValue, "post", env);
+                lionUtil.createOrSetConfig(key, newValue, HttpMethod.POST, env);
             }
             if (logger.isInfoEnabled()) {
                 logger.info(String.format("Set value from \n[%s]\n to \n[%s]\n of lion key %s successfully", oldValue,

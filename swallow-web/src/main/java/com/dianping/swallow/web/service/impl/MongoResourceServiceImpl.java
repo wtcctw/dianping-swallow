@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
+import com.dianping.swallow.common.internal.observer.Observer;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.MongoDao;
 import com.dianping.swallow.web.model.resource.MongoResource;
@@ -8,6 +9,7 @@ import com.dianping.swallow.web.service.MongoResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +27,8 @@ public class MongoResourceServiceImpl extends AbstractSwallowService implements 
 	@Autowired
 	private MongoDao mongoDao;
 
+	private List<Observer> observers = new ArrayList<Observer>();
+
 	public void setMongoDao(MongoDao mongoDao) {
 		this.mongoDao = mongoDao;
 	}
@@ -32,13 +36,21 @@ public class MongoResourceServiceImpl extends AbstractSwallowService implements 
 	@Override
 	public boolean insert(MongoResource mongoResource) {
 
-		return mongoDao.insert(mongoResource);
+		boolean result = mongoDao.insert(mongoResource);
+		if(result){
+			notifyObserver(mongoResource);
+		}
+		return result;
 	}
 
 	@Override
 	public boolean update(MongoResource mongoResource) {
 
-		return mongoDao.update(mongoResource);
+		boolean result =  mongoDao.update(mongoResource);
+		if(result){
+			notifyObserver(mongoResource);
+		}
+		return result;
 	}
 
 	@Override
@@ -90,4 +102,21 @@ public class MongoResourceServiceImpl extends AbstractSwallowService implements 
 		return null;
 	}
 
+	private void notifyObserver(MongoResource mongoResource){
+		for(Observer observer : observers){
+			observer.update(this, mongoResource);
+		}
+	}
+
+	@Override
+	public void addObserver(Observer observer) {
+
+		observers.add(observer);
+	}
+
+	@Override
+	public void removeObserver(Observer observer) {
+
+		observers.remove(observer);
+	}
 }
