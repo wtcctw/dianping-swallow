@@ -12,6 +12,7 @@ import com.dianping.swallow.web.monitor.*;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever.ConsumerDataPair;
 import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
+import com.dianping.swallow.web.monitor.collector.MongoStatsDataCollector;
 import com.dianping.swallow.web.service.MinuteEntryService;
 import com.dianping.swallow.web.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
@@ -282,23 +283,23 @@ public class DataMonitorController extends AbstractMonitorController implements 
     @ResponseBody
     public List<HighChartsWrapper> getMongoQps() {
 
-        Map<String, StatsData> serverQpx = producerDataRetriever.getMongoQpx(QPX.SECOND);
+        Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> serverQpx = producerDataRetriever.getMongoQpx(QPX.SECOND);
 
-        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+        return buildMongoHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
     }
 
     @RequestMapping(value = "/console/monitor/mongo/qps/get/{startTime}/{endTime}", method = RequestMethod.POST)
     @ResponseBody
     public List<HighChartsWrapper> getMongoQps(@PathVariable String startTime, @PathVariable String endTime) {
-        Map<String, StatsData> serverQpx = null;
+        Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> serverQpx = null;
         if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
-            return getProducerServerQps();
+            return getMongoQps();
         }
         SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
                 * TIMESPAN_UNIT);
         serverQpx = producerDataRetriever.getMongoQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
 
-        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
+        return buildMongoHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
     }
 
     @RequestMapping(value = "/console/monitor/producer/{topic}/ip/qps/get", method = RequestMethod.POST)
@@ -589,6 +590,23 @@ public class DataMonitorController extends AbstractMonitorController implements 
             allStats.add(dataPair.getSendData());
             allStats.add(dataPair.getAckData());
             result.add(ChartBuilder.getHighChart(ip, "", yAxis, allStats));
+        }
+
+        return result;
+    }
+
+    private List<HighChartsWrapper> buildMongoHighChartsWrapper(String yAxis, Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> stats) {
+
+        List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(stats.size());
+        for (Entry<MongoStatsDataCollector.MongoStatsDataKey, StatsData> entry : stats.entrySet()) {
+
+            MongoStatsDataCollector.MongoStatsDataKey key = entry.getKey();
+            String title = key.getCatalog();
+            String subTitle = key.getIp();
+            StatsData statsData = entry.getValue();
+
+            result.add(ChartBuilder.getHighChart(title, subTitle, yAxis, statsData));
+
         }
 
         return result;

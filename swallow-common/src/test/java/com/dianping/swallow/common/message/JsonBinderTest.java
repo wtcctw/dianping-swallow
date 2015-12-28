@@ -3,6 +3,7 @@ package com.dianping.swallow.common.message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -20,12 +23,32 @@ public class JsonBinderTest {
 
    private static JsonBinder binder = JsonBinder.getNonEmptyBinder();
    
+   static class Non {}
+   
+   @Test( expected = JsonMappingException.class)
+   public void testObjectMapper() throws IOException{
+	   
+	   ObjectMapper mapper = new ObjectMapper();
+	   Non non = new Non();
+	   mapper.writeValueAsString(non);
+	   
+	   
+	   
+   }
+   
    
    @Test
    public void toNullJson(){
 	   
 	   System.out.println(binder.toJson(null));
-	   
+   }
+   
+   @Test
+   public void testNonexistProperty(){
+
+      String str = "{\"name\":\"A\",\"defaultValue\":\"hello\", \"a\" : \"nihao\"}";
+      TestBean bean = binder.fromJson(str, TestBean.class);
+      
    }
 
    /**

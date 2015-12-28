@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,11 @@ public class SimpleTester {
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    String jsonString = objectMapper.writeValueAsString(myString);
 	    System.out.println(jsonString);
+	}
+	
+	@Test
+	public void testVersion(){
+		System.out.println(SwallowHelper.getVersion());
 	}
 	
 }

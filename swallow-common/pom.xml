@@ -92,6 +92,11 @@
 			<artifactId>kafka-clients</artifactId>
 			<optional>true</optional>
 		</dependency>
+         <dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<optional>true</optional>
+         </dependency>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.10</artifactId>

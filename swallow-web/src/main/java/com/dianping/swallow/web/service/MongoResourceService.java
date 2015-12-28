@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.service;
 
+import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.resource.MongoResource;
 
@@ -11,7 +12,7 @@ import java.util.List;
  *
  * 2015年9月17日下午8:20:46
  */
-public interface MongoResourceService {
+public interface MongoResourceService extends Observable {
 	
 	boolean insert(MongoResource mongoResource);
 

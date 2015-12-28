@@ -11,6 +11,7 @@ import com.dianping.lion.Constants;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.swallow.AbstractTest;
+import com.dianping.swallow.common.internal.util.http.HttpMethod;
 
 /**
  * @author mengwenchao
@@ -37,15 +38,28 @@ public class LionUtilImplTest extends AbstractTest implements ConfigChange{
 	}
 
 	
-	@Test
-	public void testGetConfigs(){
 
+	@Test
+	public void testGetConfigsPost(){
+		
+		checkConfig(HttpMethod.POST);
+	}
+
+	@Test
+	public void testGetConfigsGet(){
+
+		checkConfig(HttpMethod.GET);
+		
+	}
+	
+	private void checkConfig(HttpMethod httpMethod) {
+		
 		String value = UUID.randomUUID().toString();
 		String newKeys[] = new String[]{"", "a", "a.b", ".a", ".a.b"};
 		
 		for(String addKey : newKeys){
 			
-			lionUtil.createOrSetConfig(TEST_KEY + addKey, value + addKey);
+			lionUtil.createOrSetConfig(TEST_KEY + addKey, value + addKey, httpMethod);
 		}
 		
 		Map<String, String> cfgs = lionUtil.getCfgs(TEST_KEY);
@@ -58,9 +72,12 @@ public class LionUtilImplTest extends AbstractTest implements ConfigChange{
 		}
 		
 
+
 		
 	}
-	
+
+
+
 	@Test
 	public void testCreateOrSetConfig(){
 		

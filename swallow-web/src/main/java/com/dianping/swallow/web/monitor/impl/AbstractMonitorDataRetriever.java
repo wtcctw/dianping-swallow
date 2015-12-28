@@ -22,6 +22,7 @@ import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
+import com.dianping.swallow.web.monitor.collector.MongoStatsDataCollector;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -191,7 +192,7 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
 
     protected abstract StatsDataDesc createServerQpxDesc(String serverIp, StatisType type);
 
-    protected abstract StatsDataDesc createMongoQpxDesc(String serverIp, StatisType type);
+    protected abstract StatsDataDesc createMongoQpxDesc(MongoStatsDataCollector.MongoStatsDataKey server, StatisType type);
 
     protected abstract StatsDataDesc createServerDelayDesc(String serverIp, StatisType type);
 
