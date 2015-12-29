@@ -122,7 +122,14 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
     private void addMongoStatsData(String mongoIp, NavigableMap<Long, StatisData> lastData) {
 
-        MongoStatsDataKey mongoStatsDataKey = generateMongoStatsDataKey(mongoIp);
+        MongoStatsDataKey mongoStatsDataKey;
+        try {
+            mongoStatsDataKey = generateMongoStatsDataKey(mongoIp);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return;
+        }
+
         MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(mongoStatsDataKey);
         if (mongoStatsDataContainer == null) {
             mongoStatsDataContainer = applicationContext.getBean(MongoStatsDataContainer.class);
@@ -252,7 +259,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         return result;
     }
 
-    public MongoStatsDataKey generateMongoStatsDataKey(String ip) {
+    public MongoStatsDataKey generateMongoStatsDataKey(String ip) throws NullPointerException {
 
         List<String> candidates = new ArrayList<String>();
         for (String key : ipToCatalog.keySet()) {
@@ -265,24 +272,27 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
         if (candidates.size() == 1) {
             maxLengthIp = candidates.get(0);
-        }else{
+        } else {
             maxLengthIp = chooseMaxIPs(candidates);
 
         }
 
+        if (maxLengthIp == null) {
+            throw new NullPointerException("No match mongo for [" + ip + "] in ipToCatalog");
+        }
         String catalog = ipToCatalog.get(maxLengthIp);
         return new MongoStatsDataKey(maxLengthIp, catalog);
     }
 
-    private String chooseMaxIPs(List<String> candidates){
+    private String chooseMaxIPs(List<String> candidates) {
 
         String maxLengthIp = null;
         int maxLength = -1;
         int length;
 
-        for(String ip : candidates){
+        for (String ip : candidates) {
             length = ip.split(",").length;
-            if(length > maxLength){
+            if (length > maxLength) {
                 maxLength = length;
                 maxLengthIp = ip;
             }
