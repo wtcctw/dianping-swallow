@@ -36,6 +36,8 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
 
     protected long checkInterval = 10 * 60 * 1000;
 
+    protected long totalThreshold = 30;
+
     public void checkIpGroupStats(X ipGroupStatsData) {
         if (ipGroupStatsData == null) {
             return;
@@ -44,7 +46,7 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
         if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
             return;
         }
-        boolean hasGroupStatsData = ipGroupStatsData.hasStatsData();
+        boolean hasGroupStatsData = ipGroupStatsData.hasStatsData(totalThreshold);
         for (K ipStatsData : ipStatsDatas) {
             boolean hasStatsData = ipStatsData.hasStatsData();
             @SuppressWarnings("unchecked")
@@ -80,14 +82,14 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
             Entry<T, IpStatusData> statusDataEntry = itStatusData.next();
             T statsDataKey = statusDataEntry.getKey();
             IpStatusData ipStatusData = statusDataEntry.getValue();
-            if (ipStatusData.getNoDataCount() > 0) {
+            if (ipStatusData.getNoDataCount() > 0L) {
                 if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
                     itStatusData.remove();
-                    if (ipStatusData.getNoDataCount() > 3L) {
+                    if (ipStatusData.getNoDataCount() > 5L) {
                         report(statsDataKey);
                     }
                 }
-            } else if (ipStatusData.getSubNoDataCount() > 0) {
+            } else if (ipStatusData.getSubNoDataCount() > 0L) {
                 if (getCurrentTimeMillis() - ipStatusData.getSubNoDataTime() > checkInterval) {
                     itStatusData.remove();
                     checkUnSureLastRecords(statsDataKey);

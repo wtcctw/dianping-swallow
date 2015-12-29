@@ -27,18 +27,16 @@ public abstract class AbstractIpGroupStatsData<T extends AbstractIpStatsData> {
         ipStatsDatas.add(ipStatsData);
     }
 
-    public boolean hasStatsData() {
-        return hasStatsData(0L, 0L);
-    }
-
-    public boolean hasStatsData(long qpsThreshold, long totalThreshold) {
+    public boolean hasStatsData(long totalThreshold) {
         if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
             return false;
         }
+        long qpsCount = 0;
         for (T ipStatsData : ipStatsDatas) {
-            if (ipStatsData.hasStatsData(qpsThreshold, totalThreshold)) {
-                return true;
-            }
+            qpsCount += ipStatsData.getQpsCount();
+        }
+        if ((qpsCount / ipStatsDatas.size()) > totalThreshold) {
+            return true;
         }
         return false;
     }

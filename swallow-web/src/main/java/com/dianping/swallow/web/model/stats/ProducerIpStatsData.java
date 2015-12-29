@@ -70,6 +70,12 @@ public class ProducerIpStatsData extends AbstractIpStatsData {
         return true;
     }
 
+    @JsonIgnore
+    @Override
+    public long getQpsCount(){
+        return qpsTotal;
+    }
+
     @Override
     public IpStatsDataKey createStatsDataKey() {
         return new ProducerIpStatsDataKey(this);
