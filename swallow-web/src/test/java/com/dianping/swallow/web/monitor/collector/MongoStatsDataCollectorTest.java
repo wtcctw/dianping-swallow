@@ -157,12 +157,6 @@ public class MongoStatsDataCollectorTest extends MockTest {
             System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
 
-        System.out.println();
-
-        Map<String, String> ipToCatalog = mongoStatsDataCollector.getIpToCatalog();
-        for(Map.Entry<String, String> entry : ipToCatalog.entrySet()){
-            System.out.println(entry.getKey() + " -> " + entry.getValue());
-        }
         Assert.assertEquals(topicToMongo.keySet().size(), 6);
     }
 }
