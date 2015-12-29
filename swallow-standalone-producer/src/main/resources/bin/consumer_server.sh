@@ -126,12 +126,11 @@ log "Sleeping $SleepTime sec for waiting process started ..."
 
 if [ "$MODE" == "master" ]; then
     SuccessLog="Server started at port "
-    SleepTime=10
 else
     SuccessLog="start to wait $MASTER_IP master stop beating"
-    SleepTime=8
 fi
 
+SleepTime=10
 mysleep $SleepTime
 checkLog "$SuccessLog" $STD_OUT 
 

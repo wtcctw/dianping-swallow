@@ -69,7 +69,7 @@ log "output: $STD_OUT"
 exec java $JAVA_OPTS $MAIN_CLASS > "$STD_OUT" 2>&1 &
 
 ###########  检查是否启动成功 ############
-mysleep 12
+mysleep 14
 
 
 SuccessLog="Producer service for client is ready"
