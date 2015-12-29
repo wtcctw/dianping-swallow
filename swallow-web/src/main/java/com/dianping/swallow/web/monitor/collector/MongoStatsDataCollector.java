@@ -49,8 +49,10 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
     private ApplicationContext applicationContext;
 
+    /* 数据库读取的是3个ip */
     private Map<String, String> ipToCatalog = new ConcurrentHashMap<String, String>();
 
+    /* 这里的mongo是swallowConfig中从lion读取的，只有两个ip */
     private Map<String, String> topicToMongo = new ConcurrentHashMap<String, String>();
 
     private Map<MongoStatsDataKey, MongoStatsDataContainer> mongoStatsDataMap = new ConcurrentHashMap<MongoStatsDataKey, MongoStatsDataContainer>();
@@ -63,7 +65,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         swallowConfig.addObserver(this);
 
         List<MongoResource> mongoResources = mongoResourceService.findAll();
-        for(MongoResource mr : mongoResources){
+        for (MongoResource mr : mongoResources) {
             updateIpToCatalog(mr);
         }
         mongoResourceService.addObserver(this);
@@ -106,11 +108,11 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
             }
         }
 
-        Set<MongoStatsDataKey> ips = mongoStatsDataMap.keySet();
-        for (MongoStatsDataKey ip : ips) {
-            MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(ip);
+        Set<MongoStatsDataKey> mongoStatsDataKeys = mongoStatsDataMap.keySet();
+        for (MongoStatsDataKey msdk : mongoStatsDataKeys) {
+            MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(msdk);
             if (mongoStatsDataContainer.isUpToMaxSize() && mongoStatsDataContainer.isEmpty()) {
-                mongoStatsDataMap.remove(ip);
+                mongoStatsDataMap.remove(msdk);
                 continue;
             }
             mongoStatsDataContainer.store();
@@ -120,10 +122,11 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
     private void addMongoStatsData(String mongoIp, NavigableMap<Long, StatisData> lastData) {
 
-        MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(mongoIp);
+        MongoStatsDataKey mongoStatsDataKey = generateMongoStatsDataKey(mongoIp);
+        MongoStatsDataContainer mongoStatsDataContainer = mongoStatsDataMap.get(mongoStatsDataKey);
         if (mongoStatsDataContainer == null) {
             mongoStatsDataContainer = applicationContext.getBean(MongoStatsDataContainer.class);
-            mongoStatsDataMap.put(generateMongoStatsDataKey(mongoIp), mongoStatsDataContainer);
+            mongoStatsDataMap.put(mongoStatsDataKey, mongoStatsDataContainer);
         }
         Long time = lastData.firstKey();
         StatisData statisData = lastData.get(time);
@@ -153,8 +156,8 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
     @Override
     public void update(Observable observable, Object rawArgs) {
 
-        if(observable instanceof MongoResourceService){
-            MongoResource  mongoResource = ( MongoResource)rawArgs;
+        if (observable instanceof MongoResourceService) {
+            MongoResource mongoResource = (MongoResource) rawArgs;
             updateIpToCatalog(mongoResource);
             return;
         }
@@ -210,7 +213,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
         String ip = extractMongoIp(args);
         if (StringUtils.isNotBlank(ip)) {
-            topicToMongo.remove(ip);
+            topicToMongo.remove(args.getTopic());
         }
     }
 
@@ -229,7 +232,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
         String storeUrl = topicConfig.getStoreUrl();
         if (StringUtils.isNotBlank(storeUrl) && storeUrl.startsWith(MongoCluster.schema)) {
-            return storeUrl.substring(MongoCluster.schema.length());
+            return storeUrl.substring(MongoCluster.schema.length()).trim();
         }
 
         return StringUtils.EMPTY;
@@ -240,18 +243,52 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
 
         Map<MongoStatsDataKey, NavigableMap<Long, Long>> result = new HashMap<MongoStatsDataKey, NavigableMap<Long, Long>>();
         for (Map.Entry<MongoStatsDataKey, MongoStatsDataContainer> entry : mongoStatsDataMap.entrySet()) {
-            MongoStatsDataKey ip = entry.getKey();
+            MongoStatsDataKey mongoStatsDataKey = entry.getKey();
             MongoStatsDataContainer mongoStatsDataContainer = entry.getValue();
             NavigableMap<Long, Long> mongoQpx = mongoStatsDataContainer.retrieve(qpx);
-            result.put(ip, mongoQpx);
+            result.put(mongoStatsDataKey, mongoQpx);
         }
 
         return result;
     }
 
-    public MongoStatsDataKey generateMongoStatsDataKey(String ip){
-        String catalog = ipToCatalog.get(ip);
-        return new MongoStatsDataKey(ip, catalog);
+    public MongoStatsDataKey generateMongoStatsDataKey(String ip) {
+
+        List<String> candidates = new ArrayList<String>();
+        for (String key : ipToCatalog.keySet()) {
+            if (key.startsWith(ip)) {
+                candidates.add(key);
+            }
+        }
+
+        String maxLengthIp;
+
+        if (candidates.size() == 1) {
+            maxLengthIp = candidates.get(0);
+        }else{
+            maxLengthIp = chooseMaxIPs(candidates);
+
+        }
+
+        String catalog = ipToCatalog.get(maxLengthIp);
+        return new MongoStatsDataKey(maxLengthIp, catalog);
+    }
+
+    private String chooseMaxIPs(List<String> candidates){
+
+        String maxLengthIp = null;
+        int maxLength = -1;
+        int length;
+
+        for(String ip : candidates){
+            length = ip.split(",").length;
+            if(length > maxLength){
+                maxLength = length;
+                maxLengthIp = ip;
+            }
+        }
+
+        return maxLengthIp;
     }
 
     public Map<MongoStatsDataKey, MongoStatsDataContainer> getMongoStatsDataMap() {
@@ -268,24 +305,37 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         this.applicationContext = applicationContext;
     }
 
-    private void updateIpToCatalog(MongoResource mr){
+    public void setProducerDataRetriever(ProducerDataRetriever producerDataRetriever) {
+        this.producerDataRetriever = producerDataRetriever;
+    }
+
+    public void setSwallowConfig(SwallowConfig swallowConfig) {
+        this.swallowConfig = swallowConfig;
+    }
+
+    public void setMongoResourceService(MongoResourceService mongoResourceService) {
+        this.mongoResourceService = mongoResourceService;
+    }
+
+
+    private void updateIpToCatalog(MongoResource mr) {
         String ip = mr.getIp();
-        if(StringUtils.isNotBlank(ip)){
+        if (StringUtils.isNotBlank(ip)) {
             ipToCatalog.put(ip, mr.getCatalog());
         }
     }
 
-    public static class MongoStatsDataKey{
+    public static class MongoStatsDataKey {
 
         private String ip;
 
         private String catalog;
 
-        public MongoStatsDataKey(){
+        public MongoStatsDataKey() {
 
         }
 
-        public MongoStatsDataKey(String ip, String catalog){
+        public MongoStatsDataKey(String ip, String catalog) {
             this.ip = ip;
             this.catalog = catalog;
         }
