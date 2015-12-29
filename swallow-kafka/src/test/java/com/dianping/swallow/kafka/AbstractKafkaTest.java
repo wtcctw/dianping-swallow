@@ -6,8 +6,8 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author mengwenchao
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AbstractKafkaTest {
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	private String zkAddress;
 	private String kafkaAddress;

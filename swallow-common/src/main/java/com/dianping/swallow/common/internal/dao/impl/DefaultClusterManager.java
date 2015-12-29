@@ -1,18 +1,14 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.observer.impl.AbstractObservableLifecycle;
 import com.dianping.swallow.common.internal.observer.impl.ElementAdded;
+
+import java.net.InetSocketAddress;
+import java.util.*;
 
 /**
  * @author mengwenchao

@@ -19,8 +19,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -359,7 +359,7 @@ public class DefaultAccumulationRetriever extends AbstractRetriever implements A
 
         private NavigableMap<Long, Long> accumulations = new ConcurrentSkipListMap<Long, Long>();
 
-        protected final Logger logger = LoggerFactory.getLogger(getClass());
+        protected final Logger logger = LogManager.getLogger(getClass());
 
         protected long lastInsertTime = System.currentTimeMillis();
 

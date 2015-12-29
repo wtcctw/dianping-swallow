@@ -11,7 +11,7 @@ public class SwallowClientConfigImpl extends AbstractConfig implements SwallowCl
 
     private static final String CLIENT_CONFIG_FILE_NAME = "swallow-client.properties";
 
-    private boolean isLog4j2AsyncEnabled = true;
+    private boolean isLog4j2Enabled = true;
 
     private boolean isOnMessageLogEnabled = true;
 
@@ -32,8 +32,8 @@ public class SwallowClientConfigImpl extends AbstractConfig implements SwallowCl
     }
 
     @Override
-    public boolean isLog4j2AsyncEnabled() {
-        return isLog4j2AsyncEnabled;
+    public boolean isLog4j2Enabled() {
+        return isLog4j2Enabled;
     }
 
 }

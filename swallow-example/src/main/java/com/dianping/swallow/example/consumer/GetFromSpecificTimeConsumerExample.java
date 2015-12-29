@@ -1,13 +1,5 @@
 package com.dianping.swallow.example.consumer;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.log4j.Logger;
-import org.bson.types.BSONTimestamp;
-import org.jboss.netty.util.internal.ConcurrentHashMap;
-
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.common.message.Message;
@@ -15,10 +7,18 @@ import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.MessageListener;
 import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bson.types.BSONTimestamp;
+import org.jboss.netty.util.internal.ConcurrentHashMap;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GetFromSpecificTimeConsumerExample {
 
-	private Logger logger = Logger.getLogger(getClass());
+	private Logger logger = LogManager.getLogger(getClass());
 	
     private long lastMessageId = 0; 
     

@@ -2,8 +2,8 @@ package com.dianping.swallow.consumerserver.buffer;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author mengwenchao
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultMemoryUsage implements MemoryUsage{
 	
-	private  final Logger          logger  = LoggerFactory.getLogger(getClass());
+	private  final Logger          logger  = LogManager.getLogger(getClass());
 
 	public static final long _1MB = 1024*1024;
 	private AtomicLong usage = new AtomicLong();

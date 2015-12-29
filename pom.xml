@@ -33,7 +33,6 @@
         <module>swallow-kafka</module>
         <!--依赖其他组建-->
         <module>swallow-extensions</module>
-
     </modules>
 
     <description>swallow is a message service!</description>
@@ -60,7 +59,6 @@
         <!-- dianping -->
         <kafka-clients.version>0.8.2.2</kafka-clients.version>
         <file-queue.version>0.1.5</file-queue.version>
-        <slf4j.version>1.6.0</slf4j.version>
         <spring.version>3.2.9.RELEASE</spring.version>
         <spring.data.mongo.version>1.5.4.RELEASE</spring.data.mongo.version>
         <jackson-databind.version>2.1.4</jackson-databind.version>
@@ -70,6 +68,8 @@
         <swallow-client.version>0.5.4</swallow-client.version>
         <lion-env.version>1.0.0</lion-env.version>
         <log4j.version>1.2.17</log4j.version>
+        <log4j2.version>2.3</log4j2.version>
+        <lmax.version>3.2.1</lmax.version>
         <logback-classic.version>1.0.12</logback-classic.version>
         <dpsf-net.version>2.7.0</dpsf-net.version>
         <cglib.version>2.1_3</cglib.version>
@@ -214,24 +214,29 @@
                 <version>${kafka-clients.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j2.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-web</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lmax</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>${lmax.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -442,12 +447,12 @@
             <artifactId>log4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -506,13 +511,13 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>2.5.1</version>
-                <configuration>
-                    <instrumentation>
-                        <excludes>
-                            <!-- exclude>com/dianping/zebra/jdbc/param/**/*.class</exclude> <exclude>com/dianping/zebra/jdbc/DPDatabaseMetaData.class</exclude -->
-                        </excludes>
-                    </instrumentation>
-                </configuration>
+                <!--<configuration>-->
+                <!--<instrumentation>-->
+                <!--<excludes>-->
+                <!--&lt;!&ndash; exclude>com/dianping/zebra/jdbc/param/**/*.class</exclude> <exclude>com/dianping/zebra/jdbc/DPDatabaseMetaData.class</exclude &ndash;&gt;-->
+                <!--</excludes>-->
+                <!--</instrumentation>-->
+                <!--</configuration>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -23,8 +23,8 @@ import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,7 +92,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     @Resource(name = "topicApplyService")
     private TopicApplyService topicApplyService;
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     @RequestMapping(value = "/api/topic/apply", method = RequestMethod.POST)
     @ResponseBody

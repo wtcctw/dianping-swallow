@@ -16,8 +16,8 @@ import com.dianping.swallow.consumer.internal.action.RetryOnBackoutMessageExcept
 import com.dianping.swallow.consumer.internal.task.LongTaskChecker;
 import com.dianping.swallow.consumer.internal.task.TaskChecker;
 import com.meituan.nuclearmq.client.error.MQException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class NuclearConsumer implements Consumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(NuclearConsumer.class);
+    private static final Logger logger = LogManager.getLogger(NuclearConsumer.class);
 
     private static final String APPKEY_PREFIX = "com.dianping.swallow.";
 

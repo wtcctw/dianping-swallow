@@ -1,14 +1,6 @@
 package com.dianping.swallow.test.load.consumer;
 
 
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 import com.dianping.swallow.common.message.Destination;
@@ -20,6 +12,13 @@ import com.dianping.swallow.consumer.impl.ConsumerFactoryImpl;
 import com.dianping.swallow.test.load.AbstractLoadTest;
 import com.dianping.swallow.test.load.BitMarker;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author mengwenchao

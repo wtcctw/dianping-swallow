@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
@@ -26,7 +26,7 @@ import com.dianping.swallow.web.util.DateUtil;
  */
 public abstract class Event {
 
-	protected static Logger logger = LoggerFactory.getLogger(Event.class);
+	protected static Logger logger = LogManager.getLogger(Event.class);
 
 	protected static final String KEY_SPLIT = "&";
 

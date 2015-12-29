@@ -28,7 +28,8 @@ import com.dianping.swallow.common.internal.util.SwallowHelper;
 public final class ProducerServerBootstrap {
 	
 	static{
-		   SwallowHelper.initialize();
+
+          SwallowHelper.initialize();
 	}
 
    private ProducerServerBootstrap() {

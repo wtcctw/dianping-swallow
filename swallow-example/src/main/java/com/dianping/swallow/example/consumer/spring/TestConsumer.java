@@ -12,7 +12,6 @@ public class TestConsumer {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws InterruptedException {
-		@SuppressWarnings("resource")
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] { "applicationContext-consumer.xml" });
 		final Consumer consumerClient = (Consumer) ctx.getBean("consumerClient");
 		consumerClient.start();

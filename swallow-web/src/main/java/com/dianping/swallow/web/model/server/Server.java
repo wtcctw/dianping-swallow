@@ -1,42 +1,20 @@
 package com.dianping.swallow.web.model.server;
 
-import java.io.IOException;
+import com.dianping.swallow.common.internal.config.TopicConfig;
+import com.dianping.swallow.web.alarmer.EventReporter;
+import com.dianping.swallow.web.model.event.*;
+import com.dianping.swallow.web.service.HttpService;
+import com.dianping.swallow.web.service.HttpService.HttpResult;
+import com.dianping.swallow.web.util.JsonUtil;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import com.dianping.swallow.web.util.JsonUtil;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.dianping.swallow.common.internal.config.TopicConfig;
-import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoStatus;
-import com.dianping.swallow.common.message.JsonDeserializedException;
-import com.dianping.swallow.web.alarmer.EventReporter;
-import com.dianping.swallow.web.model.event.EventFactory;
-import com.dianping.swallow.web.model.event.EventType;
-import com.dianping.swallow.web.model.event.MongoConfigEvent;
-import com.dianping.swallow.web.model.event.ServerEvent;
-import com.dianping.swallow.web.model.event.ServerType;
-import com.dianping.swallow.web.service.HttpService;
-import com.dianping.swallow.web.service.HttpService.HttpResult;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.ServerAddress;
 
 /**
  * @author qiyin
@@ -45,7 +23,7 @@ import com.mongodb.ServerAddress;
  */
 public abstract class Server implements Sendable, Serviceable {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LogManager.getLogger(getClass());
 
     private static final long SENDER_INTERVAL = 20 * 1000;
 

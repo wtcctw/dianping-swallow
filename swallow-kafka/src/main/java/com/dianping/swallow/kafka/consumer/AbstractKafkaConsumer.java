@@ -31,8 +31,8 @@ import kafka.message.MessageAndOffset;
 import org.apache.commons.pool2.KeyedObjectPool;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import scala.collection.JavaConversions;
 
@@ -51,7 +51,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class AbstractKafkaConsumer implements KafkaConsumer{
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	protected List<InetSocketAddress> seedBrokers;
 	

@@ -2,8 +2,8 @@ package com.dianping.swallow.web.dao.impl;
 
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ import com.mongodb.Mongo;
 @Component
 public class DefaultWebMongoManager implements WebMongoManager {
 
-	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+	protected final Logger logger     = LogManager.getLogger(getClass());
 
 	public static final String TOPIC_COLLECTION = "c";
 	public static final String PRE_MSG = "msg#";

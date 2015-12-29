@@ -10,8 +10,8 @@ import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.util.JsonUtil;
 import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -46,7 +46,7 @@ public class LogFilter implements Filter {
 
     public static final String TOPIC_APPLY_ATTR = "topicApplyResource";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogManager.getLogger(getClass());
 
     public void init(FilterConfig fConfig) throws ServletException {
 
@@ -128,15 +128,19 @@ public class LogFilter implements Filter {
             HttpServletRequest req = (HttpServletRequest) request;
             @SuppressWarnings("unchecked")
             Map<String, String[]> param = req.getParameterMap();
-            StringBuilder stringBuilder = new StringBuilder();
             if (param != null) {
+                StringBuilder content = new StringBuilder(" {");
                 for (Map.Entry<String, String[]> entry : param.entrySet()) {
-                    stringBuilder.append(entry.getKey());
-                    stringBuilder.append(" : ");
-                    stringBuilder.append(entry.getValue()[0]);
-                    stringBuilder.append(" ");
+                    String[] value = entry.getValue();
+                    content.append(entry.getKey()).append(" = ").append(StringUtils.join(value, ",")).append(" ,");
                 }
-                requestContent = stringBuilder.toString();
+                int length = content.length();
+
+                if(length >1){
+                    requestContent = content.substring(0, length - 2) + " }";
+                }else{
+                    requestContent = content.toString() + " }";
+                }
             }
         }
 
@@ -152,7 +156,9 @@ public class LogFilter implements Filter {
         log.setResult(result);
         log.setIp(ip);
 
-        logger.info(log.toString());
+        if (logger.isInfoEnabled()) {
+            logger.info(log.toString());
+        }
 
     }
 

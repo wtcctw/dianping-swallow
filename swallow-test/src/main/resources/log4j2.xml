@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" monitorInterval="30">
+
+    <Appenders>
+        <CatAppender name="catAppender"/>
+
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
+        </Console>
+        <RollingRandomAccessFile name="fileAppender" immediateFlush="false"
+                                 fileName="/data/applogs/swallow/swallow-test.log"
+                                 filePattern="/data/applogs/swallow/swallow-test.log.%d{yyyy-MM-dd}.gz">
+            <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
+            <TimeBasedTriggeringPolicy interval="1"
+                                       modulate="true"/>
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="logFilterFileAppender" immediateFlush="false"
+                                 fileName="/data/applogs/swallow-web/logs/logfilter/swallow-web.log"
+                                 filePattern="/data/applogs/swallow-web/logs/logfilter/swallow-web.log.%d{yyyy-MM-dd}.gz">
+            <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
+            <TimeBasedTriggeringPolicy interval="1"
+                                       modulate="true"/>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.jasig.cas" level="ERROR"
+                additivity="true">
+            <AppenderRef ref="console" level="ERROR"/>
+        </Logger>
+        <Logger name="org.springframework" level="WARN"
+                additivity="true">
+            <AppenderRef ref="console" level="ERROR"/>
+        </Logger>
+        <Logger name="com.dianping.swallow.consumer.internal.task.DefaultConsumerTask" additivity="true" level="WARN">
+            <AppenderRef ref="console" level="ERROR"/>
+        </Logger>
+
+
+        <Logger name="com.dianping.swallow.test.other.LogTest" additivity="false">
+            <AppenderRef ref="fileAppender" level="INFO"/>
+        </Logger>
+        <root level="INFO">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="fileAppender"/>
+            <AppenderRef ref="catAppender"/>
+        </root>
+    </Loggers>
+</Configuration>

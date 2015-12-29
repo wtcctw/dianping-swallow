@@ -1,9 +1,9 @@
 package com.dianping.swallow.consumer;
 
+import com.dianping.swallow.common.message.Destination;
+
 import java.net.InetSocketAddress;
 import java.util.List;
-
-import com.dianping.swallow.common.message.Destination;
 
 public interface ConsumerFactory {
 

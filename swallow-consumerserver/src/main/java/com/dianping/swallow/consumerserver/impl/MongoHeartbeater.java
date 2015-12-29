@@ -2,8 +2,8 @@ package com.dianping.swallow.consumerserver.impl;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.dao.HeartbeatDAO;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
@@ -14,7 +14,7 @@ import com.dianping.swallow.consumerserver.config.ConfigManager;
 
 public class MongoHeartbeater extends AbstractLifecycle implements Heartbeater {
 
-   private static final Logger logger           = LoggerFactory.getLogger(MongoHeartbeater.class);
+   private static final Logger logger           = LogManager.getLogger(MongoHeartbeater.class);
    
    private HeartbeatDAO<?>        heartbeatDAO;
    private ConfigManager       configManager = ConfigManager.getInstance();

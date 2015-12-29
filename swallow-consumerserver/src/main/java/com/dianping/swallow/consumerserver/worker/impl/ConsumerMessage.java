@@ -2,8 +2,8 @@ package com.dianping.swallow.consumerserver.worker.impl;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import io.netty.channel.Channel;
 
@@ -17,7 +17,7 @@ import com.dianping.swallow.consumerserver.worker.SendAckManager;
  */
 public class ConsumerMessage {
 
-	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+	protected final Logger logger     = LogManager.getLogger(getClass());
 
 	private final SwallowMessage message;
 

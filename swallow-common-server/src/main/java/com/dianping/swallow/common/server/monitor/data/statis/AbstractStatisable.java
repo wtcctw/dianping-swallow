@@ -6,8 +6,8 @@ import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.data.annotation.Transient;
 
 /**
@@ -18,7 +18,7 @@ import org.springframework.data.annotation.Transient;
 public abstract class AbstractStatisable<V> implements Statisable<V>{
 
 	@Transient
-	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+	protected transient final Logger logger = LogManager.getLogger(getClass());
 
 	
 	protected void checkTypeMatch(Object merge) {

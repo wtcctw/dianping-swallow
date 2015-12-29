@@ -1,23 +1,5 @@
 package com.dianping.swallow.web.service.impl;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.codehaus.jettison.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.AlarmDao;
@@ -31,6 +13,18 @@ import com.dianping.swallow.web.service.HttpService;
 import com.dianping.swallow.web.service.HttpService.HttpResult;
 import com.dianping.swallow.web.service.SeqGeneratorService;
 import com.dianping.swallow.web.util.NetUtil;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.codehaus.jettison.json.JSONObject;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * @author qiyin
@@ -40,7 +34,7 @@ import com.dianping.swallow.web.util.NetUtil;
 @Service("alarmService")
 public class AlarmServiceImpl implements AlarmService, InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlarmServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(AlarmServiceImpl.class);
 
     private static final String AlARM_URL_FILE = "alarm-url.properties";
 

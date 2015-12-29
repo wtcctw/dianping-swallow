@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.DAO;
@@ -16,7 +16,7 @@ public class AbstractDao<T extends Cluster> implements DAO<T>{
 
 	private static final long serialVersionUID = 1L;
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	protected T cluster;
 	

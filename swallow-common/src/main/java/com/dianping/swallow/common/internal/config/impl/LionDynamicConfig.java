@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.lion.EnvZooKeeperConfig;
 import com.dianping.lion.client.ConfigCache;
@@ -29,7 +29,7 @@ import com.dianping.swallow.common.internal.util.PropertiesUtils;
  */
 public class LionDynamicConfig implements DynamicConfig {
 
-	private static final Logger logger = LoggerFactory.getLogger(LionDynamicConfig.class);
+	private static final Logger logger = LogManager.getLogger(LionDynamicConfig.class);
 
 	private ConfigCache cc;
 

@@ -8,8 +8,8 @@ import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.service.LogSearchService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ import java.util.Map;
 @Service("logSearchService")
 public class LogSearchServiceImpl implements LogSearchService {
 
-    private static final Logger logger = LoggerFactory.getLogger(LogSearchServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(LogSearchServiceImpl.class);
 
     private static final String INDEX_NAME = "swallow.consumelog.search.index";
 

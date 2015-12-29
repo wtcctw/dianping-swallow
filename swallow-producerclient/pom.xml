@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<parent>
 		<artifactId>swallow-parent</artifactId>
@@ -7,17 +7,17 @@
 		<version>0.8.1-SNAPSHOT</version>
 	</parent>
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>swallow-producerclient</artifactId>
-	<name>swallow-producerclient</name>
-	<packaging>jar</packaging>
+    <artifactId>swallow-producerclient</artifactId>
+    <name>swallow-producerclient</name>
+    <packaging>jar</packaging>
 
-	<url>http://maven.apache.org</url>
+    <url>http://maven.apache.org</url>
 
-	<properties>
-		<env>dev</env>
-	</properties>
+    <properties>
+        <env>dev</env>
+    </properties>
 
 	<dependencies>
 		<dependency>
@@ -51,7 +51,6 @@
 			<artifactId>swallow-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
 		<!-- pigeon -->
 		<dependency>
 			<groupId>com.dianping.dpsf</groupId>
@@ -98,5 +97,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

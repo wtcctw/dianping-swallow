@@ -48,10 +48,10 @@
 			<groupId>com.dianping.dpsf</groupId>
 			<artifactId>dpsf-net</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>javax.servlet</groupId>-->
+			<!--<artifactId>servlet-api</artifactId>-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>com.sun.tools.btrace</groupId>
 			<artifactId>btrace-client</artifactId>

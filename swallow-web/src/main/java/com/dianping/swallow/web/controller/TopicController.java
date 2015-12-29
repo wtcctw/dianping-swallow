@@ -323,5 +323,4 @@ public class TopicController extends AbstractMenuController implements ResourceO
         }
     }
 
-
 }

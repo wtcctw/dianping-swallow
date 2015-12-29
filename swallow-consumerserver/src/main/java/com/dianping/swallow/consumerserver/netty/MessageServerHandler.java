@@ -6,8 +6,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.net.InetSocketAddress;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.internal.consumer.ACKHandlerType;
@@ -30,7 +30,7 @@ import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager;
  */
 public class MessageServerHandler extends ChannelInboundHandlerAdapter {
 
-	private static final Logger logger = LoggerFactory.getLogger(MessageServerHandler.class);
+	private static final Logger logger = LogManager.getLogger(MessageServerHandler.class);
 
 	private ConsumerWorkerManager workerManager;
 

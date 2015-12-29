@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 
 /**
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BitMarker {
 
-    protected Logger logger       = LoggerFactory.getLogger(getClass());
+    protected Logger logger       = LogManager.getLogger(getClass());
 
 	private long capacity;
 

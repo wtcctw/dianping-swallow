@@ -1,15 +1,14 @@
 package com.dianping.swallow.web.util;
 
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
-import org.apache.axis2.databinding.types.Year;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author qiyin
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DateUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(DateUtil.class);
+    private static final Logger logger = LogManager.getLogger(DateUtil.class);
 
     private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("GMT+8:00");
 

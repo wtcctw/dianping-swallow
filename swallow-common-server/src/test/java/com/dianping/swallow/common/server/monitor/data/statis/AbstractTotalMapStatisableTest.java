@@ -266,8 +266,6 @@ public class AbstractTotalMapStatisableTest extends AbstractServerAllDataTest {
 
         String topic = "topic4";
         String id = consumerIds.get(0);
-        @SuppressWarnings("unused")
-		NavigableMap<Long, StatisData> value1 = consumerAllData.getStatisData(new CasKeys("total", topic, id), StatisType.SEND);
         NavigableMap<Long, StatisData> value2 = consumerAllData.getFirstValueGreaterOrEqualThan(new CasKeys("total", topic, id), StatisType.SEND, 108L);
         NavigableMap<Long, StatisData> value3 = consumerAllData.getLastValueLessOrEqualThan(new CasKeys("total", topic, id), StatisType.SEND, 108L);
         Assert.assertEquals(value2.size(), 1);

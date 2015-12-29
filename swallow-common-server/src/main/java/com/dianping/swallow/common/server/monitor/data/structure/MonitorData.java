@@ -4,8 +4,8 @@ package com.dianping.swallow.common.server.monitor.data.structure;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -33,7 +33,7 @@ public abstract class MonitorData implements KeyMergeable, Acceptable, TotalBuil
 	public static final String TOTAL_KEY = "total";
 
 	@Transient
-	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+	protected transient final Logger logger = LogManager.getLogger(getClass());
 
 	@Indexed
 	private String swallowServerIp;

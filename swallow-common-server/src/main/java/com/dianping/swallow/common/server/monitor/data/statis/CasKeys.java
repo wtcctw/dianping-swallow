@@ -2,6 +2,8 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import com.dianping.swallow.common.internal.util.StringUtils;
 
+import java.util.Arrays;
+
 /**
  * @author mengwenchao
  *
@@ -47,6 +49,28 @@ public class CasKeys {
 
 	public void reset(){
 		keyIndex = 1;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		CasKeys casKeys = (CasKeys) o;
+
+		if (keyIndex != casKeys.keyIndex) return false;
+		if (key != null ? !key.equals(casKeys.key) : casKeys.key != null) return false;
+		// Probably incorrect - comparing Object[] arrays with Arrays.equals
+		return Arrays.equals(keys, casKeys.keys);
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = key != null ? key.hashCode() : 0;
+		result = 31 * result + (keys != null ? Arrays.hashCode(keys) : 0);
+		result = 31 * result + keyIndex;
+		return result;
 	}
 
 	@Override

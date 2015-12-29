@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.internal.lifecycle.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
 import com.dianping.swallow.common.internal.lifecycle.LifecycleCallback;
@@ -17,7 +17,7 @@ import com.dianping.swallow.common.internal.monitor.impl.AbstractComponentMonito
  */
 public abstract class AbstractLifecycle extends AbstractComponentMonitorable implements Lifecycle, LifecycleComponentStatus{
 
-	protected final Logger logger     = LoggerFactory.getLogger(getClass());
+	protected final Logger logger     = LogManager.getLogger(getClass());
 	
 	private LifecycleManager lifecycleManager = new DefaultLifecycleManager(this);
 

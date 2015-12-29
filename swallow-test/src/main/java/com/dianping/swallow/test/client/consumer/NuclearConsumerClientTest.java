@@ -7,8 +7,8 @@ import com.dianping.swallow.consumer.*;
 import com.dianping.swallow.client.nuclear.consumer.impl.NuclearDestination;
 import com.dianping.swallow.client.nuclear.consumer.impl.NuclearConsumerConfig;
 import com.dianping.swallow.client.nuclear.consumer.impl.NuclearConsumerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author qi.yin
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NuclearConsumerClientTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(NuclearConsumerClientTest.class);
+    private static final Logger logger = LogManager.getLogger(NuclearConsumerClientTest.class);
 
     public void consume() {
         ConsumerFactory consumerFactory = new NuclearConsumerFactory("swallow-test", true);

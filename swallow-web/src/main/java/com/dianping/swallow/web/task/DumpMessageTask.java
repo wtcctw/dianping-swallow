@@ -12,8 +12,8 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.BSONTimestamp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -44,7 +44,7 @@ public class DumpMessageTask implements Runnable {
 
 	private MessageDumpService messageDumpService;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LogManager.getLogger(getClass());
 
 	public DumpMessageTask setMessageDumpService(MessageDumpService messageDumpService) {
 		this.messageDumpService = messageDumpService;

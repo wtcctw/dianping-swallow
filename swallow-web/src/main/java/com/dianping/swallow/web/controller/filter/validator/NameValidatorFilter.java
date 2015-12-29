@@ -7,8 +7,8 @@ import com.dianping.swallow.web.controller.filter.FilterChain;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 import com.dianping.swallow.web.service.TopicResourceService;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -23,7 +23,7 @@ import java.util.Set;
 @Component
 public class NameValidatorFilter implements Filter<TopicApplyDto, ValidatorFilterResult> {
 	
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LogManager.getLogger(getClass());
 
 	private static final String TOPIC_BLANK = "topic名称不能为空！";
 
