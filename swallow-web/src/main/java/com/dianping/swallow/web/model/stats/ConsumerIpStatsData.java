@@ -126,6 +126,12 @@ public class ConsumerIpStatsData extends AbstractIpStatsData {
         return true;
     }
 
+    @JsonIgnore
+    @Override
+    public long getQpsCount(){
+        return sendQpsTotal;
+    }
+
     @Override
     public IpStatsDataKey createStatsDataKey() {
         return new ConsumerIpStatsDataKey(this);
