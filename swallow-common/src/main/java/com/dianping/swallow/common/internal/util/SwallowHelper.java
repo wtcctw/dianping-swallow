@@ -38,7 +38,7 @@ public class SwallowHelper {
 		initialize();
 		SwallowClientConfig swallowClientConfig = SwallowClientConfigImpl.getInstance();
 
-		if (swallowClientConfig.isLog4j2AsyncEnabled()) {
+		if (swallowClientConfig.isLog4j2Enabled()) {
 			LoggerLoader.init();
 		}
 	}

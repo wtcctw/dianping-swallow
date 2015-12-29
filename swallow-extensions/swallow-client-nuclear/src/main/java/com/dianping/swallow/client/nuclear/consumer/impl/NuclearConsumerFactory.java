@@ -2,6 +2,7 @@ package com.dianping.swallow.client.nuclear.consumer.impl;
 
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.message.Destination;
+import com.dianping.swallow.consumer.AbstractConsumerFactory;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
@@ -18,9 +19,7 @@ import java.util.Properties;
  * @author qi.yin
  *         2015/12/15  上午11:21.
  */
-public class NuclearConsumerFactory implements ConsumerFactory {
-
-    protected Logger logger = LogManager.getLogger(getClass());
+public class NuclearConsumerFactory extends AbstractConsumerFactory {
 
     private static final String APP_FILENAME = "META-INF/app.properties";
 

@@ -8,6 +8,6 @@ public interface SwallowClientConfig {
 
     boolean isOnMessageLogEnabled();
 
-    boolean isLog4j2AsyncEnabled();
+    boolean isLog4j2Enabled();
 
 }
