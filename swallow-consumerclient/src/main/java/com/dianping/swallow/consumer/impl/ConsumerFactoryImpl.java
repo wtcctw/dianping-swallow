@@ -6,6 +6,7 @@ import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
 import com.dianping.swallow.common.internal.observer.impl.AbstractObservable;
+import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumer.Consumer;
@@ -98,6 +99,11 @@ public class ConsumerFactoryImpl extends AbstractObservable implements ConsumerF
 
 
         for (String topicNameToAddress : lionValue.split(getSplitWithSpace(";"))) {
+        	
+        	if(StringUtils.isEmpty(topicNameToAddress)){
+        		continue;
+        	}
+        	
             String[] splits = topicNameToAddress.split("=");
             if (splits.length != 2) {
                 throw new IllegalStateException("wrong swallow.consumer.consumerServerURI:" + topicNameToAddress);
