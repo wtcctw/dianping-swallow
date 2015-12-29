@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Scope("prototype")
 public class MongoStatsDataContainerImpl implements MongoStatsDataContainer{
 
-    private long maxSize;
+    private long maxSize = 60;
 
     private NavigableMap<Long, MongoStatsData> mongoStatsDataMap = new ConcurrentSkipListMap<Long, MongoStatsData>();
 

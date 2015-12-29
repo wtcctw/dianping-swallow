@@ -317,6 +317,9 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         this.mongoResourceService = mongoResourceService;
     }
 
+    public void setIpToCatalog(Map<String, String> ipToCatalog) {
+        this.ipToCatalog = ipToCatalog;
+    }
 
     private void updateIpToCatalog(MongoResource mr) {
         String ip = mr.getIp();
