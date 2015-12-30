@@ -50,14 +50,16 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
         ActiveIpData activeIpData = null;
         if (activeIpDatas.containsKey(key)) {
             activeIpData = activeIpDatas.get(key);
+            for (K ipStatsData : ipStatsDatas) {
+                activeIpData.addData(ipStatsData.getIp(), ipStatsData.hasStatsData());
+            }
         } else {
             activeIpData = new ActiveIpData();
+            for (K ipStatsData : ipStatsDatas) {
+                activeIpData.addData(ipStatsData.getIp(), true);
+            }
             activeIpDatas.put(key, activeIpData);
         }
-        for (K ipStatsData : ipStatsDatas) {
-            activeIpData.addData(ipStatsData.getIp(), ipStatsData.hasStatsData());
-        }
-
     }
 
     @Override
