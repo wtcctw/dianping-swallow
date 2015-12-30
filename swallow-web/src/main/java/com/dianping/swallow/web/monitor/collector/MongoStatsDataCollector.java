@@ -91,15 +91,17 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
                     TopicConfig topicConfig = swallowConfig.getTopicConfig(topic);
 
                     if (topicConfig == null || (topicConfig != null && StringUtils.isBlank(topicConfig.getStoreUrl()))) {
-                        String defaultIp = loadDefaultConfigIp();
-                        topicToMongo.put(topic, defaultIp);
-                        addMongoStatsData(defaultIp, lastData);
+                        addToDefaultMongoIp(topic, lastData);
                     } else {
                         mongoIp = doExtractMongoIp(topicConfig);
+
                         if (StringUtils.isNotBlank(mongoIp)) {
                             topicToMongo.put(topic, mongoIp);
                             addMongoStatsData(mongoIp, lastData);
+                        } else {
+                            addToDefaultMongoIp(topic, lastData);
                         }
+                        
                     }
 
                 } else {
@@ -205,6 +207,12 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         } else {
             topicToMongo.put(args.getTopic(), loadDefaultConfigIp());
         }
+    }
+
+    private void addToDefaultMongoIp(String topic, NavigableMap<Long, StatisData> lastData) {
+        String defaultIp = loadDefaultConfigIp();
+        topicToMongo.put(topic, defaultIp);
+        addMongoStatsData(defaultIp, lastData);
     }
 
     private String loadDefaultConfigIp() {
