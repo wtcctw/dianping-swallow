@@ -353,6 +353,13 @@ messageListener要自己实现``com.dianping.swallow.consumer.MessageListener``�
 		  <artifactId>swallow-client-nuclear</artifactId>
 		  <version>${currentVersion}</version>
 	 </dependency>
+	 <dependency>
+		 <groupId>com.meituan.nuclearmq</groupId>
+		 <artifactId>nuclearmq-client</artifactId>
+		 <version>${nuclearmq-client.version}</version>
+     </dependency>
+    
+其中，com.meituan.nuclearmq是nuclearmq client的jar包，本文${nuclearmq-client.version}为0.1.8-keepalive-bm1.6
 
 ##### 消费者实现MessageListener接口
 
