@@ -5,17 +5,13 @@ import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
-import com.dianping.swallow.common.internal.observer.impl.AbstractObservable;
 import com.dianping.swallow.common.internal.util.StringUtils;
-import com.dianping.swallow.common.internal.util.SwallowHelper;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumer.AbstractConsumerFactory;
 import com.dianping.swallow.consumer.Consumer;
 import com.dianping.swallow.consumer.ConsumerConfig;
 import com.dianping.swallow.consumer.ConsumerFactory;
 import com.dianping.swallow.consumer.internal.ConsumerImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.net.InetSocketAddress;
 import java.util.*;
