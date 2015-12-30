@@ -1,6 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
-import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
@@ -36,7 +36,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 	private ConsumerServerResourceDao consumerServerResourceDao;
 
 	@Autowired
-	private LionDynamicConfig lionDynamicConfig;
+	private DefaultDynamicConfig lionDynamicConfig;
 
 	private String consumerServerLionConfig;
 

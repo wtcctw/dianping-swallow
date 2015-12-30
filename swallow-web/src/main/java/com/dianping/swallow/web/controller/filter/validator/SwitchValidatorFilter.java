@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
-import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.filter.Filter;
 import com.dianping.swallow.web.controller.filter.FilterChain;
@@ -26,15 +26,15 @@ public class SwitchValidatorFilter implements Filter<TopicApplyDto, ValidatorFil
     private static final String SWALLOW_APPLY_TOPIC_SWITCH = "swallow.apply.topic.switch";
 
     @Autowired
-    private LionDynamicConfig lionDynamicConfig;
+    private DefaultDynamicConfig dynamicConfig;
 
     private String applyTopicSwitch;
 
     @PostConstruct
     public void initConsumerServerConfig() throws Exception {
 
-        applyTopicSwitch = lionDynamicConfig.get(SWALLOW_APPLY_TOPIC_SWITCH);
-        lionDynamicConfig.addConfigChangeListener(this);
+        applyTopicSwitch = dynamicConfig.get(SWALLOW_APPLY_TOPIC_SWITCH);
+        dynamicConfig.addConfigChangeListener(this);
     }
 
     @Override

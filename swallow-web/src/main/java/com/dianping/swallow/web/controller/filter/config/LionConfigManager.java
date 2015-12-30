@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
-import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 
 /**
  * @author mingdongli
@@ -24,7 +24,7 @@ public class LionConfigManager implements ConfigChangeListener {
     private static final String WHITELIST_LENGTH = "swallow.web.topic.whitelist.length";
 
     @Autowired
-    private LionDynamicConfig lionDynamicConfig;
+    private DefaultDynamicConfig dynamicConfig;
 
     private int consumerServerUriLength = 0;
 
@@ -35,13 +35,13 @@ public class LionConfigManager implements ConfigChangeListener {
     @PostConstruct
     void initLionConfig() {
 
-        String consumerServer = lionDynamicConfig.get(CONSUMERSERVERURI_LENGTH);
+        String consumerServer = dynamicConfig.get(CONSUMERSERVERURI_LENGTH);
         consumerServerUriLength = StringToInt(consumerServer, consumerServerUriLength);
 
-        String whitelist = lionDynamicConfig.get(WHITELIST_LENGTH);
+        String whitelist = dynamicConfig.get(WHITELIST_LENGTH);
         whitelistLength = StringToInt(whitelist, whitelistLength);
 
-        lionDynamicConfig.addConfigChangeListener(this);
+        dynamicConfig.addConfigChangeListener(this);
 
         if (logger.isInfoEnabled()) {
             logger.info(String.format("[Init consumerServerUriLength=%d and whitelistLength=%d]",

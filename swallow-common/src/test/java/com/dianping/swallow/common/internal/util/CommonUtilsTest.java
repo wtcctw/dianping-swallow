@@ -1,5 +1,8 @@
 package com.dianping.swallow.common.internal.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
 
 import com.dianping.swallow.AbstractTest;
@@ -17,6 +20,16 @@ public class CommonUtilsTest extends AbstractTest{
 		if(logger.isInfoEnabled()){
 			logger.info(String.valueOf(CommonUtils.getCpuCount()));
 		}
+	}
+	
+	@Test
+	public void test(){
+		
+		Map<String, Object>  maps = new HashMap<String, Object>();
+		maps.put("aa", null);
+		
+		System.out.println(maps.get("aa"));
+		
 	}
 
 }

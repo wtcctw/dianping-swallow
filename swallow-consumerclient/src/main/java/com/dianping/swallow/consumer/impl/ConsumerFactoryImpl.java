@@ -2,7 +2,7 @@ package com.dianping.swallow.consumer.impl;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
-import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 import com.dianping.swallow.common.internal.heartbeat.DefaultHeartBeatSender;
 import com.dianping.swallow.common.internal.heartbeat.HeartBeatSender;
 import com.dianping.swallow.common.internal.util.StringUtils;
@@ -64,7 +64,7 @@ public class ConsumerFactoryImpl extends AbstractConsumerFactory implements Cons
     }
 
     private void getSwallowCAddress() {
-        DynamicConfig dynamicConfig = new LionDynamicConfig(LION_CONFIG_FILENAME);
+        DynamicConfig dynamicConfig = new DefaultDynamicConfig(LION_CONFIG_FILENAME);
         String lionValue = dynamicConfig.get(LION_KEY_CONSUMER_SERVER_URI);
         dynamicConfig.addConfigChangeListener(this);
         topicName2Address = lionValue2Map(lionValue);

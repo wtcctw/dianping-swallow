@@ -2,7 +2,7 @@ package com.dianping.swallow.web.dao.impl;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
-import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoConfig;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.web.dao.SimMongoDbFactory;
@@ -58,7 +58,7 @@ public class MongoTemplateFactory {
 	@PostConstruct
 	public void getMongo() {
 
-		dynamicConfig = new LionDynamicConfig(SWALLOW_MONGO_ADDRESS_FILE);
+		dynamicConfig = new DefaultDynamicConfig(SWALLOW_MONGO_ADDRESS_FILE);
 		String mongoUrl = dynamicConfig.get(SWALLOW_STATS_MONGO_URL_KEY);
 		config = new MongoConfig(SWALLOW_MONGO_CONFIG_FILE);
 

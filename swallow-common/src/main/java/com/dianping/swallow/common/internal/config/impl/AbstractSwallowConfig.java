@@ -5,7 +5,6 @@ import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
-import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
 import com.dianping.swallow.common.internal.observer.impl.AbstractObservableLifecycle;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 
@@ -38,7 +37,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 
 	public AbstractSwallowConfig(){
 		
-		dynamicConfig = new LionDynamicConfig(LION_CONFIG_FILENAME);
+		dynamicConfig = new DefaultDynamicConfig(LION_CONFIG_FILENAME);
 	}
 	
 	@Override
