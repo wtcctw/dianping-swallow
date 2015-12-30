@@ -4,7 +4,7 @@ package com.dianping.swallow.common.internal.dao.impl.kafka;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.config.impl.LionUtilImpl;
+import com.dianping.swallow.common.internal.config.impl.lion.LionUtilImpl;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 
 /**

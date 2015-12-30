@@ -37,7 +37,7 @@ public abstract class AbstractSwallowConfig extends AbstractObservableLifecycle 
 
 	public AbstractSwallowConfig(){
 		
-		dynamicConfig = new LionDynamicConfig(LION_CONFIG_FILENAME);
+		dynamicConfig = new DefaultDynamicConfig(LION_CONFIG_FILENAME);
 	}
 	
 	@Override

@@ -1,10 +1,10 @@
 package com.dianping.swallow;
 
-import com.dianping.lion.client.ConfigCache;
 import com.dianping.swallow.common.internal.message.InternalProperties;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.common.internal.util.TestSkipRule;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,9 +69,6 @@ public abstract class AbstractTest {
 		//缓存属性信息，after之后恢复
 		properties = (Properties) System.getProperties().clone();
 		
-		
-		//清理残存配置信息
-		ConfigCache.getInstance().setPts(new Properties());
 		
 		localIp = IPUtil.getFirstNoLoopbackIP4Address();
 		MockitoAnnotations.initMocks(this);

@@ -1,6 +1,8 @@
 package com.dianping.swallow.common.internal.config.impl;
 
 import com.dianping.lion.Environment;
+import com.dianping.swallow.common.internal.util.log.TimeRollingRandomAccessFileAppender;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

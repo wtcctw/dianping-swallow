@@ -24,13 +24,13 @@ public class ConsumerAuthControllerImpl implements ConsumerAuthController, Confi
 
     private Set<String>         disableIps = new HashSet<String>();
 
-    private DynamicConfig       lionDynamicConfig;
+    private DynamicConfig       dynamicConfig;
 
     public void init() {
         build();
 
         //监听lion
-        lionDynamicConfig.addConfigChangeListener(this);
+        dynamicConfig.addConfigChangeListener(this);
 
     }
 
@@ -48,7 +48,7 @@ public class ConsumerAuthControllerImpl implements ConsumerAuthController, Confi
     }
 
     private void build() {
-        String value = lionDynamicConfig.get(LION_KEY);
+        String value = dynamicConfig.get(LION_KEY);
 
         Set<String> _ips = new HashSet<String>();
 
@@ -67,8 +67,8 @@ public class ConsumerAuthControllerImpl implements ConsumerAuthController, Confi
         logger.info("Disable ip list is :" + disableIps);
     }
 
-    public void setLionDynamicConfig(DynamicConfig lionDynamicConfig) {
-        this.lionDynamicConfig = lionDynamicConfig;
+    public void setDynamicConfig(DynamicConfig dynamicConfig) {
+        this.dynamicConfig = dynamicConfig;
     }
 
     public void addTopic(String topic) {

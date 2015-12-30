@@ -28,7 +28,7 @@ public class TopicWhiteList implements ConfigChangeListener {
     
     public static  int  MAX_TOPIC_WHILTE_LIST_DECREASE = 10;//一次最少减少10个topic白名单
 
-    private DynamicConfig       lionDynamicConfig;
+    private DynamicConfig       dynamicConfig;
     
     
     static{
@@ -41,7 +41,7 @@ public class TopicWhiteList implements ConfigChangeListener {
         build();
 
         //监听lion
-        lionDynamicConfig.addConfigChangeListener(this);
+        dynamicConfig.addConfigChangeListener(this);
 
     }
 
@@ -68,7 +68,7 @@ public class TopicWhiteList implements ConfigChangeListener {
 
 	public void build(){
     	
-    	Set<String> newWhiteList = getWhiteList(lionDynamicConfig.get(TOPIC_WHITE_LIST));
+    	Set<String> newWhiteList = getWhiteList(dynamicConfig.get(TOPIC_WHITE_LIST));
     	
     	if(newWhiteList == null || (topics.size() - newWhiteList.size()) > MAX_TOPIC_WHILTE_LIST_DECREASE){
     		
@@ -103,8 +103,8 @@ public class TopicWhiteList implements ConfigChangeListener {
         return _topics;
     }
 
-    public void setLionDynamicConfig(DynamicConfig lionDynamicConfig) {
-        this.lionDynamicConfig = lionDynamicConfig;
+    public void setDynamicConfig(DynamicConfig dynamicConfig) {
+        this.dynamicConfig = dynamicConfig;
     }
 
     public void addTopic(String topic) {

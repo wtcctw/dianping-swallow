@@ -92,7 +92,9 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
             } else if (ipStatusData.getSubNoDataCount() > 0L) {
                 if (getCurrentTimeMillis() - ipStatusData.getSubNoDataTime() > checkInterval) {
                     itStatusData.remove();
-                    checkUnSureLastRecords(statsDataKey);
+                    if (ipStatusData.getSubNoDataCount() > 5L) {
+                        checkUnSureLastRecords(statsDataKey);
+                    }
                 }
             }
         }

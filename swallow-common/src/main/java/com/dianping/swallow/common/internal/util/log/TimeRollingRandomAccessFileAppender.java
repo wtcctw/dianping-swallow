@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.config.impl;
+package com.dianping.swallow.common.internal.util.log;
 
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;

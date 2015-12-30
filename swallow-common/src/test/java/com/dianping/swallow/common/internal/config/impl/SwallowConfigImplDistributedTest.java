@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.TopicConfig;
+import com.dianping.swallow.common.internal.config.impl.lion.LionUtilImpl;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 
 /**

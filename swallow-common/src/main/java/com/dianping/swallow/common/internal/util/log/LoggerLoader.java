@@ -1,8 +1,10 @@
-package com.dianping.swallow.common.internal.config;
+package com.dianping.swallow.common.internal.util.log;
 
 
 import com.dianping.lion.Environment;
+import com.dianping.swallow.common.internal.config.SwallowClientConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -35,8 +37,6 @@ public class LoggerLoader {
     private static final String PACKAGE = "com.dianping.swallow";
 
     private static final String DEFAULT_CONSUMER_TASK = "com.dianping.swallow.consumer.internal.task.DefaultConsumerTask";
-
-    private static final String DEFAULT_CONSUMER_TASK_PROPERTY = "ConsumerTask";
 
     private static final String DEFAULT_APP_NAME = "swallow-app";
 

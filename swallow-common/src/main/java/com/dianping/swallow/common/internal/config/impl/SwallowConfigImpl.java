@@ -4,6 +4,7 @@ import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.observer.Observer;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -1,10 +1,11 @@
 package com.dianping.swallow.common.internal.util;
 
 import com.dianping.cat.Cat;
-import com.dianping.swallow.common.internal.config.LoggerLoader;
 import com.dianping.swallow.common.internal.config.SwallowClientConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.pool.DefaultThreadExceptionHandler;
+import com.dianping.swallow.common.internal.util.log.LoggerLoader;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

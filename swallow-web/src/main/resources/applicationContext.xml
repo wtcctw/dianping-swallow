@@ -48,11 +48,11 @@
 	<bean id="topicWhiteList"
 		class="com.dianping.swallow.common.internal.whitelist.TopicWhiteList"
 		init-method="init">
-		<property name="lionDynamicConfig" ref="lionDynamicConfig"></property>
+		<property name="dynamicConfig" ref="dynamicConfig"></property>
 	</bean>
 
-	<bean id="lionDynamicConfig"
-		class="com.dianping.swallow.common.internal.config.impl.LionDynamicConfig">
+	<bean id="dynamicConfig"
+		class="com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig">
 		<constructor-arg>
 			<value>swallow-topic-whitelist-lion.properties</value>
 		</constructor-arg>

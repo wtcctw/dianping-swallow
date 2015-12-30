@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.dianping.swallow.AbstractTest;
-import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 
 /**
  * @author mengwenchao
@@ -23,7 +23,7 @@ public class TopicWhiteListTest extends AbstractTest{
 	public void beforeTopicWhiteListTest(){
 		
 		 topicWhiteList = new TopicWhiteList();
-		 topicWhiteList.setLionDynamicConfig(new  LionDynamicConfig("none"));
+		 topicWhiteList.setDynamicConfig(new  DefaultDynamicConfig("none"));
 		
 	}
 	

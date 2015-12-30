@@ -12,6 +12,7 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.swallow.AbstractTest;
 import com.dianping.swallow.common.internal.config.LionUtil;
 import com.dianping.swallow.common.internal.config.TopicConfig;
+import com.dianping.swallow.common.internal.config.impl.lion.LionUtilImpl;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 
 /**

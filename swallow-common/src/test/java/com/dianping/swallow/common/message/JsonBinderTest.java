@@ -44,6 +44,7 @@ public class JsonBinderTest {
    }
    
    @Test
+   @SuppressWarnings("unused")
    public void testNonexistProperty(){
 
       String str = "{\"name\":\"A\",\"defaultValue\":\"hello\", \"a\" : \"nihao\"}";
