@@ -11,9 +11,9 @@ import com.dianping.swallow.common.internal.config.LionUtil;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
-import com.dianping.swallow.common.internal.config.impl.LionUtilImpl;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigCentral;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
+import com.dianping.swallow.common.internal.config.impl.lion.LionUtilImpl;
 import com.dianping.swallow.common.internal.util.StringUtils;
 
 

@@ -3,7 +3,6 @@ package com.dianping.swallow.test.load.dao;
 import java.util.Date;
 import java.util.HashMap;
 
-
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
 import com.dianping.swallow.common.internal.dao.MessageDAO;

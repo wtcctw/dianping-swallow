@@ -5,6 +5,7 @@ import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
+import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
 import com.dianping.swallow.common.internal.observer.impl.AbstractObservableLifecycle;
 import com.dianping.swallow.common.internal.util.PropertiesUtils;
 

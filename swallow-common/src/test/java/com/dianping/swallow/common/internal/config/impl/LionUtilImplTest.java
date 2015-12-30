@@ -11,6 +11,7 @@ import com.dianping.lion.Constants;
 import com.dianping.lion.client.ConfigCache;
 import com.dianping.lion.client.ConfigChange;
 import com.dianping.swallow.AbstractTest;
+import com.dianping.swallow.common.internal.config.impl.lion.LionUtilImpl;
 import com.dianping.swallow.common.internal.util.http.HttpMethod;
 
 /**

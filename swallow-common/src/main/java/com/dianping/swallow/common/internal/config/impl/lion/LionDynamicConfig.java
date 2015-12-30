@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.config.impl;
+package com.dianping.swallow.common.internal.config.impl.lion;
 
 import java.io.InputStream;
 import java.net.URL;

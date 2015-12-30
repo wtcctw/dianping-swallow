@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.dianping.swallow.AbstractTest;
-import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
 
 /**
  * @author mengwenchao

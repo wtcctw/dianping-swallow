@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.config.impl;
+package com.dianping.swallow.common.internal.config.impl.lion;
 
 import com.dianping.swallow.common.internal.codec.Codec;
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;

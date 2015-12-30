@@ -1,6 +1,6 @@
 package com.dianping.swallow.web.service.impl;
 
-import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.dao.ConsumerServerResourceDao;
 import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
@@ -10,11 +10,13 @@ import com.dianping.swallow.web.model.resource.ServerType;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ConsumerServerResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+
 import java.util.Date;
 import java.util.List;
 

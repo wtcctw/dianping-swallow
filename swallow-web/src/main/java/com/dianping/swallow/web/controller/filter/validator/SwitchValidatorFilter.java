@@ -1,11 +1,12 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
-import com.dianping.swallow.common.internal.config.impl.LionDynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.lion.LionDynamicConfig;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.filter.Filter;
 import com.dianping.swallow.web.controller.filter.FilterChain;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
