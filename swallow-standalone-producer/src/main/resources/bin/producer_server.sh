@@ -61,7 +61,7 @@ fi
 
 MEM=`getmem`
 CLASSPATH=${PRGDIR}/../lib/swallow/*:${PRGDIR}/../lib/dianping/*:${PRGDIR}/../lib/others/*:${PRGDIR}/../conf/:${PRGDIR}/../conf/producer
-JAVA_OPTS="${JAVA_OPTS} -DforceDistrubuted=true -cp ${CLASSPATH} -server -Xms${MEM} -Xmx${MEM} -XX:+HeapDumpOnOutOfMemoryError -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/data/applogs/swallow/swallow-producerserver-gc.log"
+JAVA_OPTS="${JAVA_OPTS} -DforceDistrubuted=true -cp ${CLASSPATH} -server -Xms${MEM} -Xmx${MEM} -XX:+HeapDumpOnOutOfMemoryError -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/data/applogs/swallow/swallow-producerserver-gc.log"
 MAIN_CLASS="com.dianping.swallow.producerserver.bootstrap.ProducerServerBootstrap"
 STD_OUT="/data/applogs/swallow/swallow-producerserver-std.out"
 log "starting..."
