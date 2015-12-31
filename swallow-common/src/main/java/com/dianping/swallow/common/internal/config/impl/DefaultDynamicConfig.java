@@ -22,6 +22,9 @@ public class DefaultDynamicConfig implements DynamicConfig {
 	
 	private DynamicConfig  dynamicConfig;
 	
+	public DefaultDynamicConfig(){
+		this(null);
+	}
 	
 	public DefaultDynamicConfig(String localConfigFileName){
 		
