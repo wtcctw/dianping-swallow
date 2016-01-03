@@ -70,7 +70,7 @@
         <log4j2.version>2.3</log4j2.version>
         <lmax.version>3.2.1</lmax.version>
         <logback-classic.version>1.0.12</logback-classic.version>
-        <dpsf-net.version>2.5.4</dpsf-net.version>
+        <dpsf-net.version>2.7.0</dpsf-net.version>
         <cglib.version>2.1_3</cglib.version>
         <commons-codec.version>1.6</commons-codec.version>
         <commons-io.version>1.4</commons-io.version>

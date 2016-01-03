@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" monitorInterval="30" packages="com.dianping.swallow.common.internal.util.log">
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c{1}] %m%n"/>
+        </Console>
+        <RollingRandomAccessFile name="fileAppender" immediateFlush="true"
+                                 fileName="/data/applogs/swallow/swallow-kafka.log"
+                                 filePattern="/data/applogs/swallow/swallow-kafka.log.%d{yyyy-MM-dd}.gz">
+            <PatternLayout pattern="[%d{ISO8601}][%p][%t][%c{1}] %m%n"/>
+            <TimeBasedTriggeringPolicy interval="1"
+                                       modulate="true"/>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="fileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>

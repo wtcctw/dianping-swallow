@@ -25,9 +25,6 @@
     </Appenders>
 
     <Loggers>
-        <!--<Logger name="org.jasig.cas" level="error" additivity="false">-->
-            <!--<AppenderRef ref="console" level="error"/>-->
-        <!--</Logger>-->
         <logger name="org.jasig.cas" additivity="true">
             <level value ="ERROR"/>
             <appender-ref ref="console" />
