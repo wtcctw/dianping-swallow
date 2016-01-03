@@ -22,7 +22,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
  * 
  *         2015年4月18日 下午10:04:45
  */
-public class AbstractConfig {
+public abstract class AbstractConfig {
 
 	protected final Logger logger = LogManager.getLogger(getClass());
 
