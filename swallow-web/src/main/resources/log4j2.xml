@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration monitorInterval="30">
+<Configuration monitorInterval="30" packages="com.dianping.swallow.common.internal.util.log">
 
     <Appenders>
         <CatAppender name="catAppender"/>
@@ -25,9 +25,13 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="org.jasig.cas" level="error" additivity="true">
-            <AppenderRef ref="console" level="error"/>
-        </Logger>
+        <!--<Logger name="org.jasig.cas" level="error" additivity="false">-->
+            <!--<AppenderRef ref="console" level="error"/>-->
+        <!--</Logger>-->
+        <logger name="org.jasig.cas" additivity="true">
+            <level value ="ERROR"/>
+            <appender-ref ref="console" />
+        </logger>
 
         <Logger name="org.springframework" level="warn" additivity="true">
             <AppenderRef ref="console" level="warn"/>

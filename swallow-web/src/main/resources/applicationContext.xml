@@ -43,7 +43,7 @@
 		class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl" />
 
 	<bean id="lionUtil"
-		class="com.dianping.swallow.common.internal.config.impl.LionUtilImpl" />
+		class="com.dianping.swallow.common.internal.config.impl.lion.LionUtilImpl" />
 
 	<bean id="topicWhiteList"
 		class="com.dianping.swallow.common.internal.whitelist.TopicWhiteList"
