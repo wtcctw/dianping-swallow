@@ -152,6 +152,10 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
 
         public IpStatusData setHasDataTime(long hasDataTime) {
             this.hasDataTime = hasDataTime;
+            subNoDataCount = 0L;
+            subNoDataTime = hasDataTime;
+            noDataCount = 0L;
+            noDataTime = hasDataTime;
             return this;
         }
 
