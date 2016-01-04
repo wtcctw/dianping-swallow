@@ -193,7 +193,25 @@ module.controller('MongoQpsController', function ($scope, $http) {
     };
 });
 
+module.controller('WithTopicController', function ($scope, $http) {
+    $scope.newWindow = function(postfix){
+
+        var prefix = window.contextPath + "/console/monitor/consumer/";
+        var oldWindow = window.location.href;
+        var newWindow = "";
+        if(oldWindow.indexOf(prefix) != -1){
+            var index = oldWindow.lastIndexOf("\/");
+            newWindow = oldWindow.substring(0, index);
+            newWindow += postfix;
+        }else{
+            newWindow = prefix + "total" + postfix;
+        }
+        window.location = newWindow;
+    }
+});
+
 module.controller('ConsumerQpsController', function ($scope, $http) {
+
     $http({
         method: 'POST',
         url: window.contextPath + '/console/monitor/topiclist/get'
