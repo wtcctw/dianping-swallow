@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import com.dianping.swallow.common.internal.config.ConfigChangeListener;
 import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractDynamicConfig;
+import com.dianping.swallow.common.internal.util.StringUtils;
 
 /**
  * @author mengwenchao
@@ -21,7 +22,15 @@ public class FileDynamicConfig extends AbstractDynamicConfig implements DynamicC
 	
 	private Properties properties = new Properties();
 	
+	public FileDynamicConfig(){
+		this(null);
+	}
+	
 	public FileDynamicConfig(String localConfigFileName){
+		
+		if(StringUtils.isEmpty(localConfigFileName)){
+			return;
+		}
 		
 		try{
 			// 如果本地文件存在，则使用Lion本地文件

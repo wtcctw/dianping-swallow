@@ -17,12 +17,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 
-import com.dianping.lion.client.ConfigCache;
-import com.dianping.lion.client.ConfigChange;
 import com.dianping.lion.client.LionException;
 import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
+import com.dianping.swallow.common.internal.config.ConfigChangeListener;
+import com.dianping.swallow.common.internal.config.DynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.threadfactory.MQThreadFactory;
@@ -39,7 +40,7 @@ import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
  *
  * 2015年4月10日 下午2:08:18
  */
-public abstract class AbstractCollector extends AbstractLifecycle implements Collector, Runnable, ConfigChange{
+public abstract class AbstractCollector extends AbstractLifecycle implements Collector, Runnable, ConfigChangeListener{
 	
 	private ScheduledExecutorService scheduled;
 	
@@ -62,7 +63,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 	protected static final int maxRetryIntervalOnException = 1000;
 	
 	private Set<String> excludeTopics;
-	private ConfigCache configCache;
+	private DynamicConfig dynamicConfig;
 	public static final String SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY = "swallow.monitor.exclude.topic"; 
 
 	
@@ -72,15 +73,15 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 		scheduled = Executors.newScheduledThreadPool(CommonUtils.getCpuCount(), new MQThreadFactory(THREAD_POOL_NAME));
 		createHttpManager();
 		
-		configCache = ConfigCache.getInstance();
-		configCache.addChange(this);
+		dynamicConfig = new DefaultDynamicConfig();
+		dynamicConfig.addConfigChangeListener(this);
 		initExculdeTopics(); 
 	}
 	
 	private void initExculdeTopics() {
 		
 		try {
-			String value = configCache.getProperty(SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY);
+			String value = dynamicConfig.get(SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY);
 			if(logger.isInfoEnabled()){
 				logger.info("[getExculdeTopics][exclude]" + value);
 			}
@@ -262,7 +263,7 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 
 	
 	@Override
-	public void onChange(String key,String value){
+	public void onConfigChange(String key, String value) throws Exception {
 		
 		if(key != null && key.equals(SWLLOW_MONITOR_EXCLUDE_TOPIC_KEY)){
 			if(logger.isInfoEnabled()){
@@ -271,7 +272,6 @@ public abstract class AbstractCollector extends AbstractLifecycle implements Col
 			excludeTopics = splitExcludeTopics(value);
 		}
 		
+		
 	}
-
-	
 }
