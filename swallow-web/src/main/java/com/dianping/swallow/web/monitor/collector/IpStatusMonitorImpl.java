@@ -26,7 +26,11 @@ public class IpStatusMonitorImpl<T, K extends AbstractIpStatsData> implements Ip
         private Map<String, Long> activeDatas = new ConcurrentHashMap<String, Long>();
 
         public void addData(String ip, boolean hasData) {
-            if (hasData) {
+            if (activeDatas.containsKey(ip)) {
+                if (hasData) {
+                    activeDatas.put(ip, System.currentTimeMillis());
+                }
+            }else{
                 activeDatas.put(ip, System.currentTimeMillis());
             }
         }
