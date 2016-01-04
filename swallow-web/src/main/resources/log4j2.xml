@@ -25,10 +25,6 @@
     </Appenders>
 
     <Loggers>
-        <logger name="org.jasig.cas" additivity="true">
-            <level value ="ERROR"/>
-            <appender-ref ref="console" />
-        </logger>
 
         <Logger name="org.springframework" level="warn" additivity="true">
             <AppenderRef ref="console" level="warn"/>
