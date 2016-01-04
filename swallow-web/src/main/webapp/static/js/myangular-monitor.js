@@ -202,6 +202,9 @@ module.controller('WithTopicController', function ($scope, $http) {
         if(oldWindow.indexOf(prefix) != -1){
             var index = oldWindow.lastIndexOf("\/");
             newWindow = oldWindow.substring(0, index);
+            if(newWindow.indexOf("\/ip\/") != -1){ //not match
+                return;
+            }
             newWindow += postfix;
         }else{
             newWindow = prefix + "total" + postfix;
